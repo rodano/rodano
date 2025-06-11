@@ -1,0 +1,40 @@
+{
+	"compilerOptions": {
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true,
+		"checkJs": true,
+		"declaration": false,
+		"downlevelIteration": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"forceConsistentCasingInFileNames": true,
+		"importHelpers": true,
+		"lib": [
+			"ESNext",
+			"DOM"
+		],
+		"module": "ESNext",
+		"moduleResolution": "node",
+		"noFallthroughCasesInSwitch": true,
+		"noEmit": true,
+		"noImplicitOverride": true,
+		"noImplicitReturns": true,
+		"noImplicitThis": true,
+		"noPropertyAccessFromIndexSignature": true,
+		"noUnusedLocals": true,
+		"strict": false,
+		"strictBindCallApply": true,
+		"sourceMap": true,
+		"strictNullChecks": false, //should be true
+		"strictPropertyInitialization": false,
+		"target": "ESNext",
+		"types": [
+			"node"
+		]
+	},
+	"exclude": [
+		"tests",
+		"www/experiments",
+		"eslint.config.js" //exclude eslint config file to avoid errors with HTML ESLint types
+	]
+}

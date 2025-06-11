@@ -1,0 +1,46 @@
+<div id="edit_layout">
+	<div class="header">
+		<h2>Layout</h2>
+	</div>
+	<form id="edit_layout_form" method="post" class="content data">
+		<p>
+			<label for="layout_id">Id</label>
+			<input id="layout_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="layout_description">Description</label>
+			<app-localized-input id="layout_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="layout_type">Type</label>
+			<select id="layout_type" name="type"></select>
+		</p>
+		<p>
+			<label for="layout_dataset_model_id">Dataset model</label>
+			<select id="layout_dataset_model_id" name="datasetModelId"></select>
+		</p>
+		<p>
+			<label for="layout_default_sort_field_model_id" title="Field model that will be used as default sort criteria for multiple layouts">Default sort</label>
+			<select id="layout_default_sort_field_model_id" name="defaultSortFieldModelId"></select>
+		</p>
+		<p>
+			<label for="layout_text_before">Text before</label>
+			<app-localized-input id="layout_text_before" type="textarea" name="textBefore" class="big"></app-localized-input>
+		</p>
+		<p>
+			<label for="layout_text_after">Text after</label>
+			<app-localized-input id="layout_text_after" type="textarea" name="textAfter" class="big"></app-localized-input>
+		</p>
+		<p>
+			<label for="layout_css_code">CSS code</label>
+			<textarea id="layout_css_code" type="text" name="cssCode" class="big"></textarea>
+		</p>
+		<menu>
+			<li><a id="layout_constraint_edit" class="button">Edit constraint</a></li>
+			<li><button id="layout_constraint_add" type="button">Add constraint</button></li>
+			<li><button id="layout_constraint_delete" type="button">Delete constraint</button></li>
+			<li class="offset"><button type="button" id="edit_layout_close">Cancel</button></li>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

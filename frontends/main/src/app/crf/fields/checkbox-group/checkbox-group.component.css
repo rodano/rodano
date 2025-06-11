@@ -1,0 +1,7 @@
+ul {
+	list-style-type: none;
+	width: 10rem;
+}
+li.hidden {
+	visibility: hidden;
+}

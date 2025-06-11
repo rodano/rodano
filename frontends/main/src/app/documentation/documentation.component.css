@@ -1,0 +1,9 @@
+button + button {
+	margin-left: var(--gap);
+}
+.mat-mdc-form-field + .mat-mdc-form-field {
+	margin-left: var(--gap);
+}
+.mat-mdc-checkbox + button {
+	margin-left: var(--gap);
+}

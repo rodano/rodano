@@ -1,0 +1,34 @@
+<div id="edit_cms_widget">
+	<h2>CMS Widget</h2>
+	<form id="edit_cms_widget_form" method="post" class="textcontent data">
+		<p>
+			<label for="cms_widget_width">Width</label>
+			<select id="cms_widget_width" name="width">
+				<option value="FULL">Whole page</option>
+				<option value="HALF">Half the page</option>
+			</select>
+		</p>
+		<p>
+			<label for="cms_widget_text_before">Text before</label>
+			<textarea id="cms_widget_text_before" name="textBefore"></textarea>
+		</p>
+		<p>
+			<label for="cms_widget_text_after">Text after</label>
+			<textarea id="cms_widget_text_after" name="textAfter"></textarea>
+		</p>
+		<p>
+			<label for="cms_widget_required_feature">Required feature</label>
+			<select id="cms_widget_required_feature" name="requiredFeature"></select>
+		</p>
+		<p>
+			<label for="cms_widget_required_right_entity">Required right</label>
+			<select id="cms_widget_required_right_entity" name="requiredRight.rightEntity"></select>
+			<select id="cms_widget_required_right_id" name="requiredRight.id" style="margin-left: 1rem;"></select>
+			<select id="cms_widget_required_right_right" name="requiredRight.right" style="margin-left: 1rem;"></select>
+		</p>
+	</form>
+	<menu>
+		<li><button type="button" id="edit_cms_widget_close">Close</button></li>
+		<li><button type="submit" form="edit_cms_widget_form">Save</button></li>
+	</menu>
+</div>

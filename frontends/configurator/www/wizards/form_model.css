@@ -1,0 +1,111 @@
+#wizard_form_model_2 {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+#wizard_form_model_field_model_types {
+	list-style-type: none;
+	padding: 0.5rem;
+	background-color: var(--background-slightly-highlight-color);
+}
+#wizard_form_model_field_model_types > li {
+	border-radius: 2px;
+	background-color: var(--background-light-color);
+	padding: 0.2rem 0.5rem;
+	margin-bottom: 0.2rem;
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+	display: inline-block;
+}
+#wizard_form_model_field_model_types > li:hover {
+	background-color: var(--background-highlight-color);
+}
+#wizard_form_model_field_model_types > li > img {
+	margin-right: 1rem;
+	vertical-align: bottom;
+}
+#wizard_form_model_editor {
+	flex-grow: 1;
+	display: flex;
+	min-height: 10rem;
+}
+#wizard_form_model_content {
+	position: relative;
+	flex-grow: 1;
+}
+#wizard_form_model_content_instructions {
+	text-align: center;
+}
+#wizard_form_model_cells > div {
+	display: flex;
+	cursor: pointer;
+	padding: 0.5rem;
+	margin: 0;
+	user-select: none;
+	align-items: center;
+}
+#wizard_form_model_cells > div:hover {
+	background-color: var(--background-slightly-highlight-color);
+}
+#wizard_form_model_cells > div.selected {
+	background-color: var(--background-light-color);
+}
+#wizard_form_model_cells > div * {
+	cursor: pointer !important;
+}
+#wizard_form_model_cells > div > img {
+	margin-right: 1rem;
+}
+#wizard_form_model_cells > div > label {
+	float: left;
+	width: 15rem;
+}
+#wizard_form_model_cells > div > input, #wizard_form_model_cells > div > select {
+	float: left;
+	font-size: 11px;
+}
+/* numbers */
+#wizard_form_model_cells > div > input[type="number"] {
+	text-align: right;
+}
+/* dates */
+#wizard_form_model_cells > div > input[type="date"] {
+	width: 10rem;
+}
+/* radios */
+#wizard_form_model_cells > div > div {
+	float: left;
+}
+#wizard_form_model_cells > div > div > label {
+	display: block;
+}
+/* details */
+#wizard_form_model_field_details {
+	width: 30rem;
+	background-color: var(--background-light-color);
+}
+#wizard_form_model_field_details > p, #wizard_form_model_field_details > div {
+	padding: 0.5rem;
+	clear: both;
+}
+#wizard_form_model_field_details label {
+	float: left;
+	width: 15rem;
+}
+#wizard_form_model_field_details select, #wizard_form_model_field_details input {
+	float: left;
+}
+#wizard_form_model_field_model_possible_values {
+	float: left;
+}
+#wizard_form_model_field_model_possible_values > li {
+	clear: both;
+}
+#wizard_form_model_field_model_possible_values > li > img {
+	cursor: pointer;
+}
+#wizard_form_model_field_model_add_possible_value {
+	display: block;
+	clear: both;
+}

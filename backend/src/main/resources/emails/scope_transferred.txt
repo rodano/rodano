@@ -1,0 +1,10 @@
+Dear ${study.defaultLocalizedLongname} Investigators and monitors,
+		
+Patient ${scope.codeAndShortname} has been transferred within the ${study.defaultLocalizedLongname} Electronic Data Capture (EDC) system on ${date} from Originating site: center ${oldParentScope.codeAndShortname} to Destination site: center ${newParentScope.codeAndShortname}.
+
+From the date of transfer, the Originating site has read only access to the data provided for the patient/subject at this site whereas the Destination site has access to all the data collected. The Destination site has the responsibility to update and complete continuing events (examples include Adverse Events and Concomitant Medications) still ongoing at the time of transfer as well as to resolve existing queries that were not answered or new queries that may be generated on data entered by the previous site.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

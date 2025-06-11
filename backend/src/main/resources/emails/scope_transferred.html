@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	</head>
+	<body>
+		<p>Dear ${study.defaultLocalizedLongname} Investigators and monitors,</p>
+
+		<p>
+			Patient ${scope.codeAndShortname} has been transferred within the ${study.defaultLocalizedLongname}
+			Electronic Data Capture (EDC) system on ${date} from Originating site: center ${oldParentScope.codeAndShortname} to
+			Destination site: center ${newParentScope.codeAndShortname}.
+		</p>
+
+		<p>
+			From the date of transfer, the Originating site has read only access to the data provided for the patient/subject at
+			this site whereas the Destination site has access to all the data collected. The Destination site has the
+			responsibility to update and complete continuing events (examples include Adverse Events and Concomitant
+			Medications) still ongoing at the time of transfer as well as to resolve existing queries that were not answered or
+			new queries that may be generated on data entered by the previous site.
+		</p>
+
+		<p>With our best regards,</p>
+		<p>The <b>${study.defaultLocalizedLongname}</b> support team.</p>
+
+		<p>*** This is an automatic notification, please do not reply ***</p>
+	</body>
+</html>

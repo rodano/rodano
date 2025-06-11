@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	</head>
+	<body>
+		<p>Dear ${user.name},</p>
+
+		<p>You have been invited to participate in the ${study.defaultLocalizedLongname} study as a <b>${study.getProfile(role.profileId).defaultLocalizedShortname}</b>.</p>
+
+		<p>Before you can log into the ${study.defaultLocalizedLongname} website as ${study.getProfile(role.profileId).defaultLocalizedShortname}, you must first activate your user account.</p>
+
+		<p>Please click on <a href="${user_activation_url}">this link</a>, and you will be automatically directed to the registration form of the ${study.defaultLocalizedShortname} website.</p>
+
+		<p>Complete the form according to the instructions and your ${study.getProfile(role.profileId).defaultLocalizedShortname} profile will be activated.</p>
+
+		<p>In case of trouble, please send an e-mail to <a href="mailto:${study.email}">${study.email}</a>.</p>
+
+		<p>With our best regards,</p>
+		<p>The <b>${study.defaultLocalizedLongname}</b> support team.</p>
+
+		<p>*** This is an automatic notification, please do not reply ***</p>
+	</body>
+</html>

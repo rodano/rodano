@@ -1,0 +1,45 @@
+<form
+	name="scopeCreationForm"
+	[formGroup]="scopeCreationForm"
+	(ngSubmit)="save()"
+	class="centered">
+	<p>
+		<mat-form-field>
+			<mat-label>Code</mat-label>
+			<input
+				matInput
+				formControlName="code"
+				required />
+		</mat-form-field>
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Shortname</mat-label>
+			<input
+				matInput
+				formControlName="shortname"
+				required />
+		</mat-form-field>
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>In</mat-label>
+			<mat-select formControlName="parentScopePk">
+				@for (parentScope of parentScopes; track parentScope.pk) {
+					<mat-option [value]="parentScope.pk">{{ parentScope | scopeCodeShortname }}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+	</p>
+
+	<p>
+		<button
+			mat-flat-button
+			type="submit"
+			[disabled]="scopeCreationForm.invalid">
+			Save
+		</button>
+	</p>
+</form>

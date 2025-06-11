@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration
+	xmlns="http://www.jooq.org/xsd/jooq-codegen-3.19.0.xsd">
+	<!-- Configure the database connection here -->
+	<jdbc>
+		<driver>org.mariadb.jdbc.Driver</driver>
+		<url>jdbc:mariadb://localhost:3306</url>
+		<user>root</user>
+		<password>root</password>
+	</jdbc>
+
+	<generator>
+		<database>
+			<name>org.jooq.meta.mariadb.MariaDBDatabase</name>
+
+			<!-- The database schema (or in the absence of schema support, in your
+				RDBMS this can be the owner, user, database name) to be generated -->
+			<inputSchema>rodano</inputSchema>
+			<!-- tells jOOQ that this will be the default schema hence removing the database prefix from all generated classes -->
+			<outputSchemaToDefault>true</outputSchemaToDefault>
+
+			<excludes>
+				internal_patch | workflow_status_aggregate | export_.*
+			</excludes>
+
+			<forcedTypes>
+				<forcedType>
+					<userType>java.time.ZonedDateTime</userType>
+					<converter>ch.rodano.core.helpers.configuration.DateConverter</converter>
+					<includeTypes>DATETIME</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<!-- do not try to type the set for now
+					jOOQ does not work with generics -->
+					<!--<userType>java.util.Set&lt;String&gt;</userType>-->
+					<userType>java.util.Set</userType>
+					<converter>ch.rodano.core.helpers.configuration.StringSetConverter</converter>
+					<includeExpression>mail.recipients</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<userType>ch.rodano.core.model.scope.ScopeData</userType>
+					<converter>ch.rodano.core.helpers.configuration.StringScopeDataConverter</converter>
+					<includeExpression>scope.data | scope_audit.data</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<userType>ch.rodano.core.model.role.RoleStatus</userType>
+					<enumConverter>true</enumConverter>
+					<includeExpression>role.status</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<userType>ch.rodano.core.model.mail.MailStatus</userType>
+					<enumConverter>true</enumConverter>
+					<includeExpression>mail.status</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<userType>ch.rodano.core.model.mail.MailOrigin</userType>
+					<enumConverter>true</enumConverter>
+					<includeExpression>mail.origin</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<name>BOOLEAN</name>
+					<includeTypes>TINYINT\(1\)</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<name>BOOLEAN</name>
+					<includeExpression>scope_ancestor.virtual | scope_ancestor.default | scope_ancestor.direct | scope_ancestor.ancestor_deleted</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+
+				<forcedType>
+					<userType>ch.rodano.core.services.dao.chart.ChartType</userType>
+					<enumConverter>true</enumConverter>
+					<includeExpression>chart.chart_type</includeExpression>
+					<includeTypes>.*</includeTypes>
+				</forcedType>
+			</forcedTypes>
+
+			<!-- this is useless at the moment
+			but this may somehow be used to write "typed" jOOQ queries
+			<embeddables>
+				<embeddable>
+					<name>AUDIT</name>
+					<referencingComment>An audit trail record.</referencingComment>
+					<fields>
+						<field><expression>audit_action_fk</expression></field>
+						<field><expression>audit_datetime</expression></field>
+						<field><expression>audit_context</expression></field>
+						<field><expression>audit_actor</expression></field>
+						<field><expression>audit_user_fk</expression></field>
+						<field><expression>audit_robot_fk</expression></field>
+					</fields>
+				</embeddable>
+			</embeddables>
+			-->
+		</database>
+
+		<strategy>
+			<matchers>
+				<tables>
+					<table>
+						<expression>.*_audit</expression>
+						<tableImplements>ch.rodano.core.model.jooqutils.AuditTable</tableImplements>
+						<recordImplements>ch.rodano.core.model.jooqutils.AuditRecord</recordImplements>
+					</table>
+				</tables>
+			</matchers>
+		</strategy>
+
+		<generate>
+			<sources>true</sources>
+			<sourcesOnViews>true</sourcesOnViews>
+			<javaTimeTypes>true</javaTimeTypes>
+			<indentation>\t</indentation>
+			<!--<daos>true</daos>-->
+			<springAnnotations>true</springAnnotations>
+		</generate>
+
+		<target>
+			<encoding>UTF-8</encoding>
+			<directory>src/main/java</directory>
+			<packageName>ch.rodano.core.model.jooq</packageName>
+		</target>
+	</generator>
+
+</configuration>

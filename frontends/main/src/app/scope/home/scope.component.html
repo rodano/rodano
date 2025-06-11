@@ -1,0 +1,73 @@
+<div class="title-tabs">
+	<h1>
+		<button
+			mat-icon-button
+			inline="true"
+			[routerLink]="['/scopes', scopeModel.id]"
+			matTooltip="Go back">
+			<mat-icon>arrow_back</mat-icon>
+		</button>
+
+		@if (scope) {
+			{{ scope.code }}
+
+			@if (scope.locked) {
+				<mat-icon
+					matTooltip="Locked"
+					aria-hidden="false">
+					lock
+				</mat-icon>
+			}
+			<app-audit-trail-button [scope]="scope" />
+		} @else {
+			New {{ scopeModel.shortname | localizeMap | lowercase }}
+		}
+	</h1>
+
+	@if (scope) {
+		<nav
+			mat-tab-nav-bar
+			[tabPanel]="tabPanel">
+			<a
+				mat-tab-link
+				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'settings']"
+				routerLinkActive
+				#settingsRLA="routerLinkActive"
+				[active]="settingsRLA.isActive">
+				Settings
+			</a>
+			<a
+				mat-tab-link
+				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'parents']"
+				routerLinkActive
+				#parentsRLA="routerLinkActive"
+				[active]="parentsRLA.isActive">
+				Parents
+			</a>
+			@for (form of forms; track form.pk) {
+				<a
+					mat-tab-link
+					[routerLink]="['/scopes', scopeModel.id, scope.pk, 'form', form.pk]"
+					routerLinkActive
+					#formRLA="routerLinkActive"
+					[active]="formRLA.isActive">
+					{{ form.model.shortname | localizeMap }}
+				</a>
+			}
+			<a
+				mat-tab-link
+				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'users']"
+				routerLinkActive
+				#usersRLA="routerLinkActive"
+				[active]="usersRLA.isActive">
+				Contacts
+			</a>
+		</nav>
+	}
+</div>
+
+<mat-tab-nav-panel #tabPanel>
+	<main>
+		<router-outlet></router-outlet>
+	</main>
+</mat-tab-nav-panel>

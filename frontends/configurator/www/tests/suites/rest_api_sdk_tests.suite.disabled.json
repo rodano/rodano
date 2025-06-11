@@ -1,0 +1,7 @@
+{
+	"name" : "Configurator - Rest API SDK tests",
+	"path" : "../../",
+	"bundles" : [
+		{"dom" : true, "dependencies" : ["tools/extension.js", "api.js"], "test" : "api.test.js"}
+	]
+}

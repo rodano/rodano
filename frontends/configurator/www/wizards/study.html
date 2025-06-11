@@ -1,0 +1,53 @@
+<form id="wizard_study" method="post" class="wizard_steps data">
+	<div data-step="1" class="wizard_step">
+		<h3>Study properties</h3>
+		<p>
+			<label for="wizard_study_id">Study id : </label>
+			<input id="wizard_study_id" type="text" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="wizard_study_name">Study name : </label>
+			<input id="wizard_study_name" type="text" required="required" />
+		</p>
+	</div>
+	<div id="wizard_study_step_2" data-step="2" class="wizard_step">
+		<h3>Choose needed scope models</h3>
+		<ul>
+			<!--<li><input id="scope_model_patient" type="checkbox" checked="checked" /><label for="scope_model_patient">Patient</label></li>-->
+			<li><input id="scope_model_center" type="checkbox" checked="checked" /><label for="scope_model_center">Center</label></li>
+			<li><input id="scope_model_country" type="checkbox" checked="checked" /><label for="scope_model_country">Country</label></li>
+			<!--<li><input id="scope_model_substudy" type="checkbox" /><label for="scope_model_substudy">Study</label></li>-->
+		</ul>
+	</div>
+	<div id="wizard_study_step_3" data-step="3" class="wizard_step">
+		<h3>Choose needed profiles</h3>
+		<ul id="wizard_study_profiles">
+			<li>
+				<input id="profile_investigator" data-profile-id="INVESTIGATOR" type="checkbox" checked="checked" />
+				<label for="profile_investigator" class="long">Investigator</label>
+			</li>
+			<li>
+				<input id="profile_principal_investigator" data-profile-id="PRINCIPAL_INVESTIGATOR" type="checkbox" checked="checked" />
+				<label for="profile_principal_investigator" class="long">Principal investigator</label>
+			</li>
+			<li>
+				<input id="profile_cra" type="checkbox" data-profile-id="CRA" checked="checked" />
+				<label for="profile_cra" class="long">CRA</label>
+			</li>
+			<li>
+				<input id="profile_cro" type="checkbox" data-profile-id="CRO" checked="checked" />
+				<label for="profile_cro" class="long">CRO</label>
+			</li>
+			<li>
+				<input id="profile_sponsor" data-profile-id="SPONSOR" type="checkbox" />
+				<label for="profile_sponsor" class="long">Sponsor</label>
+			</li>
+		</ul>
+	</div>
+	<div data-step="4" class="wizard_step">
+		<h3>Your study is about to be created</h3>
+		<p>
+			Don't worry, you can change all settings later.
+		</p>
+	</div>
+</form>

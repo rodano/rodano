@@ -1,0 +1,68 @@
+<div id="edit_cell">
+	<div class="header">
+		<h2>Cell</h2>
+	</div>
+	<form id="edit_cell_form" method="post" class="content data">
+		<p>
+			<label for="cell_id" class="long">Id</label>
+			<input id="cell_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="cell_display_label" class="long">Display label</label>
+			<input id="cell_display_label" type="checkbox" name="displayLabel" />
+		</p>
+		<p>
+			<label for="cell_display_possible_value_labels" class="long">Display label of possible values</label>
+			<input id="cell_display_possible_value_labels" type="checkbox" name="displayPossibleValueLabels" />
+		</p>
+		<p>
+			<label for="cell_possible_values_column_number" class="long">Number of possible values columns</label>
+			<input id="cell_possible_values_columns_number" type="number" name="possibleValuesColumnNumber" />
+		</p>
+		<p>
+			<label for="cell_possible_values_column_width" class="long">Width of possible values columns</label>
+			<input id="cell_possible_values_column_width" type="number" name="possibleValuesColumnWidth" />
+		</p>
+		<p>
+			<label for="cell_text_before" class="long">Text before</label>
+			<app-localized-input id="cell_text_before" type="textarea" name="textBefore" class="big"></app-localized-input>
+		</p>
+		<p>
+			<label for="cell_text_after" class="long">Text after</label>
+			<app-localized-input id="cell_text_after" type="textarea" name="textAfter" class="big"></app-localized-input>
+		</p>
+		<p>
+			<label for="cell_css_code_for_label" class="long">Label CSS code</label>
+			<textarea id="cell_css_code_for_label" type="text" name="cssCodeForLabel" class="big"></textarea>
+		</p>
+		<p>
+			<label for="cell_css_code_for_input" class="long">Input CSS code</label>
+			<textarea id="cell_css_code_for_input" type="text" name="cssCodeForInput" class="big"></textarea>
+		</p>
+		<div id="cell_visibility" style="clear: both; display: none;">
+			<div id="cell_visibility_criteria">
+				<template id="cell_visibility_criterion">
+					<div style="clear: both; padding-top: 1rem;">
+						<select data-name="operator"></select>
+						<input data-name="values" />
+						<select multiple="multiple" size="5" data-name="values"></select>
+						<select data-name="action"></select>
+						<select multiple="multiple" size="5" data-name="targetLayoutIds"></select>
+						<select multiple="multiple" size="5" data-name="targetCellIds"></select>
+						<button type="button">Delete</button>
+					</div>
+				</template>
+			</div>
+			<p>
+				<button type="button" id="cell_visibility_criterion_add">Add visibility criterion</button>
+			</p>
+		</div>
+		<menu>
+			<li><a id="cell_constraint_edit" class="button">Edit constraint</a></li>
+			<li><button id="cell_constraint_add" type="button">Add constraint</button></li>
+			<li><button id="cell_constraint_delete" type="button">Delete constraint</button></li>
+			<li class="offset"><button type="button" id="edit_cell_close">Cancel</button></li>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

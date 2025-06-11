@@ -1,0 +1,27 @@
+<div
+	class="workflow-container"
+	[style]="style">
+	<mat-icon aria-hidden="false">
+		{{ icon }}
+	</mat-icon>
+	<span>
+		@if (workflowStatus && entity === workflowableEntity.FIELD) {
+			{{ workflowStatus.state.shortname | localizeMap }}: {{ workflowStatus.triggerMessage }}
+		} @else {
+			{{ workflow?.shortname | localizeMap }}
+			@if (workflowStatus) {
+				: <strong>{{ workflowStatus.state.shortname | localizeMap }}</strong>
+			}
+		}
+	</span>
+	@if (displayActions) {
+		@for (action of actions; track action.id) {
+			<button
+				type="button"
+				mat-flat-button
+				(click)="executeWorkflowAction(action)">
+				{{ action.shortname | localizeMap }}
+			</button>
+		}
+	}
+</div>

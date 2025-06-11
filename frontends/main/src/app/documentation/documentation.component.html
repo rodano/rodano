@@ -1,0 +1,102 @@
+<h1>Documentation</h1>
+<h2>Data structure</h2>
+<p>
+	<button
+		mat-flat-button
+		[appDownload]="dataStructureUrl">
+		Download data structure
+	</button>
+</p>
+
+<form [formGroup]="blankCrfForm">
+	<h2>Blank CRF</h2>
+	<p>Based on the nodes selected in the configuration</p>
+
+	<p>
+		<mat-form-field class="scope-picker">
+			<mat-label>Scope model</mat-label>
+			<mat-select formControlName="scopeModelId">
+				@for (scopeModel of scopeModels; track scopeModel.id) {
+					<mat-option [value]="scopeModel.id">
+						{{ scopeModel.shortname | localizeMap }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<mat-checkbox formControlName="annotated">Annotated</mat-checkbox>
+		<button
+			mat-flat-button
+			[appDownload]="blankCrfUrl"
+			[disabled]="blankCrfForm.invalid">
+			Download blank CRF
+		</button>
+	</p>
+</form>
+
+<h2>Archive CRF</h2>
+<p>Based on the nodes selected in the configuration</p>
+
+<form [formGroup]="archiveOneCrfForm">
+	<p>Generate the archive CRF for one scope</p>
+	<p>
+		<mat-form-field class="scope-picker">
+			<mat-label>Scope</mat-label>
+			<app-scope-finder
+				formControlName="scopePk"
+				required></app-scope-finder>
+		</mat-form-field>
+
+		<mat-checkbox formControlName="withAuditTrails">Include audit trails</mat-checkbox>
+
+		<button
+			mat-flat-button
+			[appDownload]="archiveOneCrfUrl"
+			[disabled]="archiveOneCrfForm.invalid">
+			Download archive CRF
+		</button>
+	</p>
+</form>
+
+<form
+	[formGroup]="archiveMultipleCrfForm"
+	(ngSubmit)="generateArchive()">
+	<p>Generate the archive CRF for all descendants of a root scope</p>
+	<p>
+		<mat-form-field class="scope-picker">
+			<mat-label>Root scope</mat-label>
+			<app-scope-picker
+				formControlName="rootScopePk"
+				[scopes]="rootScopes"
+				required></app-scope-picker>
+		</mat-form-field>
+
+		<mat-form-field class="scope-picker">
+			<mat-label>Scope model</mat-label>
+			<mat-select formControlName="scopeModelId">
+				@for (scopeModel of scopeModels; track scopeModel.id) {
+					<mat-option [value]="scopeModel.id">
+						{{ scopeModel.shortname | localizeMap }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+
+		<mat-checkbox formControlName="withAuditTrails">Include audit trails</mat-checkbox>
+
+		<button
+			mat-flat-button
+			type="submit"
+			[class.loading]="generationStatus === 'IN_PROGRESS'"
+			[disabled]="archiveMultipleCrfForm.invalid || generationStatus === 'IN_PROGRESS'">
+			Request archive CRF
+		</button>
+		@if (generationStatus === 'COMPLETED') {
+			<button
+				mat-flat-button
+				[appDownload]="archiveMultipleCrfUrl"
+				[disabled]="archiveMultipleCrfForm.invalid">
+				Download archive CRF
+			</button>
+		}
+	</p>
+</form>

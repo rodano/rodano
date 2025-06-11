@@ -1,0 +1,18 @@
+.mat-column-name {
+	width: 20rem;
+}
+.mat-column-email {
+	width: 25rem;
+}
+.mat-column-phone {
+	width: 12rem;
+}
+.role-list {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+mat-icon {
+	vertical-align: middle;
+	font-size: 1.2rem;
+}

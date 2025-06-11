@@ -1,0 +1,16 @@
+{
+	"name": "KvConfig",
+	"short_name": "KVC",
+	"theme_color": "#df8d00",
+	"background_color": "#090909",
+	"start_url": "index.html",
+	"display": "standalone",
+	"orientation": "landscape",
+	"icons": [
+		{
+			"src": "images/app_icons/launcher.png",
+			"sizes": "144x144",
+			"type": "image/png"
+		}
+	]
+}

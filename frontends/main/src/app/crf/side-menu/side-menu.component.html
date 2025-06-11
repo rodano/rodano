@@ -1,0 +1,165 @@
+<nav class="side-navigation">
+	<h2>
+		<a
+			[routerLink]="['/search']"
+			mat-icon-button>
+			<mat-icon>arrow_back</mat-icon>
+		</a>
+		<span [class.removed]="scope.removed">
+			{{ scope.shortname }}
+			@if (scope.locked) {
+				<mat-icon matTooltip="Locked"> lock </mat-icon>
+			}
+		</span>
+	</h2>
+	<ol>
+		<!-- Timeline -->
+		<li class="ending-block">
+			<span>
+				<a
+					[routerLink]="['/crf', scope.pk]"
+					routerLinkActive="active"
+					[routerLinkActiveOptions]="{exact: true}"
+					queryParamsHandling="preserve"
+					class="main-content">
+					Timeline
+				</a>
+			</span>
+		</li>
+
+		<!-- Status -->
+		<li class="ending-block">
+			<span>
+				<a
+					[routerLink]="['/crf', scope.pk, 'dashboard']"
+					routerLinkActive="active"
+					[routerLinkActiveOptions]="{exact: true}"
+					queryParamsHandling="preserve"
+					class="main-content">
+					Status
+				</a>
+			</span>
+		</li>
+
+		<!-- Scope forms -->
+		@for (form of scopeForms; track form.pk) {
+			<li>
+				<span>
+					<a
+						[routerLink]="['/crf', scope.pk, 'form', form.pk]"
+						routerLinkActive="active"
+						[routerLinkActiveOptions]="{exact: true}"
+						queryParamsHandling="preserve"
+						[class.removed]="form.removed"
+						class="main-content">
+						{{ form.model.shortname | localizeMap }}
+						<span class="statuses">
+							<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+							@for (status of form.workflowStatuses; track status.pk || status.workflowId) {
+								<mat-icon
+									[style.color]="status.state.color"
+									[matTooltip]="status.state.shortname | localizeMap">
+									{{ status.state.icon }}
+								</mat-icon>
+							}
+						</span>
+					</a>
+				</span>
+			</li>
+		}
+		<!-- Events -->
+		@for (eventGroup of eventGroups; track eventGroup.id) {
+			<li class="starting-block">
+				<span class="main-content">{{ eventGroup.shortname | localizeMap }}</span>
+			</li>
+			@for (event of getEvents(eventGroup.id); track event.pk) {
+				<li class="event">
+					<span>
+						<a
+							[routerLink]="[]"
+							[queryParams]="generateToggleParameters(event.pk)">
+							<mat-icon>
+								@if (expandedEventPks.includes(event.pk)) {
+									expand_less
+								} @else {
+									expand_more
+								}
+							</mat-icon>
+						</a>
+						<a
+							[routerLink]="['/crf', scope.pk, 'event', event.pk]"
+							routerLinkActive="active"
+							[routerLinkActiveOptions]="{exact: true}"
+							queryParamsHandling="preserve"
+							[class.removed]="event.removed"
+							class="main-content">
+							{{ event.longname }}
+							<span class="statuses">
+								@if (event.locked) {
+									<mat-icon matTooltip="Locked"> lock </mat-icon>
+								}
+								<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+								@for (status of event.workflowStatuses; track status.pk || status.workflowId) {
+									<mat-icon
+										[style.color]="status.state.color"
+										[matTooltip]="status.state.shortname | localizeMap">
+										{{ status.state.icon }}
+									</mat-icon>
+								}
+							</span>
+							<br />
+							<span class="time">
+								@if (event.date) {
+									{{ event.date | dateUTC }}
+								} @else {
+									Expected on {{ event.expectedDate | dateUTC }}
+								}
+							</span>
+						</a>
+					</span>
+
+					<!-- Event forms -->
+					@if (expandedEventPks.includes(event.pk)) {
+						<ol class="submenu">
+							@for (form of eventsForms[event.pk]; track form.pk) {
+								<li>
+									<span>
+										<a
+											[routerLink]="['/crf', scope.pk, 'event', event.pk, 'form', form.pk]"
+											routerLinkActive="active"
+											[routerLinkActiveOptions]="{exact: true}"
+											queryParamsHandling="preserve"
+											[class.removed]="form.removed"
+											class="main-content">
+											{{ form.model.shortname | localizeMap }}
+											<span class="statuses">
+												<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+												@for (status of form.workflowStatuses; track status.pk || status.workflowId) {
+													<mat-icon
+														[style.color]="status.state.color"
+														[matTooltip]="status.state.shortname | localizeMap">
+														{{ status.state.icon }}
+													</mat-icon>
+												}
+											</span>
+										</a>
+									</span>
+								</li>
+							}
+						</ol>
+					}
+				</li>
+			}
+		}
+	</ol>
+	<footer>
+		@if (scope.canWrite && !scope.removed && !scope.locked) {
+			<button
+				id="add-event"
+				mat-flat-button
+				(click)="createEvent()">
+				Add event
+			</button>
+		}
+	</footer>
+</nav>

@@ -1,0 +1,160 @@
+<div id="edit_timeline_graph_section">
+	<div class="header">
+		<h2>Timeline graph section</h2>
+	</div>
+	<form id="edit_timeline_graph_section_form" method="post" class="content data">
+		<p>
+			<label for="timeline_graph_section_id">Id</label>
+			<input id="timeline_graph_section_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_label">Label</label>
+			<app-localized-input id="timeline_graph_section_label" name="label" class="very_long"></app-localized-input>
+		</p>
+		<p>
+			"Date" displays a symbol at the specified date.<br />
+			"Action" displays a vertical line at the specified date.<br />
+			"Period" displays an horizontal rectangle that begin and end at the specified dates.<br />
+			"Dot", used with a scale, displays a symbol at the specified date and at the correct vertical position.<br />
+			"Line" is the same as "Dot" but link all dots with a line.<br />
+			"Bar" displays a vertical rectangle at the specified date and with the specified value.<br />
+			<label for="timeline_graph_section_type">Type</label>
+			<select id="timeline_graph_section_type" name="type"></select>
+		</p>
+		<p id="timeline_graph_section_scope_paths">
+			<label for="timeline_graph_section_use_scope_paths">Scope paths</label>
+			<input id="timeline_graph_section_use_scope_paths" type="checkbox" name="useScopePaths" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_event_model_ids">Event models</label>
+			<app-palette id="timeline_graph_section_event_model_ids" name="eventModelIds"></app-palette>
+		</p>
+		<p>
+			<label for="timeline_graph_section_hide_expected_events">Hide expected events</label>
+			<input id="timeline_graph_section_hide_expected_events" type="checkbox" name="hideExpectedEvent" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_hide_done_events">Hide done events</label>
+			<input id="timeline_graph_section_hide_done_events" type="checkbox" name="hideDoneEvent" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_dataset_model_id">Dataset model</label>
+			<select id="timeline_graph_section_dataset_model_id" name="datasetModelId"></select>
+		</p>
+		<p id="timeline_graph_section_date_field_model">
+			<label for="timeline_graph_section_date_field_model_id" title="The field model that will be used as the date (leave blank to use date of event)">Date field model</label>
+			<select id="timeline_graph_section_date_field_model_id" name="dateFieldModelId"></select>
+		</p>
+		<p id="timeline_graph_section_end_date_field_model">
+			<label for="timeline_graph_section_end_date_field_model_id" title="The field model that will be used as the stop date (leave blank to use end date of event)">End date field model</label>
+			<select id="timeline_graph_section_end_date_field_model_id" name="endDateFieldModelId"></select>
+		</p>
+		<p id="timeline_graph_section_value_field_model">
+			<label for="timeline_graph_section_value_field_model_id" title="The field model that will be used as the value (only for Line and Dot sections)">Value field model</label>
+			<select id="timeline_graph_section_value_field_model_id" type="text" name="valueFieldModelId"></select>
+		</p>
+		<p id="timeline_graph_section_label_field_model">
+			<label for="timeline_graph_section_label_field_model_id" title="The field model that will be used as the label (only for Bar and Period sections)">Label field model</label>
+			<select id="timeline_graph_section_label_field_model_id" name="labelFieldModelId"></select>
+		</p>
+		<p id="timeline_graph_section_meta_field_models">
+			<label for="timeline_graph_section_meta_field_model_ids" title="These field models can be used in the tooltip">Meta-data field models</label>
+			<app-palette id="timeline_graph_section_meta_field_model_ids" name="metaFieldModelIds"></app-palette>
+		</p>
+		<p id="timeline_graph_section_tooltip_patterns">
+			For the tooltip, the first line will be used as the title. The following lines are for the content.<br />
+			Tooltip text will be used as a template literal with the following context: "section" and "entry".
+			For example, you can use
+			<span draggable="true" title="Label of the section">${section.label.en}</span>,
+			<span draggable="true" title="Label of the entry">${entry.label}</span>,
+			<span draggable="true" title="Value of the entry, only available for lines">${entry.value}</span>,
+			<span draggable="true" title="Date of the entry (start date for a period entry)">${entry.date.toDisplay()}</span>,
+			<span draggable="true" title="Date and time of the entry (start time for a period entry)">${entry.date.toFullDisplay()}</span>,
+			<span draggable="true" title="End date for a period entry">${entry.end_date.toDisplay()}</span>,
+			<span draggable="true" title="End date and time for a period entry">${entry.toFullDisplay}</span>,
+			<span draggable="true" title="Link associated to the entry">${entry.link}</span>.<br />
+			You can also display your meta-data
+			<span draggable="true" title="Meta data">${entry.metadata.FIELD_MODEL_ID}</span>.<br />
+			You can also include Javascript code that will be interpreted
+			<span draggable="true" title="Label fallback">${entry.label || section.label.en || ""}</span>
+			<span draggable="true" title="Condition">${entry.ongoing ? "-" : entry.end_date.toDisplay()}</span>.
+		</p>
+		<p>
+			<label for="timeline_graph_section_tooltip">Tooltip</label>
+			<app-localized-input id="timeline_graph_section_tooltip" type="textarea" name="tooltip" class="big"></app-localized-input>
+		</p>
+		<p>
+			<label for="timeline_graph_section_unit">Unit</label>
+			<input id="timeline_graph_section_unit" name="unit" class="very_short" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_color">Color</label>
+			<input id="timeline_graph_section_color" type="color" name="color" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_stroke_color">Stroke color</label>
+			<input id="timeline_graph_section_stroke_color" type="color" name="strokeColor" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_opacity">Opacity</label>
+			<input id="timeline_graph_section_opacity" type="number" name="opacity" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_dashed">Dashed</label>
+			<input id="timeline_graph_section_dashed" type="checkbox" name="dashed" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_mark">Mark</label>
+			<select id="timeline_graph_section_mark" name="mark"></select>
+		</p>
+		<p>
+			<label for="timeline_graph_section_hidden_legend">Hidden legend</label>
+			<input id="timeline_graph_section_hidden_legend" type="checkbox" name="hiddenLegend" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_hidden">Hidden</label>
+			<input id="timeline_graph_section_hidden" type="checkbox" name="hidden" />
+		</p>
+		<fieldset id="timeline_graph_section_scale">
+			<legend>Scale</legend>
+			<p>
+				<label for="timeline_graph_section_scale_min" class="long">Min</label>
+				<input id="timeline_graph_section_scale_min" type="number" name="scale.min" />
+			</p>
+			<p>
+				<label for="timeline_graph_section_scale_max" class="long">Max</label>
+				<input id="timeline_graph_section_scale_max" type="number" name="scale.max" />
+			</p>
+			<p>
+				<label for="timeline_graph_section_scale_decimal" class="long">Number of decimal places</label>
+				<input id="timeline_graph_section_scale_decimal" type="number" name="scale.decimal" />
+			</p>
+			<p>
+				<label for="timeline_graph_section_scale_mark_interval" class="long">Mark interval (every...)</label>
+				<input id="timeline_graph_section_scale_mark_interval" type="number" min="0.1" step="0.1" name="scale.markInterval" required="required" />
+			</p>
+			<p>
+				<label for="timeline_graph_section_scale_label_interval" class="long">Label interval (every...)</label>
+				<input id="timeline_graph_section_scale_label_interval" type="number" min="0.1" step="0.1" name="scale.labelInterval" required="required" />
+			</p>
+			<p>
+				<label for="timeline_graph_section_scale_position" class="long">Y-axis position</label>
+				<select id="timeline_graph_section_scale_position" name="scale.position" required="required"></select>
+			</p>
+		</fieldset>
+		<fieldset id="timeline_graph_section_position">
+			<legend>Position</legend>
+			<p>
+				<label for="timeline_graph_section_position_start">Beginning (in %)</label>
+				<input id="timeline_graph_section_position_start" type="number" min="0" name="position.start" />
+			</p>
+			<p>
+				<label for="timeline_graph_section_position_stop">End (in %)</label>
+				<input id="timeline_graph_section_position_stop" type="number" min="0" name="position.stop" />
+			</p>
+		</fieldset>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

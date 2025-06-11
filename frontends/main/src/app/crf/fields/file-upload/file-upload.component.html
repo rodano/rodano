@@ -1,0 +1,46 @@
+@if (!field.value) {
+	<div
+		class="drop-zone"
+		(drop)="dropHandler($event)"
+		(dragover)="dragOverHandler($event)">
+		<button
+			mat-button
+			(click)="onClick()"
+			type="button">
+			<mat-icon>file_upload</mat-icon>
+			Drop file here
+		</button>
+	</div>
+}
+
+@if (field.value && field.filePk) {
+	<span class="box">
+		<a
+			[href]="getFileUrl()"
+			[appDownload]="getFileUrl()">
+			{{ field.fileName }}
+		</a>
+		<button
+			mat-icon-button
+			(click)="removeFile()"
+			inline="true"
+			type="button">
+			<mat-icon>delete</mat-icon>
+		</button>
+	</span>
+}
+
+@if (uploadInProgress) {
+	<div [@fadeInOut]="animState">
+		<mat-progress-bar
+			mode="determinate"
+			[value]="uploadProgress">
+		</mat-progress-bar>
+	</div>
+}
+
+<input
+	type="file"
+	[id]="id"
+	name="fileUpload"
+	style="display: none" />

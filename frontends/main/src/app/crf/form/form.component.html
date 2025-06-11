@@ -1,0 +1,58 @@
+<form>
+	<div
+		id="form-content"
+		class="content">
+		<h1>
+			{{ form.model.shortname | localizeMap }}
+			<app-audit-trail-button [form]="form" />
+		</h1>
+		@for (layout of layouts; track layout.id) {
+			@if (layout.type === layoutType.SINGLE) {
+				<app-layout
+					[layout]="layout"
+					[datasets]="datasets"
+					[layoutUid]="layout.id"
+					[disabled]="!form.canWrite">
+				</app-layout>
+			} @else {
+				<app-multiple-layout
+					[layout]="layout"
+					[datasets]="datasets"
+					[disabled]="!form.canWrite">
+				</app-multiple-layout>
+			}
+		}
+	</div>
+
+	@if (formLoading) {
+		<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+	}
+
+	<div id="form-actions">
+		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+		@for (status of form.workflowStatuses; track status.pk || status.workflowId) {
+			<app-workflow-status
+				[entity]="workflowableEntity.FORM"
+				[workflowStatus]="status"
+				[workflowable]="form"
+				(actionResponse)="onActionResponse(form)">
+			</app-workflow-status>
+		}
+
+		@if (dirty) {
+			<span>You have unsaved values</span>
+		}
+
+		@if (form.canWrite) {
+			<span class="toolbar-spacer"></span>
+			<button
+				mat-flat-button
+				[class.loading]="saveLoading"
+				[disabled]="formLoading || saveLoading"
+				type="submit"
+				(click)="saveDatasets()">
+				Save
+			</button>
+		}
+	</div>
+</form>

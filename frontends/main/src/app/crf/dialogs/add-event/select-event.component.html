@@ -1,0 +1,23 @@
+<h1 mat-dialog-title>Select event</h1>
+
+<mat-dialog-content>
+	<mat-list>
+		@for (event of events; track event.id) {
+			<mat-list-item>
+				<button
+					mat-stroked-button
+					[mat-dialog-close]="event.id">
+					{{ event.shortname | localizeMap }}
+				</button>
+			</mat-list-item>
+		}
+	</mat-list>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		mat-dialog-close>
+		Cancel
+	</button>
+</mat-dialog-actions>

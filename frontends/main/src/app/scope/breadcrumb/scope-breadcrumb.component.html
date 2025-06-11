@@ -1,0 +1,12 @@
+<nav>
+	@for (scope of scopes; track scope.pk) {
+		<ol>
+			<button
+				mat-stroked-button
+				(click)="selectScope(scope)"
+				[class.disabled]="disableDeepest && scopes[scopes.length - 1] === scope">
+				{{ scope | scopeCodeShortname }}
+			</button>
+		</ol>
+	}
+</nav>

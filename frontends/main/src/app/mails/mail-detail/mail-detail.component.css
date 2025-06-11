@@ -1,0 +1,18 @@
+.text-body {
+	box-sizing: border-box;
+	background-color: var(--light-highlight-color);
+	border-width: 1px;
+	border-radius: var(--mat-sys-corner-extra-small);
+	padding: 1rem;
+	font-family: 'Courier New', Courier, monospace;
+	white-space: pre-wrap;
+}
+
+.text-html {
+	box-sizing: border-box;
+	background-color: var(--light-highlight-color);
+	border-width: 1px;
+	border-radius: var(--mat-sys-corner-extra-small);
+	font-family: 'Courier New', Courier, monospace;
+	padding: 1rem;
+}

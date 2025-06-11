@@ -1,0 +1,3 @@
+.actions button + button {
+	margin-left: var(--gap);
+}

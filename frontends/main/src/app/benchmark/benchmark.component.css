@@ -1,0 +1,9 @@
+.mat-mdc-form-field {
+	width: 25rem;
+}
+button + button {
+	margin-left: var(--gap);
+}
+.criteria-container {
+	width: 100%;
+}

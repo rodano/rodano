@@ -1,0 +1,7 @@
+"Dataset model ID","Dataset model shortname","Field model ID","Field model shortname","Type","Data type","Max integer digits","Max decimal digits","Size","Max length","Help","Possible values ID","Possible values shortname"
+"PATIENT_DOCUMENTATION",,"HEIGHT_AT_BIRTH","Height at birth","NUMBER","NUMBER",1,2,3,,,,
+"PATIENT_DOCUMENTATION",,"WEIGHT_AT_BIRTH","Weight at birth","NUMBER","NUMBER",1,2,3,,"Weight measured at birth",,
+"PATIENT_DOCUMENTATION",,"BLOOD_GROUP","Blood group","SELECT","STRING",,,,,"The blood group without the rhesus","A|B|AB|O",
+"PATIENT_DOCUMENTATION",,"BLOOD_RHD","Blood Rh","SELECT","STRING",,,,,,"P|N","Positive|Negative"
+"BLOOD_ANALYSIS","Blood analysis","DATE","Date","DATE_SELECT",DATE,,,,,"The date of the analysis",,
+"BLOOD_ANALYSIS","Blood analysis","AMMONIA","Ammonia","NUMBER",NUMBER,1,2,3,,,,

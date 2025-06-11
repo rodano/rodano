@@ -1,0 +1,20 @@
+.mat-mdc-form-field {
+	margin-bottom: 1rem;
+	width: 25%;
+}
+.mat-column-PARENT-SCOPE_CODE {
+	width: 8rem;
+}
+.mat-column-SCOPE_CODE {
+	width: 8rem;
+}
+.mat-column-EVENT_LABEL,
+.mat-column-FORM_LABEL,
+.mat-column-FIELD_LABEL {
+	width: 12rem;
+}
+.mat-column-EVENT_DATE,
+.mat-column-FORM_DATE,
+.mat-column-FIELD_DATE {
+	width: 8rem;
+}

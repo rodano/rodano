@@ -1,0 +1,57 @@
+<form id="wizard_validator" method="post" class="textcontent wizard_steps">
+	<div data-step="1" class="wizard_step">
+		<h3>Choose the field model to validate</h3>
+		<p>Only data and number field models are supported</p>
+		<p>
+			<label for="wizard_validator_dataset_model_id">Dataset model: </label>
+			<select id="wizard_validator_dataset_model_id" required="required"></select>
+		</p>
+		<p>
+			<label for="wizard_validator_field_model_id">Field model: </label>
+			<select id="wizard_validator_field_model_id" required="required"></select>
+		</p>
+	</div>
+	<div data-step="2" class="wizard_step">
+		<p>
+			<label>
+				Type of validator:
+				<select name="wizard_validator_type" required="required">
+					<option value="range">Range</option>
+					<!--<option value="comparator">Comparator</option>-->
+				</select>
+			</label>
+		</p>
+	</div>
+	<div data-step="3" class="wizard_step">
+		<div id="wizard_validator_range">
+			<h3>Choose range</h3>
+			<p>Type min/max values or drag and drop attributes</p>
+			<p>
+				<label>
+					Strict range
+					<input name="wizard_validator_range_strict" type="checkbox" checked="checked"></input>
+				</label>
+			</p>
+			<p id="wizard_validator_range_values">
+				<input name="wizard_validator_range_min" />
+				<span id="wizard_validator_range_min_attribute"></span>
+				<img id="wizard_validator_range_min_reset" src="wizards/bin.png" title="Reset min value" />
+
+				<span id="wizard_validator_range_min_operator"><</span>
+				value
+				<span id="wizard_validator_range_max_operator"><</span>
+
+				<input name="wizard_validator_range_max" />
+				<span id="wizard_validator_range_max_attribute"></span>
+				<img id="wizard_validator_range_max_reset" src="wizards/bin.png" title="Reset max value" />
+			</p>
+		</div>
+		<div id="wizard_validator_comparator">
+			<h3>Choose reference value</h3>
+		</div>
+	</div>
+	<div data-step="4" class="wizard_step">
+		<h3>Validator is now ready</h3>
+		<p>You can now attach this validator to any field model.</p>
+	</div>
+</form>

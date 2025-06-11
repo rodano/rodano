@@ -1,0 +1,35 @@
+{
+	"files.exclude": {
+		"node_modules": true,
+		"package-lock.json": true,
+		".angular": true,
+		"www": true
+	},
+	"css.format.maxPreserveNewLines": 2,
+	"css.format.newlineBetweenRules": false,
+	"css.format.newlineBetweenSelectors": false,
+	"css.format.spaceAroundSelectorSeparator": true,
+	"css.lint.duplicateProperties": "error",
+	"css.lint.emptyRules": "error",
+	"css.lint.zeroUnits": "error",
+	"eslint.lintTask.enable": true,
+	"files.insertFinalNewline": true,
+	"files.eol": "\n",
+	"html.format.extraLiners": "",
+	"html.format.indentInnerHtml": true,
+	"html.format.wrapAttributes": "preserve",
+	"html.format.wrapLineLength": 250,
+	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+	"javascript.preferences.quoteStyle": "single",
+	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+	"typescript.preferences.quoteStyle": "single",
+	"cSpell.words": [
+		"rodano"
+	]
+}

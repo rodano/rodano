@@ -1,0 +1,8 @@
+Dear ${user.name},
+
+Congratulations! Your ${study.getProfile(role.profileId).defaultLocalizedShortname} role has been successfully activated ${study.defaultLocalizedLongname}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

@@ -1,0 +1,15 @@
+Dear ${user.name},
+
+You have been invited to participate in the ${study.defaultLocalizedLongname} study as a ${study.getProfile(role.profileId).defaultLocalizedShortname}.
+
+Before you can log into the ${study.defaultLocalizedLongname} website, you must first activate your account.
+
+To activate your account, please visit:
+${user_activation_url}
+
+In case of trouble, please send an email to ${study.email}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

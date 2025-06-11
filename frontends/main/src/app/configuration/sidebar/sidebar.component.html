@@ -1,0 +1,62 @@
+<div class="container">
+	<aside
+		class="sidebar"
+		[class.closed]="!expanded"
+		[class.is-child]="isChild">
+		<ul [class.closed]="!expanded">
+			<li>
+				@if (expanded) {
+					<span class="header">{{ heading }}</span>
+				}
+				<!-- Opens and closes the sidebar, double left arrow icon -->
+				<button
+					id="toggle-button"
+					(click)="toggleExpanded()">
+					<mat-icon
+						class="toggle-icon"
+						[class.rotated]="!expanded"
+						>keyboard_double_arrow_left</mat-icon
+					>
+				</button>
+			</li>
+			@if (!sidebarItems.length) {
+				<div>No items added yet</div>
+			}
+			@for (item of sidebarItems; track $index) {
+				<li
+					[class.active]="isItemActive(item)"
+					class="list-item"
+					(click)="onItemClick(item)">
+					<a
+						class="link"
+						[class.closed]="!expanded"
+						[class.active]="isItemActive(item)">
+						<mat-icon class="icon">{{ item.icon }}</mat-icon>
+						@if (expanded) {
+							<span class="link-text">{{ item.text }}</span>
+						}
+					</a>
+				</li>
+			}
+		</ul>
+
+		@if (isChild && expanded) {
+			<button
+				mat-flat-button
+				class="create-new-button"
+				(click)="handleCreateNewClicked()">
+				Create new
+			</button>
+		}
+	</aside>
+	@if (selectedItem?.supportsChildren) {
+		<app-sidebar
+			[heading]="selectedItem?.text"
+			[sidebarItems]="selectedItem?.children || []"
+			[isChild]="true"
+			[activeSite]="activeSite"
+			(activeSiteChange)="activeSiteChange.emit($event)"
+			(createNewClicked)="createNewClicked.emit($event)"
+			[basePath]="basePath" />
+	}
+</div>

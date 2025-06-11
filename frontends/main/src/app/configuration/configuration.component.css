@@ -1,0 +1,11 @@
+.container {
+	height: 100%;
+	display: flex;
+}
+
+main {
+	flex-grow: 1;
+	z-index: 3;
+	border-left: 1px solid var(--mat-sys-primary);
+	padding: 12px 48px 12px 48px;
+}

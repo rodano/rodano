@@ -1,0 +1,10 @@
+.badge {
+	color: white;
+	float: right;
+	background-color: var(--mat-sys-primary);
+	border-radius: 15rem;
+	padding: 0.1rem 0.7rem;
+}
+[hidden] {
+	display: none !important;
+}

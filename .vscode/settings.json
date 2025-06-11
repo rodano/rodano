@@ -1,0 +1,21 @@
+{
+	//VSCode settings for the whole repository. In VSCode, it's usually better to open the folder of a specific module instead of the whole repository
+	"files.exclude": {
+		"backend/target": true,
+
+		"frontends/main/node_modules": true,
+		"frontends/main/package-lock.json": true,
+		"frontends/main/.angular": true,
+		"frontends/main/www": true,
+
+		"frontends/epro/package-lock.json": true,
+		"frontends/epro/node_modules": true,
+		"frontends/epro/.angular": true,
+		"frontends/epro/www": true,
+
+		"frontends/configurator/package-lock.json": true,
+		"frontends/configurator/node_modules": true,
+		"frontends/configurator/test-output": true,
+		"frontends/configurator/.vscode/chrome": true
+	}
+}

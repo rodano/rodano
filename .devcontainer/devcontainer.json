@@ -1,0 +1,35 @@
+{
+	"name": "Rodano development environment",
+	/*"image": "mcr.microsoft.com/devcontainers/base:debian",
+	"features": {
+		"ghcr.io/devcontainers/features/java:1": {
+			"installMaven": true
+		},
+		"ghcr.io/devcontainers/features/node:1": {
+			"nodeGypDependencies": true
+		},
+		"ghcr.io/eitsupi/devcontainer-features/jq-likes:0": {},
+		"ghcr.io/guiyomh/features/vim:0": {}
+	},*/
+	//use a Docker image for now because it's not possible to use "features" to install everything that is required
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"forwardPorts": [3000, 8080, 5005, "3306:3307"], //frontend, backend, api-jvm-debug, mariadb
+	"customizations": {
+		"codespaces": {
+			"repositories": {
+				"rodano/rodano": {
+					"permissions": "read-all"
+				}
+			}
+		},
+		"vscode": {
+			"extensions": [
+				"vscjava.vscode-java-pack"
+			]
+		}
+	},
+	"postCreateCommand": "sh .devcontainer/post_create.sh",
+	"postStartCommand": "/etc/init.d/mariadb start"
+}

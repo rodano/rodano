@@ -1,0 +1,408 @@
+/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
+@use '@rodano/timeline/src/timeline.css';
+
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: url('../public/fonts/open-sans-v36-latin-regular.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 700;
+	src: url('../public/fonts/open-sans-v36-latin-700.woff2') format('woff2');
+}
+
+//Material Symbols (replacement of Material Icons) host locally
+//to retrieve the asset, use the instructions here https://developers.google.com/fonts/docs/material_symbols
+//for example, to get filled icon, use this link https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@1 and copy the content here
+//the list of all symbols is available here: https://fonts.google.com/icons
+@font-face {
+	font-family: 'Material Symbols';
+	font-style: normal;
+	font-weight: 400;
+	src: url('../public/fonts/material-symbols-outlined-filled-400.woff2') format('woff2');
+}
+.material-symbols {
+	font-family: 'Material Symbols';
+	font-weight: normal;
+	font-style: normal;
+	font-size: 24px; /* Preferred icon size */
+	display: inline-block;
+	line-height: 1;
+	text-transform: none;
+	letter-spacing: normal;
+	word-wrap: normal;
+	white-space: nowrap;
+	direction: ltr;
+}
+
+:root {
+	@include mat.theme(
+		(
+			color: mat.$azure-palette,
+			typography: (
+				plain-family: Open Sans,
+				brand-family: Open Sans,
+				bold-weight: 900,
+				medium-weight: 400,
+				regular-weight: 400,
+			),
+			density: -2,
+		)
+	);
+
+	//customize CSS for Material Design Components here
+	//for styling-related customization, use this location instead of the providers configuration section in the main.ts file
+	@include mat.dialog-overrides(
+		(
+			container-min-width: 80vw,
+		)
+	);
+
+	& {
+		//override material properties for inputs
+		--mat-form-field-container-height: 36px;
+		--mat-form-field-container-vertical-padding: 6px;
+		--mat-checkbox-label-text-size: 1rem;
+
+		//custom variables
+		--light-highlight-color: #eee;
+		--light-border-color: #ccc;
+
+		--gap: 0.5rem;
+	}
+}
+::selection {
+	background: var(--mat-sys-primary);
+	color: white;
+}
+html {
+	color-scheme: light;
+	height: 100vh; /* we want an app that don't scroll and use the viewport of the browser */
+	margin: 0;
+	padding: 0;
+	font-family: 'Open Sans';
+}
+body {
+	height: 100vh; /* we want an app that don't scroll and use the viewport of the browser */
+	margin: 0;
+	padding: 0;
+}
+
+//titles
+h1,
+h2,
+h3,
+h4 {
+	margin-top: 0;
+}
+h1 {
+	font-size: 1.8rem;
+}
+
+//buttons
+button {
+	font-family: inherit;
+	&.loading {
+		background: linear-gradient(90deg, #e0e0e0 25%, #f0f0f0 50%, #e0e0e0 75%);
+		background-size: 200% 100%;
+		animation: loadingEffect 1.5s infinite;
+		color: transparent;
+		pointer-events: none;
+	}
+	&.link {
+		font-size: inherit;
+		padding: 0;
+		background: none;
+		border: none;
+		color: inherit;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+}
+@keyframes loadingEffect {
+	0% {
+		background-position: 200% 0;
+	}
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+//main content
+.content {
+	padding: calc(2 * var(--gap));
+}
+
+//alerts
+.success,
+.warning,
+.info,
+.error {
+	padding: 0.5rem;
+	border-radius: var(--mat-sys-corner-extra-small);
+
+	&:empty {
+		display: none;
+	}
+}
+.success {
+	background-color: #d4edda !important;
+	color: #155724 !important;
+}
+.warning {
+	background-color: #fff3cd !important;
+	color: #856404 !important;
+}
+.error {
+	background-color: #f8d7da !important;
+	color: #721c24 !important;
+}
+.info {
+	color: #1a5fad !important;
+	background-color: #d3e4f8 !important;
+}
+
+.removed {
+	opacity: 0.5;
+}
+
+//title for pages with tabs
+.title-tabs {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: flex-end;
+	border-bottom: 1px solid #e0e0e0;
+	margin-bottom: 2rem;
+	& h1 {
+		margin-bottom: 0.5rem !important;
+	}
+}
+
+//search block for pages with a search form and a table underneath
+.browse-entities {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: 1rem;
+	& form {
+		display: flex;
+		gap: var(--gap);
+		align-items: center;
+	}
+}
+
+//cards
+.mat-mdc-card {
+	min-width: 20rem;
+	max-width: 50rem;
+	margin: auto;
+}
+.mat-mdc-card-actions {
+	margin-top: 1rem;
+}
+
+//tables
+.mat-mdc-table {
+	background-color: white !important;
+}
+.mat-mdc-row:hover {
+	background-color: var(--light-highlight-color);
+}
+.mat-mdc-header-row {
+	background-color: var(--light-highlight-color) !important;
+}
+.mat-mdc-cell {
+	border-bottom-color: var(--light-border-color) !important;
+}
+.no-data-row > td {
+	padding: 1rem;
+	background-color: var(--light-highlight-color);
+	margin: 0;
+	text-align: center;
+}
+
+//toolbar
+.mat-toolbar-row button + button {
+	margin-left: var(--gap);
+}
+.toolbar-spacer {
+	flex: 1 1 auto;
+}
+.toolbar-offset {
+	margin-left: var(--gap);
+}
+
+//centered
+.centered {
+	width: 60%;
+	max-width: 50rem;
+	margin: auto;
+	& p {
+		display: flex;
+		gap: var(--gap);
+		align-items: center;
+
+		& .mat-mdc-form-field {
+			flex-grow: 1;
+		}
+
+		&.actions {
+			justify-content: end;
+		}
+	}
+}
+
+//forms
+.inline-fields {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	& .mat-mdc-form-field,
+	& .mat-mdc-slide-toggle {
+		flex-grow: 1;
+	}
+}
+.scope-picker {
+	width: 25rem;
+}
+
+//workflow statuses list (used in the scope and event dashboards)
+.workflow-statuses {
+	display: flex;
+	flex-direction: column;
+	gap: var(--gap);
+	margin-bottom: 1rem;
+}
+
+//page with a side section next to the main content
+*:has(> aside) {
+	display: flex;
+	height: 100%;
+	width: 100%;
+	& aside {
+		flex-basis: 20%;
+		max-width: 20%;
+		position: relative; /* this allows absolute elements below to be positioned relatively to this element */
+		background-color: var(--light-highlight-color);
+	}
+	& main {
+		flex-basis: 80%;
+		max-width: 80%;
+		height: 100%;
+		box-sizing: border-box;
+		overflow-y: auto;
+	}
+}
+
+//side navigation
+nav.side-navigation {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+	border-right: 1px solid var(--mat-sys-primary);
+	h2 {
+		padding: 0.5rem;
+		font-size: 1.5rem;
+		font-weight: normal;
+		margin: 0;
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		border-bottom: 1px solid var(--light-border-color);
+		& a {
+			height: 26px;
+			color: inherit;
+		}
+	}
+	ol {
+		list-style-type: none;
+		margin: 0;
+		padding: 0;
+		flex-grow: 1;
+		overflow: auto;
+		box-sizing: border-box;
+		&.submenu > li > span {
+			padding-left: 2rem;
+		}
+	}
+	li {
+		/* set a minimum height so badges that are loaded in a second step can fit */
+		min-height: 2.4rem;
+		&.starting-block {
+			border-top: 1px solid var(--light-border-color);
+		}
+		&.ending-block {
+			border-bottom: 1px solid var(--light-border-color);
+		}
+		& > span {
+			display: flex;
+			align-items: center;
+			padding: 0.2rem;
+			&:has(a.active) {
+				background: var(--light-border-color);
+			}
+		}
+		& .main-content {
+			padding: 0.2rem;
+			flex-grow: 1;
+		}
+		& a {
+			text-decoration: none;
+			color: inherit;
+		}
+	}
+	footer {
+		text-align: right;
+		padding: 0.8rem 1rem;
+	}
+}
+
+//cms layout
+.cms-layout {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: calc(2 * var(--gap));
+
+	.widget.full-width {
+		grid-column: span 2;
+	}
+
+	.widget.half-width {
+		grid-column: span 1;
+	}
+
+	app-generic-widget {
+		display: inline-block;
+		width: 100%;
+	}
+}
+
+//modal
+.mat-mdc-dialog-content {
+	padding-top: 0.5rem !important; //add padding so the first field of the content has some room
+}
+
+//TODO remove the following generic CSS rules
+//move rules that are really used to the upper part of the file
+
+// Utility classes
+.flex-row-between {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+}
+
+// Gaps that work in flex and in grids
+.full-width {
+	width: 100%;
+}
+.gap-1 {
+	gap: 1rem;
+}

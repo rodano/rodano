@@ -1,0 +1,8 @@
+Dear ${user.name},
+
+${currentUser.name} has successfully activated their ${study.getProfile(role.profileId).defaultLocalizedShortname} account on ${date}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

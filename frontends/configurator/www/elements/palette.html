@@ -1,0 +1,71 @@
+<template id="app-palette">
+	<style>
+		:host {
+			display: flex;
+		}
+		div {
+			width: 25rem;
+			margin-right: 1rem;
+		}
+		h3 {
+			margin: 0 !important;
+			padding: 3px !important;
+			border: 2px solid var(--background-highlight-color);
+			border-bottom: 0;
+			border-radius: 0 !important;
+		}
+		h3 > img {
+			float: right;
+		}
+		ul {
+			height: 16rem;
+			margin: 0;
+			padding: 0;
+			border: 2px solid var(--background-highlight-color);
+			list-style-type: none;
+			overflow: auto;
+			overscroll-behavior: contain;
+		}
+		ul.highlight {
+			border-style: dashed;
+		}
+		ul.disabled {
+			opacity: 0.8;
+		}
+		ul:not(.disabled) li {
+			cursor: pointer;
+			padding: 0.2rem;
+			user-select: none;
+		}
+		ul:not(.disabled) li.highlight {
+			border-top: 2px dashed var(--background-highlight-color);
+		}
+		ul:not(.disabled) li:hover {
+			background-color: var(--background-highlight-color);
+		}
+		p {
+			border: 2px solid var(--background-highlight-color);
+			border-top: 0;
+			padding: 0 !important;
+			margin-top: 0;
+		}
+		p input {
+			background: var(--background-main-color);
+			color: var(--background-highlight-color);
+			border: 0;
+			border-radius: 2px;
+			width: 100%;
+		}
+	</style>
+	<div>
+		<h3>Available<img src="images/bullet_arrow_up.png" alt="Sort" title="Sort" style="cursor: pointer; opacity: 0.4;"></h3>
+		<ul></ul>
+		<p>
+			<input placeholder="filter..." type="search" />
+		</p>
+	</div>
+	<div>
+		<h3>Selected</h3>
+		<ul></ul>
+	</div>
+</template>

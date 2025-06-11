@@ -1,0 +1,14 @@
+@for (section of layout.sections; track section.id) {
+	<h1>{{ section.labels | localizeMap }}</h1>
+	<div class="cms-layout">
+		@for (widget of section.widgets; track $index) {
+			<app-generic-widget
+				[widget]="widget"
+				[scopes]="rootScopes"
+				class="widget"
+				[class.full-width]="widget.width === 'FULL'"
+				[class.half-width]="widget.width === 'HALF'">
+			</app-generic-widget>
+		}
+	</div>
+}

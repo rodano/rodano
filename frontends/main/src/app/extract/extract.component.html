@@ -1,0 +1,92 @@
+<div class="title-tabs">
+	<h1>Data extracts</h1>
+	<nav
+		mat-tab-nav-bar
+		[tabPanel]="tabPanel">
+		@for (scopeModel of scopeModels; track scopeModel.id) {
+			<a
+				mat-tab-link
+				[routerLink]="['./', {scopeModelId: scopeModel.id}]"
+				[active]="scopeModel.id === selectedScopeModel.id">
+				{{ scopeModel.shortname | localizeMap }}
+			</a>
+		}
+	</nav>
+</div>
+
+<mat-tab-nav-panel #tabPanel>
+	@if (selectedScopeModel) {
+		<form [formGroup]="extractForm">
+			<p>
+				<mat-form-field>
+					<mat-label>Scope to extract</mat-label>
+					<app-scope-picker
+						formControlName="rootScopePk"
+						[scopes]="rootScopes"
+						required></app-scope-picker>
+				</mat-form-field>
+			</p>
+
+			<h2>Datasets</h2>
+			<mat-toolbar>
+				<mat-toolbar-row>
+					<mat-checkbox formControlName="withModificationDates">Export field modification dates</mat-checkbox>
+					<span class="toolbar-spacer"></span>
+					@if (datasetModelList.selectedOptions.selected.length === 0) {
+						<button
+							mat-flat-button
+							(click)="datasetModelList.selectAll()">
+							Select all
+						</button>
+					} @else {
+						<button
+							mat-flat-button
+							(click)="datasetModelList.deselectAll()">
+							Deselect all
+						</button>
+					}
+				</mat-toolbar-row>
+			</mat-toolbar>
+
+			<mat-selection-list
+				#datasetModelList
+				formControlName="datasetModelIds">
+				@for (datasetModel of datasetModels; track datasetModel.id) {
+					<mat-list-option [value]="datasetModel.id">
+						{{ datasetModel.shortname | localizeMap }}
+					</mat-list-option>
+				}
+			</mat-selection-list>
+
+			<mat-toolbar>
+				<mat-toolbar-row>
+					<span class="toolbar-spacer"></span>
+					<button
+						mat-flat-button
+						[appDownload]="getExportUrl()"
+						[disabled]="!extractForm.valid">
+						Download data
+					</button>
+					<button
+						mat-flat-button
+						[appDownload]="getSpecificationsUrl()"
+						[disabled]="!extractForm.valid">
+						Download specifications
+					</button>
+				</mat-toolbar-row>
+			</mat-toolbar>
+		</form>
+
+		<h2>Reports</h2>
+		<button
+			mat-flat-button
+			[appDownload]="getScopeTransfersReportUrl()">
+			Download list of scope transfers
+		</button>
+		<button
+			mat-flat-button
+			[appDownload]="getEventsReportUrl()">
+			Download list of events
+		</button>
+	}
+</mat-tab-nav-panel>

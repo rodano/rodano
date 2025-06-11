@@ -1,0 +1,117 @@
+<div id="edit_scope_model">
+	<div class="header">
+		<h2>Scope model</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_scope_model_form" >General</a></li>
+			<li><a href="#" data-tab="edit_scope_model_rules">Rules</a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<form id="edit_scope_model_form" method="post" class="data">
+			<p>
+				<label for="scope_model_id">Id</label>
+				<input id="scope_model_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="scope_model_shortname">Shortname</label>
+				<app-localized-input id="scope_model_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="scope_model_longname">Longname</label>
+				<app-localized-input id="scope_model_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="scope_model_description">Description</label>
+				<app-localized-input id="scope_model_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="scope_model_plural_shortname">Plural shortname</label>
+				<app-localized-input id="scope_model_plural_shortname" name="pluralShortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="scope_model_virtual">Virtual</label>
+				<input id="scope_model_virtual" type="checkbox" name="virtual" />
+			</p>
+			<p>
+				<label for="scope_model_expected_number">Expected number</label>
+				<input id="scope_model_expected_number" type="number" name="expectedNumber" />
+			</p>
+			<p>
+				<label for="scope_model_max_number">Max number</label>
+				<input id="scope_model_max_number" type="number" name="maxNumber" />
+			</p>
+			<p>
+				<label for="scope_model_parent_ids">Parents</label>
+				<app-palette id="scope_model_parent_ids" name="parentIds"></app-palette>
+			</p>
+			<p>
+				<label for="scope_model_default_parent_id">Default parent</label>
+				<select id="scope_model_default_parent_id" name="defaultParentId"></select>
+			</p>
+			<p>
+				<label for="scope_model_dataset_model_ids">Dataset models</label>
+				<app-palette id="scope_model_dataset_model_ids" name="datasetModelIds"></app-palette>
+			</p>
+			<p>
+				<label for="scope_model_form_model_ids">Form models</label>
+				<app-palette id="scope_model_form_model_ids" name="formModelIds"></app-palette>
+			</p>
+			<p>
+				<label for="scope_model_workflow_ids">Workflows</label>
+				<app-palette id="scope_model_workflow_ids" name="workflowIds"></app-palette>
+			</p>
+			<p>
+				<label for="scope_model_default_profile_id">Default profile</label>
+				<select id="scope_model_default_profile_id" name="defaultProfileId"></select>
+			</p>
+			<p id="scope_model_format_patterns">
+				For patterns, use
+				<span draggable="true">${parent}</span>,
+				<span draggable="true">${model}</span>,
+				<span draggable="true">${siblingsNumber:DECIMAL}</span>,
+				<span draggable="true">${sameScopeModelNumber:DECIMAL}</span>,
+				<span draggable="true">${checksum}</span>.
+			</p>
+			<p>
+				<label for="scope_model_format">Code format</label>
+				<input id="scope_model_format" type="text" name="scopeFormat" class="long" />
+			</p>
+			<div id="scope_model_workflow_states_selectors">
+				<template id="scope_model_workflow_states_selector">
+					<div>
+						<h3>
+							<span>Workflow state selector</span>
+							<button type="button" class="action image" title="Delete selector">
+								<img src="images/cross.png" alt="Delete" />
+							</button>
+						</h3>
+						<div>
+							<p>
+								<label>Workflow</label>
+								<select data-name="workflowId"></select>
+							</p>
+							<p>
+								<label>States</label>
+								<app-palette data-name="stateIds"></app-palette>
+							</p>
+						</div>
+					</div>
+				</template>
+			</div>
+			<p>
+				<button id="scope_model_workflow_states_selector_add">Add workflow states selector</button>
+			</p>
+			<menu>
+				<li><a id="scope_model_layout_edit" class="button">Edit layout</a></li>
+				<li><button id="scope_model_layout_add" type="button">Add layout</button></li>
+				<li><button id="scope_model_layout_delete" type="button">Delete layout</button></li>
+				<li class="offset"><button type="submit">Save</button></li>
+			</menu>
+		</form>
+		<div id="edit_scope_model_rules">
+			<div id="scope_model_create_rules" class="rules"></div>
+			<div id="scope_model_remove_rules" class="rules"></div>
+			<div id="scope_model_restore_rules" class="rules"></div>
+		</div>
+	</div>
+</div>

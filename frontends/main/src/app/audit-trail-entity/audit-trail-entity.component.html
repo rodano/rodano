@@ -1,0 +1,115 @@
+<h1 mat-dialog-title>Audit trail for {{ entityName }}</h1>
+
+<mat-dialog-content>
+	<table
+		mat-table
+		[dataSource]="trails"
+		multiTemplateDataRows>
+		<ng-container matColumnDef="expand">
+			<th
+				mat-header-cell
+				*matHeaderCellDef>
+				&nbsp;
+			</th>
+			<td
+				mat-cell
+				*matCellDef="let trail">
+				<button
+					mat-icon-button
+					(click)="selectedTrail = selectedTrail === trail ? null : trail; $event.stopPropagation()">
+					@if (selectedTrail === trail) {
+						<mat-icon>keyboard_arrow_up</mat-icon>
+					} @else {
+						<mat-icon>keyboard_arrow_down</mat-icon>
+					}
+				</button>
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="by">
+			<th
+				mat-header-cell
+				*matHeaderCellDef>
+				By
+			</th>
+			<td
+				mat-cell
+				*matCellDef="let trail">
+				{{ trail.auditActor }}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="date">
+			<th
+				mat-header-cell
+				*matHeaderCellDef>
+				Date
+			</th>
+			<td
+				mat-cell
+				*matCellDef="let trail">
+				{{ trail.auditDatetime | dateTimeUTC }}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="context">
+			<th
+				mat-header-cell
+				*matHeaderCellDef>
+				Context
+			</th>
+			<td
+				mat-cell
+				*matCellDef="let trail">
+				{{ trail.auditContext }}
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="modifications">
+			<td
+				mat-cell
+				*matCellDef="let trail"
+				[attr.colspan]="columnsToDisplay.length">
+				<div [class.expanded]="trail === selectedTrail">
+					<table>
+						<thead>
+							<tr>
+								<th>Property</th>
+								<th class="value-column">Old value</th>
+								<th class="value-column">New value</th>
+							</tr>
+						</thead>
+						<tbody>
+							@for (modification of getModification(trail); track modification.property) {
+								<tr>
+									<td>{{ modification.property }}</td>
+									<td>{{ modification.oldValue }}</td>
+									<td>{{ modification.newValue }}</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			</td>
+		</ng-container>
+
+		<tr
+			mat-header-row
+			*matHeaderRowDef="columnsToDisplay"></tr>
+		<tr
+			mat-row
+			*matRowDef="let trail; columns: columnsToDisplay"></tr>
+		<tr
+			mat-row
+			*matRowDef="let row; columns: ['modifications']"
+			class="modifications-row"></tr>
+	</table>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		mat-dialog-close>
+		Close
+	</button>
+</mat-dialog-actions>

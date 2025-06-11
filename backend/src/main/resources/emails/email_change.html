@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	</head>
+	<body>
+		<p>Dear ${user.name},</p>
+
+		<p>The e-mail associated with your <b>${study.defaultLocalizedLongname}</b> account has been changed to <b>${new_email}</b>.</p>
+		<p>You have <b>${time_limit_in_days} days</b> to follow the instructions sent to your new e-mail, if you want this change to take effect.</p>
+
+		<p>In case of trouble, please send an e-mail to <a href="mailto:${study.email}">${study.email}</a>.</p>
+
+		<p>With our best regards,</p>
+		<p>The <b>${study.defaultLocalizedLongname}</b> support team.</p>
+
+		<p>*** This is an automatic notification, please do not reply ***</p>
+	</body>
+</html>

@@ -1,0 +1,67 @@
+<div id="edit_timeline_graph_section_reference">
+	<div class="header">
+		<h2>Timeline graph section reference</h2>
+	</div>
+	<form id="edit_timeline_graph_section_reference_form" method="post" class="content data">
+		<p>
+			<label for="timeline_graph_section_reference_label">Label</label>
+			<app-localized-input id="timeline_graph_section_reference_label" name="label"></app-localized-input>
+		</p>
+		<p>
+			<label for="timeline_graph_section_reference_tooltip">Tooltip</label>
+			<app-localized-input id="timeline_graph_section_reference_tooltip" type="textarea" name="tooltip" class="big"></app-localized-input>
+		</p>
+		<p>
+			<label for="timeline_graph_section_reference_reference_section_id">Reference section</label>
+			<select id="timeline_graph_section_reference_reference_section_id" name="referenceSectionId"></select>
+		</p>
+		<p>
+			<label for="timeline_graph_section_reference_color">Color</label>
+			<input id="timeline_graph_section_reference_color" type="color" name="color" />
+		</p>
+		<p>
+			<label for="timeline_graph_section_reference_dashed">Dashed</label>
+			<input id="timeline_graph_section_reference_dashed" type="checkbox" name="dashed" />
+		</p>
+		<h3>Entries</h3>
+		<p>
+			Time points are set relatively to reference section. You can use "y" for years, "m" for months and "d" for days, for example 1y6m10d.
+		</p>
+		<table id="timeline_graph_section_reference_entries" style="clear: both;">
+			<thead>
+				<tr>
+					<td style="width: 8em;">Time point</td>
+					<td style="min-width: 8em;">Value</td>
+					<td style="min-width: 8em;">Label</td>
+					<td>Delete</td>
+				</tr>
+			</thead>
+			<tbody>
+				<template id="timeline_graph_section_reference_entry">
+					<tr>
+						<td>
+							<input data-name="timepoint" class="very_short" />
+						</td>
+						<td>
+							<input data-name="value" type="number" step="any" class="very_short" />
+						</td>
+						<td>
+							<input data-name="label" class="very_short" />
+						</td>
+						<td>
+							<button type="button" class="image" title="Delete entry">
+								<img src="images/cross.png" alt="Delete" />
+							</button>
+						</td>
+					</tr>
+				</template>
+			</tbody>
+		</table>
+		<div>
+			<button id="timeline_graph_section_reference_entries_add" type="button" style="margin-bottom: 1rem;">Add entry</button>
+		</div>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

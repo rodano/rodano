@@ -1,0 +1,223 @@
+<mat-form-field>
+	<mat-label>Filter</mat-label>
+	<input
+		matInput
+		[formControl]="filter"
+		name="filter" />
+</mat-form-field>
+
+<table
+	mat-table
+	[dataSource]="workflowStatuses.objects"
+	matSort
+	matSortDisableClear>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="SCOPE_CODE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('SCOPE_CODE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			<a [routerLink]="['/crf', status.scopePk, 'dashboard']">{{ status.scopeCode }}</a>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="PARENT_SCOPE_CODE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('PARENT_SCOPE_CODE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.parentScopeCode }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="STATUS_LABEL">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('STATUS_LABEL') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.status }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="STATUS_DATE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('STATUS_DATE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.statusDate | dateUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="EVENT_LABEL">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('EVENT_LABEL') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			<a [routerLink]="['/crf', status.scopePk, 'event', status.eventPk]">{{ status.eventLabel }}</a>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="EVENT_DATE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('EVENT_DATE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.eventDate | dateUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="VALUE_LABEL">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('VALUE_LABEL') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.field }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="FIELD_LABEL">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('FIELD_LABEL') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			<a [routerLink]="['/crf', status.scopePk, 'status', status.pk]">{{ status.fieldLabel }}</a>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="FIELD_DATE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('FIELD_DATE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.fieldDate | dateUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="WORKFLOW_LABEL">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('WORKFLOW_LABEL') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.workflow }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="WORKFLOW_TRIGGER_MESSAGE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('WORKFLOW_TRIGGER_MESSAGE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.triggerMessage }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="FORM_LABEL">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('FORM_LABEL') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			<a [routerLink]="['/crf', status.scopePk, 'event', status.eventPk, 'form', status.formPk]">{{ status.formLabel }}</a>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="FORM_DATE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('FORM_DATE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.formDate | dateUTC }}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let workflowStatusInfo; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-toolbar>
+	<mat-toolbar-row>
+		<button
+			mat-stroked-button
+			[appDownload]="exportUrl">
+			Export
+		</button>
+		<span class="toolbar-spacer"></span>
+		<mat-paginator
+			[pageSize]="workflowStatuses.paging.pageSize"
+			[length]="workflowStatuses.paging.total">
+		</mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

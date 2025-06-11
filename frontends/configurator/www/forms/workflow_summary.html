@@ -1,0 +1,112 @@
+<div id="edit_workflow_summary">
+	<div class="header">
+		<h2>Workflow summary</h2>
+	</div>
+	<form id="edit_workflow_summary_form" method="post" class="content data">
+		<p>
+			<label for="workflow_summary_id">Id</label>
+			<input id="workflow_summary_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="workflow_summary_title">Title</label>
+			<app-localized-input id="workflow_summary_title" name="title"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_summary_workflow_entity" title="Display only workflow states that are linked to the specified entity, useful for workflows that are on different entities">Workflow entity</label>
+			<select id="workflow_summary_workflow_entity" name="workflowEntity"></select>
+		</p>
+		<p>
+			<label for="workflow_summary_workflow_ids">Workflows</label>
+			<app-palette id="workflow_summary_workflow_ids" name="workflowIds"></app-palette>
+		</p>
+		<p>
+			<label for="workflow_summary_leaf_scope_model_id">Leaf scope model</label>
+			<select id="workflow_summary_leaf_scope_model_id" name="leafScopeModelId"></select>
+		</p>
+		<fieldset>
+			<legend>Filter</legend>
+			<p>
+				<label for="workflow_summary_filter_expected_events" title="Do not display workflow states that are linked to expected events">Hide expected events</label>
+				<input id="workflow_summary_filter_expected_events" type="checkbox" name="filterExpectedEvents" />
+			</p>
+			<p>
+				<label for="workflow_summary_filter_event_model_ids">Event models</label>
+				<app-palette id="workflow_summary_filter_event_model_ids" name="filterEventModelIds"></app-palette>
+			</p>
+		</fieldset>
+		<p>
+			<label for="workflow_summary_display_legend" class="long">Display legend</label>
+			<input id="workflow_summary_display_legend" type="checkbox" name="displayLegend" />
+		</p>
+		<p>
+			<label for="workflow_summary_display_column_export" class="long">Display column export</label>
+			<input id="workflow_summary_display_column_export" type="checkbox" name="displayColumnExport" />
+		</p>
+		<div id="workflow_summary_columns" class="nice" style="clear: both; padding-top: 1rem;">
+			<template id="workflow_summary_column">
+				<div>
+					<h3>
+						<img src="images/arrows_up_down.png" alt="Sort" title="Sort column" />
+						<span></span>
+						<button type="button" class="action image" title="Delete column">
+							<img src="images/cross.png" alt="Delete" />
+						</button>
+					</h3>
+					<div>
+						<p>
+							<label>
+								<span>Label</span>
+								<app-localized-input data-name="label"></app-localized-input>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Description</span>
+								<app-localized-input data-name="description" class="long"></app-localized-input>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Total</span>
+								<input data-name="total" type="checkbox" />
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>States</span>
+								<app-palette data-name="stateIds"></app-palette>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Percent</span>
+								<input data-name="percent" type="checkbox" />
+							</label>
+						</p>
+						<fieldset>
+							<legend>Customize color when value is not null</legend>
+							<p>
+								<label>
+									<span>Text color</span>
+									<input type="color" data-name="nonNullColor" />
+								</label>
+							</p>
+							<p>
+								<label>
+									<span>Background color</span>
+									<input type="color" data-name="nonNullBackgroundColor" />
+								</label>
+							</p>
+						</fieldset>
+					</div>
+				</div>
+			</template>
+		</div>
+		<p>
+			<button id="workflow_summary_column_add">Add column</button>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

@@ -1,0 +1,15 @@
+<ion-content style="text-align: center;">
+	<h2>
+		Unable to connect to server.
+	</h2>
+	<p>
+		Please check you internet connection and try again later.
+	</p>
+	<ion-button
+		(click)="checkConnectionAndProceed()"
+		[disabled]="loading"
+		color="primary"
+		fill="solid">
+		Try to connect
+	</ion-button>
+</ion-content>

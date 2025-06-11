@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<!--disable dark/light theme for now because it's not compatible with alternate stylesheets-->
+		<!--<meta name="color-scheme" content="dark light">-->
+		<title>KVConfig</title>
+		<!--css inclusion-->
+		<!--
+			ask Google fonts server to return a non opaque response using the "crossorigin" attribute to be able to cache the response properly in the cache service worker
+			see here https://developers.google.com/web/tools/workbox/guides/handle-third-party-requests for more details
+		-->
+		<link crossorigin="anonymous" href="https://fonts.googleapis.com/css?family=Roboto|Open+Sans:400,700" rel="stylesheet" />
+		<link href="css/base.css" rel="stylesheet" type="text/css" />
+		<link rel="icon" type="image/png" href="images/icon.png" />
+		<link rel="manifest" href="manifest.json">
+		<!--application-->
+		<script type="module" src="app.js"></script>
+	</head>
+	<body>
+		<!--custom elements templates-->
+		<div id="custom_elements"></div>
+
+		<dialog id="study_config" class="full">
+			<form method="dialog">
+				<pre id="study_config_content"></pre>
+				<menu>
+					<li><button id="study_config_close">Close</button></li>
+					<li><button id="study_config_select">Select all</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="logs">
+			<div>
+				<ul id="logs_level" class="tabs manual">
+					<li id="logs_level_error" class="selected" title="Display only errors"><img src="images/exclamation.png" alt="Errors" />Errors</li>
+					<li id="logs_level_warning" class="selected" title="Display warnings and errors"><img src="images/error.png" alt="Warnings" />Warnings</li>
+					<li id="logs_level_info" class="selected" title="Display info, warnings and errors"><img src="images/information.png" alt="Infos" />Infos</li>
+				</ul>
+				<ul id="logs_content"></ul>
+				<menu>
+					<li><button id="logs_close">Close</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="stats" class="full">
+			<div>
+				<h2>Stats</h2>
+				<div class="textcontent">
+					<h3>Current configuration</h3>
+					<p id="stats_nodes_global"></p>
+					<table>
+						<thead>
+							<tr>
+								<th style="width: 100px;">Entity</th>
+								<th style="width: 70px;">Number</th>
+							</tr>
+						</thead>
+						<tbody id="stats_nodes_entities"></tbody>
+					</table>
+					<p id="stats_nodes_script"></p>
+					<p id="stats_complexity"></p>
+					<h3>Application</h3>
+					<p id="stats_time_global"></p>
+					<table style="margin-bottom: 1rem;">
+						<thead>
+							<tr>
+								<th style="width: 120px;">Configuration</th>
+								<th style="width: 350px;">Time</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody id="stats_time_configs"></tbody>
+					</table>
+				</div>
+				<menu>
+					<li><button id="stats_close">Close</button></li>
+					<li><button id="stats_reset">Reset</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="shortcuts" class="full">
+			<div>
+				<h2>Keyboard shortcuts</h2>
+				<div class="textcontent">
+					<h3>Configuration shortcuts</h3>
+					<table>
+						<tbody>
+							<tr>
+								<td>Close current configuration</td>
+								<td><kbd><kbd>C</kbd>+<kbd>W</kbd></kbd></td>
+							</tr>
+							<tr>
+								<td>Push configuration</td>
+								<td><kbd><kbd>C</kbd>+<kbd>P</kbd></kbd></td>
+							</tr>
+							<tr>
+								<td>Save configuration locally</td>
+								<td><kbd><kbd>C</kbd>+<kbd>S</kbd></kbd></td>
+							</tr>
+							<tr>
+								<td>Load local configuration</td>
+								<td><kbd><kbd>C</kbd>+<kbd>O</kbd></kbd></td>
+							</tr>
+							<tr>
+								<td>View configuration in JSON format</td>
+								<td><kbd><kbd>C</kbd>+<kbd>V</kbd></kbd></td>
+							</tr>
+							<tr>
+								<td>Download configuration</td>
+								<td><kbd><kbd>C</kbd>+<kbd>D</kbd></kbd></td>
+							</tr>
+						</tbody>
+					</table>
+					<h3>Other shortcuts</h3>
+					<table>
+						<tbody>
+							<tr>
+								<td>Start a search</td>
+								<td><kbd>S</kbd></td>
+							</tr>
+							<tr>
+								<td>Show log panel</td>
+								<td><kbd><kbd>O</kbd>+<kbd>L</kbd></kbd></td>
+							</tr>
+							<tr>
+								<td>Open transfer window</td>
+								<td><kbd><kbd>O</kbd>+<kbd>T</kbd></kbd></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<menu>
+					<li><button id="shortcuts_close">Close</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="validate">
+			<form method="dialog">
+				<h2>Please confirm</h2>
+				<div id="validate_message" class="textcontent"></div>
+				<menu id="validate_buttons"></menu>
+			</form>
+		</dialog>
+
+		<div id="installation">
+			<p>
+				<img src="images/app_icons/launcher_32.png" style="vertical-align: middle;" />
+				Do you want to install KVConfig as a desktop application?
+			</p>
+			<menu>
+				<li><button id="installation_install">Install</button></li>
+				<li><button id="installation_close">Maybe later</button></li>
+			</menu>
+		</div>
+
+		<div id="notification">
+			<h2>
+				<img id="notification_icon" />
+				<span id="notification_title"></span>
+			</h2>
+			<p id="notification_body"></p>
+		</div>
+
+		<div id="loading">Loading</div>
+
+		<div id="tests">
+			<img id="tests_close" src="images/cross.png" alt="Close" title="Close tests box" style="right: 0.5rem;" />
+			<ul id="tests_asserts"></ul>
+		</div>
+
+		<dialog id="config_save">
+			<form method="dialog" class="nice">
+				<h2>Save configuration</h2>
+				<div class="textcontent">
+					<p>
+						<label>
+							<span>Description</span>
+							<input name="description" class="very_long" required="required" />
+						</label>
+					</p>
+				</div>
+				<menu>
+					<li><button id="config_save_cancel" type="button">Cancel</button></li>
+					<li><button>Save</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="config_load">
+			<div>
+				<h2>Load configuration</h2>
+				<ul id="config_load_list"></ul>
+				<menu>
+					<li><button id="config_load_reset">Delete all backups</button></li>
+					<li><button id="config_load_close">Close</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="transfer">
+			<div>
+				<h2>Transfer</h2>
+				<div class="textcontent">
+					<button id="transfer_start">Start</button>
+					<ul id="transfer_users"></ul>
+					<ul id="transfer_user_files"></ul>
+				</div>
+			</div>
+		</dialog>
+
+		<dialog id="compare" class="full">
+			<div>
+				<ul id="compare_choice">
+					<li id="compare_choice_current">Current config</li>
+					<ul id="compare_choice_backups"></ul>
+				</ul>
+				<h2>
+					Compare
+					<span id="compare_source" data-comparator-side="left" title="Click to select a configuration or drop a file"></span>
+					and
+					<span id="compare_target" data-comparator-side="right" title="Click to select a configuration or drop a file"></span>
+					<button id="compare_switch" style="float: right;">Switch</button>
+				</h2>
+				<div>
+					<div id="compare_error" style="display: none;"></div>
+					<div id="compare_no_difference" class="textcontent" style="display: none;">No difference</div>
+					<div id="compare_has_difference" style="display: none;">
+						<span id="compare_differences_number" style="margin: 0 8px;"></span>
+						<span style="margin: 0 8px;"><span class="legend modification"></span><span id="compare_differences_modifications_number"></span> modifications</span>
+						<span style="margin: 0 8px;"><span class="legend deletion"></span><span id="compare_differences_deletions_number"></span> deletions</span>
+						<span style="margin: 0 8px;"><span class="legend addition"></span><span id="compare_differences_additions_number"></span> additions</span>
+					</div>
+					<ul id="compare_differences"></ul>
+					<form id="compare_documentation" class="textcontent" style="display: none;">
+						<h3>Documentation</h3>
+						<textarea name="text" style="width: calc(100% - 10px);"></textarea>
+						<br style="margin: 0.5rem;" />
+						<button id="compare_documentation_cancel" type="button">Cancel</button>
+						<button>Add documentation to configuration changelog</button>
+					</form>
+				</div>
+				<menu>
+					<li><button id="compare_document">Document</button></li>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="rule_definitions" class="full">
+			<div>
+				<h2>Rule definitions</h2>
+				<div>
+					<ul id="rule_definitions_entities" class="sidetab"></ul>
+					<div>
+						<h4>Custom properties</h4>
+						<ul id="rule_definitions_custom_properties"></ul>
+						<button id="rule_definitions_custom_property_add" data-entity="RuleDefinitionProperty">Add custom property</button>
+						<h4>Custom actions</h4>
+						<ul id="rule_definitions_custom_actions"></ul>
+						<button id="rule_definitions_custom_action_add" data-entity="RuleDefinitionAction">Add custom action</button>
+					</div>
+				</div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="changelog" class="full">
+			<form method="dialog">
+				<h2>Changelogs</h2>
+				<div class="textcontent">
+					<ul id="changelog_previous" style="max-height: 250px; overflow: auto;"></ul>
+					<h3>Add a change log</h3>
+					<p>
+						<textarea name="text" required="required" style="width: calc(100% - 10px); height: 130px;"></textarea>
+					</p>
+				</div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+					<li><button>Save</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="importer" class="full">
+			<div>
+				<h2>Field model importer</h2>
+				<div class="textcontent">
+					<div>
+						<p id="importer_information"></p>
+						<p id="importer_warning"></p>
+						<p id="importer_error"></p>
+						<progress id="importer_progress"></progress>
+					</div>
+					<div id="importer_failure">
+						<p>The file cannot be imported. Fix the following errors and retry:</p>
+						<ul id="importer_report_errors"></ul>
+					</div>
+					<div id="importer_success">
+						<p>File parsed and checked successfully. It contains the following entities:</p>
+						<ul>
+							<li><span id="importer_report_new_dataset_models"></span> new dataset model(s)</li>
+							<li><span id="importer_report_new_field_models"></span> new field model(s)</li>
+							<li><span id="importer_report_updated_dataset_models"></span> existing dataset model(s)</li>
+							<li><span id="importer_report_updated_field_models"></span> existing field models(s)</li>
+						</ul>
+						<p><button id="importer_import">Looks good, import these entities!</button></p>
+					</div>
+				</div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="selection" class="full">
+			<div>
+				<h2>Documentation selection</h2>
+				<div id="selector"></div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+					<li><button id="selection_reset" type="button">Reset</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="formulas_help" class="full">
+			<div>
+				<h2>Formulas</h2>
+				<ul id="formulas_help_list"></ul>
+				<menu>
+					<li><input id="formulas_help_search" type="search" placeholder="search..." /></li>
+					<li><button id="formulas_help_close" type="button">Close</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="search">
+			<form method="dialog">
+				<h2>Search</h2>
+				<div>
+					<label>
+						<span>Entity</span>
+						<br />
+						<select name="entity" required="required"></select>
+					</label>
+					<label id="search_property" style="display: none;">
+						<span>Property</span>
+						<br />
+						<select name="property" required="required"></select>
+					</label>
+					<label id="search_operator" style="display: none;">
+						<span>Operator</span>
+						<br />
+						<select name="operator" required="required"></select>
+					</label>
+					<label id="search_value" style="display: none;">
+						<span>Value</span>
+						<br />
+					</label>
+				</div>
+				<menu>
+					<li><button id="search_cancel" type="button">Cancel</button></li>
+					<li><button id="search_reset" type="reset">Reset</button></li>
+					<li><button>Search</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="consistency_check" class="full">
+			<div>
+				<ul class="tabs">
+					<li data-tab="consistency_check_section_errors" class="selected"><img src="images/exclamation.png" alt="Errors" />Errors <span id="consistency_check_tab_errors"></span></li>
+					<li data-tab="consistency_check_section_warnings"><img src="images/error.png" alt="Warnings" />Warnings <span id="consistency_check_tab_warnings"></span></li>
+					<li data-tab="consistency_check_section_infos"><img src="images/information.png" alt="Infos" />Infos <span id="consistency_check_tab_infos"></span></li>
+				</ul>
+				<div class="textcontent">
+					<ul id="consistency_check_section_errors" class="errors"></ul>
+					<ul id="consistency_check_section_warnings" class="warnings"></ul>
+					<ul id="consistency_check_section_infos" class="infos"></ul>
+				</div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="event_models_form_models" class="full control_panel">
+			<div>
+				<h2>Test and assessments</h2>
+				<div class="textcontent"></div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="field_models_workflows" class="full control_panel">
+			<div>
+				<h2>Field models and workflows</h2>
+				<div class="textcontent"></div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="rules_dashboard" class="full">
+			<div>
+				<h2>Rules dashboard</h2>
+				<div id="rules_dashboard_entities" class="textcontent"></div>
+				<div id="rules_dashboard_control">
+					<input id="rules_dashboard_search" type="search" placeholder="search..." />
+					<ul id="rules_dashboard_tags"></ul>
+				</div>
+				<menu>
+					<li><button id="rules_dashboard_report">Report</button></li>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="constraints_dashboard" class="full">
+			<div>
+				<h2>Conditions dashboard</h2>
+				<div id="constraints_dashboard_entities" class="textcontent"></div>
+				<menu>
+					<li><button id="constraints_dashboard_report">Report</button></li>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="hooks" class="full">
+			<form method="dialog">
+				<h2>Hooks</h2>
+				<div class="textcontent">
+					<p id="hooks_error" class="error"></p>
+					<div id="hooks_values"></div>
+				</div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+					<li><button>Save</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="template_repositories">
+			<div>
+				<h2>Repositories management</h2>
+				<div id="template_repositories_management">
+					<ul id="template_repositories_list"></ul>
+					<button id="template_repository_add">Add repository</button>
+				</div>
+				<form id="template_repository" class="nice" style="display: none;">
+					<p id="template_repository_information"></p>
+					<p>
+						<label>
+							<span>Id</span>
+							<input name="repository_id" required="required" />
+						</label>
+					</p>
+					<p>
+						<label>
+							<span>URL</span>
+							<input type="url" name="url" required="required" class="long" autocomplete="url" />
+						</label>
+					</p>
+					<p>
+						<label>
+							<span>Login</span>
+							<input type="text" name="login" required="required" autocomplete="username" />
+						</label>
+					</p>
+					<p>
+						<label>
+							<span>Password</span>
+							<input type="password" name="password" required="required" autocomplete="current-password" />
+						</label>
+					</p>
+					<p style="text-align: right;">
+						<button id="template_repository_test" type="button">Test</button>
+						<button type="submit">Submit</button>
+					</p>
+				</form>
+				<menu>
+					<li><button id="template_repositories_close" type="button">Close</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="templates" class="full">
+			<form id="template_load_choice" action="post" class="nice">
+				<input type="hidden" name="template_type" />
+				<input type="hidden" name="template_id" />
+				<h2>Choose parent</h2>
+				<div class="textcontent">
+					<label><span>Parent</span><select name="parent"></select></label>
+				</div>
+				<menu>
+					<li><button id="template_load_choice_cancel" type="button">Cancel</button></li>
+					<li><button type="submit">Add template</button></li>
+				</menu>
+			</form>
+			<form id="template_send_choice" method="post" class="nice">
+				<h2>Choose destination</h2>
+				<div class="textcontent">
+					<label><span>Repository</span><select name="repository"></select></label>
+				</div>
+				<menu>
+					<li><button id="template_send_choice_cancel" type="button">Cancel</button></li>
+					<li><button type="submit">Send template</button></li>
+				</menu>
+			</form>
+			<div>
+				<h2>Templates</h2>
+				<h3>
+					Selected repository is <span id="templates_selected_repository"></span>
+					<form id="templates_choose_repository">
+						-
+						<label>
+							Switch to
+							<select name="repository" style="margin-left: 0.5rem;"></select>
+						</label>
+						<button type="submit" class="mini">Switch</button>
+					</form>
+					<button id="templates_repositories_manage">Manage repositories</button>
+				</h3>
+				<div style="position: relative;">
+					<ul id="templates_entities" class="sidetab"></ul>
+					<div id="templates_nodes">
+						<p id="templates_loading" style="display: none;">Loading...</p>
+						<p id="templates_error" class="error"></p>
+					</div>
+				</div>
+				<menu>
+					<li><a class="button" href="#">Close</a></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="template_save">
+			<form class="nice">
+				<h2>Create a template</h2>
+				<h3>Selected repository is <span id="template_save_repository"></span></h3>
+				<div class="textcontent">
+					<p>
+						<label>
+							<span>Name</span>
+							<input name="name" required="required" />
+						</label>
+					</p>
+					<p>
+						<label>
+							<span>Description</span>
+							<input name="description" class="very_long" required="required" />
+						</label>
+					</p>
+				</div>
+				<menu>
+					<li><button id="template_save_cancel" type="button">Cancel</button></li>
+					<li><button>Save</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="authentication">
+			<form method="dialog" class="nice">
+				<h2>Authentication</h2>
+				<div class="textcontent">
+					<div id="authentication_credentials">
+						<h3>Enter your credentials</h3>
+						<p id="authentication_credentials_error" class="error"></p>
+						<p>
+							<label>
+								<span>E-mail</span>
+								<input name="email" type="text" required="required" autocomplete="username" />
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Password</span>
+								<input name="password" type="password" required="required" autocomplete="current-password" />
+							</label>
+						</p>
+					</div>
+					<div id="authentication_token" style="display: none;">
+						<h3>Enter your token</h3>
+						<p id="authentication_token_error" class="error"></p>
+						<p>
+							<label>
+								<span>Token</span>
+								<input name="token" type="number" style="width: 60px;" />
+							</label>
+						</p>
+					</div>
+				</div>
+				<menu>
+					<li><button>Login</button></li>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="welcome">
+			<div>
+				<h2>Welcome</h2>
+				<div class="textcontent">
+					<p>You are in stand-alone mode (no server specified, or unable to reach the server). You can:</p>
+					<section>
+						<h3>Connect to a server</h3>
+						<form id="welcome_connect" class="nice">
+							<p id="welcome_connect_error" class="error"></p>
+							<p>
+								<label>
+									<span>URL</span>
+									<input name="url" type="url" placeholder="http://localhost:8080/api" value="http://localhost:8080/api" required="required" class="very_long" autocomplete="url" />
+								</label>
+							</p>
+							<button>Connect</button>
+						</form>
+					</section>
+					<section>
+						<h3>Load a local configuration file</h3>
+						<p id="welcome_drop_error" class="error"></p>
+						<div id="welcome_drop_local_configuration"></div>
+					</section>
+					<section>
+						<h3>Edit a configuration file on your file system</h3>
+						<p id="welcome_local_configuration_unsupported" class="error">Currently not supported by your browser</p>
+						<button id="welcome_open_filesystem">Open file</button>
+					</section>
+					<section>
+						<h3>Edit a study template or create a new study from a template</h3>
+						<button id="welcome_open_repositories_management">Edit your list of templates repositories</button>
+						<div id="welcome_template_choice">
+							Select an existing study template in list below:
+							<ul id="welcome_templates"></ul>
+						</div>
+						<div id="welcome_no_template">
+							You don't have any template. You should edit your list of templates repositories.
+							<br />
+						</div>
+					</section>
+				</div>
+			</div>
+		</dialog>
+
+		<dialog id="migration" class="full">
+			<div>
+				<h2>Migration</h2>
+				<h3>Your configuration version is <span id="migration_version"></span>. Current version is <span id="migration_current_version"></span>.</h3>
+				<div class="textcontent">
+					<p id="migration_upgrade" style="display: none;">Please wait while your configuration is updated to the latest version...</p>
+					<p id="migration_outdated" style="display: none;">Your configuration is more recent than this version of KvConfig. Update KvConfig to continue.</p>
+					<p id="migration_problem" style="display: none;">Oups. A problem occurs during the migration: <span id="migration_error"></span>.</p>
+					<ul id="migration_history" style="display: none;"></ul>
+					<p id="migration_done" style="display: none;">Migration done.</p>
+				</div>
+				<menu></menu>
+			</div>
+		</dialog>
+
+		<dialog id="wizard">
+			<div>
+				<h2 id="wizard_title">New study</h2>
+				<ul id="wizard_progress" style="display: none;"></ul>
+				<p id="wizard_error" style="display: none;"></p>
+				<p id="wizard_description"></p>
+				<div id="wizard_content"></div>
+				<menu>
+					<li><button id="wizard_cancel">Cancel</button></li>
+					<li><button id="wizard_start">Start</button></li>
+					<li><button id="wizard_previous">Previous</button></li>
+					<li><button id="wizard_next">Next</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="favorites">
+			<div>
+				<h2 id="favorites_handle">Favorites</h2>
+				<ul id="favorites_nodes"></ul>
+				<menu>
+					<li><button id="favorites_clear">Clear</button></li>
+					<li><button id="favorites_close">Close</button></li>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="edition_overlay" class="full"></dialog>
+
+		<menu id="node_menu" class="contextual">
+			<li><button id="node_menu_favorite" title="Save node as a favorite"><img alt="Favorite" src="images/star.png" />Favorite</button></li>
+			<li><button id="node_menu_delete" title="Delete node"><img alt="Delete" src="images/cross.png" />Delete</button></li>
+			<li><button id="node_menu_copy" title="Copy node in the clipboard"><img alt="Copy" src="images/page_copy.png" />Copy</button></li>
+			<li><button id="node_menu_paste" title="Paste node from the clipboard"><img alt="Paste" src="images/page_paste.png" />Paste</button></li>
+			<li><button id="node_menu_clone" title="Clone node"><img alt="Clone" src="images/page_white_copy.png" />Clone</button></li>
+		</menu>
+
+		<menu id="entity_menu" class="contextual">
+			<li><button id="entity_menu_paste" title="Paste node from the clipboard"><img alt="Paste" src="images/page_paste.png" />Paste</button></li>
+		</menu>
+
+		<header>
+			<!--
+				the menubar tabindex="0" is a hack to make Safari understand that these buttons can be focused
+				"button" and "a" tag should be focusable by default, see here https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/tabindex but not in Safari
+				otherwise, it is possible to change an option in Safari as described here https://stackoverflow.com/questions/1848390/safari-ignoring-tabindex
+			-->
+			<ul id="menubar">
+				<li>
+					<button tabindex="0">Configuration</button>
+					<ul>
+						<li>
+							<button tabindex="0" id="menu_configuration_close" disabled="disabled" class="naked">Close current configuration<kbd><kbd>C</kbd>+<kbd>W</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_template_push" disabled="disabled" class="naked">Push template to server<kbd><kbd>C</kbd>+<kbd>P</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_configuration_push" disabled="disabled" class="naked">Push configuration to server<kbd><kbd>C</kbd>+<kbd>P</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_configuration_save" class="naked">Save configuration locally<kbd><kbd>C</kbd>+<kbd>S</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_configuration_load" class="naked">Load configuration stored locally<kbd><kbd>C</kbd>+<kbd>O</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_configuration_save_filesystem" disabled="disabled" class="naked">Save configuration on the file system</button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_configuration_save_as_filesystem" disabled="disabled" class="naked">Save configuration to another file on the file system</button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_configuration_load_filesystem" class="naked">Open a configuration from your file system</button>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<button tabindex="0">Settings</button>
+					<ul>
+						<li>
+							<button tabindex="0" data-setting-id="id_check" title="Toggle check on node id (compatibility mode)"><img src="images/untick.png" />Id check</button>
+						</li>
+						<li>
+							<button tabindex="0" data-setting-id="automatic_backup" title="Enable automatic backup every 5 minutes"><img src="images/untick.png" />Backup automatically</button>
+						</li>
+						<li>
+							<button tabindex="0" data-setting-id="prevent_exit" title="Prevent closing the window if modifications have not been saved if checked"><img src="images/untick.png" />Prevent exit</button>
+						</li>
+						<li>
+							<button tabindex="0" data-setting-id="document_before_push" title="Force to document modifications made to the configuration before pushing it to the server if checked"><img src="images/untick.png" />Document before push</button>
+						</li>
+						<li class="expendable">
+							<button tabindex="0" class="naked">Default language</button>
+							<ul id="menu_languages"></ul>
+						</li>
+						<li class="expendable">
+							<button tabindex="0" class="naked">Theme</button>
+							<ul id="menu_themes"></ul>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<button tabindex="0">Tools</button>
+					<ul>
+						<li>
+							<a tabindex="0" href="#tool=rule_definitions" class="naked">Rule definitions</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#tool=comparator" class="naked">Comparator</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#tool=selection" class="naked">Documentation selection</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#tool=templates" class="naked">Templates</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#tool=changelog" class="naked">Changelog</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#tool=hooks" class="naked">Hooks</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#tool=importer" class="naked">Field model importer</a>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<button tabindex="0">Matrices</button>
+					<ul id="menu_matrices"></ul>
+				</li>
+				<li>
+					<button tabindex="0">Triggers</button>
+					<ul id="menu_triggers"></ul>
+				</li>
+				<li>
+					<button tabindex="0">Reports</button>
+					<ul>
+						<li>
+							<a tabindex="0" href="#report=consistency_check" class="naked">Consistency check</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#report=event_models_form_models" class="naked">Tests and assessments</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#report=workflows_field_models" class="naked">Field models and workflows</a>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_reports_matrices" class="naked">Matrices</button>
+						</li>
+						<li>
+							<a tabindex="0" href="#report=rules_dashboard" class="naked">Rules dashboard</a>
+						</li>
+						<li>
+							<a tabindex="0" href="#report=constraints_dashboard" class="naked">Constraints dashboard</a>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_reports_data_validation_plan" class="naked">Data validation plan</button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_reports_field_models_relation" class="naked">Field models relations</button>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<button tabindex="0">Advanced</button>
+					<ul>
+						<li>
+							<button tabindex="0" id="menu_advanced_show" class="naked">View JSON<kbd><kbd>C</kbd>+<kbd>V</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_advanced_download" class="naked">Download JSON<kbd><kbd>C</kbd>+<kbd>D</kbd></kbd></button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_advanced_logs" class="naked">Show logs<kbd><kbd>O</kbd>+<kbd>L</kbd></kbd></button>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<button tabindex="0">Wizards</button>
+					<ul>
+						<li>
+							<button tabindex="0" id="menu_wizards_payment" class="naked">Payment creation</button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_wizards_validator" class="naked">Validator creation</button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_wizards_form_model" class="naked">Form model creation</button>
+						</li>
+					</ul>
+				</li>
+				<li>
+					<button tabindex="0">?</button>
+					<ul>
+						<li>
+							<button tabindex="0" id="menu_help_shortcuts" class="naked">Shortcuts</button>
+						</li>
+						<li>
+							<button tabindex="0" id="menu_help_statistics" class="naked">Stats</button>
+						</li>
+					</ul>
+				</li>
+			</ul>
+			<ul id="iconbar">
+				<li>
+					<button id="menu_configuration_push_icon" disabled="disabled" title="Push configuration to server" class="icon">
+						<img src="images/disk_upload.png" alt="Push" />
+					</button>
+				</li>
+				<li>
+					<button id="menu_configuration_save_icon" disabled="disabled" title="Save configuration to the file system" class="icon">
+						<img src="images/disk.png" alt="Save" />
+					</button>
+				</li>
+			</ul>
+			<h1>No configuration</h1>
+		</header>
+
+		<div id="content">
+			<aside>
+				<div id="tree"></div>
+				<form id="tree_search">
+					<ul id="tree_search_results" class="node_autocomplete"></ul>
+					<input name="search" type="search" placeholder="search..." autosave="false" />
+					<img id="tree_advanced_search" src="images/find.png" alt="Search" title="Advanced search" />
+					<img id="tree_expand_all" src="images/section_collapsed.png" alt="Expand" title="Expand all" />
+					<img id="tree_collapse_all" src="images/section_expanded.png" alt="Collapse" title="Collapse all" />
+				</form>
+			</aside>
+
+			<main>
+				<div id="help">
+					<p>Select a node in the tree or reset the search</p>
+				</div>
+
+				<div id="matrix"></div>
+
+				<div id="nodes">
+					<div class="header">
+						<h2>Nodes</h2>
+					</div>
+					<div class="content">
+						<ul id="nodes_child_nodes"></ul>
+					</div>
+				</div>
+
+				<div id="layout">
+					<div class="header">
+						<h2>Layout</h2>
+					</div>
+					<div class="content">
+						<div id="layout_widgets_types_container">
+							<p>Drag and drop (or double click) widgets in the area below</p>
+							<ul id="layout_widgets_types"></ul>
+						</div>
+						<form id="layout_composition" method="post" class="data">
+							<div id="layout_sections_container">
+								<ul id="layout_sections"></ul>
+								<button id="layout_sections_add" type="button">Add section</button>
+							</div>
+							<div id="layout_widgets"></div>
+							<menu id="layout_buttons" style="clear: none;">
+								<button type="button" id="layout_cancel">Cancel</button>
+								<button type="submit">Save</button>
+							</menu>
+						</form>
+					</div>
+				</div>
+
+				<div id="trigger">
+					<div class="header">
+						<h2>Trigger</h2>
+					</div>
+					<div class="content">
+						<div id="trigger_rules" class="rules"></div>
+					</div>
+				</div>
+
+				<form id="rule">
+					<div class="header">
+						<h2>Rule</h2>
+					</div>
+					<div class="content">
+						<div id="rule_properties">
+							<div>
+								<label for="rule_description">Description</label>
+								<div><input id="rule_description" required="required" /></div>
+							</div>
+							<div>
+								<label for="rule_message">Message</label>
+								<div><app-localized-input id="rule_message"></app-localized-input></div>
+							</div>
+							<div>
+								<label for="rule_tags_field">Tags</label>
+								<div style="position: relative;">
+									<ul id="rule_tags_selected"></ul>
+									<ul id="rule_tags_choices"></ul>
+									<input id="rule_tags_field" autocomplete="off" />
+									<input id="rule_tags" type="hidden" />
+								</div>
+							</div>
+						</div>
+						<div id="rule_conditions_container">
+							<h3>Conditions</h3>
+							<ul id="rule_conditions"></ul>
+							<ul id="rule_conditions_dsl"></ul>
+						</div>
+						<div id="rule_evaluations_container" style="display: none;">
+							<h3>Evaluations</h3>
+							<ul id="rule_evaluations"></ul>
+							<button type="button" id="rule_evaluation_add">Add evaluation</button>
+						</div>
+						<div id="rule_actions_container">
+							<h3>Actions</h3>
+							<ul id="rule_actions"></ul>
+							<button type="button" id="rule_action_add">Add action</button>
+						</div>
+						<p>
+							<button id="rule_formulas" type="button" class="mini">Show list of available formulas</button>
+						</p>
+						<menu>
+							<li><button type="button" id="rule_cancel">Cancel</button></li>
+							<li><button type="submit">Save</button></li>
+						</menu>
+					</div>
+				</form>
+
+				<div id="edition"></div>
+			</main>
+		</div>
+	</body>
+</html>

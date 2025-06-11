@@ -1,0 +1,28 @@
+<h1 mat-dialog-title>Create a {{ data.childScopeModel.shortname | localizeMap | lowercase }}</h1>
+
+<mat-dialog-content>
+	<mat-form-field class="scope-picker">
+		<mat-label>Select a {{ parentScopes[0].model.shortname | localizeMap | lowercase }}</mat-label>
+		<mat-select [(value)]="selectedScope">
+			@for (parentScope of parentScopes; track parentScope.pk) {
+				<mat-option [value]="parentScope">
+					{{ parentScope | scopeCodeShortname }}
+				</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		mat-dialog-close>
+		Cancel
+	</button>
+	<button
+		[disabled]="!selectedScope"
+		mat-flat-button
+		[mat-dialog-close]="selectedScope">
+		Create
+	</button>
+</mat-dialog-actions>

@@ -1,0 +1,12 @@
+Dear ${user.name},
+
+You have not activated your ${study.defaultLocalizedLongname} account yet.
+
+When your membership request was validated, ${study.defaultLocalizedLongname} has sent you an activation code. You must use it to complete the Activation form and activate your ${study.defaultLocalizedLongname} account.
+
+Please go to ${study.url} and follow the link "Activate Account", enter your activation code and press "Activate". You will be asked to confirm your identity and choose your personal password.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

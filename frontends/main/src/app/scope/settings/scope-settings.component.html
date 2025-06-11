@@ -1,0 +1,160 @@
+<form
+	name="scopeUpdateForm"
+	[formGroup]="scopeUpdateForm"
+	(ngSubmit)="save()"
+	class="centered">
+	<p>
+		<mat-form-field>
+			<mat-label>Code</mat-label>
+			<input
+				matInput
+				formControlName="code"
+				required />
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="code" />
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Shortname</mat-label>
+			<input
+				matInput
+				formControlName="shortname"
+				required />
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="shortname" />
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Longname</mat-label>
+			<input
+				matInput
+				formControlName="longname"
+				required />
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="longname" />
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Max number</mat-label>
+			<input
+				matInput
+				formControlName="maxNumber" />
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="maxNumber" />
+
+		<mat-form-field>
+			<mat-label>Expected number</mat-label>
+			<input
+				matInput
+				formControlName="expectedNumber" />
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="expectedNumber" />
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Start date</mat-label>
+			<input
+				matInput
+				[matDatepicker]="startDatePicker"
+				formControlName="startDate" />
+			<mat-datepicker-toggle
+				matSuffix
+				[for]="startDatePicker"></mat-datepicker-toggle>
+			<mat-datepicker #startDatePicker></mat-datepicker>
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="startDate" />
+
+		<mat-form-field>
+			<mat-label>End date</mat-label>
+			<input
+				matInput
+				[matDatepicker]="stopDatePicker"
+				formControlName="stopDate" />
+			<mat-datepicker-toggle
+				matSuffix
+				[for]="stopDatePicker"></mat-datepicker-toggle>
+			<mat-datepicker #stopDatePicker></mat-datepicker>
+		</mat-form-field>
+		<app-audit-trail-button
+			[scope]="scope"
+			property="stopDate" />
+	</p>
+
+	<p class="actions">
+		@if (scope.removed) {
+			<button
+				mat-flat-button
+				(click)="restore()"
+				type="button">
+				Restore
+			</button>
+		} @else {
+			@if (scope.locked) {
+				<button
+					mat-flat-button
+					(click)="unlock()"
+					type="button">
+					Unlock
+				</button>
+			} @else {
+				<button
+					mat-flat-button
+					(click)="lock()"
+					type="button">
+					Lock
+				</button>
+			}
+
+			<button
+				mat-flat-button
+				(click)="remove()"
+				type="button">
+				Remove
+			</button>
+
+			<button
+				mat-flat-button
+				type="submit"
+				[disabled]="scopeUpdateForm.invalid">
+				Save
+			</button>
+		}
+	</p>
+
+	<div class="workflow-statuses">
+		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+		@for (status of scope.workflowStatuses; track status.pk || status.workflowId) {
+			<app-workflow-status
+				[entity]="workflowableEntity.SCOPE"
+				[workflowStatus]="status"
+				[workflowable]="scope"
+				(actionResponse)="onWorkflowExecution($event)">
+			</app-workflow-status>
+		}
+		<!-- Display workflows that can be created -->
+		@for (workflow of scope.possibleWorkflows; track workflow.id) {
+			<app-workflow-status
+				[entity]="workflowableEntity.SCOPE"
+				[workflowable]="scope"
+				[workflow]="workflow"
+				(actionResponse)="onWorkflowExecution($event)">
+			</app-workflow-status>
+		}
+	</div>
+</form>

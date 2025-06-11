@@ -1,0 +1,58 @@
+<div class="centered">
+	<h1>Test email</h1>
+	<form
+		(ngSubmit)="sendMail()"
+		[formGroup]="mailForm">
+		<p>
+			This form can be used to send an email. The email will be sent whatever the environment (even if not in production
+			mode).
+		</p>
+
+		<p class="error">{{ error }}</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Recipient</mat-label>
+				<input
+					matInput
+					name="recipient"
+					formControlName="recipient"
+					autocomplete="off"
+					required />
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Subject</mat-label>
+				<input
+					matInput
+					name="subject"
+					formControlName="subject"
+					autocomplete="off"
+					required />
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Body</mat-label>
+				<textarea
+					matInput
+					name="body"
+					formControlName="body"
+					autocomplete="off"
+					required></textarea>
+			</mat-form-field>
+		</p>
+
+		<p class="actions">
+			<button
+				mat-flat-button
+				type="submit"
+				[disabled]="mailForm.invalid">
+				Send email
+			</button>
+		</p>
+	</form>
+</div>

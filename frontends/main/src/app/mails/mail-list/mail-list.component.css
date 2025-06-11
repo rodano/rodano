@@ -1,0 +1,22 @@
+table {
+	padding-top: 0.5em;
+}
+.mat-column-selected {
+	width: 8rem;
+}
+.mat-column-status {
+	width: 8rem;
+}
+.mat-column-creationTime,
+.mat-column-sentTime {
+	width: 12rem;
+}
+.mat-column-recipients {
+	width: 20rem;
+}
+.mat-column-attachments {
+	width: 8rem;
+}
+.mat-column-actions {
+	width: 8rem;
+}

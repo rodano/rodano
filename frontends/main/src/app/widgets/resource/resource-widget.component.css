@@ -1,0 +1,27 @@
+ul {
+	margin: 0;
+	padding: 0;
+	& > li {
+		list-style: none;
+		min-height: 2rem;
+		&.expanded {
+			background-color: var(--light-highlight-color);
+			border-radius: var(--mat-sys-corner-extra-small);
+		}
+		&.no-description {
+			padding-left: 32px;
+		}
+		& time {
+			font-size: 0.8rem;
+			opacity: 0.7;
+			margin-right: var(--gap);
+		}
+		& button {
+			vertical-align: middle;
+		}
+		& p {
+			padding: 0.2rem;
+			margin: 0.2rem 0;
+		}
+	}
+}

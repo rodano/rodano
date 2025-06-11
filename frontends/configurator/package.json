@@ -1,0 +1,40 @@
+{
+	"name": "@rodano/rodano-configurator",
+	"description": "Rodano configuration tool",
+	"version": "6.12.1",
+	"scripts": {
+		"start": "node server.js",
+		"test": "node --experimental-vm-modules tests/test.js www/tests/suites",
+		"lint": "eslint .",
+		"tsc": "tsc",
+		"update-worker-cache": "node update_worker_cache.js",
+		"generate-bundle": "node update_worker_cache.js && node generate_bundle.js"
+	},
+	"keywords": [],
+	"files": [
+		"/www",
+		"/server.js"
+	],
+	"private": false,
+	"type": "module",
+	"license": "AGPL-3.0-only",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/rodano/rodano-configurator.git"
+	},
+	"dependencies": {
+		"finalhandler": "1.3.1",
+		"serve-static": "1.16.2"
+	},
+	"devDependencies": {
+		"@types/node": "22.10.2",
+		"archiver": "^7.0.1",
+		"eslint": "^9.16.0",
+		"eslint-plugin-jsdoc": "^50.6.1",
+		"globals": "^15.13.0",
+		"xmlbuilder2": "3.1.1",
+		"puppeteer": "23.10.4",
+		"rimraf": "6.0.1",
+		"typescript": "5.7.2"
+	}
+}

@@ -1,0 +1,11 @@
+#wizard_validator_range_values input {
+	width: 11rem;
+}
+#wizard_validator_range_values span {
+	margin: 0 3px;
+	max-width: 11rem;
+}
+#wizard_validator_range_values img {
+	text-align: bottom;
+	cursor: pointer;
+}

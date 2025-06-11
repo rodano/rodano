@@ -1,0 +1,39 @@
+@if (widget.textBefore) {
+	<p [innerHTML]="widget.textBefore"></p>
+}
+
+@if (widget.type === 'WELCOME_TEXT') {
+	<app-welcome-text></app-welcome-text>
+} @else if (widget.type === 'GENERAL_INFORMATIONS') {
+	<app-general-info-widget></app-general-info-widget>
+} @else if (widget.type === 'RESOURCE') {
+	<!-- TODO widget parameters should be strings and not objects -->
+	<app-resource-widget [category]="widget.parameters['category'].toString()"></app-resource-widget>
+} @else if (widget.type === 'HIGHCHART') {
+	<app-chart-widget [id]="widget.parameters['chart'].toString()"> </app-chart-widget>
+} @else if (widget.type === 'WORKFLOW') {
+	<!-- TODO solve the badge update flow -->
+	<app-workflow-widget
+		[id]="widget.parameters['workflow'].toString()"
+		[scopes]="scopes"
+		(workflowsLoaded)="passEventToParent($event)">
+	</app-workflow-widget>
+} @else if (widget.type === 'WORKFLOWS_SUMMARY') {
+	<app-workflow-summary-widget
+		[id]="widget.parameters['summary'].toString()"
+		[scopes]="scopes">
+	</app-workflow-summary-widget>
+} @else if (widget.type === 'LOCK_SUMMARY') {
+	<app-lock-summary-widget [scopes]="scopes"></app-lock-summary-widget>
+} @else if (widget.type === 'SCOPE_OVERDUE') {
+	<app-overdue-widget
+		[id]="widget.parameters['OVERDUE_TYPE'].toString()"
+		[scopes]="scopes"
+		[specificColumnName]="widget.parameters['SPECIFIC_COLUMN_NAME'].toString()"
+		(scopesLoaded)="passEventToParent($event)">
+	</app-overdue-widget>
+}
+
+@if (widget.textAfter) {
+	<p [innerHTML]="widget.textAfter"></p>
+}

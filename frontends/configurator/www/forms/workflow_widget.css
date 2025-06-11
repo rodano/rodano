@@ -1,0 +1,23 @@
+#workflow_widget_workflow_states_selectors > div {
+	padding-top: 1rem;
+}
+#workflow_widget_workflow_states_selectors > div > h3 > button {
+	margin-left: 0.5rem;
+}
+#workflow_widget_workflow_states_selectors > div > h3 > button > img {
+	vertical-align: text-bottom;
+}
+
+#workflow_widget_columns > div {
+	padding-top: 1rem;
+}
+#workflow_widget_columns > div > h3 > img {
+	vertical-align: middle;
+	cursor: pointer;
+}
+#workflow_widget_columns > div > h3 > button {
+	margin-left: 0.5rem;
+}
+#workflow_widget_columns > div > h3 > button > img {
+	vertical-align: text-bottom;
+}

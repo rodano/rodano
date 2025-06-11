@@ -1,0 +1,12 @@
+.year {
+	width: 6rem;
+}
+.year-month {
+	width: 8rem;
+}
+.year-month-day {
+	width: 10rem;
+}
+.mat-mdc-form-field + .mat-mdc-form-field {
+	margin-left: 1rem;
+}

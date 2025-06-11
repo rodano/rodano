@@ -1,0 +1,8 @@
+Dear ${user.name},
+
+A new ${resource_category_name} has been published on ${scope.shortname}: ${resource.title}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

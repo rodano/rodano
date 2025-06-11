@@ -1,0 +1,119 @@
+@if (shown) {
+	@if (!isEmptyObject(layout.textBefore)) {
+		<div
+			class="block"
+			[innerHTML]="layout.textBefore | localizeMap | safeHtml"></div>
+	}
+
+	<table
+		mat-table
+		[dataSource]="dataSource"
+		[trackBy]="trackBy"
+		multiTemplateDataRows
+		matSort
+		(matSortChange)="sortChange($event)">
+		@if (dataSource.data.length === 0) {
+			<tr
+				*matNoDataRow
+				class="no-data-row">
+				<td [attr.colspan]="columnsToDisplay.length">No data</td>
+			</tr>
+		}
+
+		@for (fieldModel of fieldModelsToDisplay; track fieldModel.id) {
+			<ng-container [matColumnDef]="fieldModel.id">
+				<th
+					mat-header-cell
+					*matHeaderCellDef
+					mat-sort-header>
+					{{ fieldModel.shortname | localizeMap }}
+				</th>
+				<td
+					mat-cell
+					*matCellDef="let dataset">
+					{{ getFieldValue(dataset, fieldModel.id) }}
+				</td>
+			</ng-container>
+		}
+
+		<ng-container matColumnDef="actions">
+			<th
+				mat-header-cell
+				*matHeaderCellDef>
+				Actions
+			</th>
+			<td
+				mat-cell
+				*matCellDef="let dataset">
+				@if (!disabled && dataset.canWrite) {
+					@if (dataset.removed) {
+						<button
+							mat-icon-button
+							type="button"
+							matTooltip="Restore"
+							(click)="restoreDataset(dataset); $event.stopPropagation()">
+							<mat-icon>restore_from_trash</mat-icon>
+						</button>
+					} @else {
+						<button
+							mat-icon-button
+							type="button"
+							matTooltip="Delete"
+							(click)="removeDataset(dataset); $event.stopPropagation()">
+							<mat-icon>delete</mat-icon>
+						</button>
+					}
+				}
+				<app-audit-trail-button [dataset]="dataset" />
+			</td>
+		</ng-container>
+
+		<ng-container matColumnDef="expandedDataset">
+			<td
+				mat-cell
+				*matCellDef="let dataset"
+				[attr.colspan]="columnsToDisplay.length">
+				<div [@layoutExpand]="dataset.expanded ? 'expanded' : 'collapsed'">
+					<app-layout
+						[layout]="layout"
+						[datasets]="[dataset]"
+						[layoutUid]="layout.id + '_' + dataset.id"
+						[disabled]="dataset.removed || disabled">
+					</app-layout>
+				</div>
+			</td>
+		</ng-container>
+
+		<tr
+			mat-header-row
+			*matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+		<tr
+			mat-row
+			*matRowDef="let dataset; columns: columnsToDisplay"
+			class="dataset"
+			[class.error]="hasError(dataset)"
+			[class.removed]="dataset.removed"
+			(click)="dataset.expanded = !dataset.expanded"></tr>
+		<tr
+			mat-row
+			*matRowDef="let dataset; columns: ['expandedDataset']"
+			class="expanded-dataset"></tr>
+	</table>
+
+	@if (!disabled && layout.datasetModel.canWrite) {
+		<div class="footer">
+			<button
+				(click)="addDataset()"
+				mat-flat-button
+				type="button">
+				Add {{ layout.datasetModel.shortname | localizeMap }}
+			</button>
+		</div>
+	}
+
+	@if (!isEmptyObject(layout.textAfter)) {
+		<div
+			class="block"
+			[innerHTML]="layout.textAfter | localizeMap | safeHtml"></div>
+	}
+}

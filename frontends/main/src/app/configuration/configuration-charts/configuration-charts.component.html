@@ -1,0 +1,85 @@
+<div class="header-container">
+	<!-- HEADER -->
+	<div class="header">
+		<mat-icon class="icon">bar_chart</mat-icon>
+		<span>{{ chart?.title }}</span>
+	</div>
+</div>
+
+<div class="main">
+	@if (chart) {
+		<div class="config">
+			<app-dynamic-form
+				[dto]="chart"
+				[fieldOptions]="{
+					chartType: chartTypeOptions,
+					'chartConfig.graphType': graphTypeOptions,
+					'chartConfig.unitFormat': unitFormatOptions,
+					'chartConfig.dataLabelPos': dataLabelPositions,
+					'chartConfig.dataLabelFormat': dataLabelFormats,
+					'requestParams.leafScopeModelId': scopeModelOptions,
+					'requestParams.datasetModelId': datasetModelOptions,
+					'requestParams.scopeModelId': scopeModelOptions,
+					'requestParams.fieldModelId': fieldModelOptions,
+					'requestParams.workflowId': workflowOptions,
+					'requestParams.stateIds': stateOptions,
+					'requestParams.eventModelId': eventOptions,
+				}"
+				[excludedFields]="getExcludedFields(chart.chartType)"
+				[immutableFields]="isNewChart ? [] : ['chartId']"
+				[onFieldChange]="handleFieldChange.bind(this)" />
+		</div>
+	}
+	<div class="right-container">
+		<div class="preview">
+			<div class="category-header">Preview</div>
+			@if (chart && chart.data && chart.data.series && chart.data.series.length > 0) {
+				<div class="chart">
+					<app-chart-ui [chart]="chart" />
+				</div>
+				<!-- <span>{{ this.chart.data | json }}</span> -->
+			} @else {
+				<div class="info-box">
+					<mat-icon>bar_chart</mat-icon>
+					These Request Parameters didn't fetch any data
+				</div>
+			}
+			@if (chart && showSyncButton) {
+				<button
+					mat-flat-button
+					class="sync-button"
+					(click)="handleSync()">
+					Reload Data
+				</button>
+			}
+		</div>
+		<div class="save-cancel-buttons">
+			<!-- Cancel button-->
+			<button
+				mat-flat-button
+				[disabled]="!changesMade"
+				(click)="handleCancel()"
+				class="cancel-button">
+				Cancel
+			</button>
+
+			<!-- Delete button-->
+			<button
+				mat-flat-button
+				color="warn"
+				(click)="openDeleteConfirmationDialog()"
+				class="cancel-button">
+				Delete
+			</button>
+
+			<!-- Save button -->
+			<button
+				mat-flat-button
+				(click)="handleSave()"
+				[disabled]="!changesMade"
+				[ngClass]="{'purple-hover': changesMade}">
+				Save
+			</button>
+		</div>
+	</div>
+</div>

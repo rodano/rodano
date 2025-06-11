@@ -1,0 +1,116 @@
+@if (scopes && scopes.length > 1) {
+	<mat-form-field>
+		<mat-label>Scope selector</mat-label>
+		<mat-select
+			[formControl]="control"
+			name="rootScope">
+			@for (scope of scopes; track scope.pk) {
+				<mat-option [value]="scope.pk">{{ scope | scopeCodeShortname }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+}
+
+<app-scope-breadcrumb
+	[scopes]="ancestors"
+	disableDeepest="true"
+	(scopeChange)="this.selectScope($event)"
+	style="margin-bottom: 1rem">
+</app-scope-breadcrumb>
+
+@if (loading) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<table
+	mat-table
+	[dataSource]="dataSource">
+	<!-- do not display this message is the page is still loading-->
+	@if (!loading) {
+		<tr
+			*matNoDataRow
+			class="no-data-row">
+			<td [attr.colspan]="columnsToDisplay.length">No data</td>
+		</tr>
+	}
+
+	<ng-container matColumnDef="scope">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Scope
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let row">
+			@if (row.scope.modelId === rootScopeModel.id) {
+				<strong>{{ row.scope | scopeCodeShortname }}</strong>
+			} @else if (row.scope.modelId === leafScopeModel.id) {
+				<a
+					[routerLink]="['/crf', row.scope.pk]"
+					matTooltip="Open in the CRF"
+					style="margin-left: 0.5rem">
+					{{ row.scope | scopeCodeShortname }}
+				</a>
+			} @else if (row.scope === getRootScope()) {
+				<button
+					(click)="selectScope(getParent())"
+					matTooltip="Go up"
+					class="scope-selector">
+					<strong>{{ row.scope | scopeCodeShortname }}</strong>
+				</button>
+			} @else {
+				<button
+					(click)="selectScope(row.scope)"
+					matTooltip="Display details"
+					class="scope-selector"
+					style="margin-left: 0.5rem">
+					{{ row.scope | scopeCodeShortname }}
+				</button>
+			}
+		</td>
+	</ng-container>
+
+	@for (column of columns; track column.id) {
+		<ng-container [matColumnDef]="column.id">
+			<th
+				mat-header-cell
+				*matHeaderCellDef>
+				{{ column.label | localizeMap }}
+			</th>
+			<td
+				mat-cell
+				*matCellDef="let row">
+				{{ getValue(row, column) }}
+				@if (column.percent) {
+					<span class="percent">({{ getValuePercent(row, column) }}%)</span>
+				}
+			</td>
+		</ng-container>
+	}
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let row; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-divider></mat-divider>
+<mat-toolbar>
+	<mat-toolbar-row>
+		@for (button of buttons; track button.url; let index = $index) {
+			<button
+				mat-stroked-button
+				[appDownload]="button.url"
+				[class.toolbar-offset]="index > 0">
+				{{ button.label }}
+			</button>
+		}
+		<span class="toolbar-spacer"></span>
+		<mat-paginator
+			[pageSize]="20"
+			showFirstLastButtons></mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

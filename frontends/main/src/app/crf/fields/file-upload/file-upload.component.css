@@ -1,0 +1,8 @@
+.drop-zone {
+	border: 1px dashed var(--mat-sys-primary);
+	border-radius: var(--mat-sys-corner-extra-small);
+	margin: 0.5rem auto;
+}
+.mdc-icon-button {
+	vertical-align: sub;
+}

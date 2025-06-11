@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script type="text/javascript" src="extension.js"></script>
+		<script type="text/javascript" src="dom_extension.js"></script>
+		<script type="text/javascript" src="forms.js"></script>
+		<script type="text/javascript">
+			var countries = [
+				{name : 'Afghanistan', code : 'AF'},
+				{name : 'Åland Islands', code : 'AX'},
+				{name : 'Albania', code : 'AL'},
+				{name : 'Algeria', code : 'DZ'},
+				{name : 'American Samoa', code : 'AS'},
+				{name : 'AndorrA', code : 'AD'},
+				{name : 'Angola', code : 'AO'},
+				{name : 'Anguilla', code : 'AI'},
+				{name : 'Antarctica', code : 'AQ'},
+				{name : 'Antigua and Barbuda', code : 'AG'},
+				{name : 'Argentina', code : 'AR'},
+				{name : 'Armenia', code : 'AM'},
+				{name : 'Aruba', code : 'AW'},
+				{name : 'Australia', code : 'AU'},
+				{name : 'Austria', code : 'AT'},
+				{name : 'Azerbaijan', code : 'AZ'},
+				{name : 'Bahamas', code : 'BS'},
+				{name : 'Bahrain', code : 'BH'},
+				{name : 'Bangladesh', code : 'BD'},
+				{name : 'Barbados', code : 'BB'},
+				{name : 'Belarus', code : 'BY'},
+				{name : 'Belgium', code : 'BE'},
+				{name : 'Belize', code : 'BZ'},
+				{name : 'Benin', code : 'BJ'},
+				{name : 'Bermuda', code : 'BM'},
+				{name : 'Bhutan', code : 'BT'},
+				{name : 'Bolivia', code : 'BO'},
+				{name : 'Bosnia and Herzegovina', code : 'BA'},
+				{name : 'Botswana', code : 'BW'},
+				{name : 'Bouvet Island', code : 'BV'},
+				{name : 'Brazil', code : 'BR'},
+				{name : 'British Indian Ocean Territory', code : 'IO'},
+				{name : 'Brunei Darussalam', code : 'BN'},
+				{name : 'Bulgaria', code : 'BG'},
+				{name : 'Burkina Faso', code : 'BF'},
+				{name : 'Burundi', code : 'BI'},
+				{name : 'Cambodia', code : 'KH'},
+				{name : 'Cameroon', code : 'CM'},
+				{name : 'Canada', code : 'CA'},
+				{name : 'Cape Verde', code : 'CV'},
+				{name : 'Cayman Islands', code : 'KY'},
+				{name : 'Central African Republic', code : 'CF'},
+				{name : 'Chad', code : 'TD'},
+				{name : 'Chile', code : 'CL'},
+				{name : 'China', code : 'CN'},
+				{name : 'Christmas Island', code : 'CX'},
+				{name : 'Cocos (Keeling) Islands', code : 'CC'},
+				{name : 'Colombia', code : 'CO'},
+				{name : 'Comoros', code : 'KM'},
+				{name : 'Congo', code : 'CG'},
+				{name : 'Congo, The Democratic Republic of the', code : 'CD'},
+				{name : 'Cook Islands', code : 'CK'},
+				{name : 'Costa Rica', code : 'CR'},
+				{name : 'Cote D\'Ivoire', code : 'CI'},
+				{name : 'Croatia', code : 'HR'},
+				{name : 'Cuba', code : 'CU'},
+				{name : 'Cyprus', code : 'CY'},
+				{name : 'Czech Republic', code : 'CZ'},
+				{name : 'Denmark', code : 'DK'},
+				{name : 'Djibouti', code : 'DJ'},
+				{name : 'Dominica', code : 'DM'},
+				{name : 'Dominican Republic', code : 'DO'},
+				{name : 'Ecuador', code : 'EC'},
+				{name : 'Egypt', code : 'EG'},
+				{name : 'El Salvador', code : 'SV'},
+				{name : 'Equatorial Guinea', code : 'GQ'},
+				{name : 'Eritrea', code : 'ER'},
+				{name : 'Estonia', code : 'EE'},
+				{name : 'Ethiopia', code : 'ET'},
+				{name : 'Falkland Islands (Malvinas)', code : 'FK'},
+				{name : 'Faroe Islands', code : 'FO'},
+				{name : 'Fiji', code : 'FJ'},
+				{name : 'Finland', code : 'FI'},
+				{name : 'France', code : 'FR'},
+				{name : 'French Guiana', code : 'GF'},
+				{name : 'French Polynesia', code : 'PF'},
+				{name : 'French Southern Territories', code : 'TF'},
+				{name : 'Gabon', code : 'GA'},
+				{name : 'Gambia', code : 'GM'},
+				{name : 'Georgia', code : 'GE'},
+				{name : 'Germany', code : 'DE'},
+				{name : 'Ghana', code : 'GH'},
+				{name : 'Gibraltar', code : 'GI'},
+				{name : 'Greece', code : 'GR'},
+				{name : 'Greenland', code : 'GL'},
+				{name : 'Grenada', code : 'GD'},
+				{name : 'Guadeloupe', code : 'GP'},
+				{name : 'Guam', code : 'GU'},
+				{name : 'Guatemala', code : 'GT'},
+				{name : 'Guernsey', code : 'GG'},
+				{name : 'Guinea', code : 'GN'},
+				{name : 'Guinea-Bissau', code : 'GW'},
+				{name : 'Guyana', code : 'GY'},
+				{name : 'Haiti', code : 'HT'},
+				{name : 'Heard Island and Mcdonald Islands', code : 'HM'},
+				{name : 'Holy See (Vatican City State)', code : 'VA'},
+				{name : 'Honduras', code : 'HN'},
+				{name : 'Hong Kong', code : 'HK'},
+				{name : 'Hungary', code : 'HU'},
+				{name : 'Iceland', code : 'IS'},
+				{name : 'India', code : 'IN'},
+				{name : 'Indonesia', code : 'ID'},
+				{name : 'Iran, Islamic Republic Of', code : 'IR'},
+				{name : 'Iraq', code : 'IQ'},
+				{name : 'Ireland', code : 'IE'},
+				{name : 'Isle of Man', code : 'IM'},
+				{name : 'Israel', code : 'IL'},
+				{name : 'Italy', code : 'IT'},
+				{name : 'Jamaica', code : 'JM'},
+				{name : 'Japan', code : 'JP'},
+				{name : 'Jersey', code : 'JE'},
+				{name : 'Jordan', code : 'JO'},
+				{name : 'Kazakhstan', code : 'KZ'},
+				{name : 'Kenya', code : 'KE'},
+				{name : 'Kiribati', code : 'KI'},
+				{name : 'Korea, Democratic People\'S Republic of', code : 'KP'},
+				{name : 'Korea, Republic of', code : 'KR'},
+				{name : 'Kuwait', code : 'KW'},
+				{name : 'Kyrgyzstan', code : 'KG'},
+				{name : 'Lao People\'S Democratic Republic', code : 'LA'},
+				{name : 'Latvia', code : 'LV'},
+				{name : 'Lebanon', code : 'LB'},
+				{name : 'Lesotho', code : 'LS'},
+				{name : 'Liberia', code : 'LR'},
+				{name : 'Libyan Arab Jamahiriya', code : 'LY'},
+				{name : 'Liechtenstein', code : 'LI'},
+				{name : 'Lithuania', code : 'LT'},
+				{name : 'Luxembourg', code : 'LU'},
+				{name : 'Macao', code : 'MO'},
+				{name : 'Macedonia, The Former Yugoslav Republic of', code : 'MK'},
+				{name : 'Madagascar', code : 'MG'},
+				{name : 'Malawi', code : 'MW'},
+				{name : 'Malaysia', code : 'MY'},
+				{name : 'Maldives', code : 'MV'},
+				{name : 'Mali', code : 'ML'},
+				{name : 'Malta', code : 'MT'},
+				{name : 'Marshall Islands', code : 'MH'},
+				{name : 'Martinique', code : 'MQ'},
+				{name : 'Mauritania', code : 'MR'},
+				{name : 'Mauritius', code : 'MU'},
+				{name : 'Mayotte', code : 'YT'},
+				{name : 'Mexico', code : 'MX'},
+				{name : 'Micronesia, Federated States of', code : 'FM'},
+				{name : 'Moldova, Republic of', code : 'MD'},
+				{name : 'Monaco', code : 'MC'},
+				{name : 'Mongolia', code : 'MN'},
+				{name : 'Montserrat', code : 'MS'},
+				{name : 'Morocco', code : 'MA'},
+				{name : 'Mozambique', code : 'MZ'},
+				{name : 'Myanmar', code : 'MM'},
+				{name : 'Namibia', code : 'NA'},
+				{name : 'Nauru', code : 'NR'},
+				{name : 'Nepal', code : 'NP'},
+				{name : 'Netherlands', code : 'NL'},
+				{name : 'Netherlands Antilles', code : 'AN'},
+				{name : 'New Caledonia', code : 'NC'},
+				{name : 'New Zealand', code : 'NZ'},
+				{name : 'Nicaragua', code : 'NI'},
+				{name : 'Niger', code : 'NE'},
+				{name : 'Nigeria', code : 'NG'},
+				{name : 'Niue', code : 'NU'},
+				{name : 'Norfolk Island', code : 'NF'},
+				{name : 'Northern Mariana Islands', code : 'MP'},
+				{name : 'Norway', code : 'NO'},
+				{name : 'Oman', code : 'OM'},
+				{name : 'Pakistan', code : 'PK'},
+				{name : 'Palau', code : 'PW'},
+				{name : 'Palestinian Territory, Occupied', code : 'PS'},
+				{name : 'Panama', code : 'PA'},
+				{name : 'Papua New Guinea', code : 'PG'},
+				{name : 'Paraguay', code : 'PY'},
+				{name : 'Peru', code : 'PE'},
+				{name : 'Philippines', code : 'PH'},
+				{name : 'Pitcairn', code : 'PN'},
+				{name : 'Poland', code : 'PL'},
+				{name : 'Portugal', code : 'PT'},
+				{name : 'Puerto Rico', code : 'PR'},
+				{name : 'Qatar', code : 'QA'},
+				{name : 'Reunion', code : 'RE'},
+				{name : 'Romania', code : 'RO'},
+				{name : 'Russian Federation', code : 'RU'},
+				{name : 'RWANDA', code : 'RW'},
+				{name : 'Saint Helena', code : 'SH'},
+				{name : 'Saint Kitts and Nevis', code : 'KN'},
+				{name : 'Saint Lucia', code : 'LC'},
+				{name : 'Saint Pierre and Miquelon', code : 'PM'},
+				{name : 'Saint Vincent and the Grenadines', code : 'VC'},
+				{name : 'Samoa', code : 'WS'},
+				{name : 'San Marino', code : 'SM'},
+				{name : 'Sao Tome and Principe', code : 'ST'},
+				{name : 'Saudi Arabia', code : 'SA'},
+				{name : 'Senegal', code : 'SN'},
+				{name : 'Serbia and Montenegro', code : 'CS'},
+				{name : 'Seychelles', code : 'SC'},
+				{name : 'Sierra Leone', code : 'SL'},
+				{name : 'Singapore', code : 'SG'},
+				{name : 'Slovakia', code : 'SK'},
+				{name : 'Slovenia', code : 'SI'},
+				{name : 'Solomon Islands', code : 'SB'},
+				{name : 'Somalia', code : 'SO'},
+				{name : 'South Africa', code : 'ZA'},
+				{name : 'South Georgia and the South Sandwich Islands', code : 'GS'},
+				{name : 'Spain', code : 'ES'},
+				{name : 'Sri Lanka', code : 'LK'},
+				{name : 'Sudan', code : 'SD'},
+				{name : 'Suriname', code : 'SR'},
+				{name : 'Svalbard and Jan Mayen', code : 'SJ'},
+				{name : 'Swaziland', code : 'SZ'},
+				{name : 'Sweden', code : 'SE'},
+				{name : 'Switzerland', code : 'CH'},
+				{name : 'Syrian Arab Republic', code : 'SY'},
+				{name : 'Taiwan, Province of China', code : 'TW'},
+				{name : 'Tajikistan', code : 'TJ'},
+				{name : 'Tanzania, United Republic of', code : 'TZ'},
+				{name : 'Thailand', code : 'TH'},
+				{name : 'Timor-Leste', code : 'TL'},
+				{name : 'Togo', code : 'TG'},
+				{name : 'Tokelau', code : 'TK'},
+				{name : 'Tonga', code : 'TO'},
+				{name : 'Trinidad and Tobago', code : 'TT'},
+				{name : 'Tunisia', code : 'TN'},
+				{name : 'Turkey', code : 'TR'},
+				{name : 'Turkmenistan', code : 'TM'},
+				{name : 'Turks and Caicos Islands', code : 'TC'},
+				{name : 'Tuvalu', code : 'TV'},
+				{name : 'Uganda', code : 'UG'},
+				{name : 'Ukraine', code : 'UA'},
+				{name : 'United Arab Emirates', code : 'AE'},
+				{name : 'United Kingdom', code : 'GB'},
+				{name : 'United States', code : 'US'},
+				{name : 'United States Minor Outlying Islands', code : 'UM'},
+				{name : 'Uruguay', code : 'UY'},
+				{name : 'Uzbekistan', code : 'UZ'},
+				{name : 'Vanuatu', code : 'VU'},
+				{name : 'Venezuela', code : 'VE'},
+				{name : 'Viet Nam', code : 'VN'},
+				{name : 'Virgin Islands, British', code : 'VG'},
+				{name : 'Virgin Islands, U.S.', code : 'VI'},
+				{name : 'Wallis and Futuna', code : 'WF'},
+				{name : 'Western Sahara', code : 'EH'},
+				{name : 'Yemen', code : 'YE'},
+				{name : 'Zambia', code : 'ZM'},
+				{name : 'Zimbabwe', code : 'ZW'}
+			];
+		</script>
+		<style media="screen" type="text/css">
+			body {
+				font-family: Verdana;
+				font-size: 12px;
+			}
+			.datalist {
+				display: none;
+				position: absolute;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+				width: 100%;
+				border: 1px solid #333;
+				box-sizing: border-box;
+				background-color: white;
+				z-index: 1;
+			}
+			.datalist > li {
+				cursor: pointer;
+				padding: 2px 0.5rem;
+			}
+			.datalist > li.selected {
+				background-color: #bbb;
+			}
+			.datalist .highlight {
+				color: red;
+			}
+			#autocomplete > div {
+				width: 250px;
+				position: relative;
+			}
+			#autocomplete input {
+				display: inline-block;
+				width: 100%;
+				box-sizing: border-box;
+			}
+			#tagger > div {
+				width: 600px;
+				position: relative;
+			}
+			#tagger input {
+				display: inline-block;
+				width: 100%;
+				box-sizing: border-box;
+			}
+			#tagger_countries {
+				line-height: 22px;
+			}
+			#tagger_countries_selected {
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				margin: 0;
+				padding: 0;
+			}
+			#tagger_countries_selected > li {
+				display: inline-block;
+				border: 1px solid #333;
+				border-radius: 2px;
+				background-color: #ccc;
+				padding: 2px;
+			}
+			#tagger_countries_selected > span > span {
+				border: 1px solid #333;
+				border-radius: 2px;
+			}
+		</style>
+		<title>Forms</title>
+	</head>
+	<body>
+		<h1>Forms</h1>
+		<h2>Autocomplete</h2>
+		<form id="autocomplete">
+			<label for="autocomplete_country">Country:</label>
+			<div>
+				<input id="autocomplete_country" name="country" autocomplete="off" />
+				<ul id="autocomplete_countries_choice" class="datalist"></ul>
+			</div>
+		</form>
+		<h2>Tagger</h2>
+		<form id="tagger">
+			<input name="selected_countries" type="hidden" value="[&quot;CH&quot;,&quot;FR&quot;]" />
+			<label for="tagger_countries">Countries:</label>
+			<div>
+				<ul id="tagger_countries_selected"></ul>
+				<input id="tagger_countries" name="countries" autocomplete="off" />
+				<ul id="tagger_countries_choices" class="datalist"></div>
+			</div>
+			<button id="tagger_change_input" type="button">Change selection programmatically</button>
+		</form>
+		<script type="text/javascript">
+			var countries_provider = function(text) {
+				var filter = text.toLowerCase();
+				return countries.filter(c => c.name.toLowerCase().includes(filter) || c.code.toLowerCase().includes(filter));
+			}
+
+			//autocomplete
+			var autocomplete_country_drawer = function(country, value) {
+				var regexp = new RegExp('('+ value + ')', 'gi');
+				var country_li = document.createFullElement('li', {'data-value' : country.code});
+				var country_label = country.name + ' (' + country.code + ')';
+				var country_span = document.createElement('span');
+				country_span.innerHTML = country_label.replace(regexp, '<span class="highlight">$1</span>');
+				country_li.appendChild(country_span);
+				return country_li;
+			}
+
+			document.getElementById('autocomplete').addEventListener(
+				'submit',
+				function(event) {
+					console.log('Final selection is ' + this['country'].value);
+					event.stop();
+				}
+			);
+
+			Forms.Autocomplete(
+				document.getElementById('autocomplete')['country'],
+				document.getElementById('autocomplete_countries_choice'),
+				countries_provider,
+				autocomplete_country_drawer,
+				function(country, value) {
+					if(country) {
+						console.log('Country selected: ' + country.name);
+					}
+					else {
+						console.log('Unknown country selected: ' + value);
+					}
+				},
+				function(country) {
+					console.log('Country highlighted: ' + country.name);
+				},
+				function(value) {
+					console.log('Country input updated: ' + value);
+				}
+			);
+
+			//drawer
+			var tagger_country_drawer = function(country, value) {
+				var regexp = new RegExp('('+ value + ')', 'gi');
+				var country_li = document.createFullElement('li', {'data-value' : country.code});
+				var country_label = country.code;
+				var country_span = document.createElement('span');
+				country_span.innerHTML = country_label.replace(regexp, '<span class="highlight">$1</span>');
+				country_li.appendChild(country_span);
+				return country_li;
+			}
+
+			document.getElementById('tagger').addEventListener(
+				'submit',
+				function(event) {
+					console.log('Final selection is ' + this['selected_countries'].value);
+					event.stop();
+				}
+			);
+
+			Forms.Tagger(
+				document.getElementById('tagger')['countries'],
+				document.getElementById('tagger_countries_choices'),
+				document.getElementById('tagger_countries_selected'),
+				document.getElementById('tagger')['selected_countries'],
+				countries_provider,
+				tagger_country_drawer,
+				function(country, value) {
+					if(country) {
+						console.log('Country selected: ' + country.name);
+					}
+					else {
+						console.log('Unknown country selected: ' + value);
+					}
+				},
+				function(country) {
+					console.log('Country highlighted: ' + country.name);
+				},
+				function(value) {
+					console.log('Country input updated: ' + value);
+				}
+			);
+
+			document.getElementById('tagger_change_input').addEventListener(
+				'click',
+				function() {
+					var selected_input = document.getElementById('tagger')['selected_countries'];
+					selected_input.value = '["AU", "ES", "FR"]';
+					var change_event = new UIEvent('change', {bubbles : true, cancelable : true});
+					selected_input.dispatchEvent(change_event);
+				}
+			);
+		</script>
+	</body>
+</html>

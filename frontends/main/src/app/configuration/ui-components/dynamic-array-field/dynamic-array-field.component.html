@@ -1,0 +1,157 @@
+<div
+	class="item-header"
+	[style.margin-left.px]="currentLayer * 16">
+	<div>{{ getLabel(key) }}</div>
+
+	<!-- If the array has pre-defined options, we render a dropdown-multiselect to choose from -->
+	@if (options.length > 0) {
+		<mat-form-field appearance="outline">
+			<mat-select
+				multiple
+				[formControl]="arrayControl">
+				@for (option of options; track $index) {
+					<mat-option [value]="option.value ?? option">
+						{{ option.label ?? option.value ?? option }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+	}
+</div>
+<div
+	class="item-wrapper"
+	[style.margin-left.px]="currentLayer * 16">
+	@if (options.length > 0) {
+		@if (dto[key].length > 0) {
+			@for (item of dto[key]; track $index) {
+				<div class="item">
+					<div class="item-text">
+						{{ item }}
+					</div>
+				</div>
+			}
+		} @else {
+			<div>No selection</div>
+		}
+	} @else {
+		@for (item of dto[key]; track $index) {
+			<div class="item">
+				<div
+					cdk-overlay-origin
+					#origin="cdkOverlayOrigin"
+					class="flex-row-center">
+					<div class="flex-row-center color-box-wrapper">
+						@if (isHexColor(item)) {
+							<span
+								class="color-box"
+								[style.background-color]="item"
+								(click)="openOverlay($index, origin)">
+							</span>
+						} @else {
+							<div
+								class="item-text"
+								(click)="openOverlay($index, origin)">
+								{{ item }}
+							</div>
+						}
+
+						<!-- Overlay (shared for add/edit) -->
+						@if (activeOverlayOrigin === origin) {
+							<ng-template
+								cdkConnectedOverlay
+								[cdkConnectedOverlayOpen]="activeOverlayOrigin !== null"
+								[cdkConnectedOverlayOrigin]="activeOverlayOrigin"
+								[cdkConnectedOverlayHasBackdrop]="true"
+								[cdkConnectedOverlayBackdropClass]="'transparent-backdrop'"
+								(backdropClick)="closeOverlay()"
+								[cdkConnectedOverlayOffsetY]="-8">
+								<div
+									class="popup flex-row-center"
+									(click)="onOverlayClick($event)">
+									@if (isHexColor(editedValue)) {
+										<span
+											class="color-box"
+											[style.background-color]="editedValue"></span>
+									}
+									<mat-form-field
+										appearance="outline"
+										class="change-field">
+										<input
+											matInput
+											type="text"
+											[formControl]="editedValue" />
+									</mat-form-field>
+
+									@if (isAddingNew) {
+										<mat-icon
+											(click)="applyChange()"
+											class="add-button"
+											>add</mat-icon
+										>
+									} @else {
+										<mat-icon
+											(click)="applyChange()"
+											class="change-button"
+											>arrow_downward</mat-icon
+										>
+										<mat-icon
+											(click)="removeItem(key, activeIndex!)"
+											class="remove-button"
+											>close</mat-icon
+										>
+									}
+								</div>
+							</ng-template>
+						}
+					</div>
+				</div>
+			</div>
+		}
+
+		<div
+			cdk-overlay-origin
+			#addOrigin="cdkOverlayOrigin"
+			class="add-button-container">
+			<mat-icon
+				(click)="openAddOverlay(addOrigin)"
+				class="button"
+				>add</mat-icon
+			>
+
+			@if (activeOverlayOrigin === addOrigin) {
+				<ng-template
+					cdkConnectedOverlay
+					[cdkConnectedOverlayOpen]="activeOverlayOrigin !== null"
+					[cdkConnectedOverlayOrigin]="activeOverlayOrigin"
+					[cdkConnectedOverlayHasBackdrop]="true"
+					[cdkConnectedOverlayBackdropClass]="'transparent-backdrop'"
+					(backdropClick)="closeOverlay()"
+					[cdkConnectedOverlayOffsetY]="-8">
+					<div
+						class="popup flex-row-center"
+						(click)="onOverlayClick($event)">
+						@if (isHexColor(editedValue)) {
+							<span
+								class="color-box"
+								[style.background-color]="editedValue"></span>
+						}
+						<mat-form-field
+							appearance="outline"
+							class="change-field">
+							<input
+								matInput
+								type="text"
+								[formControl]="editedValue" />
+						</mat-form-field>
+
+						<mat-icon
+							(click)="applyChange()"
+							class="add-button"
+							>add</mat-icon
+						>
+					</div>
+				</ng-template>
+			}
+		</div>
+	}
+</div>

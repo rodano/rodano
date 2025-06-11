@@ -1,0 +1,71 @@
+<div id="edit_rule_definition_action">
+	<div class="header">
+		<h2>Rule definition action</h2>
+	</div>
+	<form id="edit_rule_definition_action_form" method="post" class="content data">
+		<p>
+			<label for="rule_definition_action_id">Id</label>
+			<input id="rule_definition_action_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="rule_definition_action_label">Label</label>
+			<input id="rule_definition_action_label" name="label" class="long" />
+		</p>
+		<p>
+			<label for="rule_definition_action_entity">Entity</label>
+			<select id="rule_definition_action_entity" name="entityId"></select>
+		</p>
+		<div id="rule_definition_action_parameters" class="nice" style="clear: both;">
+			<template id="rule_definition_action_parameter">
+				<div>
+					<h3>
+						<img src="images/arrows_up_down.png" alt="Sort" title="Sort parameter" />
+						<span></span>
+						<button type="button" class="action image" title="Delete parameter">
+							<img src="images/cross.png" alt="Delete" />
+						</button>
+					</h3>
+					<div>
+						<p>
+							<label>
+								<span>Id</span>
+								<input data-name="id" pattern="[A-Z][A-Z0-9_]{0,61}" />
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Label</span>
+								<input data-name="label" class="long" />
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Data entity</span>
+								<select data-name="dataEntity" class="long"></select>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Configuration entity</span>
+								<select data-name="configurationEntity" class="long"></select>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Options</span>
+								<input data-name="options" class="long" />
+							</label>
+						</p>
+					</div>
+				</div>
+			</template>
+		</div>
+		<div>
+			<button id="rule_definition_action_parameters_add" type="button" style="margin-bottom: 1rem;">Add parameter</button>
+		</div>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+		<div id="rule_definition_action_usage" class="node_usage"></div>
+	</form>
+</div>

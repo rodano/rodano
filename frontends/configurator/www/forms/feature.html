@@ -1,0 +1,30 @@
+<div id="edit_feature">
+	<div class="header">
+		<h2>Feature</h2>
+	</div>
+	<form id="edit_feature_form" method="post" class="content data">
+		<p>
+			<label for="feature_id">Id</label>
+			<input id="feature_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="feature_shortname">Shortname</label>
+			<app-localized-input id="feature_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="feature_longname">Longname</label>
+			<app-localized-input id="feature_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="feature_description">Description</label>
+			<app-localized-input id="feature_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="feature_optional">Optional</label>
+			<input id="feature_optional" type="checkbox" name="optional" />
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

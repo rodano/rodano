@@ -1,0 +1,115 @@
+<table
+	mat-table
+	[dataSource]="workflowStatuses.objects"
+	matSort
+	matSortDisableClear>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="eventShortname">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Event
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			@if (status.eventFk) {
+				<a [routerLink]="['/crf', status.scopeFk, 'event', status.eventFk]">{{ status.eventShortname }}</a>
+			} @else {
+				NA
+			}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="eventDate">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Event date
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			@if (status.eventDate) {
+				{{ status.eventDate | dateUTC }}
+			} @else {
+				NA
+			}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="fieldShortname">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Field
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			@if (status.fieldFk) {
+				<a [routerLink]="['/crf', status.scopeFk, 'status', status.pk]">{{ status.fieldShortname }}</a>
+			} @else {
+				NA
+			}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="workflowId">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Workflow
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.workflowId | capitalizeFirst }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="stateId">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Status
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.state.shortname | localizeMap }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="triggerMessage">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Message
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.triggerMessage }}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let status; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-paginator
+	[pageSize]="workflowStatuses.paging.pageSize"
+	[length]="workflowStatuses.paging.total">
+</mat-paginator>

@@ -1,0 +1,129 @@
+<div class="centered">
+	<form
+		[formGroup]="emailForm"
+		(ngSubmit)="changeEmail()">
+		<mat-card appearance="outlined">
+			<mat-card-header>
+				<mat-card-title>Email</mat-card-title>
+				@if (!user.pendingEmail) {
+					<mat-card-subtitle>
+						@if (me.pk === user.pk) {
+							<span>
+								If you change your email, you will have 7 days to verify your new email address through an email that is sent
+								automatically.
+							</span>
+						} @else {
+							<span>
+								If the email of the user is changed, the user will have 7 days to verify his new email address through an email
+								that is sent automatically.
+							</span>
+						}
+						Without this verification the change will not take effect.
+					</mat-card-subtitle>
+				}
+			</mat-card-header>
+			<mat-card-content>
+				@if (user.pendingEmail && getDifferenceInDays(user.newEmailExpirationDate) > 0) {
+					<p>
+						@if (me.pk === user.pk) {
+							You have {{ getDifferenceInDays(user.newEmailExpirationDate) }} days to verify your new email address:
+						} @else {
+							The user has {{ getDifferenceInDays(user.newEmailExpirationDate) }} days to verify their new email address:
+						}
+						<strong>{{ user.pendingEmail }}</strong>
+					</p>
+					<p>
+						<button
+							mat-flat-button
+							type="button"
+							(click)="resendEmailVerificationEmail()">
+							Resend email verification email
+						</button>
+					</p>
+				}
+				<p>
+					<mat-form-field>
+						<mat-label>Email</mat-label>
+						<input
+							matInput
+							type="email"
+							formControlName="email"
+							required />
+					</mat-form-field>
+				</p>
+			</mat-card-content>
+			<mat-card-actions align="end">
+				<button
+					mat-flat-button
+					type="submit"
+					[disabled]="emailForm.pristine || emailForm.invalid">
+					Change email
+				</button>
+			</mat-card-actions>
+		</mat-card>
+	</form>
+
+	<!-- Only display this form if the user modify themselves -->
+	@if (me.pk === user.pk) {
+		<app-change-password
+			[changeRequestContext]="ChangePasswordContext.USER_REQUEST"
+			[me]="me">
+		</app-change-password>
+	}
+
+	@if (user.canWrite) {
+		<p class="actions">
+			@if (user.removed) {
+				<button
+					mat-flat-button
+					type="button"
+					(click)="restore()">
+					Restore
+				</button>
+			} @else {
+				<button
+					mat-flat-button
+					type="button"
+					(click)="remove()">
+					Remove
+				</button>
+
+				@if (!user.activated) {
+					<button
+						mat-flat-button
+						type="button"
+						(click)="resendAccountActivationEmail()">
+						Resend account activation email
+					</button>
+				}
+
+				@if (user.blocked) {
+					<button
+						mat-flat-button
+						type="button"
+						(click)="unblock()">
+						Unblock
+					</button>
+				}
+
+				@if (me.admin) {
+					@if (user.externallyManaged) {
+						<button
+							mat-flat-button
+							type="button"
+							(click)="convertToLocal()">
+							Convert to local
+						</button>
+					} @else {
+						<button
+							mat-flat-button
+							type="button"
+							(click)="convertToExternal()">
+							Convert to external
+						</button>
+					}
+				}
+			}
+		</p>
+	}
+</div>

@@ -1,0 +1,310 @@
+---
+- name: Create instance on Google Compute Engine
+  hosts: rodanos
+  vars:
+    study_path: /opt/study
+    rodano_path: /opt/rodano
+  vars_prompt:
+    - name: reset_database
+      prompt: Do you wan to reset the database?
+      default: "false"
+      private: false
+  tasks:
+    - name: Print debug message
+      ansible.builtin.debug:
+        msg: "Run by {{ lookup('env', 'USER') }} on {{ inventory_hostname }} at {{ ansible_date_time.date }}."
+
+    - name: Install basic tools
+      ansible.builtin.apt:
+        pkg: "{{ packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      vars:
+        packages:
+          - gpg
+          - jq
+      become: true
+
+    # Manage time
+    # Set timezone
+    - name: Set timezone to UTC
+      community.general.timezone:
+        name: UTC
+      become: true
+
+    # Uninstall old time sync management systems
+    - name: Uninstall old time sync management system
+      ansible.builtin.apt:
+        pkg: "{{ packages }}"
+        state: absent
+        update_cache: true
+        cache_valid_time: 3600
+      vars:
+        packages:
+          - ntp
+          - chrony
+      become: true
+
+    # Install old time sync management systems
+    - name: Install new time sync management system
+      ansible.builtin.apt:
+        pkg: "{{ packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      vars:
+        packages:
+          - systemd-timesyncd
+      become: true
+
+    # Ensure that the new systemd time sync service is running
+    - name: Reload service timesyncd
+      ansible.builtin.service:
+        name: systemd-timesyncd
+        state: restarted
+      become: true
+
+    # Let's Encrypt certbot with its Nginx plugin
+    - name: Install Let's encrypt certbot
+      ansible.builtin.apt:
+        pkg: "{{ packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      vars:
+        packages:
+          - certbot
+          - python3-certbot-nginx
+      become: true
+
+    # Install and configure Fail2ban
+    - name: Install Fail2ban
+      ansible.builtin.apt:
+        pkg: fail2ban
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+    - name: Copy Fail2ban configuration
+      ansible.builtin.copy:
+        src: /etc/fail2ban/jail.conf
+        dest: /etc/fail2ban/jail.local
+        remote_src: true
+        mode: "0644"
+      become: true
+
+    - name: Enable Nginx HTTP authentication jail in Fail2ban
+      community.general.ini_file:
+        path: /etc/fail2ban/jail.local
+        section: nginx-http-auth
+        option: enabled
+        value: "true"
+        mode: "0644"
+      become: true
+
+    - name: Enable Nginx bot search jail in Fail2ban
+      community.general.ini_file:
+        path: /etc/fail2ban/jail.local
+        section: nginx-botsearch
+        option: enabled
+        value: "true"
+        mode: "0644"
+      become: true
+
+    # Docker
+    - name: Download Docker GPG key
+      ansible.builtin.get_url:
+        url: https://download.docker.com/linux/debian/gpg
+        dest: /tmp/docker.gpg
+        mode: "0644"
+
+    - name: De-Armor Docker GPG key
+      ansible.builtin.command:
+        cmd: gpg --dearmor --batch --yes -o /usr/share/keyrings/docker.gpg /tmp/docker.gpg
+        creates: /usr/share/keyrings/docker.gpg
+      become: true
+
+    - name: Install Docker APT repository
+      ansible.builtin.apt_repository:
+        repo: deb [arch=amd64 signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/debian bookworm stable
+        state: present
+        update_cache: true
+        filename: docker
+      become: true
+
+    - name: Install Docker
+      ansible.builtin.apt:
+        pkg: "{{ packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      vars:
+        packages:
+          - docker-ce
+          - docker-ce-cli
+          - docker-compose-plugin
+      become: true
+
+    - name: Install tools required to login to a Docker registry
+      ansible.builtin.apt:
+        pkg: "{{ packages }}"
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      vars:
+        packages:
+          - gnupg2
+          - pass
+      become: true
+
+    - name: Add user to docker group
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+      become: true
+
+    # Git
+    - name: Install Git
+      ansible.builtin.apt:
+        pkg: git
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      become: true
+
+    # Retrieve study
+    - name: Prepare study folder
+      ansible.builtin.file:
+        state: directory
+        dest: "{{ study_path }}"
+        mode: "0700"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+
+    - name: Clone study Git repository
+      ansible.builtin.git:
+        accept_hostkey: true
+        repo: "{{ study_git_url }}"
+        dest: "{{ study_path }}"
+        version: "{{ study_git_reference }}"
+        force: true
+
+    # Set up Rodano
+    - name: Prepare rodano folder
+      ansible.builtin.file:
+        state: directory
+        dest: "{{ rodano_path }}"
+        mode: "0700"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+
+    - name: Copy Docker Compose file
+      ansible.builtin.template:
+        src: "../docker-compose.yml"
+        dest: "{{ rodano_path }}/docker-compose.yml"
+        mode: "0644"
+
+    - name: Create Docker Compose environment file
+      ansible.builtin.template:
+        src: "templates/env"
+        dest: "{{ rodano_path }}/env"
+        mode: "0600"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+
+    - name: Pull or refresh Docker images
+      community.docker.docker_compose_v2_pull:
+        project_src: "{{ rodano_path }}"
+        env_files:
+          - "{{ rodano_path }}/env"
+
+    # Set up Nginx
+    - name: Setup Let's Encrypt certificate
+      ansible.builtin.command:
+        cmd: certbot certonly --nginx -d {{ server_name }} --email {{ server_email }} --agree-tos --keep --non-interactive
+        creates: /etc/letsencrypt/live/{{ server_name }}
+      become: true
+
+    - name: Add Nginx configuration
+      ansible.builtin.template:
+        src: "templates/nginx.conf"
+        dest: "/etc/nginx/sites-available/rodano"
+        mode: "0644"
+      become: true
+
+    - name: Enable Nginx configuration
+      ansible.builtin.file:
+        src: "/etc/nginx/sites-available/rodano"
+        dest: "/etc/nginx/sites-enabled/rodano"
+        state: link
+      become: true
+
+    - name: Reload Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
+      become: true
+
+    # Set up systemd service
+    - name: Prepare systemd folder
+      ansible.builtin.file:
+        state: directory
+        dest: "{{ ansible_env.HOME }}/.config/systemd/user"
+        mode: "0700"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+
+    - name: Allow user to run systemd services even without session
+      ansible.builtin.command:
+        cmd: "loginctl enable-linger {{ ansible_user }}"
+        creates: /var/lib/systemd/linger/{{ ansible_user }}
+      become: true
+
+    - name: Create systemd service
+      ansible.builtin.template:
+        src: "templates/rodano.service"
+        dest: "{{ ansible_env.HOME }}/.config/systemd/user/rodano.service"
+        mode: "0600"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+      become: true
+
+    - name: Retrieve user UID
+      ansible.builtin.command: "id -u {{ ansible_user }}"
+      register: uid
+      changed_when: false
+
+    # Do not start the service here, it will be started in the next step
+    # This step will setup the service during the first deployment and will stop the service for subsequent deployments
+    - name: Reload systemd configuration and enable (so it is started automatically on boot) the rodano service
+      ansible.builtin.systemd:
+        name: rodano
+        state: stopped
+        daemon_reload: true
+        enabled: true
+        scope: user
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
+
+    - name: Reset database
+      ansible.builtin.file:
+        state: absent
+        dest: "{{ study_path }}/database"
+      when: reset_database | bool
+      become: true
+
+    - name: Start the rodano service
+      ansible.builtin.systemd:
+        name: rodano
+        state: started
+        scope: user
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"

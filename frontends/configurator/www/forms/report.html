@@ -1,0 +1,42 @@
+<div id="edit_report">
+	<div class="header">
+		<h2>Report</h2>
+	</div>
+	<form id="edit_report_form" method="post" class="content data">
+		<p>
+			<label for="report_id">Id</label>
+			<input id="report_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="report_shortname">Shortname</label>
+			<app-localized-input id="report_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="report_longname">Longname</label>
+			<app-localized-input id="report_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="report_description">Description</label>
+			<app-localized-input id="report_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="report_workflow_id">Workflow</label>
+			<select id="report_workflow_id" name="workflowId"></select>
+		</p>
+		<p>
+			<label for="report_dataset_model_id">Dataset model</label>
+			<select id="report_dataset_model_id" name="datasetModelId"></select>
+		</p>
+		<p>
+			<label for="report_field_model_ids">Field models</label>
+			<app-palette id="report_field_model_ids" name="fieldModelIds"></app-palette>
+		</p>
+		<p>
+			<label for="report_raw_sql">Raw SQL</label>
+			<input id="report_raw_sql" type="text" name="rawSql" />
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

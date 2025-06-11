@@ -1,0 +1,9 @@
+/target
+application-local.properties
+
+# IDE
+/.idea/*
+!/.idea/codeStyleSettings.xml
+!/.idea/inspectionProfiles/Project_Default.xml
+!/.idea/runConfigurations
+*.iml

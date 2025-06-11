@@ -1,0 +1,141 @@
+<h1>{{ scopeModel.pluralShortname | localizeMap }}</h1>
+
+<div class="browse-entities">
+	<form
+		[formGroup]="searchForm"
+		(ngSubmit)="search()">
+		<mat-form-field>
+			<mat-label>Name</mat-label>
+			<input
+				matInput
+				formControlName="fullText"
+				name="name" />
+		</mat-form-field>
+
+		@if (parentScopes.length > 0) {
+			<mat-form-field class="scope-picker">
+				<mat-label>Parent</mat-label>
+				<mat-select
+					formControlName="parentPk"
+					name="parentPk">
+					<mat-option></mat-option>
+					@for (parentScope of parentScopes; track parentScope.pk) {
+						<mat-option [value]="parentScope.pk">{{ parentScope | scopeCodeShortname }}</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+		}
+
+		<button
+			mat-flat-button
+			type="submit">
+			Search
+		</button>
+		<button
+			mat-stroked-button
+			type="reset"
+			(click)="reset()">
+			Clear
+		</button>
+	</form>
+
+	<button
+		mat-flat-button
+		[routerLink]="['/scopes', scopeModel.id, 'new']"
+		[disabled]="!writeAccessOnParent">
+		<mat-icon>add</mat-icon>
+		New {{ scopeModel.shortname | localizeMap | lowercase }}
+	</button>
+</div>
+
+<table
+	mat-table
+	[dataSource]="scopes.objects"
+	matSort
+	matSortDisableClear>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="code">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Code
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			<a [routerLink]="['/scopes', scope.modelId, scope.pk]">
+				{{ scope.code }}
+			</a>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="shortname">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Name
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.shortname }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="userOfInterest">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			{{ defaultProfile?.shortname | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.mainUserName }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="leavesCount">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			{{ leafScopeModel?.pluralShortname | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.leaves }}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		[class.removed]="scope.removed"
+		*matRowDef="let scope; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-divider></mat-divider>
+<mat-toolbar>
+	<mat-toolbar-row>
+		<button
+			mat-stroked-button
+			[appDownload]="exportUrl">
+			Export
+		</button>
+		<span class="toolbar-spacer"></span>
+		<mat-paginator
+			[pageSize]="scopes.paging.pageSize"
+			[length]="scopes.paging.total">
+		</mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

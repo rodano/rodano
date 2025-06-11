@@ -1,0 +1,15 @@
+<mat-form-field>
+	<input
+		matInput
+		type="text"
+		[id]="id"
+		[formControl]="control"
+		[matAutocomplete]="autocomplete" />
+	<mat-autocomplete #autocomplete="matAutocomplete">
+		@for (option of options; track $index) {
+			<mat-option [value]="option">
+				{{ option }}
+			</mat-option>
+		}
+	</mat-autocomplete>
+</mat-form-field>

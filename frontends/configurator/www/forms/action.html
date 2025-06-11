@@ -1,0 +1,64 @@
+<div id="edit_action">
+	<div class="header">
+		<h2>Action</h2>
+	</div>
+	<form id="edit_action_form" method="post" class="content data">
+		<p>
+			<label for="action_id">Id</label>
+			<input id="action_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="action_shortname">Shortname</label>
+			<app-localized-input id="action_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="action_longname">Longname</label>
+			<app-localized-input id="action_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="action_description">Description</label>
+			<app-localized-input id="action_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="action_icon">Icon</label>
+			<input id="action_icon" type="text" name="icon" />
+		</p>
+		<h3>Documentation</h3>
+		If the action is documentable, the user will be asked to provide a rationale to justify why he is doing the action. It is possible to configure a list of predefined rationales that will be presented to the user (but the user will always be able to provide a custom rationale).
+		<p>
+			<label for="action_documentable">Documentable</label>
+			<input id="action_documentable" type="checkbox" name="documentable" />
+		</p>
+		<div>
+			<div id="action_documentable_options" style="clear: both;">
+				<template id="action_documentable_option">
+					<p class="inline" style="margin-top: 0;">
+						<img src="images/arrows_up_down.png" style="vertical-align: sub;" alt="Sort" title="Sort option" />
+						<label>Text<app-localized-input data-name="text" class="very_long" style="margin-left: 0.5rem;"></app-localized-input></label>
+						<button type="button" class="action image" title="Delete option">
+							<img src="images/cross.png" style="vertical-align: sub;" alt="Delete" title="Delete option" />
+						</button>
+					</p>
+				</template>
+			</div>
+			<div>
+				<button id="action_documentable_options_add" type="button" style="margin-top: 1rem; margin-bottom: 1rem;">Add documentation option</button>
+			</div>
+		</div>
+		<h3>Signature</h3>
+		If the action requires signature, the user will be prompted to enter his login and password to validate the action. It is possible to configure the affidavit that will be shown to the user.
+		<p>
+			<label for="action_require_signature">Require signature</label>
+			<input id="action_require_signature" type="checkbox" name="requireSignature" />
+		</p>
+		<p>
+			<label for="action_require_signature_text">Signature text</label>
+			<app-localized-input id="action_require_signature_text" name="requiredSignatureText" type="textarea" class="big"></app-localized-input>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+		<div id="action_rules" class="rules"></div>
+		<div id="action_usage" class="node_usage"></div>
+	</form>
+</div>

@@ -1,0 +1,62 @@
+<div class="content">
+	<h1>
+		Status
+		<app-audit-trail-button [scope]="scope" />
+	</h1>
+
+	<div class="workflow-statuses">
+		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+		@for (status of scope.workflowStatuses; track status.pk || status.workflowId) {
+			<app-workflow-status
+				[entity]="workflowableEntity.SCOPE"
+				[workflowStatus]="status"
+				[workflowable]="scope"
+				(actionResponse)="onWorkflowExecution($event)">
+			</app-workflow-status>
+		}
+		<!-- Display workflows that can be created -->
+		@for (workflow of scope.possibleWorkflows; track workflow.id) {
+			<app-workflow-status
+				[entity]="workflowableEntity.SCOPE"
+				[workflowable]="scope"
+				[workflow]="workflow"
+				(actionResponse)="onWorkflowExecution($event)">
+			</app-workflow-status>
+		}
+	</div>
+
+	<p class="actions">
+		@if (scope.removed) {
+			<button
+				mat-flat-button
+				(click)="restore()"
+				type="button">
+				Restore
+			</button>
+		} @else {
+			@if (scope.locked) {
+				<button
+					mat-flat-button
+					(click)="unlock()"
+					type="button">
+					Unlock
+				</button>
+			} @else {
+				<button
+					mat-flat-button
+					(click)="remove()"
+					type="button">
+					Remove
+				</button>
+				<button
+					mat-flat-button
+					(click)="lock()"
+					type="button">
+					Lock
+				</button>
+			}
+		}
+	</p>
+
+	<app-issue-viewer [scopePks]="[scope.pk]"></app-issue-viewer>
+</div>

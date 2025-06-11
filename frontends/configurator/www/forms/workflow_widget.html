@@ -1,0 +1,113 @@
+<div id="edit_workflow_widget">
+	<div class="header">
+		<h2>Workflow widget</h2>
+	</div>
+	<form id="edit_workflow_widget_form" method="post" class="content data">
+		<p>
+			<label for="workflow_widget_id">Id</label>
+			<input id="workflow_widget_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="workflow_widget_shortname">Shortname</label>
+			<app-localized-input id="workflow_widget_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_widget_longname">Longname</label>
+			<app-localized-input id="workflow_widget_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_widget_description">Description</label>
+			<app-localized-input id="workflow_widget_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_widget_filter_expected_events" title="Do not display workflow states that are linked to expected events">Hide expected events</label>
+			<input id="workflow_widget_filter_expected_events" type="checkbox" name="filterExpectedEvents" />
+		</p>
+		<p>
+			<label for="workflow_widget_workflow_entity" title="Display only workflow states that are linked to the specified entity, useful for workflows that are on different entities">Workflow entity</label>
+			<select id="workflow_widget_workflow_entity" name="workflowEntity"></select>
+		</p>
+		<div id="workflow_widget_workflow_states_selectors">
+			<template id="workflow_widget_states_selector">
+				<div>
+					<h3>
+						<span>Workflow state selector</span>
+						<button type="button" class="action image" title="Delete selector">
+							<img src="images/cross.png" alt="Delete" />
+						</button>
+					</h3>
+					<div>
+						<p>
+							<label>Workflow</label>
+							<select data-name="workflowId"></select>
+						</p>
+						<p>
+							<label>States</label>
+							<app-palette data-name="stateIds"></app-palette>
+						</p>
+					</div>
+				</div>
+			</template>
+		</div>
+		<p>
+			<button id="workflow_widget_workflow_states_selector_add">Add workflow states selector</button>
+		</p>
+		<div id="workflow_widget_columns" class="nice" style="clear: both;">
+			<template id="workflow_widget_column">
+				<div>
+					<h3>
+						<img src="images/arrows_up_down.png" alt="Sort" title="Sort column" />
+						<span></span>
+						<button type="button" class="action image" title="Delete column">
+							<img src="images/cross.png" alt="Delete" />
+						</button>
+					</h3>
+					<div>
+						<p>
+							<label>
+								<span>Id</span>
+								<input data-name="id" />
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Shortname</span>
+								<app-localized-input data-name="shortname" class="long"></app-localized-input>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Longname</span>
+								<app-localized-input data-name="longname" class="long"></app-localized-input>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Description</span>
+								<app-localized-input data-name="description" class="long"></app-localized-input>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Type</span>
+								<select data-name="type" class="long"></select>
+							</label>
+						</p>
+						<p>
+							<label>
+								<span>Width</span>
+								<input type="number" data-name="width" />
+							</label>
+						</p>
+					</div>
+				</div>
+			</template>
+		</div>
+		<p>
+			<button id="workflow_widget_column_add">Add column</button>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

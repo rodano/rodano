@@ -1,0 +1,15 @@
+<h1>Account unlock</h1>
+
+@if (accountRecoverySuccessful === undefined) {
+	<p>Please wait while your account is being unlocked.</p>
+} @else if (accountRecoverySuccessful === true) {
+	<p>
+		You have successfully unlocked your account.<br />
+		You will be redirected to the login page.
+	</p>
+} @else {
+	<p>
+		There was an issue in the unlock account process.<br />
+		Please try again or contact support.
+	</p>
+}

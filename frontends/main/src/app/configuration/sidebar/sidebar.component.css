@@ -1,0 +1,163 @@
+.container {
+	display: flex;
+	height: 100%;
+}
+
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	box-sizing: border-box;
+	height: 100%;
+	width: 250px;
+	padding: 12px;
+	transition: 0.3s ease-in-out;
+	text-align: center;
+	text-wrap: nowrap;
+	position: relative;
+	background-color: var(--light-highlight-color);
+	flex-basis: auto !important;
+	max-width: none !important;
+}
+
+.sidebar.is-child {
+	border-left: 1px solid var(--mat-sys-primary);
+}
+
+.header {
+	transition: 0.3s ease-in-out;
+}
+
+.sidebar.closed {
+	padding: 12px 5px 5px;
+	width: 80px;
+}
+
+.icon {
+	width: 24px;
+	height: 24px;
+	cursor: pointer;
+}
+
+.sidebar ul {
+	list-style: none;
+	padding-left: 0;
+	width: 100%;
+	margin: 0;
+}
+
+.sidebar ul.closed {
+	width: auto;
+	margin: 0 16px 16px;
+}
+
+.sidebar > ul > li:first-child {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 16px;
+	.header {
+		font-weight: bold;
+	}
+}
+
+.list-item a,
+.header,
+#toggle-button {
+	border-radius: 0.5em;
+	padding: 0.5em;
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	gap: 1em;
+	cursor: pointer;
+}
+
+.list-item a {
+	color: black;
+}
+
+.list-item a.active {
+	color: black;
+}
+
+#toggle-button {
+	background-color: var(--mat-sys-primary);
+	border: none;
+	padding: 12px;
+	transition: 0.3s ease-in-out;
+}
+
+.list-item {
+	margin-bottom: 4px;
+	border-radius: var(--mat-sys-corner-extra-small);
+	/** transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; **/
+}
+
+.sidebar.closed.list-item span {
+	opacity: 0;
+	transform: translateX(-10px);
+	transition:
+		opacity 0.5s ease-in-out,
+		transform 0.5s ease-in-out;
+}
+
+.sidebar.list-item span {
+	opacity: 1;
+	transform: translateX(0);
+	transition:
+		opacity 0.5s ease-in-out,
+		transform 0.5s ease-in-out;
+	display: inline-block;
+	max-width: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.list-item:hover {
+	background-color: var(--light-border-color);
+}
+
+.list-item.active {
+	font-weight: bold;
+	background-color: var(--light-border-color);
+}
+
+.list-item.active:hover {
+	background-color: var(--light-border-color);
+}
+
+.link.closed {
+	display: flex;
+	justify-content: center;
+}
+
+.link.closed span {
+	opacity: 0;
+	transform: translateX(-10px);
+	transition:
+		opacity 0.1s ease-in-out,
+		transform 0.1s ease-in-out;
+}
+
+.toggle-icon {
+	transition: transform 0.3s ease-in-out;
+	color: white;
+}
+
+.toggle-icon.rotated {
+	transform: rotate(180deg);
+}
+
+.create-new-button {
+	margin-top: 12px;
+	width: 100%;
+}
+
+.link-text {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline-block;
+	max-width: 160px;
+}

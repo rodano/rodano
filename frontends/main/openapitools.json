@@ -1,0 +1,24 @@
+{
+	"$schema": "./node_modules/@openapitools/openapi-generator-cli/config.schema.json",
+	"generator-cli": {
+		"version": "7.11.0",
+		"generators": {
+			"main": {
+				"inputSpec": "http://localhost:8080/api-docs",
+				"generatorName": "typescript-angular",
+				"output": "src/app/core",
+				"typeMappings": {
+					"DateTime": "Date",
+					"Date": "Date"
+				},
+				"globalProperty": "models",
+				"additionalProperties": {
+					"enumPropertyNaming": "UPPERCASE",
+					"fileNaming": "kebab-case",
+					"withInterfaces": true,
+					"licenseName": "AGPL-3.0-only"
+				}
+			}
+		}
+	}
+}

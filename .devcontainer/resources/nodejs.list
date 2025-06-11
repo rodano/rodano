@@ -1,0 +1,1 @@
+deb [signed-by=/etc/apt/keyrings/nodejs.gpg] https://deb.nodesource.com/node_23.x bookworm main

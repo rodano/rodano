@@ -1,0 +1,15 @@
+<h1>Email verification</h1>
+
+@if (emailChangedSuccessfully === undefined) {
+	<p>Please wait while your email is being verified.</p>
+} @else if (emailChangedSuccessfully === true) {
+	<p>
+		Your email has been changed successfully. You can now log in with your new email address.<br />
+		You will be redirected to the login page.
+	</p>
+} @else {
+	<p>
+		There was an issue with your email verification.<br />
+		Please try again or contact support.
+	</p>
+}

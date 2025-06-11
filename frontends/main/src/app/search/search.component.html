@@ -1,0 +1,182 @@
+<p>
+	<button
+		mat-flat-button
+		(click)="createPatient()"
+		[disabled]="!writeAccessOnParent"
+		type="button">
+		<mat-icon>add</mat-icon>
+		New {{ leafScopeModel.shortname | localizeMap | lowercase }}
+	</button>
+</p>
+
+@if (loading) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+<div class="table-container">
+	<table
+		mat-table
+		[dataSource]="scopes"
+		matSort>
+		<tr
+			*matNoDataRow
+			class="no-data-row">
+			<td [attr.colspan]="columnsToDisplay.length">No data</td>
+		</tr>
+		<form [formGroup]="searchForm">
+			@for (column of columnsToDisplay; track column) {
+				@if (column === 'parentScopeCode') {
+					<ng-container
+						matColumnDef="parentScopeCode"
+						[sticky]="true">
+						<th
+							mat-header-cell
+							*matHeaderCellDef>
+							<mat-form-field>
+								<mat-label>{{ leafScopeModelParent.shortname | localizeMap }}</mat-label>
+								<mat-select
+									[formControl]="parentScopeControl"
+									multiple>
+									@for (parentScope of parentScopes; track parentScope.pk) {
+										<mat-option [value]="parentScope.pk">
+											{{ parentScope.shortname }}
+										</mat-option>
+									}
+								</mat-select>
+							</mat-form-field>
+						</th>
+						<td
+							mat-cell
+							*matCellDef="let scope"
+							class="value-cell">
+							{{ scope.parentScope.code }}
+						</td>
+					</ng-container>
+				} @else if (column === 'scopeCode') {
+					<ng-container
+						matColumnDef="scopeCode"
+						[sticky]="true">
+						<th
+							mat-header-cell
+							*matHeaderCellDef
+							mat-sort-header>
+							<mat-form-field>
+								<input
+									matInput
+									type="text"
+									formControlName="scopeCode"
+									[placeholder]="leafScopeModel.shortname | localizeMap" />
+							</mat-form-field>
+						</th>
+						<td
+							mat-cell
+							*matCellDef="let scope"
+							class="value-cell">
+							<a [routerLink]="['/crf', scope.pk]">
+								{{ scope.shortname }}
+							</a>
+						</td>
+					</ng-container>
+				} @else {
+					<ng-container [matColumnDef]="column">
+						<th
+							mat-header-cell
+							*matHeaderCellDef>
+							@if (fieldModelMap.has(column)) {
+								@let fieldModelDTO = getSearchableFieldFromFormControlId(column);
+								@if (fieldModelDTO?.type === FieldModelType.DATE || fieldModelDTO?.type === FieldModelType.DATE_SELECT) {
+									<mat-form-field>
+										<mat-label>{{ fieldModelDTO?.shortname | localizeMap }}</mat-label>
+										<input
+											matInput
+											[formControlName]="fieldModelDTO ? getSFFormControlName(fieldModelDTO) : null"
+											[matDatepicker]="datePicker" />
+										<mat-datepicker-toggle
+											matSuffix
+											[for]="datePicker"></mat-datepicker-toggle>
+										<mat-datepicker
+											#datePicker
+											[startAt]="getStartDate()"></mat-datepicker>
+									</mat-form-field>
+								} @else if (fieldModelDTO?.type === FieldModelType.SELECT || fieldModelDTO?.type === FieldModelType.RADIO) {
+									<mat-form-field>
+										<mat-label>{{ fieldModelDTO?.shortname | localizeMap }}</mat-label>
+										<mat-select [formControlName]="fieldModelDTO ? getSFFormControlName(fieldModelDTO) : null">
+											@for (value of fieldModelDTO?.possibleValues; track value.id) {
+												<mat-option [value]="value.id">
+													{{ value.shortname | localizeMap }}
+												</mat-option>
+											}
+										</mat-select>
+									</mat-form-field>
+								} @else {
+									<mat-form-field>
+										<mat-label>{{ fieldModelDTO?.shortname | localizeMap }}</mat-label>
+										<input
+											matInput
+											[formControlName]="fieldModelDTO ? getSFFormControlName(fieldModelDTO) : null" />
+									</mat-form-field>
+								}
+							} @else if (workflowStatusModelMap.has(column)) {
+								<mat-form-field>
+									<mat-label>{{ workflowStatusModelMap.get(column) | localizeMap }}</mat-label>
+									<mat-select
+										[formControlName]="getWorkflowDTO(column) ? getWSFormControlName(getWorkflowDTO(column)!) : null"
+										multiple>
+										@for (state of getWorkflowDTO(column)?.states || []; track state.id) {
+											<mat-option [value]="state.id">
+												{{ state.shortname | localizeMap }}
+											</mat-option>
+										}
+									</mat-select>
+								</mat-form-field>
+							}
+						</th>
+						<td
+							mat-cell
+							*matCellDef="let scope"
+							class="value-cell">
+							@for (workflowStatus of scope.workflowStatuses; track workflowStatus.workflowId) {
+								@if (workflowStatus.workflowId === column) {
+									{{ getStatusModel(column, workflowStatus.statusId) | localizeMap }}
+								}
+							}
+							@for (datasetModelId of Object.keys(scope.searchableFields); track datasetModelId) {
+								@for (fieldId of Object.keys(scope.searchableFields[datasetModelId]); track fieldId) {
+									@if (fieldId === getSearchableFieldFromFormControlId(column)?.id) {
+										@if (getIsPossibleValue(datasetModelId, fieldId)) {
+											{{
+												getValueShortname(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]) | localizeMap
+											}}
+										} @else if (getIsCompleteDate(datasetModelId, fieldId)) {
+											@let date = getDateObject(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]);
+											{{ date ? (date | dateUTC) : '' }}
+										} @else {
+											{{ scope.searchableFields[datasetModelId][fieldId] }}
+										}
+									}
+								}
+							}
+						</td>
+					</ng-container>
+				}
+			}
+			<tr
+				mat-header-row
+				*matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+			<tr
+				mat-row
+				[class.removed]="scope.removed"
+				*matRowDef="let scope; columns: columnsToDisplay"></tr>
+		</form>
+	</table>
+
+	<mat-divider></mat-divider>
+	<mat-toolbar>
+		<mat-toolbar-row>
+			<mat-paginator
+				[pageSize]="pageSize"
+				[length]="resultsLength">
+			</mat-paginator>
+		</mat-toolbar-row>
+	</mat-toolbar>
+</div>

@@ -1,0 +1,81 @@
+<table
+	mat-table
+	[dataSource]="sessions">
+	<ng-container matColumnDef="name">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Name
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let session">
+			{{ session.name }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="connected-since">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Connected since
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let session">
+			{{ session.connectedSince | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="last-access">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Last access
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let session">
+			{{ session.lastAccessTime | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="user-agent">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			User agent
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let session">
+			{{ session.userAgent }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="actions">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Actions
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let session">
+			@if (!isCurrentSession(session)) {
+				<button
+					mat-stroked-button
+					(click)="logout(session.pk)">
+					Logout
+				</button>
+			}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let row; columns: columnsToDisplay"></tr>
+</table>

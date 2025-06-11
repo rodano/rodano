@@ -1,0 +1,53 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-menu-button></ion-menu-button>
+		</ion-buttons>
+		<ion-title>Sign-in</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content>
+	<form [formGroup]="loginForm" (ngSubmit)="login()">
+		<ion-list>
+			<ion-item>
+				<ion-input
+					type="email"
+					autocorrect="off"
+					autocapitalize="none"
+					placeholder="E-mail"
+					formControlName="email"
+					name="email">
+				</ion-input>
+			</ion-item>
+
+			<ion-item>
+				<ion-input
+					type="password"
+					autocorrect="off"
+					autocapitalize="none"
+					placeholder="Password"
+					formControlName="password"
+					name="password">
+				</ion-input>
+			</ion-item>
+		</ion-list>
+
+		<ion-toolbar>
+			<ion-buttons>
+				<ion-button
+					color="primary"
+					expand="block"
+					fill="solid"
+					type="submit"
+					[disabled]="!loginForm.valid">
+					<ion-icon name="log-in"></ion-icon>
+					Sign In
+				</ion-button>
+			</ion-buttons>
+		</ion-toolbar>
+	</form>
+	<!--<p class="ion-text-center">
+		<a href="#" (click)="lostPassword()" class="trouble-helper">Forgot Password ?</a>
+	</p>-->
+</ion-content>

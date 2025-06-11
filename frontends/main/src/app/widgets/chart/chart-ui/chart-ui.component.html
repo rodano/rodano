@@ -1,0 +1,13 @@
+<div
+	class="container"
+	[style.background-color]="chart.chartConfig.backgroundColor">
+	<h3 [style.color]="chart.chartConfig.headerColor">{{ chart.title }}</h3>
+	@if (chartVisible) {
+		<canvas
+			baseChart
+			[data]="data"
+			[options]="options"
+			[type]="resolvedGraphType">
+		</canvas>
+	}
+</div>

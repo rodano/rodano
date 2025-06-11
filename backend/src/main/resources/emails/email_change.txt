@@ -1,0 +1,9 @@
+Dear ${user.name},
+
+The e-mail associated with your ${study.defaultLocalizedLongname} account has been changed to ${new_email}.
+You have ${time_limit_in_days} days to follow the instructions sent to your new e-mail, if you want this change to take effect.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

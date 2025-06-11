@@ -1,0 +1,249 @@
+<div id="edit_field_model">
+	<div class="header">
+		<h2>Field model</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_field_model_general">General</a></li>
+			<li><a href="#" data-tab="edit_field_model_possible_values">Possible values</a></li>
+			<li><a href="#" data-tab="edit_field_model_validators_workflows">Validators & Workflows</a></li>
+			<li><a href="#" data-tab="edit_field_model_rules">Rules</a></li>
+		</ul>
+	</div>
+	<form id="edit_field_model_form" method="post" class="content data">
+		<div id="edit_field_model_general">
+			<p>
+				<label for="field_model_id">Id</label>
+				<input id="field_model_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="field_model_shortname">Shortname</label>
+				<app-localized-input id="field_model_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="field_model_longname">Longname</label>
+				<app-localized-input id="field_model_longname" name="longname"></app-localized-input>
+				<img class="copy_property" src="images/page_white_copy.png" data-source="field_model_shortname" data-destination="field_model_longname" alt="Copy" title="Copy from shortname" />
+			</p>
+			<p>
+				<label for="field_model_description">Description</label>
+				<app-localized-input id="field_model_description" name="description"></app-localized-input>
+				<img class="copy_property" src="images/page_white_copy.png" data-source="field_model_shortname" data-destination="field_model_description" alt="Copy" title="Copy from shortname" />
+			</p>
+			<p>
+				<label for="field_model_type">Type</label>
+				<select id="field_model_type" name="type"></select>
+			</p>
+			<p>
+				<label for="field_model_data_type">Data type</label>
+				<select id="field_model_data_type" name="dataType"></select>
+			</p>
+			<p>
+				<label for="field_model_read_only">Read only</label>
+				<input id="field_model_read_only" type="checkbox" name="readOnly" />
+			</p>
+			<fieldset id="field_model_number">
+				<legend>Number configuration</legend>
+				<p>
+					<label for="field_model_max_integer_digits" class="long">Max. number of integer digits</label>
+					<input id="field_model_max_integer_digits" type="number" name="maxIntegerDigits" />
+				</p>
+				<p>
+					<label for="field_model_max_decimal_digits" class="long">Max. number of decimal digits</label>
+					<input id="field_model_max_decimal_digits" type="number" name="maxDecimalDigits" />
+				</p>
+			</fieldset>
+			<fieldset id="field_model_date">
+				<legend>Date configuration</legend>
+				<p class="inline">
+					<label>Collect years<input type="checkbox" name="withYears" /></label>
+					<label>Collect days<input type="checkbox" name="withDays" /></label>
+					<label>Collect months<input type="checkbox" name="withMonths" /></label>
+					<label>Collect hours<input type="checkbox" name="withHours" /></label>
+					<label>Collect minutes<input type="checkbox" name="withMinutes" /></label>
+					<label>Collect seconds<input type="checkbox" name="withSeconds" /></label>
+				</p>
+			</fieldset>
+			<fieldset id="field_model_date_select">
+				<legend>Date select configuration</legend>
+				<p class="inline">
+					<label>Year is mandatory<input type="checkbox" name="yearsMandatory" /></label>
+					<label>Month is mandatory<input type="checkbox" name="monthsMandatory" /></label>
+					<label>Day is mandatory<input type="checkbox" name="daysMandatory" /></label>
+					<label>Hour is mandatory<input type="checkbox" name="hoursMandatory" /></label>
+					<label>Minute is mandatory<input type="checkbox" name="minutesMandatory" /></label>
+					<label>Second is mandatory<input type="checkbox" name="secondsMandatory" /></label>
+				</p>
+			</fieldset>
+			<fieldset id="field_model_validation">
+				<legend>Validation</legend>
+				<p>
+					<label for="field_model_min_year">Min. year</label>
+					<input id="field_model_min_year" type="number" name="minYear" />
+				</p>
+				<p>
+					<label for="field_model_max_year">Max. year</label>
+					<input id="field_model_max_year" type="number" name="maxYear" />
+				</p>
+				<p>
+					<label for="field_model_max_length" title="Value max length for validation and export">Max. length</label>
+					<input id="field_model_max_length" type="number" name="maxLength" />
+					For a file, max. length is the maximum length for the name of the file.
+				</p>
+				<p>
+					<label for="field_model_allow_date_in_future">Allow date in future</label>
+					<input id="field_model_allow_date_in_future" type="checkbox" name="allowDateInFuture" />
+				</p>
+				<p>
+					<label for="field_model_min_value">Min. value</label>
+					<input id="field_model_min_value" type="number" step="any" name="minValue" />
+				</p>
+				<p>
+					<label for="field_model_max_value">Max. value</label>
+					<input id="field_model_max_value" type="number" step="any" name="maxValue" />
+				</p>
+				<p>
+					<label for="field_model_matcher">Matcher</label>
+					<input id="field_model_matcher" type="text" name="matcher" />
+				</p>
+				<p>
+					<label for="field_model_matcher_message">Matcher message</label>
+					<app-localized-input id="field_model_matcher_message" class="very_long" name="matcherMessage"></app-localized-input>
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Calculated value</legend>
+				<p>
+					The value of the field can be calculated by the system.
+					<br />
+					If the field model is not dynamic, the formula will be used to calculate the default value of the field.
+					<br />
+					If the field model is dynamic, the formula below will be used to calculate the value.
+				</p>
+				<p>
+					<label for="field_model_plugin" title="The value of the field will be calculated using the value formula below or using a script written in Java">Dynamic</label>
+					<input id="field_model_plugin" type="checkbox" name="plugin" />
+				</p>
+				<p>
+					A formula can be a static text (such as "my_value" or "true") or the result of a function (starting with an "=").
+					<br />
+					If a function or a combination of functions are used, a context can be used.
+				</p>
+				<p>
+					<a id="field_model_value_constraint_edit" class="button" style="margin-top: 1rem;">Edit context</a>
+					<button id="field_model_value_constraint_add" type="button" style="margin-top: 1rem;">Add context</button>
+					<button id="field_model_value_constraint_delete" type="button" style="margin-top: 1rem; margin-left: 1rem;">Delete context</button>
+				</p>
+				<p>
+					<label for="field_model_value_formula" class="long" title="Retrieve value using a condition">Value formula</label>
+					<input id="field_model_value_formula" type="text" name="valueFormula" autocomplete="off" class="very_long" />
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Export and use</legend>
+				<p class="inline">
+					<label for="field_model_exportable" title="Check to export the fields having this field model in the export files">Exportable</label>
+					<input id="field_model_exportable" type="checkbox" name="exportable" />
+					<label for="field_model_export_order">Export order</label>
+					<input id="field_model_export_order" type="number" name="exportOrder" />
+					<label for="field_model_export_label">Export label</label>
+					<input id="field_model_export_label" type="text" name="exportLabel" />
+				</p>
+				<p>
+					<label for="field_model_searchable" title="Check to show the field model in the search panel">Searchable</label>
+					<input id="field_model_searchable" type="checkbox" name="searchable" />
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Help</legend>
+				<p>
+					<label for="field_model_inline_help" title="Help text that is displayed next to the field, useful for units">Inline help</label>
+					<input id="field_model_inline_help" type="text" name="inlineHelp" />
+				</p>
+				<p>
+					<label for="field_model_advanced_help" title="Help text that is displayed after a click on an help icon">Advanced help</label>
+					<app-localized-input id="field_model_advanced_help" name="advancedHelp" type="textarea" class="very_big"></app-localized-input>
+				</p>
+			</fieldset>
+		</div>
+		<div id="edit_field_model_possible_values">
+			<p>
+				<label for="field_model_dictionary" title="Use a dictionary for possible values">Dictionary</label>
+				<input id="field_model_dictionary" name="dictionary" />
+			</p>
+			<p>
+				<label for="field_model_possible_values_provider" title="Use custom code to provide possible values">Provider</label>
+				<input id="field_model_possible_values_provider" name="possibleValuesProvider" />
+			</p>
+			<p>
+				<label for="field_model_possible_values_provider_description" title="Describe how the custom provider works">Provider description</label>
+				<input id="field_model_possible_values_provider_description" name="possibleValuesProviderDescription" class="very_long" />
+			</p>
+			<p style="padding: 16px 2px;">
+				<select id="field_model_copy_possible_values_field_models" style="max-width: 250px;"></select>
+				<button id="field_model_copy_possible_values" type="button" style="margin-left: 1rem;">Copy possible values from this field model</button>
+			</p>
+			<div id="field_model_possible_values" class="nice" style="clear: both;">
+				<template id="field_model_possible_value">
+					<div>
+						<h3>
+							<img src="images/arrows_up_down.png" alt="Sort" title="Sort possible value" />
+							<span></span>
+							<button type="button" class="action image" title="Delete possible value">
+								<img src="images/cross.png" alt="Delete" />
+							</button>
+						</h3>
+						<div style="float: left;">
+							<p>
+								<label>
+									<span>Id</span>
+									<input data-name="id" />
+								</label>
+							</p>
+							<p>
+								<label>
+									<span>Shortname</span>
+									<app-localized-input data-name="shortname" class="long"></app-localized-input>
+								</label>
+							</p>
+							<p>
+								<label>
+									<span>Export label</span>
+									<input data-name="export_label" class="long" />
+								</label>
+							</p>
+						</div>
+						<div style="float: left; margin-left: 2rem;">
+							<p>
+								<label>
+									<span>Specify</span>
+									<input type="checkbox" data-name="specify" />
+								</label>
+							</p>
+						</div>
+						<hr style="clear: both; visibility: hidden;" />
+					</div>
+				</template>
+			</div>
+			<div>
+				<button id="field_model_possible_values_add" type="button" style="margin-bottom: 1rem;">Add possible value</button>
+				<button id="field_model_possible_values_sort" type="button" style="margin-left: 1rem; margin-bottom: 1rem;">Sort possible values</button>
+			</div>
+		</div>
+		<div id="edit_field_model_validators_workflows">
+			<p>
+				<label for="field_model_workflow_ids">Workflows</label>
+				<app-palette id="field_model_workflow_ids" type="text" name="workflowIds"></app-palette>
+			</p>
+			<p>
+				<label for="field_model_validator_ids">Validators</label>
+				<app-palette id="field_model_validator_ids" name="validatorIds"></app-palette>
+			</p>
+		</div>
+		<div id="edit_field_model_rules">
+			<div id="field_model_modification_rules" class="rules"></div>
+		</div>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+		<div id="field_model_usage" class="node_usage"></div>
+	</form>
+</div>

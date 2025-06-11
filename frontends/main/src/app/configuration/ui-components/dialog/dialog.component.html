@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>{{ data.title }}</h2>
+
+<mat-dialog-content>
+	<p>{{ data.message }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+	@for (button of data.buttons; track $index) {
+		<button
+			mat-button
+			(click)="dialogRef.close(button.value)">
+			@if (button.icon) {
+				<mat-icon> {{ button.icon }}</mat-icon>
+			}
+			{{ button.label }}
+		</button>
+	}
+</mat-dialog-actions>

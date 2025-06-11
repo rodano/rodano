@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<link href="binding.css" rel="stylesheet" type="text/css" title="defaut" />
+		<script type="text/javascript" src="../tools/extension.js"></script>
+		<script type="text/javascript" src="../tools/dom_extension.js"></script>
+		<script type="text/javascript" src="../tools/bus.js"></script>
+		<script type="text/javascript" src="../tools/binding_proxy.js"></script>
+		<title>Binding</title>
+	</head>
+	<body>
+		<h2>Hello <span data-bind="name"></span>, time is <span data-bind="time" data-bind-modifier="toFullDisplay"></span></h2>
+		<p>There is <span data-bind="users.length"></span></p>
+		<!--<ul data-bind="users">
+			<li><span data-bind="firstname"></span><span data-bind="lastname"></span></li>
+		</ul>-->
+		<script type="text/javascript">
+			//create scope
+			var object = {
+				name : 'Mat',
+				time : new Date(),
+				users : []
+			};
+			//bind scope
+			var proxy = document.body.autobind(object);
+			//update scope
+			proxy.name = 'Matthieu';
+			/*setInterval(function() {
+				proxy.time = new Date();
+			}, 1000);*/
+			/*proxy.users.push({greetings : 'mr', firstname : 'John', lastname : 'Doe', email : 'john@doe.name', offline : true, profiles : ['user', 'admin']});
+			proxy.users.push({greetings : 'mr', firstname : 'Chuck', lastname : 'Norris', email : 'chuck@norris.name', offline : false, profiles : ['user']});*/
+		</script>
+	</body>
+</html>

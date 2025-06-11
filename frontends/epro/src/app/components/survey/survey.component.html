@@ -1,0 +1,53 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-back-button></ion-back-button>
+		</ion-buttons>
+		@if (dataset) {
+			<ion-title>
+				<div class="ion-text-wrap">
+					{{ dataset.model.shortname | localizer }}
+				</div>
+			</ion-title>
+		}
+	</ion-toolbar>
+	@if (datasetFields) {
+		<ion-progress-bar value="{{ (getFieldIndex() + 1) / datasetFields.length }}" />
+	}
+</ion-header>
+
+@if (event && dataset && field) {
+<ion-content>
+	<app-question
+		[rootScope]="rootScope"
+		[event]="event"
+		[field]="field"
+		[isEQ5D]="dataset.modelId === 'EQ5D'"
+		(noAnswer)="onNoAnswer()">
+	</app-question>
+</ion-content>
+}
+
+@if (dataset && field) {
+<ion-footer>
+	<ion-toolbar>
+		<ion-buttons slot="start">
+			<ion-button
+				(click)="previousFieldModel()"
+				fill="solid"
+				color="primary">
+				{{ getPreviousLabel() }}
+			</ion-button>
+		</ion-buttons>
+		<ion-buttons slot="end">
+			<ion-button
+				[disabled]="field.value === null"
+				(click)="nextFieldModel()"
+				fill="solid"
+				color="primary">
+				{{ getNextLabel() }}
+			</ion-button>
+		</ion-buttons>
+	</ion-toolbar>
+</ion-footer>
+}

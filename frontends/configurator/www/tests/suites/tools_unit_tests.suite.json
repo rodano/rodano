@@ -1,0 +1,9 @@
+{
+	"name" : "Configurator - Tools unit tests",
+	"path" : "../../",
+	"bundles" : [
+		{"test" : "tools/custom_extension.test.js"},
+		{"test" : "tools/partial_date.test.js"},
+		{"dom" : true, "test" : "tools/custom_dom_extension.test.js"}
+	]
+}

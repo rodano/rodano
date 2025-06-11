@@ -1,0 +1,19 @@
+<template id="app-constrained-input">
+	<style>
+		input {
+			font-family: var(--main-font-family);
+			font-size: 0.9rem;
+			border-radius: 2px;
+			border: 1px solid #ddd;
+			box-sizing: border-box;
+			vertical-align: top;
+			margin: 0;
+		}
+		input:invalid {
+			background-color: var(--error-color);
+		}
+	</style>
+
+	<input list="list"></input>
+	<datalist id="list"></datalist>
+</template>

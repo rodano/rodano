@@ -1,0 +1,22 @@
+<div [hidden]="!shown">
+	@if (!isEmptyObject(cell.textBefore)) {
+		<div
+			class="block"
+			[innerHTML]="cell.textBefore | localizeMap | safeHtml"></div>
+	}
+
+	@if (field) {
+		<!-- The field itself -->
+		<app-field
+			[field]="field"
+			[cell]="cell"
+			[disabled]="disabled">
+		</app-field>
+	}
+
+	@if (!isEmptyObject(cell.textAfter)) {
+		<div
+			class="block"
+			[innerHTML]="cell.textAfter | localizeMap | safeHtml"></div>
+	}
+</div>

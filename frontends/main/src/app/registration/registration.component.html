@@ -1,0 +1,98 @@
+<h1>Registration</h1>
+<!-- First step displayed while loading -->
+@if (step === RegistrationStep.LOADING) {
+	<p>Please wait while your registration is being processed.</p>
+}
+
+<!-- Step displayed if there is an error with the code -->
+@else if (step === RegistrationStep.ERROR) {
+	<p>
+		There was an issue in the registration process.<br />
+		Please try again or contact support.
+	</p>
+}
+
+<!-- Privacy policies -->
+@else if (step === RegistrationStep.POLICIES) {
+	<div>
+		<h2>Review privacy policies</h2>
+		@for (policy of policies.values(); track policy.id) {
+			<p [innerHtml]="policy.content | localizeMap"></p>
+		}
+		<div>
+			<button
+				mat-flat-button
+				(click)="agreePolicies()">
+				Accept
+			</button>
+			<button
+				mat-flat-button
+				(click)="declinePolicies()">
+				Decline
+			</button>
+		</div>
+	</div>
+}
+
+<!-- User password form -->
+@else if (step === RegistrationStep.PASSWORD) {
+	<form
+		name="passwordForm"
+		[formGroup]="passwordForm"
+		(ngSubmit)="activate()">
+		<h2>Choose a password</h2>
+
+		<!--do no use a type="hidden" field, this does not work-->
+		<input
+			formControlName="email"
+			autocomplete="username email"
+			style="display: none" />
+
+		<p>
+			<mat-form-field>
+				<input
+					matInput
+					formControlName="password"
+					type="password"
+					autocomplete="new-password"
+					placeholder="New password"
+					required />
+			</mat-form-field>
+		</p>
+		<p>
+			<mat-form-field>
+				<input
+					matInput
+					formControlName="confirmPassword"
+					type="password"
+					autocomplete="new-password"
+					placeholder="Confirm your password"
+					required />
+			</mat-form-field>
+		</p>
+		<p>
+			<button
+				mat-flat-button
+				[class.loading]="loading"
+				[disabled]="loading || passwordForm.invalid">
+				Save password
+			</button>
+		</p>
+	</form>
+}
+
+<!-- Last step: Confirmation -->
+@else if (step === RegistrationStep.CONFIRMATION) {
+	<div>
+		<p>
+			You can now log in with the following credentials:
+			<br />
+			Your email: <strong>{{ email }}</strong>
+			<br />
+			Your password: the password you just entered
+		</p>
+		<p>
+			<a [routerLink]="['/login']">Go to login page</a>
+		</p>
+	</div>
+}

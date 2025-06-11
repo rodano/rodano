@@ -1,0 +1,62 @@
+<div id="edit_workflow_state">
+	<div class="header">
+		<h2>Workflow state</h2>
+	</div>
+	<form id="edit_workflow_state_form" method="post" class="content data">
+		<p>
+			<label for="workflow_state_id">Id</label>
+			<input id="workflow_state_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="workflow_state_shortname">Shortname</label>
+			<app-localized-input id="workflow_state_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_state_longname">Longname</label>
+			<app-localized-input id="workflow_state_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_state_description">Description</label>
+			<app-localized-input id="workflow_state_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="workflow_state_actions_ids">Actions</label>
+			<app-palette id="workflow_state_actions_ids" name="possibleActionIds"></app-palette>
+		</p>
+		<p>
+			<label for="workflow_state_icon">Icon</label>
+			<input id="workflow_state_icon" type="text" name="icon" />
+		</p>
+		<p>
+			<label for="workflow_state_color">Color</label>
+			<input id="workflow_state_color" type="color" name="color" />
+		</p>
+		<p>
+			<label for="workflow_state_important" title="An important workflow will have its statuses displayed at the top of the CRF page">Important</label>
+			<input id="workflow_state_important" type="checkbox" name="important" />
+		</p>
+		<fieldset id="workflow_state_aggregate">
+			<legend>Aggregation</legend>
+			<p>
+				If this workflow is an aggregation workflow, choose here which state must be aggregated and the function that will be used to perform the aggregation:
+				<br />
+				"All" means that this state will be selected if all workflow statuses of the descendants workflowables are in the aggregated state.
+				<br />
+				"One" means that this state will be selected if at least one of the workflow statuses of the descendants workflows is in the aggregated state.
+				<br />
+				"Default" is the default state where no other state matches. There can be only zero or one default state per aggregated workflow.
+			</p>
+			<p>
+				<label for="workflow_state_aggregate_state_id" title="Aggregate state from reference workflow">Aggregate state</label>
+				<select id="workflow_state_aggregate_state_id" name="aggregateStateId"></select>
+			</p>
+			<p>
+				<label for="workflow_state_aggregate_state_matcher" title="Aggregate state matcher from reference workflow">Aggregate state matcher</label>
+				<select id="workflow_state_aggregate_state_matcher" name="aggregateStateMatcher"></select>
+			</p>
+		</fieldset>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

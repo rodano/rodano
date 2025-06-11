@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>Test</title>
+		<link href="https://fonts.googleapis.com/css?family=Inconsolata|Open+Sans:400,700" rel="stylesheet" />
+		<link rel="stylesheet" type="text/css" href="test.css" />
+		<script type="module" src="browser_test.js"></script>
+	</head>
+	<body>
+		<h1 id="report">
+			Report
+			<span id="report_date"></span>
+			<span id="report_status"></span>
+			<span id="report_duration"></span>
+			<a id="report_collapse" href="#">Collapse all</a>
+			<a id="report_expand" href="#">Expand all</a>
+			<a id="report_enhanced_download" href="#" download="report.xml" style="display: none;">Download enhanced XML report</a>
+			<a id="report_download" href="#" download="report.xml" style="display: none;">Download XML report</a>
+			<img id="report_running" src="loading.png" alt="Loading" title="Running tests" style="float: right; margin: 10px 10px 0 0;" />
+		</h1>
+		<div id="results"></div>
+	</body>
+</html>

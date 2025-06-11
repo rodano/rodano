@@ -1,0 +1,34 @@
+<div id="edit_privacy_policy">
+	<div class="header">
+		<h2>Privacy policy</h2>
+	</div>
+	<form id="edit_privacy_policy_form" method="post" class="content data">
+		<p>
+			<label for="privacy_policy_id">Id</label>
+			<input id="privacy_policy_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="privacy_policy_shortname">Shortname</label>
+			<app-localized-input id="privacy_policy_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="privacy_policy_longname">Longname</label>
+			<app-localized-input id="privacy_policy_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="privacy_policy_description">Description</label>
+			<app-localized-input id="privacy_policy_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="privacy_policy_content">Content</label>
+			<app-localized-input id="privacy_policy_content" name="content" type="textarea" class="very_very_big"></app-localized-input>
+		</p>
+		<p>
+			<label for="privacy_policy_profile_ids">Profile</label>
+			<app-palette id="privacy_policy_profile_ids" name="profileIds"></select>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

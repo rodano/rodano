@@ -1,0 +1,26 @@
+h1 {
+	font-size: 50px;
+	text-align: center;
+}
+
+.welcome-container {
+	height: 100%;
+	margin: 1rem;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.login-block {
+	width: 70%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+form {
+	width: 100%;
+}

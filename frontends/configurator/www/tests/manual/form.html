@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<script type="module" src="form.js"></script>
+		<style media="screen" type="text/css">
+			label > span {
+				float: left;
+				width: 130px;
+			}
+			p {
+				clear: both;
+			}
+			input[type="number"] {
+				width: 40px;
+				text-align: right;
+			}
+		</style>
+		<title>Forms</title>
+	</head>
+	<body>
+		<form id="properties">
+			<p><label><span>First name</span><input name="firstname" /><label></p>
+			<p><label><span>Last name</span><input name="lastname" /><label></p>
+			<p>
+				<label>
+					<span>Gender</span>
+					<select name="gender">
+						<option></option>
+						<option value="male">Male</option>
+						<option value="female">Female</option>
+					</select>
+				</label>
+			</p>
+			<p><label><span>Age</span><input type="number" name="age" /><label></p>
+			<p><label><span>Email</span><input name="email" /></label></p>
+			<p><label><span>Offline</span><input type="checkbox" name="offline" /></label></p>
+			<p><button>Update object</button></p>
+		</form>
+		<form id="source">
+			<p><textarea name="data" cols="50" rows="8"></textarea></p>
+			<p><button>Update form</button></p>
+		</form>
+		<div>
+			<button id="check">Is form dirty?</button>
+			<span id="dirty"></span>
+		</div>
+	</body>
+</html>

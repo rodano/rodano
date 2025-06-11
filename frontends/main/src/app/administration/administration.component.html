@@ -1,0 +1,46 @@
+<div class="title-tabs">
+	<h1>Administration</h1>
+
+	<nav
+		mat-tab-nav-bar
+		[tabPanel]="tabPanel">
+		<a
+			mat-tab-link
+			[routerLink]="['/administration', 'management']"
+			routerLinkActive
+			#management="routerLinkActive"
+			[active]="management.isActive">
+			Instance management
+		</a>
+		<a
+			mat-tab-link
+			[routerLink]="['/administration', 'details']"
+			routerLinkActive
+			#details="routerLinkActive"
+			[active]="details.isActive">
+			Instance details
+		</a>
+		<a
+			mat-tab-link
+			[routerLink]="['/administration', 'connected-users']"
+			routerLinkActive
+			#users="routerLinkActive"
+			[active]="users.isActive">
+			Connected users
+		</a>
+		<a
+			mat-tab-link
+			[routerLink]="['/administration', 'scheduled-tasks']"
+			routerLinkActive
+			#tasks="routerLinkActive"
+			[active]="tasks.isActive">
+			Scheduled tasks
+		</a>
+	</nav>
+</div>
+
+<mat-tab-nav-panel #tabPanel>
+	<main>
+		<router-outlet></router-outlet>
+	</main>
+</mat-tab-nav-panel>

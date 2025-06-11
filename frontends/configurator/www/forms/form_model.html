@@ -1,0 +1,86 @@
+<div id="edit_form_model">
+	<div class="header">
+		<h2>Form model</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_form_model_form">General</a></li>
+			<li><a href="#" data-tab="edit_form_model_content">Content</a></li>
+			<li><a href="#" data-tab="edit_form_model_insight">Insight</a></li>
+			<li><a href="#" data-tab="edit_form_model_rules">Rules</a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<form id="edit_form_model_form" method="post" class="data">
+			<p>
+				<label for="form_model_id">Id</label>
+				<input id="form_model_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="form_model_shortname">Shortname</label>
+				<app-localized-input id="form_model_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="form_model_longname">Longname</label>
+				<app-localized-input id="form_model_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="form_model_description">Description</label>
+				<app-localized-input id="form_model_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="form_model_workflow_ids">Workflows</label>
+				<app-palette id="form_model_workflow_ids" name="workflowIds"></app-palette>
+			</p>
+			<p>
+				<label for="form_model_optional">Optional</label>
+				<input id="form_model_optional" type="checkbox" name="optional" />
+			</p>
+			<p>
+				<label for="form_model_xsl_template">XSL template</label>
+				<input id="form_model_xsl_template" type="text" name="xslTemplate" />
+			</p>
+			<p>
+				<label for="form_model_xsl_filename">XSL filename</label>
+				<input id="form_model_xsl_filename" type="text" name="xslFilename" />
+			</p>
+			<p>
+				<label for="form_model_print_button_label">Print button label</label>
+				<app-localized-input id="form_model_print_button_label" name="printButtonLabel"></app-localized-input>
+			</p>
+			<menu>
+				<li><a id="form_model_constraint_edit" class="button">Edit constraint</a></li>
+				<li><button id="form_model_constraint_add" type="button">Add constraint</button></li>
+				<li><button id="form_model_constraint_delete" type="button">Delete constraint</button></li>
+				<li class="offset"><button type="submit">Save</button></li>
+			</menu>
+		</form>
+		<div id="edit_form_model_content" class="data">
+			<svg width="1290" height="20" viewbox="-20 0 1290 20">
+				<line x1="0" y1="0" x2="1250" y2="0" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<text x="0" y="17" text-anchor="middle" style="font-size: 10px; fill: var(--background-highlight-color);">0</text>
+				<line x1="0.5" y1="0" x2="0.5" y2="5" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<line x1="250.5" y1="0" x2="250.5" y2="5" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<text x="250" y="17" text-anchor="middle" style="font-size: 10px; fill: var(--background-highlight-color);">250px</text>
+				<line x1="500.5" y1="0" x2="500.5" y2="5" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<text x="500" y="17" text-anchor="middle" style="font-size: 10px; fill: var(--background-highlight-color);">500px</text>
+				<line x1="750.5" y1="0" x2="750.5" y2="5" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<text x="750" y="17" text-anchor="middle" style="font-size: 10px; fill: var(--background-highlight-color);">750px</text>
+				<line x1="1000.5" y1="0" x2="1000.5" y2="5" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<text x="1000" y="17" text-anchor="middle" style="font-size: 10px; fill: var(--background-highlight-color);">1000px</text>
+				<line x1="1250.5" y1="0" x2="1250.5" y2="5" style="stroke : var(--background-highlight-color); stroke-width: 1.5px;"></line>
+				<text x="1250" y="17" text-anchor="middle" style="font-size: 10px; fill: var(--background-highlight-color);">1250px</text>
+			</svg>
+			<div id="form_model_layouts" style="user-select: none;"></div>
+			<div>
+				<button id="form_model_layout_add" type="button" style="margin-bottom: 1rem;">Add empty layout</button>
+				or
+				<button id="form_model_layout_generate" type="button" style="margin-bottom: 1rem;">Add generated layout from dataset model</button>
+				<select id="form_model_layout_generate_select" style="float: none; margin-left: 0.5rem;"></select>
+			</div>
+		</div>
+		<div id="edit_form_model_rules">
+			<div id="form_model_saved_rules" class="rules"></div>
+		</div>
+		<div id="edit_form_model_insight"></div>
+		<div id="form_model_usage" class="node_usage"></div>
+	</div>
+</div>

@@ -1,0 +1,6 @@
+#unfortunately this file cannot be stored outside of www
+#the "files" property in the "package.json" disables to root ".npmignore" file
+#see https://docs.npmjs.com/cli/v6/configuring-npm/package-json
+
+#do not include tests
+*.test.js

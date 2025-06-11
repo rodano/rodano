@@ -1,0 +1,16 @@
+.mat-column-category {
+	width: 15rem;
+}
+.mat-column-scope {
+	width: 20rem;
+}
+.mat-column-public {
+	width: 5rem;
+}
+.mat-column-actions {
+	width: 24rem;
+
+	& button + button {
+		margin-left: var(--gap);
+	}
+}

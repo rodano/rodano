@@ -1,0 +1,64 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-title>Help</ion-title>
+	</ion-toolbar>
+</ion-header>
+
+<ion-content>
+	@if (study) {
+		<ion-card>
+			<ion-card-header>
+				<ion-card-title>Registered as <strong>{{ scope.code }}</strong> in study {{ study.shortname | localizer:selectedLanguage }}</ion-card-title>
+				<ion-card-subtitle>Version {{ currentVersion }}</ion-card-subtitle>
+			</ion-card-header>
+		</ion-card>
+	}
+	<ion-card>
+		<ion-card-header>
+			<ion-card-title>Help</ion-card-title>
+		</ion-card-header>
+		<ion-card-content>
+			<ion-list>
+				<ion-item>
+					<ion-icon
+						slot="start"
+						name="calendar">
+					</ion-icon>
+					<ion-label class="ion-text-wrap">
+						<h1>Surveys</h1>
+						<p>
+							This section captures the scheduled activities that you should complete as part of the study.
+						</p>
+					</ion-label>
+				</ion-item>
+				<ion-item>
+					<ion-icon
+						slot="start"
+						name="reader">
+					</ion-icon>
+					<ion-label class="ion-text-wrap">
+						<h1>Journal</h1>
+						<p>
+							Record in this section any unscheduled events which occur during the study.
+						</p>
+					</ion-label>
+				</ion-item>
+			</ion-list>
+		</ion-card-content>
+	</ion-card>
+	@if (appService.isDevMode()) {
+		<ion-card>
+			<ion-card-header>
+				<ion-card-title>Development Tools</ion-card-title>
+			</ion-card-header>
+			<ion-card-content>
+				The followings tools appear only in development mode (see config.json).
+				<ion-toolbar>
+					<ion-buttons slot="start">
+						<ion-button (click)="logout()" color="warning" fill="solid">Logout</ion-button>
+					</ion-buttons>
+				</ion-toolbar>
+			</ion-card-content>
+		</ion-card>
+	}
+</ion-content>

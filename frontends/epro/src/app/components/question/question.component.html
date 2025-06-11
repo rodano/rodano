@@ -1,0 +1,212 @@
+<div class="content">
+
+	@if (field.model.helpText && field.model.helpText[selectedLanguage]) {
+		<ion-item lines="none">
+			<ion-text color="secondary">
+				<p [innerHTML]="field.model.helpText[selectedLanguage]"></p>
+			</ion-text>
+		</ion-item>
+	}
+
+	<ion-item lines="none">
+		<ion-text>
+			<h4>
+				{{ field.model.shortname | localizer:selectedLanguage }}{{ field.model.required ? '*' : '' }}
+			</h4>
+		</ion-text>
+	</ion-item>
+
+	@if (field.model.type === 'RADIO') {
+		<ion-list>
+			<ion-radio-group>
+				<!-- TODO change to button='true' as soon as the ion-radio-group disabled is implemented-->
+				@for (possibleValue of field.model.possibleValues; track possibleValue.id) {
+					<ion-item
+						(click)="selectPossibleValue(possibleValue.id)"
+						[disabled]="rootScope.locked || event.locked"
+						button="{{ (rootScope.locked || event.locked) ? false : true }}"
+						detail="false">
+						@if (field.value !== possibleValue.id) {
+							<ion-icon
+								name="ellipse-outline"
+								slot="start"
+								color="{{ (rootScope.locked || event.locked) ? 'dark' : 'primary' }}">
+							</ion-icon>
+						}
+						@if (field.value === possibleValue.id) {
+							<ion-icon
+								name="checkmark-circle"
+								slot="start"
+								color="{{ (rootScope.locked || event.locked) ? 'dark' : 'primary' }}">
+							</ion-icon>
+						}
+						<ion-label class="ion-text-wrap">
+							<ion-text>
+								<h2 class="bigger-text">{{ possibleValue.shortname | localizer:selectedLanguage }}</h2>
+							</ion-text>
+						</ion-label>
+					</ion-item>
+				}
+			</ion-radio-group>
+		</ion-list>
+	}
+
+	@if (field.model.type === 'STRING') {
+		<ion-item>
+			<ion-input
+				[(ngModel)]="field.value"
+				[disabled]="rootScope.locked || event.locked"
+				placeholder="{{ field.model.forDisplay }}">
+			</ion-input>
+		</ion-item>
+	}
+
+	@if (field.model.type === 'NUMBER' && field.modelId !== 'YOUR_HEALTH_TODAY') {
+		<ion-item>
+			<div class="input-range-container">
+				<ion-text color="secondary">
+					<h1>{{ isFieldValueValid() ? field.value : 'NA' }}</h1>
+				</ion-text>
+				<ion-range
+					[(ngModel)]="field.value"
+					[name]="field.modelId"
+					[min]="field.model.minValue"
+					[max]="field.model.maxValue"
+					[disabled]="rootScope.locked || event.locked">
+					<ion-text slot="start">{{ field.model.minValue }}</ion-text>
+					<ion-text slot="end">{{ field.model.maxValue }}</ion-text>
+				</ion-range>
+			</div>
+		</ion-item>
+	}
+
+	@if (field.model.type === 'DATE') {
+		<ion-item
+			button="true"
+			id="open-date-input">
+			<ion-label>
+				{{ readableDateTimeValue }}
+			</ion-label>
+			<ion-popover
+				#popover
+				trigger="open-date-input">
+				<ng-template>
+					<ion-datetime
+						#dateTimePicker
+						[presentation]="dateTimePickerPresentation()"
+						firstDayOfWeek="1"
+						showDefaultButtons="true"
+						showDefaultTitle="true"
+						[disabled]="rootScope.locked || event.locked"
+						(ionChange)="setDatetimeValue(dateTimePicker.value)">
+					</ion-datetime>
+				</ng-template>
+			</ion-popover>
+		</ion-item>
+	}
+
+	@if (field.model.type === 'TEXTAREA') {
+		<ion-item>
+			<ion-textarea
+				[(ngModel)]="field.value"
+				[disabled]="rootScope.locked || event.locked"
+				placeholder="{{ field.model.forDisplay }}"
+				autoGrow="true">
+			</ion-textarea>
+		</ion-item>
+	}
+
+	@if (isEQ5D && field.modelId === 'YOUR_HEALTH_TODAY') {
+		<ion-row style="height: 1rem;"></ion-row>
+
+		@if (field.model.type === 'NUMBER') {
+			<ion-item lines="none">
+				<div class="eq5d-container">
+					<div class="eq5d-score-container">
+						<ion-text color="secondary">
+							<h3>Your health today</h3>
+						</ion-text>
+						<ion-text color="primary">
+							<h2>{{ (field.value !== null && field.value !== undefined) ? field.value : 'NA' }}</h2>
+						</ion-text>
+					</div>
+					<div class="eq5d-input-container">
+						<ion-text class="smaller-text margins">
+							The best health you can imagine
+						</ion-text>
+						<div class="eq5d-input-range-container">
+							<div class="transform-container">
+								<input
+									type="range"
+									step="1"
+									[min]="field.model.minValue"
+									[max]="field.model.maxValue"
+									[name]="field.modelId"
+									[(ngModel)]="field.value"
+									(touchmove)="onTouchMove($event)">
+							</div>
+							<div class="ticks-container">
+								<ion-text>
+									- {{ field.model.maxValue }}
+								</ion-text>
+								<ion-text>
+									- 50
+								</ion-text>
+								<ion-text>
+									- {{ field.model.minValue }}
+								</ion-text>
+							</div>
+						</div>
+						<ion-text class="smaller-text margins">
+							The worst health you can imagine
+						</ion-text>
+					</div>
+				</div>
+			</ion-item>
+		}
+
+		<ion-row style="height: 1rem;"></ion-row>
+	}
+
+	@if (!field.model.required) {
+		<ion-row>
+			<div class="no-answer-container">
+				<div>
+					@if (field.value === '') {
+						<ion-label>
+							<ion-icon slot="start" name="warning"></ion-icon>
+							<ion-text>
+								No answer has been provided
+							</ion-text>
+						</ion-label>
+					}
+				</div>
+				<ion-button
+					(click)="emitNoAnswer()"
+					[disabled]="field.value === ''"
+					color="secondary"
+					class="no-answer-button">
+					No answer
+				</ion-button>
+			</div>
+		</ion-row>
+	}
+
+	<ion-row style="height: 0.5rem;"></ion-row>
+</div>
+
+@if (field.model.required) {
+	<ion-item class="footer">
+		<ion-text>
+			<span class="bold">*</span> This field is required
+		</ion-text>
+	</ion-item>
+}
+
+@if (isEQ5D) {
+	<ion-item class="footer">
+		<ion-text class="even-smaller-text" color="secondary">
+			© EuroQol Research Foundation. EQ-5D™ is a trade mark of the EuroQol Research Foundation 
+		</ion-text>
+	</ion-item>
+}

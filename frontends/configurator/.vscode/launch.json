@@ -1,0 +1,74 @@
+{
+	"version": "0.2.0",
+	"compounds": [
+		{
+			"name": "Start & Debug",
+			"configurations": ["Start server", "Launch Chrome Unix"]
+		}
+	],
+	"configurations": [
+		{
+			"name": "Start server",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceRoot}/server.js",
+			"cwd": "${workspaceRoot}"
+		},
+		{
+			"name": "Launch Firefox",
+			"type": "firefox",
+			"request": "launch",
+			"reAttach": true,
+			"url": "http://localhost:1337",
+			"webRoot": "${workspaceRoot}/www"
+		},
+		{
+			"name": "Attach to existing Firefox",
+			"type": "firefox",
+			"request": "attach",
+			"url": "http://localhost:1337/*",
+			"webRoot": "${workspaceRoot}/www"
+		},
+		{
+			"name": "Launch Chrome Windows",
+			"type": "chrome",
+			"request": "launch",
+			"userDataDir": "${workspaceRoot}/.vscode/chrome", //customize user data dir to force VSC to open a new instance of Chrome with remote debug flag enabled
+			"windows": {
+				"runtimeExecutable": "C:/Program Files/Google/Chrome/Application/Chrome.exe",
+			},
+			"url": "http://localhost:1337",
+			"webRoot": "${workspaceRoot}/www"
+		},
+		{
+			"name": "Launch Chrome Beta Windows",
+			"type": "chrome",
+			"request": "launch",
+			"userDataDir": "${workspaceRoot}/.vscode/chrome", //customize user data dir to force VSC to open a new instance of Chrome with remote debug flag enabled
+			"windows": {
+				"runtimeExecutable": "C:/Program Files/Google/Chrome Beta/Application/chrome.exe",
+			},
+			"url": "http://localhost:1337",
+			"webRoot": "${workspaceRoot}/www"
+		},
+		{
+			"name": "Launch Chrome Unix",
+			"type": "chrome",
+			"request": "launch",
+			"userDataDir": "${workspaceRoot}/.vscode/chrome", //customize user data dir to force VSC to open a new instance of Chrome with remote debug flag enabled
+			"windows": {
+				"runtimeExecutable": "chrome.exe",
+			},
+			"url": "http://localhost:1337",
+			"webRoot": "${workspaceRoot}/www"
+		},
+		{
+			"name": "Attach to existing Chrome",
+			"type": "chrome",
+			"request": "attach",
+			"url": "http://localhost:1337/*",
+			"webRoot": "${workspaceRoot}/www",
+			"port": 9222
+		}
+	]
+}

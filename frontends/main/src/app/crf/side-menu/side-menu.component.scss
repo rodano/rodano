@@ -1,0 +1,14 @@
+.time {
+	font-size: 0.8rem;
+	color: #555;
+}
+.statuses {
+	height: 24px;
+	float: right;
+	& .mat-icon + .mat-icon {
+		margin-left: 0.2rem;
+	}
+}
+.event {
+	border-bottom: 1px solid #ddd;
+}

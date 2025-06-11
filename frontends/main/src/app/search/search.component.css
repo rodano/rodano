@@ -1,0 +1,18 @@
+table {
+	padding-top: 0.5em;
+}
+
+table th {
+	min-width: 15em;
+}
+
+.table-container {
+	overflow-x: auto;
+	overflow-y: auto;
+	max-height: 100%;
+}
+
+.value-cell {
+	text-align: left;
+	padding-left: 2.5em;
+}

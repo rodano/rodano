@@ -1,0 +1,14 @@
+{
+	"files.exclude": {
+		"target": true
+	},
+	"maven.executable.options": "-Dspring-boot.run.jvmArguments='-Dspring.profiles.active=api,local -Drodano.environment=DEV'",
+	"maven.terminal.favorites": [
+		{
+			"alias": "Start",
+			"command": "spring-boot:run",
+			"debug": false
+		}
+	],
+	"java.configuration.updateBuildConfiguration": "interactive"
+}

@@ -1,0 +1,10 @@
+.label {
+	display: inline-block;
+	width: 8rem;
+}
+.mat-mdc-radio-group {
+	margin: 1rem 0;
+	display: flex;
+	gap: var(--gap);
+	flex-direction: column;
+}

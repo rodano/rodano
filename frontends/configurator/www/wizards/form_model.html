@@ -1,0 +1,87 @@
+<div id="wizard_form_model" class="wizard_steps">
+	<div data-step="1" class="wizard_step">
+		<ul id="wizard_form_model_field_model_types">
+			<li data-type="STRING" data-data-type="STRING"><img src="wizards/text_ab.png" />String</li>
+			<li data-type="TEXTAREA" data-data-type="STRING"><img src="wizards/text_align_left.png" />Text</li>
+			<li data-type="NUMBER" data-data-type="NUMBER"><img src="wizards/number.png" />Number</li>
+			<li data-type="DATE" data-data-type="DATE"><img src="wizards/date.png" />Date</li>
+			<li data-type="SELECT" data-data-type="STRING"><img src="wizards/text_list_bullets.png" />Dropdown</li>
+			<li data-type="RADIO" data-data-type="STRING"><img src="wizards/radio-unchecked.png" />Multiple choice</li>
+			<li data-type="CHECKBOX" data-data-type="STRING"><img src="wizards/check-checked-green.png" />Checkbox</li>
+			<li><img src="wizards/text_horizontalrule.png" />Section break</li>
+		</ul>
+		<div id="wizard_form_model_editor">
+			<div id="wizard_form_model_content">
+				<div id="wizard_form_model_cells"></div>
+				<p id="wizard_form_model_content_instructions">Drop fields here</p>
+			</div>
+			<form id="wizard_form_model_field_details" style="visibility: hidden;">
+				<p>
+					<label for="wizard_form_model_field_model_label">Label</label>
+					<input id="wizard_form_model_field_model_label" name="label" required="required" />
+				</p>
+				<p>
+					<label for="wizard_form_model_field_model_size">Size</label>
+					<select id="wizard_form_model_field_model_size" name="size" required="required">
+						<option value="10">Small</option>
+						<option value="25">Medium</option>
+						<option value="45">Large</option>
+					</select>
+				</p>
+				<p>
+					<label for="wizard_form_model_field_model_format">Format</label>
+					<select id="wizard_form_model_field_model_format" name="number_format" required="required">
+						<option value="#">Integer</option>
+						<option value="#.0">One digit decimal</option>
+						<option value="#.00">Two digits decimal</option>
+						<option value="#.000">Three digits decimal</option>
+					</select>
+				</p>
+				<p>
+					<label for="wizard_form_model_field_model_unit">Unit</label>
+					<input id="wizard_form_model_field_model_unit" name="unit" />
+				</p>
+				<p>
+					<label for="wizard_form_model_field_model_date_format">Format</label>
+					<select id="wizard_form_model_field_model_date_format" name="date_format" required="required">
+						<option value="yyyy.MM.dd">Day, month and year</option>
+						<option value="yyyy.MM">Only month and year</option>
+						<option value="yyyy">Only year</option>
+						<option value="HH:mm">Hour and minutes</option>
+						<option value="HH:mm:ss">Hour, minutes and seconds</option>
+					</select>
+				</p>
+				<div>
+					<label>Options</label>
+					<ul id="wizard_form_model_field_model_possible_values"></ul>
+					<button id="wizard_form_model_field_model_add_possible_value" type="button">Add option</button>
+				</div>
+				<hr style="clear: both; visibility: hidden;" />
+				<menu>
+					<li><button>Save</button></li>
+					<li><button id="wizard_form_model_field_delete" type="button">Delete</button></li>
+				</menu>
+			</form>
+		</div>
+	</div>
+	<div data-step="2" class="wizard_step textcontent">
+		<h3>Choose the scope model</h3>
+		<p>
+			<label for="wizard_form_model_scope_model_id">Scope model: </label>
+			<select id="wizard_form_model_scope_model_id" required="required"></select>
+		</p>
+		<h3>Choose the event model</h3>
+		<p>
+			<label for="wizard_form_model_event_model_id">Event model: </label>
+			<select id="wizard_form_model_event_model_id"></select>
+		</p>
+	</div>
+	<div data-step="3" class="wizard_step textcontent">
+		<h3>Form model is now ready</h3>
+		<ul style="list-style-position: inside; list-style-type: disc;">
+			<li>A dataset model containing all the new field models has been created.</li>
+			<li>A form model has been created.</li>
+			<li>Form model and dataset model have been attached to the chosen scope model / event model.</li>
+		</ul>
+	</div>
+</div>

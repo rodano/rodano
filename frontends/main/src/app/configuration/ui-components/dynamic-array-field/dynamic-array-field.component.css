@@ -1,0 +1,134 @@
+.item {
+	display: flex;
+	width: auto;
+	justify-content: space-between;
+	border: 1px solid #ccc;
+	padding: 4px;
+	border-radius: var(--mat-sys-corner-extra-small);
+	margin-right: 8px;
+}
+
+.item:hover {
+	background-color: #d4edda;
+}
+
+.item-wrapper {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	align-items: center;
+	border: 1px solid #ccc;
+	padding: 8px 8px;
+	margin-bottom: 12px;
+	margin-top: 12px;
+	border-radius: var(--mat-sys-corner-extra-small);
+	color: var(
+		--mdc-outlined-text-field-disabled-input-text-color,
+		color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent)
+	);
+}
+
+.item-header {
+	font-weight: bold;
+	margin-top: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.item-text {
+	color: black;
+}
+
+.button {
+	margin-left: 12px;
+	padding: 4px;
+	background-color: var(--mat-sys-primary);
+	border-radius: var(--mat-sys-corner-extra-small);
+	color: white;
+}
+
+.button:hover {
+	cursor: pointer;
+}
+
+.item-header mat-icon:hover {
+	background-color: #c4d9ff;
+	cursor: pointer;
+}
+
+.color-box {
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	display: block;
+}
+
+.color-box-wrapper {
+	position: relative;
+}
+
+.popup {
+	position: absolute;
+	top: -60px;
+	left: -30px;
+	z-index: 1000;
+	background: white;
+	border: 1px solid #ccc;
+	border-radius: var(--mat-sys-corner-extra-small);
+	padding: 6px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.change-button {
+	background-color: var(--mat-sys-primary);
+	color: white;
+	margin-left: 12px;
+	padding: 4px;
+	border-radius: var(--mat-sys-corner-extra-small);
+}
+
+.change-button:hover {
+	cursor: pointer;
+}
+
+.remove-button {
+	background-color: var(--mat-sys-primary);
+	color: white;
+	margin-left: 12px;
+	padding: 4px;
+	border-radius: var(--mat-sys-corner-extra-small);
+}
+
+.remove-button:hover {
+	cursor: pointer;
+}
+
+.change-field {
+	margin-left: 8px;
+}
+
+.transparent-backdrop {
+	background-color: transparent !important;
+}
+
+.add-button {
+	background-color: var(--mat-sys-primary);
+	color: white;
+	margin-left: 12px;
+	padding: 4px;
+	border-radius: var(--mat-sys-corner-extra-small);
+}
+
+.add-button:hover {
+	cursor: pointer;
+}
+
+.add-button-container {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

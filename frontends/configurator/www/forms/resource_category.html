@@ -1,0 +1,34 @@
+<div id="edit_resource_category">
+	<div class="header">
+		<h2>Resource category</h2>
+	</div>
+	<form id="edit_resource_category_form" method="post" class="content data">
+		<p>
+			<label for="resource_category_id">Id</label>
+			<input id="resource_category_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="resource_category_shortname">Shortname</label>
+			<app-localized-input id="resource_category_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="resource_category_longname">Longname</label>
+			<app-localized-input id="resource_category_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="resource_category_description">Description</label>
+			<app-localized-input id="resource_category_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="resource_category_color">Color</label>
+			<input id="resource_category_color" type="text" name="color" />
+		</p>
+		<p>
+			<label for="resource_category_icon">Icon</label>
+			<input id="resource_category_icon" type="text" name="icon" />
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

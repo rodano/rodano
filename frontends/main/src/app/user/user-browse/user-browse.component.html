@@ -1,0 +1,85 @@
+<h1>Users</h1>
+
+<div class="browse-entities">
+	<form
+		[formGroup]="searchForm"
+		(ngSubmit)="search()">
+		<mat-form-field>
+			<mat-label>Name or email</mat-label>
+			<input
+				matInput
+				formControlName="fullText"
+				name="name" />
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Profile</mat-label>
+			<mat-select
+				formControlName="profileId"
+				name="profileId">
+				<mat-option></mat-option>
+				@for (profile of profiles; track profile.id) {
+					<mat-option [value]="profile.id">{{ profile.shortname | localizeMap }}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Scope</mat-label>
+			<app-scope-picker
+				formControlName="scopePk"
+				[scopes]="scopes"
+				required></app-scope-picker>
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Status</mat-label>
+			<mat-select
+				formControlName="status"
+				name="status">
+				<mat-option></mat-option>
+				@for (status of roleStatusArray; track status) {
+					<mat-option [value]="status">
+						{{ getRoleStatusDisplay(status).status }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+
+		@if (showExternallyManaged) {
+			<mat-form-field>
+				<mat-label>Externally managed</mat-label>
+				<mat-select
+					name="externallyManaged"
+					formControlName="externallyManaged">
+					<mat-option></mat-option>
+					<mat-option [value]="true">Externally managed</mat-option>
+					<mat-option [value]="false">Not externally managed</mat-option>
+				</mat-select>
+			</mat-form-field>
+		}
+		<button
+			mat-flat-button
+			type="submit">
+			Search
+		</button>
+		<button
+			mat-stroked-button
+			type="reset"
+			(click)="reset()">
+			Clear
+		</button>
+	</form>
+
+	<button
+		mat-flat-button
+		[routerLink]="['/users', 'new']"
+		[disabled]="!me?.rights?.canCreateUser">
+		<mat-icon>add</mat-icon>
+		New user
+	</button>
+</div>
+
+<app-user-list
+	[predicate]="predicate"
+	[showExternallyManaged]="showExternallyManaged"></app-user-list>

@@ -1,0 +1,17 @@
+<ul [formGroup]="formGroup">
+	@for (possibleValue of field.model.possibleValues; track possibleValue.id) {
+		<li>
+			<mat-checkbox [formControlName]="possibleValue.id">
+				{{ possibleValue.shortname | localizeMap }}
+			</mat-checkbox>
+		</li>
+	}
+
+	<li [class.hidden]="!specifyValueId || !formGroup.get(specifyValueId)?.value">
+		<mat-form-field>
+			<input
+				matInput
+				[formControlName]="otherControlName" />
+		</mat-form-field>
+	</li>
+</ul>

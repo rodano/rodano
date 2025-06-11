@@ -1,0 +1,8 @@
+#wizard_study_step_2 li, #wizard_study_step_3 li {
+	clear: both;
+	padding: 2px;
+}
+#wizard_study_step_2 li > input, #wizard_study_step_3 li > input {
+	margin-right: 0.5rem;
+	margin-top: 2px;
+}

@@ -1,0 +1,29 @@
+#nodes_workflows_sort div {
+	display: inline-block;
+	width: 15rem;
+	margin: 0.5rem;
+}
+#nodes_workflows_sort div h3 {
+	margin: 0 !important;
+	padding: 3px !important;
+	border: 2px solid var(--background-highlight-color);
+	border-bottom: 0;
+	border-radius: 0 !important;
+}
+#nodes_workflows_sort div ul {
+	height: 10rem;
+	border: 2px solid var(--background-highlight-color);
+	overflow: auto;
+}
+#nodes_workflows_sort div.highlight ul {
+	border-style: dashed;
+}
+#nodes_workflows_sort div a {
+	display: block;
+	cursor: pointer;
+	padding: 3px;
+	user-select: none;
+}
+#nodes_workflows_sort div a:hover {
+	background-color: var(--background-highlight-color);
+}

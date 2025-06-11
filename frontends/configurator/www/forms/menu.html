@@ -1,0 +1,83 @@
+<div id="edit_menu">
+	<div class="header">
+		<h2>Menu</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_menu_form">General</a></li>
+			<li><a href="#" data-tab="edit_menu_submenus_order">Order submenus</a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<form id="edit_menu_form" method="post" class="data">
+			<p>
+				<label for="menu_id">Id</label>
+				<input id="menu_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="menu_shortname">Shortname</label>
+				<app-localized-input id="menu_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="menu_longname">Longname</label>
+				<app-localized-input id="menu_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="menu_description">Description</label>
+				<app-localized-input id="menu_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="menu_order_by">Order by</label>
+				<input id="menu_order_by" type="number" name="orderBy" />
+			</p>
+			<p>
+				<label for="menu_public">Public</label>
+				<input id="menu_public" type="checkbox" name="public" />
+			</p>
+			<p>
+				<label for="menu_home_page">Home page</label>
+				<input id="menu_home_page" type="checkbox" name="homePage" />
+			</p>
+			<fieldset>
+				<legend>Action</legend>
+				<p>
+					<label for="menu_action_page">Action page</label>
+					<input id="menu_action_page" name="action.page" list="menu_action_page_datalist" />
+					<datalist id="menu_action_page_datalist">
+						<option>administration</option>
+						<option>audit-trails</option>
+						<option>benchmark</option>
+						<option>crf</option>
+						<option>dashboard</option>
+						<option>documentation</option>
+						<option>epro</option>
+						<option>extracts</option>
+						<option>mails</option>
+						<option>help</option>
+						<option>resources</option>
+						<option>robots</option>
+						<option>send-test-mail</option>
+						<option>scopes</option>
+						<option>users</option>
+						<option>widget</option>
+					</datalist>
+				</p>
+				<p>
+					<label for="menu_action_context">Action context</label>
+					<input id="menu_action_context" name="action.context" data-type="json" />
+				</p>
+				<p>
+					<label for="menu_action_parameters">Action parameters</label>
+					<input id="menu_action_parameters" name="action.parameters" data-type="json" />
+				</p>
+			</fieldset>
+			<menu>
+				<li><a id="menu_layout_edit" class="button">Edit layout</a></li>
+				<li><button id="menu_layout_add" type="button">Add layout</button></li>
+				<li><button id="menu_layout_delete" type="button">Delete layout</button></li>
+				<li class="offset"><button type="submit">Save</button></li>
+			</menu>
+		</form>
+		<div id="edit_menu_submenus_order">
+			<ul id="menu_submenus" class="sorter"></ul>
+		</div>
+	</div>
+</div>

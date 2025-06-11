@@ -1,0 +1,100 @@
+<mat-toolbar>
+	<h1>
+		<a [routerLink]="['/']">
+			@if (logo) {
+				<img
+					[src]="'data:image/svg+xml;base64,' + logo"
+					[alt]="study?.shortname | localizeMap" />
+			} @else {
+				{{ study?.shortname | localizeMap }}
+			}
+		</a>
+	</h1>
+
+	<div class="menus">
+		<!-- TODO the action.context should be simplified, this should be a single parameter instead of a nonsensical array-->
+		@for (menu of menus; track menu.id) {
+			@if (menu.submenus.length === 0) {
+				<a
+					mat-button
+					[routerLink]="menu.action.context.length > 0 ? [menu.action.page, menu.action.context[0]] : [menu.action.page]"
+					routerLinkActive="link-active">
+					{{ menu.shortname | localizeMap }}
+				</a>
+			}
+			@if (menu.submenus.length > 0) {
+				<button
+					mat-button
+					[matMenuTriggerFor]="subMenu"
+					routerLinkActive="link-active">
+					{{ menu.shortname | localizeMap }}
+					<mat-icon inline="true">expand_more</mat-icon>
+				</button>
+				<mat-menu #subMenu="matMenu">
+					@for (submenu of menu.submenus; track submenu.id) {
+						<a
+							mat-menu-item
+							[routerLink]="
+								submenu.action.context.length > 0 ? [submenu.action.page, submenu.action.context[0]] : [submenu.action.page]
+							">
+							{{ submenu.shortname | localizeMap }}
+						</a>
+					}
+				</mat-menu>
+			}
+		}
+	</div>
+
+	<div class="user">
+		@if (user) {
+			<a
+				[routerLink]="['/users', user.pk]"
+				mat-stroked-button
+				class="link-active"
+				[matBadge]="pendingRolesNumber"
+				matBadgeSize="small"
+				matBadgeDescription="Role to enable"
+				matBadgeOverlap="true"
+				matBadgePosition="below after"
+				[matBadgeHidden]="pendingRolesNumber === 0"
+				[matTooltip]="pendingRolesNumber > 0 ? 'Pending roles: ' + pendingRolesNumber : 'Your account'">
+				{{ user.name }}
+			</a>
+
+			<!-- Profile selector for super users -->
+			@if (study?.environment === environment.DEV) {
+				<mat-menu #appMenu="matMenu">
+					<!-- Hard code admin profile for superusers to be able to restore their admin profile -->
+					<button
+						mat-menu-item
+						type="button"
+						(click)="switchProfile(adminProfileId)">
+						<span>Administrator</span>
+					</button>
+					@for (profile of profiles; track profile.id) {
+						<button
+							mat-menu-item
+							type="button"
+							(click)="switchProfile(profile.id)">
+							<span>{{ profile.shortname | localizeMap }}</span>
+						</button>
+					}
+				</mat-menu>
+				<button
+					mat-icon-button
+					type="button"
+					[matMenuTriggerFor]="appMenu"
+					matTooltip="Switch profile (only for superusers)">
+					<mat-icon>domino_mask</mat-icon>
+				</button>
+			}
+
+			<button
+				(click)="logout()"
+				mat-icon-button
+				matTooltip="Logout">
+				<mat-icon>exit_to_app</mat-icon>
+			</button>
+		}
+	</div>
+</mat-toolbar>

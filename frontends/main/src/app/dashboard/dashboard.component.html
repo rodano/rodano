@@ -1,0 +1,39 @@
+<aside>
+	<nav class="side-navigation">
+		<ol>
+			@for (section of layout.sections; track section.id) {
+				<li>
+					<span>
+						<a
+							[routerLink]="['./', {sectionId: section.id}]"
+							[class.active]="section.id === selectedSection.id"
+							class="main-content">
+							{{ section.labels | localizeMap }}
+							@if (sectionBadges.hasOwnProperty(section.id)) {
+								<span class="badge">{{ sectionBadges[section.id] }}</span>
+							}
+						</a>
+					</span>
+				</li>
+			}
+		</ol>
+	</nav>
+</aside>
+<main class="content">
+	@for (section of layout.sections; track section.id) {
+		<div [hidden]="section.id !== selectedSection.id">
+			<h1>{{ section.labels | localizeMap }}</h1>
+			<div class="cms-layout">
+				@for (widget of section.widgets; track $index) {
+					<app-generic-widget
+						[widget]="widget"
+						class="widget"
+						[class.full-width]="widget.width === 'FULL'"
+						[class.half-width]="widget.width === 'HALF'"
+						(notifyParent)="updateBadges(section.id, $event)">
+					</app-generic-widget>
+				}
+			</div>
+		</div>
+	}
+</main>

@@ -1,0 +1,270 @@
+<mat-expansion-panel togglePosition="before">
+	<mat-expansion-panel-header>
+		<mat-panel-title>Advanced search</mat-panel-title>
+	</mat-expansion-panel-header>
+
+	<form
+		[formGroup]="searchForm"
+		(ngSubmit)="search()">
+		<p class="flex-row-between gap-1">
+			<mat-form-field class="full-width">
+				<mat-label>Subject or body</mat-label>
+				<input
+					matInput
+					formControlName="fullText"
+					name="fullText" />
+			</mat-form-field>
+		</p>
+
+		<p class="flex-row-between gap-1">
+			<mat-form-field class="full-width">
+				<mat-label>Recipient</mat-label>
+				<input
+					matInput
+					formControlName="recipient"
+					name="recipient" />
+			</mat-form-field>
+
+			<mat-form-field class="full-width">
+				<mat-label>Sender</mat-label>
+				<input
+					matInput
+					formControlName="sender"
+					name="sender" />
+			</mat-form-field>
+		</p>
+
+		<p class="flex-row-between gap-1">
+			<mat-form-field class="full-width">
+				<mat-label>From</mat-label>
+				<input
+					matInput
+					formControlName="afterDate"
+					name="afterDate"
+					[matDatepicker]="startDatePicker" />
+				<mat-datepicker-toggle
+					matSuffix
+					[for]="startDatePicker"></mat-datepicker-toggle>
+				<mat-datepicker #startDatePicker></mat-datepicker>
+			</mat-form-field>
+
+			<mat-form-field class="full-width">
+				<mat-label>To</mat-label>
+				<input
+					matInput
+					formControlName="beforeDate"
+					name="beforeDate"
+					[matDatepicker]="endDatePicker" />
+				<mat-datepicker-toggle
+					matSuffix
+					[for]="endDatePicker"></mat-datepicker-toggle>
+				<mat-datepicker #endDatePicker></mat-datepicker>
+			</mat-form-field>
+		</p>
+		<p class="flex-row-between gap-1">
+			<mat-form-field class="full-width">
+				<mat-label>Status</mat-label>
+				<mat-select
+					formControlName="status"
+					name="status">
+					@for (status of mailStatus | keyvalue; track status) {
+						<mat-option [value]="status.key">
+							{{ status.value | capitalizeFirst }}
+						</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+
+			<mat-form-field class="full-width">
+				<mat-label>Intent</mat-label>
+				<input
+					matInput
+					formControlName="intent"
+					name="intent" />
+			</mat-form-field>
+
+			<mat-form-field class="full-width">
+				<mat-label>Origin</mat-label>
+				<mat-select
+					formControlName="origin"
+					name="origin">
+					<mat-option></mat-option>
+					@for (origin of mailOrigin | keyvalue; track origin) {
+						<mat-option [value]="origin.key">
+							{{ origin.value | capitalizeFirst }}
+						</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-action-row>
+				<button
+					mat-flat-button
+					type="submit">
+					Search
+				</button>
+				<button
+					mat-stroked-button
+					type="reset"
+					(click)="reset()">
+					Clear
+				</button>
+			</mat-action-row>
+		</p>
+	</form>
+</mat-expansion-panel>
+
+<table
+	mat-table
+	[dataSource]="mails.objects"
+	matSort
+	matSortDisableClear>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="selected">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Selected
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			<mat-checkbox (change)="onSelect($event.checked, mail)"></mat-checkbox>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="status">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Status
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			{{ mail.status }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="creationTime">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Creation time
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			{{ mail.creationTime | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="sentTime">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Sent time
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			{{ mail.sentTime | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="recipients">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Recipient(s)
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			{{ mail.recipients | shortenString: 1 }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="attachments">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Attachments
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			{{ mail.attachments | yesNo }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="subject">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Subject
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			{{ mail.subject }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="actions">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Actions
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let mail">
+			<button
+				mat-stroked-button
+				(click)="openDetails(mail)">
+				Details
+			</button>
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let mail; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-divider></mat-divider>
+<mat-toolbar>
+	<mat-toolbar-row>
+		<button
+			mat-stroked-button
+			[disabled]="selectedMails.length === 0"
+			(click)="resendMails()">
+			Resend
+		</button>
+		<button
+			mat-stroked-button
+			[appDownload]="exportUrl">
+			Export
+		</button>
+		<span class="toolbar-spacer"></span>
+		<mat-paginator
+			[pageSize]="mails.paging.pageSize"
+			[length]="mails.paging.total">
+		</mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

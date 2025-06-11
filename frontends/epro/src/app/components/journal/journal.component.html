@@ -1,0 +1,54 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-title>Journal</ion-title>
+	</ion-toolbar>
+	@if (loading) {
+		<ion-progress-bar type="indeterminate" />
+	}
+</ion-header>
+
+<ion-content>
+	<!--Wrap the event with $any for now because otherwise the strict template check freaks out-->
+	<!--The ionic issue can be tracked here https://github.com/ionic-team/ionic-framework/issues/24245 -->
+	<ion-refresher slot="fixed" (ionRefresh)="onRefreshEvent($any($event))">
+		<ion-refresher-content></ion-refresher-content>
+	</ion-refresher>
+
+	@if(events) {
+		@if (events.length === 0) {
+			<ion-text class="ion-text-center" color="secondary">
+				<h1>No events yet</h1>
+			</ion-text>
+		}
+		@if (events.length > 0) {
+			@for (event of events; track event.id) {
+				<app-event-card
+					[scope]="scope"
+					[event]="event"
+					[languageId]="selectedLanguageId"
+					(deleted)="onDelete($event)">
+				</app-event-card>
+			}
+		}
+	}
+
+	@if (availableEventModels && availableEventModels.length > 0) {
+		<ion-fab
+			vertical="bottom"
+			horizontal="end"
+			slot="fixed">
+			<ion-fab-button>
+				<ion-icon name="add"></ion-icon>
+			</ion-fab-button>
+			<ion-fab-list side="top">
+				@for (eventModel of availableEventModels; track eventModel.id) {
+					<ion-fab-button
+						(click)="createEvent(eventModel)"
+						title="{{ eventModel.shortname | localizer:selectedLanguageId }}">
+						<ion-icon [name]="eventModel.icon"></ion-icon>
+					</ion-fab-button>
+				}
+			</ion-fab-list>
+		</ion-fab>
+	}
+</ion-content>

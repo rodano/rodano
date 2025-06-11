@@ -1,0 +1,35 @@
+<ul>
+	@for (resource of resources; track resource.pk) {
+		<li
+			[class.expanded]="resource.expanded"
+			[class.no-description]="!resource.description">
+			<p>
+				@if (resource.description) {
+					<button
+						mat-icon-button
+						(click)="showMoreLess(resource)">
+						<mat-icon>
+							@if (!resource.expanded) {
+								expand_more
+							} @else {
+								expand_less
+							}
+						</mat-icon>
+					</button>
+				}
+				<time [attr.datetime]="resource.creationTime | dateUTC">{{ resource.creationTime | dateUTC }}</time>
+				{{ resource.title }}
+				@if (resource.filename) {
+					<button
+						mat-button
+						[appDownload]="getResourceFileUrl(resource)">
+						{{ resource.filename }}
+					</button>
+				}
+			</p>
+			@if (resource.description && resource.expanded) {
+				<p [innerHTML]="resource.description"></p>
+			}
+		</li>
+	}
+</ul>

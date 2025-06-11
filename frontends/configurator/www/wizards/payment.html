@@ -1,0 +1,30 @@
+<form id="wizard_payment" method="post" class="textcontent wizard_steps">
+	<div data-step="1" class="wizard_step">
+		<h3>Choose the workflow on which the payment plan will be based</h3>
+		<p>
+			<label for="wizard_payment_workflow_id">Workflow: </label>
+			<select id="wizard_payment_workflow_id" required="required"></select>
+		</p>
+	</div>
+	<div data-step="2" class="wizard_step">
+		<h3>Customize payment plan</h3>
+		Customize payment plan on the left, save it and create appropriate payment steps.
+		When you're happy with payment plan configuration, click next to hook it on its scope model.
+	</div>
+	<div data-step="3" class="wizard_step">
+		<h3>Give rights on payment plan</h3>
+		<ul id="wizard_payment_profiles"></ul>
+	</div>
+	<div data-step="4" class="wizard_step">
+		<h3>Payment plan is now ready</h3>
+		<ul style="list-style-position: inside; list-style-type: disc;">
+			<li>A configuration dataset model matching your payment plan has been created.</li>
+			<li>A form model matching your payment plan has been created.</li>
+			<li>Form model and dataset model have been linked to the chosen scope model.</li>
+			<li>Configuration section has been created in scope model layout.</li>
+			<li>Payment section has been created in scope model layout.</li>
+			<li>Payment batch section has been created in scope model layout.</li>
+			<li>Rights have been given on the form model and the dataset model associated to the payment plan.</li>
+		</ul>
+	</div>
+</form>

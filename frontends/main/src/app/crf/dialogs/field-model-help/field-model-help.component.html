@@ -1,0 +1,15 @@
+<h1 mat-dialog-title>
+	{{ fieldModel.shortname | localizeMap }}
+</h1>
+
+<mat-dialog-content>
+	<p [innerHTML]="fieldModel.advancedHelp | localizeMap"></p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		mat-dialog-close>
+		Close
+	</button>
+</mat-dialog-actions>

@@ -1,0 +1,10 @@
+.workflow-container {
+	border-radius: var(--mat-sys-corner-extra-small);
+	display: flex;
+	align-items: center;
+	padding: 0.5rem;
+	gap: var(--gap);
+}
+span {
+	flex-grow: 1;
+}

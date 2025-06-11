@@ -1,0 +1,20 @@
+#scope_model_format_patterns {
+	line-height: 2rem;
+}
+#scope_model_format_patterns span {
+	border-radius: 2px;
+	background-color: var(--background-light-color);
+	padding: 0.2rem 0.5rem;
+	cursor: pointer;
+	user-select: none;
+}
+
+#scope_model_workflow_states_selectors > div {
+	padding-top: 1rem;
+}
+#scope_model_workflow_states_selectors > div > h3 > button {
+	margin-left: 0.5rem;
+}
+#scope_model_workflow_states_selectors > div > h3 > button > img {
+	vertical-align: text-bottom;
+}

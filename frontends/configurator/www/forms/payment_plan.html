@@ -1,0 +1,57 @@
+<div id="edit_payment_plan">
+	<div class="header">
+		<h2>Payment plan</h2>
+	</div>
+	<div class="content">
+		<form id="edit_payment_plan_form" method="post" class="data">
+			<p>
+				<label for="payment_plan_id">Id</label>
+				<input id="payment_plan_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="payment_plan_shortname">Shortname</label>
+				<app-localized-input id="payment_plan_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="payment_plan_longname">Longname</label>
+				<app-localized-input id="payment_plan_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="payment_plan_description">Description</label>
+				<app-localized-input id="payment_plan_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="payment_plan_template_file">Template file</label>
+				<input id="payment_plan_template_file" type="text" name="templateFile" />
+			</p>
+			<p>
+				<label for="payment_plan_currency">Currency</label>
+				<input id="payment_plan_currency" type="text" name="currency" style="width: 40px;" maxlength="3" />
+			</p>
+			<p>
+				<label for="payment_plan_invoiced_scope_model_id">Invoiced scope model</label>
+				<select id="payment_plan_invoiced_scope_model_id" name="invoicedScopeModel"></select>
+			</p>
+			<p>
+				<label for="payment_plan_allow_batch_merger">Merge batch allowed</label>
+				<input id="payment_plan_allow_batch_merger" type="checkbox" name="allowBatchMerger" />
+			</p>
+			<p>
+				<label for="payment_plan_extended_steps">Extended steps</label>
+				<input id="payment_plan_extended_steps" type="checkbox" name="extendedSteps" />
+			</p>
+			<p class="inline">
+				<label>Workflow<select id="payment_plan_workflow_id" name="workflow"></select></label>
+				<label>State<select id="payment_plan_workflow_state_id" name="state"></select></label>
+			</p>
+			<menu>
+				<li><button type="submit">Save</button></li>
+			</menu>
+		</form>
+		<h3>Hook payment</h3>
+		<p style="padding: 2px 0; margin: 2px 0;">
+			Event <select id="payment_plan_event_id" style="float: none; margin: 0 0.5rem;"></select>
+			<button id="payment_plan_hook" type="button" style="margin-left: 0.5rem;">Hook to this event</button>
+		</p>
+	</div>
+</div>

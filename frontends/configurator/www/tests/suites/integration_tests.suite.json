@@ -1,0 +1,7 @@
+{
+	"name" : "Configurator - Integration tests",
+	"path" : "../../",
+	"bundles" : [
+		{"dom" : true, "website" : "index.html", "test" : "tests/integration.test.js"}
+	]
+}

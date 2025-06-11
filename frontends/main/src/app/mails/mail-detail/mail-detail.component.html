@@ -1,0 +1,53 @@
+<h1 mat-dialog-title><strong>Subject:</strong> {{ mail.subject }}</h1>
+
+<mat-dialog-content>
+	<div>
+		<p><strong>From:</strong> {{ mail.sender }}</p>
+		<p><strong>To:</strong> {{ formatRecipients(mail.recipients) }}</p>
+
+		<p><strong>Sent on:</strong> {{ mail.sentTime | dateTimeUTC }}</p>
+		<p><strong>Reply to:</strong> {{ mail.replyTo }}</p>
+	</div>
+
+	<strong>Text Body:</strong>
+	<p class="text-body">{{ mail.textBody }}</p>
+
+	<strong>HTML Body:</strong>
+	<p class="text-html">
+		<span [innerHTML]="trustedHtml"></span>
+	</p>
+
+	<p>
+		<strong>Origin:</strong> {{ mail.origin }}<br />
+		<strong>Status:</strong> {{ mail.status }}<br />
+		<strong>Intent:</strong> {{ mail.intent }}<br />
+		<strong>Attempts:</strong> {{ mail.attempts }}
+	</p>
+
+	<span>Attachments :</span>
+	@if (mail.attachments.length > 0) {
+		<div>
+			<ul>
+				@for (attachment of mail.attachments; track attachment.pk) {
+					<li>
+						<a
+							[appDownload]="getAttachmentUrl(mail.pk, attachment.pk)"
+							download>
+							{{ attachment.filename }}
+						</a>
+					</li>
+				}
+			</ul>
+		</div>
+	} @else {
+		None.
+	}
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		mat-dialog-close>
+		Close
+	</button>
+</mat-dialog-actions>

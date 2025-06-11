@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script type="text/javascript" src="extension.js"></script>
+		<script type="text/javascript" src="dom_extension.js"></script>
+		<script type="text/javascript" src="ui.js"></script>
+		<style media="screen" type="text/css">
+			body {
+				font-family: Verdana;
+				font-size: 12px;
+			}
+			body.loading, body.loading * {
+				cursor: wait !important;
+			}
+			#modal_overlay {
+				position: fixed;
+				display: none;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				z-index: 10;
+				background-color: #eee;
+				opacity: 0.9;
+			}
+			.modal {
+				display: none;
+				position: fixed;
+				height: 240px;
+				width: 600px;
+				top: 15%;
+				left: calc(50% - 300px);
+				z-index: 11;
+				padding: 1rem;
+				background-color: white;
+				border: 1px solid #aaa;
+				border-radius: 0.5rem;
+			}
+			#loading {
+				position: fixed;
+				right: 20px;
+				bottom: 1rem;
+				display: none;
+				z-index: 110;
+				padding: 1rem;
+				border: 1px solid #aaa;
+				border-radius: 2px;
+			}
+		</style>
+		<title>UI</title>
+	</head>
+	<body>
+		<h1>UI</h1>
+		<h2>Modal window</h2>
+		<div id="modal_overlay"></div>
+		<a id="open_modal" href="#">Open modal</a>
+		<div id="modal" class="modal">
+			This is a modal window
+		</div>
+
+		<h2>Validation popup</h2>
+		<a id="validate_action" href="#">Do something</a>
+		<div id="validate" class="modal">
+			<h2>Please confirm</h2>
+			<div id="validate_message"></div>
+			<menu id="validate_buttons"></menu>
+		</div>
+
+		<h2>Loading state</h2>
+		<a id="launch_task" href="#">Launch task</a>
+		<div id="loading">Loading</div>
+
+		<h2>Notification</h2>
+		<div id="notification"></div>
+		<a id="notify_me" href="#">Notify me</a>
+
+		<script type="text/javascript">
+			//modal
+			var open_modal = document.getElementById('open_modal');
+			open_modal.addEventListener(
+				'click',
+				function(event) {
+					event.stop();
+					UI.OpenModal(document.getElementById('modal'));
+				}
+			);
+
+			//validation
+			var validate_action = document.getElementById('validate_action');
+			validate_action.addEventListener(
+				'click',
+				function(event) {
+					event.stop();
+					UI.Validate('Are you sure you wanna do this?').then(confirmed => {
+						if(confirmed) {
+							validate_action.textContent = 'Do something else';
+						}
+					});
+				}
+			);
+
+			//loading
+			var launch_task = document.getElementById('launch_task');
+			launch_task.addEventListener(
+				'click',
+				function(event) {
+					UI.StartLoading();
+					setTimeout(function() {
+						launch_task.textContent = 'Relaunch task';
+						UI.StopLoading();
+					}, 2000);
+				}
+			);
+
+			//notification
+			var notify_me = document.getElementById('notify_me');
+			notify_me.addEventListener(
+				'click',
+				function(event) {
+					UI.Notify('You\'ve been notified');
+				}
+			);
+		</script>
+	</body>
+</html>

@@ -1,0 +1,13 @@
+#workflow_summary_columns > div {
+	padding-top: 1rem;
+}
+#workflow_summary_columns > div > h3 > img {
+	vertical-align: middle;
+	cursor: pointer;
+}
+#workflow_summary_columns > div > h3 > button {
+	margin-left: 0.5rem;
+}
+#workflow_summary_columns > div > h3 > button > img {
+	vertical-align: text-bottom;
+}

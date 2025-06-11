@@ -1,0 +1,24 @@
+<input
+	matInput
+	type="text"
+	#input
+	autocomplete="off"
+	[matAutocomplete]="autocomplete"
+	placeholder="Type to search" />
+<mat-autocomplete
+	requireSelection
+	#autocomplete="matAutocomplete"
+	[displayWith]="displayScope"
+	(optionSelected)="selectScope($event.option.value)">
+	@for (scopeModel of scopeModels; track scopeModel.id) {
+		@if (getScopes(scopeModel.id).length > 0) {
+			<mat-optgroup [label]="scopeModel.shortname | localizeMap">
+				@for (scope of getScopes(scopeModel.id); track scope.pk) {
+					<mat-option [value]="scope">
+						{{ scope | scopeCodeShortname }}
+					</mat-option>
+				}
+			</mat-optgroup>
+		}
+	}
+</mat-autocomplete>

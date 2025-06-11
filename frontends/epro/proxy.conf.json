@@ -1,0 +1,9 @@
+{
+	"/api": {
+		"target": "http://[::1]:8080",
+		"pathRewrite": {
+			"^/api": ""
+		},
+		"secure": false
+	}
+}

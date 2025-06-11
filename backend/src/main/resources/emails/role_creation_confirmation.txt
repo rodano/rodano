@@ -1,0 +1,10 @@
+Dear ${user.name},
+
+A new ${study.getProfile(role.profileId).defaultLocalizedShortname} role has been added to your ${study.defaultLocalizedLongname} account.
+
+You can enable the new role in the role settings in your account menu.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

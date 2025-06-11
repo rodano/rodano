@@ -1,0 +1,13 @@
+#nodes_event_models_scheduling line.event_grading {
+	stroke: var(--text-color);
+	stroke-width: 1px;
+}
+#nodes_event_models_scheduling text.event_label {
+	fill: var(--text-color);
+}
+#nodes_event_models_scheduling g.highlight line.event_grading {
+	stroke: var(--background-highlight-color);
+}
+#nodes_event_models_scheduling g.highlight text.event_label {
+	fill: var(--background-highlight-color);
+}

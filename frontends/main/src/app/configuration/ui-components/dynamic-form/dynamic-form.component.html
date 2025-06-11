@@ -1,0 +1,139 @@
+<div class="dynamic-form">
+	@for (key of fieldKeys; track key) {
+		<div class="form-section">
+			@if (hasNestedObject(dto[key])) {
+				<!-- Render sub-heading when key has children -->
+				<div class="category-header">
+					<!-- Icon to collapse/expand children forms -->
+					<mat-icon
+						class="toggle-icon"
+						(click)="toggleCollapse(key)">
+						{{ isCollapsed(key) ? 'expand_more' : 'expand_less' }}
+					</mat-icon>
+					{{ getLabel(key) }}
+				</div>
+				<!-- Recursive call for nested fields -->
+				@if (!isCollapsed(key)) {
+					<app-dynamic-form
+						[dto]="dto[key]"
+						[excludedFields]="getNestedExcludedFields(key)"
+						[immutableFields]="getNestedImmutableFields(key)"
+						[currentLayer]="currentLayer + 1"
+						[fieldOptions]="getNestedOptions(key)"
+						[onFieldChange]="onFieldChange">
+					</app-dynamic-form>
+				}
+				<!-- If a field can have multiple values (e.g. colors) we render them individually and allow appending-->
+			} @else if (isObjectArray(key, dto[key])) {
+				<!-- If the field is an array of objects, render them recursively as dynamic form components -->
+				<div
+					class="category-header"
+					[style.margin-left.px]="currentLayer * 16">
+					<mat-icon
+						class="toggle-icon"
+						(click)="toggleCollapse(key)">
+						{{ isCollapsed(key) ? 'expand_more' : 'expand_less' }}
+					</mat-icon>
+					{{ getLabel(key) }}
+					@if (!isCollapsed(key)) {
+						<button
+							mat-flat-button
+							class="add-button"
+							(click)="addObjectToArray(key)">
+							Add {{ getSingularLabel(key) }}
+						</button>
+					}
+				</div>
+				@if (!isCollapsed(key)) {
+					<div
+						class="object-array-container"
+						[style.margin-left.px]="(currentLayer + 1) * 16">
+						@for (item of dto[key]; track $index) {
+							<div
+								class="category-header"
+								[class.object-array-header]="true">
+								<mat-icon
+									class="toggle-icon"
+									(click)="toggleCollapse(key + '.' + $index)">
+									{{ isCollapsed(key + '.' + $index) ? 'expand_more' : 'expand_less' }}
+								</mat-icon>
+								{{ item.label ? item.label : getSingularLabel(key) + ' ' + ($index + 1) }}
+							</div>
+
+							@if (!isCollapsed(key + '.' + $index)) {
+								<app-dynamic-form
+									[dto]="item"
+									[currentLayer]="currentLayer + 1"
+									[fieldOptions]="fieldOptions"
+									[onFieldChange]="handleNestedFieldChange(key, $index)">
+								</app-dynamic-form>
+								<button
+									mat-flat-button
+									class="delete-button"
+									(click)="removeObjectFromArray(key, $index)"
+									[style.margin-left.px]="(currentLayer + 1) * 16">
+									Delete {{ getSingularLabel(key) }} {{ $index + 1 }}
+								</button>
+							}
+						}
+					</div>
+				}
+			} @else if (isArray(dto[key])) {
+				<app-dynamic-array-field
+					[dto]="dto"
+					[currentLayer]="currentLayer"
+					[key]="key"
+					[options]="fieldOptions?.[key] ?? []"
+					[onFieldChange]="onFieldChange" />
+			} @else {
+				<div
+					class="form-field"
+					[style.margin-left.px]="currentLayer * 16">
+					<mat-label>{{ getLabel(key) }}</mat-label>
+					<!-- Parameters of type boolean will render a toggle -->
+					@if (getFieldType(dto[key]) === 'boolean') {
+						<mat-slide-toggle
+							[(ngModel)]="dto[key]"
+							(ngModelChange)="onFieldChange?.(key, dto[key], dto)"
+							[disabled]="isImmutable(key)"
+							class="toggle"></mat-slide-toggle>
+						<!-- Parameters with limited options (e.g. enums) will render a dropdown -->
+					} @else if (hasOptions(key)) {
+						<mat-form-field appearance="outline">
+							@if (dto[key] === null) {
+								<mat-label class="grey-label">No selection</mat-label>
+							}
+							<mat-select
+								[(ngModel)]="dto[key]"
+								(ngModelChange)="onFieldChange?.(key, dto[key], dto)"
+								[disabled]="isImmutable(key)">
+								@if (isNullableField(key)) {
+									<mat-option [value]="null">No selection</mat-option>
+								}
+								@for (option of fieldOptions![key]; track $index) {
+									<mat-option [value]="option.value ?? option">{{ option.label ?? option.value ?? option }}</mat-option>
+								}
+							</mat-select>
+						</mat-form-field>
+					} @else {
+						<div class="flex-row-center">
+							@if (isHexColor(dto[key])) {
+								<span
+									class="colorBox"
+									[style.background-color]="dto[key]"></span>
+							}
+							<mat-form-field appearance="outline">
+								<input
+									matInput
+									[type]="getFieldType(dto[key]) === 'number' ? 'number' : 'text'"
+									[(ngModel)]="dto[key]"
+									(ngModelChange)="onFieldChange?.(key, dto[key], dto)"
+									[disabled]="isImmutable(key)" />
+							</mat-form-field>
+						</div>
+					}
+				</div>
+			}
+		</div>
+	}
+</div>

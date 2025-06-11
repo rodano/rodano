@@ -1,0 +1,30 @@
+<div class="title-tabs">
+	<h1>Help</h1>
+
+	<nav
+		mat-tab-nav-bar
+		[tabPanel]="tabPanel">
+		<a
+			mat-tab-link
+			[routerLink]="['/help', 'requirements']"
+			routerLinkActive
+			#requirements="routerLinkActive"
+			[active]="requirements.isActive">
+			System requirements
+		</a>
+		<a
+			mat-tab-link
+			[routerLink]="['/help', 'support']"
+			routerLinkActive
+			#support="routerLinkActive"
+			[active]="support.isActive">
+			Request support
+		</a>
+	</nav>
+</div>
+
+<mat-tab-nav-panel #tabPanel>
+	<main>
+		<router-outlet></router-outlet>
+	</main>
+</mat-tab-nav-panel>

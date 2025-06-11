@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<script type="module" src="./binding.js"></script>
+		<style media="screen" type="text/css">
+			label > span {
+				float: left;
+				width: 130px;
+			}
+			#users {
+				border: 1px solid #eee;
+				border-collapse: collapse;
+				margin-bottom: 1rem;
+			}
+			#users tbody tr:hover {
+				background-color: #eee;
+			}
+			#users th, #users td {
+				border: 1px solid #eee;
+				padding: 2px;
+			}
+			#users img {
+				cursor: pointer;
+				margin-right:5px;
+			}
+		</style>
+		<title>Binding</title>
+	</head>
+	<body>
+		<h2 id="welcome">Hello <span data-bind="name"></span>, time is <span data-bind="time" data-bind-modifier="toFullDisplay"></span></h2>
+
+		<table id="users">
+			<thead>
+				<tr>
+					<th>Greetings</th>
+					<th style="width: 100px;">First name</th>
+					<th style="width: 100px;">Last name</th>
+					<th style="width: 200px;">E-mail</th>
+					<th>Offline</th>
+					<th style="width: 120px;">Profiles</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				<!--<tr>
+					<td data-bind="greeting"></td>
+					<td data-bind="firstname"></td>
+					<td data-bind="lastname"></td>
+					<td data-bind="email"></td>
+					<td data-bind="offline"></td>
+					<td data-bind="profile"></td>
+					<td>
+						<img src="page_white_edit.png" title="Edit" />
+						<img src="cross.png" title="Delete" />
+					</td>
+				</tr>-->
+			</tbody>
+		</table>
+		<!--<h2 data-binding-source="user">Hello <span id="firstname" data-binding="user.firstname"></span> <span id="lastname"></span></h2>-->
+		<button id="user_add">Add user</button>
+		<form id="user" style="display: none;">
+			<p>
+				<label>
+					<span>Greetings</span>
+					<select required="required" name="greetings">
+						<option></option>
+						<option value="ms">Ms</option>
+						<option value="m">M</option>
+						<option value="mr">Mr</option>
+					</select>
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>First name</span>
+					<input name="firstname" type="text" required="required" />
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Last name</span>
+					<input name="lastname" type="text" required="required" />
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>E-mail</span>
+					<input name="email" type="text" required="required" />
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Offline</span>
+					<input name="offline" type="checkbox" />
+				</label>
+			</p>
+			<p>
+				<label>
+					<span>Admin</span>
+					<input name="admin" type="checkbox" />
+				</label>
+			</p>
+			<button id="user_save" type="submit">Create</button>
+			<button id="user_cancel" type="button">Cancel</button>
+		</form>
+	</body>
+</html>

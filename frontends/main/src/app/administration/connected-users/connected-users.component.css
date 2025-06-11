@@ -1,0 +1,10 @@
+.mat-column-name {
+	width: 20rem;
+}
+.mat-column-connected-since,
+.mat-column-last-access {
+	width: 12rem;
+}
+.mat-column-actions {
+	width: 10rem;
+}

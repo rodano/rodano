@@ -1,0 +1,94 @@
+<div class="title-tabs">
+	<h1>
+		<button
+			mat-icon-button
+			inline="true"
+			[routerLink]="['/users']"
+			matTooltip="Go back">
+			<mat-icon>arrow_back</mat-icon>
+		</button>
+
+		@if (user) {
+			{{ user.name }}
+
+			@if (user.activated) {
+				<mat-icon
+					matTooltip="Email verified"
+					aria-hidden="false">
+					check_circle
+				</mat-icon>
+			}
+			<app-audit-trail-button [user]="user" />
+		} @else {
+			New user
+		}
+	</h1>
+
+	@if (user) {
+		<nav
+			mat-tab-nav-bar
+			[tabPanel]="tabPanel">
+			<a
+				mat-tab-link
+				[routerLink]="['/users', user.pk, 'profile']"
+				routerLinkActive
+				#rla1="routerLinkActive"
+				[active]="rla1.isActive">
+				Profile
+			</a>
+			<a
+				mat-tab-link
+				[routerLink]="['/users', user.pk, 'security']"
+				routerLinkActive
+				#rla2="routerLinkActive"
+				[active]="rla2.isActive">
+				Security
+			</a>
+			<a
+				mat-tab-link
+				[routerLink]="['/users', user.pk, 'roles']"
+				routerLinkActive
+				#rla3="routerLinkActive"
+				[active]="rla3.isActive">
+				<span
+					[matBadge]="pendingRolesNumber"
+					matBadgeSize="small"
+					matBadgeDescription="Role to enable"
+					matBadgeOverlap="false"
+					matBadgePosition="below after"
+					[matBadgeHidden]="pendingRolesNumber === 0">
+					Roles
+				</span>
+			</a>
+		</nav>
+	}
+</div>
+
+@if (user) {
+	@if (user.externallyManaged) {
+		<p class="warning">
+			@if (me.pk === user.pk) {
+				Your account is managed externally by an organization directory.
+			} @else {
+				This user is managed externally by an organization directory and some details cannot be edited here.
+			}
+		</p>
+	}
+
+	@if (!user.activated) {
+		<p class="warning">This user has not activated their account yet.</p>
+	}
+
+	@if (user.canWrite && user.blocked) {
+		<p class="warning">
+			This user account is locked due to suspicious activity. The user must unlock their account using the email sent to
+			their registered address.
+		</p>
+	}
+}
+
+<mat-tab-nav-panel #tabPanel>
+	<main>
+		<router-outlet></router-outlet>
+	</main>
+</mat-tab-nav-panel>

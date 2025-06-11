@@ -1,0 +1,62 @@
+#form_model_layouts div > h3 > a {
+	margin-left: 3px;
+}
+#form_model_layouts div > h3 > a > img {
+	vertical-align: middle;
+}
+#form_model_layouts .text {
+	clear: both;
+}
+#form_model_layouts .text:empty {
+	display: none;
+}
+#form_model_layouts table {
+	font-size: 0.9rem;
+}
+#form_model_layouts table .cursor {
+	width: 6px;
+	height: 20px;
+	margin-right: 3px;
+	cursor: w-resize;
+	background-color: var(--background-highlight-color);
+}
+#form_model_layouts table .control {
+	background-color: var(--background-light-color);
+	border: 1px solid var(--background-light-color);
+}
+#form_model_layouts table .column {
+	background-color: var(--background-light-color);
+	border: 1px solid var(--background-light-color);
+}
+#form_model_layouts table .column > a {
+	margin-left: 3px;
+	float: right;
+}
+#form_model_layouts table .column > a > img {
+	vertical-align: middle;
+}
+#form_model_layouts table .line.inserted-before .cell {
+	border-top: 1px dashed var(--background-highlight-color) !important;
+}
+#form_model_layouts table .line.inserted-after .cell {
+	border-bottom: 1px dashed var(--background-highlight-color) !important;
+}
+#form_model_layouts table .cell {
+	vertical-align: top;
+	border: 1px solid var(--background-light-color);
+}
+#form_model_layouts table .cell.highlight {
+	background-color: var(--background-slightly-highlight-color);
+}
+#form_model_layouts table .cell .action {
+	display: none;
+	position: absolute;
+	right : 1px;
+	top: 1px;
+	padding: 1px 3px;
+	border-radius: 2px;
+	background-color: var(--background-highlight-color);
+}
+#form_model_layouts table .cell:hover .action {
+	display: block;
+}

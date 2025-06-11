@@ -1,0 +1,69 @@
+<h1 mat-dialog-title>{{ newResource ? 'Publish a ' : 'Modify' }} {{ category?.shortname | localizeMap }}</h1>
+
+<form
+	name="resource"
+	[formGroup]="resourceForm"
+	(ngSubmit)="save()">
+	<mat-dialog-content>
+		<p>
+			<mat-form-field>
+				<mat-label>Title</mat-label>
+				<input
+					matInput
+					formControlName="title" />
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Description</mat-label>
+				<textarea
+					matInput
+					formControlName="description">
+				</textarea>
+			</mat-form-field>
+		</p>
+
+		<p class="inline-fields">
+			<mat-slide-toggle formControlName="publicResource"> Public resource </mat-slide-toggle>
+			<mat-form-field>
+				<mat-label>Scope</mat-label>
+				<app-scope-picker
+					formControlName="scopePk"
+					[scopes]="scopes"></app-scope-picker>
+			</mat-form-field>
+		</p>
+
+		<p>
+			<button
+				mat-flat-button
+				type="button"
+				(click)="openInput()">
+				<mat-icon>upload_file</mat-icon>
+				Attach a file
+			</button>
+			<input
+				id="fileInput"
+				hidden
+				type="file"
+				name="file"
+				accept=".csv,.pdf,.xlsx"
+				(change)="handleFileInput($any($event.target).files)" />
+
+			{{ fileToUpload?.name || $any(resource).filename }}
+		</p>
+	</mat-dialog-content>
+
+	<mat-dialog-actions>
+		<button
+			mat-flat-button
+			mat-dialog-close>
+			Cancel
+		</button>
+		<button
+			mat-flat-button
+			[disabled]="resourceForm.invalid">
+			{{ newResource ? 'Create' : 'Update' }}
+		</button>
+	</mat-dialog-actions>
+</form>

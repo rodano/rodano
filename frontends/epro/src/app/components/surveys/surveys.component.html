@@ -1,0 +1,32 @@
+<ion-header>
+	<ion-toolbar>
+		<ion-title>Surveys</ion-title>
+	</ion-toolbar>
+	@if (loading) {
+		<ion-progress-bar type="indeterminate" />
+	}
+</ion-header>
+
+<ion-content>
+	<ion-refresher slot="fixed" (ionRefresh)="onRefresh($any($event))">
+		<ion-refresher-content></ion-refresher-content>
+	</ion-refresher>
+
+	@if (events) {
+		@if (events.length === 0) {
+			<ion-text class="ion-text-center" color="secondary">
+				<h1>No surveys found</h1>
+			</ion-text>
+		}
+		@if (events.length > 0) {
+			@for (event of events; track event.id) {
+				<app-event-card
+					[scope]="scope"
+					[event]="event"
+					[languageId]="selectedLanguageId"
+					(deleted)="onDelete($event)">
+				</app-event-card>
+			}
+		}
+	}
+</ion-content>

@@ -1,0 +1,147 @@
+<table
+	mat-table
+	[dataSource]="roles">
+	<ng-container matColumnDef="profile">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Profile
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let role">
+			{{ role.profileId | lookupById: profiles | getField: 'shortname' | localizeMap }}
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="scope">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Scope
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let role">
+			{{ role.scope.shortname }}
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="status">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Status
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let role">
+			<mat-icon [matTooltip]="getRoleStatusDisplay(role.status).status">
+				{{ getRoleStatusDisplay(role.status).icon }}
+			</mat-icon>
+			<span> {{ getRoleStatusDisplay(role.status).status }}</span>
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="auditTrail">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Audit trail
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let role">
+			<app-audit-trail-button
+				[role]="role"
+				property="status" />
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="actions">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Actions
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let role">
+			@if (role.canInvite) {
+				<button
+					(click)="inviteToRole(role.pk)"
+					mat-stroked-button>
+					Invite
+				</button>
+			}
+			@if (role.canReInvite) {
+				<button
+					(click)="inviteToRole(role.pk)"
+					mat-stroked-button>
+					Re-invite
+				</button>
+			}
+			@if (role.canEnable) {
+				<button
+					(click)="enableRole(role.pk)"
+					mat-stroked-button>
+					Enable
+				</button>
+			}
+			@if (role.canDisable) {
+				<button
+					(click)="disableRole(role.pk)"
+					mat-stroked-button>
+					Disable
+				</button>
+			}
+		</td>
+	</ng-container>
+	<tr
+		mat-header-row
+		*matHeaderRowDef="displayedColumns"></tr>
+	<tr
+		mat-row
+		*matRowDef="let row; columns: displayedColumns"></tr>
+</table>
+
+<form
+	[formGroup]="roleForm"
+	(ngSubmit)="addRole()">
+	<mat-card appearance="outlined">
+		<mat-card-header>
+			<mat-card-title>Add a role</mat-card-title>
+		</mat-card-header>
+		<mat-card-content>
+			<div class="inline-fields">
+				<mat-form-field>
+					<mat-label>Profile</mat-label>
+					<mat-select
+						formControlName="profile"
+						required>
+						@for (profile of profiles | sort: 'id'; track profile.id) {
+							<mat-option [value]="profile.id">
+								{{ profile.shortname | localizeMap }}
+							</mat-option>
+						}
+					</mat-select>
+				</mat-form-field>
+
+				<span>on</span>
+
+				<mat-form-field class="scope-picker">
+					<mat-label>Scope</mat-label>
+					<app-scope-picker
+						formControlName="scopePk"
+						[scopes]="scopes"
+						required></app-scope-picker>
+				</mat-form-field>
+			</div>
+		</mat-card-content>
+		<mat-card-actions align="end">
+			<button
+				mat-flat-button
+				type="submit"
+				[disabled]="roleForm.invalid">
+				<mat-icon>add</mat-icon>
+				Add role
+			</button>
+		</mat-card-actions>
+	</mat-card>
+</form>

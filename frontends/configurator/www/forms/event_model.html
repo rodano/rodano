@@ -1,0 +1,141 @@
+<div id="edit_event_model">
+	<div class="header">
+		<h2>Event model</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_event_model_form" >General</a></li>
+			<li><a href="#" data-tab="edit_event_model_rules">Rules</a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<form id="edit_event_model_form" method="post" class="data">
+			<p>
+				<label for="event_model_id">Id</label>
+				<input id="event_model_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="event_model_shortname">Shortname</label>
+				<app-localized-input id="event_model_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="event_model_longname">Longname</label>
+				<app-localized-input id="event_model_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="event_model_description">Description</label>
+				<app-localized-input id="event_model_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="event_model_event_group_id">Event group</label>
+				<select id="event_model_event_group_id" name="eventGroupId"></select>
+			</p>
+			<p>
+				<label for="event_model_inceptive">Inceptive</label>
+				<input id="event_model_inceptive" type="checkbox" name="inceptive" />
+			</p>
+			<p>
+				<label for="event_model_number">Number</label>
+				<input id="event_model_number" type="number" name="number" />
+			</p>
+			<p>
+				<label for="event_model_mandatory">Mandatory</label>
+				<input id="event_model_mandatory" type="checkbox" name="mandatory" />
+			</p>
+			<p>
+				<label for="event_model_max_occurrence">Max occurrence</label>
+				<input id="event_model_max_occurrence" type="number" name="maxOccurrence" />
+			</p>
+			<p>
+				<label for="event_model_prevent_add" title="Prevent this event to be created manually by a user">Prevent manual creation</label>
+				<input id="event_model_prevent_add" type="checkbox" name="preventAdd" />
+			</p>
+			<fieldset id="event_model_planning">
+				<legend>Planning</legend>
+				<p>
+					<label for="event_model_deadline">Deadline</label>
+					<input id="event_model_deadline" type="number" name="deadline" />
+					<select id="event_model_deadline_unit" name="deadlineUnit" style="margin-left: 0.5rem;"></select>
+				</p>
+				<p>
+					<label for="event_model_deadline_aggregation_function">After</label>
+					<select id="event_model_deadline_aggregation_function" name="deadlineAggregationFunction" style="float: left; margin-right: 1rem;"></select>
+					<app-palette id="event_model_deadline_reference_event_model_ids" name="deadlineReferenceEventModelIds" style="float: left;"></app-palette>
+				</p>
+				<p>
+					<label for="event_model_interval" title="Allowed interval around expected date">Interval</label>
+					<input id="event_model_interval" type="number" name="interval" />
+					<select id="event_model_interval_unit" name="intervalUnit" style="margin-left: 0.5rem;"></select>
+				</p>
+				<p>
+					<button id="event_model_planning_reset" type="button">Remove planning</button>
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Label</legend>
+				<p id="event_model_labels_patterns">
+					For patterns, use
+					<span draggable="true">${id}</span>,
+					<span draggable="true">${shortname}</span>,
+					<span draggable="true">${longname}</span>,
+					<span draggable="true">${description}</span>,
+					<span draggable="true">${number}</span>,
+					<span draggable="true">${date}</span>,
+					<span draggable="true">${expectedDate}</span>,
+					<span draggable="true">${actualDate}</span>,
+					<span draggable="true">${endDate}</span>,
+					<span draggable="true">${time}</span>,
+					<span draggable="true">${durationInDays}</span>,
+					<span draggable="true">${durationInMonths}</span>,
+					<span draggable="true">${durationInYears}</span>,
+					<span draggable="true">${durationAuto}</span>,
+					<span draggable="true">${rawGroupNumber}</span>,
+					<span draggable="true">${groupNumber}</span>,
+					<span draggable="true">${interval}</span>,
+					<span draggable="true">${intervalUnit}</span>,
+					<span draggable="true">${intervalText}</span>,
+					<span draggable="true">${deadline}</span>,
+					<span draggable="true">${deadlineUnit}</span>,
+					<span draggable="true">${datasetModelId:DATASET_MODEL_ID-fieldModelId:FIELD_MODEL_ID}</span>.
+				</p>
+				<p>
+					<label for="event_model_label_pattern">Label pattern</label>
+					<input id="event_model_label_pattern" type="text" name="labelPattern" class="very_very_long" />
+				</p>
+				<p>
+					<label for="event_model_icon">Icon</label>
+					<input id="event_model_icon" type="text" name="icon" />
+				</p>
+			</fieldset>
+			<p>
+				<label for="event_model_dataset_model_ids">Dataset models</label>
+				<app-palette id="event_model_dataset_model_ids" name="datasetModelIds"></app-palette>
+			</p>
+			<p>
+				<label for="event_model_form_model_ids">Form models</label>
+				<app-palette id="event_model_form_model_ids" name="formModelIds"></app-palette>
+			</p>
+			<p>
+				<label for="event_model_workflow_ids">Workflows</label>
+				<app-palette id="event_model_workflow_ids" name="workflowIds"></app-palette>
+			</p>
+			<p>
+				<label for="event_model_implied_event_model_ids" title="When an event based on this model is created, the selected events will be created at the same time">Implied event models</label>
+				<app-palette id="event_model_implied_event_model_ids" name="impliedEventModelIds"></app-palette>
+			</p>
+			<p>
+				<label for="event_model_blocked_event_model_ids" title="When an event based on this model exists in a scope, it will block selected events">Blocked event models</label>
+				<app-palette id="event_model_blocked_event_model_ids" name="blockedEventModelIds"></app-palette>
+			</p>
+			<menu>
+				<li><a id="event_model_constraint_edit" class="button">Edit constraint</a></li>
+				<li><button id="event_model_constraint_add" type="button">Add constraint</button></li>
+				<li><button id="event_model_constraint_delete" type="button">Delete constraint</button></li>
+				<li class="offset"><button type="submit">Save</button></li>
+			</menu>
+		</form>
+		<div id="edit_event_model_rules">
+			<div id="event_model_create_rules" class="rules"></div>
+			<div id="event_model_remove_rules" class="rules"></div>
+			<div id="event_model_restore_rules" class="rules"></div>
+		</div>
+	</div>
+</div>

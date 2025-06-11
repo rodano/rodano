@@ -1,0 +1,231 @@
+name: Test
+
+permissions:
+  contents: read
+  packages: write
+
+# this will be executed on every push on a branch (hence on every commit), but not when pushing a tag
+on:
+  push:
+    branches:
+      - '*'
+
+jobs:
+  backend:
+    name: Test backend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    services:
+      mariadb:
+        image: mariadb:11.7
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: rodano
+        ports:
+            - 3307:3306
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v4
+
+      - name: Set up the JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '23'
+          server-id: github
+          server-username: GITHUB_MAVEN_USERNAME
+          server-password: GITHUB_MAVEN_PASSWORD
+          cache: 'maven'
+
+      - name: Download application dependencies
+        shell: bash
+        run: mvn -B dependency:go-offline --batch-mode
+
+      - name: Lint
+        shell: bash
+        run: mvn -B checkstyle:check
+
+      # test application
+      - name: Initialize database
+        shell: bash
+        run: mvn -B spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=database -Drodano.database.port=3307 -Drodano.init.with-data=false -Drodano.init.with-users=false"
+
+      - name: Create application package
+        shell: bash
+        run: mvn -B verify -Drodano.database.port=3307
+
+      # generate and transform test report
+      - name: Retrieve JUnit report merger
+        uses: actions/checkout@v4
+        with:
+          repository: rodano/action-junit-report-merger
+          path: action-junit-report-merger
+          ref: main
+
+      - name: Merge all test reports
+        shell: bash
+        run: |
+            javac ../action-junit-report-merger/Reporter.java
+            java -cp ../action-junit-report-merger/ Reporter
+      - name: Retrieve JUnit PDF reporter
+        uses: actions/checkout@v4
+        with:
+          repository: rodano/action-junit-pdf-reporter
+          path: action-junit-pdf-reporter
+          ref: main
+      - name: Generate custom test report
+        shell: bash
+        run: |
+            npm -C ../action-junit-pdf-reporter install
+            node ../action-junit-pdf-reporter/index.js
+
+      # generate and transform coverage report
+      - name: Generate coverage report
+        shell: bash
+        run: mvn jacoco:report
+      - name: Transform coverage report to PDF
+        uses: LukaszLapaj/html-to-pdf-action@master
+        with:
+          htmlFile: backend/target/site/jacoco/index.html
+          outputFile: coverage-report.pdf
+          pdfOptions: '{"format": "A4", "margin": {"top": "10mm", "left": "10mm", "right": "10mm", "bottom": "10mm"}}'
+
+      # store reports as artifacts
+      - name: Store test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/test-output/results.xml
+            backend/test-output/results.pdf
+            coverage-report.pdf
+
+      # publish module to the Maven repository
+      - name: Publish to GitHub Packages
+        run: mvn -B deploy -DskipTests #no need to re-run tests that have already been run when packaging the application
+        env:
+          GITHUB_MAVEN_USERNAME: rodano
+          GITHUB_MAVEN_PASSWORD: ${{secrets.GITHUB_TOKEN}}
+
+  frontend-main:
+    name: Test main frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontends/main
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@rodano'
+          cache: 'npm'
+          cache-dependency-path: frontends/main/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.RODANO_ACCOUNT_PAT }}
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check format
+        run: npm run format:check
+
+      - name: Execute unit tests
+        run: npm run test -- --no-watch --no-progress --karma-config=src/karma-ci.conf.cjs
+
+      # store reports as artifacts
+      - name: Store test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-main-test-report
+          path: frontends/main/test-report.html
+
+  frontend-configurator:
+    name: Test configurator frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontends/configurator
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: frontends/configurator/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Serve test configuration
+        run: sudo python tests/server.py ${{github.workspace}}/backend/src/main/resources/config/config.json &
+
+      - name: Run tests
+        run: npm test -- --debug
+      - name: Retrieve JUnit PDF reporter
+        uses: actions/checkout@v4
+        with:
+          repository: rodano/action-junit-pdf-reporter
+          path: action-junit-pdf-reporter
+          ref: main
+      - name: Generate custom test report
+        run: |
+            npm -C ../../action-junit-pdf-reporter install
+            node ../../action-junit-pdf-reporter/index.js
+
+      # store reports as artifacts
+      - name: Store test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-configurator-test-report
+          path: |
+            frontends/configurator/test-output/results.xml
+            frontends/configurator/test-output/results.pdf
+
+  frontend-epro:
+    name: Test ePro frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontends/epro
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: frontends/epro/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Execute unit tests
+        run: npm test -- --no-watch --no-progress --karma-config=src/karma-ci.conf.js
+
+      # store reports as artifacts
+      - name: Store test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-epro-test-report
+          path: frontends/epro/test-report.html

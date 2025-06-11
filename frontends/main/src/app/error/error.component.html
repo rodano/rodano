@@ -1,0 +1,13 @@
+@if (context === ErrorContext.NETWORK) {
+	<h1>Network error</h1>
+	<p>Unable to reach the API server. <a href="/">Please click here to go back home.</a></p>
+} @else if (context === ErrorContext.NOT_FOUND) {
+	<h1>Not found</h1>
+	<p>Unable to find the requested page. <a href="/">Please click here to go back home.</a></p>
+} @else if (context === ErrorContext.FORBIDDEN) {
+	<h1>Forbidden</h1>
+	<p>You do not have the right to access this content. <a href="/">Please click here to go back home.</a></p>
+} @else {
+	<h1>Error</h1>
+	<p>Unexpected error. <a href="/">Please click here to go back home.</a></p>
+}

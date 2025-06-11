@@ -1,0 +1,18 @@
+<h1 mat-dialog-title>Unsaved changes</h1>
+
+<mat-dialog-content>
+	<p>You have unsaved data, do you really want to quit this page?</p>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		[mat-dialog-close]="true">
+		Discard data
+	</button>
+	<button
+		mat-flat-button
+		[mat-dialog-close]="false">
+		Stay on the form
+	</button>
+</mat-dialog-actions>

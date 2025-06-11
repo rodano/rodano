@@ -1,0 +1,13 @@
+<div class="container">
+	<app-sidebar
+		style="width: fit-content"
+		[sidebarItems]="sidebarItems"
+		[heading]="heading"
+		[activeSite]="selectedLink"
+		(activeSiteChange)="selectedLink = $event"
+		(createNewClicked)="handleCreateNewClicked($event)"
+		[basePath]="['/configuration']" />
+	<main class="chart-config">
+		<router-outlet (activate)="onActivate($event)"></router-outlet>
+	</main>
+</div>

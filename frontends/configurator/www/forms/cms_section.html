@@ -1,0 +1,27 @@
+<div id="edit_cms_section">
+	<h2>CMS Section</h2>
+	<form id="edit_cms_section_form" method="post" class="textcontent data">
+		<p>
+			<label for="cms_section_id">Id</label>
+			<input id="cms_section_id" type="text" name="id" />
+		</p>
+		<p>
+			<label for="cms_section_labels">Label</label>
+			<app-localized-input id="cms_section_labels" name="labels"></app-localized-input>
+		</p>
+		<p>
+			<label for="cms_section_required_feature">Required feature</label>
+			<select id="cms_section_required_feature" name="requiredFeature"></select>
+		</p>
+		<p>
+			<label for="cms_section_required_right_entity">Required right</label>
+			<select id="cms_section_required_right_entity" name="requiredRight.rightEntity"></select>
+			<select id="cms_section_required_right_id" name="requiredRight.id" style="margin-left: 1rem;"></select>
+			<select id="cms_section_required_right_right" name="requiredRight.right" style="margin-left: 1rem;"></select>
+		</p>
+	</form>
+	<menu>
+		<li><button type="button" id="edit_cms_section_close">Close</button></li>
+		<li><button form="edit_cms_section_form" type="submit">Save</button></li>
+	</menu>
+</div>

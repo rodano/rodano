@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<script type="text/javascript" src="dom_extension.js"></script>
+		<script type="module" src="effects.demo.js"></script>
+		<style media="screen" type="text/css">
+			body {
+				font-family: Verdana;
+				font-size: 12px;
+			}
+			.sortables {
+				list-style-type: none;
+			}
+			.sortables > li {
+				padding: 4px 0.5rem;
+				background-color: #333;
+				color: white;
+			}
+			.sortables > li img {
+				vertical-align: middle;
+				cursor: pointer;
+			}
+		</style>
+		<title>Effects</title>
+	</head>
+	<body>
+		<h1>Effects</h1>
+		<h2>Sortables</h2>
+		<ul id="sortables" class="sortables">
+			<li style="background-color: blue;">First</li>
+			<li style="background-color: red;">Second</li>
+			<li style="background-color: green; height: 60px;">Third</li>
+			<li style="background-color: orange; height: 35px;">Fourth</li>
+			<li style="background-color: purple;">Fifth</li>
+			<li style="background-color: pink; height: 40px;">Sixth</li>
+		</ul>
+
+		<h2>Sortables with handle</h2>
+		<ul id="handle_sortables" class="sortables"></ul>
+		<button id="handle_sortables_add">Add</button><button id="handle_sortables_remove">Remove</button>
+
+		<h2>Sortables with check</h2>
+		<ul id="checked_sortables" class="sortables">
+			<li data-type="upper">Upper</li>
+			<li data-type="up">Up 1</li>
+			<li data-type="up">Up 2</li>
+			<li data-type="up">Up 3</li>
+			<li data-type="low">Low 1</li>
+			<li data-type="low">Low 2</li>
+			<li data-type="low">Low 3</li>
+			<li data-type="lower">Lower</li>
+		</ul>
+		<div style="clear: both;"></div>
+
+		<h2>Sortables with floating elements</h2>
+		<ul id="float_sortables" class="sortables">
+			<li style="height: 20px; clear: both;"><span style="float: left; width: 30px;"><img src="arrows_up_down.png" /></span><span style="float: left; width: 50px">1</span><span style="float: left; width: 80px;">One</span></li>
+			<li style="height: 20px; clear: both;"><span style="float: left; width: 30px;"><img src="arrows_up_down.png" /></span><span style="float: left; width: 50px">2</span><span style="float: left; width: 80px;">Two</span></li>
+			<li style="height: 20px; clear: both;"><span style="float: left; width: 30px;"><img src="arrows_up_down.png" /></span><span style="float: left; width: 50px">3</span><span style="float: left; width: 80px;">Three</span></li>
+		</ul>
+		<div style="clear: both;"></div>
+
+		<h2>Sortables with a table</h2>
+		<table id="table_sortables" style="margin-top: 1rem; border: 1px solid #ddd; width: 400px;">
+			<thead>
+				<tr>
+					<th></th>
+					<th>Firstname</th>
+					<th>Lastname</th>
+					<th>Surname</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><img src="arrows_up_down.png" /></td>
+					<td>John</td>
+					<td>Doe</td>
+					<td>Unnamed</td>
+				</tr>
+				<tr>
+					<td><img src="arrows_up_down.png" /></td>
+					<td>Keyser</td>
+					<td>Söze</td>
+					<td>The Hungarian</td>
+				</tr>
+				<tr>
+					<td><img src="arrows_up_down.png" /></td>
+					<td>Roger</td>
+					<td>Kint</td>
+					<td>Verbal</td>
+				</tr>
+			</tbody>
+		</table>
+	</body>
+</html>

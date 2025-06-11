@@ -1,0 +1,97 @@
+<mat-form-field>
+	<mat-label>Filter</mat-label>
+	<input
+		matInput
+		[formControl]="filter"
+		name="filter" />
+</mat-form-field>
+
+<table
+	mat-table
+	[dataSource]="scopeOverdue.objects"
+	matSort
+	matSortDisableClear>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="parentScopeCode">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ parentScopeName }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.parentScopeCode }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="scopeCode">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ scopeName }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			<a [routerLink]="['/crf', scope.scopePk]">{{ scope.scopeCode }}</a>
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="lastDate">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ specificColumnName }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.lastDate | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="daysOverdue">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Days overdue
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.daysOverdue }}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let scopeOverdues; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-toolbar>
+	<mat-toolbar-row>
+		<button
+			mat-stroked-button
+			[appDownload]="exportUrl">
+			Export
+		</button>
+		<span class="toolbar-spacer"></span>
+		<mat-paginator
+			[pageSize]="scopeOverdue.paging.pageSize"
+			[length]="scopeOverdue.paging.total">
+		</mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

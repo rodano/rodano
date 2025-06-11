@@ -1,0 +1,27 @@
+# dependencies
+/node_modules
+
+# compiled output
+/www
+/out-tsc
+
+# misc
+/.angular/cache
+/.sass-cache
+/coverage
+npm-debug.log
+
+# IDE
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*

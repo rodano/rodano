@@ -1,0 +1,39 @@
+<div id="edit_rule_definition_property">
+	<div class="header">
+		<h2>Rule definition property</h2>
+	</div>
+	<form id="edit_rule_definition_property_form" method="post" class="content data">
+		<p>
+			<label for="rule_definition_property_id">Id</label>
+			<input id="rule_definition_property_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="rule_definition_property_label">Label</label>
+			<input id="rule_definition_property_label" name="label" class="long" />
+		</p>
+		<p>
+			<label for="rule_definition_property_entity">Entity</label>
+			<select id="rule_definition_property_entity" name="entityId"></select>
+		</p>
+		<p>
+			<label for="rule_definition_property_target">Target</label>
+			<select id="rule_definition_property_target" name="target"></select>
+		</p>
+		<p>
+			<label for="rule_definition_property_type">Type</label>
+			<select id="rule_definition_property_type" name="type"></select>
+		</p>
+		<p>
+			<label for="rule_definition_property_configuration_entity">Configuration entity</label>
+			<select id="rule_definition_property_configuration_entity" name="configurationEntity"></select>
+		</p>
+		<p>
+			<label for="rule_definition_property_options">Options</label>
+			<input id="rule_definition_property_options" name="options"></select>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+		<div id="rule_definition_property_usage" class="node_usage"></div>
+	</form>
+</div>

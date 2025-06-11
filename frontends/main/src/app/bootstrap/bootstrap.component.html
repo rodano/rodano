@@ -1,0 +1,85 @@
+<div class="centered">
+	<h1>Bootstrap</h1>
+	<form
+		name="bootstrapForm"
+		[formGroup]="bootstrapForm"
+		(ngSubmit)="bootstrap()">
+		<p>The database of this instance is blank. You have to initialize it.</p>
+		<p class="error">{{ error }}</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Study name</mat-label>
+				<input
+					matInput
+					name="rootScopeName"
+					formControlName="rootScopeName"
+					required />
+
+				@if (bootstrapForm.controls.rootScopeName.errors) {
+					<mat-error>Study name is required</mat-error>
+				}
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Your email</mat-label>
+				<input
+					matInput
+					type="email"
+					name="userEmail"
+					formControlName="userEmail"
+					autocomplete="username email"
+					required />
+
+				@if (bootstrapForm.controls.userEmail.errors) {
+					<mat-error>Email is required</mat-error>
+				}
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Your password</mat-label>
+				<input
+					matInput
+					type="password"
+					name="userPassword"
+					formControlName="userPassword"
+					autocomplete="new-password"
+					required />
+
+				@if (bootstrapForm.controls.userPassword.hasError('required')) {
+					<mat-error>Password is required</mat-error>
+				}
+			</mat-form-field>
+		</p>
+
+		<p>
+			<mat-form-field>
+				<mat-label>Your name</mat-label>
+				<input
+					matInput
+					name="userName"
+					formControlName="userName"
+					autocomplete="name"
+					required />
+
+				@if (bootstrapForm.controls.userName.errors) {
+					<mat-error>Name is required</mat-error>
+				}
+			</mat-form-field>
+		</p>
+
+		<p class="actions">
+			<button
+				mat-flat-button
+				type="submit"
+				[class.loading]="loading"
+				[disabled]="loading || bootstrapForm.invalid">
+				Bootstrap database
+			</button>
+		</p>
+	</form>
+</div>

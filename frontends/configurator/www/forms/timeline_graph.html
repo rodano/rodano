@@ -1,0 +1,76 @@
+<div id="edit_timeline_graph">
+	<div class="header">
+		<h2>Timeline graph</h2>
+	</div>
+	<form id="edit_timeline_graph_form" method="post" class="content data">
+		<p>
+			<label for="timeline_graph_id">Id</label>
+			<input id="timeline_graph_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="timeline_graph_shortname">Shortname</label>
+			<app-localized-input id="timeline_graph_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="timeline_graph_longname">Longname</label>
+			<app-localized-input id="timeline_graph_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="timeline_graph_description">Description</label>
+			<app-localized-input id="timeline_graph_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="timeline_graph_scope_model_id">Scope model</label>
+			<select id="timeline_graph_scope_model_id" name="scopeModelId"></select>
+		</p>
+		<fieldset>
+			<legend>Study period</legend>
+			<p>
+				Configure the "study" period in the graph. Beginning and end event models will be used respectively as the beginning and the end of the period.<br />
+				These fields can be left blank to let the system pick respectively the first and/or the last event automatically.
+			</p>
+			<p>
+				<label for="timeline_graph_study_start_event_model_id">Beginning event model</label>
+				<select id="timeline_graph_study_start_event_model_id" name="studyStartEventModelId"></select>
+			</p>
+			<p>
+				<label for="timeline_graph_study_stop_event_model_id">End event model</label>
+				<select id="timeline_graph_study_stop_event_model_id" name="studyStopEventModelId"></select>
+			</p>
+			<p>
+				<label for="timeline_graph_study_stop_event_model_id">Use this period by default</label>
+				<input id="timeline_graph_study_period_is_default" type="checkbox" name="studyPeriodIsDefault" />
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Design</legend>
+			<p>
+				<label for="timeline_graph_width">Width</label>
+				<input id="timeline_graph_width" type="number" name="width" />
+			</p>
+			<p>
+				<label for="timeline_graph_height">Height</label>
+				<input id="timeline_graph_height" type="number" name="height" />
+			</p>
+			<p>
+				<label for="timeline_graph_legend_width">Legend width</label>
+				<input id="timeline_graph_legend_width" type="number" name="legendWidth" />
+			</p>
+			<p>
+				<label for="timeline_graph_show_scroller">Show scroller</label>
+				<input id="timeline_graph_show_scroller" type="checkbox" name="showScroller" />
+			</p>
+			<p>
+				<label for="timeline_graph_scroller_height">Scroller height</label>
+				<input id="timeline_graph_scroller_height" type="number" name="scrollerHeight" />
+			</p>
+		</fieldset>
+		<p>
+			<label for="timeline_graph_foot_note">Foot note</label>
+			<app-localized-input id="timeline_graph_foot_note" name="footNote" class="very_long"></app-localized-input>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

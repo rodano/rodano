@@ -1,0 +1,33 @@
+<h2>General information</h2>
+<table
+	mat-table
+	[dataSource]="generalInfos"
+	class="mat-elevation-z8">
+	<ng-container matColumnDef="title">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			title
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let info">
+			{{ info.title }}
+		</td>
+	</ng-container>
+	<ng-container matColumnDef="value">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			value
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let info">
+			{{ info.value }}
+		</td>
+	</ng-container>
+	<tr
+		mat-row
+		*matRowDef="let row; columns: columnsToDisplay"></tr>
+</table>

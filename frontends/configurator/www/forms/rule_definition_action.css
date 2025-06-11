@@ -1,0 +1,13 @@
+#rule_definition_action_parameters > div {
+	padding-top: 1rem;
+}
+#rule_definition_action_parameters > div > h3 > img {
+	vertical-align: middle;
+	cursor: pointer;
+}
+#rule_definition_action_parameters > div > h3 > button {
+	margin-left: 0.5rem;
+}
+#rule_definition_action_parameters > div > h3 > button > img {
+	vertical-align: text-bottom;
+}

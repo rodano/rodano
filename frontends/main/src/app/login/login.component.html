@@ -1,0 +1,125 @@
+<div [innerHtml]="study?.introductionText"></div>
+
+<div id="authentication">
+	<div class="nice-box">
+		@if (display === loginDisplay.LOGIN) {
+			<h2>Investigator and Monitor access</h2>
+			<p class="error">{{ error }}</p>
+			<form
+				name="loginForm"
+				[formGroup]="loginForm"
+				(ngSubmit)="login()">
+				<p>
+					<mat-form-field>
+						<mat-label>Email</mat-label>
+						<input
+							matInput
+							type="email"
+							name="email"
+							formControlName="email"
+							autocomplete="username email"
+							required />
+
+						@if (loginForm.controls.email.errors) {
+							<mat-error>Valid email is required</mat-error>
+						}
+					</mat-form-field>
+				</p>
+				<p>
+					<mat-form-field>
+						<mat-label>Password</mat-label>
+
+						<input
+							matInput
+							type="password"
+							name="password"
+							formControlName="password"
+							autocomplete="current-password"
+							required />
+
+						@if (loginForm.controls.password.hasError('required')) {
+							<mat-error>Password is required</mat-error>
+						}
+					</mat-form-field>
+				</p>
+				<p>
+					<button
+						mat-flat-button
+						type="submit"
+						[class.loading]="loading"
+						[disabled]="loading || loginForm.invalid">
+						Login
+					</button>
+				</p>
+				<p>
+					Have forgotten your password?<br />
+					<button
+						(click)="toggleDisplay()"
+						class="link">
+						Reset your password
+					</button>
+				</p>
+			</form>
+		} @else if (display === loginDisplay.RECOVER) {
+			<h2>Password recovery</h2>
+			<p>
+				Enter your email address that you use to log in.<br />
+				We will send you an email to reset your password.
+			</p>
+			<form
+				name="recoveryForm"
+				[formGroup]="recoveryForm"
+				(ngSubmit)="sendPassword()">
+				<p>
+					<mat-form-field>
+						<mat-label>Email</mat-label>
+
+						<input
+							matInput
+							type="email"
+							name="email"
+							formControlName="email"
+							autocomplete="username email"
+							required />
+
+						@if (loginForm.controls.email.errors) {
+							<mat-error>Valid email is required</mat-error>
+						}
+					</mat-form-field>
+				</p>
+				<p>
+					<button
+						mat-flat-button
+						type="submit"
+						[class.loading]="loading"
+						[disabled]="loading || recoveryForm.invalid">
+						Send password
+					</button>
+				</p>
+				<p>
+					<button
+						(click)="toggleDisplay()"
+						class="link">
+						Back to login
+					</button>
+				</p>
+			</form>
+		}
+	</div>
+
+	@if (study?.eproEnabled) {
+		<div class="nice-box">
+			<h2>{{ study?.eproProfile?.shortname | localizeMap }} access</h2>
+			<p>
+				{{ study?.eproProfile?.shortname | localizeMap }} enrolled in this study can participate using dedicated access.
+			</p>
+			<p>
+				<a
+					mat-flat-button
+					href="/eproapp">
+					{{ study?.eproProfile?.shortname | localizeMap }} access
+				</a>
+			</p>
+		</div>
+	}
+</div>

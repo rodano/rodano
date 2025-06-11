@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<script type="module" src="driver.demo.js"></script>
+		<title>Driver</title>
+		<style media="screen" type="text/css">
+			body {
+				font-family: Verdana;
+				font-size: 12px;
+			}
+			.counter {
+				margin-left: 1rem;
+				border-radius: 4px;
+				padding: 2px 8px;
+				background-color: #333;
+				color: #eee;
+			}
+			#dragme {
+				font-size: 11px;
+				background-color: #eee;
+				border: 1px dotted #666;
+				padding: 4px 8px;
+				cursor: pointer;
+			}
+			#dropzone {
+				background-color: #eee;
+				border: 1px dotted #666;
+				margin-top: 1rem;
+				padding: 15px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Driver</h1>
+		<h2>Click</h2>
+		<button id="click_me">Click me</button>
+		<button id="simulate_click">Simulate</button>
+		<span id="click_counter" class="counter">0</span> click(s)
+
+		<h2>Double click</h2>
+		<button id="double_click_me">Double click me</button>
+		<button id="simulate_double_click">Simulate</button>
+		<span id="double_click_counter" class="counter">0</span> double clik(s)
+
+		<h2>Right click</h2>
+		<button id="right_click_me">Right click me</button>
+		<button id="simulate_right_click">Simulate</button>
+		<span id="right_click_counter" class="counter">0</span> right click(s)
+
+		<h2>Drag and drop</h2>
+		<span id="drag_me" class="button" draggable="true">Drag me</span>
+		<button id="simulate_drag_and_drop">Simulate</button>
+		<div id="dropzone">Drop here<span id="drag_and_drop_counter" class="counter">0</span> drag&drop(s)</div>
+
+		<h2>Form</h2>
+		<form id="submit_me">
+			<p>
+				<label>Fill me <input name="fill_me" /></label>
+				<button type="button" id="simulate_fill">Simulate</button>
+			</p>
+			<p>
+				<label>Check me <input type="checkbox" name="check_me" /></label>
+				<button type="button" id="simulate_check">Simulate</button>
+			</p>
+			<p>
+				<button type="submit">Submit</button>
+				<button type="button" id="simulate_submit">Simulate</button>
+				<span id="submit_counter" class="counter">0</span> submit(s)
+			</p>
+		</form>
+
+		<h2>Link</h2>
+		<a href="#here" id="send_me">Follow link</a>
+		<a href="#elsewhere" id="send_me_elsewhere">Follow other link</a>
+		<button id="simulate_send">Simulate</button>
+		<span id="send_counter" class="counter">0</span> link(s) followed
+
+		<h2>Press</h2>
+		<p>
+			Press any key:
+			<span id="pressed"></span>
+		</p>
+		<button id="simulate_press_letter">Simulate alphanumerical</button>
+		<button id="simulate_press_key">Simulate other key</button>
+	</body>
+</html>

@@ -1,0 +1,10 @@
+#event_model_labels_patterns {
+	line-height: 2rem;
+}
+#event_model_labels_patterns span {
+	border-radius: 2px;
+	background-color: var(--background-light-color);
+	padding: 0.2rem 0.5rem;
+	cursor: pointer;
+	user-select: none;
+}

@@ -1,0 +1,4 @@
+.red-border {
+	border: 1px solid red;
+	border-radius: var(--mat-sys-corner-extra-small);
+}

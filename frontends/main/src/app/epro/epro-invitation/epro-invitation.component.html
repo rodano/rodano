@@ -1,0 +1,29 @@
+<h1 mat-dialog-title>Invitation details</h1>
+
+<mat-dialog-content>
+	<h2>Scan this QR code using the ePro application on your device</h2>
+	<div>
+		<qrcode
+			[qrdata]="qrCodeUrl"
+			[width]="256"
+			[errorCorrectionLevel]="'M'"></qrcode>
+	</div>
+	If the QR code above does not work, follow these instructions using your device (phone/tablet/computer):
+	<ol>
+		<li>
+			Go to <a [href]="data.invitation.url">{{ data.invitation.url }}</a>
+		</li>
+		<li>Click "{{ data.eproProfile.shortname | localizeMap }} access"</li>
+		<li>
+			Enter your access code <strong>{{ data.invitation.key }}</strong>
+		</li>
+	</ol>
+</mat-dialog-content>
+
+<mat-dialog-actions>
+	<button
+		mat-flat-button
+		mat-dialog-close>
+		Close
+	</button>
+</mat-dialog-actions>

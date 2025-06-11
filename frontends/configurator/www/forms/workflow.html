@@ -1,0 +1,77 @@
+<div id="edit_workflow">
+	<div class="header">
+		<h2>Workflow</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_workflow_form">General</a></li>
+			<li><a href="#" data-tab="edit_workflow_rules">Rules</a></li>
+			<li><a href="#" data-tab="edit_workflow_report">Report</a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<form id="edit_workflow_form" method="post" class="data">
+			<p>
+				<label for="workflow_id">Id</label>
+				<input id="workflow_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="workflow_shortname">Shortname</label>
+				<app-localized-input id="workflow_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="workflow_longname">Longname</label>
+				<app-localized-input id="workflow_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="workflow_description">Description</label>
+				<app-localized-input id="workflow_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="workflow_order_by">Order</label>
+				<input id="workflow_order_by" type="number" name="orderBy" />
+			</p>
+			<p>
+				<label for="workflow_aggregate_workflow_id" title="Choose a workflow that this workflow will aggregate or leave blank for a simple workflow">Aggregate workflow</label>
+				<select id="workflow_aggregate_workflow_id" name="aggregateWorkflowId"></select>
+			</p>
+			<p>
+				<label for="workflow_mandatory">Mandatory</label>
+				<input id="workflow_mandatory" type="checkbox" name="mandatory" />
+			</p>
+			<p>
+				<label for="workflow_initial_state_id" title="State in which the workflow will be initialized">Initial state</label>
+				<select id="workflow_initial_state_id" name="initialStateId"></select>
+			</p>
+			<p>
+				<label for="workflow_action_id">Creation action</label>
+				<select id="workflow_action_id" name="actionId"></select>
+			</p>
+			<p>
+				<label for="workflow_unique" title="Unique workflow can be instanced only once per workflowable (scope, event, form or field)">Unique</label>
+				<input id="workflow_unique" type="checkbox" name="unique" />
+			</p>
+			<p>
+				<label for="workflow_message" title="Message displayed to present the list of workflow states on the CRF page">Message</label>
+				<app-localized-input id="workflow_message" class="very_long" name="message"></app-localized-input>
+			</p>
+			<p>
+				<label for="workflow_icon">Icon</label>
+				<input id="workflow_icon" type="text" name="icon" />
+			</p>
+			<menu>
+				<li><button type="submit">Save</button></li>
+			</menu>
+			<div id="workflow_usage" class="node_usage"></div>
+		</form>
+		<div id="edit_workflow_rules" class="rules"></div>
+		<div id="edit_workflow_report">
+			<div id="workflow_report_rules"></div>
+			<img id="workflow_report_rules_download" src="images/disk.png" title="Download rules" alt="Download" />
+			<div id="workflow_report_diagram"></div>
+			<div id="workflow_report_file">
+				<div id="workflow_report_file_diagram"></div>
+				<canvas id="workflow_report_file_canvas"></canvas>
+			</div>
+			<img id="workflow_report_diagram_download" src="images/disk.png" title="Download diagram" alt="Download" />
+		</div>
+	</div>
+</div>

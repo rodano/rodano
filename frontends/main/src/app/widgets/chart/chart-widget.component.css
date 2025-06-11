@@ -1,0 +1,13 @@
+.container {
+	background: #ffffff; /* White background */
+	border-radius: var(--mat-sys-corner-extra-small);
+	padding: 1rem;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.error-message {
+	color: red;
+	background-color: #ffebee;
+	padding: 0.5rem;
+	border-radius: var(--mat-sys-corner-extra-small);
+}

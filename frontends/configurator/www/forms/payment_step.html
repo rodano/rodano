@@ -1,0 +1,38 @@
+<div id="edit_payment_step">
+	<div class="header">
+		<h2>Payment plan step</h2>
+	</div>
+	<form id="edit_payment_step_form" method="post" class="content data">
+		<p>
+			<label for="payment_step_id">Id</label>
+			<input id="payment_step_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="payment_step_shortname">Shortname</label>
+			<app-localized-input id="payment_step_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="payment_step_longname">Longname</label>
+			<app-localized-input id="payment_step_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="payment_step_description">Description</label>
+			<app-localized-input id="payment_step_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="payment_step_repeatable">Repeatable</label>
+			<input id="payment_step_repeatable" type="checkbox" name="repeatable" />
+		</p>
+		<p>
+			<label for="payment_step_workflowable">Workflowable</label>
+			<select id="payment_step_workflowable" name="workflowable"></select>
+		</p>
+		<div id="payment_distributions" style="clear: both; margin-top: 25px;"></div>
+		<p>
+			<button id="payment_step_distribution_add">Add distribution</button>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

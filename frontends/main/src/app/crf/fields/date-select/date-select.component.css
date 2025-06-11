@@ -1,0 +1,17 @@
+.day-month {
+	width: 5rem;
+
+	&.contains-unknown {
+		width: 8rem; /* some space is required to display the "unknown" option */
+	}
+}
+.year {
+	width: 6rem;
+
+	&.contains-unknown {
+		width: 8rem; /* some space is required to display the "unknown" option */
+	}
+}
+.mat-mdc-form-field + .mat-mdc-form-field {
+	margin-left: 0.5rem;
+}

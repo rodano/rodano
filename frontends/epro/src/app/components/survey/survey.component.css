@@ -1,0 +1,12 @@
+.header {
+	color: dimgrey;
+	margin: 0;
+	padding: 0.5rem;
+	background-color: #eee;
+}
+.header h2 {
+	margin-top: 0.2rem;
+}
+ion-item {
+	cursor: pointer;
+}

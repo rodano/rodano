@@ -1,0 +1,128 @@
+#variables using uppercase will be handled by the "env" file provided at runtime to docker-compose (during the deployment of the application)
+services:
+  db:
+    image: mariadb:11.7
+    ports:
+      - "3307:3306"
+    volumes:
+      - ${STUDY_PATH}/database:/var/lib/mysql
+    environment:
+      MARIADB_USER: root
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: rodano
+      MARIADB_AUTO_UPGRADE: true
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "healthcheck.sh",
+          "--su-mysql",
+          "--connect",
+          "--innodb_initialized"
+        ]
+      start_period: 10s
+      retries: 5
+      interval: 5s
+      timeout: 30s
+    restart: on-failure
+
+  plugins-compiler:
+    image: ghcr.io/rodano/plugins-compiler:${TAG}
+    volumes:
+      #access to the study package, to compile the plugins
+      - type: bind
+        source: ${STUDY_PATH}/backend
+        target: /app
+        read_only: false
+    working_dir: /app
+    command: mvn compile -DskipTests
+
+  smtp:
+    image: ixdotai/smtp
+    restart: on-failure
+
+  backend:
+    image: ghcr.io/rodano/backend:${TAG}
+    pull_policy: always
+    depends_on:
+      plugins-compiler:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+      smtp:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    volumes:
+      #access to the study package, to get the configuration
+      - type: bind
+        source: ${STUDY_PATH}
+        target: /app/study
+        read_only: true
+      #access to the study package, to get the plugins
+      - type: bind
+        source: ${STUDY_PATH}/backend/target/classes
+        target: /app/plugins
+        read_only: true
+    environment:
+      JVM_OPTS: -Xmx512M -XX:+ExitOnOutOfMemoryError
+      spring.profiles.active: api,study
+      rodano.config: /app/study/config.json
+      rodano.environment: VAL
+      rodano.database.host: db
+      rodano.database.port: 3306
+      rodano.database.name: rodano
+      spring.datasource.username: root
+      spring.datasource.password: root
+      spring.mail.host: smtp
+      spring.mail.port: 25
+      spring.mail.username: anonymous
+      spring.mail.password: unused-but-required
+      logging.level.ch.rodano.core: INFO
+    healthcheck:
+      test:
+        [
+            "CMD-SHELL",
+            "curl -s http://localhost:8080/administration/is-online | grep -q 'study is up'"
+        ]
+      start_period: 30s
+      retries: 5
+      interval: 10s
+      timeout: 10s
+    restart: on-failure
+
+  frontend:
+    image: ghcr.io/rodano/frontend:${TAG}
+    pull_policy: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+      - reporter
+    ports:
+      - "7586:80"
+    volumes:
+      #access to the study package, to get the static files
+      - type: bind
+        source: ${STUDY_PATH}
+        target: /app/study
+        read_only: true
+    restart: on-failure
+
+  reporter:
+    image: ghcr.io/rodano/dm-reporter:${TAG}
+    pull_policy: always
+    depends_on:
+      - backend
+    ports:
+      - "3838:3838"
+    volumes:
+      #access to the study package, to get the custom reports
+      - type: bind
+        source: ${STUDY_PATH}/dm-reporter
+        target: /opt/custom-reports
+        read_only: true
+    environment:
+      - API_URL=http://backend:8080
+    restart: on-failure

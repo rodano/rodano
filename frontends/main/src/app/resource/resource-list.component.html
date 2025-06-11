@@ -1,0 +1,179 @@
+<h1>Resources</h1>
+
+<div class="browse-entities">
+	<form
+		[formGroup]="searchForm"
+		(ngSubmit)="search()">
+		<mat-form-field>
+			<mat-label>Title</mat-label>
+			<input
+				matInput
+				formControlName="fullText"
+				name="fullText" />
+		</mat-form-field>
+
+		<mat-form-field>
+			<mat-label>Category</mat-label>
+			<mat-select
+				formControlName="categoryId"
+				name="categoryId">
+				@for (category of categories; track category.id) {
+					<mat-option [value]="category.id">
+						{{ category.shortname | localizeMap }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+
+		<button
+			mat-flat-button
+			type="submit">
+			Search
+		</button>
+		<button
+			mat-stroked-button
+			type="reset"
+			(click)="reset()">
+			Clear
+		</button>
+	</form>
+
+	<button
+		mat-flat-button
+		[matMenuTriggerFor]="menu">
+		<mat-icon>add</mat-icon>
+		New...
+	</button>
+	<mat-menu #menu="matMenu">
+		@for (category of categories; track category.id) {
+			<button
+				mat-menu-item
+				(click)="createResource(category.id)">
+				{{ category.shortname | localizeMap }}
+			</button>
+		}
+	</mat-menu>
+</div>
+
+<table
+	mat-table
+	[dataSource]="resources.objects"
+	matSort>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="title">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Title
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let resource">
+			{{ resource.title }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="category">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Category
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let resource">
+			{{ resource.category.shortname | localizeMap }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="scopeShortname">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Scope
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let resource">
+			{{ resource.scopeShortname }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="isPublic">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			Public
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let resource">
+			{{ resource.publicResource ? 'Yes' : 'No' }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="actions">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Actions
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let resource">
+			@if (!resource.removed) {
+				<button
+					mat-stroked-button
+					(click)="updateResource(resource)">
+					Update
+				</button>
+				<button
+					mat-stroked-button
+					(click)="removeResource($event, resource)">
+					Remove
+				</button>
+				@if (resource.filename) {
+					<button
+						mat-stroked-button
+						[appDownload]="getFileUrl(resource)">
+						Download
+					</button>
+				}
+			} @else {
+				<button
+					mat-stroked-button
+					(click)="restoreResource($event, resource)">
+					Restore
+				</button>
+			}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		[class.removed]="resource.removed"
+		*matRowDef="let resource; columns: columnsToDisplay"></tr>
+</table>
+
+<mat-divider></mat-divider>
+<mat-toolbar>
+	<mat-toolbar-row>
+		<span class="toolbar-spacer"></span>
+		<mat-paginator
+			[pageSize]="resources.paging.pageSize"
+			[length]="resources.paging.total">
+		</mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

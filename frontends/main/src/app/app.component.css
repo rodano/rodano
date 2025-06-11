@@ -1,0 +1,31 @@
+/* display flex to make the header and the content fill 100% of the height */
+header {
+	height: 4rem;
+}
+div {
+	flex: 1;
+	height: calc(100vh - 5.5rem);
+	box-sizing: border-box;
+	overflow: auto;
+
+	/* content is padded, except for pages that have an aside section (as the dashboard) */
+	&:not(:has(aside, mat-sidenav-container)) {
+		padding: 1rem;
+	}
+}
+
+footer {
+	height: 1.5rem;
+	display: flex;
+	justify-content: flex-start;
+	padding-left: 0.5rem;
+	align-items: center;
+	background-color: var(--mat-sys-primary);
+	color: rgba(255, 255, 255, 0.75);
+	font-size: small;
+}
+
+footer a {
+	padding-left: 0.3rem;
+	color: rgba(255, 255, 255, 0.75);
+}

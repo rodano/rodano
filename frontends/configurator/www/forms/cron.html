@@ -1,0 +1,24 @@
+<div id="edit_cron">
+	<div class="header">
+		<h2>Cron</h2>
+	</div>
+	<form id="edit_cron_form" method="post" class="content data">
+		<p>
+			<label for="cron_id">Id</label>
+			<input id="cron_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="cron_description">Description</label>
+			<app-localized-input id="cron_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="cron_interval">Interval</label>
+			<input id="cron_interval" type="number" name="interval" />
+			<select id="cron_interval_unit" name="intervalUnit" style="margin-left: 0.5rem;"></select>
+		</p>
+		<div id="cron_rules" class="rules" style="margin-top: 20px;"></div>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

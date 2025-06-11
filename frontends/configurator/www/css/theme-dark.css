@@ -1,0 +1,16 @@
+:root {
+	--background-main-color: #090909;
+	--background-light-color: #5d5d5b;
+
+	--background-slightly-highlight-color: #333;
+	--background-highlight-color: #df8d00;
+	--background-rehighlight-color: #b16406;
+
+	--text-color: white;
+	--text-fade-color: #bbb;
+	--text-refade-color: #333;
+
+	--error-color: #cf1127;
+	--warning-color: #e09c07;
+	--info-color: white;
+}

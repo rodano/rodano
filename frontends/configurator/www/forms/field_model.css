@@ -1,0 +1,22 @@
+#field_model_possible_values > div {
+	padding-top: 1rem;
+}
+#field_model_possible_values > div > h3 > img {
+	vertical-align: middle;
+	cursor: pointer;
+}
+#field_model_possible_values > div > h3 > button {
+	margin-left: 0.5rem;
+}
+#field_model_possible_values > div > h3 > button > img {
+	vertical-align: text-bottom;
+}
+#field_model_format_patterns {
+	line-height: 2rem;
+}
+#field_model_format_patterns span {
+	border-radius: 2px;
+	background-color: var(--background-light-color);
+	padding: 0.2rem 0.5rem;
+	cursor: pointer;
+}

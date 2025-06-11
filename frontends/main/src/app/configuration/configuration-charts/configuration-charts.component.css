@@ -1,0 +1,111 @@
+.header {
+	display: flex;
+	align-items: center;
+}
+
+.header span {
+	font-weight: bold;
+	margin-left: 20px;
+}
+
+.header-container {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 16px;
+}
+
+.icon {
+	border-radius: 0.25em;
+	border: 1px solid rgba(0, 0, 0, 0.25);
+	padding: 12px;
+}
+
+.main {
+	height: 90%;
+	display: grid;
+	grid-template-columns: 40% 60%;
+}
+
+.config {
+	margin-right: 1rem;
+	overflow-y: scroll;
+	padding-right: 1rem;
+	overflow-x: visible;
+}
+
+.preview {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	max-height: 100%;
+	max-width: 100%;
+	overflow: auto;
+	padding: 0 24px 24px 24px;
+	border-radius: var(--mat-sys-corner-medium);
+	background-color: var(--light-highlight-color);
+}
+
+.right-container {
+	display: flex;
+	flex-direction: column;
+}
+
+.category-header {
+	font-weight: bold;
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
+
+.chart {
+	width: 100%;
+	margin: 0 auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.save-cancel-buttons {
+	align-self: flex-end;
+	margin-top: 12px;
+}
+
+.save-cancel-buttons button {
+	margin-left: 12px;
+}
+
+.save-message {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: white;
+	background-color: var(--mat-sys-primary);
+	padding: 4px;
+	margin-right: 12px;
+	border-radius: var(--mat-sys-corner-extra-small);
+}
+
+.sync-button {
+	width: fit-content;
+	margin-top: 12px;
+	align-self: flex-end;
+}
+
+.info-box {
+	background: white;
+	border-radius: var(--mat-sys-corner-extra-small);
+	padding: 1rem;
+	box-shadow: 10px 10px 10px 0 rgba(0, 0, 0, 0.2); /* Soft shadow */
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.info-box mat-icon {
+	font-size: 120px;
+	width: 120px;
+	height: 120px;
+	margin-bottom: 20px;
+	color: var(--light-highlight-color);
+}

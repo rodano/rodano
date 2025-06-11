@@ -1,0 +1,11 @@
+#cell_visibility_criteria > div {
+	display: flex;
+	align-items: flex-start;
+}
+#cell_visibility_criteria > div > select, #cell_visibility_criteria > div > input {
+	max-width: 40rem;
+	margin-right: 1rem;
+}
+#cell_visibility_criteria > div > select[multiple="multiple"] {
+	height: 8rem;
+}

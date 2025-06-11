@@ -1,0 +1,151 @@
+<div id="edit_study">
+	<div class="header">
+		<h2>Study</h2>
+	</div>
+	<form id="edit_study_form" method="post" class="content data">
+		<p>
+			<label for="study_id">Id</label>
+			<input id="study_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="study_shortname">Shortname</label>
+			<app-localized-input id="study_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="study_longname">Longname</label>
+			<app-localized-input id="study_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="study_description">Description</label>
+			<app-localized-input id="study_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="study_url">URL</label>
+			<input id="study_url" name="url" class="long" />
+		</p>
+		<p>
+			<label for="study_email">Email</label>
+			<input id="study_email" name="email" class="long" />
+		</p>
+		<p>
+			<label for="study_color">Color</label>
+			<input id="study_color" type="color" name="color" />
+		</p>
+		<p>
+			<label for="study_logo">Logo (SVG)</label>
+			<textarea id="study_logo" name="logo" class="big"></textarea>
+		</p>
+		<fieldset>
+			<legend>Languages</legend>
+			<p>
+				<label for="study_language_ids">Available</label>
+				<app-palette id="study_language_ids" name="languageIds"></app-palette>
+			</p>
+			<p>
+				<label for="study_default_language_id">Default</label>
+				<select id="study_default_language_id" name="defaultLanguageId"></select>
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>SMTP server</legend>
+			<p>
+				<label for="study_smtp_server">IP or name</label>
+				<input id="study_smtp_server" type="text" name="smtpServer" />
+			</p>
+			<p>
+				<label for="study_smtp_port">Port</label>
+				<input id="study_smtp_port" type="number" name="smtpPort" />
+			</p>
+			<p>
+				<label for="study_smtp_tls">TLS</label>
+				<input id="study_smtp_tls" type="checkbox" name="smtpTLS" />
+			</p>
+			<p>
+				<label for="study_smtp_login">Login</label>
+				<input id="study_smtp_login" type="text" name="smtpLogin" />
+			</p>
+			<p>
+				<label for="study_smtp_password">Password</label>
+				<input id="study_smtp_password" type="password" name="smtpPassword" autocomplete="off"/>
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Passwords requirements</legend>
+			<p>
+				<label for="study_password_strong" class="very_long">Strong (one uppercase letter, one digit and one symbol)</label>
+				<input id="study_password_strong" type="checkbox" name="passwordStrong" />
+			</p>
+			<p>
+				<label for="study_password_length" class="very_long">Minimum length (minimum 4)</label>
+				<input id="study_password_length" type="number" min="4" name="passwordLength" />
+			</p>
+			<p>
+				<label for="study_password_validity_duration" class="very_long">Validity time in days</label>
+				<input id="study_password_validity_duration" type="number" name="passwordValidityDuration" />
+			</p>
+			<p>
+				<label for="study_password_uniqueness" class="very_long">Uniqueness (password cannot be re-used)</label>
+				<input id="study_password_uniqueness" type="checkbox" name="passwordUniqueness" />
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>ePro</legend>
+			<p>
+				<label for="study_epro_enabled">Enable ePro</label>
+				<input id="study_epro_enabled" type="checkbox" name="eproEnabled" />
+			</p>
+			<p>
+				<label for="study_epro_profile_id">ePro user profile</label>
+				<select id="study_epro_profile_id" name="eproProfileId"></select>
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Customer</legend>
+			<p>
+				<label for="study_client">Client</label>
+				<input id="study_client" type="text" name="client"/>
+			</p>
+			<p>
+				<label for="study_client_email">Email</label>
+				<input id="study_client_email" name="clientEmail" class="long" />
+			</p>
+			<p>
+				<label for="study_protocol_no">Protocol number</label>
+				<input id="study_protocol_no" type="text" name="protocolNo"/>
+			</p>
+			<p>
+				<label for="study_version_number">Version number</label>
+				<input id="study_version_number" type="text" name="versionNumber"/>
+			</p>
+			<p>
+				<label for="study_version_date">Version date</label>
+				<input id="study_version_date" type="text" name="versionDate"/>
+			</p>
+		</fieldset>
+		<fieldset>
+			<legend>Interface</legend>
+			<p>
+				<label for="study_login_text">Login text</label>
+				<textarea id="study_login_text" name="loginText" class="very_big"></textarea>
+			</p>
+			<p>
+				<label for="study_introduction_text">Introduction text</label>
+				<textarea id="study_introduction_text" name="introductionText" class="very_big"></textarea>
+			</p>
+			<p>
+				<label for="study_welcome_text">Welcome text</label>
+				<textarea id="study_welcome_text" name="welcomeText" class="very_big"></textarea>
+			</p>
+		</fieldset>
+		<fieldset>
+		<legend>Exports</legend>
+			<p>
+				<label for="study_export_events_label" class="long">Event column label</label>
+				<input id="study_export_events_label" type="text" name="exportVisitsLabel" />
+			</p>
+		</fieldset>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

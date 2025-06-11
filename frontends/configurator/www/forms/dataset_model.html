@@ -1,0 +1,113 @@
+<div id="edit_dataset_model">
+	<div class="header">
+		<h2>Dataset model</h2>
+		<ul class="tabs manual">
+			<li class="selected"><a href="#" data-tab="edit_dataset_model_form">General</a></li>
+			<li><a href="#" data-tab="edit_dataset_model_rules">Rules</a></li>
+			<li><a href="#" data-tab="edit_dataset_model_operations">Field models operations</a></li>
+			<li><a href="#" data-tab="edit_dataset_model_sql">SQL code</a></li>
+		</ul>
+	</div>
+	<div class="content">
+		<form id="edit_dataset_model_form" method="post" class="data">
+			<p>
+				<label for="dataset_model_id">Id</label>
+				<input id="dataset_model_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+			</p>
+			<p>
+				<label for="dataset_model_shortname">Shortname</label>
+				<app-localized-input id="dataset_model_shortname" name="shortname"></app-localized-input>
+			</p>
+			<p>
+				<label for="dataset_model_longname">Longname</label>
+				<app-localized-input id="dataset_model_longname" name="longname"></app-localized-input>
+			</p>
+			<p>
+				<label for="dataset_model_description">Description</label>
+				<app-localized-input id="dataset_model_description" name="description"></app-localized-input>
+			</p>
+			<p>
+				<label for="dataset_model_multiple">Multiple</label>
+				<input id="dataset_model_multiple" type="checkbox" name="multiple" />
+			</p>
+			<fieldset id="dataset_model_labels">
+				<legend>Labels</legend>
+				<p id="dataset_model_labels_patterns">
+					For patterns, use
+					<span draggable="true">${shortname}</span>,
+					<span draggable="true">${longname}</span>,
+					<span draggable="true">${description}</span>,
+					<span draggable="true">${number}</span>,
+					<span draggable="true">${fieldModelId:FIELD_MODEL_ID}</span>.
+				</p>
+				<p>
+					<label for="dataset_model_collapsed_label_pattern" title="Label displayed when dataset is collapsed" class="long">Collapsed label pattern</label>
+					<input id="dataset_model_collapsed_label_pattern" type="text" name="collapsedLabelPattern" class="very_long" />
+				</p>
+				<p>
+					<label for="dataset_model_expanded_label_pattern" title="Label displayed when dataset is expanded" class="long">Expanded label pattern</label>
+					<input id="dataset_model_expanded_label_pattern" type="text" name="expandedLabelPattern" class="very_long" />
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Family</legend>
+				<p>
+					<label for="dataset_model_family" title="Family is used to group dataset models together to allow double data entry">Family</label>
+					<input id="dataset_model_family" type="text" name="family" />
+				</p>
+				<p>
+					<label for="dataset_model_master" title="Check this if this dataset model is the reference in its group for double data entry">Master</label>
+					<input id="dataset_model_master" type="checkbox" name="master" />
+				</p>
+			</fieldset>
+			<fieldset>
+				<legend>Export</legend>
+				<p class="inline">
+					<label>Exportable<input type="checkbox" name="exportable" /></label>
+					<label>Export order<input type="number" name="exportOrder" /></label>
+				</p>
+			</fieldset>
+			<menu>
+				<li><button type="submit">Save</button></li>
+			</menu>
+		</form>
+		<div id="edit_dataset_model_rules">
+			<div id="dataset_model_delete_rules" class="rules"></div>
+			<div id="dataset_model_restore_rules" class="rules"></div>
+		</div>
+		<div id="edit_dataset_model_operations">
+			<fieldset>
+				<legend>Validation</legend>
+				<p style="padding: 2px 0; margin: 2px 0;">
+					<select id="dataset_model_field_model_validators" style="max-width: 250px;"></select>
+					<button id="dataset_model_all_field_models_validator" type="button" style="margin-left: 1rem;">Apply this validator on all</button>
+					<button id="dataset_model_all_field_models_not_validator" type="button" style="margin-left: 1rem;">Remove this validator on all</button>
+				</p>
+				<p style="padding: 2px 0; margin: 2px 0;">
+					<select id="dataset_model_field_model_workflows" style="max-width: 250px;"></select>
+					<button id="dataset_model_all_field_models_workflow" type="button" style="margin-left: 1rem;">Apply this workflow on all</button>
+					<button id="dataset_model_all_field_models_not_workflow" type="button" style="margin-left: 1rem;">Remove this workflow on all</button>
+				</p>
+			</fieldset>
+			<fieldset style="margin-top: 20px;">
+				<legend>Export</legend>
+				<p style="padding: 2px 0; margin: 2px 0;">
+					<button id="dataset_model_all_field_models_not_exportable" type="button">All not exportable</button>
+					<button id="dataset_model_all_field_models_exportable" type="button" style="margin-left: 1rem;">All exportable</button>
+				</p>
+				<p>
+					<button id="dataset_model_all_field_models_sort_according_to_form_model" type="button">Sort field models according to form models</button>
+					<button id="dataset_model_all_field_models_sort_alphabetically" type="button" style="margin-left: 1rem;">Sort field models alphabetically</button>
+				</p>
+				<ul id="dataset_model_field_models" class="sorter"></ul>
+			</fieldset>
+		</div>
+		<div id="edit_dataset_model_sql">
+			<h3>Create database code</h3>
+			<pre><code id="dataset_model_sql_create"></code></pre>
+			<h3>Drop database code</h3>
+			<pre><code id="dataset_model_sql_drop"></code></pre>
+		</div>
+		<div id="dataset_model_usage" class="node_usage"></div>
+	</div>
+</div>

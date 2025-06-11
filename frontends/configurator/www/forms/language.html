@@ -1,0 +1,26 @@
+<div id="edit_language">
+	<div class="header">
+		<h2>Language</h2>
+	</div>
+	<form id="edit_language_form" method="post" class="content data">
+		<p>
+			<label for="language_id">Id</label>
+			<input id="language_id" type="text" name="id" required="required" pattern="[a-zA-Z][a-zA-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="language_shortname">Shortname</label>
+			<app-localized-input id="language_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="language_longname">Longname</label>
+			<app-localized-input id="language_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="language_description">Description</label>
+			<app-localized-input id="language_description" name="description"></app-localized-input>
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+	</form>
+</div>

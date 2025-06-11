@@ -1,0 +1,6 @@
+<!-- Temporary conditional rendering so there isn't an empty box with shadow -->
+@if (chart) {
+	<app-chart-ui [chart]="chart" />
+} @else {
+	<p class="error-message">{{ errorMessage }}</p>
+}

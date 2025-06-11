@@ -1,0 +1,15 @@
+.mat-column-scope {
+	width: 25rem;
+}
+.scope-selector {
+	font-size: inherit;
+	padding: 0;
+	margin: 0;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+}
+.percent {
+	margin-left: 1rem;
+	font-weight: 200;
+}

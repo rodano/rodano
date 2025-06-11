@@ -1,0 +1,76 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+      {{ event.shortname }}
+      @if (scope?.locked || event.locked) {
+        <ion-icon name="lock-closed"></ion-icon>
+      }
+    </ion-card-title>
+    <ion-card-subtitle>
+      {{ getReadableDate() }}
+    </ion-card-subtitle>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-list lines="none">
+      @for (dataset of datasets; track dataset.id) {
+        <ion-item
+          (click)="onSelect(dataset)"
+          button
+          type="button">
+          @if (scope?.locked || event.locked) {
+            <ion-icon
+              slot="start"
+              size="large"
+              name="lock-closed">
+            </ion-icon>
+          }
+          @if (!scope?.locked && !event.locked && !datasetStateService.isStarted(dataset) && !datasetStateService.isCompleted(dataset)) {
+            <ion-icon
+              slot="start"
+              size="large"
+              name="ellipse-outline">
+            </ion-icon>
+          }
+          @if (!scope?.locked && !event.locked && datasetStateService.isStarted(dataset) && !datasetStateService.isCompleted(dataset)) {
+            <ion-icon
+              slot="start"
+              size="large"
+              name="warning"
+              color="warning">
+            </ion-icon>
+          }
+          @if (!scope?.locked && !event.locked && datasetStateService.isStarted(dataset) && datasetStateService.isCompleted(dataset)) {
+            <ion-icon
+              slot="start"
+              size="large"
+              name="checkmark-circle"
+              color="primary">
+            </ion-icon>
+          }
+
+          <ion-label class="ion-text-wrap">
+            <ion-text>
+              {{ dataset.model.shortname | localizer }}
+            </ion-text>
+            <p>{{ dataset.model.fieldModels.length }} questions</p>
+          </ion-label>
+
+        </ion-item>
+      }
+    </ion-list>
+  </ion-card-content>
+
+  @if (!eventService.isPlanned(event)) {
+    <ion-footer>
+      <ion-item>
+        <ion-button
+          (click)="onDelete(event)"
+          slot="end"
+          size="small"
+          color="danger">
+          Remove
+        </ion-button>
+      </ion-item>
+    </ion-footer>
+  }
+</ion-card>

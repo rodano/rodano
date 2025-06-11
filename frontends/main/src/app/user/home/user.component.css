@@ -1,0 +1,7 @@
+.pending {
+	position: absolute;
+	top: 5%;
+	right: 0%;
+	border: 0.3em solid rgb(255, 60, 60);
+	border-radius: 50%;
+}

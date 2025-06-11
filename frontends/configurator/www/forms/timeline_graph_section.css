@@ -1,0 +1,9 @@
+#timeline_graph_section_tooltip_patterns {
+	line-height: 20px;
+}
+#timeline_graph_section_tooltip_patterns span {
+	border-radius: 2px;
+	background-color: var(--background-light-color);
+	padding: 2px 4px;
+	cursor: pointer;
+}

@@ -1,0 +1,8 @@
+# Lint only HTML and CSS files for now
+*.ts
+*.js
+*.cjs
+*.json
+
+# Exclude generated code
+www

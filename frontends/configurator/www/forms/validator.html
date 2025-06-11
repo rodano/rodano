@@ -1,0 +1,60 @@
+<div id="edit_validator">
+	<div class="header">
+		<h2>Validator</h2>
+	</div>
+	<form id="edit_validator_form" method="post" class="content data">
+		<p>
+			<label for="validator_id">Id</label>
+			<input id="validator_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="validator_shortname">Shortname</label>
+			<app-localized-input id="validator_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="validator_longname">Longname</label>
+			<app-localized-input id="validator_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="validator_description">Description</label>
+			<app-localized-input id="validator_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="validator_message" title="Message that will be used when validator is triggered">Invalid message</label>
+			<app-localized-input id="validator_message" name="message" required="required" class="very_long"></app-localized-input>
+		</p>
+		<p>
+			<label for="validator_required" title="Check to trigger the validator if the field is empty">Required</label>
+			<input id="validator_required" type="checkbox" name="required" />
+		</p>
+		<p>
+			<label for="validator_script" title="Check if validator is a script written in Java">Script</label>
+			<input id="validator_script" type="checkbox" name="script" />
+		</p>
+		<p>
+			<label for="validator_workflow_id" title="Workflow that will be triggered and managed by this validator, leave empty to create a blocking validator">Trigger workflow</label>
+			<select id="validator_workflow_id" name="workflowId"></select>
+		</p>
+		<div id="validator_workflow_states_container">
+			<p>
+				<label for="validator_workflow_invalid_state_id" title="Status that will be set to the workflow if the validator becomes invalid">Invalid state</label>
+				<select id="validator_workflow_invalid_state_id" name="invalidStateId" required="required"></select>
+			</p>
+			<p>
+				<label for="validator_workflow_valid_state_id" title="Status that will be set to the workflow if the validator becomes valid">Valid state</label>
+				<select id="validator_workflow_valid_state_id" name="validStateId" required="required"></select>
+			</p>
+		</div>
+		<p style="padding: 16px 2px;">
+			<select id="validator_copy_rules_validators" style="max-width: 250px;"></select>
+			<button id="validator_copy_rules" type="button" style="margin-left: 1rem;">Copy rules from this validator</button>
+		</p>
+		<menu>
+			<li><a id="validator_constraint_edit" class="button">Edit constraint</a></li>
+			<li><button id="validator_constraint_add" type="button">Add constraint</button></li>
+			<li><button id="validator_constraint_delete" type="button">Delete constraint</button></li>
+			<li class="offset"><button type="submit">Save</button></li>
+		</menu>
+		<div id="validator_usage" class="node_usage"></div>
+	</form>
+</div>

@@ -1,0 +1,15 @@
+Dear ${user.name},
+
+We would like to inform that someone tried to log in on ${study.defaultLocalizedLongname} with your account multiple times with an invalid password. As a security measure, we locked your account.
+
+If it was you that tried to log in and you forgot your password, you must go to the login page and click "I forgot my password". We will send you a password reset link to reset your password. In that case, you can disregard this e-mail.
+
+Otherwise, you must unlock your account by visiting:
+${recovery_url}
+
+In case of trouble, please send an email to ${study.email}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

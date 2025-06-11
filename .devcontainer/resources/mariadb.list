@@ -1,0 +1,1 @@
+deb [signed-by=/etc/apt/keyrings/mariadb.pgp] https://mirror.mva-n.net/mariadb/repo/11.7/debian sid main

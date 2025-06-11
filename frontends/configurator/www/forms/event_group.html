@@ -1,0 +1,35 @@
+<div id="edit_event_group">
+	<div class="header">
+		<h2>Event group label</h2>
+	</div>
+	<form id="edit_event_group_form" method="post" class="content data">
+		<p>
+			<label for="event_group_id">Id</label>
+			<input id="event_group_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
+		</p>
+		<p>
+			<label for="event_group_shortname">Shortname</label>
+			<app-localized-input id="event_group_shortname" name="shortname"></app-localized-input>
+		</p>
+		<p>
+			<label for="event_group_longname">Longname</label>
+			<app-localized-input id="event_group_longname" name="longname"></app-localized-input>
+		</p>
+		<p>
+			<label for="event_group_description">Description</label>
+			<app-localized-input id="event_group_description" name="description"></app-localized-input>
+		</p>
+		<p>
+			<label for="event_group_order_by">Order by</label>
+			<input id="event_group_order_by" type="number" name="orderBy" />
+		</p>
+		<p>
+			<label for="event_group_icon">Icon</label>
+			<input id="event_group_icon" type="text" />
+		</p>
+		<menu>
+			<li><button type="submit">Save</button></li>
+		</menu>
+		<div id="event_group_usage" class="node_usage"></div>
+	</form>
+</div>

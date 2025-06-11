@@ -1,0 +1,45 @@
+@if (field.model.withDays) {
+	<mat-form-field
+		class="day-month"
+		[class.contains-unknown]="!field.model.daysMandatory">
+		<mat-select
+			[formControl]="day"
+			placeholder="Day">
+			@for (day of days; track day.value) {
+				<mat-option [value]="day.value">
+					{{ day.label }}
+				</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+}
+@if (field.model.withMonths) {
+	<mat-form-field
+		class="day-month"
+		[class.contains-unknown]="!field.model.monthsMandatory">
+		<mat-select
+			[formControl]="month"
+			placeholder="Month">
+			@for (month of months; track month.value) {
+				<mat-option [value]="month.value">
+					{{ month.label }}
+				</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+}
+@if (field.model.withYears) {
+	<mat-form-field
+		class="year"
+		[class.contains-unknown]="!field.model.yearsMandatory">
+		<mat-select
+			[formControl]="year"
+			placeholder="Year">
+			@for (year of years; track year.value) {
+				<mat-option [value]="year.value">
+					{{ year.label }}
+				</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+}

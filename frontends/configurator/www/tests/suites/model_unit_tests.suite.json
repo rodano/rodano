@@ -1,0 +1,20 @@
+{
+	"name" : "Configurator - Model unit tests",
+	"path" : "../../",
+	"bundles" : [
+		{"test" : "model/config/node_displayable.test.js"},
+		{"test" : "model/config/entities/study.test.js"},
+		{"test" : "model/config/entities/scope_model.test.js"},
+		{"test" : "model/config/entities/event_group.test.js"},
+		{"test" : "model/config/entities/dataset_model.test.js"},
+		{"test" : "model/config/entities/field_model.test.js"},
+		{"test" : "model/config/entities/profile.test.js"},
+		{"test" : "model/config/entities/rule_constraint.test.js"},
+		{"test" : "model/config/entities/rule_condition.test.js"},
+		{"test" : "model/config/entities_config.test.js"},
+		{"test" : "model/config/entities_config_bus.test.js"},
+		{"test" : "model/config/entities_config_tree.test.js"},
+		{"test" : "model/config/entities_config_dsl.test.js"},
+		{"test" : "model/config/entities_config_compare.test.js"}
+	]
+}

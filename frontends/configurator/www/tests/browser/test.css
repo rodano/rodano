@@ -1,0 +1,67 @@
+html {
+	font-family: 'Open Sans';
+	font-size: 80%; /*let users choose their own font size, but decrease this size a little bit as most browsers have default font size set to 16px*/
+}
+
+h1, h2, h3 {
+	margin: 0.5rem 0;
+	padding: 0.2rem;
+	background-color: #eee;
+}
+h1 > span, h2 > span, h3 > span {
+	margin-left: 3rem;
+	font-size: 0.9rem;
+}
+h1 > a, h2 > a {
+	margin-left: 3rem;
+	font-size: 0.9rem;
+	color: black;
+}
+h3 {
+	cursor: pointer;
+	margin-bottom: 0;
+}
+h3:before {
+	vertical-align: middle;
+}
+h3.expanded:before {
+	content: url(bullet_arrow_down.png);
+}
+h3.collapsed:before {
+	content: url(bullet_arrow_right.png);
+}
+
+/* tests */
+ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+ul:empty {
+	display: none;
+}
+li {
+	padding: 0.2rem 0.2rem 0.2rem 0.5rem;
+}
+li:before {
+	vertical-align: top;
+	margin-right: 0.5rem;
+}
+li.success:before {
+	content: url(tick.png);
+}
+li.fail:before {
+	content: url(error.png);
+}
+li > p.error {
+	margin: 0.2rem 0 0.2rem 2rem;
+	font-size: 0.9rem;
+}
+
+/* general */
+.success {
+	background-color: #d1eed1;
+}
+.fail {
+	background-color: #fddfde;
+}

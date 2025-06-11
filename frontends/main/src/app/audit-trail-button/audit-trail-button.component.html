@@ -1,0 +1,9 @@
+@if (hasRight) {
+	<button
+		mat-icon-button
+		(click)="openModal(); $event.stopPropagation()"
+		type="button"
+		matTooltip="Audit trail">
+		<mat-icon>difference</mat-icon>
+	</button>
+}

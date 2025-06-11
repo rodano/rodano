@@ -1,0 +1,86 @@
+<form
+	name="userCreationForm"
+	[formGroup]="userCreationForm"
+	(ngSubmit)="save()"
+	class="centered">
+	<p class="error">{{ errorText }}</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Name</mat-label>
+			<input
+				matInput
+				autocomplete="off"
+				formControlName="name"
+				required />
+		</mat-form-field>
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Email</mat-label>
+			<input
+				matInput
+				autocomplete="off"
+				formControlName="email"
+				required />
+		</mat-form-field>
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Phone number</mat-label>
+			<input
+				matInput
+				autocomplete="off"
+				type="phone"
+				formControlName="phone" />
+		</mat-form-field>
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Language</mat-label>
+			<mat-select
+				formControlName="languageId"
+				required>
+				@for (language of languages; track language.id) {
+					<mat-option [value]="language.id">
+						{{ language.shortname | localizeMap }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+	</p>
+
+	<p formGroupName="role">
+		<mat-form-field>
+			<mat-label>Profile</mat-label>
+			<mat-select
+				formControlName="profileId"
+				required>
+				@for (profile of profiles | sort: 'id'; track profile.id) {
+					<mat-option [value]="profile.id">
+						{{ profile.shortname | localizeMap }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<mat-form-field>
+			<mat-label>Scope</mat-label>
+			<app-scope-picker
+				formControlName="scopePk"
+				[scopes]="scopes"
+				required></app-scope-picker>
+		</mat-form-field>
+	</p>
+
+	<p class="actions">
+		<button
+			mat-flat-button
+			type="submit"
+			[disabled]="userCreationForm.invalid">
+			Save
+		</button>
+	</p>
+</form>

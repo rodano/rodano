@@ -1,0 +1,44 @@
+.mat-toolbar {
+	height: 100%;
+	color: white;
+	background-color: var(--mat-sys-primary);
+	display: flex;
+	justify-content: space-between;
+}
+h1 {
+	height: 100%;
+	& > a {
+		height: calc(100% - 1rem);
+		margin-top: 0.5rem;
+		line-height: calc(100% - 1rem);
+		display: inline-block;
+		text-decoration: none;
+		color: inherit;
+		font-size: 3.5rem;
+		& > img {
+			height: 100%;
+			width: auto;
+			object-fit: contain;
+		}
+	}
+}
+.mdc-button,
+.link-active,
+.mat-icon {
+	color: white !important;
+}
+.mdc-button {
+	font-size: 1rem;
+}
+.mdc-button:hover,
+.link-active {
+	background-color: var(--mat-sys-primary-container);
+}
+.menus {
+	display: flex;
+	gap: 0.25rem;
+}
+.user {
+	display: flex;
+	gap: var(--gap);
+}

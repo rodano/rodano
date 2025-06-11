@@ -1,0 +1,60 @@
+<form
+	name="userUpdateForm"
+	[formGroup]="userUpdateForm"
+	(ngSubmit)="save()"
+	class="centered">
+	<p>
+		<mat-form-field>
+			<mat-label>Name</mat-label>
+			<input
+				matInput
+				formControlName="name"
+				required />
+		</mat-form-field>
+		<app-audit-trail-button
+			[user]="user"
+			property="name" />
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Phone number</mat-label>
+			<input
+				matInput
+				type="phone"
+				formControlName="phone" />
+		</mat-form-field>
+		<app-audit-trail-button
+			[user]="user"
+			property="phone" />
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Language</mat-label>
+			<mat-select
+				formControlName="languageId"
+				required>
+				@for (language of languages; track language.id) {
+					<mat-option [value]="language.id">
+						{{ language.shortname | localizeMap }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<app-audit-trail-button
+			[user]="user"
+			property="languageId" />
+	</p>
+
+	@if (canSave) {
+		<p class="actions">
+			<button
+				mat-flat-button
+				type="submit"
+				[disabled]="user.externallyManaged || userUpdateForm.invalid">
+				Save
+			</button>
+		</p>
+	}
+</form>

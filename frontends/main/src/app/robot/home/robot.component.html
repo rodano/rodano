@@ -1,0 +1,82 @@
+<div class="title-tabs">
+	<h1>
+		<button
+			mat-icon-button
+			inline="true"
+			[routerLink]="['/robots']"
+			matTooltip="Go back">
+			<mat-icon>arrow_back</mat-icon>
+		</button>
+
+		@if (robot) {
+			{{ robot.name }}
+		} @else {
+			New robot
+		}
+	</h1>
+</div>
+
+<form
+	[formGroup]="robotForm"
+	(ngSubmit)="save()"
+	class="centered">
+	<p class="error">{{ errorText }}</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Name</mat-label>
+			<input
+				matInput
+				formControlName="name"
+				required />
+		</mat-form-field>
+		@if (robot) {
+			<app-audit-trail-button
+				[robot]="robot"
+				property="name" />
+		}
+	</p>
+
+	<p>
+		<mat-form-field>
+			<mat-label>Key</mat-label>
+			<input
+				matInput
+				formControlName="key"
+				placeholder="Key" />
+			<mat-hint>Leave blank to auto generate a key</mat-hint>
+		</mat-form-field>
+	</p>
+
+	@if (!robot) {
+		<p formGroupName="roleForm">
+			<mat-form-field>
+				<mat-label>Profile</mat-label>
+				<mat-select
+					formControlName="profileId"
+					required>
+					@for (profile of profiles | sort: 'id'; track profile.id) {
+						<mat-option [value]="profile.id">
+							{{ profile.shortname | localizeMap }}
+						</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Scope</mat-label>
+				<app-scope-finder
+					formControlName="scopePk"
+					required></app-scope-finder>
+			</mat-form-field>
+		</p>
+	}
+
+	<p class="actions">
+		<button
+			mat-flat-button
+			type="submit"
+			[disabled]="robotForm.invalid">
+			Save
+		</button>
+	</p>
+</form>

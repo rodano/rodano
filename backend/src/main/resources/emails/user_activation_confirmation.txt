@@ -1,0 +1,16 @@
+Dear ${user.name},
+
+Congratulations! You have successfully activated your account on ${study.defaultLocalizedLongname}.
+
+You can now access the ${study.defaultLocalizedLongname} website at ${study.url}.
+Your e-mail: ${user.email}
+Your password: the password that you entered when activating your account.
+
+If you forget your password, please go to the ${study.defaultLocalizedLongname} website and follow the link "I forgot my password".
+
+In case of trouble, please send an e-mail to ${study.email}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

@@ -1,0 +1,13 @@
+Dear ${user.name},
+
+The e-mail associated with your ${study.defaultLocalizedLongname} account has been changed.
+
+To verify your new e-mail, please visit:
+${verification_url}
+
+Note that you have ${time_limit_in_days} days to verify your new e-mail, otherwise the change will not take effect.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

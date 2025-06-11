@@ -1,0 +1,88 @@
+#workflow_report_rules ul {
+	margin-left: 25px;
+}
+#workflow_report_rules li {
+	padding: 4px 0;
+}
+#workflow_report_rules .tag {
+	padding: 3px;
+	background-color: var(--background-light-color);
+	border-radius: 2px;
+	font-size: 0.8rem;
+	float: right;
+	margin-right: 0.5rem;
+}
+#workflow_report_rules_download {
+	cursor: pointer;
+}
+
+#workflow_report_diagram rect {
+	fill: var(--background-main-color);
+	stroke: var(--background-highlight-color);
+}
+#workflow_report_diagram text {
+	fill: var(--background-highlight-color);
+}
+#workflow_report_diagram .relation {
+	fill: none;
+	stroke: var(--background-highlight-color);
+	stroke-width: 1.5px;
+}
+#workflow_report_diagram .symbol {
+	fill: var(--background-highlight-color);
+	stroke: var(--background-highlight-color);
+	stroke-width: 1.5px;
+}
+#workflow_report_diagram .highlight rect {
+	stroke: var(--background-rehighlight-color);
+}
+#workflow_report_diagram .highlight text {
+	fill: var(--background-rehighlight-color);
+}
+#workflow_report_diagram .highlight .relation, #workflow_report_diagram .highlight .symbol {
+	stroke: var(--background-rehighlight-color);
+}
+#workflow_report_diagram circle.rule {
+	fill: var(--background-highlight-color);
+	stroke: var(--background-highlight-color);
+	stroke-width: 1.5px;
+}
+#workflow_report_diagram text.rule {
+	font-size: 0.6em;
+	fill: var(--background-main-color);
+}
+#workflow_report_diagram_download {
+	cursor: pointer;
+}
+
+#workflow_report_file {
+	background-color: white;
+	display: none;
+}
+/* style for diagram that can be printed */
+#workflow_report_file_diagram rect {
+	fill: white;
+	stroke: black;
+}
+#workflow_report_file_diagram text {
+	fill: black;
+}
+#workflow_report_file_diagram .relation {
+	fill: none;
+	stroke: black;
+	stroke-width: 1px;
+}
+#workflow_report_file_diagram .symbol {
+	fill: black;
+	stroke: black;
+	stroke-width: 1px;
+}
+#workflow_report_file_diagram circle.rule {
+	fill: black;
+	stroke: black;
+	stroke-width: 1px;
+}
+#workflow_report_file_diagram text.rule {
+	font-size: 0.6em;
+	fill: white;
+}

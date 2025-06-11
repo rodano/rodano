@@ -1,0 +1,10 @@
+.mat-column-actions {
+	width: 15rem;
+}
+.mat-mdc-card-content {
+	margin-top: 1rem;
+}
+mat-icon {
+	vertical-align: middle;
+	font-size: 1.2rem;
+}

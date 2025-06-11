@@ -1,0 +1,65 @@
+.category-header {
+	font-weight: bold;
+	margin-top: 24px;
+	margin-bottom: 12px;
+	display: flex;
+	align-items: center;
+}
+
+.category-header.object-array-header {
+	margin-bottom: 12px;
+	margin-top: 0;
+}
+
+.category-header mat-icon {
+	margin-right: 12px;
+	background-color: var(--mat-sys-primary);
+	border-radius: var(--mat-sys-corner-extra-small);
+	color: white;
+}
+
+.category-header mat-icon:hover {
+	cursor: pointer;
+}
+
+.form-field {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 4px;
+}
+
+.toggle:first-child {
+	width: 100%;
+}
+
+.toggle {
+	width: 212px;
+	display: flex;
+	justify-content: center;
+}
+
+.color-box {
+	width: 16px;
+	height: 16px;
+	border-radius: 4px;
+	border: 1px solid #ccc;
+	display: inline-block;
+	margin-right: 6px;
+}
+
+:host {
+	overflow-x: visible;
+}
+
+.grey-label {
+	color: rgba(0, 0, 0, 0.38); /* same as Angular Material disabled text */
+}
+
+.add-button {
+	margin-left: 12px;
+}
+
+.delete-button {
+	margin-bottom: 12px;
+}
