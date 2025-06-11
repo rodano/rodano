@@ -3,6 +3,7 @@ name: Test
 permissions:
   contents: read
   packages: write
+  id-token: write
 
 # this will be executed on every push on a branch (hence on every commit), but not when pushing a tag
 on:
