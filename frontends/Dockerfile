@@ -4,12 +4,16 @@ WORKDIR /app
 
 # main frontend
 COPY main/package.json /app/main/package.json
+COPY main/package-lock.json /app/main/package-lock.json
 RUN npm install --prefix /app/main
+COPY main/ /app/main/
 RUN npm run build:prod --prefix /app/main
 
 # epro frontend
 COPY epro/package.json /app/epro/package.json
+COPY epro/package-lock.json /app/epro/package-lock.json
 RUN npm install --prefix /app/epro
+COPY epro/ /app/epro/
 RUN npm run build:prod --prefix /app/epro
 RUN sed -i 's/<base href="\/">/<base href="\/eproapp\/">/g' /app/epro/www/index.html
 
