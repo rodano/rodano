@@ -2,8 +2,6 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
-RUN npm config set "@rodano:registry" "https://npm.pkg.github.com/"
-
 # main frontend
 COPY main/package.json /app/main/package.json
 RUN npm install --prefix /app/main
