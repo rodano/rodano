@@ -99,7 +99,6 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - backend
-      - reporter
     ports:
       - "7586:80"
     volumes:
@@ -108,21 +107,4 @@ services:
         source: ${STUDY_PATH}
         target: /app/study
         read_only: true
-    restart: on-failure
-
-  reporter:
-    image: ghcr.io/rodano/dm-reporter:${TAG}
-    pull_policy: always
-    depends_on:
-      - backend
-    ports:
-      - "3838:3838"
-    volumes:
-      #access to the study package, to get the custom reports
-      - type: bind
-        source: ${STUDY_PATH}/dm-reporter
-        target: /opt/custom-reports
-        read_only: true
-    environment:
-      - API_URL=http://backend:8080
     restart: on-failure
