@@ -1,5 +1,5 @@
 import {Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {BaseChartDirective} from 'ng2-charts';
 import {Chart, ChartConfiguration, ChartData} from 'chart.js';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';
@@ -12,7 +12,7 @@ Chart.register(ChartDataLabels);
 
 @Component({
 	selector: 'app-chart-ui',
-	imports: [CommonModule, BaseChartDirective],
+	imports: [BaseChartDirective],
 	templateUrl: './chart-ui.component.html',
 	styleUrl: './chart-ui.component.css'
 })
