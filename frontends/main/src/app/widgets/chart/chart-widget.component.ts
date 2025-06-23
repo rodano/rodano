@@ -1,5 +1,5 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {ChartUiComponent} from './chart-ui/chart-ui.component';
 import {ChartDTO} from '@core/model/chart-dto';
 import {ChartService} from '@core/services/chart.service';
@@ -11,7 +11,7 @@ import {FieldModelCriterion} from '@core/model/field-model-criterion';
 @Component({
 	selector: 'app-chart-widget',
 	standalone: true,
-	imports: [CommonModule, ChartUiComponent],
+	imports: [ChartUiComponent],
 	templateUrl: './chart-widget.component.html',
 	styleUrls: ['./chart-widget.component.css']
 })

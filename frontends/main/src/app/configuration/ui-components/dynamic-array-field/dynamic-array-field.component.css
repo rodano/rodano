@@ -23,7 +23,7 @@
 	margin-top: 12px;
 	border-radius: var(--mat-sys-corner-extra-small);
 	color: var(
-		--mdc-outlined-text-field-disabled-input-text-color,
+		--mat-form-field-outlined-disabled-input-text-color,
 		color-mix(in srgb, var(--mat-sys-on-surface) 38%, transparent)
 	);
 }
