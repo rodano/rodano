@@ -37,6 +37,7 @@ services:
     working_dir: /app
     command: mvn compile -DskipTests
 
+#comment out the smtp service if you rely on a external SMTP server
   smtp:
     image: ixdotai/smtp
     restart: on-failure
@@ -74,6 +75,7 @@ services:
       rodano.database.name: rodano
       spring.datasource.username: root
       spring.datasource.password: root
+      #update the following spring.mail.xxx properties if you use an external SMTP server
       spring.mail.host: smtp
       spring.mail.port: 25
       spring.mail.username: anonymous
