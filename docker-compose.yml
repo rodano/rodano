@@ -65,6 +65,11 @@ services:
         source: ${STUDY_PATH}/backend/target/classes
         target: /app/plugins
         read_only: true
+     #access to the volume containing resources uploaded by users
+      - type: volume
+        source: user_content
+        target: /app/user_content
+        read_only: false
     environment:
       JVM_OPTS: -Xmx512M -XX:+ExitOnOutOfMemoryError
       spring.profiles.active: api,study
@@ -73,6 +78,7 @@ services:
       rodano.database.host: db
       rodano.database.port: 3306
       rodano.database.name: rodano
+      rodano.path.data: /app/user_content
       spring.datasource.username: root
       spring.datasource.password: root
       #update the following spring.mail.xxx properties if you use an external SMTP server
@@ -110,3 +116,6 @@ services:
         target: /app/study
         read_only: true
     restart: on-failure
+
+volumes:
+  user_content:
