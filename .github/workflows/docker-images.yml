@@ -56,6 +56,20 @@ jobs:
           tags: ${{steps.plugins-compiler-meta.outputs.tags}}
           labels: ${{steps.plugins-compiler-meta.outputs.labels}}
 
+      - name: Retrieve the metadata for the database dumper image
+        id: database-dumper-meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/rodano/database-dumper
+
+      - name: Publish the database dumper image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          context: backend/dumper
+          tags: ${{steps.database-dumper-meta.outputs.tags}}
+          labels: ${{steps.database-dumper-meta.outputs.labels}}
+
   publish-frontend-image:
     runs-on: ubuntu-latest
     steps:

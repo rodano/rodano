@@ -117,8 +117,29 @@ services:
         read_only: true
     restart: on-failure
 
+#the following service is used to dump the database content into a file, to be used for backup purposes
+  dumper:
+    image: ghcr.io/rodano/database-dumper:${TAG}
+    pull_policy: always
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - type: volume
+        source: database_dumps
+        target: /dumps
+        read_only: false
+    environment:
+      DATABASE_HOST: db
+      DATABASE_NAME: rodano
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+    command: echo "Database dumper ready"
+
 volumes:
   #database volume, to persist the database content
   database:
   #user uploaded content, such as CRF files and resources
   user_content:
+  #storage of database dumps
+  database_dumps:

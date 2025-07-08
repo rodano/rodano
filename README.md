@@ -38,6 +38,11 @@ To force the refresh of the images, run:
 docker compose --env-file env pull
 ```
 
+To backup the database, run:
+```
+docker compose --env-file env run dumper dump.sh
+```
+
 ## Deploy Rodano instances
 
 In the `ansible` folder, an Ansible playbook is provided to manage a pool of Rodano instances. The playbook only works with Debian-like servers. To start, fill-in the `hosts.yml` file with the right information:
