@@ -5,7 +5,7 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - ${STUDY_PATH}/database:/var/lib/mysql
+      - database:/var/lib/mysql
     environment:
       MARIADB_USER: root
       MARIADB_ROOT_PASSWORD: root
@@ -118,4 +118,7 @@ services:
     restart: on-failure
 
 volumes:
+  #database volume, to persist the database content
+  database:
+  #user uploaded content, such as CRF files and resources
   user_content:
