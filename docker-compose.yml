@@ -134,7 +134,23 @@ services:
       DATABASE_NAME: rodano
       DATABASE_USER: root
       DATABASE_PASSWORD: root
-    command: echo "Database dumper ready"
+    command: bash -c "echo 'Database dumper ready' && tail -f /dev/null"  #keeps the container running so it can be used to dump the database content"
+    labels:
+      docker-volume-backup.archive-pre: dump.sh
+
+  backuper:
+    image: offen/docker-volume-backup:v2
+    pull_policy: always
+    volumes:
+      - database_dumps:/backup/database_dumps:ro
+      - user_content:/backup/user_content:ro
+      - backups:/archive
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      BACKUP_CRON_EXPRESSION: "0 3 * * *"
+      BACKUP_COMPRESSION: gz
+      BACKUP_FILENAME: "backup-%Y-%m-%dT%H-%M-%S.tar.gz"
+    restart: on-failure
 
 volumes:
   #database volume, to persist the database content
@@ -143,3 +159,9 @@ volumes:
   user_content:
   #storage of database dumps
   database_dumps:
+  #place where to store automated backups
+  backups:
+  #  driver_opts:
+  #    type: cifs
+  #    o: "username=${BACKUP_USERNAME},password=${BACKUP_PASSWORD},domain=MS,noperm"
+  #    device: "//${BACKUP_HOST}/backups/"
