@@ -87,11 +87,10 @@ jobs:
         shell: bash
         run: mvn jacoco:report
       - name: Transform coverage report to PDF
-        uses: LukaszLapaj/html-to-pdf-action@master
+        uses: ferdinandkeller/html-to-pdf-action@v2
         with:
-          htmlFile: backend/target/site/jacoco/index.html
-          outputFile: coverage-report.pdf
-          pdfOptions: '{"format": "A4", "margin": {"top": "10mm", "left": "10mm", "right": "10mm", "bottom": "10mm"}}'
+          source-path: backend/target/site/jacoco
+          destination-path: coverage-report.pdf
 
       # store reports as artifacts
       - name: Store test report
