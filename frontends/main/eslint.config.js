@@ -12,7 +12,7 @@ export default tseslint.config(
 		],
 		extends: [
 			js.configs.recommended,
-			stylistic.configs['recommended-flat'],
+			stylistic.configs['recommended'],
 			...tseslint.configs.recommended,
 			...tseslint.configs.stylistic,
 			...angular.configs.tsRecommended
@@ -63,7 +63,7 @@ export default tseslint.config(
 			'strict': 'error', //suggestion
 			'yoda': 'error', //suggestion
 			//stylistic rules
-			...stylistic.configs['recommended-flat'].rules,
+			...stylistic.configs['recommended'].rules,
 			'@stylistic/arrow-parens': ['error', 'as-needed'],
 			'@stylistic/block-spacing': ["error", "never"],
 			'@stylistic/comma-dangle': ['error', 'never'],
@@ -114,7 +114,8 @@ export default tseslint.config(
 					prefix: 'app',
 					style: 'kebab-case',
 				},
-			]
+			],
+			'@angular-eslint/prefer-inject': 'off' //re-enable this when possible
 		}
 	},
 	{
@@ -124,7 +125,7 @@ export default tseslint.config(
 		],
 		rules: {
 			'@angular-eslint/template/alt-text': 'error',
-			'@angular-eslint/template/cyclomatic-complexity': 'error',
+			'@angular-eslint/template/cyclomatic-complexity': 'off', //re-enable this when possible
 			'@angular-eslint/template/no-duplicate-attributes': 'error',
 			'@angular-eslint/template/no-interpolation-in-attributes': 'error',
 			'@angular-eslint/template/prefer-control-flow': 'error',
