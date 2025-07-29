@@ -22,7 +22,6 @@ import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 		ScopeCodeShortnamePipe
 	],
 	providers: [
-		//eslint-disable-next-line no-use-before-define
 		{provide: MatFormFieldControl, useExisting: ScopePickerComponent}
 	]
 })

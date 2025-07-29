@@ -1,5 +1,4 @@
 import {Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-
 import {BaseChartDirective} from 'ng2-charts';
 import {Chart, ChartConfiguration, ChartData} from 'chart.js';
 import ChartDataLabels, {Context} from 'chartjs-plugin-datalabels';

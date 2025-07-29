@@ -1,5 +1,4 @@
 import {Component, Input, OnInit, ViewChild} from '@angular/core';
-
 import {ChartUiComponent} from './chart-ui/chart-ui.component';
 import {ChartDTO} from '@core/model/chart-dto';
 import {ChartService} from '@core/services/chart.service';

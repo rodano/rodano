@@ -29,7 +29,6 @@ import {ScopeDTO} from '@core/model/scope-dto';
 		MatAutocompleteModule
 	],
 	providers: [
-		//eslint-disable-next-line no-use-before-define
 		{provide: MatFormFieldControl, useExisting: ScopeFinderComponent}
 	]
 })
