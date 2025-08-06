@@ -37,7 +37,7 @@ services:
     working_dir: /app
     command: mvn compile -DskipTests
 
-#comment out the smtp service if you rely on a external SMTP server
+#this service can be removed if an external SMTP server is used
   smtp:
     image: ixdotai/smtp
     restart: on-failure
@@ -81,11 +81,11 @@ services:
       rodano.path.data: /app/user_content
       spring.datasource.username: root
       spring.datasource.password: root
-      #update the following spring.mail.xxx properties if you use an external SMTP server
-      spring.mail.host: smtp
-      spring.mail.port: 25
-      spring.mail.username: anonymous
-      spring.mail.password: unused-but-required
+      #provide the following spring.mail.xxx properties if you use an external SMTP server
+      spring.mail.host: ${SMTP_HOST:-smtp}
+      spring.mail.port: ${SMTP_PORT:-25}
+      spring.mail.username: ${SMTP_USERNAME:-anonymous}
+      spring.mail.password: ${SMTP_PASSWORD:-unused-but-required}
       logging.level.ch.rodano.core: INFO
     healthcheck:
       test:
