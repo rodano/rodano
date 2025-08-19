@@ -5,10 +5,6 @@ package ch.rodano.core.model.jooq;
 
 
 import ch.rodano.core.model.jooq.tables.AuditAction;
-import ch.rodano.core.model.jooq.tables.Chart;
-import ch.rodano.core.model.jooq.tables.ChartCategory;
-import ch.rodano.core.model.jooq.tables.ChartColor;
-import ch.rodano.core.model.jooq.tables.ChartState;
 import ch.rodano.core.model.jooq.tables.Dataset;
 import ch.rodano.core.model.jooq.tables.DatasetAudit;
 import ch.rodano.core.model.jooq.tables.Event;
@@ -63,26 +59,6 @@ public class DefaultSchema extends SchemaImpl {
 	 * The table <code>audit_action</code>.
 	 */
 	public final AuditAction AUDIT_ACTION = AuditAction.AUDIT_ACTION;
-
-	/**
-	 * The table <code>chart</code>.
-	 */
-	public final Chart CHART = Chart.CHART;
-
-	/**
-	 * The table <code>chart_category</code>.
-	 */
-	public final ChartCategory CHART_CATEGORY = ChartCategory.CHART_CATEGORY;
-
-	/**
-	 * The table <code>chart_color</code>.
-	 */
-	public final ChartColor CHART_COLOR = ChartColor.CHART_COLOR;
-
-	/**
-	 * The table <code>chart_state</code>.
-	 */
-	public final ChartState CHART_STATE = ChartState.CHART_STATE;
 
 	/**
 	 * The table <code>dataset</code>.
@@ -241,10 +217,6 @@ public class DefaultSchema extends SchemaImpl {
 	public final List<Table<?>> getTables() {
 		return Arrays.asList(
 			AuditAction.AUDIT_ACTION,
-			Chart.CHART,
-			ChartCategory.CHART_CATEGORY,
-			ChartColor.CHART_COLOR,
-			ChartState.CHART_STATE,
 			Dataset.DATASET,
 			DatasetAudit.DATASET_AUDIT,
 			Event.EVENT,

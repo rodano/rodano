@@ -10,12 +10,12 @@ function toggle_section_type(section, type) {
 	section.style.display = types.includes(type) ? 'block' : 'none';
 }
 
-/*function manage_event_model() {
-	const event_model_id = document.getElementById('chart_event_model_id').value;
-	if(event_model_id) {
-		const event_model = selected_chart.study.getEventModel(event_model_id);
-		FormHelpers.FillSelect(document.getElementById('chart_dataset_model_id'), event_model.getDatasetModels(), true);
-		document.getElementById('chart_document').style.display = 'block';
+function manage_leaf_scope_model(event) {
+	const scope_model_id = event ? this.value : selected_chart.leafScopeModelId;
+	if(scope_model_id) {
+		const scope_model = selected_chart.study.getScopeModel(scope_model_id);
+		FormHelpers.FillSelect(document.getElementById('chart_dataset_model_id'), scope_model.getDatasetModels(), true);
+		document.getElementById('chart_dataset_model_id').style.display = 'block';
 	}
 	else {
 		document.getElementById('chart_dataset_model_id').value = '';
@@ -23,8 +23,8 @@ function toggle_section_type(section, type) {
 	}
 }
 
-function manage_dataset_model() {
-	const dataset_model_id = document.getElementById('chart_dataset_model_id').value;
+function manage_dataset_model(event) {
+	const dataset_model_id = event ? this.value : selected_chart.datasetModelId;
 	if(dataset_model_id) {
 		const dataset_model = selected_chart.study.getDatasetModel(dataset_model_id);
 		FormHelpers.FillSelect(document.getElementById('chart_field_model_id'), dataset_model.fieldModels, true);
@@ -34,7 +34,7 @@ function manage_dataset_model() {
 		document.getElementById('chart_field_model_id').value = '';
 		document.getElementById('chart_field_model').style.display = 'none';
 	}
-}*/
+}
 
 function manage_workflow(event) {
 	const workflow_id = event ? this.value : selected_chart.workflowId;
@@ -71,14 +71,9 @@ function manage_type(event) {
 	if(event) {
 		//not statistics
 		if(chart_type !== Config.Enums.ChartType.STATISTICS) {
-			//document.getElementById('chart_event_group_id').value = '';
-			//document.getElementById('chart_event_model_id').value = '';
-			//document.getElementById('chart_dataset_model_id').value = '';
-			//document.getElementById('chart_attribute_id').value = '';
+			/**@type {HTMLInputElement}*/ (document.getElementById('chart_dataset_model_id')).value = '';
+			/**@type {HTMLInputElement}*/ (document.getElementById('chart_field_model_id')).value = '';
 			/**@type {HTMLInputElement}*/ (document.getElementById('chart_with_statistics')).checked = false;
-			/**@type {HTMLInputElement}*/ (document.getElementById('chart_use_percentile')).checked = false;
-			/**@type {HTMLInputElement}*/ (document.getElementById('chart_values_min')).value = '';
-			/**@type {HTMLInputElement}*/ (document.getElementById('chart_values_max')).value = '';
 		}
 		//not workflow status
 		if(chart_type !== Config.Enums.ChartType.WORKFLOW_STATUS) {
@@ -102,9 +97,9 @@ function manage_type(event) {
 	}
 
 	//retrieve some fields
+	toggle_section_type(document.getElementById('chart_leaf_scope_model_id').parentNode, chart_type, Config.Enums.ChartType.STATISTICS, Config.Enums.ChartType.ENROLLMENT, Config.Enums.ChartType.ENROLLMENT_BY_SCOPE);
 	toggle_section_type(document.getElementById('chart_statistics'), chart_type, Config.Enums.ChartType.STATISTICS);
 	toggle_section_type(document.getElementById('chart_workflow'), chart_type, Config.Enums.ChartType.WORKFLOW_STATUS);
-	toggle_section_type(document.getElementById('chart_enrollment'), chart_type, Config.Enums.ChartType.ENROLLMENT, Config.Enums.ChartType.ENROLLMENT_BY_SCOPE);
 	toggle_section_type(document.getElementById('chart_enrollment_by_scope'), chart_type, Config.Enums.ChartType.ENROLLMENT_BY_SCOPE);
 	toggle_section_type(document.getElementById('chart_enrollment_by_date'), chart_type, Config.Enums.ChartType.ENROLLMENT);
 }
@@ -128,7 +123,6 @@ function draw_range(range) {
 	/**@type {HTMLInputElement}*/ (instance.querySelector('input[data-name="min"]')).value = range.min !== undefined ? range.min : '';
 	/**@type {HTMLInputElement}*/ (instance.querySelector('input[data-name="max"]')).value = range.max !== undefined ? range.max : '';
 	/**@type {HTMLInputElement}*/ (instance.querySelector('input[data-name="other"]')).checked = range.other;
-	/**@type {HTMLInputElement}*/ (instance.querySelector('input[data-name="show"]')).checked = range.show;
 	instance.querySelector('button').addEventListener('click', delete_range);
 
 	return instance;
@@ -156,12 +150,9 @@ export default {
 						const range_max = chart_range.querySelector('input[data-name="max"]').value;
 						range.max = range_max !== '' ? parseFloat(range_max) : undefined;
 						range.other = chart_range.querySelector('input[data-name="other"]').checked;
-						range.show = chart_range.querySelector('input[data-name="show"]').checked;
 						range.chart = selected_chart;
 						return range;
 					});
-					const chart_request = /**@type {HTMLTextAreaElement}*/ (document.getElementById('chart_request')).value;
-					selected_chart.request = chart_request ? JSON.parse(chart_request) : {};
 					FormStaticActions.AfterSubmission(selected_chart);
 				}
 			}
@@ -178,9 +169,7 @@ export default {
 		);
 
 		document.getElementById('chart_type').addEventListener('change', manage_type);
-		//document.getElementById('chart_event_group_id').addEventListener('change', manage_event_group);
-		//document.getElementById('chart_event_model_id').addEventListener('change', manage_event_model);
-		//document.getElementById('chart_dataset_model_id').addEventListener('change', manage_dataset_model);
+		document.getElementById('chart_dataset_model_id').addEventListener('change', manage_dataset_model);
 		document.getElementById('chart_workflow_id').addEventListener('change', manage_workflow);
 		document.getElementById('chart_enrollment_workflow_id').addEventListener('change', manage_enrollment_workflow);
 	},
@@ -199,22 +188,18 @@ export default {
 		FormHelpers.FillLocalizedInput(document.getElementById('chart_longname'), chart.study.languages);
 		FormHelpers.FillLocalizedInput(document.getElementById('chart_description'), chart.study.languages);
 		FormHelpers.FillLocalizedInput(document.getElementById('chart_title'), chart.study.languages);
-		FormHelpers.FillLocalizedInput(document.getElementById('chart_legend_x_label'), chart.study.languages);
-		FormHelpers.FillLocalizedInput(document.getElementById('chart_legend_y_label'), chart.study.languages);
+		FormHelpers.FillLocalizedInput(document.getElementById('chart_legend_x'), chart.study.languages);
+		FormHelpers.FillLocalizedInput(document.getElementById('chart_legend_y'), chart.study.languages);
 
 		manage_type();
-		//manage_event_group();
-		//manage_event();
-		//manage_document();
+		manage_leaf_scope_model();
+		manage_dataset_model();
 		manage_workflow();
 		manage_enrollment_workflow();
 
 		FormHelpers.UpdateForm(document.getElementById('edit_chart_form'), chart);
 
 		FormHelpers.EnhanceInputSimpleListString(document.getElementById('chart_colors'));
-
-		/**@type {HTMLTextAreaElement}*/ (document.getElementById('chart_request')).value = JSON.stringify(chart.request || {});
-
 		chart.ranges.map(draw_range).forEach(Node.prototype.appendChild, document.querySelector('#chart_ranges > tbody').empty('tr'));
 	}
 };

@@ -5,10 +5,6 @@ package ch.rodano.core.model.jooq;
 
 
 import ch.rodano.core.model.jooq.tables.AuditAction;
-import ch.rodano.core.model.jooq.tables.Chart;
-import ch.rodano.core.model.jooq.tables.ChartCategory;
-import ch.rodano.core.model.jooq.tables.ChartColor;
-import ch.rodano.core.model.jooq.tables.ChartState;
 import ch.rodano.core.model.jooq.tables.Dataset;
 import ch.rodano.core.model.jooq.tables.DatasetAudit;
 import ch.rodano.core.model.jooq.tables.Event;
@@ -49,26 +45,6 @@ public class Tables {
 	 * The table <code>audit_action</code>.
 	 */
 	public static final AuditAction AUDIT_ACTION = AuditAction.AUDIT_ACTION;
-
-	/**
-	 * The table <code>chart</code>.
-	 */
-	public static final Chart CHART = Chart.CHART;
-
-	/**
-	 * The table <code>chart_category</code>.
-	 */
-	public static final ChartCategory CHART_CATEGORY = ChartCategory.CHART_CATEGORY;
-
-	/**
-	 * The table <code>chart_color</code>.
-	 */
-	public static final ChartColor CHART_COLOR = ChartColor.CHART_COLOR;
-
-	/**
-	 * The table <code>chart_state</code>.
-	 */
-	public static final ChartState CHART_STATE = ChartState.CHART_STATE;
 
 	/**
 	 * The table <code>dataset</code>.

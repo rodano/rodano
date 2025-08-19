@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit, QueryList, ViewChildren} from '@angular/core';
+import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {PossibleValueDTO} from '@core/model/possible-value-dto';
 import {operatorByType} from '@core/enums/operator-by-type';
@@ -45,8 +45,6 @@ import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 export class BenchmarkComponent implements OnInit, OnChanges {
 	@Input() layout: CMSLayoutDTO;
 	widgets: CMSWidgetDTO[] = [];
-
-	@ViewChildren(ChartWidgetComponent) chartWidgets: QueryList<ChartWidgetComponent>;
 
 	//customization form
 	criteria = new FormArray([] as FormArray[]);
@@ -145,26 +143,11 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 				value: criterion.controls[2].value
 			} as FieldModelCriterion;
 		});
-		console.log(this.chartScopes);
-		console.log(this.chartCriteria);
-
-		const selectedRootScopeIds: string[] = [];
-		for(const scope of this.chartScopes) {
-			selectedRootScopeIds.push(scope.id);
-		}
-
-		this.updateAllChartsBasedOnScopes(selectedRootScopeIds, this.chartCriteria);
 	}
 
 	reset() {
 		this.customizeForm.reset();
 		this.customizeForm.get('rootScopePks')?.setValue([this.rootScopes[0].pk]);
 		this.criteria.clear();
-	}
-
-	updateAllChartsBasedOnScopes(selectedRootScopes: string[], criteria: FieldModelCriterion[]): void {
-		this.chartWidgets.forEach(widget => {
-			widget.updateChartBasedOnSelectedRootScopesAndCriteria(selectedRootScopes, criteria);
-		});
 	}
 }

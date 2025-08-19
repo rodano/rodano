@@ -4,12 +4,6 @@ import {LoginGuard} from './guards/login.guard';
 import {ChangePasswordContext} from './change-password/change-password-context';
 import {ErrorContext} from './error/error-context';
 import {CMSLayoutResolver} from './resolvers/cms-layout-resolver';
-import {ConfigurationComponent} from './configuration/configuration.component';
-import {PlaceholderComponent} from './configuration/placeholder/placeholder.component';
-import {
-	ConfigurationChartsComponent
-} from './configuration/configuration-charts/configuration-charts.component';
-import {UnsavedChangesGuard} from './guards/unsaved-changes.guard';
 import {MeResolver} from './resolvers/me-resolver';
 import {EproEnabledGuard} from './guards/epro-enabled.guard';
 
@@ -17,30 +11,6 @@ export const APP_ROUTES: Routes = [
 	{
 		path: '',
 		redirectTo: '/dashboard', pathMatch: 'full'
-	},
-	{
-		path: 'configuration',
-		component: ConfigurationComponent,
-		children: [
-			{
-				path: 'chart',
-				children: [
-					{
-						path: '',
-						component: PlaceholderComponent
-					},
-					{
-						path: ':chartId',
-						component: ConfigurationChartsComponent,
-						canDeactivate: [UnsavedChangesGuard]
-					}
-				]
-			},
-			{
-				path: '**',
-				component: PlaceholderComponent
-			}
-		]
 	},
 	{
 		path: 'login',

@@ -334,7 +334,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		if(isRoot()) {
 			throw new NoNodeException(Entity.SCOPE_MODEL, String.format("No default parent for root scope model %s", getId()));
 		}
-		return getStudy().getScopeModel(defaultParentId);
+		return study.getScopeModel(defaultParentId);
 	}
 
 	@JsonIgnore

@@ -64,7 +64,6 @@ public class DatabaseInitializer {
 	private final AuditActionService auditActionService;
 	private final UserCreatorService userCreatorService;
 	private final TestDataInitializer testDataInitializer;
-	private final TestChartsInitializer testChartsInitializer;
 	private final DemoUsersInitializer demoUsersInitializer;
 	private final UserSecurityService userSecurityService;
 
@@ -86,7 +85,6 @@ public class DatabaseInitializer {
 		final AuditActionService auditActionService,
 		final UserCreatorService userCreatorService,
 		final TestDataInitializer testDataInitializer,
-		final TestChartsInitializer testChartsInitializer,
 		final DemoUsersInitializer demoUsersInitializer,
 		@Value("${rodano.database.name}") final String databaseName,
 		@Value("${rodano.init.users-password:Password1!}") final String usersPassword,
@@ -105,7 +103,6 @@ public class DatabaseInitializer {
 		this.auditActionService = auditActionService;
 		this.userCreatorService = userCreatorService;
 		this.testDataInitializer = testDataInitializer;
-		this.testChartsInitializer = testChartsInitializer;
 		this.demoUsersInitializer = demoUsersInitializer;
 		this.userSecurityService = userSecurityService;
 		this.databaseName = databaseName;
@@ -223,7 +220,6 @@ public class DatabaseInitializer {
 		if(withData) {
 			logger.info("Add demo data");
 			testDataInitializer.initialize(origin);
-			testChartsInitializer.initializeCharts();
 		}
 	}
 

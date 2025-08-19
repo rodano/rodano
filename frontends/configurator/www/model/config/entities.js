@@ -556,18 +556,6 @@ const Entities = Object.freeze({
 		configuration_name: 'CHART_RANGE',
 		comparison_structural: true
 	},
-	/**@type {Entity}*/
-	ChartRequest: {
-		name: 'ChartRequest',
-		children: {},
-		relations: {},
-		id: 'chart_request',
-		label: 'Request',
-		plural_label: 'Requests',
-		icon: 'chart_bar_link.png',
-		configuration_name: 'CHART_REQUEST',
-		comparison_structural: true
-	},
 
 	//timeline graph
 	/**@type {Entity}*/

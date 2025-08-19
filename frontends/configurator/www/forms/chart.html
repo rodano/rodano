@@ -24,92 +24,42 @@
 			<app-localized-input id="chart_title" name="title"></app-localized-input>
 		</p>
 		<p>
-			<label for="chart_colors">Colors</label>
-			<input id="chart_colors" name="colors" data-type="json" />
+			<label for="chart_legend_x">Abscissa legend</label>
+			<app-localized-input id="chart_legend_x" name="legendX"></app-localized-input>
 		</p>
 		<p>
-			<label for="chart_background_color">Background color</label>
-			<input id="chart_background_color" name="backgroundColor" />
+			<label for="chart_legend_y">Ordinate legend</label>
+			<app-localized-input id="chart_legend_y" name="legendY"></app-localized-input>
+		</p>
+		<p>
+			<label for="chart_type">Type</label>
+			<select id="chart_type" name="type"></select>
+		</p>
+		<p>
+			<label for="chart_colors">Colors</label>
+			<input id="chart_colors" name="colors" data-type="json" />
 		</p>
 		<p>
 			<label for="chart_override_user_rights" title="Display scopes even if user does not have right on them">Override user rights</label>
 			<input id="chart_override_user_rights" type="checkbox" name="overrideUserRights" />
 		</p>
-		<fieldset>
-			<legend>Abscissa legend</legend>
-			<p>
-				<label for="chart_legend_x_x">X position</label>
-				<input id="chart_legend_x_x" type="number" name="legendX.x" />
-			</p>
-			<p>
-				<label for="chart_legend_x_y">Y position</label>
-				<input id="chart_legend_x_y" type="number" name="legendX.y" />
-			</p>
-			<p>
-				<label for="chart_legend_x_color">Color</label>
-				<input id="chart_legend_x_color" type="color" name="legendX.color" />
-			</p>
-			<p>
-				<label for="chart_legend_x_label">Label</label>
-				<app-localized-input id="chart_legend_x_label" name="legendX.labels"></app-localized-input>
-			</p>
-		</fieldset>
-		<fieldset>
-			<legend>Ordinate legend</legend>
-			<p>
-				<label for="chart_legend_y_x">X position</label>
-				<input id="chart_legend_y_x" type="number" name="legendY.x" />
-			</p>
-			<p>
-				<label for="chart_legend_y_y">Y position</label>
-				<input id="chart_legend_y_y" type="number" name="legendY.y" />
-			</p>
-			<p>
-				<label for="chart_legend_y_color">Color</label>
-				<input id="chart_legend_y_color" type="color" name="legendY.color" />
-			</p>
-			<p>
-				<label for="chart_legend_y_label">Label</label>
-				<app-localized-input id="chart_legend_y_label" name="legendY.labels"></app-localized-input>
-			</p>
-		</fieldset>
 		<p>
-			<label for="chart_type">Type</label>
-			<select id="chart_type" name="type"></select>
+			<label for="chart_leaf_scope_model_id">Leaf scope model</label>
+			<select id="chart_leaf_scope_model_id" name="leafScopeModelId"></select>
 		</p>
 		<fieldset id="chart_statistics">
 			<legend>Statistics</legend>
-			<!--<p id="chart_event_model">
-				<label for="chart_event_model_id">Event model</label>
-				<select id="chart_event_model_id" name="eventModelId"></select>
-			</p>
 			<p id="chart_dataset_model">
 				<label for="chart_dataset_model_id">Dataset model</label>
 				<select id="chart_dataset_model_id" name="datasetModelId"></select>
 			</p>
-			<p id="chart_attribute">
-				<label for="chart_attribute_id">Attribute</label>
-				<select id="chart_attribute_id" name="fieldModelId"></select>
-			</p>-->
+			<p id="chart_field_model">
+				<label for="chart_field_model_id">Field model</label>
+				<select id="chart_field_model_id" name="fieldModelId"></select>
+			</p>
 			<p>
 				<label for="chart_with_statistics">With statistics</label>
 				<input id="chart_with_statistics" type="checkbox" name="withStatistics" />
-			</p>
-			<p>
-				<label for="chart_use_percentile">Use percentile</label>
-				<input id="chart_use_percentile" type="checkbox" name="usePercentile" />
-			</p>
-			<p>
-				<label for="chart_values_min">Minimum</label>
-				<input id="chart_values_min" type="number" name="valuesMin" />
-			</p>
-			<p>
-				<label for="chart_values_max">Maximum</label>
-				<input id="chart_values_max" type="number" name="valuesMax" />
-			</p>
-			<p>
-				<label for="chart_request">Request</label>
-				<textarea id="chart_request"></textarea>
 			</p>
 			<table id="chart_ranges" style="margin-top: 25px; clear: both;">
 				<thead>
@@ -120,7 +70,6 @@
 						<td style="width: 5em;">Min</td>
 						<td style="width: 5em;">Max</td>
 						<td style="width: 5em;">Other</td>
-						<td style="width: 5em;">Show</td>
 						<td>Delete</td>
 					</tr>
 				</thead>
@@ -144,9 +93,6 @@
 							</td>
 							<td>
 								<input data-name="other" type="checkbox" />
-							</td>
-							<td>
-								<input data-name="show" type="checkbox" />
 							</td>
 							<td>
 								<button type="button" class="image" title="Delete range">
@@ -177,13 +123,6 @@
 					<app-palette id="chart_workflow_exclude_state_ids" name="excludedStateIds"></app-palette>
 				</p>
 			</div>
-		</fieldset>
-		<fieldset id="chart_enrollment">
-			<legend>Enrollment (generic)</legend>
-			<p>
-				<label for="chart_leaf_scope_model_id">Leaf scope model</label>
-				<select id="chart_leaf_scope_model_id" name="leafScopeModelId"></select>
-			</p>
 		</fieldset>
 		<fieldset id="chart_enrollment_by_scope">
 			<legend>Enrollment by scope</legend>

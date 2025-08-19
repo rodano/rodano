@@ -5,10 +5,6 @@ package ch.rodano.core.model.jooq;
 
 
 import ch.rodano.core.model.jooq.tables.AuditAction;
-import ch.rodano.core.model.jooq.tables.Chart;
-import ch.rodano.core.model.jooq.tables.ChartCategory;
-import ch.rodano.core.model.jooq.tables.ChartColor;
-import ch.rodano.core.model.jooq.tables.ChartState;
 import ch.rodano.core.model.jooq.tables.Dataset;
 import ch.rodano.core.model.jooq.tables.DatasetAudit;
 import ch.rodano.core.model.jooq.tables.Event;
@@ -37,10 +33,6 @@ import ch.rodano.core.model.jooq.tables.UserSession;
 import ch.rodano.core.model.jooq.tables.WorkflowStatus;
 import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit;
 import ch.rodano.core.model.jooq.tables.records.AuditActionRecord;
-import ch.rodano.core.model.jooq.tables.records.ChartCategoryRecord;
-import ch.rodano.core.model.jooq.tables.records.ChartColorRecord;
-import ch.rodano.core.model.jooq.tables.records.ChartRecord;
-import ch.rodano.core.model.jooq.tables.records.ChartStateRecord;
 import ch.rodano.core.model.jooq.tables.records.DatasetAuditRecord;
 import ch.rodano.core.model.jooq.tables.records.DatasetRecord;
 import ch.rodano.core.model.jooq.tables.records.EventAuditRecord;
@@ -88,10 +80,6 @@ public class Keys {
 	// -------------------------------------------------------------------------
 
 	public static final UniqueKey<AuditActionRecord> KEY_AUDIT_ACTION_PRIMARY = Internal.createUniqueKey(AuditAction.AUDIT_ACTION, DSL.name("KEY_audit_action_PRIMARY"), new TableField[] { AuditAction.AUDIT_ACTION.PK }, true);
-	public static final UniqueKey<ChartRecord> KEY_CHART_PRIMARY = Internal.createUniqueKey(Chart.CHART, DSL.name("KEY_chart_PRIMARY"), new TableField[] { Chart.CHART.PK }, true);
-	public static final UniqueKey<ChartCategoryRecord> KEY_CHART_CATEGORY_PRIMARY = Internal.createUniqueKey(ChartCategory.CHART_CATEGORY, DSL.name("KEY_chart_category_PRIMARY"), new TableField[] { ChartCategory.CHART_CATEGORY.PK }, true);
-	public static final UniqueKey<ChartColorRecord> KEY_CHART_COLOR_PRIMARY = Internal.createUniqueKey(ChartColor.CHART_COLOR, DSL.name("KEY_chart_color_PRIMARY"), new TableField[] { ChartColor.CHART_COLOR.PK }, true);
-	public static final UniqueKey<ChartStateRecord> KEY_CHART_STATE_PRIMARY = Internal.createUniqueKey(ChartState.CHART_STATE, DSL.name("KEY_chart_state_PRIMARY"), new TableField[] { ChartState.CHART_STATE.PK }, true);
 	public static final UniqueKey<DatasetRecord> KEY_DATASET_PRIMARY = Internal.createUniqueKey(Dataset.DATASET, DSL.name("KEY_dataset_PRIMARY"), new TableField[] { Dataset.DATASET.PK }, true);
 	public static final UniqueKey<DatasetRecord> KEY_DATASET_U_DATASET_ID = Internal.createUniqueKey(Dataset.DATASET, DSL.name("KEY_dataset_u_dataset_id"), new TableField[] { Dataset.DATASET.ID }, true);
 	public static final UniqueKey<DatasetAuditRecord> KEY_DATASET_AUDIT_PRIMARY = Internal.createUniqueKey(DatasetAudit.DATASET_AUDIT, DSL.name("KEY_dataset_audit_PRIMARY"), new TableField[] { DatasetAudit.DATASET_AUDIT.PK }, true);

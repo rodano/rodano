@@ -11,8 +11,7 @@ export class ChartRange extends Node {
 			value: {type: 'string'},
 			min: {type: 'number'},
 			max: {type: 'number'},
-			other: {type: 'boolean'},
-			show: {type: 'boolean'}
+			other: {type: 'boolean'}
 		};
 	}
 
@@ -25,7 +24,6 @@ export class ChartRange extends Node {
 		this.min = undefined;
 		this.max = undefined;
 		this.other = false;
-		this.show = false;
 		EntitiesHooks?.CreateNode.call(this, values);
 	}
 }

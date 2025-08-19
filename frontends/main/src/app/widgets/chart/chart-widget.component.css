@@ -1,13 +1,13 @@
-.container {
-	background: #ffffff; /* White background */
-	border-radius: var(--mat-sys-corner-extra-small);
-	padding: 1rem;
-	border: 1px solid rgba(0, 0, 0, 0.2);
+table {
+	border-collapse: collapse;
+	width: 100%;
 }
-
-.error-message {
-	color: red;
-	background-color: #ffebee;
-	padding: 0.5rem;
-	border-radius: var(--mat-sys-corner-extra-small);
+th,
+td {
+	border: 1px solid var(--light-border-color);
+	padding: 8px;
+	text-align: left;
+}
+th {
+	background-color: var(--light-highlight-color);
 }

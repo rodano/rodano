@@ -9,8 +9,12 @@
 } @else if (widget.type === 'RESOURCE') {
 	<!-- TODO widget parameters should be strings and not objects -->
 	<app-resource-widget [category]="widget.parameters['category'].toString()"></app-resource-widget>
-} @else if (widget.type === 'HIGHCHART') {
-	<app-chart-widget [id]="widget.parameters['chart'].toString()"> </app-chart-widget>
+} @else if (widget.type === 'CHART') {
+	<app-chart-widget
+		[id]="widget.parameters['chart'].toString()"
+		[scopes]="scopes"
+		[criteria]="criteria">
+	</app-chart-widget>
 } @else if (widget.type === 'WORKFLOW') {
 	<!-- TODO solve the badge update flow -->
 	<app-workflow-widget

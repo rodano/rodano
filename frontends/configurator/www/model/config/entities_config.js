@@ -39,7 +39,6 @@ import {WorkflowWidgetColumn} from './entities/workflow_widget_column.js';
 import {WorkflowSummaryColumn} from './entities/workflow_summary_column.js';
 import {Chart} from './entities/chart.js';
 import {ChartRange} from './entities/chart_range.js';
-import {ChartRequest} from './entities/chart_request.js';
 import {TimelineGraph} from './entities/timeline_graph.js';
 import {TimelineGraphSection} from './entities/timeline_graph_section.js';
 import {TimelineGraphSectionPosition} from './entities/timeline_graph_section_position.js';
@@ -156,7 +155,6 @@ export function create_config() {
 		//graphs
 		Chart: Chart,
 		ChartRange: ChartRange,
-		ChartRequest: ChartRequest,
 
 		//timeline graph
 		TimelineGraph: TimelineGraph,

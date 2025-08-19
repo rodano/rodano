@@ -142,7 +142,7 @@ export const WidgetTypes = Object.freeze({
 			}
 		]
 	},
-	HIGHCHART: {
+	CHART: {
 		label: 'Chart',
 		parameters: [
 			{

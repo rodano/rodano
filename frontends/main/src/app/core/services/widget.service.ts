@@ -11,6 +11,7 @@ import {WorkflowWidgetSearch} from '../utilities/search/workflow-widget-search';
 import {OverdueWidgetSearch} from '../utilities/search/overdue-widget-search';
 import {PagedResultOverdueDTO} from '../model/paged-result-overdue-dto';
 import {FieldModelCriterion} from '../model/field-model-criterion';
+import {ChartDTO} from '@core/model/chart-dto';
 
 @Injectable({
 	providedIn: 'root'
@@ -62,16 +63,16 @@ export class WidgetService {
 		return url;
 	}
 
-	//TODO returns StatisticDTO as soon as it is included in the OpenAPI spec
-	getHighchartWidgetData(chartId: string, scopePks?: number[], criteria?: FieldModelCriterion[]): Observable<any> {
+	@reviveDates
+	getChart(chartId: string, scopePks?: number[], criteria?: FieldModelCriterion[]): Observable<ChartDTO> {
 		let params = new HttpParams();
 		if(scopePks) {
 			params = params.set('scopePks', scopePks.toString());
 		}
 		if(criteria) {
-			params = params.set('fieldModelCriteria', JSON.stringify(criteria));
+			params = params.set('criteria', JSON.stringify(criteria));
 		}
-		return this.http.get<any>(`${this.serviceUrl}/highchart/${chartId}`, {params});
+		return this.http.get<ChartDTO>(`${this.serviceUrl}/chart/${chartId}`, {params});
 	}
 
 	getGeneralInfo(): Observable<{title: string; value: string}[]> {

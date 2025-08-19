@@ -6,7 +6,7 @@
 		},
 		"secure": false
 	},
-	"/config/": {
+	"/config": {
 		"target": "http://localhost:1337",
 		"pathRewrite": {
 			"^/config": ""

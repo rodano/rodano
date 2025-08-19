@@ -13,10 +13,9 @@ import org.slf4j.LoggerFactory;
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.FieldModelType;
 import ch.rodano.configuration.model.field.PartialDate;
-import ch.rodano.configuration.model.predicate.ValueSourceCriteria;
 
 public class DateValidator implements ValueFormatValidator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ValueSourceCriteria.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DateValidator.class);
 
 	public static final PartialDate DATE_1900 = PartialDate.of(1900);
 

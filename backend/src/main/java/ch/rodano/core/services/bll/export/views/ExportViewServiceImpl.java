@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.rules.OperandType;
+import ch.rodano.core.model.jooqutils.JOOQTranslator;
 import ch.rodano.core.services.bll.study.StudyService;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
@@ -208,7 +209,7 @@ public class ExportViewServiceImpl implements ExportViewService {
 					datePrefix.append("01.");
 				}
 				final Field<?> streamlinedValue = datePrefix.isEmpty() ? rawValue : DSL.concat(DSL.inline(datePrefix.toString()), rawValue);
-				return DSL.function("str_to_date", SQLDataType.LOCALDATETIME, streamlinedValue, DSL.inline("%d.%m.%Y"));
+				return DSL.function("str_to_date", SQLDataType.LOCALDATETIME, streamlinedValue, JOOQTranslator.SQL_FIELD_DATE_FORMAT);
 			}
 			case STRING -> {
 				return rawValue.cast(SQLDataType.CHAR(255));

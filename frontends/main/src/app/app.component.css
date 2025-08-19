@@ -9,7 +9,7 @@ div {
 	overflow: auto;
 
 	/* content is padded, except for pages that have an aside section (as the dashboard) */
-	&:not(:has(aside, mat-sidenav-container)) {
+	&:not(:has(aside)) {
 		padding: 1rem;
 	}
 }

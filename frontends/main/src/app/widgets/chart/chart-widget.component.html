@@ -1,6 +1,33 @@
-<!-- Temporary conditional rendering so there isn't an empty box with shadow -->
 @if (chart) {
-	<app-chart-ui [chart]="chart" />
-} @else {
-	<p class="error-message">{{ errorMessage }}</p>
+	<h2>{{ chart.model.title }}</h2>
+	<canvas
+		baseChart
+		[data]="data"
+		[options]="options"
+		[type]="graphType">
+	</canvas>
+	@if (chart.model.withStatistics) {
+		<table>
+			<thead>
+				<th>Scope</th>
+				<th>Count</th>
+				<th>Min</th>
+				<th>Max</th>
+				<th>Mean</th>
+				<th>SD</th>
+			</thead>
+			<tbody>
+				@for (dataset of chart.datasets; track $index) {
+					<tr>
+						<td>{{ dataset.label }}</td>
+						<td>{{ dataset.statistics?.count }}</td>
+						<td>{{ dataset.statistics?.min }}</td>
+						<td>{{ dataset.statistics?.max }}</td>
+						<td>{{ dataset.statistics?.mean?.toPrecision(2) }}</td>
+						<td>{{ dataset.statistics?.sd?.toPrecision(2) }}</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
 }

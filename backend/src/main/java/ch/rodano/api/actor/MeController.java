@@ -2,7 +2,6 @@ package ch.rodano.api.actor;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -31,7 +30,6 @@ import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.api.scope.ScopeMiniDTO;
 import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.exception.UnauthorizedException;
@@ -51,12 +49,6 @@ import ch.rodano.core.utils.RightsService;
 @Validated
 @Transactional(readOnly = true)
 public class MeController extends AbstractSecuredController {
-	public static final Comparator<Scope> SCOPE_COMPARATOR = Comparator
-		.comparing(Scope::getScopeModel, ScopeModel.COMPARATOR_DEPTH)
-		.thenComparing(Scope::getCode)
-		.thenComparing(Scope::getCreationTime)
-		.thenComparing(Scope::getPk);
-
 	private final ActorDTOService actorDTOService;
 	private final Configurator configurator;
 	private final ScopeService scopeService;
@@ -136,7 +128,7 @@ public class MeController extends AbstractSecuredController {
 			.filter(s -> !excludeVirtual || !s.isVirtual())
 			.collect(Collectors.toSet());
 
-		final Set<Scope> scopes = new TreeSet<>(SCOPE_COMPARATOR);
+		final Set<Scope> scopes = new TreeSet<>(Scope.DEPTH_COMPARATOR);
 		for(final var rootScope : rootScopes) {
 			scopes.add(rootScope);
 			scopes.addAll(scopeService.getAll(scopeModels, Collections.singleton(rootScope)));

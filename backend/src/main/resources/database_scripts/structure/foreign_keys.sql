@@ -118,12 +118,3 @@ alter table file
 alter table audit_action
 	add constraint fk_audit_action_user_fk foreign key (user_fk) references user (pk),
 	add constraint fk_audit_action_robot_fk foreign key (robot_fk) references robot (pk);
-
-/* chart_color */
-alter table chart_color add constraint fk_chart_color_chart_fk foreign key (chart_fk) references chart (pk);
-
-/* chart_state */
-alter table chart_state add constraint fk_chart_state_chart_fk foreign key (chart_fk) references chart (pk);
-
-/* chart_category */
-alter table chart_category add constraint fk_chart_category_chart_fk foreign key (chart_fk) references chart (pk);

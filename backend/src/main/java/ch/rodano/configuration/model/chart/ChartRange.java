@@ -17,17 +17,34 @@ public class ChartRange implements Node {
 
 	private String id;
 
-	private Map<String, String> labels;
+	private Map<String, String> labels = new HashMap<>();
 
-	private double min;
-	private double max;
+	private Double min;
+	private Double max;
 	private String value;
 
-	private boolean show;
 	private boolean other;
 
 	public ChartRange() {
-		labels = new HashMap<>();
+		//use for deserialization
+	}
+
+	public ChartRange(final Map<String, String> labels, final double min, final double max) {
+		this.labels = labels;
+		this.min = min;
+		this.max = max;
+	}
+
+	public ChartRange(final Map<String, String> labels, final String value) {
+		this.labels = labels;
+		this.value = value;
+	}
+
+	public static ChartRange otherChartRange(final Map<String, String> labels) {
+		final var range = new ChartRange();
+		range.setLabels(labels);
+		range.setOther(true);
+		return range;
 	}
 
 	public String getId() {
@@ -46,28 +63,20 @@ public class ChartRange implements Node {
 		this.value = value;
 	}
 
-	public double getMax() {
-		return max;
-	}
-
-	public void setMax(final double max) {
-		this.max = max;
-	}
-
-	public double getMin() {
+	public Double getMin() {
 		return min;
 	}
 
-	public void setMin(final double min) {
+	public void setMin(final Double min) {
 		this.min = min;
 	}
 
-	public void setShow(final boolean show) {
-		this.show = show;
+	public Double getMax() {
+		return max;
 	}
 
-	public boolean getShow() {
-		return show;
+	public void setMax(final Double max) {
+		this.max = max;
 	}
 
 	public void setOther(final boolean other) {

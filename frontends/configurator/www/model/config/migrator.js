@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 119;
+const CURRENT_VERSION = 120;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -125,6 +125,41 @@ const Migrations = {
 				field_model.advancedHelp = field_model.helpText;
 				delete field_model.helpText;
 				delete field_model.size;
+			});
+		}
+	},
+	migrate_119: {
+		description: 'Rework chart configuration',
+		migration: function(config) {
+			function migrate_section(section) {
+				section.widgets.forEach(widget => {
+					if(widget.type === 'HIGHCHART') {
+						widget.type = 'CHART';
+					}
+				});
+			}
+			function migrate_menu(menu) {
+				menu.submenus.forEach(migrate_menu);
+				menu.layout?.sections.forEach(migrate_section);
+			}
+			config.menus.forEach(migrate_menu);
+			config.charts.forEach(chart => {
+				chart.legendX = chart.legendX.labels;
+				chart.legendY = chart.legendY.labels;
+				delete chart.backgroundColor;
+				delete chart.valuesMin;
+				delete chart.valuesMax;
+				delete chart.usePercentile;
+				if(chart.type === 'STATISTICS') {
+					const result = chart.request.results[0];
+					chart.leafScopeModelId = result.scopeModelId;
+					chart.datasetModelId = result.datasetModelId;
+					chart.fieldModelId = result.fieldModelId;
+				}
+				delete chart.request;
+				chart.ranges.forEach(range => {
+					delete range.show;
+				});
 			});
 		}
 	}
