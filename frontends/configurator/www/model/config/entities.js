@@ -114,7 +114,7 @@ const Entities = Object.freeze({
 		representation: function(link) {
 			enhance_usable.call(this, link);
 			const previous_customization = link.querySelector('img[data-ui-customization]');
-			if(this.dynamic) {
+			if(this.plugin) {
 				if(!previous_customization) {
 					link.appendChild(document.createFullElement('img', {src: 'images/bullet_wrench.png', alt: 'Plugin', title: 'Plugin', 'data-ui-customization': 'true'}));
 				}
