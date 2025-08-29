@@ -1,11 +1,12 @@
 create or replace view scope_ancestor
-as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, end_date, direct, `virtual`, default_relation, ancestor_deleted) as (
+as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, end_date, direct, depth, `virtual`, default_relation, ancestor_deleted) as (
 	select
 		scope_fk,
 		parent_fk,
 		sr.start_date,
 		sr.end_date,
 		1 as direct,
+		1 as depth,
 		s.`virtual`,
 		sr.`default`,
 		deleted as ancestor_deleted
@@ -25,6 +26,7 @@ as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, e
 			else least(sr.end_date, rsa.end_date)
 		end as end_date,
 		0 as direct,
+		rsa.depth + 1 as depth,
 		s.virtual or rsa.virtual,
 		sr.`default` && rsa.`default_relation`,
 		s.deleted or rsa.ancestor_deleted AS ancestor_deleted
@@ -42,6 +44,7 @@ select
 		THEN MAX(end_date)
 	END as end_date,
 	bit_or(direct) as direct,
+	depth as depth,
 	bit_and(`virtual`) as `virtual`,
 	bit_or(default_relation) as `default`,
 	bit_and(ancestor_deleted) as ancestor_deleted

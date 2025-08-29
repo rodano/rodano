@@ -90,45 +90,59 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 	}
 
 	/**
+	 * Setter for <code>scope_ancestor.depth</code>.
+	 */
+	public void setDepth(Integer value) {
+		set(5, value);
+	}
+
+	/**
+	 * Getter for <code>scope_ancestor.depth</code>.
+	 */
+	public Integer getDepth() {
+		return (Integer) get(5);
+	}
+
+	/**
 	 * Setter for <code>scope_ancestor.virtual</code>.
 	 */
 	public void setVirtual(Boolean value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>scope_ancestor.virtual</code>.
 	 */
 	public Boolean getVirtual() {
-		return (Boolean) get(5);
+		return (Boolean) get(6);
 	}
 
 	/**
 	 * Setter for <code>scope_ancestor.default</code>.
 	 */
 	public void setDefault(Boolean value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>scope_ancestor.default</code>.
 	 */
 	public Boolean getDefault() {
-		return (Boolean) get(6);
+		return (Boolean) get(7);
 	}
 
 	/**
 	 * Setter for <code>scope_ancestor.ancestor_deleted</code>.
 	 */
 	public void setAncestorDeleted(Boolean value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>scope_ancestor.ancestor_deleted</code>.
 	 */
 	public Boolean getAncestorDeleted() {
-		return (Boolean) get(7);
+		return (Boolean) get(8);
 	}
 
 	// -------------------------------------------------------------------------
@@ -145,7 +159,7 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 	/**
 	 * Create a detached, initialised ScopeAncestorRecord
 	 */
-	public ScopeAncestorRecord(Long scopeFk, Long ancestorFk, ZonedDateTime startDate, ZonedDateTime endDate, Boolean direct, Boolean virtual, Boolean default_, Boolean ancestorDeleted) {
+	public ScopeAncestorRecord(Long scopeFk, Long ancestorFk, ZonedDateTime startDate, ZonedDateTime endDate, Boolean direct, Integer depth, Boolean virtual, Boolean default_, Boolean ancestorDeleted) {
 		super(ScopeAncestor.SCOPE_ANCESTOR);
 
 		setScopeFk(scopeFk);
@@ -153,6 +167,7 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 		setStartDate(startDate);
 		setEndDate(endDate);
 		setDirect(direct);
+		setDepth(depth);
 		setVirtual(virtual);
 		setDefault(default_);
 		setAncestorDeleted(ancestorDeleted);
