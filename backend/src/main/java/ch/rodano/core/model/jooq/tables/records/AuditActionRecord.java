@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.AuditAction;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,59 +36,73 @@ public class AuditActionRecord extends UpdatableRecordImpl<AuditActionRecord> {
 	}
 
 	/**
+	 * Setter for <code>audit_action.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>audit_action.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>audit_action.date</code>.
 	 */
 	public void setDate(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>audit_action.date</code>.
 	 */
 	public ZonedDateTime getDate() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>audit_action.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>audit_action.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(2);
+		return (Long) get(3);
 	}
 
 	/**
 	 * Setter for <code>audit_action.robot_fk</code>.
 	 */
 	public void setRobotFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>audit_action.robot_fk</code>.
 	 */
 	public Long getRobotFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>audit_action.context</code>.
 	 */
 	public void setContext(String value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>audit_action.context</code>.
 	 */
 	public String getContext() {
-		return (String) get(4);
+		return (String) get(5);
 	}
 
 	// -------------------------------------------------------------------------
@@ -113,10 +128,11 @@ public class AuditActionRecord extends UpdatableRecordImpl<AuditActionRecord> {
 	/**
 	 * Create a detached, initialised AuditActionRecord
 	 */
-	public AuditActionRecord(Long pk, ZonedDateTime date, Long userFk, Long robotFk, String context) {
+	public AuditActionRecord(Long pk, UUID projectId, ZonedDateTime date, Long userFk, Long robotFk, String context) {
 		super(AuditAction.AUDIT_ACTION);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setDate(date);
 		setUserFk(userFk);
 		setRobotFk(robotFk);

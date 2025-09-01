@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.PaymentTarget;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,87 +36,101 @@ public class PaymentTargetRecord extends UpdatableRecordImpl<PaymentTargetRecord
 	}
 
 	/**
+	 * Setter for <code>payment_target.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>payment_target.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>payment_target.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>payment_target.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>payment_target.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>payment_target.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>payment_target.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>payment_target.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>payment_target.payment_fk</code>.
 	 */
 	public void setPaymentFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>payment_target.payment_fk</code>.
 	 */
 	public Long getPaymentFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>payment_target.payable_id</code>.
 	 */
 	public void setPayableId(String value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>payment_target.payable_id</code>.
 	 */
 	public String getPayableId() {
-		return (String) get(5);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>payment_target.value</code>.
 	 */
 	public void setValue(Double value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>payment_target.value</code>.
 	 */
 	public Double getValue() {
-		return (Double) get(6);
+		return (Double) get(7);
 	}
 
 	// -------------------------------------------------------------------------
@@ -141,10 +156,11 @@ public class PaymentTargetRecord extends UpdatableRecordImpl<PaymentTargetRecord
 	/**
 	 * Create a detached, initialised PaymentTargetRecord
 	 */
-	public PaymentTargetRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long paymentFk, String payableId, Double value) {
+	public PaymentTargetRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long paymentFk, String payableId, Double value) {
 		super(PaymentTarget.PAYMENT_TARGET);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);

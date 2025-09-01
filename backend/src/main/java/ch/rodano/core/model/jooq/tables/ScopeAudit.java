@@ -8,29 +8,20 @@ import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.helpers.configuration.StringScopeDataConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
-import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
-import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 import ch.rodano.core.model.scope.ScopeData;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -69,6 +60,11 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	 * The column <code>scope_audit.pk</code>.
 	 */
 	public final TableField<ScopeAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>scope_audit.project_id</code>.
+	 */
+	public final TableField<ScopeAuditRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>scope_audit.audit_action_fk</code>.
@@ -118,7 +114,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>scope_audit.scope_model_id</code>.
 	 */
-	public final TableField<ScopeAuditRecord, String> SCOPE_MODEL_ID = createField(DSL.name("scope_model_id"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<ScopeAuditRecord, UUID> SCOPE_MODEL_ID = createField(DSL.name("scope_model_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>scope_audit.code</code>.
@@ -204,39 +200,6 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 		this(DSL.name("scope_audit"), null);
 	}
 
-	public <O extends Record> ScopeAudit(Table<O> path, ForeignKey<O, ScopeAuditRecord> childPath, InverseForeignKey<O, ScopeAuditRecord> parentPath) {
-		super(path, childPath, parentPath, SCOPE_AUDIT);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class ScopeAuditPath extends ScopeAudit implements Path<ScopeAuditRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> ScopeAuditPath(Table<O> path, ForeignKey<O, ScopeAuditRecord> childPath, InverseForeignKey<O, ScopeAuditRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private ScopeAuditPath(Name alias, Table<ScopeAuditRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public ScopeAuditPath as(String alias) {
-			return new ScopeAuditPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public ScopeAuditPath as(Name alias) {
-			return new ScopeAuditPath(alias, this);
-		}
-
-		@Override
-		public ScopeAuditPath as(Table<?> alias) {
-			return new ScopeAuditPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -250,59 +213,6 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	@Override
 	public UniqueKey<ScopeAuditRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_AUDIT_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<ScopeAuditRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_SCOPE_AUDIT_OBJECT_FK, Keys.FK_SCOPE_AUDIT_ROBOT_FK, Keys.FK_SCOPE_AUDIT_USER_FK, Keys.FK_SCOPE_TRAIL_AUDIT_ACTION_FK);
-	}
-
-	private transient ScopePath _scope;
-
-	/**
-	 * Get the implicit join path to the <code>scope</code> table.
-	 */
-	public ScopePath scope() {
-		if (_scope == null)
-			_scope = new ScopePath(this, Keys.FK_SCOPE_AUDIT_OBJECT_FK, null);
-
-		return _scope;
-	}
-
-	private transient RobotPath _robot;
-
-	/**
-	 * Get the implicit join path to the <code>robot</code> table.
-	 */
-	public RobotPath robot() {
-		if (_robot == null)
-			_robot = new RobotPath(this, Keys.FK_SCOPE_AUDIT_ROBOT_FK, null);
-
-		return _robot;
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_SCOPE_AUDIT_USER_FK, null);
-
-		return _user;
-	}
-
-	private transient AuditActionPath _auditAction;
-
-	/**
-	 * Get the implicit join path to the <code>audit_action</code> table.
-	 */
-	public AuditActionPath auditAction() {
-		if (_auditAction == null)
-			_auditAction = new AuditActionPath(this, Keys.FK_SCOPE_TRAIL_AUDIT_ACTION_FK, null);
-
-		return _auditAction;
 	}
 
 	@Override

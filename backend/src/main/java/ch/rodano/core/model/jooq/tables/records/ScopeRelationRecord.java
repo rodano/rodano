@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.ScopeRelation;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,101 +36,115 @@ public class ScopeRelationRecord extends UpdatableRecordImpl<ScopeRelationRecord
 	}
 
 	/**
+	 * Setter for <code>scope_relation.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>scope_relation.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>scope_relation.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>scope_relation.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>scope_relation.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>scope_relation.parent_fk</code>.
 	 */
 	public void setParentFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.parent_fk</code>.
 	 */
 	public Long getParentFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>scope_relation.start_date</code>.
 	 */
 	public void setStartDate(ZonedDateTime value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.start_date</code>.
 	 */
 	public ZonedDateTime getStartDate() {
-		return (ZonedDateTime) get(5);
+		return (ZonedDateTime) get(6);
 	}
 
 	/**
 	 * Setter for <code>scope_relation.end_date</code>.
 	 */
 	public void setEndDate(ZonedDateTime value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.end_date</code>.
 	 */
 	public ZonedDateTime getEndDate() {
-		return (ZonedDateTime) get(6);
+		return (ZonedDateTime) get(7);
 	}
 
 	/**
 	 * Setter for <code>scope_relation.default</code>.
 	 */
 	public void setDefault(Boolean value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>scope_relation.default</code>.
 	 */
 	public Boolean getDefault() {
-		return (Boolean) get(7);
+		return (Boolean) get(8);
 	}
 
 	// -------------------------------------------------------------------------
@@ -155,10 +170,11 @@ public class ScopeRelationRecord extends UpdatableRecordImpl<ScopeRelationRecord
 	/**
 	 * Create a detached, initialised ScopeRelationRecord
 	 */
-	public ScopeRelationRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long scopeFk, Long parentFk, ZonedDateTime startDate, ZonedDateTime endDate, Boolean default_) {
+	public ScopeRelationRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long scopeFk, Long parentFk, ZonedDateTime startDate, ZonedDateTime endDate, Boolean default_) {
 		super(ScopeRelation.SCOPE_RELATION);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setScopeFk(scopeFk);

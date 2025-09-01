@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.Field;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,87 +36,101 @@ public class FieldRecord extends UpdatableRecordImpl<FieldRecord> {
 	}
 
 	/**
+	 * Setter for <code>field.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>field.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>field.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>field.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>field.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>field.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>field.dataset_fk</code>.
 	 */
 	public void setDatasetFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>field.dataset_fk</code>.
 	 */
 	public Long getDatasetFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>field.dataset_model_id</code>.
 	 */
-	public void setDatasetModelId(String value) {
-		set(4, value);
+	public void setDatasetModelId(UUID value) {
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>field.dataset_model_id</code>.
 	 */
-	public String getDatasetModelId() {
-		return (String) get(4);
+	public UUID getDatasetModelId() {
+		return (UUID) get(5);
 	}
 
 	/**
 	 * Setter for <code>field.field_model_id</code>.
 	 */
-	public void setFieldModelId(String value) {
-		set(5, value);
+	public void setFieldModelId(UUID value) {
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>field.field_model_id</code>.
 	 */
-	public String getFieldModelId() {
-		return (String) get(5);
+	public UUID getFieldModelId() {
+		return (UUID) get(6);
 	}
 
 	/**
 	 * Setter for <code>field.value</code>.
 	 */
 	public void setValue(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>field.value</code>.
 	 */
 	public String getValue() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	// -------------------------------------------------------------------------
@@ -141,10 +156,11 @@ public class FieldRecord extends UpdatableRecordImpl<FieldRecord> {
 	/**
 	 * Create a detached, initialised FieldRecord
 	 */
-	public FieldRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long datasetFk, String datasetModelId, String fieldModelId, String value) {
+	public FieldRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long datasetFk, UUID datasetModelId, UUID fieldModelId, String value) {
 		super(Field.FIELD);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDatasetFk(datasetFk);

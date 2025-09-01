@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.UserSession;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,59 +36,73 @@ public class UserSessionRecord extends UpdatableRecordImpl<UserSessionRecord> {
 	}
 
 	/**
+	 * Setter for <code>user_session.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>user_session.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>user_session.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>user_session.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>user_session.token</code>.
 	 */
 	public void setToken(String value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>user_session.token</code>.
 	 */
 	public String getToken() {
-		return (String) get(2);
+		return (String) get(3);
 	}
 
 	/**
 	 * Setter for <code>user_session.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>user_session.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>user_session.last_access_time</code>.
 	 */
 	public void setLastAccessTime(ZonedDateTime value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>user_session.last_access_time</code>.
 	 */
 	public ZonedDateTime getLastAccessTime() {
-		return (ZonedDateTime) get(4);
+		return (ZonedDateTime) get(5);
 	}
 
 	// -------------------------------------------------------------------------
@@ -113,10 +128,11 @@ public class UserSessionRecord extends UpdatableRecordImpl<UserSessionRecord> {
 	/**
 	 * Create a detached, initialised UserSessionRecord
 	 */
-	public UserSessionRecord(Long pk, ZonedDateTime creationTime, String token, Long userFk, ZonedDateTime lastAccessTime) {
+	public UserSessionRecord(Long pk, UUID projectId, ZonedDateTime creationTime, String token, Long userFk, ZonedDateTime lastAccessTime) {
 		super(UserSession.USER_SESSION);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setToken(token);
 		setUserFk(userFk);

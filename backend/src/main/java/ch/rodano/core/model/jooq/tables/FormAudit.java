@@ -7,28 +7,19 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
-import ch.rodano.core.model.jooq.tables.Form.FormPath;
-import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.FormAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -67,6 +58,11 @@ public class FormAudit extends TableImpl<FormAuditRecord> implements AuditTable 
 	 * The column <code>form_audit.pk</code>.
 	 */
 	public final TableField<FormAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>form_audit.project_id</code>.
+	 */
+	public final TableField<FormAuditRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>form_audit.audit_action_fk</code>.
@@ -121,7 +117,7 @@ public class FormAudit extends TableImpl<FormAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>form_audit.form_model_id</code>.
 	 */
-	public final TableField<FormAuditRecord, String> FORM_MODEL_ID = createField(DSL.name("form_model_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<FormAuditRecord, UUID> FORM_MODEL_ID = createField(DSL.name("form_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	private FormAudit(Name alias, Table<FormAuditRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
@@ -152,39 +148,6 @@ public class FormAudit extends TableImpl<FormAuditRecord> implements AuditTable 
 		this(DSL.name("form_audit"), null);
 	}
 
-	public <O extends Record> FormAudit(Table<O> path, ForeignKey<O, FormAuditRecord> childPath, InverseForeignKey<O, FormAuditRecord> parentPath) {
-		super(path, childPath, parentPath, FORM_AUDIT);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class FormAuditPath extends FormAudit implements Path<FormAuditRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> FormAuditPath(Table<O> path, ForeignKey<O, FormAuditRecord> childPath, InverseForeignKey<O, FormAuditRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private FormAuditPath(Name alias, Table<FormAuditRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public FormAuditPath as(String alias) {
-			return new FormAuditPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public FormAuditPath as(Name alias) {
-			return new FormAuditPath(alias, this);
-		}
-
-		@Override
-		public FormAuditPath as(Table<?> alias) {
-			return new FormAuditPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -198,59 +161,6 @@ public class FormAudit extends TableImpl<FormAuditRecord> implements AuditTable 
 	@Override
 	public UniqueKey<FormAuditRecord> getPrimaryKey() {
 		return Keys.KEY_FORM_AUDIT_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<FormAuditRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_FORM_AUDIT_OBJECT_FK, Keys.FK_FORM_AUDIT_ROBOT_FK, Keys.FK_FORM_AUDIT_USER_FK, Keys.FK_FORM_TRAIL_AUDIT_ACTION_FK);
-	}
-
-	private transient FormPath _form;
-
-	/**
-	 * Get the implicit join path to the <code>form</code> table.
-	 */
-	public FormPath form() {
-		if (_form == null)
-			_form = new FormPath(this, Keys.FK_FORM_AUDIT_OBJECT_FK, null);
-
-		return _form;
-	}
-
-	private transient RobotPath _robot;
-
-	/**
-	 * Get the implicit join path to the <code>robot</code> table.
-	 */
-	public RobotPath robot() {
-		if (_robot == null)
-			_robot = new RobotPath(this, Keys.FK_FORM_AUDIT_ROBOT_FK, null);
-
-		return _robot;
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_FORM_AUDIT_USER_FK, null);
-
-		return _user;
-	}
-
-	private transient AuditActionPath _auditAction;
-
-	/**
-	 * Get the implicit join path to the <code>audit_action</code> table.
-	 */
-	public AuditActionPath auditAction() {
-		if (_auditAction == null)
-			_auditAction = new AuditActionPath(this, Keys.FK_FORM_TRAIL_AUDIT_ACTION_FK, null);
-
-		return _auditAction;
 	}
 
 	@Override

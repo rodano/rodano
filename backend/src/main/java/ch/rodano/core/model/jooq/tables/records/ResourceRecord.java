@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.Resource;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,157 +36,171 @@ public class ResourceRecord extends UpdatableRecordImpl<ResourceRecord> {
 	}
 
 	/**
+	 * Setter for <code>resource.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>resource.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>resource.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>resource.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>resource.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>resource.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>resource.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>resource.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>resource.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>resource.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>resource.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>resource.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>resource.uuid</code>.
 	 */
 	public void setUuid(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>resource.uuid</code>.
 	 */
 	public String getUuid() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>resource.title</code>.
 	 */
 	public void setTitle(String value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>resource.title</code>.
 	 */
 	public String getTitle() {
-		return (String) get(7);
+		return (String) get(8);
 	}
 
 	/**
 	 * Setter for <code>resource.description</code>.
 	 */
 	public void setDescription(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>resource.description</code>.
 	 */
 	public String getDescription() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>resource.category_id</code>.
 	 */
-	public void setCategoryId(String value) {
-		set(9, value);
+	public void setCategoryId(UUID value) {
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>resource.category_id</code>.
 	 */
-	public String getCategoryId() {
-		return (String) get(9);
+	public UUID getCategoryId() {
+		return (UUID) get(10);
 	}
 
 	/**
 	 * Setter for <code>resource.public_resource</code>.
 	 */
 	public void setPublicResource(Boolean value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>resource.public_resource</code>.
 	 */
 	public Boolean getPublicResource() {
-		return (Boolean) get(10);
+		return (Boolean) get(11);
 	}
 
 	/**
 	 * Setter for <code>resource.filename</code>.
 	 */
 	public void setFilename(String value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>resource.filename</code>.
 	 */
 	public String getFilename() {
-		return (String) get(11);
+		return (String) get(12);
 	}
 
 	// -------------------------------------------------------------------------
@@ -211,10 +226,11 @@ public class ResourceRecord extends UpdatableRecordImpl<ResourceRecord> {
 	/**
 	 * Create a detached, initialised ResourceRecord
 	 */
-	public ResourceRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long userFk, Long scopeFk, String uuid, String title, String description, String categoryId, Boolean publicResource, String filename) {
+	public ResourceRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long userFk, Long scopeFk, String uuid, String title, String description, UUID categoryId, Boolean publicResource, String filename) {
 		super(Resource.RESOURCE);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);

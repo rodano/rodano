@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.Payment;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,129 +36,143 @@ public class PaymentRecord extends UpdatableRecordImpl<PaymentRecord> {
 	}
 
 	/**
+	 * Setter for <code>payment.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>payment.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>payment.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>payment.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>payment.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>payment.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>payment.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>payment.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>payment.payment_batch_fk</code>.
 	 */
 	public void setPaymentBatchFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>payment.payment_batch_fk</code>.
 	 */
 	public Long getPaymentBatchFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>payment.workflow_status_fk</code>.
 	 */
 	public void setWorkflowStatusFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>payment.workflow_status_fk</code>.
 	 */
 	public Long getWorkflowStatusFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
-	 * Setter for <code>payment.plan_id</code>.
+	 * Setter for <code>payment.payment_plan_id</code>.
 	 */
-	public void setPlanId(String value) {
-		set(6, value);
-	}
-
-	/**
-	 * Getter for <code>payment.plan_id</code>.
-	 */
-	public String getPlanId() {
-		return (String) get(6);
-	}
-
-	/**
-	 * Setter for <code>payment.step_id</code>.
-	 */
-	public void setStepId(String value) {
+	public void setPaymentPlanId(UUID value) {
 		set(7, value);
 	}
 
 	/**
-	 * Getter for <code>payment.step_id</code>.
+	 * Getter for <code>payment.payment_plan_id</code>.
 	 */
-	public String getStepId() {
-		return (String) get(7);
+	public UUID getPaymentPlanId() {
+		return (UUID) get(7);
+	}
+
+	/**
+	 * Setter for <code>payment.payment_step_id</code>.
+	 */
+	public void setPaymentStepId(UUID value) {
+		set(8, value);
+	}
+
+	/**
+	 * Getter for <code>payment.payment_step_id</code>.
+	 */
+	public UUID getPaymentStepId() {
+		return (UUID) get(8);
 	}
 
 	/**
 	 * Setter for <code>payment.status</code>.
 	 */
 	public void setStatus(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>payment.status</code>.
 	 */
 	public String getStatus() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>payment.value</code>.
 	 */
 	public void setValue(Integer value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>payment.value</code>.
 	 */
 	public Integer getValue() {
-		return (Integer) get(9);
+		return (Integer) get(10);
 	}
 
 	// -------------------------------------------------------------------------
@@ -183,17 +198,18 @@ public class PaymentRecord extends UpdatableRecordImpl<PaymentRecord> {
 	/**
 	 * Create a detached, initialised PaymentRecord
 	 */
-	public PaymentRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long paymentBatchFk, Long workflowStatusFk, String planId, String stepId, String status, Integer value) {
+	public PaymentRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long paymentBatchFk, Long workflowStatusFk, UUID paymentPlanId, UUID paymentStepId, String status, Integer value) {
 		super(Payment.PAYMENT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);
 		setPaymentBatchFk(paymentBatchFk);
 		setWorkflowStatusFk(workflowStatusFk);
-		setPlanId(planId);
-		setStepId(stepId);
+		setPaymentPlanId(paymentPlanId);
+		setPaymentStepId(paymentStepId);
 		setStatus(status);
 		setValue(value);
 		resetChangedOnNotNull();

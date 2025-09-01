@@ -7,34 +7,18 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.DatasetAudit.DatasetAuditPath;
-import ch.rodano.core.model.jooq.tables.EventAudit.EventAuditPath;
-import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
-import ch.rodano.core.model.jooq.tables.FormAudit.FormAuditPath;
-import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
-import ch.rodano.core.model.jooq.tables.RobotAudit.RobotAuditPath;
-import ch.rodano.core.model.jooq.tables.RoleAudit.RoleAuditPath;
-import ch.rodano.core.model.jooq.tables.ScopeAudit.ScopeAuditPath;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
-import ch.rodano.core.model.jooq.tables.UserAudit.UserAuditPath;
-import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit.WorkflowStatusAuditPath;
 import ch.rodano.core.model.jooq.tables.records.AuditActionRecord;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -73,6 +57,11 @@ public class AuditAction extends TableImpl<AuditActionRecord> {
 	 * The column <code>audit_action.pk</code>.
 	 */
 	public final TableField<AuditActionRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>audit_action.project_id</code>.
+	 */
+	public final TableField<AuditActionRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>audit_action.date</code>.
@@ -123,39 +112,6 @@ public class AuditAction extends TableImpl<AuditActionRecord> {
 		this(DSL.name("audit_action"), null);
 	}
 
-	public <O extends Record> AuditAction(Table<O> path, ForeignKey<O, AuditActionRecord> childPath, InverseForeignKey<O, AuditActionRecord> parentPath) {
-		super(path, childPath, parentPath, AUDIT_ACTION);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class AuditActionPath extends AuditAction implements Path<AuditActionRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> AuditActionPath(Table<O> path, ForeignKey<O, AuditActionRecord> childPath, InverseForeignKey<O, AuditActionRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private AuditActionPath(Name alias, Table<AuditActionRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public AuditActionPath as(String alias) {
-			return new AuditActionPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public AuditActionPath as(Name alias) {
-			return new AuditActionPath(alias, this);
-		}
-
-		@Override
-		public AuditActionPath as(Table<?> alias) {
-			return new AuditActionPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -169,144 +125,6 @@ public class AuditAction extends TableImpl<AuditActionRecord> {
 	@Override
 	public UniqueKey<AuditActionRecord> getPrimaryKey() {
 		return Keys.KEY_AUDIT_ACTION_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<AuditActionRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_AUDIT_ACTION_ROBOT_FK, Keys.FK_AUDIT_ACTION_USER_FK);
-	}
-
-	private transient RobotPath _robot;
-
-	/**
-	 * Get the implicit join path to the <code>robot</code> table.
-	 */
-	public RobotPath robot() {
-		if (_robot == null)
-			_robot = new RobotPath(this, Keys.FK_AUDIT_ACTION_ROBOT_FK, null);
-
-		return _robot;
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_AUDIT_ACTION_USER_FK, null);
-
-		return _user;
-	}
-
-	private transient DatasetAuditPath _datasetAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>dataset_audit</code> table
-	 */
-	public DatasetAuditPath datasetAudit() {
-		if (_datasetAudit == null)
-			_datasetAudit = new DatasetAuditPath(this, null, Keys.FK_DATASET_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _datasetAudit;
-	}
-
-	private transient EventAuditPath _eventAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>event_audit</code> table
-	 */
-	public EventAuditPath eventAudit() {
-		if (_eventAudit == null)
-			_eventAudit = new EventAuditPath(this, null, Keys.FK_EVENT_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _eventAudit;
-	}
-
-	private transient FieldAuditPath _fieldAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>field_audit</code> table
-	 */
-	public FieldAuditPath fieldAudit() {
-		if (_fieldAudit == null)
-			_fieldAudit = new FieldAuditPath(this, null, Keys.FK_FIELD_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _fieldAudit;
-	}
-
-	private transient FormAuditPath _formAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>form_audit</code> table
-	 */
-	public FormAuditPath formAudit() {
-		if (_formAudit == null)
-			_formAudit = new FormAuditPath(this, null, Keys.FK_FORM_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _formAudit;
-	}
-
-	private transient RobotAuditPath _robotAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>robot_audit</code> table
-	 */
-	public RobotAuditPath robotAudit() {
-		if (_robotAudit == null)
-			_robotAudit = new RobotAuditPath(this, null, Keys.FK_ROBOT_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _robotAudit;
-	}
-
-	private transient RoleAuditPath _roleAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>role_audit</code> table
-	 */
-	public RoleAuditPath roleAudit() {
-		if (_roleAudit == null)
-			_roleAudit = new RoleAuditPath(this, null, Keys.FK_ROLE_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _roleAudit;
-	}
-
-	private transient ScopeAuditPath _scopeAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>scope_audit</code> table
-	 */
-	public ScopeAuditPath scopeAudit() {
-		if (_scopeAudit == null)
-			_scopeAudit = new ScopeAuditPath(this, null, Keys.FK_SCOPE_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _scopeAudit;
-	}
-
-	private transient UserAuditPath _userAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>user_audit</code> table
-	 */
-	public UserAuditPath userAudit() {
-		if (_userAudit == null)
-			_userAudit = new UserAuditPath(this, null, Keys.FK_USER_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _userAudit;
-	}
-
-	private transient WorkflowStatusAuditPath _workflowStatusAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>workflow_status_audit</code>
-	 * table
-	 */
-	public WorkflowStatusAuditPath workflowStatusAudit() {
-		if (_workflowStatusAudit == null)
-			_workflowStatusAudit = new WorkflowStatusAuditPath(this, null, Keys.FK_WORKFLOW_STATUS_TRAIL_AUDIT_ACTION_FK.getInverseKey());
-
-		return _workflowStatusAudit;
 	}
 
 	@Override

@@ -6,29 +6,19 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
-import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.PaymentBatch.PaymentBatchPath;
-import ch.rodano.core.model.jooq.tables.PaymentTarget.PaymentTargetPath;
-import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.PaymentRecord;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.Index;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -69,6 +59,11 @@ public class Payment extends TableImpl<PaymentRecord> {
 	public final TableField<PaymentRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
 	/**
+	 * The column <code>payment.project_id</code>.
+	 */
+	public final TableField<PaymentRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
+
+	/**
 	 * The column <code>payment.creation_time</code>.
 	 */
 	public final TableField<PaymentRecord, ZonedDateTime> CREATION_TIME = createField(DSL.name("creation_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
@@ -94,14 +89,14 @@ public class Payment extends TableImpl<PaymentRecord> {
 	public final TableField<PaymentRecord, Long> WORKFLOW_STATUS_FK = createField(DSL.name("workflow_status_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>payment.plan_id</code>.
+	 * The column <code>payment.payment_plan_id</code>.
 	 */
-	public final TableField<PaymentRecord, String> PLAN_ID = createField(DSL.name("plan_id"), SQLDataType.VARCHAR(50).nullable(false), this, "");
+	public final TableField<PaymentRecord, UUID> PAYMENT_PLAN_ID = createField(DSL.name("payment_plan_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
-	 * The column <code>payment.step_id</code>.
+	 * The column <code>payment.payment_step_id</code>.
 	 */
-	public final TableField<PaymentRecord, String> STEP_ID = createField(DSL.name("step_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<PaymentRecord, UUID> PAYMENT_STEP_ID = createField(DSL.name("payment_step_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>payment.status</code>.
@@ -142,47 +137,9 @@ public class Payment extends TableImpl<PaymentRecord> {
 		this(DSL.name("payment"), null);
 	}
 
-	public <O extends Record> Payment(Table<O> path, ForeignKey<O, PaymentRecord> childPath, InverseForeignKey<O, PaymentRecord> parentPath) {
-		super(path, childPath, parentPath, PAYMENT);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class PaymentPath extends Payment implements Path<PaymentRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> PaymentPath(Table<O> path, ForeignKey<O, PaymentRecord> childPath, InverseForeignKey<O, PaymentRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private PaymentPath(Name alias, Table<PaymentRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public PaymentPath as(String alias) {
-			return new PaymentPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public PaymentPath as(Name alias) {
-			return new PaymentPath(alias, this);
-		}
-
-		@Override
-		public PaymentPath as(Table<?> alias) {
-			return new PaymentPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
-	}
-
-	@Override
-	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.PAYMENT_IDX_PAYMENT_DELETED);
 	}
 
 	@Override
@@ -193,47 +150,6 @@ public class Payment extends TableImpl<PaymentRecord> {
 	@Override
 	public UniqueKey<PaymentRecord> getPrimaryKey() {
 		return Keys.KEY_PAYMENT_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<PaymentRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_PAYMENT_PAYMENT_BATCH_FK, Keys.FK_PAYMENT_WORKFLOW_STATUS_FK);
-	}
-
-	private transient PaymentBatchPath _paymentBatch;
-
-	/**
-	 * Get the implicit join path to the <code>payment_batch</code> table.
-	 */
-	public PaymentBatchPath paymentBatch() {
-		if (_paymentBatch == null)
-			_paymentBatch = new PaymentBatchPath(this, Keys.FK_PAYMENT_PAYMENT_BATCH_FK, null);
-
-		return _paymentBatch;
-	}
-
-	private transient WorkflowStatusPath _workflowStatus;
-
-	/**
-	 * Get the implicit join path to the <code>workflow_status</code> table.
-	 */
-	public WorkflowStatusPath workflowStatus() {
-		if (_workflowStatus == null)
-			_workflowStatus = new WorkflowStatusPath(this, Keys.FK_PAYMENT_WORKFLOW_STATUS_FK, null);
-
-		return _workflowStatus;
-	}
-
-	private transient PaymentTargetPath _paymentTarget;
-
-	/**
-	 * Get the implicit to-many join path to the <code>payment_target</code> table
-	 */
-	public PaymentTargetPath paymentTarget() {
-		if (_paymentTarget == null)
-			_paymentTarget = new PaymentTargetPath(this, null, Keys.FK_PAYMENT_TARGET_PAYMENT_FK.getInverseKey());
-
-		return _paymentTarget;
 	}
 
 	@Override

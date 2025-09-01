@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.File;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,171 +36,185 @@ public class FileRecord extends UpdatableRecordImpl<FileRecord> {
 	}
 
 	/**
+	 * Setter for <code>file.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>file.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>file.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>file.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>file.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>file.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>file.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>file.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>file.event_fk</code>.
 	 */
 	public void setEventFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>file.event_fk</code>.
 	 */
 	public Long getEventFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>file.dataset_fk</code>.
 	 */
 	public void setDatasetFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>file.dataset_fk</code>.
 	 */
 	public Long getDatasetFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>file.field_fk</code>.
 	 */
 	public void setFieldFk(Long value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>file.field_fk</code>.
 	 */
 	public Long getFieldFk() {
-		return (Long) get(6);
+		return (Long) get(7);
 	}
 
 	/**
 	 * Setter for <code>file.trail_fk</code>.
 	 */
 	public void setTrailFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>file.trail_fk</code>.
 	 */
 	public Long getTrailFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>file.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>file.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(8);
+		return (Long) get(9);
 	}
 
 	/**
 	 * Setter for <code>file.uuid</code>.
 	 */
 	public void setUuid(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>file.uuid</code>.
 	 */
 	public String getUuid() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>file.name</code>.
 	 */
 	public void setName(String value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>file.name</code>.
 	 */
 	public String getName() {
-		return (String) get(10);
+		return (String) get(11);
 	}
 
 	/**
 	 * Setter for <code>file.checksum</code>.
 	 */
 	public void setChecksum(byte[] value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>file.checksum</code>.
 	 */
 	public byte[] getChecksum() {
-		return (byte[]) get(11);
+		return (byte[]) get(12);
 	}
 
 	/**
 	 * Setter for <code>file.submitted</code>.
 	 */
 	public void setSubmitted(Boolean value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>file.submitted</code>.
 	 */
 	public Boolean getSubmitted() {
-		return (Boolean) get(12);
+		return (Boolean) get(13);
 	}
 
 	// -------------------------------------------------------------------------
@@ -225,10 +240,11 @@ public class FileRecord extends UpdatableRecordImpl<FileRecord> {
 	/**
 	 * Create a detached, initialised FileRecord
 	 */
-	public FileRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long scopeFk, Long eventFk, Long datasetFk, Long fieldFk, Long trailFk, Long userFk, String uuid, String name, byte[] checksum, Boolean submitted) {
+	public FileRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long scopeFk, Long eventFk, Long datasetFk, Long fieldFk, Long trailFk, Long userFk, String uuid, String name, byte[] checksum, Boolean submitted) {
 		super(File.FILE);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setScopeFk(scopeFk);

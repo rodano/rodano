@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.PaymentBatch;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,143 +36,157 @@ public class PaymentBatchRecord extends UpdatableRecordImpl<PaymentBatchRecord> 
 	}
 
 	/**
+	 * Setter for <code>payment_batch.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>payment_batch.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>payment_batch.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.scope_id</code>.
 	 */
 	public void setScopeId(String value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.scope_id</code>.
 	 */
 	public String getScopeId() {
-		return (String) get(4);
-	}
-
-	/**
-	 * Setter for <code>payment_batch.plan_id</code>.
-	 */
-	public void setPlanId(String value) {
-		set(5, value);
-	}
-
-	/**
-	 * Getter for <code>payment_batch.plan_id</code>.
-	 */
-	public String getPlanId() {
 		return (String) get(5);
+	}
+
+	/**
+	 * Setter for <code>payment_batch.payment_plan_id</code>.
+	 */
+	public void setPaymentPlanId(UUID value) {
+		set(6, value);
+	}
+
+	/**
+	 * Getter for <code>payment_batch.payment_plan_id</code>.
+	 */
+	public UUID getPaymentPlanId() {
+		return (UUID) get(6);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.status</code>.
 	 */
 	public void setStatus(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.status</code>.
 	 */
 	public String getStatus() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.payment_date</code>.
 	 */
 	public void setPaymentDate(ZonedDateTime value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.payment_date</code>.
 	 */
 	public ZonedDateTime getPaymentDate() {
-		return (ZonedDateTime) get(7);
+		return (ZonedDateTime) get(8);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.closed_date</code>.
 	 */
 	public void setClosedDate(ZonedDateTime value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.closed_date</code>.
 	 */
 	public ZonedDateTime getClosedDate() {
-		return (ZonedDateTime) get(8);
+		return (ZonedDateTime) get(9);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.printed_date</code>.
 	 */
 	public void setPrintedDate(ZonedDateTime value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.printed_date</code>.
 	 */
 	public ZonedDateTime getPrintedDate() {
-		return (ZonedDateTime) get(9);
+		return (ZonedDateTime) get(10);
 	}
 
 	/**
 	 * Setter for <code>payment_batch.comment</code>.
 	 */
 	public void setComment(String value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>payment_batch.comment</code>.
 	 */
 	public String getComment() {
-		return (String) get(10);
+		return (String) get(11);
 	}
 
 	// -------------------------------------------------------------------------
@@ -197,15 +212,16 @@ public class PaymentBatchRecord extends UpdatableRecordImpl<PaymentBatchRecord> 
 	/**
 	 * Create a detached, initialised PaymentBatchRecord
 	 */
-	public PaymentBatchRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String scopeId, String planId, String status, ZonedDateTime paymentDate, ZonedDateTime closedDate, ZonedDateTime printedDate, String comment) {
+	public PaymentBatchRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String scopeId, UUID paymentPlanId, String status, ZonedDateTime paymentDate, ZonedDateTime closedDate, ZonedDateTime printedDate, String comment) {
 		super(PaymentBatch.PAYMENT_BATCH);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);
 		setScopeId(scopeId);
-		setPlanId(planId);
+		setPaymentPlanId(paymentPlanId);
 		setStatus(status);
 		setPaymentDate(paymentDate);
 		setClosedDate(closedDate);

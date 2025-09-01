@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.User;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,367 +36,381 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> {
 	}
 
 	/**
+	 * Setter for <code>user.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>user.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>user.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>user.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>user.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>user.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>user.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>user.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>user.name</code>.
 	 */
 	public void setName(String value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>user.name</code>.
 	 */
 	public String getName() {
-		return (String) get(4);
+		return (String) get(5);
 	}
 
 	/**
 	 * Setter for <code>user.email</code>.
 	 */
 	public void setEmail(String value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>user.email</code>.
 	 */
 	public String getEmail() {
-		return (String) get(5);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>user.externally_managed</code>.
 	 */
 	public void setExternallyManaged(Boolean value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>user.externally_managed</code>.
 	 */
 	public Boolean getExternallyManaged() {
-		return (Boolean) get(6);
+		return (Boolean) get(7);
 	}
 
 	/**
 	 * Setter for <code>user.activated</code>.
 	 */
 	public void setActivated(Boolean value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>user.activated</code>.
 	 */
 	public Boolean getActivated() {
-		return (Boolean) get(7);
+		return (Boolean) get(8);
 	}
 
 	/**
 	 * Setter for <code>user.activation_code</code>.
 	 */
 	public void setActivationCode(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>user.activation_code</code>.
 	 */
 	public String getActivationCode() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>user.recovery_code</code>.
 	 */
 	public void setRecoveryCode(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>user.recovery_code</code>.
 	 */
 	public String getRecoveryCode() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>user.pending_email</code>.
 	 */
 	public void setPendingEmail(String value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>user.pending_email</code>.
 	 */
 	public String getPendingEmail() {
-		return (String) get(10);
+		return (String) get(11);
 	}
 
 	/**
 	 * Setter for <code>user.email_modification_date</code>.
 	 */
 	public void setEmailModificationDate(ZonedDateTime value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>user.email_modification_date</code>.
 	 */
 	public ZonedDateTime getEmailModificationDate() {
-		return (ZonedDateTime) get(11);
+		return (ZonedDateTime) get(12);
 	}
 
 	/**
 	 * Setter for <code>user.email_verification_code</code>.
 	 */
 	public void setEmailVerificationCode(String value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>user.email_verification_code</code>.
 	 */
 	public String getEmailVerificationCode() {
-		return (String) get(12);
+		return (String) get(13);
 	}
 
 	/**
 	 * Setter for <code>user.password</code>.
 	 */
 	public void setPassword(String value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>user.password</code>.
 	 */
 	public String getPassword() {
-		return (String) get(13);
+		return (String) get(14);
 	}
 
 	/**
 	 * Setter for <code>user.password_changed_date</code>.
 	 */
 	public void setPasswordChangedDate(ZonedDateTime value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>user.password_changed_date</code>.
 	 */
 	public ZonedDateTime getPasswordChangedDate() {
-		return (ZonedDateTime) get(14);
+		return (ZonedDateTime) get(15);
 	}
 
 	/**
 	 * Setter for <code>user.previous_passwords</code>.
 	 */
 	public void setPreviousPasswords(String value) {
-		set(15, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>user.previous_passwords</code>.
 	 */
 	public String getPreviousPasswords() {
-		return (String) get(15);
+		return (String) get(16);
 	}
 
 	/**
 	 * Setter for <code>user.password_attempts</code>.
 	 */
 	public void setPasswordAttempts(Integer value) {
-		set(16, value);
+		set(17, value);
 	}
 
 	/**
 	 * Getter for <code>user.password_attempts</code>.
 	 */
 	public Integer getPasswordAttempts() {
-		return (Integer) get(16);
+		return (Integer) get(17);
 	}
 
 	/**
 	 * Setter for <code>user.password_reset_code</code>.
 	 */
 	public void setPasswordResetCode(String value) {
-		set(17, value);
+		set(18, value);
 	}
 
 	/**
 	 * Getter for <code>user.password_reset_code</code>.
 	 */
 	public String getPasswordResetCode() {
-		return (String) get(17);
+		return (String) get(18);
 	}
 
 	/**
 	 * Setter for <code>user.password_reset_date</code>.
 	 */
 	public void setPasswordResetDate(ZonedDateTime value) {
-		set(18, value);
+		set(19, value);
 	}
 
 	/**
 	 * Getter for <code>user.password_reset_date</code>.
 	 */
 	public ZonedDateTime getPasswordResetDate() {
-		return (ZonedDateTime) get(18);
+		return (ZonedDateTime) get(19);
 	}
 
 	/**
 	 * Setter for <code>user.login_date</code>.
 	 */
 	public void setLoginDate(ZonedDateTime value) {
-		set(19, value);
+		set(20, value);
 	}
 
 	/**
 	 * Getter for <code>user.login_date</code>.
 	 */
 	public ZonedDateTime getLoginDate() {
-		return (ZonedDateTime) get(19);
+		return (ZonedDateTime) get(20);
 	}
 
 	/**
 	 * Setter for <code>user.previous_login_date</code>.
 	 */
 	public void setPreviousLoginDate(ZonedDateTime value) {
-		set(20, value);
+		set(21, value);
 	}
 
 	/**
 	 * Getter for <code>user.previous_login_date</code>.
 	 */
 	public ZonedDateTime getPreviousLoginDate() {
-		return (ZonedDateTime) get(20);
+		return (ZonedDateTime) get(21);
 	}
 
 	/**
 	 * Setter for <code>user.logout_date</code>.
 	 */
 	public void setLogoutDate(ZonedDateTime value) {
-		set(21, value);
+		set(22, value);
 	}
 
 	/**
 	 * Getter for <code>user.logout_date</code>.
 	 */
 	public ZonedDateTime getLogoutDate() {
-		return (ZonedDateTime) get(21);
+		return (ZonedDateTime) get(22);
 	}
 
 	/**
 	 * Setter for <code>user.login_blocking_date</code>.
 	 */
 	public void setLoginBlockingDate(ZonedDateTime value) {
-		set(22, value);
+		set(23, value);
 	}
 
 	/**
 	 * Getter for <code>user.login_blocking_date</code>.
 	 */
 	public ZonedDateTime getLoginBlockingDate() {
-		return (ZonedDateTime) get(22);
+		return (ZonedDateTime) get(23);
 	}
 
 	/**
 	 * Setter for <code>user.should_change_password</code>.
 	 */
 	public void setShouldChangePassword(Boolean value) {
-		set(23, value);
+		set(24, value);
 	}
 
 	/**
 	 * Getter for <code>user.should_change_password</code>.
 	 */
 	public Boolean getShouldChangePassword() {
-		return (Boolean) get(23);
+		return (Boolean) get(24);
 	}
 
 	/**
 	 * Setter for <code>user.phone</code>.
 	 */
 	public void setPhone(String value) {
-		set(24, value);
+		set(25, value);
 	}
 
 	/**
 	 * Getter for <code>user.phone</code>.
 	 */
 	public String getPhone() {
-		return (String) get(24);
+		return (String) get(25);
 	}
 
 	/**
 	 * Setter for <code>user.language_id</code>.
 	 */
 	public void setLanguageId(String value) {
-		set(25, value);
+		set(26, value);
 	}
 
 	/**
 	 * Getter for <code>user.language_id</code>.
 	 */
 	public String getLanguageId() {
-		return (String) get(25);
+		return (String) get(26);
 	}
 
 	/**
 	 * Setter for <code>user.user_agent</code>.
 	 */
 	public void setUserAgent(String value) {
-		set(26, value);
+		set(27, value);
 	}
 
 	/**
 	 * Getter for <code>user.user_agent</code>.
 	 */
 	public String getUserAgent() {
-		return (String) get(26);
+		return (String) get(27);
 	}
 
 	// -------------------------------------------------------------------------
@@ -421,10 +436,11 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> {
 	/**
 	 * Create a detached, initialised UserRecord
 	 */
-	public UserRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
+	public UserRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
 		super(User.USER);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);

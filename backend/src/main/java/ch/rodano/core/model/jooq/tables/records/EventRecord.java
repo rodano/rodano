@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.Event;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,199 +36,213 @@ public class EventRecord extends UpdatableRecordImpl<EventRecord> {
 	}
 
 	/**
+	 * Setter for <code>event.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>event.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>event.id</code>.
 	 */
 	public void setId(String value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>event.id</code>.
 	 */
 	public String getId() {
-		return (String) get(1);
+		return (String) get(2);
 	}
 
 	/**
 	 * Setter for <code>event.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>event.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>event.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>event.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(3);
+		return (ZonedDateTime) get(4);
 	}
 
 	/**
 	 * Setter for <code>event.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>event.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(4);
+		return (Boolean) get(5);
 	}
 
 	/**
 	 * Setter for <code>event.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>event.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>event.scope_model_id</code>.
 	 */
-	public void setScopeModelId(String value) {
-		set(6, value);
+	public void setScopeModelId(UUID value) {
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>event.scope_model_id</code>.
 	 */
-	public String getScopeModelId() {
-		return (String) get(6);
+	public UUID getScopeModelId() {
+		return (UUID) get(7);
 	}
 
 	/**
 	 * Setter for <code>event.event_group_number</code>.
 	 */
 	public void setEventGroupNumber(Integer value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>event.event_group_number</code>.
 	 */
 	public Integer getEventGroupNumber() {
-		return (Integer) get(7);
+		return (Integer) get(8);
 	}
 
 	/**
 	 * Setter for <code>event.event_model_id</code>.
 	 */
-	public void setEventModelId(String value) {
-		set(8, value);
+	public void setEventModelId(UUID value) {
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>event.event_model_id</code>.
 	 */
-	public String getEventModelId() {
-		return (String) get(8);
+	public UUID getEventModelId() {
+		return (UUID) get(9);
 	}
 
 	/**
 	 * Setter for <code>event.expected_date</code>.
 	 */
 	public void setExpectedDate(ZonedDateTime value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>event.expected_date</code>.
 	 */
 	public ZonedDateTime getExpectedDate() {
-		return (ZonedDateTime) get(9);
+		return (ZonedDateTime) get(10);
 	}
 
 	/**
 	 * Setter for <code>event.date</code>.
 	 */
 	public void setDate(ZonedDateTime value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>event.date</code>.
 	 */
 	public ZonedDateTime getDate() {
-		return (ZonedDateTime) get(10);
+		return (ZonedDateTime) get(11);
 	}
 
 	/**
 	 * Setter for <code>event.end_date</code>.
 	 */
 	public void setEndDate(ZonedDateTime value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>event.end_date</code>.
 	 */
 	public ZonedDateTime getEndDate() {
-		return (ZonedDateTime) get(11);
+		return (ZonedDateTime) get(12);
 	}
 
 	/**
 	 * Setter for <code>event.not_done</code>.
 	 */
 	public void setNotDone(Boolean value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>event.not_done</code>.
 	 */
 	public Boolean getNotDone() {
-		return (Boolean) get(12);
+		return (Boolean) get(13);
 	}
 
 	/**
 	 * Setter for <code>event.blocking</code>.
 	 */
 	public void setBlocking(Boolean value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>event.blocking</code>.
 	 */
 	public Boolean getBlocking() {
-		return (Boolean) get(13);
+		return (Boolean) get(14);
 	}
 
 	/**
 	 * Setter for <code>event.locked</code>.
 	 */
 	public void setLocked(Boolean value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>event.locked</code>.
 	 */
 	public Boolean getLocked() {
-		return (Boolean) get(14);
+		return (Boolean) get(15);
 	}
 
 	// -------------------------------------------------------------------------
@@ -253,10 +268,11 @@ public class EventRecord extends UpdatableRecordImpl<EventRecord> {
 	/**
 	 * Create a detached, initialised EventRecord
 	 */
-	public EventRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, String scopeModelId, Integer eventGroupNumber, String eventModelId, ZonedDateTime expectedDate, ZonedDateTime date, ZonedDateTime endDate, Boolean notDone, Boolean blocking, Boolean locked) {
+	public EventRecord(Long pk, UUID projectId, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, UUID scopeModelId, Integer eventGroupNumber, UUID eventModelId, ZonedDateTime expectedDate, ZonedDateTime date, ZonedDateTime endDate, Boolean notDone, Boolean blocking, Boolean locked) {
 		super(Event.EVENT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setId(id);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);

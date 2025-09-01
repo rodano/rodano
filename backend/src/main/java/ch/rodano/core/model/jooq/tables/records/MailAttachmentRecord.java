@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.MailAttachment;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,73 +36,87 @@ public class MailAttachmentRecord extends UpdatableRecordImpl<MailAttachmentReco
 	}
 
 	/**
+	 * Setter for <code>mail_attachment.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>mail_attachment.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>mail_attachment.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>mail_attachment.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>mail_attachment.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>mail_attachment.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>mail_attachment.mail_fk</code>.
 	 */
 	public void setMailFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>mail_attachment.mail_fk</code>.
 	 */
 	public Long getMailFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>mail_attachment.filename</code>.
 	 */
 	public void setFilename(String value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>mail_attachment.filename</code>.
 	 */
 	public String getFilename() {
-		return (String) get(4);
+		return (String) get(5);
 	}
 
 	/**
 	 * Setter for <code>mail_attachment.content</code>.
 	 */
 	public void setContent(byte[] value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>mail_attachment.content</code>.
 	 */
 	public byte[] getContent() {
-		return (byte[]) get(5);
+		return (byte[]) get(6);
 	}
 
 	// -------------------------------------------------------------------------
@@ -127,10 +142,11 @@ public class MailAttachmentRecord extends UpdatableRecordImpl<MailAttachmentReco
 	/**
 	 * Create a detached, initialised MailAttachmentRecord
 	 */
-	public MailAttachmentRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long mailFk, String filename, byte[] content) {
+	public MailAttachmentRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long mailFk, String filename, byte[] content) {
 		super(MailAttachment.MAIL_ATTACHMENT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setMailFk(mailFk);

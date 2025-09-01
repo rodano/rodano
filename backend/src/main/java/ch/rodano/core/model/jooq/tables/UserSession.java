@@ -7,24 +7,18 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.UserSessionRecord;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -63,6 +57,11 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	 * The column <code>user_session.pk</code>.
 	 */
 	public final TableField<UserSessionRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>user_session.project_id</code>.
+	 */
+	public final TableField<UserSessionRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>user_session.creation_time</code>.
@@ -113,39 +112,6 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 		this(DSL.name("user_session"), null);
 	}
 
-	public <O extends Record> UserSession(Table<O> path, ForeignKey<O, UserSessionRecord> childPath, InverseForeignKey<O, UserSessionRecord> parentPath) {
-		super(path, childPath, parentPath, USER_SESSION);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class UserSessionPath extends UserSession implements Path<UserSessionRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> UserSessionPath(Table<O> path, ForeignKey<O, UserSessionRecord> childPath, InverseForeignKey<O, UserSessionRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private UserSessionPath(Name alias, Table<UserSessionRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public UserSessionPath as(String alias) {
-			return new UserSessionPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public UserSessionPath as(Name alias) {
-			return new UserSessionPath(alias, this);
-		}
-
-		@Override
-		public UserSessionPath as(Table<?> alias) {
-			return new UserSessionPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -159,23 +125,6 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	@Override
 	public UniqueKey<UserSessionRecord> getPrimaryKey() {
 		return Keys.KEY_USER_SESSION_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<UserSessionRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_USER_SESSION_USER_FK);
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_USER_SESSION_USER_FK, null);
-
-		return _user;
 	}
 
 	@Override

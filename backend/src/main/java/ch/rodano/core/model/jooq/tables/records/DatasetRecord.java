@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.Dataset;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,101 +36,115 @@ public class DatasetRecord extends UpdatableRecordImpl<DatasetRecord> {
 	}
 
 	/**
+	 * Setter for <code>dataset.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>dataset.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>dataset.id</code>.
 	 */
 	public void setId(String value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.id</code>.
 	 */
 	public String getId() {
-		return (String) get(1);
+		return (String) get(2);
 	}
 
 	/**
 	 * Setter for <code>dataset.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>dataset.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(3);
+		return (ZonedDateTime) get(4);
 	}
 
 	/**
 	 * Setter for <code>dataset.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(4);
+		return (Boolean) get(5);
 	}
 
 	/**
 	 * Setter for <code>dataset.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>dataset.event_fk</code>.
 	 */
 	public void setEventFk(Long value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.event_fk</code>.
 	 */
 	public Long getEventFk() {
-		return (Long) get(6);
+		return (Long) get(7);
 	}
 
 	/**
 	 * Setter for <code>dataset.dataset_model_id</code>.
 	 */
-	public void setDatasetModelId(String value) {
-		set(7, value);
+	public void setDatasetModelId(UUID value) {
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>dataset.dataset_model_id</code>.
 	 */
-	public String getDatasetModelId() {
-		return (String) get(7);
+	public UUID getDatasetModelId() {
+		return (UUID) get(8);
 	}
 
 	// -------------------------------------------------------------------------
@@ -155,10 +170,11 @@ public class DatasetRecord extends UpdatableRecordImpl<DatasetRecord> {
 	/**
 	 * Create a detached, initialised DatasetRecord
 	 */
-	public DatasetRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, String datasetModelId) {
+	public DatasetRecord(Long pk, UUID projectId, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, UUID datasetModelId) {
 		super(Dataset.DATASET);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setId(id);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);

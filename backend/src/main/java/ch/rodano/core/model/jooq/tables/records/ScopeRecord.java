@@ -8,6 +8,7 @@ import ch.rodano.core.model.jooq.tables.Scope;
 import ch.rodano.core.model.scope.ScopeData;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -36,227 +37,241 @@ public class ScopeRecord extends UpdatableRecordImpl<ScopeRecord> {
 	}
 
 	/**
+	 * Setter for <code>scope.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>scope.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>scope.id</code>.
 	 */
 	public void setId(String value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>scope.id</code>.
 	 */
 	public String getId() {
-		return (String) get(1);
+		return (String) get(2);
 	}
 
 	/**
 	 * Setter for <code>scope.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>scope.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>scope.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>scope.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(3);
+		return (ZonedDateTime) get(4);
 	}
 
 	/**
 	 * Setter for <code>scope.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>scope.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(4);
+		return (Boolean) get(5);
 	}
 
 	/**
 	 * Setter for <code>scope.scope_model_id</code>.
 	 */
-	public void setScopeModelId(String value) {
-		set(5, value);
+	public void setScopeModelId(UUID value) {
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>scope.scope_model_id</code>.
 	 */
-	public String getScopeModelId() {
-		return (String) get(5);
+	public UUID getScopeModelId() {
+		return (UUID) get(6);
 	}
 
 	/**
 	 * Setter for <code>scope.code</code>.
 	 */
 	public void setCode(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>scope.code</code>.
 	 */
 	public String getCode() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>scope.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>scope.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(7);
+		return (String) get(8);
 	}
 
 	/**
 	 * Setter for <code>scope.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>scope.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>scope.start_date</code>.
 	 */
 	public void setStartDate(ZonedDateTime value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>scope.start_date</code>.
 	 */
 	public ZonedDateTime getStartDate() {
-		return (ZonedDateTime) get(9);
+		return (ZonedDateTime) get(10);
 	}
 
 	/**
 	 * Setter for <code>scope.stop_date</code>.
 	 */
 	public void setStopDate(ZonedDateTime value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>scope.stop_date</code>.
 	 */
 	public ZonedDateTime getStopDate() {
-		return (ZonedDateTime) get(10);
+		return (ZonedDateTime) get(11);
 	}
 
 	/**
 	 * Setter for <code>scope.virtual</code>.
 	 */
 	public void setVirtual(Boolean value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>scope.virtual</code>.
 	 */
 	public Boolean getVirtual() {
-		return (Boolean) get(11);
+		return (Boolean) get(12);
 	}
 
 	/**
 	 * Setter for <code>scope.color</code>.
 	 */
 	public void setColor(String value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>scope.color</code>.
 	 */
 	public String getColor() {
-		return (String) get(12);
+		return (String) get(13);
 	}
 
 	/**
 	 * Setter for <code>scope.expected_number</code>.
 	 */
 	public void setExpectedNumber(Integer value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>scope.expected_number</code>.
 	 */
 	public Integer getExpectedNumber() {
-		return (Integer) get(13);
+		return (Integer) get(14);
 	}
 
 	/**
 	 * Setter for <code>scope.max_number</code>.
 	 */
 	public void setMaxNumber(Integer value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>scope.max_number</code>.
 	 */
 	public Integer getMaxNumber() {
-		return (Integer) get(14);
+		return (Integer) get(15);
 	}
 
 	/**
 	 * Setter for <code>scope.locked</code>.
 	 */
 	public void setLocked(Boolean value) {
-		set(15, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>scope.locked</code>.
 	 */
 	public Boolean getLocked() {
-		return (Boolean) get(15);
+		return (Boolean) get(16);
 	}
 
 	/**
 	 * Setter for <code>scope.data</code>.
 	 */
 	public void setData(ScopeData value) {
-		set(16, value);
+		set(17, value);
 	}
 
 	/**
 	 * Getter for <code>scope.data</code>.
 	 */
 	public ScopeData getData() {
-		return (ScopeData) get(16);
+		return (ScopeData) get(17);
 	}
 
 	// -------------------------------------------------------------------------
@@ -282,10 +297,11 @@ public class ScopeRecord extends UpdatableRecordImpl<ScopeRecord> {
 	/**
 	 * Create a detached, initialised ScopeRecord
 	 */
-	public ScopeRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
+	public ScopeRecord(Long pk, UUID projectId, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, UUID scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
 		super(Scope.SCOPE);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setId(id);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);

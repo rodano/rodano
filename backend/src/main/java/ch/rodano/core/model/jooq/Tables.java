@@ -5,34 +5,130 @@ package ch.rodano.core.model.jooq;
 
 
 import ch.rodano.core.model.jooq.tables.AuditAction;
+import ch.rodano.core.model.jooq.tables.Chart;
+import ch.rodano.core.model.jooq.tables.ChartColor;
+import ch.rodano.core.model.jooq.tables.ChartRange;
+import ch.rodano.core.model.jooq.tables.ChartStateFilter;
+import ch.rodano.core.model.jooq.tables.Cron;
 import ch.rodano.core.model.jooq.tables.Dataset;
 import ch.rodano.core.model.jooq.tables.DatasetAudit;
+import ch.rodano.core.model.jooq.tables.DatasetModel;
 import ch.rodano.core.model.jooq.tables.Event;
 import ch.rodano.core.model.jooq.tables.EventAudit;
+import ch.rodano.core.model.jooq.tables.EventGroup;
+import ch.rodano.core.model.jooq.tables.EventModel;
+import ch.rodano.core.model.jooq.tables.EventModelBlockedEvent;
+import ch.rodano.core.model.jooq.tables.EventModelDatasetModel;
+import ch.rodano.core.model.jooq.tables.EventModelDeadlineReference;
+import ch.rodano.core.model.jooq.tables.EventModelFormModel;
+import ch.rodano.core.model.jooq.tables.EventModelImpliedEvent;
+import ch.rodano.core.model.jooq.tables.EventModelWorkflow;
+import ch.rodano.core.model.jooq.tables.Feature;
 import ch.rodano.core.model.jooq.tables.Field;
 import ch.rodano.core.model.jooq.tables.FieldAudit;
+import ch.rodano.core.model.jooq.tables.FieldModel;
+import ch.rodano.core.model.jooq.tables.FieldModelValidator;
+import ch.rodano.core.model.jooq.tables.FieldModelWorkflow;
+import ch.rodano.core.model.jooq.tables.FieldPossibleValue;
 import ch.rodano.core.model.jooq.tables.File;
 import ch.rodano.core.model.jooq.tables.Form;
 import ch.rodano.core.model.jooq.tables.FormAudit;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteria;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaTargetCell;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaTargetLayout;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaValue;
+import ch.rodano.core.model.jooq.tables.FormLayout;
+import ch.rodano.core.model.jooq.tables.FormLayoutCell;
+import ch.rodano.core.model.jooq.tables.FormLayoutColumn;
+import ch.rodano.core.model.jooq.tables.FormLayoutLine;
+import ch.rodano.core.model.jooq.tables.FormModel;
+import ch.rodano.core.model.jooq.tables.FormModelWorkflow;
 import ch.rodano.core.model.jooq.tables.Mail;
 import ch.rodano.core.model.jooq.tables.MailAttachment;
+import ch.rodano.core.model.jooq.tables.Menu;
+import ch.rodano.core.model.jooq.tables.MenuAction;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSection;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter;
 import ch.rodano.core.model.jooq.tables.Payment;
 import ch.rodano.core.model.jooq.tables.PaymentBatch;
+import ch.rodano.core.model.jooq.tables.PaymentPlan;
+import ch.rodano.core.model.jooq.tables.PaymentStep;
+import ch.rodano.core.model.jooq.tables.PaymentStepDistribution;
 import ch.rodano.core.model.jooq.tables.PaymentTarget;
+import ch.rodano.core.model.jooq.tables.PrivacyPolicy;
+import ch.rodano.core.model.jooq.tables.PrivacyPolicyProfile;
+import ch.rodano.core.model.jooq.tables.Profile;
+import ch.rodano.core.model.jooq.tables.ProfileCategoryGrants;
+import ch.rodano.core.model.jooq.tables.ProfileDatasetModelRights;
+import ch.rodano.core.model.jooq.tables.ProfileEventModelRights;
+import ch.rodano.core.model.jooq.tables.ProfileFeatureGrants;
+import ch.rodano.core.model.jooq.tables.ProfileFormModelRights;
+import ch.rodano.core.model.jooq.tables.ProfileMenuGrants;
+import ch.rodano.core.model.jooq.tables.ProfilePaymentModelRights;
+import ch.rodano.core.model.jooq.tables.ProfileProfileRights;
+import ch.rodano.core.model.jooq.tables.ProfileReportGrants;
+import ch.rodano.core.model.jooq.tables.ProfileScopeModelRights;
+import ch.rodano.core.model.jooq.tables.ProfileTimelineGraphGrants;
+import ch.rodano.core.model.jooq.tables.ProfileWorkflowActionRights;
+import ch.rodano.core.model.jooq.tables.ProfileWorkflowRights;
+import ch.rodano.core.model.jooq.tables.Project;
+import ch.rodano.core.model.jooq.tables.ProjectLanguage;
+import ch.rodano.core.model.jooq.tables.ProjectRuleTag;
+import ch.rodano.core.model.jooq.tables.Report;
+import ch.rodano.core.model.jooq.tables.ReportField;
 import ch.rodano.core.model.jooq.tables.Resource;
+import ch.rodano.core.model.jooq.tables.ResourceCategory;
 import ch.rodano.core.model.jooq.tables.Robot;
 import ch.rodano.core.model.jooq.tables.RobotAudit;
 import ch.rodano.core.model.jooq.tables.Role;
 import ch.rodano.core.model.jooq.tables.RoleAudit;
+import ch.rodano.core.model.jooq.tables.Rule;
+import ch.rodano.core.model.jooq.tables.RuleAction;
+import ch.rodano.core.model.jooq.tables.RuleActionParameter;
+import ch.rodano.core.model.jooq.tables.RuleCondition;
+import ch.rodano.core.model.jooq.tables.RuleConditionList;
+import ch.rodano.core.model.jooq.tables.RuleConstraint;
+import ch.rodano.core.model.jooq.tables.RuleCriterion;
+import ch.rodano.core.model.jooq.tables.RuleCriterionValue;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionAction;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionActionParameter;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionProperty;
 import ch.rodano.core.model.jooq.tables.Scope;
 import ch.rodano.core.model.jooq.tables.ScopeAncestor;
 import ch.rodano.core.model.jooq.tables.ScopeAudit;
+import ch.rodano.core.model.jooq.tables.ScopeModel;
+import ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel;
+import ch.rodano.core.model.jooq.tables.ScopeModelFormModel;
+import ch.rodano.core.model.jooq.tables.ScopeModelParent;
+import ch.rodano.core.model.jooq.tables.ScopeModelWorkflow;
+import ch.rodano.core.model.jooq.tables.ScopeModelWorkflowStateSelector;
 import ch.rodano.core.model.jooq.tables.ScopeRelation;
+import ch.rodano.core.model.jooq.tables.SelectionNode;
+import ch.rodano.core.model.jooq.tables.TimelineGraph;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionEvent;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionMetaField;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionReference;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionReferenceEntry;
 import ch.rodano.core.model.jooq.tables.User;
 import ch.rodano.core.model.jooq.tables.UserAudit;
 import ch.rodano.core.model.jooq.tables.UserSession;
+import ch.rodano.core.model.jooq.tables.Validator;
+import ch.rodano.core.model.jooq.tables.Workflow;
+import ch.rodano.core.model.jooq.tables.WorkflowAction;
+import ch.rodano.core.model.jooq.tables.WorkflowState;
+import ch.rodano.core.model.jooq.tables.WorkflowStatePossibleAction;
 import ch.rodano.core.model.jooq.tables.WorkflowStatus;
 import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit;
+import ch.rodano.core.model.jooq.tables.WorkflowSummary;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryColumn;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryColumnState;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryFilterEventModel;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryWorkflow;
+import ch.rodano.core.model.jooq.tables.WorkflowWidget;
+import ch.rodano.core.model.jooq.tables.WorkflowWidgetColumn;
+import ch.rodano.core.model.jooq.tables.WorkflowWidgetStateSelector;
 
 
 /**
@@ -47,6 +143,31 @@ public class Tables {
 	public static final AuditAction AUDIT_ACTION = AuditAction.AUDIT_ACTION;
 
 	/**
+	 * The table <code>chart</code>.
+	 */
+	public static final Chart CHART = Chart.CHART;
+
+	/**
+	 * The table <code>chart_color</code>.
+	 */
+	public static final ChartColor CHART_COLOR = ChartColor.CHART_COLOR;
+
+	/**
+	 * The table <code>chart_range</code>.
+	 */
+	public static final ChartRange CHART_RANGE = ChartRange.CHART_RANGE;
+
+	/**
+	 * The table <code>chart_state_filter</code>.
+	 */
+	public static final ChartStateFilter CHART_STATE_FILTER = ChartStateFilter.CHART_STATE_FILTER;
+
+	/**
+	 * The table <code>cron</code>.
+	 */
+	public static final Cron CRON = Cron.CRON;
+
+	/**
 	 * The table <code>dataset</code>.
 	 */
 	public static final Dataset DATASET = Dataset.DATASET;
@@ -55,6 +176,11 @@ public class Tables {
 	 * The table <code>dataset_audit</code>.
 	 */
 	public static final DatasetAudit DATASET_AUDIT = DatasetAudit.DATASET_AUDIT;
+
+	/**
+	 * The table <code>dataset_model</code>.
+	 */
+	public static final DatasetModel DATASET_MODEL = DatasetModel.DATASET_MODEL;
 
 	/**
 	 * The table <code>event</code>.
@@ -67,6 +193,51 @@ public class Tables {
 	public static final EventAudit EVENT_AUDIT = EventAudit.EVENT_AUDIT;
 
 	/**
+	 * The table <code>event_group</code>.
+	 */
+	public static final EventGroup EVENT_GROUP = EventGroup.EVENT_GROUP;
+
+	/**
+	 * The table <code>event_model</code>.
+	 */
+	public static final EventModel EVENT_MODEL = EventModel.EVENT_MODEL;
+
+	/**
+	 * The table <code>event_model_blocked_event</code>.
+	 */
+	public static final EventModelBlockedEvent EVENT_MODEL_BLOCKED_EVENT = EventModelBlockedEvent.EVENT_MODEL_BLOCKED_EVENT;
+
+	/**
+	 * The table <code>event_model_dataset_model</code>.
+	 */
+	public static final EventModelDatasetModel EVENT_MODEL_DATASET_MODEL = EventModelDatasetModel.EVENT_MODEL_DATASET_MODEL;
+
+	/**
+	 * The table <code>event_model_deadline_reference</code>.
+	 */
+	public static final EventModelDeadlineReference EVENT_MODEL_DEADLINE_REFERENCE = EventModelDeadlineReference.EVENT_MODEL_DEADLINE_REFERENCE;
+
+	/**
+	 * The table <code>event_model_form_model</code>.
+	 */
+	public static final EventModelFormModel EVENT_MODEL_FORM_MODEL = EventModelFormModel.EVENT_MODEL_FORM_MODEL;
+
+	/**
+	 * The table <code>event_model_implied_event</code>.
+	 */
+	public static final EventModelImpliedEvent EVENT_MODEL_IMPLIED_EVENT = EventModelImpliedEvent.EVENT_MODEL_IMPLIED_EVENT;
+
+	/**
+	 * The table <code>event_model_workflow</code>.
+	 */
+	public static final EventModelWorkflow EVENT_MODEL_WORKFLOW = EventModelWorkflow.EVENT_MODEL_WORKFLOW;
+
+	/**
+	 * The table <code>feature</code>.
+	 */
+	public static final Feature FEATURE = Feature.FEATURE;
+
+	/**
 	 * The table <code>field</code>.
 	 */
 	public static final Field FIELD = Field.FIELD;
@@ -75,6 +246,26 @@ public class Tables {
 	 * The table <code>field_audit</code>.
 	 */
 	public static final FieldAudit FIELD_AUDIT = FieldAudit.FIELD_AUDIT;
+
+	/**
+	 * The table <code>field_model</code>.
+	 */
+	public static final FieldModel FIELD_MODEL = FieldModel.FIELD_MODEL;
+
+	/**
+	 * The table <code>field_model_validator</code>.
+	 */
+	public static final FieldModelValidator FIELD_MODEL_VALIDATOR = FieldModelValidator.FIELD_MODEL_VALIDATOR;
+
+	/**
+	 * The table <code>field_model_workflow</code>.
+	 */
+	public static final FieldModelWorkflow FIELD_MODEL_WORKFLOW = FieldModelWorkflow.FIELD_MODEL_WORKFLOW;
+
+	/**
+	 * The table <code>field_possible_value</code>.
+	 */
+	public static final FieldPossibleValue FIELD_POSSIBLE_VALUE = FieldPossibleValue.FIELD_POSSIBLE_VALUE;
 
 	/**
 	 * The table <code>file</code>.
@@ -92,6 +283,56 @@ public class Tables {
 	public static final FormAudit FORM_AUDIT = FormAudit.FORM_AUDIT;
 
 	/**
+	 * The table <code>form_cell_visibility_criteria</code>.
+	 */
+	public static final FormCellVisibilityCriteria FORM_CELL_VISIBILITY_CRITERIA = FormCellVisibilityCriteria.FORM_CELL_VISIBILITY_CRITERIA;
+
+	/**
+	 * The table <code>form_cell_visibility_criteria_target_cell</code>.
+	 */
+	public static final FormCellVisibilityCriteriaTargetCell FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL = FormCellVisibilityCriteriaTargetCell.FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL;
+
+	/**
+	 * The table <code>form_cell_visibility_criteria_target_layout</code>.
+	 */
+	public static final FormCellVisibilityCriteriaTargetLayout FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT = FormCellVisibilityCriteriaTargetLayout.FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT;
+
+	/**
+	 * The table <code>form_cell_visibility_criteria_value</code>.
+	 */
+	public static final FormCellVisibilityCriteriaValue FORM_CELL_VISIBILITY_CRITERIA_VALUE = FormCellVisibilityCriteriaValue.FORM_CELL_VISIBILITY_CRITERIA_VALUE;
+
+	/**
+	 * The table <code>form_layout</code>.
+	 */
+	public static final FormLayout FORM_LAYOUT = FormLayout.FORM_LAYOUT;
+
+	/**
+	 * The table <code>form_layout_cell</code>.
+	 */
+	public static final FormLayoutCell FORM_LAYOUT_CELL = FormLayoutCell.FORM_LAYOUT_CELL;
+
+	/**
+	 * The table <code>form_layout_column</code>.
+	 */
+	public static final FormLayoutColumn FORM_LAYOUT_COLUMN = FormLayoutColumn.FORM_LAYOUT_COLUMN;
+
+	/**
+	 * The table <code>form_layout_line</code>.
+	 */
+	public static final FormLayoutLine FORM_LAYOUT_LINE = FormLayoutLine.FORM_LAYOUT_LINE;
+
+	/**
+	 * The table <code>form_model</code>.
+	 */
+	public static final FormModel FORM_MODEL = FormModel.FORM_MODEL;
+
+	/**
+	 * The table <code>form_model_workflow</code>.
+	 */
+	public static final FormModelWorkflow FORM_MODEL_WORKFLOW = FormModelWorkflow.FORM_MODEL_WORKFLOW;
+
+	/**
 	 * The table <code>mail</code>.
 	 */
 	public static final Mail MAIL = Mail.MAIL;
@@ -100,6 +341,31 @@ public class Tables {
 	 * The table <code>mail_attachment</code>.
 	 */
 	public static final MailAttachment MAIL_ATTACHMENT = MailAttachment.MAIL_ATTACHMENT;
+
+	/**
+	 * The table <code>menu</code>.
+	 */
+	public static final Menu MENU = Menu.MENU;
+
+	/**
+	 * The table <code>menu_action</code>.
+	 */
+	public static final MenuAction MENU_ACTION = MenuAction.MENU_ACTION;
+
+	/**
+	 * The table <code>menu_layout_section</code>.
+	 */
+	public static final MenuLayoutSection MENU_LAYOUT_SECTION = MenuLayoutSection.MENU_LAYOUT_SECTION;
+
+	/**
+	 * The table <code>menu_layout_section_widget</code>.
+	 */
+	public static final MenuLayoutSectionWidget MENU_LAYOUT_SECTION_WIDGET = MenuLayoutSectionWidget.MENU_LAYOUT_SECTION_WIDGET;
+
+	/**
+	 * The table <code>menu_layout_section_widget_parameter</code>.
+	 */
+	public static final MenuLayoutSectionWidgetParameter MENU_LAYOUT_SECTION_WIDGET_PARAMETER = MenuLayoutSectionWidgetParameter.MENU_LAYOUT_SECTION_WIDGET_PARAMETER;
 
 	/**
 	 * The table <code>payment</code>.
@@ -112,14 +378,139 @@ public class Tables {
 	public static final PaymentBatch PAYMENT_BATCH = PaymentBatch.PAYMENT_BATCH;
 
 	/**
+	 * The table <code>payment_plan</code>.
+	 */
+	public static final PaymentPlan PAYMENT_PLAN = PaymentPlan.PAYMENT_PLAN;
+
+	/**
+	 * The table <code>payment_step</code>.
+	 */
+	public static final PaymentStep PAYMENT_STEP = PaymentStep.PAYMENT_STEP;
+
+	/**
+	 * The table <code>payment_step_distribution</code>.
+	 */
+	public static final PaymentStepDistribution PAYMENT_STEP_DISTRIBUTION = PaymentStepDistribution.PAYMENT_STEP_DISTRIBUTION;
+
+	/**
 	 * The table <code>payment_target</code>.
 	 */
 	public static final PaymentTarget PAYMENT_TARGET = PaymentTarget.PAYMENT_TARGET;
 
 	/**
+	 * The table <code>privacy_policy</code>.
+	 */
+	public static final PrivacyPolicy PRIVACY_POLICY = PrivacyPolicy.PRIVACY_POLICY;
+
+	/**
+	 * The table <code>privacy_policy_profile</code>.
+	 */
+	public static final PrivacyPolicyProfile PRIVACY_POLICY_PROFILE = PrivacyPolicyProfile.PRIVACY_POLICY_PROFILE;
+
+	/**
+	 * The table <code>profile</code>.
+	 */
+	public static final Profile PROFILE = Profile.PROFILE;
+
+	/**
+	 * The table <code>profile_category_grants</code>.
+	 */
+	public static final ProfileCategoryGrants PROFILE_CATEGORY_GRANTS = ProfileCategoryGrants.PROFILE_CATEGORY_GRANTS;
+
+	/**
+	 * The table <code>profile_dataset_model_rights</code>.
+	 */
+	public static final ProfileDatasetModelRights PROFILE_DATASET_MODEL_RIGHTS = ProfileDatasetModelRights.PROFILE_DATASET_MODEL_RIGHTS;
+
+	/**
+	 * The table <code>profile_event_model_rights</code>.
+	 */
+	public static final ProfileEventModelRights PROFILE_EVENT_MODEL_RIGHTS = ProfileEventModelRights.PROFILE_EVENT_MODEL_RIGHTS;
+
+	/**
+	 * The table <code>profile_feature_grants</code>.
+	 */
+	public static final ProfileFeatureGrants PROFILE_FEATURE_GRANTS = ProfileFeatureGrants.PROFILE_FEATURE_GRANTS;
+
+	/**
+	 * The table <code>profile_form_model_rights</code>.
+	 */
+	public static final ProfileFormModelRights PROFILE_FORM_MODEL_RIGHTS = ProfileFormModelRights.PROFILE_FORM_MODEL_RIGHTS;
+
+	/**
+	 * The table <code>profile_menu_grants</code>.
+	 */
+	public static final ProfileMenuGrants PROFILE_MENU_GRANTS = ProfileMenuGrants.PROFILE_MENU_GRANTS;
+
+	/**
+	 * The table <code>profile_payment_model_rights</code>.
+	 */
+	public static final ProfilePaymentModelRights PROFILE_PAYMENT_MODEL_RIGHTS = ProfilePaymentModelRights.PROFILE_PAYMENT_MODEL_RIGHTS;
+
+	/**
+	 * The table <code>profile_profile_rights</code>.
+	 */
+	public static final ProfileProfileRights PROFILE_PROFILE_RIGHTS = ProfileProfileRights.PROFILE_PROFILE_RIGHTS;
+
+	/**
+	 * The table <code>profile_report_grants</code>.
+	 */
+	public static final ProfileReportGrants PROFILE_REPORT_GRANTS = ProfileReportGrants.PROFILE_REPORT_GRANTS;
+
+	/**
+	 * The table <code>profile_scope_model_rights</code>.
+	 */
+	public static final ProfileScopeModelRights PROFILE_SCOPE_MODEL_RIGHTS = ProfileScopeModelRights.PROFILE_SCOPE_MODEL_RIGHTS;
+
+	/**
+	 * The table <code>profile_timeline_graph_grants</code>.
+	 */
+	public static final ProfileTimelineGraphGrants PROFILE_TIMELINE_GRAPH_GRANTS = ProfileTimelineGraphGrants.PROFILE_TIMELINE_GRAPH_GRANTS;
+
+	/**
+	 * The table <code>profile_workflow_action_rights</code>.
+	 */
+	public static final ProfileWorkflowActionRights PROFILE_WORKFLOW_ACTION_RIGHTS = ProfileWorkflowActionRights.PROFILE_WORKFLOW_ACTION_RIGHTS;
+
+	/**
+	 * The table <code>profile_workflow_rights</code>.
+	 */
+	public static final ProfileWorkflowRights PROFILE_WORKFLOW_RIGHTS = ProfileWorkflowRights.PROFILE_WORKFLOW_RIGHTS;
+
+	/**
+	 * The table <code>project</code>.
+	 */
+	public static final Project PROJECT = Project.PROJECT;
+
+	/**
+	 * The table <code>project_language</code>.
+	 */
+	public static final ProjectLanguage PROJECT_LANGUAGE = ProjectLanguage.PROJECT_LANGUAGE;
+
+	/**
+	 * The table <code>project_rule_tag</code>.
+	 */
+	public static final ProjectRuleTag PROJECT_RULE_TAG = ProjectRuleTag.PROJECT_RULE_TAG;
+
+	/**
+	 * The table <code>report</code>.
+	 */
+	public static final Report REPORT = Report.REPORT;
+
+	/**
+	 * The table <code>report_field</code>.
+	 */
+	public static final ReportField REPORT_FIELD = ReportField.REPORT_FIELD;
+
+	/**
 	 * The table <code>resource</code>.
 	 */
 	public static final Resource RESOURCE = Resource.RESOURCE;
+
+	/**
+	 * The table <code>resource_category</code>.
+	 */
+	public static final ResourceCategory RESOURCE_CATEGORY = ResourceCategory.RESOURCE_CATEGORY;
 
 	/**
 	 * The table <code>robot</code>.
@@ -142,6 +533,61 @@ public class Tables {
 	public static final RoleAudit ROLE_AUDIT = RoleAudit.ROLE_AUDIT;
 
 	/**
+	 * The table <code>rule</code>.
+	 */
+	public static final Rule RULE = Rule.RULE;
+
+	/**
+	 * The table <code>rule_action</code>.
+	 */
+	public static final RuleAction RULE_ACTION = RuleAction.RULE_ACTION;
+
+	/**
+	 * The table <code>rule_action_parameter</code>.
+	 */
+	public static final RuleActionParameter RULE_ACTION_PARAMETER = RuleActionParameter.RULE_ACTION_PARAMETER;
+
+	/**
+	 * The table <code>rule_condition</code>.
+	 */
+	public static final RuleCondition RULE_CONDITION = RuleCondition.RULE_CONDITION;
+
+	/**
+	 * The table <code>rule_condition_list</code>.
+	 */
+	public static final RuleConditionList RULE_CONDITION_LIST = RuleConditionList.RULE_CONDITION_LIST;
+
+	/**
+	 * The table <code>rule_constraint</code>.
+	 */
+	public static final RuleConstraint RULE_CONSTRAINT = RuleConstraint.RULE_CONSTRAINT;
+
+	/**
+	 * The table <code>rule_criterion</code>.
+	 */
+	public static final RuleCriterion RULE_CRITERION = RuleCriterion.RULE_CRITERION;
+
+	/**
+	 * The table <code>rule_criterion_value</code>.
+	 */
+	public static final RuleCriterionValue RULE_CRITERION_VALUE = RuleCriterionValue.RULE_CRITERION_VALUE;
+
+	/**
+	 * The table <code>rule_definition_action</code>.
+	 */
+	public static final RuleDefinitionAction RULE_DEFINITION_ACTION = RuleDefinitionAction.RULE_DEFINITION_ACTION;
+
+	/**
+	 * The table <code>rule_definition_action_parameter</code>.
+	 */
+	public static final RuleDefinitionActionParameter RULE_DEFINITION_ACTION_PARAMETER = RuleDefinitionActionParameter.RULE_DEFINITION_ACTION_PARAMETER;
+
+	/**
+	 * The table <code>rule_definition_property</code>.
+	 */
+	public static final RuleDefinitionProperty RULE_DEFINITION_PROPERTY = RuleDefinitionProperty.RULE_DEFINITION_PROPERTY;
+
+	/**
 	 * The table <code>scope</code>.
 	 */
 	public static final Scope SCOPE = Scope.SCOPE;
@@ -157,9 +603,74 @@ public class Tables {
 	public static final ScopeAudit SCOPE_AUDIT = ScopeAudit.SCOPE_AUDIT;
 
 	/**
+	 * The table <code>scope_model</code>.
+	 */
+	public static final ScopeModel SCOPE_MODEL = ScopeModel.SCOPE_MODEL;
+
+	/**
+	 * The table <code>scope_model_dataset_model</code>.
+	 */
+	public static final ScopeModelDatasetModel SCOPE_MODEL_DATASET_MODEL = ScopeModelDatasetModel.SCOPE_MODEL_DATASET_MODEL;
+
+	/**
+	 * The table <code>scope_model_form_model</code>.
+	 */
+	public static final ScopeModelFormModel SCOPE_MODEL_FORM_MODEL = ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
+
+	/**
+	 * The table <code>scope_model_parent</code>.
+	 */
+	public static final ScopeModelParent SCOPE_MODEL_PARENT = ScopeModelParent.SCOPE_MODEL_PARENT;
+
+	/**
+	 * The table <code>scope_model_workflow</code>.
+	 */
+	public static final ScopeModelWorkflow SCOPE_MODEL_WORKFLOW = ScopeModelWorkflow.SCOPE_MODEL_WORKFLOW;
+
+	/**
+	 * The table <code>scope_model_workflow_state_selector</code>.
+	 */
+	public static final ScopeModelWorkflowStateSelector SCOPE_MODEL_WORKFLOW_STATE_SELECTOR = ScopeModelWorkflowStateSelector.SCOPE_MODEL_WORKFLOW_STATE_SELECTOR;
+
+	/**
 	 * The table <code>scope_relation</code>.
 	 */
 	public static final ScopeRelation SCOPE_RELATION = ScopeRelation.SCOPE_RELATION;
+
+	/**
+	 * The table <code>selection_node</code>.
+	 */
+	public static final SelectionNode SELECTION_NODE = SelectionNode.SELECTION_NODE;
+
+	/**
+	 * The table <code>timeline_graph</code>.
+	 */
+	public static final TimelineGraph TIMELINE_GRAPH = TimelineGraph.TIMELINE_GRAPH;
+
+	/**
+	 * The table <code>timeline_graph_section</code>.
+	 */
+	public static final TimelineGraphSection TIMELINE_GRAPH_SECTION = TimelineGraphSection.TIMELINE_GRAPH_SECTION;
+
+	/**
+	 * The table <code>timeline_graph_section_event</code>.
+	 */
+	public static final TimelineGraphSectionEvent TIMELINE_GRAPH_SECTION_EVENT = TimelineGraphSectionEvent.TIMELINE_GRAPH_SECTION_EVENT;
+
+	/**
+	 * The table <code>timeline_graph_section_meta_field</code>.
+	 */
+	public static final TimelineGraphSectionMetaField TIMELINE_GRAPH_SECTION_META_FIELD = TimelineGraphSectionMetaField.TIMELINE_GRAPH_SECTION_META_FIELD;
+
+	/**
+	 * The table <code>timeline_graph_section_reference</code>.
+	 */
+	public static final TimelineGraphSectionReference TIMELINE_GRAPH_SECTION_REFERENCE = TimelineGraphSectionReference.TIMELINE_GRAPH_SECTION_REFERENCE;
+
+	/**
+	 * The table <code>timeline_graph_section_reference_entry</code>.
+	 */
+	public static final TimelineGraphSectionReferenceEntry TIMELINE_GRAPH_SECTION_REFERENCE_ENTRY = TimelineGraphSectionReferenceEntry.TIMELINE_GRAPH_SECTION_REFERENCE_ENTRY;
 
 	/**
 	 * The table <code>user</code>.
@@ -177,6 +688,31 @@ public class Tables {
 	public static final UserSession USER_SESSION = UserSession.USER_SESSION;
 
 	/**
+	 * The table <code>validator</code>.
+	 */
+	public static final Validator VALIDATOR = Validator.VALIDATOR;
+
+	/**
+	 * The table <code>workflow</code>.
+	 */
+	public static final Workflow WORKFLOW = Workflow.WORKFLOW;
+
+	/**
+	 * The table <code>workflow_action</code>.
+	 */
+	public static final WorkflowAction WORKFLOW_ACTION = WorkflowAction.WORKFLOW_ACTION;
+
+	/**
+	 * The table <code>workflow_state</code>.
+	 */
+	public static final WorkflowState WORKFLOW_STATE = WorkflowState.WORKFLOW_STATE;
+
+	/**
+	 * The table <code>workflow_state_possible_action</code>.
+	 */
+	public static final WorkflowStatePossibleAction WORKFLOW_STATE_POSSIBLE_ACTION = WorkflowStatePossibleAction.WORKFLOW_STATE_POSSIBLE_ACTION;
+
+	/**
 	 * The table <code>workflow_status</code>.
 	 */
 	public static final WorkflowStatus WORKFLOW_STATUS = WorkflowStatus.WORKFLOW_STATUS;
@@ -185,4 +721,44 @@ public class Tables {
 	 * The table <code>workflow_status_audit</code>.
 	 */
 	public static final WorkflowStatusAudit WORKFLOW_STATUS_AUDIT = WorkflowStatusAudit.WORKFLOW_STATUS_AUDIT;
+
+	/**
+	 * The table <code>workflow_summary</code>.
+	 */
+	public static final WorkflowSummary WORKFLOW_SUMMARY = WorkflowSummary.WORKFLOW_SUMMARY;
+
+	/**
+	 * The table <code>workflow_summary_column</code>.
+	 */
+	public static final WorkflowSummaryColumn WORKFLOW_SUMMARY_COLUMN = WorkflowSummaryColumn.WORKFLOW_SUMMARY_COLUMN;
+
+	/**
+	 * The table <code>workflow_summary_column_state</code>.
+	 */
+	public static final WorkflowSummaryColumnState WORKFLOW_SUMMARY_COLUMN_STATE = WorkflowSummaryColumnState.WORKFLOW_SUMMARY_COLUMN_STATE;
+
+	/**
+	 * The table <code>workflow_summary_filter_event_model</code>.
+	 */
+	public static final WorkflowSummaryFilterEventModel WORKFLOW_SUMMARY_FILTER_EVENT_MODEL = WorkflowSummaryFilterEventModel.WORKFLOW_SUMMARY_FILTER_EVENT_MODEL;
+
+	/**
+	 * The table <code>workflow_summary_workflow</code>.
+	 */
+	public static final WorkflowSummaryWorkflow WORKFLOW_SUMMARY_WORKFLOW = WorkflowSummaryWorkflow.WORKFLOW_SUMMARY_WORKFLOW;
+
+	/**
+	 * The table <code>workflow_widget</code>.
+	 */
+	public static final WorkflowWidget WORKFLOW_WIDGET = WorkflowWidget.WORKFLOW_WIDGET;
+
+	/**
+	 * The table <code>workflow_widget_column</code>.
+	 */
+	public static final WorkflowWidgetColumn WORKFLOW_WIDGET_COLUMN = WorkflowWidgetColumn.WORKFLOW_WIDGET_COLUMN;
+
+	/**
+	 * The table <code>workflow_widget_state_selector</code>.
+	 */
+	public static final WorkflowWidgetStateSelector WORKFLOW_WIDGET_STATE_SELECTOR = WorkflowWidgetStateSelector.WORKFLOW_WIDGET_STATE_SELECTOR;
 }

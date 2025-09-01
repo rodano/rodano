@@ -7,30 +7,22 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.helpers.configuration.StringSetConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
-import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.MailAttachment.MailAttachmentPath;
 import ch.rodano.core.model.jooq.tables.records.MailRecord;
 import ch.rodano.core.model.mail.MailOrigin;
 import ch.rodano.core.model.mail.MailStatus;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.Index;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -70,6 +62,11 @@ public class Mail extends TableImpl<MailRecord> {
 	 * The column <code>mail.pk</code>.
 	 */
 	public final TableField<MailRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>mail.project_id</code>.
+	 */
+	public final TableField<MailRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>mail.creation_time</code>.
@@ -170,47 +167,9 @@ public class Mail extends TableImpl<MailRecord> {
 		this(DSL.name("mail"), null);
 	}
 
-	public <O extends Record> Mail(Table<O> path, ForeignKey<O, MailRecord> childPath, InverseForeignKey<O, MailRecord> parentPath) {
-		super(path, childPath, parentPath, MAIL);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class MailPath extends Mail implements Path<MailRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> MailPath(Table<O> path, ForeignKey<O, MailRecord> childPath, InverseForeignKey<O, MailRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private MailPath(Name alias, Table<MailRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public MailPath as(String alias) {
-			return new MailPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public MailPath as(Name alias) {
-			return new MailPath(alias, this);
-		}
-
-		@Override
-		public MailPath as(Table<?> alias) {
-			return new MailPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
-	}
-
-	@Override
-	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.MAIL_IDX_MAIL_ORIGIN, Indexes.MAIL_IDX_MAIL_SENDER, Indexes.MAIL_IDX_MAIL_STATUS, Indexes.MAIL_IDX_MAIL_SUBJECT);
 	}
 
 	@Override
@@ -221,18 +180,6 @@ public class Mail extends TableImpl<MailRecord> {
 	@Override
 	public UniqueKey<MailRecord> getPrimaryKey() {
 		return Keys.KEY_MAIL_PRIMARY;
-	}
-
-	private transient MailAttachmentPath _mailAttachment;
-
-	/**
-	 * Get the implicit to-many join path to the <code>mail_attachment</code> table
-	 */
-	public MailAttachmentPath mailAttachment() {
-		if (_mailAttachment == null)
-			_mailAttachment = new MailAttachmentPath(this, null, Keys.FK_MAIL_ATTACHMENT_MAIL_FK.getInverseKey());
-
-		return _mailAttachment;
 	}
 
 	@Override

@@ -7,26 +7,17 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
-import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
-import ch.rodano.core.model.jooq.tables.File.FilePath;
-import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.FieldRecord;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -67,6 +58,11 @@ public class Field extends TableImpl<FieldRecord> {
 	public final TableField<FieldRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
 	/**
+	 * The column <code>field.project_id</code>.
+	 */
+	public final TableField<FieldRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
+
+	/**
 	 * The column <code>field.creation_time</code>.
 	 */
 	public final TableField<FieldRecord, ZonedDateTime> CREATION_TIME = createField(DSL.name("creation_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
@@ -84,12 +80,12 @@ public class Field extends TableImpl<FieldRecord> {
 	/**
 	 * The column <code>field.dataset_model_id</code>.
 	 */
-	public final TableField<FieldRecord, String> DATASET_MODEL_ID = createField(DSL.name("dataset_model_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<FieldRecord, UUID> DATASET_MODEL_ID = createField(DSL.name("dataset_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>field.field_model_id</code>.
 	 */
-	public final TableField<FieldRecord, String> FIELD_MODEL_ID = createField(DSL.name("field_model_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<FieldRecord, UUID> FIELD_MODEL_ID = createField(DSL.name("field_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>field.value</code>.
@@ -125,39 +121,6 @@ public class Field extends TableImpl<FieldRecord> {
 		this(DSL.name("field"), null);
 	}
 
-	public <O extends Record> Field(Table<O> path, ForeignKey<O, FieldRecord> childPath, InverseForeignKey<O, FieldRecord> parentPath) {
-		super(path, childPath, parentPath, FIELD);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class FieldPath extends Field implements Path<FieldRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> FieldPath(Table<O> path, ForeignKey<O, FieldRecord> childPath, InverseForeignKey<O, FieldRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private FieldPath(Name alias, Table<FieldRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public FieldPath as(String alias) {
-			return new FieldPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public FieldPath as(Name alias) {
-			return new FieldPath(alias, this);
-		}
-
-		@Override
-		public FieldPath as(Table<?> alias) {
-			return new FieldPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -171,59 +134,6 @@ public class Field extends TableImpl<FieldRecord> {
 	@Override
 	public UniqueKey<FieldRecord> getPrimaryKey() {
 		return Keys.KEY_FIELD_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<FieldRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_FIELD_DATASET_FK);
-	}
-
-	private transient DatasetPath _dataset;
-
-	/**
-	 * Get the implicit join path to the <code>dataset</code> table.
-	 */
-	public DatasetPath dataset() {
-		if (_dataset == null)
-			_dataset = new DatasetPath(this, Keys.FK_FIELD_DATASET_FK, null);
-
-		return _dataset;
-	}
-
-	private transient FieldAuditPath _fieldAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>field_audit</code> table
-	 */
-	public FieldAuditPath fieldAudit() {
-		if (_fieldAudit == null)
-			_fieldAudit = new FieldAuditPath(this, null, Keys.FK_FIELD_AUDIT_OBJECT_FK.getInverseKey());
-
-		return _fieldAudit;
-	}
-
-	private transient FilePath _file;
-
-	/**
-	 * Get the implicit to-many join path to the <code>file</code> table
-	 */
-	public FilePath file() {
-		if (_file == null)
-			_file = new FilePath(this, null, Keys.FK_FILE_FIELD_FK.getInverseKey());
-
-		return _file;
-	}
-
-	private transient WorkflowStatusPath _workflowStatus;
-
-	/**
-	 * Get the implicit to-many join path to the <code>workflow_status</code> table
-	 */
-	public WorkflowStatusPath workflowStatus() {
-		if (_workflowStatus == null)
-			_workflowStatus = new WorkflowStatusPath(this, null, Keys.FK_WORKFLOW_STATUS_FIELD_FK.getInverseKey());
-
-		return _workflowStatus;
 	}
 
 	@Override

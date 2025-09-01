@@ -8,6 +8,7 @@ import ch.rodano.core.model.jooq.tables.RoleAudit;
 import ch.rodano.core.model.jooqutils.AuditRecord;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -36,171 +37,185 @@ public class RoleAuditRecord extends UpdatableRecordImpl<RoleAuditRecord> implem
 	}
 
 	/**
+	 * Setter for <code>role_audit.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>role_audit.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>role_audit.audit_action_fk</code>.
 	 */
 	public void setAuditActionFk(Long value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_action_fk</code>.
 	 */
 	public Long getAuditActionFk() {
-		return (Long) get(1);
+		return (Long) get(2);
 	}
 
 	/**
 	 * Setter for <code>role_audit.audit_datetime</code>.
 	 */
 	public void setAuditDatetime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_datetime</code>.
 	 */
 	public ZonedDateTime getAuditDatetime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>role_audit.audit_actor</code>.
 	 */
 	public void setAuditActor(String value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_actor</code>.
 	 */
 	public String getAuditActor() {
-		return (String) get(3);
+		return (String) get(4);
 	}
 
 	/**
 	 * Setter for <code>role_audit.audit_user_fk</code>.
 	 */
 	public void setAuditUserFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_user_fk</code>.
 	 */
 	public Long getAuditUserFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>role_audit.audit_robot_fk</code>.
 	 */
 	public void setAuditRobotFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_robot_fk</code>.
 	 */
 	public Long getAuditRobotFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>role_audit.audit_context</code>.
 	 */
 	public void setAuditContext(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_context</code>.
 	 */
 	public String getAuditContext() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>role_audit.audit_object_fk</code>.
 	 */
 	public void setAuditObjectFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.audit_object_fk</code>.
 	 */
 	public Long getAuditObjectFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>role_audit.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(8);
+		return (Long) get(9);
 	}
 
 	/**
 	 * Setter for <code>role_audit.robot_fk</code>.
 	 */
 	public void setRobotFk(Long value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.robot_fk</code>.
 	 */
 	public Long getRobotFk() {
-		return (Long) get(9);
+		return (Long) get(10);
 	}
 
 	/**
 	 * Setter for <code>role_audit.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(10);
+		return (Long) get(11);
 	}
 
 	/**
 	 * Setter for <code>role_audit.profile_id</code>.
 	 */
-	public void setProfileId(String value) {
-		set(11, value);
+	public void setProfileId(UUID value) {
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.profile_id</code>.
 	 */
-	public String getProfileId() {
-		return (String) get(11);
+	public UUID getProfileId() {
+		return (UUID) get(12);
 	}
 
 	/**
 	 * Setter for <code>role_audit.status</code>.
 	 */
 	public void setStatus(String value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>role_audit.status</code>.
 	 */
 	public String getStatus() {
-		return (String) get(12);
+		return (String) get(13);
 	}
 
 	// -------------------------------------------------------------------------
@@ -226,10 +241,11 @@ public class RoleAuditRecord extends UpdatableRecordImpl<RoleAuditRecord> implem
 	/**
 	 * Create a detached, initialised RoleAuditRecord
 	 */
-	public RoleAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Long userFk, Long robotFk, Long scopeFk, String profileId, String status) {
+	public RoleAuditRecord(Long pk, UUID projectId, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Long userFk, Long robotFk, Long scopeFk, UUID profileId, String status) {
 		super(RoleAudit.ROLE_AUDIT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setAuditActionFk(auditActionFk);
 		setAuditDatetime(auditDatetime);
 		setAuditActor(auditActor);

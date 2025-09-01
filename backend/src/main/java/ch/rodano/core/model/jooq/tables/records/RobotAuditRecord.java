@@ -8,6 +8,7 @@ import ch.rodano.core.model.jooq.tables.RobotAudit;
 import ch.rodano.core.model.jooqutils.AuditRecord;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -36,157 +37,171 @@ public class RobotAuditRecord extends UpdatableRecordImpl<RobotAuditRecord> impl
 	}
 
 	/**
+	 * Setter for <code>robot_audit.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>robot_audit.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>robot_audit.audit_action_fk</code>.
 	 */
 	public void setAuditActionFk(Long value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_action_fk</code>.
 	 */
 	public Long getAuditActionFk() {
-		return (Long) get(1);
+		return (Long) get(2);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.audit_datetime</code>.
 	 */
 	public void setAuditDatetime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_datetime</code>.
 	 */
 	public ZonedDateTime getAuditDatetime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.audit_actor</code>.
 	 */
 	public void setAuditActor(String value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_actor</code>.
 	 */
 	public String getAuditActor() {
-		return (String) get(3);
+		return (String) get(4);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.audit_user_fk</code>.
 	 */
 	public void setAuditUserFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_user_fk</code>.
 	 */
 	public Long getAuditUserFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.audit_robot_fk</code>.
 	 */
 	public void setAuditRobotFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_robot_fk</code>.
 	 */
 	public Long getAuditRobotFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.audit_context</code>.
 	 */
 	public void setAuditContext(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_context</code>.
 	 */
 	public String getAuditContext() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.audit_object_fk</code>.
 	 */
 	public void setAuditObjectFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.audit_object_fk</code>.
 	 */
 	public Long getAuditObjectFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(8);
+		return (Boolean) get(9);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.name</code>.
 	 */
 	public void setName(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.name</code>.
 	 */
 	public String getName() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.key</code>.
 	 */
 	public void setKey(String value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.key</code>.
 	 */
 	public String getKey() {
-		return (String) get(10);
+		return (String) get(11);
 	}
 
 	/**
 	 * Setter for <code>robot_audit.activated</code>.
 	 */
 	public void setActivated(Boolean value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>robot_audit.activated</code>.
 	 */
 	public Boolean getActivated() {
-		return (Boolean) get(11);
+		return (Boolean) get(12);
 	}
 
 	// -------------------------------------------------------------------------
@@ -212,10 +227,11 @@ public class RobotAuditRecord extends UpdatableRecordImpl<RobotAuditRecord> impl
 	/**
 	 * Create a detached, initialised RobotAuditRecord
 	 */
-	public RobotAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, String name, String key, Boolean activated) {
+	public RobotAuditRecord(Long pk, UUID projectId, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, String name, String key, Boolean activated) {
 		super(RobotAudit.ROBOT_AUDIT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setAuditActionFk(auditActionFk);
 		setAuditDatetime(auditDatetime);
 		setAuditActor(auditActor);

@@ -7,28 +7,19 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
-import ch.rodano.core.model.jooq.tables.Field.FieldPath;
-import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.FieldAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -67,6 +58,11 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	 * The column <code>field_audit.pk</code>.
 	 */
 	public final TableField<FieldAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>field_audit.project_id</code>.
+	 */
+	public final TableField<FieldAuditRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>field_audit.audit_action_fk</code>.
@@ -111,12 +107,12 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>field_audit.dataset_model_id</code>.
 	 */
-	public final TableField<FieldAuditRecord, String> DATASET_MODEL_ID = createField(DSL.name("dataset_model_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<FieldAuditRecord, UUID> DATASET_MODEL_ID = createField(DSL.name("dataset_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>field_audit.field_model_id</code>.
 	 */
-	public final TableField<FieldAuditRecord, String> FIELD_MODEL_ID = createField(DSL.name("field_model_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<FieldAuditRecord, UUID> FIELD_MODEL_ID = createField(DSL.name("field_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>field_audit.value</code>.
@@ -152,39 +148,6 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 		this(DSL.name("field_audit"), null);
 	}
 
-	public <O extends Record> FieldAudit(Table<O> path, ForeignKey<O, FieldAuditRecord> childPath, InverseForeignKey<O, FieldAuditRecord> parentPath) {
-		super(path, childPath, parentPath, FIELD_AUDIT);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class FieldAuditPath extends FieldAudit implements Path<FieldAuditRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> FieldAuditPath(Table<O> path, ForeignKey<O, FieldAuditRecord> childPath, InverseForeignKey<O, FieldAuditRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private FieldAuditPath(Name alias, Table<FieldAuditRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public FieldAuditPath as(String alias) {
-			return new FieldAuditPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public FieldAuditPath as(Name alias) {
-			return new FieldAuditPath(alias, this);
-		}
-
-		@Override
-		public FieldAuditPath as(Table<?> alias) {
-			return new FieldAuditPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -198,59 +161,6 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	@Override
 	public UniqueKey<FieldAuditRecord> getPrimaryKey() {
 		return Keys.KEY_FIELD_AUDIT_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<FieldAuditRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_FIELD_AUDIT_OBJECT_FK, Keys.FK_FIELD_AUDIT_ROBOT_FK, Keys.FK_FIELD_AUDIT_USER_FK, Keys.FK_FIELD_TRAIL_AUDIT_ACTION_FK);
-	}
-
-	private transient FieldPath _field;
-
-	/**
-	 * Get the implicit join path to the <code>field</code> table.
-	 */
-	public FieldPath field() {
-		if (_field == null)
-			_field = new FieldPath(this, Keys.FK_FIELD_AUDIT_OBJECT_FK, null);
-
-		return _field;
-	}
-
-	private transient RobotPath _robot;
-
-	/**
-	 * Get the implicit join path to the <code>robot</code> table.
-	 */
-	public RobotPath robot() {
-		if (_robot == null)
-			_robot = new RobotPath(this, Keys.FK_FIELD_AUDIT_ROBOT_FK, null);
-
-		return _robot;
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_FIELD_AUDIT_USER_FK, null);
-
-		return _user;
-	}
-
-	private transient AuditActionPath _auditAction;
-
-	/**
-	 * Get the implicit join path to the <code>audit_action</code> table.
-	 */
-	public AuditActionPath auditAction() {
-		if (_auditAction == null)
-			_auditAction = new AuditActionPath(this, Keys.FK_FIELD_TRAIL_AUDIT_ACTION_FK, null);
-
-		return _auditAction;
 	}
 
 	@Override

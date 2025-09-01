@@ -10,6 +10,7 @@ import ch.rodano.core.model.mail.MailStatus;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -38,199 +39,213 @@ public class MailRecord extends UpdatableRecordImpl<MailRecord> {
 	}
 
 	/**
+	 * Setter for <code>mail.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>mail.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>mail.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>mail.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>mail.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>mail.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>mail.attempts</code>.
 	 */
 	public void setAttempts(Integer value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>mail.attempts</code>.
 	 */
 	public Integer getAttempts() {
-		return (Integer) get(3);
+		return (Integer) get(4);
 	}
 
 	/**
 	 * Setter for <code>mail.status</code>.
 	 */
 	public void setStatus(MailStatus value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>mail.status</code>.
 	 */
 	public MailStatus getStatus() {
-		return (MailStatus) get(4);
+		return (MailStatus) get(5);
 	}
 
 	/**
 	 * Setter for <code>mail.error</code>.
 	 */
 	public void setError(String value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>mail.error</code>.
 	 */
 	public String getError() {
-		return (String) get(5);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>mail.sent_time</code>.
 	 */
 	public void setSentTime(ZonedDateTime value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>mail.sent_time</code>.
 	 */
 	public ZonedDateTime getSentTime() {
-		return (ZonedDateTime) get(6);
+		return (ZonedDateTime) get(7);
 	}
 
 	/**
 	 * Setter for <code>mail.origin</code>.
 	 */
 	public void setOrigin(MailOrigin value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>mail.origin</code>.
 	 */
 	public MailOrigin getOrigin() {
-		return (MailOrigin) get(7);
+		return (MailOrigin) get(8);
 	}
 
 	/**
 	 * Setter for <code>mail.intent</code>.
 	 */
 	public void setIntent(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>mail.intent</code>.
 	 */
 	public String getIntent() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>mail.sender</code>.
 	 */
 	public void setSender(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>mail.sender</code>.
 	 */
 	public String getSender() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>mail.recipients</code>.
 	 */
 	public void setRecipients(Set value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>mail.recipients</code>.
 	 */
 	public Set getRecipients() {
-		return (Set) get(10);
+		return (Set) get(11);
 	}
 
 	/**
 	 * Setter for <code>mail.reply_to</code>.
 	 */
 	public void setReplyTo(String value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>mail.reply_to</code>.
 	 */
 	public String getReplyTo() {
-		return (String) get(11);
+		return (String) get(12);
 	}
 
 	/**
 	 * Setter for <code>mail.subject</code>.
 	 */
 	public void setSubject(String value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>mail.subject</code>.
 	 */
 	public String getSubject() {
-		return (String) get(12);
+		return (String) get(13);
 	}
 
 	/**
 	 * Setter for <code>mail.text_body</code>.
 	 */
 	public void setTextBody(String value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>mail.text_body</code>.
 	 */
 	public String getTextBody() {
-		return (String) get(13);
+		return (String) get(14);
 	}
 
 	/**
 	 * Setter for <code>mail.html_body</code>.
 	 */
 	public void setHtmlBody(String value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>mail.html_body</code>.
 	 */
 	public String getHtmlBody() {
-		return (String) get(14);
+		return (String) get(15);
 	}
 
 	// -------------------------------------------------------------------------
@@ -256,10 +271,11 @@ public class MailRecord extends UpdatableRecordImpl<MailRecord> {
 	/**
 	 * Create a detached, initialised MailRecord
 	 */
-	public MailRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Integer attempts, MailStatus status, String error, ZonedDateTime sentTime, MailOrigin origin, String intent, String sender, Set recipients, String replyTo, String subject, String textBody, String htmlBody) {
+	public MailRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Integer attempts, MailStatus status, String error, ZonedDateTime sentTime, MailOrigin origin, String intent, String sender, Set recipients, String replyTo, String subject, String textBody, String htmlBody) {
 		super(Mail.MAIL);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setAttempts(attempts);

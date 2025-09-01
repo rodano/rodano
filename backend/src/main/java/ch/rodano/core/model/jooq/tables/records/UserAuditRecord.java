@@ -8,6 +8,7 @@ import ch.rodano.core.model.jooq.tables.UserAudit;
 import ch.rodano.core.model.jooqutils.AuditRecord;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -36,437 +37,451 @@ public class UserAuditRecord extends UpdatableRecordImpl<UserAuditRecord> implem
 	}
 
 	/**
+	 * Setter for <code>user_audit.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>user_audit.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>user_audit.audit_action_fk</code>.
 	 */
 	public void setAuditActionFk(Long value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_action_fk</code>.
 	 */
 	public Long getAuditActionFk() {
-		return (Long) get(1);
+		return (Long) get(2);
 	}
 
 	/**
 	 * Setter for <code>user_audit.audit_datetime</code>.
 	 */
 	public void setAuditDatetime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_datetime</code>.
 	 */
 	public ZonedDateTime getAuditDatetime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>user_audit.audit_actor</code>.
 	 */
 	public void setAuditActor(String value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_actor</code>.
 	 */
 	public String getAuditActor() {
-		return (String) get(3);
+		return (String) get(4);
 	}
 
 	/**
 	 * Setter for <code>user_audit.audit_user_fk</code>.
 	 */
 	public void setAuditUserFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_user_fk</code>.
 	 */
 	public Long getAuditUserFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>user_audit.audit_robot_fk</code>.
 	 */
 	public void setAuditRobotFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_robot_fk</code>.
 	 */
 	public Long getAuditRobotFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>user_audit.audit_context</code>.
 	 */
 	public void setAuditContext(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_context</code>.
 	 */
 	public String getAuditContext() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>user_audit.audit_object_fk</code>.
 	 */
 	public void setAuditObjectFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.audit_object_fk</code>.
 	 */
 	public Long getAuditObjectFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>user_audit.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(8);
+		return (Boolean) get(9);
 	}
 
 	/**
 	 * Setter for <code>user_audit.name</code>.
 	 */
 	public void setName(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.name</code>.
 	 */
 	public String getName() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>user_audit.email</code>.
 	 */
 	public void setEmail(String value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.email</code>.
 	 */
 	public String getEmail() {
-		return (String) get(10);
+		return (String) get(11);
 	}
 
 	/**
 	 * Setter for <code>user_audit.externally_managed</code>.
 	 */
 	public void setExternallyManaged(Boolean value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.externally_managed</code>.
 	 */
 	public Boolean getExternallyManaged() {
-		return (Boolean) get(11);
+		return (Boolean) get(12);
 	}
 
 	/**
 	 * Setter for <code>user_audit.activated</code>.
 	 */
 	public void setActivated(Boolean value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.activated</code>.
 	 */
 	public Boolean getActivated() {
-		return (Boolean) get(12);
+		return (Boolean) get(13);
 	}
 
 	/**
 	 * Setter for <code>user_audit.activation_code</code>.
 	 */
 	public void setActivationCode(String value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.activation_code</code>.
 	 */
 	public String getActivationCode() {
-		return (String) get(13);
+		return (String) get(14);
 	}
 
 	/**
 	 * Setter for <code>user_audit.recovery_code</code>.
 	 */
 	public void setRecoveryCode(String value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.recovery_code</code>.
 	 */
 	public String getRecoveryCode() {
-		return (String) get(14);
+		return (String) get(15);
 	}
 
 	/**
 	 * Setter for <code>user_audit.pending_email</code>.
 	 */
 	public void setPendingEmail(String value) {
-		set(15, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.pending_email</code>.
 	 */
 	public String getPendingEmail() {
-		return (String) get(15);
+		return (String) get(16);
 	}
 
 	/**
 	 * Setter for <code>user_audit.email_modification_date</code>.
 	 */
 	public void setEmailModificationDate(ZonedDateTime value) {
-		set(16, value);
+		set(17, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.email_modification_date</code>.
 	 */
 	public ZonedDateTime getEmailModificationDate() {
-		return (ZonedDateTime) get(16);
+		return (ZonedDateTime) get(17);
 	}
 
 	/**
 	 * Setter for <code>user_audit.email_verification_code</code>.
 	 */
 	public void setEmailVerificationCode(String value) {
-		set(17, value);
+		set(18, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.email_verification_code</code>.
 	 */
 	public String getEmailVerificationCode() {
-		return (String) get(17);
+		return (String) get(18);
 	}
 
 	/**
 	 * Setter for <code>user_audit.password</code>.
 	 */
 	public void setPassword(String value) {
-		set(18, value);
+		set(19, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.password</code>.
 	 */
 	public String getPassword() {
-		return (String) get(18);
+		return (String) get(19);
 	}
 
 	/**
 	 * Setter for <code>user_audit.password_changed_date</code>.
 	 */
 	public void setPasswordChangedDate(ZonedDateTime value) {
-		set(19, value);
+		set(20, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.password_changed_date</code>.
 	 */
 	public ZonedDateTime getPasswordChangedDate() {
-		return (ZonedDateTime) get(19);
+		return (ZonedDateTime) get(20);
 	}
 
 	/**
 	 * Setter for <code>user_audit.previous_passwords</code>.
 	 */
 	public void setPreviousPasswords(String value) {
-		set(20, value);
+		set(21, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.previous_passwords</code>.
 	 */
 	public String getPreviousPasswords() {
-		return (String) get(20);
+		return (String) get(21);
 	}
 
 	/**
 	 * Setter for <code>user_audit.password_attempts</code>.
 	 */
 	public void setPasswordAttempts(Integer value) {
-		set(21, value);
+		set(22, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.password_attempts</code>.
 	 */
 	public Integer getPasswordAttempts() {
-		return (Integer) get(21);
+		return (Integer) get(22);
 	}
 
 	/**
 	 * Setter for <code>user_audit.password_reset_code</code>.
 	 */
 	public void setPasswordResetCode(String value) {
-		set(22, value);
+		set(23, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.password_reset_code</code>.
 	 */
 	public String getPasswordResetCode() {
-		return (String) get(22);
+		return (String) get(23);
 	}
 
 	/**
 	 * Setter for <code>user_audit.password_reset_date</code>.
 	 */
 	public void setPasswordResetDate(ZonedDateTime value) {
-		set(23, value);
+		set(24, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.password_reset_date</code>.
 	 */
 	public ZonedDateTime getPasswordResetDate() {
-		return (ZonedDateTime) get(23);
+		return (ZonedDateTime) get(24);
 	}
 
 	/**
 	 * Setter for <code>user_audit.login_date</code>.
 	 */
 	public void setLoginDate(ZonedDateTime value) {
-		set(24, value);
+		set(25, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.login_date</code>.
 	 */
 	public ZonedDateTime getLoginDate() {
-		return (ZonedDateTime) get(24);
+		return (ZonedDateTime) get(25);
 	}
 
 	/**
 	 * Setter for <code>user_audit.previous_login_date</code>.
 	 */
 	public void setPreviousLoginDate(ZonedDateTime value) {
-		set(25, value);
+		set(26, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.previous_login_date</code>.
 	 */
 	public ZonedDateTime getPreviousLoginDate() {
-		return (ZonedDateTime) get(25);
+		return (ZonedDateTime) get(26);
 	}
 
 	/**
 	 * Setter for <code>user_audit.logout_date</code>.
 	 */
 	public void setLogoutDate(ZonedDateTime value) {
-		set(26, value);
+		set(27, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.logout_date</code>.
 	 */
 	public ZonedDateTime getLogoutDate() {
-		return (ZonedDateTime) get(26);
+		return (ZonedDateTime) get(27);
 	}
 
 	/**
 	 * Setter for <code>user_audit.login_blocking_date</code>.
 	 */
 	public void setLoginBlockingDate(ZonedDateTime value) {
-		set(27, value);
+		set(28, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.login_blocking_date</code>.
 	 */
 	public ZonedDateTime getLoginBlockingDate() {
-		return (ZonedDateTime) get(27);
+		return (ZonedDateTime) get(28);
 	}
 
 	/**
 	 * Setter for <code>user_audit.should_change_password</code>.
 	 */
 	public void setShouldChangePassword(Boolean value) {
-		set(28, value);
+		set(29, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.should_change_password</code>.
 	 */
 	public Boolean getShouldChangePassword() {
-		return (Boolean) get(28);
+		return (Boolean) get(29);
 	}
 
 	/**
 	 * Setter for <code>user_audit.phone</code>.
 	 */
 	public void setPhone(String value) {
-		set(29, value);
+		set(30, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.phone</code>.
 	 */
 	public String getPhone() {
-		return (String) get(29);
+		return (String) get(30);
 	}
 
 	/**
 	 * Setter for <code>user_audit.language_id</code>.
 	 */
 	public void setLanguageId(String value) {
-		set(30, value);
+		set(31, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.language_id</code>.
 	 */
 	public String getLanguageId() {
-		return (String) get(30);
+		return (String) get(31);
 	}
 
 	/**
 	 * Setter for <code>user_audit.user_agent</code>.
 	 */
 	public void setUserAgent(String value) {
-		set(31, value);
+		set(32, value);
 	}
 
 	/**
 	 * Getter for <code>user_audit.user_agent</code>.
 	 */
 	public String getUserAgent() {
-		return (String) get(31);
+		return (String) get(32);
 	}
 
 	// -------------------------------------------------------------------------
@@ -492,10 +507,11 @@ public class UserAuditRecord extends UpdatableRecordImpl<UserAuditRecord> implem
 	/**
 	 * Create a detached, initialised UserAuditRecord
 	 */
-	public UserAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
+	public UserAuditRecord(Long pk, UUID projectId, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
 		super(UserAudit.USER_AUDIT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setAuditActionFk(auditActionFk);
 		setAuditDatetime(auditDatetime);
 		setAuditActor(auditActor);

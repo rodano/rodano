@@ -8,6 +8,7 @@ import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit;
 import ch.rodano.core.model.jooqutils.AuditRecord;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -36,283 +37,297 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 	}
 
 	/**
+	 * Setter for <code>workflow_status_audit.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>workflow_status_audit.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>workflow_status_audit.audit_action_fk</code>.
 	 */
 	public void setAuditActionFk(Long value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_action_fk</code>.
 	 */
 	public Long getAuditActionFk() {
-		return (Long) get(1);
+		return (Long) get(2);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.audit_datetime</code>.
 	 */
 	public void setAuditDatetime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_datetime</code>.
 	 */
 	public ZonedDateTime getAuditDatetime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.audit_actor</code>.
 	 */
 	public void setAuditActor(String value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_actor</code>.
 	 */
 	public String getAuditActor() {
-		return (String) get(3);
+		return (String) get(4);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.audit_user_fk</code>.
 	 */
 	public void setAuditUserFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_user_fk</code>.
 	 */
 	public Long getAuditUserFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.audit_robot_fk</code>.
 	 */
 	public void setAuditRobotFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_robot_fk</code>.
 	 */
 	public Long getAuditRobotFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.audit_context</code>.
 	 */
 	public void setAuditContext(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_context</code>.
 	 */
 	public String getAuditContext() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.audit_object_fk</code>.
 	 */
 	public void setAuditObjectFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.audit_object_fk</code>.
 	 */
 	public Long getAuditObjectFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(8);
+		return (Boolean) get(9);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(9);
+		return (Long) get(10);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.event_fk</code>.
 	 */
 	public void setEventFk(Long value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.event_fk</code>.
 	 */
 	public Long getEventFk() {
-		return (Long) get(10);
+		return (Long) get(11);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.form_fk</code>.
 	 */
 	public void setFormFk(Long value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.form_fk</code>.
 	 */
 	public Long getFormFk() {
-		return (Long) get(11);
+		return (Long) get(12);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.field_fk</code>.
 	 */
 	public void setFieldFk(Long value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.field_fk</code>.
 	 */
 	public Long getFieldFk() {
-		return (Long) get(12);
+		return (Long) get(13);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(13);
+		return (Long) get(14);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.robot_fk</code>.
 	 */
 	public void setRobotFk(Long value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.robot_fk</code>.
 	 */
 	public Long getRobotFk() {
-		return (Long) get(14);
+		return (Long) get(15);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.profile_id</code>.
 	 */
-	public void setProfileId(String value) {
-		set(15, value);
+	public void setProfileId(UUID value) {
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.profile_id</code>.
 	 */
-	public String getProfileId() {
-		return (String) get(15);
+	public UUID getProfileId() {
+		return (UUID) get(16);
 	}
 
 	/**
-	 * Setter for <code>workflow_status_audit.state_id</code>.
+	 * Setter for <code>workflow_status_audit.workflow_state_id</code>.
 	 */
-	public void setStateId(String value) {
-		set(16, value);
+	public void setWorkflowStateId(UUID value) {
+		set(17, value);
 	}
 
 	/**
-	 * Getter for <code>workflow_status_audit.state_id</code>.
+	 * Getter for <code>workflow_status_audit.workflow_state_id</code>.
 	 */
-	public String getStateId() {
-		return (String) get(16);
+	public UUID getWorkflowStateId() {
+		return (UUID) get(17);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.workflow_id</code>.
 	 */
-	public void setWorkflowId(String value) {
-		set(17, value);
+	public void setWorkflowId(UUID value) {
+		set(18, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.workflow_id</code>.
 	 */
-	public String getWorkflowId() {
-		return (String) get(17);
+	public UUID getWorkflowId() {
+		return (UUID) get(18);
 	}
 
 	/**
-	 * Setter for <code>workflow_status_audit.action_id</code>.
+	 * Setter for <code>workflow_status_audit.workflow_action_id</code>.
 	 */
-	public void setActionId(String value) {
-		set(18, value);
+	public void setWorkflowActionId(UUID value) {
+		set(19, value);
 	}
 
 	/**
-	 * Getter for <code>workflow_status_audit.action_id</code>.
+	 * Getter for <code>workflow_status_audit.workflow_action_id</code>.
 	 */
-	public String getActionId() {
-		return (String) get(18);
+	public UUID getWorkflowActionId() {
+		return (UUID) get(19);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.validator_id</code>.
 	 */
-	public void setValidatorId(String value) {
-		set(19, value);
+	public void setValidatorId(UUID value) {
+		set(20, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.validator_id</code>.
 	 */
-	public String getValidatorId() {
-		return (String) get(19);
+	public UUID getValidatorId() {
+		return (UUID) get(20);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.trigger_message</code>.
 	 */
 	public void setTriggerMessage(String value) {
-		set(20, value);
+		set(21, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.trigger_message</code>.
 	 */
 	public String getTriggerMessage() {
-		return (String) get(20);
+		return (String) get(21);
 	}
 
 	// -------------------------------------------------------------------------
@@ -338,10 +353,11 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 	/**
 	 * Create a detached, initialised WorkflowStatusAuditRecord
 	 */
-	public WorkflowStatusAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String profileId, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusAuditRecord(Long pk, UUID projectId, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, UUID profileId, UUID workflowStateId, UUID workflowId, UUID workflowActionId, UUID validatorId, String triggerMessage) {
 		super(WorkflowStatusAudit.WORKFLOW_STATUS_AUDIT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setAuditActionFk(auditActionFk);
 		setAuditDatetime(auditDatetime);
 		setAuditActor(auditActor);
@@ -357,9 +373,9 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 		setUserFk(userFk);
 		setRobotFk(robotFk);
 		setProfileId(profileId);
-		setStateId(stateId);
+		setWorkflowStateId(workflowStateId);
 		setWorkflowId(workflowId);
-		setActionId(actionId);
+		setWorkflowActionId(workflowActionId);
 		setValidatorId(validatorId);
 		setTriggerMessage(triggerMessage);
 		resetChangedOnNotNull();

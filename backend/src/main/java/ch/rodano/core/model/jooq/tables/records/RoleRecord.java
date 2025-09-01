@@ -8,6 +8,7 @@ import ch.rodano.core.model.jooq.tables.Role;
 import ch.rodano.core.model.role.RoleStatus;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -36,101 +37,115 @@ public class RoleRecord extends UpdatableRecordImpl<RoleRecord> {
 	}
 
 	/**
+	 * Setter for <code>role.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>role.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>role.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>role.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>role.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>role.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>role.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>role.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(3);
+		return (Long) get(4);
 	}
 
 	/**
 	 * Setter for <code>role.robot_fk</code>.
 	 */
 	public void setRobotFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>role.robot_fk</code>.
 	 */
 	public Long getRobotFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>role.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>role.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>role.profile_id</code>.
 	 */
-	public void setProfileId(String value) {
-		set(6, value);
+	public void setProfileId(UUID value) {
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>role.profile_id</code>.
 	 */
-	public String getProfileId() {
-		return (String) get(6);
+	public UUID getProfileId() {
+		return (UUID) get(7);
 	}
 
 	/**
 	 * Setter for <code>role.status</code>.
 	 */
 	public void setStatus(RoleStatus value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>role.status</code>.
 	 */
 	public RoleStatus getStatus() {
-		return (RoleStatus) get(7);
+		return (RoleStatus) get(8);
 	}
 
 	// -------------------------------------------------------------------------
@@ -156,10 +171,11 @@ public class RoleRecord extends UpdatableRecordImpl<RoleRecord> {
 	/**
 	 * Create a detached, initialised RoleRecord
 	 */
-	public RoleRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long userFk, Long robotFk, Long scopeFk, String profileId, RoleStatus status) {
+	public RoleRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Long userFk, Long robotFk, Long scopeFk, UUID profileId, RoleStatus status) {
 		super(Role.ROLE);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setUserFk(userFk);

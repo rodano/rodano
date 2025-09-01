@@ -9,6 +9,7 @@ import ch.rodano.core.model.jooqutils.AuditRecord;
 import ch.rodano.core.model.scope.ScopeData;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -37,297 +38,311 @@ public class ScopeAuditRecord extends UpdatableRecordImpl<ScopeAuditRecord> impl
 	}
 
 	/**
+	 * Setter for <code>scope_audit.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>scope_audit.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>scope_audit.audit_action_fk</code>.
 	 */
 	public void setAuditActionFk(Long value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_action_fk</code>.
 	 */
 	public Long getAuditActionFk() {
-		return (Long) get(1);
+		return (Long) get(2);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.audit_datetime</code>.
 	 */
 	public void setAuditDatetime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_datetime</code>.
 	 */
 	public ZonedDateTime getAuditDatetime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.audit_actor</code>.
 	 */
 	public void setAuditActor(String value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_actor</code>.
 	 */
 	public String getAuditActor() {
-		return (String) get(3);
+		return (String) get(4);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.audit_user_fk</code>.
 	 */
 	public void setAuditUserFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_user_fk</code>.
 	 */
 	public Long getAuditUserFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.audit_robot_fk</code>.
 	 */
 	public void setAuditRobotFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_robot_fk</code>.
 	 */
 	public Long getAuditRobotFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.audit_context</code>.
 	 */
 	public void setAuditContext(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_context</code>.
 	 */
 	public String getAuditContext() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.audit_object_fk</code>.
 	 */
 	public void setAuditObjectFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.audit_object_fk</code>.
 	 */
 	public Long getAuditObjectFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.id</code>.
 	 */
 	public void setId(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.id</code>.
 	 */
 	public String getId() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(9);
+		return (Boolean) get(10);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.scope_model_id</code>.
 	 */
-	public void setScopeModelId(String value) {
-		set(10, value);
+	public void setScopeModelId(UUID value) {
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.scope_model_id</code>.
 	 */
-	public String getScopeModelId() {
-		return (String) get(10);
+	public UUID getScopeModelId() {
+		return (UUID) get(11);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.code</code>.
 	 */
 	public void setCode(String value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.code</code>.
 	 */
 	public String getCode() {
-		return (String) get(11);
+		return (String) get(12);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(12);
+		return (String) get(13);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(13);
+		return (String) get(14);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.start_date</code>.
 	 */
 	public void setStartDate(ZonedDateTime value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.start_date</code>.
 	 */
 	public ZonedDateTime getStartDate() {
-		return (ZonedDateTime) get(14);
+		return (ZonedDateTime) get(15);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.stop_date</code>.
 	 */
 	public void setStopDate(ZonedDateTime value) {
-		set(15, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.stop_date</code>.
 	 */
 	public ZonedDateTime getStopDate() {
-		return (ZonedDateTime) get(15);
+		return (ZonedDateTime) get(16);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.virtual</code>.
 	 */
 	public void setVirtual(Boolean value) {
-		set(16, value);
+		set(17, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.virtual</code>.
 	 */
 	public Boolean getVirtual() {
-		return (Boolean) get(16);
+		return (Boolean) get(17);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.color</code>.
 	 */
 	public void setColor(String value) {
-		set(17, value);
+		set(18, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.color</code>.
 	 */
 	public String getColor() {
-		return (String) get(17);
+		return (String) get(18);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.expected_number</code>.
 	 */
 	public void setExpectedNumber(Integer value) {
-		set(18, value);
+		set(19, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.expected_number</code>.
 	 */
 	public Integer getExpectedNumber() {
-		return (Integer) get(18);
+		return (Integer) get(19);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.max_number</code>.
 	 */
 	public void setMaxNumber(Integer value) {
-		set(19, value);
+		set(20, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.max_number</code>.
 	 */
 	public Integer getMaxNumber() {
-		return (Integer) get(19);
+		return (Integer) get(20);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.locked</code>.
 	 */
 	public void setLocked(Boolean value) {
-		set(20, value);
+		set(21, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.locked</code>.
 	 */
 	public Boolean getLocked() {
-		return (Boolean) get(20);
+		return (Boolean) get(21);
 	}
 
 	/**
 	 * Setter for <code>scope_audit.data</code>.
 	 */
 	public void setData(ScopeData value) {
-		set(21, value);
+		set(22, value);
 	}
 
 	/**
 	 * Getter for <code>scope_audit.data</code>.
 	 */
 	public ScopeData getData() {
-		return (ScopeData) get(21);
+		return (ScopeData) get(22);
 	}
 
 	// -------------------------------------------------------------------------
@@ -353,10 +368,11 @@ public class ScopeAuditRecord extends UpdatableRecordImpl<ScopeAuditRecord> impl
 	/**
 	 * Create a detached, initialised ScopeAuditRecord
 	 */
-	public ScopeAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean deleted, String scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
+	public ScopeAuditRecord(Long pk, UUID projectId, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean deleted, UUID scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
 		super(ScopeAudit.SCOPE_AUDIT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setAuditActionFk(auditActionFk);
 		setAuditDatetime(auditDatetime);
 		setAuditActor(auditActor);

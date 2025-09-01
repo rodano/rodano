@@ -6,31 +6,20 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
-import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
-import ch.rodano.core.model.jooq.tables.RoleAudit.RoleAuditPath;
-import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.RoleRecord;
 import ch.rodano.core.model.role.RoleStatus;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.Index;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -72,6 +61,11 @@ public class Role extends TableImpl<RoleRecord> {
 	public final TableField<RoleRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
 
 	/**
+	 * The column <code>role.project_id</code>.
+	 */
+	public final TableField<RoleRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
+
+	/**
 	 * The column <code>role.creation_time</code>.
 	 */
 	public final TableField<RoleRecord, ZonedDateTime> CREATION_TIME = createField(DSL.name("creation_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
@@ -99,7 +93,7 @@ public class Role extends TableImpl<RoleRecord> {
 	/**
 	 * The column <code>role.profile_id</code>.
 	 */
-	public final TableField<RoleRecord, String> PROFILE_ID = createField(DSL.name("profile_id"), SQLDataType.VARCHAR(50).nullable(false), this, "");
+	public final TableField<RoleRecord, UUID> PROFILE_ID = createField(DSL.name("profile_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>role.status</code>.
@@ -135,47 +129,9 @@ public class Role extends TableImpl<RoleRecord> {
 		this(DSL.name("role"), null);
 	}
 
-	public <O extends Record> Role(Table<O> path, ForeignKey<O, RoleRecord> childPath, InverseForeignKey<O, RoleRecord> parentPath) {
-		super(path, childPath, parentPath, ROLE);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class RolePath extends Role implements Path<RoleRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> RolePath(Table<O> path, ForeignKey<O, RoleRecord> childPath, InverseForeignKey<O, RoleRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private RolePath(Name alias, Table<RoleRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public RolePath as(String alias) {
-			return new RolePath(DSL.name(alias), this);
-		}
-
-		@Override
-		public RolePath as(Name alias) {
-			return new RolePath(alias, this);
-		}
-
-		@Override
-		public RolePath as(Table<?> alias) {
-			return new RolePath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
-	}
-
-	@Override
-	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.ROLE_IDX_ROLE_PROFILE_ID);
 	}
 
 	@Override
@@ -186,59 +142,6 @@ public class Role extends TableImpl<RoleRecord> {
 	@Override
 	public UniqueKey<RoleRecord> getPrimaryKey() {
 		return Keys.KEY_ROLE_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<RoleRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_ROLE_ROBOT_FK, Keys.FK_ROLE_SCOPE_FK, Keys.FK_ROLE_USER_FK);
-	}
-
-	private transient RobotPath _robot;
-
-	/**
-	 * Get the implicit join path to the <code>robot</code> table.
-	 */
-	public RobotPath robot() {
-		if (_robot == null)
-			_robot = new RobotPath(this, Keys.FK_ROLE_ROBOT_FK, null);
-
-		return _robot;
-	}
-
-	private transient ScopePath _scope;
-
-	/**
-	 * Get the implicit join path to the <code>scope</code> table.
-	 */
-	public ScopePath scope() {
-		if (_scope == null)
-			_scope = new ScopePath(this, Keys.FK_ROLE_SCOPE_FK, null);
-
-		return _scope;
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_ROLE_USER_FK, null);
-
-		return _user;
-	}
-
-	private transient RoleAuditPath _roleAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>role_audit</code> table
-	 */
-	public RoleAuditPath roleAudit() {
-		if (_roleAudit == null)
-			_roleAudit = new RoleAuditPath(this, null, Keys.FK_ROLE_AUDIT_AUDIT_OBJECT_FK.getInverseKey());
-
-		return _roleAudit;
 	}
 
 	@Override

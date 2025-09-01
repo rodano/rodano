@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.Robot;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,87 +36,101 @@ public class RobotRecord extends UpdatableRecordImpl<RobotRecord> {
 	}
 
 	/**
+	 * Setter for <code>robot.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>robot.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>robot.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>robot.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>robot.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>robot.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>robot.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>robot.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>robot.name</code>.
 	 */
 	public void setName(String value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>robot.name</code>.
 	 */
 	public String getName() {
-		return (String) get(4);
+		return (String) get(5);
 	}
 
 	/**
 	 * Setter for <code>robot.key</code>.
 	 */
 	public void setKey(String value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>robot.key</code>.
 	 */
 	public String getKey() {
-		return (String) get(5);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>robot.activated</code>.
 	 */
 	public void setActivated(Boolean value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>robot.activated</code>.
 	 */
 	public Boolean getActivated() {
-		return (Boolean) get(6);
+		return (Boolean) get(7);
 	}
 
 	// -------------------------------------------------------------------------
@@ -141,10 +156,11 @@ public class RobotRecord extends UpdatableRecordImpl<RobotRecord> {
 	/**
 	 * Create a detached, initialised RobotRecord
 	 */
-	public RobotRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String name, String key, Boolean activated) {
+	public RobotRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String name, String key, Boolean activated) {
 		super(Robot.ROBOT);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);

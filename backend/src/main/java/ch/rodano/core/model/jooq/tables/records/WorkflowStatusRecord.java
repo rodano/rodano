@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables.records;
 import ch.rodano.core.model.jooq.tables.WorkflowStatus;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.jooq.Record1;
 import org.jooq.impl.UpdatableRecordImpl;
@@ -35,213 +36,227 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	}
 
 	/**
+	 * Setter for <code>workflow_status.project_id</code>.
+	 */
+	public void setProjectId(UUID value) {
+		set(1, value);
+	}
+
+	/**
+	 * Getter for <code>workflow_status.project_id</code>.
+	 */
+	public UUID getProjectId() {
+		return (UUID) get(1);
+	}
+
+	/**
 	 * Setter for <code>workflow_status.creation_time</code>.
 	 */
 	public void setCreationTime(ZonedDateTime value) {
-		set(1, value);
+		set(2, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.creation_time</code>.
 	 */
 	public ZonedDateTime getCreationTime() {
-		return (ZonedDateTime) get(1);
+		return (ZonedDateTime) get(2);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.last_update_time</code>.
 	 */
 	public void setLastUpdateTime(ZonedDateTime value) {
-		set(2, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.last_update_time</code>.
 	 */
 	public ZonedDateTime getLastUpdateTime() {
-		return (ZonedDateTime) get(2);
+		return (ZonedDateTime) get(3);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.deleted</code>.
 	 */
 	public void setDeleted(Boolean value) {
-		set(3, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.deleted</code>.
 	 */
 	public Boolean getDeleted() {
-		return (Boolean) get(3);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.scope_fk</code>.
 	 */
 	public void setScopeFk(Long value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.scope_fk</code>.
 	 */
 	public Long getScopeFk() {
-		return (Long) get(4);
+		return (Long) get(5);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.event_fk</code>.
 	 */
 	public void setEventFk(Long value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.event_fk</code>.
 	 */
 	public Long getEventFk() {
-		return (Long) get(5);
+		return (Long) get(6);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.form_fk</code>.
 	 */
 	public void setFormFk(Long value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.form_fk</code>.
 	 */
 	public Long getFormFk() {
-		return (Long) get(6);
+		return (Long) get(7);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.field_fk</code>.
 	 */
 	public void setFieldFk(Long value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.field_fk</code>.
 	 */
 	public Long getFieldFk() {
-		return (Long) get(7);
+		return (Long) get(8);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.user_fk</code>.
 	 */
 	public void setUserFk(Long value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.user_fk</code>.
 	 */
 	public Long getUserFk() {
-		return (Long) get(8);
+		return (Long) get(9);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.robot_fk</code>.
 	 */
 	public void setRobotFk(Long value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.robot_fk</code>.
 	 */
 	public Long getRobotFk() {
-		return (Long) get(9);
+		return (Long) get(10);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.profile_id</code>.
 	 */
-	public void setProfileId(String value) {
-		set(10, value);
+	public void setProfileId(UUID value) {
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.profile_id</code>.
 	 */
-	public String getProfileId() {
-		return (String) get(10);
+	public UUID getProfileId() {
+		return (UUID) get(11);
 	}
 
 	/**
-	 * Setter for <code>workflow_status.state_id</code>.
+	 * Setter for <code>workflow_status.workflow_state_id</code>.
 	 */
-	public void setStateId(String value) {
-		set(11, value);
+	public void setWorkflowStateId(UUID value) {
+		set(12, value);
 	}
 
 	/**
-	 * Getter for <code>workflow_status.state_id</code>.
+	 * Getter for <code>workflow_status.workflow_state_id</code>.
 	 */
-	public String getStateId() {
-		return (String) get(11);
+	public UUID getWorkflowStateId() {
+		return (UUID) get(12);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.workflow_id</code>.
 	 */
-	public void setWorkflowId(String value) {
-		set(12, value);
+	public void setWorkflowId(UUID value) {
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.workflow_id</code>.
 	 */
-	public String getWorkflowId() {
-		return (String) get(12);
+	public UUID getWorkflowId() {
+		return (UUID) get(13);
 	}
 
 	/**
-	 * Setter for <code>workflow_status.action_id</code>.
+	 * Setter for <code>workflow_status.workflow_action_id</code>.
 	 */
-	public void setActionId(String value) {
-		set(13, value);
+	public void setWorkflowActionId(UUID value) {
+		set(14, value);
 	}
 
 	/**
-	 * Getter for <code>workflow_status.action_id</code>.
+	 * Getter for <code>workflow_status.workflow_action_id</code>.
 	 */
-	public String getActionId() {
-		return (String) get(13);
+	public UUID getWorkflowActionId() {
+		return (UUID) get(14);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.validator_id</code>.
 	 */
-	public void setValidatorId(String value) {
-		set(14, value);
+	public void setValidatorId(UUID value) {
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.validator_id</code>.
 	 */
-	public String getValidatorId() {
-		return (String) get(14);
+	public UUID getValidatorId() {
+		return (UUID) get(15);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.trigger_message</code>.
 	 */
 	public void setTriggerMessage(String value) {
-		set(15, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.trigger_message</code>.
 	 */
 	public String getTriggerMessage() {
-		return (String) get(15);
+		return (String) get(16);
 	}
 
 	// -------------------------------------------------------------------------
@@ -267,10 +282,11 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	/**
 	 * Create a detached, initialised WorkflowStatusRecord
 	 */
-	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String profileId, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusRecord(Long pk, UUID projectId, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, UUID profileId, UUID workflowStateId, UUID workflowId, UUID workflowActionId, UUID validatorId, String triggerMessage) {
 		super(WorkflowStatus.WORKFLOW_STATUS);
 
 		setPk(pk);
+		setProjectId(projectId);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
 		setDeleted(deleted);
@@ -281,9 +297,9 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 		setUserFk(userFk);
 		setRobotFk(robotFk);
 		setProfileId(profileId);
-		setStateId(stateId);
+		setWorkflowStateId(workflowStateId);
 		setWorkflowId(workflowId);
-		setActionId(actionId);
+		setWorkflowActionId(workflowActionId);
 		setValidatorId(validatorId);
 		setTriggerMessage(triggerMessage);
 		resetChangedOnNotNull();

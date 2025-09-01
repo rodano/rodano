@@ -6,34 +6,19 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
-import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.Event.EventPath;
-import ch.rodano.core.model.jooq.tables.Field.FieldPath;
-import ch.rodano.core.model.jooq.tables.Form.FormPath;
-import ch.rodano.core.model.jooq.tables.Payment.PaymentPath;
-import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
-import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
-import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit.WorkflowStatusAuditPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowStatusRecord;
 
 import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.Index;
-import org.jooq.InverseForeignKey;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -72,6 +57,11 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	 * The column <code>workflow_status.pk</code>.
 	 */
 	public final TableField<WorkflowStatusRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>workflow_status.project_id</code>.
+	 */
+	public final TableField<WorkflowStatusRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>workflow_status.creation_time</code>.
@@ -121,27 +111,27 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	/**
 	 * The column <code>workflow_status.profile_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> PROFILE_ID = createField(DSL.name("profile_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<WorkflowStatusRecord, UUID> PROFILE_ID = createField(DSL.name("profile_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
-	 * The column <code>workflow_status.state_id</code>.
+	 * The column <code>workflow_status.workflow_state_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> STATE_ID = createField(DSL.name("state_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<WorkflowStatusRecord, UUID> WORKFLOW_STATE_ID = createField(DSL.name("workflow_state_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>workflow_status.workflow_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> WORKFLOW_ID = createField(DSL.name("workflow_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<WorkflowStatusRecord, UUID> WORKFLOW_ID = createField(DSL.name("workflow_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
-	 * The column <code>workflow_status.action_id</code>.
+	 * The column <code>workflow_status.workflow_action_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> ACTION_ID = createField(DSL.name("action_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<WorkflowStatusRecord, UUID> WORKFLOW_ACTION_ID = createField(DSL.name("workflow_action_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>workflow_status.validator_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> VALIDATOR_ID = createField(DSL.name("validator_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<WorkflowStatusRecord, UUID> VALIDATOR_ID = createField(DSL.name("validator_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>workflow_status.trigger_message</code>.
@@ -177,47 +167,9 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 		this(DSL.name("workflow_status"), null);
 	}
 
-	public <O extends Record> WorkflowStatus(Table<O> path, ForeignKey<O, WorkflowStatusRecord> childPath, InverseForeignKey<O, WorkflowStatusRecord> parentPath) {
-		super(path, childPath, parentPath, WORKFLOW_STATUS);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class WorkflowStatusPath extends WorkflowStatus implements Path<WorkflowStatusRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> WorkflowStatusPath(Table<O> path, ForeignKey<O, WorkflowStatusRecord> childPath, InverseForeignKey<O, WorkflowStatusRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private WorkflowStatusPath(Name alias, Table<WorkflowStatusRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public WorkflowStatusPath as(String alias) {
-			return new WorkflowStatusPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public WorkflowStatusPath as(Name alias) {
-			return new WorkflowStatusPath(alias, this);
-		}
-
-		@Override
-		public WorkflowStatusPath as(Table<?> alias) {
-			return new WorkflowStatusPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
-	}
-
-	@Override
-	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.WORKFLOW_STATUS_AGGREGATE_EVENT, Indexes.WORKFLOW_STATUS_AGGREGATE_SCOPE, Indexes.WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_DELETED, Indexes.WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_STATE_ID, Indexes.WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_WORKFLOW_ID);
 	}
 
 	@Override
@@ -228,108 +180,6 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	@Override
 	public UniqueKey<WorkflowStatusRecord> getPrimaryKey() {
 		return Keys.KEY_WORKFLOW_STATUS_PRIMARY;
-	}
-
-	@Override
-	public List<ForeignKey<WorkflowStatusRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_WORKFLOW_STATUS_EVENT_FK, Keys.FK_WORKFLOW_STATUS_FIELD_FK, Keys.FK_WORKFLOW_STATUS_FORM_FK, Keys.FK_WORKFLOW_STATUS_ROBOT_FK, Keys.FK_WORKFLOW_STATUS_SCOPE_FK, Keys.FK_WORKFLOW_STATUS_USER_FK);
-	}
-
-	private transient EventPath _event;
-
-	/**
-	 * Get the implicit join path to the <code>event</code> table.
-	 */
-	public EventPath event() {
-		if (_event == null)
-			_event = new EventPath(this, Keys.FK_WORKFLOW_STATUS_EVENT_FK, null);
-
-		return _event;
-	}
-
-	private transient FieldPath _field;
-
-	/**
-	 * Get the implicit join path to the <code>field</code> table.
-	 */
-	public FieldPath field() {
-		if (_field == null)
-			_field = new FieldPath(this, Keys.FK_WORKFLOW_STATUS_FIELD_FK, null);
-
-		return _field;
-	}
-
-	private transient FormPath _form;
-
-	/**
-	 * Get the implicit join path to the <code>form</code> table.
-	 */
-	public FormPath form() {
-		if (_form == null)
-			_form = new FormPath(this, Keys.FK_WORKFLOW_STATUS_FORM_FK, null);
-
-		return _form;
-	}
-
-	private transient RobotPath _robot;
-
-	/**
-	 * Get the implicit join path to the <code>robot</code> table.
-	 */
-	public RobotPath robot() {
-		if (_robot == null)
-			_robot = new RobotPath(this, Keys.FK_WORKFLOW_STATUS_ROBOT_FK, null);
-
-		return _robot;
-	}
-
-	private transient ScopePath _scope;
-
-	/**
-	 * Get the implicit join path to the <code>scope</code> table.
-	 */
-	public ScopePath scope() {
-		if (_scope == null)
-			_scope = new ScopePath(this, Keys.FK_WORKFLOW_STATUS_SCOPE_FK, null);
-
-		return _scope;
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_WORKFLOW_STATUS_USER_FK, null);
-
-		return _user;
-	}
-
-	private transient PaymentPath _payment;
-
-	/**
-	 * Get the implicit to-many join path to the <code>payment</code> table
-	 */
-	public PaymentPath payment() {
-		if (_payment == null)
-			_payment = new PaymentPath(this, null, Keys.FK_PAYMENT_WORKFLOW_STATUS_FK.getInverseKey());
-
-		return _payment;
-	}
-
-	private transient WorkflowStatusAuditPath _workflowStatusAudit;
-
-	/**
-	 * Get the implicit to-many join path to the <code>workflow_status_audit</code>
-	 * table
-	 */
-	public WorkflowStatusAuditPath workflowStatusAudit() {
-		if (_workflowStatusAudit == null)
-			_workflowStatusAudit = new WorkflowStatusAuditPath(this, null, Keys.FK_WORKFLOW_STATUS_AUDIT_OBJECT_FK.getInverseKey());
-
-		return _workflowStatusAudit;
 	}
 
 	@Override
