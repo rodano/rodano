@@ -4,7 +4,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import ch.rodano.batch.ImportJobProperties;
 
 /**
  * Main class for the Spring application
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class })
 @EnableTransactionManagement
+@EnableConfigurationProperties(ImportJobProperties.class)
 public class RodanoApplication {
 
 	/**
@@ -25,6 +29,6 @@ public class RodanoApplication {
 	 */
 	@SuppressWarnings("resource")
 	public static void main(final String[] args) {
-		new SpringApplication(RodanoApplication.class).run(args);
+		SpringApplication.run(RodanoApplication.class, args);
 	}
 }

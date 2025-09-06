@@ -63,6 +63,9 @@ public class SecurityConfiguration {
 			.authorizeHttpRequests(
 				authorize -> authorize
 					.requestMatchers(HttpMethod.GET, "/config/public-study").permitAll()
+					// batch
+					.requestMatchers(HttpMethod.GET, "/batch/**", "/api/batch/**").permitAll()
+					.requestMatchers(HttpMethod.POST, "/batch/**", "/api/batch/**").permitAll()
 					//administration and database
 					.requestMatchers(HttpMethod.GET, "/administration/database/status", "/administration/maintenance", "/administration/debug", "/administration/is-online").permitAll()
 					.requestMatchers(HttpMethod.POST, "/administration/database/bootstrap").permitAll()

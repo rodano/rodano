@@ -1,0 +1,23 @@
+### Start import job with defaults from application.yml
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
+
+{}
+
+### Start import job with overrides
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
+
+{
+  "projectId": "MS_REG",
+  "config": "file:/tmp/study.json",
+  "dbUrl": "jdbc:mariadb://localhost:3306/rodano",
+  "dbUser": "rodano",
+  "dbPassword": "secret"
+}
+
+### Get status of job execution with id 1
+GET http://localhost:8080/api/batch/execution/1
+
+### Stop execution with id 1
+POST http://localhost:8080/api/batch/execution/1/stop

@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Profile;
 
 import ch.rodano.core.database.initializer.DatabaseInitializer;
@@ -14,7 +15,12 @@ import ch.rodano.core.services.bll.scope.ScopeAncestorServiceImpl;
 
 @Profile({ "api" })
 @Configuration
-@ComponentScan(basePackages = { "ch.rodano.core", "ch.rodano.api", "ch.rodano.studies" })
+@ComponentScan(basePackages = { "ch.rodano.core", "ch.rodano.api", "ch.rodano.batch" },
+	excludeFilters = {
+		@ComponentScan.Filter(type = FilterType.REGEX, pattern = "ch\\.rodano\\.batch\\.processor\\..*"),
+		@ComponentScan.Filter(type = FilterType.REGEX, pattern = "ch\\.rodano\\.batch\\.writer\\..*"),
+		@ComponentScan.Filter(type = FilterType.REGEX, pattern = "ch\\.rodano\\.batch\\.support\\..*")
+	})
 public class ApiConfiguration implements InitializingBean {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 

@@ -59,6 +59,141 @@ This profile will migrate a database. Here is an example of how to launch a data
 mvn spring-boot:run -Dspring-boot.run.profiles=migration -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/config.json -Drodano.database.name=database_name"
 ```
 
+## Batch Import
+
+The application uses JBeret (Jakarta Batch implementation) to import configuration from JSON files into the database. The batch import reads the study configuration and populates model tables including:
+
+* Workflows and workflow states
+* Forms and field models
+* Charts and reports
+* Profiles and permissions
+* Scope models and event models
+* Validators and rules
+* Menus and widgets
+* And other configuration entities
+
+### Batch Import Process
+
+The batch import job (`import-config`) consists of 21 sequential steps that populate different model tables. Each step reads a specific section from the JSON configuration file and inserts the corresponding records into the database.
+
+The main steps include:
+1. Project and rule definitions
+2. Features and resource categories
+3. Dataset models
+4. **Workflows** (including workflow states and actions)
+5. Profiles
+6. Form models and field models
+7. Scope models and event models
+8. Payment plans
+9. Reports, charts, and graphs
+10. Workflow widgets and summaries
+11. Menus
+12. Profile rights and permissions
+13. Privacy policies
+14. Validators
+15. Event action rules
+16. Crons and selections
+
+### Running Batch Import via API
+
+The batch import is executed via REST API endpoints. Start the application in `api` profile, then make HTTP requests to trigger the import.
+
+#### Start a Batch Import Job
+
+Using default configuration from `application.yml`:
+```http
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
+
+{}
+```
+
+With custom parameters:
+```http
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
+
+{
+  "projectId": "MY_PROJECT",
+  "config": "file:/path/to/config.json",
+  "dbUrl": "jdbc:mariadb://localhost:3306/rodano",
+  "dbUser": "user",
+  "dbPass": "password"
+}
+```
+
+#### Check Batch Job Status by Execution ID
+```http
+GET http://localhost:8080/api/batch/execution/1
+```
+
+Response includes:
+- Job execution status (STARTING, STARTED, COMPLETED, FAILED)
+- Start and end times
+- Exit status
+- Details for each step
+
+#### Stop a Running Batch Job
+```http
+POST http://localhost:8080/api/batch/execution/1/stop
+```
+
+### Batch Import Configuration
+
+Configure default batch import parameters in `application.yml`:
+```yaml
+batch:
+  import:
+    job: import-config
+    projectId: MY_PROJECT
+    config: file:/path/to/config.json
+    db:
+      url: jdbc:mariadb://localhost:3306/rodano
+      user: user
+      password: password
+```
+
+These defaults are used when making a batch import request without parameters.
+
+### Full Database Initialization Workflow
+
+To initialize a completely new database:
+
+1. **Create the database schema:**
+```bash
+   mvn spring-boot:run \
+  -Dspring-boot.run.profiles=database \
+  -Dspring-boot.run.arguments="--rodano.config=/absolute/path/to/config.json \ 
+  --rodano.database.name=database_name \ 
+  --rodano.init.with-data=true --rodano.init.with-users=true --rodano.init.users-password=MySuperPassword"
+```
+This creates all tables and seeds the runtime tables (scope, user, etc.) and creates the uuid links to the models.
+
+2. **Start the Application:**
+```bash
+   mvn spring-boot:run
+```
+
+3. **Run the batch import via HTTP:**
+```http
+   POST http://localhost:8080/api/batch/import
+   Content-Type: application/json
+   
+   {}
+```
+
+4. **Wait for completion** - Monitor the job status until it shows `COMPLETED`
+
+
+### Important Notes
+
+* The batch import must be run **after** the database schema is created
+* The batch import uses deterministic UUID generation to ensure consistent identifiers across imports
+* If you modify your JSON configuration, truncate the model tables and re-run the batch import
+* Each batch import execution is tracked with a unique execution ID that can be used to monitor progress
+* The batch import runs in a separate transaction for each chunk (default 100-200 items per chunk)
+
+
 ## Configuration properties
 
 The application and its profiles rely on configuration properties. The default values for these properties are stored in files in the folder `src/main/resources`. On top of the global `application.properties` file, which contains configuration properties for Spring Boot and general Rodano settings, each profile has its own property file named `application-xxx.properties`.
