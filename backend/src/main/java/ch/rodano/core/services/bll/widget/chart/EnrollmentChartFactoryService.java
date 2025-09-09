@@ -86,7 +86,7 @@ public class EnrollmentChartFactoryService {
 					.map(target -> new ChartDatasetPoint<ZonedDateTime, Integer>(target.getDate(), target.getExpectedNumber()))
 					.forEach(expectedTimepoints::add);
 
-				datasets.add(new ChartDatasetDTO<ZonedDateTime, Integer>(String.format("%s (expected)", scope.getCode()), timepoints));
+				datasets.add(new ChartDatasetDTO<ZonedDateTime, Integer>(String.format("%s (expected)", scope.getCode()), expectedTimepoints));
 			}
 		}
 		return datasets;
