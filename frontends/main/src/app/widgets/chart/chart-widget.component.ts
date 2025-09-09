@@ -142,25 +142,6 @@ export class ChartWidgetComponent implements OnChanges {
 		});
 	}
 
-	//transform statistics data into percent data series
-	/*const datasets = data.series.map(series => {
-		const valuesMap = new Map(series.values.map(([x, y]) => [x === '' ? 'N/A' : x, y]));
-		let dataPoints = allX.map(x => valuesMap.get(x) ?? 0);
-
-		//Percentage logic (optional)
-		if(options.percentage) {
-			const total = dataPoints.reduce((sum, val) => sum + val, 0);
-			dataPoints = dataPoints.map(val =>
-				total ? +(100 * val / total).toFixed(2) : 0
-			);
-		}
-
-		return {
-			label: series.label,
-			data: dataPoints
-		};
-	});*/
-
 	getGraphType(type: ChartType): string {
 		switch(type) {
 			case ChartType.ENROLLMENT_BY_SCOPE:
