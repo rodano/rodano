@@ -158,7 +158,7 @@ public class StatisticsChartFactoryService {
 						final var value = Double.parseDouble(entry.getKey());
 						final var weight = entry.getValue();
 						//add value the number of times that it appears
-						for(int i = 0; i <= weight; i++) {
+						for(int i = 0; i < weight; i++) {
 							values.add(value);
 						}
 					}
