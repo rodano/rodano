@@ -29,6 +29,7 @@ export class ChartWidgetComponent implements OnChanges {
 				displayColors: false
 			}
 		},
+		pointStyle: false,
 		scales: {
 			x: {
 				//display the x-axis title
@@ -122,6 +123,11 @@ export class ChartWidgetComponent implements OnChanges {
 			//configure x-scale for chart based on time
 			if([ChartType.ENROLLMENT, ChartType.WORKFLOW_STATUS].includes(chart.model.type)) {
 				this.options.scales.x.type = 'time';
+				this.options.interaction = {
+					mode: 'nearest',
+					axis: 'xy',
+					intersect: false
+				};
 				this.options.scales.x.ticks = {
 					callback: function (value: number) {
 						const date = new Date(value);
