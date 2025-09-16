@@ -81,6 +81,7 @@ bootstrapApplication(AppComponent, {
 		ActuatorService,
 		provideAnimations(),
 		provideHttpClient(withInterceptorsFromDi()),
-		provideRouter(APP_ROUTES, withComponentInputBinding(), withRouterConfig({paramsInheritanceStrategy: 'always'})), provideCharts(withDefaultRegisterables())
+		provideRouter(APP_ROUTES, withComponentInputBinding(), withRouterConfig({paramsInheritanceStrategy: 'always'})),
+		provideCharts(withDefaultRegisterables())
 	]
 }).catch(err => console.error(err));

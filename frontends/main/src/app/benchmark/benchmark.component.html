@@ -97,6 +97,8 @@
 	@for (widget of widgets; track $index) {
 		<app-chart-widget
 			[id]="$any(widget.parameters['chart'])"
+			[scopes]="chartScopes"
+			[criteria]="chartCriteria"
 			[class]="'half-width'">
 		</app-chart-widget>
 	}

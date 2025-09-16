@@ -2,7 +2,7 @@
 	width: 10rem;
 }
 tr {
-	border: 0;
+	border: none;
 	&.dataset {
 		cursor: pointer;
 	}

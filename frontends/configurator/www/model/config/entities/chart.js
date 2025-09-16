@@ -15,19 +15,17 @@ export class Chart extends DisplayableNode {
 			legendX: {type: 'object'},
 			legendY: {type: 'object'},
 			colors: {type: 'array'},
-			backgroundColor: {type: 'string'},
 			overrideUserRights: {type: 'boolean'},
-			valuesMin: {type: 'number'},
-			valuesMax: {type: 'number'},
 			withStatistics: {type: 'boolean'},
-			usePercentile: {type: 'boolean'},
-			request: {type: 'object'},
 			ranges: {type: 'array', subtype: Entities.ChartRange.name},
 			workflowId: {type: 'string'},
 			includedStateIds: {type: 'array'},
 			excludedStateIds: {type: 'array'},
 			scopeModelId: {type: 'string'},
 			leafScopeModelId: {type: 'string'},
+			eventModelId: {type: 'string'},
+			datasetModelId: {type: 'string'},
+			fieldModelId: {type: 'string'},
 			enrollmentWorkflowId: {type: 'string'},
 			enrollmentStateIds: {type: 'array'},
 			displayExpected: {type: 'boolean'}
@@ -43,22 +41,20 @@ export class Chart extends DisplayableNode {
 		this.description = {};
 		this.type = 'STATISTICS';
 		this.title = {};
-		this.legendX = {x: undefined, y: undefined, color: undefined, labels: {}};
-		this.legendY = {x: undefined, y: undefined, color: undefined, labels: {}};
+		this.legendX = {};
+		this.legendY = {};
 		this.colors = [];
-		this.backgroundColor = undefined;
 		this.overrideUserRights = false;
-		this.valuesMin = undefined;
-		this.valuesMax = undefined;
 		this.withStatistics = false;
-		this.usePercentile = false;
-		this.request = {};
 		this.ranges = [];
 		this.workflowId = undefined;
 		this.includedStateIds = [];
 		this.excludedStateIds = [];
 		this.scopeModelId = undefined;
 		this.leafScopeModelId = undefined;
+		this.eventModelId = undefined;
+		this.datasetModelId = undefined;
+		this.fieldModelId = undefined;
 		this.enrollmentWorkflowId = undefined;
 		this.enrollmentStateIds = [];
 		this.displayExpected = false;
@@ -119,6 +115,35 @@ export class Chart extends DisplayableNode {
 		}
 		if(this.enrollmentWorkflowId === event.oldParent.id) {
 			this.enrollmentStateIds.removeElement(event.node.id);
+		}
+	}
+
+	onChangeDatasetModelId(event) {
+		if(this.datasetModelId === event.oldValue) {
+			this.datasetModelId = event.newValue;
+		}
+	}
+	onDeleteDatasetModel(event) {
+		if(this.datasetModelId === event.node.id) {
+			this.datasetModelId = undefined;
+			this.fieldModelId = undefined;
+		}
+	}
+
+	onChangeFieldModelId(event) {
+		if(this.fieldModelId && this.fieldModelId === event.oldValue) {
+			this.fieldModelId = event.newValue;
+		}
+	}
+	onDeleteFieldModel(event) {
+		if(this.datasetModelId === event.node.datasetModel.id && this.fieldModelId === event.node.id) {
+			this.datasetModelId = undefined;
+			this.fieldModelId = undefined;
+		}
+	}
+	onMoveFieldModel(event) {
+		if(this.datasetModelId === event.oldParent.id && this.fieldModelId === event.node.id) {
+			this.datasetModelId = event.newParent.id;
 		}
 	}
 }

@@ -1708,7 +1708,7 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.getValue('#menu_action_context'), '["CENTER"]', 'Menu action context is ["CENTER"]');
 			await driver.submit('#edit_menu_form');
 			//check that parameters have been saved
-			await driver.click('#tree ul.entities > li > ul.menu > li:nth-child(11) a[href="#node=Study:TEST|Menu:USERS"]');
+			await driver.click('#tree ul.entities > li > ul.menu > li:nth-child(10) a[href="#node=Study:TEST|Menu:USERS"]');
 			await driver.wait();
 			assert.equal(await driver.getValue('#menu_id'), 'USERS', 'Third menu id is "USERS"');
 			await driver.click('#tree ul.entities > li > ul.menu > li:nth-child(2) a[href="#node=Study:TEST|Menu:CENTERS"]');
@@ -1794,7 +1794,7 @@ export default async function test(bundle, assert, driver) {
 	await bundle.describe('tree', async feature => {
 		const study = StudyHandler.GetStudy();
 		//check configuration has been loaded
-		assert.equal(study.menus.length, 11, 'There are 11 menus in configuration');
+		assert.equal(study.menus.length, 10, 'There are 10 menus in configuration');
 
 		await feature.it('expands and collapses the whole tree', async () => {
 			//expand and collapse tree

@@ -3,13 +3,14 @@ package ch.rodano.configuration.model.chart;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,7 +19,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
-import ch.rodano.configuration.model.request.Request;
+import ch.rodano.configuration.model.dataset.DatasetModel;
+import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.utils.DisplayableUtils;
@@ -36,30 +38,16 @@ public class Chart implements Node, Comparable<Chart> {
 	private Map<String, String> title;
 	private ChartType type;
 
-	private Legend legendX, legendY;
+	private Map<String, String> legendX;
+	private Map<String, String> legendY;
 
 	private List<String> colors;
-	private String backgroundColor;
-
-	private Integer marginLeft;
-	private Integer marginRight;
-	private Integer marginTop;
-	private Integer marginBottom;
 
 	//statistic chart
-	private Request request;
-	private String eventModelId;
 	private String datasetModelId;
 	private String fieldModelId;
-
 	private List<ChartRange> ranges;
-	private Float valuesMin;
-	private Float valuesMax;
-
-	private boolean fillDataGaps;
-	private boolean verticalLines;
 	private boolean withStatistics;
-	private boolean usePercentile;
 
 	//workflow chart
 	private String workflowId;
@@ -95,9 +83,6 @@ public class Chart implements Node, Comparable<Chart> {
 	@JsonBackReference
 	public void setStudy(final Study study) {
 		this.study = study;
-		if(request != null) {
-			request.setStudy(this.study);
-		}
 	}
 
 	public String getId() {
@@ -112,7 +97,7 @@ public class Chart implements Node, Comparable<Chart> {
 		return shortname;
 	}
 
-	public final void setShortname(final SortedMap<String, String> shortname) {
+	public final void setShortname(final Map<String, String> shortname) {
 		this.shortname = shortname;
 	}
 
@@ -120,7 +105,7 @@ public class Chart implements Node, Comparable<Chart> {
 		return description;
 	}
 
-	public final void setDescription(final SortedMap<String, String> description) {
+	public final void setDescription(final Map<String, String> description) {
 		this.description = description;
 	}
 
@@ -128,7 +113,7 @@ public class Chart implements Node, Comparable<Chart> {
 		return longname;
 	}
 
-	public final void setLongname(final SortedMap<String, String> longname) {
+	public final void setLongname(final Map<String, String> longname) {
 		this.longname = longname;
 	}
 
@@ -152,20 +137,28 @@ public class Chart implements Node, Comparable<Chart> {
 		return DisplayableUtils.getLocalizedMap(title, languages);
 	}
 
-	public Legend getLegendX() {
+	public Map<String, String> getLegendX() {
 		return legendX;
 	}
 
-	public void setLegendX(final Legend legendX) {
+	public void setLegendX(final Map<String, String> legendX) {
 		this.legendX = legendX;
 	}
 
-	public Legend getLegendY() {
+	public String getLocalizedLegendX(final String... languages) {
+		return DisplayableUtils.getLocalizedMap(legendX, languages);
+	}
+
+	public Map<String, String> getLegendY() {
 		return legendY;
 	}
 
-	public void setLegendY(final Legend legendY) {
+	public void setLegendY(final Map<String, String> legendY) {
 		this.legendY = legendY;
+	}
+
+	public String getLocalizedLegendY(final String... languages) {
+		return DisplayableUtils.getLocalizedMap(legendY, languages);
 	}
 
 	public List<String> getColors() {
@@ -174,46 +167,6 @@ public class Chart implements Node, Comparable<Chart> {
 
 	public void setColors(final List<String> colors) {
 		this.colors = colors;
-	}
-
-	public String getBackgroundColor() {
-		return backgroundColor;
-	}
-
-	public void setBackgroundColor(final String backgroundColor) {
-		this.backgroundColor = backgroundColor;
-	}
-
-	public Integer getMarginBottom() {
-		return marginBottom;
-	}
-
-	public void setMarginBottom(final Integer marginBottom) {
-		this.marginBottom = marginBottom;
-	}
-
-	public Integer getMarginLeft() {
-		return marginLeft;
-	}
-
-	public void setMarginLeft(final Integer marginLeft) {
-		this.marginLeft = marginLeft;
-	}
-
-	public Integer getMarginRight() {
-		return marginRight;
-	}
-
-	public void setMarginRight(final Integer marginRight) {
-		this.marginRight = marginRight;
-	}
-
-	public Integer getMarginTop() {
-		return marginTop;
-	}
-
-	public void setMarginTop(final Integer marginTop) {
-		this.marginTop = marginTop;
 	}
 
 	@Override
@@ -237,23 +190,6 @@ public class Chart implements Node, Comparable<Chart> {
 	}
 
 	//statistics
-	public Request getRequest() {
-		return request;
-	}
-
-	public void setRequest(final Request request) {
-		this.request = request;
-		this.request.setStudy(study);
-	}
-
-	public final String getEventModelId() {
-		return eventModelId;
-	}
-
-	public final void setEventModelId(final String eventId) {
-		this.eventModelId = eventId;
-	}
-
 	public final String getDatasetModelId() {
 		return datasetModelId;
 	}
@@ -286,46 +222,6 @@ public class Chart implements Node, Comparable<Chart> {
 		this.withStatistics = withStatistics;
 	}
 
-	public boolean isUsePercentile() {
-		return usePercentile;
-	}
-
-	public void setUsePercentile(final boolean statisticsUsePercentile) {
-		usePercentile = statisticsUsePercentile;
-	}
-
-	public Float getValuesMin() {
-		return valuesMin;
-	}
-
-	public void setValuesMin(final Float valuesMin) {
-		this.valuesMin = valuesMin;
-	}
-
-	public Float getValuesMax() {
-		return valuesMax;
-	}
-
-	public void setValuesMax(final Float valuesMax) {
-		this.valuesMax = valuesMax;
-	}
-
-	public boolean getFillDataGaps() {
-		return fillDataGaps;
-	}
-
-	public void setFillDataGaps(final boolean fillDataGaps) {
-		this.fillDataGaps = fillDataGaps;
-	}
-
-	public boolean getVerticalLines() {
-		return verticalLines;
-	}
-
-	public void setVerticalLines(final boolean verticalLines) {
-		this.verticalLines = verticalLines;
-	}
-
 	@JsonIgnore
 	public boolean hasRange() {
 		return !ranges.isEmpty();
@@ -333,7 +229,7 @@ public class Chart implements Node, Comparable<Chart> {
 
 	@JsonIgnore
 	public List<String> getRangesIds() {
-		return getRanges().stream().map(ChartRange::getId).collect(Collectors.toCollection(LinkedList::new));
+		return ranges.stream().map(ChartRange::getId).toList();
 	}
 
 	public ChartRange getRangeFromId(final String rangeId) {
@@ -344,13 +240,18 @@ public class Chart implements Node, Comparable<Chart> {
 	}
 
 	@JsonIgnore
-	public ChartRange getOtherRange() {
-		return ranges.stream().filter(r -> r.getOther()).findAny().orElseThrow();
+	public List<ChartRange> getValueRanges() {
+		return ranges.stream().filter(r -> StringUtils.isNotBlank(r.getValue())).toList();
 	}
 
 	@JsonIgnore
-	public List<ChartRange> getDisplayableRanges() {
-		return getRanges().stream().filter(ChartRange::getShow).toList();
+	public List<ChartRange> getNumericRanges() {
+		return ranges.stream().filter(r -> Objects.nonNull(r.getMin()) && Objects.nonNull(r.getMax())).toList();
+	}
+
+	@JsonIgnore
+	public Optional<ChartRange> getOtherRange() {
+		return ranges.stream().filter(r -> r.getOther()).findAny();
 	}
 
 	//workflow chart
@@ -412,6 +313,16 @@ public class Chart implements Node, Comparable<Chart> {
 	@JsonIgnore
 	public final ScopeModel getScopeModel() {
 		return study.getScopeModel(scopeModelId);
+	}
+
+	@JsonIgnore
+	public DatasetModel getDatasetModel() {
+		return study.getDatasetModel(datasetModelId);
+	}
+
+	@JsonIgnore
+	public FieldModel getFieldModel() {
+		return getDatasetModel().getFieldModel(fieldModelId);
 	}
 
 	//enrollment by date

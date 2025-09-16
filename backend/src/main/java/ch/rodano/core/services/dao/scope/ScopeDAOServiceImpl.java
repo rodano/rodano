@@ -482,7 +482,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					final var criterionValue = criterion.value();
 
 					final var operatedFieldName = String.format("%s.%s", datasetModel.getExportTableName(), fieldModel.getId());
-					final var operatedField = field(operatedFieldName);
+					final var operatedField = field(operatedFieldName, String.class);
 					final var fieldCondition = JOOQTranslator.translate(operator, fieldModel, operatedField, criterionValue);
 
 					criteriaCondition = criteriaCondition.and(fieldCondition);

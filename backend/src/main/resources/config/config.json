@@ -25,8 +25,9 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 119,
-	"configDate": 1748855790029,
+	"configVersion": 120,
+	"configDate": 1756481458698,
+	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
 		"en",
@@ -5845,6 +5846,151 @@
 					"maxIntegerDigits": 3,
 					"minValue": 0,
 					"maxValue": 130,
+					"matcherMessage": {},
+					"withYears": false,
+					"withMonths": false,
+					"withDays": false,
+					"withHours": false,
+					"withMinutes": false,
+					"withSeconds": false,
+					"yearsMandatory": true,
+					"monthsMandatory": true,
+					"daysMandatory": true,
+					"hoursMandatory": true,
+					"minutesMandatory": true,
+					"secondsMandatory": true,
+					"advancedHelp": {},
+					"className": "FieldModel"
+				},
+				{
+					"id": "INITIAL_EDSS",
+					"shortname": {
+						"en": "Initial EDSS"
+					},
+					"longname": {},
+					"description": {},
+					"type": "NUMBER",
+					"dataType": "NUMBER",
+					"plugin": true,
+					"valueConstraint": {
+						"conditions": {
+							"SCOPE": {
+								"mode": "OR",
+								"conditions": [
+									{
+										"id": "11",
+										"criterion": {
+											"property": "EVENT",
+											"values": [],
+											"className": "RuleConditionCriterion"
+										},
+										"inverse": false,
+										"dependency": false,
+										"breakType": "NONE",
+										"mode": "OR",
+										"conditions": [
+											{
+												"id": "111",
+												"criterion": {
+													"property": "ID",
+													"operator": "EQUALS",
+													"values": [
+														"BASELINE"
+													],
+													"className": "RuleConditionCriterion"
+												},
+												"inverse": false,
+												"dependency": false,
+												"breakType": "NONE",
+												"mode": "OR",
+												"conditions": [
+													{
+														"id": "1111",
+														"criterion": {
+															"property": "DATASET",
+															"values": [],
+															"className": "RuleConditionCriterion"
+														},
+														"inverse": false,
+														"dependency": false,
+														"breakType": "NONE",
+														"mode": "OR",
+														"conditions": [
+															{
+																"id": "11111",
+																"criterion": {
+																	"property": "ID",
+																	"operator": "EQUALS",
+																	"values": [
+																		"VISIT_DOCUMENTATION"
+																	],
+																	"className": "RuleConditionCriterion"
+																},
+																"inverse": false,
+																"dependency": false,
+																"breakType": "NONE",
+																"mode": "OR",
+																"conditions": [
+																	{
+																		"id": "111111",
+																		"criterion": {
+																			"property": "FIELD",
+																			"values": [],
+																			"className": "RuleConditionCriterion"
+																		},
+																		"inverse": false,
+																		"dependency": false,
+																		"breakType": "NONE",
+																		"mode": "OR",
+																		"conditions": [
+																			{
+																				"id": "EDSS_SCORE",
+																				"criterion": {
+																					"property": "ID",
+																					"operator": "EQUALS",
+																					"values": [
+																						"EDSS_SCORE"
+																					],
+																					"className": "RuleConditionCriterion"
+																				},
+																				"inverse": false,
+																				"dependency": false,
+																				"breakType": "NONE",
+																				"mode": "OR",
+																				"conditions": [],
+																				"className": "RuleCondition"
+																			}
+																		],
+																		"className": "RuleCondition"
+																	}
+																],
+																"className": "RuleCondition"
+															}
+														],
+														"className": "RuleCondition"
+													}
+												],
+												"className": "RuleCondition"
+											}
+										],
+										"className": "RuleCondition"
+									}
+								],
+								"className": "RuleConditionList"
+							}
+						},
+						"evaluations": [],
+						"className": "RuleConstraint"
+					},
+					"valueFormula": "=EDSS_SCORE:VALUE_NUMBER",
+					"possibleValues": [],
+					"validatorIds": [],
+					"workflowIds": [],
+					"rules": [],
+					"searchable": false,
+					"readOnly": false,
+					"exportable": true,
+					"allowDateInFuture": false,
 					"matcherMessage": {},
 					"withYears": false,
 					"withMonths": false,
@@ -22351,8 +22497,7 @@
 				"LOCK_SUMMARY",
 				"DATA_MANAGEMENT_STATUS",
 				"STUDY_MANAGEMENT",
-				"SEND_MAIL",
-				"CONFIGURATION"
+				"SEND_MAIL"
 			],
 			"grantedCategoryIds": [
 				"NEWSLETTERS",
@@ -24394,7 +24539,6 @@
 				"SEARCH",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
-				"CONFIGURATION",
 				"LOCK_SUMMARY",
 				"DATA_MANAGEMENT_STATUS",
 				"STUDY_MANAGEMENT"
@@ -26264,7 +26408,7 @@
 								"className": "CMSWidget"
 							},
 							{
-								"type": "HIGHCHART",
+								"type": "CHART",
 								"parameters": {
 									"title": "Patient enrollment by dates",
 									"chart": "ENROLLMENT"
@@ -26276,7 +26420,7 @@
 								"className": "CMSWidget"
 							},
 							{
-								"type": "HIGHCHART",
+								"type": "CHART",
 								"parameters": {
 									"title": "Patient enrollment by center",
 									"chart": "ENROLLMENT_BY_CENTER"
@@ -26288,9 +26432,9 @@
 								"className": "CMSWidget"
 							},
 							{
-								"type": "HIGHCHART",
+								"type": "CHART",
 								"parameters": {
-									"chart": "ENROLLMENT_OF_CENTERS"
+									"chart": "OPEN_CENTERS"
 								},
 								"width": "FULL",
 								"requiredRight": {
@@ -26907,7 +27051,7 @@
 										"className": "CMSWidget"
 									},
 									{
-										"type": "HIGHCHART",
+										"type": "CHART",
 										"parameters": {
 											"type": "HIGHCHART",
 											"chart": "ENROLLMENT"
@@ -27001,7 +27145,7 @@
 								},
 								"widgets": [
 									{
-										"type": "HIGHCHART",
+										"type": "CHART",
 										"parameters": {
 											"chart": "GENDER"
 										},
@@ -27012,22 +27156,11 @@
 										"className": "CMSWidget"
 									},
 									{
-										"type": "HIGHCHART",
+										"type": "CHART",
 										"parameters": {
 											"chart": "EDSS_AT_BASELINE"
 										},
-										"width": "HALF",
-										"requiredRight": {
-											"className": "ScopeCriterionRight"
-										},
-										"className": "CMSWidget"
-									},
-									{
-										"type": "HIGHCHART",
-										"parameters": {
-											"chart": "EDSS_PROGRESSION"
-										},
-										"width": "HALF",
+										"width": "FULL",
 										"requiredRight": {
 											"className": "ScopeCriterionRight"
 										},
@@ -27071,7 +27204,7 @@
 								},
 								"widgets": [
 									{
-										"type": "HIGHCHART",
+										"type": "CHART",
 										"parameters": {
 											"chart": "GENDER"
 										},
@@ -27079,7 +27212,7 @@
 										"className": "CMSWidget"
 									},
 									{
-										"type": "HIGHCHART",
+										"type": "CHART",
 										"parameters": {
 											"chart": "AGE_AT_DIAGNOSIS"
 										},
@@ -27087,7 +27220,7 @@
 										"className": "CMSWidget"
 									},
 									{
-										"type": "HIGHCHART",
+										"type": "CHART",
 										"parameters": {
 											"chart": "EDSS_AT_BASELINE"
 										},
@@ -27298,29 +27431,6 @@
 			},
 			"submenus": [],
 			"className": "Menu"
-		},
-		{
-			"id": "CONFIGURATION",
-			"shortname": {
-				"en": "Configuration"
-			},
-			"longname": {
-				"en": "Configuration"
-			},
-			"description": {
-				"en": "This is the configuration"
-			},
-			"public": false,
-			"homePage": false,
-			"action": {
-				"labels": {},
-				"page": "configuration",
-				"context": [],
-				"parameters": {},
-				"className": "CMSAction"
-			},
-			"submenus": [],
-			"className": "Menu"
 		}
 	],
 	"privacyPolicies": [
@@ -27420,42 +27530,16 @@
 				"fr": "EDSS à la visite d'inclusion"
 			},
 			"legendX": {
-				"labels": {
-					"en": "EDSS",
-					"fr": "EDSS"
-				},
-				"x": 47,
-				"y": 75,
-				"color": "#333333"
+				"en": "EDSS",
+				"fr": "EDSS"
 			},
 			"legendY": {
-				"labels": {
-					"en": "Number of patients (%)",
-					"fr": "Nombre de patients (%)"
-				},
-				"x": 2,
-				"y": 50,
-				"color": "#333333"
+				"en": "Number of patients",
+				"fr": "Nombre de patients"
 			},
-			"colors": [
-				"#6a98af"
-			],
+			"colors": [],
 			"overrideUserRights": false,
 			"withStatistics": true,
-			"usePercentile": false,
-			"request": {
-				"parameters": [],
-				"resultType": "PERCENT",
-				"results": [
-					{
-						"ignoreNull": true,
-						"scopeModelId": "PATIENT",
-						"datasetModelId": "VISIT_DOCUMENTATION",
-						"eventModelId": "BASELINE",
-						"fieldModelId": "EDSS_SCORE"
-					}
-				]
-			},
 			"ranges": [
 				{
 					"id": "0.0",
@@ -27464,7 +27548,6 @@
 					},
 					"value": "0.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27474,7 +27557,6 @@
 					},
 					"value": "1.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27484,7 +27566,6 @@
 					},
 					"value": "1.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27494,7 +27575,6 @@
 					},
 					"value": "2.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27504,7 +27584,6 @@
 					},
 					"value": "2.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27514,7 +27593,6 @@
 					},
 					"value": "3.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27524,7 +27602,6 @@
 					},
 					"value": "3.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27534,7 +27611,6 @@
 					},
 					"value": "4.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27544,7 +27620,6 @@
 					},
 					"value": "4.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27554,7 +27629,6 @@
 					},
 					"value": "5.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27564,7 +27638,6 @@
 					},
 					"value": "5.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27574,7 +27647,6 @@
 					},
 					"value": "6.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27584,7 +27656,6 @@
 					},
 					"value": "6.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27594,7 +27665,6 @@
 					},
 					"value": "7.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27604,7 +27674,6 @@
 					},
 					"value": "7.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27614,7 +27683,6 @@
 					},
 					"value": "8.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27624,7 +27692,6 @@
 					},
 					"value": "8.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27634,7 +27701,6 @@
 					},
 					"value": "9.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27644,7 +27710,6 @@
 					},
 					"value": "9.5",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27654,12 +27719,14 @@
 					},
 					"value": "10.0",
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				}
 			],
 			"includedStateIds": [],
 			"excludedStateIds": [],
+			"leafScopeModelId": "PATIENT",
+			"datasetModelId": "PATIENT_DOCUMENTATION",
+			"fieldModelId": "INITIAL_EDSS",
 			"enrollmentStateIds": [],
 			"displayExpected": false,
 			"className": "Chart"
@@ -27673,36 +27740,21 @@
 			"description": {},
 			"type": "ENROLLMENT",
 			"title": {
-				"en": "Enrollment status"
+				"en": "Patient enrollment"
 			},
-			"legendX": {
-				"labels": {
-					"en": "Enrollment status"
-				},
-				"x": 47,
-				"y": 85,
-				"color": "#624d5a"
-			},
+			"legendX": {},
 			"legendY": {
-				"labels": {
-					"en": "Number of patients"
-				},
-				"x": 2,
-				"y": 50,
-				"color": "#624d5a"
+				"en": "Number of patients"
 			},
-			"colors": [
-				"#6a98af"
-			],
+			"colors": [],
 			"overrideUserRights": true,
 			"withStatistics": false,
-			"usePercentile": false,
-			"request": {},
 			"ranges": [],
 			"includedStateIds": [],
 			"excludedStateIds": [],
+			"leafScopeModelId": "PATIENT",
 			"enrollmentStateIds": [],
-			"displayExpected": false,
+			"displayExpected": true,
 			"className": "Chart"
 		},
 		{
@@ -27714,26 +27766,15 @@
 			"description": {},
 			"type": "ENROLLMENT_BY_SCOPE",
 			"title": {
-				"en": "Enrollment by center"
+				"en": "Patient enrollment by center"
 			},
-			"legendX": {
-				"labels": {},
-				"color": "#000000"
-			},
+			"legendX": {},
 			"legendY": {
-				"labels": {},
-				"color": "#000000"
+				"en": "Number of patients"
 			},
-			"colors": [
-				"#6a98af",
-				"#66ccff",
-				"#336699",
-				"#db4c3c"
-			],
-			"overrideUserRights": false,
+			"colors": [],
+			"overrideUserRights": true,
 			"withStatistics": false,
-			"usePercentile": false,
-			"request": {},
 			"ranges": [],
 			"includedStateIds": [],
 			"excludedStateIds": [],
@@ -27756,43 +27797,19 @@
 				"fr": "Distribution du sexe"
 			},
 			"legendX": {
-				"labels": {
-					"en": "Gender",
-					"fr": "Sexe"
-				},
-				"x": 47,
-				"y": 75,
-				"color": "#333333"
+				"en": "Gender",
+				"fr": "Sexe"
 			},
 			"legendY": {
-				"labels": {
-					"en": "Number of patients (%)",
-					"fr": "Nombre de patients (%)"
-				},
-				"x": 2,
-				"y": 50,
-				"color": "#333333"
+				"en": "Number of patients",
+				"fr": "Nombre de patients"
 			},
 			"colors": [
-				"#6a98af",
-				"#ff0800"
+				"#f00",
+				"#00f"
 			],
 			"overrideUserRights": false,
-			"withStatistics": true,
-			"usePercentile": false,
-			"request": {
-				"parameters": [],
-				"resultType": "PERCENT",
-				"results": [
-					{
-						"ignoreNull": true,
-						"eventSourceParameter": "",
-						"scopeModelId": "PATIENT",
-						"datasetModelId": "PATIENT_DOCUMENTATION",
-						"fieldModelId": "GENDER"
-					}
-				]
-			},
+			"withStatistics": false,
 			"ranges": [
 				{
 					"id": "FEMALE",
@@ -27802,7 +27819,6 @@
 					},
 					"value": "FEMALE",
 					"other": false,
-					"show": false,
 					"className": "ChartRange"
 				},
 				{
@@ -27813,81 +27829,36 @@
 					},
 					"value": "MALE",
 					"other": false,
-					"show": false,
 					"className": "ChartRange"
 				}
 			],
 			"includedStateIds": [],
 			"excludedStateIds": [],
+			"leafScopeModelId": "PATIENT",
+			"datasetModelId": "PATIENT_DOCUMENTATION",
+			"fieldModelId": "GENDER",
 			"enrollmentStateIds": [],
 			"displayExpected": false,
 			"className": "Chart"
 		},
 		{
-			"id": "EDSS_PROGRESSION",
+			"id": "OPEN_CENTERS",
 			"shortname": {
-				"en": "EDSS progression"
-			},
-			"longname": {},
-			"description": {},
-			"type": "STATISTICS",
-			"title": {
-				"en": "Progression of EDSS",
-				"fr": "Progression de l'EDSS"
-			},
-			"legendX": {
-				"labels": {},
-				"color": "#000000"
-			},
-			"legendY": {
-				"labels": {
-					"en": "EDSS",
-					"fr": "EDSS"
-				},
-				"x": 2,
-				"y": 50,
-				"color": "#333333"
-			},
-			"colors": [
-				"#6a98af"
-			],
-			"overrideUserRights": false,
-			"valuesMin": 0,
-			"valuesMax": 10,
-			"withStatistics": true,
-			"usePercentile": false,
-			"request": {},
-			"ranges": [],
-			"includedStateIds": [],
-			"excludedStateIds": [],
-			"enrollmentStateIds": [],
-			"displayExpected": false,
-			"className": "Chart"
-		},
-		{
-			"id": "ENROLLMENT_OF_CENTERS",
-			"shortname": {
-				"en": "Enrollment of centers"
+				"en": "Open centers"
 			},
 			"longname": {},
 			"description": {},
 			"type": "WORKFLOW_STATUS",
-			"title": {},
-			"legendX": {
-				"color": "#000000",
-				"labels": {}
+			"title": {
+				"en": "Open centers"
 			},
+			"legendX": {},
 			"legendY": {
-				"color": "#000000",
-				"labels": {}
+				"en": "Number of centers"
 			},
-			"colors": [
-				"#6a98af"
-			],
-			"overrideUserRights": false,
+			"colors": [],
+			"overrideUserRights": true,
 			"withStatistics": false,
-			"usePercentile": false,
-			"request": {},
 			"ranges": [],
 			"workflowId": "CENTER_STATUS",
 			"includedStateIds": [
@@ -27910,39 +27881,14 @@
 				"en": "Age at diagnosis"
 			},
 			"legendX": {
-				"x": 45,
-				"y": 75,
-				"color": "#000000",
-				"labels": {
-					"en": "Age (years)"
-				}
+				"en": "Age (years)"
 			},
 			"legendY": {
-				"x": 2,
-				"y": 50,
-				"color": "#000000",
-				"labels": {
-					"en": "Number of patients (%)"
-				}
+				"en": "Number of patients"
 			},
-			"colors": [
-				"#6a98af"
-			],
+			"colors": [],
 			"overrideUserRights": false,
 			"withStatistics": true,
-			"usePercentile": false,
-			"request": {
-				"parameters": [],
-				"resultType": "PERCENT",
-				"results": [
-					{
-						"ignoreNull": false,
-						"scopeModelId": "PATIENT",
-						"datasetModelId": "PATIENT_DOCUMENTATION",
-						"fieldModelId": "AGE_AT_DIAGNOSIS"
-					}
-				]
-			},
 			"ranges": [
 				{
 					"id": "0-19",
@@ -27953,7 +27899,6 @@
 					"min": 0,
 					"max": 20,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27965,7 +27910,6 @@
 					"min": 20,
 					"max": 30,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27977,7 +27921,6 @@
 					"min": 30,
 					"max": 40,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -27989,7 +27932,6 @@
 					"min": 40,
 					"max": 50,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -28001,7 +27943,6 @@
 					"min": 50,
 					"max": 60,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -28013,7 +27954,6 @@
 					"min": 60,
 					"max": 70,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -28025,7 +27965,6 @@
 					"min": 70,
 					"max": 80,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -28037,7 +27976,6 @@
 					"min": 80,
 					"max": 120,
 					"other": false,
-					"show": true,
 					"className": "ChartRange"
 				},
 				{
@@ -28047,12 +27985,14 @@
 					},
 					"value": "",
 					"other": true,
-					"show": true,
 					"className": "ChartRange"
 				}
 			],
 			"includedStateIds": [],
 			"excludedStateIds": [],
+			"leafScopeModelId": "PATIENT",
+			"datasetModelId": "PATIENT_DOCUMENTATION",
+			"fieldModelId": "AGE_AT_DIAGNOSIS",
 			"enrollmentStateIds": [],
 			"displayExpected": false,
 			"className": "Chart"

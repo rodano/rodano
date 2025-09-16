@@ -48,8 +48,8 @@ export class WidgetService {
 		return `${this.apiService.getApiUrl()}/widget/workflow/${widgetId}/export?scopePks=${scopePks}`;
 	}
 
-	getHighchartWidgetData(chartId: string, scopePks, criteria): Observable<WidgetChart> {
-		return this.http.post<WidgetChart>(`${this.apiService.getApiUrl()}/widget/highchart/${chartId}`, criteria, {params: {scopePks}});
+	getChartWidgetData(chartId: string, scopePks: number[], criteria): Observable<WidgetChart> {
+		return this.http.post<WidgetChart>(`${this.apiService.getApiUrl()}/widget/chart/${chartId}`, criteria, {params: {scopePks}});
 	}
 
 }

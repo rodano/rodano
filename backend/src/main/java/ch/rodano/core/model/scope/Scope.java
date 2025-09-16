@@ -31,6 +31,12 @@ public class Scope extends ScopeRecord implements DeletableObject, Timestampable
 		.thenComparing(Scope::getCreationTime)
 		.thenComparing(Scope::getPk);
 
+	public static final Comparator<Scope> DEPTH_COMPARATOR = Comparator
+		.comparing(Scope::getScopeModel, ScopeModel.COMPARATOR_DEPTH)
+		.thenComparing(Scope::getCode)
+		.thenComparing(Scope::getCreationTime)
+		.thenComparing(Scope::getPk);
+
 	private Long pk;
 	protected ZonedDateTime creationTime;
 	protected ZonedDateTime lastUpdateTime;

@@ -11,18 +11,18 @@ import {MatTableModule} from '@angular/material/table';
 	]
 })
 export class GeneralInfoWidgetComponent implements OnInit {
-	generalInfos: {title: string; value: string}[] = [];
+	info: {title: string; value: string}[] = [];
 
 	columnsToDisplay: string[] = ['title', 'value'];
-	dataSource = this.generalInfos;
+	dataSource = this.info;
 
 	constructor(
 		private widgetService: WidgetService
 	) {}
 
 	ngOnInit(): void {
-		this.widgetService.getGeneralInfo().subscribe(infos => {
-			this.generalInfos = infos;
+		this.widgetService.getGeneralInfo().subscribe(info => {
+			this.info = info;
 		});
 	}
 }

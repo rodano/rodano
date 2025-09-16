@@ -78,13 +78,6 @@
 					<includeExpression>scope_ancestor.virtual | scope_ancestor.default | scope_ancestor.direct | scope_ancestor.ancestor_deleted</includeExpression>
 					<includeTypes>.*</includeTypes>
 				</forcedType>
-
-				<forcedType>
-					<userType>ch.rodano.core.services.dao.chart.ChartType</userType>
-					<enumConverter>true</enumConverter>
-					<includeExpression>chart.chart_type</includeExpression>
-					<includeTypes>.*</includeTypes>
-				</forcedType>
 			</forcedTypes>
 
 			<!-- this is useless at the moment
