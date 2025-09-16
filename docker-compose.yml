@@ -35,7 +35,6 @@ services:
         target: /app
         read_only: false
     working_dir: /app
-    command: mvn compile -o -DskipTests
 
 #this service can be removed if an external SMTP server is used
   smtp:

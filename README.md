@@ -10,7 +10,7 @@ The detailed content of this repository is the following:
 
 ## Start Rodano locally
 
-To start Rodano locally, you must already have access to a study repository, containing the configuration of the study and its custom code.
+To start Rodano locally, you need a configuration file. You can use a study repository if you have access to one, as it contains the study's configuration and custom code. Alternatively, you can use the test configuration that's already embedded in this repository.
 
 ### Requirements
 
@@ -25,6 +25,8 @@ TAG=rodano-version
 The variables to configure are:
 - `STUDY_PATH`: the path to a folder containing a study repository (including its configuration and its custom code)
 - `TAG`: the version of Rodano to use, using a Git tag
+
+To use the embedded test configuration, `STUDY_PATH` must be set to `/path/to/rodano/repository///backend/src/man/resources/config`.
 
 Then, run:
 ```

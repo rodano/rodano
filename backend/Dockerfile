@@ -17,6 +17,11 @@ FROM builder AS plugins-compiler
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano image containing the bits required to compile study plugins"
 
+COPY compile-plugins.sh /usr/local/bin/compile-plugins.sh
+RUN chmod +x /usr/local/bin/compile-plugins.sh
+
+ENTRYPOINT ["compile-plugins.sh"]
+
 # build a light image containing only the backend
 FROM eclipse-temurin:23
 
