@@ -1,5 +1,5 @@
 ---
-- name: Create instance on Google Compute Engine
+- name: Set up Rodano on a Debian server
   hosts: rodanos
   vars:
     study_path: /opt/study
