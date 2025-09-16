@@ -1,4 +1,4 @@
-FROM mariadb:11.7
+FROM mariadb:12.0
 
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano database dumper container"
