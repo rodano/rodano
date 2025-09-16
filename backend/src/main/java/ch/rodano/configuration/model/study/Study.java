@@ -125,7 +125,7 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	private String versionDate;
 	private String versionNumber;
 
-	//filled by kvconfig
+	//filled by the configurator
 	private int configVersion;
 	private Date configDate;
 	private String configUser;
