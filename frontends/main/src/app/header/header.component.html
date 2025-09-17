@@ -4,9 +4,9 @@
 			@if (logo) {
 				<img
 					[src]="'data:image/svg+xml;base64,' + logo"
-					[alt]="study?.shortname | localizeMap" />
+					[alt]="study.shortname | localizeMap" />
 			} @else {
-				{{ study?.shortname | localizeMap }}
+				{{ study.shortname | localizeMap }}
 			}
 		</a>
 	</h1>
@@ -62,7 +62,7 @@
 			</a>
 
 			<!-- Profile selector for super users -->
-			@if (study?.environment === environment.DEV) {
+			@if (study.environment === environment.DEV) {
 				<mat-menu #appMenu="matMenu">
 					<!-- Hard code admin profile for superusers to be able to restore their admin profile -->
 					<button

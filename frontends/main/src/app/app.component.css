@@ -2,7 +2,26 @@
 header {
 	height: 4rem;
 }
-div {
+#stamp {
+	color: white;
+	font-size: 2rem;
+	font-weight: bold;
+	background-color: red;
+	width: 20rem; /* must be wide enough to overflow the corner when rotated */
+	height: 3rem;
+	line-height: 3rem;
+	position: fixed;
+	/* position the center of the box at the position (0,0) */
+	top: -1.5rem; /* half height */
+	left: -10rem; /* half width */
+	text-align: center;
+	z-index: 10;
+	transform-origin: center;
+	transform: translate(2.5rem, 2.5rem) rotate(-45deg);
+	user-select: none;
+	pointer-events: none;
+}
+#content {
 	flex: 1;
 	height: calc(100vh - 5.5rem);
 	box-sizing: border-box;
@@ -13,7 +32,6 @@ div {
 		padding: 1rem;
 	}
 }
-
 footer {
 	height: 1.5rem;
 	line-height: 1.5rem;

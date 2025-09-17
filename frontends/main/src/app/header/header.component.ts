@@ -1,4 +1,4 @@
-import {Component, OnInit, DestroyRef} from '@angular/core';
+import {Component, OnInit, DestroyRef, Input} from '@angular/core';
 import {Router, RouterLinkActive, RouterLink} from '@angular/router';
 import {MenuDTO} from '@core/model/menu-dto';
 import {switchMap} from 'rxjs/operators';
@@ -40,7 +40,8 @@ export class HeaderComponent implements OnInit {
 	environment = Environment;
 	adminProfileId = 'ADMIN';
 
-	study?: PublicStudyDTO;
+	@Input() study: PublicStudyDTO;
+
 	logo?: string;
 	user?: UserDTO;
 	menus?: MenuDTO[];
@@ -56,25 +57,9 @@ export class HeaderComponent implements OnInit {
 		private router: Router) {}
 
 	ngOnInit() {
-		//set the CSS color variables to the body
-		this.configurationService.getPublicStudy()
-			.subscribe(study => {
-				this.study = study;
-				if(study.logo) {
-					this.logo = btoa(study.logo);
-				}
-
-				document.body.style.setProperty('--mat-sys-primary', study.color);
-				document.body.style.setProperty('--mat-sys-on-primary', 'white');
-
-				document.body.style.setProperty('--mat-sys-outline', study.color);
-				//document.body.style.setProperty('--mat-icon-color', study.color);
-
-				document.body.style.setProperty('--mat-sys-primary-container', 'color(from var(--mat-sys-primary) display-p3 calc(r - 0.1) calc(g - 0.1) calc(b - 0.1))');
-				document.body.style.setProperty('--mat-sys-on-primary-container', 'white');
-				document.body.style.setProperty('--mat-sys-secondary-container', 'color(from var(--mat-sys-primary) display-p3 calc(r - 0.1) calc(g - 0.1) calc(b - 0.1))');
-				document.body.style.setProperty('--mat-sys-on-secondary-container', 'white');
-			});
+		if(this.study.logo) {
+			this.logo = btoa(this.study.logo);
+		}
 
 		this.authStateService.listenConnectedUser().pipe(
 			takeUntilDestroyed(this.destroyRef),
