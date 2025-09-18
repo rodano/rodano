@@ -1,0 +1,272 @@
+:root {
+	--border-color: #888;
+	--border-radius: 0.5rem;
+
+	--selected-background-color: #444;
+	--selected-color: #ddd;
+
+	--highlight-background-color: #ddd;
+	--highlight-color: #555;
+
+	--text-block-container-padding: 0.5rem;
+	--text-inline-container-padding: 0.2rem 0.5rem;
+
+	accent-color: #5bd4d4;
+}
+html {
+	font-family: 'Open Sans';
+	font-size: 80%; /*let users choose their own font size, but decrease this size a little bit as most browsers have default font size set to 16px*/
+}
+body {
+	margin: 0;
+	padding: 1rem;
+	&:has(button.loading) {
+		cursor: wait;
+		& * {
+			cursor: wait;
+		}
+	}
+}
+h1 {
+	margin: 0.5rem 0;
+}
+h2 {
+	margin: 0 0 0.5rem 0;
+}
+h3 {
+	margin: 0.5rem 0;
+}
+ul {
+	padding: 0 1rem;
+}
+section {
+	margin: 1rem 0;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius);
+	padding: 0 1rem 1rem 1rem;
+}
+details {
+	margin: 0.5rem 0;
+}
+summary {
+	cursor: pointer;
+}
+progress {
+	display: none;
+	margin-top: 1rem;
+	width: 100%;
+}
+small {
+	color: #888;
+}
+
+/* forms */
+label > span {
+	float: left;
+	width: 20rem;
+	padding-top: 0.2rem;
+}
+input {
+	border: 1px solid #aaa;
+	&[disabled] {
+		opacity: 0.8;
+		cursor: not-allowed;
+		background-color: #eee;
+		border: 1px solid #eee;
+	}
+}
+
+/* buttons */
+button, a.button {
+	display: inline-block;
+	height: 2rem;
+	box-sizing: border-box;
+	font-family: inherit;
+	color: black;
+	padding: var(--text-inline-container-padding);
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius);
+	background-color: #eee;
+	cursor: pointer;
+	&:hover:not([disabled]) {
+		background-color: var(--selected-background-color);
+		color: var(--selected-color);
+	}
+	&[disabled] {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+	&.loading::after {
+		content: url("../images/loading.png");
+		margin-left: 0.2rem;
+		vertical-align: sub;
+	}
+}
+a.button {
+	line-height: 1.5rem;
+	text-decoration: none;
+	vertical-align: bottom;
+}
+
+/* dialogs */
+dialog::backdrop {
+	background-color: #eee;
+	opacity: 0.9;
+}
+dialog {
+	position: fixed;
+	z-index: 100;
+	width: 70%;
+	height: 40rem;
+	padding: 1rem;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius);
+	box-sizing: border-box;
+	&.full {
+		height: 80%;
+		width: 80%;
+	}
+	& > :is(form, div) {
+		display: flex; /*dialog cannot be displayed flex directly because the display property is managed by the Javascript dialog API*/
+		flex-direction: column;
+		flex-wrap: nowrap;
+		height: 100%;
+		width: 100%;
+		& > menu {
+			margin: auto 0 0 0;
+			text-align: right;
+		}
+	}
+	dialog .textcontent {
+		padding: var(--text-block-container-padding);
+		overflow: auto;
+	}
+}
+
+#error {
+	background-color: #f8d7da;
+	border: 1px solid #721c24;
+	color: #721c24;
+	height: 10rem;
+	width: 50rem;
+}
+
+/* notifications */
+#notification {
+	position: fixed;
+	display: none;
+	top: 2rem;
+	right: 2rem;
+	width: 25rem;
+	z-index: 10;
+	border: 1px solid var(--border-color);
+	border-radius: var(--border-radius);
+	background-color: var(--highlight-background-color);
+	color: var(--highlight-color);
+	padding: var(--text-block-container-padding);
+
+	& > h2 {
+		font-size: 1rem;
+		font-weight: bold;
+		margin-top: 0;
+	}
+
+	& > p {
+		margin: 0;
+	}
+}
+#notification_icon {
+	width: 1.5rem;
+	height: 1.5rem;
+	margin-right: 0.5rem;
+	vertical-align: middle;
+}
+
+#tasks {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	z-index: 11;
+}
+#tasks > div {
+	background-color: var(--highlight-background-color);
+	color: var(--highlight-color);
+	border: 1px solid var(--border-color);
+	padding: var(--text-block-container-padding);
+}
+
+/* generic classes */
+.error, .warning {
+	margin: 0 0 1rem 0;
+	padding: var(--text-block-container-padding);
+	border-radius: var(--border-radius);
+	&.error {
+		background-color: #f8d7da;
+		border: 1px solid #721c24;
+		color: #721c24;
+	}
+	&.warning {
+		background-color: #fff3cd;
+		border: 1px solid #856404;
+		color: #856404;
+	}
+	&:empty {
+		display: none;
+	}
+}
+
+.sha1 {
+	font-family: 'Inconsolata';
+	color: #111;
+}
+
+.environment {
+	margin-left: 0.5rem;
+	background-color: black;
+	color: white;
+	font-size: 0.9rem;
+	padding: var(--text-inline-container-padding);
+	border-radius: var(--border-radius);
+	vertical-align: middle;
+}
+
+.console {
+	max-height: 50rem;
+	overflow: auto;
+	margin: 0;
+	font-family: 'Inconsolata';
+	color: #0f0;
+	list-style: none;
+	background-color: black;
+	padding: var(--text-block-container-padding);
+	&:empty {
+		display: none;
+	}
+}
+
+/* animations */
+@keyframes fadein {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+@keyframes fadeout {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+.fadeout {
+	animation-duration: 1s;
+	animation-name: fadeout;
+}
+.fadein {
+	animation-duration: 1s;
+	animation-name: fadein;
+}

@@ -1,0 +1,4 @@
+/website/.venv
+*.pyc
+
+/website/static/node_modules

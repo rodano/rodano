@@ -1,0 +1,8 @@
+{
+	"files.exclude": {
+		"website/.venv": true,
+		"website/__pycache__*": true,
+		"website/static/node_modules": true,
+		"website/static/package-lock.json": true
+	}
+}

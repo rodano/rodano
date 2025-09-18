@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="description" content="Rodano management website"/>
+		<title>Rodano manager</title>
+		<!--icons inclusion-->
+		<link rel="icon" type="image/png" href="images/icon_small.png"/>
+		<!--css inclusion-->
+		<link href="https://fonts.googleapis.com/css?family=Inconsolata|Open+Sans:400,700" rel="stylesheet"/>
+		<link href="css/index.css" rel="stylesheet" type="text/css" title="default"/>
+		<!--javascript inclusion-->
+		<script type="module" src="js/index.js"></script>
+	</head>
+	<body>
+		<!-- dialogs -->
+		<dialog id="control">
+			<div>
+				<h2>Control</h2>
+				<p id="control_connected_users_warning" class="error"></p>
+				<div>
+					<p id="control_error" class="error"></p>
+					<p id="control_confirmation"></p>
+					<progress id="control_progress" value="0" max="1"></progress>
+					<p id="control_progress_message"></p>
+				</div>
+				<menu>
+					<a id="control_close" href="#" class="button">Cancel</a>
+					<button id="control_validate">Validate</button>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="reset">
+			<form id="reset_form" method="dialog">
+				<h2>Reset</h2>
+				<p id="reset_prod_warning" class="error">This is an application in production. Beware!</p>
+				<p id="reset_error" class="error"></p>
+
+				This will delete the database and restore a default database containing only default users.
+				<p>
+					<label>
+						<span>Repository reference</span>
+						<input
+							name="reference"
+							inputmode="verbatim"
+							maxlength="40"
+							class="sha1"
+							placeholder="origin/master"
+							style="width: 20rem; margin-bottom: 0.5rem;"
+						/>
+						<small>Leave blank to use origin/master.</small>
+					</label>
+				</p>
+				<p>
+					<label>
+						<span>Add demo users</span>
+						<input name="demo_users" type="checkbox"/>
+					</label>
+				</p>
+				<p>
+					<label>
+						<span>Demo users password</span>
+						<input name="demo_users_password" style="width: 8rem;"/>
+						<button id="reset_generate_password" type="button">Generate password</button>
+						<small>Leave blank to use default password.</small>
+					</label>
+				</p>
+				<p>
+					<label>
+						<span>Add demo data</span>
+						<input name="demo_data" type="checkbox"/>
+					</label>
+				</p>
+				<p>
+					<button>Reset database</button>
+				</p>
+
+				<progress id="reset_progress" value="0" max="1"></progress>
+
+				<menu>
+					<a id="reset_close" href="#" class="button">Cancel</a>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="restore">
+			<div>
+				<h2>Restore</h2>
+				<p id="restore_prod_warning" class="error">This is an application in production. Beware!</p>
+				<p id="restore_error" class="error"></p>
+
+				<p>This will delete the existing database and data and restore the selected backup. This may take a while.</p>
+
+				<h3>Restore a backup from the backup storage</h3>
+				<form id="restore_storage">
+					<p>
+						<label>
+							<span>Backup</span>
+							<select name="file" required="required" style="width: 20rem;"></select>
+							<img id="restore_storage_loading" src="images/loading.png" alt="Loading" style="margin-left: 2px; vertical-align: text-top; visibility: hidden;"/>
+						</label>
+					</p>
+					<p>
+						<button>Restore backup</button>
+					</p>
+				</form>
+
+				<h3>Restore a backup file</h3>
+				<form id="restore_file">
+					The file must be a zip file containing the following files:
+					<ul>
+						<li>
+							<strong>database.sql.gz</strong> containing the SQL dump of the database, gzipped (optional)
+						</li>
+						<li>
+							<strong>data.tar.gz</strong> containing the user content files, gzipped (optional)
+						</li>
+					</ul>
+					<p>
+						<label>
+							<span>File</span>
+							<input type="file" name="file" required="required" style="width: 20rem;"/>
+						</label>
+					</p>
+					<p>
+						<button>Restore backup</button>
+					</p>
+				</form>
+
+				<progress id="restore_progress" value="0" max="1"></progress>
+				<p id="restore_progress_message"></p>
+
+				<menu>
+					<a id="restore_close" href="#" class="button">Cancel</a>
+				</menu>
+			</div>
+		</dialog>
+
+		<dialog id="backup">
+			<form id="backup_form" method="dialog">
+				<h2>Backup</h2>
+				<p id="backup_not_prod_warning" class="error">This is not a production application. Beware!</p>
+				<p id="backup_error" class="error"></p>
+				<p>
+					<label>
+						Please enter a rationale for the backup:
+						<br/>
+						<input name="rationale" required="required" style="box-sizing: border-box; width: 100%;"/>
+					</label>
+				</p>
+
+				<progress id="backup_progress" value="0" max="1"></progress>
+				<p id="backup_progress_message"></p>
+
+				<menu>
+					<a id="backup_close" href="#" class="button">Cancel</a>
+					<button id="backup_validate">Backup</button>
+				</menu>
+			</form>
+		</dialog>
+
+		<dialog id="token">
+			<form id="token_form" method="dialog">
+				<h2>Authentication required</h2>
+				<p>A valid token is required to use the manager.</p>
+
+				<p>
+					<label>
+						<span>Token</span>
+						<input
+							type="password"
+							name="token"
+							required="required"
+							autocomplete="off"
+							style="width: 30rem;"
+						/>
+					</label>
+				</p>
+
+				<p>
+					<label>
+						<input type="checkbox" name="save"/>
+						Save token in local storage
+					</label>
+				</p>
+
+				<menu>
+					<button>Validate</button>
+				</menu>
+			</form>
+		</dialog>
+
+		<!--notification-->
+		<div id="notification">
+			<h2>
+				<img id="notification_icon" alt="Notification icon"/>
+				<span id="notification_title"></span>
+			</h2>
+			<p id="notification_body"></p>
+		</div>
+
+		<!--tasks-->
+		<div id="tasks"></div>
+
+		<!--error-->
+		<dialog id="error">
+			<div>
+				<p id="error_message"></p>
+				<menu>
+					<button id="error_close">Close</button>
+				</menu>
+			</div>
+		</dialog>
+
+		<!-- real content -->
+		<h1>
+			Rodano manager
+			<img id="deployer_status" src="images/blue_circle.png" alt="Deployer status" style="margin-left: 0.5rem;"/>
+			<!--preload disconnected status icon-->
+			<img src="images/red_circle.png" alt="Deployer status" style="visibility: hidden;"/>
+		</h1>
+
+		<main style="display: none;">
+			<p id="error_not_started" class="error">
+				The backend container is not started. Application details won't be available until the backend container is started.
+			</p>
+			<h2>
+				<span id="application_name"></span>
+				<span id="application_environment" class="environment"></span>
+			</h2>
+
+			<section>
+				<h3>Control</h3>
+				<a id="application_stop" href="#action=control&id=stop" title="Stop application" class="button">Stop</a>
+				<a id="application_start" href="#action=control&id=start" title="Start application" class="button">Start</a>
+				<a id="application_restart" href="#action=control&id=restart" title="Restart application" class="button">Restart</a>
+			</section>
+
+			<section>
+				<h3>Backup & Restore</h3>
+				<ul id="application_backups"></ul>
+				<p id="application_running_warning" class="warning">The application must be stopped to restore a backup</p>
+				<a id="application_backup" href="#action=backup" class="button">Backup</a>
+				<a id="application_reset" href="#action=reset" class="button" style="display: none;">Reset</a>
+				<a id="application_restore" href="#action=restore" class="button">Restore</a>
+			</section>
+
+			<section>
+				<h3>Status</h3>
+				<details>
+					<summary>Environment variables</summary>
+					<ul id="application_environment_variables" class="console"></ul>
+				</details>
+				<details>
+					<summary id="connected_users_message">Connected users</summary>
+					<ul id="connected_users" class="console"></ul>
+				</details>
+				<details>
+					<summary>Logs</summary>
+					<pre id="application_logs" class="console"></pre>
+				</details>
+			</section>
+		</main>
+	</body>
+</html>
