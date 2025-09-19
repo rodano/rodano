@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {StudyDTO} from '@core/model/study-dto';
+import {Study} from '@core/model/study';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {MatTabsModule} from '@angular/material/tabs';
 import {RouterLink, RouterLinkActive, RouterOutlet, Routes} from '@angular/router';
@@ -40,7 +40,7 @@ export class HelpComponent implements OnInit {
 		}
 	];
 
-	study: StudyDTO;
+	study: Study;
 
 	constructor(
 		public configurationService: ConfigurationService

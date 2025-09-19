@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {CMSLayoutDTO} from '@core/model/cms-layout-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {CMSLayout} from '@core/model/cms-layout';
+import {Scope} from '@core/model/scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {GenericWidgetComponent} from '../generic-widget/generic-widget.component';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
@@ -15,7 +15,7 @@ import {FieldModelCriterion} from '@core/model/field-model-criterion';
 	]
 })
 export class WidgetLayoutComponent {
-	@Input() layout: CMSLayoutDTO;
-	@Input() rootScopes: ScopeDTO[];
+	@Input() layout: CMSLayout;
+	@Input() rootScopes: Scope[];
 	@Input() criteria?: FieldModelCriterion[];
 }

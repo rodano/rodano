@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {NotificationService} from 'src/app/services/notification.service';
-import {TimelineGraphDataDTO} from '@core/model/timeline-graph-data-dto';
+import {TimelineGraphData} from '@core/model/timeline-graph-data';
 import {WorkflowStatusComponent} from '../workflow-status/workflow-status.component';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {IssueViewerComponent} from '../issue-viewer/issue-viewer.component';
@@ -28,8 +28,8 @@ import {CRFChangeService} from '../services/crf-change.service';
 export class ScopeDashboardComponent {
 	workflowableEntity = WorkflowableEntity;
 
-	@Input() scope: ScopeDTO;
-	graphs: TimelineGraphDataDTO[] = [];
+	@Input() scope: Scope;
+	graphs: TimelineGraphData[] = [];
 
 	constructor(
 		private scopeService: ScopeService,
@@ -120,7 +120,7 @@ export class ScopeDashboardComponent {
 		});
 	}
 
-	onWorkflowExecution(newScope: WorkflowableDTO) {
-		this.scope = newScope as ScopeDTO;
+	onWorkflowExecution(newScope: Workflowable) {
+		this.scope = newScope as Scope;
 	}
 }

@@ -1,8 +1,8 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
-import {WorkflowUpdateDTO} from '@core/model/workflow-update-dto';
-import {WorkflowActionDTO} from '@core/model/workflow-action-dto';
-import {WorkflowStatusDTO} from '@core/model/workflow-status-dto';
+import {WorkflowUpdate} from '@core/model/workflow-update';
+import {WorkflowAction} from '@core/model/workflow-action';
+import {WorkflowStatus} from '@core/model/workflow-status';
 import {CapitalizeFirstPipe} from '../../../pipes/capitalize-first.pipe';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
@@ -34,10 +34,10 @@ export class WorkflowRationaleComponent {
 	otherOption = false;
 
 	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: {action: WorkflowActionDTO; workflow?: WorkflowStatusDTO}
+		@Inject(MAT_DIALOG_DATA) public data: {action: WorkflowAction; workflow?: WorkflowStatus}
 	) { }
 
-	getResponse(): WorkflowUpdateDTO {
+	getResponse(): WorkflowUpdate {
 		return {
 			workflowId: this.data.action.workflowId,
 			actionId: this.data.action.id,

@@ -9,6 +9,9 @@
  */
 
 
+/**
+ * Field value type for the operands
+ */
 export type OperandType = 'STRING' | 'DATE' | 'NUMBER' | 'BOOLEAN' | 'BLOB';
 
 export const OperandType = {

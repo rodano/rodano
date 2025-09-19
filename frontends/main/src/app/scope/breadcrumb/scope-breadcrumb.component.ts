@@ -1,8 +1,8 @@
 import {booleanAttribute, Component, EventEmitter, Input, Output} from '@angular/core';
 import {MatButton} from '@angular/material/button';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
-import {ScopeTinyDTO} from '@core/model/scope-tiny-dto';
+import {Scope} from '@core/model/scope';
+import {ScopeMini} from '@core/model/scope-mini';
+import {ScopeTiny} from '@core/model/scope-tiny';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 
 @Component({
@@ -11,7 +11,7 @@ import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 	styleUrls: ['./scope-breadcrumb.component.css'],
 	imports: [MatButton, ScopeCodeShortnamePipe]
 })
-export class ScopeBreadcrumbComponent<T extends (ScopeDTO | ScopeMiniDTO | ScopeTinyDTO)> {
+export class ScopeBreadcrumbComponent<T extends (Scope | ScopeMini | ScopeTiny)> {
 	@Input() scopes: T[];
 	@Input({transform: booleanAttribute}) disableDeepest = false;
 	@Output() scopeChange = new EventEmitter<T>();

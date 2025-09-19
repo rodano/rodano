@@ -1,9 +1,9 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {APIService} from './api.service';
-import {BootstrapDTO} from '../model/bootstrap-dto';
+import {Bootstrap} from '../model/bootstrap';
 import {Observable} from 'rxjs';
-import {DemoUserSchemeDTO} from '../model/demo-user-scheme-dto';
+import {DemoUserScheme} from '../model/demo-user-scheme';
 
 @Injectable({
 	providedIn: 'root'
@@ -22,11 +22,11 @@ export class DatabaseService {
 		return this.http.get<{status: string}>(`${this.serviceUrl}/status`);
 	}
 
-	bootstrap(bootstrap: BootstrapDTO) {
+	bootstrap(bootstrap: Bootstrap) {
 		return this.http.post(`${this.serviceUrl}/bootstrap`, bootstrap);
 	}
 
-	createDemoUsers(scheme: DemoUserSchemeDTO) {
+	createDemoUsers(scheme: DemoUserScheme) {
 		return this.http.post(`${this.serviceUrl}/create-demo-users`, scheme);
 	}
 

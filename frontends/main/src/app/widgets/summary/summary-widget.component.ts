@@ -3,7 +3,7 @@ import {WidgetService} from '@core/services/widget.service';
 import {forkJoin, Observable, of, Subject} from 'rxjs';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {switchMap, startWith} from 'rxjs/operators';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {DownloadDirective} from '../../directives/download.component';
 import {MatButton} from '@angular/material/button';
@@ -12,18 +12,18 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {RouterLink} from '@angular/router';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {ScopeModel} from '@core/model/scope-model';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {ScopeBreadcrumbComponent} from '../../scope/breadcrumb/scope-breadcrumb.component';
-import {ScopeTinyDTO} from '@core/model/scope-tiny-dto';
-import {SummaryRowDTO} from '@core/model/summary-row-dto';
-import {SummaryColumnDTO} from '@core/model/summary-column-dto';
+import {ScopeTiny} from '@core/model/scope-tiny';
+import {SummaryRow} from '@core/model/summary-row';
+import {SummaryColumn} from '@core/model/summary-column';
 import {ExportButton} from './export-button';
-import {SummaryDTO} from '@core/model/summary-dto';
+import {Summary} from '@core/model/summary';
 import {MatDivider} from '@angular/material/divider';
 import {MatTooltip} from '@angular/material/tooltip';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -53,22 +53,22 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 	]
 })
 export abstract class SummaryWidgetComponent implements OnInit {
-	@Input() scopes?: ScopeDTO[];
+	@Input() scopes?: Scope[];
 
 	loading = true;
 
 	//scope selector
 	control: FormControl;
 
-	rootScopeModel: ScopeModelDTO;
-	leafScopeModel: ScopeModelDTO;
+	rootScopeModel: ScopeModel;
+	leafScopeModel: ScopeModel;
 
 	//table
-	ancestors: (ScopeTinyDTO | ScopeDTO)[];
-	columns: SummaryColumnDTO[];
-	@ViewChild(MatTable, {static: true}) table: MatTable<SummaryRowDTO>;
+	ancestors: (ScopeTiny | Scope)[];
+	columns: SummaryColumn[];
+	@ViewChild(MatTable, {static: true}) table: MatTable<SummaryRow>;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-	dataSource = new MatTableDataSource<SummaryRowDTO>([]);
+	dataSource = new MatTableDataSource<SummaryRow>([]);
 	columnsToDisplay: string[] = [];
 
 	buttons: ExportButton[] = [];
@@ -114,7 +114,7 @@ export abstract class SummaryWidgetComponent implements OnInit {
 			).subscribe(({data, ancestors}) => {
 				this.columns = data.columns;
 				this.columnsToDisplay = ['scope', ...data.columns.map(c => c.id)];
-				this.dataSource = new MatTableDataSource<SummaryRowDTO>(data.rows);
+				this.dataSource = new MatTableDataSource<SummaryRow>(data.rows);
 				this.dataSource.paginator = this.paginator;
 				this.ancestors = [...ancestors, this.getRootScope()];
 				this.loading = false;
@@ -122,7 +122,7 @@ export abstract class SummaryWidgetComponent implements OnInit {
 		});
 	}
 
-	abstract getData(scopePk: number | undefined): Observable<SummaryDTO>;
+	abstract getData(scopePk: number | undefined): Observable<Summary>;
 
 	abstract getButtons(scopePk: number | undefined): ExportButton[];
 
@@ -130,32 +130,32 @@ export abstract class SummaryWidgetComponent implements OnInit {
 		return this.scopes?.[0].pk;
 	}
 
-	getRootScope(): ScopeTinyDTO {
+	getRootScope(): ScopeTiny {
 		return this.dataSource.data[0].scope;
 	}
 
-	getParent(): ScopeTinyDTO | ScopeDTO {
+	getParent(): ScopeTiny | Scope {
 		const depth = this.ancestors.length;
 		return this.ancestors[depth - 2];
 	}
 
-	selectScope(scope: ScopeTinyDTO | ScopeDTO) {
+	selectScope(scope: ScopeTiny | Scope) {
 		this.rootScopePkChanged.next(scope.pk);
 	}
 
-	getRawValue(row: SummaryRowDTO, column: SummaryColumnDTO): number {
+	getRawValue(row: SummaryRow, column: SummaryColumn): number {
 		if(column.total) {
 			return row.total;
 		}
 		return row.values[column.id];
 	}
 
-	getValue(row: SummaryRowDTO, column: SummaryColumnDTO): string {
+	getValue(row: SummaryRow, column: SummaryColumn): string {
 		const value = this.getRawValue(row, column);
 		return value !== undefined ? value.toString() : 'Not implemented';
 	}
 
-	getValuePercent(row: SummaryRowDTO, column: SummaryColumnDTO): string {
+	getValuePercent(row: SummaryRow, column: SummaryColumn): string {
 		const value = this.getRawValue(row, column);
 		const percent = row.total === 0 ? 0 : Math.round(100 * value / row.total);
 		return percent.toString();

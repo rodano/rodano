@@ -7,15 +7,15 @@ import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatIcon} from '@angular/material/icon';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {FormDTO} from '@core/model/form-dto';
-import {EventDTO} from '@core/model/event-dto';
+import {Scope} from '@core/model/scope';
+import {Form} from '@core/model/form';
+import {Event} from '@core/model/event';
 import {MatButton} from '@angular/material/button';
 import {ScopeService} from '@core/services/scope.service';
 import {SelectEventComponent} from '../dialogs/add-event/select-event.component';
 import {CRFChangeService} from '../services/crf-change.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {EventGroupDTO} from '@core/model/event-group-dto';
+import {EventGroup} from '@core/model/event-group';
 import {NotificationService} from 'src/app/services/notification.service';
 import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
@@ -42,20 +42,20 @@ export class SideMenuComponent implements OnInit, OnChanges {
 		shortname: {
 			en: 'Events'
 		}
-	} satisfies EventGroupDTO;
+	} satisfies EventGroup;
 
 	static OTHER_EVENT_GROUP = {
 		id: 'OTHER',
 		shortname: {
 			en: 'Other events'
 		}
-	} satisfies EventGroupDTO;
+	} satisfies EventGroup;
 
-	@Input() scope: ScopeDTO;
-	eventGroups: EventGroupDTO[] = [];
-	scopeForms: FormDTO[];
-	events: EventDTO[];
-	eventsForms: Record<number, FormDTO[]> = {};
+	@Input() scope: Scope;
+	eventGroups: EventGroup[] = [];
+	scopeForms: Form[];
+	events: Event[];
+	eventsForms: Record<number, Form[]> = {};
 	expandedEventPks: number[] = [];
 
 	constructor(
@@ -79,7 +79,7 @@ export class SideMenuComponent implements OnInit, OnChanges {
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(typedWorkflowable => {
 			if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {
-				this.scope = typedWorkflowable.workflowable as ScopeDTO;
+				this.scope = typedWorkflowable.workflowable as Scope;
 			}
 			this.refresh();
 		});

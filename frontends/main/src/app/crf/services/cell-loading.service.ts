@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Subject, BehaviorSubject} from 'rxjs';
-import {LayoutDTO} from '@core/model/layout-dto';
+import {Layout} from '@core/model/layout';
 import {CRFDataset} from '../models/crf-dataset';
 import {CRFService} from './crf.service';
 import {LoggingService} from '@core/services/logging.service';
@@ -39,7 +39,7 @@ export class CellLoadingService {
 		});
 	}
 
-	public registerFormCells(layouts: LayoutDTO[], datasets: CRFDataset[]) {
+	public registerFormCells(layouts: Layout[], datasets: CRFDataset[]) {
 		this.loadingCellIds = [];
 		const cellIds: string[] = [];
 		layouts.forEach(layout => {
@@ -62,7 +62,7 @@ export class CellLoadingService {
 		this.loggingService.info('New form cell ids registered, waiting to be loaded', cellIds);
 	}
 
-	public registerLayoutCells(layout: LayoutDTO) {
+	public registerLayoutCells(layout: Layout) {
 		const layoutCellIds = this.dataStateService.getLayoutCells(layout).map(c => c.id);
 		//layout may not contain any cell
 		if(layoutCellIds.length === 0) {

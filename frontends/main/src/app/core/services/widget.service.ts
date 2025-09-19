@@ -2,16 +2,16 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
-import {WorkflowWidgetDTO} from '../model/workflow-widget-dto';
+import {WorkflowWidget} from '../model/workflow-widget';
 import {PagedResultWorkflowStatusInfo} from '../model/paged-result-workflow-status-info';
-import {SummaryDTO} from '../model/summary-dto';
+import {Summary} from '../model/summary';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {HttpParamsService} from './http-params.service';
 import {WorkflowWidgetSearch} from '../utilities/search/workflow-widget-search';
 import {OverdueWidgetSearch} from '../utilities/search/overdue-widget-search';
-import {PagedResultOverdueDTO} from '../model/paged-result-overdue-dto';
+import {PagedResultOverdue} from '../model/paged-result-overdue';
 import {FieldModelCriterion} from '../model/field-model-criterion';
-import {ChartDTO} from '@core/model/chart-dto';
+import {Chart} from '@core/model/chart';
 
 @Injectable({
 	providedIn: 'root'
@@ -27,8 +27,8 @@ export class WidgetService {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/widget`;
 	}
 
-	getWorkflowWidget(widgetId: string): Observable<WorkflowWidgetDTO> {
-		return this.http.get<WorkflowWidgetDTO>(`${this.serviceUrl}/workflow/${widgetId}`);
+	getWorkflowWidget(widgetId: string): Observable<WorkflowWidget> {
+		return this.http.get<WorkflowWidget>(`${this.serviceUrl}/workflow/${widgetId}`);
 	}
 
 	@reviveDates
@@ -45,14 +45,14 @@ export class WidgetService {
 		return url;
 	}
 
-	getScopeOverdueWidget(widgetId: string): Observable<WorkflowWidgetDTO> {
-		return this.http.get<WorkflowWidgetDTO>(`${this.serviceUrl}/overdue/${widgetId}`);
+	getScopeOverdueWidget(widgetId: string): Observable<WorkflowWidget> {
+		return this.http.get<WorkflowWidget>(`${this.serviceUrl}/overdue/${widgetId}`);
 	}
 
 	@reviveDates
-	getScopeOverdue(widgetId: string, search: OverdueWidgetSearch): Observable<PagedResultOverdueDTO> {
+	getScopeOverdue(widgetId: string, search: OverdueWidgetSearch): Observable<PagedResultOverdue> {
 		const params = this.httpParamsService.toHttpParams(search);
-		return this.http.get<PagedResultOverdueDTO>(`${this.serviceUrl}/overdue/${widgetId}`, {params});
+		return this.http.get<PagedResultOverdue>(`${this.serviceUrl}/overdue/${widgetId}`, {params});
 	}
 
 	getScopeOverdueExportUrl(widgetId: string, scopePks?: number[]): string {
@@ -64,7 +64,7 @@ export class WidgetService {
 	}
 
 	@reviveDates
-	getChart(chartId: string, scopePks?: number[], criteria?: FieldModelCriterion[]): Observable<ChartDTO> {
+	getChart(chartId: string, scopePks?: number[], criteria?: FieldModelCriterion[]): Observable<Chart> {
 		let params = new HttpParams();
 		if(scopePks) {
 			params = params.set('scopePks', scopePks.toString());
@@ -72,19 +72,19 @@ export class WidgetService {
 		if(criteria) {
 			params = params.set('criteria', JSON.stringify(criteria));
 		}
-		return this.http.get<ChartDTO>(`${this.serviceUrl}/chart/${chartId}`, {params});
+		return this.http.get<Chart>(`${this.serviceUrl}/chart/${chartId}`, {params});
 	}
 
 	getGeneralInfo(): Observable<{title: string; value: string}[]> {
 		return this.http.get<{title: string; value: string}[]>(`${this.serviceUrl}/dashboard/general-information`);
 	}
 
-	getWorkflowSummary(workflowSummaryId: string, scopePk: number): Observable<SummaryDTO> {
+	getWorkflowSummary(workflowSummaryId: string, scopePk: number): Observable<Summary> {
 		let params = new HttpParams();
 		if(scopePk) {
 			params = params.set('scopePk', scopePk.toString());
 		}
-		return this.http.get<SummaryDTO>(`${this.serviceUrl}/workflow-summary/${workflowSummaryId}`, {params});
+		return this.http.get<Summary>(`${this.serviceUrl}/workflow-summary/${workflowSummaryId}`, {params});
 	}
 
 	getWorkflowSummaryExportUrl(workflowSummaryId: string, scopePk?: number): string {
@@ -95,12 +95,12 @@ export class WidgetService {
 		return `${this.serviceUrl}/workflow-summary/${workflowSummaryId}/export/history?scopePk=${scopePk}`;
 	}
 
-	getLockSummary(scopePk: number): Observable<SummaryDTO> {
+	getLockSummary(scopePk: number): Observable<Summary> {
 		let params = new HttpParams();
 		if(scopePk) {
 			params = params.set('scopePk', scopePk.toString());
 		}
-		return this.http.get<SummaryDTO>(`${this.serviceUrl}/lock-summary`, {params});
+		return this.http.get<Summary>(`${this.serviceUrl}/lock-summary`, {params});
 	}
 
 	getScopesLockSummaryExportUrl(scopePk: number): string {

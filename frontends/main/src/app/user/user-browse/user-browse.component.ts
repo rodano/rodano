@@ -1,5 +1,5 @@
 import {Component, DestroyRef, OnInit} from '@angular/core';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {UserSearch} from '@core/utilities/search/user-search';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -12,10 +12,10 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {UserListComponent} from '../user-list/user-list.component';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {MeService} from '@core/services/me.service';
 import {forkJoin} from 'rxjs';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {RoleStatus} from '@core/model/role-status';
 import {getRoleStatusDisplay} from '../role-status-display';
@@ -41,9 +41,9 @@ import {FeatureStatic} from '@core/model/feature-static';
 })
 export class UserBrowseComponent implements OnInit {
 	predicate = new UserSearch();
-	profiles: ProfileDTO[];
-	scopes: ScopeMiniDTO[];
-	me?: UserDTO;
+	profiles: Profile[];
+	scopes: ScopeMini[];
+	me?: User;
 	roleStatus = RoleStatus;
 	showDeleted = false;
 	showExternallyManaged = false;

@@ -4,7 +4,7 @@ import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {Observable, EMPTY} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {NotificationService} from 'src/app/services/notification.service';
-import {FormInfoDTO} from '@core/model/form-info-dto';
+import {FormInfo} from '@core/model/form-info';
 import {SideMenuComponent} from '../side-menu/side-menu.component';
 
 //TODO rework this resolver or find another way to navigate to issues
@@ -12,14 +12,14 @@ import {SideMenuComponent} from '../side-menu/side-menu.component';
 @Injectable({
 	providedIn: 'root'
 })
-export class WorkflowStatusPathResolver implements Resolve<FormInfoDTO> {
+export class WorkflowStatusPathResolver implements Resolve<FormInfo> {
 	constructor(
 		private workflowStatusService: WorkflowStatusService,
 		private router: Router,
 		private notificationService: NotificationService
 	) {}
 
-	resolve(route: ActivatedRouteSnapshot): Observable<FormInfoDTO> {
+	resolve(route: ActivatedRouteSnapshot): Observable<FormInfo> {
 		const wsPkParam = route.paramMap.get('statusPk');
 		if(!wsPkParam) {
 			this.router.navigate(['/search']);

@@ -2,7 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
-import {FieldDTO} from '@core/model/field-dto';
+import {Field} from '@core/model/field';
 import {DateTimeUTCPipe} from '../pipes/date-time-utc.pipe';
 import {MatTableModule} from '@angular/material/table';
 import {AuditTrailService} from '@core/services/audit-trail.service';
@@ -32,7 +32,7 @@ export class AuditTrailFieldComponent implements OnInit {
 
 	constructor(
 		private auditTrailService: AuditTrailService,
-		@Inject(MAT_DIALOG_DATA) public field: FieldDTO
+		@Inject(MAT_DIALOG_DATA) public field: Field
 	) {
 	}
 

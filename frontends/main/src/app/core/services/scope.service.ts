@@ -1,14 +1,14 @@
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {APIService} from './api.service';
-import {ScopeDTO} from '../model/scope-dto';
+import {Scope} from '../model/scope';
 import {ScopeSearch} from '../utilities/search/scope-search';
 import {Observable} from 'rxjs';
 import {HttpParamsService} from './http-params.service';
-import {PagedResultScopeDTO} from '../model/paged-result-scope-dto';
-import {TimelineGraphDataDTO} from '../model/timeline-graph-data-dto';
-import {EventModelDTO} from '../model/event-model-dto';
-import {ScopeCandidateDTO} from '../model/scope-candidate-dto';
+import {PagedResultScope} from '../model/paged-result-scope';
+import {TimelineGraphData} from '../model/timeline-graph-data';
+import {EventModel} from '../model/event-model';
+import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
 @Injectable({
@@ -26,9 +26,9 @@ export class ScopeService {
 	}
 
 	@reviveDates
-	search(search: ScopeSearch): Observable<PagedResultScopeDTO> {
+	search(search: ScopeSearch): Observable<PagedResultScope> {
 		const params = this.httpParamsService.toHttpParams(search);
-		return this.http.get<PagedResultScopeDTO>(this.serviceUrl, {params});
+		return this.http.get<PagedResultScope>(this.serviceUrl, {params});
 	}
 
 	getExportUrl(search: ScopeSearch): string {
@@ -37,52 +37,52 @@ export class ScopeService {
 	}
 
 	@reviveDates
-	get(scopePk: number): Observable<ScopeDTO> {
-		return this.http.get<ScopeDTO>(`${this.serviceUrl}/${scopePk}`);
+	get(scopePk: number): Observable<Scope> {
+		return this.http.get<Scope>(`${this.serviceUrl}/${scopePk}`);
 	}
 
-	getCandidate(parentScopePk: number, scopeModelId: string): Observable<ScopeCandidateDTO> {
+	getCandidate(parentScopePk: number, scopeModelId: string): Observable<ScopeCandidate> {
 		const params = new HttpParams()
 			.set('parentScopePk', parentScopePk.toString())
 			.set('scopeModelId', scopeModelId);
-		return this.http.get<ScopeCandidateDTO>(`${this.serviceUrl}/candidate`, {params});
+		return this.http.get<ScopeCandidate>(`${this.serviceUrl}/candidate`, {params});
 	}
 
 	@reviveDates
-	create(scopeCandidate: ScopeCandidateDTO): Observable<ScopeDTO> {
-		return this.http.post<ScopeDTO>(this.serviceUrl, scopeCandidate);
+	create(scopeCandidate: ScopeCandidate): Observable<Scope> {
+		return this.http.post<Scope>(this.serviceUrl, scopeCandidate);
 	}
 
 	@reviveDates
-	save(scopePk: number, scope: ScopeDTO): Observable<ScopeDTO> {
-		return this.http.put<ScopeDTO>(`${this.serviceUrl}/${scopePk}`, scope);
+	save(scopePk: number, scope: Scope): Observable<Scope> {
+		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}`, scope);
 	}
 
 	@reviveDates
-	remove(scopePk: number, message: string): Observable<ScopeDTO> {
-		return this.http.put<ScopeDTO>(`${this.serviceUrl}/${scopePk}/remove`, {message});
+	remove(scopePk: number, message: string): Observable<Scope> {
+		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}/remove`, {message});
 	}
 
 	@reviveDates
-	restore(scopePk: number, message: string): Observable<ScopeDTO> {
-		return this.http.put<ScopeDTO>(`${this.serviceUrl}/${scopePk}/restore`, {message});
+	restore(scopePk: number, message: string): Observable<Scope> {
+		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}/restore`, {message});
 	}
 
 	@reviveDates
-	lock(scopePk: number): Observable<ScopeDTO> {
-		return this.http.put<ScopeDTO>(`${this.serviceUrl}/${scopePk}/lock`, {});
+	lock(scopePk: number): Observable<Scope> {
+		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}/lock`, {});
 	}
 
 	@reviveDates
-	unlock(scopePk: number): Observable<ScopeDTO> {
-		return this.http.put<ScopeDTO>(`${this.serviceUrl}/${scopePk}/unlock`, {});
+	unlock(scopePk: number): Observable<Scope> {
+		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}/unlock`, {});
 	}
 
-	getGraphs(scopePk: number): Observable<TimelineGraphDataDTO[]> {
-		return this.http.get<TimelineGraphDataDTO[]>(`${this.serviceUrl}/${scopePk}/timeline`);
+	getGraphs(scopePk: number): Observable<TimelineGraphData[]> {
+		return this.http.get<TimelineGraphData[]>(`${this.serviceUrl}/${scopePk}/timeline`);
 	}
 
-	getAvailableEventModels(scopePk: number): Observable<EventModelDTO[]> {
-		return this.http.get<EventModelDTO[]>(`${this.serviceUrl}/${scopePk}/available-event-models`);
+	getAvailableEventModels(scopePk: number): Observable<EventModel[]> {
+		return this.http.get<EventModel[]>(`${this.serviceUrl}/${scopePk}/available-event-models`);
 	}
 }

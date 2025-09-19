@@ -1,9 +1,9 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
 import {forkJoin} from 'rxjs';
-import {PossibleValueDTO} from '@core/model/possible-value-dto';
+import {PossibleValue} from '@core/model/possible-value';
 import {operatorByType} from '@core/enums/operator-by-type';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {FieldModelDTO} from '@core/model/field-model-dto';
+import {FieldModel} from '@core/model/field-model';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
 import {CapitalizeFirstPipe} from '../pipes/capitalize-first.pipe';
 import {MatIcon} from '@angular/material/icon';
@@ -16,11 +16,11 @@ import {FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators} from
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Operator} from '@core/model/operator';
 import {MeService} from '@core/services/me.service';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {ChartWidgetComponent} from 'src/app/widgets/chart/chart-widget.component';
-import {CMSLayoutDTO} from '@core/model/cms-layout-dto';
-import {CMSWidgetDTO} from '@core/model/cms-widget-dto';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {CMSLayout} from '@core/model/cms-layout';
+import {CMSWidget} from '@core/model/cms-widget';
+import {ScopeModel} from '@core/model/scope-model';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 
 @Component({
@@ -43,8 +43,8 @@ import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 	]
 })
 export class BenchmarkComponent implements OnInit, OnChanges {
-	@Input() layout: CMSLayoutDTO;
-	widgets: CMSWidgetDTO[] = [];
+	@Input() layout: CMSLayout;
+	widgets: CMSWidget[] = [];
 
 	//customization form
 	criteria = new FormArray([] as FormArray[]);
@@ -53,12 +53,12 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 		criteria: this.criteria
 	}) as FormGroup;
 
-	scopeModels: ScopeModelDTO[] = [];
-	rootScopes: ScopeMiniDTO[] = [];
-	fieldModels: FieldModelDTO[];
+	scopeModels: ScopeModel[] = [];
+	rootScopes: ScopeMini[] = [];
+	fieldModels: FieldModel[];
 
 	//parameters sent to widgets
-	chartScopes: ScopeMiniDTO[] = [];
+	chartScopes: ScopeMini[] = [];
 	chartCriteria: FieldModelCriterion[] = [];
 
 	constructor(
@@ -86,7 +86,7 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 		this.widgets = this.layout.sections[0].widgets;
 	}
 
-	getScopes(modelId: string): ScopeMiniDTO[] {
+	getScopes(modelId: string): ScopeMini[] {
 		return this.rootScopes?.filter(s => s.modelId === modelId) ?? [];
 	}
 
@@ -95,10 +95,10 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 		return criterion.controls[j] as FormControl;
 	}
 
-	getFieldModel(index: number): FieldModelDTO {
+	getFieldModel(index: number): FieldModel {
 		const criterion = this.criteria.controls[index] as FormArray;
 		const fieldModelId = criterion.controls[0].value;
-		return this.fieldModels.find(f => f.id === fieldModelId) as FieldModelDTO;
+		return this.fieldModels.find(f => f.id === fieldModelId) as FieldModel;
 	}
 
 	getOperators(index: number): Operator[] {
@@ -109,7 +109,7 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 		return operatorByType[fieldModel.type];
 	}
 
-	getPossibleValues(index: number): PossibleValueDTO[] {
+	getPossibleValues(index: number): PossibleValue[] {
 		const fieldModel = this.getFieldModel(index);
 		if(!fieldModel) {
 			return [];
@@ -132,7 +132,7 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 
 	update() {
 		const scopes = (this.customizeForm.get('rootScopePks')?.value ?? []) as number[];
-		this.chartScopes = scopes.map(p => this.rootScopes.find(s => s.pk === p) as ScopeMiniDTO);
+		this.chartScopes = scopes.map(p => this.rootScopes.find(s => s.pk === p) as ScopeMini);
 
 		this.chartCriteria = this.criteria.controls.map((criterion: FormArray, index: number) => {
 			const fieldModel = this.getFieldModel(index);

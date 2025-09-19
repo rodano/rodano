@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {HttpClient, HttpRequest, HttpEvent} from '@angular/common/http';
 import {APIService} from './api.service';
 import {Observable} from 'rxjs';
-import {FileDTO} from '../model/file-dto';
+import {FileModel} from '../model/file-model';
 
 @Injectable({
 	providedIn: 'root'
@@ -13,7 +13,7 @@ export class FileService {
 		private apiService: APIService
 	) { }
 
-	upload(scopePk: number, file: File, eventPk?: number): Observable<HttpEvent<FileDTO>> {
+	upload(scopePk: number, file: File, eventPk?: number): Observable<HttpEvent<FileModel>> {
 		const formData = new FormData();
 		formData.append('file', file, file.name);
 

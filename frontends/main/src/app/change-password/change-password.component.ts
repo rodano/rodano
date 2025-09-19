@@ -12,9 +12,9 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatCardModule} from '@angular/material/card';
 import {getPasswordErrorMessage} from '@core/utilities/error-utils';
 import {ChangePasswordContext} from './change-password-context';
-import {ResetPasswordDTO} from '@core/model/reset-password-dto';
-import {ChangePasswordDTO} from '@core/model/change-password-dto';
-import {UserDTO} from '@core/model/user-dto';
+import {ResetPassword} from '@core/model/reset-password';
+import {ChangePassword} from '@core/model/change-password';
+import {User} from '@core/model/user';
 
 @Component({
 	selector: 'app-change-password',
@@ -32,7 +32,7 @@ import {UserDTO} from '@core/model/user-dto';
 export class ChangePasswordComponent implements OnInit {
 	loading = false;
 
-	@Input() me?: UserDTO; //me will be available when the user is logged in
+	@Input() me?: User; //me will be available when the user is logged in
 	@Input() recoveryCode?: string; //recoveryCode will be available when the user clicks on the link in password recovery email
 	@Input() changeRequestContext: ChangePasswordContext;
 
@@ -75,10 +75,10 @@ export class ChangePasswordComponent implements OnInit {
 
 		if(this.recoveryCode && this.changeRequestContext === ChangePasswordContext.PASSWORD_RESET) {
 			const newPassword = this.changePasswordForm.controls.password.value;
-			const resetPasswordDTO = {} as ResetPasswordDTO;
-			resetPasswordDTO.newPassword = newPassword;
-			resetPasswordDTO.resetCode = this.recoveryCode;
-			this.authService.resetPassword(resetPasswordDTO).pipe(
+			const resetPassword = {} as ResetPassword;
+			resetPassword.newPassword = newPassword;
+			resetPassword.resetCode = this.recoveryCode;
+			this.authService.resetPassword(resetPassword).pipe(
 				finalize(() => this.loading = false)
 			).subscribe({
 				next: () => {
@@ -91,11 +91,11 @@ export class ChangePasswordComponent implements OnInit {
 			});
 		}
 		else {
-			const changePasswordDTO = {} as ChangePasswordDTO;
-			changePasswordDTO.currentPassword = this.changePasswordForm.controls.currentPassword.value;
-			changePasswordDTO.newPassword = this.changePasswordForm.controls.password.value;
+			const changePassword = {} as ChangePassword;
+			changePassword.currentPassword = this.changePasswordForm.controls.currentPassword.value;
+			changePassword.newPassword = this.changePasswordForm.controls.password.value;
 
-			this.authService.changePassword(changePasswordDTO).pipe(
+			this.authService.changePassword(changePassword).pipe(
 				finalize(() => {
 					this.loading = false;
 				})

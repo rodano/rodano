@@ -2,8 +2,8 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
-import {ScopeMiniDTO} from '../model/scope-mini-dto';
-import {DatasetModelDTO} from '../model/dataset-model-dto';
+import {ScopeMini} from '../model/scope-mini';
+import {DatasetModel} from '../model/dataset-model';
 
 @Injectable({
 	providedIn: 'root'
@@ -18,13 +18,13 @@ export class ExtractService {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/extracts`;
 	}
 
-	getRootScopes(): Observable<Record<string, ScopeMiniDTO[]>> {
-		return this.http.get<Record<string, ScopeMiniDTO[]>>(`${this.serviceUrl}/root-scopes`);
+	getRootScopes(): Observable<Record<string, ScopeMini[]>> {
+		return this.http.get<Record<string, ScopeMini[]>>(`${this.serviceUrl}/root-scopes`);
 	}
 
-	getDatasetModels(scopeModelId: string): Observable<DatasetModelDTO[]> {
+	getDatasetModels(scopeModelId: string): Observable<DatasetModel[]> {
 		const params = new HttpParams().set('scopeModelId', scopeModelId);
-		return this.http.get<DatasetModelDTO[]>(`${this.serviceUrl}/dataset-models`, {params});
+		return this.http.get<DatasetModel[]>(`${this.serviceUrl}/dataset-models`, {params});
 	}
 
 	getSpecificationsUrl(datasetModelIds: string[], withModificationDates?: boolean): string {

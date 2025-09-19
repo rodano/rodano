@@ -1,19 +1,19 @@
 import {booleanAttribute, Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
-import {WorkflowActionDTO} from '@core/model/workflow-action-dto';
-import {WorkflowStatusDTO} from '@core/model/workflow-status-dto';
+import {WorkflowAction} from '@core/model/workflow-action';
+import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowActionService} from '../services/workflow-action.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIcon} from '@angular/material/icon';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {CRFChangeService} from '../services/crf-change.service';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {EventDTO} from '@core/model/event-dto';
-import {FormDTO} from '@core/model/form-dto';
-import {FieldDTO} from '@core/model/field-dto';
-import {WorkflowDTO} from '@core/model/workflow-dto';
+import {Scope} from '@core/model/scope';
+import {Event} from '@core/model/event';
+import {Form} from '@core/model/form';
+import {Field} from '@core/model/field';
+import {Workflow} from '@core/model/workflow';
 
 @Component({
 	selector: 'app-workflow-status',
@@ -30,15 +30,15 @@ export class WorkflowStatusComponent implements OnChanges {
 	workflowableEntity = WorkflowableEntity;
 
 	@Input({required: true}) entity: WorkflowableEntity;
-	@Input({required: true}) workflowable: WorkflowableDTO;
+	@Input({required: true}) workflowable: Workflowable;
 
 	//workflow status is provided only when the status already exists
-	@Input() workflowStatus?: WorkflowStatusDTO;
-	@Input() workflow?: WorkflowDTO;
+	@Input() workflowStatus?: WorkflowStatus;
+	@Input() workflow?: Workflow;
 
 	@Input({transform: booleanAttribute}) rough = false;
 
-	@Output() actionResponse = new EventEmitter<WorkflowableDTO>();
+	@Output() actionResponse = new EventEmitter<Workflowable>();
 
 	constructor(
 		private workflowActionService: WorkflowActionService,
@@ -51,13 +51,13 @@ export class WorkflowStatusComponent implements OnChanges {
 		}
 	}
 
-	executeWorkflowAction(action: WorkflowActionDTO) {
+	executeWorkflowAction(action: WorkflowAction) {
 		let request;
 		if(this.workflowStatus) {
 			request = this.workflowActionService.executeActionOnWorkflowable(
 				this.entity,
 				this.workflowable,
-				this.workflowStatus as WorkflowStatusDTO,
+				this.workflowStatus as WorkflowStatus,
 				action
 			);
 		}
@@ -92,29 +92,29 @@ export class WorkflowStatusComponent implements OnChanges {
 		};
 	}
 
-	get actions(): WorkflowActionDTO[] {
+	get actions(): WorkflowAction[] {
 		if(this.workflowStatus) {
 			return this.workflowStatus.state.possibleActions;
 		}
-		return [this.workflow?.actions.find(a => a.id === this.workflow?.actionId) as WorkflowActionDTO];
+		return [this.workflow?.actions.find(a => a.id === this.workflow?.actionId) as WorkflowAction];
 	}
 
 	get displayActions(): boolean {
 		switch(this.entity) {
 			case WorkflowableEntity.SCOPE: {
-				const scope = this.workflowable as ScopeDTO;
+				const scope = this.workflowable as Scope;
 				return !scope.removed && !scope.locked;
 			}
 			case WorkflowableEntity.EVENT: {
-				const event = this.workflowable as EventDTO;
+				const event = this.workflowable as Event;
 				return !event.removed && !event.inRemoved && !event.locked && !event.inLocked;
 			}
 			case WorkflowableEntity.FORM: {
-				const form = this.workflowable as FormDTO;
+				const form = this.workflowable as Form;
 				return !form.removed && !form.inLocked;
 			}
 			case WorkflowableEntity.FIELD: {
-				const field = this.workflowable as FieldDTO;
+				const field = this.workflowable as Field;
 				return !field.inRemoved && !field.inLocked;
 			}
 			default: return false;

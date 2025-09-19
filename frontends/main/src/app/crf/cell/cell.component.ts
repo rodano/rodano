@@ -1,5 +1,5 @@
 import {Component, Input, DestroyRef, OnInit, AfterViewInit} from '@angular/core';
-import {CellDTO} from '@core/model/cell-dto';
+import {Cell} from '@core/model/cell';
 import {VisibilityService} from '../services/visibility.service';
 import {CellLoadingService} from '../services/cell-loading.service';
 import {CRFField} from '../models/crf-field';
@@ -23,7 +23,7 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	]
 })
 export class CellComponent implements OnInit, AfterViewInit {
-	@Input() cell: CellDTO;
+	@Input() cell: Cell;
 	//layoutUid is the global identifier of the parent layout
 	//it is required for cells that are in a multiple layout and do not contain a field
 	//they must be identified properly to manage visibility criteria
@@ -46,7 +46,7 @@ export class CellComponent implements OnInit, AfterViewInit {
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(criterion => {
 			this.loggingService.info(`Cell ${this.cell.id} receiving criterion`, criterion);
-			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteriaDTO.ActionEnum.SHOW.toLocaleLowerCase();
+			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteria.ActionEnum.SHOW.toLocaleLowerCase();
 			this.shown = criterion.reverse ? !show : show;
 
 			//mark the field

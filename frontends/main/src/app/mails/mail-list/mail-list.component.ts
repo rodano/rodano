@@ -3,8 +3,8 @@ import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {startWith, switchMap} from 'rxjs/operators';
 import {Subject, merge} from 'rxjs';
-import {MailDTO} from '@core/model/mail-dto';
-import {PagedResultMailDTO} from '@core/model/paged-result-mail-dto';
+import {Mail} from '@core/model/mail';
+import {PagedResultMail} from '@core/model/paged-result-mail';
 import {MailsService} from '@core/services/mails.service';
 import {MailSearch} from '@core/utilities/search/mail-search';
 import {MailDetailComponent} from '../mail-detail/mail-detail.component';
@@ -81,7 +81,7 @@ export class MailListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 
-	mails: PagedResultMailDTO = EMPTY_PAGED_RESULT;
+	mails: PagedResultMail = EMPTY_PAGED_RESULT;
 	columnsToDisplay: string[] = [
 		'selected',
 		'status',
@@ -93,7 +93,7 @@ export class MailListComponent implements OnInit {
 		'actions'
 	];
 
-	selectedMails: MailDTO[] = [];
+	selectedMails: Mail[] = [];
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -141,13 +141,13 @@ export class MailListComponent implements OnInit {
 		this.refreshSearch$.next();
 	}
 
-	openDetails(mail: MailDTO) {
+	openDetails(mail: Mail) {
 		return this.dialog
 			.open(MailDetailComponent, {data: mail})
 			.afterClosed();
 	}
 
-	onSelect(isSelected: boolean, mail: MailDTO) {
+	onSelect(isSelected: boolean, mail: Mail) {
 		if(isSelected) {
 			this.selectedMails.push(mail);
 		}

@@ -9,6 +9,9 @@
  */
 
 
+/**
+ * Workflow entity to which the widget\'s workflows are tied to
+ */
 export type WorkflowableEntity = 'SCOPE' | 'EVENT' | 'FORM' | 'FIELD';
 
 export const WorkflowableEntity = {

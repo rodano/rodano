@@ -2,11 +2,11 @@ import {Component, HostBinding, Input, OnInit, Optional, Self, ViewChild} from '
 import {ControlValueAccessor, NgControl, ReactiveFormsModule} from '@angular/forms';
 import {MatOptgroup, MatOption, MatSelect} from '@angular/material/select';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {MatFormFieldControl} from '@angular/material/form-field';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {ScopeModel} from '@core/model/scope-model';
 import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 
 @Component({
@@ -28,14 +28,14 @@ import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 export class ScopePickerComponent implements MatFormFieldControl<number>, OnInit, ControlValueAccessor {
 	static nextId = 0;
 
-	@Input() scopes: ScopeMiniDTO[] = [];
+	@Input() scopes: ScopeMini[] = [];
 
 	@ViewChild(MatSelect, {static: true}) select: MatSelect;
 
 	@HostBinding() id = `scope-picker-${ScopePickerComponent.nextId++}`;
 	controlType = 'scope-picker';
 
-	scopeModels: ScopeModelDTO[] = [];
+	scopeModels: ScopeModel[] = [];
 
 	constructor(
 		private configurationService: ConfigurationService,
@@ -141,7 +141,7 @@ export class ScopePickerComponent implements MatFormFieldControl<number>, OnInit
 		});
 	}
 
-	getScopes(modelId: string): ScopeMiniDTO[] {
+	getScopes(modelId: string): ScopeMini[] {
 		return this.scopes?.filter(c => c.modelId === modelId) ?? [];
 	}
 

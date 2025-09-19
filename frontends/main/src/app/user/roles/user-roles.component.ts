@@ -1,12 +1,12 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import {UserDTO} from '@core/model/user-dto';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {User} from '@core/model/user';
+import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {switchMap} from 'rxjs/operators';
 import {forkJoin, Observable} from 'rxjs';
 import {RoleService} from '@core/services/role.service';
-import {RoleDTO} from '@core/model/role-dto';
+import {Role} from '@core/model/role';
 import {NotificationService} from 'src/app/services/notification.service';
 import {GetFieldPipe} from '../../pipes/get-field.pipe';
 import {LookupByIdPipe} from '../../pipes/lookup-by-id.pipe';
@@ -23,7 +23,7 @@ import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-
 import {AuthStateService} from 'src/app/services/auth-state.service';
 import {MeService} from '@core/services/me.service';
 import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
 import {getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
@@ -52,9 +52,9 @@ import {MatTooltip} from '@angular/material/tooltip';
 	]
 })
 export class UserRolesComponent implements OnInit {
-	@Input() user: UserDTO;
-	me: UserDTO;
-	roles: RoleDTO[] = [];
+	@Input() user: User;
+	me: User;
+	roles: Role[] = [];
 
 	displayedColumns: string[] = [
 		'profile',
@@ -64,8 +64,8 @@ export class UserRolesComponent implements OnInit {
 		'actions'
 	];
 
-	profiles: ProfileDTO[];
-	scopes: ScopeMiniDTO[];
+	profiles: Profile[];
+	scopes: ScopeMini[];
 
 	getRoleStatusDisplay = getRoleStatusDisplay;
 
@@ -128,7 +128,7 @@ export class UserRolesComponent implements OnInit {
 		this.performRoleAction(this.roleService.disableRole(this.user.pk, rolePk));
 	}
 
-	private performRoleAction(role$: Observable<RoleDTO>) {
+	private performRoleAction(role$: Observable<Role>) {
 		role$.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe({

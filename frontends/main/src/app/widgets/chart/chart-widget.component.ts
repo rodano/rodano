@@ -1,9 +1,9 @@
 import {Component, Input, OnChanges, ViewChild} from '@angular/core';
-import {ChartDTO} from '@core/model/chart-dto';
+import {Chart} from '@core/model/chart';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
 import {WidgetService} from '@core/services/widget.service';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {Scope} from '@core/model/scope';
+import {ScopeMini} from '@core/model/scope-mini';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {BaseChartDirective} from 'ng2-charts';
 import {ChartConfiguration, ChartData, TooltipItem} from 'chart.js';
@@ -53,12 +53,12 @@ export class ChartWidgetComponent implements OnChanges {
 	private static DATE_FORMATTER = new DateUTCPipe();
 
 	@Input() id: string;
-	@Input() scopes?: ScopeDTO[] | ScopeMiniDTO[];
+	@Input() scopes?: Scope[] | ScopeMini[];
 	@Input() criteria?: FieldModelCriterion[];
 
 	@ViewChild(BaseChartDirective) chartDirective?: BaseChartDirective;
 
-	chart: ChartDTO;
+	chart: Chart;
 	studyColor: string;
 	data: ChartData<any>;
 	options: ChartConfiguration<any>['options'];

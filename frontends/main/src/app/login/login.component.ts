@@ -2,8 +2,8 @@ import {Component, DestroyRef, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router, ActivatedRoute} from '@angular/router';
 import {finalize} from 'rxjs/operators';
-import {PublicStudyDTO} from '@core/model/public-study-dto';
-import {CredentialsDTO} from '@core/model/credentials-dto';
+import {PublicStudy} from '@core/model/public-study';
+import {Credentials} from '@core/model/credentials';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {AuthStateService} from '../services/auth-state.service';
 import {MatButton} from '@angular/material/button';
@@ -30,7 +30,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 	]
 })
 export class LoginComponent implements OnInit {
-	study?: PublicStudyDTO;
+	study?: PublicStudy;
 	loading = false;
 
 	display: LoginDisplay = LoginDisplay.LOGIN; //Initialize to show login
@@ -74,7 +74,7 @@ export class LoginComponent implements OnInit {
 
 	login() {
 		this.loading = true;
-		const credentials = this.loginForm.value as CredentialsDTO;
+		const credentials = this.loginForm.value as Credentials;
 
 		this.authStateService.login(credentials).pipe(
 			takeUntilDestroyed(this.destroyRef),

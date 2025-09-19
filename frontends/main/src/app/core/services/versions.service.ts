@@ -9,7 +9,7 @@ import {DatasetAuditTrail} from '../model/dataset-audit-trail';
 import {FormAuditTrail} from '../model/form-audit-trail';
 import {FieldAuditTrail} from '../model/field-audit-trail';
 import {WorkflowStatusAuditTrail} from '../model/workflow-status-audit-trail';
-import {UserAuditTrailDTO} from '../model/user-audit-trail-dto';
+import {UserAuditTrail} from '../model/user-audit-trail';
 import {RoleAuditTrail} from '../model/role-audit-trail';
 import {RobotAuditTrail} from '../model/robot-audit-trail';
 
@@ -71,12 +71,12 @@ export class VersionsService {
 		return this.getForEntity<WorkflowStatusAuditTrail>(url, auditActorPk);
 	}
 
-	getForUser(userPk: number, auditActorPk?: number): Observable<UserAuditTrailDTO[]> {
+	getForUser(userPk: number, auditActorPk?: number): Observable<UserAuditTrail[]> {
 		const url = `${this.apiService.getApiUrl()}/users/${userPk}/versions`;
-		return this.getForEntity<UserAuditTrailDTO>(url, auditActorPk);
+		return this.getForEntity<UserAuditTrail>(url, auditActorPk);
 	}
 
-	getForRobot(robotPk: number, auditActorPk?: number): Observable<UserAuditTrailDTO[]> {
+	getForRobot(robotPk: number, auditActorPk?: number): Observable<UserAuditTrail[]> {
 		const url = `${this.apiService.getApiUrl()}/robots/${robotPk}/versions`;
 		return this.getForEntity<RobotAuditTrail>(url, auditActorPk);
 	}

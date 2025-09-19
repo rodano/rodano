@@ -1,6 +1,6 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
-import {CMSLayoutDTO} from '@core/model/cms-layout-dto';
-import {CMSSectionDTO} from '@core/model/cms-section-dto';
+import {CMSLayout} from '@core/model/cms-layout';
+import {CMSSection} from '@core/model/cms-section';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {GenericWidgetComponent} from '../widgets/generic-widget/generic-widget.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -16,9 +16,9 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 	]
 })
 export class DashboardComponent implements OnInit {
-	@Input() layout: CMSLayoutDTO;
+	@Input() layout: CMSLayout;
 
-	selectedSection: CMSSectionDTO;
+	selectedSection: CMSSection;
 	sectionBadges: Record<string, number> = {};
 
 	constructor(

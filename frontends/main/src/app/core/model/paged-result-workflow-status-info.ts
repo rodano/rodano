@@ -16,9 +16,6 @@ export interface PagedResultWorkflowStatusInfo {
      * Objects of the page
      */
     objects: Array<WorkflowStatusInfo>;
-    /**
-     * Paging information
-     */
     paging: Paging;
 }
 

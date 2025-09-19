@@ -1,9 +1,9 @@
 import {Injectable} from '@angular/core';
 import {concat, Observable, Subject} from 'rxjs';
 import {map, shareReplay, switchMap, tap} from 'rxjs/operators';
-import {CredentialsDTO} from '@core/model/credentials-dto';
+import {Credentials} from '@core/model/credentials';
 import {AuthService} from '@core/services/auth.service';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 import {MeService} from '@core/services/me.service';
 import {RoleStatus} from '@core/model/role-status';
 
@@ -13,13 +13,13 @@ import {RoleStatus} from '@core/model/role-status';
 export class AuthStateService {
 	private static TOKEN_STORAGE_KEY = 'token';
 
-	static getUserPendingRolesNumber(user?: UserDTO): number {
+	static getUserPendingRolesNumber(user?: User): number {
 		return user?.roles.filter(r => r.status === RoleStatus.PENDING).length ?? 0;
 	}
 
-	private connectedUserSubject = new Subject<UserDTO | undefined>();
+	private connectedUserSubject = new Subject<User | undefined>();
 
-	private connectedUserStream: Observable<UserDTO | undefined>;
+	private connectedUserStream: Observable<User | undefined>;
 
 	constructor(
 		private authService: AuthService,
@@ -33,15 +33,15 @@ export class AuthStateService {
 		);
 	}
 
-	private emitUser(user?: UserDTO) {
+	private emitUser(user?: User) {
 		this.connectedUserSubject.next(user);
 	}
 
-	updateUser(user: UserDTO) {
+	updateUser(user: User) {
 		this.emitUser(user);
 	}
 
-	listenConnectedUser(): Observable<UserDTO | undefined> {
+	listenConnectedUser(): Observable<User | undefined> {
 		return this.connectedUserStream;
 	}
 
@@ -61,7 +61,7 @@ export class AuthStateService {
 		return sessionStorage.getItem(AuthStateService.TOKEN_STORAGE_KEY) as string;
 	}
 
-	public login(credentials: CredentialsDTO): Observable<UserDTO> {
+	public login(credentials: Credentials): Observable<User> {
 		return this.authService.login(credentials).pipe(
 			tap(a => this.setToken(a.token)),
 			switchMap(() => this.meService.get()),

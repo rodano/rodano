@@ -1,7 +1,7 @@
 import {Component, DestroyRef, OnInit} from '@angular/core';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {ScopeModel} from '@core/model/scope-model';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/input';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -11,12 +11,12 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DocumentationService} from '@core/services/documentation.service';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {forkJoin, interval, skipWhile, switchMap} from 'rxjs';
 import {ScopePickerComponent} from '../scope-picker/scope-picker.component';
 import {MeService} from '@core/services/me.service';
 import {FeatureStatic} from '@core/model/feature-static';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {CRFDocumentationGenerationStatus} from '@core/model/crf-documentation-generation-status';
 import {ScopeFinderComponent} from '../scope-finder/scope-finder.component';
 
@@ -41,9 +41,9 @@ import {ScopeFinderComponent} from '../scope-finder/scope-finder.component';
 export class DocumentationComponent implements OnInit {
 	crfDocumentationGenerationStatus: CRFDocumentationGenerationStatus;
 
-	scopeModels: ScopeModelDTO[] = [];
-	rootScopes: ScopeMiniDTO[] = [];
-	scopes: ScopeDTO[] = [];
+	scopeModels: ScopeModel[] = [];
+	rootScopes: ScopeMini[] = [];
+	scopes: Scope[] = [];
 
 	generationStatus: CRFDocumentationGenerationStatus;
 
@@ -96,7 +96,7 @@ export class DocumentationComponent implements OnInit {
 		).subscribe(s => this.generationStatus = s);
 	}
 
-	getScopes(modelId: string): ScopeDTO[] {
+	getScopes(modelId: string): Scope[] {
 		return this.scopes?.filter(s => s.modelId === modelId) ?? [];
 	}
 

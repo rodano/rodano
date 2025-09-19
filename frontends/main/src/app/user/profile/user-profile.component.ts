@@ -1,6 +1,6 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
 import {NotificationService} from 'src/app/services/notification.service';
 import {MatButton} from '@angular/material/button';
@@ -9,7 +9,7 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {LanguageDTO} from '@core/model/language-dto';
+import {Language} from '@core/model/language';
 import {MatOption} from '@angular/material/core';
 import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
 import {MatSelect} from '@angular/material/select';
@@ -30,10 +30,10 @@ import {MatSelect} from '@angular/material/select';
 	]
 })
 export class UserProfileComponent implements OnInit, OnChanges {
-	@Input() me: UserDTO;
-	@Input() user: UserDTO;
+	@Input() me: User;
+	@Input() user: User;
 
-	languages: LanguageDTO[];
+	languages: Language[];
 
 	userUpdateForm = new FormGroup({
 		name: new FormControl('', [Validators.required]),
@@ -73,7 +73,7 @@ export class UserProfileComponent implements OnInit, OnChanges {
 	}
 
 	save() {
-		const userUpdate = Object.assign({}, this.userUpdateForm.value) as UserDTO;
+		const userUpdate = Object.assign({}, this.userUpdateForm.value) as User;
 
 		this.userService.save(this.user.pk, userUpdate).pipe(
 			takeUntilDestroyed(this.destroyRef)

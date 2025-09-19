@@ -1,6 +1,6 @@
-import {FieldDTO} from '@core/model/field-dto';
+import {Field} from '@core/model/field';
 
-export interface CRFField extends FieldDTO {
+export interface CRFField extends Field {
 
 	//Visibility criteria status
 	shown: boolean;

@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {ScopeModel} from '@core/model/scope-model';
+import {Scope} from '@core/model/scope';
 import {ScopeService} from '@core/services/scope.service';
 import {NotificationService} from 'src/app/services/notification.service';
 import {MatDatepickerModule} from '@angular/material/datepicker';
@@ -13,7 +13,7 @@ import {DeleteRestoreComponent} from 'src/app/crf/dialogs/delete-restore/delete-
 import {of, switchMap} from 'rxjs';
 import {WorkflowStatusComponent} from 'src/app/crf/workflow-status/workflow-status.component';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 
 @Component({
 	templateUrl: './scope-settings.component.html',
@@ -32,8 +32,8 @@ import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
 export class ScopeSettingsComponent implements OnInit {
 	workflowableEntity = WorkflowableEntity;
 
-	@Input() scopeModel: ScopeModelDTO;
-	@Input() scope: ScopeDTO;
+	@Input() scopeModel: ScopeModel;
+	@Input() scope: Scope;
 
 	scopeUpdateForm = this.formBuilder.group({
 		code: ['', [Validators.required]],
@@ -67,7 +67,7 @@ export class ScopeSettingsComponent implements OnInit {
 	}
 
 	save() {
-		const updatedScope = {...this.scope, ...this.scopeUpdateForm.value} as ScopeDTO;
+		const updatedScope = {...this.scope, ...this.scopeUpdateForm.value} as Scope;
 		this.scopeService.save(this.scope.pk, updatedScope).subscribe(scope => {
 			Object.assign(this.scope, scope);
 			this.scopeUpdateForm.reset(this.scope);
@@ -141,7 +141,7 @@ export class ScopeSettingsComponent implements OnInit {
 		});
 	}
 
-	onWorkflowExecution(newScope: WorkflowableDTO) {
-		this.scope = newScope as ScopeDTO;
+	onWorkflowExecution(newScope: Workflowable) {
+		this.scope = newScope as Scope;
 	}
 }

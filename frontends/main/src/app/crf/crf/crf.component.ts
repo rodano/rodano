@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {SideMenuComponent} from '../side-menu/side-menu.component';
 
 @Component({
@@ -13,5 +13,5 @@ import {SideMenuComponent} from '../side-menu/side-menu.component';
 	]
 })
 export class CRFComponent {
-	@Input() scope: ScopeDTO;
+	@Input() scope: Scope;
 }

@@ -7,14 +7,14 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { ScopeTinyDTO } from './scope-tiny-dto';
+import { ScopeTiny } from './scope-tiny';
 
 
 /**
  * An auxiliary object that provides information relevant to a WorkflowStatus
  */
 export interface WorkflowStatusInfo { 
-    ancestors: Array<ScopeTinyDTO>;
+    ancestors: Array<ScopeTiny>;
     parentScopeCode: string;
     scopePk: number;
     scopeModelId: string;

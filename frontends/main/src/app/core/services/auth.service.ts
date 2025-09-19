@@ -2,11 +2,11 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from 'src/app/interceptors/auth.interceptor';
-import {AuthenticationDTO} from '../model/authentication-dto';
-import {CredentialsDTO} from '../model/credentials-dto';
+import {Authentication} from '../model/authentication';
+import {Credentials} from '../model/credentials';
 import {APIService} from './api.service';
-import {ResetPasswordDTO} from '../model/reset-password-dto';
-import {ChangePasswordDTO} from '../model/change-password-dto';
+import {ResetPassword} from '../model/reset-password';
+import {ChangePassword} from '../model/change-password';
 
 @Injectable({
 	providedIn: 'root'
@@ -17,8 +17,8 @@ export class AuthService {
 		private apiService: APIService
 	) {}
 
-	login(credentials: CredentialsDTO): Observable<AuthenticationDTO> {
-		return this.http.post<AuthenticationDTO>(
+	login(credentials: Credentials): Observable<Authentication> {
+		return this.http.post<Authentication>(
 			`${this.apiService.getApiUrl()}/sessions`,
 			credentials
 		);
@@ -42,20 +42,20 @@ export class AuthService {
 		);
 	}
 
-	changePassword(changePasswordDTO: ChangePasswordDTO): Observable<any> {
+	changePassword(changePassword: ChangePassword): Observable<any> {
 		return this.http.post(
 			`${this.apiService.getApiUrl()}/auth/password/change`,
-			changePasswordDTO,
+			changePassword,
 			{
 				headers: new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '')
 			}
 		);
 	}
 
-	resetPassword(resetPasswordDTO: ResetPasswordDTO): Observable<any> {
+	resetPassword(resetPassword: ResetPassword): Observable<any> {
 		return this.http.post(
 			`${this.apiService.getApiUrl()}/auth/password/reset`,
-			resetPasswordDTO,
+			resetPassword,
 			{
 				headers: new HttpHeaders().set(SKIP_AUTH_TOKEN_HEADER, '').set(SKIP_ERROR_HANDLING_HEADER, '')
 			}

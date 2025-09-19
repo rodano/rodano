@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {TimelineGraphDataDTO} from '@core/model/timeline-graph-data-dto';
+import {Scope} from '@core/model/scope';
+import {TimelineGraphData} from '@core/model/timeline-graph-data';
 import {Timeline} from '@rodano/timeline';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatCardModule} from '@angular/material/card';
@@ -19,8 +19,8 @@ import {LoggingService} from '@core/services/logging.service';
 	]
 })
 export class TimelineComponent implements OnInit {
-	@Input() scope: ScopeDTO;
-	graphs: TimelineGraphDataDTO[] = [];
+	@Input() scope: Scope;
+	graphs: TimelineGraphData[] = [];
 
 	constructor(
 		private scopeService: ScopeService,

@@ -1,6 +1,6 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {UserDTO} from '@core/model/user-dto';
+import {Scope} from '@core/model/scope';
+import {User} from '@core/model/user';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
 import {AuditTrailPropertyComponent} from '../audit-trail-property/audit-trail-property.component';
@@ -8,16 +8,16 @@ import {MatIconButton} from '@angular/material/button';
 import {MatTooltip} from '@angular/material/tooltip';
 import {AuditTrailEntityComponent} from '../audit-trail-entity/audit-trail-entity.component';
 import {AuditTrailService} from '@core/services/audit-trail.service';
-import {RoleDTO} from '@core/model/role-dto';
+import {Role} from '@core/model/role';
 import {Observable} from 'rxjs';
 import {PropertyAuditTrail} from '@core/model/property-audit-trail';
-import {RobotDTO} from '@core/model/robot-dto';
-import {EventDTO} from '@core/model/event-dto';
-import {DatasetDTO} from '@core/model/dataset-dto';
+import {Robot} from '@core/model/robot';
+import {Event} from '@core/model/event';
+import {Dataset} from '@core/model/dataset';
 import {EntityAuditTrail} from '@core/model/entity-audit-trail';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
-import {FormDTO} from '@core/model/form-dto';
-import {FieldDTO} from '@core/model/field-dto';
+import {Form} from '@core/model/form';
+import {Field} from '@core/model/field';
 import {AuthStateService} from '../services/auth-state.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FeatureStatic} from '@core/model/feature-static';
@@ -35,14 +35,14 @@ import {FeatureStatic} from '@core/model/feature-static';
 })
 export class AuditTrailButtonComponent implements OnInit {
 	hasRight = false;
-	@Input() scope: ScopeDTO;
-	@Input() event: EventDTO;
-	@Input() dataset: DatasetDTO;
-	@Input() form: FormDTO;
-	@Input() field: FieldDTO;
-	@Input() user: UserDTO;
-	@Input() robot: RobotDTO;
-	@Input() role: RoleDTO;
+	@Input() scope: Scope;
+	@Input() event: Event;
+	@Input() dataset: Dataset;
+	@Input() form: Form;
+	@Input() field: Field;
+	@Input() user: User;
+	@Input() robot: Robot;
+	@Input() role: Role;
 	@Input() property: string;
 
 	constructor(

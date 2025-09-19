@@ -1,18 +1,18 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve} from '@angular/router';
 import {Observable, EMPTY} from 'rxjs';
-import {EventDTO} from '@core/model/event-dto';
+import {Event} from '@core/model/event';
 import {EventService} from '@core/services/event.service';
 
 @Injectable({
 	providedIn: 'root'
 })
-export class EventResolver implements Resolve<EventDTO> {
+export class EventResolver implements Resolve<Event> {
 	constructor(
 		private eventService: EventService
 	) {}
 
-	resolve(route: ActivatedRouteSnapshot): Observable<EventDTO> {
+	resolve(route: ActivatedRouteSnapshot): Observable<Event> {
 		//Since this resolver is used on two levels of the router hierarchy, we need
 		//to check both the paramMap AND the parent paramMap
 		const scopePkParam = route.paramMap.get('scopePk') ?? route.parent?.paramMap.get('scopePk');

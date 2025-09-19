@@ -14,7 +14,7 @@ import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {ScopeBreadcrumbComponent} from '../../scope/breadcrumb/scope-breadcrumb.component';
 import {ExportButton} from '../summary/export-button';
-import {SummaryDTO} from '@core/model/summary-dto';
+import {Summary} from '@core/model/summary';
 import {SummaryWidgetComponent} from '../summary/summary-widget.component';
 import {MatDivider} from '@angular/material/divider';
 
@@ -43,7 +43,7 @@ import {MatDivider} from '@angular/material/divider';
 	]
 })
 export class LockSummaryWidgetComponent extends SummaryWidgetComponent {
-	getData(scopePk: number): Observable<SummaryDTO> {
+	getData(scopePk: number): Observable<Summary> {
 		return this.widgetService.getLockSummary(scopePk);
 	}
 

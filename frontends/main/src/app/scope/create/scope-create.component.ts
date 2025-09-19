@@ -1,8 +1,8 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {ScopeModel} from '@core/model/scope-model';
+import {Scope} from '@core/model/scope';
 import {ScopeService} from '@core/services/scope.service';
 import {NotificationService} from 'src/app/services/notification.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
@@ -11,7 +11,7 @@ import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {ScopeCandidateDTO} from '@core/model/scope-candidate-dto';
+import {ScopeCandidate} from '@core/model/scope-candidate';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Rights} from '@core/model/rights';
@@ -31,7 +31,7 @@ import {Rights} from '@core/model/rights';
 	]
 })
 export class ScopeCreateComponent implements OnInit {
-	@Input() scopeModel: ScopeModelDTO;
+	@Input() scopeModel: ScopeModel;
 
 	scopeCreationForm = this.formBuilder.nonNullable.group({
 		code: ['', [Validators.required]],
@@ -39,7 +39,7 @@ export class ScopeCreateComponent implements OnInit {
 		parentScopePk: [1, [Validators.required]]
 	});
 
-	parentScopes: ScopeDTO[];
+	parentScopes: Scope[];
 
 	constructor(
 		private router: Router,
@@ -55,7 +55,7 @@ export class ScopeCreateComponent implements OnInit {
 	}
 
 	save() {
-		const scopeCandidate = Object.assign({}, this.scopeCreationForm.value) as ScopeCandidateDTO;
+		const scopeCandidate = Object.assign({}, this.scopeCreationForm.value) as ScopeCandidate;
 		scopeCandidate.modelId = this.scopeModel.id;
 		//Set the scope start date to now
 		scopeCandidate.startDate = new Date();

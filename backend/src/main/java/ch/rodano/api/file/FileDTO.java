@@ -13,7 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import ch.rodano.core.model.file.File;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@Schema(description = "File transmission DTO")
+@Schema(description = "File transmission")
 public record FileDTO(
 	@NotNull
 	Long pk,

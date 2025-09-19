@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
@@ -27,9 +27,9 @@ import {MeService} from '@core/services/me.service';
 	]
 })
 export class UserComponent implements OnInit {
-	@Input() me: UserDTO;
+	@Input() me: User;
 	//user will be undefined when this component is displayed to create a new user
-	@Input() user?: UserDTO;
+	@Input() user?: User;
 	pendingRolesNumber = 0;
 
 	constructor(

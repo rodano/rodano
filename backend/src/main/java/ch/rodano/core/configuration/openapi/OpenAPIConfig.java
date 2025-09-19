@@ -1,14 +1,19 @@
 package ch.rodano.core.configuration.openapi;
 
 import java.util.Arrays;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.utils.SpringDocUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.v3.core.converter.AnnotatedType;
+import io.swagger.v3.core.converter.ModelConverter;
 import io.swagger.v3.core.jackson.ModelResolver;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -23,8 +28,29 @@ import ch.rodano.configuration.model.common.Node;
 @Configuration
 public class OpenAPIConfig {
 
-	@Autowired
-	BuildProperties buildProperties;
+	public static final List<String> SCHEMA_RESERVED_NAMES = List.of("File");
+
+	private final BuildProperties buildProperties;
+
+	public OpenAPIConfig(final BuildProperties buildProperties) {
+		this.buildProperties = buildProperties;
+	}
+
+	@Bean
+	public ModelConverter modelConverter(final ObjectMapper objectMapper) {
+		return new ModelResolver(objectMapper) {
+			@Override
+			protected String decorateModelName(final AnnotatedType type, final String originalName) {
+				//remove the DTO suffix
+				final var name = StringUtils.stripEnd(originalName, "DTO");
+				//change reserved schema names
+				if(name != null && SCHEMA_RESERVED_NAMES.contains(name)) {
+					return name + "Model";
+				}
+				return name;
+			}
+		};
+	}
 
 	@Bean
 	public OpenAPI customOpenAPI() {

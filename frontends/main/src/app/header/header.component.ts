@@ -1,12 +1,12 @@
 import {Component, OnInit, DestroyRef, Input} from '@angular/core';
 import {Router, RouterLinkActive, RouterLink} from '@angular/router';
-import {MenuDTO} from '@core/model/menu-dto';
+import {Menu} from '@core/model/menu';
 import {switchMap} from 'rxjs/operators';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatIcon} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatToolbarModule} from '@angular/material/toolbar';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatBadge} from '@angular/material/badge';
 import {MatTooltip} from '@angular/material/tooltip';
@@ -14,9 +14,9 @@ import {forkJoin, of} from 'rxjs';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {AuthStateService} from '../services/auth-state.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {PublicStudyDTO} from '@core/model/public-study-dto';
+import {PublicStudy} from '@core/model/public-study';
 import {Environment} from '@core/model/environment';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {MeService} from '@core/services/me.service';
 import {NotificationService} from '../services/notification.service';
 
@@ -40,12 +40,12 @@ export class HeaderComponent implements OnInit {
 	environment = Environment;
 	adminProfileId = 'ADMIN';
 
-	@Input() study: PublicStudyDTO;
+	@Input() study: PublicStudy;
 
 	logo?: string;
-	user?: UserDTO;
-	menus?: MenuDTO[];
-	profiles: ProfileDTO[] = [];
+	user?: User;
+	menus?: Menu[];
+	profiles: Profile[] = [];
 	pendingRolesNumber = 0;
 
 	constructor(

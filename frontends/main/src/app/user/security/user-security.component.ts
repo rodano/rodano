@@ -1,6 +1,6 @@
 import {Component, DestroyRef, Input, OnChanges} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
 import {MatDialog} from '@angular/material/dialog';
 import {UserPasswordDialogComponent} from '../dialogs/user-password.dialog';
@@ -31,8 +31,8 @@ import {of} from 'rxjs';
 	]
 })
 export class UserSecurityComponent implements OnChanges {
-	@Input() user: UserDTO;
-	@Input() me: UserDTO;
+	@Input() user: User;
+	@Input() me: User;
 
 	emailForm = new FormGroup({
 		email: new FormControl('', {

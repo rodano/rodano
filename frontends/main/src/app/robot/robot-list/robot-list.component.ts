@@ -1,11 +1,11 @@
 import {Component, OnInit, ViewChild, DestroyRef} from '@angular/core';
-import {RobotDTO} from '@core/model/robot-dto';
+import {Robot} from '@core/model/robot';
 import {RobotService} from '@core/services/robot.service';
 import {startWith, switchMap} from 'rxjs/operators';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {MatPaginator} from '@angular/material/paginator';
-import {PagedResultRobotDTO} from '@core/model/paged-result-robot-dto';
+import {PagedResultRobot} from '@core/model/paged-result-robot';
 import {RobotSearch} from '@core/utilities/search/robot-search';
 import {Subject, merge} from 'rxjs';
 import {GetFieldPipe} from '../../pipes/get-field.pipe';
@@ -54,7 +54,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	]
 })
 export class RobotListComponent implements OnInit {
-	profiles: ProfileDTO[];
+	profiles: Profile[];
 	searchForm = new FormGroup({
 		name: new FormControl('', {nonNullable: true}),
 		profileId: new FormControl('')
@@ -62,7 +62,7 @@ export class RobotListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 
-	robots: PagedResultRobotDTO = EMPTY_PAGED_RESULT;
+	robots: PagedResultRobot = EMPTY_PAGED_RESULT;
 	columnsToDisplay: string[] = [
 		'name',
 		'profileId',
@@ -119,14 +119,14 @@ export class RobotListComponent implements OnInit {
 		this.refreshSearch$.next();
 	}
 
-	remove(robot: RobotDTO) {
+	remove(robot: Robot) {
 		this.robotService.remove(robot.pk).subscribe(() => {
 			robot.removed = true;
 			this.notificationService.showSuccess('Robot removed');
 		});
 	}
 
-	restore(robot: RobotDTO) {
+	restore(robot: Robot) {
 		this.robotService.restore(robot.pk).subscribe(() => {
 			robot.removed = false;
 			this.notificationService.showSuccess('Robot restored');

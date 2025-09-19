@@ -1,9 +1,9 @@
 import {Component, Inject, Input} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
-import {EPROInvitationDTO} from '@core/model/epro-invitation-dto';
+import {EPROInvitation} from '@core/model/epro-invitation';
 import {MatButton} from '@angular/material/button';
 import {QRCodeComponent} from 'angularx-qrcode';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
 @Component({
@@ -12,12 +12,12 @@ import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 	imports: [MatDialogModule, MatButton, QRCodeComponent, LocalizeMapPipe]
 })
 export class EproInvitationComponent {
-	@Input() eproProfile: ProfileDTO;
+	@Input() eproProfile: Profile;
 
 	public qrCodeUrl: string;
 
 	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: {invitation: EPROInvitationDTO; eproProfile: ProfileDTO}
+		@Inject(MAT_DIALOG_DATA) public data: {invitation: EPROInvitation; eproProfile: Profile}
 	) {
 		this.qrCodeUrl = `${data.invitation.url}/eproapp/login?code=${data.invitation.key}`;
 	}

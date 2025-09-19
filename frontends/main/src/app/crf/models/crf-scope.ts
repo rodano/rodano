@@ -1,8 +1,8 @@
 import {Observable} from 'rxjs';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {FormDTO} from '@core/model/form-dto';
+import {Scope} from '@core/model/scope';
+import {Form} from '@core/model/form';
 
-export interface CRFScopeDTO extends ScopeDTO {
+export interface CRFScope extends Scope {
 	//Used to track the forms on scope
-	forms: Observable<FormDTO[]>;
+	forms: Observable<Form[]>;
 }

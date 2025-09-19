@@ -5,7 +5,7 @@ import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MailsService} from '@core/services/mails.service';
 import {NotificationService} from '../services/notification.service';
-import {MailCreationDTO} from '@core/model/mail-creation-dto';
+import {MailCreation} from '@core/model/mail-creation';
 import {MeService} from '@core/services/me.service';
 import {MailStatus} from '@core/model/mail-status';
 
@@ -40,7 +40,7 @@ export class SendTestMailComponent implements OnInit {
 
 	sendMail() {
 		this.error = undefined;
-		const mail = this.mailForm.value as MailCreationDTO;
+		const mail = this.mailForm.value as MailCreation;
 		this.mailService.send(mail).subscribe({
 			next: mail => {
 				if(mail.status === MailStatus.FAILED) {

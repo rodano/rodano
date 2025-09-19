@@ -9,9 +9,9 @@ import {MatTable, MatTableModule} from '@angular/material/table';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {RouterLink} from '@angular/router';
 import {debounceTime, merge, startWith, switchMap} from 'rxjs';
-import {OverdueDTO} from '@core/model/overdue-dto';
-import {PagedResultOverdueDTO} from '@core/model/paged-result-overdue-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Overdue} from '@core/model/overdue';
+import {PagedResultOverdue} from '@core/model/paged-result-overdue';
+import {Scope} from '@core/model/scope';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {WidgetService} from '@core/services/widget.service';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
@@ -41,13 +41,13 @@ import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
 	styleUrl: './overdue.component.css'
 })
 export class OverdueComponent implements OnInit {
-	@Input() scopes?: ScopeDTO[];
+	@Input() scopes?: Scope[];
 	@Input() id: string;
 	@Input() specificColumnName: string;
 
 	@Output() scopesLoaded = new EventEmitter<number>();
 
-	scopeOverdue: PagedResultOverdueDTO = EMPTY_PAGED_RESULT;
+	scopeOverdue: PagedResultOverdue = EMPTY_PAGED_RESULT;
 	overdueType: string;
 
 	scopeName: string;
@@ -56,7 +56,7 @@ export class OverdueComponent implements OnInit {
 	scopePks: number[];
 	exportUrl: string;
 
-	@ViewChild(MatTable, {static: true}) table: MatTable<OverdueDTO>;
+	@ViewChild(MatTable, {static: true}) table: MatTable<Overdue>;
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 

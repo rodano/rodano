@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {CMSWidgetDTO} from '@core/model/cms-widget-dto';
+import {CMSWidget} from '@core/model/cms-widget';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {WorkflowWidgetComponent} from '../workflow/workflow-widget.component';
 import {ChartWidgetComponent} from '../chart/chart-widget.component';
 import {ResourceWidgetComponent} from '../resource/resource-widget.component';
@@ -27,8 +27,8 @@ import {WelcomeTextComponent} from '../welcome-text/welcome-text.component';
 	]
 })
 export class GenericWidgetComponent {
-	@Input() widget: CMSWidgetDTO;
-	@Input() scopes?: ScopeDTO[];
+	@Input() widget: CMSWidget;
+	@Input() scopes?: Scope[];
 	@Input() criteria?: FieldModelCriterion[];
 
 	@Output() notifyParent = new EventEmitter<number>();

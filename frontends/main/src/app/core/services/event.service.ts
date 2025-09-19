@@ -1,7 +1,7 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {EventDTO} from '../model/event-dto';
+import {Event} from '../model/event';
 import {APIService} from './api.service';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
@@ -15,47 +15,47 @@ export class EventService {
 	) { }
 
 	@reviveDates
-	create(scopePk: number, eventModelId: string): Observable<EventDTO> {
+	create(scopePk: number, eventModelId: string): Observable<Event> {
 		const params = new HttpParams().set('eventModelId', eventModelId);
-		return this.http.post<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`, undefined, {params});
+		return this.http.post<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`, undefined, {params});
 	}
 
 	@reviveDates
-	get(scopePk: number, eventPk: number): Observable<EventDTO> {
-		return this.http.get<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}`);
+	get(scopePk: number, eventPk: number): Observable<Event> {
+		return this.http.get<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}`);
 	}
 
 	@reviveDates
-	search(scopePk: number): Observable<EventDTO[]> {
-		return this.http.get<EventDTO[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`);
+	search(scopePk: number): Observable<Event[]> {
+		return this.http.get<Event[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`);
 	}
 
 	@reviveDates
-	updateDates(scopePk: number, eventPk: number, date: Date, endDate?: Date): Observable<EventDTO> {
+	updateDates(scopePk: number, eventPk: number, date: Date, endDate?: Date): Observable<Event> {
 		let params = new HttpParams().set('date', date.toISOString());
 		if(endDate) {
 			params = params.set('endDate', endDate.toISOString());
 		}
-		return this.http.put<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}`, undefined, {params});
+		return this.http.put<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}`, undefined, {params});
 	}
 
 	@reviveDates
-	remove(scopePk: number, eventPk: number, message: string): Observable<EventDTO> {
-		return this.http.put<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/remove`, {message});
+	remove(scopePk: number, eventPk: number, message: string): Observable<Event> {
+		return this.http.put<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/remove`, {message});
 	}
 
 	@reviveDates
-	restore(scopePk: number, eventPk: number, message: string): Observable<EventDTO> {
-		return this.http.put<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/restore`, {message});
+	restore(scopePk: number, eventPk: number, message: string): Observable<Event> {
+		return this.http.put<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/restore`, {message});
 	}
 
 	@reviveDates
-	lock(scopePk: number, eventPk: number): Observable<EventDTO> {
-		return this.http.put<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/lock`, {});
+	lock(scopePk: number, eventPk: number): Observable<Event> {
+		return this.http.put<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/lock`, {});
 	}
 
 	@reviveDates
-	unlock(scopePk: number, eventPk: number): Observable<EventDTO> {
-		return this.http.put<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/unlock`, {});
+	unlock(scopePk: number, eventPk: number): Observable<Event> {
+		return this.http.put<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/unlock`, {});
 	}
 }

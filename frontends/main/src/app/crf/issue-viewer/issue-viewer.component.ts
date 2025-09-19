@@ -4,8 +4,8 @@ import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTable, MatTableModule} from '@angular/material/table';
 import {merge} from 'rxjs';
 import {startWith, switchMap} from 'rxjs/operators';
-import {PagedResultWorkflowStatusDTO} from '@core/model/paged-result-workflow-status-dto';
-import {WorkflowStatusDTO} from '@core/model/workflow-status-dto';
+import {PagedResultWorkflowStatus} from '@core/model/paged-result-workflow-status';
+import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {WorkflowStatusSearch} from '@core/utilities/search/workflow-status-search';
 import {CapitalizeFirstPipe} from '../../pipes/capitalize-first.pipe';
@@ -46,9 +46,9 @@ export class IssueViewerComponent implements OnInit {
 		'triggerMessage'
 	];
 
-	workflowStatuses: PagedResultWorkflowStatusDTO = EMPTY_PAGED_RESULT;
+	workflowStatuses: PagedResultWorkflowStatus = EMPTY_PAGED_RESULT;
 
-	@ViewChild(MatTable, {static: true}) table: MatTable<WorkflowStatusDTO>;
+	@ViewChild(MatTable, {static: true}) table: MatTable<WorkflowStatus>;
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 

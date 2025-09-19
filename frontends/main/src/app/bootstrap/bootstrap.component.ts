@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
-import {BootstrapDTO} from '@core/model/bootstrap-dto';
+import {Bootstrap} from '@core/model/bootstrap';
 import {DatabaseService} from '@core/services/database.service';
 
 @Component({
@@ -51,7 +51,7 @@ export class BootstrapComponent {
 	bootstrap() {
 		this.loading = true;
 		this.error = undefined;
-		const bootstrap = this.bootstrapForm.value as BootstrapDTO;
+		const bootstrap = this.bootstrapForm.value as Bootstrap;
 
 		this.databaseService.bootstrap(bootstrap).subscribe({
 			next: () => this.router.navigate(['/login']),

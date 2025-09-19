@@ -1,25 +1,25 @@
 import {Injectable} from '@angular/core';
-import {FieldDTO} from '../model/field-dto';
+import {Field} from '../model/field';
 import {FieldModelType} from '../model/field-model-type';
-import {FieldModelDTO} from '../model/field-model-dto';
+import {FieldModel} from '../model/field-model';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class FieldService {
-	isBlank(field: FieldDTO): boolean {
+	isBlank(field: Field): boolean {
 		return field.value === undefined || field.value === null || field.value === '';
 	}
 
-	isDate(fieldModel: FieldModelDTO): boolean {
+	isDate(fieldModel: FieldModel): boolean {
 		return fieldModel.withYears;
 	}
 
-	isTime(fieldModel: FieldModelDTO): boolean {
+	isTime(fieldModel: FieldModel): boolean {
 		return fieldModel.withHours;
 	}
 
-	generateDateFormat(fieldModel: FieldModelDTO): string {
+	generateDateFormat(fieldModel: FieldModel): string {
 		if(![FieldModelType.DATE, FieldModelType.DATE_SELECT].includes(fieldModel.type)) {
 			throw new Error(`Generating a date format is not supported for field model ${fieldModel.id} of type ${fieldModel.type}`);
 		}
@@ -42,7 +42,7 @@ export class FieldService {
 		return format;
 	}
 
-	generateTimeFormat(fieldModel: FieldModelDTO): string {
+	generateTimeFormat(fieldModel: FieldModel): string {
 		if(![FieldModelType.DATE, FieldModelType.DATE_SELECT].includes(fieldModel.type)) {
 			throw new Error(`Generating a time format is not supported for field model ${fieldModel.id} of type ${fieldModel.type}`);
 		}
@@ -65,7 +65,7 @@ export class FieldService {
 		return format;
 	}
 
-	generateFormat(fieldModel: FieldModelDTO): string {
+	generateFormat(fieldModel: FieldModel): string {
 		if(this.isDate(fieldModel) && this.isTime(fieldModel)) {
 			const parts = [this.generateDateFormat(fieldModel), this.generateTimeFormat(fieldModel)];
 			return parts.join(' ');

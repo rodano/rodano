@@ -9,6 +9,9 @@
  */
 
 
+/**
+ * Field type
+ */
 export type FieldModelType = 'STRING' | 'AUTO_COMPLETION' | 'DATE' | 'DATE_SELECT' | 'NUMBER' | 'SELECT' | 'RADIO' | 'CHECKBOX' | 'CHECKBOX_GROUP' | 'TEXTAREA' | 'FILE';
 
 export const FieldModelType = {

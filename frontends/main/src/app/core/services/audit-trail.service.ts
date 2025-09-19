@@ -1,12 +1,12 @@
 import {Injectable} from '@angular/core';
 import {forkJoin, map, Observable} from 'rxjs';
-import {FieldDTO} from '../model/field-dto';
+import {Field} from '../model/field';
 import {VersionsService} from './versions.service';
 import {PropertyAuditTrail} from '../model/property-audit-trail';
 import {EntityVersion} from '../model/entity-version';
 import {EntityAuditTrail} from '../model/entity-audit-trail';
 import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
-import {RoleDTO} from '../model/role-dto';
+import {Role} from '../model/role';
 import {FieldEventAuditTrail, FieldEventEntityType} from '../model/field-event-audit-trail';
 import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
 
@@ -160,7 +160,7 @@ export class AuditTrailService {
 		);
 	}
 
-	getForRoleProperty(role: RoleDTO, property: string) {
+	getForRoleProperty(role: Role, property: string) {
 		return role.userPk
 			? this.getForUserRoleProperty(role.userPk, role.pk, property)
 			: this.getForUserRoleProperty(role.robotPk as number, role.pk, property);
@@ -178,7 +178,7 @@ export class AuditTrailService {
 		);
 	}
 
-	getForField(field: FieldDTO): Observable<FieldEventAuditTrail[]> {
+	getForField(field: Field): Observable<FieldEventAuditTrail[]> {
 		const statuses = field.workflowStatuses;
 		return forkJoin([
 			this.versionsService.getForField(field.scopePk, field.eventPk, field.datasetPk, field.pk),

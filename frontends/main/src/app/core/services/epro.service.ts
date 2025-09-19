@@ -2,8 +2,8 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
-import {EPROInvitationDTO} from '../model/epro-invitation-dto';
-import {EproRobotDTO} from '../model/epro-robot-dto';
+import {EPROInvitation} from '../model/epro-invitation';
+import {EproRobot} from '../model/epro-robot';
 
 @Injectable({
 	providedIn: 'root'
@@ -18,16 +18,16 @@ export class EproService {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/epro`;
 	}
 
-	getInvitedRobots(): Observable<EproRobotDTO[]> {
-		return this.http.get<EproRobotDTO[]>(`${this.serviceUrl}/robots`);
+	getInvitedRobots(): Observable<EproRobot[]> {
+		return this.http.get<EproRobot[]>(`${this.serviceUrl}/robots`);
 	}
 
-	getRobot(key: string): Observable<EproRobotDTO> {
-		return this.http.post<EproRobotDTO>(`${this.serviceUrl}/robot`, {key});
+	getRobot(key: string): Observable<EproRobot> {
+		return this.http.post<EproRobot>(`${this.serviceUrl}/robot`, {key});
 	}
 
-	invite(scopePk: number): Observable<EPROInvitationDTO> {
-		return this.http.put<EPROInvitationDTO>(`${this.serviceUrl}/${scopePk}/invite`, undefined);
+	invite(scopePk: number): Observable<EPROInvitation> {
+		return this.http.put<EPROInvitation>(`${this.serviceUrl}/${scopePk}/invite`, undefined);
 	}
 
 	revoke(scopePk: number): Observable<void> {

@@ -1,6 +1,6 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
-import {EventModelDTO} from '@core/model/event-model-dto';
+import {EventModel} from '@core/model/event-model';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatListModule} from '@angular/material/list';
@@ -22,6 +22,6 @@ export interface WorkflowRationaleData {
 })
 export class SelectEventComponent {
 	constructor(
-		@Inject(MAT_DIALOG_DATA) public events: EventModelDTO[]
+		@Inject(MAT_DIALOG_DATA) public events: EventModel[]
 	) {}
 }

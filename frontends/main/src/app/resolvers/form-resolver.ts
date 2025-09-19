@@ -2,17 +2,17 @@ import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve} from '@angular/router';
 import {Observable, EMPTY} from 'rxjs';
 import {FormService} from '@core/services/form.service';
-import {FormDTO} from '@core/model/form-dto';
+import {Form} from '@core/model/form';
 
 @Injectable({
 	providedIn: 'root'
 })
-export class FormResolver implements Resolve<FormDTO> {
+export class FormResolver implements Resolve<Form> {
 	constructor(
 		private formService: FormService
 	) {}
 
-	resolve(route: ActivatedRouteSnapshot): Observable<FormDTO> {
+	resolve(route: ActivatedRouteSnapshot): Observable<Form> {
 		//Since this resolver is used on two levels of the router hierarchy, we need
 		//to check both the paramMap AND the parent paramMap
 		const scopePkParam = route.paramMap.get('scopePk') ?? route.parent?.paramMap.get('scopePk');

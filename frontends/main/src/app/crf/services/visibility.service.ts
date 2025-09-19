@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
-import {CellDTO} from '@core/model/cell-dto';
+import {Cell} from '@core/model/cell';
 import {CRFField} from '../models/crf-field';
 import {CRFService} from './crf.service';
 import {CellVisibilityEvent} from './visibility-event-cell';
@@ -42,7 +42,7 @@ export class VisibilityService {
 		);
 	}*/
 
-	public triggerCriteria(cell: CellDTO, layoutUid: string, field: CRFField): void {
+	public triggerCriteria(cell: Cell, layoutUid: string, field: CRFField): void {
 		cell.visibilityCriteria.forEach(criterion => {
 			const fieldValues = this.crfService.parseFieldValue(field);
 			const criterionValues = this.crfService.typeFieldValues(field.model, criterion.values);
@@ -89,7 +89,7 @@ export class VisibilityService {
 		this.cellVisibilityStream$.next(event);
 	}
 
-	public triggerCellsVisibilityEvent(cells: CellDTO[], layoutUid: string, visible: boolean): void {
+	public triggerCellsVisibilityEvent(cells: Cell[], layoutUid: string, visible: boolean): void {
 		cells
 			.map(c => c.id)
 			.forEach(c => this.triggerCellVisibilityEvent(c, layoutUid, visible));

@@ -1,10 +1,10 @@
 import {Component, OnInit, ViewChild, Input, DestroyRef, OnChanges} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {UserService} from '@core/services/user.service';
 import {UserSearch} from '@core/utilities/search/user-search';
-import {PagedResultUserDTO} from '@core/model/paged-result-user-dto';
+import {PagedResultUser} from '@core/model/paged-result-user';
 import {GetFieldPipe} from '../../pipes/get-field.pipe';
 import {LookupByIdPipe} from '../../pipes/lookup-by-id.pipe';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -51,12 +51,12 @@ export class UserListComponent implements OnInit, OnChanges {
 
 	refreshSearch$ = new Subject<void>();
 
-	profiles: ProfileDTO[];
+	profiles: Profile[];
 	roleStatus = RoleStatus;
 
 	getRoleStatusDisplay = getRoleStatusDisplay;
 
-	users: PagedResultUserDTO = EMPTY_PAGED_RESULT;
+	users: PagedResultUser = EMPTY_PAGED_RESULT;
 	columnsToDisplay: string[] = [
 		'name',
 		'email',

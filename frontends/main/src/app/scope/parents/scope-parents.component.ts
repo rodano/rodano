@@ -1,12 +1,12 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
 import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {forkJoin} from 'rxjs';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {ScopeRelationDTO} from '@core/model/scope-relation-dto';
+import {ScopeModel} from '@core/model/scope-model';
+import {Scope} from '@core/model/scope';
+import {ScopeRelation} from '@core/model/scope-relation';
 import {NotificationService} from 'src/app/services/notification.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
-import {ScopeRelationCreationDTO} from '@core/model/scope-relation-creation-dto';
+import {ScopeRelationCreation} from '@core/model/scope-relation-creation';
 import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MatInput} from '@angular/material/input';
@@ -50,10 +50,10 @@ import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 	]
 })
 export class ScopeParentsComponent implements OnInit {
-	@Input() scopeModel: ScopeModelDTO;
-	@Input() scope: ScopeDTO;
+	@Input() scopeModel: ScopeModel;
+	@Input() scope: Scope;
 
-	scopeRelations: ScopeRelationDTO[] = [];
+	scopeRelations: ScopeRelation[] = [];
 
 	displayedColumns = [
 		'scope',
@@ -78,9 +78,9 @@ export class ScopeParentsComponent implements OnInit {
 		})
 	});
 
-	allParentScopes: ScopeDTO[] = [];
-	parentScopes: ScopeDTO[] = [];
-	transferParentScopes: ScopeDTO[] = [];
+	allParentScopes: Scope[] = [];
+	parentScopes: Scope[] = [];
+	transferParentScopes: Scope[] = [];
 
 	constructor(
 		private scopeRelationsService: ScopeRelationsService,
@@ -102,7 +102,7 @@ export class ScopeParentsComponent implements OnInit {
 	}
 
 	addParent() {
-		const scopeRelationCreation = this.addParentForm.value as ScopeRelationCreationDTO;
+		const scopeRelationCreation = this.addParentForm.value as ScopeRelationCreation;
 
 		this.scopeRelationsService.createScopeRelation(this.scope.pk, scopeRelationCreation).pipe(
 			takeUntilDestroyed(this.destroyRef)
@@ -127,7 +127,7 @@ export class ScopeParentsComponent implements OnInit {
 
 	transfer() {
 		const parentPk = this.transferForm.value.parentPk;
-		const scopeRelationCreation = {parentPk, startDate: new Date()} as ScopeRelationCreationDTO;
+		const scopeRelationCreation = {parentPk, startDate: new Date()} as ScopeRelationCreation;
 
 		this.scopeRelationsService.transfer(this.scope.pk, scopeRelationCreation).pipe(
 			takeUntilDestroyed(this.destroyRef)
@@ -184,7 +184,7 @@ export class ScopeParentsComponent implements OnInit {
 		this.transferParentScopes = this.parentScopes.filter(s => s.modelId === defaultParentScopeModelId);
 	}
 
-	isCurrent(scopeRelation: ScopeRelationDTO): boolean {
+	isCurrent(scopeRelation: ScopeRelation): boolean {
 		return !scopeRelation.stopDate || scopeRelation.stopDate.getTime() > new Date().getTime();
 	}
 }

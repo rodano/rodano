@@ -1,11 +1,11 @@
 import {Component, OnInit, Input} from '@angular/core';
 import {RouterLink, Router} from '@angular/router';
-import {RobotDTO} from '@core/model/robot-dto';
+import {Robot} from '@core/model/robot';
 import {Validators, ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {Observable} from 'rxjs';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {PagedResultScopeDTO} from '@core/model/paged-result-scope-dto';
+import {PagedResultScope} from '@core/model/paged-result-scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
@@ -15,14 +15,14 @@ import {MatInput} from '@angular/material/input';
 import {MatFormField, MatHint, MatLabel} from '@angular/material/form-field';
 import {RobotService} from '@core/services/robot.service';
 import {NotificationService} from 'src/app/services/notification.service';
-import {RobotCreationDTO} from '@core/model/robot-creation-dto';
+import {RobotCreation} from '@core/model/robot-creation';
 import {MatIcon} from '@angular/material/icon';
-import {RobotUpdateDTO} from '@core/model/robot-update-dto';
+import {RobotUpdate} from '@core/model/robot-update';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {MatTooltip} from '@angular/material/tooltip';
 import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
 import {ScopeFinderComponent} from 'src/app/scope-finder/scope-finder.component';
-import {RoleCreationDTO} from '@core/model/role-creation-dto';
+import {RoleCreation} from '@core/model/role-creation';
 
 @Component({
 	templateUrl: './robot.component.html',
@@ -48,7 +48,7 @@ import {RoleCreationDTO} from '@core/model/role-creation-dto';
 	]
 })
 export class RobotComponent implements OnInit {
-	@Input() robot?: RobotDTO;
+	@Input() robot?: Robot;
 	roleForm = new FormGroup({
 		profileId: new FormControl('', [Validators.required]),
 		scopePk: new FormControl<number | null>(null, [Validators.required])
@@ -60,9 +60,9 @@ export class RobotComponent implements OnInit {
 		roleForm: this.roleForm
 	});
 
-	profiles: ProfileDTO[];
+	profiles: Profile[];
 
-	scopeResult$: Observable<PagedResultScopeDTO>;
+	scopeResult$: Observable<PagedResultScope>;
 	errorText: string;
 
 	constructor(
@@ -86,10 +86,10 @@ export class RobotComponent implements OnInit {
 
 	save() {
 		if(this.robot) {
-			const robotUpdate = this.robotForm.value as RobotUpdateDTO;
+			const robotUpdate = this.robotForm.value as RobotUpdate;
 			this.robotService.save(this.robot.pk, robotUpdate).subscribe({
 				next: robot => {
-					Object.assign(this.robot as RobotDTO, robot);
+					Object.assign(this.robot as Robot, robot);
 					this.notificationService.showSuccess('Robot saved');
 				},
 				error: e => this.errorText = e.error.message
@@ -99,8 +99,8 @@ export class RobotComponent implements OnInit {
 			const robotCreation = {
 				name: this.robotForm.controls.name.value,
 				key: this.robotForm.controls.key.value,
-				role: this.roleForm.value as RoleCreationDTO
-			} as RobotCreationDTO;
+				role: this.roleForm.value as RoleCreation
+			} as RobotCreation;
 
 			this.robotService.create(robotCreation).subscribe({
 				next: r => {

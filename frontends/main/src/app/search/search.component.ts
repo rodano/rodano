@@ -3,11 +3,11 @@ import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
 import {Observable, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
 import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
 import {ScopeService} from '@core/services/scope.service';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
-import {WorkflowDTO} from '@core/model/workflow-dto';
+import {ScopeModel} from '@core/model/scope-model';
+import {Workflow} from '@core/model/workflow';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {HttpParamsService} from '@core/services/http-params.service';
 import {Router, ActivatedRoute, RouterLink, Routes} from '@angular/router';
@@ -16,7 +16,7 @@ import {SelectScopeComponent} from './dialogs/create-scope/select-scope.componen
 import {NotificationService} from 'src/app/services/notification.service';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {WorkflowStatusSearch} from '@core/utilities/search/workflow-status-search';
-import {WorkflowStatusDTO} from '@core/model/workflow-status-dto';
+import {WorkflowStatus} from '@core/model/workflow-status';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatDivider} from '@angular/material/divider';
@@ -30,7 +30,7 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatSort, MatSortModule} from '@angular/material/sort';
-import {FieldModelDTO} from '@core/model/field-model-dto';
+import {FieldModel} from '@core/model/field-model';
 import {FieldModelType} from '@core/model/field-model-type';
 import {MatSelect, MatOption} from '@angular/material/select';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
@@ -39,9 +39,9 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {Operator} from '@core/model/operator';
 import {DateUTCPipe} from '../pipes/date-utc.pipe';
 import {MeService} from '@core/services/me.service';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {LowerCasePipe} from '@angular/common';
-import {FormModelDTO} from '@core/model/form-model-dto';
+import {FormModel} from '@core/model/form-model';
 import {FormService} from '@core/services/form.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
@@ -91,19 +91,19 @@ export class SearchComponent implements OnInit {
 	Object = Object;
 	FieldModelType = FieldModelType;
 
-	leafScopeModel: ScopeModelDTO = {} as ScopeModelDTO;
-	leafScopeModelParent: ScopeModelDTO = {} as ScopeModelDTO;
+	leafScopeModel: ScopeModel = {} as ScopeModel;
+	leafScopeModelParent: ScopeModel = {} as ScopeModel;
 	writeAccessOnParent = false;
 
-	leafScopeForms: FormModelDTO[] = [];
+	leafScopeForms: FormModel[] = [];
 
-	workflows: WorkflowDTO[];
-	parentScopes: ScopeMiniDTO[];
-	searchableFields: FieldModelDTO[];
+	workflows: Workflow[];
+	parentScopes: ScopeMini[];
+	searchableFields: FieldModel[];
 
 	fieldModelCriteria: FieldModelCriterion[] = [];
 
-	scopes: ScopeDTO[] = [];
+	scopes: Scope[] = [];
 
 	searchForm = new FormGroup<Record<string, FormControl<any>>>({
 		scopeCode: new FormControl()
@@ -126,7 +126,7 @@ export class SearchComponent implements OnInit {
 	aggregatedWorkflowMap = new Map<string, string>();
 
 	//TODO filter out only the workflows that we want visible to the user
-	importantWorkflowsPerScope: Record<number, WorkflowStatusDTO[]> = {};
+	importantWorkflowsPerScope: Record<number, WorkflowStatus[]> = {};
 
 	loading = false;
 
@@ -165,9 +165,9 @@ export class SearchComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			switchMap(results => {
 				const scopeModels = results.scopeModel;
-				this.leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModelDTO);
+				this.leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModel);
 				this.leafScopeForms = results.formModels;
-				this.leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.id === this.leafScopeModel.defaultParentId) ?? ({} as ScopeModelDTO);
+				this.leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.id === this.leafScopeModel.defaultParentId) ?? ({} as ScopeModel);
 
 				this.workflows = results.workflows.filter(ws => this.leafScopeModel.workflowIds.includes(ws.id));
 				this.parentScopes = results.parentScopes.filter(scope => scope.modelId === this.leafScopeModelParent.id);
@@ -259,12 +259,12 @@ export class SearchComponent implements OnInit {
 		});
 	}
 
-	getWSFormControlName(workflowDTO: WorkflowDTO): string {
-		return `ws_${workflowDTO.id}`;
+	getWSFormControlName(workflow: Workflow): string {
+		return `ws_${workflow.id}`;
 	}
 
-	getSFFormControlName(fieldModelDTO: FieldModelDTO): string {
-		return `${fieldModelDTO.datasetModelId}/${fieldModelDTO.id}`;
+	getSFFormControlName(fieldModel: FieldModel): string {
+		return `${fieldModel.datasetModelId}/${fieldModel.id}`;
 	}
 
 	createPatient() {
@@ -297,32 +297,32 @@ export class SearchComponent implements OnInit {
 				return this.scopeService.getCandidate(parentScope.pk, this.leafScopeModel.id);
 			}),
 			switchMap(candidateScope => this.scopeService.create(candidateScope)),
-			switchMap(newScopeDTO =>
+			switchMap(newScope =>
 				//get the forms for the new scope
-				this.formService.searchOnScope(newScopeDTO.pk).pipe(
-					map(forms => ({newScopeDTO, forms}))
+				this.formService.searchOnScope(newScope.pk).pipe(
+					map(forms => ({newScope, forms}))
 				)
 			)
-		).subscribe(({newScopeDTO, forms}) => {
+		).subscribe(({newScope, forms}) => {
 			if(forms.length > 0) {
-				this.router.navigate(['crf', newScopeDTO.pk, 'form', forms[0].pk]);
+				this.router.navigate(['crf', newScope.pk, 'form', forms[0].pk]);
 			}
 			else {
-				this.router.navigate(['crf', newScopeDTO.pk]);
+				this.router.navigate(['crf', newScope.pk]);
 			}
-			this.notificationService.showSuccess(`${newScopeDTO.shortname} created`);
+			this.notificationService.showSuccess(`${newScope.shortname} created`);
 		});
 	}
 
-	private createParentScopeFormControls(parentScopes: ScopeMiniDTO[]): Observable<any>[] {
-		return parentScopes.map(parentScopeDTO => {
+	private createParentScopeFormControls(parentScopes: ScopeMini[]): Observable<any>[] {
+		return parentScopes.map(parentScope => {
 			const control = new FormControl();
-			this.searchForm.addControl(parentScopeDTO.id, control);
+			this.searchForm.addControl(parentScope.id, control);
 			return control.valueChanges;
 		});
 	}
 
-	private createWSStateChanges(workflows: WorkflowDTO[]): Observable<any>[] {
+	private createWSStateChanges(workflows: Workflow[]): Observable<any>[] {
 		const observables: Observable<any>[] = [];
 
 		workflows.forEach(workflow => {
@@ -333,7 +333,7 @@ export class SearchComponent implements OnInit {
 		return observables;
 	}
 
-	private createSFStateChanges(searchableFields: FieldModelDTO[]): Observable<any>[] {
+	private createSFStateChanges(searchableFields: FieldModel[]): Observable<any>[] {
 		const observables: Observable<any>[] = [];
 
 		searchableFields.forEach(fieldModel => {
@@ -358,11 +358,11 @@ export class SearchComponent implements OnInit {
 
 		//Sync the workflow controls
 		if(scopeSearch.workflowStates) {
-			Object.keys(scopeSearch.workflowStates).forEach(workflow => {
-				const workflowDTO = this.getWorkflowDTO(workflow);
-				if(workflowDTO) {
-					const control = this.searchForm.controls[this.getWSFormControlName(workflowDTO)];
-					control.setValue(scopeSearch.workflowStates[workflow], {emitEvent: false});
+			Object.keys(scopeSearch.workflowStates).forEach(workflowId => {
+				const workflow = this.getWorkflow(workflowId);
+				if(workflow) {
+					const control = this.searchForm.controls[this.getWSFormControlName(workflow)];
+					control.setValue(scopeSearch.workflowStates[workflowId], {emitEvent: false});
 				}
 			});
 		}
@@ -376,7 +376,7 @@ export class SearchComponent implements OnInit {
 					return;
 				}
 
-				const fieldModel = this.getFieldModelDTO(datasetModelId, fieldModelId);
+				const fieldModel = this.getFieldModel(datasetModelId, fieldModelId);
 				if(!fieldModel) {
 					return;
 				}
@@ -509,7 +509,7 @@ export class SearchComponent implements OnInit {
 			map(results => {
 				const worklowStatuses = results.objects;
 
-				const res: Record<number, WorkflowStatusDTO[]> = {};
+				const res: Record<number, WorkflowStatus[]> = {};
 
 				this.scopes.forEach(scope => {
 					res[scope.pk] = worklowStatuses.filter(ws => ws.scopeFk === scope.pk);
@@ -521,7 +521,7 @@ export class SearchComponent implements OnInit {
 		).subscribe(result => this.importantWorkflowsPerScope = result);
 	}
 
-	private openScopeSelectDialog(parentScopes: ScopeDTO[], leafScopeModel: ScopeModelDTO): Observable<ScopeDTO | undefined> {
+	private openScopeSelectDialog(parentScopes: Scope[], leafScopeModel: ScopeModel): Observable<Scope | undefined> {
 		const data = {
 			parentScopes: parentScopes,
 			childScopeModel: leafScopeModel
@@ -579,7 +579,7 @@ export class SearchComponent implements OnInit {
 		return false;
 	}
 
-	getFieldModelDTO(datasetModelId: string, fieldId: string): FieldModelDTO | undefined {
+	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
 		for(const fieldModel of this.searchableFields) {
 			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
 				return fieldModel;
@@ -588,7 +588,7 @@ export class SearchComponent implements OnInit {
 		return undefined;
 	}
 
-	getWorkflowDTO(workflowId: string): WorkflowDTO | undefined {
+	getWorkflow(workflowId: string): Workflow | undefined {
 		for(const workflow of this.workflows) {
 			if(workflow.id === workflowId) {
 				return workflow;
@@ -598,14 +598,14 @@ export class SearchComponent implements OnInit {
 	}
 
 	getFieldModelType(datasetModelId: string, fieldId: string): FieldModelType | undefined {
-		const fieldModelDTO = this.getFieldModelDTO(datasetModelId, fieldId);
-		if(fieldModelDTO) {
-			return fieldModelDTO.type;
+		const fieldModel = this.getFieldModel(datasetModelId, fieldId);
+		if(fieldModel) {
+			return fieldModel.type;
 		}
 		return undefined;
 	}
 
-	getFieldValueForCriteria(fieldModel: FieldModelDTO, value: string): string {
+	getFieldValueForCriteria(fieldModel: FieldModel, value: string): string {
 		if(this.getIsSearchableDate(fieldModel)) {
 			const dateValue = new Date(value);
 			return format(dateValue, 'dd.MM.yyyy');
@@ -613,7 +613,7 @@ export class SearchComponent implements OnInit {
 		return value;
 	}
 
-	getIsSearchableDate(fieldModel: FieldModelDTO): boolean {
+	getIsSearchableDate(fieldModel: FieldModel): boolean {
 		if(fieldModel) {
 			return (fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT);
 			//&& (fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory)
@@ -621,7 +621,7 @@ export class SearchComponent implements OnInit {
 		return false;
 	}
 
-	resetFieldCriteria(fieldModel: FieldModelDTO): void {
+	resetFieldCriteria(fieldModel: FieldModel): void {
 		const controlName = this.getSFFormControlName(fieldModel);
 		const control = this.searchForm.controls[controlName];
 		if(control) {
@@ -640,8 +640,8 @@ export class SearchComponent implements OnInit {
 	}
 
 	//return the searchable field from the form control ID
-	getSearchableFieldFromFormControlId(formControlId: string): FieldModelDTO | undefined {
+	getSearchableFieldFromFormControlId(formControlId: string): FieldModel | undefined {
 		const [datasetModelId, fieldModelId] = formControlId.split('/');
-		return this.getFieldModelDTO(datasetModelId, fieldModelId);
+		return this.getFieldModel(datasetModelId, fieldModelId);
 	}
 }

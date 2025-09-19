@@ -1,12 +1,12 @@
 import {CRFDataset} from 'src/app/crf/models/crf-dataset';
 import {CRFField} from 'src/app/crf/models/crf-field';
-import {DatasetModelDTO} from '@core/model/dataset-model-dto';
-import {FieldModelDTO} from '@core/model/field-model-dto';
-import {FieldDTO} from '@core/model/field-dto';
-import {DatasetDTO} from '@core/model/dataset-dto';
-import {FormDTO} from '@core/model/form-dto';
-import {FormModelDTO} from '@core/model/form-model-dto';
-import {UserDTO} from '@core/model/user-dto';
+import {DatasetModel} from '@core/model/dataset-model';
+import {FieldModel} from '@core/model/field-model';
+import {Field} from '@core/model/field';
+import {Dataset} from '@core/model/dataset';
+import {Form} from '@core/model/form';
+import {FormModel} from '@core/model/form-model';
+import {User} from '@core/model/user';
 
 export const FIELD_MODEL_DATE_OF_WITHDRAWAL = {
 	type: 'DATE',
@@ -46,7 +46,7 @@ export const FIELD_MODEL_DATE_OF_WITHDRAWAL = {
 	maxYear: undefined,
 	dynamic: false,
 	exportable: false
-} satisfies FieldModelDTO;
+} satisfies FieldModel;
 
 export const FIELD_DATE_OF_WITHDRAWAL = {
 	scopePk: 8,
@@ -54,7 +54,7 @@ export const FIELD_DATE_OF_WITHDRAWAL = {
 	scopeCodeAndShortname: 'AT-01-01',
 	eventPk: 2,
 	eventId: 'VISIT_6_MONTHS',
-	eventShortname: 'EventDTO 6 months - 24.10.2020',
+	eventShortname: 'Event 6 months - 24.10.2020',
 	datasetPk: 16,
 	datasetId: 'f566b84f-892c-450e-84f0-98f946e52322',
 	datasetModelId: 'VISIT_DOCUMENTATION',
@@ -72,7 +72,7 @@ export const FIELD_DATE_OF_WITHDRAWAL = {
 	fileName: '',
 	inRemoved: false,
 	inLocked: false
-} satisfies FieldDTO;
+} satisfies Field;
 
 export const CRF_FIELD_DATE_OF_WITHDRAWAL = {
 	...FIELD_DATE_OF_WITHDRAWAL,
@@ -118,7 +118,7 @@ const FIELD_MODEL_DATE_OF_VISIT = {
 	maxYear: undefined,
 	dynamic: false,
 	exportable: false
-} satisfies FieldModelDTO;
+} satisfies FieldModel;
 
 const FIELD_DATE_OF_VISIT = {
 	scopePk: 8,
@@ -126,7 +126,7 @@ const FIELD_DATE_OF_VISIT = {
 	scopeCodeAndShortname: 'AT-01-01',
 	eventPk: 2,
 	eventId: 'VISIT_6_MONTHS',
-	eventShortname: 'EventDTO 6 months - 24.10.2020',
+	eventShortname: 'Event 6 months - 24.10.2020',
 	datasetPk: 16,
 	datasetId: 'f566b84f-892c-450e-84f0-98f946e52322',
 	datasetModelId: 'VISIT_DOCUMENTATION',
@@ -143,7 +143,7 @@ const FIELD_DATE_OF_VISIT = {
 	possibleWorkflows: [],
 	inRemoved: false,
 	inLocked: false
-} satisfies FieldDTO;
+} satisfies Field;
 
 const CRF_FIELD_DATE_OF_VISIT = {
 	...FIELD_DATE_OF_VISIT,
@@ -161,7 +161,7 @@ const DATASET_MODEL_VISIT_DOCUMENTATION = {
 	exportable: true,
 	scopeDocumentation: false,
 	canWrite: true
-} satisfies DatasetModelDTO;
+} satisfies DatasetModel;
 
 export const DATASET_VISIT_DOCUMENTATION = {
 	scopePk: 8,
@@ -181,7 +181,7 @@ export const DATASET_VISIT_DOCUMENTATION = {
 	inLocked: false,
 	canWrite: true,
 	canBeRemoved: true
-} satisfies DatasetDTO;
+} satisfies Dataset;
 
 export const CRF_DATASET_VISIT_DOCUMENTATION = {
 	...DATASET_VISIT_DOCUMENTATION,
@@ -264,7 +264,7 @@ const FIELD_MODEL_SELF_CARE = {
 	maxYear: undefined,
 	dynamic: false,
 	exportable: false
-} satisfies FieldModelDTO;
+} satisfies FieldModel;
 
 const FIELD_MODEL_HEALTH = {
 	type: 'NUMBER',
@@ -307,7 +307,7 @@ const FIELD_MODEL_HEALTH = {
 	maxYear: undefined,
 	dynamic: false,
 	exportable: false
-} satisfies FieldModelDTO;
+} satisfies FieldModel;
 
 const FIELD_HEALTH = {
 	scopeId: 'AT-01',
@@ -332,7 +332,7 @@ const FIELD_HEALTH = {
 	possibleWorkflows: [],
 	inRemoved: false,
 	inLocked: false
-} satisfies FieldDTO;
+} satisfies Field;
 
 const CRF_FIELD_HEALTH = {
 	...FIELD_HEALTH,
@@ -363,7 +363,7 @@ const FIELD_SELF_CARE = {
 	possibleWorkflows: [],
 	inRemoved: false,
 	inLocked: false
-} satisfies FieldDTO;
+} satisfies Field;
 
 const CRF_FIELD_SELF_CARE = {
 	...FIELD_SELF_CARE,
@@ -383,7 +383,7 @@ const DATASET_MODEL_EQ5D = {
 	expandedLabelPattern: '',
 	collapsedLabelPattern: '',
 	canWrite: true
-} satisfies DatasetModelDTO;
+} satisfies DatasetModel;
 
 export const DATASET_EQ5D = {
 	scopePk: 8,
@@ -403,7 +403,7 @@ export const DATASET_EQ5D = {
 	inLocked: false,
 	canWrite: true,
 	canBeRemoved: true
-} satisfies DatasetDTO;
+} satisfies Dataset;
 
 export const CRF_DATASET_EQ5D = {
 	...DATASET_EQ5D,
@@ -421,7 +421,7 @@ const DATASET_MODEL = {
 	exportable: true,
 	scopeDocumentation: false,
 	canWrite: true
-} satisfies DatasetModelDTO;
+} satisfies DatasetModel;
 
 export const DATASET = {
 	scopePk: 2,
@@ -441,7 +441,7 @@ export const DATASET = {
 	inLocked: false,
 	canWrite: true,
 	canBeRemoved: true
-} satisfies DatasetDTO;
+} satisfies Dataset;
 
 export const CRF_DATASET = {
 	...DATASET,
@@ -453,7 +453,7 @@ export const CRF_DATASET = {
 const FORM_MODEL = {
 	id: 'FORM_MODEL_1',
 	shortname: {en: 'Form model 1'}
-} satisfies FormModelDTO;
+} satisfies FormModel;
 
 export const FORM = {
 	scopePk: 2,
@@ -475,7 +475,7 @@ export const FORM = {
 	workflowStatuses: [],
 	possibleWorkflows: [],
 	printable: false
-} satisfies FormDTO;
+} satisfies Form;
 
 export const USER = {
 	pk: 1,
@@ -498,4 +498,4 @@ export const USER = {
 		canCreateUser: true
 	},
 	blocked: false
-} satisfies UserDTO;
+} satisfies User;

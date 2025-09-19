@@ -2,13 +2,13 @@ import {Component, DestroyRef, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Subject, merge} from 'rxjs';
 import {startWith, switchMap} from 'rxjs/operators';
-import {PagedResultResourceDTO} from '@core/model/paged-result-resource-dto';
-import {ResourceCategoryDTO} from '@core/model/resource-category-dto';
-import {ResourceDTO} from '@core/model/resource-dto';
+import {PagedResultResource} from '@core/model/paged-result-resource';
+import {ResourceCategory} from '@core/model/resource-category';
+import {Resource} from '@core/model/resource';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {ResourceService} from '@core/services/resource.service';
 import {ResourceSearch} from '@core/utilities/search/resource-search';
-import {ResourceSubmissionDTO} from '@core/model/resource-submission-dto';
+import {ResourceSubmission} from '@core/model/resource-submission';
 import {NotificationService} from 'src/app/services/notification.service';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatToolbarModule} from '@angular/material/toolbar';
@@ -55,7 +55,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	]
 })
 export class ResourceListComponent implements OnInit {
-	categories: ResourceCategoryDTO[];
+	categories: ResourceCategory[];
 
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
@@ -64,7 +64,7 @@ export class ResourceListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 
-	resources: PagedResultResourceDTO = EMPTY_PAGED_RESULT;
+	resources: PagedResultResource = EMPTY_PAGED_RESULT;
 	columnsToDisplay = [
 		'title',
 		'category',
@@ -127,15 +127,15 @@ export class ResourceListComponent implements OnInit {
 	createResource(categoryId: string): void {
 		const resource = {
 			categoryId
-		} as ResourceSubmissionDTO;
+		} as ResourceSubmission;
 		this.saveResource(resource);
 	}
 
-	updateResource(resource: ResourceDTO): void {
+	updateResource(resource: Resource): void {
 		this.saveResource(resource);
 	}
 
-	removeResource(_: Event, resource: ResourceDTO) {
+	removeResource(_: Event, resource: Resource) {
 		this.resourceService.remove(resource).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
@@ -144,7 +144,7 @@ export class ResourceListComponent implements OnInit {
 		});
 	}
 
-	restoreResource(_: Event, resource: ResourceDTO) {
+	restoreResource(_: Event, resource: Resource) {
 		this.resourceService.restore(resource).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
@@ -153,11 +153,11 @@ export class ResourceListComponent implements OnInit {
 		});
 	}
 
-	getFileUrl(resource: ResourceDTO): string {
+	getFileUrl(resource: Resource): string {
 		return this.resourceService.getFileUrl(resource);
 	}
 
-	private saveResource(resource: ResourceSubmissionDTO | ResourceDTO) {
+	private saveResource(resource: ResourceSubmission | Resource) {
 		return this.dialog
 			.open(ModifyResourceDialogComponent, {data: resource})
 			.afterClosed()

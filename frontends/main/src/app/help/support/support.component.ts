@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {StudyDTO} from '@core/model/study-dto';
+import {Study} from '@core/model/study';
 import {ConfigurationService} from '@core/services/configuration.service';
 
 @Component({
@@ -7,7 +7,7 @@ import {ConfigurationService} from '@core/services/configuration.service';
 	styleUrls: ['./support.component.css']
 })
 export class SupportComponent implements OnInit {
-	study?: StudyDTO;
+	study?: Study;
 
 	constructor(
 		public configurationService: ConfigurationService

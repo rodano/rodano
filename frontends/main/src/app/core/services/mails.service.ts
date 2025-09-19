@@ -3,11 +3,11 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {HttpParamsService} from './http-params.service';
 import {APIService} from './api.service';
 import {Observable} from 'rxjs';
-import {MailDTO} from '../model/mail-dto';
+import {Mail} from '../model/mail';
 import {MailSearch} from '../utilities/search/mail-search';
-import {PagedResultMailDTO} from '../model/paged-result-mail-dto';
+import {PagedResultMail} from '../model/paged-result-mail';
 import {reviveDates} from '../decorators/revive-dates.decorator';
-import {MailCreationDTO} from '../model/mail-creation-dto';
+import {MailCreation} from '../model/mail-creation';
 
 @Injectable({
 	providedIn: 'root'
@@ -24,14 +24,14 @@ export class MailsService {
 	}
 
 	@reviveDates
-	get(mailPk: number): Observable<MailDTO> {
-		return this.http.get<MailDTO>(`${this.serviceUrl}/${mailPk}`);
+	get(mailPk: number): Observable<Mail> {
+		return this.http.get<Mail>(`${this.serviceUrl}/${mailPk}`);
 	}
 
 	@reviveDates
-	search(search: MailSearch): Observable<PagedResultMailDTO> {
+	search(search: MailSearch): Observable<PagedResultMail> {
 		const params = this.httpParamsService.toHttpParams(search);
-		return this.http.get<PagedResultMailDTO>(this.serviceUrl, {params});
+		return this.http.get<PagedResultMail>(this.serviceUrl, {params});
 	}
 
 	getExportUrl(search: MailSearch): string {
@@ -39,8 +39,8 @@ export class MailsService {
 		return `${this.serviceUrl}/export?${params}`;
 	}
 
-	send(mail: MailCreationDTO): Observable<MailDTO> {
-		return this.http.post<MailDTO>(this.serviceUrl, mail);
+	send(mail: MailCreation): Observable<Mail> {
+		return this.http.post<Mail>(this.serviceUrl, mail);
 	}
 
 	getAttachmentByPk(mailPk: number, attPk: number): string {
@@ -55,7 +55,7 @@ export class MailsService {
 		return this.http.get<string[]>(`${this.serviceUrl}/statuses`);
 	}
 
-	resendMails(mails: MailDTO[]): Observable<string> {
+	resendMails(mails: Mail[]): Observable<string> {
 		let params = new HttpParams();
 		mails.map(mail => mail.pk).forEach(mailPk => {
 			params = params.append('mailPks', mailPk);

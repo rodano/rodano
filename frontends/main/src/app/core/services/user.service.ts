@@ -1,12 +1,12 @@
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {UserDTO} from '../model/user-dto';
-import {UserCreationDTO} from '../model/user-creation-dto';
+import {User} from '../model/user';
+import {UserCreation} from '../model/user-creation';
 import {UserSearch} from '../utilities/search/user-search';
 import {APIService} from './api.service';
 import {HttpParamsService} from './http-params.service';
-import {PagedResultUserDTO} from '../model/paged-result-user-dto';
+import {PagedResultUser} from '../model/paged-result-user';
 import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from 'src/app/interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
@@ -25,9 +25,9 @@ export class UserService {
 	}
 
 	@reviveDates
-	search(predicate: UserSearch): Observable<PagedResultUserDTO> {
+	search(predicate: UserSearch): Observable<PagedResultUser> {
 		const params = this.httpParamsService.toHttpParams(predicate);
-		return this.http.get<PagedResultUserDTO>(`${this.serviceUrl}`, {params});
+		return this.http.get<PagedResultUser>(`${this.serviceUrl}`, {params});
 	}
 
 	getExportUrl(predicate: UserSearch): string {
@@ -36,59 +36,59 @@ export class UserService {
 	}
 
 	@reviveDates
-	get(userPk: number): Observable<UserDTO> {
-		return this.http.get<UserDTO>(`${this.serviceUrl}/${userPk}`);
+	get(userPk: number): Observable<User> {
+		return this.http.get<User>(`${this.serviceUrl}/${userPk}`);
 	}
 
 	@reviveDates
-	create(user: UserCreationDTO): Observable<UserDTO> {
-		return this.http.post<UserDTO>(this.serviceUrl, user);
+	create(user: UserCreation): Observable<User> {
+		return this.http.post<User>(this.serviceUrl, user);
 	}
 
 	@reviveDates
-	save(userPk: number, user: UserDTO): Observable<UserDTO> {
-		return this.http.put<UserDTO>(`${this.serviceUrl}/${userPk}`, user);
+	save(userPk: number, user: User): Observable<User> {
+		return this.http.put<User>(`${this.serviceUrl}/${userPk}`, user);
 	}
 
 	@reviveDates
-	remove(userPk: number, rationale: string): Observable<UserDTO> {
+	remove(userPk: number, rationale: string): Observable<User> {
 		const params = new HttpParams()
 			.set('rationale', rationale);
-		return this.http.put<UserDTO>(`${this.serviceUrl}/${userPk}/remove`, undefined, {params});
+		return this.http.put<User>(`${this.serviceUrl}/${userPk}/remove`, undefined, {params});
 	}
 
 	@reviveDates
-	restore(userPk: number, rationale: string): Observable<UserDTO> {
+	restore(userPk: number, rationale: string): Observable<User> {
 		const params = new HttpParams()
 			.set('rationale', rationale);
-		return this.http.put<UserDTO>(`${this.serviceUrl}/${userPk}/restore`, undefined, {params});
+		return this.http.put<User>(`${this.serviceUrl}/${userPk}/restore`, undefined, {params});
 	}
 
 	@reviveDates
-	convertToLocal(userPk: number): Observable<UserDTO> {
-		return this.http.put<UserDTO>(`${this.serviceUrl}/${userPk}/convert-to-local`, {});
+	convertToLocal(userPk: number): Observable<User> {
+		return this.http.put<User>(`${this.serviceUrl}/${userPk}/convert-to-local`, {});
 	}
 
 	@reviveDates
-	convertToExternal(userPk: number): Observable<UserDTO> {
-		return this.http.put<UserDTO>(`${this.serviceUrl}/${userPk}/convert-to-external`, {});
+	convertToExternal(userPk: number): Observable<User> {
+		return this.http.put<User>(`${this.serviceUrl}/${userPk}/convert-to-external`, {});
 	}
 
 	@reviveDates
-	changePassword(userPk: number, oldPassword: string, newPassword: string): Observable<UserDTO> {
+	changePassword(userPk: number, oldPassword: string, newPassword: string): Observable<User> {
 		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
-		return this.http.post<UserDTO>(`${this.serviceUrl}/${userPk}/password`, {oldPassword, newPassword}, {headers});
+		return this.http.post<User>(`${this.serviceUrl}/${userPk}/password`, {oldPassword, newPassword}, {headers});
 	}
 
 	@reviveDates
-	changeEmail(userPk: number, password: string, email: string): Observable<UserDTO> {
+	changeEmail(userPk: number, password: string, email: string): Observable<User> {
 		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '');
-		return this.http.post<UserDTO>(`${this.serviceUrl}/${userPk}/email`, {password, email}, {headers});
+		return this.http.post<User>(`${this.serviceUrl}/${userPk}/email`, {password, email}, {headers});
 	}
 
 	@reviveDates
-	unblock(userPk: number): Observable<UserDTO> {
-		return this.http.put<UserDTO>(`${this.serviceUrl}/${userPk}/unblock`, undefined);
+	unblock(userPk: number): Observable<User> {
+		return this.http.put<User>(`${this.serviceUrl}/${userPk}/unblock`, undefined);
 	}
 
 	recoverAccount(recoveryCode: string): Observable<undefined> {

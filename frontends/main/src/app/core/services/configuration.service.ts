@@ -2,26 +2,26 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {identity, Observable} from 'rxjs';
 import {concatMap, map, first, shareReplay} from 'rxjs/operators';
-import {MenuDTO} from '../model/menu-dto';
-import {ScopeModelDTO} from '../model/scope-model-dto';
-import {StudyDTO} from '../model/study-dto';
-import {WorkflowDTO} from '../model/workflow-dto';
+import {Menu} from '../model/menu';
+import {ScopeModel} from '../model/scope-model';
+import {Study} from '../model/study';
+import {Workflow} from '../model/workflow';
 import {APIService} from './api.service';
-import {PublicStudyDTO} from '../model/public-study-dto';
-import {ProfileDTO} from '../model/profile-dto';
-import {CMSLayoutDTO} from '../model/cms-layout-dto';
-import {ResourceCategoryDTO} from '../model/resource-category-dto';
-import {DatasetModelDTO} from '../model/dataset-model-dto';
-import {FormModelDTO} from '../model/form-model-dto';
-import {FieldModelDTO} from '../model/field-model-dto';
-import {LanguageDTO} from '../model/language-dto';
+import {PublicStudy} from '../model/public-study';
+import {Profile} from '../model/profile';
+import {CMSLayout} from '../model/cms-layout';
+import {ResourceCategory} from '../model/resource-category';
+import {DatasetModel} from '../model/dataset-model';
+import {FormModel} from '../model/form-model';
+import {FieldModel} from '../model/field-model';
+import {Language} from '../model/language';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ConfigurationService {
 	private readonly serviceUrl: string;
-	private readonly publicStudy$: Observable<PublicStudyDTO>;
+	private readonly publicStudy$: Observable<PublicStudy>;
 
 	constructor(
 		private http: HttpClient,
@@ -29,113 +29,113 @@ export class ConfigurationService {
 	) {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/config`;
 		//cache public study
-		this.publicStudy$ = this.http.get<StudyDTO>(`${this.serviceUrl}/public-study`).pipe(shareReplay());
+		this.publicStudy$ = this.http.get<Study>(`${this.serviceUrl}/public-study`).pipe(shareReplay());
 	}
 
-	getPublicStudy(): Observable<PublicStudyDTO> {
+	getPublicStudy(): Observable<PublicStudy> {
 		return this.publicStudy$;
 	}
 
-	getStudy(): Observable<StudyDTO> {
-		return this.http.get<StudyDTO>(`${this.serviceUrl}/study`);
+	getStudy(): Observable<Study> {
+		return this.http.get<Study>(`${this.serviceUrl}/study`);
 	}
 
-	getLanguages(): Observable<LanguageDTO[]> {
+	getLanguages(): Observable<Language[]> {
 		return this.getStudy().pipe(map(study => study.activatedLanguages));
 	}
 
-	getScopeModels(): Observable<ScopeModelDTO[]> {
+	getScopeModels(): Observable<ScopeModel[]> {
 		return this.getStudy().pipe(map(study => study.scopeModels));
 	}
 
-	getScopeModel(scopeModelId: string): Observable<ScopeModelDTO> {
+	getScopeModel(scopeModelId: string): Observable<ScopeModel> {
 		return this.getScopeModels().pipe(
 			concatMap(identity),
 			first(s => s.id === scopeModelId)
 		);
 	}
 
-	getRootScopeModel(): Observable<ScopeModelDTO> {
+	getRootScopeModel(): Observable<ScopeModel> {
 		return this.getScopeModels().pipe(
 			concatMap(identity),
 			first(s => s.parentIds.length === 0)
 		);
 	}
 
-	getLeafScopeModel(): Observable<ScopeModelDTO> {
+	getLeafScopeModel(): Observable<ScopeModel> {
 		return this.getScopeModels().pipe(
 			concatMap(identity),
 			first(s => s.leaf)
 		);
 	}
 
-	getDatasetModels(): Observable<DatasetModelDTO[]> {
+	getDatasetModels(): Observable<DatasetModel[]> {
 		return this.getStudy().pipe(map(study => study.datasetModels));
 	}
 
-	getDatasetModel(datasetModelId: string): Observable<DatasetModelDTO> {
+	getDatasetModel(datasetModelId: string): Observable<DatasetModel> {
 		return this.getDatasetModels().pipe(
 			concatMap(identity),
 			first(d => d.id === datasetModelId)
 		);
 	}
 
-	getFormModels(): Observable<FormModelDTO[]> {
+	getFormModels(): Observable<FormModel[]> {
 		return this.getStudy().pipe(map(study => study.formModels));
 	}
 
-	getLeafScopeModelFormModels(): Observable<FormModelDTO[]> {
-		return this.getStudy().pipe(map(study => study.leafScopeModel.formModelIds.map(id => study.formModels.find(f => f.id === id)).filter(f => f !== undefined) as FormModelDTO[]));
+	getLeafScopeModelFormModels(): Observable<FormModel[]> {
+		return this.getStudy().pipe(map(study => study.leafScopeModel.formModelIds.map(id => study.formModels.find(f => f.id === id)).filter(f => f !== undefined) as FormModel[]));
 	}
 
-	getWorkflows(): Observable<WorkflowDTO[]> {
+	getWorkflows(): Observable<Workflow[]> {
 		return this.getStudy().pipe(map(study => study.workflows));
 	}
 
-	getProfiles(): Observable<ProfileDTO[]> {
+	getProfiles(): Observable<Profile[]> {
 		return this.getStudy().pipe(map(study => study.profiles));
 	}
 
-	getProfile(profileId: string): Observable<ProfileDTO> {
+	getProfile(profileId: string): Observable<Profile> {
 		return this.getProfiles().pipe(
 			concatMap(identity),
 			first(p => p.id === profileId)
 		);
 	}
 
-	getMenus(): Observable<MenuDTO[]> {
+	getMenus(): Observable<Menu[]> {
 		return this.getStudy().pipe(map(study => study.menus));
 	}
 
-	getMenuLayout(menuId: string): Observable<CMSLayoutDTO> {
-		return this.http.get<CMSLayoutDTO>(`${this.serviceUrl}/menu/${menuId}/layout`);
+	getMenuLayout(menuId: string): Observable<CMSLayout> {
+		return this.http.get<CMSLayout>(`${this.serviceUrl}/menu/${menuId}/layout`);
 	}
 
-	getResourceCategories(): Observable<ResourceCategoryDTO[]> {
-		return this.http.get<ResourceCategoryDTO[]>(`${this.serviceUrl}/resource-categories`);
+	getResourceCategories(): Observable<ResourceCategory[]> {
+		return this.http.get<ResourceCategory[]>(`${this.serviceUrl}/resource-categories`);
 	}
 
-	getSearchableFieldModels(): Observable<FieldModelDTO[]> {
-		return this.http.get<FieldModelDTO[]>(`${this.serviceUrl}/searchable-field-models`);
+	getSearchableFieldModels(): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`${this.serviceUrl}/searchable-field-models`);
 	}
 
 	getAutocompleteOptions(datasetModelId: string, fieldModelId: string, value: string): Observable<string[]> {
 		return this.http.get<string[]>(`${this.serviceUrl}/dataset-models/${datasetModelId}/field-models/${fieldModelId}/autocomplete/${value}`);
 	}
 
-	private getScopeModelIsRoot(scopeModel: ScopeModelDTO): boolean {
+	private getScopeModelIsRoot(scopeModel: ScopeModel): boolean {
 		return scopeModel.parentIds.length === 0;
 	}
 
-	private getScopeModelDepth(scopeModels: ScopeModelDTO[], scopeModel: ScopeModelDTO): number {
+	private getScopeModelDepth(scopeModels: ScopeModel[], scopeModel: ScopeModel): number {
 		if(this.getScopeModelIsRoot(scopeModel)) {
 			return 0;
 		}
-		const parentScopeModel = scopeModels.find(s => s.id === scopeModel.defaultParentId) as ScopeModelDTO;
+		const parentScopeModel = scopeModels.find(s => s.id === scopeModel.defaultParentId) as ScopeModel;
 		return 1 + this.getScopeModelDepth(scopeModels, parentScopeModel);
 	}
 
-	getScopeModelsSorted(): Observable<ScopeModelDTO[]> {
+	getScopeModelsSorted(): Observable<ScopeModel[]> {
 		return this.getScopeModels().pipe(
 			map(scopeModels => scopeModels.sort((s1, s2) => {
 				const depth1 = this.getScopeModelDepth(scopeModels, s1);

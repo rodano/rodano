@@ -3,9 +3,9 @@ import {forkJoin} from 'rxjs';
 import {ExtractService} from '@core/services/extract.service';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatTabsModule} from '@angular/material/tabs';
-import {ScopeMiniDTO} from '@core/model/scope-mini-dto';
+import {ScopeMini} from '@core/model/scope-mini';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {ScopeModel} from '@core/model/scope-model';
 import {ReportService} from '@core/services/report.service';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/input';
@@ -15,7 +15,7 @@ import {MatCheckbox} from '@angular/material/checkbox';
 import {DownloadDirective} from '../directives/download.component';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {nonEmptyArrayValidator} from '../validators/not-empty-array.validator';
-import {DatasetModelDTO} from '@core/model/dataset-model-dto';
+import {DatasetModel} from '@core/model/dataset-model';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ScopePickerComponent} from '../scope-picker/scope-picker.component';
@@ -43,11 +43,11 @@ import {FeatureStatic} from '@core/model/feature-static';
 	]
 })
 export class ExtractComponent implements OnInit {
-	selectedScopeModel: ScopeModelDTO;
+	selectedScopeModel: ScopeModel;
 
-	rootScopes: ScopeMiniDTO[] = [];
-	scopeModels: ScopeModelDTO[];
-	datasetModels: DatasetModelDTO[];
+	rootScopes: ScopeMini[] = [];
+	scopeModels: ScopeModel[];
+	datasetModels: DatasetModel[];
 
 	extractForm = new FormGroup({
 		rootScopePk: new FormControl(0, {nonNullable: true, validators: [Validators.required]}),

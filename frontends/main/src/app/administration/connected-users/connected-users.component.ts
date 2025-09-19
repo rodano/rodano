@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {SessionDTO} from '@core/model/session-dto';
+import {Session} from '@core/model/session';
 import {SessionService} from '@core/services/session.service';
 import {AuthStateService} from 'src/app/services/auth-state.service';
 import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
@@ -24,7 +24,7 @@ export class ConnectedUsersComponent implements OnInit {
 		'actions'
 	];
 
-	sessions: SessionDTO[];
+	sessions: Session[];
 
 	constructor(
 		private sessionService: SessionService,
@@ -35,7 +35,7 @@ export class ConnectedUsersComponent implements OnInit {
 		this.sessionService.get().subscribe(sessions => this.sessions = sessions);
 	}
 
-	isCurrentSession(session: SessionDTO) {
+	isCurrentSession(session: Session) {
 		return this.authStateService.getToken() === session.token;
 	}
 

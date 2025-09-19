@@ -4,7 +4,7 @@ import {tap, last, map} from 'rxjs/operators';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
 import {trigger, state, style, transition, animate} from '@angular/animations';
 import {NotificationService} from 'src/app/services/notification.service';
-import {FileDTO} from '@core/model/file-dto';
+import {FileModel} from '@core/model/file-model';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {DownloadDirective} from '../../../directives/download.component';
 import {MatIcon} from '@angular/material/icon';
@@ -68,7 +68,7 @@ export class FileUploadComponent {
 				}
 			}),
 			last(),
-			map(f => f as HttpResponse<FileDTO>)
+			map(f => f as HttpResponse<FileModel>)
 		).subscribe({
 			next: response => {
 				const value = response.body?.uniqueName ?? '';

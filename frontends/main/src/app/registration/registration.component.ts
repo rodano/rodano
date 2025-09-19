@@ -1,7 +1,7 @@
 import {Component, Input, OnChanges} from '@angular/core';
 import {Validators, ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
-import {PrivacyPolicyDTO} from '@core/model/privacy-policy-dto';
+import {PrivacyPolicy} from '@core/model/privacy-policy';
 import {ActivationService} from '@core/services/activation.service';
 import {CustomValidators} from '../utils/custom-validators';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -32,7 +32,7 @@ export class RegistrationComponent implements OnChanges {
 	RegistrationStep = RegistrationStep;
 	loading = false;
 
-	policies: PrivacyPolicyDTO[];
+	policies: PrivacyPolicy[];
 	email: string;
 
 	passwordForm = new FormGroup({

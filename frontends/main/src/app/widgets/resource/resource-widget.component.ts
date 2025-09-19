@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ResourceDTO} from '@core/model/resource-dto';
+import {Resource} from '@core/model/resource';
 import {ResourceService} from '@core/services/resource.service';
 import {Expandable} from '@core/utilities/expandable';
 import {ResourceSearch} from '@core/utilities/search/resource-search';
@@ -23,7 +23,7 @@ import {MatIcon} from '@angular/material/icon';
 export class ResourceWidgetComponent implements OnInit {
 	@Input({required: true}) category: string;
 
-	resources: (ResourceDTO & Expandable)[];
+	resources: (Resource & Expandable)[];
 
 	constructor(
 		private resourceService: ResourceService
@@ -42,11 +42,11 @@ export class ResourceWidgetComponent implements OnInit {
 		});
 	}
 
-	showMoreLess(resource: (ResourceDTO & Expandable)) {
+	showMoreLess(resource: (Resource & Expandable)) {
 		resource.expanded = !resource.expanded;
 	}
 
-	getResourceFileUrl(resource: ResourceDTO) {
+	getResourceFileUrl(resource: Resource) {
 		return this.resourceService.getFileUrl(resource);
 	}
 }

@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {HeaderComponent} from './header/header.component';
 import {Environment} from '@core/model/environment';
-import {PublicStudyDTO} from '@core/model/public-study-dto';
+import {PublicStudy} from '@core/model/public-study';
 import {ConfigurationService} from '@core/services/configuration.service';
 
 @Component({
@@ -16,7 +16,7 @@ export class AppComponent implements OnInit {
 
 	environment = Environment;
 
-	study?: PublicStudyDTO;
+	study?: PublicStudy;
 
 	ngOnInit() {
 		//set the CSS color variables to the body

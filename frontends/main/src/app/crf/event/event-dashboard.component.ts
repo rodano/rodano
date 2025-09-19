@@ -1,12 +1,12 @@
 import {Component, Input, OnChanges} from '@angular/core';
-import {EventDTO} from '@core/model/event-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Event} from '@core/model/event';
+import {Scope} from '@core/model/scope';
 import {EventService} from '@core/services/event.service';
 import {differenceInDays} from 'date-fns';
 import {WorkflowStatusComponent} from '../workflow-status/workflow-status.component';
 import {MatIcon} from '@angular/material/icon';
 import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {IssueViewerComponent} from '../issue-viewer/issue-viewer.component';
@@ -34,8 +34,8 @@ import {CRFChangeService} from '../services/crf-change.service';
 export class EventDashboardComponent implements OnChanges {
 	workflowableEntity = WorkflowableEntity;
 
-	@Input() scope: ScopeDTO;
-	@Input() event: EventDTO;
+	@Input() scope: Scope;
+	@Input() event: Event;
 
 	dateDifferenceInDays: number;
 
@@ -133,7 +133,7 @@ export class EventDashboardComponent implements OnChanges {
 		});
 	}
 
-	onWorkflowExecution(newEvent: WorkflowableDTO) {
-		this.event = newEvent as EventDTO;
+	onWorkflowExecution(newEvent: Workflowable) {
+		this.event = newEvent as Event;
 	}
 }

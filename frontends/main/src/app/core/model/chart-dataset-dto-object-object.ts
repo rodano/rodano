@@ -11,6 +11,9 @@ import { ChartDatasetPointObjectObject } from './chart-dataset-point-object-obje
 import { Statistics } from './statistics';
 
 
+/**
+ * Chart datasets
+ */
 export interface ChartDatasetDTOObjectObject { 
     label: string;
     data: Array<ChartDatasetPointObjectObject>;

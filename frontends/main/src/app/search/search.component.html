@@ -82,13 +82,13 @@
 							mat-header-cell
 							*matHeaderCellDef>
 							@if (fieldModelMap.has(column)) {
-								@let fieldModelDTO = getSearchableFieldFromFormControlId(column);
-								@if (fieldModelDTO?.type === FieldModelType.DATE || fieldModelDTO?.type === FieldModelType.DATE_SELECT) {
+								@let fieldModel = getSearchableFieldFromFormControlId(column);
+								@if (fieldModel?.type === FieldModelType.DATE || fieldModel?.type === FieldModelType.DATE_SELECT) {
 									<mat-form-field>
-										<mat-label>{{ fieldModelDTO?.shortname | localizeMap }}</mat-label>
+										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
 										<input
 											matInput
-											[formControlName]="fieldModelDTO ? getSFFormControlName(fieldModelDTO) : null"
+											[formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null"
 											[matDatepicker]="datePicker" />
 										<mat-datepicker-toggle
 											matSuffix
@@ -97,11 +97,11 @@
 											#datePicker
 											[startAt]="getStartDate()"></mat-datepicker>
 									</mat-form-field>
-								} @else if (fieldModelDTO?.type === FieldModelType.SELECT || fieldModelDTO?.type === FieldModelType.RADIO) {
+								} @else if (fieldModel?.type === FieldModelType.SELECT || fieldModel?.type === FieldModelType.RADIO) {
 									<mat-form-field>
-										<mat-label>{{ fieldModelDTO?.shortname | localizeMap }}</mat-label>
-										<mat-select [formControlName]="fieldModelDTO ? getSFFormControlName(fieldModelDTO) : null">
-											@for (value of fieldModelDTO?.possibleValues; track value.id) {
+										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
+										<mat-select [formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null">
+											@for (value of fieldModel?.possibleValues; track value.id) {
 												<mat-option [value]="value.id">
 													{{ value.shortname | localizeMap }}
 												</mat-option>
@@ -110,19 +110,19 @@
 									</mat-form-field>
 								} @else {
 									<mat-form-field>
-										<mat-label>{{ fieldModelDTO?.shortname | localizeMap }}</mat-label>
+										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
 										<input
 											matInput
-											[formControlName]="fieldModelDTO ? getSFFormControlName(fieldModelDTO) : null" />
+											[formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null" />
 									</mat-form-field>
 								}
 							} @else if (workflowStatusModelMap.has(column)) {
 								<mat-form-field>
 									<mat-label>{{ workflowStatusModelMap.get(column) | localizeMap }}</mat-label>
 									<mat-select
-										[formControlName]="getWorkflowDTO(column) ? getWSFormControlName(getWorkflowDTO(column)!) : null"
+										[formControlName]="getWorkflow(column) ? getWSFormControlName(getWorkflow(column)!) : null"
 										multiple>
-										@for (state of getWorkflowDTO(column)?.states || []; track state.id) {
+										@for (state of getWorkflow(column)?.states || []; track state.id) {
 											<mat-option [value]="state.id">
 												{{ state.shortname | localizeMap }}
 											</mat-option>

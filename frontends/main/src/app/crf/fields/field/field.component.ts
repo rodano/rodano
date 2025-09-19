@@ -1,5 +1,5 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
-import {CellDTO} from '@core/model/cell-dto';
+import {Cell} from '@core/model/cell';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
 import {AutoCompleteComponent} from '../auto-complete/auto-complete.component';
@@ -20,7 +20,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FieldModelType} from '@core/model/field-model-type';
 import {MatIcon} from '@angular/material/icon';
 import {MatDialog} from '@angular/material/dialog';
-import {FieldModelDTO} from '@core/model/field-model-dto';
+import {FieldModel} from '@core/model/field-model';
 import {FieldModelHelpComponent} from '../../dialogs/field-model-help/field-model-help.component';
 import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
 import {AuditTrailFieldComponent} from 'src/app/audit-trail-field/audit-trail-field.component';
@@ -28,14 +28,14 @@ import {AuthStateService} from 'src/app/services/auth-state.service';
 import {MatMenuModule} from '@angular/material/menu';
 import {WorkflowStatusComponent} from '../../workflow-status/workflow-status.component';
 import {LocalizeFieldModelPipe} from 'src/app/pipes/localize-field-model.pipe';
-import {WorkflowActionDTO} from '@core/model/workflow-action-dto';
+import {WorkflowAction} from '@core/model/workflow-action';
 import {WorkflowActionService} from '../../services/workflow-action.service';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 import {AdministrationService} from '@core/services/administration.service';
 import {MatIconButton} from '@angular/material/button';
 import {WorkflowStatusImportantPipe} from 'src/app/pipes/workflow-status-important.pipe';
-import {WorkflowStatusDTO} from '@core/model/workflow-status-dto';
+import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusNotImportantPipe} from 'src/app/pipes/workflow-status-not-important';
 import {FeatureStatic} from '@core/model/feature-static';
 
@@ -68,7 +68,7 @@ import {FeatureStatic} from '@core/model/feature-static';
 })
 export class FieldComponent implements OnInit, OnChanges {
 	@Input() field: CRFField;
-	@Input() cell: CellDTO;
+	@Input() cell: Cell;
 	@Input() disabled: boolean;
 
 	fieldModelType = FieldModelType;
@@ -162,9 +162,9 @@ export class FieldComponent implements OnInit, OnChanges {
 		return this.field.possibleWorkflows.length > 0 || this.field.workflowStatuses.filter(s => !s.state.important).some(s => s.state.possibleActions.length > 0);
 	}
 
-	get creationActions(): WorkflowActionDTO[] {
+	get creationActions(): WorkflowAction[] {
 		return this.field.possibleWorkflows.map(workflow => {
-			return workflow.actions.find(a => a.id === workflow.actionId) as WorkflowActionDTO;
+			return workflow.actions.find(a => a.id === workflow.actionId) as WorkflowAction;
 		});
 	}
 
@@ -176,23 +176,23 @@ export class FieldComponent implements OnInit, OnChanges {
 		return EmptyObjectCheck.isEmptyObject(object);
 	}
 
-	initializeWorkflow(action: WorkflowActionDTO) {
+	initializeWorkflow(action: WorkflowAction) {
 		this.workflowActionService.createOnField(this.field, action).subscribe(newField => {
 			Object.assign(this.field, newField);
 		});
 	}
 
-	updateWorkflow(status: WorkflowStatusDTO, action: WorkflowActionDTO) {
+	updateWorkflow(status: WorkflowStatus, action: WorkflowAction) {
 		this.workflowActionService.executeActionOnField(this.field, status, action).subscribe(newField => {
 			Object.assign(this.field, newField);
 		});
 	}
 
-	onActionResponse(newField: WorkflowableDTO) {
+	onActionResponse(newField: Workflowable) {
 		Object.assign(this.field, newField);
 	}
 
-	openHelp(fieldModel: FieldModelDTO) {
+	openHelp(fieldModel: FieldModel) {
 		return this.dialog
 			.open(FieldModelHelpComponent, {data: fieldModel})
 			.afterClosed();

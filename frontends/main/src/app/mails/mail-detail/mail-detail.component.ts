@@ -1,7 +1,7 @@
 import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {MailsService} from '@core/services/mails.service';
-import {MailDTO} from '@core/model/mail-dto';
+import {Mail} from '@core/model/mail';
 import {MatButton} from '@angular/material/button';
 import {DownloadDirective} from '../../directives/download.component';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -25,7 +25,7 @@ export class MailDetailComponent {
 
 	constructor(
 		private mailsService: MailsService,
-		@Inject(MAT_DIALOG_DATA) public mail: MailDTO,
+		@Inject(MAT_DIALOG_DATA) public mail: Mail,
 		private domSanitizer: DomSanitizer
 	) {
 		this.trustedHtml = this.domSanitizer.bypassSecurityTrustHtml(mail.htmlBody || '');

@@ -6,9 +6,9 @@ import {MatTable, MatTableModule} from '@angular/material/table';
 import {MatSort} from '@angular/material/sort';
 import {switchMap, startWith, debounceTime} from 'rxjs/operators';
 import {PagedResultWorkflowStatusInfo} from '@core/model/paged-result-workflow-status-info';
-import {WorkflowWidgetDTO} from '@core/model/workflow-widget-dto';
+import {WorkflowWidget} from '@core/model/workflow-widget';
 import {WorkflowStatusInfo} from '@core/model/workflow-status-info';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {DownloadDirective} from '../../directives/download.component';
 import {MatButton} from '@angular/material/button';
@@ -45,10 +45,10 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 })
 export class WorkflowWidgetComponent implements OnInit {
 	@Input() id: string;
-	@Input() scopes?: ScopeDTO[];
+	@Input() scopes?: Scope[];
 	@Output() workflowsLoaded = new EventEmitter<number>();
 
-	widget: WorkflowWidgetDTO;
+	widget: WorkflowWidget;
 	columnsToDisplay: string[] = [];
 	workflowStatuses: PagedResultWorkflowStatusInfo = EMPTY_PAGED_RESULT;
 

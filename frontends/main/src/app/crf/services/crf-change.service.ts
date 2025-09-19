@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {Subject} from 'rxjs';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {TypedWorkflowable} from './typed-workflowable';
 
@@ -17,7 +17,7 @@ export class CRFChangeService {
 	private readonly updatedWorkflowableStream$ = new Subject<TypedWorkflowable>();
 	public readonly updatedWorkflowable$ = this.updatedWorkflowableStream$.asObservable();
 
-	public emitUpdatedWorkflowable(entity: WorkflowableEntity, workflowable: WorkflowableDTO) {
+	public emitUpdatedWorkflowable(entity: WorkflowableEntity, workflowable: Workflowable) {
 		const typedWorkflowable = {
 			entity,
 			workflowable

@@ -2,10 +2,10 @@ import {Component, ViewChild, Input, OnChanges, DestroyRef, OnInit} from '@angul
 import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {RouterLink} from '@angular/router';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {ScopeModel} from '@core/model/scope-model';
 import {forkJoin, merge, of, startWith, Subject, switchMap} from 'rxjs';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
-import {PagedResultScopeDTO} from '@core/model/paged-result-scope-dto';
+import {PagedResultScope} from '@core/model/paged-result-scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {LowerCasePipe} from '@angular/common';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
@@ -19,9 +19,9 @@ import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {DownloadDirective} from 'src/app/directives/download.component';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -59,15 +59,15 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	]
 })
 export class ScopeListComponent implements OnInit, OnChanges {
-	@Input({required: true}) scopeModel: ScopeModelDTO;
+	@Input({required: true}) scopeModel: ScopeModel;
 
-	leafScopeModel?: ScopeModelDTO;
-	defaultProfile: ProfileDTO | undefined;
+	leafScopeModel?: ScopeModel;
+	defaultProfile: Profile | undefined;
 	exportUrl: string;
 
 	writeAccessOnParent = false;
 
-	parentScopes: ScopeDTO[] = [];
+	parentScopes: Scope[] = [];
 
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
@@ -76,7 +76,7 @@ export class ScopeListComponent implements OnInit, OnChanges {
 
 	refreshSearch$ = new Subject<void>();
 
-	scopes: PagedResultScopeDTO = EMPTY_PAGED_RESULT;
+	scopes: PagedResultScope = EMPTY_PAGED_RESULT;
 	columnsToDisplay: string[] = [];
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;

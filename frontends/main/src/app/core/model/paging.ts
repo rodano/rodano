@@ -9,6 +9,9 @@
  */
 
 
+/**
+ * Paging information
+ */
 export interface Paging { 
     pageSize: number;
     pageIndex: number;

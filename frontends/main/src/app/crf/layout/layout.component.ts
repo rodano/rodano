@@ -1,10 +1,10 @@
 import {Component, Input, OnInit, DestroyRef} from '@angular/core';
-import {LayoutDTO} from '@core/model/layout-dto';
+import {Layout} from '@core/model/layout';
 import {VisibilityService} from '../services/visibility.service';
 import {CellComponent} from '../cell/cell.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {CRFDataset} from '../models/crf-dataset';
-import {CellDTO} from '@core/model/cell-dto';
+import {Cell} from '@core/model/cell';
 import {CRFField} from '../models/crf-field';
 import {CRFService} from '../services/crf.service';
 import {LoggingService} from '@core/services/logging.service';
@@ -24,7 +24,7 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	]
 })
 export class LayoutComponent implements OnInit {
-	@Input() layout: LayoutDTO;
+	@Input() layout: Layout;
 	@Input() datasets: CRFDataset[];
 	//layoutUid is the global identifier of the layout
 	//it is required for visibility criteria
@@ -45,7 +45,7 @@ export class LayoutComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(criterion => {
 			this.loggingService.info(`Layout ${this.layout.id} receiving criterion`, criterion);
-			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteriaDTO.ActionEnum.SHOW.toLocaleLowerCase();
+			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteria.ActionEnum.SHOW.toLocaleLowerCase();
 			this.shown = criterion.reverse ? !show : show;
 
 			//mark the fields
@@ -80,14 +80,14 @@ export class LayoutComponent implements OnInit {
 		});
 	}
 
-	getField(cell: CellDTO): CRFField | undefined {
+	getField(cell: Cell): CRFField | undefined {
 		if(!this.crfService.getCellHasField(cell)) {
 			return undefined;
 		}
 		return this.crfService.getCellField(cell, this.datasets);
 	}
 
-	getDisabled(cell: CellDTO): boolean {
+	getDisabled(cell: Cell): boolean {
 		if(!this.crfService.getCellHasField(cell)) {
 			return false;
 		}

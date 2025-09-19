@@ -1,7 +1,7 @@
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
+import {Workflowable} from '@core/utilities/workflowable';
 
 export interface TypedWorkflowable {
 	entity: WorkflowableEntity;
-	workflowable: WorkflowableDTO;
+	workflowable: Workflowable;
 }

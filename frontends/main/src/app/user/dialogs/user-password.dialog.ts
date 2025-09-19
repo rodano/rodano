@@ -5,7 +5,7 @@ import {MatButton} from '@angular/material/button';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {UserDTO} from '@core/model/user-dto';
+import {User} from '@core/model/user';
 
 @Component({
 	selector: 'app-user-password',
@@ -32,7 +32,7 @@ export class UserPasswordDialogComponent {
 	});
 
 	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: {actionLabel: string; user: UserDTO}
+		@Inject(MAT_DIALOG_DATA) public data: {actionLabel: string; user: User}
 	) { }
 
 	getResponse(): UserPasswordDialogResult {

@@ -1,7 +1,7 @@
-import {DatasetDTO} from '@core/model/dataset-dto';
+import {Dataset} from '@core/model/dataset';
 import {CRFField} from './crf-field';
 
-export interface CRFDataset extends DatasetDTO {
+export interface CRFDataset extends Dataset {
 
 	fields: CRFField[];
 

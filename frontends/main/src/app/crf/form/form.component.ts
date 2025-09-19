@@ -1,19 +1,19 @@
 import {Component, Input, OnChanges, DestroyRef, OnInit} from '@angular/core';
 import {forkJoin} from 'rxjs';
-import {FormDTO} from '@core/model/form-dto';
-import {LayoutDTO} from '@core/model/layout-dto';
+import {Form} from '@core/model/form';
+import {Layout} from '@core/model/layout';
 import {FormService} from '@core/services/form.service';
 import {filter, finalize, switchMap} from 'rxjs/operators';
 import {CRFService} from '../services/crf.service';
 import {CellLoadingService} from '../services/cell-loading.service';
 import {NotificationService} from 'src/app/services/notification.service';
-import {BlockingErrorsDTO} from '@core/model/blocking-errors-dto';
+import {BlockingErrors} from '@core/model/blocking-errors';
 import {CRFDataset} from '../models/crf-dataset';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
 import {LayoutComponent} from '../layout/layout.component';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {EventDTO} from '@core/model/event-dto';
+import {Scope} from '@core/model/scope';
+import {Event} from '@core/model/event';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MultipleLayoutComponent} from '../multiple-layout/multiple-layout.component';
 import {WorkflowStatusComponent} from '../workflow-status/workflow-status.component';
@@ -40,15 +40,15 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 	]
 })
 export class FormComponent implements OnInit, OnChanges {
-	@Input() scope: ScopeDTO;
+	@Input() scope: Scope;
 	//event may be null form scope attached directly to the scope
-	@Input() event?: EventDTO;
-	@Input() form: FormDTO;
+	@Input() event?: Event;
+	@Input() form: Form;
 
 	layoutType = LayoutType;
 	workflowableEntity = WorkflowableEntity;
 
-	layouts: LayoutDTO[];
+	layouts: Layout[];
 	datasets: CRFDataset[];
 
 	//distinguish between loading the form (all the cells are being initialized) vs saving the form
@@ -141,7 +141,7 @@ export class FormComponent implements OnInit, OnChanges {
 					this.notificationService.showSuccess('Form saved');
 				},
 				error: (response: any) => {
-					const result = response.error as BlockingErrorsDTO;
+					const result = response.error as BlockingErrors;
 					result.errors.forEach(error => {
 						const dataset = this.datasets.find(d => d.id === error.datasetId) as CRFDataset;
 						const field = dataset.fields.find(f => f.modelId === error.fieldModelId) as CRFField;
@@ -158,7 +158,7 @@ export class FormComponent implements OnInit, OnChanges {
 			});
 	}
 
-	onActionResponse(newForm: FormDTO) {
-		(this.form as FormDTO).workflowStatuses = (newForm as FormDTO).workflowStatuses;
+	onActionResponse(newForm: Form) {
+		(this.form as Form).workflowStatuses = (newForm as Form).workflowStatuses;
 	}
 }

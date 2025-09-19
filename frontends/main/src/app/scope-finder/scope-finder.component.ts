@@ -5,7 +5,7 @@ import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatFormFieldControl} from '@angular/material/form-field';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {BooleanInput, coerceBooleanProperty} from '@angular/cdk/coercion';
-import {ScopeModelDTO} from '@core/model/scope-model-dto';
+import {ScopeModel} from '@core/model/scope-model';
 import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 import {MatInput} from '@angular/material/input';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
@@ -13,7 +13,7 @@ import {debounceTime, fromEvent, merge, Observable, of, switchMap} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ScopeService} from '@core/services/scope.service';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
-import {ScopeDTO} from '@core/model/scope-dto';
+import {Scope} from '@core/model/scope';
 
 @Component({
 	selector: 'app-scope-finder',
@@ -44,8 +44,8 @@ export class ScopeFinderComponent implements MatFormFieldControl<number>, OnInit
 	onChange: (value: number | null) => void;
 
 	scopePk: number | null = null;
-	scopeModels: ScopeModelDTO[] = [];
-	scopes: ScopeDTO[] = [];
+	scopeModels: ScopeModel[] = [];
+	scopes: Scope[] = [];
 
 	constructor(
 		private configurationService: ConfigurationService,
@@ -173,7 +173,7 @@ export class ScopeFinderComponent implements MatFormFieldControl<number>, OnInit
 		});
 	}
 
-	retrieveScope(scopePk: number | null): Observable<ScopeDTO | undefined> {
+	retrieveScope(scopePk: number | null): Observable<Scope | undefined> {
 		if(!scopePk) {
 			return of(undefined);
 		}
@@ -184,16 +184,16 @@ export class ScopeFinderComponent implements MatFormFieldControl<number>, OnInit
 		return this.scopeService.get(scopePk);
 	}
 
-	getScopes(modelId: string): ScopeDTO[] {
+	getScopes(modelId: string): Scope[] {
 		return this.scopes.filter(c => c.modelId === modelId) ?? [];
 	}
 
-	selectScope(scope: ScopeDTO) {
+	selectScope(scope: Scope) {
 		this.value = scope.pk;
 	}
 
 	//this function cannot be a method because it is called statically bu the template
-	displayScope = (scope: ScopeDTO) => {
+	displayScope = (scope: Scope) => {
 		if(!scope) {
 			//this is a workaround for the fact that there is no event when the input is reset because no option is selected
 			this.value = null;

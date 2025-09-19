@@ -2,7 +2,7 @@ import {Component, Inject} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
-import {FieldModelDTO} from '@core/model/field-model-dto';
+import {FieldModel} from '@core/model/field-model';
 
 export interface WorkflowRationaleData {
 	title: string;
@@ -20,6 +20,6 @@ export interface WorkflowRationaleData {
 })
 export class FieldModelHelpComponent {
 	constructor(
-		@Inject(MAT_DIALOG_DATA) public fieldModel: FieldModelDTO
+		@Inject(MAT_DIALOG_DATA) public fieldModel: FieldModel
 	) {}
 }

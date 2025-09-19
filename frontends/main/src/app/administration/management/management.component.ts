@@ -1,7 +1,7 @@
 import {Component, DestroyRef, OnInit} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {forkJoin} from 'rxjs';
-import {StudyDTO} from '@core/model/study-dto';
+import {Study} from '@core/model/study';
 import {AdministrationService} from '@core/services/administration.service';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {AuthStateService} from 'src/app/services/auth-state.service';
@@ -11,7 +11,7 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatInput} from '@angular/material/input';
 import {DatabaseService} from '@core/services/database.service';
-import {DemoUserSchemeDTO} from '@core/model/demo-user-scheme-dto';
+import {DemoUserScheme} from '@core/model/demo-user-scheme';
 
 @Component({
 	templateUrl: './management.component.html',
@@ -26,7 +26,7 @@ import {DemoUserSchemeDTO} from '@core/model/demo-user-scheme-dto';
 	]
 })
 export class ManagementComponent implements OnInit {
-	study: StudyDTO;
+	study: Study;
 	editConfigurationLink: string;
 	inMaintenance: boolean;
 	inDebug: boolean;
@@ -77,7 +77,7 @@ export class ManagementComponent implements OnInit {
 	}
 
 	createDemoUsers() {
-		const demoUserScheme = this.demoUserSchemeForm.value as DemoUserSchemeDTO;
+		const demoUserScheme = this.demoUserSchemeForm.value as DemoUserScheme;
 		this.databaseService.createDemoUsers(demoUserScheme).subscribe(() => this.notificationService.showSuccess('Demo users created'));
 	}
 

@@ -1,20 +1,20 @@
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {DatasetDTO} from '@core/model/dataset-dto';
+import {Dataset} from '@core/model/dataset';
 import {map} from 'rxjs/operators';
 import {DatasetService} from '@core/services/dataset.service';
 import {CRFDataset} from '../models/crf-dataset';
-import {FormDTO} from '@core/model/form-dto';
-import {LayoutDTO} from '@core/model/layout-dto';
-import {CellDTO} from '@core/model/cell-dto';
-import {DatasetUpdateDTO} from '@core/model/dataset-update-dto';
+import {Form} from '@core/model/form';
+import {Layout} from '@core/model/layout';
+import {Cell} from '@core/model/cell';
+import {DatasetUpdate} from '@core/model/dataset-update';
 import {FormService} from '@core/services/form.service';
-import {DatasetSubmissionDTO} from '@core/model/dataset-submission-dto';
-import {DatasetRestorationDTO} from '@core/model/dataset-restoration-dto';
-import {DatasetCreationDTO} from '@core/model/dataset-creation-dto';
-import {FieldUpdateDTO} from '@core/model/field-update-dto';
-import {FieldModelDTO} from '@core/model/field-model-dto';
-import {FieldDTO} from '@core/model/field-dto';
+import {DatasetSubmission} from '@core/model/dataset-submission';
+import {DatasetRestoration} from '@core/model/dataset-restoration';
+import {DatasetCreation} from '@core/model/dataset-creation';
+import {FieldUpdate} from '@core/model/field-update';
+import {FieldModel} from '@core/model/field-model';
+import {Field} from '@core/model/field';
 import {CRFField} from '../models/crf-field';
 import {OperandType} from '@core/model/operand-type';
 import {FieldModelType} from '@core/model/field-model-type';
@@ -29,16 +29,16 @@ export class CRFService {
 		private formService: FormService
 	) { }
 
-	getLayoutsCells(layouts: LayoutDTO[]): CellDTO[] {
+	getLayoutsCells(layouts: Layout[]): Cell[] {
 		return layouts.flatMap(l => this.getLayoutCells(l));
 	}
 
-	getLayoutCells(layout: LayoutDTO): CellDTO[] {
+	getLayoutCells(layout: Layout): Cell[] {
 		return layout.lines
 			.flatMap(c => c.cells);
 	}
 
-	createCRFDataset(dataset: DatasetDTO): CRFDataset {
+	createCRFDataset(dataset: Dataset): CRFDataset {
 		return {
 			...dataset,
 			fields: dataset.fields.map(f => ({...f, shown: true, error: undefined})),
@@ -48,7 +48,7 @@ export class CRFService {
 		} satisfies CRFDataset as CRFDataset;
 	}
 
-	createCRFDatasets(datasets: DatasetDTO[]): CRFDataset[] {
+	createCRFDatasets(datasets: Dataset[]): CRFDataset[] {
 		return datasets.map(d => this.createCRFDataset(d));
 	}
 
@@ -63,22 +63,22 @@ export class CRFService {
 	 * @param form A form
 	 * @param layouts The layout of the forms
 	 */
-	getCRFDatasets(form: FormDTO): Observable<CRFDataset[]> {
+	getCRFDatasets(form: Form): Observable<CRFDataset[]> {
 		return this.datasetService.searchOnForm(form.scopePk, form.eventPk, form.pk).pipe(
 			map(d => this.createCRFDatasets(d))
 		);
 	}
 
 	/**
-	 * Transform datasets into a submission DTO and push it to the server
+	 * Transform datasets into a submission and push it to the server
 	 * @param form A form
 	 * @param datasets A list of CRFDatasets
 	 */
-	saveCRFDatasets(form: FormDTO, crfDatasets: CRFDataset[]): Observable<DatasetDTO[]> {
-		const updatedDatasets = [] as DatasetUpdateDTO[];
-		const newDatasets = [] as DatasetCreationDTO[];
+	saveCRFDatasets(form: Form, crfDatasets: CRFDataset[]): Observable<Dataset[]> {
+		const updatedDatasets = [] as DatasetUpdate[];
+		const newDatasets = [] as DatasetCreation[];
 		const removedDatasets = {} as Record<number, string>;
-		const restoredDatasets = [] as DatasetRestorationDTO[];
+		const restoredDatasets = [] as DatasetRestoration[];
 		crfDatasets
 			//remove read only data
 			.filter(d => d.canWrite)
@@ -102,7 +102,7 @@ export class CRFService {
 							modelId: field.modelId,
 							value: field.value,
 							filePk: field.filePk
-						} as FieldUpdateDTO;
+						} as FieldUpdate;
 						//mark hidden fields as reset
 						if(!field.shown) {
 							updatedField.reset = true;
@@ -116,7 +116,7 @@ export class CRFService {
 							id: dataset.id,
 							modelId: dataset.modelId,
 							fields: updatedFields
-						} as DatasetCreationDTO;
+						} as DatasetCreation;
 						newDatasets.push(newDataset);
 					}
 					else {
@@ -124,7 +124,7 @@ export class CRFService {
 						const updateDataset = {
 							pk: dataset.pk,
 							fields: updatedFields
-						} as DatasetUpdateDTO;
+						} as DatasetUpdate;
 						//handled restored datasets
 						if(dataset.rationale) {
 							restoredDatasets.push({rationale: dataset.rationale, dataset: updateDataset});
@@ -137,18 +137,18 @@ export class CRFService {
 				}
 			});
 
-		const submissionDTO = {
+		const submission = {
 			updatedDatasets,
 			newDatasets,
 			removedDatasets,
 			restoredDatasets
-		} as DatasetSubmissionDTO;
+		} as DatasetSubmission;
 
-		return this.formService.submit(form.scopePk, form.eventPk, form.pk, submissionDTO);
+		return this.formService.submit(form.scopePk, form.eventPk, form.pk, submission);
 	}
 
 	//transform a field value into a typed value
-	public typeFieldValue(fieldModel: FieldModelDTO, value?: string): any {
+	public typeFieldValue(fieldModel: FieldModel, value?: string): any {
 		switch(fieldModel?.dataType) {
 			case OperandType.BOOLEAN:
 				return value === 'true';
@@ -161,11 +161,11 @@ export class CRFService {
 
 	//transform field values into a list of typed values
 	//remember that the value of a field may be an array (for example, checkbox groups)
-	public typeFieldValues(fieldModel: FieldModelDTO, values: string[]): any[] {
+	public typeFieldValues(fieldModel: FieldModel, values: string[]): any[] {
 		return values.map(v => this.typeFieldValue(fieldModel, v));
 	}
 
-	public parseFieldValue(field: FieldDTO): any[] {
+	public parseFieldValue(field: Field): any[] {
 		const value = field.value as string;
 		let values;
 		switch(field.model.type) {
@@ -180,7 +180,7 @@ export class CRFService {
 
 	//transform a typed field value into a string value
 	//for example, this is used to transform a date value into a string value
-	public buildFieldValue(fieldModel: FieldModelDTO, value?: any): string {
+	public buildFieldValue(fieldModel: FieldModel, value?: any): string {
 		switch(fieldModel?.dataType) {
 			case OperandType.BOOLEAN:
 			case OperandType.NUMBER:
@@ -191,7 +191,7 @@ export class CRFService {
 	}
 
 	//transform a typed field value into a value label
-	public buildFieldValueLabel(fieldModel: FieldModelDTO, value?: any): string {
+	public buildFieldValueLabel(fieldModel: FieldModel, value?: any): string {
 		const stringValue = this.buildFieldValue(fieldModel, value);
 		switch(fieldModel.type) {
 			case FieldModelType.SELECT:
@@ -204,25 +204,25 @@ export class CRFService {
 		}
 	}
 
-	getLayoutFields(layout: LayoutDTO, datasets: CRFDataset[]): CRFField[] {
+	getLayoutFields(layout: Layout, datasets: CRFDataset[]): CRFField[] {
 		const cells = this.getLayoutCells(layout);
 		return cells
 			.filter(c => this.getCellHasField(c))
 			.map(c => this.getCellField(c, datasets));
 	}
 
-	getCellHasField(cell: CellDTO) {
+	getCellHasField(cell: Cell) {
 		return cell.datasetModelId && cell.fieldModelId;
 	}
 
-	getCellDataset(cell: CellDTO, datasets: CRFDataset[]): CRFDataset {
+	getCellDataset(cell: Cell, datasets: CRFDataset[]): CRFDataset {
 		if(!this.getCellHasField(cell)) {
 			throw new Error(`Cell ${cell.id} does not contain a field`);
 		}
 		return datasets.find(d => d.modelId === cell.datasetModelId) as CRFDataset;
 	}
 
-	getCellField(cell: CellDTO, datasets: CRFDataset[]): CRFField {
+	getCellField(cell: Cell, datasets: CRFDataset[]): CRFField {
 		if(!this.getCellHasField(cell)) {
 			throw new Error(`Cell ${cell.id} does not contain a field`);
 		}

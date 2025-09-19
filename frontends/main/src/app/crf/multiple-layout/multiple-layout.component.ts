@@ -1,5 +1,5 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
-import {LayoutDTO} from '@core/model/layout-dto';
+import {Layout} from '@core/model/layout';
 import {trigger, state, style, transition, animate} from '@angular/animations';
 import {MatSortModule, Sort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -11,7 +11,7 @@ import {NotificationService} from 'src/app/services/notification.service';
 import {CellLoadingService} from '../services/cell-loading.service';
 import {VisibilityService} from '../services/visibility.service';
 import {CRFService} from '../services/crf.service';
-import {FieldModelDTO} from '@core/model/field-model-dto';
+import {FieldModel} from '@core/model/field-model';
 import {CRFDataset} from '../models/crf-dataset';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Observable} from 'rxjs';
@@ -53,7 +53,7 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	]
 })
 export class MultipleLayoutComponent implements OnInit, OnChanges {
-	@Input() layout: LayoutDTO;
+	@Input() layout: Layout;
 	//this component must have a reference to the reference list of datasets to be able to push new datasets in it
 	//if a filtered list is provided, new datasets will not be visible by the parent component
 	@Input() datasets: CRFDataset[];
@@ -62,7 +62,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	multipleDatasets: CRFDataset[] = [];
 
 	@ViewChild(MatTable) table: MatTable<any>;
-	fieldModelsToDisplay: FieldModelDTO[] = [];
+	fieldModelsToDisplay: FieldModel[] = [];
 	columnsToDisplay: string[] = [];
 	//handle datasource manually to be able to refresh it properly
 	dataSource = new MatTableDataSource<CRFDataset>([]);
@@ -86,7 +86,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(criterion => {
 			this.loggingService.info(`Multiple layout ${this.layout.id} receiving criterion`, criterion);
-			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteriaDTO.ActionEnum.SHOW.toLocaleLowerCase();
+			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteria.ActionEnum.SHOW.toLocaleLowerCase();
 			this.shown = criterion.reverse ? !show : show;
 
 			//mark the datasets
@@ -116,7 +116,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 				element = element.trim();
 				if(element.startsWith('fieldModelId:')) {
 					const fieldModelId = element.slice(13, -1);
-					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModelDTO;
+					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
 					this.fieldModelsToDisplay.push(fieldModel);
 				}
 			}
@@ -189,7 +189,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 			.afterClosed();
 	}
 
-	sortDatasets(sortField: FieldModelDTO, direction: boolean) {
+	sortDatasets(sortField: FieldModel, direction: boolean) {
 		let comparator: (d1: CRFDataset, d2: CRFDataset) => number;
 		if(sortField) {
 			comparator = (d1, d2) => {
@@ -209,14 +209,14 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		if(!sort.active && sort.direction === '') {
 			return;
 		}
-		const sortField = this.layout.datasetModel.fieldModels.find(f => f.id === sort.active) as FieldModelDTO;
+		const sortField = this.layout.datasetModel.fieldModels.find(f => f.id === sort.active) as FieldModel;
 		this.sortDatasets(sortField, sort.direction === 'asc');
 
 		//re-render the rows after the sorting is done
 		this.table.renderRows();
 	}
 
-	compareFieldValues(field: FieldModelDTO, v1: string | undefined, v2: string | undefined) {
+	compareFieldValues(field: FieldModel, v1: string | undefined, v2: string | undefined) {
 		//manage undefined values
 		if(!v1) {
 			return 1;

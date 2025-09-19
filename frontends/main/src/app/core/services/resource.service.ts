@@ -1,12 +1,12 @@
 import {HttpClient, HttpEvent, HttpRequest} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {PagedResultResourceDTO} from '../model/paged-result-resource-dto';
+import {PagedResultResource} from '../model/paged-result-resource';
 import {ResourceSearch} from '../utilities/search/resource-search';
 import {APIService} from './api.service';
 import {HttpParamsService} from './http-params.service';
-import {ResourceSubmissionDTO} from '../model/resource-submission-dto';
-import {ResourceDTO} from '../model/resource-dto';
+import {ResourceSubmission} from '../model/resource-submission';
+import {Resource} from '../model/resource';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
 @Injectable({
@@ -24,36 +24,36 @@ export class ResourceService {
 	}
 
 	@reviveDates
-	search(search: ResourceSearch): Observable<PagedResultResourceDTO> {
+	search(search: ResourceSearch): Observable<PagedResultResource> {
 		const params = this.httpParamsService.toHttpParams(search);
-		return this.http.get<PagedResultResourceDTO>(this.serviceUrl, {params});
+		return this.http.get<PagedResultResource>(this.serviceUrl, {params});
 	}
 
-	create(resourceSubmission: ResourceSubmissionDTO): Observable<ResourceDTO> {
-		return this.http.post<ResourceDTO>(this.serviceUrl, resourceSubmission);
+	create(resourceSubmission: ResourceSubmission): Observable<Resource> {
+		return this.http.post<Resource>(this.serviceUrl, resourceSubmission);
 	}
 
-	save(resource: ResourceDTO): Observable<ResourceDTO> {
-		return this.http.put<ResourceDTO>(`${this.serviceUrl}/${resource.pk}`, resource);
+	save(resource: Resource): Observable<Resource> {
+		return this.http.put<Resource>(`${this.serviceUrl}/${resource.pk}`, resource);
 	}
 
-	remove(resource: ResourceDTO): Observable<ResourceDTO> {
-		return this.http.put<ResourceDTO>(`${this.serviceUrl}/${resource.pk}/remove`, {});
+	remove(resource: Resource): Observable<Resource> {
+		return this.http.put<Resource>(`${this.serviceUrl}/${resource.pk}/remove`, {});
 	}
 
-	restore(resource: ResourceDTO): Observable<ResourceDTO> {
-		return this.http.put<ResourceDTO>(`${this.serviceUrl}/${resource.pk}/restore`, {});
+	restore(resource: Resource): Observable<Resource> {
+		return this.http.put<Resource>(`${this.serviceUrl}/${resource.pk}/restore`, {});
 	}
 
-	downloadFile(resource: ResourceDTO): Observable<Blob> {
+	downloadFile(resource: Resource): Observable<Blob> {
 		return this.http.get(this.getFileUrl(resource), {responseType: 'blob'});
 	}
 
-	getFileUrl(resource: ResourceDTO): string {
+	getFileUrl(resource: Resource): string {
 		return `${this.serviceUrl}/${resource.pk}/file`;
 	}
 
-	uploadFile(resourcePk: number, file: File): Observable<HttpEvent<ResourceDTO>> {
+	uploadFile(resourcePk: number, file: File): Observable<HttpEvent<Resource>> {
 		const formData = new FormData();
 		formData.append('file', file, file.name);
 

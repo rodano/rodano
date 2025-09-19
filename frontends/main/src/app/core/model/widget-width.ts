@@ -9,6 +9,9 @@
  */
 
 
+/**
+ * Width of the widget. Can only be HALF or FULL.
+ */
 export type WidgetWidth = 'HALF' | 'FULL';
 
 export const WidgetWidth = {

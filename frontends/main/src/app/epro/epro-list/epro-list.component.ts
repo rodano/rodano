@@ -5,11 +5,11 @@ import {MatPaginator} from '@angular/material/paginator';
 import {startWith, switchMap} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
-import {EproRobotDTO} from '@core/model/epro-robot-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {PagedResultScopeDTO} from '@core/model/paged-result-scope-dto';
+import {EproRobot} from '@core/model/epro-robot';
+import {Scope} from '@core/model/scope';
+import {PagedResultScope} from '@core/model/paged-result-scope';
 import {Subject, forkJoin, merge, of} from 'rxjs';
-import {EPROInvitationDTO} from '@core/model/epro-invitation-dto';
+import {EPROInvitation} from '@core/model/epro-invitation';
 import {EproInvitationComponent} from '../epro-invitation/epro-invitation.component';
 import {NotificationService} from 'src/app/services/notification.service';
 import {ConfigurationService} from '@core/services/configuration.service';
@@ -27,7 +27,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {Rights} from '@core/model/rights';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
-import {ProfileDTO} from '@core/model/profile-dto';
+import {Profile} from '@core/model/profile';
 
 @Component({
 	templateUrl: './epro-list.component.html',
@@ -49,16 +49,16 @@ import {ProfileDTO} from '@core/model/profile-dto';
 	]
 })
 export class EproListComponent implements OnInit {
-	parentScopes: ScopeDTO[] = [];
+	parentScopes: Scope[] = [];
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
 		parentPk: new FormControl(0)
 	});
 
 	refreshSearch$ = new Subject<void>();
-	scopes: PagedResultScopeDTO = EMPTY_PAGED_RESULT;
+	scopes: PagedResultScope = EMPTY_PAGED_RESULT;
 
-	robots: EproRobotDTO[];
+	robots: EproRobot[];
 	columnsToDisplay: string[] = [
 		'code',
 		'name',
@@ -66,9 +66,9 @@ export class EproListComponent implements OnInit {
 		'actions'
 	];
 
-	eproProfile?: ProfileDTO;
+	eproProfile?: Profile;
 
-	scopeRobotMap: Record<number, EproRobotDTO>;
+	scopeRobotMap: Record<number, EproRobot>;
 
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
@@ -136,11 +136,11 @@ export class EproListComponent implements OnInit {
 		this.refreshSearch$.next();
 	}
 
-	hasBeenInvited(scope: ScopeDTO): boolean {
+	hasBeenInvited(scope: Scope): boolean {
 		return this.robots.some(robot => robot.scopePk === scope.pk);
 	}
 
-	invite(scope: ScopeDTO) {
+	invite(scope: Scope) {
 		this.eproService.invite(scope.pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(invitation => {
@@ -149,7 +149,7 @@ export class EproListComponent implements OnInit {
 		});
 	}
 
-	revoke(scope: ScopeDTO) {
+	revoke(scope: Scope) {
 		this.eproService.revoke(scope.pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
@@ -158,7 +158,7 @@ export class EproListComponent implements OnInit {
 		});
 	}
 
-	private openInvitationDialog(invitation: EPROInvitationDTO) {
+	private openInvitationDialog(invitation: EPROInvitation) {
 		return this.dialog
 			.open(EproInvitationComponent, {
 				data: {

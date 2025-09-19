@@ -2,20 +2,20 @@ import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable, EMPTY, of} from 'rxjs';
 import {catchError, mergeMap, switchMap, tap} from 'rxjs/operators';
-import {WorkflowActionDTO} from '@core/model/workflow-action-dto';
-import {FieldDTO} from '@core/model/field-dto';
-import {ScopeDTO} from '@core/model/scope-dto';
-import {EventDTO} from '@core/model/event-dto';
-import {WorkflowUpdateDTO} from '@core/model/workflow-update-dto';
-import {WorkflowStatusDTO} from '@core/model/workflow-status-dto';
+import {WorkflowAction} from '@core/model/workflow-action';
+import {Field} from '@core/model/field';
+import {Scope} from '@core/model/scope';
+import {Event} from '@core/model/event';
+import {WorkflowUpdate} from '@core/model/workflow-update';
+import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {CapitalizeFirstPipe} from 'src/app/pipes/capitalize-first.pipe';
 import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
 import {NotificationService} from 'src/app/services/notification.service';
 import {WorkflowRationaleComponent} from '../dialogs/workflow-rationale/workflow-rationale.component';
 import {WorkflowSignatureComponent} from '../dialogs/workflow-signature/workflow-signature.component';
-import {WorkflowableDTO} from '@core/utilities/workflowable-dto';
-import {FormDTO} from '@core/model/form-dto';
+import {Workflowable} from '@core/utilities/workflowable';
+import {Form} from '@core/model/form';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 
 @Injectable({
@@ -35,32 +35,32 @@ export class WorkflowActionService {
 	}
 
 	private openWorkflowRationaleDialog(
-		action: WorkflowActionDTO,
-		workflowStatus?: WorkflowStatusDTO
-	): Observable<WorkflowUpdateDTO | undefined> {
+		action: WorkflowAction,
+		workflowStatus?: WorkflowStatus
+	): Observable<WorkflowUpdate | undefined> {
 		const data = {
 			workflow: workflowStatus,
 			action
 		};
 		return this.dialog
-			.open<WorkflowRationaleComponent, any, WorkflowUpdateDTO>(WorkflowRationaleComponent, {data})
+			.open<WorkflowRationaleComponent, any, WorkflowUpdate>(WorkflowRationaleComponent, {data})
 			.afterClosed();
 	}
 
 	private openWorkflowSignatureDialog(
-		action: WorkflowActionDTO,
-		workflowStatus: WorkflowStatusDTO
-	): Observable<WorkflowUpdateDTO | undefined> {
+		action: WorkflowAction,
+		workflowStatus: WorkflowStatus
+	): Observable<WorkflowUpdate | undefined> {
 		const data = {
 			workflow: workflowStatus,
 			action
 		};
 		return this.dialog
-			.open<WorkflowSignatureComponent, any, WorkflowUpdateDTO>(WorkflowSignatureComponent, {data})
+			.open<WorkflowSignatureComponent, any, WorkflowUpdate>(WorkflowSignatureComponent, {data})
 			.afterClosed();
 	}
 
-	private openWorkflowActionDialog(action: WorkflowActionDTO, workflowStatus?: WorkflowStatusDTO): Observable<WorkflowUpdateDTO | undefined> {
+	private openWorkflowActionDialog(action: WorkflowAction, workflowStatus?: WorkflowStatus): Observable<WorkflowUpdate | undefined> {
 		if(action.documentable) {
 			return this.openWorkflowRationaleDialog(action, workflowStatus);
 		}
@@ -70,7 +70,7 @@ export class WorkflowActionService {
 		throw new Error(`The action ${action.id} is neither documentable, nor requires a signature`);
 	}
 
-	private buildWorkflowUpdate(action: WorkflowActionDTO, workflowStatus?: WorkflowStatusDTO): Observable<WorkflowUpdateDTO | undefined> {
+	private buildWorkflowUpdate(action: WorkflowAction, workflowStatus?: WorkflowStatus): Observable<WorkflowUpdate | undefined> {
 		if(!action.documentable && !action.requireSignature) {
 			return of({workflowId: action.workflowId, actionId: action.id});
 		}
@@ -78,51 +78,51 @@ export class WorkflowActionService {
 	}
 
 	createOnScope(
-		scope: ScopeDTO,
-		action: WorkflowActionDTO
-	): Observable<ScopeDTO> {
-		return this.createOnWorkflowable(WorkflowableEntity.SCOPE, scope, action) as Observable<ScopeDTO>;
+		scope: Scope,
+		action: WorkflowAction
+	): Observable<Scope> {
+		return this.createOnWorkflowable(WorkflowableEntity.SCOPE, scope, action) as Observable<Scope>;
 	}
 
 	createOnEvent(
-		event: EventDTO,
-		action: WorkflowActionDTO
-	): Observable<EventDTO> {
-		return this.createOnWorkflowable(WorkflowableEntity.EVENT, event, action) as Observable<EventDTO>;
+		event: Event,
+		action: WorkflowAction
+	): Observable<Event> {
+		return this.createOnWorkflowable(WorkflowableEntity.EVENT, event, action) as Observable<Event>;
 	}
 
 	createOnField(
-		field: FieldDTO,
-		action: WorkflowActionDTO
-	): Observable<FieldDTO> {
-		return this.createOnWorkflowable(WorkflowableEntity.FIELD, field, action) as Observable<FieldDTO>;
+		field: Field,
+		action: WorkflowAction
+	): Observable<Field> {
+		return this.createOnWorkflowable(WorkflowableEntity.FIELD, field, action) as Observable<Field>;
 	}
 
 	createOnForm(
-		form: FormDTO,
-		action: WorkflowActionDTO
-	): Observable<FormDTO> {
-		return this.createOnWorkflowable(WorkflowableEntity.FORM, form, action) as Observable<FormDTO>;
+		form: Form,
+		action: WorkflowAction
+	): Observable<Form> {
+		return this.createOnWorkflowable(WorkflowableEntity.FORM, form, action) as Observable<Form>;
 	}
 
 	createOnWorkflowable(
 		entity: WorkflowableEntity,
-		workflowable: WorkflowableDTO,
-		action: WorkflowActionDTO
-	): Observable<WorkflowableDTO> {
+		workflowable: Workflowable,
+		action: WorkflowAction
+	): Observable<Workflowable> {
 		const workflowLabel = this.capitalizeFirstPipe.transform(action.workflowId);
 		return this.buildWorkflowUpdate(action).pipe(
 			mergeMap(workflowUpdate => {
 				if(workflowUpdate) {
 					switch(entity) {
 						case WorkflowableEntity.SCOPE:
-							return this.workflowStatusService.createOnScope(workflowable as ScopeDTO, workflowUpdate);
+							return this.workflowStatusService.createOnScope(workflowable as Scope, workflowUpdate);
 						case WorkflowableEntity.EVENT:
-							return this.workflowStatusService.createOnEvent(workflowable as EventDTO, workflowUpdate);
+							return this.workflowStatusService.createOnEvent(workflowable as Event, workflowUpdate);
 						case WorkflowableEntity.FORM:
-							return this.workflowStatusService.createOnForm(workflowable as FormDTO, workflowUpdate);
+							return this.workflowStatusService.createOnForm(workflowable as Form, workflowUpdate);
 						case WorkflowableEntity.FIELD:
-							return this.workflowStatusService.createOnField(workflowable as FieldDTO, workflowUpdate);
+							return this.workflowStatusService.createOnField(workflowable as Field, workflowUpdate);
 						default:
 							throw new Error(`Unable to create workflow status for an object of type ${entity}`);
 					}
@@ -140,43 +140,43 @@ export class WorkflowActionService {
 	}
 
 	executeActionOnScope(
-		scope: ScopeDTO,
-		workflowStatus: WorkflowStatusDTO,
-		action: WorkflowActionDTO
-	): Observable<ScopeDTO> {
-		return this.executeActionOnWorkflowable(WorkflowableEntity.SCOPE, scope, workflowStatus, action) as Observable<ScopeDTO>;
+		scope: Scope,
+		workflowStatus: WorkflowStatus,
+		action: WorkflowAction
+	): Observable<Scope> {
+		return this.executeActionOnWorkflowable(WorkflowableEntity.SCOPE, scope, workflowStatus, action) as Observable<Scope>;
 	}
 
 	executeActionOnEvent(
-		event: EventDTO,
-		workflowStatus: WorkflowStatusDTO,
-		action: WorkflowActionDTO
-	): Observable<EventDTO> {
-		return this.executeActionOnWorkflowable(WorkflowableEntity.FIELD, event, workflowStatus, action) as Observable<EventDTO>;
+		event: Event,
+		workflowStatus: WorkflowStatus,
+		action: WorkflowAction
+	): Observable<Event> {
+		return this.executeActionOnWorkflowable(WorkflowableEntity.FIELD, event, workflowStatus, action) as Observable<Event>;
 	}
 
 	executeActionOnField(
-		field: FieldDTO,
-		workflowStatus: WorkflowStatusDTO,
-		action: WorkflowActionDTO
-	): Observable<FieldDTO> {
-		return this.executeActionOnWorkflowable(WorkflowableEntity.FIELD, field, workflowStatus, action) as Observable<FieldDTO>;
+		field: Field,
+		workflowStatus: WorkflowStatus,
+		action: WorkflowAction
+	): Observable<Field> {
+		return this.executeActionOnWorkflowable(WorkflowableEntity.FIELD, field, workflowStatus, action) as Observable<Field>;
 	}
 
 	executeActionOnForm(
-		form: FormDTO,
-		workflowStatus: WorkflowStatusDTO,
-		action: WorkflowActionDTO
-	): Observable<FormDTO> {
-		return this.executeActionOnWorkflowable(WorkflowableEntity.FORM, form, workflowStatus, action) as Observable<FormDTO>;
+		form: Form,
+		workflowStatus: WorkflowStatus,
+		action: WorkflowAction
+	): Observable<Form> {
+		return this.executeActionOnWorkflowable(WorkflowableEntity.FORM, form, workflowStatus, action) as Observable<Form>;
 	}
 
 	executeActionOnWorkflowable(
 		entity: WorkflowableEntity,
-		workflowable: WorkflowableDTO,
-		workflowStatus: WorkflowStatusDTO,
-		action: WorkflowActionDTO
-	): Observable<WorkflowableDTO> {
+		workflowable: Workflowable,
+		workflowStatus: WorkflowStatus,
+		action: WorkflowAction
+	): Observable<Workflowable> {
 		const actionLabel = this.capitalizeFirstPipe.transform(this.localizeMapPipe.transform(action.shortname));
 		return this.buildWorkflowUpdate(action, workflowStatus).pipe(
 			switchMap(workflowUpdate => {
@@ -184,21 +184,21 @@ export class WorkflowActionService {
 					switch(entity) {
 						case WorkflowableEntity.SCOPE:
 							if(workflowStatus.workflow.aggregator) {
-								return this.workflowStatusService.executeAggregateActionOnScope(workflowable as ScopeDTO, workflowStatus.workflow.id, workflowUpdate);
+								return this.workflowStatusService.executeAggregateActionOnScope(workflowable as Scope, workflowStatus.workflow.id, workflowUpdate);
 							}
-							return this.workflowStatusService.executeActionOnScope(workflowable as ScopeDTO, workflowStatus.pk, workflowUpdate);
+							return this.workflowStatusService.executeActionOnScope(workflowable as Scope, workflowStatus.pk, workflowUpdate);
 						case WorkflowableEntity.EVENT:
 							if(workflowStatus.workflow.aggregator) {
-								return this.workflowStatusService.executeAggregateActionOnEvent(workflowable as EventDTO, workflowStatus.workflow.id, workflowUpdate);
+								return this.workflowStatusService.executeAggregateActionOnEvent(workflowable as Event, workflowStatus.workflow.id, workflowUpdate);
 							}
-							return this.workflowStatusService.executeActionOnEvent(workflowable as EventDTO, workflowStatus.pk, workflowUpdate);
+							return this.workflowStatusService.executeActionOnEvent(workflowable as Event, workflowStatus.pk, workflowUpdate);
 						case WorkflowableEntity.FORM:
 							if(workflowStatus.workflow.aggregator) {
-								return this.workflowStatusService.executeAggregateActionOnForm(workflowable as FormDTO, workflowStatus.workflow.id, workflowUpdate);
+								return this.workflowStatusService.executeAggregateActionOnForm(workflowable as Form, workflowStatus.workflow.id, workflowUpdate);
 							}
-							return this.workflowStatusService.executeActionOnForm(workflowable as FormDTO, workflowStatus.pk, workflowUpdate);
+							return this.workflowStatusService.executeActionOnForm(workflowable as Form, workflowStatus.pk, workflowUpdate);
 						case WorkflowableEntity.FIELD:
-							return this.workflowStatusService.executeActionOnField(workflowable as FieldDTO, workflowStatus.pk, workflowUpdate);
+							return this.workflowStatusService.executeActionOnField(workflowable as Field, workflowStatus.pk, workflowUpdate);
 						default:
 							throw new Error(`Unable to execute workflow action for an object of type ${entity}`);
 					}
