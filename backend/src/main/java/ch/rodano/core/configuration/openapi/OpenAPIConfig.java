@@ -42,7 +42,7 @@ public class OpenAPIConfig {
 			@Override
 			protected String decorateModelName(final AnnotatedType type, final String originalName) {
 				//remove the DTO suffix
-				final var name = StringUtils.stripEnd(originalName, "DTO");
+				final var name = StringUtils.removeEnd(originalName, "DTO");
 				//change reserved schema names
 				if(name != null && SCHEMA_RESERVED_NAMES.contains(name)) {
 					return name + "Model";
