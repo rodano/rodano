@@ -1,12 +1,10 @@
 {
 	"name": "@rodano/rodano-frontend",
+	"description": "Main frontend for Rodano",
 	"version": "7.0.0-dev",
-	"repository": "git://github.com/rodano/rodano-frontend.git",
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com"
-	},
-	"type": "module",
+	"repository": "git://github.com/rodano/rodano.git",
 	"license": "AGPL-3.0-only",
+	"type": "module",
 	"scripts": {
 		"ng": "ng",
 		"start": "ng serve --proxy-config proxy.conf.json",
