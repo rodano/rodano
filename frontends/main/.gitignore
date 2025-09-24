@@ -2,15 +2,11 @@
 /node_modules
 
 # compiled output
+/dist
 /www
-/out-tsc
 
 # misc
-/.angular/cache
-/.sass-cache
-/coverage
-npm-debug.log
-
+/.angular
 # IDE
 /.idea
 .project
