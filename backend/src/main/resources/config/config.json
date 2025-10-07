@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 120,
-	"configDate": 1756481458698,
+	"configDate": 1759820064764,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -28466,9 +28466,7 @@
 						"en": "First symptoms"
 					},
 					"useScopePaths": false,
-					"eventModelIds": [
-						"PATIENT_RECORD"
-					],
+					"eventModelIds": [],
 					"hideExpectedEvent": false,
 					"hideDoneEvent": false,
 					"datasetModelId": "PATIENT_DOCUMENTATION",
