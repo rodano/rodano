@@ -84,9 +84,8 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let user"
-			[class.removed]="user.externallyManaged">
-			{{ user.externallyManaged }}
+			*matCellDef="let user">
+			{{ user.externallyManaged | yesNo }}
 		</td>
 	</ng-container>
 

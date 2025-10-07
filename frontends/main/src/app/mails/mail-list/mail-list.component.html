@@ -204,7 +204,7 @@
 		<td
 			mat-cell
 			*matCellDef="let mail">
-			{{ mail.attachments | yesNo }}
+			{{ mail.attachments.length > 0 | yesNo }}
 		</td>
 	</ng-container>
 

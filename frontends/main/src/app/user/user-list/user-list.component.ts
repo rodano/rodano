@@ -22,6 +22,7 @@ import {RoleStatus, getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
+import {YesNoPipe} from 'src/app/pipes/yes-no.pipe';
 
 @Component({
 	templateUrl: './user-list.component.html',
@@ -42,7 +43,8 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatPaginatorModule,
 		LocalizeMapPipe,
 		LookupByIdPipe,
-		GetFieldPipe
+		GetFieldPipe,
+		YesNoPipe
 	]
 })
 export class UserListComponent implements OnInit, OnChanges {
