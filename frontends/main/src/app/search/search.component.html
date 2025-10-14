@@ -2,28 +2,28 @@
 	<button
 		mat-flat-button
 		(click)="createPatient()"
-		[disabled]="!writeAccessOnParent()"
+		[disabled]="!writeAccessOnParent"
 		type="button">
 		<mat-icon>add</mat-icon>
-		New {{ leafScopeModel().shortname | localizeMap | lowercase }}
+		New {{ leafScopeModel.shortname | localizeMap | lowercase }}
 	</button>
 </p>
 
-@if (loading()) {
+@if (loading) {
 	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 <div class="table-container">
 	<table
 		mat-table
-		[dataSource]="scopes()"
+		[dataSource]="extendedScopeSearchResult"
 		matSort>
 		<tr
 			*matNoDataRow
 			class="no-data-row">
-			<td [attr.colspan]="columnsToDisplay().length">No data</td>
+			<td [attr.colspan]="columnsToDisplay.length">No data</td>
 		</tr>
 		<form [formGroup]="searchForm">
-			@for (column of columnsToDisplay(); track column) {
+			@for (column of columnsToDisplay; track column) {
 				@if (column === 'parentScopeCode') {
 					<ng-container
 						matColumnDef="parentScopeCode"
@@ -32,11 +32,11 @@
 							mat-header-cell
 							*matHeaderCellDef>
 							<mat-form-field>
-								<mat-label>{{ leafScopeModelParent().shortname | localizeMap }}</mat-label>
+								<mat-label>{{ leafScopeModelParent.shortname | localizeMap }}</mat-label>
 								<mat-select
 									[formControl]="parentScopeControl"
 									multiple>
-									@for (parentScope of parentScopes(); track parentScope.pk) {
+									@for (parentScope of parentScopes; track parentScope.pk) {
 										<mat-option [value]="parentScope.pk">
 											{{ parentScope.shortname }}
 										</mat-option>
@@ -46,9 +46,9 @@
 						</th>
 						<td
 							mat-cell
-							*matCellDef="let scope"
+							*matCellDef="let result"
 							class="value-cell">
-							{{ scope.parentScope.code }}
+							{{ result.scope.parentScope.code }}
 						</td>
 					</ng-container>
 				} @else if (column === 'scopeCode') {
@@ -64,15 +64,15 @@
 									matInput
 									type="text"
 									formControlName="scopeCode"
-									[placeholder]="leafScopeModel().shortname | localizeMap" />
+									[placeholder]="leafScopeModel.shortname | localizeMap" />
 							</mat-form-field>
 						</th>
 						<td
 							mat-cell
-							*matCellDef="let scope"
+							*matCellDef="let result"
 							class="value-cell">
-							<a [routerLink]="['/crf', scope.pk]">
-								{{ scope.shortname }}
+							<a [routerLink]="['/crf', result.scope.pk]">
+								{{ result.scope.shortname }}
 							</a>
 						</td>
 					</ng-container>
@@ -80,8 +80,9 @@
 					<ng-container [matColumnDef]="column">
 						<th
 							mat-header-cell
-							*matHeaderCellDef>
-							@if (fieldModelMap().has(column)) {
+							*matHeaderCellDef
+							mat-sort-header>
+							@if (fieldModelMap.has(column)) {
 								@let fieldModel = getSearchableFieldFromFormControlId(column);
 								@if (fieldModel?.type === FieldModelType.DATE || fieldModel?.type === FieldModelType.DATE_SELECT) {
 									<mat-form-field>
@@ -116,9 +117,9 @@
 											[formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null" />
 									</mat-form-field>
 								}
-							} @else if (workflowStatusModelMap().has(column)) {
+							} @else if (workflowStatusModelMap.has(column)) {
 								<mat-form-field>
-									<mat-label>{{ workflowStatusModelMap().get(column) | localizeMap }}</mat-label>
+									<mat-label>{{ workflowStatusModelMap.get(column) | localizeMap }}</mat-label>
 									<mat-select
 										[formControlName]="getWorkflow(column) ? getWSFormControlName(getWorkflow(column)!) : null"
 										multiple>
@@ -133,40 +134,49 @@
 						</th>
 						<td
 							mat-cell
-							*matCellDef="let scope"
+							*matCellDef="let result"
 							class="value-cell">
-							@for (workflowStatus of scope.workflowStatuses; track workflowStatus.workflowId) {
-								@if (workflowStatus.workflowId === column) {
-									{{ getStatusModel(column, workflowStatus.statusId) | localizeMap }}
-								}
-							}
-							@for (datasetModelId of Object.keys(scope.searchableFields); track datasetModelId) {
-								@for (fieldId of Object.keys(scope.searchableFields[datasetModelId]); track fieldId) {
-									@if (fieldId === getSearchableFieldFromFormControlId(column)?.id) {
-										@if (getIsPossibleValue(datasetModelId, fieldId)) {
-											{{
-												getValueShortname(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]) | localizeMap
-											}}
-										} @else if (getIsCompleteDate(datasetModelId, fieldId)) {
-											@let date = getDateObject(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]);
-											{{ date ? (date | dateUTC) : '' }}
-										} @else {
-											{{ scope.searchableFields[datasetModelId][fieldId] }}
-										}
+							@if (workflowStatusModelMap.has(column)) {
+							@for (workflowStatus of result.workflowStatuses; track Object.keys(workflowStatus)) {
+								@for (key of Object.keys(workflowStatus); track key) {
+									@if (key === column) {
+										{{ getStatusModel(column, workflowStatus[key]) | localizeMap }}
 									}
 								}
 							}
+						}
+						
+						@if (fieldModelMap.has(column)){
+						@let fieldModel = getSearchableFieldFromFormControlId(column);
+						@for (datasetModelId of Object.keys(result.fieldValues); track datasetModelId) {
+								@if (datasetModelId === getSearchableFieldFromFormControlId(column).datasetModelId) {
+								@let value = result.fieldValues[datasetModelId][fieldModel.id];
+								@if (getIsPossibleValue(datasetModelId, fieldModel.id)) {
+										{{
+											getValueShortname(datasetModelId, fieldModel.id , value ) | localizeMap
+										}}
+									} @else if (getIsCompleteDate(datasetModelId, fieldModel.id )) {
+										@let date = getDateObjectFromString(value);
+										<!--{{debugLogFormValues(date)}}-->
+										{{ date ? (date | dateUTC) : value }}
+									} @else {
+										{{ value }}
+									}								
+								}
+							}
+						}
+
 						</td>
 					</ng-container>
 				}
 			}
 			<tr
 				mat-header-row
-				*matHeaderRowDef="columnsToDisplay(); sticky: true"></tr>
+				*matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
 			<tr
 				mat-row
-				[class.removed]="scope.removed"
-				*matRowDef="let scope; columns: columnsToDisplay()"></tr>
+				[class.removed]="result.scope.removed"
+				*matRowDef="let result; columns: columnsToDisplay"></tr>
 		</form>
 	</table>
 
@@ -174,8 +184,8 @@
 	<mat-toolbar>
 		<mat-toolbar-row>
 			<mat-paginator
-				[pageSize]="pageSize()"
-				[length]="resultsLength()">
+				[pageSize]="pageSize"
+				[length]="resultsLength">
 			</mat-paginator>
 		</mat-toolbar-row>
 	</mat-toolbar>

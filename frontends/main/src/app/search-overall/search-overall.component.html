@@ -1,0 +1,32 @@
+
+<table
+	mat-table
+	[dataSource]="scopeOverallSearchResult"
+	>
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+	@for (column of columnsToDisplay; track column) {
+		<ng-container
+			[matColumnDef]="column">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			{{ column  }}
+		</th>
+		<td
+			mat-cell		
+			*matCellDef="let element">
+		</td>
+		</ng-container>
+		}
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay;"></tr>
+	<tr
+		mat-row
+		*matRowDef="let resultscope; columns: columnsToDisplay"></tr>
+</table>
+

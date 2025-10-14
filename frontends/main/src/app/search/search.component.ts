@@ -45,6 +45,7 @@ import {FormModel} from '@core/model/form-model';
 import {FormService} from '@core/services/form.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
+import {ExtendedScopeSearchResult} from '@core/model/extended-scope-search-result';
 
 @Component({
 	selector: 'app-search',
@@ -83,24 +84,29 @@ export class SearchComponent implements OnInit {
 		}
 	];
 
-	readonly columnsToDisplay = signal<string[]>([]);
+	columnsToDisplay: string[] = [
+		'parentScopeCode',
+		'scopeCode'
+	];
 
 	Object = Object;
 	FieldModelType = FieldModelType;
 
-	readonly leafScopeModel = signal<ScopeModel>({} as ScopeModel);
-	readonly leafScopeModelParent = signal<ScopeModel>({} as ScopeModel);
-	readonly writeAccessOnParent = signal(false);
+	leafScopeModel: ScopeModel = {} as ScopeModel;
+	leafScopeModelParent: ScopeModel = {} as ScopeModel;
+	writeAccessOnParent = false;
 
 	leafScopeForms: FormModel[] = [];
 
 	workflows: Workflow[];
-	readonly parentScopes = signal<ScopeMini[]>([]);
+	parentScopes: ScopeMini[];
 	searchableFields: FieldModel[];
 
 	fieldModelCriteria: FieldModelCriterion[] = [];
 
-	readonly scopes = signal<Scope[]>([]);
+	scopes: ScopeMini[] = [];
+
+	extendedScopeSearchResult: ExtendedScopeSearchResult[] = [];
 
 	searchForm = new FormGroup<Record<string, FormControl<any>>>({
 		scopeCode: new FormControl()
@@ -109,15 +115,16 @@ export class SearchComponent implements OnInit {
 	parentScopeControl = new FormControl();
 	workflowControl = new FormControl();
 
-	readonly resultsLength = signal(0);
-	readonly pageSize = signal<number | undefined>(undefined);
+	resultsLength: number;
+	pageSize: number;
 
 	//Map to hold the workflowStatus model shortname
-	readonly workflowStatusModelMap = signal(new Map<string, Record<string, string>>());
+	workflowStatusModelMap = new Map<string, Record<string, string>>();
 
 	statusModelMap = new Map<string, Record<string, string>>();
 
-	readonly fieldModelMap = signal(new Map<string, Record<string, string>>());
+	//Map to hold the fieldModel
+	fieldModelMap = new Map<string, Record<string, string>>();
 
 	//Map to hold the aggregated workflow ID for a workflow aggregator
 	aggregatedWorkflowMap = new Map<string, string>();
@@ -125,7 +132,7 @@ export class SearchComponent implements OnInit {
 	//TODO filter out only the workflows that we want visible to the user
 	importantWorkflowsPerScope: Record<number, WorkflowStatus[]> = {};
 
-	readonly loading = signal(false);
+	loading = false;
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -146,15 +153,22 @@ export class SearchComponent implements OnInit {
 	) {}
 
 	ngOnInit(): void {
-		this.initializeData();
-		this.sort.active = 'scopeCode';
-		this.sort.direction = 'asc';
+		this.configurationService.getScopeModels().pipe(
+			tap(scopeModels => {
+				this.leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModel);
+			}),
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(() => {
+			this.initializeData();
+			this.sort.active = 'scopeCode';
+			this.sort.direction = 'asc';
+		});
 	}
 
 	private initializeData(): void {
 		forkJoin({
 			scopeModel: this.configurationService.getScopeModels(),
-			workflows: this.configurationService.getWorkflows(),
+			workflows: this.configurationService.getWorkflowsOnScope(this.leafScopeModel),
 			parentScopes: this.meService.getScopes(undefined, true, false),
 			searchableFields: this.configurationService.getSearchableFieldModels(),
 			formModels: this.configurationService.getLeafScopeModelFormModels()
@@ -162,28 +176,24 @@ export class SearchComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			switchMap(results => {
 				const scopeModels = results.scopeModel;
-				const leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModel);
-				this.leafScopeModel.set(leafScopeModel);
+				this.leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModel);
 				this.leafScopeForms = results.formModels;
-				const leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.id === leafScopeModel.defaultParentId) ?? ({} as ScopeModel);
-				this.leafScopeModelParent.set(leafScopeModelParent);
+				this.leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.id === this.leafScopeModel.defaultParentId) ?? ({} as ScopeModel);
 
-				this.workflows = results.workflows.filter(ws => leafScopeModel.workflowIds.includes(ws.id));
-				this.parentScopes.set(results.parentScopes.filter(scope => scope.modelId === leafScopeModelParent.id));
+				this.workflows = results.workflows;
+				console.log('Workflows:', this.workflows);
+				this.parentScopes = results.parentScopes.filter(scope => scope.modelId === this.leafScopeModelParent.id);
 				this.searchableFields = results.searchableFields;
-
+				console.log('Searchable fields:', this.searchableFields);
 				//fill in the fieldModelMap and the columnsToDisplay
-				const newColumns = ['parentScopeCode', 'scopeCode'];
-				const newFieldModelMap = new Map<string, Record<string, string>>();
 				this.searchableFields.forEach(fieldModel => {
-					newColumns.push(this.getSFFormControlName(fieldModel));
-					newFieldModelMap.set(this.getSFFormControlName(fieldModel), fieldModel.shortname);
+					this.columnsToDisplay.push(this.getSFFormControlName(fieldModel));
+					this.fieldModelMap.set(this.getSFFormControlName(fieldModel), fieldModel.shortname);
 				});
 
-				const newWorkflowStatusModelMap = new Map<string, Record<string, string>>();
 				this.workflows.forEach(workflow => {
-					newColumns.push(workflow.id);
-					newWorkflowStatusModelMap.set(workflow.id, workflow.shortname);
+					this.columnsToDisplay.push(workflow.id);
+					this.workflowStatusModelMap.set(workflow.id, workflow.shortname);
 					workflow.states.forEach(state => {
 						this.statusModelMap.set(`${workflow.id}_${state.id}`, state.shortname);
 					});
@@ -192,27 +202,24 @@ export class SearchComponent implements OnInit {
 						this.aggregatedWorkflowMap.set(workflow.id, workflow.aggregatedWorkflowId);
 					}
 				});
-				this.columnsToDisplay.set(newColumns);
-				this.fieldModelMap.set(newFieldModelMap);
-				this.workflowStatusModelMap.set(newWorkflowStatusModelMap);
 				this.setupFormListeners();
 				this.loadData();
 				//Now return the parentsWithWriteAccess observable
-				return this.scopeRelationService.getParents(leafScopeModel.id, Rights.WRITE).pipe(
+				return this.scopeRelationService.getParents(this.leafScopeModel.id, Rights.WRITE).pipe(
 					map(parentsWithWriteAccess => ({
 						parentsWithWriteAccess
 					}))
 				);
 			})
 		).subscribe(({parentsWithWriteAccess}) => {
-			this.writeAccessOnParent.set(parentsWithWriteAccess.length > 0);
+			this.writeAccessOnParent = parentsWithWriteAccess.length > 0;
 		});
 	}
 
 	private setupFormListeners(): void {
 		const scopeCode$ = this.searchForm.controls.scopeCode.valueChanges.pipe(debounceTime(300));
 		const workflows$ = this.createWSStateChanges(this.workflows);
-		const parentScopes$ = this.createParentScopeFormControls(this.parentScopes());
+		const parentScopes$ = this.createParentScopeFormControls(this.parentScopes);
 		const fieldModels$ = this.createSFStateChanges(this.searchableFields);
 		const scopeCodeControl$ = this.parentScopeControl.valueChanges;
 
@@ -238,7 +245,7 @@ export class SearchComponent implements OnInit {
 
 	private loadData(): void {
 		this.route.queryParams.pipe(
-			tap(() => this.loading.set(true)),
+			tap(() => this.loading = true),
 			switchMap(params => {
 				let scopeSearchObj: ScopeSearch;
 
@@ -251,16 +258,18 @@ export class SearchComponent implements OnInit {
 				}
 
 				//Always set the scope model to PATIENT
-				scopeSearchObj.scopeModelId = this.leafScopeModel().id;
+				scopeSearchObj.scopeModelId = this.leafScopeModel.id;
 				this.syncFormAndUrl(scopeSearchObj);
-
-				return this.scopeService.search(scopeSearchObj);
+				return this.scopeService.extendedSearch(scopeSearchObj);
 			}),
-			tap(() => this.loading.set(false))
+			tap(() => this.loading = false)
 		).subscribe(scopeResults => {
-			this.scopes.set(scopeResults.objects);
-			this.resultsLength.set(scopeResults.paging.total);
-			this.updateImportantWorkflows();
+			this.scopes = scopeResults.objects.map(obj => obj.scope).filter((scope): scope is Scope => scope !== undefined);
+
+			this.extendedScopeSearchResult = scopeResults.objects;
+
+			this.resultsLength = scopeResults.paging.total;
+			//this.updateImportantWorkflows();
 		});
 	}
 
@@ -269,13 +278,15 @@ export class SearchComponent implements OnInit {
 	}
 
 	getSFFormControlName(fieldModel: FieldModel): string {
-		return `${fieldModel.datasetModelId}/${fieldModel.id}`;
+		//var fieldName = `'export_${fieldModel.datasetModelId}.${fieldModel.id}`.toLowerCase();
+		const fieldName = `${fieldModel.datasetModelId}.${fieldModel.id}`.toLowerCase();
+		return fieldName;
 	}
 
 	createPatient() {
 		const scopeSearch = new ScopeSearch();
 		//TODO improve this as soon as the scopes search supports multiple scopeModelIds
-		scopeSearch.scopeModelId = this.leafScopeModel().parentIds[0];
+		scopeSearch.scopeModelId = this.leafScopeModel.parentIds[0];
 
 		//1. search for all the scopes with the parent scope model
 		//2. if there is more than one scope available, open the scope selection dialog, otherwise pick the only one that is available
@@ -291,7 +302,7 @@ export class SearchComponent implements OnInit {
 
 				return iif(
 					() => parentScopes.length > 1,
-					defer(() => this.openScopeSelectDialog(parentScopes, this.leafScopeModel())),
+					defer(() => this.openScopeSelectDialog(parentScopes, this.leafScopeModel)),
 					of(parentScopes[0])
 				);
 			}),
@@ -299,7 +310,7 @@ export class SearchComponent implements OnInit {
 				if(!parentScope) {
 					return EMPTY;
 				}
-				return this.scopeService.getCandidate(parentScope.pk, this.leafScopeModel().id);
+				return this.scopeService.getCandidate(parentScope.pk, this.leafScopeModel.id);
 			}),
 			switchMap(candidateScope => this.scopeService.create(candidateScope)),
 			switchMap(newScope =>
@@ -410,15 +421,15 @@ export class SearchComponent implements OnInit {
 		this.paginator.pageSize = scopeSearch.pageSize;
 
 		//Sync the sort
-		//transform 'scopeCode' to 'code'
-		scopeSearch.sortBy = this.sort.active === 'scopeCode' ? 'code' : '';
+		//transform 'scopeCode' to 'code', use other sort fields as-is
+		scopeSearch.sortBy = this.sort.active === 'scopeCode' ? 'code' : this.sort.active;
 		scopeSearch.orderAscending = this.sort.direction === 'asc';
 	}
 
 	private generateScopeSearch(): ScopeSearch {
 		const search = new ScopeSearch();
 		search.fullText = this.searchForm.controls.scopeCode.value;
-		search.scopeModelId = this.leafScopeModel().id;
+		search.scopeModelId = this.leafScopeModel.id;
 		search.workflowStates = {};
 		search.fieldModelCriteria = '';
 
@@ -496,17 +507,16 @@ export class SearchComponent implements OnInit {
 		search.pageSize = this.paginator.pageSize;
 
 		//Sync the sort
-		//transform 'scopeCode' to 'code'
-		search.sortBy = this.sort.active === 'scopeCode' ? 'code' : '';
+		//transform 'scopeCode' to 'code', use other sort fields as-is
+		search.sortBy = this.sort.active === 'scopeCode' ? 'code' : this.sort.active;
 		search.orderAscending = this.sort.direction === 'asc';
-
 		return search;
 	}
 
 	private updateImportantWorkflows(): void {
 		const search = new WorkflowStatusSearch();
 		search.workflowIds = this.workflows.map(w => w.id);
-		search.ancestorScopePks = this.scopes().map(s => s.pk);
+		search.ancestorScopePks = this.scopes.map(s => s.pk);
 		search.filterExpectedEvents = true;
 		search.pageSize = 20;
 
@@ -516,7 +526,7 @@ export class SearchComponent implements OnInit {
 
 				const res: Record<number, WorkflowStatus[]> = {};
 
-				this.scopes().forEach(scope => {
+				this.scopes.forEach(scope => {
 					res[scope.pk] = worklowStatuses.filter(ws => ws.scopeFk === scope.pk);
 				});
 
@@ -566,6 +576,20 @@ export class SearchComponent implements OnInit {
 		return undefined;
 	}
 
+	getDateObjectFromString(field: any): Date | undefined {
+		if(!field) {
+			return undefined;
+		}
+		try {
+			// the field string is in dd.MM.yyyy format
+			const parsedDate = parse(field, 'dd.MM.yyyy', new Date());
+			return isValid(parsedDate) ? parsedDate : undefined;
+		}
+		catch {
+			return undefined;
+		}
+	}
+
 	getIsPossibleValue(datasetModelId: string, fieldId: string): boolean {
 		for(const fieldModel of this.searchableFields) {
 			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
@@ -584,13 +608,15 @@ export class SearchComponent implements OnInit {
 		return false;
 	}
 
-	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
+	getFieldModel(datasetModelId: string, fieldId: string): FieldModel {
+		datasetModelId = datasetModelId.toUpperCase();
+		fieldId = fieldId.toUpperCase();
 		for(const fieldModel of this.searchableFields) {
 			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
 				return fieldModel;
 			}
 		}
-		return undefined;
+		return {} as FieldModel;
 	}
 
 	getWorkflow(workflowId: string): Workflow | undefined {
@@ -645,8 +671,13 @@ export class SearchComponent implements OnInit {
 	}
 
 	//return the searchable field from the form control ID
-	getSearchableFieldFromFormControlId(formControlId: string): FieldModel | undefined {
-		const [datasetModelId, fieldModelId] = formControlId.split('/');
+	getSearchableFieldFromFormControlId(formControlId: string): FieldModel {
+		const [datasetModelId, fieldModelId] = formControlId.split('.');
+
 		return this.getFieldModel(datasetModelId, fieldModelId);
+	}
+
+	debugLogFormValues(obj: any): void {
+		console.log(obj);
 	}
 }

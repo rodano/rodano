@@ -198,6 +198,26 @@ public class ConfigurationController extends AbstractSecuredController {
 			.toList();
 	}
 
+	@Operation(summary = "Get the study workflow models on the scope model")
+	@GetMapping("workflows/{scopeModelId}")
+	public List<WorkflowDTO> getWorkflowsOnScopeModel(
+		@PathVariable final String scopeModelId,
+		@RequestParam(name = "isAggregator", required = false) final Boolean isAggregator
+	) {
+		final var acl = rightsService.getACL(currentActor());
+
+		return studyService.getStudy().getScopeModel(scopeModelId).getWorkflows().stream()
+			.filter(w -> acl.hasRight(w))
+			.filter(w -> {
+				if (isAggregator == null) {
+					return !w.isAggregator(); // preserve previous default behavior
+				}
+				return w.isAggregator() == isAggregator;
+			})
+			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
+			.toList();
+	}
+
 	@Operation(summary = "Get form models for a scope model")
 	@GetMapping("/scope-model/{scopeModelId}/form-models")
 	@ResponseStatus(HttpStatus.OK)

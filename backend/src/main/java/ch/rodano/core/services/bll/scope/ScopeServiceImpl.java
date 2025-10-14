@@ -725,4 +725,27 @@ public class ScopeServiceImpl implements ScopeService {
 		scope.unlock();
 		scopeDAOService.saveScope(scope, context, rationale);
 	}
+
+	@Override
+	public Optional<Map<String, List<Long>>> buildActorRightPredicate(final List<Role> roles, final Optional<String> scopeModelId) {
+		// if a scope model is provided, hard-code ancestors pks
+		if (scopeModelId.isPresent()) {
+			final String id = scopeModelId.get();
+			final List<Long> ancestorFks = rightsService.filterRoles(roles, studyService.getStudy().getScopeModel(id), ch.rodano.configuration.model.rights.Rights.READ).stream()
+				.map(Role::getScopeFk)
+				.distinct()
+				.toList();
+			return Optional.of(Collections.singletonMap(id, ancestorFks));
+		}
+
+		final Map<String, List<Long>> scopeModelAncestorPks = new HashMap<>();
+		for (final var role : roles) {
+			final var roleScopeModelIds = role.getProfile().getScopeModels(ch.rodano.configuration.model.rights.Rights.READ).stream().map(ScopeModel::getId).toList();
+			for (final String roleScopeModelId : roleScopeModelIds) {
+				scopeModelAncestorPks.putIfAbsent(roleScopeModelId, new ArrayList<>());
+				scopeModelAncestorPks.get(roleScopeModelId).add(role.getScopeFk());
+			}
+		}
+		return Optional.of(scopeModelAncestorPks);
+	}
 }

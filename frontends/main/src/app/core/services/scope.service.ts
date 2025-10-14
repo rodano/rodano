@@ -30,6 +30,11 @@ export class ScopeService {
 		return this.http.get<PagedResultScope>(this.serviceUrl, {params});
 	}
 
+	extendedSearch(search: ScopeSearch): Observable<PagedResultExtendedScopeSearchResult> {
+		//return this.http.post<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/extended-search`, {search});
+		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/extended-search`, {params: this.httpParamsService.toHttpParams(search)});
+	}
+
 	getExportUrl(search: ScopeSearch): string {
 		const params = this.httpParamsService.toHttpParams(search, ['pageSize', 'pageIndex', 'sortBy', 'orderAscending']);
 		return `${this.serviceUrl}/export?${params}`;

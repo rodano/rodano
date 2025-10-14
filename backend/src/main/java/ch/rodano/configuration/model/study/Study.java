@@ -570,6 +570,24 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW, workflowId));
 	}
 
+	@JsonIgnore
+	public List<Workflow> getAggregatedWorkflowsOnScopeModel(final String ScopeModelId) {
+		return getScopeModel(ScopeModelId).getWorkflows().stream().filter(Workflow::isAggregator).toList();
+	}
+
+	@JsonIgnore
+	public List<Workflow> getWorkflowsOnScopeModel(final String ScopeModelId) {
+		return getScopeModel(ScopeModelId).getWorkflows().stream().filter(workflow -> !workflow.isAggregator()).toList();
+	}
+
+	@JsonIgnore
+	public List<FieldModel> getSearchableFieldsOnScopeModel(final String ScopeModelId) {
+		return getScopeModel(ScopeModelId).getDatasetModels().stream()
+			.flatMap(d -> d.getFieldModels().stream())
+			.filter(FieldModel::isSearchable)
+			.toList();
+	}
+
 	@JsonManagedReference
 	public final void setWorkflowWidgets(final SortedSet<WorkflowWidget> workflowWidgets) {
 		this.workflowWidgets = workflowWidgets;

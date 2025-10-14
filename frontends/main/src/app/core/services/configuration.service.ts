@@ -90,6 +90,10 @@ export class ConfigurationService {
 		return this.getStudy().pipe(map(study => study.workflows));
 	}
 
+	getWorkflowsOnScope(scopeModel: ScopeModel): Observable<Workflow[]> {
+		return this.http.get<Workflow[]>(`${this.serviceUrl}/workflows/${scopeModel.id}`);
+	}
+
 	getProfiles(): Observable<Profile[]> {
 		return this.getStudy().pipe(map(study => study.profiles));
 	}

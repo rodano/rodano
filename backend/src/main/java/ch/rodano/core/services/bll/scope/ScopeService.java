@@ -289,4 +289,15 @@ public interface ScopeService {
 	 * @return The depth
 	 */
 	int getTreeDepth(Scope scope);
+
+	/**
+	 * Build a predicate mapping scope model ids to ancestor PKs for which the provided roles
+	 * have READ right.
+	 *
+	 * @param roles The actor roles
+	 * @param scopeModelId Optional scope model id to restrict the predicate
+	 * @return Optional map of scopeModelId -> list of ancestor PKs
+	 */
+	Optional<Map<String, List<Long>>> buildActorRightPredicate(List<Role> roles, Optional<String> scopeModelId);
+
 }

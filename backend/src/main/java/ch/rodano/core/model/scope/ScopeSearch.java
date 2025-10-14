@@ -53,6 +53,9 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 	@Schema(description = "Sort by")
 	public ScopeSortBy sortBy = DEFAULT_SORT_BY;
 
+	@Schema(description = "Extended sort by")
+	public String extendedSortBy = "";
+
 	public ScopeSearch() {
 		super();
 		sortAscending = DEFAULT_SORT_ASCENDING;
@@ -190,4 +193,11 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 		return this;
 	}
 
+	public String getExtendedSortBy() {
+		return extendedSortBy;
+	}
+
+	public void setExtendedSortBy(String extendedSortBy) {
+		this.extendedSortBy = extendedSortBy;
+	}
 }
