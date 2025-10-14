@@ -45,6 +45,7 @@ import {FormModel} from '@core/model/form-model';
 import {FormService} from '@core/services/form.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
+import {ExtendedScopeSearchResult} from '@core/model/extended-scope-search-result';
 
 @Component({
 	selector: 'app-search',
@@ -103,7 +104,9 @@ export class SearchComponent implements OnInit {
 
 	fieldModelCriteria: FieldModelCriterion[] = [];
 
-	scopes: Scope[] = [];
+	scopes: ScopeMini[] = [];
+
+	extendedScopeSearchResult: ExtendedScopeSearchResult[] = [];
 
 	searchForm = new FormGroup<Record<string, FormControl<any>>>({
 		scopeCode: new FormControl()
@@ -120,6 +123,7 @@ export class SearchComponent implements OnInit {
 
 	statusModelMap = new Map<string, Record<string, string>>();
 
+	//Map to hold the fieldModel
 	fieldModelMap = new Map<string, Record<string, string>>();
 
 	//Map to hold the aggregated workflow ID for a workflow aggregator
@@ -149,15 +153,22 @@ export class SearchComponent implements OnInit {
 	) {}
 
 	ngOnInit(): void {
-		this.initializeData();
-		this.sort.active = 'scopeCode';
-		this.sort.direction = 'asc';
+		this.configurationService.getScopeModels().pipe(
+			tap(scopeModels => {
+				this.leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModel);
+			}),
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(() => {
+			this.initializeData();
+			this.sort.active = 'scopeCode';
+			this.sort.direction = 'asc';
+		});
 	}
 
 	private initializeData(): void {
 		forkJoin({
 			scopeModel: this.configurationService.getScopeModels(),
-			workflows: this.configurationService.getWorkflows(),
+			workflows: this.configurationService.getWorkflowsOnScope(this.leafScopeModel),
 			parentScopes: this.meService.getScopes(undefined, true, false),
 			searchableFields: this.configurationService.getSearchableFieldModels(),
 			formModels: this.configurationService.getLeafScopeModelFormModels()
@@ -169,10 +180,11 @@ export class SearchComponent implements OnInit {
 				this.leafScopeForms = results.formModels;
 				this.leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.id === this.leafScopeModel.defaultParentId) ?? ({} as ScopeModel);
 
-				this.workflows = results.workflows.filter(ws => this.leafScopeModel.workflowIds.includes(ws.id));
+				this.workflows = results.workflows;
+				console.log('Workflows:', this.workflows);
 				this.parentScopes = results.parentScopes.filter(scope => scope.modelId === this.leafScopeModelParent.id);
 				this.searchableFields = results.searchableFields;
-
+				console.log('Searchable fields:', this.searchableFields);
 				//fill in the fieldModelMap and the columnsToDisplay
 				this.searchableFields.forEach(fieldModel => {
 					this.columnsToDisplay.push(this.getSFFormControlName(fieldModel));
@@ -248,14 +260,16 @@ export class SearchComponent implements OnInit {
 				//Always set the scope model to PATIENT
 				scopeSearchObj.scopeModelId = this.leafScopeModel.id;
 				this.syncFormAndUrl(scopeSearchObj);
-
-				return this.scopeService.search(scopeSearchObj);
+				return this.scopeService.extendedSearch(scopeSearchObj);
 			}),
 			tap(() => this.loading = false)
 		).subscribe(scopeResults => {
-			this.scopes = scopeResults.objects;
+			this.scopes = scopeResults.objects.map(obj => obj.scope).filter((scope): scope is Scope => scope !== undefined);
+
+			this.extendedScopeSearchResult = scopeResults.objects;
+
 			this.resultsLength = scopeResults.paging.total;
-			this.updateImportantWorkflows();
+			//this.updateImportantWorkflows();
 		});
 	}
 
@@ -264,7 +278,9 @@ export class SearchComponent implements OnInit {
 	}
 
 	getSFFormControlName(fieldModel: FieldModel): string {
-		return `${fieldModel.datasetModelId}/${fieldModel.id}`;
+		//var fieldName = `'export_${fieldModel.datasetModelId}.${fieldModel.id}`.toLowerCase();
+		const fieldName = `${fieldModel.datasetModelId}.${fieldModel.id}`.toLowerCase();
+		return fieldName;
 	}
 
 	createPatient() {
@@ -405,8 +421,8 @@ export class SearchComponent implements OnInit {
 		this.paginator.pageSize = scopeSearch.pageSize;
 
 		//Sync the sort
-		//transform 'scopeCode' to 'code'
-		scopeSearch.sortBy = this.sort.active === 'scopeCode' ? 'code' : '';
+		//transform 'scopeCode' to 'code', use other sort fields as-is
+		scopeSearch.sortBy = this.sort.active === 'scopeCode' ? 'code' : this.sort.active;
 		scopeSearch.orderAscending = this.sort.direction === 'asc';
 	}
 
@@ -491,10 +507,9 @@ export class SearchComponent implements OnInit {
 		search.pageSize = this.paginator.pageSize;
 
 		//Sync the sort
-		//transform 'scopeCode' to 'code'
-		search.sortBy = this.sort.active === 'scopeCode' ? 'code' : '';
+		//transform 'scopeCode' to 'code', use other sort fields as-is
+		search.sortBy = this.sort.active === 'scopeCode' ? 'code' : this.sort.active;
 		search.orderAscending = this.sort.direction === 'asc';
-
 		return search;
 	}
 
@@ -561,6 +576,20 @@ export class SearchComponent implements OnInit {
 		return undefined;
 	}
 
+	getDateObjectFromString(field: any): Date | undefined {
+		if(!field) {
+			return undefined;
+		}
+		try {
+			// the field string is in dd.MM.yyyy format
+			const parsedDate = parse(field, 'dd.MM.yyyy', new Date());
+			return isValid(parsedDate) ? parsedDate : undefined;
+		}
+		catch {
+			return undefined;
+		}
+	}
+
 	getIsPossibleValue(datasetModelId: string, fieldId: string): boolean {
 		for(const fieldModel of this.searchableFields) {
 			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
@@ -579,13 +608,15 @@ export class SearchComponent implements OnInit {
 		return false;
 	}
 
-	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
+	getFieldModel(datasetModelId: string, fieldId: string): FieldModel {
+		datasetModelId = datasetModelId.toUpperCase();
+		fieldId = fieldId.toUpperCase();
 		for(const fieldModel of this.searchableFields) {
 			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
 				return fieldModel;
 			}
 		}
-		return undefined;
+		return {} as FieldModel;
 	}
 
 	getWorkflow(workflowId: string): Workflow | undefined {
@@ -640,8 +671,13 @@ export class SearchComponent implements OnInit {
 	}
 
 	//return the searchable field from the form control ID
-	getSearchableFieldFromFormControlId(formControlId: string): FieldModel | undefined {
-		const [datasetModelId, fieldModelId] = formControlId.split('/');
+	getSearchableFieldFromFormControlId(formControlId: string): FieldModel {
+		const [datasetModelId, fieldModelId] = formControlId.split('.');
+
 		return this.getFieldModel(datasetModelId, fieldModelId);
+	}
+
+	debugLogFormValues(obj: any): void {
+		console.log(obj);
 	}
 }

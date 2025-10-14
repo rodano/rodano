@@ -52,6 +52,7 @@ import ch.rodano.core.services.dao.event.EventDAOService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.rule.RuleService;
+import ch.rodano.core.utils.RightsService;
 
 @Service
 public class ScopeServiceImpl implements ScopeService {
@@ -68,6 +69,7 @@ public class ScopeServiceImpl implements ScopeService {
 	private final ValidationService validationService;
 	private final FieldDAOService fieldDAOService;
 	private final WorkflowStatusService workflowStatusService;
+	private final RightsService rightsService;
 
 	private final Pattern siblingsPattern;
 	private final Pattern sameScopeModelPattern;
@@ -83,7 +85,8 @@ public class ScopeServiceImpl implements ScopeService {
 		final WorkflowStatusService workflowStatusService,
 		final ValidationService validationService,
 		final ScopeDAOService scopeDAOService,
-		final ScopeRelationService scopeRelationService
+		final ScopeRelationService scopeRelationService,
+		final RightsService rightsService
 	) {
 		this.studyService = studyService;
 		this.ruleService = ruleService;
@@ -96,6 +99,7 @@ public class ScopeServiceImpl implements ScopeService {
 		this.validationService = validationService;
 		this.scopeDAOService = scopeDAOService;
 		this.scopeRelationService = scopeRelationService;
+		this.rightsService = rightsService;
 
 		siblingsPattern = Pattern.compile("\\$\\{siblingsNumber:(\\d+)}");
 		sameScopeModelPattern = Pattern.compile("\\$\\{sameScopeModelNumber:(\\d+)}");
@@ -755,5 +759,28 @@ public class ScopeServiceImpl implements ScopeService {
 	private void unlockScope(final Scope scope, final DatabaseActionContext context, final String rationale) {
 		scope.setLocked(false);
 		scopeDAOService.saveScope(scope, context, rationale);
+	}
+
+	@Override
+	public Optional<Map<String, List<Long>>> buildActorRightPredicate(final List<Role> roles, final Optional<String> scopeModelId) {
+		// if a scope model is provided, hard-code ancestors pks
+		if (scopeModelId.isPresent()) {
+			final String id = scopeModelId.get();
+			final List<Long> ancestorFks = rightsService.filterRoles(roles, studyService.getStudy().getScopeModel(id), ch.rodano.configuration.model.rights.Rights.READ).stream()
+				.map(Role::getScopeFk)
+				.distinct()
+				.toList();
+			return Optional.of(Collections.singletonMap(id, ancestorFks));
+		}
+
+		final Map<String, List<Long>> scopeModelAncestorPks = new HashMap<>();
+		for (final var role : roles) {
+			final var roleScopeModelIds = role.getProfile().getScopeModels(ch.rodano.configuration.model.rights.Rights.READ).stream().map(ScopeModel::getId).toList();
+			for (final String roleScopeModelId : roleScopeModelIds) {
+				scopeModelAncestorPks.putIfAbsent(roleScopeModelId, new ArrayList<>());
+				scopeModelAncestorPks.get(roleScopeModelId).add(role.getScopeFk());
+			}
+		}
+		return Optional.of(scopeModelAncestorPks);
 	}
 }

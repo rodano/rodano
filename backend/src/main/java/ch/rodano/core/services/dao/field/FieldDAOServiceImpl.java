@@ -1,13 +1,20 @@
 package ch.rodano.core.services.dao.field;
 
+import ch.rodano.configuration.model.field.FieldModel;
+import ch.rodano.configuration.model.scope.ScopeModel;
+
+import ch.rodano.core.model.dataset.Dataset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Operator;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
@@ -21,6 +28,7 @@ import ch.rodano.core.model.jooq.tables.records.FieldRecord;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.commons.AuditableDAOService;
 import ch.rodano.core.services.dao.strategy.DAOStrategy;
+import java.util.stream.Collectors;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.FIELD;
@@ -138,9 +146,42 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 		return find(query);
 	}
 
-	public List<Field> getSearchableFields(final Collection<Long> scopePk, final Collection<String> fieldModelIds){
+	@Override
+	public List<Field> getSearchableFields(final Collection<Long> scopePk, final Collection<String> fieldModelIds) {
 		final var query = create.selectFrom(FIELD).where(FIELD.FIELD_MODEL_ID.in(fieldModelIds).and(FIELD.dataset().SCOPE_FK.in(scopePk)));
 		return find(query);
 	}
+
+	@Override
+	public Map<Long, List<Dataset>> getSearchableFieldsOnScope(ScopeModel scopeModel) {
+		final var dsOnScope = studyService.getStudy().getScopeModel(scopeModel.getId()).getDatasetModels().stream().toList();
+
+		// Map of dataset model IDs and searchable field model IDs
+		final Map<String, String> searchableFields = dsOnScope.stream()
+			.flatMap(dm -> dm.getFieldModels().stream()
+				.filter(FieldModel::isSearchable)
+				.map(fm -> Map.entry(dm.getId(), fm.getId())))
+			.collect(java.util.stream.Collectors.toMap(
+				Map.Entry::getKey,
+				Map.Entry::getValue,
+				(a, b) -> a
+			));
+
+		final SelectConditionStep<Record> query = create.select().from(FIELD)
+			.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
+			.where(DATASET.DATASET_MODEL_ID.in(searchableFields.keySet()))
+			.and(FIELD.FIELD_MODEL_ID.in(searchableFields.values()));
+
+		// Fetch the fields and map to Field entities
+		final var result = create.fetch(query);
+
+		return result.stream()
+			.collect(Collectors.groupingBy(
+				r -> r.get(DATASET.SCOPE_FK),
+				Collectors.mapping(r -> r.into(Dataset.class), Collectors.toList())
+			));
+	}
+
+
 
 }

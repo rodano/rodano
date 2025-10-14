@@ -1,5 +1,21 @@
 package ch.rodano.api.config;
 
+import ch.rodano.api.cms.CMSDTOService;
+import ch.rodano.api.cms.CMSLayoutDTO;
+import ch.rodano.api.controller.AbstractSecuredController;
+import ch.rodano.api.exception.http.ForbiddenOperationException;
+import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.api.workflow.WorkflowDTO;
+import ch.rodano.api.workflow.WorkflowDTOService;
+import ch.rodano.configuration.model.feature.FeatureStatic;
+import ch.rodano.configuration.model.rights.Rights;
+import ch.rodano.core.configuration.core.Configurator;
+import ch.rodano.core.configuration.core.Environment;
+import ch.rodano.core.model.role.Role;
+import ch.rodano.core.services.bll.actor.ActorService;
+import ch.rodano.core.services.bll.role.RoleService;
+import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.core.utils.RightsService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,23 +41,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
-import ch.rodano.api.cms.CMSDTOService;
-import ch.rodano.api.cms.CMSLayoutDTO;
-import ch.rodano.api.controller.AbstractSecuredController;
-import ch.rodano.api.exception.http.ForbiddenOperationException;
-import ch.rodano.api.request.context.RequestContextService;
-import ch.rodano.api.workflow.WorkflowDTO;
-import ch.rodano.api.workflow.WorkflowDTOService;
-import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.configuration.model.rights.Rights;
-import ch.rodano.core.configuration.core.Configurator;
-import ch.rodano.core.configuration.core.Environment;
-import ch.rodano.core.model.role.Role;
-import ch.rodano.core.services.bll.actor.ActorService;
-import ch.rodano.core.services.bll.role.RoleService;
-import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.utils.RightsService;
 
 @Tag(name = "Configuration")
 @RestController
@@ -105,7 +104,7 @@ public class ConfigurationController extends AbstractSecuredController {
 		@RequestParam final MultipartFile config,
 		@RequestParam final boolean compressed
 	) throws IOException {
-		if(Environment.PROD.equals(configurator.getEnvironment())) {
+		if (Environment.PROD.equals(configurator.getEnvironment())) {
 			throw new ForbiddenOperationException("No right to push the configuration on a production instance");
 		}
 
@@ -113,7 +112,7 @@ public class ConfigurationController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.MANAGE_CONFIGURATION);
 
-		try(var is = config.getInputStream()) {
+		try (var is = config.getInputStream()) {
 			studyService.save(is, compressed);
 		}
 	}
@@ -197,6 +196,26 @@ public class ConfigurationController extends AbstractSecuredController {
 			.toList();
 	}
 
+	@Operation(summary = "Get the study workflow models on the scope model")
+	@GetMapping("workflows/{scopeModelId}")
+	public List<WorkflowDTO> getWorkflowsOnScopeModel(
+		@PathVariable final String scopeModelId,
+		@RequestParam(name = "isAggregator", required = false) final Boolean isAggregator
+	) {
+		final var acl = rightsService.getACL(currentActor());
+
+		return studyService.getStudy().getScopeModel(scopeModelId).getWorkflows().stream()
+			.filter(w -> acl.hasRight(w))
+			.filter(w -> {
+				if (isAggregator == null) {
+					return !w.isAggregator(); // preserve previous default behavior
+				}
+				return w.isAggregator() == isAggregator;
+			})
+			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
+			.toList();
+	}
+
 	@Operation(summary = "Get form models for a scope model")
 	@GetMapping("/scope-model/{scopeModelId}/form-models")
 	@ResponseStatus(HttpStatus.OK)
@@ -247,13 +266,13 @@ public class ConfigurationController extends AbstractSecuredController {
 		final var fieldModel = studyService.getStudy().getDatasetModel(datasetModelId).getFieldModel(fieldModelId);
 		final var dictionary = fieldModel.getDictionary();
 		final List<String> results = new ArrayList<>();
-		if(StringUtils.isNotBlank(text) && text.length() > 1) {
+		if (StringUtils.isNotBlank(text) && text.length() > 1) {
 			final var search = text.toLowerCase();
 			var i = 0;
-			try(var scan = new Scanner(ConfigurationController.class.getResource(String.format("/dictionaries/%s", dictionary)).openStream())) {
-				while(scan.hasNext() && i < 100) {
+			try (var scan = new Scanner(ConfigurationController.class.getResource(String.format("/dictionaries/%s", dictionary)).openStream())) {
+				while (scan.hasNext() && i < 100) {
 					final var line = scan.nextLine();
-					if(line.toLowerCase().contains(search)) {
+					if (line.toLowerCase().contains(search)) {
 						results.add(line);
 						i++;
 					}

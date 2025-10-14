@@ -10,6 +10,7 @@ import {TimelineGraphData} from '../model/timeline-graph-data';
 import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
+import {PagedResultExtendedScopeSearchResult} from '@core/model/paged-result-extended-scope-search-result';
 
 @Injectable({
 	providedIn: 'root'
@@ -29,6 +30,11 @@ export class ScopeService {
 	search(search: ScopeSearch): Observable<PagedResultScope> {
 		const params = this.httpParamsService.toHttpParams(search);
 		return this.http.get<PagedResultScope>(this.serviceUrl, {params});
+	}
+
+	extendedSearch(search: ScopeSearch): Observable<PagedResultExtendedScopeSearchResult> {
+		//return this.http.post<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/extended-search`, {search});
+		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/extended-search`, {params: this.httpParamsService.toHttpParams(search)});
 	}
 
 	getExportUrl(search: ScopeSearch): string {

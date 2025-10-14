@@ -1,7 +1,10 @@
 package ch.rodano.core.services.dao.field;
 
+import ch.rodano.configuration.model.scope.ScopeModel;
+import ch.rodano.core.model.dataset.Dataset;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.function.Function;
@@ -54,4 +57,6 @@ public interface FieldDAOService {
 	NavigableSet<FieldAuditTrail> getAuditTrailsForProperty(Field field, Optional<Timeframe> timeframe, Function<FieldAuditTrail, Object> property);
 
 	List<Field> getSearchableFields(Collection<Long> scopePks, Collection<String> searchableFieldModel);
+
+	Map<Long, List<Dataset>> getSearchableFieldsOnScope(ScopeModel scopeModel);
 }

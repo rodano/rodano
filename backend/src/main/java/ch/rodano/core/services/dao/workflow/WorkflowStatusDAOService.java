@@ -2,12 +2,14 @@ package ch.rodano.core.services.dao.workflow;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.function.Function;
 
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.workflow.WorkflowStatusSearch;
+import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.WorkflowStatusAuditTrail;
 import ch.rodano.core.model.event.Timeframe;

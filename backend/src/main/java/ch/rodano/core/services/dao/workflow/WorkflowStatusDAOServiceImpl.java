@@ -1,10 +1,13 @@
 package ch.rodano.core.services.dao.workflow;
 
+import ch.rodano.configuration.model.scope.ScopeModel;
+import ch.rodano.configuration.model.workflow.Workflow;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.jooq.Condition;
@@ -24,6 +27,7 @@ import ch.rodano.core.model.workflow.WorkflowStatus;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.commons.AuditableDAOService;
 import ch.rodano.core.services.dao.strategy.DAOStrategy;
+import java.util.stream.Collectors;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.EVENT;

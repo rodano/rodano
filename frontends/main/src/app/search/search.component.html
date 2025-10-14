@@ -15,7 +15,7 @@
 <div class="table-container">
 	<table
 		mat-table
-		[dataSource]="scopes"
+		[dataSource]="extendedScopeSearchResult"
 		matSort>
 		<tr
 			*matNoDataRow
@@ -46,9 +46,9 @@
 						</th>
 						<td
 							mat-cell
-							*matCellDef="let scope"
+							*matCellDef="let result"
 							class="value-cell">
-							{{ scope.parentScope.code }}
+							{{ result.scope.parentScope.code }}
 						</td>
 					</ng-container>
 				} @else if (column === 'scopeCode') {
@@ -69,10 +69,10 @@
 						</th>
 						<td
 							mat-cell
-							*matCellDef="let scope"
+							*matCellDef="let result"
 							class="value-cell">
-							<a [routerLink]="['/crf', scope.pk]">
-								{{ scope.shortname }}
+							<a [routerLink]="['/crf', result.scope.pk]">
+								{{ result.scope.shortname }}
 							</a>
 						</td>
 					</ng-container>
@@ -80,7 +80,8 @@
 					<ng-container [matColumnDef]="column">
 						<th
 							mat-header-cell
-							*matHeaderCellDef>
+							*matHeaderCellDef
+							mat-sort-header>
 							@if (fieldModelMap.has(column)) {
 								@let fieldModel = getSearchableFieldFromFormControlId(column);
 								@if (fieldModel?.type === FieldModelType.DATE || fieldModel?.type === FieldModelType.DATE_SELECT) {
@@ -133,29 +134,38 @@
 						</th>
 						<td
 							mat-cell
-							*matCellDef="let scope"
+							*matCellDef="let result"
 							class="value-cell">
-							@for (workflowStatus of scope.workflowStatuses; track workflowStatus.workflowId) {
-								@if (workflowStatus.workflowId === column) {
-									{{ getStatusModel(column, workflowStatus.statusId) | localizeMap }}
-								}
-							}
-							@for (datasetModelId of Object.keys(scope.searchableFields); track datasetModelId) {
-								@for (fieldId of Object.keys(scope.searchableFields[datasetModelId]); track fieldId) {
-									@if (fieldId === getSearchableFieldFromFormControlId(column)?.id) {
-										@if (getIsPossibleValue(datasetModelId, fieldId)) {
-											{{
-												getValueShortname(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]) | localizeMap
-											}}
-										} @else if (getIsCompleteDate(datasetModelId, fieldId)) {
-											@let date = getDateObject(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]);
-											{{ date ? (date | dateUTC) : '' }}
-										} @else {
-											{{ scope.searchableFields[datasetModelId][fieldId] }}
-										}
+							@if (workflowStatusModelMap.has(column)) {
+							@for (workflowStatus of result.workflowStatuses; track Object.keys(workflowStatus)) {
+								@for (key of Object.keys(workflowStatus); track key) {
+									@if (key === column) {
+										{{ getStatusModel(column, workflowStatus[key]) | localizeMap }}
 									}
 								}
 							}
+						}
+						
+						@if (fieldModelMap.has(column)){
+						@let fieldModel = getSearchableFieldFromFormControlId(column);
+						@for (datasetModelId of Object.keys(result.fieldValues); track datasetModelId) {
+								@if (datasetModelId === getSearchableFieldFromFormControlId(column).datasetModelId) {
+								@let value = result.fieldValues[datasetModelId][fieldModel.id];
+								@if (getIsPossibleValue(datasetModelId, fieldModel.id)) {
+										{{
+											getValueShortname(datasetModelId, fieldModel.id , value ) | localizeMap
+										}}
+									} @else if (getIsCompleteDate(datasetModelId, fieldModel.id )) {
+										@let date = getDateObjectFromString(value);
+										<!--{{debugLogFormValues(date)}}-->
+										{{ date ? (date | dateUTC) : value }}
+									} @else {
+										{{ value }}
+									}								
+								}
+							}
+						}
+
 						</td>
 					</ng-container>
 				}
@@ -165,8 +175,8 @@
 				*matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
 			<tr
 				mat-row
-				[class.removed]="scope.removed"
-				*matRowDef="let scope; columns: columnsToDisplay"></tr>
+				[class.removed]="result.scope.removed"
+				*matRowDef="let result; columns: columnsToDisplay"></tr>
 		</form>
 	</table>
 
