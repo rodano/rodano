@@ -43,7 +43,6 @@ services:
 
   backend:
     image: ghcr.io/rodano/backend:${TAG}
-    pull_policy: always
     depends_on:
       plugins-compiler:
         condition: service_completed_successfully
@@ -100,7 +99,6 @@ services:
 
   frontend:
     image: ghcr.io/rodano/frontend:${TAG}
-    pull_policy: always
     build:
       context: frontends
       dockerfile: Dockerfile
@@ -119,7 +117,6 @@ services:
 #the following service is used to dump the database content into a file, to be used for backup purposes
   dumper:
     image: ghcr.io/rodano/database-dumper:${TAG}
-    pull_policy: always
     depends_on:
       db:
         condition: service_healthy
@@ -139,7 +136,6 @@ services:
 
   backuper:
     image: offen/docker-volume-backup:v2
-    pull_policy: always
     volumes:
       - database_dumps:/backup/database_dumps:ro
       - user_content:/backup/user_content:ro
