@@ -102,7 +102,7 @@ services:
     image: ghcr.io/rodano/frontend:${TAG}
     pull_policy: always
     build:
-      context: .
+      context: frontends
       dockerfile: Dockerfile
     depends_on:
       - backend
