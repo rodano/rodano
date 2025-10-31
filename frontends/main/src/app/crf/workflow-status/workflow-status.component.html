@@ -24,4 +24,8 @@
 			</button>
 		}
 	}
+
+	@if(workflowStatus) {
+		<app-audit-trail-button [workflowStatus]="workflowStatus" />
+	}
 </div>

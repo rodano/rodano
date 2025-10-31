@@ -14,6 +14,7 @@ import {Event} from '@core/model/event';
 import {Form} from '@core/model/form';
 import {Field} from '@core/model/field';
 import {Workflow} from '@core/model/workflow';
+import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 
 @Component({
 	selector: 'app-workflow-status',
@@ -23,7 +24,8 @@ import {Workflow} from '@core/model/workflow';
 		MatIcon,
 		MatFormFieldModule,
 		MatButton,
-		LocalizeMapPipe
+		LocalizeMapPipe,
+		AuditTrailButtonComponent
 	]
 })
 export class WorkflowStatusComponent implements OnChanges {

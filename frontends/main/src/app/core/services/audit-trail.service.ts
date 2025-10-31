@@ -136,6 +136,12 @@ export class AuditTrailService {
 		);
 	}
 
+	getForWorkflowStatus(workflowStatusPk: number): Observable<EntityAuditTrail[]> {
+		return this.versionsService.getForWorkflowStatus(workflowStatusPk).pipe(
+			map(v => this.generateEntityAuditTrail(v as EntityVersion[]))
+		);
+	}
+
 	getForUser(userPk: number): Observable<EntityAuditTrail[]> {
 		return this.versionsService.getForUser(userPk).pipe(
 			map(v => this.generateEntityAuditTrail(v as EntityVersion[]))

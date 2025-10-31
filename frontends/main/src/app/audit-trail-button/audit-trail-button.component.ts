@@ -21,6 +21,7 @@ import {Field} from '@core/model/field';
 import {AuthStateService} from '../services/auth-state.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FeatureStatic} from '@core/model/feature-static';
+import {WorkflowStatus} from '@core/model/workflow-status';
 
 @Component({
 	selector: 'app-audit-trail-button',
@@ -40,6 +41,7 @@ export class AuditTrailButtonComponent implements OnInit {
 	@Input() dataset: Dataset;
 	@Input() form: Form;
 	@Input() field: Field;
+	@Input() workflowStatus: WorkflowStatus;
 	@Input() user: User;
 	@Input() robot: Robot;
 	@Input() role: Role;
@@ -74,6 +76,9 @@ export class AuditTrailButtonComponent implements OnInit {
 		if(this.form) {
 			return this.localizeMapPipe.transform(this.form.model.shortname);
 		}
+		if(this.workflowStatus) {
+			return this.localizeMapPipe.transform(this.workflowStatus.workflow.shortname);
+		}
 		if(this.user) {
 			return this.user.name;
 		}
@@ -98,6 +103,9 @@ export class AuditTrailButtonComponent implements OnInit {
 		}
 		if(this.form) {
 			return this.auditTrailService.getForForm(this.form.scopePk, this.form.eventPk, this.form.pk);
+		}
+		if(this.workflowStatus) {
+			return this.auditTrailService.getForWorkflowStatus(this.workflowStatus.pk);
 		}
 		return this.auditTrailService.getForUser(this.user.pk);
 	}
