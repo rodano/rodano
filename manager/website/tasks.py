@@ -51,7 +51,7 @@ async def do_task(task, steps, *args):
 	while process.returncode is None:
 		try:
 			#if process has been killed, readline will never return, hence the timeout
-			#if process is still alive and no line has been return, process.returncode will still be None and the while loop will continue
+			#if process is still alive and no line has been returned, process.returncode will still be None and the while loop will continue
 			line = await asyncio.wait_for(process.stdout.readline(), 3)
 		except asyncio.TimeoutError:
 			pass
@@ -108,7 +108,7 @@ class TaskCancel(helpers.AuthenticatedRequestHandler):
 						#this sends a SIGTERM to the process
 						task["process"].terminate()
 						#do not remove task from task list
-						#this will be handle by the code that started the task
+						#this will be handled by the code that started the task
 						messaging.broadcast_task_message({"task" : task_type, "id" : id, "cancelled" : True, "message" : "Task cancelled."})
 						self.write({"message" : "Task cancelled.", "terminated" : False})
 					except OSError:

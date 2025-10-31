@@ -38,7 +38,7 @@ RESTORE_STEPS = [
 	"Deleting current data...",
 	"Importing data...",
 	"Deleting temporary file...",
-	"restored successfully"
+	"Application restored successfully"
 ]
 
 RESET_STEPS = [
@@ -46,7 +46,7 @@ RESET_STEPS = [
 	"Retrieving last version of initialization script...",
 	"Compiling initialization script...",
 	"Executing initialization script...",
-	"reset successfully"
+	"Application reset successfully"
 ]
 
 CONTROL_STEPS = {
@@ -270,8 +270,8 @@ class ApplicationRestore(helpers.AuthenticatedRequestHandler):
 						self.write({"error" : "Invalid characters in backup file name"})
 						self.finish()
 						return
-					source_backup = open(f"{BACKUPS_STORAGE_PATH}/{restore_file}", "rb")
-					backup_file.write(source_backup.read())
+					with open(f"{BACKUPS_STORAGE_PATH}/{restore_file}", "rb") as source_backup:
+						backup_file.write(source_backup.read())
 
 				#terminate http request
 				self.write({"message" : "Restoration started. Watch tasks to get progression of restoration.", "id" : tasks.tasks["restore"]["id"], "steps" : len(RESTORE_STEPS)})

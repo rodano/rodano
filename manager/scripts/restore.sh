@@ -30,6 +30,7 @@ mkdir -p "$backup_build_dir"
 #extract restore file
 unzip "$RESTORE_FILE" -d "$backup_build_dir"
 
+#restore database
 mariadb_connection_arguments=("-h$DATABASE_HOST" "-u$DATABASE_USER" "-p$DATABASE_PASSWORD")
 
 echo "Deleting current database..."
@@ -42,7 +43,6 @@ mariadb_command_arguments=("${mariadb_connection_arguments[@]}")
 mariadb_command_arguments+=("-e" "CREATE DATABASE $DATABASE_NAME")
 mariadb "${mariadb_command_arguments[@]}"
 
-#restore database
 echo "Importing database..."
 mariadb_command_arguments=("${mariadb_connection_arguments[@]}")
 mariadb_command_arguments+=("$DATABASE_NAME")
@@ -50,9 +50,11 @@ backup_db="$backup_build_dir/database.sql.gz"
 gunzip < "$backup_db" | mariadb "${mariadb_command_arguments[@]}"
 
 #restore data
+echo "Deleting current data..."
+rm -r "${USER_CONTENT:?}"/*
+
 echo "Importing data..."
 backup_data="$backup_build_dir/data.tar.gz"
-rm -r "${USER_CONTENT:?}"/*
 tar -zxvf "$backup_data" -C "$USER_CONTENT"
 
 echo "Deleting temporary file..."
