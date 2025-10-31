@@ -62,7 +62,7 @@ export class AuditTrailService {
 					const previousVersion = index === 0 ? undefined : versions[index - 1];
 					const previousValue = previousVersion?.[property];
 					const value = version[property] as string;
-					if(!this.valuesEqual(previousValue, value)) {
+					if((previousValue || value) && !this.valuesEqual(previousValue, value)) {
 						modifications[property] = {oldValue: this.stringify(previousValue), newValue: this.stringify(value)};
 					}
 				});
