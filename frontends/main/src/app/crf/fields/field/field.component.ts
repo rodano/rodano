@@ -168,6 +168,10 @@ export class FieldComponent implements OnInit, OnChanges {
 		});
 	}
 
+	get indeterminate(): boolean {
+		return typeof this.control.value !== 'boolean';
+	}
+
 	getDisabled(): boolean {
 		return this.field.model.dynamic || this.field.model.readOnly || this.disabled;
 	}

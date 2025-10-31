@@ -67,6 +67,7 @@
 		} @else if (field.model.type === fieldModelType.CHECKBOX) {
 			<mat-checkbox
 				[id]="id"
+				[indeterminate]="indeterminate"
 				[formControl]="control">
 				{{ field.model | localizeFieldModel }}
 			</mat-checkbox>

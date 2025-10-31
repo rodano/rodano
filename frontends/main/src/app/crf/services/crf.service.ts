@@ -151,7 +151,7 @@ export class CRFService {
 	public typeFieldValue(fieldModel: FieldModel, value?: string): any {
 		switch(fieldModel?.dataType) {
 			case OperandType.BOOLEAN:
-				return value === 'true';
+				return value ? value === 'true' : undefined;
 			case OperandType.NUMBER.toLowerCase():
 				return value ? parseFloat(value) : undefined;
 			default:
