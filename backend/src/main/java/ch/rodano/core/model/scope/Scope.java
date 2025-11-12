@@ -5,6 +5,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,6 +44,8 @@ public class Scope extends ScopeRecord implements DeletableObject, Timestampable
 
 	private ScopeModel scopeModel;
 
+	private UUID projectId;
+
 	public Scope() {
 		super();
 	}
@@ -79,7 +82,7 @@ public class Scope extends ScopeRecord implements DeletableObject, Timestampable
 
 	public void setScopeModel(final ScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
-		this.scopeModelId = scopeModel.getId();
+		this.scopeModelId = scopeModel.getScopeModelId();
 	}
 
 	public ScopeModel getScopeModel() {
@@ -105,6 +108,14 @@ public class Scope extends ScopeRecord implements DeletableObject, Timestampable
 	@Override
 	public WorkflowableEntity getWorkflowableEntity() {
 		return WorkflowableEntity.SCOPE;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public static String formatCodeAndShortname(final String code, final String shortname) {
@@ -188,7 +199,7 @@ public class Scope extends ScopeRecord implements DeletableObject, Timestampable
 
 	@Override
 	public final String getPayableModelId() {
-		return getScopeModelId();
+		return getId();
 	}
 
 	@Override

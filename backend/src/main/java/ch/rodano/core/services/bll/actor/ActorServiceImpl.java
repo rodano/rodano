@@ -88,7 +88,7 @@ public class ActorServiceImpl implements ActorService {
 	@Override
 	public List<Scope> getRootScopes(final Actor actor, final Profile profile) {
 		final var scopePks = roleService.getActiveRoles(actor).stream()
-			.filter(r -> r.getProfileId().equals(profile.getId()))
+			.filter(r -> r.getProfileId().equals(profile.getProfileId()))
 			.map(Role::getScopeFk).toList();
 		return scopeDAOService.getScopesByPks(scopePks);
 	}

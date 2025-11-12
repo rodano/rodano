@@ -1,6 +1,7 @@
 package ch.rodano.api.actor;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -82,7 +83,7 @@ public class RobotController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<RobotDTO> search(
 		@Parameter(description = "Robot name") @RequestParam final Optional<String> name,
-		@Parameter(description = "Profile ID") @RequestParam final Optional<String> profileId,
+		@Parameter(description = "Profile ID") @RequestParam final Optional<UUID> profileId,
 		@Parameter(description = "Sort the results by which property?") @RequestParam final Optional<RobotSortBy> sortBy,
 		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
 		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
@@ -94,7 +95,7 @@ public class RobotController extends AbstractSecuredController {
 
 		final var search = new RobotSearch()
 			.setName(name.filter(StringUtils::isNotBlank))
-			.setProfileId(profileId.filter(StringUtils::isNotBlank))
+			.setProfileId(profileId)
 			.setIncludeDeleted(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_DELETED_DATA))
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
 			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);

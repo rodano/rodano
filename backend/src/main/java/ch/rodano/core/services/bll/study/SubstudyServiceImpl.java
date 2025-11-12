@@ -96,7 +96,7 @@ public class SubstudyServiceImpl implements SubstudyService {
 	@Override
 	public List<Scope> getOpenSubstudiesByFieldModel(final FieldModel fieldModel) {
 		final Predicate<Scope> filterSubstudy = s -> s.getData().getEnrollmentModel().getCriteria().stream().anyMatch(
-			c -> c.datasetModelId().equals(fieldModel.getDatasetModel().getId()) && c.fieldModelId().equals(fieldModel.getId())
+			c -> c.datasetModelId().equals(fieldModel.getDatasetModel().getDatasetModelId()) && c.fieldModelId().equals(fieldModel.getFieldModelId())
 		);
 		return getOpenSubstudies().stream().filter(filterSubstudy).toList();
 	}
@@ -120,7 +120,7 @@ public class SubstudyServiceImpl implements SubstudyService {
 
 		final var scopePredicate = new ScopeSearch()
 			.enforceAncestorPks(rootScopes.stream().map(Scope::getPk).toList())
-			.enforceScopeModelId(targetScopeModel.getId())
+			.enforceScopeModelId(targetScopeModel.getScopeModelId())
 			.enforceFieldModelCriteria(substudyCriteria);
 
 		return scopeService.search(scopePredicate).getObjects();

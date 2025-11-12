@@ -1,14 +1,24 @@
 package ch.rodano.core.model.session;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 public class Session {
 
+	protected UUID projectId;
 	protected Long pk;
 	protected ZonedDateTime creationTime;
 	private ZonedDateTime lastAccessTime;
 	private Long userFk;
 	private String token;
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
 
 	public Long getPk() {
 		return pk;

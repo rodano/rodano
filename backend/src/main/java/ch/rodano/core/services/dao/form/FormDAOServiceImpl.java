@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.form;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.jooq.Table;
@@ -69,7 +70,7 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 	}
 
 	@Override
-	public Form getFormByScopePkAndFormModelId(final Long scopePk, final String formModelId) {
+	public Form getFormByScopePkAndFormModelId(final Long scopePk, final UUID formModelId) {
 		final var query = create.selectFrom(FORM).where(FORM.SCOPE_FK.eq(scopePk).and(FORM.FORM_MODEL_ID.eq(formModelId)));
 		return findUnique(query);
 	}
@@ -87,7 +88,7 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 	}
 
 	@Override
-	public Form getFormByEventPkAndFormModelId(final Long eventPk, final String formModelId) {
+	public Form getFormByEventPkAndFormModelId(final Long eventPk, final UUID formModelId) {
 		final var query = create.selectFrom(FORM).where(FORM.EVENT_FK.eq(eventPk).and(FORM.FORM_MODEL_ID.eq(formModelId)));
 		return findUnique(query);
 	}
@@ -104,6 +105,9 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 
 	@Override
 	public void saveForm(final Form form, final DatabaseActionContext context, final String rationale) {
+		if(form.getProjectId() == null) {
+			form.setProjectId(studyService.getStudy().getProjectId());
+		}
 		save(form, context, rationale);
 	}
 }

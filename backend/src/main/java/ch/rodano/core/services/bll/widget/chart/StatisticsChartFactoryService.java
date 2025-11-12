@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -76,9 +77,7 @@ public class StatisticsChartFactoryService {
 			final var range = findRange(chart, entry.getKey());
 			final var key = range.map(r -> r.getLocalizedLabel(languages));
 			//keep result only if it's part on a range
-			if(key.isPresent()) {
-				processedResult.merge(key.get(), entry.getValue(), (current, value) -> current + value);
-			}
+			key.ifPresent(s -> processedResult.merge(s, entry.getValue(), Integer::sum));
 		}
 		return processedResult;
 	}
@@ -90,9 +89,9 @@ public class StatisticsChartFactoryService {
 		//conditions
 		final List<Condition> conditions = new ArrayList<>();
 		conditions.add(SCOPE.DELETED.isFalse());
-		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId()));
-		conditions.add(DATASET.DATASET_MODEL_ID.eq(chart.getDatasetModelId()));
-		conditions.add(FIELD.FIELD_MODEL_ID.eq(chart.getFieldModelId()));
+		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelUuid()));
+		conditions.add(DATASET.DATASET_MODEL_ID.eq(chart.getDatasetModelUuid()));
+		conditions.add(FIELD.FIELD_MODEL_ID.eq(chart.getFieldModelUuid()));
 		conditions.add(SCOPE_ANCESTOR.ANCESTOR_FK.in(scopePks));
 		conditions.add(SCOPE_ANCESTOR.START_DATE.lessOrEqual(now));
 		conditions.add(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterOrEqual(now)));
@@ -111,16 +110,22 @@ public class StatisticsChartFactoryService {
 		//that's because filters can be applied to the same dataset
 		//this does not work if multiple filters are applied to the same field, but that's ok
 		//do not try to include the main field (Chart::getFieldModelId) in this cache to be able to apply a filter on it
-		final var datasetJoins = new HashMap<String, Dataset>();
+		final var datasetJoins = new HashMap<UUID, Dataset>();
 
 		for(final var criterion : criteria) {
-			if(!datasetJoins.containsKey(criterion.datasetModelId())) {
-				final var datasetJoin = DATASET.as(criterion.datasetModelId());
-				datasetJoins.put(criterion.datasetModelId(), datasetJoin);
-				query.join(datasetJoin).on(datasetJoin.SCOPE_FK.eq(SCOPE.PK).and(datasetJoin.DATASET_MODEL_ID.eq(criterion.datasetModelId())));
+			final var datasetModelId = criterion.datasetModelId();
+			final var fieldModelId = criterion.fieldModelId();
+
+			final var dsAlias = "ds_" + datasetModelId.toString().replace("-", "");
+			final var fAlias = "f_" + fieldModelId.toString().replace("-", "");
+
+			if(!datasetJoins.containsKey(datasetModelId)) {
+				final var datasetJoin = DATASET.as(dsAlias);
+				datasetJoins.put(datasetModelId, datasetJoin);
+				query.join(datasetJoin).on(datasetJoin.SCOPE_FK.eq(SCOPE.PK).and(datasetJoin.DATASET_MODEL_ID.eq(datasetModelId)));
 			}
 			final var datasetJoin = datasetJoins.get(criterion.datasetModelId());
-			final var fieldJoin = FIELD.as(criterion.fieldModelId());
+			final var fieldJoin = FIELD.as(fAlias);
 			query.join(fieldJoin).on(fieldJoin.DATASET_FK.eq(datasetJoin.PK).and(fieldJoin.FIELD_MODEL_ID.eq(criterion.fieldModelId())));
 
 			conditions.add(JOOQTranslator.translate(studyService.getStudy(), criterion, fieldJoin.VALUE));
@@ -137,6 +142,15 @@ public class StatisticsChartFactoryService {
 		final List<ChartDatasetDTO<String, Integer>> datasets = new ArrayList<>();
 		//sort scopes to be able to sort results
 		final var sortedScopes = new ArrayList<>(scopes);
+		sortedScopes.forEach(scope -> {
+			if(scope.getScopeModel() == null && scope.getScopeModelId() != null) {
+				final var scopeModel = studyService.getStudy().getScopeModels().stream()
+					.filter(sm -> sm.getScopeModelId().equals(scope.getScopeModelId()))
+					.findFirst()
+					.orElse(null);
+				scope.setScopeModel(scopeModel);
+			}
+		});
 		sortedScopes.sort(Scope.DEPTH_COMPARATOR);
 		for(final var scope : sortedScopes) {
 			final var scopeResult = new LinkedHashMap<String, Integer>();

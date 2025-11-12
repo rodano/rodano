@@ -26,7 +26,7 @@ public class Selection {
 		studyElement.appendChild(smsElement);
 
 		for(final var scopeModel : study.getScopeModels()) {
-			final var scopeModelSelection = SelectionNode.getSelection(studySelections, Entity.SCOPE_MODEL, scopeModel.getId());
+			final var scopeModelSelection = SelectionNode.getSelection(studySelections, Entity.SCOPE_MODEL, scopeModel.getScopeModelId());
 			if(scopeModelSelection.isEmpty()) {
 				continue;
 			}
@@ -42,7 +42,7 @@ public class Selection {
 			Collections.sort(eventModels);
 
 			for(final var eventModel : eventModels) {
-				final var eventModelSelection = scopeModelSelection.get().getSelection(Entity.EVENT_MODEL, eventModel.getId());
+				final var eventModelSelection = scopeModelSelection.get().getSelection(Entity.EVENT_MODEL, eventModel.getEventModelId());
 				if(eventModelSelection.isEmpty()) {
 					continue;
 				}
@@ -55,7 +55,7 @@ public class Selection {
 				emElement.appendChild(fmsElement);
 
 				for(final var formModel : eventModel.getFormModels()) {
-					final var formModelSelection = eventModelSelection.get().getSelection(Entity.FORM_MODEL, formModel.getId());
+					final var formModelSelection = eventModelSelection.get().getSelection(Entity.FORM_MODEL, formModel.getFormModelId());
 					if(formModelSelection.isEmpty()) {
 						continue;
 					}
@@ -68,7 +68,7 @@ public class Selection {
 					fmElement.appendChild(layoutsElement);
 
 					for(final var layout : formModel.getLayouts()) {
-						final var layoutSelection = formModelSelection.get().getSelection(Entity.LAYOUT, layout.getId());
+						final var layoutSelection = formModelSelection.get().getSelection(Entity.LAYOUT, layout.getLayoutId());
 						if(layoutSelection.isEmpty()) {
 							continue;
 						}
@@ -87,16 +87,13 @@ public class Selection {
 			//retrieve and sort form models
 			final var formModels = new ArrayList<FormModel>();
 			scopeModel.getEventModels().forEach(event -> {
-				final var eventSelection = scopeModelSelection.get().getSelection(Entity.EVENT_MODEL, event.getId());
-				if(eventSelection.isPresent()) {
-
-					event.getFormModels().forEach(formModel -> {
-						final var formModelSelection = eventSelection.get().getSelection(Entity.FORM_MODEL, formModel.getId());
-						if(formModelSelection.isPresent() && !formModels.contains(formModel)) {
-							formModels.add(formModel);
-						}
-					});
-				}
+				final var eventSelection = scopeModelSelection.get().getSelection(Entity.EVENT_MODEL, event.getEventModelId());
+				eventSelection.ifPresent(selectionNode -> event.getFormModels().forEach(formModel -> {
+					final var formModelSelection = selectionNode.getSelection(Entity.FORM_MODEL, formModel.getFormModelId());
+					if(formModelSelection.isPresent() && !formModels.contains(formModel)) {
+						formModels.add(formModel);
+					}
+				}));
 			});
 
 			//add form models

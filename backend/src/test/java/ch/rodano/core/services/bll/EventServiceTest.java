@@ -137,8 +137,8 @@ public class EventServiceTest extends DatabaseTest {
 
 		assertAll(
 			() -> assertEquals(5, eventService.getAll(patient).size()),
-			() -> assertEquals("BASELINE", eventService.get(patient, getBaselineEvent(), 0).getEventModelId()),
-			() -> assertEquals("TERMINATION_VISIT", eventService.get(patient, getTerminationEvent(), 0).getEventModelId())
+			() -> assertEquals(getBaselineEvent().getEventModelId(), eventService.get(patient, getBaselineEvent(), 0).getEventModelId()),
+			() -> assertEquals(getTerminationEvent().getEventModelId(), eventService.get(patient, getTerminationEvent(), 0).getEventModelId())
 		);
 	}
 
@@ -178,10 +178,10 @@ public class EventServiceTest extends DatabaseTest {
 		assertTrue(eventService.getPrevious(firstEvent).isEmpty());
 
 		final var secondEvent = eventService.getNext(firstEvent).get();
-		assertEquals("VISIT_6", secondEvent.getEventModelId(), "Check next in group");
+		assertEquals("VISIT_6", secondEvent.getEventModel().getId(), "Check next in group");
 
 		final var thirdEvent = eventService.getNext(secondEvent).get();
-		assertEquals("VISIT_12", thirdEvent.getEventModelId(), "Check next next id");
+		assertEquals("VISIT_12", thirdEvent.getEventModel().getId(), "Check next next id");
 
 		assertEquals(firstEvent.getId(), eventService.getPrevious(secondEvent).get().getId(), "Check previous");
 
@@ -190,7 +190,7 @@ public class EventServiceTest extends DatabaseTest {
 
 		//try to retrieve the event that follows the last event
 		assertTrue(eventService.getNext(last).isEmpty());
-		assertEquals("TERMINATION_VISIT", last.getEventModelId());
+		assertEquals("TERMINATION_VISIT", last.getEventModel().getId());
 	}
 
 	@Test
@@ -354,8 +354,13 @@ public class EventServiceTest extends DatabaseTest {
 			}
 		}
 
+		final var studyEntryModel = studyService.getStudy().getFormModel("STUDY_ENTRY");
+		if(studyEntryModel == null) {
+			throw new IllegalStateException("STUDY_ENTRY form model not found in study");
+		}
+
 		//check number of fields in first form
-		final var form = formService.get(baselineVisit, "STUDY_ENTRY");
+		final var form = formService.get(baselineVisit, studyEntryModel.getFormModelId());
 		final var formContent = formContentService.generateFormContent(patient, Optional.of(baselineVisit), form);
 		assertEquals(4, formContent.getAllNonDeletedFields().size());
 

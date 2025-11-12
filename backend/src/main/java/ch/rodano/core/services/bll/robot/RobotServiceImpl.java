@@ -12,18 +12,22 @@ import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.dao.robot.RobotDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 
 @Service
 public class RobotServiceImpl implements RobotService {
 	private final RobotDAOService robotDAOService;
 	private final RoleService roleService;
+	private final ProjectIdResolver projectIdResolver;
 
 	public RobotServiceImpl(
 		final RobotDAOService robotDAOService,
-		final RoleService roleService
+		final RoleService roleService,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.robotDAOService = robotDAOService;
 		this.roleService = roleService;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	@Override
@@ -39,6 +43,7 @@ public class RobotServiceImpl implements RobotService {
 			throw new BadArgumentException("A robot with the same name already exists");
 		}
 		checkKeyUniqueness(robot);
+		robot.setProjectId(projectIdResolver.id());
 
 		robotDAOService.saveRobot(robot, context, rationale);
 
@@ -70,6 +75,10 @@ public class RobotServiceImpl implements RobotService {
 			throw new BadArgumentException("A robot with the same name already exists");
 		}
 		checkKeyUniqueness(robot);
+
+		if(robot.getProjectId() == null) {
+			robot.setProjectId(projectIdResolver.id());
+		}
 
 		robotDAOService.saveRobot(robot, context, rationale);
 	}

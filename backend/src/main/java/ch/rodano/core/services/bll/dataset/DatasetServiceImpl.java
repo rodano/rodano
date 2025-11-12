@@ -2,8 +2,8 @@ package ch.rodano.core.services.bll.dataset;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -140,6 +140,7 @@ public class DatasetServiceImpl implements DatasetService {
 		//dataset
 		final var dataset = new Dataset();
 		id.ifPresent(dataset::setId);
+		dataset.setProjectId(studyService.getStudy().getProjectId());
 		dataset.setDatasetModel(datasetModel);
 		dataset.setScopeFk(scope.getPk());
 
@@ -184,7 +185,9 @@ public class DatasetServiceImpl implements DatasetService {
 		//dataset
 		final var dataset = new Dataset();
 		id.ifPresent(dataset::setId);
+		dataset.setProjectId(studyService.getStudy().getProjectId());
 		dataset.setDatasetModel(datasetModel);
+		dataset.setScopeFk(scope.getPk());
 		dataset.setEventFk(event.getPk());
 
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? "Create dataset" : "Create dataset: " + rationale;
@@ -350,7 +353,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAllIncludingRemoved(final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getDatasetModelId).collect(Collectors.toList());
 		return datasetDAOService.getAllDatasetsByDatasetModelIds(datasetModelIds);
 	}
 
@@ -362,7 +365,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAllIncludingRemoved(final Scope scope, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getDatasetModelId).collect(Collectors.toList());
 		return datasetDAOService.getAllDatasetsByScopePkAndDatasetModelIds(scope.getPk(), datasetModelIds);
 	}
 
@@ -373,7 +376,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAll(final Scope scope, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getDatasetModelId).collect(Collectors.toList());
 		return datasetDAOService.getDatasetsByScopePkAndDatasetModelIds(scope.getPk(), datasetModelIds);
 	}
 
@@ -382,7 +385,12 @@ public class DatasetServiceImpl implements DatasetService {
 		if(datasetModel.isMultiple()) {
 			throw new InvalidParameterException("Unable to retrieve unique dataset if dataset model is a multiple");
 		}
-		return datasetDAOService.getDatasetsByScopePkAndDatasetModelIds(scope.getPk(), Collections.singletonList(datasetModel.getId())).get(0);
+		final var list = datasetDAOService
+			.getDatasetsByScopePkAndDatasetModelIds(scope.getPk(), List.of(datasetModel.getDatasetModelId()));
+		return list.stream()
+			.findFirst()
+			.orElseThrow(() -> new NoSuchElementException(
+				"Dataset not found for scopePk=" + scope.getPk() + " model=" + datasetModel.getId()));
 	}
 
 	//event
@@ -393,7 +401,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAllIncludingRemoved(final Event event, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getDatasetModelId).collect(Collectors.toList());
 		return datasetDAOService.getAllDatasetsByEventPkAndDatasetModelIds(event.getPk(), datasetModelIds);
 	}
 
@@ -404,7 +412,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAll(final Event event, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getDatasetModelId).collect(Collectors.toList());
 		return datasetDAOService.getDatasetsByEventPkAndDatasetModelIds(event.getPk(), datasetModelIds);
 	}
 
@@ -413,7 +421,31 @@ public class DatasetServiceImpl implements DatasetService {
 		if(datasetModel.isMultiple()) {
 			throw new InvalidParameterException("Unable to retrieve unique dataset if dataset model is a multiple");
 		}
-		return datasetDAOService.getDatasetsByEventPkAndDatasetModelIds(event.getPk(), Collections.singletonList(datasetModel.getId())).get(0);
+		final var list = datasetDAOService
+			.getDatasetsByEventPkAndDatasetModelIds(event.getPk(), List.of(datasetModel.getDatasetModelId()));
+		return list.stream()
+			.findFirst()
+			.orElseThrow(() -> new NoSuchElementException(
+				"Dataset not found for eventPk=" + event.getPk() + " model=" + datasetModel.getId()));
 	}
 
+	@Override
+	public Dataset getOrCreate(final Scope scope, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale) {
+		try {
+			return get(scope, datasetModel);
+		}
+		catch(NoSuchElementException e) {
+			return create(scope, datasetModel, context, rationale);
+		}
+	}
+
+	@Override
+	public Dataset getOrCreate(final Scope scope, final Event event, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale) {
+		try {
+			return get(event, datasetModel);
+		}
+		catch(NoSuchElementException e) {
+			return create(scope, event, datasetModel, context, rationale);
+		}
+	}
 }

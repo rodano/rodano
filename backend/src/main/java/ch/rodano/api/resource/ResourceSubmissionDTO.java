@@ -1,14 +1,20 @@
 package ch.rodano.api.resource;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotNull;
 
 public class ResourceSubmissionDTO {
-	@NotNull protected String title;
+	@NotNull
+	protected String title;
 	protected String description;
-	@NotNull protected String categoryId;
+	@NotNull
+	protected UUID categoryId;
 
-	@NotNull protected Long scopePk;
-	@NotNull protected Boolean publicResource;
+	@NotNull
+	protected Long scopePk;
+	@NotNull
+	protected Boolean publicResource;
 
 	public String getTitle() {
 		return title;
@@ -26,11 +32,11 @@ public class ResourceSubmissionDTO {
 		this.description = description;
 	}
 
-	public String getCategoryId() {
+	public UUID getCategoryId() {
 		return categoryId;
 	}
 
-	public void setCategoryId(final String categoryId) {
+	public void setCategoryId(final UUID categoryId) {
 		this.categoryId = categoryId;
 	}
 

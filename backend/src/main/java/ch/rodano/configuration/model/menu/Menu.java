@@ -9,6 +9,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -27,6 +28,8 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.Assignable;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Menu implements SuperDisplayable, Serializable, Assignable<Menu>, Node, Comparable<Menu> {
@@ -36,6 +39,7 @@ public class Menu implements SuperDisplayable, Serializable, Assignable<Menu>, N
 	private Study study;
 	private Menu parent;
 
+	private UUID menuId;
 	private String id;
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> longname;
@@ -56,6 +60,20 @@ public class Menu implements SuperDisplayable, Serializable, Assignable<Menu>, N
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
 		submenus = new TreeSet<>();
+	}
+
+	public UUID getMenuId() {
+		if(this.menuId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.menuId = deterministic(
+				this.study.getProjectId(),
+				"MENU",
+				this.id);
+		}
+		return menuId;
+	}
+
+	public void setMenuId(final UUID menuId) {
+		this.menuId = menuId;
 	}
 
 	@Override
@@ -145,7 +163,15 @@ public class Menu implements SuperDisplayable, Serializable, Assignable<Menu>, N
 
 	@JsonManagedReference("parent")
 	public final void setSubmenus(final SortedSet<Menu> submenus) {
-		this.submenus = submenus;
+		this.submenus = (submenus == null) ? new TreeSet<>() : submenus;
+
+		for(Menu child : this.submenus) {
+			child.setParent(this);
+
+			if(this.study != null && child.getStudy() == null) {
+				child.setStudy(this.study);
+			}
+		}
 	}
 
 	@JsonIgnore

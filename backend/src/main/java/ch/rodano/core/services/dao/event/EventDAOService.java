@@ -3,6 +3,7 @@ package ch.rodano.core.services.dao.event;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -25,11 +26,12 @@ public interface EventDAOService {
 
 	/**
 	 * Get the events matching the provided scope pk and event model id
+	 *
 	 * @param scopePk
 	 * @param eventModelId
 	 * @return The events associated with the scope and matching the event model id
 	 */
-	List<Event> getEventsByScopePkAndEventModelId(Long scopePk, String eventModelId);
+	List<Event> getEventsByScopePkAndEventModelId(Long scopePk, UUID eventModelId);
 
 	/**
 	 * Get all the events (including deleted) matching the provided event model id
@@ -37,7 +39,7 @@ public interface EventDAOService {
 	 * @param eventModelId The event model id
 	 * @return The events matching the event model id
 	 */
-	List<Event> getAllEventsByEventModelId(String eventModelId);
+	List<Event> getAllEventsByEventModelId(UUID eventModelId);
 
 	/**
 	 * Get all the events (including deleted) associated with the given scope pk
@@ -47,9 +49,9 @@ public interface EventDAOService {
 	 */
 	List<Event> getAllEventsByScopePk(Long scopePk);
 
-	List<Event> getAllEventsByScopePkAndEventModelId(Long scopePk, String eventModelId);
+	List<Event> getAllEventsByScopePkAndEventModelId(Long scopePk, UUID eventModelId);
 
-	Event getEventByScopePkAndEventModelIdAndEventNumber(Long scopePk, String eventModelId, int eventNumber);
+	Event getEventByScopePkAndEventModelIdAndEventNumber(Long scopePk, UUID eventModelId, int eventNumber);
 
 	NavigableSet<EventAuditTrail> getAuditTrails(Event event, Optional<Timeframe> timeframe, Optional<Long> actorPk);
 

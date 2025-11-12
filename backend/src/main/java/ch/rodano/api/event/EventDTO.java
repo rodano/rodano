@@ -2,6 +2,7 @@ package ch.rodano.api.event;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -42,7 +43,7 @@ public class EventDTO {
 	EventModelDTO model;
 	@Schema(description = "Event model id")
 	@NotNull
-	String modelId;
+	UUID modelId;
 
 	@NotBlank
 	String shortname;
@@ -127,11 +128,11 @@ public class EventDTO {
 		this.model = model;
 	}
 
-	public String getModelId() {
+	public UUID getModelId() {
 		return modelId;
 	}
 
-	public void setModelId(final String modelId) {
+	public void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

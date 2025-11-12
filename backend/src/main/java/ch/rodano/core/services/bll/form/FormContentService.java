@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -60,8 +61,8 @@ public class FormContentService {
 		return evaluation.isValid();
 	}
 
-	private List<Dataset> getDatasets(final Optional<Event> event, final List<Dataset> scopeDatasets, final List<Dataset> eventDatasets, final String datasetModelId) {
-		final boolean isEventDataset = event.isPresent() && event.get().getEventModel().getDatasetModelIds().contains(datasetModelId);
+	private List<Dataset> getDatasets(final Optional<Event> event, final List<Dataset> scopeDatasets, final List<Dataset> eventDatasets, final UUID datasetModelId) {
+		final boolean isEventDataset = event.isPresent() && event.get().getEventModel().getDatasetModelUuids().contains(datasetModelId);
 		final var datasets = isEventDataset ? eventDatasets : scopeDatasets;
 		return datasets.stream().filter(d -> d.getDatasetModelId().equals(datasetModelId)).toList();
 	}
@@ -100,12 +101,12 @@ public class FormContentService {
 			//add entire datasets if the layout is a multiple layout
 			if(layout.getType().isRepeatable()) {
 				//retrieve all field models in this document (hence in this layout)
-				final List<String> fieldModelIds = cells.stream()
+				final List<UUID> fieldModelIds = cells.stream()
 					.filter(Cell::hasFieldModel)
-					.map(Cell::getFieldModelId)
+					.map(Cell::getFieldModelUuid)
 					.toList();
 				//retrieve all datasets for this layout
-				final List<Dataset> datasets = getDatasets(event, scopeDatasets, eventDatasets, layout.getDatasetModelId());
+				final List<Dataset> datasets = getDatasets(event, scopeDatasets, eventDatasets, layout.getDatasetModelUuid());
 				//gather all fields in this layout
 				final var datasetsFields = new ArrayList<Pair<Dataset, Field>>();
 				for(final Dataset dataset : datasets) {
@@ -120,12 +121,12 @@ public class FormContentService {
 			else {
 				final var datasetsFields = new ArrayList<Pair<Dataset, Field>>();
 				for(final Cell cell : cells) {
-					final String datasetModelId = cell.getDatasetModelId();
+					final UUID datasetModelId = cell.getDatasetModelUuid();
 					//retrieve the datasets for this cell
 					final Dataset dataset = getDatasets(event, scopeDatasets, eventDatasets, datasetModelId).getFirst();
 					//gather the fields in this cell
 					final var field = fieldsByDataset.get(dataset.getPk()).stream()
-						.filter(f -> f.getFieldModelId().equals(cell.getFieldModelId()))
+						.filter(f -> f.getFieldModelId().equals(cell.getFieldModelUuid()))
 						.findAny().orElseThrow();
 					datasetsFields.add(Pair.of(dataset, field));
 				}

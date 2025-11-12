@@ -2,7 +2,6 @@ package ch.rodano.core.services.bll;
 
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,15 +63,12 @@ public class RoleServiceTest extends DatabaseTest {
 	User user;
 	User unactivatedUser;
 
-	@BeforeAll
+	@BeforeEach
 	public void initRoleTests() {
-		rootScope = scopeDAOService.getRootScope();
+		rootScope = scopeDAOService.getRootScope(studyService.getStudy())
+			.orElseThrow(() -> new IllegalStateException("Root scope not found for test study"));
 		adminProfile = studyService.getStudy().getProfile("ADMIN");
 		investigatorProfile = studyService.getStudy().getProfile("INVESTIGATOR");
-	}
-
-	@BeforeEach
-	public void initUser() {
 		user = createUser();
 		unactivatedUser = createUnactivatedUser();
 	}
@@ -89,7 +85,7 @@ public class RoleServiceTest extends DatabaseTest {
 
 		assertEquals(user.getPk(), role.getUserFk());
 		assertEquals(role.getScopeFk(), rootScope.getPk());
-		assertEquals(role.getStatus(), RoleStatus.PENDING);
+		assertEquals(RoleStatus.PENDING, role.getStatus());
 
 		// search for the role invitation mail
 		final var userMails = mailService.getMails(MailStatus.PENDING, Integer.MAX_VALUE).stream()
@@ -124,7 +120,7 @@ public class RoleServiceTest extends DatabaseTest {
 
 		assertEquals(user.getPk(), role.getUserFk());
 		assertEquals(role.getScopeFk(), rootScope.getPk());
-		assertEquals(role.getStatus(), RoleStatus.ENABLED);
+		assertEquals(RoleStatus.ENABLED, role.getStatus());
 
 		// search for the role invitation mail
 		mailService.getMails(MailStatus.PENDING, Integer.MAX_VALUE).stream()
@@ -335,6 +331,7 @@ public class RoleServiceTest extends DatabaseTest {
 
 	private User createUser() {
 		final var user = new User();
+		user.setProjectId(studyService.getStudy().getProjectId());
 		user.setName("Luke Skywalker");
 		user.setEmail("luke.skywalker@rodano.ch");
 		user.setPassword("VERySeKuREPass!@#");
@@ -363,6 +360,7 @@ public class RoleServiceTest extends DatabaseTest {
 
 	private User createUnactivatedUser() {
 		final var user = new User();
+		user.setProjectId(studyService.getStudy().getProjectId());
 		user.setName("Darth Vader");
 		user.setEmail("darth.vader@rodano.ch");
 		userDAOService.saveUser(user, context, TEST_RATIONALE);
@@ -370,10 +368,15 @@ public class RoleServiceTest extends DatabaseTest {
 	}
 
 	private Role addAdminRole(final User user) {
+		final var scope = scopeDAOService.getRootScope(studyService.getStudy())
+			.orElseThrow(() -> new IllegalStateException("Root scope not found for study"));
+
+
 		final var role = new Role();
+		role.setProjectId(studyService.getStudy().getProjectId());
 		role.setProfile(adminProfile);
 		role.setUserFk(user.getPk());
-		role.setScopeFk(scopeDAOService.getRootScope().getPk());
+		role.setScopeFk(scope.getPk());
 		role.enable();
 		roleDAOService.saveRole(role, context, TEST_RATIONALE);
 		return role;

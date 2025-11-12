@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -27,6 +28,8 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.utils.DisplayableUtils;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
@@ -65,6 +68,7 @@ public class Validator implements Serializable, SuperDisplayable, Node, Comparab
 		return DEFAULT_COMPARATOR.compare(v1, v2);
 	};
 
+	private UUID validatorId;
 	private String id;
 	private Study study;
 
@@ -87,6 +91,20 @@ public class Validator implements Serializable, SuperDisplayable, Node, Comparab
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
 		message = new TreeMap<>();
+	}
+
+	public UUID getValidatorId() {
+		if(this.validatorId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.validatorId = deterministic(
+				this.study.getProjectId(),
+				"VALIDATOR",
+				this.id);
+		}
+		return validatorId;
+	}
+
+	public void setValidatorId(final UUID validatorId) {
+		this.validatorId = validatorId;
 	}
 
 	public final void setId(final String id) {
@@ -240,5 +258,29 @@ public class Validator implements Serializable, SuperDisplayable, Node, Comparab
 	@JsonIgnore
 	public int compareTo(final Validator otherValidator) {
 		return COMPARATOR_IMPORTANCE.compare(this, otherValidator);
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowUuid() {
+		if(this.study == null || StringUtils.isBlank(workflowId)) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW", this.workflowId);
+	}
+
+	@JsonIgnore
+	public UUID getInvalidStateUuid() {
+		if(this.study == null || StringUtils.isBlank(invalidStateId)) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW_STATE", this.workflowId + "|" + this.invalidStateId);
+	}
+
+	@JsonIgnore
+	public UUID getValidStateUuid() {
+		if(this.study == null || StringUtils.isBlank(validStateId)) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW_STATE", this.workflowId + "|" + this.validStateId);
 	}
 }

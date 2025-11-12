@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +26,8 @@ import ch.rodano.configuration.model.form.FormModel;
 import ch.rodano.configuration.model.rules.RuleConstraint;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Layout implements Node {
@@ -31,6 +35,7 @@ public class Layout implements Node {
 	private static final long serialVersionUID = -2887720419558440587L;
 
 	private FormModel formModel;
+	private UUID layoutId;
 	private String id;
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> description;
@@ -63,12 +68,14 @@ public class Layout implements Node {
 
 	public Layout(final Layout layout) {
 		formModel = layout.getFormModel();
+		layoutId = layout.getLayoutId();
 		id = layout.getId();
 		shortname = layout.getShortname();
 		description = layout.getDescription();
 		contribution = layout.isContribution();
 		type = layout.getType();
 		datasetModelId = layout.getDatasetModelId();
+		defaultSortFieldModelId = layout.getDefaultSortFieldModelId();
 		columns = layout.getColumns();
 		lines = layout.getLines();
 		textBefore = layout.getTextBefore();
@@ -85,6 +92,24 @@ public class Layout implements Node {
 	@JsonBackReference
 	public final void setFormModel(final FormModel formModel) {
 		this.formModel = formModel;
+	}
+
+	public UUID getLayoutId() {
+		if(this.layoutId == null
+			&& this.id != null && !this.id.isBlank()
+			&& this.formModel != null
+			&& this.formModel.getId() != null && !this.formModel.getId().isBlank()
+			&& this.formModel.getStudy() != null) {
+			this.layoutId = deterministic(
+				this.formModel.getStudy().getProjectId(),
+				"FORM_LAYOUT",
+				this.formModel.getId() + "|" + this.id);
+		}
+		return layoutId;
+	}
+
+	public void setLayoutId(final UUID layoutId) {
+		this.layoutId = layoutId;
 	}
 
 	public final String getId() {
@@ -170,7 +195,11 @@ public class Layout implements Node {
 
 	@JsonManagedReference
 	public final void setLines(final List<Line> lines) {
-		this.lines = lines;
+		this.lines = (lines != null) ? lines : new ArrayList<>();
+
+		for(Line line : this.lines) {
+			line.setLayout(this);
+		}
 	}
 
 	public final SortedMap<String, String> getTextBefore() {
@@ -222,6 +251,9 @@ public class Layout implements Node {
 
 	@JsonIgnore
 	public DatasetModel getDatasetModel() {
+		if(this.datasetModelId == null || this.datasetModelId.isBlank()) {
+			return null;
+		}
 		return getFormModel().getStudy().getDatasetModel(datasetModelId);
 	}
 
@@ -245,11 +277,37 @@ public class Layout implements Node {
 
 	@Override
 	public Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case LINE:
-				return Collections.unmodifiableList(lines);
-			default:
-				return Collections.emptyList();
+		if(Objects.requireNonNull(entity) == Entity.LINE) {
+			return Collections.unmodifiableList(lines);
+		}
+		return Collections.emptyList();
+	}
+
+	@JsonIgnore
+	public UUID getDatasetModelUuid() {
+		if(this.datasetModelId == null || this.datasetModelId.isBlank()) {
+			return null;
+		}
+		return getDatasetModel().getDatasetModelId();
+	}
+
+	@JsonIgnore
+	public UUID getDefaultSortFieldModelUuid() {
+		if(this.defaultSortFieldModelId == null || this.defaultSortFieldModelId.isBlank()) {
+			return null;
+		}
+
+		final var datasetModel = getDatasetModel();
+		if(datasetModel == null) {
+			return null;
+		}
+
+		try {
+			final var fieldModel = datasetModel.getFieldModel(this.defaultSortFieldModelId);
+			return fieldModel.getFieldModelId();
+		}
+		catch(Exception e) {
+			return null;
 		}
 	}
 }

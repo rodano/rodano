@@ -3,6 +3,7 @@ package ch.rodano.core.services.dao.form;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -33,8 +34,8 @@ public interface FormDAOService {
 	/**
 	 * Restore a form
 	 *
-	 * @param form    The form to restore
-	 * @param context The context in which the action takes place
+	 * @param form      The form to restore
+	 * @param context   The context in which the action takes place
 	 * @param rationale The rationale for the operation
 	 */
 	void restoreForm(Form form, DatabaseActionContext context, String rationale);
@@ -42,15 +43,15 @@ public interface FormDAOService {
 	/**
 	 * Create or update a form
 	 *
-	 * @param form    The form to create or update
-	 * @param context The context in which the action takes place
+	 * @param form      The form to create or update
+	 * @param context   The context in which the action takes place
 	 * @param rationale The rationale for the operation
 	 */
 	void saveForm(Form form, DatabaseActionContext context, String rationale);
 
-	Form getFormByScopePkAndFormModelId(Long scopePk, String formId);
+	Form getFormByScopePkAndFormModelId(Long scopePk, UUID formId);
 
-	Form getFormByEventPkAndFormModelId(Long eventPk, String formId);
+	Form getFormByEventPkAndFormModelId(Long eventPk, UUID formId);
 
 	NavigableSet<FormAuditTrail> getAuditTrails(Form form, Optional<Timeframe> timeframe, Optional<Long> actorPk);
 

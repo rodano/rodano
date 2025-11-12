@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,12 +21,15 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PaymentStep implements Serializable, SuperDisplayable, Node, Comparable<PaymentStep> {
 	@Serial
 	private static final long serialVersionUID = -3643822784996243315L;
 
+	private UUID paymentStepId;
 	private String id;
 	private PaymentPlan paymentPlan;
 
@@ -43,6 +47,25 @@ public class PaymentStep implements Serializable, SuperDisplayable, Node, Compar
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
 		distributions = new ArrayList<>();
+	}
+
+	public UUID getPaymentStepId() {
+		if(this.paymentStepId == null
+			&& this.id != null && !this.id.isBlank()
+			&& this.paymentPlan != null
+			&& this.paymentPlan.getStudy() != null
+			&& this.paymentPlan.getId() != null && !this.paymentPlan.getId().isBlank()) {
+			this.paymentStepId = deterministic(
+				this.paymentPlan.getStudy().getProjectId(),
+				"PAYMENT_STEP",
+				this.paymentPlan.getId() + "|" + this.id
+			);
+		}
+		return paymentStepId;
+	}
+
+	public void setPaymentStepId(final UUID paymentStepId) {
+		this.paymentStepId = paymentStepId;
 	}
 
 	@Override
@@ -149,5 +172,16 @@ public class PaymentStep implements Serializable, SuperDisplayable, Node, Compar
 	@Override
 	public final int compareTo(final PaymentStep o) {
 		return getPaymentPlan().getSteps().indexOf(this) - o.getPaymentPlan().getSteps().indexOf(o);
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowableUuid() {
+		if(this.workflowable == null || this.workflowable.isBlank() || this.paymentPlan == null || this.paymentPlan.getStudy() == null) {
+			return null;
+		}
+		return deterministic(
+			this.paymentPlan.getStudy().getProjectId(),
+			"EVENT_MODEL",
+			this.paymentPlan.getInvoicedScopeModel() + "|" + this.workflowable);
 	}
 }

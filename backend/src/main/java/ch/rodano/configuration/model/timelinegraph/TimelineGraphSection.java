@@ -9,18 +9,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
+import ch.rodano.configuration.model.study.Study;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @JsonInclude(Include.NON_NULL)
 public class TimelineGraphSection implements Node {
 	@Serial
 	private static final long serialVersionUID = 6494810301408433597L;
 
+	private TimelineGraph timelineGraph;
+
+	private UUID graphSectionId;
 	private String id;
 
 	//data
@@ -58,6 +68,30 @@ public class TimelineGraphSection implements Node {
 		metaFieldModelIds = new ArrayList<>();
 		label = new HashMap<>();
 		tooltip = new HashMap<>();
+	}
+
+	@JsonBackReference
+	public TimelineGraph getTimelineGraph() {
+		return timelineGraph;
+	}
+
+	@JsonBackReference
+	public void setTimelineGraph(final TimelineGraph timelineGraph) {
+		this.timelineGraph = timelineGraph;
+	}
+
+	public UUID getGraphSectionId() {
+		if(this.graphSectionId == null && this.id != null && !this.id.isBlank() && this.timelineGraph.getStudy() != null) {
+			this.graphSectionId = deterministic(
+				this.timelineGraph.getStudy().getProjectId(),
+				"TIMELINE_GRAPH_SECTION",
+				this.timelineGraph.getId() + "|" + this.id);
+		}
+		return graphSectionId;
+	}
+
+	public void setGraphSectionId(final UUID graphSectionId) {
+		this.graphSectionId = graphSectionId;
 	}
 
 	public final String getId() {
@@ -265,9 +299,72 @@ public class TimelineGraphSection implements Node {
 		return Entity.TIMELINE_GRAPH_SECTION;
 	}
 
-
 	@Override
 	public Collection<Node> getChildrenWithEntity(final Entity entity) {
 		return Collections.emptyList();
+	}
+
+	@JsonIgnore
+	private Study study() {
+		return (this.timelineGraph != null) ? this.timelineGraph.getStudy() : null;
+	}
+
+	@JsonIgnore
+	public List<UUID> getEventModelUuids() {
+		final Study s = study();
+		if(s == null || this.eventModelIds == null) {
+			return List.of();
+		}
+		return eventModelIds.stream()
+			.filter(c -> c != null && !c.isBlank())
+			.map(c -> deterministic(s.getProjectId(), "EVENT_MODEL", this.timelineGraph.getScopeModelId() + "|" + c))
+			.collect(Collectors.toList());
+	}
+
+	@JsonIgnore
+	public UUID getDatasetModelUuid() {
+		final Study s = study();
+		return (s == null || this.datasetModelId == null || this.datasetModelId.isBlank())
+			? null : deterministic(s.getProjectId(), "DATASET_MODEL", this.datasetModelId);
+	}
+
+	@JsonIgnore
+	public UUID getDateFieldModelUuid() {
+		final Study s = study();
+		return (s == null || this.dateFieldModelId == null || this.dateFieldModelId.isBlank())
+			? null : deterministic(s.getProjectId(), "FIELD_MODEL", this.datasetModelId + "|" + this.dateFieldModelId);
+	}
+
+	@JsonIgnore
+	public UUID getEndDateFieldModelUuid() {
+		final Study s = study();
+		return (s == null || this.endDateFieldModelId == null || this.endDateFieldModelId.isBlank())
+			? null : deterministic(s.getProjectId(), "FIELD_MODEL", this.datasetModelId + "|" + this.endDateFieldModelId);
+	}
+
+	@JsonIgnore
+	public UUID getValueFieldModelUuid() {
+		final Study s = study();
+		return (s == null || this.valueFieldModelId == null || this.valueFieldModelId.isBlank())
+			? null : deterministic(s.getProjectId(), "FIELD_MODEL", this.datasetModelId + "|" + this.valueFieldModelId);
+	}
+
+	@JsonIgnore
+	public UUID getLabelFieldModelUuid() {
+		final Study s = study();
+		return (s == null || this.labelFieldModelId == null || this.labelFieldModelId.isBlank())
+			? null : deterministic(s.getProjectId(), "FIELD_MODEL", this.datasetModelId + "|" + this.labelFieldModelId);
+	}
+
+	@JsonIgnore
+	public List<UUID> getMetaFieldModelUuids() {
+		final Study s = study();
+		if(s == null || this.metaFieldModelIds == null) {
+			return List.of();
+		}
+		return metaFieldModelIds.stream()
+			.filter(c -> c != null && !c.isBlank())
+			.map(c -> deterministic(s.getProjectId(), "FIELD_MODEL", this.datasetModelId + "|" + c))
+			.collect(Collectors.toList());
 	}
 }

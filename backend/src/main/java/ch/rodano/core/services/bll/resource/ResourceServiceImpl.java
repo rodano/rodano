@@ -25,8 +25,12 @@ import ch.rodano.core.model.resource.ResourceSearch;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.mail.MailService;
 import ch.rodano.core.services.bll.scope.ScopeService;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.resource.ResourceDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @Service
 public class ResourceServiceImpl implements ResourceService {
@@ -37,19 +41,25 @@ public class ResourceServiceImpl implements ResourceService {
 	private final Configurator configurator;
 	private final MailService mailService;
 	private final ScopeService scopeService;
+	private final ProjectIdResolver projectIdResolver;
+	private final StudyService studyService;
 
 	public ResourceServiceImpl(
 		final ResourceDAOService resourceDAOService,
 		final Configurator configurator,
 		final MailService mailService,
 		final ScopeService scopeService,
-		final ScopeDAOService scopeDAOService
+		final ScopeDAOService scopeDAOService,
+		final ProjectIdResolver projectIdResolver,
+		final StudyService studyService
 	) {
 		this.scopeDAOService = scopeDAOService;
 		this.resourceDAOService = resourceDAOService;
 		this.configurator = configurator;
 		this.mailService = mailService;
 		this.scopeService = scopeService;
+		this.projectIdResolver = projectIdResolver;
+		this.studyService = studyService;
 	}
 
 	@Override
@@ -68,6 +78,7 @@ public class ResourceServiceImpl implements ResourceService {
 		final Actor actor,
 		final DatabaseActionContext context
 	) {
+		resource.setProjectId(projectIdResolver.id());
 		resource.setUuid(UUID.randomUUID().toString());
 		resource.setUserFk(actor.getPk());
 		saveResource(resource, context, "Create a resource");
@@ -120,7 +131,9 @@ public class ResourceServiceImpl implements ResourceService {
 		resourceDAOService.saveResource(resource, context, "Attach a file to the resource");
 
 		// Notify users of the new file for all categories, except the NEWS category
-		if(!resource.getCategoryId().equals("NEWS") && context.actor().isPresent() && context.actor().get() instanceof final User user) {
+		final var newsUUid = deterministic(studyService.getStudy().getProjectId(), "RESOURCE_CATEGORY", "NEWS");
+		final boolean isNews = newsUUid.equals(resource.getCategoryId());
+		if(!isNews && context.actor().isPresent() && context.actor().get() instanceof final User user) {
 			mailService.sendResourcePublicationNotification(user, resource, context);
 		}
 
@@ -152,6 +165,7 @@ public class ResourceServiceImpl implements ResourceService {
 
 	/**
 	 * Verify if the resource can be made public, otherwise throw an exception.
+	 *
 	 * @param resource The resource to be made public
 	 * @throws BadArgumentException Thrown in case of non-conformity
 	 */

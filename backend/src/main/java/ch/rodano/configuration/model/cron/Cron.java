@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -16,11 +17,14 @@ import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 public class Cron implements Node {
 
 	@Serial
 	private static final long serialVersionUID = -4213624739903698733L;
 
+	private UUID cronId;
 	private String id;
 	private Study study;
 
@@ -34,6 +38,20 @@ public class Cron implements Node {
 	public Cron() {
 		description = new TreeMap<>();
 		rules = new ArrayList<>();
+	}
+
+	public UUID getCronId() {
+		if(this.cronId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.cronId = deterministic(
+				this.study.getProjectId(),
+				"CRON",
+				this.id);
+		}
+		return cronId;
+	}
+
+	public void setCronId(final UUID cronId) {
+		this.cronId = cronId;
 	}
 
 	public final String getId() {

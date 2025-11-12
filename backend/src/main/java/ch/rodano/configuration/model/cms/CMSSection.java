@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -28,6 +29,7 @@ public class CMSSection implements Node, Comparable<CMSSection>, Cloneable {
 
 	private CMSLayout layout;
 
+	protected UUID menuSectionId;
 	protected String id;
 	protected Map<String, String> labels;
 
@@ -49,6 +51,14 @@ public class CMSSection implements Node, Comparable<CMSSection>, Cloneable {
 
 	public final void setLayout(final CMSLayout layout) {
 		this.layout = layout;
+	}
+
+	public UUID getMenuSectionId() {
+		return menuSectionId;
+	}
+
+	public void setMenuSectionId(final UUID menuSectionId) {
+		this.menuSectionId = menuSectionId;
 	}
 
 	public final String getId() {

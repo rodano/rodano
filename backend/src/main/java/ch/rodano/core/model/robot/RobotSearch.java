@@ -1,6 +1,7 @@
 package ch.rodano.core.model.robot;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -14,7 +15,7 @@ public class RobotSearch extends PaginatedSearch<RobotSearch> {
 	private Optional<String> name = Optional.empty();
 
 	@Schema(description = "Profile id")
-	private Optional<String> profileId = Optional.empty();
+	private Optional<UUID> profileId = Optional.empty();
 
 	@Schema(description = "Include the deleted resources?")
 	private boolean includeDeleted;
@@ -36,11 +37,11 @@ public class RobotSearch extends PaginatedSearch<RobotSearch> {
 		return this;
 	}
 
-	public Optional<String> getProfileId() {
+	public Optional<UUID> getProfileId() {
 		return profileId;
 	}
 
-	public RobotSearch setProfileId(final Optional<String> profileId) {
+	public RobotSearch setProfileId(final Optional<UUID> profileId) {
 		this.profileId = profileId;
 		return this;
 	}

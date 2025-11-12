@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -36,7 +37,10 @@ import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.form.FormDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 import ch.rodano.core.services.rule.RuleService;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @Service
 public class WorkflowStatusServiceImpl implements WorkflowStatusService {
@@ -52,6 +56,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 	private final DatasetDAOService datasetDAOService;
 	private final FormDAOService formDAOService;
 	private final FieldDAOService fieldDAOService;
+	private final ProjectIdResolver projectIdResolver;
 
 	public WorkflowStatusServiceImpl(
 		final StudyService studyService,
@@ -62,7 +67,8 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final EventDAOService eventDAOService,
 		final DatasetDAOService datasetDAOService,
 		final FormDAOService formDAOService,
-		final FieldDAOService fieldDAOService
+		final FieldDAOService fieldDAOService,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.studyService = studyService;
 		this.workflowStatusDAOService = workflowStatusDAOService;
@@ -73,6 +79,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		this.datasetDAOService = datasetDAOService;
 		this.formDAOService = formDAOService;
 		this.fieldDAOService = fieldDAOService;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	@Override
@@ -97,8 +104,31 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
+
+		if(state.getWorkflowStateId() == null) {
+			state.setWorkflow(workflowStatus.getWorkflow());
+			if(state.getWorkflowStateId() == null) {
+				final var workflowCode = workflowStatus.getWorkflow().getId();
+				final var fallback = deterministic(projectIdResolver.id(), "WORKFLOW_STATE", workflowCode + "|" + state.getId());
+				state.setWorkflowStateId(fallback);
+			}
+		}
+
+		if(workflowStatus.getWorkflowStateId() == null && workflowStatus.getState() != null) {
+			final var currentState = workflowStatus.getState();
+			if(currentState.getWorkflowStateId() == null) {
+				currentState.setWorkflow(workflowStatus.getWorkflow());
+				if(currentState.getWorkflowStateId() == null) {
+					final var workflowCode = workflowStatus.getWorkflow().getId();
+					final var fallback = deterministic(projectIdResolver.id(), "WORKFLOW_STATE", workflowCode + "|" + currentState.getId());
+					currentState.setWorkflowStateId(fallback);
+				}
+			}
+			workflowStatus.setWorkflowStateId(currentState.getWorkflowStateId());
+		}
+
 		//update modification date, add trail and execute rules only if workflow status changes
-		if(!state.getId().equals(workflowStatus.getStateId())) {
+		if(!state.getWorkflowStateId().equals(workflowStatus.getWorkflowStateId())) {
 			family.checkNotLocked();
 			family.checkNotDeleted();
 
@@ -152,6 +182,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
+		logger.info("Creating workflow status for workflow: {}", workflow.getId());
 		family.checkNotLocked();
 		family.checkNotDeleted();
 
@@ -165,6 +196,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		//however the rules associated to their creation action can be executed
 		//for example this is very useful to initialize workflows on fields from a scope (even if the workflow on the scope is an aggregated workflow)
 		if(workflow.isAggregator()) {
+			logger.info("Workflow {} is aggregator, skipping database insert", workflow.getId());
 			//execute rules only if workflow is initialized by a click on a button
 			if(action.isPresent()) {
 				//execute action rules
@@ -187,6 +219,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		}
 
 		final var ws = new WorkflowStatus();
+		ws.setProjectId(projectIdResolver.id());
 		ws.setScopeFk(family.scope().getPk());
 		family.event().map(Event::getPk).ifPresent(ws::setEventFk);
 		family.form().map(Form::getPk).ifPresent(ws::setFormFk);
@@ -195,11 +228,39 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		ws.setWorkflow(workflow);
 		ws.setTriggerMessage(rationale);
 		//use orElseGet to retrieve the workflow initial state only if the state is not provided
-		//retrieving the initial state will fail if the workflow has none
-		ws.setState(state.orElseGet(() -> workflow.getInitialState()));
+		// retrieving the initial state will fail if the workflow has none
+		final var chosenState = state.orElseGet(workflow::getInitialState);
+		logger.info("Chosen state: {} for workflow: {}", chosenState.getId(), workflow.getId());
+
+		ws.setState(chosenState);
+		final UUID stateUuid = chosenState.getWorkflowStateId();
+		logger.info("State UUID: {}", stateUuid);
+		if(stateUuid == null) {
+			logger.error("State UUID is NULL for state: {} in workflow: {}", chosenState.getId(), workflow.getId());
+			final var workflowCode = ws.getWorkflow().getId();
+			final var fallback = deterministic(projectIdResolver.id(), "WORKFLOW_STATE", workflowCode + "|" + chosenState.getId());
+			logger.info("Using fallback UUID: {}", fallback);
+			chosenState.setWorkflowStateId(fallback);
+			ws.setWorkflowStateId(fallback);
+		}
+		else {
+			ws.setWorkflowStateId(stateUuid);
+		}
+
+		logger.info("About to save workflow status with state UUID: {}", ws.getWorkflowStateId());
+
 		action.ifPresent(ws::setAction);
 		validator.ifPresent(ws::setValidator);
 		profile.ifPresent(ws::setProfile);
+
+		try {
+			workflowStatusDAOService.saveWorkflowStatus(ws, context, rationale);
+			logger.info("Successfully saved workflow status");
+		}
+		catch(Exception e) {
+			logger.error("Failed to save workflow status", e);
+			throw e;
+		}
 
 		workflowStatusDAOService.saveWorkflowStatus(ws, context, rationale);
 
@@ -301,9 +362,27 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		return workflowable.getWorkflowableModel().getWorkflows().stream()
-			.filter(w -> !w.isAggregator() && w.isMandatory())
-			.map(w -> create(family, workflowable, w, data, context, rationale))
+		logger.info("=== createAll called for workflowable: {} ===", workflowable.getWorkflowableModel().getId());
+
+		final var workflows = workflowable.getWorkflowableModel().getWorkflows();
+		logger.info("Total workflows in model: {}", workflows.size());
+
+		final var filteredWorkflows = workflows.stream()
+			.filter(w -> {
+				final boolean isAggregator = w.isAggregator();
+				final boolean isMandatory = w.isMandatory();
+				logger.info("Workflow {}: isAggregator={}, isMandatory={}", w.getId(), isAggregator, isMandatory);
+				return !isAggregator && isMandatory;
+			})
+			.toList();
+
+		logger.info("Filtered workflows to create: {}", filteredWorkflows.size());
+
+		return filteredWorkflows.stream()
+			.map(w -> {
+				logger.info("Creating workflow: {}", w.getId());
+				return create(family, workflowable, w, data, context, rationale);
+			})
 			.toList();
 	}
 
@@ -357,7 +436,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 	@Override
 	public List<WorkflowStatus> getAll(final Workflowable workflowable, final WorkflowState workflowState) {
 		return getAll(workflowable, workflowState.getWorkflow()).stream()
-			.filter(w -> w.getStateId().equals(workflowState.getId()))
+			.filter(w -> w.getWorkflowStateId().equals(workflowState.getWorkflowStateId()))
 			.toList();
 	}
 
@@ -455,18 +534,18 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 	}
 
 	private List<WorkflowStatus> getAll(final Scope scope, final Workflow workflow) {
-		return workflowStatusDAOService.getWorkflowStatusesByScopePk(scope.getPk(), workflow.getId());
+		return workflowStatusDAOService.getWorkflowStatusesByScopePk(scope.getPk(), workflow.getWorkflowId());
 	}
 
 	private List<WorkflowStatus> getAll(final Event event, final Workflow workflow) {
-		return workflowStatusDAOService.getWorkflowStatusesByEventPk(event.getPk(), workflow.getId());
+		return workflowStatusDAOService.getWorkflowStatusesByEventPk(event.getPk(), workflow.getWorkflowId());
 	}
 
 	private List<WorkflowStatus> getAll(final Form form, final Workflow workflow) {
-		return workflowStatusDAOService.getWorkflowStatusesByFormPk(form.getPk(), workflow.getId());
+		return workflowStatusDAOService.getWorkflowStatusesByFormPk(form.getPk(), workflow.getWorkflowId());
 	}
 
 	private List<WorkflowStatus> getAll(final Field field, final Workflow workflow) {
-		return workflowStatusDAOService.getWorkflowStatusesByFieldPk(field.getPk(), workflow.getId());
+		return workflowStatusDAOService.getWorkflowStatusesByFieldPk(field.getPk(), workflow.getWorkflowId());
 	}
 }

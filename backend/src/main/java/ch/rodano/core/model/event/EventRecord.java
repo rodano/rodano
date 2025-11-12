@@ -1,16 +1,18 @@
 package ch.rodano.core.model.event;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 public class EventRecord {
 
 	protected boolean deleted;
 
+	protected UUID projectId;
 	protected String id;
 	protected Long scopeFk;
-	protected String scopeModelId;
+	protected UUID scopeModelId;
 	protected Integer eventGroupNumber;
-	protected String eventModelId;
+	protected UUID eventModelId;
 	protected ZonedDateTime expectedDate;
 	protected ZonedDateTime date;
 	protected ZonedDateTime endDate;
@@ -30,6 +32,14 @@ public class EventRecord {
 		this.deleted = deleted;
 	}
 
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -46,11 +56,11 @@ public class EventRecord {
 		this.scopeFk = scopeFk;
 	}
 
-	public String getScopeModelId() {
+	public UUID getScopeModelId() {
 		return scopeModelId;
 	}
 
-	public void setScopeModelId(final String scopeModelId) {
+	public void setScopeModelId(final UUID scopeModelId) {
 		this.scopeModelId = scopeModelId;
 	}
 
@@ -62,11 +72,11 @@ public class EventRecord {
 		this.eventGroupNumber = eventGroupNumber;
 	}
 
-	public String getEventModelId() {
+	public UUID getEventModelId() {
 		return eventModelId;
 	}
 
-	public void setEventModelId(final String eventModelId) {
+	public void setEventModelId(final UUID eventModelId) {
 		this.eventModelId = eventModelId;
 	}
 

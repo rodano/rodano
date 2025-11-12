@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -24,6 +25,8 @@ import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PrivacyPolicy implements Serializable, SuperDisplayable, Node, Comparable<PrivacyPolicy> {
@@ -32,6 +35,7 @@ public class PrivacyPolicy implements Serializable, SuperDisplayable, Node, Comp
 
 	private Study study;
 
+	private UUID privacyPolicyId;
 	private String id;
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> longname;
@@ -56,6 +60,20 @@ public class PrivacyPolicy implements Serializable, SuperDisplayable, Node, Comp
 	@JsonBackReference
 	public final void setStudy(final Study study) {
 		this.study = study;
+	}
+
+	public UUID getPrivacyPolicyId() {
+		if(this.privacyPolicyId == null && this.study != null && this.id != null && !this.id.isBlank()) {
+			this.privacyPolicyId = deterministic(
+				this.study.getProjectId(),
+				"PRIVACY_POLICY",
+				this.id);
+		}
+		return privacyPolicyId;
+	}
+
+	public void setPrivacyPolicyId(final UUID privacyPolicyId) {
+		this.privacyPolicyId = privacyPolicyId;
 	}
 
 	@Override
@@ -133,5 +151,20 @@ public class PrivacyPolicy implements Serializable, SuperDisplayable, Node, Comp
 	@Override
 	public final int compareTo(final PrivacyPolicy o) {
 		return id.compareTo(o.id);
+	}
+
+	@JsonIgnore
+	public String getDefaultLocalizedShortname() {
+		return getLocalizedShortname(study == null ? null : study.getDefaultLanguage().getId());
+	}
+
+	@JsonIgnore
+	public List<UUID> getProfileUuids() {
+		if(this.study == null || this.profileIds == null) {
+			return List.of();
+		}
+		return profileIds.stream()
+			.map(code -> deterministic(this.study.getProjectId(), "PROFILE", code))
+			.toList();
 	}
 }

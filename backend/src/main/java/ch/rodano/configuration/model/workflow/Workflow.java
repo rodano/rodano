@@ -13,6 +13,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -35,6 +36,8 @@ import ch.rodano.configuration.model.rights.Attributable;
 import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Workflow implements SuperDisplayable, Serializable, Attributable<Workflow>, Node {
@@ -55,6 +58,7 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 		};
 	}
 
+	private UUID workflowId;
 	private String id;
 	private Study study;
 
@@ -86,6 +90,20 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 		actions = new TreeSet<>();
 		mandatory = true;
 		message = new TreeMap<>();
+	}
+
+	public UUID getWorkflowId() {
+		if(this.workflowId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.workflowId = deterministic(
+				this.study.getProjectId(),
+				"WORKFLOW",
+				this.id);
+		}
+		return workflowId;
+	}
+
+	public void setWorkflowId(final UUID workflowId) {
+		this.workflowId = workflowId;
 	}
 
 	@Override
@@ -150,6 +168,11 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	@JsonManagedReference
 	public void setStates(final List<WorkflowState> states) {
 		this.states = states;
+		if(this.states != null) {
+			for(final var s : this.states) {
+				s.setWorkflow(this);
+			}
+		}
 	}
 
 	@JsonManagedReference
@@ -212,7 +235,7 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 
 	@JsonIgnore
 	public final boolean isAggregator() {
-		return StringUtils.isNotBlank(aggregateWorkflowId);
+		return aggregateWorkflowId != null;
 	}
 
 	public final String getAggregateWorkflowId() {
@@ -256,11 +279,37 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	}
 
 	@JsonIgnore
-	public WorkflowState getState(final String stateId) {
+	public WorkflowState getState(final UUID stateId) {
+		var state = getStates().stream()
+			.filter(s -> stateId != null && stateId.equals(s.getWorkflowStateId()))
+			.findFirst();
+
+		if(state.isPresent()) {
+			return state.get();
+		}
+
+		if(study != null && stateId != null) {
+			state = getStates().stream()
+				.filter(s -> {
+					final UUID regeneratedId = deterministic(study.getProjectId(), "WORKFLOW_STATE", workflowId + "|" + s.getId());
+					return stateId.equals(regeneratedId);
+				})
+				.findFirst();
+
+			if(state.isPresent()) {
+				return state.get();
+			}
+		}
+
+		throw new NoNodeException(this, Entity.WORKFLOW_STATE, stateId != null ? stateId.toString() : "null");
+	}
+
+	@JsonIgnore
+	public WorkflowState getState(final String stateCode) {
 		return getStates().stream()
-			.filter(s -> s.getId().equals(stateId))
+			.filter(s -> s.getId().equals(stateCode))
 			.findFirst()
-			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_STATE, stateId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_STATE, stateCode));
 	}
 
 	@JsonIgnore
@@ -333,5 +382,29 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 			case ACTION -> Collections.unmodifiableSet(actions);
 			default -> Collections.emptyList();
 		};
+	}
+
+	@JsonIgnore
+	public UUID getInitialStateUuid() {
+		if(this.study == null || StringUtils.isBlank(initialStateId)) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW_STATE", this.workflowId + "|" + this.initialStateId);
+	}
+
+	@JsonIgnore
+	public UUID getAggregateWorkflowUuid() {
+		if(this.study == null || StringUtils.isBlank(aggregateWorkflowId)) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW", this.aggregateWorkflowId);
+	}
+
+	@JsonIgnore
+	public UUID getActionUuid() {
+		if(this.study == null || StringUtils.isBlank(actionId)) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW_ACTION", this.workflowId + "|" + this.actionId);
 	}
 }

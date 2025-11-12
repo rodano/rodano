@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
@@ -18,7 +18,9 @@ import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.chart.ChartDatasetDTO;
 import ch.rodano.core.model.chart.ChartDatasetPoint;
 import ch.rodano.core.model.scope.Scope;
+import ch.rodano.core.services.bll.study.StudyService;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.Tables.SCOPE;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
 import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATUS;
@@ -30,11 +32,15 @@ public class EnrollmentChartFactoryService {
 
 	private final DateConverter dateConverter;
 
+	private final StudyService studyService;
+
 	public EnrollmentChartFactoryService(
-		final DSLContext create
+		final DSLContext create,
+		final StudyService studyService
 	) {
 		this.create = create;
 		this.dateConverter = new DateConverter();
+		this.studyService = studyService;
 	}
 
 	private Map<ZonedDateTime, Integer> getEnrolledScopesPerDate(final Chart chart, final Scope scope) {
@@ -44,17 +50,25 @@ public class EnrollmentChartFactoryService {
 			.from(SCOPE)
 			.join(SCOPE_ANCESTOR).on(SCOPE.PK.eq(SCOPE_ANCESTOR.SCOPE_FK).and(SCOPE_ANCESTOR.DEFAULT.isTrue()));
 
-		if(StringUtils.isNotEmpty(chart.getEnrollmentWorkflowId()) && !chart.getEnrollmentStateIds().isEmpty()) {
+		if(chart.getEnrollmentWorkflowId() != null && chart.getEnrollmentStateIds() != null && !chart.getEnrollmentStateIds().isEmpty()) {
+			final var study = studyService.getStudy();
+			final String workflowCode = chart.getEnrollmentWorkflowId();
+			final var stateUuids = chart.getEnrollmentStateIds().stream()
+				.filter(Objects::nonNull)
+				.map(String::trim)
+				.map(code -> deterministic(study.getProjectId(), "WORKFLOW_STATE", workflowCode + "|" + code))
+				.toList();
+
 			query = query.innerJoin(WORKFLOW_STATUS)
 				.on(
 					SCOPE.PK.eq(WORKFLOW_STATUS.SCOPE_FK)
-						.and(WORKFLOW_STATUS.WORKFLOW_ID.eq(chart.getEnrollmentWorkflowId()))
-						.and(WORKFLOW_STATUS.STATE_ID.in(chart.getEnrollmentStateIds()))
+						.and(WORKFLOW_STATUS.WORKFLOW_ID.eq(chart.getEnrollmentWorkflowUuid()))
+						.and(WORKFLOW_STATUS.WORKFLOW_STATE_ID.in(stateUuids))
 						.and(WORKFLOW_STATUS.DELETED.isFalse())
 				);
 		}
 		query.where(
-				SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId())
+				SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelUuid())
 					.and(SCOPE.DELETED.isFalse())
 					.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
 			)

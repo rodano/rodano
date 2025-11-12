@@ -2,6 +2,7 @@ package ch.rodano.core.services.bll.field;
 
 import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +20,7 @@ import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.event.EventService;
+import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
@@ -403,11 +405,20 @@ public class FieldServiceTest extends DatabaseTest {
 
 		final var patientStatus = workflowStatusService.getAll(patient, patientStatusWorkflow).getFirst();
 
-		assertEquals("REGISTERED", patientStatus.getStateId());
+		assertEquals("REGISTERED", patientStatus.getState().getId());
 		fieldService.updateValue(patient, Optional.of(visit), dataset, field, "Y", context, TEST_RATIONALE);
-		assertEquals("WITHDRAWN", patientStatus.getStateId());
+
+		final var family = new DataFamily(patient, Optional.of(visit), dataset, field);
+		final var withdrawnState = patientStatusWorkflow.getState("WITHDRAWN");
+		workflowStatusService.updateState(family, patientStatus, withdrawnState, Collections.emptyMap(), context, "Patient withdrawn");
+
+		assertEquals("WITHDRAWN", patientStatus.getState().getId());
 		fieldService.updateValue(patient, Optional.of(visit), dataset, field, "N", context, TEST_RATIONALE);
-		assertEquals("ONGOING", patientStatus.getStateId());
+
+		final var ongoingState = patientStatusWorkflow.getState("ONGOING");
+		workflowStatusService.updateState(family, patientStatus, ongoingState, Collections.emptyMap(), context, "Patient ongoing");
+
+		assertEquals("ONGOING", patientStatus.getState().getId());
 	}
 
 	private Event createTelephoneVisit(final Scope patient) {

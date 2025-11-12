@@ -8,8 +8,10 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -79,12 +81,12 @@ public class TimelineServiceImpl implements TimelineService {
 	private SortedSet<TimelineGraph> getGraphConfigs(final List<Role> roles, final Scope scope) {
 		return roles.stream().map(Role::getProfile)
 			.flatMap(profile -> profile.getGraphConfigs().stream())
-			.filter(config -> config.getScopeModelId().equals(scope.getScopeModelId()))
+			.filter(config -> config.getScopeModelUuid().equals(scope.getScopeModelId()))
 			.collect(Collectors.toCollection(TreeSet::new));
 	}
 
 	private Optional<Event> getFirstEventOfType(final List<Event> events, final String eventModelId) {
-		if(StringUtils.isNotBlank(eventModelId)) {
+		if(eventModelId != null) {
 			for(final Event v : events) {
 				if(v.getEventModelId().equals(eventModelId)) {
 					return Optional.of(v);
@@ -95,7 +97,7 @@ public class TimelineServiceImpl implements TimelineService {
 	}
 
 	private Optional<Event> getLastEventOfType(final List<Event> events, final String eventModelId) {
-		if(StringUtils.isNotBlank(eventModelId)) {
+		if(eventModelId != null) {
 			for(final Event v : events) {
 				if(v.getEventModelId().equals(eventModelId)) {
 					return Optional.of(v);
@@ -116,13 +118,13 @@ public class TimelineServiceImpl implements TimelineService {
 		final Optional<Event> latestDoneEvent = allEvents.stream().filter(expectedPredicate.negate()).max(Event::compareTo);
 
 		//retrieve scope forms by form model id
-		final Map<String, Long> formsByFormModelId = create.select(FORM.FORM_MODEL_ID, FORM.PK)
+		final Map<UUID, Long> formsByFormModelId = create.select(FORM.FORM_MODEL_ID, FORM.PK)
 			.from(FORM)
 			.where(FORM.SCOPE_FK.eq(scope.getPk()))
 			.fetchMap(FORM.FORM_MODEL_ID, FORM.PK);
 
 		//retrieve forms by events and form model ids
-		final Map<Long, Map<String, Long>> formsByEventPkAndFormModelId = create.select(
+		final Map<Long, Map<UUID, Long>> formsByEventPkAndFormModelId = create.select(
 				FORM.EVENT_FK,
 				DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
 			).from(FORM)
@@ -137,7 +139,7 @@ public class TimelineServiceImpl implements TimelineService {
 			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelId()).orElse(allEvents.getFirst());
 			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStopEventModelId()).orElse(allEvents.getLast());
 			//sort these events because in some cases, the stop event may be before the start event
-			final var dates = List.of(startEvent.getDateOrExpectedDate(), stopEvent.getDateOrExpectedDate()).stream().sorted().toList();
+			final var dates = Stream.of(startEvent.getDateOrExpectedDate(), stopEvent.getDateOrExpectedDate()).sorted().toList();
 			if(!dates.get(0).equals(dates.get(1))) {
 				period.setStartDate(dates.get(0));
 				period.setStopDate(dates.get(1));
@@ -217,7 +219,7 @@ public class TimelineServiceImpl implements TimelineService {
 						.leftJoin(FIELD).on(FIELD.DATASET_FK.eq(DATASET.PK))
 						.leftJoin(EVENT).on(DATASET.EVENT_FK.eq(EVENT.PK))
 						.where(
-							DATASET.DATASET_MODEL_ID.eq(section.getDatasetModelId())
+							DATASET.DATASET_MODEL_ID.eq(section.getDatasetModelUuid())
 								.and(DATASET.SCOPE_FK.eq(scope.getPk()).or(DATASET.EVENT_FK.in(eventPks)))
 								.and(DATASET.DELETED.isFalse())
 								.and(FIELD.FIELD_MODEL_ID.isNull().or(FIELD.FIELD_MODEL_ID.in(sectionFieldModelIds)))
@@ -234,9 +236,9 @@ public class TimelineServiceImpl implements TimelineService {
 						final var recordByFieldModelId = entry.getValue().intoMap(FIELD.FIELD_MODEL_ID);
 
 						//date
-						if(StringUtils.isNotBlank(section.getDateFieldModelId())) {
+						if(section.getDateFieldModelId() != null) {
 							referenceFieldModel = datasetModel.getFieldModel(section.getDateFieldModelId());
-							final var value = recordByFieldModelId.get(section.getDateFieldModelId()).get(FIELD.VALUE);
+							final var value = recordByFieldModelId.get(section.getDateFieldModelUuid()).get(FIELD.VALUE);
 							//unable to add date to graph if it is totally unknown
 							if(value == null) {
 								continue;
@@ -257,8 +259,8 @@ public class TimelineServiceImpl implements TimelineService {
 						//end date
 						//find end date in the selected field or use the end date of the event
 						ZonedDateTime endDate = null;
-						if(StringUtils.isNotBlank(section.getEndDateFieldModelId())) {
-							final var value = recordByFieldModelId.get(section.getEndDateFieldModelId()).get(FIELD.VALUE);
+						if(section.getEndDateFieldModelId() != null) {
+							final var value = recordByFieldModelId.get(section.getEndDateFieldModelUuid()).get(FIELD.VALUE);
 							if(value != null) {
 								final var date = PartialDate.of(value);
 								final Optional<ZonedDateTime> zonedDate = date.toZonedDateTime();
@@ -284,9 +286,9 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 
 						//value
-						if(StringUtils.isNotBlank(section.getValueFieldModelId())) {
+						if(section.getValueFieldModelId() != null) {
 							referenceFieldModel = datasetModel.getFieldModel(section.getValueFieldModelId());
-							final var value = recordByFieldModelId.get(referenceFieldModel.getId()).get(FIELD.VALUE);
+							final var value = recordByFieldModelId.get(referenceFieldModel.getFieldModelId()).get(FIELD.VALUE);
 
 							//display only non empty value
 							if(StringUtils.isBlank(value)) {
@@ -297,9 +299,9 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 
 						//label
-						if(StringUtils.isNotBlank(section.getLabelFieldModelId())) {
+						if(section.getLabelFieldModelId() != null) {
 							referenceFieldModel = datasetModel.getFieldModel(section.getLabelFieldModelId());
-							final var value = recordByFieldModelId.get(referenceFieldModel.getId()).get(FIELD.VALUE);
+							final var value = recordByFieldModelId.get(referenceFieldModel.getFieldModelId()).get(FIELD.VALUE);
 							//display only non empty value
 							if(StringUtils.isNotBlank(value)) {
 								//TODO find a proper way to calculate the actual label based on custom possible values
@@ -313,7 +315,7 @@ public class TimelineServiceImpl implements TimelineService {
 							final var formModel = referenceFieldModel.getFormModels().stream()
 								.findFirst();
 							if(formModel.isPresent()) {
-								final var formModelId = formModel.get().getId();
+								final var formModelId = formModel.get().getFormModelId();
 								final var baseLink = String.format("/crf/%s", scope.getPk());
 								//find form
 								if(eventPk == null) {
@@ -331,7 +333,7 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 
 						//add meta data
-						section.getMetaFieldModelIds().forEach(fieldModelId -> {
+						section.getMetaFieldModelUuids().forEach(fieldModelId -> {
 							final var value = recordByFieldModelId.get(fieldModelId).get(FIELD.VALUE);
 							graphValue.getMetadata().put(fieldModelId, value);
 						});

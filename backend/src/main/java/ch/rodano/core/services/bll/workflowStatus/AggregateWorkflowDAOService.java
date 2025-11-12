@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -15,7 +16,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.GroupConcatOrderByStep;
 import org.jooq.GroupField;
-import org.jooq.Record16;
+import org.jooq.Record17;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
@@ -69,13 +70,13 @@ public class AggregateWorkflowDAOService {
 			.toList();
 	}
 
-	private final GroupConcatOrderByStep STATE_IDS = DSL.groupConcatDistinct(WORKFLOW_STATUS.STATE_ID);
+	private final GroupConcatOrderByStep STATE_IDS = DSL.groupConcatDistinct(WORKFLOW_STATUS.WORKFLOW_STATE_ID);
 
 	private Field<String> constructWorkflowField(final List<Workflow> workflows) {
 		if(workflows.size() == 1) {
 			return DSL.inline(workflows.getFirst().getId());
 		}
-		final var values = workflows.stream().collect(Collectors.toMap(Workflow::getAggregateWorkflowId, Workflow::getId));
+		final var values = workflows.stream().collect(Collectors.toMap(Workflow::getAggregateWorkflowUuid, Workflow::getId));
 		return DSL.case_(WORKFLOW_STATUS.WORKFLOW_ID).mapValues(values);
 	}
 
@@ -108,11 +109,11 @@ public class AggregateWorkflowDAOService {
 	}
 
 	private Field<String> constructStateCases(final List<Workflow> workflows) {
-		final var values = workflows.stream().collect(Collectors.toMap(w -> DSL.inline(w.getAggregateWorkflowId()), w -> constructStateCase(w)));
+		final var values = workflows.stream().collect(Collectors.toMap(w -> DSL.inline(w.getAggregateWorkflowUuid()), this::constructStateCase));
 		return DSL.case_(WORKFLOW_STATUS.WORKFLOW_ID).mapFields(values);
 	}
 
-	public Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> generateScopeQuery(
+	public Select<Record17<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, UUID, String, String, UUID, UUID, String, UUID>> generateScopeQuery(
 		final Optional<Workflow> workflow,
 		final Optional<Collection<Long>> scopePks
 	) {
@@ -126,9 +127,7 @@ public class AggregateWorkflowDAOService {
 		//select only workflow that could be aggregated
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflows.stream().map(Workflow::getAggregateWorkflowId).toList()));
 
-		if(scopePks.isPresent()) {
-			conditions.add(WORKFLOW_STATUS.SCOPE_FK.in(scopePks.get()));
-		}
+		scopePks.ifPresent(longs -> conditions.add(WORKFLOW_STATUS.SCOPE_FK.in(longs)));
 
 		//exclude workflow states that are attached directly on a scope (we want only workflow states on fields, forms or events included in a scope)
 		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNotNull().or(WORKFLOW_STATUS.FIELD_FK.isNotNull()).or(WORKFLOW_STATUS.FORM_FK.isNotNull()));
@@ -148,6 +147,8 @@ public class AggregateWorkflowDAOService {
 			groupByFields.add(WORKFLOW_STATUS.WORKFLOW_ID);
 		}
 
+		groupByFields.add(WORKFLOW_STATUS.PROJECT_ID);
+
 		return create.select(
 				//select min(ws.pk) as aggregated workflow state pk
 				//the goal is to be able to identify aggregated workflow status with a stable identifier
@@ -166,9 +167,10 @@ public class AggregateWorkflowDAOService {
 				DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
 				stateCases.as("state_id"),
 				workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
-				DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
+				DSL.inline(null, WORKFLOW_STATUS.WORKFLOW_ACTION_ID).as(WORKFLOW_STATUS.WORKFLOW_ACTION_ID),
 				DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
-				DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
+				DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE),
+				WORKFLOW_STATUS.PROJECT_ID
 			)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(EVENT).on(WORKFLOW_STATUS.EVENT_FK.eq(EVENT.PK))
@@ -180,7 +182,7 @@ public class AggregateWorkflowDAOService {
 			.having(DSL.field("state_id").isNotNull());
 	}
 
-	public Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> generateEventQuery(
+	public Select<Record17<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, UUID, String, String, UUID, UUID, String, UUID>> generateEventQuery(
 		final Optional<Workflow> workflow,
 		final Optional<Collection<Long>> eventPks
 	) {
@@ -214,6 +216,8 @@ public class AggregateWorkflowDAOService {
 			groupByFields.add(WORKFLOW_STATUS.WORKFLOW_ID);
 		}
 
+		groupByFields.add(WORKFLOW_STATUS.PROJECT_ID);
+
 		return create.select(
 				//select min(ws.pk) as aggregated workflow state pk
 				//the goal is to be able to identify aggregated workflow status with a stable identifier
@@ -232,9 +236,10 @@ public class AggregateWorkflowDAOService {
 				DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
 				stateCases.as("state_id"),
 				workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
-				DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
+				DSL.inline(null, WORKFLOW_STATUS.WORKFLOW_ACTION_ID).as(WORKFLOW_STATUS.WORKFLOW_ACTION_ID),
 				DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
-				DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
+				DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE),
+				WORKFLOW_STATUS.PROJECT_ID
 			)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(FIELD).on(WORKFLOW_STATUS.FIELD_FK.eq(FIELD.PK))
@@ -261,7 +266,7 @@ public class AggregateWorkflowDAOService {
 		//filter these workflow statuses according to the scope model
 		for(final var status : strategy.executeQuery(query, AggregateWorkflowStatus.class)) {
 			final var scope = scopeByPks.get(status.getScopeFk());
-			if(scope.getScopeModel().getWorkflowIds().contains(status.getWorkflowId())) {
+			if(scope.getScopeModel().getWorkflowIds().contains(status.getWorkflow().getId())) {
 				statuses.add(status);
 			}
 		}
@@ -283,7 +288,7 @@ public class AggregateWorkflowDAOService {
 		//filter these workflow statuses according to the event model
 		for(final var status : strategy.executeQuery(query, AggregateWorkflowStatus.class)) {
 			final var event = eventByPks.get(status.getEventFk());
-			if(event.getEventModel().getWorkflowIds().contains(status.getWorkflowId())) {
+			if(event.getEventModel().getWorkflowIds().contains(status.getWorkflow().getId())) {
 				statuses.add(status);
 			}
 		}
@@ -312,12 +317,12 @@ public class AggregateWorkflowDAOService {
 	private Optional<WorkflowState> retriveState(final List<WorkflowStatus> statuses, final Workflow workflow) {
 		if(!statuses.isEmpty()) {
 			for(final var state : workflow.getStatesHavingMatcher(StateMatcher.ALL)) {
-				if(statuses.stream().allMatch(s -> s.getStateId().equals(state.getAggregateStateId()))) {
+				if(statuses.stream().allMatch(s -> s.getState().getId().equals(state.getAggregateStateId()))) {
 					return Optional.of(state);
 				}
 			}
 			for(final var state : workflow.getStatesHavingMatcher(StateMatcher.ONE)) {
-				if(statuses.stream().anyMatch(s -> s.getStateId().equals(state.getAggregateStateId()))) {
+				if(statuses.stream().anyMatch(s -> s.getState().getId().equals(state.getAggregateStateId()))) {
 					return Optional.of(state);
 				}
 			}
@@ -333,7 +338,7 @@ public class AggregateWorkflowDAOService {
 		final List<AggregateWorkflowStatus> formStatuses = new ArrayList<>();
 		for(final Workflow workflow : form.getFormModel().getWorkflows()) {
 			if(workflow.isAggregator()) {
-				final List<WorkflowStatus> statuses = containedStatuses.stream().filter(ws -> ws.getWorkflowId().equals(workflow.getAggregateWorkflowId())).toList();
+				final List<WorkflowStatus> statuses = containedStatuses.stream().filter(ws -> ws.getWorkflow().getId().equals(workflow.getAggregateWorkflowId())).toList();
 				final Optional<WorkflowState> state = retriveState(statuses, workflow);
 				if(state.isPresent()) {
 					final var status = new AggregateWorkflowStatus();

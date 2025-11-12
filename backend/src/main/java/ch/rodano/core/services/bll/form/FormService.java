@@ -2,6 +2,7 @@ package ch.rodano.core.services.bll.form;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.form.FormModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -101,13 +102,13 @@ public interface FormService {
 
 	List<Form> getAll(Scope scope);
 
-	Form get(Scope scope, String formId);
+	Form get(Scope scope, UUID formId);
 
 	List<Form> getAllIncludingRemoved(Event event);
 
 	List<Form> getAll(Event event);
 
-	Form get(Event event, String formId);
+	Form get(Event event, UUID formId);
 
 	Optional<Form> get(WorkflowStatus workflowStatus);
 }

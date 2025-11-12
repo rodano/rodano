@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,8 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.Assignable;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class TimelineGraph implements SuperDisplayable, Serializable, Assignable<TimelineGraph>, Node {
@@ -29,6 +32,7 @@ public class TimelineGraph implements SuperDisplayable, Serializable, Assignable
 	private static final long serialVersionUID = 5861725017187478844L;
 
 	private Study study;
+	private UUID timelineGraphId;
 	private String id;
 
 	private SortedMap<String, String> shortname;
@@ -56,6 +60,20 @@ public class TimelineGraph implements SuperDisplayable, Serializable, Assignable
 		description = new TreeMap<>();
 		footNote = new TreeMap<>();
 		sections = new ArrayList<>();
+	}
+
+	public UUID getTimelineGraphId() {
+		if(this.timelineGraphId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.timelineGraphId = deterministic(
+				this.study.getProjectId(),
+				"TIMELINE_GRAPH",
+				this.id);
+		}
+		return timelineGraphId;
+	}
+
+	public void setTimelineGraphId(final UUID timelineGraphId) {
+		this.timelineGraphId = timelineGraphId;
 	}
 
 	@Override
@@ -225,5 +243,23 @@ public class TimelineGraph implements SuperDisplayable, Serializable, Assignable
 			.filter(s -> s.getId().equals(sectionId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.TIMELINE_GRAPH_SECTION, sectionId));
+	}
+
+	@JsonIgnore
+	public UUID getScopeModelUuid() {
+		return (this.scopeModelId == null || this.scopeModelId.isBlank() || this.study == null)
+			? null : deterministic(this.study.getProjectId(), "SCOPE_MODEL", this.scopeModelId);
+	}
+
+	@JsonIgnore
+	public UUID getStudyStartEventModelUuid() {
+		return (this.studyStartEventModelId == null || this.studyStartEventModelId.isBlank() || this.study == null)
+			? null : deterministic(this.study.getProjectId(), "EVENT_MODEL", this.scopeModelId + "|" + this.studyStartEventModelId);
+	}
+
+	@JsonIgnore
+	public UUID getStudyStopEventModelUuid() {
+		return (this.studyStopEventModelId == null || this.studyStopEventModelId.isBlank() || this.study == null)
+			? null : deterministic(this.study.getProjectId(), "EVENT_MODEL", this.scopeModelId + "|" + this.studyStopEventModelId);
 	}
 }

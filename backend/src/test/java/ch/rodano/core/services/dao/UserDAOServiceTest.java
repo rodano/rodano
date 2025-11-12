@@ -3,12 +3,12 @@ package ch.rodano.core.services.dao;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.scope.ScopeExtension;
@@ -70,10 +70,20 @@ public class UserDAOServiceTest extends DatabaseTest {
 		predicate.enforceEnabled(true);
 
 		final var users = userDAOService.search(predicate).getObjects();
+
+		final var investigatorProfileId = studyService.getStudy().getProfiles().stream()
+			.filter(p -> p.getId().equals("INVESTIGATOR"))
+			.map(Profile::getProfileId)
+			.findFirst()
+			.orElse(null);
+
 		assertAll(
 			"Find the investigator on study",
 			() -> assertEquals(1, users.size()),
-			() -> assertTrue(users.stream().flatMap(u -> roleService.getActiveRoles(u).stream()).map(Role::getProfileId).anyMatch(id -> id.equals("INVESTIGATOR")))
+			() -> assertTrue(users.stream()
+				.flatMap(u -> roleService.getActiveRoles(u).stream())
+				.map(Role::getProfileId)
+				.anyMatch(id -> id.equals(investigatorProfileId)))
 		);
 	}
 

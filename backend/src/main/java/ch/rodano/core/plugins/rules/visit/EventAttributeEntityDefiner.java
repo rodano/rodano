@@ -1,6 +1,7 @@
 package ch.rodano.core.plugins.rules.visit;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
@@ -67,7 +68,7 @@ public class EventAttributeEntityDefiner extends AbstractEventEntityDefiner {
 		return List.of(
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
+				public UUID getValue(final Evaluable evaluable) {
 					return ((Event) evaluable).getEventModelId();
 				}
 

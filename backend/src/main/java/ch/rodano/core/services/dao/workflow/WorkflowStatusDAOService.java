@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import ch.rodano.api.dto.paging.PagedResult;
@@ -19,25 +20,25 @@ public interface WorkflowStatusDAOService {
 
 	List<WorkflowStatus> getWorkflowStatusesByScopePk(Long scopePk);
 
-	List<WorkflowStatus> getWorkflowStatusesByScopePk(Long scopePk, String workflowId);
+	List<WorkflowStatus> getWorkflowStatusesByScopePk(Long scopePk, UUID workflowId);
 
 	List<WorkflowStatus> getWorkflowStatusesByScopePks(Collection<Long> scopePks);
 
 	List<WorkflowStatus> getWorkflowStatusesByEventPk(Long eventPk);
 
-	List<WorkflowStatus> getWorkflowStatusesByEventPk(Long eventPk, String workflowId);
+	List<WorkflowStatus> getWorkflowStatusesByEventPk(Long eventPk, UUID workflowId);
 
 	List<WorkflowStatus> getWorkflowStatusesByEventPks(Collection<Long> eventPks);
 
 	List<WorkflowStatus> getWorkflowStatusesByFormPk(Long formPk);
 
-	List<WorkflowStatus> getWorkflowStatusesByFormPk(Long formPk, String workflowId);
+	List<WorkflowStatus> getWorkflowStatusesByFormPk(Long formPk, UUID workflowId);
 
 	List<WorkflowStatus> getWorkflowStatusesByFormPks(Collection<Long> formPks);
 
 	List<WorkflowStatus> getWorkflowStatusesByFieldPk(Long fieldPk);
 
-	List<WorkflowStatus> getWorkflowStatusesByFieldPk(Long fieldPk, String workflowId);
+	List<WorkflowStatus> getWorkflowStatusesByFieldPk(Long fieldPk, UUID workflowId);
 
 	List<WorkflowStatus> getWorkflowStatusesByFieldPks(Collection<Long> fieldPks);
 

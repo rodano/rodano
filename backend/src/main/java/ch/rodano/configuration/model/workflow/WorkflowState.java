@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -20,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
@@ -44,6 +47,7 @@ public class WorkflowState implements Serializable, SuperDisplayable, Node, Comp
 		return o1.getId().compareTo(o2.getId());
 	};
 
+	private UUID workflowStateId;
 	private String id;
 
 	private Workflow workflow;
@@ -66,6 +70,24 @@ public class WorkflowState implements Serializable, SuperDisplayable, Node, Comp
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
 		possibleActionIds = new ArrayList<>();
+	}
+
+	public UUID getWorkflowStateId() {
+		if(this.workflowStateId == null
+			&& this.id != null && !this.id.isBlank()
+			&& this.workflow != null
+			&& this.workflow.getStudy() != null) {
+			this.workflowStateId = deterministic(
+				this.workflow.getStudy().getProjectId(),
+				"WORKFLOW_STATE",
+				this.workflow.getId() + "|" + this.id
+			);
+		}
+		return workflowStateId;
+	}
+
+	public void setWorkflowStateId(final UUID workflowStateId) {
+		this.workflowStateId = workflowStateId;
 	}
 
 	@Override
@@ -189,5 +211,13 @@ public class WorkflowState implements Serializable, SuperDisplayable, Node, Comp
 	@Override
 	public final int compareTo(final WorkflowState otherWorkflowState) {
 		return COMPARATOR_INDEX.compare(this, otherWorkflowState);
+	}
+
+	@JsonIgnore
+	public UUID getAggregateStateUuid() {
+		if(this.aggregateStateId == null || this.aggregateStateId.isBlank() || this.workflow == null || this.workflow.getStudy() == null) {
+			return null;
+		}
+		return deterministic(this.workflow.getStudy().getProjectId(), "WORKFLOW_STATE", this.workflow.getId() + "|" + this.aggregateStateId);
 	}
 }

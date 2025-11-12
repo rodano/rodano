@@ -57,7 +57,7 @@ public class Role extends RoleRecord implements TimestampableObject, AuditableOb
 
 	public void setProfile(final Profile profile) {
 		this.profile = profile;
-		this.profileId = profile.getId();
+		this.profileId = profile.getProfileId();
 	}
 
 	public Profile getProfile() {

@@ -37,15 +37,20 @@ public class WorkflowStatusChartFactoryService {
 	}
 
 	public List<ChartDatasetDTO<ZonedDateTime, Integer>> buildChartDatasets(final Chart chart, final String[] languages) {
+		final var study = studyService.getStudy();
+		final var workflow = study.getWorkflow(chart.getWorkflowId());
+
 		//the first step is to select the most recent audit date for each workflow
 		final var conditions = new ArrayList<Condition>();
-		conditions.add(WORKFLOW_STATUS_AUDIT.WORKFLOW_ID.eq(chart.getWorkflowId()));
+		conditions.add(WORKFLOW_STATUS_AUDIT.WORKFLOW_ID.eq(chart.getWorkflowUuid()));
 		conditions.add(SCOPE.DELETED.isFalse());
 		if(CollectionUtils.isNotEmpty(chart.getIncludedStateIds())) {
-			conditions.add(WORKFLOW_STATUS_AUDIT.STATE_ID.in(chart.getIncludedStateIds()));
+			final var includedStateIds = chart.getIncludedStateUuids();
+			conditions.add(WORKFLOW_STATUS_AUDIT.WORKFLOW_STATE_ID.in(includedStateIds));
 		}
 		if(CollectionUtils.isNotEmpty(chart.getExcludedStateIds())) {
-			conditions.add(WORKFLOW_STATUS_AUDIT.STATE_ID.notIn(chart.getExcludedStateIds()));
+			final var excludedStateIds = chart.getExcludedStateUuids();
+			conditions.add(WORKFLOW_STATUS_AUDIT.WORKFLOW_STATE_ID.notIn(excludedStateIds));
 		}
 		//truncate audit trail date to the day (remove time)
 		final var auditDate = DSL.function("date", SQLDataType.LOCALDATETIME, DSL.max(WORKFLOW_STATUS_AUDIT.AUDIT_DATETIME)).as("audit_date");
@@ -68,7 +73,6 @@ public class WorkflowStatusChartFactoryService {
 		final var downsampledResults = ChartHelpers.downsample(cumulatedResults, ChartHelpers.DEFAULT_MAX_POINTS);
 		final var timepoints = ChartHelpers.processTimepoints(downsampledResults);
 
-		final var workflow = studyService.getStudy().getWorkflow(chart.getWorkflowId());
-		return List.of(new ChartDatasetDTO<ZonedDateTime, Integer>(workflow.getLocalizedShortname(languages), timepoints));
+		return List.of(new ChartDatasetDTO<>(workflow.getLocalizedShortname(languages), timepoints));
 	}
 }

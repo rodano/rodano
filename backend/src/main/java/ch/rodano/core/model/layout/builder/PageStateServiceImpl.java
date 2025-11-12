@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
@@ -78,12 +79,12 @@ public class PageStateServiceImpl implements PageStateService {
 		}
 		//SINGLE
 		else {
-			final SortedMap<String, Dataset> datasets = new TreeMap<>();
+			final SortedMap<UUID, Dataset> datasets = new TreeMap<>();
 			for(final var line : layout.getLines()) {
 				for(final var cell : line.getCells()) {
 					if(cell.hasFieldModel()) {
-						if(!datasets.containsKey(cell.getDatasetModelId())) {
-							datasets.put(cell.getDatasetModelId(), getDataset(scope, event, cell.getDatasetModel()));
+						if(!datasets.containsKey(cell.getDatasetModelUuid())) {
+							datasets.put(cell.getDatasetModelUuid(), getDataset(scope, event, cell.getDatasetModel()));
 						}
 					}
 				}
@@ -93,7 +94,7 @@ public class PageStateServiceImpl implements PageStateService {
 		return layoutGroupState;
 	}
 
-	public LayoutState createLayout(final Scope scope, final Optional<Event> event, final Form form, final LayoutGroupState layoutGroupState, final Map<String, Dataset> datasets) {
+	public LayoutState createLayout(final Scope scope, final Optional<Event> event, final Form form, final LayoutGroupState layoutGroupState, final Map<UUID, Dataset> datasets) {
 		final var layoutState = new LayoutState(layoutGroupState, datasets);
 
 		//create cell states
@@ -101,7 +102,7 @@ public class PageStateServiceImpl implements PageStateService {
 			Dataset dataset = null;
 			Field field = null;
 			if(cell.hasFieldModel()) {
-				dataset = datasets.get(cell.getDatasetModelId());
+				dataset = datasets.get(cell.getDatasetModelUuid());
 				field = fieldService.get(dataset, cell.getFieldModel());
 			}
 			//build cell state

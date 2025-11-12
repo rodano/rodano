@@ -1,6 +1,7 @@
 package ch.rodano.api;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,12 @@ import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.exception.ErrorDetails;
 import ch.rodano.api.resource.ResourceDTO;
 import ch.rodano.api.resource.ResourceSubmissionDTO;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,6 +31,9 @@ class ResourceControllerTest extends ControllerTest {
 
 	@Autowired
 	private ScopeDAOService scopeDAOService;
+
+	@Autowired
+	private StudyService studyService;
 
 	final ParameterizedTypeReference<PagedResult<ResourceDTO>> type = new ParameterizedTypeReference<>() {};
 
@@ -124,7 +130,7 @@ class ResourceControllerTest extends ControllerTest {
 		// Modify the newly created resource
 		final var newTitle = "New title";
 		createdResource.setTitle(newTitle);
-		createdResource.setCategoryId("DOCUMENTS");
+		createdResource.setCategoryId(catUuid("DOCUMENTS"));
 		createdResource.setRemoved(true);
 		createdResource.setPublicResource(true);
 
@@ -158,7 +164,11 @@ class ResourceControllerTest extends ControllerTest {
 		resourceDTO.setPublicResource(isPublic);
 		resourceDTO.setScopePk(scopePk);
 		resourceDTO.setTitle("Quarterly report announcement");
-		resourceDTO.setCategoryId("NEWSLETTERS");
+		resourceDTO.setCategoryId(catUuid("NEWSLETTERS"));
 		return resourceDTO;
+	}
+
+	private UUID catUuid(final String code) {
+		return deterministic(studyService.getStudy().getProjectId(), "RESOURCE_CATEGORY", code);
 	}
 }

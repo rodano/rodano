@@ -3,6 +3,7 @@ package ch.rodano.configuration.model.payment;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,6 +15,9 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.scope.ScopeModel;
+import ch.rodano.configuration.model.study.Study;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
@@ -21,11 +25,20 @@ public class PaymentDistribution implements Node {
 	@Serial
 	private static final long serialVersionUID = -7856978742306432331L;
 
+	private UUID paymentDistributionId;
 	private PaymentStep step;
 
 	private String scopeModelId;
 	private String profileId;
 	private double value;
+
+	public UUID getPaymentDistributionId() {
+		return paymentDistributionId;
+	}
+
+	public void setPaymentDistributionId(final UUID paymentDistributionId) {
+		this.paymentDistributionId = paymentDistributionId;
+	}
 
 	@JsonBackReference
 	public final void setStep(final PaymentStep step) {
@@ -107,4 +120,26 @@ public class PaymentDistribution implements Node {
 		return Collections.emptyList();
 	}
 
+	@JsonIgnore
+	public UUID getProfileUuid() {
+		final var s = getStudyOrNull();
+		if(s == null || this.profileId == null || this.profileId.isBlank()) {
+			return null;
+		}
+		return deterministic(s.getProjectId(), "PROFILE", this.profileId);
+	}
+
+	@JsonIgnore
+	public UUID getScopeModelUuid() {
+		final var s = getStudyOrNull();
+		if(s == null || this.scopeModelId == null || this.scopeModelId.isBlank()) {
+			return null;
+		}
+		return deterministic(s.getProjectId(), "SCOPE_MODEL", this.scopeModelId);
+	}
+
+	@JsonIgnore
+	private Study getStudyOrNull() {
+		return (this.step == null || this.step.getPaymentPlan() == null) ? null : this.step.getPaymentPlan().getStudy();
+	}
 }

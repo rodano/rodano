@@ -1,8 +1,7 @@
 package ch.rodano.core.model.scope;
 
 import java.util.Objects;
-
-import org.apache.commons.lang3.StringUtils;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -13,8 +12,8 @@ import ch.rodano.configuration.model.study.Study;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record FieldModelCriterion(
-	String datasetModelId,
-	String fieldModelId,
+	UUID datasetModelId,
+	UUID fieldModelId,
 	Operator operator,
 	String value
 ) {
@@ -26,12 +25,12 @@ public record FieldModelCriterion(
 	}
 
 	public FieldModelCriterion(final FieldModel fieldModel, final Operator operator, final String value) {
-		this(fieldModel.getDatasetModel().getId(), fieldModel.getId(), operator, value);
+		this(fieldModel.getDatasetModel().getDatasetModelId(), fieldModel.getFieldModelId(), operator, value);
 	}
 
 	@JsonIgnore
 	public final boolean hasFieldModel() {
-		return StringUtils.isNotBlank(datasetModelId) && StringUtils.isNotBlank(fieldModelId);
+		return datasetModelId != null && fieldModelId != null;
 	}
 
 	@JsonIgnore

@@ -30,7 +30,7 @@ public class EnrollmentByScopeFactoryService {
 		//find all the scopes matching the scope model that has been requested in the root scopes
 		final Set<Scope> containers = new HashSet<Scope>();
 		for(final Scope scope : rootScopes) {
-			if(scope.getScopeModelId().equals(chart.getScopeModelId())) {
+			if(scope.getScopeModelId().equals(chart.getScopeModelUuid())) {
 				containers.add(scope);
 			}
 			else {

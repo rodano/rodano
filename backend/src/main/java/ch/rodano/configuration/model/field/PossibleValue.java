@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,12 +19,15 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PossibleValue implements Node {
 	@Serial
 	private static final long serialVersionUID = -10498351329495800L;
 
+	private UUID possibleValueId;
 	private String id;
 	private FieldModel fieldModel;
 
@@ -40,6 +44,25 @@ public class PossibleValue implements Node {
 	public PossibleValue(final String id, final Map<String, String> shortname) {
 		this.id = id;
 		this.shortname = shortname;
+	}
+
+	public UUID getPossibleValueId() {
+		if(this.possibleValueId == null
+			&& this.id != null && !this.id.isBlank()
+			&& this.fieldModel != null
+			&& this.fieldModel.getDatasetModel() != null
+			&& this.fieldModel.getDatasetModel().getStudy() != null) {
+			final var projectId = this.fieldModel.getDatasetModel().getStudy().getProjectId();
+			this.possibleValueId = deterministic(
+				projectId,
+				"POSSIBLE_VALUE",
+				this.fieldModel.getId() + "|" + this.id);
+		}
+		return possibleValueId;
+	}
+
+	public void setPossibleValueId(final UUID possibleValueId) {
+		this.possibleValueId = possibleValueId;
 	}
 
 	public final String getId() {

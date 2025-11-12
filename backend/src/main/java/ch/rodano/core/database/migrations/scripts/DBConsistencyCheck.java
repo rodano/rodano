@@ -2,6 +2,7 @@ package ch.rodano.core.database.migrations.scripts;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
@@ -73,15 +74,15 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 				try(var cursor = scopeQuery.fetchLazy()) {
 					while(cursor.hasNext()) {
 						final var r = cursor.fetchNext();
-						final var scopePk = r.get(SCOPE.PK);
-						final var scopeModel = studyService.getStudy().getScopeModel(r.get(SCOPE.SCOPE_MODEL_ID));
+						final var scopePk = r != null ? r.get(SCOPE.PK) : null;
+						final var scopeModel = studyService.getStudy().getScopeModel(r != null ? r.get(SCOPE.SCOPE_MODEL_ID) : null);
 
 						final var requiredDatasetIds = scopeModel.getDatasetModels().stream()
 							.filter(d -> !d.isMultiple())
-							.map(DatasetModel::getId)
+							.map(DatasetModel::getDatasetModelId)
 							.sorted()
 							.toList();
-						final var datasetIds = r.get(datasetIdsField);
+						final var datasetIds = r != null ? r.get(datasetIdsField) : null;
 
 						//the two lists must be strictly equal:
 						//there must be no dataset in the database that don't have their dataset model in the configuration
@@ -91,18 +92,18 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 							scopeDatasetsConsistent = false;
 							consistent = false;
 
-							final var missingDatasetIds = new ArrayList<String>(requiredDatasetIds);
+							final var missingDatasetIds = new ArrayList<UUID>(requiredDatasetIds);
 							missingDatasetIds.removeAll(datasetIds);
 
-							final var extraDatasetIds = new ArrayList<String>(datasetIds);
+							final var extraDatasetIds = new ArrayList<UUID>(datasetIds);
 							extraDatasetIds.removeAll(requiredDatasetIds);
 
 							final var errors = new ArrayList<String>();
 							if(!missingDatasetIds.isEmpty()) {
-								errors.add(String.format("[%s] are missing", String.join(",", missingDatasetIds)));
+								errors.add(String.format("[%s] are missing", String.join(",", missingDatasetIds.toString())));
 							}
 							if(!extraDatasetIds.isEmpty()) {
-								errors.add(String.format("[%s] have no matching dataset model", String.join(",", extraDatasetIds)));
+								errors.add(String.format("[%s] have no matching dataset model", String.join(",", extraDatasetIds.toString())));
 							}
 
 							logger.error(
@@ -132,33 +133,33 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 				try(var cursor = eventQuery.fetchLazy()) {
 					while(cursor.hasNext()) {
 						final var r = cursor.fetchNext();
-						final var eventPk = r.get(EVENT.PK);
-						final var scopeModel = studyService.getStudy().getScopeModel(r.get(EVENT.SCOPE_MODEL_ID));
-						final var eventModel = scopeModel.getEventModel(r.get(EVENT.EVENT_MODEL_ID));
+						final var eventPk = r != null ? r.get(EVENT.PK) : null;
+						final var scopeModel = studyService.getStudy().getScopeModel(r != null ? r.get(EVENT.SCOPE_MODEL_ID) : null);
+						final var eventModel = scopeModel.getEventModel(r != null ? r.get(EVENT.EVENT_MODEL_ID) : null);
 
 						final var requiredDatasetIds = eventModel.getDatasetModels().stream()
 							.filter(d -> !d.isMultiple())
-							.map(DatasetModel::getId)
+							.map(DatasetModel::getDatasetModelId)
 							.sorted()
 							.toList();
-						final var datasetIds = r.get(datasetIdsField);
+						final var datasetIds = r != null ? r.get(datasetIdsField) : null;
 
 						if(!datasetIds.equals(requiredDatasetIds)) {
 							eventDatasetsConsistent = false;
 							consistent = false;
 
-							final var missingDatasetIds = new ArrayList<String>(requiredDatasetIds);
+							final var missingDatasetIds = new ArrayList<UUID>(requiredDatasetIds);
 							missingDatasetIds.removeAll(datasetIds);
 
-							final var extraDatasetIds = new ArrayList<String>(datasetIds);
+							final var extraDatasetIds = new ArrayList<UUID>(datasetIds);
 							extraDatasetIds.removeAll(requiredDatasetIds);
 
 							final var errors = new ArrayList<String>();
 							if(!missingDatasetIds.isEmpty()) {
-								errors.add(String.format("[%s] are missing", String.join(",", missingDatasetIds)));
+								errors.add(String.format("[%s] are missing", String.join(",", missingDatasetIds.toString())));
 							}
 							if(!extraDatasetIds.isEmpty()) {
-								errors.add(String.format("[%s] have no matching dataset model", String.join(",", extraDatasetIds)));
+								errors.add(String.format("[%s] have no matching dataset model", String.join(",", extraDatasetIds.toString())));
 							}
 
 							logger.error(
@@ -195,8 +196,8 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 				final var datasetModelFieldModels = studyService.getStudy().getDatasetModels().stream()
 					.collect(
 						Collectors.toMap(
-							DatasetModel::getId,
-							d -> d.getFieldModels().stream().map(FieldModel::getId).sorted().toList()
+							DatasetModel::getDatasetModelId,
+							d -> d.getFieldModels().stream().map(FieldModel::getFieldModelId).sorted().toList()
 						)
 					);
 
@@ -214,8 +215,8 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 				try(var cursor = query.fetchLazy()) {
 					while(cursor.hasNext()) {
 						final var r = cursor.fetchNext();
-						final var datasetPk = r.get(DATASET.PK);
-						final var datasetModelId = r.get(DATASET.DATASET_MODEL_ID);
+						final var datasetPk = r != null ? r.get(DATASET.PK) : null;
+						final var datasetModelId = r != null ? r.get(DATASET.DATASET_MODEL_ID) : null;
 						final var requiredFieldIds = datasetModelFieldModels.get(datasetModelId);
 
 						// If the dataset model is not found in the configuration, it means that it exists only in the database and that's an error.
@@ -224,7 +225,7 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 							logger.error("Dataset pk {}: There is no dataset model with the id {} in the configuration", datasetPk, datasetModelId);
 						}
 						else {
-							final var fieldIds = r.get(fieldIdsField);
+							final var fieldIds = r != null ? r.get(fieldIdsField) : null;
 
 							//the two lists must be strictly equal:
 							//there must be no field in the database that don't have their field model in the configuration
@@ -232,18 +233,18 @@ public class DBConsistencyCheck extends AbstractDatabaseMigration {
 							//there must be no more that one instance of each single field model
 							if(!fieldIds.equals(requiredFieldIds)) {
 								consistent = false;
-								final var missingFieldIds = new ArrayList<String>(requiredFieldIds);
+								final var missingFieldIds = new ArrayList<UUID>(requiredFieldIds);
 								missingFieldIds.removeAll(fieldIds);
 
-								final var extraFieldIds = new ArrayList<String>(fieldIds);
+								final var extraFieldIds = new ArrayList<UUID>(fieldIds);
 								extraFieldIds.removeAll(requiredFieldIds);
 
 								final var errors = new ArrayList<String>();
 								if(!missingFieldIds.isEmpty()) {
-									errors.add(String.format("[%s] are missing", String.join(",", missingFieldIds)));
+									errors.add(String.format("[%s] are missing", String.join(",", missingFieldIds.toString())));
 								}
 								if(!extraFieldIds.isEmpty()) {
-									errors.add(String.format("[%s] have no matching field model", String.join(",", extraFieldIds)));
+									errors.add(String.format("[%s] have no matching field model", String.join(",", extraFieldIds.toString())));
 								}
 
 								logger.error(

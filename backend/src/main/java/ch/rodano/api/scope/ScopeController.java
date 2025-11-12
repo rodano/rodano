@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -133,7 +134,7 @@ public class ScopeController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<ScopeDTO> search(
-		@Parameter(description = "Scope model ID") @RequestParam final Optional<String> scopeModelId,
+		@Parameter(description = "Scope model ID") @RequestParam final Optional<UUID> scopeModelId,
 		@Parameter(description = "Full text search on code, shortname and longname") @RequestParam final Optional<String> fullText,
 		@Parameter(description = "Scope code") @RequestParam final Optional<String> code,
 		@Parameter(description = "Scope IDs") @RequestParam final Optional<List<String>> ids,
@@ -153,7 +154,7 @@ public class ScopeController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor);
 
 		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
-		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
+		final Optional<Map<UUID, List<UUID>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
 		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
@@ -185,7 +186,7 @@ public class ScopeController extends AbstractSecuredController {
 	@GetMapping("export")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> export(
-		@Parameter(description = "Scope model ID") @RequestParam final Optional<String> scopeModelId,
+		@Parameter(description = "Scope model ID") @RequestParam final Optional<UUID> scopeModelId,
 		@Parameter(description = "Full text search on code, shortname and longname") @RequestParam final Optional<String> fullText,
 		@Parameter(description = "Scope code") @RequestParam final Optional<String> code,
 		@Parameter(description = "Scope IDs") @RequestParam final Optional<List<String>> ids,
@@ -201,7 +202,7 @@ public class ScopeController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor);
 
 		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
-		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
+		final Optional<Map<UUID, List<UUID>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
 		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
@@ -490,7 +491,7 @@ public class ScopeController extends AbstractSecuredController {
 	}
 
 	//TODO move this in the scope service
-	private Optional<Map<String, List<Long>>> buildActorRightPredicate(final List<Role> roles, final Optional<String> scopeModelId) {
+	private Optional<Map<UUID, List<Long>>> buildActorRightPredicate(final List<Role> roles, final Optional<UUID> scopeModelId) {
 		//if a scope model is provided, hard-code ancestors pks
 		if(scopeModelId.isPresent()) {
 			//retrieve all ancestors on which current actor has the right to read scope having specified scope model
@@ -501,10 +502,10 @@ public class ScopeController extends AbstractSecuredController {
 			return Optional.of(Collections.singletonMap(scopeModelId.get(), ancestorFks));
 		}
 		//otherwise, return all couples scope model / list of ancestors that the provided actor has the right to READ
-		final Map<String, List<Long>> scopeModelAncestorPks = new HashMap<>();
+		final Map<UUID, List<Long>> scopeModelAncestorPks = new HashMap<>();
 		for(final var role : roles) {
-			final var roleScopeModelIds = role.getProfile().getScopeModels(Rights.READ).stream().map(ScopeModel::getId).toList();
-			for(final String roleScopeModelId : roleScopeModelIds) {
+			final var roleScopeModelIds = role.getProfile().getScopeModels(Rights.READ).stream().map(ScopeModel::getScopeModelId).toList();
+			for(final UUID roleScopeModelId : roleScopeModelIds) {
 				scopeModelAncestorPks.putIfAbsent(roleScopeModelId, new ArrayList<>());
 				scopeModelAncestorPks.get(roleScopeModelId).add(role.getScopeFk());
 			}

@@ -329,13 +329,13 @@ public record DataState(
 		final var label = new StringBuilder("DataState : Scopes=[");
 		label.append(scopes.stream().map(Scope::getCode).collect(Collectors.joining(",")));
 		label.append("] Events=[");
-		label.append(events.stream().map(Event::getEventModelId).collect(Collectors.joining(",")));
+		label.append(events.stream().map(Event::getId).collect(Collectors.joining(",")));
 		label.append("] Datasets=[");
-		label.append(datasets.stream().map(Dataset::getDatasetModelId).collect(Collectors.joining(",")));
+		label.append(datasets.stream().map(Dataset::getId).collect(Collectors.joining(",")));
 		label.append("] Fields=[");
-		label.append(fields.stream().map(Field::getFieldModelId).collect(Collectors.joining(",")));
+		label.append(fields.stream().map(Field::getId).collect(Collectors.joining(",")));
 		label.append("] Forms=[");
-		label.append(forms.stream().map(Form::getFormModelId).collect(Collectors.joining(",")));
+		label.append(forms.stream().map(Form::getId).collect(Collectors.joining(",")));
 		label.append("] Workflow statuses=[");
 		label.append(workflows.stream().map(WorkflowStatus::getId).collect(Collectors.joining(",")));
 		label.append("] Reference entity=[");

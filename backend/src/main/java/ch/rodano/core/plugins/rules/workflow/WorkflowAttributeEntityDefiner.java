@@ -2,6 +2,7 @@ package ch.rodano.core.plugins.rules.workflow;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -47,7 +48,7 @@ public class WorkflowAttributeEntityDefiner extends AbstractWorkflowEntityDefine
 		return List.of(
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
+				public UUID getValue(final Evaluable evaluable) {
 					return ((WorkflowStatus) evaluable).getWorkflowId();
 				}
 
@@ -63,8 +64,8 @@ public class WorkflowAttributeEntityDefiner extends AbstractWorkflowEntityDefine
 			},
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
-					return ((WorkflowStatus) evaluable).getStateId();
+				public UUID getValue(final Evaluable evaluable) {
+					return ((WorkflowStatus) evaluable).getWorkflowStateId();
 				}
 
 				@Override

@@ -39,6 +39,7 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.configuration.LZW;
+import ch.rodano.core.services.project.ProjectIdResolver;
 import ch.rodano.core.utils.file.ResourceUtils;
 
 @Service
@@ -50,6 +51,7 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	private final String configurationResource;
 	private final Integer configVersion;
 	private final Configurator configurator;
+	private final ProjectIdResolver projectIdResolver;
 
 	private Study study;
 	private String studyChecksum;
@@ -58,14 +60,15 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		@Value("${rodano.config:${rodano.config.jar}}") final String configurationResource,
 		@Value("${rodano.config.version:0}") final Integer configVersion,
 		final ObjectMapper objectMapper,
-		final Configurator configurator
+		final Configurator configurator,
+		final ProjectIdResolver projectIdResolver
 
 	) throws IOException {
 		this.objectMapper = objectMapper;
 		this.configurationResource = configurationResource;
 		this.configVersion = configVersion;
 		this.configurator = configurator;
-
+		this.projectIdResolver = projectIdResolver;
 		load();
 	}
 
@@ -83,6 +86,9 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 
 				study = objectMapper.readValue(watchedIs, Study.class);
 				study.init();
+
+				study.setProjectId(projectIdResolver.id());
+
 				studyChecksum = Hex.encodeHexString(md.digest());
 
 				checkConfiguration();

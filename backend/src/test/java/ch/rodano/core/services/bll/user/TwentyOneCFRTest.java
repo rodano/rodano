@@ -59,6 +59,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 	private User createVerifiedUser() {
 		final var user = new User();
+		user.setProjectId(studyService.getStudy().getProjectId());
 		user.setName("John Doe");
 		user.setEmail("john.doe@rodano.ch");
 		user.setActivated(true);
@@ -191,6 +192,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 		//add a role
 		final var role = new Role();
+		role.setProjectId(studyService.getStudy().getProjectId());
 		role.setProfile(adminProfile);
 		role.setUserFk(user.getPk());
 		role.setScopeFk(scopeService.getRootScope().getPk());
@@ -275,6 +277,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 		//add a role
 		final var role = new Role();
+		role.setProjectId(studyService.getStudy().getProjectId());
 		role.setProfile(adminProfile);
 		role.setUserFk(user.getPk());
 		role.setScopeFk(scopeService.getRootScope().getPk());
@@ -354,6 +357,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 		//add a role
 		final var role = new Role();
+		role.setProjectId(studyService.getStudy().getProjectId());
 		role.setProfile(adminProfile);
 		role.enable();
 
@@ -399,13 +403,13 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 		//add a role
 		final var role = new Role();
+		role.setProjectId(studyService.getStudy().getProjectId());
 		role.setProfile(adminProfile);
 		role.enable();
 		userDAOService.saveUser(user, context, TEST_RATIONALE);
 		role.setUserFk(user.getPk());
 		role.setScopeFk(scopeService.getRootScope().getPk());
 		roleDAOService.saveRole(role, context, TEST_RATIONALE);
-
 		userSecurityService.forceSetNewPassword(user, password, context);
 
 		final var sessionToken = userSecurityService.login(

@@ -82,7 +82,7 @@ public class EproController extends AbstractSecuredController {
 		final var query = create.select(SCOPE.PK.as("scope_pk"), ROBOT.NAME.as("robot_name"), ROBOT.KEY.as("robot_key"))
 			.from(ROBOT)
 			.innerJoin(SCOPE).on(SCOPE.ID.eq(ROBOT.NAME))
-			.where(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()).and(ROBOT.DELETED.isFalse()));
+			.where(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId()).and(ROBOT.DELETED.isFalse()));
 
 		return query.fetchInto(EproRobotDTO.class);
 	}

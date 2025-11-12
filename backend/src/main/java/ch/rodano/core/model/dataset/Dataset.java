@@ -66,7 +66,7 @@ public class Dataset extends DatasetRecord implements DeletableObject, Timestamp
 
 	public void setDatasetModel(final DatasetModel datasetModel) {
 		this.datasetModel = datasetModel;
-		this.datasetModelId = datasetModel.getId();
+		this.datasetModelId = datasetModel.getDatasetModelId();
 	}
 
 	@Override

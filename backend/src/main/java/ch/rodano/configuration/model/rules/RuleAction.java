@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
@@ -17,6 +18,7 @@ public class RuleAction implements Node {
 	@Serial
 	private static final long serialVersionUID = 8950905524257402197L;
 
+	private UUID ruleActionId;
 	//some actions are optional up to user in UI
 	private String id;
 	private SortedMap<String, String> label;
@@ -40,6 +42,14 @@ public class RuleAction implements Node {
 	public RuleAction() {
 		label = new TreeMap<>();
 		parameters = new ArrayList<>();
+	}
+
+	public UUID getRuleActionId() {
+		return ruleActionId;
+	}
+
+	public void setRuleActionId(final UUID ruleActionId) {
+		this.ruleActionId = ruleActionId;
 	}
 
 	public final String getId() {

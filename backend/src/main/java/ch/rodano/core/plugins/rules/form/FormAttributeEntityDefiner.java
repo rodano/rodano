@@ -1,6 +1,7 @@
 package ch.rodano.core.plugins.rules.form;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -36,7 +37,7 @@ public class FormAttributeEntityDefiner extends AbstractFormEntityDefiner {
 		return List.of(
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
+				public UUID getValue(final Evaluable evaluable) {
 					return ((Form) evaluable).getFormModelId();
 				}
 

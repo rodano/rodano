@@ -91,12 +91,12 @@ public class ExtractServiceImpl implements ExtractService {
 		);
 
 		for(final var fieldModel : datasetModel.getFieldModelsExportables()) {
-			fields.add(DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(fieldModel.getId()));
-			fields.add(DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(String.format("%s_MD", fieldModel.getId())));
+			fields.add(DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getFieldModelId())).as(fieldModel.getId()));
+			fields.add(DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getFieldModelId())).as(String.format("%s_MD", fieldModel.getId())));
 		}
 
 		final List<Condition> conditions = new ArrayList<>();
-		conditions.add(DATASET.DATASET_MODEL_ID.eq(datasetModel.getId()));
+		conditions.add(DATASET.DATASET_MODEL_ID.eq(datasetModel.getDatasetModelId()));
 		conditions.add(DATASET.DELETED.isFalse());
 		conditions.add(SCOPE.DELETED.isFalse());
 

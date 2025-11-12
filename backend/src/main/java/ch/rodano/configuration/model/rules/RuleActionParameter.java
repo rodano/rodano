@@ -3,6 +3,7 @@ package ch.rodano.configuration.model.rules;
 import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
@@ -11,10 +12,19 @@ public class RuleActionParameter implements Node {
 	@Serial
 	private static final long serialVersionUID = -2969109579952293555L;
 
+	private UUID ruleActionParameterId;
 	private String id;
 	private RulableEntity rulableEntity;
 	private String conditionId;
 	private String value;
+
+	public UUID getRuleActionParameterId() {
+		return ruleActionParameterId;
+	}
+
+	public void setRuleActionParameterId(final UUID ruleActionParameterId) {
+		this.ruleActionParameterId = ruleActionParameterId;
+	}
 
 	public final String getId() {
 		return id;

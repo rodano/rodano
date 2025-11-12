@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -77,7 +78,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 	}
 
 	@Override
-	public List<WorkflowStatus> getWorkflowStatusesByScopePk(final Long scopePk, final String workflowId) {
+	public List<WorkflowStatus> getWorkflowStatusesByScopePk(final Long scopePk, final UUID workflowId) {
 		return getWorkflowStatusesByScopePks(Collections.singleton(scopePk), Optional.of(workflowId));
 	}
 
@@ -86,7 +87,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		return getWorkflowStatusesByScopePks(scopePks, Optional.empty());
 	}
 
-	private List<WorkflowStatus> getWorkflowStatusesByScopePks(final Collection<Long> scopePks, final Optional<String> workflowId) {
+	private List<WorkflowStatus> getWorkflowStatusesByScopePks(final Collection<Long> scopePks, final Optional<UUID> workflowId) {
 		if(scopePks.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -108,7 +109,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 	}
 
 	@Override
-	public List<WorkflowStatus> getWorkflowStatusesByEventPk(final Long eventPk, final String workflowId) {
+	public List<WorkflowStatus> getWorkflowStatusesByEventPk(final Long eventPk, final UUID workflowId) {
 		return getWorkflowStatusesByEventPks(Collections.singleton(eventPk), Optional.of(workflowId));
 	}
 
@@ -117,7 +118,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		return getWorkflowStatusesByEventPks(eventPks, Optional.empty());
 	}
 
-	private List<WorkflowStatus> getWorkflowStatusesByEventPks(final Collection<Long> eventPks, final Optional<String> workflowId) {
+	private List<WorkflowStatus> getWorkflowStatusesByEventPks(final Collection<Long> eventPks, final Optional<UUID> workflowId) {
 		if(eventPks.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -138,7 +139,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 	}
 
 	@Override
-	public List<WorkflowStatus> getWorkflowStatusesByFormPk(final Long formPk, final String workflowId) {
+	public List<WorkflowStatus> getWorkflowStatusesByFormPk(final Long formPk, final UUID workflowId) {
 		return getWorkflowStatusesByFormPks(Collections.singleton(formPk), Optional.of(workflowId));
 	}
 
@@ -147,7 +148,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		return getWorkflowStatusesByFormPks(formPks, Optional.empty());
 	}
 
-	private List<WorkflowStatus> getWorkflowStatusesByFormPks(final Collection<Long> formPks, final Optional<String> workflowId) {
+	private List<WorkflowStatus> getWorkflowStatusesByFormPks(final Collection<Long> formPks, final Optional<UUID> workflowId) {
 		if(formPks.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -166,7 +167,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 	}
 
 	@Override
-	public List<WorkflowStatus> getWorkflowStatusesByFieldPk(final Long fieldPk, final String workflowId) {
+	public List<WorkflowStatus> getWorkflowStatusesByFieldPk(final Long fieldPk, final UUID workflowId) {
 		return getWorkflowStatusesByFieldPks(Collections.singleton(fieldPk), Optional.of(workflowId));
 	}
 
@@ -175,7 +176,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		return getWorkflowStatusesByFieldPks(fieldPks, Optional.empty());
 	}
 
-	private List<WorkflowStatus> getWorkflowStatusesByFieldPks(final Collection<Long> fieldPks, final Optional<String> workflowId) {
+	private List<WorkflowStatus> getWorkflowStatusesByFieldPks(final Collection<Long> fieldPks, final Optional<UUID> workflowId) {
 		if(fieldPks.isEmpty()) {
 			throw new IllegalArgumentException();
 		}
@@ -190,6 +191,9 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 	@Override
 	public void saveWorkflowStatus(final WorkflowStatus ws, final DatabaseActionContext context, final String rationale) {
+		if(ws.getProjectId() == null) {
+			ws.setProjectId(studyService.getStudy().getProjectId());
+		}
 		save(ws, context, rationale);
 	}
 
@@ -232,7 +236,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(search.getWorkflowIds()));
 
 		search.getStateIds().ifPresent(stateIds -> {
-			conditions.add(WORKFLOW_STATUS.STATE_ID.in(stateIds));
+			conditions.add(WORKFLOW_STATUS.WORKFLOW_STATE_ID.in(stateIds));
 		});
 
 		search.getScopePks().ifPresent(scopePks -> {

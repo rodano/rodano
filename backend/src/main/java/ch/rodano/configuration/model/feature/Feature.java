@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,6 +22,8 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.Assignable;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Feature implements SuperDisplayable, Serializable, Assignable<Feature>, Node {
@@ -28,6 +31,7 @@ public class Feature implements SuperDisplayable, Serializable, Assignable<Featu
 	private static final long serialVersionUID = 4081701801864249665L;
 
 	private Study study;
+	private UUID featureId;
 	private String id;
 	private boolean isStatic;
 	private boolean optional;
@@ -50,6 +54,20 @@ public class Feature implements SuperDisplayable, Serializable, Assignable<Featu
 	@JsonBackReference
 	public final Study getStudy() {
 		return study;
+	}
+
+	public UUID getFeatureId() {
+		if(this.featureId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.featureId = deterministic(
+				this.study.getProjectId(),
+				"FEATURE",
+				this.id);
+		}
+		return featureId;
+	}
+
+	public void setFeatureId(final UUID featureId) {
+		this.featureId = featureId;
 	}
 
 	@Override

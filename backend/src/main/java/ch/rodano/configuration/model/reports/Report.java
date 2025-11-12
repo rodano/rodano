@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,11 +20,14 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.Assignable;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonPropertyOrder(alphabetic = true)
 public class Report implements Cloneable, SuperDisplayable, Serializable, Assignable<Report>, Node {
 	@Serial
 	private static final long serialVersionUID = 4081701801864249665L;
 
+	private UUID reportId;
 	private String id;
 	private String rawSql;
 
@@ -42,6 +46,20 @@ public class Report implements Cloneable, SuperDisplayable, Serializable, Assign
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
 		fieldModelIds = new ArrayList<>();
+	}
+
+	public UUID getReportId() {
+		if(this.reportId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.reportId = deterministic(
+				this.study.getProjectId(),
+				"REPORT",
+				this.id);
+		}
+		return reportId;
+	}
+
+	public void setReportId(final UUID reportId) {
+		this.reportId = reportId;
 	}
 
 	public final List<String> getFieldModelIds() {
@@ -153,5 +171,31 @@ public class Report implements Cloneable, SuperDisplayable, Serializable, Assign
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
 		return Collections.emptyList();
+	}
+
+	@JsonIgnore
+	public UUID getDatasetModelUuid() {
+		if(this.study == null || this.datasetModelId == null || this.datasetModelId.isBlank()) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "DATASET_MODEL", this.datasetModelId);
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowUuid() {
+		if(this.study == null || this.workflowId == null || this.workflowId.isBlank()) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW", this.workflowId);
+	}
+
+	@JsonIgnore
+	public List<UUID> getFieldModelUuids() {
+		if(this.study == null || this.fieldModelIds == null || this.fieldModelIds.isEmpty()) {
+			return List.of();
+		}
+		return fieldModelIds.stream()
+			.map(code -> deterministic(this.study.getProjectId(), "FIELD_MODEL", this.datasetModelId + "|" + code))
+			.toList();
 	}
 }

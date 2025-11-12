@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.exceptions.RuleBreakException;
+import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.rules.Operator;
 import ch.rodano.configuration.model.rules.RulableEntity;
 import ch.rodano.configuration.model.rules.RuleBreakType;
@@ -27,6 +29,7 @@ import ch.rodano.core.model.rules.entity.EntityAttribute;
 import ch.rodano.core.model.rules.entity.EntityRelation;
 import ch.rodano.core.model.rules.formula.FormulaParserService;
 import ch.rodano.core.model.rules.formula.exception.UnableToCalculateFormulaException;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.rule.RulableEntityBinderService;
 
 @Service
@@ -37,10 +40,12 @@ public class ConstraintEvaluationService {
 
 	private final RulableEntityBinderService rulableEntityBinderService;
 	private final FormulaParserService formulaParserService;
+	private final StudyService studyService;
 
-	public ConstraintEvaluationService(final RulableEntityBinderService rulableEntityBinderService, final FormulaParserService formulaParserService) {
+	public ConstraintEvaluationService(final RulableEntityBinderService rulableEntityBinderService, final FormulaParserService formulaParserService, final StudyService studyService) {
 		this.rulableEntityBinderService = rulableEntityBinderService;
 		this.formulaParserService = formulaParserService;
+		this.studyService = studyService;
 	}
 
 	//TODO improve this
@@ -141,7 +146,12 @@ public class ConstraintEvaluationService {
 					else {
 						switch(property.getType()) {
 							case DATE:
-								values.add(ZonedDateTime.of(LocalDate.parse(value, DATE_FORMAT), LocalTime.MIDNIGHT, ZoneId.of("UTC")));
+								if(value.length() == 4 && value.matches("\\d{4}")) {
+									values.add(ZonedDateTime.of(LocalDate.of(Integer.parseInt(value), 1, 1), LocalTime.MIDNIGHT, ZoneId.of("UTC")));
+								}
+								else {
+									values.add(ZonedDateTime.of(LocalDate.parse(value, DATE_FORMAT), LocalTime.MIDNIGHT, ZoneId.of("UTC")));
+								}
 								break;
 							case NUMBER:
 								values.add(Double.valueOf(value));
@@ -150,7 +160,13 @@ public class ConstraintEvaluationService {
 								values.add(Boolean.valueOf(value));
 								break;
 							default:
-								values.add(value);
+								try {
+									values.add(UUID.fromString(value));
+								}
+								catch(IllegalArgumentException e) {
+									final UUID convertedUuid = convertStringIdToUuid(state.reference(), value);
+									values.add(Objects.requireNonNullElse(convertedUuid, value));
+								}
 								break;
 						}
 					}
@@ -240,5 +256,20 @@ public class ConstraintEvaluationService {
 		}
 		//return validity for current and children
 		return isValid && areChildrenValid;
+	}
+
+	private UUID convertStringIdToUuid(final RulableEntity entity, final String stringId) {
+		final var study = studyService.getStudy();
+
+		return switch(entity) {
+			case SCOPE -> study.getScopeModel(stringId).getScopeModelId();
+			case DATASET -> study.getDatasetModel(stringId).getDatasetModelId();
+			case FIELD -> study.getFieldModels().stream()
+				.filter(f -> f.getId().equals(stringId))
+				.findFirst()
+				.map(FieldModel::getFieldModelId)
+				.orElse(null);
+			default -> null;
+		};
 	}
 }

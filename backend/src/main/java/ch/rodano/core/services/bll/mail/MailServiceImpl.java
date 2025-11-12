@@ -170,6 +170,8 @@ public class MailServiceImpl implements MailService {
 		// Create a specific template loader as the subject is a string and not a folder
 		// Put the custom template into the loader
 
+		mail.setProjectId(studyService.getStudy().getProjectId());
+
 		// Process the template
 		mail.setSubject(readTemplate("subject", templateParameters, loader));
 		// Set the mail body
@@ -185,6 +187,7 @@ public class MailServiceImpl implements MailService {
 
 		// The sender and replyTo are always defined by the study configuration
 		final var study = studyService.getStudy();
+		mail.setProjectId(study.getProjectId());
 		mail.setSender(study.getEmail());
 		mail.setReplyTo(study.getEmail());
 
@@ -540,12 +543,12 @@ public class MailServiceImpl implements MailService {
 		if(!recipients.isEmpty()) {
 			final var mail = new DefinedTemplatedMail(
 				MailTemplate.DOCUMENT_PUBLISHED, Map.ofEntries(
-					Map.entry("study", study),
-					Map.entry("user", user),
-					Map.entry("resource", resource),
-					Map.entry("resource_category_name", study.getResourceCategory(resource.getCategoryId()).getDefaultLocalizedShortname()),
-					Map.entry("scope", scope)
-				)
+				Map.entry("study", study),
+				Map.entry("user", user),
+				Map.entry("resource", resource),
+				Map.entry("resource_category_name", study.getResourceCategory(resource.getCategoryId()).getDefaultLocalizedShortname()),
+				Map.entry("scope", scope)
+			)
 			);
 
 			mail.setSender(study.getEmail());
@@ -560,12 +563,13 @@ public class MailServiceImpl implements MailService {
 
 	/**
 	 * Auxiliary method used to construct an e-mail from a template
+	 *
 	 * @param recipientUser The recipient user
 	 * @param template      The e-mail template
 	 * @param templateVars  The e-mail template variables
 	 * @param recipients    The e-mail addresses of the recipients
 	 * @param intent        The e-mail intent
-	 * @return              Filled-out e-mail template
+	 * @return Filled-out e-mail template
 	 */
 	private DefinedTemplatedMail prepareMail(
 		final User recipientUser,

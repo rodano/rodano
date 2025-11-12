@@ -83,12 +83,13 @@ public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObj
 
 	public void setWorkflow(final Workflow workflow) {
 		this.workflow = workflow;
-		this.workflowId = workflow.getId();
+		this.workflowId = workflow.getWorkflowId();
 	}
 
 	public void setState(final WorkflowState state) {
 		this.state = state;
-		this.stateId = state.getId();
+		this.workflowStateId = state.getWorkflowStateId();
+		this.workflowId = state.getWorkflow().getWorkflowId();
 	}
 
 	public void setAction(final Action action) {
@@ -189,7 +190,7 @@ public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObj
 	@Override
 	public void onPostLoad(final Study study) {
 		workflow = study.getWorkflow(workflowId);
-		state = workflow.getState(stateId);
+		state = workflow.getState(workflowStateId);
 		action = StringUtils.isNotBlank(actionId) ? workflow.getAction(actionId) : null;
 		validator = StringUtils.isNotBlank(validatorId) ? study.getValidator(validatorId) : null;
 		profile = StringUtils.isNotBlank(profileId) ? study.getProfile(profileId) : null;

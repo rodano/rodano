@@ -5,9 +5,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 public class SelectionNode implements Node {
 
@@ -42,12 +47,40 @@ public class SelectionNode implements Node {
 		this.selections = selections;
 	}
 
-	public static Optional<SelectionNode> getSelection(final List<SelectionNode> selections, final Entity nodeEntity, final String nodeId) {
-		return selections.stream().filter(s -> s.getNodeEntity().equals(nodeEntity) && s.getNodeId().equals(nodeId)).findAny();
+	@JsonIgnore
+	public UUID getNodeUuid() {
+		if(nodeEntity == null || nodeId == null || nodeId.isBlank()) {
+			return null;
+		}
+		return deterministic(null, nodeEntity.name(), nodeId);
 	}
 
-	public Optional<SelectionNode> getSelection(final Entity entity, final String id) {
-		return getSelection(selections, entity, id);
+	public static Optional<SelectionNode> getSelection(final List<SelectionNode> selections, final Entity nodeEntity, final String nodeCode) {
+		if(selections == null || nodeEntity == null || nodeCode == null) {
+			return Optional.empty();
+		}
+		return selections.stream()
+			.filter(s -> nodeEntity.equals(s.getNodeEntity()) &&
+				nodeCode.equalsIgnoreCase(s.getNodeId()))
+			.findAny();
+	}
+
+	public static Optional<SelectionNode> getSelection(final List<SelectionNode> selections, final Entity nodeEntity, final UUID nodeUuid) {
+		if(selections == null || nodeEntity == null || nodeUuid == null) {
+			return Optional.empty();
+		}
+		return selections.stream()
+			.filter(s -> nodeEntity.equals(s.getNodeEntity()) &&
+				nodeUuid.equals(s.getNodeUuid()))
+			.findAny();
+	}
+
+	public Optional<SelectionNode> getSelection(final Entity entity, final String nodeCode) {
+		return getSelection(selections, entity, nodeCode);
+	}
+
+	public Optional<SelectionNode> getSelection(final Entity entity, final UUID nodeUuid) {
+		return getSelection(selections, entity, nodeUuid);
 	}
 
 	@Override

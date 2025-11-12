@@ -2,6 +2,7 @@ package ch.rodano.core.services.bll;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,7 +39,7 @@ public class AuditTrailsTest extends DatabaseTest {
 
 	@Test
 	@DisplayName("Audit trails depict history correctly")
-	public void auditTrailsDepictHistory() {
+	public void auditTrailsDepictHistory() throws InterruptedException {
 		final var newScope = createScope();
 
 		//update ID
@@ -48,6 +49,8 @@ public class AuditTrailsTest extends DatabaseTest {
 		final var secondContextRationale = "Update ID";
 		final var secondContext = createDatabaseActionContext(secondContextRationale);
 		scopeService.save(newScope, secondContext, secondContextRationale);
+
+		Thread.sleep(10); // save() happens too fast. Small delay to ensure different timestamps that can be sorted
 
 		//update ID again
 		final var thirdId = "thirdId";
@@ -87,7 +90,10 @@ public class AuditTrailsTest extends DatabaseTest {
 		final var centerScopeModel = studyService.getStudy().getScopeModel("CENTER");
 		final var centerParent = scopeService.getAll(centerScopeModel).stream().findFirst().get();
 		final var patientScopeModel = studyService.getStudy().getScopeModel("PATIENT");
+
+		final var uniqueCode = "AT-" + UUID.randomUUID().toString().substring(0, 8);
 		final var scopeCandidate = scopeService.createCandidate(patientScopeModel, ZonedDateTime.now(), centerParent);
+		scopeCandidate.setCode(uniqueCode);
 
 		return scopeService.createFromCandidate(scopeCandidate, patientScopeModel, centerParent, context, "Create new scope");
 	}

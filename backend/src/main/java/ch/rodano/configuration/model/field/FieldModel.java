@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,6 +54,8 @@ import ch.rodano.configuration.model.validator.ValueCheck;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializable, Node, Comparable<FieldModel> {
@@ -65,6 +68,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 
 	public static final int MAX_LENGTH = 400;
 
+	private UUID fieldModelId;
 	private String id;
 	private DatasetModel datasetModel;
 
@@ -148,6 +152,20 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 		workflowIds = new ArrayList<>();
 		matcherMessage = new HashMap<>();
 		rules = new ArrayList<>();
+	}
+
+	public UUID getFieldModelId() {
+		if(this.fieldModelId == null && this.id != null && !this.id.isBlank() && this.datasetModel != null && this.datasetModel.getStudy() != null) {
+			this.fieldModelId = deterministic(
+				this.datasetModel.getStudy().getProjectId(),
+				"FIELD_MODEL",
+				this.datasetModel.getId() + "|" + this.id);
+		}
+		return this.fieldModelId;
+	}
+
+	public void setFieldModelId(final UUID fieldModelId) {
+		this.fieldModelId = fieldModelId;
 	}
 
 	@Override
@@ -245,6 +263,16 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 		return validatorIds.stream().map(study::getValidator).collect(Collectors.toSet());
 	}
 
+	@JsonIgnore
+	public List<UUID> getValidatorUuids() {
+		final var study = datasetModel != null ? datasetModel.getStudy() : null;
+		final var projectId = study != null ? study.getProjectId() : null;
+		if(projectId == null || validatorIds == null) {
+			return List.of();
+		}
+		return validatorIds.stream().map(code -> deterministic(study.getProjectId(), "VALIDATOR", code)).toList();
+	}
+
 	public void setWorkflowIds(final List<String> workflowIds) {
 		this.workflowIds = workflowIds;
 	}
@@ -252,6 +280,16 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	@Override
 	public List<String> getWorkflowIds() {
 		return workflowIds;
+	}
+
+	@JsonIgnore
+	public List<UUID> getWorkflowUuids() {
+		final var study = datasetModel != null ? datasetModel.getStudy() : null;
+		final var projectId = study != null ? study.getProjectId() : null;
+		if(projectId == null || workflowIds == null) {
+			return List.of();
+		}
+		return workflowIds.stream().map(code -> deterministic(study.getProjectId(), "WORKFLOW", code)).toList();
 	}
 
 	public final FieldModelType getType() {
@@ -690,7 +728,8 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	 * Transform a field value into a nice label, based on the possible values described in the configuration
 	 * This does not work for fields with a custom possible values provider
 	 * However, this works most and the time and is required where the custom possible values are not available
-	 * @param value the value to transform into a nice label
+	 *
+	 * @param value     the value to transform into a nice label
 	 * @param languages the languages to use for the label
 	 * @return a nice label
 	 */
@@ -989,5 +1028,10 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	@JsonIgnore
 	public final String getExportColumnLabel() {
 		return StringUtils.defaultIfBlank(exportLabel, id);
+	}
+
+	@JsonIgnore
+	public UUID getDatasetModelId() {
+		return (datasetModel != null) ? datasetModel.getDatasetModelId() : null;
 	}
 }

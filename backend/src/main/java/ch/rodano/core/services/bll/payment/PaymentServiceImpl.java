@@ -41,6 +41,7 @@ import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 	private static final DecimalFormat NUMBER_FORMATTER;
+
 	static {
 		NUMBER_FORMATTER = (DecimalFormat) NumberFormat.getInstance(Locale.US);
 		NUMBER_FORMATTER.applyPattern("0.0");
@@ -93,7 +94,7 @@ public class PaymentServiceImpl implements PaymentService {
 		Collections.reverse(ancestors);
 
 		for(final var scope : ancestors) {
-			if(scope.getScopeModelId().equals(payment.getPlan().getInvoicedScopeModel())) {
+			if(scope.getScopeModelId().equals(payment.getPlan().getInvoicedScopeModelUuid())) {
 				return scope;
 			}
 		}

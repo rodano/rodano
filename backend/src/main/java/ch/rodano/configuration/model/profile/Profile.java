@@ -7,12 +7,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -45,6 +47,8 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.timelinegraph.TimelineGraph;
 import ch.rodano.configuration.model.workflow.Workflow;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Profile implements SuperDisplayable, Payable, PayableModel, Node, RightAssignable<Profile> {
@@ -73,6 +77,7 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 		return COMPARATOR_ID.compare(p1, p2);
 	};
 
+	private UUID profileId;
 	private String id;
 	private Study study;
 
@@ -129,6 +134,20 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	@JsonBackReference
 	public final Study getStudy() {
 		return study;
+	}
+
+	public UUID getProfileId() {
+		if(this.profileId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.profileId = deterministic(
+				this.study.getProjectId(),
+				"PROFILE",
+				this.id);
+		}
+		return profileId;
+	}
+
+	public void setProfileId(final UUID profileId) {
+		this.profileId = profileId;
 	}
 
 	@Override
@@ -526,5 +545,162 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	@JsonIgnore
 	public List<PrivacyPolicy> getPrivacyPolicies() {
 		return study.getPrivacyPolicies().stream().filter(p -> p.getProfileIds().contains(id)).toList();
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowUuidOfInterest() {
+		if(this.workflowIdOfInterest == null || this.workflowIdOfInterest.isBlank() || this.study == null) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW", this.workflowIdOfInterest);
+	}
+
+	@JsonIgnore
+	private UUID resolveUuid(final String namespace, final String code) {
+		if(this.study == null || code == null || code.isBlank()) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), namespace, code);
+	}
+
+	@JsonIgnore
+	public SortedSet<UUID> getGrantedFeatureUuids() {
+		return grantedFeatureIds.stream()
+			.map(id -> resolveUuid("FEATURE", id))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	@JsonIgnore
+	public SortedSet<UUID> getGrantedReportUuids() {
+		return grantedReportIds.stream()
+			.map(id -> resolveUuid("REPORT", id))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	@JsonIgnore
+	public SortedSet<UUID> getGrantedMenuUuids() {
+		return grantedMenuIds.stream()
+			.map(id -> resolveUuid("MENU", id))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	@JsonIgnore
+	public SortedSet<UUID> getGrantedCategoryUuids() {
+		return grantedCategoryIds.stream()
+			.map(id -> resolveUuid("RESOURCE_CATEGORY", id))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	@JsonIgnore
+	public SortedSet<UUID> getGrantedTimelineGraphUuids() {
+		return grantedTimelineGraphIds.stream()
+			.map(id -> resolveUuid("TIMELINE_GRAPH", id))
+			.filter(Objects::nonNull)
+			.collect(Collectors.toCollection(TreeSet::new));
+	}
+
+	@JsonIgnore
+	public Map<UUID, Set<Rights>> getGrantedProfileUuidRights() {
+		return toUuidRights(grantedProfileIdRights, "PROFILE");
+	}
+
+	@JsonIgnore
+	public Map<UUID, Set<Rights>> getGrantedScopeModelUuidRights() {
+		return toUuidRights(grantedScopeModelIdRights, "SCOPE_MODEL");
+	}
+
+	@JsonIgnore
+	public Map<UUID, Set<Rights>> getGrantedPaymentPlanUuidRights() {
+		return toUuidRights(grantedPaymentIdRights, "PAYMENT_PLAN");
+	}
+
+	@JsonIgnore
+	public Map<UUID, Set<Rights>> getGrantedDatasetModelUuidRights() {
+		return toUuidRights(grantedDatasetModelIdRights, "DATASET_MODEL");
+	}
+
+	@JsonIgnore
+	public Map<UUID, Set<Rights>> getGrantedEventModelUuidRights() {
+		return toUuidRightsForEventModels(grantedEventModelIdRights);
+	}
+
+	@JsonIgnore
+	public Map<UUID, Set<Rights>> getGrantedFormModelUuidRights() {
+		return toUuidRights(grantedFormModelIdRights, "FORM_MODEL");
+	}
+
+	@JsonIgnore
+	private Map<UUID, Set<Rights>> toUuidRights(final Map<String, Set<Rights>> src, final String namespace) {
+		if(src == null || src.isEmpty()) {
+			return Collections.emptyMap();
+		}
+		return src.entrySet().stream()
+			.map(e -> Map.entry(resolveUuid(namespace, e.getKey()), e.getValue()))
+			.filter(e -> e.getKey() != null)
+			.collect(Collectors.toMap(
+				Entry::getKey,
+				Entry::getValue,
+				(a, b) -> {
+					a.addAll(b);
+					return a;
+				},
+				() -> new TreeMap<>(Comparator.comparing(UUID::toString))
+			));
+	}
+
+	@JsonIgnore
+	public SortedMap<UUID, Right> getGrantedWorkflowUuidMap() {
+		final SortedMap<UUID, Right> out = new TreeMap<>(Comparator.comparing(UUID::toString));
+		for(var e : grantedWorkflowIds.entrySet()) {
+			final var k = resolveUuid("WORKFLOW", e.getKey());
+			if(k != null) {
+				out.put(k, e.getValue());
+			}
+		}
+		return out;
+	}
+
+	@JsonIgnore
+	private Map<UUID, Set<Rights>> toUuidRightsForEventModels(final Map<String, Set<Rights>> src) {
+		if(src == null || src.isEmpty() || study == null) {
+			return Collections.emptyMap();
+		}
+
+		final Map<String, EventModel> eventModelMap = this.study.getEventModels().stream()
+			.collect(Collectors.toMap(EventModel::getId, em -> em));
+
+		return src.entrySet().stream()
+			.map(e -> {
+				final String eventModelCode = e.getKey();
+				final EventModel eventModel = eventModelMap.get(eventModelCode);
+				if(eventModel == null) {
+					return null;
+				}
+				final String scopeModelCode = eventModel.getScopeModel().getId();
+				if(scopeModelCode == null || scopeModelCode.isBlank()) {
+					return null;
+				}
+				final UUID eventModelUuid = deterministic(
+					this.study.getProjectId(),
+					"EVENT_MODEL",
+					scopeModelCode + "|" + eventModelCode
+				);
+				return Map.entry(eventModelUuid, e.getValue());
+			})
+			.filter(Objects::nonNull)
+			.filter(e -> e.getKey() != null)
+			.collect(Collectors.toMap(
+				Entry::getKey,
+				Entry::getValue,
+				(a, b) -> {
+					a.addAll(b);
+					return a;
+				},
+				() -> new TreeMap<>(Comparator.comparing(UUID::toString))
+			));
 	}
 }

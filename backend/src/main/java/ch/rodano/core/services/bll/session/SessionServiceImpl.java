@@ -10,20 +10,24 @@ import org.springframework.stereotype.Service;
 import ch.rodano.core.model.session.Session;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.dao.session.SessionDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 
 @Service
 public class SessionServiceImpl implements SessionService {
 
 	private final SessionDAOService sessionDAOService;
+	private final ProjectIdResolver projectIdResolver;
 
-	public SessionServiceImpl(final SessionDAOService sessionDAOService) {
+	public SessionServiceImpl(final SessionDAOService sessionDAOService, final ProjectIdResolver projectIdResolver) {
 		this.sessionDAOService = sessionDAOService;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	@Override
 	public Session createSession(final User user) {
 		final var now = ZonedDateTime.now();
 		final var session = new Session();
+		session.setProjectId(projectIdResolver.id());
 		session.setUserFk(user.getPk());
 		session.setCreationTime(now);
 		session.setLastAccessTime(ZonedDateTime.now());

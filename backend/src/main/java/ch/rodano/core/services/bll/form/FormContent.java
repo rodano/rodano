@@ -55,7 +55,7 @@ public class FormContent {
 			return Collections.emptyList();
 		}
 		return getAllFields().stream()
-			.filter(f -> f.getDatasetModelId().equals(cell.getDatasetModelId()) && f.getFieldModelId().equals(cell.getFieldModelId()))
+			.filter(f -> f.getDatasetModelId().equals(cell.getDatasetModelUuid()) && f.getFieldModelId().equals(cell.getFieldModelUuid()))
 			.toList();
 	}
 }

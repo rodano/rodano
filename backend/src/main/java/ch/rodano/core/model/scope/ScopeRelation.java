@@ -1,6 +1,7 @@
 package ch.rodano.core.model.scope;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import ch.rodano.core.model.common.HardDeletableObject;
 import ch.rodano.core.model.common.IdentifiableObject;
@@ -8,6 +9,7 @@ import ch.rodano.core.model.common.TimestampableObject;
 
 public class ScopeRelation implements IdentifiableObject, TimestampableObject, HardDeletableObject, Comparable<ScopeRelation> {
 
+	protected UUID projectId;
 	protected Long pk;
 	protected ZonedDateTime creationTime;
 	protected ZonedDateTime lastUpdateTime;
@@ -16,6 +18,14 @@ public class ScopeRelation implements IdentifiableObject, TimestampableObject, H
 	private ZonedDateTime startDate;
 	private ZonedDateTime endDate;
 	private Boolean defaultRelation;
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
 
 	@Override
 	public Long getPk() {

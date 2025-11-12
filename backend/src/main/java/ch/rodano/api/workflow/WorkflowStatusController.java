@@ -188,7 +188,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 
 		final var search = new WorkflowStatusSearch()
 			.setAncestorScopePks(ancestorScopes.stream().map(Scope::getPk).collect(Collectors.toList()))
-			.setWorkflowIds(workflows.stream().map(Workflow::getId).collect(Collectors.toList()))
+			.setWorkflowIds(workflows.stream().map(Workflow::getWorkflowId).collect(Collectors.toList()))
 			.setStateIds(stateIds)
 			.setScopePks(scopePks)
 			.setEventPks(eventPks)
@@ -610,7 +610,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 				.filter(f -> f.containsFieldModel(fieldModel))
 				.findFirst()
 				.orElseThrow();
-			final var form = formService.get(event.get(), formModel.getId());
+			final var form = formService.get(event.get(), formModel.getFormModelId());
 			return new FormInfoDTO(fieldDTO, scope.getPk(), event.get().getPk(), form.getPk());
 		}
 		//if the workflow is attached to the scope (not attached to a event), search form in the scope forms
@@ -619,7 +619,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 				.filter(f -> f.containsFieldModel(fieldModel))
 				.findFirst()
 				.orElseThrow();
-			final var form = formService.get(scope, formModel.getId());
+			final var form = formService.get(scope, formModel.getFormModelId());
 			return new FormInfoDTO(fieldDTO, scope.getPk(), null, form.getPk());
 		}
 		else {
@@ -633,7 +633,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 					.findFirst();
 
 				if(formModel.isPresent()) {
-					final var form = formService.get(e, formModel.get().getId());
+					final var form = formService.get(e, formModel.get().getFormModelId());
 					return new FormInfoDTO(fieldDTO, scope.getPk(), e.getPk(), form.getPk());
 				}
 			}

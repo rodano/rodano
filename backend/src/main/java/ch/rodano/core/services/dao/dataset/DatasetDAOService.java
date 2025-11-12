@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -23,7 +24,7 @@ public interface DatasetDAOService {
 	 * @param datasetModelIds The dataset model ids
 	 * @return The datasets matching the dataset model ids
 	 */
-	List<Dataset> getAllDatasetsByDatasetModelIds(Collection<String> datasetModelIds);
+	List<Dataset> getAllDatasetsByDatasetModelIds(Collection<UUID> datasetModelIds);
 
 	/**
 	 * Get the datasets associated with a given scope pk
@@ -33,7 +34,7 @@ public interface DatasetDAOService {
 	 */
 	List<Dataset> getDatasetsByScopePk(Long scopePk);
 
-	List<Dataset> getDatasetsByScopePkAndDatasetModelIds(Long scopePk, Collection<String> datasetModelIds);
+	List<Dataset> getDatasetsByScopePkAndDatasetModelIds(Long scopePk, Collection<UUID> datasetModelIds);
 
 	/**
 	 * Get all the datasets (including deleted) associated with the given scope pk
@@ -45,11 +46,12 @@ public interface DatasetDAOService {
 
 	/**
 	 * Get all the datasets (including deleted) associated with the given scope pk
-	 * @param scopePk The scope pk
+	 *
+	 * @param scopePk         The scope pk
 	 * @param datasetModelIds The dataset model ids
 	 * @return The datasets associated with the scope pk
 	 */
-	List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(Long scopePk, Collection<String> datasetModelIds);
+	List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(Long scopePk, Collection<UUID> datasetModelIds);
 
 	/**
 	 * Get the datasets associated with a given event pk
@@ -59,7 +61,7 @@ public interface DatasetDAOService {
 	 */
 	List<Dataset> getDatasetsByEventPk(Long eventPk);
 
-	List<Dataset> getDatasetsByEventPkAndDatasetModelIds(Long eventPk, Collection<String> datasetModelIds);
+	List<Dataset> getDatasetsByEventPkAndDatasetModelIds(Long eventPk, Collection<UUID> datasetModelIds);
 
 	/**
 	 * Get all the datasets (including deleted) associated with the given event pk
@@ -71,17 +73,18 @@ public interface DatasetDAOService {
 
 	/**
 	 * Get all the datasets (including deleted) associated with the given event pk
-	 * @param eventPk The pk of the event
+	 *
+	 * @param eventPk         The pk of the event
 	 * @param datasetModelIds The dataset model ids
 	 * @return The datasets associated with the event pk
 	 */
-	List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(Long eventPk, Collection<String> datasetModelIds);
+	List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(Long eventPk, Collection<UUID> datasetModelIds);
 
 	/**
 	 * Sets the deleted flag to true on a dataset in the database
 	 *
-	 * @param dataset The dataset to delete
-	 * @param context The context of the action
+	 * @param dataset   The dataset to delete
+	 * @param context   The context of the action
 	 * @param rationale The rationale for the operation
 	 */
 	void deleteDataset(Dataset dataset, DatabaseActionContext context, String rationale);
@@ -89,8 +92,8 @@ public interface DatasetDAOService {
 	/**
 	 * Sets the deleted flag to false on a dataset in the database
 	 *
-	 * @param dataset The dataset to restore
-	 * @param context The context of the action
+	 * @param dataset   The dataset to restore
+	 * @param context   The context of the action
 	 * @param rationale The rationale for the operation
 	 */
 	void restoreDataset(Dataset dataset, DatabaseActionContext context, String rationale);
@@ -98,8 +101,8 @@ public interface DatasetDAOService {
 	/**
 	 * Save a dataset in the database
 	 *
-	 * @param dataset The dataset to create/update
-	 * @param context The context of the action
+	 * @param dataset   The dataset to create/update
+	 * @param context   The context of the action
 	 * @param rationale The rationale for the operation
 	 */
 	void saveDataset(Dataset dataset, DatabaseActionContext context, String rationale);

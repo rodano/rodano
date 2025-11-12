@@ -63,12 +63,12 @@ public class Form extends FormRecord implements DeletableObject, TimestampableOb
 
 	@Override
 	public String getId() {
-		return formModelId;
+		return formModel.getId();
 	}
 
 	public void setFormModel(final FormModel formModel) {
 		this.formModel = formModel;
-		this.formModelId = formModel.getId();
+		this.formModelId = formModel.getFormModelId();
 	}
 
 	public FormModel getFormModel() {

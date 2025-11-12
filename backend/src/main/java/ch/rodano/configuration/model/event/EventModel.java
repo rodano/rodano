@@ -9,10 +9,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +39,8 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class EventModel implements Serializable, SuperDisplayable, WorkflowableModel, RightAssignable<EventModel>, Node, Comparable<EventModel> {
@@ -49,6 +53,7 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	private ScopeModel scopeModel;
 
+	private UUID eventModelId;
 	private String id;
 
 	private SortedMap<String, String> shortname;
@@ -96,6 +101,20 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 		workflowIds = new ArrayList<>();
 		impliedEventModelIds = new TreeSet<>();
 		blockedEventModelIds = new TreeSet<>();
+	}
+
+	public UUID getEventModelId() {
+		if(this.eventModelId == null && this.id != null && !this.id.isBlank() && this.scopeModel != null && this.scopeModel.getStudy() != null) {
+			this.eventModelId = deterministic(
+				this.scopeModel.getStudy().getProjectId(),
+				"EVENT_MODEL",
+				this.scopeModel.getId() + "|" + this.id);
+		}
+		return this.eventModelId;
+	}
+
+	public void setEventModelId(final UUID eventModelId) {
+		this.eventModelId = eventModelId;
 	}
 
 	@Override
@@ -157,6 +176,11 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 		this.eventGroupId = eventGroupId;
 	}
 
+	@JsonIgnore
+	public UUID getEventGroupUuid() {
+		return StringUtils.isBlank(eventGroupId) ? null : deterministic(scopeModel.getStudy().getProjectId(), "EVENT_GROUP", scopeModel.getId() + "|" + eventGroupId);
+	}
+
 	public final boolean isInceptive() {
 		return inceptive;
 	}
@@ -171,6 +195,22 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	public void setImpliedEventModelIds(final Set<String> impliedEventIds) {
 		this.impliedEventModelIds = impliedEventIds;
+	}
+
+	@JsonIgnore
+	public List<UUID> getImpliedEventModelUuids() {
+		final var projectId = scopeModel != null && scopeModel.getStudy() != null
+			? scopeModel.getStudy().getProjectId()
+			: null;
+
+		if(projectId == null) {
+			return List.of();
+		}
+
+		return impliedEventModelIds == null ? List.of()
+			: impliedEventModelIds.stream()
+			.map(c -> deterministic(projectId, "EVENT_MODEL", scopeModel.getId() + "|" + c))
+			.toList();
 	}
 
 	@JsonIgnore
@@ -189,6 +229,22 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	public void setBlockedEventModelIds(final Set<String> blockedEventIds) {
 		this.blockedEventModelIds = blockedEventIds;
+	}
+
+	@JsonIgnore
+	public List<UUID> getBlockedEventModelUuids() {
+		final var projectId = scopeModel != null && scopeModel.getStudy() != null
+			? scopeModel.getStudy().getProjectId()
+			: null;
+
+		if(projectId == null) {
+			return List.of();
+		}
+
+		return blockedEventModelIds == null ? List.of()
+			: blockedEventModelIds.stream()
+			.map(c -> deterministic(projectId, "EVENT_MODEL", scopeModel.getId() + "|" + c))
+			.toList();
 	}
 
 	@JsonIgnore
@@ -309,6 +365,22 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 		this.deadlineReferenceEventModelIds = deadlineReferenceEventIds;
 	}
 
+	@JsonIgnore
+	public List<UUID> getDeadlineReferenceEventModelUuids() {
+		final var projectId = scopeModel != null && scopeModel.getStudy() != null
+			? scopeModel.getStudy().getProjectId()
+			: null;
+
+		if(projectId == null) {
+			return List.of();
+		}
+
+		return deadlineReferenceEventModelIds == null ? List.of()
+			: deadlineReferenceEventModelIds.stream()
+			.map(c -> deterministic(projectId, "EVENT_MODEL", scopeModel.getId() + "|" + c))
+			.toList();
+	}
+
 	public DateAggregationFunction getDeadlineAggregationFunction() {
 		return deadlineAggregationFunction;
 	}
@@ -388,6 +460,30 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
+	public List<UUID> getDatasetModelUuids() {
+		if(datasetModelIds == null || datasetModelIds.isEmpty()) {
+			return List.of();
+		}
+		final var study = getStudy();
+		if(study == null) {
+			return List.of();
+		}
+
+		return datasetModelIds.stream()
+			.map(id -> {
+				try {
+					final var datasetModel = study.getDatasetModel(id);
+					return datasetModel.getDatasetModelId();
+				}
+				catch(Exception e) {
+					return null;
+				}
+			})
+			.filter(Objects::nonNull)
+			.toList();
+	}
+
+	@JsonIgnore
 	public List<DatasetModel> getDatasetModels() {
 		return getStudy().getNodesFromIds(Entity.DATASET_MODEL, datasetModelIds);
 	}
@@ -398,6 +494,31 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	public final void setFormModelIds(final List<String> formModelIds) {
 		this.formModelIds = formModelIds;
+	}
+
+	@JsonIgnore
+	public List<UUID> getFormModelUuids() {
+		if(this.formModelIds == null || this.formModelIds.isEmpty()) {
+			return List.of();
+		}
+
+		final var study = getStudy();
+		if(study == null) {
+			return List.of();
+		}
+
+		return formModelIds.stream()
+			.map(id -> {
+				try {
+					final var formModel = study.getFormModel(id);
+					return formModel.getFormModelId();
+				}
+				catch(Exception e) {
+					return null;
+				}
+			})
+			.filter(Objects::nonNull)
+			.toList();
 	}
 
 	@JsonIgnore
@@ -418,6 +539,31 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	public final void setWorkflowIds(final List<String> workflowIds) {
 		this.workflowIds = workflowIds;
+	}
+
+	@JsonIgnore
+	public List<UUID> getWorkflowUuids() {
+		if(this.workflowIds == null || this.workflowIds.isEmpty()) {
+			return List.of();
+		}
+
+		final var study = getStudy();
+		if(study == null) {
+			return List.of();
+		}
+
+		return workflowIds.stream()
+			.map(id -> {
+				try {
+					final var workflow = study.getWorkflow(id);
+					return workflow.getWorkflowId();
+				}
+				catch(Exception e) {
+					return null;
+				}
+			})
+			.filter(Objects::nonNull)
+			.toList();
 	}
 
 	@JsonIgnore

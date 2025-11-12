@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -18,19 +19,19 @@ public interface FieldDAOService {
 	/**
 	 * Get the fields associated with a given dataset
 	 *
-	 * @param datasetPk The dataset pk
+	 * @param datasetPk     The dataset pk
 	 * @param fieldModelIds The list of field model ids
 	 * @return The list of fields associated with the dataset
 	 */
-	List<Field> getFieldsByDatasetPkHavingFieldModelIds(Long datasetPk, Collection<String> fieldModelIds);
+	List<Field> getFieldsByDatasetPkHavingFieldModelIds(Long datasetPk, Collection<UUID> fieldModelIds);
 
 	List<Field> getFieldsFromDatasetWithAValue(Long datasetPk);
 
 	/**
 	 * Creates/updates a field in the database
 	 *
-	 * @param field   The field to create/update
-	 * @param context The context of the action
+	 * @param field     The field to create/update
+	 * @param context   The context of the action
 	 * @param rationale The rationale for the operation
 	 */
 	void saveField(Field field, DatabaseActionContext context, String rationale);

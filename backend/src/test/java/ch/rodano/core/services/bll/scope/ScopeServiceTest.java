@@ -43,7 +43,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringTestConfiguration
-@Transactional
 public class ScopeServiceTest extends DatabaseTest {
 
 	@Autowired
@@ -74,6 +73,7 @@ public class ScopeServiceTest extends DatabaseTest {
 
 	@Test
 	@DisplayName("Deleted scope retrieval works correctly")
+	@Transactional
 	public void testDeletedScopeRetrieval() {
 		// create a patient
 		final var patientScopeModel = studyService.getStudy().getScopeModel("PATIENT");
@@ -238,14 +238,22 @@ public class ScopeServiceTest extends DatabaseTest {
 		final var parentScope = scopeDAOService.getScopeByCode("FR-01");
 
 		// set a limit on the max number of patients
-		study.getScopeModel("PATIENT").setMaxNumber(3);
+		final var patientModel = study.getScopeModel("PATIENT");
+		final var originalMaxNumber = patientModel.getMaxNumber();
 
 		// patient should be impossible to create
-		assertThrows(
-			MaxDescendantScopesReachedException.class,
-			() -> testHelperService.createPatient(parentScope, context),
-			"We manage to create a patient despite exceeding the established maximum number of patients"
-		);
+		try {
+			patientModel.setMaxNumber(3);
+
+			assertThrows(
+				MaxDescendantScopesReachedException.class,
+				() -> testHelperService.createPatient(parentScope, context),
+				"We manage to create a patient despite exceeding the established maximum number of patients"
+			);
+		}
+		finally {
+			patientModel.setMaxNumber(originalMaxNumber);
+		}
 	}
 
 	@Test

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.text.WordUtils;
 
@@ -29,12 +30,15 @@ import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightAssignable<PaymentPlan>, Comparable<PaymentPlan> {
 	@Serial
 	private static final long serialVersionUID = 7456710559952363241L;
 
+	private UUID paymentPlanId;
 	private String id;
 	private Study study;
 
@@ -59,6 +63,20 @@ public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightA
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
 		steps = new ArrayList<>();
+	}
+
+	public UUID getPaymentPlanId() {
+		if(this.paymentPlanId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.paymentPlanId = deterministic(
+				this.study.getProjectId(),
+				"PAYMENT_PLAN",
+				this.id);
+		}
+		return paymentPlanId;
+	}
+
+	public void setPaymentPlanId(final UUID paymentPlanId) {
+		this.paymentPlanId = paymentPlanId;
 	}
 
 	@Override
@@ -159,7 +177,10 @@ public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightA
 
 	@JsonManagedReference
 	public final void setSteps(final List<PaymentStep> steps) {
-		this.steps = steps;
+		this.steps = (steps == null) ? new ArrayList<>() : steps;
+		for(var s : this.steps) {
+			s.setPaymentPlan(this);
+		}
 	}
 
 	@Override
@@ -244,5 +265,29 @@ public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightA
 	@JsonIgnore
 	public String getAssignableDescription() {
 		return getDefaultLocalizedShortname();
+	}
+
+	@JsonIgnore
+	public UUID getInvoicedScopeModelUuid() {
+		if(this.invoicedScopeModel == null || this.invoicedScopeModel.isBlank() || this.study == null) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "SCOPE_MODEL", this.invoicedScopeModel);
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowUuid() {
+		if(this.workflow == null || this.workflow.isBlank() || this.study == null) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW", this.workflow);
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowStateUuid() {
+		if(this.state == null || this.state.isBlank() || this.study == null) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "WORKFLOW_STATE", this.workflow + "|" + this.state);
 	}
 }

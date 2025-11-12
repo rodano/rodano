@@ -68,6 +68,9 @@ public class EventDAOServiceImpl extends AuditableDAOService<Event, EventAuditTr
 		if(event.getId() == null) {
 			event.setId(UUID.randomUUID().toString());
 		}
+		if(event.getProjectId() == null) {
+			event.setProjectId(studyService.getStudy().getProjectId());
+		}
 		save(event, context, rationale);
 	}
 
@@ -88,13 +91,13 @@ public class EventDAOServiceImpl extends AuditableDAOService<Event, EventAuditTr
 	}
 
 	@Override
-	public List<Event> getAllEventsByEventModelId(final String eventModelId) {
+	public List<Event> getAllEventsByEventModelId(final UUID eventModelId) {
 		final var query = create.selectFrom(EVENT).where(EVENT.EVENT_MODEL_ID.eq(eventModelId));
 		return find(query);
 	}
 
 	@Override
-	public List<Event> getEventsByScopePkAndEventModelId(final Long scopePk, final String eventModelId) {
+	public List<Event> getEventsByScopePkAndEventModelId(final Long scopePk, final UUID eventModelId) {
 		final var query = create.selectFrom(EVENT).where(EVENT.SCOPE_FK.eq(scopePk).and(EVENT.EVENT_MODEL_ID.eq(eventModelId))).and(EVENT.DELETED.isFalse());
 		return find(query);
 	}
@@ -106,13 +109,13 @@ public class EventDAOServiceImpl extends AuditableDAOService<Event, EventAuditTr
 	}
 
 	@Override
-	public List<Event> getAllEventsByScopePkAndEventModelId(final Long scopePk, final String eventModelId) {
+	public List<Event> getAllEventsByScopePkAndEventModelId(final Long scopePk, final UUID eventModelId) {
 		final var query = create.selectFrom(EVENT).where(EVENT.SCOPE_FK.eq(scopePk).and(EVENT.EVENT_MODEL_ID.eq(eventModelId)));
 		return find(query);
 	}
 
 	@Override
-	public Event getEventByScopePkAndEventModelIdAndEventNumber(final Long scopePk, final String eventModelId, final int eventNumber) {
+	public Event getEventByScopePkAndEventModelIdAndEventNumber(final Long scopePk, final UUID eventModelId, final int eventNumber) {
 		final var query = create.selectFrom(EVENT)
 			.where(
 				EVENT.SCOPE_FK.eq(scopePk)

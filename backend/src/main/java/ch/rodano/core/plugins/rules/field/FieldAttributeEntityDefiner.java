@@ -2,6 +2,7 @@ package ch.rodano.core.plugins.rules.field;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
@@ -50,7 +51,7 @@ public class FieldAttributeEntityDefiner extends AbstractFieldEntityDefiner {
 		return List.of(
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
+				public UUID getValue(final Evaluable evaluable) {
 					return ((Field) evaluable).getFieldModelId();
 				}
 

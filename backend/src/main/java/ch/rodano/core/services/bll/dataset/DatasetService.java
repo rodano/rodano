@@ -213,4 +213,19 @@ public interface DatasetService {
 		DatabaseActionContext context,
 		String rationale
 	);
+
+	Dataset getOrCreate(
+		Scope scope,
+		DatasetModel datasetModel,
+		DatabaseActionContext context,
+		String rationale
+	);
+
+	Dataset getOrCreate(
+		Scope scope,
+		Event event,
+		DatasetModel datasetModel,
+		DatabaseActionContext context,
+		String rationale
+	);
 }

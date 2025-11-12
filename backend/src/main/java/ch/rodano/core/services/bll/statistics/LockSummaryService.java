@@ -83,12 +83,12 @@ public class LockSummaryService {
 		//fetch scope and event statuses
 		final var now = ZonedDateTime.now();
 		final var scopeSubquery = create.select(
-			SCOPE_ANCESTOR.ANCESTOR_FK.as("ancestor_fk"),
-			SCOPE.PK.as("scope_pk"),
-			SCOPE.LOCKED.as("scope_locked"),
-			DSL.sum(DSL.when(EVENT.LOCKED.isTrue(), 1).otherwise(0)).coerce(Long.class).as("event_locked"),
-			DSL.sum(DSL.when(EVENT.LOCKED.isFalse(), 1).otherwise(0)).coerce(Long.class).as("event_unlocked")
-		)
+				SCOPE_ANCESTOR.ANCESTOR_FK.as("ancestor_fk"),
+				SCOPE.PK.as("scope_pk"),
+				SCOPE.LOCKED.as("scope_locked"),
+				DSL.sum(DSL.when(EVENT.LOCKED.isTrue(), 1).otherwise(0)).coerce(Long.class).as("event_locked"),
+				DSL.sum(DSL.when(EVENT.LOCKED.isFalse(), 1).otherwise(0)).coerce(Long.class).as("event_unlocked")
+			)
 			.from(SCOPE)
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE.PK.equal(SCOPE_ANCESTOR.SCOPE_FK))
 			.leftJoin(EVENT).on(EVENT.SCOPE_FK.equal(SCOPE_ANCESTOR.SCOPE_FK))
@@ -96,19 +96,19 @@ public class LockSummaryService {
 			.and(SCOPE_ANCESTOR.DEFAULT.isTrue())
 			.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
 			.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
-			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()))
+			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId()))
 			.and(SCOPE.DELETED.isFalse())
 			//remember that the scope may not have any event
 			.and(EVENT.DELETED.isNull().or(EVENT.DELETED.isFalse()))
 			.groupBy(SCOPE_ANCESTOR.ANCESTOR_FK, SCOPE.PK).asTable("x");
 
 		final var query = create.select(
-			scopeSubquery.field("ancestor_fk"),
-			DSL.sum(DSL.when(scopeSubquery.field("scope_locked").isTrue(), 1).otherwise(0)).coerce(Long.class).as("scope_locked"),
-			DSL.sum(DSL.when(scopeSubquery.field("scope_locked").isFalse(), 1).otherwise(0)).coerce(Long.class).as("scope_unlocked"),
-			DSL.sum(scopeSubquery.field("event_locked", Long.class)).coerce(Long.class).as("event_locked"),
-			DSL.sum(scopeSubquery.field("event_unlocked", Long.class)).coerce(Long.class).as("event_unlocked")
-		)
+				scopeSubquery.field("ancestor_fk"),
+				DSL.sum(DSL.when(scopeSubquery.field("scope_locked").isTrue(), 1).otherwise(0)).coerce(Long.class).as("scope_locked"),
+				DSL.sum(DSL.when(scopeSubquery.field("scope_locked").isFalse(), 1).otherwise(0)).coerce(Long.class).as("scope_unlocked"),
+				DSL.sum(scopeSubquery.field("event_locked", Long.class)).coerce(Long.class).as("event_locked"),
+				DSL.sum(scopeSubquery.field("event_unlocked", Long.class)).coerce(Long.class).as("event_unlocked")
+			)
 			.from(scopeSubquery)
 			.groupBy(scopeSubquery.field("ancestor_fk"));
 
@@ -176,7 +176,7 @@ public class LockSummaryService {
 			.where(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
 			.and(ancestorTable.VIRTUAL.isFalse())
 			.and(ancestorTable.SCOPE_MODEL_ID.in(scopeModelIds))
-			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()))
+			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId()))
 			.and(SCOPE.DELETED.isFalse())
 			.groupBy(SCOPE.PK);
 
@@ -210,7 +210,7 @@ public class LockSummaryService {
 
 				//column of ancestors' scopes
 				for(final var scopeModel : scopeModels) {
-					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getId())).findAny();
+					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getScopeModelId())).findAny();
 					line.add(ancestor.map(ScopeTinyDTO::pk).map(p -> Long.toString(p)).orElse(""));
 					line.add(ancestor.map(ScopeTinyDTO::code).orElse(""));
 				}
@@ -247,7 +247,7 @@ public class LockSummaryService {
 			.where(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
 			.and(ancestorTable.VIRTUAL.isFalse())
 			.and(ancestorTable.SCOPE_MODEL_ID.in(scopeModelIds))
-			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()))
+			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId()))
 			.and(SCOPE.DELETED.isFalse())
 			.and(EVENT.DELETED.isFalse())
 			.groupBy(EVENT.PK);
@@ -285,7 +285,7 @@ public class LockSummaryService {
 
 				//column of ancestors' scopes
 				for(final var scopeModel : scopeModels) {
-					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getId())).findAny();
+					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getScopeModelId())).findAny();
 					line.add(ancestor.map(ScopeTinyDTO::pk).map(p -> Long.toString(p)).orElse(""));
 					line.add(ancestor.map(ScopeTinyDTO::code).orElse(""));
 				}

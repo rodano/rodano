@@ -3,6 +3,7 @@ package ch.rodano.api.resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -95,7 +96,7 @@ public class ResourceController extends AbstractSecuredController {
 	@GetMapping(value = { "", "public" })
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<ResourceDTO> search(
-		@Parameter(description = "Category ID of the resource") @RequestParam final Optional<String> categoryId,
+		@Parameter(description = "Category ID of the resource") @RequestParam final Optional<UUID> categoryId,
 		@Parameter(description = "Full text search on title and description") @RequestParam final Optional<String> fullText,
 		@Parameter(description = "Has the resource been removed ?") @RequestParam final Optional<Boolean> removed,
 		@Parameter(description = "Sort the results by which property?") @RequestParam final Optional<ResourceSortBy> sortBy,
@@ -120,7 +121,7 @@ public class ResourceController extends AbstractSecuredController {
 		final var hasRightToSeeDeleted = currentRoles.isPresent() && rightsService.hasRight(currentRoles.get(), FeatureStatic.MANAGE_DELETED_DATA);
 
 		final var search = new ResourceSearch()
-			.setCategoryId(categoryId.filter(StringUtils::isNotBlank))
+			.setCategoryId(categoryId)
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
 			.setIncludeDeleted(hasRightToSeeDeleted && removed.orElse(false))
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)

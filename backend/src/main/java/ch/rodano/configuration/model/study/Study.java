@@ -18,6 +18,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -31,9 +32,12 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
+import ch.rodano.configuration.jackson.DeterministicNamespace;
+import ch.rodano.configuration.jackson.DeterministicUuidDeserializer;
 import ch.rodano.configuration.model.changelog.Changelog;
 import ch.rodano.configuration.model.chart.Chart;
 import ch.rodano.configuration.model.common.Entity;
@@ -65,6 +69,8 @@ import ch.rodano.configuration.model.validator.Validator;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public final class Study implements Serializable, SuperDisplayable, Node, Comparable<Study> {
@@ -89,6 +95,10 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	private String id;
+
+	@DeterministicNamespace(value = "PROJECT", sourceProperty = "id")
+	@JsonDeserialize(using = DeterministicUuidDeserializer.class)
+	private UUID projectId;
 
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> longname;
@@ -207,11 +217,27 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	public final void setId(final String id) {
 		this.id = id;
+		if(this.projectId == null && this.id != null && !this.id.isBlank()) {
+			this.projectId = deterministic(null, "PROJECT", id);
+		}
 	}
 
 	@Override
 	public final String getId() {
 		return id;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		if(projectId != null) {
+			this.projectId = projectId;
+		}
+		else if(this.projectId == null && this.id != null && !this.id.isBlank()) {
+			this.projectId = deterministic(null, "PROJECT", this.id);
+		}
 	}
 
 	@Override
@@ -515,11 +541,19 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
-	public ScopeModel getScopeModel(final String scopeModelId) {
+	public ScopeModel getScopeModel(final UUID scopeModelId) {
 		return scopeModels.stream()
-			.filter(s -> s.getId().equalsIgnoreCase(scopeModelId))
+			.filter(s -> scopeModelId != null && scopeModelId.equals(s.getScopeModelId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.SCOPE_MODEL, scopeModelId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.SCOPE_MODEL, scopeModelId != null ? scopeModelId.toString() : null));
+	}
+
+	@JsonIgnore
+	public ScopeModel getScopeModel(final String scopeModelCode) {
+		return scopeModels.stream()
+			.filter(s -> s.getId().equalsIgnoreCase(scopeModelCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.SCOPE_MODEL, scopeModelCode));
 	}
 
 	@JsonManagedReference("study")
@@ -566,11 +600,19 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
-	public Workflow getWorkflow(final String workflowId) {
+	public Workflow getWorkflow(final UUID workflowId) {
 		return workflows.stream()
-			.filter(w -> w.getId().equalsIgnoreCase(workflowId))
+			.filter(w -> workflowId != null && workflowId.equals(w.getWorkflowId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW, workflowId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW, workflowId != null ? workflowId.toString() : null));
+	}
+
+	@JsonIgnore
+	public Workflow getWorkflow(final String workflowCode) {
+		return workflows.stream()
+			.filter(w -> w.getId().equalsIgnoreCase(workflowCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW, workflowCode));
 	}
 
 	@JsonManagedReference
@@ -716,6 +758,26 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public ResourceCategory getResourceCategory(final UUID resourceCategoryId) {
+		var category = resourceCategories.stream()
+			.filter(r -> resourceCategoryId != null && resourceCategoryId.equals(r.getResourceCategoryId()))
+			.findFirst();
+
+		if(category.isPresent()) {
+			return category.get();
+		}
+
+		category = resourceCategories.stream()
+			.filter(r -> {
+				final UUID regeneratedId = deterministic(projectId, "RESOURCE_CATEGORY", r.getId());
+				return resourceCategoryId.equals(regeneratedId);
+			})
+			.findFirst();
+
+		return category.orElseThrow(() -> new NoNodeException(this, Entity.RESOURCE_CATEGORY, resourceCategoryId != null ? resourceCategoryId.toString() : null));
+	}
+
+	@JsonIgnore
 	public ResourceCategory getResourceCategory(final String resourceCategoryId) {
 		return resourceCategories.stream()
 			.filter(r -> r.getId().equalsIgnoreCase(resourceCategoryId))
@@ -836,11 +898,19 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
-	public FormModel getFormModel(final String formModelId) {
+	public FormModel getFormModel(final UUID formModelId) {
 		return formModels.stream()
-			.filter(p -> p.getId().equalsIgnoreCase(formModelId))
+			.filter(p -> formModelId != null && formModelId.equals(p.getFormModelId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.FORM_MODEL, formModelId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.FORM_MODEL, formModelId != null ? formModelId.toString() : null));
+	}
+
+	@JsonIgnore
+	public FormModel getFormModel(final String formModelCode) {
+		return formModels.stream()
+			.filter(p -> p.getId().equalsIgnoreCase(formModelCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.FORM_MODEL, formModelCode));
 	}
 
 	@JsonManagedReference
@@ -854,11 +924,19 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
-	public DatasetModel getDatasetModel(final String datasetModelId) {
+	public DatasetModel getDatasetModel(final UUID datasetModelId) {
 		return datasetModels.stream()
-			.filter(d -> d.getId().equalsIgnoreCase(datasetModelId))
+			.filter(d -> datasetModelId != null && datasetModelId.equals(d.getDatasetModelId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.DATASET_MODEL, datasetModelId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.DATASET_MODEL, datasetModelId != null ? datasetModelId.toString() : null));
+	}
+
+	@JsonIgnore
+	public DatasetModel getDatasetModel(final String datasetModelCode) {
+		return datasetModels.stream()
+			.filter(d -> d.getId().equalsIgnoreCase(datasetModelCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.DATASET_MODEL, datasetModelCode));
 	}
 
 	@JsonProperty("features")
@@ -918,11 +996,19 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
-	public Profile getProfile(final String profileId) {
+	public Profile getProfile(final UUID profileId) {
 		return profiles.stream()
-			.filter(p -> p.getId().equalsIgnoreCase(profileId))
+			.filter(p -> profileId != null && profileId.equals(p.getProfileId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.PROFILE, profileId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.PROFILE, profileId != null ? profileId.toString() : null));
+	}
+
+	@JsonIgnore
+	public Profile getProfile(final String profileCode) {
+		return profiles.stream()
+			.filter(p -> p.getId().equalsIgnoreCase(profileCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.PROFILE, profileCode));
 	}
 
 	@JsonManagedReference
@@ -1140,5 +1226,12 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public String generateFilename(final String filename, final ExportFormat format) {
 		return String.format("%s.%s", generateFilename(filename), format.getExtension());
+	}
+
+	@JsonIgnore
+	public UUID getEproProfileUuid() {
+		return (eproProfileId == null || eproProfileId.isBlank())
+			? null
+			: deterministic(projectId, "PROFILE", eproProfileId);
 	}
 }

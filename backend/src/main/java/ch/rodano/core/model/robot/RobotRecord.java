@@ -1,9 +1,12 @@
 package ch.rodano.core.model.robot;
 
+import java.util.UUID;
+
 public class RobotRecord {
 
 	protected boolean deleted;
 
+	protected UUID projectId;
 	protected String name;
 	protected String key;
 
@@ -17,6 +20,14 @@ public class RobotRecord {
 
 	public void setDeleted(final boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public String getName() {

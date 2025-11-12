@@ -1,6 +1,7 @@
 package ch.rodano.api.scope;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +12,7 @@ public record ScopeCandidateDTO(
 	@NotNull Long parentScopePk,
 	@NotBlank String code,
 	@NotBlank String shortname,
-	@NotBlank String modelId,
+	@NotBlank UUID modelId,
 	@NotNull ZonedDateTime startDate,
 	ZonedDateTime stopDate
 ) {

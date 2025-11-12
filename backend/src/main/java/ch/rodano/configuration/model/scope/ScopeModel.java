@@ -12,6 +12,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -43,6 +44,8 @@ import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableModel, PayableModel, Node, RightAssignable<ScopeModel> {
@@ -61,6 +64,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	};
 
 	private Study study;
+	private UUID scopeModelId;
 	private String id;
 
 	private SortedMap<String, String> shortname;
@@ -114,6 +118,20 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	@JsonBackReference
 	public final Study getStudy() {
 		return study;
+	}
+
+	public UUID getScopeModelId() {
+		if(this.scopeModelId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.scopeModelId = deterministic(
+				this.study.getProjectId(),
+				"SCOPE_MODEL",
+				this.id);
+		}
+		return scopeModelId;
+	}
+
+	public void setScopeModelId(final UUID scopeModelId) {
+		this.scopeModelId = scopeModelId;
 	}
 
 	@Override
@@ -229,11 +247,19 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
-	public EventModel getEventModel(final String eventModelId) {
+	public EventModel getEventModel(final UUID eventModelId) {
 		return eventModels.stream()
-			.filter(e -> e.getId().equalsIgnoreCase(eventModelId))
+			.filter(e -> eventModelId != null && eventModelId.equals(e.getEventModelId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.EVENT_MODEL, eventModelId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.EVENT_MODEL, eventModelId != null ? eventModelId.toString() : "null"));
+	}
+
+	@JsonIgnore
+	public EventModel getEventModel(final String eventModelCode) {
+		return eventModels.stream()
+			.filter(e -> e.getId().equalsIgnoreCase(eventModelCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.EVENT_MODEL, eventModelCode));
 	}
 
 	@JsonManagedReference
@@ -389,7 +415,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		models.add(this);
 
 		if(getParentIds().isEmpty()) {
-			throw new NoRespectForConfigurationException(String.format("%s and %s are not on the same branch", models.get(0).getId(), model.getId()));
+			throw new NoRespectForConfigurationException(String.format("%s and %s are not on the same branch", models.getFirst().getId(), model.getId()));
 		}
 
 		if(getParentIds().contains(model.getId())) {
@@ -549,5 +575,37 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	@JsonIgnore
 	public final String getDefaultLocalizedShortname() {
 		return getLocalizedShortname(study.getDefaultLanguage().getId());
+	}
+
+	@JsonIgnore
+	public UUID getDefaultProfileUuid() {
+		if(this.defaultProfileId == null || this.defaultProfileId.isBlank() || this.study == null) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "PROFILE", this.defaultProfileId);
+	}
+
+	@JsonIgnore
+	public List<UUID> getParentUuids() {
+		return parentIds == null ? List.of()
+			: parentIds.stream().map(code -> deterministic(this.study.getProjectId(), "SCOPE_MODEL", code)).toList();
+	}
+
+	@JsonIgnore
+	public List<UUID> getDatasetModelUuids() {
+		return datasetModelIds == null ? List.of()
+			: datasetModelIds.stream().map(code -> deterministic(this.study.getProjectId(), "DATASET_MODEL", code)).toList();
+	}
+
+	@JsonIgnore
+	public List<UUID> getFormModelUuids() {
+		return formModelIds == null ? List.of()
+			: formModelIds.stream().map(code -> deterministic(this.study.getProjectId(), "FORM_MODEL", code)).toList();
+	}
+
+	@JsonIgnore
+	public List<UUID> getWorkflowUuids() {
+		return workflowIds == null ? List.of()
+			: workflowIds.stream().map(code -> deterministic(this.study.getProjectId(), "WORKFLOW", code)).toList();
 	}
 }

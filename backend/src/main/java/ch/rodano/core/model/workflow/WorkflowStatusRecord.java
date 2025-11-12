@@ -1,9 +1,12 @@
 package ch.rodano.core.model.workflow;
 
+import java.util.UUID;
+
 public class WorkflowStatusRecord {
 
 	protected boolean deleted;
 
+	protected UUID projectId;
 	protected Long scopeFk;
 	protected Long fieldFk;
 	protected Long eventFk;
@@ -11,8 +14,8 @@ public class WorkflowStatusRecord {
 	protected Long userFk;
 	protected Long robotFk;
 	protected String profileId;
-	protected String stateId;
-	protected String workflowId;
+	protected UUID workflowStateId;
+	protected UUID workflowId;
 	protected String actionId;
 	protected String validatorId;
 	protected String triggerMessage;
@@ -27,6 +30,14 @@ public class WorkflowStatusRecord {
 
 	public void setDeleted(final boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public Long getScopeFk() {
@@ -87,19 +98,19 @@ public class WorkflowStatusRecord {
 		this.profileId = profileId;
 	}
 
-	public String getStateId() {
-		return stateId;
+	public UUID getWorkflowStateId() {
+		return workflowStateId;
 	}
 
-	public void setStateId(final String stateId) {
-		this.stateId = stateId;
+	public void setWorkflowStateId(final UUID workflowStateId) {
+		this.workflowStateId = workflowStateId;
 	}
 
-	public String getWorkflowId() {
+	public UUID getWorkflowId() {
 		return workflowId;
 	}
 
-	public void setWorkflowId(final String workflowId) {
+	public void setWorkflowId(final UUID workflowId) {
 		this.workflowId = workflowId;
 	}
 

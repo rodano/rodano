@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,8 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.ProfileRightAssignable;
 import ch.rodano.configuration.model.rules.Rule;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Action implements Serializable, SuperDisplayable, Node, ProfileRightAssignable<Action>, Comparable<Action> {
@@ -30,6 +33,7 @@ public class Action implements Serializable, SuperDisplayable, Node, ProfileRigh
 
 	public static final Comparator<Action> DEFAULT_COMPARATOR = Comparator.comparing(Action::getId);
 
+	private UUID workflowActionId;
 	private String id;
 	private Workflow workflow;
 
@@ -50,6 +54,20 @@ public class Action implements Serializable, SuperDisplayable, Node, ProfileRigh
 		shortname = new TreeMap<>();
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
+	}
+
+	public UUID getWorkflowActionId() {
+		if(this.workflowActionId == null && this.id != null && !this.id.isBlank() && this.workflow != null && this.workflow.getStudy() != null) {
+			this.workflowActionId = deterministic(
+				this.workflow.getStudy().getProjectId(),
+				"WORKFLOW_ACTION",
+				this.workflow.getId() + "|" + this.id);
+		}
+		return workflowActionId;
+	}
+
+	public void setWorkflowActionId(final UUID workflowActionId) {
+		this.workflowActionId = workflowActionId;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,12 +27,15 @@ import ch.rodano.configuration.model.rules.RuleConstraint;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Cell implements Node {
 	@Serial
 	private static final long serialVersionUID = 7222424955705312814L;
 
+	private UUID layoutCellId;
 	private String id;
 	private Line line;
 
@@ -59,6 +63,25 @@ public class Cell implements Node {
 		textBefore = new TreeMap<>();
 		textAfter = new TreeMap<>();
 		visibilityCriteria = new ArrayList<>();
+	}
+
+	public UUID getLayoutCellId() {
+		if(this.layoutCellId == null
+			&& this.line != null
+			&& this.id != null && !this.id.isBlank()
+			&& this.line.getLayout() != null
+			&& this.line.getLayout().getFormModel() != null
+			&& this.line.getLayout().getFormModel().getStudy() != null) {
+			this.layoutCellId = deterministic(
+				this.line.getLayout().getFormModel().getStudy().getProjectId(),
+				"FORM_LAYOUT_CELL",
+				this.line.getLayout().getFormModel().getId() + "|" + this.line.getLayout().getId() + "|" + this.id);
+		}
+		return layoutCellId;
+	}
+
+	public void setLayoutCellId(final UUID layoutCellId) {
+		this.layoutCellId = layoutCellId;
 	}
 
 	@JsonBackReference
@@ -139,7 +162,11 @@ public class Cell implements Node {
 
 	@JsonManagedReference
 	public void setVisibilityCriteria(final List<VisibilityCriteria> visibilityCriteria) {
-		this.visibilityCriteria = visibilityCriteria;
+		this.visibilityCriteria = visibilityCriteria == null ? new ArrayList<>() : visibilityCriteria;
+
+		for(VisibilityCriteria vc : this.visibilityCriteria) {
+			vc.setCell(this);
+		}
 	}
 
 	public final SortedMap<String, String> getTextBefore() {
@@ -230,5 +257,21 @@ public class Cell implements Node {
 	@Override
 	public Collection<Node> getChildrenWithEntity(final Entity entity) {
 		return Collections.emptyList();
+	}
+
+	@JsonIgnore
+	public UUID getDatasetModelUuid() {
+		if(this.datasetModelId == null || this.datasetModelId.isBlank()) {
+			return null;
+		}
+		return getDatasetModel().getDatasetModelId();
+	}
+
+	@JsonIgnore
+	public UUID getFieldModelUuid() {
+		if(this.fieldModelId == null || this.fieldModelId.isBlank()) {
+			return null;
+		}
+		return getFieldModel().getFieldModelId();
 	}
 }

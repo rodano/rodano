@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -25,7 +26,7 @@ public class TimelineGraphDataValue implements Serializable {
 	private Object value;
 	private String link;
 	private String icon;
-	private Map<String, Object> metadata;
+	private Map<UUID, Object> metadata;
 
 	/**
 	 * Constructor
@@ -103,11 +104,11 @@ public class TimelineGraphDataValue implements Serializable {
 		this.icon = icon;
 	}
 
-	public Map<String, Object> getMetadata() {
+	public Map<UUID, Object> getMetadata() {
 		return metadata;
 	}
 
-	public void setMetadata(final Map<String, Object> metadata) {
+	public void setMetadata(final Map<UUID, Object> metadata) {
 		this.metadata = metadata;
 	}
 }

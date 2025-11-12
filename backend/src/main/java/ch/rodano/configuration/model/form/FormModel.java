@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -33,12 +34,15 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class FormModel implements Serializable, SuperDisplayable, RightAssignable<FormModel>, WorkflowableModel, Node, Comparable<FormModel> {
 	@Serial
 	private static final long serialVersionUID = 6338027622028458338L;
 
+	private UUID formModelId;
 	private String id;
 	private Study study;
 
@@ -69,12 +73,14 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 	}
 
 	public FormModel(final FormModel formModel) {
+		formModelId = formModel.getFormModelId();
 		id = formModel.getId();
 		study = formModel.getStudy();
 		shortname = formModel.getShortname();
 		longname = formModel.getLongname();
 		description = formModel.getDescription();
 		optional = formModel.isOptional();
+		rules = formModel.getRules();
 		layouts = formModel.getLayouts();
 		workflowIds = formModel.getWorkflowIds();
 		constraint = formModel.getConstraint();
@@ -92,6 +98,20 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 	@JsonBackReference
 	public final Study getStudy() {
 		return study;
+	}
+
+	public UUID getFormModelId() {
+		if(this.formModelId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.formModelId = deterministic(
+				this.study.getProjectId(),
+				"FORM_MODEL",
+				this.id);
+		}
+		return formModelId;
+	}
+
+	public void setFormModelId(final UUID formModelId) {
+		this.formModelId = formModelId;
 	}
 
 	@JsonManagedReference
@@ -304,5 +324,11 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 			case FIELD_MODEL -> Collections.unmodifiableList(getFieldModels());
 			default -> Collections.emptyList();
 		};
+	}
+
+	@JsonIgnore
+	public List<UUID> getWorkflowUuids() {
+		return workflowIds == null ? List.of()
+			: workflowIds.stream().map(code -> deterministic(this.study.getProjectId(), "WORKFLOW", code)).toList();
 	}
 }

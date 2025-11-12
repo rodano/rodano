@@ -1,9 +1,11 @@
 package ch.rodano.configuration.model.chart;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -11,11 +13,17 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-public class ChartRange implements Node {
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
+public class ChartRange implements Node {
+	@Serial
 	private static final long serialVersionUID = 4582052131761798996L;
 
+	private UUID chartRangeId;
 	private String id;
+
+	@JsonIgnore
+	private transient Chart chart;
 
 	private Map<String, String> labels = new HashMap<>();
 
@@ -47,12 +55,34 @@ public class ChartRange implements Node {
 		return range;
 	}
 
+	public UUID getChartRangeId() {
+		if(this.chartRangeId == null && this.id != null && !this.id.isBlank() && this.chart != null && this.chart.getStudy() != null) {
+			this.chartRangeId = deterministic(
+				this.chart.getStudy().getProjectId(),
+				"CHART_RANGE",
+				this.chart.getId() + "|" + this.id);
+		}
+		return chartRangeId;
+	}
+
+	public void setChartRangeId(final UUID chartRangeId) {
+		this.chartRangeId = chartRangeId;
+	}
+
 	public String getId() {
 		return id;
 	}
 
 	public void setId(final String id) {
 		this.id = id;
+	}
+
+	public Chart getChart() {
+		return chart;
+	}
+
+	public void setChart(final Chart chart) {
+		this.chart = chart;
 	}
 
 	public String getValue() {

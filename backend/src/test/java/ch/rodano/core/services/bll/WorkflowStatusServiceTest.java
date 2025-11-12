@@ -76,11 +76,11 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		workflow.setInitialStateId("OPEN");
 		final var openWorkflowStatus = workflowStatusService.create(family, center, workflow, null, context, TEST_RATIONALE);
-		assertEquals(openWorkflowStatus.getStateId(), "OPEN");
+		assertEquals("OPEN", openWorkflowStatus.getState().getId());
 
 		workflow.setInitialStateId("PENDING");
 		final var pendingWorkflowStatus = workflowStatusService.create(family, center, workflow, null, context, TEST_RATIONALE);
-		assertEquals(pendingWorkflowStatus.getStateId(), "PENDING");
+		assertEquals("PENDING", pendingWorkflowStatus.getState().getId());
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//search for workflow statuses related to the scopes
 		final var allWorkflowIds = studyService.getStudy().getWorkflows().stream()
-			.map(Workflow::getId)
+			.map(Workflow::getWorkflowId)
 			.toList();
 		final var scopePks = scopes.stream()
 			.map(Scope::getPk)
@@ -204,7 +204,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//search for workflow statuses related to the events
 		final var allWorkflowIds = studyService.getStudy().getWorkflows().stream()
-			.map(Workflow::getId)
+			.map(Workflow::getWorkflowId)
 			.toList();
 		final var predicate = new WorkflowStatusSearch()
 			.setAncestorScopePks(List.of(center.getPk()))
@@ -251,7 +251,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//search for workflow statuses
 		final var allWorkflowIds = studyService.getStudy().getWorkflows().stream()
-			.map(Workflow::getId)
+			.map(Workflow::getWorkflowId)
 			.toList();
 		final var predicate = new WorkflowStatusSearch()
 			.setAncestorScopePks(Collections.singletonList(center.getPk()))
@@ -281,7 +281,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//get the baseline event
 		final var baselineEvent = events.stream()
-			.filter(event -> event.getEventModelId().equals("BASELINE"))
+			.filter(event -> event.getEventModelId().equals(getBaselineEvent().getEventModelId()))
 			.findFirst()
 			.orElseThrow();
 
@@ -296,7 +296,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//search for the event workflows and filter the expected events
 		final var allWorkflowIds = studyService.getStudy().getWorkflows().stream()
-			.map(Workflow::getId)
+			.map(Workflow::getWorkflowId)
 			.toList();
 		final var eventPKs = events.stream()
 			.map(Event::getPk)
@@ -347,7 +347,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		final var scopeWorkflows = studyService.getStudy().getScopeModel(patientScope.getScopeModelId()).getWorkflows();
 		final var scopeWorkflowIds = scopeWorkflows.stream()
 			.filter(Workflow::isMandatory)
-			.map(Workflow::getId)
+			.map(Workflow::getWorkflowId)
 			.toArray();
 		final var createdWSIds = workflowStatusService.getAll(patientScope).stream()
 			.map(WorkflowStatus::getWorkflowId)
@@ -401,7 +401,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		//verify that the mandatory WS are reset and that other WS are deleted
 		assertTrue(
 			workflowStatusService.getAll(patientScope).stream()
-				.allMatch(workflowStatus -> workflowStatus.getWorkflow().isMandatory() && workflowStatus.getStateId().equals(workflowStatus.getWorkflow().getInitialStateId()))
+				.allMatch(workflowStatus -> workflowStatus.getWorkflow().isMandatory() && workflowStatus.getState().getId().equals(workflowStatus.getWorkflow().getInitialStateId()))
 		);
 
 		// TODO not possible to do right now since there are no scopes that have a mandatory and non-mandatory workflow models on it
@@ -428,7 +428,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		assertAll(
 			"Retrieve state and actions",
 			() -> assertTrue(currentWorkflowStatus.isPresent()),
-			() -> assertEquals(patientStatus.getInitialStateId(), currentWorkflowStatus.get().getStateId()),
+			() -> assertEquals(patientStatus.getInitialStateId(), currentWorkflowStatus.get().getState().getId()),
 			() -> assertTrue(currentWorkflowStatus.get().getState().getPossibleActions().isEmpty())
 		);
 
@@ -437,7 +437,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		final var family = new DataFamily(patient, baselineVisit);
 
 		//retrieve state and actions
-		assertEquals(dataManagementStatus.getInitialStateId(), workflowStatusService.getMostRecent(baselineVisit, dataManagementStatus).get().getStateId());
+		assertEquals(dataManagementStatus.getInitialStateId(), workflowStatusService.getMostRecent(baselineVisit, dataManagementStatus).get().getState().getId());
 
 		//change state
 		final var dataManagementWS = workflowStatusService.getMostRecent(baselineVisit, dataManagementStatus);
@@ -448,7 +448,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		assertAll(
 			"Change state",
 			() -> assertTrue(reviewedWorkflowStatus.isPresent()),
-			() -> assertEquals("REVIEWED", reviewedWorkflowStatus.get().getStateId()),
+			() -> assertEquals("REVIEWED", reviewedWorkflowStatus.get().getState().getId()),
 			() -> assertEquals(1, reviewedWorkflowStatus.get().getState().getPossibleActions().size())
 		);
 
@@ -458,15 +458,15 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		assertAll(
 			() -> assertTrue(readyToReviewWorkflowStatus.isPresent()),
-			() -> assertEquals("READY_TO_REVIEW", readyToReviewWorkflowStatus.get().getStateId()),
+			() -> assertEquals("READY_TO_REVIEW", readyToReviewWorkflowStatus.get().getState().getId()),
 			() -> assertEquals(1, readyToReviewWorkflowStatus.get().getState().getPossibleActions().size())
 		);
 
 		//form
-		final var form = formService.get(baselineVisit, "STUDY_ENTRY");
+		final var form = formService.get(baselineVisit, studyService.getStudy().getFormModel("STUDY_ENTRY").getFormModelId());
 
 		//get state
-		assertEquals(formReporting.getInitialStateId(), workflowStatusService.getMostRecent(form, formReporting).get().getStateId());
+		assertEquals(formReporting.getInitialStateId(), workflowStatusService.getMostRecent(form, formReporting).get().getState().getId());
 	}
 
 	@Test
@@ -496,7 +496,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		// upon empty cache and null key, returned null : ok behavior ???
 
 		//form
-		final var form = formService.get(baselineEvent, "STUDY_ENTRY");
+		final var form = formService.get(baselineEvent, studyService.getStudy().getFormModel("STUDY_ENTRY").getFormModelId());
 		final var formReportingWS = workflowStatusService.getMostRecent(form, formReporting);
 		final var formWorkflowable = workflowStatusService.getWorkflowable(formReportingWS.get());
 
@@ -523,7 +523,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		assertAll(
 			() -> assertTrue(eventStatus.isPresent()),
-			() -> assertEquals(paymentDAOService.getPaymentsByWorkflowStatusFk(eventStatus.get().getPk()).size(), 0)
+			() -> assertEquals(0, paymentDAOService.getPaymentsByWorkflowStatusFk(eventStatus.get().getPk()).size())
 		);
 	}
 

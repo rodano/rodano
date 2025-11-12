@@ -1,13 +1,16 @@
 package ch.rodano.core.model.dataset;
 
+import java.util.UUID;
+
 public class DatasetRecord {
 
 	protected boolean deleted;
 
+	protected UUID projectId;
 	protected String id;
 	protected Long scopeFk;
 	protected Long eventFk;
-	protected String datasetModelId;
+	protected UUID datasetModelId;
 
 	protected DatasetRecord() {
 		deleted = false;
@@ -15,6 +18,14 @@ public class DatasetRecord {
 
 	public boolean getDeleted() {
 		return deleted;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public void setDeleted(final boolean deleted) {
@@ -45,11 +56,11 @@ public class DatasetRecord {
 		this.eventFk = eventFk;
 	}
 
-	public String getDatasetModelId() {
+	public UUID getDatasetModelId() {
 		return datasetModelId;
 	}
 
-	public void setDatasetModelId(final String datasetModelId) {
+	public void setDatasetModelId(final UUID datasetModelId) {
 		this.datasetModelId = datasetModelId;
 	}
 

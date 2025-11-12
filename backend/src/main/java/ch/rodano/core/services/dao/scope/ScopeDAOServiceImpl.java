@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.api.dto.paging.PagedResult;
+import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.ScopeAuditTrail;
 import ch.rodano.core.model.jooq.Tables;
@@ -72,46 +74,87 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public List<Scope> getAllScopes() {
-		final var query = create.selectFrom(SCOPE);
-		return find(query);
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModels(find(query));
 	}
 
 	@Override
-	public List<Scope> getAllScopesByScopeModelId(final String scopeModelId) {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId));
-		return find(query);
+	public List<Scope> getAllScopesByScopeModelId(final UUID scopeModelId) {
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
+			.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModels(find(query));
 	}
 
 	@Override
 	public List<Scope> getVirtualScopes() {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.VIRTUAL.isTrue().and(SCOPE.DELETED.isFalse()));
-		return find(query);
-	}
-
-	@Override
-	public Scope getRootScope() {
 		final var query = create.selectFrom(SCOPE)
-			.where(DSL.notExists(DSL.selectFrom(SCOPE_RELATION).where(SCOPE_RELATION.SCOPE_FK.eq(SCOPE.PK))));
-		return findUnique(query);
+			.where(SCOPE.VIRTUAL.isTrue()
+				.and(SCOPE.DELETED.isFalse())
+				.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId())));
+		return populateScopeModels(find(query));
 	}
 
 	@Override
-	public List<Scope> getScopesByScopeModelId(final String scopeModelId) {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId).and(SCOPE.DELETED.isFalse()));
-		return find(query);
+	public Optional<Scope> getRootScope(final Study study) {
+		final var rootModelId = study.getRootScopeModel().getScopeModelId();
+		final var projectId = study.getProjectId();
+
+		var opt = create.selectFrom(SCOPE)
+			.where(SCOPE.SCOPE_MODEL_ID.eq(rootModelId))
+			.and(SCOPE.PROJECT_ID.eq(projectId))
+			.orderBy(SCOPE.PK.asc())
+			.limit(1)
+			.fetchOptionalInto(Scope.class);
+		if(opt.isPresent()) {
+			return Optional.of(populateScopeModel(opt.get()));
+		}
+
+		opt = create.selectFrom(SCOPE)
+			.where(SCOPE.CODE.in(study.getId(), study.getDefaultLocalizedShortname()))
+			.and(SCOPE.PROJECT_ID.eq(projectId))
+			.orderBy(SCOPE.PK.asc())
+			.limit(1)
+			.fetchOptionalInto(Scope.class);
+		if(opt.isPresent()) {
+			return Optional.of(populateScopeModel(opt.get()));
+		}
+
+		opt = create.selectFrom(SCOPE)
+			.where(SCOPE.PROJECT_ID.eq(projectId))
+			.and(DSL.notExists(
+				create.selectFrom(SCOPE_RELATION)
+					.where(SCOPE_RELATION.SCOPE_FK.eq(SCOPE.PK))
+			))
+			.orderBy(SCOPE.PK.asc())
+			.limit(1)
+			.fetchOptionalInto(Scope.class);
+		return opt.map(this::populateScopeModel);
 	}
 
 	@Override
-	public Integer getScopesByScopeModelIdCount(final String scopeModelId) {
+	public List<Scope> getScopesByScopeModelId(final UUID scopeModelId) {
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId)
+				.and(SCOPE.DELETED.isFalse())
+				.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId())));
+		return populateScopeModels(find(query));
+	}
+
+	@Override
+	public Integer getScopesByScopeModelIdCount(final UUID scopeModelId) {
 		return create.select(DSL.count(SCOPE.PK))
 			.from(SCOPE)
-			.where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId).and(SCOPE.DELETED.isFalse()))
+			.where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId)
+				.and(SCOPE.DELETED.isFalse())
+				.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId())))
 			.fetchSingle()
 			.value1();
 	}
 
 	@Override
-	public List<Scope> getScopesByScopeModelIdHavingAncestor(final Collection<String> scopeModelIds, final Collection<Long> ancestorPks) {
+	public List<Scope> getScopesByScopeModelIdHavingAncestor(final Collection<UUID> scopeModelIds, final Collection<Long> ancestorPks) {
 		if(scopeModelIds.isEmpty() || ancestorPks.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -127,9 +170,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					)
 					.and(SCOPE.SCOPE_MODEL_ID.in(scopeModelIds))
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -141,13 +185,14 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 				SCOPE_ANCESTOR.ANCESTOR_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
-	public List<Scope> getDescendants(final Long scopePk, final String scopeModelId) {
+	public List<Scope> getDescendants(final Long scopePk, final UUID scopeModelId) {
 		final var query = create.selectDistinct(SCOPE.asterisk())
 			.from(SCOPE)
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
@@ -156,9 +201,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -174,13 +220,14 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					//TODO the prefix "All" in the method name is usually used to say that we consider all objects, even the deleted ones
 					//this condition should be removed
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
-	public List<Scope> getAllEnabledDescendants(final Long scopePk, final String scopeModelId) {
+	public List<Scope> getAllEnabledDescendants(final Long scopePk, final UUID scopeModelId) {
 		final var now = ZonedDateTime.now();
 		final var query = create.selectDistinct(SCOPE.asterisk())
 			.from(SCOPE)
@@ -193,9 +240,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					//TODO the prefix "All" in the method name is usually used to say that we consider all objects, even the deleted ones
 					//this condition should be removed
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -209,13 +257,14 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
-	public List<Scope> getEnabledDescendants(final Long scopePk, final String scopeModelId) {
+	public List<Scope> getEnabledDescendants(final Long scopePk, final UUID scopeModelId) {
 		final var now = ZonedDateTime.now();
 		final var query = create.selectDistinct(SCOPE.asterisk())
 			.from(SCOPE)
@@ -227,18 +276,19 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
-	public Integer getEnabledDescendantsByScopeModelIdCount(final String scopeModelId, final Long scopePk) {
+	public Integer getEnabledDescendantsByScopeModelIdCount(final UUID scopeModelId, final Long scopePk) {
 		return getEnabledDescendantsByScopeModelIdCount(scopeModelId, Collections.singleton(scopePk)).get(scopePk);
 	}
 
 	@Override
-	public Map<Long, Integer> getEnabledDescendantsByScopeModelIdCount(final String scopeModelId, final Collection<Long> scopePks) {
+	public Map<Long, Integer> getEnabledDescendantsByScopeModelIdCount(final UUID scopeModelId, final Collection<Long> scopePks) {
 		final var now = ZonedDateTime.now();
 		final var count = DSL.countDistinct(SCOPE.PK).as("count");
 		final var values = create.select(SCOPE_ANCESTOR.ANCESTOR_FK, count)
@@ -251,6 +301,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.groupBy(SCOPE_ANCESTOR.ANCESTOR_FK)
 			.fetchMap(SCOPE_ANCESTOR.ANCESTOR_FK, count);
@@ -269,9 +320,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -285,9 +337,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -299,9 +352,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.DEFAULT.isTrue())
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -326,9 +380,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue())
 					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
 			)
 			.coerce(SCOPE);
-		return find(query);
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -360,8 +415,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public Scope getScopeByPk(final Long pk) {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.PK.eq(pk));
-		return findUnique(query);
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.PK.eq(pk))
+			.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModel(findUnique(query));
 	}
 
 	@Override
@@ -369,14 +426,21 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		if(CollectionUtils.isEmpty(pks)) {
 			return Collections.emptyList();
 		}
-		final var query = create.selectFrom(SCOPE).where(SCOPE.PK.in(pks));
-		return find(query);
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.PK.in(pks))
+			.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModels(find(query));
 	}
 
 	@Override
 	public Scope getScopeByCode(final String code) {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.CODE.eq(code));
-		return findUnique(query);
+		final var scope = create.selectFrom(SCOPE)
+			.where(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()))
+			.and(SCOPE.CODE.eq(code))
+			.and(SCOPE.DELETED.isFalse().or(SCOPE.DELETED.isNull()))
+			.limit(1)
+			.fetchOneInto(Scope.class);
+		return populateScopeModel(scope);
 	}
 
 	@Override
@@ -384,14 +448,28 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		if(CollectionUtils.isEmpty(codes)) {
 			return Collections.emptyList();
 		}
-		final var query = create.selectFrom(SCOPE).where(SCOPE.CODE.in(codes));
-		return find(query);
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.CODE.in(codes))
+			.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModels(find(query));
+	}
+
+	@Override
+	public Scope getProjectRootScope(final UUID projectId) {
+		final var scope = create.selectFrom(SCOPE)
+			.where(SCOPE.PROJECT_ID.eq(projectId))
+			.and(SCOPE.DELETED.isNull().or(SCOPE.DELETED.isFalse()))
+			.limit(1)
+			.fetchOneInto(Scope.class);
+		return populateScopeModel(scope);
 	}
 
 	@Override
 	public Scope getScopeById(final String id) {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.ID.eq(id));
-		return findUnique(query);
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.ID.eq(id))
+			.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModel(findUnique(query));
 	}
 
 	@Override
@@ -399,8 +477,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		if(CollectionUtils.isEmpty(ids)) {
 			return Collections.emptyList();
 		}
-		final var query = create.selectFrom(SCOPE).where(SCOPE.ID.in(ids));
-		return find(query);
+		final var query = create.selectFrom(SCOPE)
+			.where(SCOPE.ID.in(ids))
+			.and(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
+		return populateScopeModels(find(query));
 	}
 
 	@Override
@@ -408,6 +488,11 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		if(scope.getId() == null) {
 			scope.setId(UUID.randomUUID().toString());
 		}
+
+		if(scope.getProjectId() == null) {
+			scope.setProjectId(studyService.getStudy().getProjectId());
+		}
+
 		save(scope, context, rationale);
 	}
 
@@ -454,13 +539,13 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		if(search.getWorkflowStates().isPresent()) {
 			//one join per workflow filter is required
 			for(final var entry : search.getWorkflowStates().get().entrySet()) {
-				final var workflowJoin = WORKFLOW_STATUS.as(entry.getKey());
+				final var workflowJoin = WORKFLOW_STATUS.as(entry.getKey().toString());
 				//perform an inner join to only include scopes that have matching workflow status rows
 				query.innerJoin(workflowJoin).on(
 					SCOPE.PK.eq(workflowJoin.SCOPE_FK)
 						.and(workflowJoin.WORKFLOW_ID.eq(entry.getKey()))
 						.and(workflowJoin.DELETED.isFalse())
-						.and(workflowJoin.STATE_ID.in(entry.getValue()))
+						.and(workflowJoin.WORKFLOW_STATE_ID.in(entry.getValue()))
 				);
 			}
 		}
@@ -502,7 +587,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		});
 
 		search.getScopeModelAncestorPks().ifPresent(ancestorPks -> {
-			if(ancestorPks.size() > 0) {
+			if(!ancestorPks.isEmpty()) {
 				final List<Condition> scopeConditions = new ArrayList<>();
 				for(final var entry : ancestorPks.entrySet()) {
 					scopeConditions.add(
@@ -537,7 +622,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		});
 
 		search.getLeaf().ifPresent(leaf -> {
-			final var leafId = studyService.getStudy().getLeafScopeModel().getId();
+			final var leafId = studyService.getStudy().getLeafScopeModel().getScopeModelId();
 			if(leaf) {
 				conditions.add(SCOPE.SCOPE_MODEL_ID.eq(leafId));
 			}
@@ -553,6 +638,8 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.or(SCOPE.LONGNAME.containsIgnoreCase(fullText))
 			);
 		});
+
+		conditions.add(SCOPE.PROJECT_ID.eq(studyService.getStudy().getProjectId()));
 
 		// group results by unique scope pk to avoid duplicates
 		query
@@ -571,5 +658,19 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		final var scopes = result.into(Scope.class);
 		scopes.forEach(s -> s.onPostLoad(studyService.getStudy()));
 		return new PagedResult<>(scopes, search.getPageSize(), search.getPageIndex(), total);
+	}
+
+	private Scope populateScopeModel(final Scope scope) {
+		if(scope != null) {
+			scope.onPostLoad(studyService.getStudy());
+		}
+		return scope;
+	}
+
+	private List<Scope> populateScopeModels(final List<Scope> scopes) {
+		if(scopes != null) {
+			scopes.forEach(s -> s.onPostLoad(studyService.getStudy()));
+		}
+		return scopes;
 	}
 }

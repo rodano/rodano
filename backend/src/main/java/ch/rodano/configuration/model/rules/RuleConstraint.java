@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
@@ -15,12 +16,21 @@ public class RuleConstraint implements Node {
 	@Serial
 	private static final long serialVersionUID = 8354365482907115176L;
 
+	private UUID ruleConstraintId;
 	private Map<RulableEntity, RuleConditionList> conditions;
 	private List<RuleEvaluation> evaluations;
 
 	public RuleConstraint() {
 		conditions = new TreeMap<>();
 		evaluations = new ArrayList<>();
+	}
+
+	public UUID getRuleConstraintId() {
+		return ruleConstraintId;
+	}
+
+	public void setRuleConstraintId(final UUID ruleConstraintId) {
+		this.ruleConstraintId = ruleConstraintId;
 	}
 
 	public final Map<RulableEntity, RuleConditionList> getConditions() {

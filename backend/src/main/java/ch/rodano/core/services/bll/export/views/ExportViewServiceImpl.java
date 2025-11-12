@@ -109,7 +109,7 @@ public class ExportViewServiceImpl implements ExportViewService {
 				.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
 				.join(SCOPE).on(DATASET.SCOPE_FK.eq(SCOPE.PK))
 				.where(
-					DATASET.DATASET_MODEL_ID.eq(datasetModel.getId())
+					DATASET.DATASET_MODEL_ID.eq(datasetModel.getDatasetModelId())
 						.and(DATASET.DELETED.isFalse())
 						.and(SCOPE.DELETED.isFalse())
 				)
@@ -152,7 +152,7 @@ public class ExportViewServiceImpl implements ExportViewService {
 				.join(EVENT).on(DATASET.EVENT_FK.eq(EVENT.PK))
 				.join(SCOPE).on(EVENT.SCOPE_FK.eq(SCOPE.PK))
 				.where(
-					DATASET.DATASET_MODEL_ID.eq(datasetModel.getId())
+					DATASET.DATASET_MODEL_ID.eq(datasetModel.getDatasetModelId())
 						.and(DATASET.DELETED.isFalse())
 						.and(EVENT.DELETED.isFalse())
 						.and(EVENT.DATE.isNotNull())
@@ -171,11 +171,11 @@ public class ExportViewServiceImpl implements ExportViewService {
 		return columns;
 	}
 
-	private final List<Pair<String, Field<?>>> generateDatasetFieldColumns(final FieldModel fieldModel) {
+	private List<Pair<String, Field<?>>> generateDatasetFieldColumns(final FieldModel fieldModel) {
 		final var fielModelColumn = fieldModel.getId().toLowerCase();
 		final Pair<String, Field<?>> rawColumn = Pair.of(
 			String.format("%s_raw", fielModelColumn),
-			DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId()))
+			DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getFieldModelId()))
 		);
 		final Pair<String, Field<?>> typedColumn = Pair.of(
 			fielModelColumn,
@@ -183,13 +183,13 @@ public class ExportViewServiceImpl implements ExportViewService {
 		);
 		final Pair<String, Field<?>> mdColumn = Pair.of(
 			String.format("%s_md", fielModelColumn),
-			DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId()))
+			DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getFieldModelId()))
 		);
 		return List.of(rawColumn, typedColumn, mdColumn);
 	}
 
 	private Field<?> typedColumn(final FieldModel fieldModel) {
-		final var rawValue = DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId()));
+		final var rawValue = DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getFieldModelId()));
 		if(OperandType.NUMBER.equals(fieldModel.getDataType())) {
 			return DSL.case_().when(rawValue.notEqual(""), rawValue.cast(SQLDataType.DECIMAL(18, 9)));
 		}

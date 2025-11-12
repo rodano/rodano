@@ -21,8 +21,8 @@ import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringTestConfiguration
 public class RobotControllerTest extends ControllerTest {
@@ -47,7 +47,7 @@ public class RobotControllerTest extends ControllerTest {
 
 		// get some results
 		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertTrue(response.getBody().getObjects().size() > 0);
+		assertFalse(response.getBody().getObjects().isEmpty());
 	}
 
 	@Test
@@ -76,7 +76,7 @@ public class RobotControllerTest extends ControllerTest {
 
 		// should succeed
 		assertEquals(1, responseBody.getRoles().size());
-		assertEquals(studyService.getStudy().getEproProfileId(), responseBody.getRoles().get(0).getProfileId());
+		assertEquals(studyService.getStudy().getEproProfileId(), responseBody.getRoles().getFirst().getProfile().id());
 		assertEquals("TestBot", responseBody.getName());
 		assertNotNull(responseBody.getKey());
 
@@ -138,7 +138,7 @@ public class RobotControllerTest extends ControllerTest {
 		assertEquals(newKey, updatedRobot.getKey());
 
 		// check that the robot role has remained the same
-		assertEquals(studyService.getStudy().getEproProfileId(), updatedRobot.getRoles().get(0).getProfileId());
+		assertEquals(studyService.getStudy().getEproProfileId(), updatedRobot.getRoles().getFirst().getProfile().id());
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class RobotControllerTest extends ControllerTest {
 		final var profile = studyService.getStudy().getEproProfile();
 		final var roleCreationDTO = new RoleCreationDTO();
 		roleCreationDTO.setScopePk(1L);
-		roleCreationDTO.setProfileId(profile.getId());
+		roleCreationDTO.setProfileId(profile.getProfileId());
 
 		final var robotName = name.orElseGet(() -> RandomStringUtils.randomAlphanumeric(10));
 

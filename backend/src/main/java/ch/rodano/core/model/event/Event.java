@@ -58,12 +58,12 @@ public class Event extends EventRecord implements DeletableObject, Timestampable
 
 	public void setScopeModel(final ScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
-		this.scopeModelId = scopeModel.getId();
+		this.scopeModelId = scopeModel.getScopeModelId();
 	}
 
 	public void setEventModel(final EventModel eventModel) {
 		this.eventModel = eventModel;
-		this.eventModelId = eventModel.getId();
+		this.eventModelId = eventModel.getEventModelId();
 	}
 
 	public ScopeModel getScopeModel() {

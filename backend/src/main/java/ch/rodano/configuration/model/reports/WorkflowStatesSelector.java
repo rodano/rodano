@@ -5,13 +5,19 @@ import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
+import ch.rodano.configuration.model.study.Study;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
@@ -48,4 +54,19 @@ public class WorkflowStatesSelector implements Node {
 		return Collections.emptyList();
 	}
 
+	@JsonIgnore
+	public UUID getWorkflowUuid(final Study study) {
+		return this.workflowId == null || this.workflowId.isBlank()
+			? null
+			: deterministic(study.getProjectId(), "WORKFLOW", this.workflowId);
+	}
+
+	@JsonIgnore
+	public Set<UUID> getStateUuids(final Study study) {
+		return this.stateIds == null
+			? Set.of()
+			: this.stateIds.stream()
+			.map(id -> deterministic(study.getProjectId(), "WORKFLOW_STATE", this.workflowId + "|" + id))
+			.collect(Collectors.toUnmodifiableSet());
+	}
 }

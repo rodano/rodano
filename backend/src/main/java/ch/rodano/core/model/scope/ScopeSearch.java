@@ -3,6 +3,7 @@ package ch.rodano.core.model.scope;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -27,7 +28,7 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 	public Optional<List<Long>> pks = Optional.empty();
 
 	@Schema(description = "Allowed scope model id")
-	public Optional<String> scopeModelId = Optional.empty();
+	public Optional<UUID> scopeModelId = Optional.empty();
 
 	@Schema(description = "Allowed parent pks")
 	public Optional<List<Long>> parentPks = Optional.empty();
@@ -36,13 +37,13 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 	public Optional<List<Long>> ancestorPks = Optional.empty();
 
 	@Schema(description = "Allowed ancestor pks by scope models ids")
-	public Optional<Map<String, List<Long>>> scopeModelAncestorPks = Optional.empty();
+	public Optional<Map<UUID, List<Long>>> scopeModelAncestorPks = Optional.empty();
 
 	@Schema(description = "A list of field model criteria for filtering")
 	public Optional<List<FieldModelCriterion>> fieldModelCriteria = Optional.empty();
 
 	@Schema(description = "Allowed workflow states map")
-	public Optional<Map<String, List<String>>> workflowStates = Optional.empty();
+	public Optional<Map<UUID, List<UUID>>> workflowStates = Optional.empty();
 
 	@Schema(description = "Include the leaf scope")
 	public Optional<Boolean> leaf = Optional.empty();
@@ -94,16 +95,16 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 		return this;
 	}
 
-	public Optional<String> getScopeModelId() {
+	public Optional<UUID> getScopeModelId() {
 		return scopeModelId;
 	}
 
-	public ScopeSearch setScopeModelId(final Optional<String> scopeModelId) {
+	public ScopeSearch setScopeModelId(final Optional<UUID> scopeModelId) {
 		this.scopeModelId = scopeModelId;
 		return this;
 	}
 
-	public ScopeSearch enforceScopeModelId(final String scopeModelId) {
+	public ScopeSearch enforceScopeModelId(final UUID scopeModelId) {
 		this.scopeModelId = Optional.of(scopeModelId);
 		return this;
 	}
@@ -131,11 +132,11 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 		return this;
 	}
 
-	public Optional<Map<String, List<Long>>> getScopeModelAncestorPks() {
+	public Optional<Map<UUID, List<Long>>> getScopeModelAncestorPks() {
 		return scopeModelAncestorPks;
 	}
 
-	public ScopeSearch setScopeModelAncestorPks(final Optional<Map<String, List<Long>>> scopeModelAncestorPks) {
+	public ScopeSearch setScopeModelAncestorPks(final Optional<Map<UUID, List<Long>>> scopeModelAncestorPks) {
 		this.scopeModelAncestorPks = scopeModelAncestorPks;
 		return this;
 	}
@@ -154,11 +155,11 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 		return this;
 	}
 
-	public Optional<Map<String, List<String>>> getWorkflowStates() {
+	public Optional<Map<UUID, List<UUID>>> getWorkflowStates() {
 		return workflowStates;
 	}
 
-	public ScopeSearch setWorkflowStates(final Optional<Map<String, List<String>>> workflowStates) {
+	public ScopeSearch setWorkflowStates(final Optional<Map<UUID, List<UUID>>> workflowStates) {
 		this.workflowStates = workflowStates;
 		return this;
 	}

@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -15,6 +16,7 @@ public class RuleConditionCriterion implements Node {
 	@Serial
 	private static final long serialVersionUID = -7897881749660873674L;
 
+	private UUID ruleCriterionId;
 	private String property;
 	private Operator operator;
 	private Set<String> values;
@@ -22,6 +24,14 @@ public class RuleConditionCriterion implements Node {
 
 	public RuleConditionCriterion() {
 		values = new HashSet<>();
+	}
+
+	public UUID getRuleCriterionId() {
+		return ruleCriterionId;
+	}
+
+	public void setRuleCriterionId(final UUID ruleCriterionId) {
+		this.ruleCriterionId = ruleCriterionId;
 	}
 
 	public final String getProperty() {

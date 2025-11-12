@@ -8,6 +8,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
@@ -52,10 +54,12 @@ import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
 import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
 import ch.rodano.core.services.rule.RuleService;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @Service
 public class TestDataInitializer {
 
-	private static DateTimeFormatter DATE_FIELD_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+	private static final DateTimeFormatter DATE_FIELD_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	private final AuditActionService auditActionService;
 	private final StudyService studyService;
@@ -141,11 +145,13 @@ public class TestDataInitializer {
 
 		final var creator = userDAOService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL);
 		final var actionDate = origin.plusMonths(3);
-		final var root = scopeService.getRootScope();
 		final var study = studyService.getStudy();
+		var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, actionDate);
+
+		final var root = ensureRootScope(study, origin, context);
 		final var adminProfile = study.getProfile("ADMIN");
 
-		var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, actionDate);
+		final Function<String, UUID> cat = code -> deterministic(study.getProjectId(), "RESOURCE_CATEGORY", code);
 
 		//add the robots
 		createAndSaveRobot("Bender", root, adminProfile, context);
@@ -219,7 +225,7 @@ public class TestDataInitializer {
 		var baseline = eventService.get(fr0101, baselineEvent, 0);
 
 		//study entry inputs
-		var patientDocumentation = datasetService.get(fr0101, patientDatasetModel);
+		var patientDocumentation = datasetService.getOrCreate(fr0101, patientDatasetModel, context, DatabaseInitializer.RATIONALE);
 		var submitter = new FieldSubmitterHelper(context, fr0101, Optional.of(baseline), fieldService, validationService);
 		final Map<String, String> inputs = new HashMap<>();
 		inputs.put("GENDER", "FEMALE");
@@ -240,7 +246,7 @@ public class TestDataInitializer {
 		submitter.updateField(patientDocumentation, "DATE_OF_FIRST_STUDY_DRUG", "20.10.2001");
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
-		var studyEntryDataset = datasetService.get(baseline, studyEntryDatasetModel);
+		var studyEntryDataset = datasetService.getOrCreate(fr0101, baseline, studyEntryDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0101, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
 		inputs.put("ELIGIBILITY_CRITERIA", "Y");
@@ -248,7 +254,7 @@ public class TestDataInitializer {
 		submitter.updateFields(studyEntryDataset, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study entry workflow
-		var studyEntry = formService.get(baseline, "STUDY_ENTRY");
+		var studyEntry = formService.get(baseline, fmId("STUDY_ENTRY"));
 		formDAOService.saveForm(studyEntry, context, DatabaseInitializer.RATIONALE);
 
 		var state = new DataState(fr01, Optional.of(baseline), studyEntry);
@@ -260,7 +266,7 @@ public class TestDataInitializer {
 		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
 
 		//demographics entry inputs
-		patientDocumentation = datasetService.get(fr0103, patientDatasetModel);
+		patientDocumentation = datasetService.getOrCreate(fr0103, patientDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.empty(), fieldService, validationService);
 		inputs.clear();
 		inputs.put("GENDER", "MALE");
@@ -282,7 +288,7 @@ public class TestDataInitializer {
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		//ms history workflow
-		final var msHistory = formService.get(fr0103, "MS_HISTORY");
+		final var msHistory = formService.get(fr0103, fmId("MS_HISTORY"));
 		formDAOService.saveForm(msHistory, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.empty(), msHistory);
@@ -309,7 +315,7 @@ public class TestDataInitializer {
 		datasetDAOService.saveDataset(dmt2, context, DatabaseInitializer.RATIONALE);
 
 		//dmt workflow
-		final var dmt = formService.get(fr0103, "DMT");
+		final var dmt = formService.get(fr0103, fmId("DMT"));
 		formDAOService.saveForm(dmt, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.empty(), dmt);
@@ -318,7 +324,7 @@ public class TestDataInitializer {
 
 		//study entry inputs
 		baseline = eventService.get(fr0103, baselineEvent, 0);
-		studyEntryDataset = datasetService.get(baseline, studyEntryDatasetModel);
+		studyEntryDataset = datasetService.getOrCreate(fr0103, baseline, studyEntryDatasetModel, context, DatabaseInitializer.RATIONALE);
 
 		//add file
 		try(var certificateFile = getClass().getResourceAsStream("/files/certificate.jpg")) {
@@ -328,7 +334,7 @@ public class TestDataInitializer {
 			fileService.saveFile(certificate, context, "Submit file");
 		}
 
-		studyEntryDataset = datasetService.get(baseline, studyEntryDatasetModel);
+		studyEntryDataset = datasetService.getOrCreate(fr0103, baseline, studyEntryDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
 		inputs.put("ELIGIBILITY_CRITERIA", "Y");
@@ -338,17 +344,17 @@ public class TestDataInitializer {
 		submitter.updateFields(studyEntryDataset, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study entry workflow
-		studyEntry = formService.get(baseline, "STUDY_ENTRY");
+		studyEntry = formService.get(baseline, fmId("STUDY_ENTRY"));
 		formDAOService.saveForm(studyEntry, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(baseline), studyEntry);
 		ruleService.execute(state, study.getEventActions().get(WorkflowAction.SAVE_FORM), context);
 		ruleService.execute(state, studyEntry.getFormModel().getRules(), context);
 
-		var visitDocumentation = datasetService.get(baseline, visitDatasetModel);
+		var visitDocumentation = datasetService.getOrCreate(fr0103, baseline, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 
 		//demographics workflow
-		final var demographics = formService.get(fr0103, "DEMOGRAPHICS");
+		final var demographics = formService.get(fr0103, fmId("DEMOGRAPHICS"));
 		formDAOService.saveForm(demographics, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.empty(), demographics);
@@ -356,7 +362,7 @@ public class TestDataInitializer {
 		ruleService.execute(state, studyEntry.getFormModel().getRules(), context);
 
 		//edss inputs
-		visitDocumentation = datasetService.get(baseline, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, baseline, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
 		inputs.put("KFS1", "3");
@@ -371,7 +377,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
-		var edss = formService.get(baseline, "EDSS");
+		var edss = formService.get(baseline, fmId("EDSS"));
 		formDAOService.saveForm(edss, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(baseline), edss);
@@ -383,7 +389,7 @@ public class TestDataInitializer {
 		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
 
 		//study status inputs
-		visitDocumentation = datasetService.get(visit6, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, visit6, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		inputs.clear();
 		inputs.put("DATE_OF_VISIT", chronology.format(DATE_FIELD_FORMATTER));
@@ -392,7 +398,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study status workflow
-		var studyStatus = formService.get(visit6, "STUDY_STATUS");
+		var studyStatus = formService.get(visit6, fmId("STUDY_STATUS"));
 		formDAOService.saveForm(studyStatus, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(baseline), studyStatus);
@@ -400,7 +406,7 @@ public class TestDataInitializer {
 		ruleService.execute(state, studyStatus.getFormModel().getRules(), context);
 
 		//edss inputs
-		visitDocumentation = datasetService.get(visit6, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, visit6, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		inputs.clear();
 		inputs.put("KFS1", "3");
@@ -415,7 +421,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
-		edss = formService.get(visit6, "EDSS");
+		edss = formService.get(visit6, fmId("EDSS"));
 		formDAOService.saveForm(edss, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit6), edss);
@@ -423,7 +429,7 @@ public class TestDataInitializer {
 		ruleService.execute(state, edss.getFormModel().getRules(), context);
 
 		//relapses inputs
-		visitDocumentation = datasetService.get(visit6, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, visit6, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		submitter.updateField(visitDocumentation, "RELAPSES_SINCE_LV", "Y");
 		submitter.submit(DatabaseInitializer.RATIONALE);
@@ -462,7 +468,7 @@ public class TestDataInitializer {
 		datasetDAOService.saveDataset(relapse3, context, DatabaseInitializer.RATIONALE);
 
 		//relapse workflow
-		var relapse = formService.get(visit6, "RELAPSES");
+		var relapse = formService.get(visit6, fmId("RELAPSES"));
 		formDAOService.saveForm(relapse, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit6), relapse);
@@ -477,7 +483,7 @@ public class TestDataInitializer {
 		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
 
 		//study status inputs
-		visitDocumentation = datasetService.get(visit12, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, visit12, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit12), fieldService, validationService);
 		inputs.clear();
 		inputs.put("DATE_OF_VISIT", chronology.format(DATE_FIELD_FORMATTER));
@@ -486,7 +492,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study status workflow
-		studyStatus = formService.get(visit12, "STUDY_STATUS");
+		studyStatus = formService.get(visit12, fmId("STUDY_STATUS"));
 		formDAOService.saveForm(studyStatus, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit12), studyStatus);
@@ -494,7 +500,7 @@ public class TestDataInitializer {
 		ruleService.execute(state, studyStatus.getFormModel().getRules(), context);
 
 		//edss inputs
-		visitDocumentation = datasetService.get(visit12, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, visit12, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit12), fieldService, validationService);
 		inputs.clear();
 		inputs.put("KFS1", "4");
@@ -509,7 +515,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
-		edss = formService.get(visit12, "EDSS");
+		edss = formService.get(visit12, fmId("EDSS"));
 		formDAOService.saveForm(edss, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit12), edss);
@@ -517,13 +523,13 @@ public class TestDataInitializer {
 		ruleService.execute(state, edss.getFormModel().getRules(), context);
 
 		//relapses inputs
-		visitDocumentation = datasetService.get(visit12, visitDatasetModel);
+		visitDocumentation = datasetService.getOrCreate(fr0103, visit12, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit12), fieldService, validationService);
 		submitter.updateField(visitDocumentation, "RELAPSES_SINCE_LV", "Y");
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		//relapse workflow
-		relapse = formService.get(visit12, "RELAPSES");
+		relapse = formService.get(visit12, fmId("RELAPSES"));
 		formDAOService.saveForm(relapse, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit12), relapse);
@@ -586,7 +592,7 @@ public class TestDataInitializer {
 
 		//add resources
 		final Resource resourceStudy1 = new Resource();
-		resourceStudy1.setCategoryId("DOCUMENTS");
+		resourceStudy1.setCategoryId(cat.apply("DOCUMENTS"));
 		resourceStudy1.setTitle("Annual report 2019");
 		resourceStudy1.setDescription("See attached document.");
 		resourceStudy1.setPublicResource(false);
@@ -595,7 +601,7 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceStudy1, dataManager, context);
 
 		final Resource resourceStudy2 = new Resource();
-		resourceStudy2.setCategoryId("NEWS");
+		resourceStudy2.setCategoryId(cat.apply("NEWS"));
 		resourceStudy2.setTitle("Starting phase II");
 		resourceStudy2.setDescription("Here come the details of what this news entails.");
 		resourceStudy2.setPublicResource(false);
@@ -604,7 +610,7 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceStudy2, dataManager, context);
 
 		final Resource resourceCountry1SpreadToDescendants = new Resource();
-		resourceCountry1SpreadToDescendants.setCategoryId("DOCUMENTS");
+		resourceCountry1SpreadToDescendants.setCategoryId(cat.apply("DOCUMENTS"));
 		resourceCountry1SpreadToDescendants.setTitle("Ethical charter");
 		resourceCountry1SpreadToDescendants.setDescription("Guidelines concerning this study.");
 		resourceCountry1SpreadToDescendants.setPublicResource(false);
@@ -613,7 +619,7 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceCountry1SpreadToDescendants, dataManager, context);
 
 		final Resource resourceCountry2Public = new Resource();
-		resourceCountry2Public.setCategoryId("DOCUMENTS");
+		resourceCountry2Public.setCategoryId(cat.apply("DOCUMENTS"));
 		resourceCountry2Public.setTitle("User guide");
 		resourceCountry2Public.setDescription("This is the user guide to download when logging in for the first time.");
 		resourceCountry2Public.setPublicResource(true);
@@ -622,7 +628,7 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceCountry2Public, dataManager, context);
 
 		final Resource resourceCenter1 = new Resource();
-		resourceCenter1.setCategoryId("NEWS");
+		resourceCenter1.setCategoryId(cat.apply("NEWS"));
 		resourceCenter1.setTitle("Putting study on hold due to current situation");
 		resourceCenter1.setDescription("bla");
 		resourceCenter1.setPublicResource(false);
@@ -631,7 +637,7 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceCenter1, dataManager, context);
 
 		final Resource resourceCenter2Public = new Resource();
-		resourceCenter2Public.setCategoryId("NEWSLETTERS");
+		resourceCenter2Public.setCategoryId(cat.apply("NEWSLETTERS"));
 		resourceCenter2Public.setTitle("Situation 03/20");
 		resourceCenter2Public.setDescription("A brief summary of this trimester.");
 		resourceCenter2Public.setPublicResource(false);
@@ -640,12 +646,41 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceCenter2Public, dataManager, context);
 
 		final Resource resourceCenter3 = new Resource();
-		resourceCenter3.setCategoryId("NEWSLETTERS");
+		resourceCenter3.setCategoryId(cat.apply("NEWSLETTERS"));
 		resourceCenter3.setTitle("Situation 06/20");
 		resourceCenter3.setDescription("A brief summary of this trimester.");
 		resourceCenter3.setPublicResource(false);
 		resourceCenter3.setScopeFk(fr02.getPk());
 		resourceCenter3.setUserFk(dataManager.getPk());
 		resourceService.createResource(resourceCenter3, dataManager, context);
+	}
+
+	private UUID fmId(final String code) {
+		return studyService.getStudy().getFormModel(code).getFormModelId();
+	}
+
+	private Scope ensureRootScope(final ch.rodano.configuration.model.study.Study study,
+								  final ZonedDateTime origin,
+								  final DatabaseActionContext context) {
+		try {
+			return scopeService.getRootScope();
+		}
+		catch(IllegalStateException notFound) {
+			final var rootModel = study.getScopeModels().stream()
+				.filter(ch.rodano.configuration.model.scope.ScopeModel::isRoot)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException("No root ScopeModel in study configuration"));
+
+			final var candidate = scopeService.createCandidate(rootModel, origin, null);
+
+			if(org.apache.commons.lang3.StringUtils.isBlank(candidate.getCode())) {
+				candidate.setCode(study.getId());
+				candidate.setShortname(study.getDefaultLocalizedShortname());
+			}
+
+			scopeService.create(candidate, null, context, "Create root scope");
+
+			return candidate;
+		}
 	}
 }

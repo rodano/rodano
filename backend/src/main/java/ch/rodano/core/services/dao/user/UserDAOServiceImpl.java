@@ -59,6 +59,10 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 
 	@Override
 	public void saveUser(final User user, final DatabaseActionContext context, final String rationale) {
+		if(user.getProjectId() == null) {
+			user.setProjectId(studyService.getStudy().getProjectId());
+		}
+
 		save(user, context, rationale);
 	}
 
@@ -143,7 +147,14 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 
 		//select the allowed profiles
 		search.getProfileIds().ifPresent(profileIds -> {
-			conditions.add(ROLE.PROFILE_ID.in(profileIds));
+			final var profileUuids = studyService.getStudy().getProfiles().stream()
+				.filter(p -> profileIds.contains(p.getId()))
+				.map(Profile::getProfileId)
+				.toList();
+
+			if(!profileUuids.isEmpty()) {
+				conditions.add(ROLE.PROFILE_ID.in(profileUuids));
+			}
 		});
 
 		//select the allowed features

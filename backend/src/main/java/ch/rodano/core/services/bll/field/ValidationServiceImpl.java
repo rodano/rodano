@@ -143,12 +143,12 @@ public class ValidationServiceImpl implements ValidationService {
 			//that means workflow statuses that have been created by a validator and are in the validator invalid state
 			final var runningValidationStatuses = workflowStatusService.getAll(field).stream()
 				.filter(ws -> StringUtils.isNotBlank(ws.getValidatorId()))
-				.filter(ws -> ws.getStateId().equals(ws.getValidator().getInvalidStateId()))
+				.filter(ws -> ws.getState().getId().equals(ws.getValidator().getInvalidStateId()))
 				.toList();
 
 			//put theses statuses in their valid state (according to their validator) if any
 			for(final var status : runningValidationStatuses) {
-				logger.info("Field [{}], existing workflow [{}] in state [{}] will be discarded (set to valid state) because field is now valid", field.getId(), status.getId(), status.getStateId());
+				logger.info("Field [{}], existing workflow [{}] in state [{}] will be discarded (set to valid state) because field is now valid", field.getId(), status.getId(), status.getState().getId());
 				final var validWorkflowState = status.getValidator().getValidWorkflowState();
 				if(validWorkflowState != null) {
 					workflowStatusService.updateState(family, status, validWorkflowState, Collections.emptyMap(), context, "Re-assessing due to value change. Validation criteria satisfied.");
@@ -174,7 +174,7 @@ public class ValidationServiceImpl implements ValidationService {
 
 				//now, the goal is to find if the validation error that has just been triggered matches an existing workflow status (either an "open" workflow status or an old workflow status)
 				//check if workflow is the the same
-				var contextChanged = !workflow.getId().equals(status.getWorkflowId());
+				var contextChanged = !workflow.getWorkflowId().equals(status.getWorkflowId());
 				if(contextChanged) {
 					logger.debug("Field [{}], different context: current workflow [{}] - existing workflow [{}]", field.getId(), workflow.getId(), status.getWorkflowId());
 				}
@@ -214,11 +214,10 @@ public class ValidationServiceImpl implements ValidationService {
 				//handle running workflows that are related to an old context
 				if(contextChanged) {
 					//care, do not touch workflows that are "closed" (not in their invalid state)
-					if(status.getValidator().getInvalidStateId().equals(status.getStateId())) {
+					if(status.getValidator().getInvalidStateId().equals(status.getState().getId())) {
 						//context has changed since the creation of the workflow status
 						logger.info(
-							"Field [{}], existing workflow [{}] in state [{}] will be discarded (set to valid state) and a new workflow will be created", field.getId(), status.getId(), status
-								.getStateId()
+							"Field [{}], existing workflow [{}] in state [{}] will be discarded (set to valid state) and a new workflow will be created", field.getId(), status.getId(), status.getState().getId()
 						);
 
 						//these existing workflows must be handled

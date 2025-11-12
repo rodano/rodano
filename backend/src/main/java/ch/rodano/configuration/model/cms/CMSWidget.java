@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -25,6 +26,7 @@ public class CMSWidget implements Node, Comparable<CMSWidget> {
 	private static final long serialVersionUID = 503573635425875692L;
 
 	private CMSSection section;
+	protected UUID menuWidgetId;
 	protected String type;
 
 	protected String textBefore;
@@ -48,6 +50,14 @@ public class CMSWidget implements Node, Comparable<CMSWidget> {
 	@JsonBackReference
 	public final void setSection(final CMSSection section) {
 		this.section = section;
+	}
+
+	public UUID getMenuWidgetId() {
+		return menuWidgetId;
+	}
+
+	public void setMenuWidgetId(final UUID menuWidgetId) {
+		this.menuWidgetId = menuWidgetId;
 	}
 
 	public final String getType() {

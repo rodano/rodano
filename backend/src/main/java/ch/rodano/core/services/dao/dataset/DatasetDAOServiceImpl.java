@@ -71,13 +71,13 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 	}
 
 	@Override
-	public List<Dataset> getDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
+	public List<Dataset> getDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<UUID> datasetModelIds) {
 		final var query = create.selectFrom(DATASET).where(DATASET.SCOPE_FK.eq(scopePk).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds)).and(DATASET.DELETED.isFalse()));
 		return find(query);
 	}
 
 	@Override
-	public List<Dataset> getAllDatasetsByDatasetModelIds(final Collection<String> datasetModelIds) {
+	public List<Dataset> getAllDatasetsByDatasetModelIds(final Collection<UUID> datasetModelIds) {
 		final var query = create.selectFrom(DATASET).where(DATASET.DATASET_MODEL_ID.in(datasetModelIds));
 		return find(query);
 	}
@@ -89,7 +89,7 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 	}
 
 	@Override
-	public List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
+	public List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<UUID> datasetModelIds) {
 		final var query = create.selectFrom(DATASET).where(DATASET.SCOPE_FK.eq(scopePk)).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds));
 		return find(query);
 	}
@@ -107,13 +107,13 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 	}
 
 	@Override
-	public List<Dataset> getDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<String> datasetModelIds) {
+	public List<Dataset> getDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<UUID> datasetModelIds) {
 		final var query = create.selectFrom(DATASET).where(DATASET.EVENT_FK.eq(eventPk).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds)).and(DATASET.DELETED.isFalse()));
 		return find(query);
 	}
 
 	@Override
-	public List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<String> datasetModelIds) {
+	public List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<UUID> datasetModelIds) {
 		final var query = create.selectFrom(DATASET).where(DATASET.EVENT_FK.eq(eventPk).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds)));
 		return find(query);
 	}
@@ -132,6 +132,9 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 	public void saveDataset(final Dataset dataset, final DatabaseActionContext context, final String rationale) {
 		if(dataset.getId() == null) {
 			dataset.setId(UUID.randomUUID().toString());
+		}
+		if(dataset.getProjectId() == null) {
+			dataset.setProjectId(studyService.getStudy().getProjectId());
 		}
 		save(dataset, context, rationale);
 	}

@@ -39,6 +39,7 @@ import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.file.FileDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.EVENT;
@@ -55,17 +56,20 @@ public class FileServiceImpl implements FileService {
 	private final FileDAOService fileDAOService;
 	private final StudyService studyService;
 	private final Configurator configurator;
+	private final ProjectIdResolver projectIdResolver;
 
 	public FileServiceImpl(
 		final FileDAOService fileDAOService,
 		final StudyService studyService,
 		final Configurator configurator,
-		final DSLContext create
+		final DSLContext create,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.create = create;
 		this.fileDAOService = fileDAOService;
 		this.studyService = studyService;
 		this.configurator = configurator;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	private void attacheContentToFile(final File file, final InputStream content) throws IOException {
@@ -109,6 +113,7 @@ public class FileServiceImpl implements FileService {
 		}
 
 		final var file = new File();
+		file.setProjectId(projectIdResolver.id());
 		file.setScopeFk(scope.getPk());
 		event.map(Event::getPk).ifPresent(file::setEventFk);
 		file.setUuid(UUID.randomUUID().toString());
@@ -143,6 +148,7 @@ public class FileServiceImpl implements FileService {
 		}
 
 		final var file = new File();
+		file.setProjectId(projectIdResolver.id());
 		file.setScopeFk(scope.getPk());
 		event.map(Event::getPk).ifPresent(file::setEventFk);
 		file.setDatasetFk(dataset.getPk());
@@ -229,9 +235,7 @@ public class FileServiceImpl implements FileService {
 		conditions.add(FILE.TRAIL_FK.isNull());
 		conditions.add(SCOPE.DELETED.isFalse());
 		conditions.add(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()));
-		if(scopeModel.isPresent()) {
-			conditions.add(SCOPE.SCOPE_MODEL_ID.eq(scopeModel.get().getId()));
-		}
+		scopeModel.ifPresent(model -> conditions.add(SCOPE.SCOPE_MODEL_ID.eq(model.getScopeModelId())));
 		//create role sub query
 		final var query = create
 			.select(
@@ -264,12 +268,12 @@ public class FileServiceImpl implements FileService {
 
 				// Generate the file's path name in the zip folder
 				final Path path;
-				if(StringUtils.isNotBlank(eventModelId)) {
+				if(eventModelId != null) {
 					final var eventModelShortname = studyService.getStudy().getScopeModel(scopeModelId).getEventModel(eventModelId).getDefaultLocalizedShortname();
-					path = Paths.get(scopeCode, eventModelShortname, datasetModelId, fieldModelId, fieldValue);
+					path = Paths.get(scopeCode, eventModelShortname, datasetModelId.toString(), fieldModelId.toString(), fieldValue);
 				}
 				else {
-					path = Paths.get(scopeCode, datasetModelId, fieldModelId, fieldValue);
+					path = Paths.get(scopeCode, datasetModelId.toString(), fieldModelId.toString(), fieldValue);
 				}
 
 				final var storedFile = getStoredFile(r.getValue(FILE.UUID));

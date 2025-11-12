@@ -164,7 +164,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 			children.put("message", auditTrail.getAuditContext());
 
 			if(auditTrail instanceof final WorkflowStatusAuditTrail workflowStatusAuditTrail) {
-				children.put("status", workflowStatusAuditTrail.getStateId());
+				children.put("status", workflowStatusAuditTrail.getWorkflowStateId().toString());
 			}
 			DocumentHelper.appendSimpleChildren(trailE, children);
 		}
@@ -194,7 +194,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 		for(final var ws : workflowStatusDAOService.getWorkflowStatusesByFieldPk(field.getPk())) {
 			workflowIds.put(ws.getPk(), ws.getId());
-			final var wsTrails = workflowStatusDAOService.getAuditTrailsForProperty(ws, Optional.empty(), WorkflowStatusRecord::getStateId);
+			final var wsTrails = workflowStatusDAOService.getAuditTrailsForProperty(ws, Optional.empty(), WorkflowStatusRecord::getWorkflowStateId);
 			final var filteredWSTrails = wsTrails.descendingSet().stream()
 				.filter(t -> date.isEmpty() || t.getAuditDatetime().isBefore(date.get()) || t.getAuditDatetime().equals(date.get()))
 				.toList();
@@ -230,7 +230,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 				trailE.appendChild(trailWorkflowE);
 
 				final var trailStatusE = doc.createElement("state");
-				trailStatusE.setTextContent(((WorkflowStatusAuditTrail) trail).getStateId());
+				trailStatusE.setTextContent(((WorkflowStatusAuditTrail) trail).getWorkflowStateId().toString());
 				trailE.appendChild(trailStatusE);
 			}
 
@@ -269,9 +269,9 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 		//build the lists of interesting audit trail properties for each entity
 		final List<Function<ScopeAuditTrail, Object>> scopeProperties = Arrays.asList(ScopeAuditTrail::getDeleted, ScopeAuditTrail::getLocked);
 		final List<Function<EventAuditTrail, Object>> visitProperties = Arrays.asList(EventAuditTrail::getDeleted, EventAuditTrail::getLocked);
-		final List<Function<FormAuditTrail, Object>> formProperties = Arrays.asList(FormAuditTrail::getDeleted);
-		final List<Function<DatasetAuditTrail, Object>> datasetProperties = Arrays.asList(DatasetAuditTrail::getDeleted);
-		final List<Function<WorkflowStatusAuditTrail, Object>> workflowStatusProperties = Arrays.asList(WorkflowStatusAuditTrail::getStateId);
+		final List<Function<FormAuditTrail, Object>> formProperties = List.of(FormAuditTrail::getDeleted);
+		final List<Function<DatasetAuditTrail, Object>> datasetProperties = List.of(DatasetAuditTrail::getDeleted);
+		final List<Function<WorkflowStatusAuditTrail, Object>> workflowStatusProperties = List.of(WorkflowStatusAuditTrail::getWorkflowStateId);
 
 		final var studyE = ExportableUtils.getExportForXml(doc, study, languages);
 		doc.appendChild(studyE);
@@ -285,7 +285,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 		final var scopeE = doc.createElement("scope");
 		studyE.appendChild(scopeE);
-		scopeE.setAttribute("scopeModelId", scope.getScopeModelId());
+		scopeE.setAttribute("scopeModelId", scope.getScopeModelId().toString());
 		scopeE.setAttribute("scopeModelLabel", scope.getScopeModel().getDefaultLocalizedShortname());
 		scopeE.setAttribute("id", scope.getId());
 		scopeE.setAttribute("code", scope.getCode());
@@ -317,7 +317,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 			final var eventE = doc.createElement("event");
 			eventE.setAttribute("id", event.getId());
-			eventE.setAttribute("eventModelId", event.getEventModelId());
+			eventE.setAttribute("eventModelId", event.getEventModelId().toString());
 			eventE.setAttribute("deleted", Boolean.toString(event.getDeleted()));
 			eventE.setAttribute("shortname", event.getEventModel().getLocalizedShortname(languages));
 			eventE.setAttribute("label", eventService.getLabel(scope, event, languages));
@@ -343,7 +343,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 				final var formE = doc.createElement("form");
 				formE.setAttribute("id", form.getId());
-				formE.setAttribute("formModelId", form.getFormModelId());
+				formE.setAttribute("formModelId", form.getFormModelId().toString());
 				formE.setAttribute("deleted", Boolean.toString(form.getDeleted()));
 				formE.setAttribute("shortname", form.getFormModel().getLocalizedShortname(languages));
 				formE.appendChild(generateTrailsElement(doc, formDAOService.getAuditTrailsForProperties(form, Optional.of(timeframe), formProperties)));
@@ -353,7 +353,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 					final var layout = layoutGroupState.getLayout();
 
 					//check if layout has been selected
-					final var layoutSelection = formSelection.get().getSelection(Entity.LAYOUT, layout.getId());
+					final var layoutSelection = formSelection.get().getSelection(Entity.LAYOUT, layout.getLayoutId());
 					if(layoutSelection.isEmpty()) {
 						continue;
 					}
@@ -384,7 +384,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 						//add more attributes for repeatable layouts
 						if(repeatable) {
 							final var dataset = layoutState.getReferenceDataset();
-							layoutE.setAttribute("documentId", dataset.getDatasetModelId());
+							layoutE.setAttribute("documentId", dataset.getDatasetModelId().toString());
 							layoutE.setAttribute("index", Integer.toString(++index));
 							layoutE.setAttribute("deleted", Boolean.toString(dataset.getDeleted()));
 							layoutE.appendChild(generateTrailsElement(doc, datasetDAOService.getAuditTrailsForProperties(dataset, Optional.of(timeframe), datasetProperties)));
@@ -507,10 +507,9 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 	/**
 	 * Generate all the CRF archives files for the descendants of the given scope
 	 *
-	 * @param scope      The scope to export
-	 * @param parent     The parent scope of the scope to export
-	 * @param parameters The parameters of the export
-	 * @param folder     The folder where the report should be created
+	 * @param scope  The scope to export
+	 * @param parent The parent scope of the scope to export
+	 * @param folder The folder where the report should be created
 	 */
 	private void generateCRFArchives(
 		final Actor actor,
@@ -681,8 +680,8 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 	/**
 	 * Recursively add all sub-folders and files into the zip file
 	 *
-	 * @param zip  The zip file
-	 * @param file The file to add to the zip
+	 * @param zip     The zip file
+	 * @param file    The file to add to the zip
 	 * @param zipPath The path of the file in the zip file
 	 * @throws IOException Thrown if an error occurred while creating the zip file
 	 */

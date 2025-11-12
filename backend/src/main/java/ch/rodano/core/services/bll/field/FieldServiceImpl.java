@@ -106,6 +106,7 @@ public class FieldServiceImpl implements FieldService {
 		}
 
 		final var field = new Field();
+		field.setProjectId(document.getStudy().getProjectId());
 		field.setDatasetModel(document);
 		field.setFieldModel(fieldModel);
 		field.setDatasetFk(dataset.getPk());
@@ -355,21 +356,31 @@ public class FieldServiceImpl implements FieldService {
 
 	@Override
 	public List<Field> getAll(final Dataset dataset) {
-		final var fieldModelIds = dataset.getDatasetModel().getFieldModels().stream().map(FieldModel::getId).toList();
+		final var datasetModel = dataset.getDatasetModel();
+
+		final var fieldModelIds = datasetModel.getFieldModels().stream()
+			.map(FieldModel::getFieldModelId)
+			.collect(Collectors.toList());
+
+		if(fieldModelIds.isEmpty()) {
+			logger.warn("Dataset model {} has no field models!", datasetModel.getId());
+			return Collections.emptyList();
+		}
+
 		return fieldDAOService.getFieldsByDatasetPkHavingFieldModelIds(dataset.getPk(), fieldModelIds);
 	}
 
 	@Override
 	public List<Field> getAll(final Dataset dataset, final Collection<FieldModel> fieldModels) {
 		final var fieldModelIds = fieldModels.stream()
-			.map(FieldModel::getId)
+			.map(FieldModel::getFieldModelId)
 			.toList();
 		return fieldDAOService.getFieldsByDatasetPkHavingFieldModelIds(dataset.getPk(), fieldModelIds);
 	}
 
 	@Override
 	public Field get(final Dataset dataset, final FieldModel fieldModel) {
-		return fieldDAOService.getFieldsByDatasetPkHavingFieldModelIds(dataset.getPk(), Collections.singleton(fieldModel.getId())).stream()
+		return fieldDAOService.getFieldsByDatasetPkHavingFieldModelIds(dataset.getPk(), Collections.singleton(fieldModel.getFieldModelId())).stream()
 			.findFirst()
 			.orElseThrow();
 	}

@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.opencsv.CSVWriter;
@@ -62,9 +61,9 @@ public class ScopeExportServiceImpl implements ScopeExportService {
 			header.add(String.format("%s name", model.getLocalizedShortname(languages)));
 
 			final Map<Long, String> users = new TreeMap<>();
-			if(StringUtils.isNotBlank(model.getDefaultProfileId())) {
+			if(model.getDefaultProfileId() != null) {
 				// Retrieve users
-				for(final var role : roleDAOService.getRolesByProfile(model.getDefaultProfileId())) {
+				for(final var role : roleDAOService.getRolesByProfile(model.getDefaultProfileUuid())) {
 					//do not consider role link to a robot
 					if(role.getUserFk() != null) {
 						users.put(role.getScopeFk(), userService.getUserByPk(role.getUserFk()).getName());

@@ -66,10 +66,6 @@ public class ResourceDAOServiceImpl extends AbstractDAOService<Resource, Resourc
 			conditions.add(RESOURCE.CATEGORY_ID.eq(categoryId));
 		});
 
-		search.getFullText().ifPresent(fullText -> {
-			conditions.add(RESOURCE.TITLE.containsIgnoreCase(fullText).or(RESOURCE.DESCRIPTION.containsIgnoreCase(fullText)));
-		});
-
 		if(!search.getIncludeDeleted()) {
 			conditions.add(RESOURCE.DELETED.isFalse());
 		}

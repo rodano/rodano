@@ -10,7 +10,7 @@ public enum WorkflowStatusSortBy {
 	creationTime(WORKFLOW_STATUS.CREATION_TIME),
 	lastUpdateTime(WORKFLOW_STATUS.LAST_UPDATE_TIME),
 	workflowId(WORKFLOW_STATUS.WORKFLOW_ID),
-	stateId(WORKFLOW_STATUS.STATE_ID);
+	stateId(WORKFLOW_STATUS.WORKFLOW_STATE_ID);
 
 	private final TableField<WorkflowStatusRecord, ?> field;
 

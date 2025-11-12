@@ -1,6 +1,7 @@
 package ch.rodano.core.model.scope;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 public class ScopeRecord {
 
@@ -13,7 +14,7 @@ public class ScopeRecord {
 	protected ZonedDateTime startDate;
 	protected ZonedDateTime stopDate;
 
-	protected String scopeModelId;
+	protected UUID scopeModelId;
 
 	protected ScopeData data;
 
@@ -74,11 +75,11 @@ public class ScopeRecord {
 		this.longname = longname;
 	}
 
-	public final String getScopeModelId() {
+	public final UUID getScopeModelId() {
 		return scopeModelId;
 	}
 
-	public void setScopeModelId(final String scopeModelId) {
+	public void setScopeModelId(final UUID scopeModelId) {
 		this.scopeModelId = scopeModelId;
 	}
 

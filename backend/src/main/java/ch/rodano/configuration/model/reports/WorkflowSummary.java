@@ -9,6 +9,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -23,11 +24,14 @@ import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 public class WorkflowSummary implements Node, Comparable<WorkflowSummary> {
 	@Serial
 	private static final long serialVersionUID = 5262106614046834382L;
 
 	private Study study;
+	private UUID workflowSummaryId;
 	private String id;
 
 	//workflow
@@ -62,6 +66,20 @@ public class WorkflowSummary implements Node, Comparable<WorkflowSummary> {
 	@JsonBackReference
 	public final void setStudy(final Study study) {
 		this.study = study;
+	}
+
+	public UUID getWorkflowSummaryId() {
+		if(this.workflowSummaryId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.workflowSummaryId = deterministic(
+				this.study.getProjectId(),
+				"WORKFLOW_SUMMARY",
+				this.id);
+		}
+		return workflowSummaryId;
+	}
+
+	public void setWorkflowSummaryId(final UUID workflowSummaryId) {
+		this.workflowSummaryId = workflowSummaryId;
 	}
 
 	public final String getId() {
@@ -192,5 +210,31 @@ public class WorkflowSummary implements Node, Comparable<WorkflowSummary> {
 	@Override
 	public Collection<Node> getChildrenWithEntity(final Entity entity) {
 		return Collections.emptyList();
+	}
+
+	@JsonIgnore
+	public List<UUID> getWorkflowUuids() {
+		if(this.study == null || this.workflowIds == null || this.workflowIds.isEmpty()) {
+			return List.of();
+		}
+		return workflowIds.stream().map(code -> deterministic(this.study.getProjectId(), "WORKFLOW", code)).toList();
+	}
+
+	@JsonIgnore
+	public UUID getLeafScopeModelUuid() {
+		if(this.study == null || this.leafScopeModelId == null || this.leafScopeModelId.isBlank()) {
+			return null;
+		}
+		return deterministic(study.getProjectId(), "SCOPE_MODEL", this.leafScopeModelId);
+	}
+
+	@JsonIgnore
+	public SortedSet<UUID> getFilterEventModelUuids() {
+		if(this.study == null || this.filterEventModelIds == null || this.filterEventModelIds.isEmpty()) {
+			return new TreeSet<>();
+		}
+		final var out = new TreeSet<UUID>();
+		filterEventModelIds.forEach(code -> out.add(deterministic(this.study.getProjectId(), "EVENT_MODEL", this.leafScopeModelId + "|" + code)));
+		return out;
 	}
 }

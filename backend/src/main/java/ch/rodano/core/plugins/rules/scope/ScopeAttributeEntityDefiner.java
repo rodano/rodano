@@ -2,6 +2,7 @@ package ch.rodano.core.plugins.rules.scope;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
@@ -83,7 +84,7 @@ public class ScopeAttributeEntityDefiner extends AbstractScopeEntityDefiner {
 			},
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
+				public UUID getValue(final Evaluable evaluable) {
 					return ((Scope) evaluable).getScopeModelId();
 				}
 

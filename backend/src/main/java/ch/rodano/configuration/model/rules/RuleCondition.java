@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -20,6 +21,7 @@ public class RuleCondition implements Node {
 	@Serial
 	private static final long serialVersionUID = -2106058031155804759L;
 
+	protected UUID ruleConditionId;
 	protected String id;
 
 	protected RuleConditionCriterion criterion;
@@ -34,6 +36,14 @@ public class RuleCondition implements Node {
 		breakType = RuleBreakType.NONE;
 		mode = RuleConditionListEvaluationMode.OR;
 		conditions = new ArrayList<>();
+	}
+
+	public UUID getRuleConditionId() {
+		return ruleConditionId;
+	}
+
+	public void setRuleConditionId(final UUID ruleConditionId) {
+		this.ruleConditionId = ruleConditionId;
 	}
 
 	public final String getId() {

@@ -1,6 +1,7 @@
 package ch.rodano.core.model.file;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import ch.rodano.core.model.common.HardDeletableObject;
 import ch.rodano.core.model.common.IdentifiableObject;
@@ -8,6 +9,7 @@ import ch.rodano.core.model.common.TimestampableObject;
 
 public class File implements IdentifiableObject, TimestampableObject, HardDeletableObject {
 
+	protected UUID projectId;
 	protected Long pk;
 	protected ZonedDateTime creationTime;
 	protected ZonedDateTime lastUpdateTime;
@@ -23,7 +25,16 @@ public class File implements IdentifiableObject, TimestampableObject, HardDeleta
 	private byte[] checksum;
 	private boolean submitted;
 
-	public File() {}
+	public File() {
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
 
 	@Override
 	public Long getPk() {

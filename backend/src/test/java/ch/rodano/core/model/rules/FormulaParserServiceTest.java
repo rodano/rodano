@@ -168,6 +168,7 @@ public class FormulaParserServiceTest {
 		//create dataset model
 		final var datasetModel = new DatasetModel();
 		datasetModel.setId("FORMULA_DOCUMENT");
+		datasetModel.setStudy(studyService.getStudy());
 		studyService.getStudy().getDatasetModels().add(datasetModel);
 
 		//create dataset
@@ -179,7 +180,9 @@ public class FormulaParserServiceTest {
 		anyNumber.setType(FieldModelType.NUMBER);
 		anyNumber.setDataType(OperandType.NUMBER);
 		anyNumber.setMaxIntegerDigits(1);
+		anyNumber.setDatasetModel(datasetModel);
 		datasetModel.getFieldModels().add(anyNumber);
+		datasetModel.addFieldModel(anyNumber);
 
 		//create field
 		var field = new Field();
@@ -204,7 +207,9 @@ public class FormulaParserServiceTest {
 		anyDate.setWithYears(true);
 		anyDate.setWithMonths(true);
 		anyDate.setWithDays(true);
+		anyDate.setDatasetModel(datasetModel);
 		datasetModel.getFieldModels().add(anyDate);
+		datasetModel.addFieldModel(anyDate);
 
 		final var referenceDate = PartialDate.of(2010, 2, 5, 0, 0, 0);
 
@@ -244,14 +249,18 @@ public class FormulaParserServiceTest {
 		weightFieldModel.setType(FieldModelType.NUMBER);
 		weightFieldModel.setDataType(OperandType.NUMBER);
 		weightFieldModel.setMaxIntegerDigits(1);
+		weightFieldModel.setDatasetModel(datasetModel);
 		datasetModel.getFieldModels().add(weightFieldModel);
+		datasetModel.addFieldModel(weightFieldModel);
 
 		final var heightFieldModel = new FieldModel();
 		heightFieldModel.setId("HEIGHT");
 		heightFieldModel.setType(FieldModelType.NUMBER);
 		heightFieldModel.setDataType(OperandType.NUMBER);
 		heightFieldModel.setMaxIntegerDigits(1);
+		heightFieldModel.setDatasetModel(datasetModel);
 		datasetModel.getFieldModels().add(heightFieldModel);
+		datasetModel.addFieldModel(heightFieldModel);
 
 		final var weight = new Field();
 		weight.setDatasetFk(dataset.getPk());

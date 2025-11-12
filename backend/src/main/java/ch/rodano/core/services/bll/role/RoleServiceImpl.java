@@ -120,6 +120,7 @@ public class RoleServiceImpl implements RoleService {
 		final DatabaseActionContext context
 	) {
 		final var role = new Role();
+		role.setProjectId(studyService.getStudy().getProjectId());
 		role.setProfile(profile);
 
 		if(actor instanceof User) {

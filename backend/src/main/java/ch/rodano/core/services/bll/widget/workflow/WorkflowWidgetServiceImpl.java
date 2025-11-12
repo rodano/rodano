@@ -67,7 +67,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		Map.entry("fieldDate", FIELD.LAST_UPDATE_TIME),
 		Map.entry("workflow", WORKFLOW_STATUS.WORKFLOW_ID),
 		Map.entry("triggerMessage", WORKFLOW_STATUS.WORKFLOW_ID),
-		Map.entry("status", WORKFLOW_STATUS.STATE_ID),
+		Map.entry("status", WORKFLOW_STATUS.WORKFLOW_STATE_ID),
 		Map.entry("statusDate", WORKFLOW_STATUS.LAST_UPDATE_TIME)
 	);
 
@@ -151,7 +151,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 				ancestorsField,
 				totalField,
 				WORKFLOW_STATUS.PK, WORKFLOW_STATUS.SCOPE_FK, WORKFLOW_STATUS.EVENT_FK, WORKFLOW_STATUS.FORM_FK, WORKFLOW_STATUS.FIELD_FK,
-				WORKFLOW_STATUS.TRIGGER_MESSAGE, WORKFLOW_STATUS.LAST_UPDATE_TIME, WORKFLOW_STATUS.WORKFLOW_ID, WORKFLOW_STATUS.STATE_ID,
+				WORKFLOW_STATUS.TRIGGER_MESSAGE, WORKFLOW_STATUS.LAST_UPDATE_TIME, WORKFLOW_STATUS.WORKFLOW_ID, WORKFLOW_STATUS.WORKFLOW_STATE_ID,
 				SCOPE.PK, SCOPE.SCOPE_MODEL_ID, SCOPE.CODE, SCOPE.SHORTNAME, SCOPE.LONGNAME,
 				PARENT_SCOPE_TABLE.CODE
 			)
@@ -205,7 +205,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		//filter on workflows and states
 		final List<Condition> wssConditions = new ArrayList<>();
 		for(final var filter : widget.getWorkflowStatesSelectors()) {
-			wssConditions.add(WORKFLOW_STATUS.WORKFLOW_ID.eq(filter.getWorkflowId()).and(WORKFLOW_STATUS.STATE_ID.in(filter.getStateIds())));
+			wssConditions.add(WORKFLOW_STATUS.WORKFLOW_ID.eq(filter.getWorkflowUuid(study)).and(WORKFLOW_STATUS.WORKFLOW_STATE_ID.in(filter.getStateIds())));
 		}
 		query.and(DSL.or(wssConditions));
 
@@ -323,7 +323,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 			if(WorkflowableEntity.SCOPE != widget.getWorkflowEntity()) {
 				final var scopeModelId = record.getValue(EVENT.SCOPE_MODEL_ID);
 				final var eventModelId = record.getValue(EVENT.EVENT_MODEL_ID);
-				if(StringUtils.isNoneBlank(scopeModelId, eventModelId)) {
+				if(scopeModelId != null && eventModelId != null) {
 					final var eventModel = study.getScopeModel(scopeModelId).getEventModel(eventModelId);
 					final var eventExpectedDate = record.getValue(EVENT.EXPECTED_DATE);
 					final var eventDate = record.getValue(EVENT.DATE);
@@ -336,7 +336,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 
 			if(WorkflowableEntity.FORM == widget.getWorkflowEntity()) {
 				final var formModelId = record.getValue(FORM.FORM_MODEL_ID);
-				if(StringUtils.isNotBlank(formModelId)) {
+				if(formModelId != null) {
 					final var formModel = study.getFormModel(formModelId);
 					wsi.setFormPk(record.getValue(WORKFLOW_STATUS.FORM_FK));
 					wsi.setFormModelId(formModel.getId());
@@ -347,7 +347,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 			else if(WorkflowableEntity.FIELD == widget.getWorkflowEntity()) {
 				final var datasetModelId = record.getValue(FIELD.DATASET_MODEL_ID);
 				final var fieldModelId = record.getValue(FIELD.FIELD_MODEL_ID);
-				if(StringUtils.isNoneBlank(datasetModelId, fieldModelId)) {
+				if(datasetModelId != null && fieldModelId != null) {
 					final var fieldModel = study.getDatasetModel(datasetModelId).getFieldModel(fieldModelId);
 					wsi.setFieldPk(record.getValue(WORKFLOW_STATUS.FIELD_FK));
 					wsi.setDatasetModelId(datasetModelId);
@@ -362,7 +362,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 
 			final var workflow = study.getWorkflow(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID));
 			wsi.setWorkflow(workflow.getLocalizedShortname(languages));
-			final var state = workflow.getState(record.getValue(WORKFLOW_STATUS.STATE_ID));
+			final var state = workflow.getState(record.getValue(WORKFLOW_STATUS.WORKFLOW_STATE_ID));
 			wsi.setStatus(state.getLocalizedShortname(languages));
 			wsi.setStatusIcon(state.getIcon());
 			wsi.setStatusColor(state.getColor());
@@ -422,7 +422,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 
 				//column of ancestors' scopes
 				for(final var scopeModel : scopeModels) {
-					final var ancestor = info.getAncestors().stream().filter(a -> a.modelId().equals(scopeModel.getId())).findAny();
+					final var ancestor = info.getAncestors().stream().filter(a -> a.modelId().equals(scopeModel.getScopeModelId())).findAny();
 					line.add(ancestor.map(ScopeTinyDTO::pk).map(p -> Long.toString(p)).orElse(""));
 					line.add(ancestor.map(ScopeTinyDTO::code).orElse(""));
 				}

@@ -9,6 +9,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -23,6 +24,7 @@ public class Rule implements Node {
 	@Serial
 	private static final long serialVersionUID = 6038492625572866859L;
 
+	private UUID ruleId;
 	private String description;
 	private SortedMap<String, String> message;
 	private SortedSet<String> tags;
@@ -33,6 +35,14 @@ public class Rule implements Node {
 		message = new TreeMap<>();
 		tags = new TreeSet<>();
 		actions = new ArrayList<>();
+	}
+
+	public UUID getRuleId() {
+		return ruleId;
+	}
+
+	public void setRuleId(final UUID ruleId) {
+		this.ruleId = ruleId;
 	}
 
 	public final String getDescription() {

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,6 +20,8 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.Assignable;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ResourceCategory implements Serializable, SuperDisplayable, Assignable<ResourceCategory>, Node {
@@ -26,6 +29,7 @@ public class ResourceCategory implements Serializable, SuperDisplayable, Assigna
 	private static final long serialVersionUID = -813476290184481379L;
 
 	private Study study;
+	private UUID resourceCategoryId;
 	private String id;
 
 	private SortedMap<String, String> shortname;
@@ -49,6 +53,20 @@ public class ResourceCategory implements Serializable, SuperDisplayable, Assigna
 	@JsonBackReference
 	public final void setStudy(final Study study) {
 		this.study = study;
+	}
+
+	public UUID getResourceCategoryId() {
+		if(this.resourceCategoryId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.resourceCategoryId = deterministic(
+				this.study.getProjectId(),
+				"RESOURCE_CATEGORY",
+				this.id);
+		}
+		return resourceCategoryId;
+	}
+
+	public void setResourceCategoryId(final UUID resourceCategoryId) {
+		this.resourceCategoryId = resourceCategoryId;
 	}
 
 	@Override

@@ -7,8 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -34,18 +36,21 @@ import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class DatasetModel implements Serializable, SuperDisplayable, Node, RightAssignable<DatasetModel> {
 	@Serial
 	private static final long serialVersionUID = 3650259090775513476L;
 
-	private static Comparator<DatasetModel> DEFAULT_COMPARATOR = Comparator
+	private static final Comparator<DatasetModel> DEFAULT_COMPARATOR = Comparator
 		.comparing(DatasetModel::getExportOrder)
 		.thenComparing(DatasetModel::getId);
 
 	public static final String EXPORT_TABLE_PREFIX = "export_";
 
+	private UUID datasetModelId;
 	private String id;
 	private Study study;
 
@@ -80,6 +85,7 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 	}
 
 	public DatasetModel(final DatasetModel datasetModel) {
+		datasetModelId = datasetModel.getDatasetModelId();
 		id = datasetModel.getId();
 		study = datasetModel.getStudy();
 		multiple = datasetModel.isMultiple();
@@ -108,6 +114,20 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 		return study;
 	}
 
+	public UUID getDatasetModelId() {
+		if(this.datasetModelId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.datasetModelId = deterministic(
+				this.study.getProjectId(),
+				"DATASET_MODEL",
+				this.id);
+		}
+		return datasetModelId;
+	}
+
+	public void setDatasetModelId(final UUID datasetModelId) {
+		this.datasetModelId = datasetModelId;
+	}
+
 	public final void setId(final String id) {
 		this.id = id;
 	}
@@ -130,9 +150,21 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 		return fieldModels;
 	}
 
+	public void addFieldModel(final FieldModel fieldModel) {
+		if(fieldModel.getDatasetModel() != this) {
+			fieldModel.setDatasetModel(this);
+		}
+		this.fieldModels.add(fieldModel);
+	}
+
 	@JsonManagedReference
 	public final void setFieldModels(final List<FieldModel> fieldModels) {
-		this.fieldModels = fieldModels;
+		this.fieldModels = new ArrayList<>(fieldModels);
+		this.fieldModels.forEach(fm -> {
+			if(fm.getDatasetModel() != this) {
+				fm.setDatasetModel(this);
+			}
+		});
 	}
 
 	public final String getFamily() {
@@ -237,11 +269,20 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 	}
 
 	@JsonIgnore
-	public final FieldModel getFieldModel(final String fieldModelId) {
+	public FieldModel getFieldModel(final UUID fieldModelId) {
 		return fieldModels.stream()
-			.filter(f -> f.getId().equalsIgnoreCase(fieldModelId))
+			.filter(f -> fieldModelId != null && fieldModelId.equals(f.getFieldModelId()))
 			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.FIELD_MODEL, fieldModelId));
+			.orElseThrow(() -> new NoNodeException(this, Entity.FIELD_MODEL,
+				fieldModelId != null ? fieldModelId.toString() : null));
+	}
+
+	@JsonIgnore
+	public final FieldModel getFieldModel(final String fieldModelCode) {
+		return fieldModels.stream()
+			.filter(f -> f.getId().equalsIgnoreCase(fieldModelCode))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.FIELD_MODEL, fieldModelCode));
 	}
 
 	@JsonIgnore
@@ -355,12 +396,10 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 	@Override
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case FIELD_MODEL:
-				return Collections.unmodifiableList(fieldModels);
-			default:
-				return Collections.emptyList();
+		if(Objects.requireNonNull(entity) == Entity.FIELD_MODEL) {
+			return Collections.unmodifiableList(fieldModels);
 		}
+		return Collections.emptyList();
 	}
 
 	@JsonIgnore

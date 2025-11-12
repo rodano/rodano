@@ -1,12 +1,15 @@
 package ch.rodano.core.model.form;
 
+import java.util.UUID;
+
 public class FormRecord {
 
 	protected boolean deleted;
 
+	protected UUID projectId;
 	protected Long scopeFk;
 	protected Long eventFk;
-	protected String formModelId;
+	protected UUID formModelId;
 
 	protected FormRecord() {
 		deleted = false;
@@ -18,6 +21,14 @@ public class FormRecord {
 
 	public void setDeleted(final boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public Long getScopeFk() {
@@ -36,11 +47,11 @@ public class FormRecord {
 		this.eventFk = eventFk;
 	}
 
-	public String getFormModelId() {
+	public UUID getFormModelId() {
 		return formModelId;
 	}
 
-	public void setFormModelId(final String formModelId) {
+	public void setFormModelId(final UUID formModelId) {
 		this.formModelId = formModelId;
 	}
 }

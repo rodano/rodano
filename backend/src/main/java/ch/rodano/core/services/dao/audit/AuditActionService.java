@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.AuditAction;
 import ch.rodano.core.model.audit.DatabaseActionContext;
+import ch.rodano.core.services.bll.study.StudyService;
 
 import static ch.rodano.core.model.jooq.Tables.AUDIT_ACTION;
 
@@ -16,16 +17,20 @@ import static ch.rodano.core.model.jooq.Tables.AUDIT_ACTION;
 public class AuditActionService {
 
 	private final DSLContext create;
+	private final StudyService studyService;
 
 	public AuditActionService(
-		final DSLContext create
+		final DSLContext create,
+		final StudyService studyService
 	) {
 		this.create = create;
+		this.studyService = studyService;
 	}
 
 	public DatabaseActionContext createAuditActionAndGenerateContext(final Optional<Actor> actor, final String rationale, final ZonedDateTime date) {
 		final var action = new AuditAction(actor, rationale, date);
 		final var record = create.newRecord(AUDIT_ACTION, action);
+		record.setProjectId(studyService.getStudy().getProjectId());
 		record.store();
 		action.setPk(record.getPk());
 		return new DatabaseActionContext(action, actor);

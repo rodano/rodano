@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -26,12 +29,15 @@ import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonPropertyOrder(alphabetic = true)
 public class Chart implements Node, Comparable<Chart> {
 	@Serial
 	private static final long serialVersionUID = 3353079861292862954L;
 
 	private Study study;
+	private UUID chartId;
 	private String id;
 	private Map<String, String> shortname;
 	private Map<String, String> longname;
@@ -85,6 +91,20 @@ public class Chart implements Node, Comparable<Chart> {
 	@JsonBackReference
 	public void setStudy(final Study study) {
 		this.study = study;
+	}
+
+	public UUID getChartId() {
+		if(this.chartId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.chartId = deterministic(
+				this.study.getProjectId(),
+				"CHART",
+				this.id);
+		}
+		return chartId;
+	}
+
+	public void setChartId(final UUID chartId) {
+		this.chartId = chartId;
 	}
 
 	public String getId() {
@@ -183,12 +203,10 @@ public class Chart implements Node, Comparable<Chart> {
 
 	@Override
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case CHART_RANGE:
-				return Collections.unmodifiableList(ranges);
-			default:
-				return Collections.emptyList();
+		if(Objects.requireNonNull(entity) == Entity.CHART_RANGE) {
+			return Collections.unmodifiableList(ranges);
 		}
+		return Collections.emptyList();
 	}
 
 	//statistics
@@ -214,6 +232,11 @@ public class Chart implements Node, Comparable<Chart> {
 
 	public void setRanges(final List<ChartRange> ranges) {
 		this.ranges = ranges;
+		if(this.ranges != null) {
+			for(ChartRange r : this.ranges) {
+				r.setChart(this);
+			}
+		}
 	}
 
 	public boolean isWithStatistics() {
@@ -253,7 +276,7 @@ public class Chart implements Node, Comparable<Chart> {
 
 	@JsonIgnore
 	public Optional<ChartRange> getOtherRange() {
-		return ranges.stream().filter(r -> r.getOther()).findAny();
+		return ranges.stream().filter(ChartRange::getOther).findAny();
 	}
 
 	//workflow chart
@@ -350,5 +373,86 @@ public class Chart implements Node, Comparable<Chart> {
 
 	public final void setEnrollmentStateIds(final Set<String> enrollmentStateIds) {
 		this.enrollmentStateIds = enrollmentStateIds;
+	}
+
+	@JsonIgnore
+	public UUID getDatasetModelUuid() {
+		if(datasetModelId == null || datasetModelId.isBlank()) {
+			return null;
+		}
+		return getDatasetModel().getDatasetModelId();
+	}
+
+	@JsonIgnore
+	public UUID getFieldModelUuid() {
+		if(fieldModelId == null || fieldModelId.isBlank()) {
+			return null;
+		}
+		return getFieldModel().getFieldModelId();
+	}
+
+	@JsonIgnore
+	public UUID getWorkflowUuid() {
+		if(workflowId == null || workflowId.isBlank()) {
+			return null;
+		}
+		return study.getWorkflow(workflowId).getWorkflowId();
+	}
+
+	@JsonIgnore
+	public UUID getLeafScopeModelUuid() {
+		if(leafScopeModelId == null || leafScopeModelId.isBlank()) {
+			return null;
+		}
+		return getLeafScopeModel().getScopeModelId();
+	}
+
+	@JsonIgnore
+	public UUID getScopeModelUuid() {
+		if(scopeModelId == null || scopeModelId.isBlank()) {
+			return null;
+		}
+		return getScopeModel().getScopeModelId();
+	}
+
+	@JsonIgnore
+	public UUID getEnrollmentWorkflowUuid() {
+		return deterministic(study.getProjectId(), "WORKFLOW", enrollmentWorkflowId);
+	}
+
+	@JsonIgnore
+	public Set<UUID> getEnrollmentStateUuids() {
+		if(enrollmentWorkflowId == null || enrollmentWorkflowId.isBlank()) {
+			return Collections.emptySet();
+		}
+		return toUuidSet(study.getProjectId(), enrollmentWorkflowId, enrollmentStateIds);
+	}
+
+	@JsonIgnore
+	public Set<UUID> getIncludedStateUuids() {
+		if(workflowId == null || workflowId.isBlank()) {
+			return Collections.emptySet();
+		}
+		return toUuidSet(study.getProjectId(), workflowId, includedStateIds);
+	}
+
+	@JsonIgnore
+	public Set<UUID> getExcludedStateUuids() {
+		if(workflowId == null || workflowId.isBlank()) {
+			return Collections.emptySet();
+		}
+		return toUuidSet(study.getProjectId(), workflowId, excludedStateIds);
+	}
+
+	@JsonIgnore
+	private static Set<UUID> toUuidSet(final UUID projectId, final String workflowCode, final Set<String> codes) {
+		if(codes == null || codes.isEmpty() || projectId == null) {
+			return Collections.emptySet();
+		}
+		return codes.stream()
+			.filter(Objects::nonNull)
+			.filter(s -> !s.isBlank())
+			.map(s -> deterministic(projectId, "WORKFLOW_STATE", workflowCode + "|" + s))
+			.collect(Collectors.toCollection(TreeSet::new));
 	}
 }

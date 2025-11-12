@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.RoleAuditTrail;
@@ -52,12 +53,12 @@ public interface RoleDAOService {
 	 * @param profileId The given profile id
 	 * @return The roles of a profile
 	 */
-	List<Role> getRolesByProfile(String profileId);
+	List<Role> getRolesByProfile(UUID profileId);
 
 	/**
 	 * Get roles for the corresponding scope pk and profile ids
 	 *
-	 * @param scopePk   The scope pk
+	 * @param scopePk    The scope pk
 	 * @param profileIds The collection of profile ids
 	 * @return All roles corresponding to the given scope pk and profile ids
 	 */
@@ -66,8 +67,8 @@ public interface RoleDAOService {
 	/**
 	 * Get the active roles on or over the given scope pk
 	 *
-	 * @param userPk The user pk
-	 * @param scopePk   The scope pk
+	 * @param userPk  The user pk
+	 * @param scopePk The scope pk
 	 * @return The active roles of the user on or over the given scope pk
 	 */
 	List<Role> getActiveRolesByUserPkOverScopePk(Long userPk, Long scopePk);
@@ -76,7 +77,7 @@ public interface RoleDAOService {
 	 * Get the active roles on or over the given scope pk
 	 *
 	 * @param robotPk The robot pk
-	 * @param scopePk   The scope pk
+	 * @param scopePk The scope pk
 	 * @return The active roles of the robot on or over the given scope pk
 	 */
 	List<Role> getActiveRolesByRobotPkOverScopePk(Long robotPk, Long scopePk);
@@ -84,8 +85,8 @@ public interface RoleDAOService {
 	/**
 	 * Create or update a role
 	 *
-	 * @param role    The role to create or update
-	 * @param context The context in which the action takes place
+	 * @param role      The role to create or update
+	 * @param context   The context in which the action takes place
 	 * @param rationale The rationale for the operation
 	 */
 	void saveRole(Role role, DatabaseActionContext context, String rationale);

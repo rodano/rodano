@@ -106,6 +106,7 @@ public class MailDAOServiceImpl extends AbstractDAOService<Mail, MailRecord> imp
 		save(mail, context, rationale);
 
 		mailAttachments.forEach(attachment -> {
+			attachment.setProjectId(mail.getProjectId());
 			attachment.setMailFk(mail.getPk());
 			mailAttachmentDAOService.saveMailAttachment(attachment, context, rationale);
 		});

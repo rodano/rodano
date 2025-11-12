@@ -1,6 +1,7 @@
 package ch.rodano.api.scope;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public class ScopeMiniDTO {
 
 	@Schema(description = "Scope model ID")
 	@NotBlank
-	protected String modelId;
+	protected UUID modelId;
 	@NotNull
 	protected boolean virtual;
 	@NotNull
@@ -88,11 +89,11 @@ public class ScopeMiniDTO {
 		this.longname = longname;
 	}
 
-	public String getModelId() {
+	public UUID getModelId() {
 		return modelId;
 	}
 
-	public void setModelId(final String modelId) {
+	public void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

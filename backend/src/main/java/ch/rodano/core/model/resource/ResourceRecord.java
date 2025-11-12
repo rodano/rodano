@@ -1,16 +1,19 @@
 package ch.rodano.core.model.resource;
 
+import java.util.UUID;
+
 public class ResourceRecord {
 
 	protected boolean deleted;
 
+	protected UUID projectId;
 	protected Long userFk;
 	protected Long scopeFk;
 	protected String uuid;
 	protected String title;
 	protected String description;
 
-	protected String categoryId;
+	protected UUID categoryId;
 
 	protected Boolean publicResource;
 
@@ -26,6 +29,14 @@ public class ResourceRecord {
 
 	public void setDeleted(final boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public Long getUserFk() {
@@ -76,11 +87,11 @@ public class ResourceRecord {
 		this.filename = filename;
 	}
 
-	public String getCategoryId() {
+	public UUID getCategoryId() {
 		return categoryId;
 	}
 
-	public void setCategoryId(final String categoryId) {
+	public void setCategoryId(final UUID categoryId) {
 		this.categoryId = categoryId;
 	}
 

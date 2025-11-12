@@ -45,6 +45,7 @@ import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.event.EventDAOService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 import ch.rodano.core.services.rule.RuleService;
 import ch.rodano.core.utils.ACL;
 import ch.rodano.core.utils.Utils;
@@ -67,6 +68,7 @@ public class EventServiceImpl implements EventService {
 	private final WorkflowStatusService workflowStatusService;
 	private final ConstraintEvaluationService constraintEvaluationService;
 	private final UtilsService utilsService;
+	private final ProjectIdResolver projectIdResolver;
 
 	public EventServiceImpl(
 		@Lazy final ScopeService scopeService,
@@ -79,7 +81,8 @@ public class EventServiceImpl implements EventService {
 		final StudyService studyService,
 		final WorkflowStatusService workflowStatusService,
 		final ConstraintEvaluationService constraintEvaluationService,
-		final UtilsService utilsService
+		final UtilsService utilsService,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.scopeService = scopeService;
 		this.eventDAOService = eventDAOService;
@@ -92,13 +95,15 @@ public class EventServiceImpl implements EventService {
 		this.workflowStatusService = workflowStatusService;
 		this.constraintEvaluationService = constraintEvaluationService;
 		this.utilsService = utilsService;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	/**
 	 * This method performs the necessary checks before event addition to scope.
-	 * @param scope The scope
+	 *
+	 * @param scope          The scope
 	 * @param existingEvents All existing events of the scope
-	 * @param eventModel The concerned event model
+	 * @param eventModel     The concerned event model
 	 */
 	private Optional<RuntimeException> verifyScopePreRequisites(final Scope scope, final List<Event> existingEvents, final EventModel eventModel) {
 		//check that scope is not locked
@@ -114,7 +119,7 @@ public class EventServiceImpl implements EventService {
 
 		// check if there is not a blocking event group
 		for(final var blockingEventModel : eventModel.getBlockingEventModels()) {
-			if(existingEvents.stream().anyMatch(e -> e.getEventModelId().equals(blockingEventModel.getId()))) {
+			if(existingEvents.stream().anyMatch(e -> e.getEventModelId().equals(blockingEventModel.getEventModelId()))) {
 				final var message = String.format("Unable to add event %s to scope %s as it already has the blocking event %s", eventModel.getId(), scope.getCode(), blockingEventModel.getId());
 				return Optional.of(new WrongDataConditionException(message));
 			}
@@ -122,7 +127,7 @@ public class EventServiceImpl implements EventService {
 
 		//filter existing events with the same event model
 		final var sameEvents = existingEvents.stream()
-			.filter(e -> e.getEventModelId().equals(eventModel.getId()))
+			.filter(e -> e.getEventModelId().equals(eventModel.getEventModelId()))
 			.sorted()
 			.toList();
 
@@ -167,7 +172,7 @@ public class EventServiceImpl implements EventService {
 		//this check cannot be moved to verifyScopePreRequisites because it is too costly
 		final var emptyEvent = existingEvents
 			.stream()
-			.filter(e -> e.getEventModelId().equals(eventModel.getId()))
+			.filter(e -> e.getEventModelId().equals(eventModel.getEventModelId()))
 			.map(Event::getPk)
 			.filter(Predicate.not(fieldDAOService::doesEventHaveFieldsWithAValue))
 			.findAny();
@@ -296,7 +301,7 @@ public class EventServiceImpl implements EventService {
 			//retrieve number of existing events (among non deleted events)
 			final var sameEventsCount = existingEvents
 				.stream()
-				.filter(e -> e.getEventModelId().equals(eventModel.getId()))
+				.filter(e -> e.getEventModelId().equals(eventModel.getEventModelId()))
 				.count();
 			if(sameEventsCount >= eventModel.getMaxOccurrence()) {
 				throw new WrongDataConditionException(String.format("Max occurrence for event %s has been reached for scope %s", eventModel.getId(), scope.getCode()));
@@ -414,7 +419,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<Event> getAll(final Scope scope, final EventModel eventModel) {
-		return eventDAOService.getEventsByScopePkAndEventModelId(scope.getPk(), eventModel.getId());
+		return eventDAOService.getEventsByScopePkAndEventModelId(scope.getPk(), eventModel.getEventModelId());
 	}
 
 	@Override
@@ -441,7 +446,7 @@ public class EventServiceImpl implements EventService {
 		final EventModel eventModel,
 		final int eventNumber
 	) {
-		return eventDAOService.getEventByScopePkAndEventModelIdAndEventNumber(scope.getPk(), eventModel.getId(), eventNumber);
+		return eventDAOService.getEventByScopePkAndEventModelIdAndEventNumber(scope.getPk(), eventModel.getEventModelId(), eventNumber);
 	}
 
 	@Override
@@ -456,7 +461,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<Event> getAllIncludingRemoved(final EventModel eventModel) {
-		return eventDAOService.getAllEventsByEventModelId(eventModel.getId());
+		return eventDAOService.getAllEventsByEventModelId(eventModel.getEventModelId());
 	}
 
 	@Override
@@ -466,7 +471,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<Event> getAllIncludingRemoved(final Scope scope, final EventModel eventModel) {
-		return eventDAOService.getAllEventsByScopePkAndEventModelId(scope.getPk(), eventModel.getId());
+		return eventDAOService.getAllEventsByScopePkAndEventModelId(scope.getPk(), eventModel.getEventModelId());
 	}
 
 	@Override
@@ -606,8 +611,10 @@ public class EventServiceImpl implements EventService {
 		final var lastEventGroupNumber = getAllIncludingRemoved(scope, eventModel).stream().mapToInt(Event::getEventGroupNumber).max().orElse(-1) + 1;
 
 		final var event = new Event();
+		event.setProjectId(projectIdResolver.id());
 		event.setScope(scope);
 		event.setScopeModel(scope.getScopeModel());
+		event.setScopeModelId(scope.getScopeModelId());
 		event.setEventModel(eventModel);
 		event.setEventGroupNumber(lastEventGroupNumber);
 		event.setNotDone(false);
@@ -615,7 +622,9 @@ public class EventServiceImpl implements EventService {
 		event.setLocked(false);
 
 		if(event.getEventModel().isPlanned()) {
-			event.setExpectedDate(date);
+			final var existingEvents = getAll(scope);
+			final var calculatedDate = getDateTheoretical(existingEvents, event);
+			event.setExpectedDate(calculatedDate != null ? calculatedDate : date);
 		}
 		else {
 			event.setDate(date);
@@ -634,7 +643,7 @@ public class EventServiceImpl implements EventService {
 
 	private ZonedDateTime getDateTheoretical(final List<Event> events, final Event event) {
 		final var eventModel = event.getEventModel();
-		final var deadlineReferenceEventIds = CollectionUtils.emptyIfNull(eventModel.getDeadlineReferenceEventModelIds());
+		final var deadlineReferenceEventIds = CollectionUtils.emptyIfNull(eventModel.getDeadlineReferenceEventModelUuids());
 		return events.stream()
 			.filter(e -> deadlineReferenceEventIds.contains(e.getEventModelId()))
 			.map(Event::getDateOrExpectedDate)

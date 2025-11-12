@@ -47,6 +47,7 @@ public class UserServiceTest extends DatabaseTest {
 	public void userCreationTest() {
 		// create a user with a role
 		final var user = new User();
+		user.setProjectId(studyService.getStudy().getProjectId());
 		user.setName("John Doe");
 		user.setEmail("john.doe@rodano.ch");
 		user.setExternallyManaged(false);
@@ -84,6 +85,7 @@ public class UserServiceTest extends DatabaseTest {
 	public void extManagedUserCreationTest() {
 		// create a user with a role
 		final var user = new User();
+		user.setProjectId(studyService.getStudy().getProjectId());
 		user.setName("Jane Doe");
 		user.setEmail("jane.doe@rodano.ch");
 		user.setExternallyManaged(true);
@@ -132,6 +134,7 @@ public class UserServiceTest extends DatabaseTest {
 	@DisplayName("Can not save a user with an invalid e-mail")
 	public void canNotCreateUserWithInvalidEmail() {
 		final var user = new User();
+		user.setProjectId(studyService.getStudy().getProjectId());
 		user.setName("John Doe");
 		user.setEmail("john.doe@rodano.ch ");
 

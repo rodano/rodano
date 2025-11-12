@@ -79,7 +79,7 @@ public class ReportServiceImpl implements ReportService {
 
 				// Filter by parent model
 				final var filteredRelations = relations.stream()
-					.filter(relation -> scopeRelationService.getParent(relation).getScopeModelId().equals(parentScopeModel.getId()))
+					.filter(relation -> scopeRelationService.getParent(relation).getScopeModelId().equals(parentScopeModel.getScopeModelId()))
 					.collect(Collectors.toCollection(ArrayList::new));
 
 				if(filteredRelations.size() > 1) {
@@ -137,7 +137,7 @@ public class ReportServiceImpl implements ReportService {
 				.innerJoin(PARENT_SCOPE).on(SCOPE_RELATION.PARENT_FK.eq(PARENT_SCOPE.PK).and(SCOPE_RELATION.DEFAULT.isTrue()))
 				.innerJoin(SCOPE_ANCESTOR).on(SCOPE.PK.eq(SCOPE_ANCESTOR.SCOPE_FK))
 				.where(SCOPE_ANCESTOR.ANCESTOR_FK.in(rootScopePks))
-				.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModel.getId()))
+				.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModel.getScopeModelId()))
 				.and(EVENT.EXPECTED_DATE.isNotNull());
 
 			final var result = query.fetch();

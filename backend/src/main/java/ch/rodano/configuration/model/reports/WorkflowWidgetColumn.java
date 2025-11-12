@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,6 +18,8 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Node, Comparable<WorkflowWidgetColumn> {
@@ -25,6 +28,7 @@ public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Nod
 
 	private WorkflowWidget widget;
 
+	private UUID workflowWidgetColumnId;
 	private String id;
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> longname;
@@ -47,6 +51,24 @@ public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Nod
 	@JsonBackReference
 	public final void setWidget(final WorkflowWidget widget) {
 		this.widget = widget;
+	}
+
+	public UUID getWorkflowWidgetColumnId() {
+		if(this.workflowWidgetColumnId == null
+			&& this.id != null && !this.id.isBlank()
+			&& this.widget != null
+			&& this.widget.getStudy() != null) {
+			this.workflowWidgetColumnId =
+				deterministic(
+					this.widget.getStudy().getProjectId(),
+					"WORKFLOW_WIDGET_COLUMN",
+					this.widget.getId() + "|" + this.id);
+		}
+		return workflowWidgetColumnId;
+	}
+
+	public void setWorkflowWidgetColumnId(final UUID workflowWidgetColumnId) {
+		this.workflowWidgetColumnId = workflowWidgetColumnId;
 	}
 
 	@Override
@@ -120,5 +142,13 @@ public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Nod
 	@Override
 	public final int compareTo(final WorkflowWidgetColumn o) {
 		return getWidget().getColumns().indexOf(this) - o.getWidget().getColumns().indexOf(o);
+	}
+
+	@JsonIgnore
+	public String getDefaultLocalizedShortname() {
+		if(widget == null || widget.getStudy() == null) {
+			return id;
+		}
+		return getLocalizedShortname(widget.getStudy().getDefaultLanguage().getId());
 	}
 }

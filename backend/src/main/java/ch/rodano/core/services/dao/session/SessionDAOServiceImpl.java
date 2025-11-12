@@ -7,6 +7,7 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.core.model.session.Session;
+import ch.rodano.core.services.project.ProjectIdResolver;
 
 import static ch.rodano.core.model.jooq.Tables.USER_SESSION;
 
@@ -14,17 +15,21 @@ import static ch.rodano.core.model.jooq.Tables.USER_SESSION;
 public class SessionDAOServiceImpl implements SessionDAOService {
 
 	private final DSLContext create;
+	private final ProjectIdResolver projectIdResolver;
 
 	public SessionDAOServiceImpl(
-		final DSLContext create
+		final DSLContext create,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.create = create;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	@Override
 	public Session insertSession(final Session session) {
 		final var record = create.newRecord(USER_SESSION, session);
 		record.insert();
+		session.setProjectId(projectIdResolver.id());
 		session.setPk(record.getPk());
 		return session;
 	}

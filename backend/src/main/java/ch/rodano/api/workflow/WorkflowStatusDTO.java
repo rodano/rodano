@@ -1,6 +1,7 @@
 package ch.rodano.api.workflow;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ public class WorkflowStatusDTO {
 	String workflowId;
 	@Schema(description = "The workflow status ID")
 	@NotBlank
-	String statusId;
+	UUID statusId;
 	@Schema(description = "User message that was attached to the latest status change")
 	@NotBlank
 	String triggerMessage;
@@ -75,11 +76,11 @@ public class WorkflowStatusDTO {
 		this.workflowId = workflowId;
 	}
 
-	public String getStatusId() {
+	public UUID getStatusId() {
 		return statusId;
 	}
 
-	public void setStatusId(final String statusId) {
+	public void setStatusId(final UUID statusId) {
 		this.statusId = statusId;
 	}
 

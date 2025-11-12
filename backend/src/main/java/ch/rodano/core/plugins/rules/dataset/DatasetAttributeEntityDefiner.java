@@ -1,6 +1,7 @@
 package ch.rodano.core.plugins.rules.dataset;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -53,7 +54,7 @@ public class DatasetAttributeEntityDefiner extends AbstractDatasetEntityDefiner 
 			},
 			new EntityAttribute() {
 				@Override
-				public String getValue(final Evaluable evaluable) {
+				public UUID getValue(final Evaluable evaluable) {
 					return ((Dataset) evaluable).getDatasetModelId();
 				}
 

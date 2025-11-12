@@ -12,12 +12,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record16;
+import org.jooq.Record17;
 import org.jooq.Select;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -51,6 +51,7 @@ import static ch.rodano.core.model.jooq.Tables.FORM;
 import static ch.rodano.core.model.jooq.Tables.SCOPE;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_RELATION;
+import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATE;
 import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATUS;
 import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATUS_AUDIT;
 
@@ -80,14 +81,15 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 	/**
 	 * Returns the summary data
+	 *
 	 * @param summary Workflow summary object
-	 * @param scope Root scope for the data collection
+	 * @param scope   Root scope for the data collection
 	 * @return the summary
 	 */
 	@Override
 	public SummaryDTO getSummary(final WorkflowSummary summary, final Scope scope) {
 		//check validity of widget
-		if(scope.getScopeModelId().equals(summary.getLeafScopeModelId())) {
+		if(scope.getScopeModelId().equals(summary.getLeafScopeModelUuid())) {
 			throw new UnsupportedOperationException("Can not generate summary data for a leaf scope");
 		}
 		if(!summary.isValid()) {
@@ -125,11 +127,12 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 		final var childScopeTable = SCOPE.as("child");
 		final var countColumn = DSL.countDistinct(WORKFLOW_STATUS.PK).coerce(Long.class);
+		final var stateCodeField = WORKFLOW_STATE.CODE.as("state_code");
 
 		//query columns
 		final var columns = new ArrayList<SelectField<?>>();
 		columns.addAll(List.of(childScopeTable.PK, childScopeTable.SCOPE_MODEL_ID, childScopeTable.CODE, childScopeTable.SHORTNAME, childScopeTable.LONGNAME));
-		columns.addAll(List.of(WORKFLOW_STATUS.STATE_ID, countColumn));
+		columns.addAll(List.of(stateCodeField, countColumn));
 
 		//query conditions
 		final var conditions = new ArrayList<Condition>();
@@ -147,7 +150,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 		);
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
 		conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
-		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelId()));
+		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelUuid()));
 		conditions.add(SCOPE.DELETED.isFalse());
 		conditions.add(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse());
 		//keep in mind that the workflow may be attached directly to scopes (and not be linked to a event nor to a dataset)
@@ -187,14 +190,16 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			.leftJoin(FORM).on(WORKFLOW_STATUS.FORM_FK.eq(FORM.PK))
 			.leftJoin(FIELD).on(WORKFLOW_STATUS.FIELD_FK.eq(FIELD.PK))
 			.leftJoin(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
+			.leftJoin(WORKFLOW_STATE).on(WORKFLOW_STATE.WORKFLOW_ID.eq(WORKFLOW_STATUS.WORKFLOW_ID)
+				.and(WORKFLOW_STATE.WORKFLOW_STATE_ID.eq(WORKFLOW_STATUS.WORKFLOW_STATE_ID)))
 			.where(DSL.and(conditions))
-			.groupBy(childScopeTable.PK, WORKFLOW_STATUS.STATE_ID)
+			.groupBy(childScopeTable.PK, stateCodeField)
 			.orderBy(childScopeTable.CODE);
 
 		final var results = query.fetch();
 		for(final var record : results) {
 			final var childScopePk = record.getValue(childScopeTable.PK);
-			final var stateId = record.getValue(WORKFLOW_STATUS.STATE_ID);
+			final var stateCode = record.get(stateCodeField);
 			final var count = record.getValue(countColumn);
 			if(!summaryByScopePk.containsKey(childScopePk)) {
 				final var scopeDTO = new ScopeTinyDTO(
@@ -206,7 +211,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				);
 				summaryByScopePk.put(childScopePk, new SummaryRowDTO(scopeDTO, new HashMap<>(defaultValues)));
 			}
-			summaryByScopePk.get(childScopePk).values().put(stateId, count);
+			summaryByScopePk.get(childScopePk).values().put(stateCode, count);
 		}
 
 		//the SQL query returns results for all children of the selected root scope
@@ -256,7 +261,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 		final Table<?> table;
 		if(isAggregator) {
-			Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> tableQuery = null;
+			Select<Record17<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, UUID, String, String, UUID, UUID, String, UUID>> tableQuery = null;
 			//a widget displaying an aggregation workflow is either on scopes or events
 			if(WorkflowableEntity.SCOPE.equals(entity)) {
 				tableQuery = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.getFirst()), Optional.empty());
@@ -298,7 +303,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				WORKFLOW_STATUS.WORKFLOW_ID,
 				WORKFLOW_STATUS.TRIGGER_MESSAGE,
 				WORKFLOW_STATUS.VALIDATOR_ID,
-				WORKFLOW_STATUS.STATE_ID
+				WORKFLOW_STATUS.WORKFLOW_STATE_ID
 			)
 		);
 		columns.add(removedField);
@@ -321,7 +326,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			)
 		);
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
-		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelId()));
+		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelUuid()));
 		//do not consider workflows on field that are empty
 		if(WorkflowableEntity.FIELD.equals(entity)) {
 			conditions.add(FIELD.VALUE.isNotNull());
@@ -429,7 +434,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 				//column of ancestors' scopes
 				for(final var scopeModel : scopeModels) {
-					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getId())).findAny();
+					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getScopeModelId())).findAny();
 					line.add(ancestor.map(ScopeTinyDTO::pk).map(p -> Long.toString(p)).orElse(""));
 					line.add(ancestor.map(ScopeTinyDTO::code).orElse(""));
 				}
@@ -438,7 +443,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					//event
 					final var scopeModelId = record.getValue(SCOPE.SCOPE_MODEL_ID);
 					final var eventModelId = record.getValue(EVENT.EVENT_MODEL_ID);
-					if(StringUtils.isNoneBlank(scopeModelId, eventModelId)) {
+					if(scopeModelId != null && eventModelId != null) {
 						line.add(Long.toString(record.getValue(EVENT.PK)));
 						final var eventModel = study.getScopeModel(scopeModelId).getEventModel(eventModelId);
 						line.add(eventModel.getLocalizedShortname(languages));
@@ -466,11 +471,11 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					if(WorkflowableEntity.FIELD.equals(entity)) {
 						final var datasetModelId = record.getValue(DATASET.DATASET_MODEL_ID);
 						final var fieldModelId = record.getValue(FIELD.FIELD_MODEL_ID);
-						if(StringUtils.isNoneBlank(datasetModelId, fieldModelId)) {
+						if(datasetModelId != null && fieldModelId != null) {
 							line.add(Long.toString(record.getValue(DATASET.PK)));
-							line.add(datasetModelId);
+							line.add(datasetModelId.toString());
 							line.add(Long.toString(record.getValue(FIELD.PK)));
-							line.add(fieldModelId);
+							line.add(fieldModelId.toString());
 							line.add(record.getValue(FIELD.VALUE));
 						}
 						else {
@@ -480,11 +485,11 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				}
 
 				line.add(Long.toString(record.getValue(WORKFLOW_STATUS.PK)));
-				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID));
+				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID).toString());
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS.CREATION_TIME)));
 				line.add(record.getValue(WORKFLOW_STATUS.TRIGGER_MESSAGE));
-				line.add(record.getValue(WORKFLOW_STATUS.VALIDATOR_ID));
-				line.add(record.getValue(WORKFLOW_STATUS.STATE_ID));
+				line.add(record.getValue(WORKFLOW_STATUS.VALIDATOR_ID).toString());
+				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_STATE_ID).toString());
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS.LAST_UPDATE_TIME)));
 				line.add(Boolean.toString(record.getValue(removedField)));
 
@@ -530,7 +535,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				WORKFLOW_STATUS.VALIDATOR_ID
 			)
 		);
-		columns.addAll(List.of(WORKFLOW_STATUS_AUDIT.PK, WORKFLOW_STATUS_AUDIT.AUDIT_DATETIME, WORKFLOW_STATUS_AUDIT.AUDIT_ACTOR, WORKFLOW_STATUS_AUDIT.AUDIT_CONTEXT, WORKFLOW_STATUS_AUDIT.STATE_ID));
+		columns.addAll(List.of(WORKFLOW_STATUS_AUDIT.PK, WORKFLOW_STATUS_AUDIT.AUDIT_DATETIME, WORKFLOW_STATUS_AUDIT.AUDIT_ACTOR, WORKFLOW_STATUS_AUDIT.AUDIT_CONTEXT, WORKFLOW_STATUS_AUDIT.WORKFLOW_STATE_ID));
 		columns.add(removedField);
 		columns.addAll(List.of(ancestorsField, SCOPE.PK, SCOPE.SCOPE_MODEL_ID, SCOPE.CODE, SCOPE.SHORTNAME, SCOPE.LONGNAME));
 		columns.addAll(List.of(EVENT.PK, EVENT.EVENT_MODEL_ID, EVENT.DATE));
@@ -550,7 +555,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			)
 		);
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
-		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelId()));
+		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelUuid()));
 		//do not consider workflows on field that are empty
 		if(WorkflowableEntity.FIELD.equals(entity)) {
 			conditions.add(FIELD.VALUE.isNotNull());
@@ -661,7 +666,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 				//column of ancestors' scopes
 				for(final var scopeModel : scopeModels) {
-					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getId())).findAny();
+					final var ancestor = ancestors.stream().filter(a -> a.modelId().equals(scopeModel.getScopeModelId())).findAny();
 					line.add(ancestor.map(ScopeTinyDTO::pk).map(p -> Long.toString(p)).orElse(""));
 					line.add(ancestor.map(ScopeTinyDTO::code).orElse(""));
 				}
@@ -670,7 +675,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					//event
 					final var scopeModelId = record.getValue(SCOPE.SCOPE_MODEL_ID);
 					final var eventModelId = record.getValue(EVENT.EVENT_MODEL_ID);
-					if(StringUtils.isNoneBlank(scopeModelId, eventModelId)) {
+					if(scopeModelId != null && eventModelId != null) {
 						line.add(Long.toString(record.getValue(EVENT.PK)));
 						final var eventModel = study.getScopeModel(scopeModelId).getEventModel(eventModelId);
 						line.add(eventModel.getLocalizedShortname(languages));
@@ -684,7 +689,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					//form
 					if(WorkflowableEntity.FORM.equals(entity)) {
 						final var formModelId = record.getValue(FORM.FORM_MODEL_ID);
-						if(StringUtils.isNotBlank(formModelId)) {
+						if(formModelId != null) {
 							line.add(Long.toString(record.getValue(FORM.PK)));
 							final var formModel = study.getFormModel(formModelId);
 							line.add(formModel.getLocalizedShortname(languages));
@@ -698,11 +703,11 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					if(WorkflowableEntity.FIELD.equals(entity)) {
 						final var datasetModelId = record.getValue(DATASET.DATASET_MODEL_ID);
 						final var fieldModelId = record.getValue(FIELD.FIELD_MODEL_ID);
-						if(StringUtils.isNoneBlank(datasetModelId, fieldModelId)) {
+						if(datasetModelId != null && fieldModelId != null) {
 							line.add(Long.toString(record.getValue(DATASET.PK)));
-							line.add(datasetModelId);
+							line.add(datasetModelId.toString());
 							line.add(Long.toString(record.getValue(FIELD.PK)));
-							line.add(fieldModelId);
+							line.add(fieldModelId.toString());
 							line.add(record.getValue(FIELD.VALUE));
 						}
 						else {
@@ -712,15 +717,15 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				}
 
 				line.add(Long.toString(record.getValue(WORKFLOW_STATUS.PK)));
-				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID));
+				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID).toString());
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS.CREATION_TIME)));
 				line.add(record.getValue(WORKFLOW_STATUS.TRIGGER_MESSAGE));
-				line.add(record.getValue(WORKFLOW_STATUS.VALIDATOR_ID));
+				line.add(record.getValue(WORKFLOW_STATUS.VALIDATOR_ID).toString());
 				line.add(Boolean.toString(record.getValue(removedField)));
 				line.add(record.getValue(WORKFLOW_STATUS_AUDIT.AUDIT_ACTOR()));
 				line.add(Long.toString(record.getValue(WORKFLOW_STATUS_AUDIT.PK)));
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS_AUDIT.AUDIT_DATETIME())));
-				line.add(record.getValue(WORKFLOW_STATUS_AUDIT.STATE_ID));
+				line.add(record.getValue(WORKFLOW_STATUS_AUDIT.WORKFLOW_STATE_ID).toString());
 				line.add(record.getValue(WORKFLOW_STATUS_AUDIT.AUDIT_CONTEXT));
 
 				writer.writeNext(line.toArray(new String[0]));

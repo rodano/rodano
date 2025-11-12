@@ -116,6 +116,7 @@ public class ScopeServiceImpl implements ScopeService {
 		final Scope parent
 	) {
 		final var scope = new Scope();
+		scope.setProjectId(studyService.getStudy().getProjectId());
 		scope.setScopeModel(model);
 		scope.setVirtual(model.isVirtual());
 		scope.setStartDate(startDate);
@@ -179,13 +180,24 @@ public class ScopeServiceImpl implements ScopeService {
 		if(StringUtils.isBlank(scopeFormat)) {
 			throw new NoRespectForConfigurationException("Unable to generate new code for a scope model without a scope format");
 		}
-		var siblingsNumber = scopeDAOService.getScopesByScopeModelIdHavingAncestor(Collections.singleton(model.getId()), Collections.singleton(parent.getPk())).size();
-		var sameScopeModelNumber = scopeDAOService.getScopesByScopeModelIdCount(model.getId()).intValue();
+		final int siblingsNumber;
+		if(parent == null) {
+			siblingsNumber = 0;
+		}
+		else {
+			siblingsNumber = scopeDAOService.getScopesByScopeModelIdHavingAncestor(Collections.singleton(model.getScopeModelId()), Collections.singleton(parent.getPk())).size();
+		}
+		var sameScopeModelNumber = scopeDAOService.getScopesByScopeModelIdCount(model.getScopeModelId()).intValue();
 
+		int attempts = 0;
 		while(true) {
-			final var potentialCode = generateCode(model, parent, ++siblingsNumber, ++sameScopeModelNumber);
+			attempts++;
+			final var potentialCode = generateCode(model, parent, siblingsNumber + attempts, ++sameScopeModelNumber);
 			if(scopeDAOService.getScopeByCode(potentialCode) == null) {
 				return potentialCode;
+			}
+			if(attempts > 1000) {
+				throw new IllegalStateException("Cannot generate unique code after 1000 attempts");
 			}
 		}
 	}
@@ -207,7 +219,26 @@ public class ScopeServiceImpl implements ScopeService {
 			throw new OutOfEnrollmentWindowException(parent);
 		}
 
+		if(parent == null) {
+			if(scope.getProjectId() == null) {
+				scope.setProjectId(studyService.getStudy().getProjectId());
+			}
+		}
+		else {
+			if(scope.getProjectId() == null) {
+				scope.setProjectId(parent.getProjectId());
+			}
+		}
+
 		scopeDAOService.saveScope(scope, context, rationale);
+
+		if(parent != null && parent.getScopeModel() == null) {
+			final var model = studyService.getStudy().getScopeModels().stream()
+				.filter(m -> m.getScopeModelId().equals(parent.getScopeModelId()))
+				.findFirst()
+				.orElse(null);
+			parent.setScopeModel(model);
+		}
 
 		// Add relation with the parent
 		if(parent != null) {
@@ -296,7 +327,7 @@ public class ScopeServiceImpl implements ScopeService {
 
 		// Check if the code has already been used.
 		final var scopeHavingSameCode = scopeDAOService.getScopeByCode(scope.getCode());
-		if(scopeHavingSameCode != null && !scopeHavingSameCode.equals(scope)) {
+		if(scopeHavingSameCode != null && !scopeHavingSameCode.getPk().equals(scope.getPk())) {
 			throw new ScopeCodeAlreadyUsedException(scope.getCode());
 		}
 
@@ -386,17 +417,48 @@ public class ScopeServiceImpl implements ScopeService {
 
 	@Override
 	public Scope getRootScope() {
-		return scopeDAOService.getRootScope();
+		final var study = studyService.getStudy();
+
+		final var opt = scopeDAOService.getRootScope(study);
+		if(opt.isPresent()) {
+			return opt.get();
+		}
+
+		final var isTrueRoot = (java.util.function.Predicate<Scope>) s ->
+			s != null && s.getScopeModel() != null && s.getScopeModel().isRoot();
+
+		Scope s = scopeDAOService.getScopeByCode(study.getId());
+		if(isTrueRoot.test(s)) {
+			return s;
+		}
+
+		s = scopeDAOService.getScopeByCode(study.getDefaultLocalizedShortname());
+		if(isTrueRoot.test(s)) {
+			return s;
+		}
+
+		s = scopeDAOService.getProjectRootScope(study.getProjectId());
+		if(isTrueRoot.test(s)) {
+			return s;
+		}
+
+		final var rootModel = study.getRootScopeModel();
+		final var candidates = scopeDAOService.getScopesByScopeModelId(rootModel.getScopeModelId());
+		if(candidates != null && !candidates.isEmpty()) {
+			return candidates.getFirst();
+		}
+
+		throw new IllegalStateException("Root scope not found for study code=" + study.getId());
 	}
 
 	@Override
 	public List<Scope> getAll(final ScopeModel scopeModel) {
-		return scopeDAOService.getScopesByScopeModelId(scopeModel.getId());
+		return scopeDAOService.getScopesByScopeModelId(scopeModel.getScopeModelId());
 	}
 
 	@Override
 	public List<Scope> getAll(final Collection<ScopeModel> scopeModels, final Collection<Scope> ancestors) {
-		final var scopeModelIds = scopeModels.stream().map(ScopeModel::getId).toList();
+		final var scopeModelIds = scopeModels.stream().map(ScopeModel::getScopeModelId).toList();
 		final var ancestorPks = ancestors.stream().map(Scope::getPk).toList();
 		return scopeDAOService.getScopesByScopeModelIdHavingAncestor(scopeModelIds, ancestorPks);
 	}
@@ -452,7 +514,7 @@ public class ScopeServiceImpl implements ScopeService {
 
 	@Override
 	public List<Scope> getAllIncludingRemoved(final ScopeModel scopeModel) {
-		return scopeDAOService.getAllScopesByScopeModelId(scopeModel.getId());
+		return scopeDAOService.getAllScopesByScopeModelId(scopeModel.getScopeModelId());
 	}
 
 	@Override
@@ -472,7 +534,7 @@ public class ScopeServiceImpl implements ScopeService {
 		if(scope.getScopeModel().equals(leafScopeModel)) {
 			return 0;
 		}
-		return scopeDAOService.getEnabledDescendantsByScopeModelIdCount(leafScopeModel.getId(), scope.getPk());
+		return scopeDAOService.getEnabledDescendantsByScopeModelIdCount(leafScopeModel.getScopeModelId(), scope.getPk());
 	}
 
 	@Override
@@ -492,7 +554,7 @@ public class ScopeServiceImpl implements ScopeService {
 		//retrieve number of leaves for non leaf scopes
 		if(!nonLeafScopePks.isEmpty()) {
 			final var scopeByPks = scopes.stream().collect(Collectors.toMap(Scope::getPk, Function.identity()));
-			for(final var entry : scopeDAOService.getEnabledDescendantsByScopeModelIdCount(leafScopeModel.getId(), nonLeafScopePks).entrySet()) {
+			for(final var entry : scopeDAOService.getEnabledDescendantsByScopeModelIdCount(leafScopeModel.getScopeModelId(), nonLeafScopePks).entrySet()) {
 				leavesCountByScope.put(scopeByPks.get(entry.getKey()), entry.getValue());
 			}
 		}
@@ -589,14 +651,21 @@ public class ScopeServiceImpl implements ScopeService {
 	 *
 	 * @param model  The scope model
 	 * @param parent The parent
-	 * @throws ImpossibleScopeModelPathException         Thrown if no path is possible
-	 * @throws ImpossibleVirtualChainException Thrown if no virtual chain is possible
-	 * @throws MaxDescendantScopesReachedException       Thrown
+	 * @throws ImpossibleScopeModelPathException   Thrown if no path is possible
+	 * @throws ImpossibleVirtualChainException     Thrown if no virtual chain is possible
+	 * @throws MaxDescendantScopesReachedException Thrown
 	 */
 	private void checkModelParentCorrectness(final ScopeModel model, final Scope parent) {
-		// check if model and parent are compatible
-		if(!model.isChildOf(parent.getScopeModel())) {
-			throw new ImpossibleScopeModelPathException(model, parent.getScopeModel());
+		if(parent == null) {
+			if(model.isRoot()) {
+				return;
+			}
+			throw new ImpossibleScopeModelPathException(model, null);
+		}
+
+		final var parentModel = parent.getScopeModel();
+		if(!model.getParentIds().contains(parentModel.getId())) {
+			throw new ImpossibleScopeModelPathException(model, parentModel);
 		}
 
 		// check if parent is virtual
@@ -605,7 +674,7 @@ public class ScopeServiceImpl implements ScopeService {
 		}
 
 		// check if max number is not reached
-		if(model.getMaxNumber() != null && model.getMaxNumber() != 0 && scopeDAOService.getScopesByScopeModelIdCount(model.getId()) >= model.getMaxNumber()) {
+		if(model.getMaxNumber() != null && model.getMaxNumber() != 0 && scopeDAOService.getScopesByScopeModelIdCount(model.getScopeModelId()) >= model.getMaxNumber()) {
 			throw new MaxDescendantScopesReachedException(model);
 		}
 
@@ -615,7 +684,7 @@ public class ScopeServiceImpl implements ScopeService {
 			ancestors.add(parent);
 			for(final var ancestor : ancestors) {
 				if(ancestor.getMaxNumber() != null) {
-					final var leafNumber = scopeDAOService.getEnabledDescendantsByScopeModelIdCount(model.getId(), ancestor.getPk());
+					final var leafNumber = scopeDAOService.getEnabledDescendantsByScopeModelIdCount(model.getScopeModelId(), ancestor.getPk());
 					if(leafNumber >= ancestor.getMaxNumber()) {
 						throw new MaxDescendantScopesReachedException(model, ancestor);
 					}

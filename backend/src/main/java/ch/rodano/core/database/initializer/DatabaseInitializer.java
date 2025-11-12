@@ -40,8 +40,15 @@ import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
 import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
 import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
+import ch.rodano.core.services.project.ProjectIdResolver;
 
+import static ch.rodano.core.model.jooq.Tables.DATASET_MODEL;
+import static ch.rodano.core.model.jooq.Tables.EVENT_MODEL;
+import static ch.rodano.core.model.jooq.Tables.FIELD_MODEL;
+import static ch.rodano.core.model.jooq.Tables.FORM_MODEL;
+import static ch.rodano.core.model.jooq.Tables.PROJECT;
 import static ch.rodano.core.model.jooq.Tables.SCOPE;
+import static ch.rodano.core.model.jooq.Tables.SCOPE_MODEL;
 
 @Component
 @Profile({ "api", "test", "database" })
@@ -73,6 +80,8 @@ public class DatabaseInitializer {
 	private final Boolean cleanPatchTable;
 	private final String internalPatchTable;
 
+	private final ProjectIdResolver projectIdResolver;
+
 	public DatabaseInitializer(
 		final DataSource dataSource,
 		final DSLContext create,
@@ -90,7 +99,8 @@ public class DatabaseInitializer {
 		@Value("${rodano.init.users-password:Password1!}") final String usersPassword,
 		@Value("${rodano.init.clean-patch-table:true}") final Boolean cleanPatchTable,
 		@Value("${rodano.migration.internal-patch-table}") final String internalPatchTable,
-		final UserSecurityService userSecurityService
+		final UserSecurityService userSecurityService,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.dataSource = dataSource;
 		this.create = create;
@@ -109,6 +119,7 @@ public class DatabaseInitializer {
 		this.usersPassword = StringUtils.defaultIfBlank(usersPassword, DEFAULT_PASSWORD);
 		this.cleanPatchTable = cleanPatchTable;
 		this.internalPatchTable = internalPatchTable;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	private List<String> getTables() {
@@ -145,6 +156,7 @@ public class DatabaseInitializer {
 		// Create the root scope
 		final ScopeModel rootScopeModel = study.getRootScopeModel();
 		final Scope root = new Scope();
+		root.setProjectId(study.getProjectId());
 		root.setScopeModel(rootScopeModel);
 		root.setId(UUID.randomUUID().toString());
 		root.setCode(study.getId());
@@ -163,6 +175,74 @@ public class DatabaseInitializer {
 		return root;
 	}
 
+	private void ensureProjectExists(final Study study) {
+		if(study.getProjectId() == null || !study.getProjectId().equals(projectIdResolver.id())) {
+			study.setProjectId(projectIdResolver.id());
+		}
+
+		create.insertInto(PROJECT)
+			.set(PROJECT.PROJECT_ID, projectIdResolver.id())
+			.set(PROJECT.CODE, projectIdResolver.code())
+			.onDuplicateKeyUpdate()
+			.set(PROJECT.CODE, projectIdResolver.code())
+			.execute();
+	}
+
+	private void ensureModelCatalogExists(final Study study) {
+		final var projectId = study.getProjectId();
+
+		// SCOPE MODELS
+		for(ScopeModel sm : study.getScopeModels()) {
+			create.insertInto(SCOPE_MODEL)
+				.set(SCOPE_MODEL.PROJECT_ID, projectId)
+				.set(SCOPE_MODEL.SCOPE_MODEL_ID, sm.getScopeModelId())
+				.set(SCOPE_MODEL.CODE, sm.getId())
+				.onDuplicateKeyIgnore()
+				.execute();
+		}
+
+		// DATASET MODELS
+		study.getDatasetModels().forEach(dm -> {
+			create.insertInto(DATASET_MODEL)
+				.set(DATASET_MODEL.PROJECT_ID, projectId)
+				.set(DATASET_MODEL.DATASET_MODEL_ID, dm.getDatasetModelId())
+				.set(DATASET_MODEL.CODE, dm.getId())
+				.onDuplicateKeyIgnore()
+				.execute();
+		});
+
+		// EVENT MODELS
+		study.getEventModels().forEach(em -> {
+			create.insertInto(EVENT_MODEL)
+				.set(EVENT_MODEL.PROJECT_ID, projectId)
+				.set(EVENT_MODEL.EVENT_MODEL_ID, em.getEventModelId())
+				.set(EVENT_MODEL.CODE, em.getId())
+				.onDuplicateKeyIgnore()
+				.execute();
+		});
+
+		// FORM MODELS
+		study.getFormModels().forEach(fm -> {
+			create.insertInto(FORM_MODEL)
+				.set(FORM_MODEL.PROJECT_ID, projectId)
+				.set(FORM_MODEL.FORM_MODEL_ID, fm.getFormModelId())
+				.set(FORM_MODEL.CODE, fm.getId())
+				.onDuplicateKeyIgnore()
+				.execute();
+		});
+
+		// FIELD MODELS
+		study.getFieldModels().forEach(fm -> {
+			create.insertInto(FIELD_MODEL)
+				.set(FIELD_MODEL.PROJECT_ID, projectId)
+				.set(FIELD_MODEL.FIELD_MODEL_ID, fm.getFieldModelId())
+				.set(FIELD_MODEL.DATASET_MODEL_ID, fm.getDatasetModel().getDatasetModelId())
+				.set(FIELD_MODEL.CODE, fm.getId())
+				.onDuplicateKeyIgnore()
+				.execute();
+		});
+	}
+
 	/**
 	 * Bootstrap the database
 	 *
@@ -173,6 +253,8 @@ public class DatabaseInitializer {
 		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE);
 
 		final Study study = studyService.getStudy();
+		ensureProjectExists(study);
+		//ensureModelCatalogExists(study);
 
 		final var root = createRootScope(context, origin, rootScopeName);
 
@@ -208,7 +290,11 @@ public class DatabaseInitializer {
 
 		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE);
 
-		addRequiredData(context, origin);
+		final Study study = studyService.getStudy();
+		ensureProjectExists(study);
+		ensureModelCatalogExists(study);
+
+		addRequiredData(context, origin, study);
 
 		// Add demo users
 		if(withUsers) {
@@ -229,10 +315,8 @@ public class DatabaseInitializer {
 	 *
 	 * @param origin The origin date time
 	 */
-	private void addRequiredData(final DatabaseActionContext context, final ZonedDateTime origin) {
+	private void addRequiredData(final DatabaseActionContext context, final ZonedDateTime origin, final Study study) {
 		logger.info("Add required data");
-
-		final Study study = studyService.getStudy();
 
 		final var root = createRootScope(context, origin, study.getDefaultLocalizedShortname());
 

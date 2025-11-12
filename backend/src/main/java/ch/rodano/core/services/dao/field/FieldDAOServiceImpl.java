@@ -1,13 +1,11 @@
 package ch.rodano.core.services.dao.field;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Operator;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
@@ -22,8 +20,8 @@ import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.commons.AuditableDAOService;
 import ch.rodano.core.services.dao.strategy.DAOStrategy;
 
-import static ch.rodano.core.model.jooq.Tables.DATASET;
-import static ch.rodano.core.model.jooq.Tables.FIELD;
+import static ch.rodano.core.model.jooq.tables.Dataset.DATASET;
+import static ch.rodano.core.model.jooq.tables.Field.FIELD;
 
 @Service
 public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTrail, FieldRecord, FieldAuditRecord> implements FieldDAOService {
@@ -34,6 +32,10 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 		final StudyService studyService
 	) {
 		super(create, strategy, studyService);
+	}
+
+	private UUID tenant() {
+		return studyService.getStudy().getProjectId();
 	}
 
 	@Override
@@ -65,11 +67,14 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 
 	@Override
 	public void saveField(final Field field, final DatabaseActionContext context, final String rationale) {
+		if(field.getProjectId() == null) {
+			field.setProjectId(studyService.getStudy().getProjectId());
+		}
 		save(field, context, rationale);
 	}
 
 	@Override
-	public List<Field> getFieldsByDatasetPkHavingFieldModelIds(final Long datasetPk, final Collection<String> fieldModelIds) {
+	public List<Field> getFieldsByDatasetPkHavingFieldModelIds(final Long datasetPk, final Collection<UUID> fieldModelIds) {
 		final var query = create.selectFrom(FIELD).where(FIELD.DATASET_FK.eq(datasetPk).and(FIELD.FIELD_MODEL_ID.in(fieldModelIds)));
 		return find(query);
 	}
@@ -83,14 +88,29 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	@Override
 	public List<Field> getFieldsByScopePk(final Long scopePk) {
 		final var query = create.selectFrom(FIELD)
-			.where(FIELD.dataset().SCOPE_FK.eq(scopePk));
+			.where(FIELD.PROJECT_ID.eq(tenant()))
+			.andExists(
+				create.selectOne()
+					.from(DATASET)
+					.where(DATASET.PK.eq(FIELD.DATASET_FK)
+						.and(DATASET.PROJECT_ID.eq(FIELD.PROJECT_ID))
+						.and(DATASET.SCOPE_FK.eq(scopePk)))
+			);
 		return find(query);
 	}
 
 	@Override
 	public List<Field> getFieldsFromScopeWithAValue(final Long scopePk) {
 		final var query = create.selectFrom(FIELD)
-			.where(FIELD.dataset().SCOPE_FK.eq(scopePk).and(FIELD.VALUE.isNotNull()));
+			.where(FIELD.PROJECT_ID.eq(tenant()))
+			.and(FIELD.VALUE.isNotNull())
+			.andExists(
+				create.selectOne()
+					.from(DATASET)
+					.where(DATASET.PK.eq(FIELD.DATASET_FK)
+						.and(DATASET.PROJECT_ID.eq(FIELD.PROJECT_ID))
+						.and(DATASET.SCOPE_FK.eq(scopePk)))
+			);
 		return find(query);
 	}
 
@@ -107,14 +127,29 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	@Override
 	public List<Field> getFieldsByEventPk(final Long eventPk) {
 		final var query = create.selectFrom(FIELD)
-			.where(FIELD.dataset().EVENT_FK.eq(eventPk));
+			.where(FIELD.PROJECT_ID.eq(tenant()))
+			.andExists(
+				create.selectOne()
+					.from(DATASET)
+					.where(DATASET.PK.eq(FIELD.DATASET_FK)
+						.and(DATASET.PROJECT_ID.eq(FIELD.PROJECT_ID))
+						.and(DATASET.EVENT_FK.eq(eventPk)))
+			);
 		return find(query);
 	}
 
 	@Override
 	public List<Field> getFieldsFromEventWithAValue(final Long eventPk) {
 		final var query = create.selectFrom(FIELD)
-			.where(FIELD.dataset().EVENT_FK.eq(eventPk).and(FIELD.VALUE.isNotNull()));
+			.where(FIELD.PROJECT_ID.eq(tenant()))
+			.and(FIELD.VALUE.isNotNull())
+			.andExists(
+				create.selectOne()
+					.from(DATASET)
+					.where(DATASET.PK.eq(FIELD.DATASET_FK)
+						.and(DATASET.PROJECT_ID.eq(FIELD.PROJECT_ID))
+						.and(DATASET.EVENT_FK.eq(eventPk)))
+			);
 		return find(query);
 	}
 
@@ -130,16 +165,34 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 
 	@Override
 	public List<Field> getFieldsRelatedToEvent(final Long scopePk, final Optional<Long> eventPk) {
-		final var conditions = new ArrayList<Condition>();
-		conditions.add(FIELD.dataset().SCOPE_FK.eq(scopePk));
-		eventPk.ifPresent(p -> conditions.add(FIELD.dataset().EVENT_FK.eq(p)));
+		var condition = DATASET.PK.eq(FIELD.DATASET_FK)
+			.and(DATASET.PROJECT_ID.eq(FIELD.PROJECT_ID))
+			.and(DATASET.SCOPE_FK.eq(scopePk));
+
+		if(eventPk.isPresent()) {
+			condition = condition.and(DATASET.EVENT_FK.eq(eventPk.get()));
+		}
+
+		final var exists = create.selectOne()
+			.from(DATASET)
+			.where(condition);
+
 		final var query = create.selectFrom(FIELD)
-			.where(DSL.condition(Operator.OR, conditions));
+			.where(FIELD.PROJECT_ID.eq(tenant())).andExists(exists);
 		return find(query);
 	}
 
-	public List<Field> getSearchableFields(final Collection<Long> scopePk, final Collection<String> fieldModelIds){
-		final var query = create.selectFrom(FIELD).where(FIELD.FIELD_MODEL_ID.in(fieldModelIds).and(FIELD.dataset().SCOPE_FK.in(scopePk)));
+	public List<Field> getSearchableFields(final Collection<Long> scopePk, final Collection<String> fieldModelIds) {
+		final var query = create.selectFrom(FIELD)
+			.where(FIELD.PROJECT_ID.eq(tenant()))
+			.and(FIELD.FIELD_MODEL_ID.in(fieldModelIds))
+			.andExists(
+				create.selectOne()
+					.from(DATASET)
+					.where(DATASET.PK.eq(FIELD.DATASET_FK)
+						.and(DATASET.PROJECT_ID.eq(FIELD.PROJECT_ID))
+						.and(DATASET.SCOPE_FK.in(scopePk)))
+			);
 		return find(query);
 	}
 

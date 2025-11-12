@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -254,7 +253,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 		//retrieve user linked to this scope
 		//used in scope list to display the user in charge of the scope
 		dto.defaultProfileId = scope.getScopeModel().getDefaultProfileId();
-		if(StringUtils.isNotBlank(dto.defaultProfileId)) {
+		if(dto.defaultProfileId != null) {
 			final var search = new UserSearch()
 				.enforceScopePks(Collections.singleton(scope.getPk()))
 				.enforceProfileIds(Collections.singleton(dto.defaultProfileId))

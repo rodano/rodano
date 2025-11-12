@@ -2,6 +2,7 @@ package ch.rodano.api.workflow;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -16,7 +17,7 @@ public class WorkflowStatusSearch extends PaginatedSearch<WorkflowStatusSearch> 
 	private List<Long> ancestorScopePks;
 
 	@Schema(description = "Workflow ids")
-	private List<String> workflowIds;
+	private List<UUID> workflowIds;
 
 	@Schema(description = "State ids")
 	private Optional<List<String>> stateIds = Optional.empty();
@@ -39,11 +40,11 @@ public class WorkflowStatusSearch extends PaginatedSearch<WorkflowStatusSearch> 
 		sortAscending = DEFAULT_SORT_ASCENDING;
 	}
 
-	public List<String> getWorkflowIds() {
+	public List<UUID> getWorkflowIds() {
 		return workflowIds;
 	}
 
-	public WorkflowStatusSearch setWorkflowIds(final List<String> workflowIds) {
+	public WorkflowStatusSearch setWorkflowIds(final List<UUID> workflowIds) {
 		this.workflowIds = workflowIds;
 		return this;
 	}

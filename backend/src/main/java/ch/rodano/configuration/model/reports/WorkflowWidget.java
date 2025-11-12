@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -27,6 +28,8 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class WorkflowWidget implements SuperDisplayable, Serializable, Node, Comparable<WorkflowWidget> {
@@ -35,6 +38,7 @@ public class WorkflowWidget implements SuperDisplayable, Serializable, Node, Com
 
 	private Study study;
 
+	private UUID workflowWidgetId;
 	private String id;
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> longname;
@@ -62,6 +66,20 @@ public class WorkflowWidget implements SuperDisplayable, Serializable, Node, Com
 	@JsonBackReference
 	public Study getStudy() {
 		return study;
+	}
+
+	public UUID getWorkflowWidgetId() {
+		if(this.workflowWidgetId == null && this.id != null && !this.id.isBlank() && this.study != null) {
+			this.workflowWidgetId = deterministic(
+				this.study.getProjectId(),
+				"WORKFLOW_WIDGET",
+				this.id);
+		}
+		return workflowWidgetId;
+	}
+
+	public void setWorkflowWidgetId(final UUID workflowWidgetId) {
+		this.workflowWidgetId = workflowWidgetId;
 	}
 
 	@Override

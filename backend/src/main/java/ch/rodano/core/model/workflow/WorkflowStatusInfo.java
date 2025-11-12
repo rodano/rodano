@@ -2,6 +2,7 @@ package ch.rodano.core.model.workflow;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,7 +25,7 @@ public class WorkflowStatusInfo {
 	@NotNull
 	private Long scopePk;
 	@NotBlank
-	private String scopeModelId;
+	private UUID scopeModelId;
 	@NotBlank
 	private String scopeCode;
 	@NotBlank
@@ -48,9 +49,9 @@ public class WorkflowStatusInfo {
 	@NotBlank
 	private Long fieldPk;
 	@NotBlank
-	private String datasetModelId;
+	private UUID datasetModelId;
 	@NotBlank
-	private String fieldModelId;
+	private UUID fieldModelId;
 	@NotBlank
 	private String fieldLabel;
 	@NotBlank
@@ -114,11 +115,11 @@ public class WorkflowStatusInfo {
 		this.scopeCode = scopeCode;
 	}
 
-	public String getScopeModelId() {
+	public UUID getScopeModelId() {
 		return scopeModelId;
 	}
 
-	public void setScopeModelId(final String scopeModelId) {
+	public void setScopeModelId(final UUID scopeModelId) {
 		this.scopeModelId = scopeModelId;
 	}
 
@@ -218,19 +219,19 @@ public class WorkflowStatusInfo {
 		this.fieldPk = fieldPk;
 	}
 
-	public String getDatasetModelId() {
+	public UUID getDatasetModelId() {
 		return datasetModelId;
 	}
 
-	public void setDatasetModelId(final String datasetModelId) {
+	public void setDatasetModelId(final UUID datasetModelId) {
 		this.datasetModelId = datasetModelId;
 	}
 
-	public String getFieldModelId() {
+	public UUID getFieldModelId() {
 		return fieldModelId;
 	}
 
-	public void setFieldModelId(final String fieldModelId) {
+	public void setFieldModelId(final UUID fieldModelId) {
 		this.fieldModelId = fieldModelId;
 	}
 

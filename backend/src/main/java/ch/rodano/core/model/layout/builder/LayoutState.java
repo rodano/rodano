@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -12,16 +13,16 @@ import ch.rodano.core.model.exception.MissingDataException;
 
 public class LayoutState {
 	private final LayoutGroupState layoutGroupState;
-	private final Map<String, Dataset> datasets;
+	private final Map<UUID, Dataset> datasets;
 
 	private final List<CellState> cellStates = new ArrayList<>();
 
-	public LayoutState(final LayoutGroupState layoutGroupState, final Map<String, Dataset> datasets) {
+	public LayoutState(final LayoutGroupState layoutGroupState, final Map<UUID, Dataset> datasets) {
 		this.layoutGroupState = layoutGroupState;
 		this.datasets = datasets;
 	}
 
-	public final Map<String, Dataset> getDatasets() {
+	public final Map<UUID, Dataset> getDatasets() {
 		return datasets;
 	}
 

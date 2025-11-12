@@ -44,7 +44,7 @@ public class FormServiceTest extends DatabaseTest {
 		final var chilrenForm = formService.create(patient, childrenFormModel, context, TEST_RATIONALE);
 
 		final var childrenForms = formService.getAllIncludingRemoved(patient).stream()
-			.filter(f -> f.getFormModelId().equals("CHILDREN"))
+			.filter(f -> f.getFormModelId().equals(childrenFormModel.getFormModelId()))
 			.toList();
 		assertEquals(1, childrenForms.size());
 		assertEquals(childrenFormModel, chilrenForm.getFormModel());
@@ -62,7 +62,7 @@ public class FormServiceTest extends DatabaseTest {
 		formService.delete(patient, Optional.empty(), chilrenForm, context, TEST_RATIONALE);
 
 		final var childrenForms = formService.getAllIncludingRemoved(patient).stream()
-			.filter(f -> f.getFormModelId().equals("CHILDREN"))
+			.filter(f -> f.getFormModelId().equals(childrenFormModel.getFormModelId()))
 			.toList();
 		assertEquals(1, childrenForms.size());
 		assertTrue(chilrenForm.getDeleted());

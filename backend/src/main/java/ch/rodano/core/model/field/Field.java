@@ -79,17 +79,17 @@ public class Field extends FieldRecord implements TimestampableObject, Persisten
 
 	@Override
 	public final String getId() {
-		return fieldModelId;
+		return fieldModel.getId();
 	}
 
 	public void setDatasetModel(final DatasetModel datasetModel) {
 		this.datasetModel = datasetModel;
-		this.datasetModelId = datasetModel.getId();
+		this.datasetModelId = datasetModel.getDatasetModelId();
 	}
 
 	public void setFieldModel(final FieldModel fieldModel) {
 		this.fieldModel = fieldModel;
-		this.fieldModelId = fieldModel.getId();
+		this.fieldModelId = fieldModel.getFieldModelId();
 	}
 
 	@JsonIgnore

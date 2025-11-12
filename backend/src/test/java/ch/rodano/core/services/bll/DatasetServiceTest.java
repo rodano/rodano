@@ -53,7 +53,7 @@ public class DatasetServiceTest extends DatabaseTest {
 
 		final var patientDatasets = datasetService.getAll(patient, Collections.singleton(dmtGridDocument));
 		assertEquals(1, patientDatasets.size());
-		assertEquals(dmtGridDocument.getId(), dmtDataset.getDatasetModelId());
+		assertEquals(dmtGridDocument.getDatasetModelId(), dmtDataset.getDatasetModelId());
 		assertEquals(1, datasetDAOService.getAuditTrails(dmtDataset, Optional.empty(), Optional.empty()).size());
 	}
 

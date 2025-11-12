@@ -6,8 +6,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,6 +23,8 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class EventGroup implements Serializable, SuperDisplayable, Node, Comparable<EventGroup> {
@@ -33,6 +37,7 @@ public class EventGroup implements Serializable, SuperDisplayable, Node, Compara
 
 	private ScopeModel scopeModel;
 
+	private UUID eventGroupId;
 	private String id;
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> longname;
@@ -60,6 +65,20 @@ public class EventGroup implements Serializable, SuperDisplayable, Node, Compara
 	@JsonIgnore
 	public Study getStudy() {
 		return scopeModel.getStudy();
+	}
+
+	public UUID getEventGroupId() {
+		if(this.eventGroupId == null && this.id != null && !this.id.isBlank() && this.scopeModel != null && this.scopeModel.getStudy() != null) {
+			this.eventGroupId = deterministic(
+				this.scopeModel.getStudy().getProjectId(),
+				"EVENT_GROUP",
+				this.scopeModel.getId() + "|" + this.id);
+		}
+		return eventGroupId;
+	}
+
+	public void setEventGroupId(final UUID eventGroupId) {
+		this.eventGroupId = eventGroupId;
 	}
 
 	@Override
@@ -127,16 +146,19 @@ public class EventGroup implements Serializable, SuperDisplayable, Node, Compara
 	@Override
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case EVENT_MODEL:
-				return Collections.unmodifiableList(getEventModels());
-			default:
-				return Collections.emptyList();
+		if(Objects.requireNonNull(entity) == Entity.EVENT_MODEL) {
+			return Collections.unmodifiableList(getEventModels());
 		}
+		return Collections.emptyList();
 	}
 
 	@Override
 	public final int compareTo(final EventGroup otherEventGroup) {
 		return DEFAULT_COMPARATOR.compare(this, otherEventGroup);
+	}
+
+	@JsonIgnore
+	public String getDefaultLocalizedShortname() {
+		return getLocalizedShortname(getStudy().getDefaultLanguage().getId());
 	}
 }

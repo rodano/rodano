@@ -1,18 +1,29 @@
 package ch.rodano.core.model.role;
 
+import java.util.UUID;
+
 public class RoleRecord {
 
-	protected String profileId;
+	protected UUID projectId;
+	protected UUID profileId;
 	protected RoleStatus status;
 	protected Long userFk;
 	protected Long robotFk;
 	protected Long scopeFk;
 
-	public String getProfileId() {
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
+
+	public UUID getProfileId() {
 		return profileId;
 	}
 
-	public void setProfileId(final String profileId) {
+	public void setProfileId(final UUID profileId) {
 		this.profileId = profileId;
 	}
 

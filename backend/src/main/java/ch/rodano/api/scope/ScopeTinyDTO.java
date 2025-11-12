@@ -1,5 +1,7 @@
 package ch.rodano.api.scope;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,7 +11,7 @@ public record ScopeTinyDTO(
 	@NotNull
 	Long pk,
 	@NotBlank
-	String modelId,
+	UUID modelId,
 	@NotBlank
 	String code,
 	@NotBlank

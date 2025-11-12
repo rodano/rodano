@@ -5,9 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 import ch.rodano.api.dto.paging.PagedResult;
+import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.ScopeAuditTrail;
 import ch.rodano.core.model.event.Timeframe;
@@ -29,14 +31,14 @@ public interface ScopeDAOService {
 	 * @param scopeModelId The scope model id
 	 * @return The scopes matching the scope model id
 	 */
-	List<Scope> getAllScopesByScopeModelId(String scopeModelId);
+	List<Scope> getAllScopesByScopeModelId(UUID scopeModelId);
 
 	/**
 	 * Get the root scope
 	 *
 	 * @return The root scope
 	 */
-	Scope getRootScope();
+	Optional<Scope> getRootScope(Study study);
 
 	/**
 	 * Get a scope by its pk
@@ -52,33 +54,35 @@ public interface ScopeDAOService {
 
 	List<Scope> getScopesByCodes(Collection<String> codes);
 
+	Scope getProjectRootScope(UUID projectId);
+
 	Scope getScopeById(String id);
 
 	List<Scope> getScopesByIds(Collection<String> ids);
 
 	List<Scope> getVirtualScopes();
 
-	List<Scope> getScopesByScopeModelId(String scopeModelId);
+	List<Scope> getScopesByScopeModelId(UUID scopeModelId);
 
-	Integer getScopesByScopeModelIdCount(String scopeModelId);
+	Integer getScopesByScopeModelIdCount(UUID scopeModelId);
 
-	List<Scope> getScopesByScopeModelIdHavingAncestor(Collection<String> scopeModelIds, Collection<Long> ancestorPks);
+	List<Scope> getScopesByScopeModelIdHavingAncestor(Collection<UUID> scopeModelIds, Collection<Long> ancestorPks);
 
 	List<Scope> getDescendants(Long scopePk);
 
-	List<Scope> getDescendants(Long scopePk, String scopeModelId);
+	List<Scope> getDescendants(Long scopePk, UUID scopeModelId);
 
-	List<Scope> getAllEnabledDescendants(Long scopePk, String scopeModelId);
+	List<Scope> getAllEnabledDescendants(Long scopePk, UUID scopeModelId);
 
-	List<Scope> getEnabledDescendants(Long scopePk, String scopeModelId);
+	List<Scope> getEnabledDescendants(Long scopePk, UUID scopeModelId);
 
 	List<Scope> getAllEnabledDescendants(Long scopePk);
 
 	List<Scope> getEnabledDescendants(Long scopePk);
 
-	Integer getEnabledDescendantsByScopeModelIdCount(String scopeModelId, Long scopePk);
+	Integer getEnabledDescendantsByScopeModelIdCount(UUID scopeModelId, Long scopePk);
 
-	Map<Long, Integer> getEnabledDescendantsByScopeModelIdCount(String scopeModelId, Collection<Long> scopePks);
+	Map<Long, Integer> getEnabledDescendantsByScopeModelIdCount(UUID scopeModelId, Collection<Long> scopePks);
 
 	List<Scope> getAncestors(Long scopePk);
 

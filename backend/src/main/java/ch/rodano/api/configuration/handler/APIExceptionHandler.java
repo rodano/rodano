@@ -138,6 +138,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 				e.printStackTrace(writer);
 
 				final var mail = new Mail();
+				mail.setProjectId(study.getProjectId());
 				mail.setSender(study.getEmail());
 				mail.setReplyTo(study.getEmail());
 				mail.setRecipients(Collections.singleton(exceptionEmailRecipient));

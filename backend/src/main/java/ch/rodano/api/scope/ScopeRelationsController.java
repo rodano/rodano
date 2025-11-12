@@ -6,8 +6,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import jakarta.validation.Valid;
 
@@ -212,10 +216,22 @@ public class ScopeRelationsController extends AbstractSecuredController {
 		}
 
 		//retrieve parent scope models
-		final var scopeModelIds = onlyDefault ? Collections.singleton(scopeModel.getDefaultParentId()) : scopeModel.getParentIds();
+		final Set<UUID> parentModelIds = (
+			onlyDefault
+				? Stream.of(scopeModel.getDefaultParentId())
+				: scopeModel.getParentIds().stream()
+		)
+			.filter(Objects::nonNull)
+			.map(code -> {
+				final var parentModel = studyService.getStudy().getScopeModel(code);
+				if(parentModel == null) {
+					throw new IllegalStateException("Unknown parent ScopeModel code: " + code);
+				}
+				return parentModel.getScopeModelId();
+			}).collect(Collectors.toSet());
 
 		final var rootScopesPks = rightsService.filterRoles(currentRoles, scopeModel, right).stream().map(Role::getScopeFk).collect(Collectors.toSet());
-		final List<Scope> scopes = scopeDAOService.getScopesByScopeModelIdHavingAncestor(scopeModelIds, rootScopesPks).stream()
+		final List<Scope> scopes = scopeDAOService.getScopesByScopeModelIdHavingAncestor(parentModelIds, rootScopesPks).stream()
 			//when asking for parent to create a scope, do a special filter
 			.filter(s -> Rights.WRITE != right || s.canEnroll())
 			.sorted(Comparator.comparing(Scope::getCode))

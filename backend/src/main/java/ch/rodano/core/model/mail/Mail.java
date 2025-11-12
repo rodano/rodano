@@ -2,11 +2,13 @@ package ch.rodano.core.model.mail;
 
 import java.time.ZonedDateTime;
 import java.util.Set;
+import java.util.UUID;
 
 import ch.rodano.core.model.common.IdentifiableObject;
 
 public class Mail implements IdentifiableObject, TimestampedMail {
 
+	private UUID projectId;
 	private Long pk;
 	private ZonedDateTime creationTime;
 	private ZonedDateTime lastUpdateTime;
@@ -38,6 +40,14 @@ public class Mail implements IdentifiableObject, TimestampedMail {
 		sender = mail.getSender();
 		replyTo = mail.getReplyTo();
 		setRecipients(mail.getRecipients());
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	@Override

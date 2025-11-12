@@ -2,6 +2,7 @@ package ch.rodano.core.services.dao.role;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.jooq.Table;
@@ -84,7 +85,7 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 	}
 
 	@Override
-	public List<Role> getRolesByProfile(final String profileId) {
+	public List<Role> getRolesByProfile(final UUID profileId) {
 		final var query = create.selectFrom(ROLE).where(ROLE.PROFILE_ID.eq(profileId));
 		return find(query);
 	}
@@ -125,6 +126,10 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 
 	@Override
 	public void saveRole(final Role role, final DatabaseActionContext context, final String rationale) {
+		if(role.getProjectId() == null) {
+			role.setProjectId(studyService.getStudy().getProjectId());
+		}
+
 		save(role, context, rationale);
 	}
 }

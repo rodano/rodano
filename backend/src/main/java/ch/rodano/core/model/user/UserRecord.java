@@ -1,10 +1,13 @@
 package ch.rodano.core.model.user;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 public class UserRecord {
 
 	private boolean deleted;
+
+	protected UUID projectId;
 
 	protected String name;
 
@@ -51,6 +54,14 @@ public class UserRecord {
 
 	public void setDeleted(final boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
 	}
 
 	public String getName() {

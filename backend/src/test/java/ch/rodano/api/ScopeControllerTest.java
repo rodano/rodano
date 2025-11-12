@@ -2,6 +2,7 @@ package ch.rodano.api;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -86,7 +87,7 @@ public class ScopeControllerTest extends ControllerTest {
 	}
 
 	private PagedResult searchScopes(
-		final String scopeModelId,
+		final UUID scopeModelId,
 		final Long ancestorPk
 	) {
 		final var response = restTemplate.exchange(

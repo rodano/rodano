@@ -2,13 +2,14 @@ package ch.rodano.core.model.resource;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.core.model.common.PaginatedSearch;
 
 public class ResourceSearch extends PaginatedSearch<ResourceSearch> {
-	public static final ResourceSortBy DEFAULT_SORT_BY = ResourceSortBy.title;
+	public static final ResourceSortBy DEFAULT_SORT_BY = ResourceSortBy.lastUpdateTime;
 	public static final boolean DEFAULT_SORT_ASCENDING = true;
 
 	@Schema(description = "Allow only public")
@@ -18,7 +19,7 @@ public class ResourceSearch extends PaginatedSearch<ResourceSearch> {
 	private Optional<List<Long>> referenceScopePks = Optional.empty();
 
 	@Schema(description = "Category id")
-	private Optional<String> categoryId = Optional.empty();
+	private Optional<UUID> categoryId = Optional.empty();
 
 	@Schema(description = "Text search on title and description")
 	private Optional<String> fullText = Optional.empty();
@@ -52,11 +53,11 @@ public class ResourceSearch extends PaginatedSearch<ResourceSearch> {
 		return this;
 	}
 
-	public Optional<String> getCategoryId() {
+	public Optional<UUID> getCategoryId() {
 		return categoryId;
 	}
 
-	public ResourceSearch setCategoryId(final Optional<String> categoryId) {
+	public ResourceSearch setCategoryId(final Optional<UUID> categoryId) {
 		this.categoryId = categoryId;
 		return this;
 	}

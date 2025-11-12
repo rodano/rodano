@@ -16,19 +16,23 @@ import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.scope.ScopeRelation;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.dao.scope.ScopeRelationDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 import ch.rodano.core.utils.UtilsService;
 
 @Service
 public class ScopeRelationServiceImpl implements ScopeRelationService {
 	private final ScopeRelationDAOService scopeRelationDAOService;
 	private final ScopeDAOService scopeDAOService;
+	private final ProjectIdResolver projectIdResolver;
 
 	public ScopeRelationServiceImpl(
 		final ScopeRelationDAOService scopeRelationDAOService,
-		final ScopeDAOService scopeDAOService
+		final ScopeDAOService scopeDAOService,
+		final ProjectIdResolver projectIdResolver
 	) {
 		this.scopeRelationDAOService = scopeRelationDAOService;
 		this.scopeDAOService = scopeDAOService;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	@Override
@@ -85,6 +89,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		}
 
 		final var relation = new ScopeRelation();
+		relation.setProjectId(projectIdResolver.id());
 		relation.setScopeFk(scope.getPk());
 		relation.setParentFk(parent.getPk());
 		relation.setStartDate(startDate);
@@ -215,7 +220,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 	@Override
 	public List<Scope> getEnabledAncestors(final Scope scope, final ScopeModel scopeModel) {
 		return this.getEnabledAncestors(scope).stream()
-			.filter(s -> s.getScopeModelId().equals(scopeModel.getId()))
+			.filter(s -> s.getScopeModelId().equals(scopeModel.getScopeModelId()))
 			.toList();
 	}
 
@@ -330,7 +335,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	@Override
 	public List<Scope> getDescendants(final Scope scope, final ScopeModel scopeModel) {
-		return scopeDAOService.getDescendants(scope.getPk(), scopeModel.getId());
+		return scopeDAOService.getDescendants(scope.getPk(), scopeModel.getScopeModelId());
 	}
 
 	@Override
@@ -340,7 +345,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	@Override
 	public List<Scope> getEnabledDescendants(final Scope scope, final ScopeModel scopeModel) {
-		return scopeDAOService.getEnabledDescendants(scope.getPk(), scopeModel.getId());
+		return scopeDAOService.getEnabledDescendants(scope.getPk(), scopeModel.getScopeModelId());
 	}
 
 	@Override
@@ -350,7 +355,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	@Override
 	public List<Scope> getAllEnabledDescendants(final Scope scope, final ScopeModel scopeModel) {
-		return scopeDAOService.getAllEnabledDescendants(scope.getPk(), scopeModel.getId());
+		return scopeDAOService.getAllEnabledDescendants(scope.getPk(), scopeModel.getScopeModelId());
 	}
 
 	@Override
@@ -444,10 +449,11 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	/**
 	 * Checks that there is no overlap in the relationships between the given scopes, otherwise throws an error.
-	 * @param scope         Child scope
-	 * @param parent        Parent scope
-	 * @param startDate     Start date of the relation
-	 * @param endDate       End date of the relation
+	 *
+	 * @param scope     Child scope
+	 * @param parent    Parent scope
+	 * @param startDate Start date of the relation
+	 * @param endDate   End date of the relation
 	 * @throws ScopeRelationException Thrown if there is a relation overlap between the two scopes
 	 */
 	private void verifyNoRelationOverlap(
@@ -512,7 +518,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 	}
 
 	private Optional<Integer> getShortestDistanceToAncestor(final Scope scope, final Scope ancestor) {
-		final var parents = this.getAllParents(scope);
+		final var parents = this.getParents(scope);
 
 		// No parent = root
 		if(parents.isEmpty()) {
@@ -521,12 +527,12 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 		Optional<Integer> min = Optional.empty();
 		for(final var parent : parents) {
-			if(parent == ancestor) {
+			if(parent.getPk().equals(ancestor.getPk())) {
 				return Optional.of(1);
 			}
 			final var distance = getShortestDistanceToAncestor(parent, ancestor);
-			if(getShortestDistanceToAncestor(parent, ancestor).isPresent()) {
-				if(min.isEmpty() || distance.isPresent() && distance.get() < min.get()) {
+			if(distance.isPresent()) {
+				if(min.isEmpty() || distance.get() < min.get()) {
 					min = distance;
 				}
 			}
@@ -536,7 +542,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 	}
 
 	private Optional<Integer> getShortestDistanceToDescendant(final Scope scope, final Scope descendant) {
-		final var children = this.getAllChildren(scope);
+		final var children = this.getChildren(scope);
 
 		// No parent = root
 		if(children.isEmpty()) {
@@ -545,12 +551,12 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 		Optional<Integer> min = Optional.empty();
 		for(final var child : children) {
-			if(child == descendant) {
+			if(child.getPk().equals(descendant.getPk())) {
 				return Optional.of(1);
 			}
 			final var distance = getShortestDistanceToDescendant(child, descendant);
-			if(getShortestDistanceToDescendant(child, descendant).isPresent()) {
-				if(min.isEmpty() || distance.isPresent() && distance.get() < min.get()) {
+			if(distance.isPresent()) {
+				if(min.isEmpty() || distance.get() < min.get()) {
 					min = distance;
 				}
 			}
@@ -558,5 +564,4 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 		return min.map(integer -> integer + 1);
 	}
-
 }

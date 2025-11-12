@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -89,6 +90,7 @@ public class FormServiceImpl implements FormService {
 		}
 
 		final var form = new Form();
+		form.setProjectId(scope.getProjectId());
 		form.setFormModel(formModel);
 		form.setScopeFk(scope.getPk());
 
@@ -121,6 +123,7 @@ public class FormServiceImpl implements FormService {
 		}
 
 		final var form = new Form();
+		form.setProjectId(scope.getProjectId());
 		form.setFormModel(formModel);
 		form.setEventFk(event.getPk());
 
@@ -224,7 +227,7 @@ public class FormServiceImpl implements FormService {
 	}
 
 	@Override
-	public Form get(final Scope scope, final String formId) {
+	public Form get(final Scope scope, final UUID formId) {
 		final var form = formDAOService.getFormByScopePkAndFormModelId(scope.getPk(), formId);
 		if(formId != null) {
 			return form;
@@ -243,7 +246,7 @@ public class FormServiceImpl implements FormService {
 	}
 
 	@Override
-	public Form get(final Event event, final String formId) {
+	public Form get(final Event event, final UUID formId) {
 		final var form = formDAOService.getFormByEventPkAndFormModelId(event.getPk(), formId);
 		if(formId != null) {
 			return form;

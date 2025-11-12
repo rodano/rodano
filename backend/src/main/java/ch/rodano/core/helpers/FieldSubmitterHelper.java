@@ -3,6 +3,7 @@ package ch.rodano.core.helpers;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -38,7 +39,21 @@ public class FieldSubmitterHelper {
 			inputs.put(dataset, new HashMap<>());
 		}
 		final var fieldModel = dataset.getDatasetModel().getFieldModel(fieldModelId);
-		final var field = fieldService.get(dataset, fieldModel);
+
+		Field field;
+		try {
+			field = fieldService.get(dataset, fieldModel);
+		}
+		catch(NoSuchElementException e) {
+			field = fieldService.create(
+				scope,
+				event,
+				dataset,
+				fieldModel,
+				context,
+				"Auto-crate missing field"
+			);
+		}
 		inputs.get(dataset).put(field, value);
 
 		return this;

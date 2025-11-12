@@ -79,7 +79,6 @@ public enum Operator {
 
 	},
 	NOT_EQUALS {
-
 		@Override
 		public String toSql(final FieldModel fieldModel, final String column) {
 			throw new UnsupportedOperationException();
@@ -151,7 +150,6 @@ public enum Operator {
 		}
 	},
 	CONTAINS {
-
 		@Override
 		public String toSql(final FieldModel fieldModel, final String column) {
 			throw new UnsupportedOperationException();
@@ -925,28 +923,50 @@ public enum Operator {
 	public abstract boolean test(Boolean value1, Boolean value2);
 
 	public boolean test(final OperandType operandType, final Object value1, final Object value2) {
-		switch(operandType) {
-			case DATE:
-				return test(PartialDate.ofObject(value1), PartialDate.ofObject(value2));
-			case NUMBER:
-				return test((Number) value1, (Number) value2);
-			case BOOLEAN:
-				return test((Boolean) value1, (Boolean) value2);
-			default:
-				return test((String) value1, (String) value2);
-		}
+		return switch(operandType) {
+			case DATE -> test(PartialDate.ofObject(value1), PartialDate.ofObject(value2));
+			case NUMBER -> test(asNumber(value1), asNumber(value2));
+			case BOOLEAN -> test(asBoolean(value1), asBoolean(value2));
+			default -> test(asString(value1), asString(value2));
+		};
 	}
 
 	public boolean test(final OperandType operandType, final Object value) {
-		switch(operandType) {
-			case DATE:
-				return test(PartialDate.ofObject(value));
-			case NUMBER:
-				return test((Number) value);
-			case BOOLEAN:
-				return test((Boolean) value);
-			default:
-				return test((String) value);
+		return switch(operandType) {
+			case DATE -> test(PartialDate.ofObject(value));
+			case NUMBER -> test(asNumber(value));
+			case BOOLEAN -> test(asBoolean(value));
+			default -> test(asString(value));
+		};
+	}
+
+	private static String asString(final Object o) {
+		return (o == null) ? null : String.valueOf(o);
+	}
+
+	private static Number asNumber(final Object o) {
+		if(o == null) {
+			return null;
 		}
+		if(o instanceof Number n) {
+			return n;
+		}
+		try {
+			return Double.valueOf(String.valueOf(o));
+		}
+		catch(Exception ignore) {
+			return null;
+		}
+	}
+
+	private static Boolean asBoolean(final Object o) {
+		if(o == null) {
+			return null;
+		}
+		if(o instanceof Boolean b) {
+			return b;
+		}
+		final var s = String.valueOf(o);
+		return "true".equalsIgnoreCase(s) || "1".equals(s);
 	}
 }

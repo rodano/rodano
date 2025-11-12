@@ -1,13 +1,25 @@
 package ch.rodano.core.model.field;
 
+import java.util.UUID;
+
 public class FieldRecord {
 
+	protected UUID projectId;
 	protected Long datasetFk;
-	protected String datasetModelId;
-	protected String fieldModelId;
+	protected UUID datasetModelId;
+	protected UUID fieldModelId;
 	protected String value;
 
-	protected FieldRecord() {}
+	protected FieldRecord() {
+	}
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
 
 	public Long getDatasetFk() {
 		return datasetFk;
@@ -17,19 +29,19 @@ public class FieldRecord {
 		this.datasetFk = datasetFk;
 	}
 
-	public String getDatasetModelId() {
+	public UUID getDatasetModelId() {
 		return datasetModelId;
 	}
 
-	public void setDatasetModelId(final String datasetModelId) {
+	public void setDatasetModelId(final UUID datasetModelId) {
 		this.datasetModelId = datasetModelId;
 	}
 
-	public String getFieldModelId() {
+	public UUID getFieldModelId() {
 		return fieldModelId;
 	}
 
-	public void setFieldModelId(final String fieldModelId) {
+	public void setFieldModelId(final UUID fieldModelId) {
 		this.fieldModelId = fieldModelId;
 	}
 

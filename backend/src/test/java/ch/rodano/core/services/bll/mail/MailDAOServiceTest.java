@@ -38,6 +38,7 @@ public class MailDAOServiceTest extends DatabaseTest {
 	public void prepare() throws IOException {
 		// Same mail stub is used across test methods, so we only build it once
 		mailStub = new Mail();
+		mailStub.setProjectId(studyService.getStudy().getProjectId());
 		mailStub.setSender("spok@enterprise.com");
 		mailStub.setRecipients(Collections.singleton("marf@enterprise.com"));
 		mailStub.setSubject("About Interferometron");
@@ -47,6 +48,7 @@ public class MailDAOServiceTest extends DatabaseTest {
 		mailStub.setIntent("WishLuck");
 
 		mailAtt = new MailAttachment();
+		mailAtt.setProjectId(studyService.getStudy().getProjectId());
 		mailAtt.setFilename("attachment.txt");
 		try(var is = MailDAOServiceTest.class.getResourceAsStream("/services/mail/attachment.txt")) {
 			mailAtt.setContent(is.readAllBytes());
