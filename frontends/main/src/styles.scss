@@ -72,6 +72,8 @@
 		--light-highlight-color: #eee;
 		--light-border-color: #ccc;
 
+		--lighter-border-color: #ddd;
+
 		--gap: 0.5rem;
 	}
 }
@@ -327,34 +329,48 @@ nav.side-navigation {
 		flex-grow: 1;
 		overflow: auto;
 		box-sizing: border-box;
-		&.submenu > li > span {
-			padding-left: 2rem;
+		&.submenu {
+			& .main-content {
+				padding: 0.1rem;
+				padding-left: 2.5rem;
+			}
 		}
 	}
 	li {
-		/* set a minimum height so badges that are loaded in a second step can fit */
-		min-height: 2.4rem;
 		&.starting-block {
 			border-top: 1px solid var(--light-border-color);
 		}
 		&.ending-block {
 			border-bottom: 1px solid var(--light-border-color);
 		}
+		&.ending-block-light {
+			border-bottom: 1px solid var(--lighter-border-color);
+		}
 		& > span {
 			display: flex;
 			align-items: center;
-			padding: 0.2rem;
 			&:has(a.active) {
 				background: var(--light-border-color);
 			}
 		}
 		& .main-content {
-			padding: 0.2rem;
+			padding: 0.4rem;
 			flex-grow: 1;
 		}
 		& a {
 			text-decoration: none;
 			color: inherit;
+		}
+		&:has(.badge) {
+			/* set a minimum height so badges that are loaded in a second step can fit */
+			min-height: 2.4rem;
+		}
+		& .badge {
+			color: white;
+			float: right;
+			background-color: var(--mat-sys-primary);
+			border-radius: 15rem;
+			padding: 0.1rem 0.7rem;
 		}
 	}
 	footer {
