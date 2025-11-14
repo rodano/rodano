@@ -56,7 +56,6 @@ function download_backup(event) {
 	event.stop();
 	FetchFile(this.href)
 		.then(file => {
-			console.log(file.name);
 			const url = URL.createObjectURL(file);
 			//Chrome does not support to set location href
 			if(/Chrome/.test(navigator.userAgent)) {
@@ -77,7 +76,7 @@ function update_backups(backups) {
 		const li = document.createElement('li');
 		const link = document.createElement('a');
 		link.textContent = backup;
-		link.href = `/api/backups/${encodeURIComponent(backup)}`;
+		link.href = `${api_base_url}/backups/${encodeURIComponent(backup)}`;
 		link.addEventListener('click', download_backup);
 		li.appendChild(link);
 		application_backups.appendChild(li);

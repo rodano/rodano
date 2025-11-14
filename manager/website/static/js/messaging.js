@@ -1,19 +1,20 @@
 import {bus, ServerMessage} from './event_bus.js';
+import {api_base_url} from './fetch.js';
 import {TokenManager} from './token.js';
 
 let socket;
 
 function connect_socket() {
 	const deployer_status = document.getElementById('deployer_status');
-	//open websocket to be kept updated
-	const secure = window.location.protocol.includes('s');
-	const server = `${(secure ? 'wss://' : 'ws://') + window.location.host}/api/messaging`;
+	//removing http from base URI (keeping the "s" if present)
+	const base_uri = document.baseURI.substring(4);
+	const server = `ws${base_uri}${api_base_url}/messaging`;
 	socket = new WebSocket(server, ['access_token', TokenManager.GetToken()]);
 	socket.addEventListener(
 		'open',
 		function() {
 			deployer_status.src = 'images/green_circle.png';
-			deployer_status.title = 'Connected to server.';
+			deployer_status.title = 'Connected to server';
 			deployer_status.style.cursor = 'auto';
 			socket.send('status');
 		}
@@ -22,7 +23,7 @@ function connect_socket() {
 		'close',
 		function() {
 			deployer_status.src = 'images/red_circle.png';
-			deployer_status.title = 'Disconnected from the server. Click to reconnect.';
+			deployer_status.title = 'Disconnected from the server, click to reconnect';
 			deployer_status.style.cursor = 'pointer';
 		}
 	);

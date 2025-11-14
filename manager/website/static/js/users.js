@@ -7,7 +7,7 @@ function draw_user(user) {
 
 export const Users = {
 	GetUsers: function() {
-		return Fetch(`${api_base_url}/api/users`, {'managed-error': [500]});
+		return Fetch(`${api_base_url}/users`, {'managed-error': [500]});
 	},
 	RefreshUsers() {
 		Users.GetUsers()

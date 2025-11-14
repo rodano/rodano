@@ -102,8 +102,6 @@ services:
     build:
       context: frontends
       dockerfile: Dockerfile
-    depends_on:
-      - backend
     ports:
       - "0.0.0.0:7586:80"
     volumes:
@@ -135,6 +133,7 @@ services:
       DATABASE_USER: root
       DATABASE_PASSWORD: root
       DATABASE_NAME: rodano
+      BASE_URL_PATH: /manager/
       MAGIC_TOKEN: ${MANAGER_MAGIC_TOKEN}
       USER_CONTENT: /user_content
       BACKUPS_PATH: /backups
