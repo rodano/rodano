@@ -102,8 +102,11 @@ services:
     build:
       context: frontends
       dockerfile: Dockerfile
+    depends_on:
+      - backend
+      - manager
     ports:
-      - "0.0.0.0:7586:80"
+      - "0.0.0.0:7586:7586"
     volumes:
       #access to the study package, to get the static files
       - type: bind
