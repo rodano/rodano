@@ -8,7 +8,7 @@
 		<span [class.removed]="scope.removed">
 			{{ scope.shortname }}
 			@if (scope.locked) {
-				<mat-icon matTooltip="Locked"> lock </mat-icon>
+				<mat-icon matTooltip="Locked">lock</mat-icon>
 			}
 		</span>
 	</h2>
@@ -70,14 +70,25 @@
 		<!-- Events -->
 		@for (eventGroup of eventGroups; track eventGroup.id) {
 			<li class="starting-block">
-				<span class="main-content">{{ eventGroup.shortname | localizeMap }}</span>
+				<span>
+					<button
+						mat-icon-button
+						(click)="toggleEventGroupSort(eventGroup.id)"
+						class="action">
+						<mat-icon>{{ isSortedChronologically(eventGroup.id) ? 'clock_arrow_up' : 'clock_arrow_down' }}</mat-icon>
+					</button>
+					<span class="main-content">
+						{{ eventGroup.shortname | localizeMap }}
+					</span>
+				</span>
 			</li>
 			@for (event of getEvents(eventGroup.id); track event.pk) {
 				<li class="event">
 					<span>
 						<a
 							[routerLink]="[]"
-							[queryParams]="generateToggleParameters(event.pk)">
+							[queryParams]="generateToggleParameters(event.pk)"
+							class="action">
 							<mat-icon>
 								@if (expandedEventPks.includes(event.pk)) {
 									expand_less

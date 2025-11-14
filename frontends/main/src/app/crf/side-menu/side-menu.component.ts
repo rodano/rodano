@@ -10,7 +10,7 @@ import {MatIcon} from '@angular/material/icon';
 import {Scope} from '@core/model/scope';
 import {Form} from '@core/model/form';
 import {Event} from '@core/model/event';
-import {MatButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {ScopeService} from '@core/services/scope.service';
 import {SelectEventComponent} from '../dialogs/add-event/select-event.component';
 import {CRFChangeService} from '../services/crf-change.service';
@@ -19,6 +19,7 @@ import {EventGroup} from '@core/model/event-group';
 import {NotificationService} from 'src/app/services/notification.service';
 import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
+import {SettingsService} from '@core/services/settings.service';
 
 @Component({
 	selector: 'app-side-menu',
@@ -28,6 +29,7 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 		RouterLink,
 		MatIcon,
 		MatButton,
+		MatIconButton,
 		RouterLinkActive,
 		MatTooltipModule,
 		LocalizeMapPipe,
@@ -36,6 +38,7 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 })
 export class SideMenuComponent implements OnInit, OnChanges {
 	static EXPANDED_EVENT_PKS_PARAMETER = 'expandedEventPks';
+	static EVENT_ORDERS_SETTING_KEY_PREFIX = 'eventOrders';
 
 	static ALL_EVENT_GROUP = {
 		id: 'ALL',
@@ -57,6 +60,7 @@ export class SideMenuComponent implements OnInit, OnChanges {
 	events: Event[];
 	eventsForms: Record<number, Form[]> = {};
 	expandedEventPks: number[] = [];
+	eventOrdersByEventGroupId: Record<string, boolean> = {};
 
 	constructor(
 		private activatedRoute: ActivatedRoute,
@@ -67,7 +71,8 @@ export class SideMenuComponent implements OnInit, OnChanges {
 		private destroyRef: DestroyRef,
 		private notificationService: NotificationService,
 		private router: Router,
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private settingsService: SettingsService
 	) { }
 
 	ngOnInit() {
@@ -81,11 +86,13 @@ export class SideMenuComponent implements OnInit, OnChanges {
 			if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {
 				this.scope = typedWorkflowable.workflowable as Scope;
 			}
+			this.loadSortSettings();
 			this.refresh();
 		});
 	}
 
 	ngOnChanges() {
+		this.loadSortSettings();
 		this.refresh();
 	}
 
@@ -130,10 +137,41 @@ export class SideMenuComponent implements OnInit, OnChanges {
 	}
 
 	getEvents(eventGroupId: string) {
+		let events: Event[];
 		if([SideMenuComponent.OTHER_EVENT_GROUP.id, SideMenuComponent.ALL_EVENT_GROUP.id].includes(eventGroupId)) {
-			return this.events.filter(e => !e.model.eventGroupId);
+			events = this.events.filter(e => !e.model.eventGroupId);
 		}
-		return this.events.filter(e => e.model.eventGroupId === eventGroupId);
+		else {
+			events = this.events.filter(e => e.model.eventGroupId === eventGroupId);
+		}
+
+		//sort events based on the sort order for this event group
+		const isReverse = this.eventOrdersByEventGroupId[eventGroupId] || false;
+		return [...events].sort((a, b) => {
+			//sort events based on date if available, otherwise use the expected date
+			const dateA = a.date ? new Date(a.date) : (a.expectedDate ? new Date(a.expectedDate) : new Date(0));
+			const dateB = b.date ? new Date(b.date) : (b.expectedDate ? new Date(b.expectedDate) : new Date(0));
+
+			const comparison = dateA.getTime() - dateB.getTime();
+			return isReverse ? -comparison : comparison;
+		});
+	}
+
+	toggleEventGroupSort(eventGroupId: string) {
+		this.eventOrdersByEventGroupId[eventGroupId] = !this.eventOrdersByEventGroupId[eventGroupId];
+		this.saveSortSettings();
+	}
+
+	isSortedChronologically(eventGroupId: string): boolean {
+		return this.eventOrdersByEventGroupId[eventGroupId] || false;
+	}
+
+	private loadSortSettings() {
+		this.eventOrdersByEventGroupId = this.settingsService.get(SideMenuComponent.EVENT_ORDERS_SETTING_KEY_PREFIX, {});
+	}
+
+	private saveSortSettings() {
+		this.settingsService.set(SideMenuComponent.EVENT_ORDERS_SETTING_KEY_PREFIX, this.eventOrdersByEventGroupId);
 	}
 
 	generateToggleParameters(eventPk: number): Record<string, string> {
