@@ -107,7 +107,7 @@ public class UserData {
 
 	@JsonAnySetter
 	public void setAnySetter(final String key, final Object value) {
-		System.err.printf("Unknown property %s with value %s%n", key, value);
+		logger.error("Unknown property {} (value {}) in class {}", key, value, getClass().getSimpleName());
 	}
 
 	public String getEncryptedPrivateKey() {

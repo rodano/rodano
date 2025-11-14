@@ -7,7 +7,8 @@
 			"command": "mvn",
 			"args": [
 				"spring-boot:run",
-				"-Dspring-boot.run.jvmArguments='-Dspring.profiles.active=database,local -Drodano.init.with-data=true'"
+				"-Dspring-boot.run.profiles=database,local",
+				"-Dspring-boot.run.jvmArguments='-Drodano.init.with-data=true'"
 			],
 			"presentation": {
 				"echo": true,
@@ -23,7 +24,7 @@
 			"command": "mvn",
 			"args": [
 				"spring-boot:run",
-				"-Dspring-boot.run.jvmArguments='-Dspring.profiles.active=api,local -Drodano.environment=DEV'"
+				"-Dspring-boot.run.jvmArguments='-Drodano.environment=DEV'"
 			],
 			"presentation": {
 				"echo": true,

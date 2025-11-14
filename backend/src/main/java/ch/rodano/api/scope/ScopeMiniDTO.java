@@ -5,13 +5,10 @@ import java.time.ZonedDateTime;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.core.model.scope.Scope;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ScopeMiniDTO {
 	@Schema(description = "Scope pk")
 	@NotNull

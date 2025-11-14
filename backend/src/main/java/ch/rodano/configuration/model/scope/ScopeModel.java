@@ -16,10 +16,7 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
@@ -43,8 +40,6 @@ import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableModel, PayableModel, Node, RightAssignable<ScopeModel> {
 	@Serial
 	private static final long serialVersionUID = -3652751984945692998L;

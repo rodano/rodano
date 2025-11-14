@@ -6,13 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.binary.Base32;
 import org.apache.commons.io.FilenameUtils;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.core.model.file.File;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "File transmission")
 public record FileDTO(
 	@NotNull

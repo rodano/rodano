@@ -1,5 +1,5 @@
 # build an intermediate image containing everything required to compile the backend
-FROM maven:3-eclipse-temurin-23 AS builder
+FROM maven:3-eclipse-temurin-25 AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ RUN chmod +x /usr/local/bin/compile-plugins.sh
 ENTRYPOINT ["compile-plugins.sh"]
 
 # build a light image containing only the backend
-FROM eclipse-temurin:23
+FROM eclipse-temurin:25
 
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano backend"

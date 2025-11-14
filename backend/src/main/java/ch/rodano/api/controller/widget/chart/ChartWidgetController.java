@@ -14,13 +14,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
@@ -41,7 +38,7 @@ import ch.rodano.core.utils.RightsService;
 @RequestMapping("/widget/chart")
 @Transactional(readOnly = true)
 public class ChartWidgetController extends AbstractSecuredController {
-	private final ObjectMapper mapper;
+	private final JsonMapper mapper;
 	private final ChartFactoryService chartFactoryService;
 	private final ScopeService scopeService;
 	private final ScopeDAOService scopeDAOService;
@@ -53,7 +50,7 @@ public class ChartWidgetController extends AbstractSecuredController {
 		final RoleService roleService,
 		final RightsService rightsService,
 		final ChartFactoryService chartFactoryService,
-		final ObjectMapper mapper,
+		final JsonMapper mapper,
 		final ScopeService scopeService,
 		final ScopeDAOService scopeDAOService
 	) {
@@ -72,7 +69,7 @@ public class ChartWidgetController extends AbstractSecuredController {
 		@PathVariable final String chartId,
 		@RequestParam final Optional<List<Long>> scopePks,
 		@RequestParam(name = "criteria") final Optional<String> encodedCriteria
-	) throws JsonMappingException, JsonProcessingException {
+	) {
 		final var currentActor = currentActor();
 		final var study = studyService.getStudy();
 		final var chart = study.getChart(chartId);
@@ -106,7 +103,7 @@ public class ChartWidgetController extends AbstractSecuredController {
 		//retrieve chart criteria
 		List<FieldModelCriterion> criteria = Collections.emptyList();
 		if(encodedCriteria.isPresent()) {
-			criteria = (List<FieldModelCriterion>) mapper.readValue(encodedCriteria.get(), TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class));
+			criteria = (List<FieldModelCriterion>) mapper.readerForListOf(FieldModelCriterion.class).readValue(encodedCriteria.get());
 		}
 
 		return chartFactoryService.getChart(chart, currentActor, scopes, criteria);

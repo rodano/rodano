@@ -8,16 +8,11 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import ch.rodano.configuration.model.event.EventConfigurationHook;
 import ch.rodano.core.model.enrollment.EnrollmentModel;
 import ch.rodano.core.model.enrollment.EnrollmentTarget;
 import ch.rodano.core.model.enrollment.SubscriptionRestriction;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class ScopeData implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -2250927876597655682L;

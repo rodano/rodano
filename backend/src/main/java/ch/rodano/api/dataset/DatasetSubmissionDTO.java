@@ -3,11 +3,8 @@ package ch.rodano.api.dataset;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "Dataset submission")
 public class DatasetSubmissionDTO {
 	@Schema(description = "List of datasets to update")

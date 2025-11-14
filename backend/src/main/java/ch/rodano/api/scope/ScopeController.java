@@ -28,14 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.web.util.UriUtils;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.type.TypeFactory;
 
 import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.controller.AbstractSecuredController;
@@ -75,7 +74,7 @@ public class ScopeController extends AbstractSecuredController {
 	private final ScopeExportService scopeExportService;
 	private final ScopeDTOService scopeDTOService;
 	private final ScopeRelationService scopeRelationService;
-	private final ObjectMapper mapper;
+	private final JsonMapper mapper;
 	private final EventService eventService;
 	private final UtilsService utilsService;
 	private final ScopeDAOService scopeDAOService;
@@ -93,7 +92,7 @@ public class ScopeController extends AbstractSecuredController {
 		final ScopeExportService scopeExportService,
 		final ScopeDTOService scopeDTOService,
 		final ScopeRelationService scopeRelationService,
-		final ObjectMapper mapper,
+		final JsonMapper mapper,
 		final EventService eventService,
 		final UtilsService utilsService,
 		final ScopeDAOService scopeDAOService,
@@ -152,9 +151,9 @@ public class ScopeController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		final var acl = rightsService.getACL(currentActor);
 
-		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
+		final var stateType = TypeFactory.createDefaultInstance().constructMapType(Map.class, String.class, List.class);
 		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
-		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
+		final var criteriaType = TypeFactory.createDefaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
 		final var search = new ScopeSearch()
@@ -200,9 +199,9 @@ public class ScopeController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		final var acl = rightsService.getACL(currentActor);
 
-		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
+		final var stateType = TypeFactory.createDefaultInstance().constructMapType(Map.class, String.class, List.class);
 		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
-		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
+		final var criteriaType = TypeFactory.createDefaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
 		final var predicate = new ScopeSearch()
@@ -481,12 +480,7 @@ public class ScopeController extends AbstractSecuredController {
 
 	private <T> T readFromURI(final String input, final JavaType type) {
 		final var string = UriUtils.decode(input, "UTF-8");
-		try {
-			return mapper.readValue(string, type);
-		}
-		catch(final JsonProcessingException e) {
-			throw new IllegalArgumentException(e);
-		}
+		return mapper.readValue(string, type);
 	}
 
 	//TODO move this in the scope service

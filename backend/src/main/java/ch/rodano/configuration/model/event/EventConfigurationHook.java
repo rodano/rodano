@@ -20,7 +20,7 @@ public class EventConfigurationHook implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -3556215335256366005L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EventConfigurationHook.class);
+	private final Logger logger = LoggerFactory.getLogger(EventConfigurationHook.class);
 
 	private String eventModelId;
 	private List<DatasetModel> datasetModels;
@@ -70,7 +70,7 @@ public class EventConfigurationHook implements Serializable {
 	@JsonAnySetter
 	public final void setAnySetter(final String key, final Object value) {
 		if(!"entity".equals(key)) {
-			LOGGER.error("EventConfigurationHook - Unknown property : key={}, value={}", key, value);
+			logger.error("Unknown property {} (value {}) in class {}", key, value, getClass().getName());
 		}
 	}
 }

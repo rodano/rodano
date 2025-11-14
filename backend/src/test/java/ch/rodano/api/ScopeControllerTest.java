@@ -1,5 +1,7 @@
 package ch.rodano.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.util.Collections;
 import java.util.Map;
 
@@ -8,20 +10,22 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.core.ParameterizedTypeReference;
 
 import ch.rodano.api.dto.paging.PagedResult;
+import ch.rodano.api.scope.ScopeDTO;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @SpringTestConfiguration
 public class ScopeControllerTest extends ControllerTest {
+
+	private final ParameterizedTypeReference<PagedResult<ScopeDTO>> paginatedScopesType = new ParameterizedTypeReference<>() {
+		//don't care
+	};
 
 	@Autowired
 	private ScopeService scopeService;
@@ -32,7 +36,7 @@ public class ScopeControllerTest extends ControllerTest {
 	private Scope france;
 	private Scope frenchPatient1;
 
-	// TODO replace this initialisation by proper scope creation as soon as KV-1456 is done
+	// TODO replace this initialisation by proper scope creation
 	@BeforeEach
 	public void setup() {
 		france = scopeDAOService.getScopeByCode("FR");
@@ -46,22 +50,13 @@ public class ScopeControllerTest extends ControllerTest {
 		authenticate(adminOnStudyEmail);
 
 		// look for all scopes
-		final var response = restTemplate.exchange(
-			"/scopes",
-			HttpMethod.GET,
-			null,
-			PagedResult.class,
-			Collections.emptyMap()
-		);
+		var scopes = get("/scopes", PagedResult.class);
 
 		final var allScopes = scopeDAOService.getAllScopes();
-
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertEquals(allScopes.size(), response.getBody().getObjects().size());
+		assertEquals(allScopes.size(), scopes.getObjects().size());
 	}
 
 	@Test
-	// TODO re-enable this as soon KV-1456 is done
 	@Disabled
 	@DisplayName("User who does not have the MANAGE_DELETED_DATA feature can not see scopes that have a deleted ancestor")
 	public void canNotGetScopesWithDeletedAncestor() {
@@ -85,21 +80,21 @@ public class ScopeControllerTest extends ControllerTest {
 		assertEquals(0, foundScopesWithoutDeleted.getObjects().size());
 	}
 
-	private PagedResult searchScopes(
+	private PagedResult<ScopeDTO> searchScopes(
 		final String scopeModelId,
 		final Long ancestorPk
 	) {
-		final var response = restTemplate.exchange(
-			"/scopes?scopeModelId={scopeModelId}&ancestorPks={ancestorPks}",
-			HttpMethod.GET,
-			null,
-			PagedResult.class,
-			Map.of(
-				"scopeModelId", scopeModelId,
-				"ancestorPks", new int[] { Math.toIntExact(ancestorPk) }
-			)
-		);
-
-		return response.getBody();
+		return client
+			.get()
+			.uri("/scopes?scopeModelId={scopeModelId}&ancestorPks={ancestorPks}",
+				Map.of(
+					"scopeModelId", scopeModelId,
+					"ancestorPks", new int[] { Math.toIntExact(ancestorPk) }
+				))
+			.exchange()
+			.expectStatus().isOk()
+			.expectBody(paginatedScopesType)
+			.returnResult()
+			.getResponseBody();
 	}
 }

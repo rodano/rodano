@@ -7,13 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 
-@JsonInclude(Include.NON_NULL)
 public class TimelineGraphSectionReference implements Node {
 	@Serial
 	private static final long serialVersionUID = 6494810301408433597L;

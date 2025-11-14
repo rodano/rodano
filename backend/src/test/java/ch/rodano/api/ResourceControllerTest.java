@@ -1,14 +1,14 @@
 package ch.rodano.api;
 
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.exception.ErrorDetails;
@@ -18,36 +18,29 @@ import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @SpringTestConfiguration
 class ResourceControllerTest extends ControllerTest {
 
 	@Autowired
 	private ScopeDAOService scopeDAOService;
 
-	final ParameterizedTypeReference<PagedResult<ResourceDTO>> type = new ParameterizedTypeReference<>() {};
+	private final ParameterizedTypeReference<PagedResult<ResourceDTO>> paginatedResourcesType = new ParameterizedTypeReference<>() {
+		//don't care
+	};
 
 	@Test
 	@DisplayName("Private resource are unreachable for unauthorized users")
 	public void privateResourcesUnreachable() {
-		final var unauthorizedResponse = restTemplate.getForEntity("/resources", ErrorDetails.class);
-		assertEquals(HttpStatus.UNAUTHORIZED, unauthorizedResponse.getStatusCode());
-
+		client.get().uri("/resources").exchange().expectStatus().isUnauthorized().expectBody(ErrorDetails.class);
 		authenticate(adminOnStudyEmail);
-		final var authorizedResponse = executeGet("/resources", type);
-		assertEquals(HttpStatus.OK, authorizedResponse.getStatusCode());
+		client.get().uri("/resources").exchange().expectStatus().isOk();
 	}
 
 	@Test
 	@DisplayName("Anyone can access public resources")
 	public void publicResourcesReachable() {
-		final var response = executeGet("/resources/public", type);
-		assertFalse(response.getBody().getObjects().isEmpty());
-		assertEquals(HttpStatus.OK, response.getStatusCode());
+		final var response = get("/resources/public", paginatedResourcesType);
+		assertFalse(response.getObjects().isEmpty());
 	}
 
 	@Test
@@ -60,15 +53,14 @@ class ResourceControllerTest extends ControllerTest {
 
 		// Create the resource
 		final var resourceDTO = createResourceDTO(root.getPk(), false);
-		final var resourceEntity = new HttpEntity<>(resourceDTO);
-		final var createdResource = executePostAndReturnBody("/resources", resourceEntity, ResourceDTO.class);
+		final var createdResource = post("/resources", resourceDTO, ResourceDTO.class);
 
 		// The new resource is correct
 		assertNotNull(createdResource.getPk());
 		assertEquals("NEWSLETTERS", createdResource.getCategory().getId());
 
 		// The newly created resource is present in the private resource list
-		final var privateResources = executeGetAndReturnBody("/resources", type);
+		final var privateResources = get("/resources", paginatedResourcesType);
 		assertTrue(
 			privateResources.getObjects().stream()
 				.anyMatch(resource -> resource.getPk().equals(createdResource.getPk()))
@@ -85,15 +77,14 @@ class ResourceControllerTest extends ControllerTest {
 
 		// Create a public resource
 		final var resourceDTO = createResourceDTO(root.getPk(), true);
-		final var resourceEntity = new HttpEntity<>(resourceDTO);
-		final var createdResource = executePostAndReturnBody("/resources", resourceEntity, ResourceDTO.class);
+		final var createdResource = post("/resources", resourceDTO, ResourceDTO.class);
 
 		// The new resource is correct
 		assertNotNull(createdResource.getPk());
 		assertEquals("NEWSLETTERS", createdResource.getCategory().getId());
 
 		// The newly created resource is present in the private resource list
-		final var privateResources = executeGetAndReturnBody("/resources", type);
+		final var privateResources = get("/resources", paginatedResourcesType);
 		assertTrue(
 			privateResources.getObjects().stream()
 				.anyMatch(resource -> resource.getPk().equals(createdResource.getPk()))
@@ -101,7 +92,7 @@ class ResourceControllerTest extends ControllerTest {
 
 		// Log out and check if the newly created resource is in the public resources
 		clearAuthentication();
-		final var publicResources = executeGetAndReturnBody("/resources/public", type);
+		final var publicResources = get("/resources/public", paginatedResourcesType);
 		assertTrue(
 			publicResources.getObjects().stream()
 				.anyMatch(resource -> resource.getPk().equals(createdResource.getPk()))
@@ -118,8 +109,7 @@ class ResourceControllerTest extends ControllerTest {
 
 		// Create a private resource
 		final var resourceDTO = createResourceDTO(root.getPk(), false);
-		final var resourceEntity = new HttpEntity<>(resourceDTO);
-		final var createdResource = executePostAndReturnBody("/resources", resourceEntity, ResourceDTO.class);
+		final var createdResource = post("/resources", resourceDTO, ResourceDTO.class);
 
 		// Modify the newly created resource
 		final var newTitle = "New title";
@@ -129,15 +119,7 @@ class ResourceControllerTest extends ControllerTest {
 		createdResource.setPublicResource(true);
 
 		// Update the resource on the server
-		final var updateEntity = new HttpEntity<>(createdResource);
-		final var updatedResourceEntity = restTemplate.exchange(
-			"/resources/{resourcePk}",
-			HttpMethod.PUT,
-			updateEntity,
-			ResourceDTO.class,
-			Collections.singletonMap("resourcePk", createdResource.getPk())
-		);
-		final var updatedResource = updatedResourceEntity.getBody();
+		final var updatedResource = put("/resources/" + createdResource.getPk(), createdResource, ResourceDTO.class);
 
 		// Check that the resource has been updated correctly
 		assertEquals(newTitle, updatedResource.getTitle());
@@ -146,7 +128,7 @@ class ResourceControllerTest extends ControllerTest {
 
 		// Check if the resource has become public
 		clearAuthentication();
-		final var publicResources = executeGetAndReturnBody("/resources/public", type);
+		final var publicResources = get("/resources/public", paginatedResourcesType);
 		assertTrue(
 			publicResources.getObjects().stream()
 				.anyMatch(resource -> resource.getPk().equals(updatedResource.getPk()))

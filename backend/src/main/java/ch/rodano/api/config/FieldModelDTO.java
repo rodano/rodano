@@ -103,7 +103,7 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	/**
 	 * Default constructor, needed by some serializer
 	 */
-	FieldModelDTO() {
+	public FieldModelDTO() {
 
 	}
 

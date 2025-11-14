@@ -5,9 +5,6 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserRightsDTO {
 	@NotNull List<String> readProfilesIds = new ArrayList<>();
 	@NotNull List<String> writeProfilesIds = new ArrayList<>();

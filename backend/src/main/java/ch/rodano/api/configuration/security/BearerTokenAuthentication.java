@@ -1,6 +1,7 @@
 package ch.rodano.api.configuration.security;
 
 import java.io.Serial;
+import java.util.Collections;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
@@ -16,7 +17,7 @@ public class BearerTokenAuthentication extends AbstractAuthenticationToken {
 	 * @param token The bearer token
 	 */
 	public BearerTokenAuthentication(final String token) {
-		super(null);
+		super(Collections.emptyList());
 		credentials = token;
 	}
 

@@ -22,7 +22,7 @@ public class ConfigurationControllerTest extends ControllerTest {
 	@Test
 	@DisplayName("Public study endpoint works")
 	void getPublicStudy() {
-		final var publicStudy = executeGetAndReturnBody("/config/public-study", PublicStudyDTO.class);
+		final var publicStudy = get("/config/public-study", PublicStudyDTO.class);
 		assertNotNull(publicStudy);
 	}
 
@@ -30,7 +30,7 @@ public class ConfigurationControllerTest extends ControllerTest {
 	@DisplayName("Study endpoint works")
 	void getStudy() {
 		authenticate(investigatorOnStudyEmail);
-		final var study = executeGetAndReturnBody("/config/study", StudyDTO.class);
+		final var study = get("/config/study", StudyDTO.class);
 		assertNotNull(study);
 	}
 
@@ -38,39 +38,39 @@ public class ConfigurationControllerTest extends ControllerTest {
 	@DisplayName("Menu configuration endpoint works")
 	void getMenus() {
 		authenticate(investigatorOnStudyEmail);
-		final var result = executeGetAndReturnBody("/config/menu", new ParameterizedTypeReference<List<MenuDTO>>() {});
-		assertNotNull(result);
+		final var menus = get("/config/menu", new ParameterizedTypeReference<List<MenuDTO>>() {});
+		assertNotNull(menus);
 	}
 
 	@Test
 	@DisplayName("Searchable field models endpoint works")
 	void getSearchableFieldModels() {
 		authenticate(investigatorOnStudyEmail);
-		final var result = executeGetAndReturnBody("/config/searchable-field-models", new ParameterizedTypeReference<List<FieldModelDTO>>() {});
-		assertNotNull(result);
+		final var fieldModels = get("/config/searchable-field-models", new ParameterizedTypeReference<List<FieldModelDTO>>() {});
+		assertNotNull(fieldModels);
 	}
 
 	@Test
 	@DisplayName("Event model configuration endpoint works")
 	void getEventModels() {
 		authenticate(adminOnStudyEmail);
-		final var result = executeGetAndReturnBody("/config/event-models", new ParameterizedTypeReference<List<EventModelDTO>>() {});
-		assertNotNull(result);
+		final var eventModels = get("/config/event-models", new ParameterizedTypeReference<List<EventModelDTO>>() {});
+		assertNotNull(eventModels);
 	}
 
 	@Test
 	@DisplayName("Field model configuration endpoint works")
 	void getFieldModels() {
 		authenticate(adminOnStudyEmail);
-		final var result = executeGetAndReturnBody("/config/field-models", new ParameterizedTypeReference<List<FieldModelDTO>>() {});
-		assertNotNull(result);
+		final var fieldModels = get("/config/field-models", new ParameterizedTypeReference<List<FieldModelDTO>>() {});
+		assertNotNull(fieldModels);
 	}
 
 	@Test
 	@DisplayName("Workflow configuration works")
 	void getWorkflows() {
 		authenticate(adminOnStudyEmail);
-		final var result = executeGetAndReturnBody("/config/workflows", new ParameterizedTypeReference<List<WorkflowDTO>>() {});
-		assertNotNull(result);
+		final var workflows = get("/config/workflows", new ParameterizedTypeReference<List<WorkflowDTO>>() {});
+		assertNotNull(workflows);
 	}
 }

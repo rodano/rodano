@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.field.FieldModel;
@@ -29,7 +27,6 @@ import ch.rodano.core.model.rules.Evaluable;
 import ch.rodano.core.model.sql.SQLValue;
 import ch.rodano.core.model.workflow.Workflowable;
 
-@JsonInclude(Include.NON_NULL)
 public class Field extends FieldRecord implements TimestampableObject, PersistentObject, AuditableObject, Serializable, SQLValue, Workflowable, Comparable<Field>, Evaluable {
 	@Serial
 	private static final long serialVersionUID = 6565374409857436890L;

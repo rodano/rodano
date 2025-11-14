@@ -20,17 +20,14 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
@@ -65,13 +62,11 @@ import ch.rodano.configuration.model.validator.Validator;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public final class Study implements Serializable, SuperDisplayable, Node, Comparable<Study> {
 	@Serial
 	private static final long serialVersionUID = -5790468283716242383L;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(Study.class);
+	private final Logger logger = LoggerFactory.getLogger(Study.class);
 
 	public static final Comparator<Study> DEFAULT_COMPARATOR = Comparator.comparing(Study::getId);
 
@@ -85,7 +80,9 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 		PASSWORD_LENGTH_MESSAGES.put(LanguageStatic.en.name(), DEFAULT_PASSWORD_LENGTH_MESSAGE);
 		PASSWORD_LENGTH_MESSAGES.put(LanguageStatic.fr.name(), "Le mot de passe n'est pas assez robuste: il doit contenir au moins %d charactères");
 		PASSWORD_STRENGTH_MESSAGES.put(LanguageStatic.en.name(), DEFAULT_PASSWORD_STRENGTH_MESSAGE);
-		PASSWORD_STRENGTH_MESSAGES.put(LanguageStatic.fr.name(), ", une majuscule, un chiffre et un des caractères parmi la liste suivante : ! \\ \" # $ % & ' ( ) * + , - . / : ; < = > ? @ [ ] ^ _ `");
+		PASSWORD_STRENGTH_MESSAGES.put(
+			LanguageStatic.fr.name(), ", une majuscule, un chiffre et un des caractères parmi la liste suivante : ! \\ \" # $ % & ' ( ) * + , - . / : ; < = > ? @ [ ] ^ _ `"
+		);
 	}
 
 	private String id;
@@ -1126,13 +1123,13 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonAnySetter
 	public void setAnySetter(final String key, final Object value) {
 		if(!"className".equals(key) && !"ruleDefinitionProperties".equals(key) && !"ruleDefinitionActions".equals(key)) {
-			LOGGER.error("Unknown property {} (value {}) in class {}", key, value, getClassName());
+			logger.error("Unknown property {} (value {}) in class {}", key, value, getClassName());
 		}
 	}
 
 	@JsonIgnore
 	public String generateFilename(final String filename) {
-		final var studyLabel = StringUtils.replace(getDefaultLocalizedShortname().toLowerCase(), " ", "_");
+		final var studyLabel = Strings.CS.replace(getDefaultLocalizedShortname().toLowerCase(), " ", "_");
 		final var date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 		return String.format("%s_%s_%s", studyLabel, filename, date);
 	}

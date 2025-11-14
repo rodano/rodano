@@ -9,9 +9,6 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
@@ -19,8 +16,6 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.rights.Assignable;
 import ch.rodano.configuration.model.study.Study;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class ResourceCategory implements Serializable, SuperDisplayable, Assignable<ResourceCategory>, Node {
 	@Serial
 	private static final long serialVersionUID = -813476290184481379L;

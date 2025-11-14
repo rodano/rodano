@@ -36,7 +36,7 @@ public class SecurityConfiguration {
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+	public SecurityFilterChain filterChain(final HttpSecurity http) {
 		http
 			//disable cross site request forging protection
 			.csrf(

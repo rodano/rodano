@@ -2,28 +2,22 @@ package ch.rodano.api.authentication;
 
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.Hidden;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class AuthenticationDTO {
-	@NotNull private String token;
-	@Hidden private String tsKey;
-
-	/**
-	 * Default constructor, needed by some serializer
-	 */
-	AuthenticationDTO() {
-
-	}
+	@NotNull
+	private String token;
+	@Hidden
+	private String tsKey;
 
 	/**
 	 * Constructor
 	 *
 	 * @param token The token
 	 */
-	public AuthenticationDTO(final String token) {
+	public AuthenticationDTO(@JsonProperty("token") final String token) {
 		this.token = token;
 	}
 

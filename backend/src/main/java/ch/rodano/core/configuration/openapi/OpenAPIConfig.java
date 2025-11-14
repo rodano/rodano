@@ -36,6 +36,7 @@ public class OpenAPIConfig {
 		this.buildProperties = buildProperties;
 	}
 
+	// TODO migrate to Jackson 3
 	@Bean
 	public ModelConverter modelConverter(final ObjectMapper objectMapper) {
 		return new ModelResolver(objectMapper) {

@@ -15,7 +15,7 @@ import ch.rodano.configuration.model.field.FieldModelType;
 import ch.rodano.configuration.model.field.PartialDate;
 
 public class DateValidator implements ValueFormatValidator {
-	private static final Logger LOGGER = LoggerFactory.getLogger(DateValidator.class);
+	private final Logger logger = LoggerFactory.getLogger(DateValidator.class);
 
 	public static final PartialDate DATE_1900 = PartialDate.of(1900);
 
@@ -123,7 +123,7 @@ public class DateValidator implements ValueFormatValidator {
 			return new ValueCheck(value);
 		}
 		catch(final DateTimeException e) {
-			LOGGER.error("Unable to parse {} with formatter {} due to: {}", value, fieldModel.getInlineHelpOrFormat(), e.getLocalizedMessage());
+			logger.error("Unable to parse {} with formatter {} due to: {}", value, fieldModel.getInlineHelpOrFormat(), e.getLocalizedMessage());
 			return InvalidDate.invalidDateFormat(fieldModel.getInlineHelpOrFormat());
 		}
 	}

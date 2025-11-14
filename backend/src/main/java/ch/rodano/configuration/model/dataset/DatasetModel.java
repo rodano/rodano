@@ -14,10 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Entity;
@@ -34,8 +31,6 @@ import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class DatasetModel implements Serializable, SuperDisplayable, Node, RightAssignable<DatasetModel> {
 	@Serial
 	private static final long serialVersionUID = 3650259090775513476L;

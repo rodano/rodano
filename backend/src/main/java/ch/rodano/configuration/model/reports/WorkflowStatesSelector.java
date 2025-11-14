@@ -6,15 +6,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class WorkflowStatesSelector implements Node {
 	@Serial
 	private static final long serialVersionUID = -1703578816489405753L;

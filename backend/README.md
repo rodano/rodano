@@ -4,8 +4,8 @@ The backend of Rodano. In addition to the API, it is able to initialize and migr
 
 ## System Requirements
 
-* JDK 23
-* Maven 3.8.6
+* JDK 25
+* Maven 3.9.0
 * MariaDB 12.0
 
 ## Profiles

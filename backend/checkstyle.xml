@@ -56,7 +56,7 @@
 		<module name="AvoidStarImport"/>
 		<module name="IllegalImport"/>
 		<module name="ImportOrder">
-			<property name="groups" value="/^java\./,javax,jakarta,org,com,io,freemarker"/>
+			<property name="groups" value="/^java\./,javax,jakarta,org,com,io,freemarker,tools"/>
 			<property name="ordered" value="true"/>
 			<property name="separated" value="true"/>
 			<property name="separatedStaticGroups" value="true"/>

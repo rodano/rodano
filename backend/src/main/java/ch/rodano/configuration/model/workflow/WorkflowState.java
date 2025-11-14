@@ -13,16 +13,11 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class WorkflowState implements Serializable, SuperDisplayable, Node, Comparable<WorkflowState> {
 	@Serial
 	private static final long serialVersionUID = 8285922897928637570L;

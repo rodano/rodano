@@ -7,10 +7,6 @@ import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 import ch.rodano.api.actor.RobotCreationDTO;
 import ch.rodano.api.actor.RobotDTO;
@@ -34,20 +30,9 @@ public class RobotControllerTest extends ControllerTest {
 		authenticate(adminOnStudyEmail);
 
 		// look for robots
-		final var response = restTemplate.exchange(
-			"/robots?pageSize={pageSize}&pageIndex={pageIndex}",
-			HttpMethod.GET,
-			null,
-			PagedResult.class,
-			Map.of(
-				"pageSize", MAX_PAGE_SIZE,
-				"pageIndex", 0
-			)
-		);
-
-		// get some results
-		assertEquals(HttpStatus.OK, response.getStatusCode());
-		assertTrue(response.getBody().getObjects().size() > 0);
+		final var uri = "/robots?pageSize={pageSize}&pageIndex={pageIndex}";
+		final var robots = client.get().uri(uri, MAX_PAGE_SIZE, 0).exchange().expectStatus().isOk().expectBody(PagedResult.class).returnResult().getResponseBody();
+		assertTrue(robots.getObjects().size() > 0);
 	}
 
 	@Test
@@ -58,11 +43,7 @@ public class RobotControllerTest extends ControllerTest {
 
 		// try to create a robot
 		final var robotCreationDTO = createRobotDTO(Optional.empty(), Optional.empty());
-		final var robotCreationEntity = new HttpEntity<>(robotCreationDTO);
-		final var response = executePost("/robots", robotCreationEntity, RobotDTO.class);
-
-		// must fail
-		assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+		client.post().uri("/robots").body(robotCreationDTO).exchange().expectStatus().isUnauthorized();
 	}
 
 	@Test
@@ -71,29 +52,22 @@ public class RobotControllerTest extends ControllerTest {
 		// login as an admin
 		authenticate(adminOnStudyEmail);
 
-		// try to create a robot
-		final var responseBody = postNewRobotAndReturnBody(Optional.of("TestBot"), Optional.empty());
+		// create a robot
+		final var robotDTO = createRobotDTO(Optional.of("TestBot"), Optional.empty());
+		final var createdRobot = post("/robots", robotDTO, RobotDTO.class);
 
 		// should succeed
-		assertEquals(1, responseBody.getRoles().size());
-		assertEquals(studyService.getStudy().getEproProfileId(), responseBody.getRoles().get(0).getProfileId());
-		assertEquals("TestBot", responseBody.getName());
-		assertNotNull(responseBody.getKey());
+		assertEquals(1, createdRobot.getRoles().size());
+		assertEquals(studyService.getStudy().getEproProfileId(), createdRobot.getRoles().get(0).getProfileId());
+		assertEquals("TestBot", createdRobot.getName());
+		assertNotNull(createdRobot.getKey());
 
 		// we should be able to find the created robot using GET
-		final var robotPk = responseBody.getPk();
-		final var getRobotResponse = restTemplate.exchange(
-			"/robots/{robotPk}",
-			HttpMethod.GET,
-			null,
-			RobotDTO.class,
-			Map.of(
-				"robotPk", robotPk
-			)
-		);
+		final var robotPk = createdRobot.getPk();
+		final var robot = client.get().uri("/robots/{robotPk}", Map.of("robotPk", robotPk)).exchange().expectStatus().isOk().expectBody(RobotDTO.class).returnResult().getResponseBody();
 
-		assertEquals(HttpStatus.OK, getRobotResponse.getStatusCode());
-		assertEquals(robotPk, getRobotResponse.getBody().getPk());
+		assertEquals(robotPk, robot.getPk());
+		assertEquals("TestBot", robot.getName());
 	}
 
 	@Test
@@ -102,14 +76,12 @@ public class RobotControllerTest extends ControllerTest {
 		// login as an admin
 		authenticate(adminOnStudyEmail);
 
-		final var robotName = "Terminattore";
-		// create a robot
-		postNewRobotAndReturnBody(Optional.of(robotName), Optional.empty());
+		final var robotName = Optional.of("Terminattore");
 
-		// create a second robot with the same name
-		final var duplicateRobotResponse = postNewRobot(Optional.of(robotName), Optional.empty());
+		final var robotDTO = createRobotDTO(robotName, Optional.empty());
+		post("/robots", robotDTO, RobotDTO.class);
 
-		assertEquals(HttpStatus.BAD_REQUEST, duplicateRobotResponse.getStatusCode());
+		client.post().uri("/robots").body(robotDTO).exchange().expectStatus().isBadRequest();
 	}
 
 	@Test
@@ -119,7 +91,8 @@ public class RobotControllerTest extends ControllerTest {
 		authenticate(adminOnStudyEmail);
 
 		// create a robot
-		final var robotDTO = postNewRobotAndReturnBody(Optional.empty(), Optional.empty());
+		final var robotDTO = createRobotDTO(Optional.empty(), Optional.empty());
+		final var createdRobot = post("/robots", robotDTO, RobotDTO.class);
 
 		// modify the created robot
 		final var newName = "UpdatedBot";
@@ -127,11 +100,11 @@ public class RobotControllerTest extends ControllerTest {
 		final var robotUpdateDTO = new RobotUpdateDTO(newName, newKey);
 
 		// this change should not be taken into account
-		robotDTO.setRoles(Collections.emptyList());
+		createdRobot.setRoles(Collections.emptyList());
 
 		// update the robot
-		final var updatedRobotResponse = testRobotUpdate(robotDTO.getPk(), robotUpdateDTO);
-		final var updatedRobot = updatedRobotResponse.getBody();
+		final var updatedRobot = client.put().uri("/robots/{robotPk}", Map.of("robotPk", createdRobot.getPk())).body(robotUpdateDTO).exchange().expectBody(RobotDTO.class).returnResult()
+			.getResponseBody();
 
 		// check that the robot has been modified correctly
 		assertEquals(newName, updatedRobot.getName());
@@ -148,36 +121,17 @@ public class RobotControllerTest extends ControllerTest {
 		authenticate(adminOnStudyEmail);
 
 		// create a robot and get its key
-		final var robotResponse = postNewRobot(Optional.of("NewBot"), Optional.empty());
-
-		assertEquals(HttpStatus.CREATED, robotResponse.getStatusCode());
-
-		final var key = robotResponse.getBody().getKey();
+		final var robotDTO1 = createRobotDTO(Optional.of("NewBot"), Optional.empty());
+		final var createdRobot1 = post("/robots", robotDTO1, RobotDTO.class);
+		final var key = createdRobot1.getKey();
 
 		// create another robot
-		final var secondRobotDTO = postNewRobotAndReturnBody(Optional.of("NewerBot"), Optional.empty());
+		final var robotDTO2 = createRobotDTO(Optional.of("NewerBot"), Optional.empty());
+		final var createdRobot2 = post("/robots", robotDTO2, RobotDTO.class);
 
 		// try to update the second robot with an already used key
-		final var secondRobotUpdateDTO = new RobotUpdateDTO(secondRobotDTO.getName(), key);
-		final var updatedRobotResponse = testRobotUpdate(secondRobotDTO.getPk(), secondRobotUpdateDTO);
-
-		assertEquals(HttpStatus.BAD_REQUEST, updatedRobotResponse.getStatusCode());
-	}
-
-	private RobotDTO postNewRobotAndReturnBody(
-		final Optional<String> name,
-		final Optional<String> key
-	) {
-		return postNewRobot(name, key).getBody();
-	}
-
-	private ResponseEntity<RobotDTO> postNewRobot(
-		final Optional<String> name,
-		final Optional<String> key
-	) {
-		final var robotCreationDTO = createRobotDTO(name, key);
-		final var robotCreationEntity = new HttpEntity<>(robotCreationDTO);
-		return executePost("/robots", robotCreationEntity, RobotDTO.class);
+		final var robotDTO3 = new RobotUpdateDTO(createdRobot2.getName(), key);
+		client.put().uri("/robots/{robotPk}", Map.of("robotPk", createdRobot2.getPk())).body(robotDTO3).exchange().expectStatus().isBadRequest();
 	}
 
 	private RobotCreationDTO createRobotDTO(
@@ -189,25 +143,12 @@ public class RobotControllerTest extends ControllerTest {
 		roleCreationDTO.setScopePk(1L);
 		roleCreationDTO.setProfileId(profile.getId());
 
-		final var robotName = name.orElseGet(() -> RandomStringUtils.randomAlphanumeric(10));
+		final var robotName = name.orElseGet(() -> RandomStringUtils.secure().nextAlphanumeric(10));
 
 		return new RobotCreationDTO(
 			robotName,
 			roleCreationDTO,
 			key.orElse(null)
-		);
-	}
-
-	private ResponseEntity<RobotDTO> testRobotUpdate(final Long robotPk, final RobotUpdateDTO robotDTO) {
-		final var robotEntity = new HttpEntity<>(robotDTO);
-		return restTemplate.exchange(
-			"/robots/{robotPk}",
-			HttpMethod.PUT,
-			robotEntity,
-			RobotDTO.class,
-			Map.of(
-				"robotPk", robotPk
-			)
 		);
 	}
 }
