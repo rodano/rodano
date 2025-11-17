@@ -428,9 +428,7 @@ public class UserSecurityService {
 		//user password is too old and must be changed
 		if(study.getPasswordValidityDuration() > 0) {
 			final var passwordChangedDate = user.getPasswordChangedDate().plusDays(study.getPasswordValidityDuration());
-			if(passwordChangedDate.isBefore(ZonedDateTime.now())) {
-				return true;
-			}
+			return passwordChangedDate.isBefore(ZonedDateTime.now());
 		}
 
 		return false;
@@ -450,9 +448,9 @@ public class UserSecurityService {
 		if(!user.isActivated()) {
 			final var mail = new DefinedTemplatedMail(
 				MailTemplate.VALIDATE_REGISTRATION_FIRST, Map.ofEntries(
-					Map.entry("study", study),
-					Map.entry("user", user)
-				)
+				Map.entry("study", study),
+				Map.entry("user", user)
+			)
 			);
 			mail.setSender(study.getEmail());
 			mail.setRecipients(Collections.singleton(user.getEmail()));

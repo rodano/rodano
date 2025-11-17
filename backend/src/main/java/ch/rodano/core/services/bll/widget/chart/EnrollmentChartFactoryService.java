@@ -54,10 +54,10 @@ public class EnrollmentChartFactoryService {
 				);
 		}
 		query.where(
-			SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId())
-				.and(SCOPE.DELETED.isFalse())
-				.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
-		)
+				SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId())
+					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
+			)
 			.groupBy(scopeDate)
 			.orderBy(scopeDate);
 

@@ -1,5 +1,25 @@
 package ch.rodano.core.model.graph.timeline;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import io.micrometer.common.util.StringUtils;
+
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.PartialDate;
 import ch.rodano.configuration.model.study.Study;
@@ -12,20 +32,12 @@ import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.event.EventService;
 import ch.rodano.core.services.bll.scope.ScopeRelationService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.apache.commons.lang3.StringUtils;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
-import org.springframework.stereotype.Service;
 
-import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import static ch.rodano.core.model.jooq.tables.Dataset.DATASET;
+import static ch.rodano.core.model.jooq.tables.Event.EVENT;
+import static ch.rodano.core.model.jooq.tables.Field.FIELD;
+import static ch.rodano.core.model.jooq.tables.Form.FORM;
 
-import static ch.rodano.core.model.jooq.Tables.*;
 
 @Service
 public class TimelineServiceImpl implements TimelineService {
@@ -111,9 +123,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 		//retrieve forms by events and form model ids
 		final Map<Long, Map<String, Long>> formsByEventPkAndFormModelId = create.select(
-			FORM.EVENT_FK,
-			DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
-		).from(FORM)
+				FORM.EVENT_FK,
+				DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
+			).from(FORM)
 			.join(EVENT).on(FORM.EVENT_FK.eq(EVENT.PK))
 			.where(EVENT.SCOPE_FK.eq(scope.getPk()))
 			.groupBy(FORM.EVENT_FK)
@@ -331,5 +343,4 @@ public class TimelineServiceImpl implements TimelineService {
 		}
 		return instance;
 	}
-
 }

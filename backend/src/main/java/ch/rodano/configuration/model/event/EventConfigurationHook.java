@@ -70,11 +70,7 @@ public class EventConfigurationHook implements Serializable {
 	@JsonAnySetter
 	public final void setAnySetter(final String key, final Object value) {
 		if(!"entity".equals(key)) {
-			final var message = new StringBuilder("EventConfigurationHook - Unknown property : ");
-			message.append(key);
-			message.append(" - ");
-			message.append(value);
-			LOGGER.error(message.toString());
+			LOGGER.error("EventConfigurationHook - Unknown property : key={}, value={}", key, value);
 		}
 	}
 }

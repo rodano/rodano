@@ -203,9 +203,9 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		final var now = ZonedDateTime.now();
 
 		final var query = create.selectDistinct(
-			WORKFLOW_STATUS.asterisk(),
-			DSL.count().over().as("total")
-		)
+				WORKFLOW_STATUS.asterisk(),
+				DSL.count().over().as("total")
+			)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(SCOPE_ANCESTOR).on(
 				WORKFLOW_STATUS.SCOPE_FK.eq(SCOPE_ANCESTOR.SCOPE_FK)
@@ -260,7 +260,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 		final var result = query.fetch();
 		var total = 0;
-		if(result.size() > 0) {
+		if(!result.isEmpty()) {
 			total = result.getFirst().getValue("total", Integer.class);
 		}
 

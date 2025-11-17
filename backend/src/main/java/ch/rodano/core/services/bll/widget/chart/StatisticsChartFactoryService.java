@@ -164,7 +164,7 @@ public class StatisticsChartFactoryService {
 					}
 				}
 				//values can be empty if the result contains only the NULL or BLANK value
-				if(values.size() > 0) {
+				if(!values.isEmpty()) {
 					statistics = new Statistics(values);
 				}
 			}

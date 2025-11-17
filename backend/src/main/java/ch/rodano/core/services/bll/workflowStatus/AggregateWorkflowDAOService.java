@@ -149,27 +149,27 @@ public class AggregateWorkflowDAOService {
 		}
 
 		return create.select(
-			//select min(ws.pk) as aggregated workflow state pk
-			//the goal is to be able to identify aggregated workflow status with a stable identifier
-			//for example, this allows to use "distinct" on queries the aggregated workflow table
-			//the columns are aliases as workflow status native columns to make the resulting rows look like rows from the real workflow status table
-			DSL.min(WORKFLOW_STATUS.PK).as(WORKFLOW_STATUS.PK),
-			DSL.min(WORKFLOW_STATUS.CREATION_TIME).as(WORKFLOW_STATUS.CREATION_TIME),
-			DSL.max(WORKFLOW_STATUS.LAST_UPDATE_TIME).as(WORKFLOW_STATUS.LAST_UPDATE_TIME),
-			DSL.inline(false, WORKFLOW_STATUS.DELETED).as(WORKFLOW_STATUS.DELETED),
-			WORKFLOW_STATUS.SCOPE_FK,
-			DSL.inline(null, WORKFLOW_STATUS.EVENT_FK).as(WORKFLOW_STATUS.EVENT_FK),
-			DSL.inline(null, WORKFLOW_STATUS.FORM_FK).as(WORKFLOW_STATUS.FORM_FK),
-			DSL.inline(null, WORKFLOW_STATUS.FIELD_FK).as(WORKFLOW_STATUS.FIELD_FK),
-			DSL.inline(null, WORKFLOW_STATUS.USER_FK).as(WORKFLOW_STATUS.USER_FK),
-			DSL.inline(null, WORKFLOW_STATUS.ROBOT_FK).as(WORKFLOW_STATUS.ROBOT_FK),
-			DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
-			stateCases.as("state_id"),
-			workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
-			DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
-			DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
-			DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
-		)
+				//select min(ws.pk) as aggregated workflow state pk
+				//the goal is to be able to identify aggregated workflow status with a stable identifier
+				//for example, this allows to use "distinct" on queries the aggregated workflow table
+				//the columns are aliases as workflow status native columns to make the resulting rows look like rows from the real workflow status table
+				DSL.min(WORKFLOW_STATUS.PK).as(WORKFLOW_STATUS.PK),
+				DSL.min(WORKFLOW_STATUS.CREATION_TIME).as(WORKFLOW_STATUS.CREATION_TIME),
+				DSL.max(WORKFLOW_STATUS.LAST_UPDATE_TIME).as(WORKFLOW_STATUS.LAST_UPDATE_TIME),
+				DSL.inline(false, WORKFLOW_STATUS.DELETED).as(WORKFLOW_STATUS.DELETED),
+				WORKFLOW_STATUS.SCOPE_FK,
+				DSL.inline(null, WORKFLOW_STATUS.EVENT_FK).as(WORKFLOW_STATUS.EVENT_FK),
+				DSL.inline(null, WORKFLOW_STATUS.FORM_FK).as(WORKFLOW_STATUS.FORM_FK),
+				DSL.inline(null, WORKFLOW_STATUS.FIELD_FK).as(WORKFLOW_STATUS.FIELD_FK),
+				DSL.inline(null, WORKFLOW_STATUS.USER_FK).as(WORKFLOW_STATUS.USER_FK),
+				DSL.inline(null, WORKFLOW_STATUS.ROBOT_FK).as(WORKFLOW_STATUS.ROBOT_FK),
+				DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
+				stateCases.as("state_id"),
+				workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
+				DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
+				DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
+				DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
+			)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(EVENT).on(WORKFLOW_STATUS.EVENT_FK.eq(EVENT.PK))
 			.leftJoin(FIELD).on(WORKFLOW_STATUS.FIELD_FK.eq(FIELD.PK))
@@ -194,9 +194,7 @@ public class AggregateWorkflowDAOService {
 		//select only workflow that could be aggregated
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflows.stream().map(Workflow::getAggregateWorkflowId).toList()));
 
-		if(eventPks.isPresent()) {
-			conditions.add(WORKFLOW_STATUS.EVENT_FK.in(eventPks.get()));
-		}
+		eventPks.ifPresent(longs -> conditions.add(WORKFLOW_STATUS.EVENT_FK.in(longs)));
 
 		//exclude workflow states on scope (hence those with a null event fk)
 		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNotNull());
@@ -217,27 +215,27 @@ public class AggregateWorkflowDAOService {
 		}
 
 		return create.select(
-			//select min(ws.pk) as aggregated workflow state pk
-			//the goal is to be able to identify aggregated workflow status with a stable identifier
-			//for example, this allows to use "distinct" on queries the aggregated workflow table
-			//the columns are aliases as workflow status native columns to make the resulting rows look like rows from the real workflow status table
-			DSL.min(WORKFLOW_STATUS.PK).as(WORKFLOW_STATUS.PK),
-			DSL.min(WORKFLOW_STATUS.CREATION_TIME).as(WORKFLOW_STATUS.CREATION_TIME),
-			DSL.max(WORKFLOW_STATUS.LAST_UPDATE_TIME).as(WORKFLOW_STATUS.LAST_UPDATE_TIME),
-			DSL.inline(false, WORKFLOW_STATUS.DELETED).as(WORKFLOW_STATUS.DELETED),
-			WORKFLOW_STATUS.SCOPE_FK,
-			WORKFLOW_STATUS.EVENT_FK,
-			DSL.inline(null, WORKFLOW_STATUS.FORM_FK).as(WORKFLOW_STATUS.FORM_FK),
-			DSL.inline(null, WORKFLOW_STATUS.FIELD_FK).as(WORKFLOW_STATUS.FIELD_FK),
-			DSL.inline(null, WORKFLOW_STATUS.USER_FK).as(WORKFLOW_STATUS.USER_FK),
-			DSL.inline(null, WORKFLOW_STATUS.ROBOT_FK).as(WORKFLOW_STATUS.ROBOT_FK),
-			DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
-			stateCases.as("state_id"),
-			workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
-			DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
-			DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
-			DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
-		)
+				//select min(ws.pk) as aggregated workflow state pk
+				//the goal is to be able to identify aggregated workflow status with a stable identifier
+				//for example, this allows to use "distinct" on queries the aggregated workflow table
+				//the columns are aliases as workflow status native columns to make the resulting rows look like rows from the real workflow status table
+				DSL.min(WORKFLOW_STATUS.PK).as(WORKFLOW_STATUS.PK),
+				DSL.min(WORKFLOW_STATUS.CREATION_TIME).as(WORKFLOW_STATUS.CREATION_TIME),
+				DSL.max(WORKFLOW_STATUS.LAST_UPDATE_TIME).as(WORKFLOW_STATUS.LAST_UPDATE_TIME),
+				DSL.inline(false, WORKFLOW_STATUS.DELETED).as(WORKFLOW_STATUS.DELETED),
+				WORKFLOW_STATUS.SCOPE_FK,
+				WORKFLOW_STATUS.EVENT_FK,
+				DSL.inline(null, WORKFLOW_STATUS.FORM_FK).as(WORKFLOW_STATUS.FORM_FK),
+				DSL.inline(null, WORKFLOW_STATUS.FIELD_FK).as(WORKFLOW_STATUS.FIELD_FK),
+				DSL.inline(null, WORKFLOW_STATUS.USER_FK).as(WORKFLOW_STATUS.USER_FK),
+				DSL.inline(null, WORKFLOW_STATUS.ROBOT_FK).as(WORKFLOW_STATUS.ROBOT_FK),
+				DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
+				stateCases.as("state_id"),
+				workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
+				DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
+				DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
+				DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
+			)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(FIELD).on(WORKFLOW_STATUS.FIELD_FK.eq(FIELD.PK))
 			.leftJoin(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))

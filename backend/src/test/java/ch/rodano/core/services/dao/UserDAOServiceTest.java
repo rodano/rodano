@@ -107,7 +107,7 @@ public class UserDAOServiceTest extends DatabaseTest {
 		predicate.enforceProfileIds(profileIds);
 		predicate.enforceEnabled(true);
 
-		final var userEmails = userDAOService.search(predicate).getObjects().stream().map(User::getEmail).collect(Collectors.toList());
+		final var userEmails = userDAOService.search(predicate).getObjects().stream().map(User::getEmail).toList();
 
 		assertAll(
 			"Find all the investigators on study and descendants",
@@ -127,7 +127,7 @@ public class UserDAOServiceTest extends DatabaseTest {
 		predicate.enforceProfileIds(Collections.singleton("ADMIN"));
 		predicate.enforceEnabled(true);
 
-		final var userEmails = userDAOService.search(predicate).getObjects().stream().map(User::getEmail).collect(Collectors.toList());
+		final var userEmails = userDAOService.search(predicate).getObjects().stream().map(User::getEmail).toList();
 
 		assertAll(
 			"Find all the administrators on study and descendants",

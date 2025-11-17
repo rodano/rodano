@@ -53,8 +53,8 @@ public class DocumentHelper {
 
 	public static Element appendSimpleChildren(final Element element, final Map<String, String> children) {
 		children.entrySet().stream()
-		.map(e -> createElement(element.getOwnerDocument(), e.getKey(), e.getValue()))
-		.forEach(element::appendChild);
+			.map(e -> createElement(element.getOwnerDocument(), e.getKey(), e.getValue()))
+			.forEach(element::appendChild);
 		return element;
 	}
 

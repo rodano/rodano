@@ -21,18 +21,23 @@ public class SelectionNode implements Node {
 	public Entity getNodeEntity() {
 		return nodeEntity;
 	}
+
 	public void setNodeEntity(final Entity nodeEntity) {
 		this.nodeEntity = nodeEntity;
 	}
+
 	public String getNodeId() {
 		return nodeId;
 	}
+
 	public void setNodeId(final String id) {
 		this.nodeId = id;
 	}
+
 	public List<SelectionNode> getSelections() {
 		return selections;
 	}
+
 	public void setSelections(final List<SelectionNode> selections) {
 		this.selections = selections;
 	}

@@ -85,7 +85,7 @@ public class ResourceDAOServiceImpl extends AbstractDAOService<Resource, Resourc
 
 		final var result = query.fetch();
 		var total = 0;
-		if(result.size() > 0) {
+		if(!result.isEmpty()) {
 			total = result.getFirst().getValue("total", Integer.class);
 		}
 

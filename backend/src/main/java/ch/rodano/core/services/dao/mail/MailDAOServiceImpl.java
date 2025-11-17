@@ -164,7 +164,7 @@ public class MailDAOServiceImpl extends AbstractDAOService<Mail, MailRecord> imp
 
 		final var result = query.fetch();
 		var total = 0;
-		if(result.size() > 0) {
+		if(!result.isEmpty()) {
 			total = result.getFirst().getValue("total", Integer.class);
 		}
 

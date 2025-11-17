@@ -19,7 +19,7 @@ public final class Utils {
 	public static String implodeForSQL(final Collection<?> items) {
 		final var sql = new StringBuilder();
 		for(final Object item : items) {
-			if(sql.length() > 0) {
+			if(!sql.isEmpty()) {
 				sql.append(",");
 			}
 			final var value = item.toString();
@@ -36,10 +36,10 @@ public final class Utils {
 	}
 
 	public static String replaceText(final String text, final Map<String, String> replacements) {
-		if(text == null || text.trim().length() == 0) {
+		if(text == null || text.trim().isEmpty()) {
 			return "";
 		}
-		final var replacedText = new StringBuffer();
+		final var replacedText = new StringBuilder();
 		final var regexMatcher = REGEX.matcher(text);
 		while(regexMatcher.find()) {
 			regexMatcher.appendReplacement(replacedText, replacements.getOrDefault(regexMatcher.group(1), "NA"));
