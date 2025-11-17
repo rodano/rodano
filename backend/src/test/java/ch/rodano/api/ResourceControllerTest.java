@@ -19,6 +19,7 @@ import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,7 +46,7 @@ class ResourceControllerTest extends ControllerTest {
 	@DisplayName("Anyone can access public resources")
 	public void publicResourcesReachable() {
 		final var response = executeGet("/resources/public", type);
-		assertTrue(response.getBody().getObjects().size() > 0);
+		assertFalse(response.getBody().getObjects().isEmpty());
 		assertEquals(HttpStatus.OK, response.getStatusCode());
 	}
 

@@ -169,7 +169,7 @@ public class EventServiceTest extends DatabaseTest {
 		final var patientCode = scopeService.getNextCode(patientModel, center);
 		final var patient = scopeCreatorService.createScope(new ScopeBuilder(context).createScope(patientModel, center, patientCode));
 
-		assertEquals(eventService.get(patient, getVisit6Event(), 0).getEventModelId(), "VISIT_6");
+		assertEquals("VISIT_6", eventService.get(patient, getVisit6Event(), 0).getEventModel().getId());
 
 		//first event
 		final var firstEvent = eventService.get(patient, getBaselineEvent(), 0);
@@ -410,7 +410,7 @@ public class EventServiceTest extends DatabaseTest {
 
 		//create telephone event group
 		final var visit = eventService.create(patient, getTelephoneEvent(), context, TEST_RATIONALE);
-		assertEquals(visit.getEventModelId(), "TELEPHONE_VISIT");
+		assertEquals("TELEPHONE_VISIT", visit.getEventModel().getId());
 
 		//check that telephone event can be added
 		assertTrue(eventService.getEventModels(patient).contains(getTelephoneEvent()));

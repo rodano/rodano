@@ -1,8 +1,5 @@
 package ch.rodano.configuration.model.event;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
@@ -13,6 +10,9 @@ import org.junit.jupiter.api.Test;
 
 import ch.rodano.configuration.builder.StudyBuilder;
 import ch.rodano.configuration.model.language.LanguageStatic;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Tag("configuration")
 public class EventTest {
