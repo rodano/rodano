@@ -367,20 +367,15 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	//assignable
 	@JsonIgnore
 	public SortedSet<String> getAssignableIds(final Entity entity) {
-		switch(entity) {
-			case FEATURE:
-				return getGrantedFeatureIds();
-			case REPORT:
-				return getGrantedReportIds();
-			case MENU:
-				return getGrantedMenuIds();
-			case RESOURCE_CATEGORY:
-				return getGrantedCategoryIds();
-			case TIMELINE_GRAPH:
-				return getGrantedTimelineGraphIds();
-			default:
+		return switch(entity) {
+			case FEATURE -> getGrantedFeatureIds();
+			case REPORT -> getGrantedReportIds();
+			case MENU -> getGrantedMenuIds();
+			case RESOURCE_CATEGORY -> getGrantedCategoryIds();
+			case TIMELINE_GRAPH -> getGrantedTimelineGraphIds();
+			default ->
 				throw new UnsupportedOperationException(String.format("%s is not an assignable entity", entity.getId()));
-		}
+		};
 	}
 
 	@JsonIgnore
@@ -396,22 +391,16 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	//right assignable
 	@JsonIgnore
 	public Map<String, Set<Rights>> getEnumRightMatrixIds(final Entity entity) {
-		switch(entity) {
-			case DATASET_MODEL:
-				return grantedDatasetModelIdRights;
-			case FORM_MODEL:
-				return grantedFormModelIdRights;
-			case PROFILE:
-				return grantedProfileIdRights;
-			case SCOPE_MODEL:
-				return grantedScopeModelIdRights;
-			case PAYMENT_PLAN:
-				return grantedPaymentIdRights;
-			case EVENT_MODEL:
-				return grantedEventModelIdRights;
-			default:
+		return switch(entity) {
+			case DATASET_MODEL -> grantedDatasetModelIdRights;
+			case FORM_MODEL -> grantedFormModelIdRights;
+			case PROFILE -> grantedProfileIdRights;
+			case SCOPE_MODEL -> grantedScopeModelIdRights;
+			case PAYMENT_PLAN -> grantedPaymentIdRights;
+			case EVENT_MODEL -> grantedEventModelIdRights;
+			default ->
 				throw new UnsupportedOperationException(String.format("%s is not a right assignable entity", entity.getId()));
-		}
+		};
 	}
 
 	@JsonIgnore

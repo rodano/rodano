@@ -447,15 +447,11 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 	@JsonIgnore
 	@Override
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case DATASET_MODEL:
-				return Collections.unmodifiableList(getDatasetModels());
-			case FORM_MODEL:
-				return Collections.unmodifiableList(getFormModels());
-			case WORKFLOW:
-				return Collections.unmodifiableList(getWorkflows());
-			default:
-				return Collections.emptyList();
-		}
+		return switch(entity) {
+			case DATASET_MODEL -> Collections.unmodifiableList(getDatasetModels());
+			case FORM_MODEL -> Collections.unmodifiableList(getFormModels());
+			case WORKFLOW -> Collections.unmodifiableList(getWorkflows());
+			default -> Collections.emptyList();
+		};
 	}
 }

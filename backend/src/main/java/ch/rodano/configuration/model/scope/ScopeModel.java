@@ -498,16 +498,12 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	@Override
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case SCOPE_MODEL:
-				return Collections.unmodifiableList(getChildrenScopeModel());
-			case EVENT_GROUP:
-				return Collections.unmodifiableList(getEventGroups());
-			case EVENT_MODEL:
-				return Collections.unmodifiableList(getEventModels());
-			default:
-				return Collections.emptyList();
-		}
+		return switch(entity) {
+			case SCOPE_MODEL -> Collections.unmodifiableList(getChildrenScopeModel());
+			case EVENT_GROUP -> Collections.unmodifiableList(getEventGroups());
+			case EVENT_MODEL -> Collections.unmodifiableList(getEventModels());
+			default -> Collections.emptyList();
+		};
 	}
 
 	@JsonIgnore

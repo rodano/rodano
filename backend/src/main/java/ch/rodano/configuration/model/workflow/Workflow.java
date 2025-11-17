@@ -299,7 +299,7 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 			Entity.EVENT_MODEL, study.getEventModels().stream().filter(hasWorkflow).collect(Collectors.toList()),
 			Entity.FORM_MODEL, study.getFormModels().stream().filter(hasWorkflow).collect(Collectors.toList()),
 			Entity.FIELD_MODEL, study.getFieldModels().stream().filter(hasWorkflow).collect(Collectors.toList())
-			);
+		);
 	}
 
 	@JsonIgnore
@@ -328,13 +328,10 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	@Override
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case WORKFLOW_STATE:
-				return Collections.unmodifiableList(states);
-			case ACTION:
-				return Collections.unmodifiableSet(actions);
-			default:
-				return Collections.emptyList();
-		}
+		return switch(entity) {
+			case WORKFLOW_STATE -> Collections.unmodifiableList(states);
+			case ACTION -> Collections.unmodifiableSet(actions);
+			default -> Collections.emptyList();
+		};
 	}
 }

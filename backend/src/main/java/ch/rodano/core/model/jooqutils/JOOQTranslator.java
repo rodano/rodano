@@ -22,46 +22,33 @@ public class JOOQTranslator {
 
 	public static Condition translate(final Operator operator, final FieldModel fieldModel, final Field<String> sqlField, final String criterionValue) {
 		final var sqlValue = DSL.value(criterionValue);
-		switch(operator) {
-			case EQUALS:
-				return sqlField.eq(criterionValue);
-			case NOT_EQUALS:
-				return sqlField.ne(criterionValue);
-			case CONTAINS:
-				return sqlField.contains(criterionValue);
-			case NOT_CONTAINS:
-				return sqlField.notContains(criterionValue);
-			case LOWER:
-				return castSQLField(fieldModel, sqlField).lessThan(castSQLField(fieldModel, sqlValue));
-			case GREATER:
-				return castSQLField(fieldModel, sqlField).greaterThan(castSQLField(fieldModel, sqlValue));
-			case LOWER_EQUALS:
-				return castSQLField(fieldModel, sqlField).lessOrEqual(castSQLField(fieldModel, sqlValue));
-			case GREATER_EQUALS:
-				return castSQLField(fieldModel, sqlField).greaterOrEqual(castSQLField(fieldModel, sqlValue));
-			case NULL:
-				return sqlField.isNull();
-			case NOT_NULL:
-				return sqlField.isNotNull();
-			case BLANK:
-				return sqlField.isNull().or(sqlField.like(""));
-			case NOT_BLANK:
-				return sqlField.isNotNull().and(sqlField.notLike(""));
-			default:
+		return switch(operator) {
+			case EQUALS -> sqlField.eq(criterionValue);
+			case NOT_EQUALS -> sqlField.ne(criterionValue);
+			case CONTAINS -> sqlField.contains(criterionValue);
+			case NOT_CONTAINS -> sqlField.notContains(criterionValue);
+			case LOWER -> castSQLField(fieldModel, sqlField).lessThan(castSQLField(fieldModel, sqlValue));
+			case GREATER -> castSQLField(fieldModel, sqlField).greaterThan(castSQLField(fieldModel, sqlValue));
+			case LOWER_EQUALS -> castSQLField(fieldModel, sqlField).lessOrEqual(castSQLField(fieldModel, sqlValue));
+			case GREATER_EQUALS ->
+				castSQLField(fieldModel, sqlField).greaterOrEqual(castSQLField(fieldModel, sqlValue));
+			case NULL -> sqlField.isNull();
+			case NOT_NULL -> sqlField.isNotNull();
+			case BLANK -> sqlField.isNull().or(sqlField.like(""));
+			case NOT_BLANK -> sqlField.isNotNull().and(sqlField.notLike(""));
+			default -> {
 				final var errorMessage = String.format("%s operator is not supported", operator.name());
 				throw new UnsupportedOperationException(errorMessage);
-		}
+			}
+		};
 	}
 
 	private static <T> Field<T> castSQLField(final FieldModel fieldModel, final Field<String> field) {
-		switch(fieldModel.getDataType()) {
-			case DATE: {
-				return (Field<T>) DSL.function("str_to_date", SQLDataType.LOCALDATETIME, field, SQL_FIELD_DATE_FORMAT);
-			}
-			case NUMBER:
-				return (Field<T>) field.cast(Double.class);
-			default:
-				return (Field<T>) field;
-		}
+		return switch(fieldModel.getDataType()) {
+			case DATE ->
+				(Field<T>) DSL.function("str_to_date", SQLDataType.LOCALDATETIME, field, SQL_FIELD_DATE_FORMAT);
+			case NUMBER -> (Field<T>) field.cast(Double.class);
+			default -> (Field<T>) field;
+		};
 	}
 }

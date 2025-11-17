@@ -1048,83 +1048,49 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	@JsonIgnore
 	public final Node getChild(final Entity entity, final String nodeId) {
-		switch(entity) {
-			case DATASET_MODEL:
-				return getDatasetModel(nodeId);
-			case VALIDATOR:
-				return getValidator(nodeId);
-			case FORM_MODEL:
-				return getFormModel(nodeId);
-			case WORKFLOW:
-				return getWorkflow(nodeId);
-			case PROFILE:
-				return getProfile(nodeId);
-			case FEATURE:
-				return getFeature(nodeId);
-			case PAYMENT_PLAN:
-				return getPaymentPlan(nodeId);
-			case REPORT:
-				return getReport(nodeId);
-			case PRIVACY_POLICY:
-				return getPrivacyPolicy(nodeId);
-			case WORKFLOW_WIDGET:
-				return getWorkflowWidget(nodeId);
-			case RESOURCE_CATEGORY:
-				return getResourceCategory(nodeId);
-			case LANGUAGE:
-				return getLanguage(nodeId);
-			case MENU:
-				return getMenu(nodeId);
-			case SCOPE_MODEL:
-				return getScopeModel(nodeId);
-			case TIMELINE_GRAPH:
-				return getTimelineGraph(nodeId);
-			case CHART:
-				return getChart(nodeId);
-			default:
-				throw new UnsupportedOperationException(String.format("No entity %s", entity.getId()));
-		}
+		return switch(entity) {
+			case DATASET_MODEL -> getDatasetModel(nodeId);
+			case VALIDATOR -> getValidator(nodeId);
+			case FORM_MODEL -> getFormModel(nodeId);
+			case WORKFLOW -> getWorkflow(nodeId);
+			case PROFILE -> getProfile(nodeId);
+			case FEATURE -> getFeature(nodeId);
+			case PAYMENT_PLAN -> getPaymentPlan(nodeId);
+			case REPORT -> getReport(nodeId);
+			case PRIVACY_POLICY -> getPrivacyPolicy(nodeId);
+			case WORKFLOW_WIDGET -> getWorkflowWidget(nodeId);
+			case RESOURCE_CATEGORY -> getResourceCategory(nodeId);
+			case LANGUAGE -> getLanguage(nodeId);
+			case MENU -> getMenu(nodeId);
+			case SCOPE_MODEL -> getScopeModel(nodeId);
+			case TIMELINE_GRAPH -> getTimelineGraph(nodeId);
+			case CHART -> getChart(nodeId);
+			default -> throw new UnsupportedOperationException(String.format("No entity %s", entity.getId()));
+		};
 	}
 
 	@Override
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case DATASET_MODEL:
-				return Collections.unmodifiableSet(datasetModels);
-			case VALIDATOR:
-				return Collections.unmodifiableSet(validators);
-			case FORM_MODEL:
-				return Collections.unmodifiableSet(formModels);
-			case WORKFLOW:
-				return Collections.unmodifiableSet(workflows);
-			case PROFILE:
-				return Collections.unmodifiableSet(profiles);
-			case FEATURE:
-				return Collections.unmodifiableSet(features);
-			case PAYMENT_PLAN:
-				return Collections.unmodifiableSet(paymentPlans);
-			case REPORT:
-				return Collections.unmodifiableSet(reports);
-			case PRIVACY_POLICY:
-				return Collections.unmodifiableSet(privacyPolicies);
-			case WORKFLOW_WIDGET:
-				return Collections.unmodifiableSet(workflowWidgets);
-			case RESOURCE_CATEGORY:
-				return Collections.unmodifiableSet(resourceCategories);
-			case LANGUAGE:
-				return Collections.unmodifiableSet(languages);
-			case MENU:
-				return Collections.unmodifiableSet(menus);
-			case SCOPE_MODEL:
-				return Collections.unmodifiableSet(scopeModels);
-			case TIMELINE_GRAPH:
-				return Collections.unmodifiableSet(timelineGraphs);
-			case CHART:
-				return Collections.unmodifiableSet(charts);
-			default:
-				return Collections.emptyList();
-		}
+		return switch(entity) {
+			case DATASET_MODEL -> Collections.unmodifiableSet(datasetModels);
+			case VALIDATOR -> Collections.unmodifiableSet(validators);
+			case FORM_MODEL -> Collections.unmodifiableSet(formModels);
+			case WORKFLOW -> Collections.unmodifiableSet(workflows);
+			case PROFILE -> Collections.unmodifiableSet(profiles);
+			case FEATURE -> Collections.unmodifiableSet(features);
+			case PAYMENT_PLAN -> Collections.unmodifiableSet(paymentPlans);
+			case REPORT -> Collections.unmodifiableSet(reports);
+			case PRIVACY_POLICY -> Collections.unmodifiableSet(privacyPolicies);
+			case WORKFLOW_WIDGET -> Collections.unmodifiableSet(workflowWidgets);
+			case RESOURCE_CATEGORY -> Collections.unmodifiableSet(resourceCategories);
+			case LANGUAGE -> Collections.unmodifiableSet(languages);
+			case MENU -> Collections.unmodifiableSet(menus);
+			case SCOPE_MODEL -> Collections.unmodifiableSet(scopeModels);
+			case TIMELINE_GRAPH -> Collections.unmodifiableSet(timelineGraphs);
+			case CHART -> Collections.unmodifiableSet(charts);
+			default -> Collections.emptyList();
+		};
 	}
 
 	@JsonIgnore
