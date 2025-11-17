@@ -110,7 +110,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 			}
 		}
 		else {
-			scopes.addAll(actorService.getRootScopes(currentActor, widget.getWorkflows().get(0)));
+			scopes.addAll(actorService.getRootScopes(currentActor, widget.getWorkflows().getFirst()));
 		}
 
 		return workflowWidgetService.getData(
@@ -148,7 +148,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 			}
 		}
 		else {
-			scopes.addAll(actorService.getRootScopes(currentActor, widget.getWorkflows().get(0)));
+			scopes.addAll(actorService.getRootScopes(currentActor, widget.getWorkflows().getFirst()));
 		}
 
 		//send response

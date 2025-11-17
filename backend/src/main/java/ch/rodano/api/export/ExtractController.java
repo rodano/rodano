@@ -132,7 +132,7 @@ public class ExtractController extends AbstractSecuredController {
 		}
 
 		if(datasetModels.size() == 1) {
-			final var document = datasetModels.get(0);
+			final var document = datasetModels.getFirst();
 			final StreamingResponseBody stream = os -> reportService.getDataStructure(
 				os,
 				document,
@@ -198,7 +198,7 @@ public class ExtractController extends AbstractSecuredController {
 
 		//extract the selected dataset model
 		if(datasetModels.size() == 1) {
-			final var document = datasetModels.get(0);
+			final var document = datasetModels.getFirst();
 			final StreamingResponseBody stream = os -> extractService.getDataExtract(
 				os,
 				document,

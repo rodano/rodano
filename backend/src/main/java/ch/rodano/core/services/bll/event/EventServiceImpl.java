@@ -215,7 +215,7 @@ public class EventServiceImpl implements EventService {
 			}
 		}
 
-		return createdEvents.get(0);
+		return createdEvents.getFirst();
 	}
 
 	@Override

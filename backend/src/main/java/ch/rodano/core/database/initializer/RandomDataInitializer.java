@@ -197,7 +197,7 @@ public class RandomDataInitializer {
 			final var pastStart = ZonedDateTime.now().minusYears(3);
 			final var pastStop = ZonedDateTime.now().minusYears(1);
 			final var visitDate = generateRandomDate(Optional.of(pastStart), Optional.of(pastStop), Optional.empty());
-			eventService.updateDate(scope, events.get(0), visitDate, context, RATIONALE);
+			eventService.updateDate(scope, events.getFirst(), visitDate, context, RATIONALE);
 		}
 		//add multiple datasets in visits
 		for(final var event : events) {

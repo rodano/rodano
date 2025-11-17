@@ -154,7 +154,7 @@ public class MeController extends AbstractSecuredController {
 		}
 
 		final var profile = studyService.getStudy().getProfile(impersonation.profileId());
-		final var role = currentRoles.get(0);
+		final var role = currentRoles.getFirst();
 		role.setProfile(profile);
 		roleService.updateRole(role, currentContext(), "Set profile");
 

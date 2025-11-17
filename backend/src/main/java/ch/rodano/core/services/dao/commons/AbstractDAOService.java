@@ -240,6 +240,6 @@ public abstract class AbstractDAOService<U extends IdentifiableObject, V extends
 		if(results.size() > 1) {
 			throw new NotUniqueResultException("More than one result has been found with the query: " + query);
 		}
-		return results.get(0);
+		return results.getFirst();
 	}
 }

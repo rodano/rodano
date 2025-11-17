@@ -124,10 +124,10 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		if(isAggregator) {
 			//a widget displaying an aggregation workflow is either on scopes or events
 			if(WorkflowableEntity.SCOPE == widget.getWorkflowEntity()) {
-				wsTable = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.get(0)), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
+				wsTable = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.getFirst()), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
 			}
 			else {
-				wsTable = aggregateWorkflowDAOService.generateEventQuery(Optional.of(workflows.get(0)), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
+				wsTable = aggregateWorkflowDAOService.generateEventQuery(Optional.of(workflows.getFirst()), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
 			}
 		}
 		else {

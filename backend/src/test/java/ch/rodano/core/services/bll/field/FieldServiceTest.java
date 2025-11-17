@@ -401,7 +401,7 @@ public class FieldServiceTest extends DatabaseTest {
 		final var dataset = datasetService.get(visit, visitDatasetModel);
 		final var field = fieldService.get(dataset, withdrawalFieldModel);
 
-		final var patientStatus = workflowStatusService.getAll(patient, patientStatusWorkflow).get(0);
+		final var patientStatus = workflowStatusService.getAll(patient, patientStatusWorkflow).getFirst();
 
 		assertEquals("REGISTERED", patientStatus.getStateId());
 		fieldService.updateValue(patient, Optional.of(visit), dataset, field, "Y", context, TEST_RATIONALE);

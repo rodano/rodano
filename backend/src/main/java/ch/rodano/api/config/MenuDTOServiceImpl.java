@@ -20,7 +20,7 @@ public class MenuDTOServiceImpl implements MenuDTOService {
 			.toList();
 
 		// If submenus are present, automatically link first level action to the first second level menu action
-		final var action = !submenus.isEmpty() ? submenus.get(0).action() : createActionDTO(menu);
+		final var action = !submenus.isEmpty() ? submenus.getFirst().action() : createActionDTO(menu);
 
 		return new MenuDTO(
 			menu.getId(),

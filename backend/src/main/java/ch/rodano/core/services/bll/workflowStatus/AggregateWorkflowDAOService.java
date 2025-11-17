@@ -73,7 +73,7 @@ public class AggregateWorkflowDAOService {
 
 	private Field<String> constructWorkflowField(final List<Workflow> workflows) {
 		if(workflows.size() == 1) {
-			return DSL.inline(workflows.get(0).getId());
+			return DSL.inline(workflows.getFirst().getId());
 		}
 		final var values = workflows.stream().collect(Collectors.toMap(Workflow::getAggregateWorkflowId, Workflow::getId));
 		return DSL.case_(WORKFLOW_STATUS.WORKFLOW_ID).mapValues(values);
@@ -324,8 +324,8 @@ public class AggregateWorkflowDAOService {
 				}
 			}
 			final var defaultStates = workflow.getStatesHavingMatcher(StateMatcher.DEFAULT);
-			if(defaultStates.size() > 0) {
-				return Optional.of(defaultStates.get(0));
+			if(!defaultStates.isEmpty()) {
+				return Optional.of(defaultStates.getFirst());
 			}
 		}
 		return Optional.<WorkflowState> empty();

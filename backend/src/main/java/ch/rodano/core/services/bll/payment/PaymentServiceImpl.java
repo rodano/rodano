@@ -197,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
 			return null;
 		}
 
-		return payableScopes.get(0);
+		return payableScopes.getFirst();
 	}
 
 	@Override

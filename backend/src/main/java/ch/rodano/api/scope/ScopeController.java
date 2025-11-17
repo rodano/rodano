@@ -412,7 +412,7 @@ public class ScopeController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor(), scope);
 		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
 
-		final var targetScopeModel = scope.getScopeModel().getDescendantsScopeModel().get(0);
+		final var targetScopeModel = scope.getScopeModel().getDescendantsScopeModel().getFirst();
 		return substudyService.findPotentialScopes(Collections.singleton(scopeService.getRootScope()), targetScopeModel, criteria).size();
 	}
 

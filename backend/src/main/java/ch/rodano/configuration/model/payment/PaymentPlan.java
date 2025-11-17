@@ -142,7 +142,7 @@ public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightA
 	@JsonIgnore
 	public WorkflowableModel getWorkflowableModel() {
 		//plan are based on workflows used only once
-		return study.getWorkflow(workflow).getWorkflowableModels().get(0);
+		return study.getWorkflow(workflow).getWorkflowableModels().getFirst();
 	}
 
 	@JsonIgnore

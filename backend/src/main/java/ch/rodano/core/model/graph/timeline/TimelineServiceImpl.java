@@ -132,8 +132,8 @@ public class TimelineServiceImpl implements TimelineService {
 		//set study period if any
 		if(!allEvents.isEmpty()) {
 			final var period = new TimelineGraphDataPeriod();
-			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelId()).orElse(allEvents.get(0));
-			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStopEventModelId()).orElse(allEvents.get(allEvents.size() - 1));
+			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelId()).orElse(allEvents.getFirst());
+			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStopEventModelId()).orElse(allEvents.getLast());
 			//sort these events because in some cases, the stop event may be before the start event
 			final var dates = List.of(startEvent.getDateOrExpectedDate(), stopEvent.getDateOrExpectedDate()).stream().sorted().toList();
 			if(!dates.get(0).equals(dates.get(1))) {

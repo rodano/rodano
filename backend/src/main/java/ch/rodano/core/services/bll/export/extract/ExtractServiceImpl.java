@@ -71,7 +71,7 @@ public class ExtractServiceImpl implements ExtractService {
 
 		//retrieve document scope model
 		final var scopeModels = datasetModel.getScopeModels();
-		final var scopeModel = !scopeModels.isEmpty() ? scopeModels.get(0) : datasetModel.getEventModels().get(0).getScopeModel();
+		final var scopeModel = !scopeModels.isEmpty() ? scopeModels.getFirst() : datasetModel.getEventModels().getFirst().getScopeModel();
 		final Optional<ScopeModel> parentScopeModel = scopeModel.isRoot() ? Optional.empty() : Optional.of(scopeModel.getDefaultParent());
 
 		final var parentTable = SCOPE.as("parent");

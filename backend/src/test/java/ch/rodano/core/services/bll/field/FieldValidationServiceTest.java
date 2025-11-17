@@ -223,7 +223,7 @@ public class FieldValidationServiceTest extends DatabaseTest {
 		assertEquals(1, workflowStatusService.getAll(field).size());
 		assertEquals(1, workflowStatusService.getAll(field, queryWorkflow).size());
 
-		final var query = workflowStatusService.getAll(field, queryWorkflow).get(0);
+		final var query = workflowStatusService.getAll(field, queryWorkflow).getFirst();
 		final var queryTrails = workflowStatusDAOService.getAuditTrails(query, Optional.empty(), Optional.empty());
 		assertAll(
 			"One workflow status has been created for workflow QUERY and status OPEN",
@@ -245,7 +245,7 @@ public class FieldValidationServiceTest extends DatabaseTest {
 		assertEquals("CLOSED", query.getStateId());
 
 		//new workflow status has been created for workflow PROTOCOL_DEVIATION and status TO_REVIEW
-		final var protocolDeviation = workflowStatusService.getAll(field, protocolDeviationWorkflow).get(0);
+		final var protocolDeviation = workflowStatusService.getAll(field, protocolDeviationWorkflow).getFirst();
 		final var protocolDeviationTrails = workflowStatusDAOService.getAuditTrails(protocolDeviation, Optional.empty(), Optional.empty());
 		assertAll(
 			"New workflow status has been created for workflow PROTOCOL_DEVIATION and status TO_REVIEW",

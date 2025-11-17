@@ -427,7 +427,7 @@ public final class ExportableUtils {
 			if(scopeModels.isEmpty() && eventModels.isEmpty()) {
 				continue;
 			}
-			final var scopeModel = !scopeModels.isEmpty() ? scopeModels.get(0) : eventModels.get(0).getScopeModel();
+			final var scopeModel = !scopeModels.isEmpty() ? scopeModels.getFirst() : eventModels.getFirst().getScopeModel();
 			final var parentScopeModel = scopeModel.isRoot() ? null : scopeModel.getDefaultParent();
 
 			//create first rows for informations columns

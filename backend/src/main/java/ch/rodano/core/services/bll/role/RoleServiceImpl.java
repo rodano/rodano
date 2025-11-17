@@ -252,7 +252,7 @@ public class RoleServiceImpl implements RoleService {
 
 		//disallow disabling the last role
 		final var enabledRoles = getActiveRoles(actor);
-		if(enabledRoles.size() == 1 && enabledRoles.get(0).equals(role)) {
+		if(enabledRoles.size() == 1 && enabledRoles.getFirst().equals(role)) {
 			throw new UnsupportedOperationException("User must have at least one active role");
 		}
 
