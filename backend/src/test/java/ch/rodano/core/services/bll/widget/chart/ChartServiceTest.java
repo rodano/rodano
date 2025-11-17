@@ -26,8 +26,8 @@ import static org.junit.Assert.assertNotNull;
 @SpringTestConfiguration
 public class ChartServiceTest extends DatabaseTest {
 
-	private static String DEFAULT_LANGUAGE = LanguageStatic.en.name();
-	private static String[] LANGUAGES = new String[] { DEFAULT_LANGUAGE };
+	private static final String DEFAULT_LANGUAGE = LanguageStatic.en.name();
+	private static final String[] LANGUAGES = new String[] { DEFAULT_LANGUAGE };
 
 	@Autowired
 	private ScopeService scopeService;

@@ -39,7 +39,7 @@ public class Validator implements Serializable, SuperDisplayable, Node, Comparab
 		LanguageStatic.fr.name(), "est requis"
 	);
 
-	private static Comparator<Validator> DEFAULT_COMPARATOR = Comparator.comparing(Validator::getId);
+	private static final Comparator<Validator> DEFAULT_COMPARATOR = Comparator.comparing(Validator::getId);
 
 	public static final Comparator<Validator> COMPARATOR_IMPORTANCE = (v1, v2) -> {
 		if(v1 == v2) {

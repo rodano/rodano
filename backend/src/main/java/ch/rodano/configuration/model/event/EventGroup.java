@@ -27,7 +27,7 @@ public class EventGroup implements Serializable, SuperDisplayable, Node, Compara
 	@Serial
 	private static final long serialVersionUID = -5410921258509148168L;
 
-	private static Comparator<EventGroup> DEFAULT_COMPARATOR = Comparator
+	private static final Comparator<EventGroup> DEFAULT_COMPARATOR = Comparator
 		.comparing(EventGroup::getOrderBy)
 		.thenComparing(EventGroup::getId);
 

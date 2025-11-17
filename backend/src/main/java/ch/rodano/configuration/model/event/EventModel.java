@@ -43,7 +43,7 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 	@Serial
 	private static final long serialVersionUID = -5437648376925328189L;
 
-	private static Comparator<EventModel> DEFAULT_COMPARATOR = Comparator
+	private static final Comparator<EventModel> DEFAULT_COMPARATOR = Comparator
 		.comparing(EventModel::getNumber)
 		.thenComparing(EventModel::getId);
 

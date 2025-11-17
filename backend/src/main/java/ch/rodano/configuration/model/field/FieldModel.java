@@ -59,8 +59,8 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	@Serial
 	private static final long serialVersionUID = -3499790065637274737L;
 
-	private static Comparator<FieldModel> DEFAULT_COMPARATOR = Comparator.comparing(FieldModel::getDatasetModel)
-		.thenComparing(Comparator.comparing(FieldModel::getExportOrder))
+	private static final Comparator<FieldModel> DEFAULT_COMPARATOR = Comparator.comparing(FieldModel::getDatasetModel)
+		.thenComparing(FieldModel::getExportOrder)
 		.thenComparing(FieldModel::getId);
 
 	public static final int MAX_LENGTH = 400;
