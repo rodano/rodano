@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.payment;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,6 +23,7 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PaymentStep implements Serializable, SuperDisplayable, Node, Comparable<PaymentStep> {
+	@Serial
 	private static final long serialVersionUID = -3643822784996243315L;
 
 	private String id;

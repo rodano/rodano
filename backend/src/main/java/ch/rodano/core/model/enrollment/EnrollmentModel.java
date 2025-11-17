@@ -1,5 +1,6 @@
 package ch.rodano.core.model.enrollment;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import ch.rodano.core.model.scope.EnrollmentType;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 
 public class EnrollmentModel implements Serializable {
+	@Serial
 	private static final long serialVersionUID = 8815322291100222508L;
 
 	private boolean draft;

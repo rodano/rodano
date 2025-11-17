@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.form;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,6 +36,7 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class FormModel implements Serializable, SuperDisplayable, RightAssignable<FormModel> , WorkflowableModel, Node, Comparable<FormModel> {
+	@Serial
 	private static final long serialVersionUID = 6338027622028458338L;
 
 	private String id;

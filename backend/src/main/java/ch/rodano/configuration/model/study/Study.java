@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.study;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,6 +68,7 @@ import ch.rodano.configuration.model.workflow.WorkflowAction;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public final class Study implements Serializable, SuperDisplayable, Node, Comparable<Study> {
+	@Serial
 	private static final long serialVersionUID = -5790468283716242383L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Study.class);

@@ -1,11 +1,13 @@
 package ch.rodano.core.model.graph.timeline;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
 import ch.rodano.configuration.model.timelinegraph.TimelineGraphSection;
 
 public class TimelineGraphDataSection extends TimelineGraphSection {
+	@Serial
 	private static final long serialVersionUID = 8318434632793519458L;
 
 	private List<TimelineGraphDataValue> values = new ArrayList<>();

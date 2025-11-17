@@ -1,8 +1,11 @@
 package ch.rodano.api.configuration.security;
 
+import java.io.Serial;
+
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 public class BearerTokenAuthentication extends AbstractAuthenticationToken {
+	@Serial
 	private static final long serialVersionUID = 2193341416571338550L;
 
 	private final String credentials;

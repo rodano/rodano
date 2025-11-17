@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.profile;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,6 +48,7 @@ import ch.rodano.configuration.model.workflow.Workflow;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Profile implements SuperDisplayable, Payable, PayableModel, Node, RightAssignable<Profile> {
+	@Serial
 	private static final long serialVersionUID = -213015124204792366L;
 
 	private static final Comparator<Profile> COMPARATOR_ID = Comparator.comparing(Profile::getId);

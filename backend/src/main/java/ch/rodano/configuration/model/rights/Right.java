@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.rights;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.SortedMap;
@@ -10,6 +11,7 @@ import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.profile.ProfileRight;
 
 public class Right implements Node {
+	@Serial
 	private static final long serialVersionUID = -6284310979400853784L;
 
 	private boolean right;

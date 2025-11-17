@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.workflow;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,6 +25,7 @@ import ch.rodano.configuration.model.rules.Rule;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Action implements Serializable, SuperDisplayable, Node, ProfileRightAssignable<Action>, Comparable<Action> {
+	@Serial
 	private static final long serialVersionUID = -4500446941849236252L;
 
 	public static final Comparator<Action> DEFAULT_COMPARATOR = Comparator.comparing(Action::getId);

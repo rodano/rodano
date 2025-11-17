@@ -1,5 +1,7 @@
 package ch.rodano.core.configuration.jooq;
 
+import java.io.Serial;
+
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import ch.rodano.core.services.dao.audit.AuditActionService;
  * Overrides the transaction manager provided by Spring.
  */
 public class AuditActionTransactionManager extends DataSourceTransactionManager {
+	@Serial
 	private static final long serialVersionUID = -3326997135903793557L;
 
 	@Autowired

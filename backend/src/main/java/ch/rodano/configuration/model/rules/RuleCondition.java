@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.rules;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +17,7 @@ import ch.rodano.configuration.model.common.Node;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class RuleCondition implements Node {
+	@Serial
 	private static final long serialVersionUID = -2106058031155804759L;
 
 	protected String id;

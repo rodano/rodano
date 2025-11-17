@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.timelinegraph;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +25,7 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class TimelineGraph implements SuperDisplayable, Serializable, Assignable<TimelineGraph>, Node {
+	@Serial
 	private static final long serialVersionUID = 5861725017187478844L;
 
 	private Study study;

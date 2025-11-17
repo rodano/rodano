@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.cms;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -17,6 +18,7 @@ import ch.rodano.configuration.model.rights.Rights;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ScopeCriterionRight implements Node {
+	@Serial
 	private static final long serialVersionUID = -3789324658324836433L;
 
 	private String id;

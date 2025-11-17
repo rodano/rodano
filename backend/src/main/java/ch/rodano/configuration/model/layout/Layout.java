@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.layout;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Layout implements Node {
+	@Serial
 	private static final long serialVersionUID = -2887720419558440587L;
 
 	private FormModel formModel;

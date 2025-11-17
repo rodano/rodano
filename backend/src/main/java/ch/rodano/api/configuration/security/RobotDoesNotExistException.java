@@ -1,11 +1,14 @@
 package ch.rodano.api.configuration.security;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 
 import ch.rodano.api.exception.ManagedException;
 
 public class RobotDoesNotExistException extends AuthenticationException implements ManagedException {
+	@Serial
 	private static final long serialVersionUID = 3089763968832398606L;
 
 	public RobotDoesNotExistException(final String robotName) {

@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.cms;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class CMSAction implements Node {
+	@Serial
 	private static final long serialVersionUID = -1200436924072696369L;
 
 	private String id;

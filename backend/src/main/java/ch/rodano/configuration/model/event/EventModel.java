@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.event;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class EventModel implements Serializable, SuperDisplayable, WorkflowableModel, RightAssignable<EventModel>, Node, Comparable<EventModel> {
+	@Serial
 	private static final long serialVersionUID = -5437648376925328189L;
 
 	private static Comparator<EventModel> DEFAULT_COMPARATOR = Comparator

@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.scope;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -45,6 +46,7 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableModel, PayableModel, Node, RightAssignable<ScopeModel> {
+	@Serial
 	private static final long serialVersionUID = -3652751984945692998L;
 
 	public static final Comparator<ScopeModel> DEFAULT_COMPARATOR = Comparator.comparing(ScopeModel::getId);

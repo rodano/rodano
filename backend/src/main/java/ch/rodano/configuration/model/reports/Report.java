@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.reports;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ import ch.rodano.configuration.model.study.Study;
 
 @JsonPropertyOrder(alphabetic = true)
 public class Report implements Cloneable, SuperDisplayable, Serializable, Assignable<Report>, Node {
+	@Serial
 	private static final long serialVersionUID = 4081701801864249665L;
 
 	private String id;

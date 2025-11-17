@@ -1,5 +1,6 @@
 package ch.rodano.core.helpers.configuration;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -16,6 +17,7 @@ import org.jooq.Converter;
  */
 @SuppressWarnings("rawtypes")
 public class StringSetConverter implements Converter<String, Set> {
+	@Serial
 	private static final long serialVersionUID = 2883930587007849214L;
 
 	@Override

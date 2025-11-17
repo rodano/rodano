@@ -1,5 +1,6 @@
 package ch.rodano.core.model.graph.timeline;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +8,7 @@ import ch.rodano.configuration.model.timelinegraph.TimelineGraph;
 import ch.rodano.configuration.model.timelinegraph.TimelineGraphSection;
 
 public class TimelineGraphData extends TimelineGraph {
+	@Serial
 	private static final long serialVersionUID = -601065732031149176L;
 
 	private List<TimelineGraphDataPeriod> periods = new ArrayList<>();

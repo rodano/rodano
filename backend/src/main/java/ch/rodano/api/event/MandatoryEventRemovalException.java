@@ -1,11 +1,14 @@
 package ch.rodano.api.event;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 
 public class MandatoryEventRemovalException extends RuntimeException implements ManagedException {
 
+	@Serial
 	private static final long serialVersionUID = 6873162138022468014L;
 
 	public MandatoryEventRemovalException() {

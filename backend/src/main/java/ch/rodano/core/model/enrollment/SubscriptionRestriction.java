@@ -1,5 +1,6 @@
 package ch.rodano.core.model.enrollment;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,6 +8,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
 public class SubscriptionRestriction implements Serializable {
+	@Serial
 	private static final long serialVersionUID = -1749507570862464575L;
 
 	private String model;

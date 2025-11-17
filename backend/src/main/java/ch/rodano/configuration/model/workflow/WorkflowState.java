@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.workflow;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +24,7 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class WorkflowState implements Serializable, SuperDisplayable, Node, Comparable<WorkflowState> {
+	@Serial
 	private static final long serialVersionUID = 8285922897928637570L;
 
 	public static final Comparator<WorkflowState> COMPARATOR_INDEX = (o1, o2) -> {

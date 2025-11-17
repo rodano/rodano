@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.layout;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -13,6 +14,7 @@ import ch.rodano.configuration.model.common.Node;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ColumnHeader implements Node {
+	@Serial
 	private static final long serialVersionUID = -6496770259697992993L;
 
 	private String cssCode;

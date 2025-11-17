@@ -1,5 +1,6 @@
 package ch.rodano.core.model.rules.data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.model.rules.Evaluable;
 
 public class DataEvaluation implements Serializable {
+	@Serial
 	private static final long serialVersionUID = -6415893882665841504L;
 
 	private final DataState initialState;

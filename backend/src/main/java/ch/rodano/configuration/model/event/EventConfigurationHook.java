@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.event;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.form.FormModel;
 
 public class EventConfigurationHook implements Serializable {
+	@Serial
 	private static final long serialVersionUID = -3556215335256366005L;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EventConfigurationHook.class);

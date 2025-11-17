@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.event;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class EventGroup implements Serializable, SuperDisplayable, Node, Comparable<EventGroup> {
+	@Serial
 	private static final long serialVersionUID = -5410921258509148168L;
 
 	private static Comparator<EventGroup> DEFAULT_COMPARATOR = Comparator

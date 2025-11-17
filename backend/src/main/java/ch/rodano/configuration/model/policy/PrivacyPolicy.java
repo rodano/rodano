@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.policy;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PrivacyPolicy implements Serializable, SuperDisplayable, Node, Comparable<PrivacyPolicy> {
+	@Serial
 	private static final long serialVersionUID = -360517234571933188L;
 
 	private Study study;

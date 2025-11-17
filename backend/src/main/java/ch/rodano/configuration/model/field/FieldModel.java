@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.field;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -55,6 +56,7 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializable, Node, Comparable<FieldModel> {
+	@Serial
 	private static final long serialVersionUID = -3499790065637274737L;
 
 	private static Comparator<FieldModel> DEFAULT_COMPARATOR = Comparator.comparing(FieldModel::getDatasetModel)

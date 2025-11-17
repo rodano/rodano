@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.cron;
 
+import java.io.Serial;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +18,7 @@ import ch.rodano.configuration.model.study.Study;
 
 public class Cron implements Node {
 
+	@Serial
 	private static final long serialVersionUID = -4213624739903698733L;
 
 	private String id;

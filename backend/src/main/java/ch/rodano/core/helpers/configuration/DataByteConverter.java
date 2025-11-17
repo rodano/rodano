@@ -1,10 +1,13 @@
 package ch.rodano.core.helpers.configuration;
 
+import java.io.Serial;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.jooq.Converter;
 
 public class DataByteConverter implements Converter<byte[], Byte[]> {
 
+	@Serial
 	private static final long serialVersionUID = 1588612595752596800L;
 
 	@Override

@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.reports;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -19,6 +20,7 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Node, Comparable<WorkflowWidgetColumn> {
+	@Serial
 	private static final long serialVersionUID = 2737350294266317303L;
 
 	private WorkflowWidget widget;

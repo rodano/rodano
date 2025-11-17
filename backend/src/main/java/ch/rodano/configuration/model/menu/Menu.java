@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.menu;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -29,6 +30,7 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Menu implements SuperDisplayable, Serializable, Assignable<Menu>, Node, Comparable<Menu> {
+	@Serial
 	private static final long serialVersionUID = 4081701801864249665L;
 
 	private Study study;

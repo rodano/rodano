@@ -1,5 +1,6 @@
 package ch.rodano.core.model.field;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,6 +31,7 @@ import ch.rodano.core.model.workflow.Workflowable;
 
 @JsonInclude(Include.NON_NULL)
 public class Field extends FieldRecord implements TimestampableObject, PersistentObject, AuditableObject, Serializable, SQLValue, Workflowable, Comparable<Field>, Evaluable {
+	@Serial
 	private static final long serialVersionUID = 6565374409857436890L;
 
 	private static final DateTimeFormatter SQL_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
