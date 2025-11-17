@@ -75,7 +75,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 	@Override
 	public WorkflowStateDTO createWorkflowStateDTO(final WorkflowState state, final ACL acl) {
 		final var actions = state.getPossibleActions().stream()
-			.filter(a -> acl.hasRight(a))
+			.filter(acl::hasRight)
 			.toList();
 		return createWorkflowStateDTO(state, actions);
 	}

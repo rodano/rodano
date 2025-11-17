@@ -799,13 +799,13 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	@JsonIgnore
 	public ScopeModel getRootScopeModel() {
-		return scopeModels.stream().filter(s -> s.isRoot()).findFirst().orElseThrow();
+		return scopeModels.stream().filter(ScopeModel::isRoot).findFirst().orElseThrow();
 	}
 
 	@JsonIgnore
 	public List<ScopeModel> getLeafScopeModels() {
 		return scopeModels.stream()
-			.filter(s -> s.isLeaf())
+			.filter(ScopeModel::isLeaf)
 			.sorted(ScopeModel.COMPARATOR_DEPTH)
 			.toList();
 	}
@@ -813,7 +813,7 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public ScopeModel getLeafScopeModel() {
 		return scopeModels.stream()
-			.filter(s -> s.isLeaf())
+			.filter(ScopeModel::isLeaf)
 			.max(ScopeModel.COMPARATOR_DEPTH)
 			.orElseThrow();
 	}
@@ -999,7 +999,7 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public SortedSet<Menu> getMenusPublic() {
 		return getMenus().stream()
-			.filter(menu -> menu.isPublic())
+			.filter(Menu::isPublic)
 			.collect(Collectors.toCollection(TreeSet::new));
 	}
 

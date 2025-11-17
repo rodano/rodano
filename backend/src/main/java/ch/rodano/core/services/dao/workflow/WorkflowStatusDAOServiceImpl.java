@@ -97,7 +97,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 					.and(WORKFLOW_STATUS.FORM_FK.isNull())
 					.and(WORKFLOW_STATUS.FIELD_FK.isNull())
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -127,7 +127,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 					.and(WORKFLOW_STATUS.FORM_FK.isNull())
 					.and(WORKFLOW_STATUS.FIELD_FK.isNull())
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -155,7 +155,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 			.where(
 				WORKFLOW_STATUS.FORM_FK.in(formPks)
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -183,7 +183,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 			.where(
 				WORKFLOW_STATUS.FIELD_FK.in(fieldPks)
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}

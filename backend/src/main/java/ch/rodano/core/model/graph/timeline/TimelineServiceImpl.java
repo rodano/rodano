@@ -1,24 +1,5 @@
 package ch.rodano.core.model.graph.timeline;
 
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.SortedSet;
-import java.util.TreeSet;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
-import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.PartialDate;
 import ch.rodano.configuration.model.study.Study;
@@ -31,11 +12,20 @@ import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.event.EventService;
 import ch.rodano.core.services.bll.scope.ScopeRelationService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.apache.commons.lang3.StringUtils;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import org.springframework.stereotype.Service;
 
-import static ch.rodano.core.model.jooq.Tables.DATASET;
-import static ch.rodano.core.model.jooq.Tables.EVENT;
-import static ch.rodano.core.model.jooq.Tables.FIELD;
-import static ch.rodano.core.model.jooq.Tables.FORM;
+import java.time.ZonedDateTime;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static ch.rodano.core.model.jooq.Tables.*;
 
 @Service
 public class TimelineServiceImpl implements TimelineService {

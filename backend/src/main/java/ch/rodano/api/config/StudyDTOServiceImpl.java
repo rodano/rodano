@@ -106,7 +106,7 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 			.map(FormModelDTO::new)
 			.toList();
 		dto.workflows = study.getWorkflows().stream()
-			.filter(w -> acl.hasRight(w))
+			.filter(acl::hasRight)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl)).toList();
 
 		//return profiles on which the user has the right plus the profiles of their disabled roles
@@ -118,7 +118,7 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 			.map(ProfileDTO::new)
 			.toList();
 
-		dto.menus = study.getMenus().stream().filter(m -> acl.hasRight(m)).map(m -> menuDTOService.createDTO(m, acl)).toList();
+		dto.menus = study.getMenus().stream().filter(acl::hasRight).map(m -> menuDTOService.createDTO(m, acl)).toList();
 
 		return dto;
 	}
