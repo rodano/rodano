@@ -104,8 +104,9 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - backend
+      - manager
     ports:
-      - "0.0.0.0:7586:80"
+      - "0.0.0.0:7586:7586"
     volumes:
       #access to the study package, to get the static files
       - type: bind
@@ -114,37 +115,32 @@ services:
         read_only: true
     restart: on-failure
 
-#the following service is used to dump the database content into a file, to be used for backup purposes
-  dumper:
-    image: ghcr.io/rodano/database-dumper:${TAG}
+  manager:
+    image: ghcr.io/rodano/manager:${TAG}
+    build:
+      context: manager
+      dockerfile: Dockerfile
     depends_on:
       db:
         condition: service_healthy
+    ports:
+      - "127.0.0.1:8081:8081"
     volumes:
-      - type: volume
-        source: database_dumps
-        target: /dumps
-        read_only: false
-    environment:
-      DATABASE_HOST: db
-      DATABASE_NAME: rodano
-      DATABASE_USER: root
-      DATABASE_PASSWORD: root
-    command: bash -c "echo 'Database dumper ready' && tail -f /dev/null"  #keeps the container running so it can be used to dump the database content"
-    labels:
-      docker-volume-backup.archive-pre: dump.sh
-
-  backuper:
-    image: offen/docker-volume-backup:v2
-    volumes:
-      - database_dumps:/backup/database_dumps:ro
-      - user_content:/backup/user_content:ro
-      - backups:/archive
+      #access to the user content to back it up and to restore it
+      - user_content:/user_content
+      - backups:/backups
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 3306
+      DATABASE_USER: root
+      DATABASE_PASSWORD: root
+      DATABASE_NAME: rodano
+      BASE_URL_PATH: /manager/
+      MAGIC_TOKEN: ${MANAGER_MAGIC_TOKEN}
+      USER_CONTENT: /user_content
+      BACKUPS_PATH: /backups
       BACKUP_CRON_EXPRESSION: "0 3 * * *"
-      BACKUP_COMPRESSION: gz
-      BACKUP_FILENAME: "backup-%Y-%m-%dT%H-%M-%S.tar.gz"
     restart: on-failure
 
 volumes:
@@ -152,9 +148,8 @@ volumes:
   database:
   #user uploaded content, such as CRF files and resources
   user_content:
-  #storage of database dumps
-  database_dumps:
-  #place where to store automated backups
+  #place where to store backups
+  #can be mapped to local folder or to a network share
   backups:
   #  driver_opts:
   #    type: cifs
