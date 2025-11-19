@@ -1,0 +1,3 @@
+# use with ansible-galaxy install -r requirements.yml
+collections:
+  - name: community.general

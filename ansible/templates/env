@@ -1,2 +1,3 @@
 STUDY_PATH={{ study_path }}
 TAG={{ rodano_git_reference }}
+MANAGER_MAGIC_TOKEN={{ manager_magic_token }}
