@@ -51,7 +51,12 @@ jobs:
       # test application
       - name: Initialize database
         shell: bash
-        run: mvn -B spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=database -Drodano.database.port=3307 -Drodano.init.with-data=false -Drodano.init.with-users=false"
+        env:
+          SPRING_PROFILES_ACTIVE: database
+          RODANO_DATABASE_PORT: 3307
+          RODANO_INIT_WITH_DATA: false
+          RODANO_INIT_WITH_USERS: false
+        run: mvn -B spring-boot:run
 
       - name: Create application package
         shell: bash
