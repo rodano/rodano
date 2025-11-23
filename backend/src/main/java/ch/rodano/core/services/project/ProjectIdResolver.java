@@ -2,21 +2,30 @@ package ch.rodano.core.services.project;
 
 import java.util.UUID;
 
+import org.jooq.DSLContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import static ch.rodano.core.model.jooq.tables.Project.PROJECT;
 
 @Component
 public class ProjectIdResolver {
 
-	private final String code;
-	private final UUID id;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectIdResolver.class);
 
-	public ProjectIdResolver(final @Value("${rodano.project.code}") String code) {
+	private final String code;
+	private final DSLContext dslContext;
+
+	private UUID id;
+
+	public ProjectIdResolver(final @Value("${rodano.project.code}") String code, final DSLContext dslContext) {
 		if(code == null || code.isBlank()) {
 			throw new IllegalStateException("rodano.project.code is missing/blank");
 		}
 		this.code = code.trim();
-		this.id = UUID.nameUUIDFromBytes(("PROJECT:" + this.code).getBytes(java.nio.charset.StandardCharsets.UTF_8));
+		this.dslContext = dslContext;
 	}
 
 	public String code() {
@@ -24,6 +33,27 @@ public class ProjectIdResolver {
 	}
 
 	public UUID id() {
-		return id;
+		if(id != null) {
+			return id;
+		}
+
+		try {
+			id = dslContext.select(PROJECT.PROJECT_ID)
+				.from(PROJECT)
+				.where(PROJECT.CODE.eq(code))
+				.fetchOne(PROJECT.PROJECT_ID);
+
+			if(id == null) {
+				LOGGER.error("Project with code {} not found in database", code);
+				throw new IllegalStateException("Project " + code + " not found in database");
+			}
+
+			LOGGER.info("Resolved project '{}' to UUID {}", code, id);
+			return id;
+		}
+		catch(Exception e) {
+			LOGGER.error("Failed to resolve project '{}' to UUID {}", code, id, e);
+			return null;
+		}
 	}
 }
