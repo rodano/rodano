@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.rules;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 
 public class RuleConstraint implements Node {
+	@Serial
 	private static final long serialVersionUID = 8354365482907115176L;
 
 	private Map<RulableEntity, RuleConditionList> conditions;

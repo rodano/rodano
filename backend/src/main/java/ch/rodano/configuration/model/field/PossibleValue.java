@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.field;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -20,6 +21,7 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PossibleValue implements Node {
+	@Serial
 	private static final long serialVersionUID = -10498351329495800L;
 
 	private String id;

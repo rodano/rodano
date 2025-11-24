@@ -54,10 +54,10 @@ public class EnrollmentChartFactoryService {
 				);
 		}
 		query.where(
-			SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId())
-				.and(SCOPE.DELETED.isFalse())
-				.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
-		)
+				SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId())
+					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
+			)
 			.groupBy(scopeDate)
 			.orderBy(scopeDate);
 
@@ -73,20 +73,20 @@ public class EnrollmentChartFactoryService {
 			final var downsampledResults = ChartHelpers.downsample(cumulatedResults, ChartHelpers.DEFAULT_MAX_POINTS);
 			final var timepoints = ChartHelpers.processTimepoints(downsampledResults);
 
-			datasets.add(new ChartDatasetDTO<ZonedDateTime, Integer>(scope.getCode(), timepoints));
+			datasets.add(new ChartDatasetDTO<>(scope.getCode(), timepoints));
 
 			//expected data
 			final var expectedTimepoints = new ArrayList<ChartDatasetPoint<ZonedDateTime, Integer>>();
 			if(chart.isDisplayExpected() && !scope.getData().getEnrollmentTargets().isEmpty()) {
-				expectedTimepoints.add(new ChartDatasetPoint<ZonedDateTime, Integer>(scope.getData().getEnrollmentStart(), 0));
+				expectedTimepoints.add(new ChartDatasetPoint<>(scope.getData().getEnrollmentStart(), 0));
 
 				//middle points
 				scope.getData().getEnrollmentTargets()
 					.stream()
-					.map(target -> new ChartDatasetPoint<ZonedDateTime, Integer>(target.getDate(), target.getExpectedNumber()))
+					.map(target -> new ChartDatasetPoint<>(target.getDate(), target.getExpectedNumber()))
 					.forEach(expectedTimepoints::add);
 
-				datasets.add(new ChartDatasetDTO<ZonedDateTime, Integer>(String.format("%s (expected)", scope.getCode()), expectedTimepoints));
+				datasets.add(new ChartDatasetDTO<>(String.format("%s (expected)", scope.getCode()), expectedTimepoints));
 			}
 		}
 		return datasets;

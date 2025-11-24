@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.language;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -24,11 +25,13 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Language implements Serializable, Node, SuperDisplayable, Comparable<Language> {
+	@Serial
 	private static final long serialVersionUID = 2474749013663395804L;
 
 	public static final Comparator<Language> DEFAULT_COMPARATOR = Comparator.comparing(Language::getId);
 
 	public static final Map<String, String> DEFAULT = new HashMap<>();
+
 	static {
 		DEFAULT.put(LanguageStatic.en.getId(), "(default)");
 		DEFAULT.put(LanguageStatic.fr.getId(), "(défaut)");

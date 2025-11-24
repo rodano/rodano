@@ -1,9 +1,12 @@
 package ch.rodano.core.model.rules.formula.exception;
 
+import java.io.Serial;
+
 import ch.rodano.core.model.exception.TechnicalException;
 import ch.rodano.core.model.rules.formula.FormulaFunction;
 
 public class FormulaWrongFunctionParametersException extends RuntimeException implements TechnicalException {
+	@Serial
 	private static final long serialVersionUID = 5046503907867421007L;
 
 	public FormulaWrongFunctionParametersException(final FormulaFunction function, final int actualParameterNumber, final int expectedParameterNumber) {

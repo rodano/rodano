@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.profile;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -9,6 +10,7 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 
 public class ProfileRight implements Node {
+	@Serial
 	private static final long serialVersionUID = 3498268060491376410L;
 
 	private boolean system;

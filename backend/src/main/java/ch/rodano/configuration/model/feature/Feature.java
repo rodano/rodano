@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.feature;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Feature implements SuperDisplayable, Serializable, Assignable<Feature>, Node {
+	@Serial
 	private static final long serialVersionUID = 4081701801864249665L;
 
 	private Study study;

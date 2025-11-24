@@ -1,6 +1,7 @@
 package ch.rodano.configuration.model.reports;
 
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -15,6 +16,7 @@ import ch.rodano.configuration.model.common.Node;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class WorkflowStatesSelector implements Node {
+	@Serial
 	private static final long serialVersionUID = -1703578816489405753L;
 
 	private String workflowId;
@@ -23,6 +25,7 @@ public class WorkflowStatesSelector implements Node {
 	public String getWorkflowId() {
 		return workflowId;
 	}
+
 	public void setWorkflowId(final String workflowId) {
 		this.workflowId = workflowId;
 	}
@@ -30,6 +33,7 @@ public class WorkflowStatesSelector implements Node {
 	public Set<String> getStateIds() {
 		return stateIds;
 	}
+
 	public void setStateIds(final Set<String> stateIds) {
 		this.stateIds = stateIds;
 	}
@@ -38,6 +42,7 @@ public class WorkflowStatesSelector implements Node {
 	public Entity getEntity() {
 		return Entity.WORKFLOW_STATE_SELECTOR;
 	}
+
 	@Override
 	public Collection<Node> getChildrenWithEntity(final Entity entity) {
 		return Collections.emptyList();

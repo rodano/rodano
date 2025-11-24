@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.field;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -55,10 +56,11 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializable, Node, Comparable<FieldModel> {
+	@Serial
 	private static final long serialVersionUID = -3499790065637274737L;
 
-	private static Comparator<FieldModel> DEFAULT_COMPARATOR = Comparator.comparing(FieldModel::getDatasetModel)
-		.thenComparing(Comparator.comparing(FieldModel::getExportOrder))
+	private static final Comparator<FieldModel> DEFAULT_COMPARATOR = Comparator.comparing(FieldModel::getDatasetModel)
+		.thenComparing(FieldModel::getExportOrder)
 		.thenComparing(FieldModel::getId);
 
 	public static final int MAX_LENGTH = 400;
@@ -485,9 +487,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	@JsonIgnore
 	public final String getLocalizedLabel(final String... languages) {
 		if(isRequired()) {
-			final var label = new StringBuilder(getLocalizedShortname(languages));
-			label.append(" *");
-			return label.toString();
+			return getLocalizedShortname(languages) + " *";
 		}
 		return getLocalizedShortname(languages);
 	}
@@ -509,10 +509,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 
 	@JsonIgnore
 	public final String getOperatorLabel() {
-		final var operator = new StringBuilder(type.toString());
-		operator.append(".");
-		operator.append(id);
-		return operator.toString();
+		return type.toString() + "." + id;
 	}
 
 	@Override
@@ -698,7 +695,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	 * @return a nice label
 	 */
 	public String valueToLabel(final String value, final String... languages) {
-		return valueToLabel(possibleValues,  value, languages);
+		return valueToLabel(possibleValues, value, languages);
 	}
 
 	public String valueToLabel(final List<PossibleValue> actualPossibleValues, final String value, final String... languages) {
@@ -711,7 +708,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 			//values list
 			if(FieldModelType.CHECKBOX_GROUP.equals(type)) {
 				//transform value into list
-				return Arrays.asList(value.split(",")).stream()
+				return Arrays.stream(value.split(","))
 					.map(v -> getPossibleValueLabel(actualPossibleValues, v, languages))
 					.collect(Collectors.joining(", "));
 			}
@@ -790,8 +787,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 			//value can be a ZonedDateTime or a PartialDate
 			//in any case, we need a ZonedDateTime at the end
 			final ZonedDateTime date;
-			if(value instanceof PartialDate) {
-				final var partialDate = (PartialDate) value;
+			if(value instanceof PartialDate partialDate) {
 				//if partial date is not anchored in time, it is not possible to transform it into a real date
 				if(!partialDate.isAnchoredInTime()) {
 					return "";
@@ -978,6 +974,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 		}
 		return format.toString();
 	}
+
 	@JsonIgnore
 	public DateTimeFormatter getDateTimeFormatter() {
 		final var formatterBuilder = new DateTimeFormatterBuilder().appendPattern(getDateTimeFormat());

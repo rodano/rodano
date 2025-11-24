@@ -58,7 +58,7 @@ public class MailServiceTest extends DatabaseTest {
 				Map.entry("study", studyService.getStudy()),
 				Map.entry("test", 4),
 				Map.entry("user", user),
-				Map.entry("role", roles.get(0))
+				Map.entry("role", roles.getFirst())
 			)
 		);
 		final var mailStub = generateMockMail();

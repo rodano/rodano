@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.reports;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
 public class WorkflowSummary implements Node, Comparable<WorkflowSummary> {
+	@Serial
 	private static final long serialVersionUID = 5262106614046834382L;
 
 	private Study study;

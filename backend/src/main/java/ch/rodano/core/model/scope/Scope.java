@@ -159,7 +159,7 @@ public class Scope extends ScopeRecord implements DeletableObject, Timestampable
 				target.setDate(date);
 				enrollmentTargets.add(target);
 			}
-			date = date.plus(1, ChronoUnit.MONTHS);
+			date = date.plusMonths(1);
 		}
 		// sort targets
 		Collections.sort(enrollmentTargets);

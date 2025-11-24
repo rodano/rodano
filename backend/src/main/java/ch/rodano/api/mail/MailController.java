@@ -195,7 +195,7 @@ public class MailController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.MANAGE_MAILS);
 
-		if(mailPks.size() == 0) {
+		if(mailPks.isEmpty()) {
 			return;
 		}
 

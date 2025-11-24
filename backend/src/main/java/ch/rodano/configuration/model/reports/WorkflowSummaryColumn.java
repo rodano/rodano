@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.reports;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -11,6 +12,7 @@ import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
 public class WorkflowSummaryColumn implements Node {
+	@Serial
 	private static final long serialVersionUID = 6897340405982829336L;
 
 	private SortedMap<String, String> label;

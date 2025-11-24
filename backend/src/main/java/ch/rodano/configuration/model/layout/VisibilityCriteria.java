@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.layout;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -20,6 +21,7 @@ import ch.rodano.configuration.model.rules.Operator;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class VisibilityCriteria implements Node {
+	@Serial
 	private static final long serialVersionUID = 6078561914633069811L;
 
 	private Cell cell;
@@ -99,7 +101,7 @@ public class VisibilityCriteria implements Node {
 			try {
 				valueLabels.add(fieldModel.getPossibleValue(value).getLocalizedShortname(languages));
 			}
-			catch (final Exception e) {
+			catch(final Exception e) {
 				valueLabels.add(value);
 			}
 		}

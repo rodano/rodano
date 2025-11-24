@@ -11,13 +11,14 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import io.micrometer.common.util.StringUtils;
 
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.PartialDate;
@@ -32,10 +33,11 @@ import ch.rodano.core.services.bll.event.EventService;
 import ch.rodano.core.services.bll.scope.ScopeRelationService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 
-import static ch.rodano.core.model.jooq.Tables.DATASET;
-import static ch.rodano.core.model.jooq.Tables.EVENT;
-import static ch.rodano.core.model.jooq.Tables.FIELD;
-import static ch.rodano.core.model.jooq.Tables.FORM;
+import static ch.rodano.core.model.jooq.tables.Dataset.DATASET;
+import static ch.rodano.core.model.jooq.tables.Event.EVENT;
+import static ch.rodano.core.model.jooq.tables.Field.FIELD;
+import static ch.rodano.core.model.jooq.tables.Form.FORM;
+
 
 @Service
 public class TimelineServiceImpl implements TimelineService {
@@ -121,9 +123,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 		//retrieve forms by events and form model ids
 		final Map<Long, Map<String, Long>> formsByEventPkAndFormModelId = create.select(
-			FORM.EVENT_FK,
-			DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
-		).from(FORM)
+				FORM.EVENT_FK,
+				DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
+			).from(FORM)
 			.join(EVENT).on(FORM.EVENT_FK.eq(EVENT.PK))
 			.where(EVENT.SCOPE_FK.eq(scope.getPk()))
 			.groupBy(FORM.EVENT_FK)
@@ -132,8 +134,8 @@ public class TimelineServiceImpl implements TimelineService {
 		//set study period if any
 		if(!allEvents.isEmpty()) {
 			final var period = new TimelineGraphDataPeriod();
-			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelId()).orElse(allEvents.get(0));
-			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStopEventModelId()).orElse(allEvents.get(allEvents.size() - 1));
+			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelId()).orElse(allEvents.getFirst());
+			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStopEventModelId()).orElse(allEvents.getLast());
 			//sort these events because in some cases, the stop event may be before the start event
 			final var dates = List.of(startEvent.getDateOrExpectedDate(), stopEvent.getDateOrExpectedDate()).stream().sorted().toList();
 			if(!dates.get(0).equals(dates.get(1))) {
@@ -341,5 +343,4 @@ public class TimelineServiceImpl implements TimelineService {
 		}
 		return instance;
 	}
-
 }

@@ -97,7 +97,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 					.and(WORKFLOW_STATUS.FORM_FK.isNull())
 					.and(WORKFLOW_STATUS.FIELD_FK.isNull())
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -127,7 +127,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 					.and(WORKFLOW_STATUS.FORM_FK.isNull())
 					.and(WORKFLOW_STATUS.FIELD_FK.isNull())
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -155,7 +155,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 			.where(
 				WORKFLOW_STATUS.FORM_FK.in(formPks)
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -183,7 +183,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 			.where(
 				WORKFLOW_STATUS.FIELD_FK.in(fieldPks)
 					.and(WORKFLOW_STATUS.DELETED.isFalse())
-					.and(workflowId.map(w -> WORKFLOW_STATUS.WORKFLOW_ID.eq(w)).orElse(DSL.noCondition()))
+					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
 	}
@@ -203,9 +203,9 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		final var now = ZonedDateTime.now();
 
 		final var query = create.selectDistinct(
-			WORKFLOW_STATUS.asterisk(),
-			DSL.count().over().as("total")
-		)
+				WORKFLOW_STATUS.asterisk(),
+				DSL.count().over().as("total")
+			)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(SCOPE_ANCESTOR).on(
 				WORKFLOW_STATUS.SCOPE_FK.eq(SCOPE_ANCESTOR.SCOPE_FK)
@@ -260,8 +260,8 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 		final var result = query.fetch();
 		var total = 0;
-		if(result.size() > 0) {
-			total = result.get(0).getValue("total", Integer.class);
+		if(!result.isEmpty()) {
+			total = result.getFirst().getValue("total", Integer.class);
 		}
 
 		final var workflowStatuses = result.into(WorkflowStatus.class);

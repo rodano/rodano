@@ -80,7 +80,7 @@ public record ACL(
 		return permissions.stream()
 			.filter(p -> p.profile().hasRight(rightAssignable, right))
 			.map(Permission::timeframe)
-			.reduce((t1, t2) -> t1.withExtension(t2));
+			.reduce(Timeframe::withExtension);
 	}
 
 	private boolean hasRight(final Predicate<Profile> profileCheck) {

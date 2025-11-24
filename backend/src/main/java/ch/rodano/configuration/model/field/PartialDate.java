@@ -34,7 +34,7 @@ public class PartialDate implements Comparable<PartialDate> {
 		ChronoField.MINUTE_OF_HOUR, 0,
 		ChronoField.SECOND_OF_MINUTE, 0,
 		ChronoField.NANO_OF_SECOND, 0
-		);
+	);
 
 	//TODO this is wrong
 	//base fields are used to compare two dates
@@ -45,7 +45,7 @@ public class PartialDate implements Comparable<PartialDate> {
 		ChronoField.HOUR_OF_DAY,
 		ChronoField.MINUTE_OF_HOUR,
 		ChronoField.SECOND_OF_MINUTE
-		);
+	);
 
 	public static final PartialDate TOTALLY_UNKNOWN = PartialDate.of(Optional.empty());
 
@@ -180,7 +180,7 @@ public class PartialDate implements Comparable<PartialDate> {
 			ChronoField.YEAR_OF_ERA, year,
 			ChronoField.MONTH_OF_YEAR, month,
 			ChronoField.DAY_OF_MONTH, day
-			);
+		);
 	}
 
 	private static Map<ChronoField, Optional<Integer>> parseTime(final String time) {
@@ -204,7 +204,7 @@ public class PartialDate implements Comparable<PartialDate> {
 			ChronoField.HOUR_OF_DAY, hour,
 			ChronoField.MINUTE_OF_HOUR, minute,
 			ChronoField.SECOND_OF_MINUTE, second
-			);
+		);
 	}
 
 	public static PartialDate of(final String date) {
@@ -214,7 +214,7 @@ public class PartialDate implements Comparable<PartialDate> {
 			return new PartialDate(
 				ZonedDateTime.now(),
 				Set.of(ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.DAYS, ChronoUnit.HOURS, ChronoUnit.MINUTES, ChronoUnit.SECONDS)
-				);
+			);
 		}
 		try {
 			final Map<TemporalField, Optional<Integer>> fields = BASE_FIELDS.stream().collect(Collectors.toMap(Function.identity(), _ -> Optional.empty()));
@@ -552,13 +552,13 @@ public class PartialDate implements Comparable<PartialDate> {
 			value.append(getDayLiteral());
 		}
 		if(displayMonths) {
-			if(value.length() > 0) {
+			if(!value.isEmpty()) {
 				value.append(".");
 			}
 			value.append(getMonthLiteral());
 		}
 		if(displayYears) {
-			if(value.length() > 0) {
+			if(!value.isEmpty()) {
 				value.append(".");
 			}
 			value.append(getYearLiteral());

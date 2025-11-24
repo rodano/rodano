@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.timelinegraph;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -7,6 +8,7 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 
 public class TimelineGraphSectionPosition implements Node {
+	@Serial
 	private static final long serialVersionUID = 3773184542129742539L;
 
 	private Integer start;

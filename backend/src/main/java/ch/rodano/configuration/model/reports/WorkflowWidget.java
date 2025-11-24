@@ -1,6 +1,7 @@
 package ch.rodano.configuration.model.reports;
 
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +30,7 @@ import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class WorkflowWidget implements SuperDisplayable, Serializable, Node, Comparable<WorkflowWidget> {
+	@Serial
 	private static final long serialVersionUID = 6618695584561912753L;
 
 	private Study study;

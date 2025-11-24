@@ -113,7 +113,7 @@ public class NumberValidator implements ValueFormatValidator {
 		}
 
 		if(fieldModel.getMinValue() != null || fieldModel.getMaxValue() != null) {
-			final Double numberValue = Double.parseDouble(value);
+			final double numberValue = Double.parseDouble(value);
 			if(fieldModel.getMinValue() != null && numberValue < fieldModel.getMinValue()) {
 				return InvalidNumber.tooSmall(fieldModel.getNumberFormatter(), fieldModel.getMinValue());
 			}

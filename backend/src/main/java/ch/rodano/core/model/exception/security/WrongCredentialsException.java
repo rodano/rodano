@@ -1,11 +1,14 @@
 package ch.rodano.core.model.exception.security;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 
 public class WrongCredentialsException extends RuntimeException implements ManagedException {
 
+	@Serial
 	private static final long serialVersionUID = -3484601656930020185L;
 
 	public WrongCredentialsException() {

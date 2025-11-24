@@ -90,7 +90,7 @@ public class ConfigurationController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.MANAGE_CONFIGURATION);
 
-		final StreamingResponseBody stream = os -> studyService.read(os);
+		final StreamingResponseBody stream = studyService::read;
 		return streamResponse(stream, MediaType.APPLICATION_JSON);
 	}
 
@@ -143,7 +143,7 @@ public class ConfigurationController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor());
 
 		return studyService.getStudy().getMenus().stream()
-			.filter(m -> acl.hasRight(m))
+			.filter(acl::hasRight)
 			.map(m -> menuDTOService.createDTO(m, acl))
 			.toList();
 	}
@@ -192,7 +192,7 @@ public class ConfigurationController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor());
 
 		return studyService.getStudy().getWorkflows().stream()
-			.filter(w -> acl.hasRight(w))
+			.filter(acl::hasRight)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
 			.toList();
 	}

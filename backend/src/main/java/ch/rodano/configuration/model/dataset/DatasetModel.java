@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.dataset;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +37,7 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class DatasetModel implements Serializable, SuperDisplayable, Node, RightAssignable<DatasetModel> {
+	@Serial
 	private static final long serialVersionUID = 3650259090775513476L;
 
 	private static Comparator<DatasetModel> DEFAULT_COMPARATOR = Comparator

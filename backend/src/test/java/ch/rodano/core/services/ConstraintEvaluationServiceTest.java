@@ -18,6 +18,7 @@ import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringTestConfiguration
@@ -63,6 +64,6 @@ public class ConstraintEvaluationServiceTest extends DatabaseTest {
 		// consider only the appropriate value
 		final var evaluable = dataEvaluation.getDependencies().stream().filter(d -> d.getId().equals("DATE_OF_FIRST_SYMPTOMS")).findAny();
 		assertTrue(evaluable.isPresent());
-		assertTrue(evaluable.get() instanceof Field);
+		assertInstanceOf(Field.class, evaluable.get());
 	}
 }

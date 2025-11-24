@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.cms;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +20,7 @@ import ch.rodano.configuration.model.common.Node;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class CMSLayout implements Node {
+	@Serial
 	private static final long serialVersionUID = 7253496770406322390L;
 
 	protected List<CMSSection> sections;

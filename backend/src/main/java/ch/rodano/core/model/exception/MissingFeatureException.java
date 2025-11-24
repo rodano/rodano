@@ -1,5 +1,6 @@
 package ch.rodano.core.model.exception;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -7,6 +8,7 @@ import ch.rodano.configuration.model.feature.Feature;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 
 public final class MissingFeatureException extends RuntimeException implements TechnicalException {
+	@Serial
 	private static final long serialVersionUID = -1873768816151745669L;
 
 	private MissingFeatureException(final Collection<String> featureIds) {

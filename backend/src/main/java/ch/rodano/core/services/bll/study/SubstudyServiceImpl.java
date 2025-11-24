@@ -129,7 +129,7 @@ public class SubstudyServiceImpl implements SubstudyService {
 	@Override
 	public List<Scope> findPotentialScopes(final Scope substudy) {
 		//TODO search all types of scopes
-		final var targetScopeModel = substudy.getScopeModel().getDescendantsScopeModel().get(0);
+		final var targetScopeModel = substudy.getScopeModel().getDescendantsScopeModel().getFirst();
 		final var enrollmentModel = substudy.getData().getEnrollmentModel();
 		final var rootScopes = enrollmentModel.isSystem() ? Collections.singletonList(scopeService.getRootScope()) : scopeDAOService.getScopesByIds(enrollmentModel.getScopesContainerIds());
 		final var scopes = findPotentialScopes(rootScopes, targetScopeModel, enrollmentModel.getCriteria());

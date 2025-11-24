@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.form;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,7 +35,8 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
-public class FormModel implements Serializable, SuperDisplayable, RightAssignable<FormModel> , WorkflowableModel, Node, Comparable<FormModel> {
+public class FormModel implements Serializable, SuperDisplayable, RightAssignable<FormModel>, WorkflowableModel, Node, Comparable<FormModel> {
+	@Serial
 	private static final long serialVersionUID = 6338027622028458338L;
 
 	private String id;
@@ -297,13 +299,10 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 	@Override
 	@JsonIgnore
 	public Collection<Node> getChildrenWithEntity(final Entity entity) {
-		switch(entity) {
-			case WORKFLOW:
-				return Collections.unmodifiableList(getWorkflows());
-			case FIELD_MODEL:
-				return Collections.unmodifiableList(getFieldModels());
-			default:
-				return Collections.emptyList();
-		}
+		return switch(entity) {
+			case WORKFLOW -> Collections.unmodifiableList(getWorkflows());
+			case FIELD_MODEL -> Collections.unmodifiableList(getFieldModels());
+			default -> Collections.emptyList();
+		};
 	}
 }

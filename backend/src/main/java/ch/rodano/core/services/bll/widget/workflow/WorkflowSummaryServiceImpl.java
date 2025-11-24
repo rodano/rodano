@@ -95,7 +95,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 		}
 		final var entity = summary.getWorkflowEntity();
 		//only one workflow is supported
-		final var workflow = summary.getWorkflows().get(0);
+		final var workflow = summary.getWorkflows().getFirst();
 		final var now = ZonedDateTime.now();
 
 		final Map<Long, SummaryRowDTO> summaryByScopePk = new LinkedHashMap<>();
@@ -259,10 +259,10 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> tableQuery = null;
 			//a widget displaying an aggregation workflow is either on scopes or events
 			if(WorkflowableEntity.SCOPE.equals(entity)) {
-				tableQuery = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.get(0)), Optional.empty());
+				tableQuery = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.getFirst()), Optional.empty());
 			}
 			else {
-				tableQuery = aggregateWorkflowDAOService.generateEventQuery(Optional.of(workflows.get(0)), Optional.empty());
+				tableQuery = aggregateWorkflowDAOService.generateEventQuery(Optional.of(workflows.getFirst()), Optional.empty());
 			}
 			table = DSL.table(tableQuery);
 		}

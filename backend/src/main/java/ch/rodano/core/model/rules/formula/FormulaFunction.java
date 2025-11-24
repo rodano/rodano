@@ -172,7 +172,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			final var initialDate = (PartialDate) parameters.get(0);
+			final var initialDate = (PartialDate) parameters.getFirst();
 			return initialDate.withDayOfMonth(1);
 		}
 	},
@@ -203,7 +203,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			final Double value = (Double) parameters.get(0);
+			final Double value = (Double) parameters.getFirst();
 			final long longValue = value.longValue();
 			if(Double.valueOf(longValue).equals(value)) {
 				return Long.toString(longValue);
@@ -217,7 +217,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			final String value = (String) parameters.get(0);
+			final String value = (String) parameters.getFirst();
 			return Double.valueOf(value);
 		}
 	},
@@ -228,7 +228,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			return StringUtils.isBlank((String) parameters.get(0));
+			return StringUtils.isBlank((String) parameters.getFirst());
 		}
 	},
 	CONCAT {
@@ -244,13 +244,13 @@ public enum FormulaFunction {
 	UPPERCASE {
 		@Override
 		public String getValue(final List<Object> parameters) {
-			return StringUtils.upperCase((String) parameters.get(0));
+			return StringUtils.upperCase((String) parameters.getFirst());
 		}
 	},
 	LOWERCASE {
 		@Override
 		public String getValue(final List<Object> parameters) {
-			return StringUtils.lowerCase((String) parameters.get(0));
+			return StringUtils.lowerCase((String) parameters.getFirst());
 		}
 	},
 	//numbers
@@ -371,7 +371,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			final Double number = (Double) parameters.get(0);
+			final Double number = (Double) parameters.getFirst();
 			return Math.sqrt(number);
 		}
 	},
@@ -381,7 +381,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			final var number = BigDecimal.valueOf((Double) parameters.get(0));
+			final var number = BigDecimal.valueOf((Double) parameters.getFirst());
 			return BigDecimal.ONE.divide(number).doubleValue();
 		}
 	},
@@ -448,7 +448,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			return Math.abs((Double) parameters.get(0));
+			return Math.abs((Double) parameters.getFirst());
 		}
 	},
 	ROUND {
@@ -468,7 +468,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			return Math.ceil((Double) parameters.get(0));
+			return Math.ceil((Double) parameters.getFirst());
 		}
 	},
 	FLOOR {
@@ -477,7 +477,7 @@ public enum FormulaFunction {
 			if(parameters.size() != 1) {
 				throw new FormulaWrongFunctionParametersException(this, parameters.size(), 1);
 			}
-			return Math.floor((Double) parameters.get(0));
+			return Math.floor((Double) parameters.getFirst());
 		}
 	},
 	BMI {

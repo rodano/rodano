@@ -1,5 +1,6 @@
 package ch.rodano.core.model.scope;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ import ch.rodano.core.model.enrollment.SubscriptionRestriction;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ScopeData implements Serializable {
+	@Serial
 	private static final long serialVersionUID = -2250927876597655682L;
 
 	private SortedMap<String, String> description;

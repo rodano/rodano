@@ -731,7 +731,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		acl.checkRight(action, Optional.empty());
 
 		//find profile
-		final var profile = actorService.getActiveProfiles(acl.actor()).get(0);
+		final var profile = actorService.getActiveProfiles(acl.actor()).getFirst();
 
 		// Initialize workflow
 		workflowStatusService.create(

@@ -45,7 +45,7 @@ public class LZW {
 		}
 
 		//add last characters to results
-		if(phrase.length() > 0) {
+		if(!phrase.isEmpty()) {
 			result.add(dictionary.get(phrase.toString()));
 		}
 		return result;

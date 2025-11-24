@@ -1,5 +1,6 @@
 package ch.rodano.core.model.enrollment;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class EnrollmentTarget implements Comparable<EnrollmentTarget>, Serializable {
+	@Serial
 	private static final long serialVersionUID = -8726806535623074346L;
 
 	private ZonedDateTime date;

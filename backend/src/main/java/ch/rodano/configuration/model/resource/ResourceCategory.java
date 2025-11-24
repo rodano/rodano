@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.resource;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,6 +22,7 @@ import ch.rodano.configuration.model.study.Study;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class ResourceCategory implements Serializable, SuperDisplayable, Assignable<ResourceCategory>, Node {
+	@Serial
 	private static final long serialVersionUID = -813476290184481379L;
 
 	private Study study;

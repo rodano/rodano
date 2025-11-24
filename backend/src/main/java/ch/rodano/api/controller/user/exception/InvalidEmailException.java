@@ -1,11 +1,14 @@
 package ch.rodano.api.controller.user.exception;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 
 public class InvalidEmailException extends RuntimeException implements ManagedException {
 
+	@Serial
 	private static final long serialVersionUID = -5371079453802727633L;
 
 	public InvalidEmailException(final String message) {

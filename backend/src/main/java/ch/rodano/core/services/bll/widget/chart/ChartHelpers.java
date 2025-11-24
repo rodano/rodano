@@ -64,7 +64,7 @@ public class ChartHelpers {
 		}
 
 		//be sure to add the final point
-		if(input.size() > 0) {
+		if(!input.isEmpty()) {
 			final var lastEntry = input.lastEntry();
 			result.put(lastEntry.getKey(), lastEntry.getValue());
 		}

@@ -1,6 +1,9 @@
 package ch.rodano.configuration.exceptions;
 
+import java.io.Serial;
+
 public class RuleBreakException extends Exception {
+	@Serial
 	private static final long serialVersionUID = 179170340556907064L;
 
 	private final boolean valid;

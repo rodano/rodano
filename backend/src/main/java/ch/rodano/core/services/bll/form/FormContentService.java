@@ -122,7 +122,7 @@ public class FormContentService {
 				for(final Cell cell : cells) {
 					final String datasetModelId = cell.getDatasetModelId();
 					//retrieve the datasets for this cell
-					final Dataset dataset = getDatasets(event, scopeDatasets, eventDatasets, datasetModelId).get(0);
+					final Dataset dataset = getDatasets(event, scopeDatasets, eventDatasets, datasetModelId).getFirst();
 					//gather the fields in this cell
 					final var field = fieldsByDataset.get(dataset.getPk()).stream()
 						.filter(f -> f.getFieldModelId().equals(cell.getFieldModelId()))

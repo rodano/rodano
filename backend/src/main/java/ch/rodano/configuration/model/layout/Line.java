@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.layout;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -17,6 +18,7 @@ import ch.rodano.configuration.model.common.Node;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Line implements Node {
+	@Serial
 	private static final long serialVersionUID = -5443844894479046768L;
 
 	private List<Cell> cells;

@@ -163,11 +163,11 @@ public final class ExportableUtils {
 
 		//add condition
 		layout.getFormModel().getLayouts().stream()
-		.flatMap(l -> l.getCells().stream())
-		.flatMap(c -> c.getVisibilityCriteria().stream())
-		.filter(c -> c.getTargetLayoutIds().contains(layout.getId()))
-		.findAny()
-		.ifPresent(c -> children.put("condition", c.getDescription(languages)));
+			.flatMap(l -> l.getCells().stream())
+			.flatMap(c -> c.getVisibilityCriteria().stream())
+			.filter(c -> c.getTargetLayoutIds().contains(layout.getId()))
+			.findAny()
+			.ifPresent(c -> children.put("condition", c.getDescription(languages)));
 
 		//add all children
 		DocumentHelper.appendSimpleChildren(element, children);
@@ -224,10 +224,10 @@ public final class ExportableUtils {
 
 		//add condition
 		cell.getLine().getLayout().getCells().stream()
-		.flatMap(c -> c.getVisibilityCriteria().stream())
-		.filter(c -> c.getTargetCellIds().contains(cell.getId()))
-		.findAny()
-		.ifPresent(c -> children.put("condition", c.getDescription(languages)));
+			.flatMap(c -> c.getVisibilityCriteria().stream())
+			.filter(c -> c.getTargetCellIds().contains(cell.getId()))
+			.findAny()
+			.ifPresent(c -> children.put("condition", c.getDescription(languages)));
 
 		//add all children
 		DocumentHelper.appendSimpleChildren(element, children);
@@ -371,20 +371,11 @@ public final class ExportableUtils {
 	}
 
 	private static String getFormatSpecification(final FieldModel fieldModel) {
-		switch(fieldModel.getType()) {
-			case CHECKBOX:
-			case CHECKBOX_GROUP:
-			case DATE_SELECT:
-			case RADIO:
-			case SELECT:
-			case TEXTAREA:
-			case STRING:
-				return "String";
-			case NUMBER:
-				return fieldModel.isDecimal() ? DECIMAL : INTEGER;
-			default:
-				return fieldModel.getInlineHelpOrFormat();
-		}
+		return switch(fieldModel.getType()) {
+			case CHECKBOX, CHECKBOX_GROUP, DATE_SELECT, RADIO, SELECT, TEXTAREA, STRING -> "String";
+			case NUMBER -> fieldModel.isDecimal() ? DECIMAL : INTEGER;
+			default -> fieldModel.getInlineHelpOrFormat();
+		};
 	}
 
 	private static String getPossibleValuesSpecification(final FieldModel fieldModel, final String... languages) {
@@ -399,8 +390,7 @@ public final class ExportableUtils {
 
 	@SuppressWarnings("null")
 	public static void getDataStructure(final OutputStream out, final Collection<DatasetModel> datasetModels, final boolean withModificationDate, final String... languages) throws IOException {
-		@SuppressWarnings("resource")
-		final var writer = new CSVWriter(new OutputStreamWriter(out));
+		@SuppressWarnings("resource") final var writer = new CSVWriter(new OutputStreamWriter(out));
 
 		//static columns
 		writer.writeNext(new String[] {
@@ -427,7 +417,7 @@ public final class ExportableUtils {
 			if(scopeModels.isEmpty() && eventModels.isEmpty()) {
 				continue;
 			}
-			final var scopeModel = !scopeModels.isEmpty() ? scopeModels.get(0) : eventModels.get(0).getScopeModel();
+			final var scopeModel = !scopeModels.isEmpty() ? scopeModels.getFirst() : eventModels.getFirst().getScopeModel();
 			final var parentScopeModel = scopeModel.isRoot() ? null : scopeModel.getDefaultParent();
 
 			//create first rows for informations columns
@@ -604,9 +594,9 @@ public final class ExportableUtils {
 
 					getFormatSpecification(fieldModel),
 					fieldModel.hasPossibleValuesProvider() ? "Yes" : "No",
-						getPossibleValuesSpecification(fieldModel, languages),
+					getPossibleValuesSpecification(fieldModel, languages),
 
-						fieldModel.isPlugin() ? "Yes" : "No"
+					fieldModel.isPlugin() ? "Yes" : "No"
 				});
 
 				if(withModificationDate) {

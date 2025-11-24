@@ -1,5 +1,6 @@
 package ch.rodano.core.model.graph.timeline;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonInclude(Include.NON_NULL)
 public class TimelineGraphDataPeriod implements Serializable {
+	@Serial
 	private static final long serialVersionUID = -2982982586763193668L;
 
 	private ZonedDateTime startDate;

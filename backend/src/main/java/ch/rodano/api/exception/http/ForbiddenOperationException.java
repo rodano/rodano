@@ -1,11 +1,14 @@
 package ch.rodano.api.exception.http;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 
 public class ForbiddenOperationException extends RuntimeException implements ManagedException {
 
+	@Serial
 	private static final long serialVersionUID = -4756725511335581895L;
 
 	public ForbiddenOperationException(final String message) {

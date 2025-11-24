@@ -185,14 +185,12 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 		final Map<Long, String> workflowIds = new HashMap<>();
 
-		final var trails = new ArrayList<AuditTrail>();
-
 		//merge field and workflow status trails
 		final var auditTrails = fieldDAOService.getAuditTrailsForProperty(field, Optional.empty(), FieldRecord::getValue);
 		final var filteredTrails = auditTrails.descendingSet().stream()
 			.filter(t -> date.isEmpty() || t.getAuditDatetime().isBefore(date.get()) || t.getAuditDatetime().equals(date.get()))
 			.toList();
-		trails.addAll(filteredTrails);
+		final var trails = new ArrayList<AuditTrail>(filteredTrails);
 
 		for(final var ws : workflowStatusDAOService.getWorkflowStatusesByFieldPk(field.getPk())) {
 			workflowIds.put(ws.getPk(), ws.getId());

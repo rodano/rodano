@@ -315,7 +315,7 @@ public class PaymentBatchServiceImpl implements PaymentBatchService {
 
 		numRow += 3;
 
-		final var firstWorkflowStatus = workflowStatusDAOService.getWorkflowStatusByPk(payments.get(0).getWorkflowStatusFk());
+		final var firstWorkflowStatus = workflowStatusDAOService.getWorkflowStatusByPk(payments.getFirst().getWorkflowStatusFk());
 
 		final var paymentHeadRow = sheet.createRow(numRow++);
 		final var paymentScopeHeadCell = paymentHeadRow.createCell((short) 0);

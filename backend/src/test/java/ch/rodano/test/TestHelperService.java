@@ -49,7 +49,7 @@ public class TestHelperService {
 		final var study = studyService.getStudy();
 		final var centerScopeModel = study.getScopeModel("CENTER");
 		final var parentModel = centerScopeModel.getDefaultParent();
-		final var anyParent = scopeService.getAll(parentModel).get(0);
+		final var anyParent = scopeService.getAll(parentModel).getFirst();
 
 		return createCenter(anyParent, context);
 	}

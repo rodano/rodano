@@ -504,7 +504,7 @@ public enum Entity implements SuperDisplayable {
 
 		@Override
 		public List<Entity> getChildrenEmbedded() {
-			return Arrays.asList(CMS_SECTION);
+			return List.of(CMS_SECTION);
 		}
 	},
 	CMS_SECTION {
@@ -518,7 +518,7 @@ public enum Entity implements SuperDisplayable {
 
 		@Override
 		public List<Entity> getChildrenEmbedded() {
-			return Arrays.asList(CMS_WIDGET);
+			return List.of(CMS_WIDGET);
 		}
 	},
 	CMS_WIDGET {

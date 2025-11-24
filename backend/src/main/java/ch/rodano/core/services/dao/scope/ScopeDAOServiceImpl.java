@@ -121,10 +121,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.leftJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE.PK.in(ancestorPks).or(
-					SCOPE_ANCESTOR.ANCESTOR_FK.in(ancestorPks)
-						.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
-						.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
-				)
+						SCOPE_ANCESTOR.ANCESTOR_FK.in(ancestorPks)
+							.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+							.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
+					)
 					.and(SCOPE.SCOPE_MODEL_ID.in(scopeModelIds))
 					.and(SCOPE.DELETED.isFalse())
 			)
@@ -564,8 +564,8 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 		final var result = query.fetch();
 		var total = 0;
-		if(result.size() > 0) {
-			total = result.get(0).getValue("total", Integer.class);
+		if(!result.isEmpty()) {
+			total = result.getFirst().getValue("total", Integer.class);
 		}
 
 		final var scopes = result.into(Scope.class);

@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.chart;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 
 @JsonPropertyOrder(alphabetic = true)
 public class Chart implements Node, Comparable<Chart> {
+	@Serial
 	private static final long serialVersionUID = 3353079861292862954L;
 
 	private Study study;

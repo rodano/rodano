@@ -15,12 +15,12 @@ public class MenuDTOServiceImpl implements MenuDTOService {
 
 		// Get the submenus to which the user has rights
 		final var submenus = menu.getSubmenus().stream()
-			.filter(m -> acl.hasRight(m))
+			.filter(acl::hasRight)
 			.map(m -> createDTO(m, acl))
 			.toList();
 
 		// If submenus are present, automatically link first level action to the first second level menu action
-		final var action = !submenus.isEmpty() ? submenus.get(0).action() : createActionDTO(menu);
+		final var action = !submenus.isEmpty() ? submenus.getFirst().action() : createActionDTO(menu);
 
 		return new MenuDTO(
 			menu.getId(),

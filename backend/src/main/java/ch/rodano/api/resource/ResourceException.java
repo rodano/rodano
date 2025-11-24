@@ -1,10 +1,13 @@
 package ch.rodano.api.resource;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 
 public class ResourceException extends RuntimeException implements ManagedException {
+	@Serial
 	private static final long serialVersionUID = 1515352132495239409L;
 
 	public ResourceException(final String message) {

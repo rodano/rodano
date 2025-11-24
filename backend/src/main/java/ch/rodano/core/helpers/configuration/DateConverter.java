@@ -1,5 +1,6 @@
 package ch.rodano.core.helpers.configuration;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -7,6 +8,7 @@ import java.time.ZonedDateTime;
 import org.jooq.Converter;
 
 public class DateConverter implements Converter<LocalDateTime, ZonedDateTime> {
+	@Serial
 	private static final long serialVersionUID = 8448973178380772934L;
 
 	@Override

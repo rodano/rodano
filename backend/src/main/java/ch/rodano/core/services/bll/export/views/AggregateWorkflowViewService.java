@@ -38,7 +38,7 @@ public class AggregateWorkflowViewService {
 		final var scopeQuery = aggregateWorkflowDAOService.generateScopeQuery(Optional.empty(), Optional.empty());
 		final var eventQuery = aggregateWorkflowDAOService.generateEventQuery(Optional.empty(), Optional.empty());
 		//the fields of the view are the same as the fields of the workflow status table
-		final var fields = Arrays.asList(WORKFLOW_STATUS.fields()).stream().map(Field<?>::getName).toList().toArray(new String[0]);
+		final String[] fields = Arrays.stream(WORKFLOW_STATUS.fields()).map(Field::getName).toArray(String[]::new);
 		create.createOrReplaceView("workflow_status_aggregate", fields).as(scopeQuery.union(eventQuery)).execute();
 	}
 }

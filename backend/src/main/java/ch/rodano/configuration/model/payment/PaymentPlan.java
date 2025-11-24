@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.payment;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,8 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
-public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightAssignable<PaymentPlan> {
+public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightAssignable<PaymentPlan>, Comparable<PaymentPlan> {
+	@Serial
 	private static final long serialVersionUID = 7456710559952363241L;
 
 	private String id;
@@ -142,7 +144,7 @@ public class PaymentPlan implements Serializable, SuperDisplayable, Node, RightA
 	@JsonIgnore
 	public WorkflowableModel getWorkflowableModel() {
 		//plan are based on workflows used only once
-		return study.getWorkflow(workflow).getWorkflowableModels().get(0);
+		return study.getWorkflow(workflow).getWorkflowableModels().getFirst();
 	}
 
 	@JsonIgnore

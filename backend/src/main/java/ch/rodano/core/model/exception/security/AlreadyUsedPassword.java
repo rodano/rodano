@@ -1,10 +1,13 @@
 package ch.rodano.core.model.exception.security;
 
+import java.io.Serial;
+
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 
 public final class AlreadyUsedPassword extends RuntimeException implements ManagedException {
+	@Serial
 	private static final long serialVersionUID = 6904976712601969446L;
 
 	public AlreadyUsedPassword() {

@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.validator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,14 +31,15 @@ import ch.rodano.configuration.utils.DisplayableUtils;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class Validator implements Serializable, SuperDisplayable, Node, Comparable<Validator> {
+	@Serial
 	private static final long serialVersionUID = -7922512122647649002L;
 
 	public static final Map<String, String> REQUIRED = Map.of(
 		LanguageStatic.en.name(), "is required",
 		LanguageStatic.fr.name(), "est requis"
-		);
+	);
 
-	private static Comparator<Validator> DEFAULT_COMPARATOR = Comparator.comparing(Validator::getId);
+	private static final Comparator<Validator> DEFAULT_COMPARATOR = Comparator.comparing(Validator::getId);
 
 	public static final Comparator<Validator> COMPARATOR_IMPORTANCE = (v1, v2) -> {
 		if(v1 == v2) {

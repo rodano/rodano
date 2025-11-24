@@ -78,7 +78,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		WorkflowableEntity.FIELD, FIELD.FIELD_MODEL_ID
 	);
 
-	private static final Map<WorkflowableEntity, TableField<?, ?>> WORKFLOW_ENTITY_COLMUN = Map.of(
+	private static final Map<WorkflowableEntity, TableField<?, ?>> WORKFLOW_ENTITY_COLUMN = Map.of(
 		WorkflowableEntity.FIELD, WORKFLOW_STATUS.FIELD_FK,
 		WorkflowableEntity.FORM, WORKFLOW_STATUS.FORM_FK,
 		WorkflowableEntity.EVENT, WORKFLOW_STATUS.EVENT_FK,
@@ -124,10 +124,10 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		if(isAggregator) {
 			//a widget displaying an aggregation workflow is either on scopes or events
 			if(WorkflowableEntity.SCOPE == widget.getWorkflowEntity()) {
-				wsTable = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.get(0)), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
+				wsTable = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.getFirst()), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
 			}
 			else {
-				wsTable = aggregateWorkflowDAOService.generateEventQuery(Optional.of(workflows.get(0)), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
+				wsTable = aggregateWorkflowDAOService.generateEventQuery(Optional.of(workflows.getFirst()), Optional.empty()).asTable(WORKFLOW_STATUS.getName());
 			}
 		}
 		else {
@@ -199,7 +199,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		//filter workflow states by entity chosen in the configuration
 		//the same workflow can be attached to different element
 		//think about the query_summary workflow that could be attached to some events and some scopes
-		query.where(WORKFLOW_ENTITY_COLMUN.get(widget.getWorkflowEntity()).isNotNull())
+		query.where(WORKFLOW_ENTITY_COLUMN.get(widget.getWorkflowEntity()).isNotNull())
 			.and(ancestorTable.VIRTUAL.isFalse());
 
 		//filter on workflows and states

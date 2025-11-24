@@ -79,24 +79,21 @@ public class ExportViewServiceImpl implements ExportViewService {
 	private void generateDatasetOnScopeView(final DatasetModel datasetModel) {
 		final List<String> columns = new ArrayList<>(BASE_COLUMNS);
 
-		final List<SelectFieldOrAsterisk> fields = new ArrayList<>();
-		fields.addAll(
-			List.of(
-				SCOPE.PK,
-				SCOPE.ID,
-				SCOPE.CODE,
-				SCOPE.SCOPE_MODEL_ID,
-				DSL.inline(null, SQLDataType.BIGINT),
-				DSL.inline(null, SQLDataType.VARCHAR),
-				DSL.inline(null, SQLDataType.INTEGER),
-				DSL.inline(null, SQLDataType.BOOLEAN),
-				DSL.inline(null, SQLDataType.DATE),
-				DSL.inline(null, SQLDataType.DATE),
-				DSL.inline(null, SQLDataType.DATE),
-				DATASET.LAST_UPDATE_TIME,
-				DATASET.PK
-			)
-		);
+		final List<SelectFieldOrAsterisk> fields = new ArrayList<>(List.of(
+			SCOPE.PK,
+			SCOPE.ID,
+			SCOPE.CODE,
+			SCOPE.SCOPE_MODEL_ID,
+			DSL.inline(null, SQLDataType.BIGINT),
+			DSL.inline(null, SQLDataType.VARCHAR),
+			DSL.inline(null, SQLDataType.INTEGER),
+			DSL.inline(null, SQLDataType.BOOLEAN),
+			DSL.inline(null, SQLDataType.DATE),
+			DSL.inline(null, SQLDataType.DATE),
+			DSL.inline(null, SQLDataType.DATE),
+			DATASET.LAST_UPDATE_TIME,
+			DATASET.PK
+		));
 
 		for(final var column : generateFieldColumns(datasetModel)) {
 			columns.add(column.getLeft());
@@ -124,24 +121,21 @@ public class ExportViewServiceImpl implements ExportViewService {
 	private void generateDatasetOnEventView(final DatasetModel datasetModel) {
 		final List<String> columns = new ArrayList<>(BASE_COLUMNS);
 
-		final List<SelectFieldOrAsterisk> fields = new ArrayList<>();
-		fields.addAll(
-			List.of(
-				SCOPE.PK,
-				SCOPE.ID,
-				SCOPE.CODE,
-				SCOPE.SCOPE_MODEL_ID,
-				EVENT.PK,
-				EVENT.EVENT_MODEL_ID,
-				EVENT.EVENT_GROUP_NUMBER,
-				EVENT.BLOCKING,
-				EVENT.EXPECTED_DATE,
-				EVENT.DATE,
-				EVENT.END_DATE,
-				DATASET.LAST_UPDATE_TIME,
-				DATASET.PK
-			)
-		);
+		final List<SelectFieldOrAsterisk> fields = new ArrayList<>(List.of(
+			SCOPE.PK,
+			SCOPE.ID,
+			SCOPE.CODE,
+			SCOPE.SCOPE_MODEL_ID,
+			EVENT.PK,
+			EVENT.EVENT_MODEL_ID,
+			EVENT.EVENT_GROUP_NUMBER,
+			EVENT.BLOCKING,
+			EVENT.EXPECTED_DATE,
+			EVENT.DATE,
+			EVENT.END_DATE,
+			DATASET.LAST_UPDATE_TIME,
+			DATASET.PK
+		));
 
 		for(final var column : generateFieldColumns(datasetModel)) {
 			columns.add(column.getLeft());

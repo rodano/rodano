@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.payment;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 
@@ -17,6 +18,7 @@ import ch.rodano.configuration.model.scope.ScopeModel;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder(alphabetic = true)
 public class PaymentDistribution implements Node {
+	@Serial
 	private static final long serialVersionUID = -7856978742306432331L;
 
 	private PaymentStep step;

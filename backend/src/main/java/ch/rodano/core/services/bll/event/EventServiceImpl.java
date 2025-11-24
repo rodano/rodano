@@ -215,7 +215,7 @@ public class EventServiceImpl implements EventService {
 			}
 		}
 
-		return createdEvents.get(0);
+		return createdEvents.getFirst();
 	}
 
 	@Override
@@ -575,7 +575,7 @@ public class EventServiceImpl implements EventService {
 
 		//manage value in label //so cool
 		if(pattern.contains("${datasetModelId:")) {
-			final var attributePattern = new StringBuffer();
+			final var attributePattern = new StringBuilder();
 			final var regexMatcher = REGEXP.matcher(pattern);
 			while(regexMatcher.find()) {
 				var value = "NA";

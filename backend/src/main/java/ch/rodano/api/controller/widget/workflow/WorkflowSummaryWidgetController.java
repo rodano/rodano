@@ -76,7 +76,7 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 			}
 		}
 		else {
-			scope = actorService.getRootScope(currentActor, workflowSummary.getWorkflows().get(0)).orElseThrow();
+			scope = actorService.getRootScope(currentActor, workflowSummary.getWorkflows().getFirst()).orElseThrow();
 		}
 
 		return workflowSummaryService.getSummary(workflowSummary, scope);
@@ -105,12 +105,12 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 			scopes.add(scope);
 		}
 		else {
-			scopes.addAll(actorService.getRootScopes(currentActor, summary.getWorkflows().get(0)));
+			scopes.addAll(actorService.getRootScopes(currentActor, summary.getWorkflows().getFirst()));
 			if(scopes.isEmpty()) {
 				throw new UnsupportedOperationException("No scope available for the export");
 			}
 			//TODO do not rely on only one scope to decide if deleted data must be included
-			roles = currentActiveRoles(scopes.get(0));
+			roles = currentActiveRoles(scopes.getFirst());
 		}
 
 		final var includeDeleted = rightsService.hasRight(roles, FeatureStatic.MANAGE_DELETED_DATA);
@@ -145,12 +145,12 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 			scopes.add(scope);
 		}
 		else {
-			scopes.addAll(actorService.getRootScopes(currentActor, summary.getWorkflows().get(0)));
+			scopes.addAll(actorService.getRootScopes(currentActor, summary.getWorkflows().getFirst()));
 			if(scopes.isEmpty()) {
 				throw new UnsupportedOperationException("No scope available for the export");
 			}
 			//TODO do not rely on only one scope to decide if deleted data must be included
-			roles = currentActiveRoles(scopes.get(0));
+			roles = currentActiveRoles(scopes.getFirst());
 		}
 
 		final var includeDeleted = rightsService.hasRight(roles, FeatureStatic.MANAGE_DELETED_DATA);

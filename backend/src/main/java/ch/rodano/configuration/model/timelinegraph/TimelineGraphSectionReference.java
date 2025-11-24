@@ -1,5 +1,6 @@
 package ch.rodano.configuration.model.timelinegraph;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,6 +15,7 @@ import ch.rodano.configuration.model.common.Node;
 
 @JsonInclude(Include.NON_NULL)
 public class TimelineGraphSectionReference implements Node {
+	@Serial
 	private static final long serialVersionUID = 6494810301408433597L;
 
 	private Map<String, String> label;
