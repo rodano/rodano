@@ -28,7 +28,6 @@ input[type='number'] {
 }
 .mat-mdc-radio-group {
 	display: flex;
-	gap: var(--gap);
 	flex-direction: column;
 
 	&.horizontal {
