@@ -372,7 +372,7 @@ public class EventServiceTest extends DatabaseTest {
 		);
 
 		final var progressAfterOneValue = eventService.getProgression(baselineVisit);
-		assertEquals(47, progressAfterOneValue.getTotal());
+		assertEquals(48, progressAfterOneValue.getTotal());
 		assertEquals(1, progressAfterOneValue.getProgress());
 		assertFalse(progressAfterOneValue.isNull());
 		assertFalse(progressAfterOneValue.isComplete());
@@ -390,7 +390,7 @@ public class EventServiceTest extends DatabaseTest {
 		);
 
 		final var progressAfterTwoValues = eventService.getProgression(baselineVisit);
-		assertEquals(47, progressAfterTwoValues.getTotal());
+		assertEquals(48, progressAfterTwoValues.getTotal());
 		assertEquals(2, progressAfterTwoValues.getProgress());
 		assertFalse(progressAfterTwoValues.isNull());
 		assertFalse(progressAfterTwoValues.isComplete());

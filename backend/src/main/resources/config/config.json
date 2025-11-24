@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 120,
-	"configDate": 1759820064764,
+	"configDate": 1763985376091,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -8780,7 +8780,7 @@
 				{
 					"id": "RELAPSES_SINCE_LV",
 					"shortname": {
-						"en": "Has the patient experienced relapses since the last visit ?"
+						"en": "Has the patient experienced relapses since the last visit?"
 					},
 					"longname": {},
 					"description": {},
@@ -9262,6 +9262,40 @@
 					"yearsMandatory": false,
 					"monthsMandatory": false,
 					"daysMandatory": false,
+					"hoursMandatory": true,
+					"minutesMandatory": true,
+					"secondsMandatory": true,
+					"advancedHelp": {},
+					"className": "FieldModel"
+				},
+				{
+					"id": "GRADUATED",
+					"shortname": {
+						"en": "Has the patient graduated?"
+					},
+					"longname": {},
+					"description": {},
+					"type": "CHECKBOX",
+					"dataType": "BOOLEAN",
+					"plugin": false,
+					"possibleValues": [],
+					"validatorIds": [],
+					"workflowIds": [],
+					"rules": [],
+					"searchable": false,
+					"readOnly": false,
+					"exportable": true,
+					"allowDateInFuture": false,
+					"matcherMessage": {},
+					"withYears": false,
+					"withMonths": false,
+					"withDays": false,
+					"withHours": false,
+					"withMinutes": false,
+					"withSeconds": false,
+					"yearsMandatory": true,
+					"monthsMandatory": true,
+					"daysMandatory": true,
 					"hoursMandatory": true,
 					"minutesMandatory": true,
 					"secondsMandatory": true,
@@ -11421,33 +11455,25 @@
 					"plugin": false,
 					"possibleValues": [
 						{
-							"id": "CLINICAL_FINDINGS",
+							"id": "PHONE",
 							"shortname": {
-								"en": "Clinical findings"
+								"en": "Phone"
 							},
 							"specify": false,
 							"className": "PossibleValue"
 						},
 						{
-							"id": "MRI",
+							"id": "PAPER",
 							"shortname": {
-								"en": "MRI"
+								"en": "Paper"
 							},
 							"specify": false,
 							"className": "PossibleValue"
 						},
 						{
-							"id": "CSF",
+							"id": "MOBILE",
 							"shortname": {
-								"en": "CSF"
-							},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "VEP",
-							"shortname": {
-								"en": "VEP"
+								"en": "Mobile"
 							},
 							"specify": false,
 							"className": "PossibleValue"
@@ -15292,9 +15318,122 @@
 						{
 							"cells": [
 								{
+									"id": "VISIT_DOCUMENTATION_GRADUATED",
+									"datasetModelId": "VISIT_DOCUMENTATION",
+									"fieldModelId": "GRADUATED",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"constraint": {
+										"conditions": {
+											"SCOPE": {
+												"mode": "OR",
+												"conditions": [
+													{
+														"id": "11",
+														"criterion": {
+															"property": "DATASET",
+															"values": [],
+															"className": "RuleConditionCriterion"
+														},
+														"inverse": false,
+														"dependency": false,
+														"breakType": "NONE",
+														"mode": "OR",
+														"conditions": [
+															{
+																"id": "111",
+																"criterion": {
+																	"property": "ID",
+																	"operator": "EQUALS",
+																	"values": [
+																		"PATIENT_DOCUMENTATION"
+																	],
+																	"className": "RuleConditionCriterion"
+																},
+																"inverse": false,
+																"dependency": false,
+																"breakType": "NONE",
+																"mode": "OR",
+																"conditions": [
+																	{
+																		"id": "1111",
+																		"criterion": {
+																			"property": "FIELD",
+																			"values": [],
+																			"className": "RuleConditionCriterion"
+																		},
+																		"inverse": false,
+																		"dependency": false,
+																		"breakType": "NONE",
+																		"mode": "OR",
+																		"conditions": [
+																			{
+																				"id": "11111",
+																				"criterion": {
+																					"property": "ID",
+																					"operator": "EQUALS",
+																					"values": [
+																						"EMPLOYMENT"
+																					],
+																					"className": "RuleConditionCriterion"
+																				},
+																				"inverse": false,
+																				"dependency": false,
+																				"breakType": "NONE",
+																				"mode": "OR",
+																				"conditions": [
+																					{
+																						"id": "111111",
+																						"criterion": {
+																							"property": "VALUE",
+																							"operator": "EQUALS",
+																							"values": [
+																								"STUDENT"
+																							],
+																							"className": "RuleConditionCriterion"
+																						},
+																						"inverse": false,
+																						"dependency": false,
+																						"breakType": "NONE",
+																						"mode": "OR",
+																						"conditions": [],
+																						"className": "RuleCondition"
+																					}
+																				],
+																				"className": "RuleCondition"
+																			}
+																		],
+																		"className": "RuleCondition"
+																	}
+																],
+																"className": "RuleCondition"
+															}
+														],
+														"className": "RuleCondition"
+													}
+												],
+												"className": "RuleConditionList"
+											}
+										},
+										"evaluations": [],
+										"className": "RuleConstraint"
+									},
+									"cssCodeForLabel": "width: 365px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
+						{
+							"cells": [
+								{
 									"id": "HEADING",
 									"textBefore": {
-										"en": "Patient withdrawal"
+										"en": "<h3>Patient withdrawal</h3>"
 									},
 									"textAfter": {},
 									"visibilityCriteria": [],
@@ -15450,6 +15589,23 @@
 						}
 					],
 					"lines": [
+						{
+							"cells": [
+								{
+									"id": "BMI_LAYOUT_TITLE",
+									"textBefore": {
+										"en": "<h3>BMI</h3>"
+									},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
 						{
 							"cells": [
 								{
@@ -16329,7 +16485,7 @@
 						{
 							"cells": [
 								{
-									"id": "CHILD_CHILD_CERTIFICA_0",
+									"id": "CHILD_CHILD_CERTIFICATE",
 									"datasetModelId": "CHILD",
 									"fieldModelId": "CHILD_CERTIFICATE",
 									"textBefore": {},
