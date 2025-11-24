@@ -1,7 +1,4 @@
 /* display flex to make the header and the content fill 100% of the height */
-header {
-	height: 4rem;
-}
 #stamp {
 	color: white;
 	font-size: 2rem;
@@ -21,9 +18,11 @@ header {
 	user-select: none;
 	pointer-events: none;
 }
+header {
+	height: 4rem;
+}
 #content {
 	flex: 1;
-	height: calc(100vh - 5.5rem);
 	box-sizing: border-box;
 	overflow: auto;
 

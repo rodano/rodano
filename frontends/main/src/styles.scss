@@ -93,6 +93,11 @@ body {
 	margin: 0;
 	padding: 0;
 }
+app-root {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
 
 //titles
 h1,
