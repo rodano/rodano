@@ -1,4 +1,4 @@
-import os
+import config
 import logging
 import json
 import sys
@@ -6,10 +6,9 @@ import traceback
 import tornado.web
 
 logger = logging.getLogger(__name__)
-magic_token = os.getenv("MAGIC_TOKEN")
 
 def validate_token(token):
-	return token == magic_token
+	return token == config.MAGIC_TOKEN
 
 def validate_authorization_header(header):
 	if not header:

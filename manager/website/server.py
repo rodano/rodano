@@ -6,23 +6,10 @@ import tornado.httpserver
 import messaging
 import tasks
 import applications
-
-logging.basicConfig(
-	level=logging.INFO,
-	format="%(asctime)s [%(levelname)s] %(message)s",
-	datefmt="%Y-%m-%d %H:%M:%S",
-	handlers=[
-		logging.StreamHandler()
-	]
-)
+import config
 
 logger = logging.getLogger(__name__)
-
-DEBUG = os.getenv("DEBUG", "false").lower() == "true"
-
-magic_token = os.getenv("MAGIC_TOKEN")
 base_url_path = os.getenv("BASE_URL_PATH", "/")
-
 static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "static")
 
 class IndexHandler(tornado.web.RequestHandler):
@@ -38,7 +25,7 @@ url_pattern.extend([
 	("/(.+)", tornado.web.StaticFileHandler, {"path": static_path})
 ])
 
-application = tornado.web.Application(url_pattern, debug=DEBUG)
+application = tornado.web.Application(url_pattern, debug=config.DEBUG)
 
 async def main():
 	#allow files of 500M to be uploaded
@@ -52,7 +39,7 @@ async def main():
 
 if __name__ == "__main__":
 
-	if not magic_token:
+	if not config.MAGIC_TOKEN:
 		logger.error("The MAGIC_TOKEN environment must be set to start the manager")
 		exit(1)
 
