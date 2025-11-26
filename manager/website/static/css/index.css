@@ -246,14 +246,6 @@ dialog {
 }
 
 /* animations */
-@keyframes fadein {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
 @keyframes fadeout {
 	from {
 		opacity: 1;
@@ -265,8 +257,4 @@ dialog {
 .fadeout {
 	animation-duration: 1s;
 	animation-name: fadeout;
-}
-.fadein {
-	animation-duration: 1s;
-	animation-name: fadein;
 }
