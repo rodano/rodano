@@ -230,9 +230,6 @@ class ApplicationRestore(helpers.AuthenticatedRequestHandler):
 			self.finish()
 
 #application control
-async def do_control(action):
-	await tasks.do_task("control", config.CONTROL_STEPS[action], action)
-
 class ApplicationControl(helpers.AuthenticatedRequestHandler):
 	def post(self):
 		#retrieve parameters
@@ -247,7 +244,12 @@ class ApplicationControl(helpers.AuthenticatedRequestHandler):
 			self.finish()
 			#run task
 			asyncio.create_task(
-				do_control(action)
+				tasks.do_task(
+					"control",
+					config.CONTROL_STEPS[action],
+					action,
+					config.DOCKER_BACKEND_CONTAINER_NAME
+				)
 			)
 		else:
 			self.set_status(403)

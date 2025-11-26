@@ -1,6 +1,8 @@
 import os
 import logging
 import asyncio
+import socket
+import aiodocker
 import tornado.web
 import tornado.httpserver
 import messaging
@@ -28,6 +30,8 @@ url_pattern.extend([
 application = tornado.web.Application(url_pattern, debug=config.DEBUG)
 
 async def main():
+	await config.discover_compose_environment()
+
 	#allow files of 500M to be uploaded
 	server = tornado.httpserver.HTTPServer(application, max_buffer_size=500 * 1024 * 1024)
 	server.listen(8081)

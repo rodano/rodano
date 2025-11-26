@@ -2,6 +2,7 @@
 
 #retrieve parameters
 ACTION=$1
+CONTAINER_NAME=$2
 
 #check parameters
 if [[ -z $ACTION ]]
@@ -9,8 +10,6 @@ then
 	echo "Usage: {start|stop|restart}"
 	exit 1
 fi
-
-CONTAINER_NAME="rodano-backend-1"
 
 #fail if a variable is referenced before being set or if a command fails
 set -u -e -x
