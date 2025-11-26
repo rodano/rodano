@@ -6,6 +6,8 @@ let socket;
 
 function connect_socket() {
 	const deployer_status = document.getElementById('deployer_status');
+	deployer_status.className = 'connecting';
+	deployer_status.title = 'Connecting to server';
 	//removing http from base URI (keeping the "s" if present)
 	const base_uri = document.baseURI.substring(4);
 	const server = `ws${base_uri}${api_base_url}/messaging`;
@@ -13,18 +15,16 @@ function connect_socket() {
 	socket.addEventListener(
 		'open',
 		function() {
-			deployer_status.src = 'images/green_circle.png';
+			deployer_status.className = 'connected';
 			deployer_status.title = 'Connected to server';
-			deployer_status.style.cursor = 'auto';
 			socket.send('status');
 		}
 	);
 	socket.addEventListener(
 		'close',
 		function() {
-			deployer_status.src = 'images/red_circle.png';
+			deployer_status.className = 'disconnected';
 			deployer_status.title = 'Disconnected from the server, click to reconnect';
-			deployer_status.style.cursor = 'pointer';
 		}
 	);
 	socket.addEventListener(

@@ -259,6 +259,27 @@ dialog {
 	animation-name: fadeout;
 }
 
+#deployer_status {
+	display: inline-block;
+	margin-left: 0.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	vertical-align: middle;
+	border-radius: 50%;
+
+	&.disconnected {
+		background-color: #f8d7da;
+	}
+	&.connected {
+		background-color: #d4edda;
+		cursor: auto;
+	}
+	&.connecting {
+		background-color: #fff3cd;
+		cursor: auto;
+	}
+}
+
 #application_backups {
 	max-height: 20rem;
 	overflow: auto;
