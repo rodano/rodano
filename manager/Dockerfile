@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano manager"
 
 #install OS dependencies
-RUN apt-get update && apt-get install -y zip jq docker-cli mariadb-client && apt-get clean
+RUN apt-get update && apt-get install -y zip jq docker-cli && apt-get clean
 
 #install Python dependencies
 COPY website/requirements.txt /app/website/requirements.txt
