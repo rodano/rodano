@@ -258,3 +258,8 @@ dialog {
 	animation-duration: 1s;
 	animation-name: fadeout;
 }
+
+#application_backups {
+	max-height: 20rem;
+	overflow: auto;
+}
