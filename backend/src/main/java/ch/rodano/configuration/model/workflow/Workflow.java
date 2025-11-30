@@ -194,6 +194,14 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	}
 
 	@JsonIgnore
+	public Action getAction(final UUID containedActionId) {
+		return getActions().stream()
+			.filter(a -> containedActionId != null && containedActionId.equals(a.getWorkflowActionId()))
+			.findFirst()
+			.orElseThrow(() -> new NoNodeException(this, Entity.ACTION, containedActionId != null ? containedActionId.toString() : null));
+	}
+
+	@JsonIgnore
 	public Action getAction(final String containedActionId) {
 		return getActions().stream()
 			.filter(a -> a.getId().equals(containedActionId))

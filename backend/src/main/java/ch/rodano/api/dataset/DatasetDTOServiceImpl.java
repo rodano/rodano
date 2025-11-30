@@ -74,7 +74,7 @@ public class DatasetDTOServiceImpl implements DatasetDTOService {
 		dto.lastUpdateTime = dataset.getLastUpdateTime();
 
 		dto.model = configDTOService.createDatasetModelDTO(model, acl);
-		dto.modelId = model.getId();
+		dto.modelId = model.getDatasetModelId();
 
 		dto.removed = dataset.getDeleted();
 		dto.inRemoved = scope.getDeleted();

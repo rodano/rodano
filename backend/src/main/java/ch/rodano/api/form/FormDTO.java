@@ -3,8 +3,8 @@ package ch.rodano.api.form;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
@@ -42,8 +42,8 @@ public class FormDTO {
 	@NotNull
 	FormModelDTO model;
 	@Schema(description = "ID of the form model")
-	@NotBlank
-	String modelId;
+	@NotNull
+	UUID modelId;
 
 	@NotNull
 	boolean removed;
@@ -150,11 +150,11 @@ public class FormDTO {
 		this.model = model;
 	}
 
-	public String getModelId() {
+	public UUID getModelId() {
 		return modelId;
 	}
 
-	public void setModelId(final String modelId) {
+	public void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

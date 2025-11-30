@@ -23,14 +23,10 @@ public interface Node extends Serializable {
 	@JsonIgnore
 	Collection<Node> getChildrenWithEntity(Entity entity);
 
-	default String getClassName() {
-		return getClass().getSimpleName();
-	}
-
 	@JsonAnySetter
 	default void setAnySetter(final String key, final Object value) {
 		if(!"className".equals(key) && !"entity".equals(key)) {
-			LOGGER.error("Unknown property {} (value {}) in class {}", key, value, getClassName());
+			LOGGER.error("Unknown property {} (value {}) in class {}", key, value, getClass().getSimpleName());
 		}
 	}
 }

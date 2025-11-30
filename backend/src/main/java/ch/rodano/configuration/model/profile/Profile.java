@@ -300,22 +300,22 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 
 	@JsonIgnore
 	public final List<Feature> getFeatures() {
-		return study.getNodesFromIds(Entity.FEATURE, grantedFeatureIds);
+		return study.getNodesFromCodes(Entity.FEATURE, grantedFeatureIds);
 	}
 
 	@JsonIgnore
 	public final List<TimelineGraph> getGraphConfigs() {
-		return study.getNodesFromIds(Entity.TIMELINE_GRAPH, grantedTimelineGraphIds);
+		return study.getNodesFromCodes(Entity.TIMELINE_GRAPH, grantedTimelineGraphIds);
 	}
 
 	@JsonIgnore
 	public final List<ResourceCategory> getResourceCategories() {
-		return study.getNodesFromIds(Entity.RESOURCE_CATEGORY, grantedCategoryIds);
+		return study.getNodesFromCodes(Entity.RESOURCE_CATEGORY, grantedCategoryIds);
 	}
 
 	@JsonIgnore
 	public final List<Report> getReports() {
-		return study.getNodesFromIds(Entity.REPORT, grantedReportIds);
+		return study.getNodesFromCodes(Entity.REPORT, grantedReportIds);
 	}
 
 
@@ -324,7 +324,7 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 			.filter(e -> e.getValue().contains(right))
 			.map(Entry::getKey)
 			.toList();
-		return study.getNodesFromIds(entity, nodeIds);
+		return study.getNodesFromCodes(entity, nodeIds);
 	}
 
 	@JsonIgnore
@@ -359,7 +359,7 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 
 	@JsonIgnore
 	public final List<Workflow> getWorkflows() {
-		return study.getNodesFromIds(Entity.WORKFLOW, grantedWorkflowIds.keySet());
+		return study.getNodesFromCodes(Entity.WORKFLOW, grantedWorkflowIds.keySet());
 	}
 
 	@JsonIgnore

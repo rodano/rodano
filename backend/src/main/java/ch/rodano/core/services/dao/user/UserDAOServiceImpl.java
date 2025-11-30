@@ -148,8 +148,8 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 		//select the allowed profiles
 		search.getProfileIds().ifPresent(profileIds -> {
 			final var profileUuids = studyService.getStudy().getProfiles().stream()
-				.filter(p -> profileIds.contains(p.getId()))
 				.map(Profile::getProfileId)
+				.filter(profileIds::contains)
 				.toList();
 
 			if(!profileUuids.isEmpty()) {
@@ -159,8 +159,9 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 
 		//select the allowed features
 		search.getFeatureId().ifPresent(featureId -> {
+			final var featureCode = studyService.getStudy().getFeature(featureId).getId();
 			//retrieve the profile containing the feature
-			final var profileIds = studyService.getStudy().getProfiles().stream().filter(p -> p.hasFeature(featureId)).map(Profile::getId).toList();
+			final var profileIds = studyService.getStudy().getProfiles().stream().filter(p -> p.hasFeature(featureCode)).map(Profile::getProfileId).toList();
 			conditions.add(ROLE.PROFILE_ID.in(profileIds));
 		});
 

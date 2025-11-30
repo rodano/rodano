@@ -153,7 +153,8 @@ public class ScopeController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		final var acl = rightsService.getACL(currentActor);
 
-		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
+		final JavaType uuidListType = TypeFactory.defaultInstance().constructCollectionType(List.class, UUID.class);
+		final JavaType stateType = TypeFactory.defaultInstance().constructMapType(HashMap.class, TypeFactory.defaultInstance().constructType(UUID.class), uuidListType);
 		final Optional<Map<UUID, List<UUID>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
 		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
@@ -201,7 +202,8 @@ public class ScopeController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		final var acl = rightsService.getACL(currentActor);
 
-		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
+		final JavaType uuidListType = TypeFactory.defaultInstance().constructCollectionType(List.class, UUID.class);
+		final JavaType stateType = TypeFactory.defaultInstance().constructMapType(HashMap.class, TypeFactory.defaultInstance().constructType(UUID.class), uuidListType);
 		final Optional<Map<UUID, List<UUID>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
 		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
@@ -237,7 +239,7 @@ public class ScopeController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public ScopeCandidateDTO createCandidateScope(
 		@RequestParam final Long parentScopePk,
-		@RequestParam final String scopeModelId
+		@RequestParam final UUID scopeModelId
 	) {
 		final var parentScope = scopeDAOService.getScopeByPk(parentScopePk);
 		final var selectedScopeModel = studyService.getStudy().getScopeModel(scopeModelId);

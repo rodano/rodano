@@ -85,7 +85,7 @@ public class TimelineServiceImpl implements TimelineService {
 			.collect(Collectors.toCollection(TreeSet::new));
 	}
 
-	private Optional<Event> getFirstEventOfType(final List<Event> events, final String eventModelId) {
+	private Optional<Event> getFirstEventOfType(final List<Event> events, final UUID eventModelId) {
 		if(eventModelId != null) {
 			for(final Event v : events) {
 				if(v.getEventModelId().equals(eventModelId)) {
@@ -96,7 +96,7 @@ public class TimelineServiceImpl implements TimelineService {
 		return Optional.empty();
 	}
 
-	private Optional<Event> getLastEventOfType(final List<Event> events, final String eventModelId) {
+	private Optional<Event> getLastEventOfType(final List<Event> events, final UUID eventModelId) {
 		if(eventModelId != null) {
 			for(final Event v : events) {
 				if(v.getEventModelId().equals(eventModelId)) {
@@ -136,8 +136,8 @@ public class TimelineServiceImpl implements TimelineService {
 		//set study period if any
 		if(!allEvents.isEmpty()) {
 			final var period = new TimelineGraphDataPeriod();
-			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelId()).orElse(allEvents.getFirst());
-			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStopEventModelId()).orElse(allEvents.getLast());
+			final var startEvent = getFirstEventOfType(allEvents, config.getStudyStartEventModelUuid()).orElse(allEvents.getFirst());
+			final var stopEvent = getLastEventOfType(allEvents, config.getStudyStartEventModelUuid()).orElse(allEvents.getLast());
 			//sort these events because in some cases, the stop event may be before the start event
 			final var dates = Stream.of(startEvent.getDateOrExpectedDate(), stopEvent.getDateOrExpectedDate()).sorted().toList();
 			if(!dates.get(0).equals(dates.get(1))) {
@@ -179,8 +179,8 @@ public class TimelineServiceImpl implements TimelineService {
 			else {
 				List<Event> events = new ArrayList<>(allEvents);
 				//filter events on event group
-				if(!section.getEventModelIds().isEmpty()) {
-					events = events.stream().filter(e -> section.getEventModelIds().contains(e.getEventModelId())).toList();
+				if(!section.getEventModelUuids().isEmpty()) {
+					events = events.stream().filter(e -> section.getEventModelUuids().contains(e.getEventModelId())).toList();
 				}
 				//filter event on expected criteria
 				if(section.isHideExpectedEvent()) {

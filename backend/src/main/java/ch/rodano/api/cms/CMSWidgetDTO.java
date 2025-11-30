@@ -1,6 +1,7 @@
 package ch.rodano.api.cms;
 
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,9 @@ import ch.rodano.configuration.model.cms.WidgetWidth;
 
 @Schema(description = "Widgets that are displayed in the layouts")
 public class CMSWidgetDTO {
+	@NotNull
+	UUID menuWidgetId;
+
 	@Schema(description = "Type of widget")
 	@NotBlank
 	String type;
@@ -27,6 +31,7 @@ public class CMSWidgetDTO {
 	Map<String, Object> parameters;
 
 	public CMSWidgetDTO(final CMSWidget cmsWidget) {
+		this.menuWidgetId = cmsWidget.getMenuWidgetId();
 		this.type = cmsWidget.getType();
 
 		this.textBefore = cmsWidget.getTextBefore();
@@ -34,6 +39,14 @@ public class CMSWidgetDTO {
 		this.width = cmsWidget.getWidth();
 
 		this.parameters = cmsWidget.getParameters();
+	}
+
+	public UUID getMenuWidgetId() {
+		return menuWidgetId;
+	}
+
+	public void setMenuWidgetId(final UUID menuWidgetId) {
+		this.menuWidgetId = menuWidgetId;
 	}
 
 	public String getType() {

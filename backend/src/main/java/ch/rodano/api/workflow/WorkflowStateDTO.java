@@ -2,6 +2,7 @@ package ch.rodano.api.workflow;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Workflow state")
 public class WorkflowStateDTO {
+	@NotNull
+	UUID workflowStateId;
 	@NotBlank
 	String id;
 	@NotNull
@@ -59,6 +62,14 @@ public class WorkflowStateDTO {
 
 	public void setColor(final String color) {
 		this.color = color;
+	}
+
+	public UUID getWorkflowStateId() {
+		return workflowStateId;
+	}
+
+	public void setWorkflowStateId(final UUID workflowStateId) {
+		this.workflowStateId = workflowStateId;
 	}
 
 	public String getId() {

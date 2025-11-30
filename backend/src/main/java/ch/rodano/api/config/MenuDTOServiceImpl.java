@@ -23,6 +23,7 @@ public class MenuDTOServiceImpl implements MenuDTOService {
 		final var action = !submenus.isEmpty() ? submenus.getFirst().action() : createActionDTO(menu);
 
 		return new MenuDTO(
+			menu.getMenuId(),
 			menu.getId(),
 			menu.getShortname(),
 			menu.getLongname(),

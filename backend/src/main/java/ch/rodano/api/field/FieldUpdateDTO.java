@@ -1,6 +1,9 @@
 package ch.rodano.api.field;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -13,8 +16,8 @@ public class FieldUpdateDTO {
 	@Schema(description = "Field reference")
 	Long pk;
 	@Schema(description = "Field model ID")
-	@NotBlank
-	String modelId;
+	@NotNull
+	UUID modelId;
 
 	@Schema(description = "Field value")
 	@NotBlank
@@ -33,11 +36,11 @@ public class FieldUpdateDTO {
 		this.pk = pk;
 	}
 
-	public String getModelId() {
+	public UUID getModelId() {
 		return modelId;
 	}
 
-	public void setModelId(final String modelId) {
+	public void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

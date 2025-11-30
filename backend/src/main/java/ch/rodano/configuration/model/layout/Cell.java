@@ -261,7 +261,7 @@ public class Cell implements Node {
 
 	@JsonIgnore
 	public UUID getDatasetModelUuid() {
-		if(this.datasetModelId == null || this.datasetModelId.isBlank()) {
+		if(this.datasetModelId == null || this.datasetModelId.isBlank() || this.line == null) {
 			return null;
 		}
 		return getDatasetModel().getDatasetModelId();
@@ -269,7 +269,7 @@ public class Cell implements Node {
 
 	@JsonIgnore
 	public UUID getFieldModelUuid() {
-		if(this.fieldModelId == null || this.fieldModelId.isBlank()) {
+		if(this.fieldModelId == null || this.fieldModelId.isBlank() || this.line == null) {
 			return null;
 		}
 		return getFieldModel().getFieldModelId();

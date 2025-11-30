@@ -2,6 +2,7 @@ package ch.rodano.configuration.model.workflow;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -54,6 +55,7 @@ public class Action implements Serializable, SuperDisplayable, Node, ProfileRigh
 		shortname = new TreeMap<>();
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
+		rules = new ArrayList<>();
 	}
 
 	public UUID getWorkflowActionId() {
@@ -122,7 +124,7 @@ public class Action implements Serializable, SuperDisplayable, Node, ProfileRigh
 	}
 
 	public final List<Rule> getRules() {
-		return rules;
+		return rules != null ? rules : Collections.emptyList();
 	}
 
 	public final void setRules(final List<Rule> rules) {

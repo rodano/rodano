@@ -20,7 +20,7 @@ public class WorkflowStatusSearch extends PaginatedSearch<WorkflowStatusSearch> 
 	private List<UUID> workflowIds;
 
 	@Schema(description = "State ids")
-	private Optional<List<String>> stateIds = Optional.empty();
+	private Optional<List<UUID>> stateIds = Optional.empty();
 
 	@Schema(description = "Scope pks")
 	private Optional<List<Long>> scopePks = Optional.empty();
@@ -49,11 +49,11 @@ public class WorkflowStatusSearch extends PaginatedSearch<WorkflowStatusSearch> 
 		return this;
 	}
 
-	public Optional<List<String>> getStateIds() {
+	public Optional<List<UUID>> getStateIds() {
 		return stateIds;
 	}
 
-	public WorkflowStatusSearch setStateIds(final Optional<List<String>> stateIds) {
+	public WorkflowStatusSearch setStateIds(final Optional<List<UUID>> stateIds) {
 		this.stateIds = stateIds;
 		return this;
 	}

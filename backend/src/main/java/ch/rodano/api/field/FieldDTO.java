@@ -2,6 +2,7 @@ package ch.rodano.api.field;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,8 +36,8 @@ public class FieldDTO {
 	Long datasetPk;
 	@NotBlank
 	String datasetId;
-	@NotBlank
-	String datasetModelId;
+	@NotNull
+	UUID datasetModelId;
 
 	@Schema(description = "Field pk")
 	@NotNull
@@ -51,8 +52,8 @@ public class FieldDTO {
 	@NotNull
 	FieldModelDTO model;
 	@Schema(description = "Field model id")
-	@NotBlank
-	String modelId;
+	@NotNull
+	UUID modelId;
 
 	@Schema(description = "Is the field attached to a removed entity?")
 	@NotNull
@@ -133,11 +134,11 @@ public class FieldDTO {
 		this.pk = pk;
 	}
 
-	public String getDatasetModelId() {
+	public UUID getDatasetModelId() {
 		return datasetModelId;
 	}
 
-	public void setDatasetModelId(final String datasetModelId) {
+	public void setDatasetModelId(final UUID datasetModelId) {
 		this.datasetModelId = datasetModelId;
 	}
 
@@ -165,11 +166,11 @@ public class FieldDTO {
 		this.model = model;
 	}
 
-	public String getModelId() {
+	public UUID getModelId() {
 		return modelId;
 	}
 
-	public void setModelId(final String modelId) {
+	public void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

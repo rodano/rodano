@@ -485,7 +485,7 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	@JsonIgnore
 	public List<DatasetModel> getDatasetModels() {
-		return getStudy().getNodesFromIds(Entity.DATASET_MODEL, datasetModelIds);
+		return getStudy().getNodesFromCodes(Entity.DATASET_MODEL, datasetModelIds);
 	}
 
 	public final List<String> getFormModelIds() {
@@ -523,7 +523,7 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	@JsonIgnore
 	public List<FormModel> getFormModels() {
-		return getStudy().getNodesFromIds(Entity.FORM_MODEL, formModelIds);
+		return getStudy().getNodesFromCodes(Entity.FORM_MODEL, formModelIds);
 	}
 
 	@JsonIgnore
@@ -569,7 +569,7 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 	@JsonIgnore
 	@Override
 	public final List<Workflow> getWorkflows() {
-		return getStudy().getNodesFromIds(Entity.WORKFLOW, workflowIds);
+		return getStudy().getNodesFromCodes(Entity.WORKFLOW, workflowIds);
 	}
 
 	@JsonIgnore

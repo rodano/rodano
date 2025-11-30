@@ -39,6 +39,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 	@Override
 	public WorkflowDTO createWorkflowDTO(final Workflow workflow, final ACL acl) {
 		final var dto = new WorkflowDTO();
+		dto.workflowId = workflow.getWorkflowId();
 		dto.id = workflow.getId();
 
 		dto.shortname = workflow.getShortname();
@@ -46,9 +47,9 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.description = workflow.getDescription();
 
 		dto.aggregator = workflow.isAggregator();
-		dto.aggregatedWorkflowId = workflow.getAggregateWorkflowId();
+		dto.aggregatedWorkflowId = workflow.getAggregateWorkflowUuid();
 		dto.mandatory = workflow.isMandatory();
-		dto.actionId = workflow.getActionId();
+		dto.actionId = workflow.getActionUuid();
 
 		dto.message = workflow.getMessage();
 		dto.icon = workflow.getIcon();
@@ -61,6 +62,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 
 	private WorkflowStateDTO createWorkflowStateDTO(final WorkflowState state, final List<Action> actions) {
 		final var dto = new WorkflowStateDTO();
+		dto.workflowStateId = state.getWorkflowStateId();
 		dto.icon = StringUtils.defaultIfBlank(state.getIcon(), state.getWorkflow().getIcon());
 		dto.color = state.getColor();
 		dto.id = state.getId();
@@ -111,7 +113,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 
 		final var dto = new WorkflowStatusDTO();
 		dto.pk = workflowStatus.getPk();
-		dto.workflowId = workflow.getId();
+		dto.workflowId = workflow.getWorkflowId();
 		dto.statusId = workflowStatus.getWorkflowStateId();
 		dto.orderBy = workflow.getOrderBy();
 		dto.date = workflowStatus.getLastUpdateTime();
@@ -149,7 +151,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 
 		final var dto = new WorkflowStatusDTO();
 		dto.pk = workflowStatus.getPk();
-		dto.workflowId = workflow.getId();
+		dto.workflowId = workflow.getWorkflowId();
 		dto.statusId = workflowStatus.getWorkflowStateId();
 		dto.orderBy = workflow.getOrderBy();
 		dto.date = workflowStatus.getLastUpdateTime();
@@ -179,7 +181,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 	@Override
 	public WorkflowStatusDTO createWorkflowStatusDTO(final Workflow workflow, final WorkflowState state, final ACL acl) {
 		final var dto = new WorkflowStatusDTO();
-		dto.workflowId = workflow.getId();
+		dto.workflowId = workflow.getWorkflowId();
 		dto.statusId = state.getWorkflowStateId();
 		dto.orderBy = workflow.getOrderBy();
 		dto.hasCreationAction = workflow.getActionId() != null;

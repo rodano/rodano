@@ -80,6 +80,7 @@ public class TimelineGraphSection implements Node {
 		this.timelineGraph = timelineGraph;
 	}
 
+	@JsonIgnore
 	public UUID getGraphSectionId() {
 		if(this.graphSectionId == null && this.id != null && !this.id.isBlank() && this.timelineGraph.getStudy() != null) {
 			this.graphSectionId = deterministic(

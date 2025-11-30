@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
@@ -109,7 +110,7 @@ public class DatasetController extends AbstractSecuredController {
 	public List<DatasetDTO> getDatasets(
 		@PathVariable final Long scopePk,
 		@PathVariable final Optional<Long> eventPk,
-		@RequestParam final Optional<Collection<String>> datasetModelIds
+		@RequestParam final Optional<Collection<UUID>> datasetModelIds
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -198,7 +199,7 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public DatasetDTO createCandidateScopeDataset(
 		@PathVariable final Long scopePk,
-		@RequestParam final String datasetModelId
+		@RequestParam final UUID datasetModelId
 	) {
 		final var transactionTemplate = new TransactionTemplate(transactionManager);
 		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -232,7 +233,7 @@ public class DatasetController extends AbstractSecuredController {
 	public DatasetDTO createCandidateEventDataset(
 		@PathVariable final Long scopePk,
 		@PathVariable final Long eventPk,
-		@RequestParam final String datasetModelId
+		@RequestParam final UUID datasetModelId
 	) {
 		final var transactionTemplate = new TransactionTemplate(transactionManager);
 		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);

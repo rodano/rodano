@@ -81,7 +81,7 @@ public class DatabaseController extends AbstractSecuredController {
 		@Valid @RequestBody final BootstrapDTO bootstrap
 	) {
 		if(!databaseInitializer.isDatabaseEmpty()) {
-			throw new WrongDataConditionException("Database has already been bootstraped");
+			throw new WrongDataConditionException("Database has already been bootstrapped");
 		}
 
 		databaseInitializer.initializeStructure();

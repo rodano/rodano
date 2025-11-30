@@ -3,6 +3,7 @@ package ch.rodano.api.config;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +12,8 @@ import ch.rodano.configuration.model.event.DateAggregationFunction;
 import ch.rodano.configuration.model.event.EventModel;
 
 public class EventModelDTO {
+	@NotNull
+	private UUID eventModelId;
 	@NotBlank
 	private String id;
 	@NotNull
@@ -19,15 +22,15 @@ public class EventModelDTO {
 	private String eventGroupId;
 
 	@NotNull
-	private List<String> datasetModelIds;
+	private List<UUID> datasetModelIds;
 	@NotNull
-	private List<String> formModelIds;
+	private List<UUID> formModelIds;
 	@NotNull
-	private List<String> workflowIds;
+	private List<UUID> workflowIds;
 
 	private Integer deadline;
 	private ChronoUnit deadlineUnit;
-	private List<String> deadlineReferenceEventModelIds;
+	private List<UUID> deadlineReferenceEventModelIds;
 	private DateAggregationFunction deadlineAggregationFunction;
 
 	private Integer interval;
@@ -45,18 +48,19 @@ public class EventModelDTO {
 	}
 
 	public EventModelDTO(final EventModel eventModel) {
+		eventModelId = eventModel.getEventModelId();
 		id = eventModel.getId();
 		shortname = eventModel.getShortname();
 
 		eventGroupId = eventModel.getEventGroupId();
 
-		datasetModelIds = eventModel.getDatasetModelIds();
-		formModelIds = eventModel.getFormModelIds();
-		workflowIds = eventModel.getWorkflowIds();
+		datasetModelIds = eventModel.getDatasetModelUuids();
+		formModelIds = eventModel.getFormModelUuids();
+		workflowIds = eventModel.getWorkflowUuids();
 
 		deadline = eventModel.getDeadline();
 		deadlineUnit = eventModel.getDeadlineUnit();
-		deadlineReferenceEventModelIds = eventModel.getDeadlineReferenceEventModelIds();
+		deadlineReferenceEventModelIds = eventModel.getDeadlineReferenceEventModelUuids();
 		deadlineAggregationFunction = eventModel.getDeadlineAggregationFunctionOrDefault();
 
 		interval = eventModel.getInterval();
@@ -64,6 +68,14 @@ public class EventModelDTO {
 
 		icon = eventModel.getIcon();
 		number = eventModel.getNumber();
+	}
+
+	public UUID getEventModelId() {
+		return eventModelId;
+	}
+
+	public void setEventModelId(final UUID eventModelId) {
+		this.eventModelId = eventModelId;
 	}
 
 	public String getId() {
@@ -90,27 +102,27 @@ public class EventModelDTO {
 		this.eventGroupId = eventGroupId;
 	}
 
-	public List<String> getDatasetModelIds() {
+	public List<UUID> getDatasetModelIds() {
 		return datasetModelIds;
 	}
 
-	public void setDatasetModelIds(final List<String> datasetModelIds) {
+	public void setDatasetModelIds(final List<UUID> datasetModelIds) {
 		this.datasetModelIds = datasetModelIds;
 	}
 
-	public List<String> getFormModelIds() {
+	public List<UUID> getFormModelIds() {
 		return formModelIds;
 	}
 
-	public void setFormModelIds(final List<String> formModelIds) {
+	public void setFormModelIds(final List<UUID> formModelIds) {
 		this.formModelIds = formModelIds;
 	}
 
-	public List<String> getWorkflowIds() {
+	public List<UUID> getWorkflowIds() {
 		return workflowIds;
 	}
 
-	public void setWorkflowIds(final List<String> workflowIds) {
+	public void setWorkflowIds(final List<UUID> workflowIds) {
 		this.workflowIds = workflowIds;
 	}
 
@@ -130,11 +142,11 @@ public class EventModelDTO {
 		this.deadlineUnit = deadlineUnit;
 	}
 
-	public List<String> getDeadlineReferenceEventModelIds() {
+	public List<UUID> getDeadlineReferenceEventModelIds() {
 		return deadlineReferenceEventModelIds;
 	}
 
-	public void setDeadlineReferenceEventModelIds(final List<String> deadlineReferenceEventModelIds) {
+	public void setDeadlineReferenceEventModelIds(final List<UUID> deadlineReferenceEventModelIds) {
 		this.deadlineReferenceEventModelIds = deadlineReferenceEventModelIds;
 	}
 

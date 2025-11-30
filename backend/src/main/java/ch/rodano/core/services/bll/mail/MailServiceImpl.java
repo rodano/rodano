@@ -532,7 +532,7 @@ public class MailServiceImpl implements MailService {
 		final var study = studyService.getStudy();
 		final var scope = scopeDAOService.getScopeByPk(resource.getScopeFk());
 
-		final var featureId = FeatureStatic.NOTIFY_RESOURCE_PUBLISHED.getId();
+		final var featureId = FeatureStatic.NOTIFY_RESOURCE_PUBLISHED.getFeatureId(study.getProjectId());
 		final var predicate = new UserSearch()
 			.enforceScopePks(Collections.singleton(scope.getPk()))
 			.enforceExtension(ScopeExtension.ANCESTORS)

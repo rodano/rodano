@@ -24,7 +24,7 @@ public class WorkflowStatusInfo {
 
 	@NotNull
 	private Long scopePk;
-	@NotBlank
+	@NotNull
 	private UUID scopeModelId;
 	@NotBlank
 	private String scopeCode;
@@ -48,9 +48,9 @@ public class WorkflowStatusInfo {
 
 	@NotBlank
 	private Long fieldPk;
-	@NotBlank
+	@NotNull
 	private UUID datasetModelId;
-	@NotBlank
+	@NotNull
 	private UUID fieldModelId;
 	@NotBlank
 	private String fieldLabel;

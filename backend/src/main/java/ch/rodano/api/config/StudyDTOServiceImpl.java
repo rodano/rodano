@@ -89,9 +89,9 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 		dto.configUser = study.getConfigUser();
 		dto.configDate = TimeHelper.asZonedDateTime(study.getConfigDate());
 
-		dto.rootScopeModelId = study.getRootScopeModel().getId();
-		dto.leafScopeModelIds = study.getLeafScopeModels().stream().map(ScopeModel::getId).toList();
-		dto.leafScopeId = study.getLeafScopeModel().getId();
+		dto.rootScopeModelId = study.getRootScopeModel().getScopeModelId();
+		dto.leafScopeModelIds = study.getLeafScopeModels().stream().map(ScopeModel::getScopeModelId).toList();
+		dto.leafScopeId = study.getLeafScopeModel().getScopeModelId();
 
 		dto.scopeModels = study.getScopeModels().stream()
 			.filter(s -> acl.hasRight(s, Rights.READ))

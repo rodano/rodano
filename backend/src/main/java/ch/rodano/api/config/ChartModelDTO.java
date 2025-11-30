@@ -1,6 +1,7 @@
 package ch.rodano.api.config;
 
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -8,6 +9,8 @@ import ch.rodano.configuration.model.chart.Chart;
 import ch.rodano.configuration.model.chart.ChartType;
 
 public class ChartModelDTO {
+	@NotNull
+	private UUID chartId;
 	@NotNull
 	private String id;
 	@NotNull
@@ -26,6 +29,7 @@ public class ChartModelDTO {
 	private final boolean withStatistics;
 
 	public ChartModelDTO(final Chart chart, final String[] languages) {
+		this.chartId = chart.getChartId();
 		this.id = chart.getId();
 		this.type = chart.getType();
 		this.title = chart.getLocalizedTitle(languages);
@@ -33,6 +37,14 @@ public class ChartModelDTO {
 		this.legendY = chart.getLocalizedLegendY(languages);
 		this.colors = chart.getColors();
 		this.withStatistics = chart.isWithStatistics();
+	}
+
+	public UUID getChartId() {
+		return chartId;
+	}
+
+	public void setChartId(final UUID chartId) {
+		this.chartId = chartId;
 	}
 
 	public String getId() {

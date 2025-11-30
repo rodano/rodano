@@ -2,9 +2,12 @@ package ch.rodano.configuration.model.feature;
 
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.language.LanguageStatic;
+
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 
 public enum FeatureStatic implements SuperDisplayable {
 	//basics
@@ -184,6 +187,10 @@ public enum FeatureStatic implements SuperDisplayable {
 	@Override
 	public final String getId() {
 		return name();
+	}
+
+	public UUID getFeatureId(final UUID projectId) {
+		return deterministic(projectId, "FEATURE", name());
 	}
 
 	public boolean isOptional() {

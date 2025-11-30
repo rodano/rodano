@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -30,6 +29,7 @@ import ch.rodano.core.services.bll.scope.ScopeRelationService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.utils.UtilsService;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.Tables.EVENT;
 import static ch.rodano.core.model.jooq.Tables.SCOPE;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
@@ -60,7 +60,8 @@ public class LockSummaryService {
 
 	/**
 	 * Get the lock summary
-	 * @param scope Root scope for the data collection.
+	 *
+	 * @param scope          Root scope for the data collection.
 	 * @param leafScopeModel Leaf scope model object
 	 * @return a summary
 	 */
@@ -139,14 +140,36 @@ public class LockSummaryService {
 			})
 			.toList();
 
-		final var columns = Stream.of(EntityLockStatus.values())
-			.map(s -> new SummaryColumnDTO(s.name(), s.getLabel(leafScopeModel), false, false))
-			.toList();
+		final var projectId = studyService.getStudy().getProjectId();
+		final var entityLockStatuses = EntityLockStatus.values();
+		final var columns = new ArrayList<SummaryColumnDTO>();
+		for(int i = 0; i < entityLockStatuses.length; i++) {
+			final var status = entityLockStatuses[i];
+			final var summaryColumnId = deterministic(
+				projectId,
+				"WORKFLOW_SUMMARY_COLUMN",
+				"LOCK_SUMMARY|" + i
+			);
+			columns.add(new SummaryColumnDTO(
+				summaryColumnId,
+				status.name(),
+				status.getLabel(leafScopeModel),
+				false,
+				false
+			));
+		}
+
+		final var workflowSummaryId = deterministic(
+			projectId,
+			"WORKFLOW_SUMMARY",
+			"LOCK_SUMMARY"
+		);
 
 		return new SummaryDTO(
+			workflowSummaryId,
 			"LOCK_SUMMARY",
 			Map.of("en", "Lock summary"),
-			leafScopeModel.getId(),
+			leafScopeModel.getScopeModelId(),
 			columns,
 			rows
 		);

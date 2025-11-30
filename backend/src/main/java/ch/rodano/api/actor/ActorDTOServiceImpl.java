@@ -230,10 +230,10 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 
 		dto.canCreateUser = rightsService.hasRight(roles, Entity.PROFILE, Rights.WRITE);
 		final var profiles = roles.stream().map(Role::getProfile).toList();
-		dto.readProfilesIds = profiles.stream().flatMap(p -> p.getProfiles(Rights.READ).stream()).map(Profile::getId).collect(Collectors.toList());
-		dto.writeProfilesIds = profiles.stream().flatMap(p -> p.getProfiles(Rights.WRITE).stream()).map(Profile::getId).collect(Collectors.toList());
-		dto.readScopeModelIds = profiles.stream().flatMap(p -> p.getScopeModels(Rights.READ).stream()).map(ScopeModel::getId).collect(Collectors.toList());
-		dto.writeScopeModelIds = profiles.stream().flatMap(p -> p.getScopeModels(Rights.WRITE).stream()).map(ScopeModel::getId).collect(Collectors.toList());
+		dto.readProfilesIds = profiles.stream().flatMap(p -> p.getProfiles(Rights.READ).stream()).map(Profile::getProfileId).collect(Collectors.toList());
+		dto.writeProfilesIds = profiles.stream().flatMap(p -> p.getProfiles(Rights.WRITE).stream()).map(Profile::getProfileId).collect(Collectors.toList());
+		dto.readScopeModelIds = profiles.stream().flatMap(p -> p.getScopeModels(Rights.READ).stream()).map(ScopeModel::getScopeModelId).collect(Collectors.toList());
+		dto.writeScopeModelIds = profiles.stream().flatMap(p -> p.getScopeModels(Rights.WRITE).stream()).map(ScopeModel::getScopeModelId).collect(Collectors.toList());
 
 		return dto;
 	}

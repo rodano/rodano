@@ -12,7 +12,7 @@ public record ScopeCandidateDTO(
 	@NotNull Long parentScopePk,
 	@NotBlank String code,
 	@NotBlank String shortname,
-	@NotBlank UUID modelId,
+	@NotNull UUID modelId,
 	@NotNull ZonedDateTime startDate,
 	ZonedDateTime stopDate
 ) {

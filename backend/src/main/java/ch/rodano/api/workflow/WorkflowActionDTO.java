@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,12 +17,14 @@ import ch.rodano.configuration.model.workflow.Action;
 
 @Schema(description = "An action that can be performed on a workflow")
 public class WorkflowActionDTO {
+	@NotNull
+	private UUID workflowActionId;
 	@Schema(description = "Action ID")
 	@NotBlank
 	private String id;
 	@Schema(description = "Workflow ID")
-	@NotBlank
-	private String workflowId;
+	@NotNull
+	private UUID workflowId;
 
 	@NotNull
 	private SortedMap<String, String> shortname;
@@ -50,8 +53,9 @@ public class WorkflowActionDTO {
 	WorkflowActionDTO() {}
 
 	public WorkflowActionDTO(final Action action) {
+		workflowActionId = action.getWorkflowActionId();
 		id = action.getId();
-		workflowId = action.getWorkflow().getId();
+		workflowId = action.getWorkflow().getWorkflowId();
 
 		shortname = action.getShortname();
 		longname = action.getLongname();
@@ -76,6 +80,14 @@ public class WorkflowActionDTO {
 		return actions.stream().map(WorkflowActionDTO::new).toList();
 	}
 
+	public UUID getWorkflowActionId() {
+		return workflowActionId;
+	}
+
+	public void setWorkflowActionId(final UUID workflowActionId) {
+		this.workflowActionId = workflowActionId;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -84,11 +96,11 @@ public class WorkflowActionDTO {
 		this.id = id;
 	}
 
-	public String getWorkflowId() {
+	public UUID getWorkflowId() {
 		return workflowId;
 	}
 
-	public void setWorkflowId(final String parentId) {
+	public void setWorkflowId(final UUID parentId) {
 		this.workflowId = parentId;
 	}
 

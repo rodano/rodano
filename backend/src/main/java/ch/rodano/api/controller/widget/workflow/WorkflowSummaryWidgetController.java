@@ -3,6 +3,7 @@ package ch.rodano.api.controller.widget.workflow;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,7 +61,7 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 	@GetMapping("{workflowSummaryId}")
 	@ResponseStatus(HttpStatus.OK)
 	public SummaryDTO getSummary(
-		@PathVariable final String workflowSummaryId,
+		@PathVariable final UUID workflowSummaryId,
 		@RequestParam final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
@@ -85,7 +86,7 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the workflow summary")
 	@GetMapping("{workflowSummaryId}/export")
 	public ResponseEntity<StreamingResponseBody> getExport(
-		@PathVariable final String workflowSummaryId,
+		@PathVariable final UUID workflowSummaryId,
 		@RequestParam final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
@@ -125,7 +126,7 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the historical workflow summary")
 	@GetMapping("{workflowSummaryId}/export/history")
 	public ResponseEntity<StreamingResponseBody> getHistoricalExport(
-		@PathVariable final String workflowSummaryId,
+		@PathVariable final UUID workflowSummaryId,
 		@RequestParam final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();

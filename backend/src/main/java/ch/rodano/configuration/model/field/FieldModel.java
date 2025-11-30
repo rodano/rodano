@@ -512,7 +512,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	@JsonIgnore
 	@Override
 	public final List<Workflow> getWorkflows() {
-		return datasetModel.getStudy().getNodesFromIds(Entity.WORKFLOW, getWorkflowIds());
+		return datasetModel.getStudy().getNodesFromCodes(Entity.WORKFLOW, getWorkflowIds());
 	}
 
 	@JsonIgnore

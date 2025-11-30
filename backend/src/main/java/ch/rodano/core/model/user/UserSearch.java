@@ -2,6 +2,7 @@ package ch.rodano.core.model.user;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,10 +23,10 @@ public class UserSearch extends PaginatedSearch<UserSearch> {
 	private Optional<ScopeExtension> extension = Optional.empty();
 
 	@Schema(description = "Profile ids")
-	private Optional<Set<String>> profileIds = Optional.empty();
+	private Optional<Set<UUID>> profileIds = Optional.empty();
 
 	@Schema(description = "Feature id")
-	private Optional<String> featureId = Optional.empty();
+	private Optional<UUID> featureId = Optional.empty();
 
 	@Schema(description = "Allowed role states")
 	private Optional<Set<RoleStatus>> states = Optional.empty();
@@ -81,30 +82,30 @@ public class UserSearch extends PaginatedSearch<UserSearch> {
 		return this;
 	}
 
-	public Optional<Set<String>> getProfileIds() {
+	public Optional<Set<UUID>> getProfileIds() {
 		return profileIds;
 	}
 
-	public UserSearch setProfileIds(final Optional<Set<String>> profileIds) {
+	public UserSearch setProfileIds(final Optional<Set<UUID>> profileIds) {
 		this.profileIds = profileIds;
 		return this;
 	}
 
-	public UserSearch enforceProfileIds(final Set<String> profileIds) {
+	public UserSearch enforceProfileIds(final Set<UUID> profileIds) {
 		this.profileIds = Optional.of(profileIds);
 		return this;
 	}
 
-	public Optional<String> getFeatureId() {
+	public Optional<UUID> getFeatureId() {
 		return featureId;
 	}
 
-	public UserSearch setFeatureId(final Optional<String> featureId) {
+	public UserSearch setFeatureId(final Optional<UUID> featureId) {
 		this.featureId = featureId;
 		return this;
 	}
 
-	public UserSearch enforceFeatureId(final String featureId) {
+	public UserSearch enforceFeatureId(final UUID featureId) {
 		this.featureId = Optional.of(featureId);
 		return this;
 	}

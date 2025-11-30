@@ -2,6 +2,7 @@ package ch.rodano.api.config;
 
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Dataset model")
 public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
+	@Schema(description = "Unique document UUID")
+	@NotNull
+	UUID datasetModelId;
 	@Schema(description = "Unique document ID")
 	@NotBlank
 	String id;
@@ -37,6 +41,14 @@ public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
 	@Schema(description = "Does the current user have write permission on this document")
 	@NotNull
 	boolean canWrite;
+
+	public UUID getDatasetModelId() {
+		return datasetModelId;
+	}
+
+	public void setDatasetModelId(final UUID datasetModelId) {
+		this.datasetModelId = datasetModelId;
+	}
 
 	public String getId() {
 		return id;

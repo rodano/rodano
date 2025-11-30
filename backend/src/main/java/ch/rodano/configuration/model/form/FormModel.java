@@ -282,7 +282,7 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 	@Override
 	@JsonIgnore
 	public List<Workflow> getWorkflows() {
-		return getStudy().getNodesFromIds(Entity.WORKFLOW, getWorkflowIds());
+		return getStudy().getNodesFromCodes(Entity.WORKFLOW, getWorkflowIds());
 	}
 
 	@Override

@@ -2,6 +2,7 @@ package ch.rodano.api.dto.widget.workflow;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -16,6 +17,8 @@ import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 @Schema(description = "Widget that shows workflows based on specified criteria")
 public class WorkflowWidgetDTO {
 
+	@NotNull
+	private UUID workflowWidgetId;
 	@Schema(description = "Widget ID")
 	@NotBlank
 	private String id;
@@ -40,6 +43,7 @@ public class WorkflowWidgetDTO {
 	private List<WorkflowWidgetColumnDTO> columns;
 
 	public WorkflowWidgetDTO(final WorkflowWidget workflowWidget) {
+		this.workflowWidgetId = workflowWidget.getWorkflowWidgetId();
 		this.id = workflowWidget.getId();
 		this.shortname = workflowWidget.getShortname();
 		this.longname = workflowWidget.getLongname();
@@ -50,6 +54,14 @@ public class WorkflowWidgetDTO {
 		this.columns = workflowWidget.getColumns().stream()
 			.map(WorkflowWidgetColumnDTO::new)
 			.toList();
+	}
+
+	public UUID getWorkflowWidgetId() {
+		return workflowWidgetId;
+	}
+
+	public void setWorkflowWidgetId(final UUID workflowWidgetId) {
+		this.workflowWidgetId = workflowWidgetId;
 	}
 
 	public String getId() {

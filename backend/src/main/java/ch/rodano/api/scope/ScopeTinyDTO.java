@@ -10,7 +10,7 @@ import ch.rodano.core.model.scope.Scope;
 public record ScopeTinyDTO(
 	@NotNull
 	Long pk,
-	@NotBlank
+	@NotNull
 	UUID modelId,
 	@NotBlank
 	String code,

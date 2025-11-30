@@ -1,6 +1,7 @@
 package ch.rodano.api.dto.widget.workflow;
 
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,9 @@ import ch.rodano.configuration.model.reports.WorkflowWidgetColumnType;
 
 @Schema(description = "Workflow widget column configuration")
 public class WorkflowWidgetColumnDTO {
+	@NotNull
+	private UUID workflowWidgetColumnId;
+
 	@Schema(description = "Column ID")
 	@NotBlank
 	private String id;
@@ -28,12 +32,21 @@ public class WorkflowWidgetColumnDTO {
 	private int width;
 
 	public WorkflowWidgetColumnDTO(final WorkflowWidgetColumn workflowWidgetColumn) {
+		this.workflowWidgetColumnId = workflowWidgetColumn.getWorkflowWidgetColumnId();
 		this.id = workflowWidgetColumn.getId();
 		this.shortname = workflowWidgetColumn.getShortname();
 		this.longname = workflowWidgetColumn.getLongname();
 		this.description = workflowWidgetColumn.getDescription();
 		this.type = workflowWidgetColumn.getType();
 		this.width = workflowWidgetColumn.getWidth();
+	}
+
+	public UUID getWorkflowWidgetColumnId() {
+		return workflowWidgetColumnId;
+	}
+
+	public void setWorkflowWidgetColumnId(final UUID workflowWidgetColumnId) {
+		this.workflowWidgetColumnId = workflowWidgetColumnId;
 	}
 
 	public String getId() {

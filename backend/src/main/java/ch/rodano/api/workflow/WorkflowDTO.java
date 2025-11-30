@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,6 +13,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "The workflow model")
 public class WorkflowDTO {
+	@NotNull
+	public UUID workflowId;
 	@Schema(description = "The unique ID of the workflow")
 	@NotBlank
 	public String id;
@@ -26,12 +29,12 @@ public class WorkflowDTO {
 	public boolean aggregator;
 
 	@Schema(description = "Aggregated workflow Id")
-	public String aggregatedWorkflowId;
+	public UUID aggregatedWorkflowId;
 
 	@Schema(description = "Is the workflow mandatory?")
 	@NotNull
 	public boolean mandatory;
-	public String actionId;
+	public UUID actionId;
 
 	@Schema(description = "Message attached to the workflow")
 	@NotNull

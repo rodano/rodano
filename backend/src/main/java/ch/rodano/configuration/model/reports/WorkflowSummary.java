@@ -194,7 +194,7 @@ public class WorkflowSummary implements Node, Comparable<WorkflowSummary> {
 
 	@JsonIgnore
 	public List<EventModel> getFilterEventModels() {
-		return study.getNodesFromIds(Entity.EVENT_MODEL, filterEventModelIds);
+		return study.getNodesFromCodes(Entity.EVENT_MODEL, filterEventModelIds);
 	}
 
 	@Override

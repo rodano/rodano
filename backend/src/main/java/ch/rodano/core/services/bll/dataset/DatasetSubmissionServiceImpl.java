@@ -382,7 +382,7 @@ public class DatasetSubmissionServiceImpl implements DatasetSubmissionService {
 					blockingErrorDTOS.add(
 						new BlockingErrorDTO(
 							dataset.getId(),
-							field.getFieldModel().getId(),
+							field.getFieldModel().getFieldModelId(),
 							e.getUserFriendlyErrorMessage(studyService.getStudy().getDefaultLanguageId())
 						)
 					);

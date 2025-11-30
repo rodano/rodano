@@ -180,7 +180,7 @@ public class PaymentServiceImpl implements PaymentService {
 		//retrieve interted profiles
 		final var profileIds = studyService.getStudy().getProfiles().stream()
 			.filter(p -> p.hasRight(Entity.PAYMENT_PLAN, payment.getPlan().getId(), Rights.WRITE))
-			.map(Profile::getId)
+			.map(Profile::getProfileId)
 			.collect(Collectors.toSet());
 
 		final var predicate = new UserSearch()
@@ -194,7 +194,7 @@ public class PaymentServiceImpl implements PaymentService {
 		final var scope = getScope(payment);
 		final List<Scope> payableScopes = new ArrayList<>(scopeRelationService.getEnabledAncestors(scope, distribution.getScopeModel()));
 
-		if(payableScopes.isEmpty() || payableScopes.size() > 1) {
+		if(payableScopes.size() != 1) {
 			return null;
 		}
 

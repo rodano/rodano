@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,10 +65,10 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	}
 
 	@Operation(summary = "Get the workflow widget")
-	@GetMapping("{widgetId}")
+	@GetMapping("{workflowWidgetId}")
 	@ResponseStatus(HttpStatus.OK)
 	public WorkflowWidgetDTO getWidget(
-		@PathVariable final String widgetId
+		@PathVariable final UUID workflowWidgetId
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -75,7 +76,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 		final var study = studyService.getStudy();
 
 		// Retrieve widget and check rights
-		final var widget = study.getWorkflowWidget(widgetId);
+		final var widget = study.getWorkflowWidget(workflowWidgetId);
 		for(final var workflow : widget.getWorkflows()) {
 			rightsService.checkRight(currentActor, currentRoles, workflow);
 		}
@@ -84,9 +85,9 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	}
 
 	@Operation(summary = "Get the workflows widget data")
-	@GetMapping("{widgetId}/data")
+	@GetMapping("{workflowWidgetId}/data")
 	public PagedResult<WorkflowStatusInfo> getData(
-		@PathVariable final String widgetId,
+		@PathVariable final UUID workflowWidgetId,
 		@RequestParam final Optional<List<Long>> scopePks,
 		@Parameter(description = "Full text search on scope code and workflowable model") @RequestParam final Optional<String> fullText,
 		@Parameter(description = "Order the results by which property?") @RequestParam final Optional<String> sortBy,
@@ -96,7 +97,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	) {
 		final var currentActor = currentActor();
 		final var study = studyService.getStudy();
-		final var widget = study.getWorkflowWidget(widgetId);
+		final var widget = study.getWorkflowWidget(workflowWidgetId);
 
 		//use the scope pks provided in the URL or retrieve root scopes of the user
 		final Collection<Scope> scopes = new ArrayList<>();
@@ -126,15 +127,15 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	}
 
 	@Operation(summary = "Export the workflow widget")
-	@GetMapping("{widgetId}/export")
+	@GetMapping("{workflowWidgetId}/export")
 	public ResponseEntity<StreamingResponseBody> getExport(
-		@PathVariable final String widgetId,
+		@PathVariable final UUID workflowWidgetId,
 		@RequestParam final Optional<List<Long>> scopePks
 	) {
 		final var currentActor = currentActor();
 		final var languages = currentLanguages();
 		final var study = studyService.getStudy();
-		final var widget = study.getWorkflowWidget(widgetId);
+		final var widget = study.getWorkflowWidget(workflowWidgetId);
 
 		//use the scope pks provided in the URL or retrieve root scopes of the user
 		final Collection<Scope> scopes = new ArrayList<>();

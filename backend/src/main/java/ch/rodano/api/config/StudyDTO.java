@@ -2,6 +2,7 @@ package ch.rodano.api.config;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -39,12 +40,12 @@ public class StudyDTO extends PublicStudyDTO {
 	@NotNull
 	List<MenuDTO> menus;
 
-	@NotBlank
-	String rootScopeModelId;
-	@NotBlank
-	String leafScopeId;
 	@NotNull
-	List<String> leafScopeModelIds;
+	UUID rootScopeModelId;
+	@NotNull
+	UUID leafScopeId;
+	@NotNull
+	List<UUID> leafScopeModelIds;
 
 	public String getEmail() {
 		return email;
@@ -134,27 +135,27 @@ public class StudyDTO extends PublicStudyDTO {
 		this.menus = menus;
 	}
 
-	public String getRootScopeModelId() {
+	public UUID getRootScopeModelId() {
 		return rootScopeModelId;
 	}
 
-	public void setRootScopeModelId(final String rootScopeModelId) {
+	public void setRootScopeModelId(final UUID rootScopeModelId) {
 		this.rootScopeModelId = rootScopeModelId;
 	}
 
-	public String getLeafScopeId() {
+	public UUID getLeafScopeId() {
 		return leafScopeId;
 	}
 
-	public void setLeafScopeId(final String leafScopeId) {
+	public void setLeafScopeId(final UUID leafScopeId) {
 		this.leafScopeId = leafScopeId;
 	}
 
-	public List<String> getLeafScopeModelIds() {
+	public List<UUID> getLeafScopeModelIds() {
 		return leafScopeModelIds;
 	}
 
-	public void setLeafScopeModelIds(final List<String> leafScopeModelIds) {
+	public void setLeafScopeModelIds(final List<UUID> leafScopeModelIds) {
 		this.leafScopeModelIds = leafScopeModelIds;
 	}
 

@@ -142,7 +142,7 @@ public class EventDTOServiceImpl implements EventDTOService {
 		dto.possibleWorkflows = model.getWorkflows()
 			.stream()
 			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getWorkflowId())))
 			.filter(w -> acl.hasRight(w.getAction()))
 			.sorted(workflowComparator)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))

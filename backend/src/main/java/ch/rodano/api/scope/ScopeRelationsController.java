@@ -203,7 +203,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@GetMapping("relations/available-parents")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeDTO> getParents(
-		@RequestParam final String scopeModelId,
+		@RequestParam final UUID scopeModelId,
 		@RequestParam final Rights right,
 		@RequestParam final boolean onlyDefault
 	) {
@@ -290,7 +290,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeDTO> getChildrenScopes(
 		@PathVariable final Long scopePk,
-		@RequestParam final Optional<String> scopeModelId,
+		@RequestParam final Optional<UUID> scopeModelId,
 		@RequestParam(defaultValue = "false") final Boolean enabled
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);

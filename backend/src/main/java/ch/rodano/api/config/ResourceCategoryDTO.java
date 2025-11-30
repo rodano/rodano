@@ -1,6 +1,7 @@
 package ch.rodano.api.config;
 
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import ch.rodano.configuration.model.resource.ResourceCategory;
 
 public class ResourceCategoryDTO {
+	@NotNull
+	private UUID categoryId;
 	@NotBlank
 	private String id;
 	@NotNull
@@ -17,15 +20,25 @@ public class ResourceCategoryDTO {
 	private String color;
 	private String icon;
 
-	public ResourceCategoryDTO() { }
+	public ResourceCategoryDTO() {
+	}
 
 	public ResourceCategoryDTO(final ResourceCategory resourceCategory) {
+		categoryId = resourceCategory.getResourceCategoryId();
 		id = resourceCategory.getId();
 		shortname = resourceCategory.getShortname();
 		longname = resourceCategory.getLongname();
 		description = resourceCategory.getDescription();
 		color = resourceCategory.getColor();
 		icon = resourceCategory.getIcon();
+	}
+
+	public UUID getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(final UUID categoryId) {
+		this.categoryId = categoryId;
 	}
 
 	public String getId() {

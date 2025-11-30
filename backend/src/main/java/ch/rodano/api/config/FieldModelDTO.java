@@ -2,6 +2,7 @@ package ch.rodano.api.config;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,14 +14,17 @@ import ch.rodano.configuration.model.field.FieldModelType;
 import ch.rodano.configuration.model.rules.OperandType;
 
 public class FieldModelDTO implements Comparable<FieldModelDTO> {
+	@NotNull
+	private UUID fieldModelId;
+	@NotNull
 	@Schema(description = "Field type")
 	@NotNull
 	private FieldModelType type;
 	@Schema(description = "Field value type for the operands")
 	@NotNull
 	private OperandType dataType;
-	@NotBlank
-	private String datasetModelId;
+	@NotNull
+	private UUID datasetModelId;
 	@NotBlank
 	private String id;
 
@@ -108,7 +112,8 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	}
 
 	public FieldModelDTO(final FieldModel fieldModel, final String[] languages) {
-		datasetModelId = fieldModel.getDatasetModel().getId();
+		fieldModelId = fieldModel.getFieldModelId();
+		datasetModelId = fieldModel.getDatasetModel().getDatasetModelId();
 		id = fieldModel.getId();
 
 		type = fieldModel.getType();
@@ -173,6 +178,14 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 		return id.compareTo(o.id);
 	}
 
+	public UUID getFieldModelId() {
+		return fieldModelId;
+	}
+
+	public void setFieldModelId(final UUID fieldModelId) {
+		this.fieldModelId = fieldModelId;
+	}
+
 	public FieldModelType getType() {
 		return type;
 	}
@@ -197,11 +210,11 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 		this.dataType = dataType;
 	}
 
-	public String getDatasetModelId() {
+	public UUID getDatasetModelId() {
 		return datasetModelId;
 	}
 
-	public void setDatasetModelId(final String datasetModelId) {
+	public void setDatasetModelId(final UUID datasetModelId) {
 		this.datasetModelId = datasetModelId;
 	}
 

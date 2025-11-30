@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
 			final var profileIds = roles.stream()
 				.map(Role::getProfile)
 				.flatMap(p -> p.getProfiles(Rights.READ).stream())
-				.map(Profile::getId)
+				.map(Profile::getProfileId)
 				.collect(Collectors.toSet());
 			search.setProfileIds(Optional.of(profileIds));
 		}

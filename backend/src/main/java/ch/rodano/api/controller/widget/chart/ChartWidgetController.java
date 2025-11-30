@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
@@ -64,15 +64,14 @@ public class ChartWidgetController extends AbstractSecuredController {
 		this.scopeDAOService = scopeDAOService;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Operation(summary = "Get chart widget")
 	@GetMapping("{chartId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ChartDTO<?, ?> getChart(
-		@PathVariable final String chartId,
+		@PathVariable final UUID chartId,
 		@RequestParam final Optional<List<Long>> scopePks,
 		@RequestParam(name = "criteria") final Optional<String> encodedCriteria
-	) throws JsonMappingException, JsonProcessingException {
+	) throws JsonProcessingException {
 		final var currentActor = currentActor();
 		final var study = studyService.getStudy();
 		final var chart = study.getChart(chartId);
@@ -106,7 +105,7 @@ public class ChartWidgetController extends AbstractSecuredController {
 		//retrieve chart criteria
 		List<FieldModelCriterion> criteria = Collections.emptyList();
 		if(encodedCriteria.isPresent()) {
-			criteria = (List<FieldModelCriterion>) mapper.readValue(encodedCriteria.get(), TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class));
+			criteria = mapper.readValue(encodedCriteria.get(), TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class));
 		}
 
 		return chartFactoryService.getChart(chart, currentActor, scopes, criteria);

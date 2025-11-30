@@ -567,11 +567,27 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public Menu getMenu(final UUID menuId) {
+		return menus.stream()
+			.filter(m -> menuId != null && menuId.equals(m.getMenuId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.MENU, menuId != null ? menuId.toString() : null));
+	}
+
+	@JsonIgnore
 	public Menu getMenu(final String menuId) {
 		return menus.stream()
 			.filter(m -> m.getId().equalsIgnoreCase(menuId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.MENU, menuId));
+	}
+
+	@JsonIgnore
+	public Menu getAllMenu(final UUID menuId) {
+		return getAllMenus().stream()
+			.filter(m -> menuId != null && menuId.equals(m.getMenuId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.MENU, menuId != null ? menuId.toString() : null));
 	}
 
 	@JsonIgnore
@@ -592,6 +608,11 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonManagedReference
 	public final void setWorkflows(final SortedSet<Workflow> workflows) {
 		this.workflows = workflows;
+		if(this.workflows != null) {
+			for(final var workflow : this.workflows) {
+				workflow.setStudy(this);
+			}
+		}
 	}
 
 	@JsonManagedReference
@@ -626,6 +647,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public WorkflowWidget getWorkflowWidget(final UUID workflowWidgetId) {
+		return workflowWidgets.stream()
+			.filter(ww -> workflowWidgetId != null && workflowWidgetId.equals(ww.getWorkflowWidgetId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_WIDGET, workflowWidgetId != null ? workflowWidgetId.toString() : null));
+	}
+
+	@JsonIgnore
 	public WorkflowWidget getWorkflowWidget(final String workflowWidgetId) {
 		return workflowWidgets.stream()
 			.filter(w -> w.getId().equalsIgnoreCase(workflowWidgetId))
@@ -641,6 +670,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonManagedReference
 	public final void setWorkflowSummaries(final SortedSet<WorkflowSummary> workflowSummaries) {
 		this.workflowSummaries = workflowSummaries;
+	}
+
+	@JsonIgnore
+	public WorkflowSummary getWorkflowSummary(final UUID workflowSummaryId) {
+		return workflowSummaries.stream()
+			.filter(ws -> workflowSummaryId != null && workflowSummaryId.equals(ws.getWorkflowSummaryId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_SUMMARY, workflowSummaryId != null ? workflowSummaryId.toString() : null));
 	}
 
 	@JsonIgnore
@@ -662,6 +699,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public Chart getChart(final UUID chartId) {
+		return charts.stream()
+			.filter(c -> chartId != null && chartId.equals(c.getChartId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.CHART, chartId != null ? chartId.toString() : null));
+	}
+
+	@JsonIgnore
 	public Chart getChart(final String chartId) {
 		return charts.stream()
 			.filter(c -> c.getId().equalsIgnoreCase(chartId))
@@ -680,6 +725,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public TimelineGraph getTimelineGraph(final UUID timelineGraphId) {
+		return timelineGraphs.stream()
+			.filter(t -> timelineGraphId != null && timelineGraphId.equals(t.getTimelineGraphId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.TIMELINE_GRAPH, timelineGraphId != null ? timelineGraphId.toString() : null));
+	}
+
+	@JsonIgnore
 	public TimelineGraph getTimelineGraph(final String timelineGraphId) {
 		return timelineGraphs.stream()
 			.filter(t -> t.getId().equalsIgnoreCase(timelineGraphId))
@@ -695,6 +748,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonManagedReference
 	public final SortedSet<Report> getReports() {
 		return reports;
+	}
+
+	@JsonIgnore
+	public Report getReport(final UUID reportId) {
+		return reports.stream()
+			.filter(r -> reportId != null && reportId.equals(r.getReportId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.REPORT, reportId != null ? reportId.toString() : null));
 	}
 
 	@JsonIgnore
@@ -796,6 +857,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public PrivacyPolicy getPrivacyPolicy(final UUID privacyPolicyId) {
+		return privacyPolicies.stream()
+			.filter(p -> privacyPolicyId != null && privacyPolicyId.equals(p.getPrivacyPolicyId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.PRIVACY_POLICY, privacyPolicyId != null ? privacyPolicyId.toString() : null));
+	}
+
+	@JsonIgnore
 	public PrivacyPolicy getPrivacyPolicy(final String privacyPolicyId) {
 		return privacyPolicies.stream()
 			.filter(p -> p.getId().equalsIgnoreCase(privacyPolicyId))
@@ -811,6 +880,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonManagedReference
 	public final SortedSet<PaymentPlan> getPaymentPlans() {
 		return paymentPlans;
+	}
+
+	@JsonIgnore
+	public PaymentPlan getPaymentPlan(final UUID paymentPlanId) {
+		return paymentPlans.stream()
+			.filter(p -> paymentPlanId != null && paymentPlanId.equals(p.getPaymentPlanId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.PAYMENT_PLAN, paymentPlanId != null ? paymentPlanId.toString() : null));
 	}
 
 	@JsonIgnore
@@ -950,6 +1027,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public Feature getFeature(final UUID featureId) {
+		return features.stream()
+			.filter(f -> featureId != null && featureId.equals(f.getFeatureId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.FEATURE, featureId != null ? featureId.toString() : null));
+	}
+
+	@JsonIgnore
 	public Feature getFeature(final String featureId) {
 		return features.stream()
 			.filter(f -> f.getId().equalsIgnoreCase(featureId))
@@ -1019,6 +1104,14 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonManagedReference
 	public final SortedSet<Validator> getValidators() {
 		return validators;
+	}
+
+	@JsonIgnore
+	public Validator getValidator(final UUID validatorId) {
+		return validators.stream()
+			.filter(v -> validatorId != null && validatorId.equals(v.getValidatorId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.VALIDATOR, validatorId != null ? validatorId.toString() : null));
 	}
 
 	@JsonIgnore
@@ -1123,17 +1216,28 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	@SuppressWarnings("unchecked")
 	@JsonIgnore
-	public final <T> List<T> getNodesFromIds(final Entity entity, final Collection<String> nodeIds) {
+	public final <T> List<T> getNodesFromCodes(final Entity entity, final Collection<String> nodeIds) {
 		return nodeIds.stream().map(i -> (T) getChild(entity, i)).toList();
 	}
 
 	@JsonIgnore
-	public final <T extends Node> List<T> getNodesFromIds(final Entity entity, final String... ids) {
+	public final <T extends Node> List<T> getNodesFromCodes(final Entity entity, final String... ids) {
+		return getNodesFromCodes(entity, Arrays.asList(ids));
+	}
+
+	@SuppressWarnings("unchecked")
+	@JsonIgnore
+	public final <T> List<T> getNodesFromIds(final Entity entity, final Collection<UUID> nodeIds) {
+		return nodeIds.stream().map(i -> (T) getChild(entity, i)).toList();
+	}
+
+	@JsonIgnore
+	public final <T extends Node> List<T> getNodesFromIds(final Entity entity, final UUID... ids) {
 		return getNodesFromIds(entity, Arrays.asList(ids));
 	}
 
 	@JsonIgnore
-	public final Node getChild(final Entity entity, final String nodeId) {
+	public final Node getChild(final Entity entity, final UUID nodeId) {
 		return switch(entity) {
 			case DATASET_MODEL -> getDatasetModel(nodeId);
 			case VALIDATOR -> getValidator(nodeId);
@@ -1146,11 +1250,34 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 			case PRIVACY_POLICY -> getPrivacyPolicy(nodeId);
 			case WORKFLOW_WIDGET -> getWorkflowWidget(nodeId);
 			case RESOURCE_CATEGORY -> getResourceCategory(nodeId);
-			case LANGUAGE -> getLanguage(nodeId);
 			case MENU -> getMenu(nodeId);
 			case SCOPE_MODEL -> getScopeModel(nodeId);
 			case TIMELINE_GRAPH -> getTimelineGraph(nodeId);
 			case CHART -> getChart(nodeId);
+			default -> throw new UnsupportedOperationException(String.format("No entity %s", entity.getId()));
+		};
+	}
+
+	@JsonIgnore
+	public final Node getChild(final Entity entity, final String nodeCode) {
+		return switch(entity) {
+			case DATASET_MODEL -> getDatasetModel(nodeCode);
+			case VALIDATOR -> getValidator(nodeCode);
+			case FORM_MODEL -> getFormModel(nodeCode);
+			case WORKFLOW -> getWorkflow(nodeCode);
+			case PROFILE -> getProfile(nodeCode);
+			case FEATURE -> getFeature(nodeCode);
+			case PAYMENT_PLAN -> getPaymentPlan(nodeCode);
+			case REPORT -> getReport(nodeCode);
+			case PRIVACY_POLICY -> getPrivacyPolicy(nodeCode);
+			case WORKFLOW_WIDGET -> getWorkflowWidget(nodeCode);
+			case RESOURCE_CATEGORY -> getResourceCategory(nodeCode);
+			case MENU -> getMenu(nodeCode);
+			case SCOPE_MODEL -> getScopeModel(nodeCode);
+			case TIMELINE_GRAPH -> getTimelineGraph(nodeCode);
+			case CHART -> getChart(nodeCode);
+			case WORKFLOW_SUMMARY -> getWorkflowSummary(nodeCode);
+			case LANGUAGE -> getLanguage(nodeCode);
 			default -> throw new UnsupportedOperationException(String.format("No entity %s", entity.getId()));
 		};
 	}
@@ -1212,7 +1339,7 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonAnySetter
 	public void setAnySetter(final String key, final Object value) {
 		if(!"className".equals(key) && !"ruleDefinitionProperties".equals(key) && !"ruleDefinitionActions".equals(key)) {
-			LOGGER.error("Unknown property {} (value {}) in class {}", key, value, getClassName());
+			LOGGER.error("Unknown property {} (value {}) in class {}", key, value, getClass().getSimpleName());
 		}
 	}
 

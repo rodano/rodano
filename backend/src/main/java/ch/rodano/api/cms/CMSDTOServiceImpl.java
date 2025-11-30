@@ -46,6 +46,7 @@ public class CMSDTOServiceImpl implements CMSDTOService {
 
 	public CMSSectionDTO createSectionDTO(final CMSSection cmsSection, final List<Role> roles) {
 		final var dto = new CMSSectionDTO();
+		dto.menuSectionId = cmsSection.getMenuSectionId();
 		dto.id = cmsSection.getId();
 		dto.labels = cmsSection.getLabels();
 

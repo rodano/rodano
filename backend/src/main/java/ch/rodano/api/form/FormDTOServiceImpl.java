@@ -124,7 +124,7 @@ public class FormDTOServiceImpl implements FormDTOService {
 		dto.lastUpdateTime = form.getLastUpdateTime();
 
 		dto.model = new FormModelDTO(model);
-		dto.modelId = model.getId();
+		dto.modelId = model.getFormModelId();
 
 		dto.removed = form.getDeleted();
 		dto.inRemoved = scope.getDeleted();
@@ -157,7 +157,7 @@ public class FormDTOServiceImpl implements FormDTOService {
 		dto.possibleWorkflows = model.getWorkflows()
 			.stream()
 			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getWorkflowId())))
 			.filter(w -> acl.hasRight(w.getAction()))
 			.sorted(workflowComparator)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))

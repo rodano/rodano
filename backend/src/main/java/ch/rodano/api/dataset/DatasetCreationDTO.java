@@ -1,6 +1,7 @@
 package ch.rodano.api.dataset;
 
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -20,8 +21,8 @@ public class DatasetCreationDTO {
 	String id;
 
 	@Schema(description = "Dataset model ID")
-	@NotBlank
-	String modelId;
+	@NotNull
+	UUID modelId;
 
 	@Schema(description = "Fields associated with the dataset")
 	@NotNull
@@ -35,11 +36,11 @@ public class DatasetCreationDTO {
 		this.id = id;
 	}
 
-	public String getModelId() {
+	public UUID getModelId() {
 		return modelId;
 	}
 
-	public void setModelId(final String modelId) {
+	public void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

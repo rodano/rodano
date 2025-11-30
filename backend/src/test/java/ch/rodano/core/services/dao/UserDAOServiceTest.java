@@ -3,6 +3,7 @@ package ch.rodano.core.services.dao;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -50,10 +51,12 @@ public class UserDAOServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Find investigators on center")
 	public void testFindInvestigatorsOnCenter() {
+		final var profileId = getProfileUuid("INVESTIGATOR");
+
 		final var predicate = new UserSearch();
 		predicate.enforceScopePks(Collections.singleton(scopeDAOService.getScopeByCode("FR-01").getPk()));
 		predicate.enforceExtension(ScopeExtension.DESCENDANTS);
-		predicate.enforceProfileIds(Collections.singleton("INVESTIGATOR"));
+		predicate.enforceProfileIds(Collections.singleton(profileId));
 		predicate.enforceEnabled(true);
 
 		final var users = userDAOService.search(predicate).getObjects();
@@ -63,10 +66,12 @@ public class UserDAOServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Find investigators on study")
 	public void testFindInvestigatorsOnStudy() {
+		final var profileId = getProfileUuid("INVESTIGATOR");
+
 		final var predicate = new UserSearch();
 		predicate.enforceScopePks(Collections.singleton(scopeService.getRootScope().getPk()));
 		predicate.enforceExtension(ScopeExtension.NONE);
-		predicate.enforceProfileIds(Collections.singleton("INVESTIGATOR"));
+		predicate.enforceProfileIds(Collections.singleton(profileId));
 		predicate.enforceEnabled(true);
 
 		final var users = userDAOService.search(predicate).getObjects();
@@ -90,10 +95,12 @@ public class UserDAOServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Find investigators on study and descendants")
 	public void testFindInvestigatorsOnStudyAndDescendants() {
+		final var profileId = getProfileUuid("INVESTIGATOR");
+
 		final var predicate = new UserSearch();
 		predicate.enforceScopePks(Collections.singleton(scopeService.getRootScope().getPk()));
 		predicate.enforceExtension(ScopeExtension.DESCENDANTS);
-		predicate.enforceProfileIds(Collections.singleton("INVESTIGATOR"));
+		predicate.enforceProfileIds(Collections.singleton(profileId));
 		predicate.enforceEnabled(true);
 
 		final var users = userDAOService.search(predicate).getObjects();
@@ -111,9 +118,9 @@ public class UserDAOServiceTest extends DatabaseTest {
 		final var predicate = new UserSearch();
 		predicate.enforceScopePks(Collections.singleton(scopeService.getRootScope().getPk()));
 		predicate.enforceExtension(ScopeExtension.DESCENDANTS);
-		final Set<String> profileIds = new HashSet<>();
-		profileIds.add("PRINCIPAL_INVESTIGATOR");
-		profileIds.add("INVESTIGATOR");
+		final Set<UUID> profileIds = new HashSet<>();
+		profileIds.add(getProfileUuid("PRINCIPAL_INVESTIGATOR"));
+		profileIds.add(getProfileUuid("INVESTIGATOR"));
 		predicate.enforceProfileIds(profileIds);
 		predicate.enforceEnabled(true);
 
@@ -131,10 +138,12 @@ public class UserDAOServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Find admins on study")
 	public void testFindAdminsOnStudy() {
+		final var profileId = getProfileUuid("ADMIN");
+
 		final var predicate = new UserSearch();
 		predicate.enforceScopePks(Collections.singleton(scopeService.getRootScope().getPk()));
 		predicate.enforceExtension(ScopeExtension.DESCENDANTS);
-		predicate.enforceProfileIds(Collections.singleton("ADMIN"));
+		predicate.enforceProfileIds(Collections.singleton(profileId));
 		predicate.enforceEnabled(true);
 
 		final var userEmails = userDAOService.search(predicate).getObjects().stream().map(User::getEmail).toList();
@@ -144,5 +153,13 @@ public class UserDAOServiceTest extends DatabaseTest {
 			() -> assertTrue(userEmails.contains(DatabaseInitializer.TEST_USER_EMAIL)),
 			() -> assertFalse(userEmails.contains("test+iinves@rodano.ch"))
 		);
+	}
+
+	private UUID getProfileUuid(final String profileCode) {
+		return studyService.getStudy().getProfiles().stream()
+			.filter(p -> p.getId().equals(profileCode))
+			.map(Profile::getProfileId)
+			.findFirst()
+			.orElseThrow(() -> new IllegalArgumentException(String.format("Profile with code=%s not found.", profileCode)));
 	}
 }

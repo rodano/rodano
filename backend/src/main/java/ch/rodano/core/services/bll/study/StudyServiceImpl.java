@@ -1,6 +1,5 @@
 package ch.rodano.core.services.bll.study;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +14,10 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
+
+import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -38,6 +40,7 @@ import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
+import ch.rodano.core.loader.DatabaseStudyLoader;
 import ch.rodano.core.model.configuration.LZW;
 import ch.rodano.core.services.project.ProjectIdResolver;
 import ch.rodano.core.utils.file.ResourceUtils;
@@ -49,27 +52,41 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	private final ObjectMapper objectMapper;
 
 	private final String configurationResource;
+	private final String configSource;
 	private final Integer configVersion;
 	private final Configurator configurator;
 	private final ProjectIdResolver projectIdResolver;
+	private final DatabaseStudyLoader databaseStudyLoader;
 
 	private Study study;
 	private String studyChecksum;
 
 	public StudyServiceImpl(
 		@Value("${rodano.config:${rodano.config.jar}}") final String configurationResource,
+		@Value("${rodano.config.source:JSON}") final String configSource,
 		@Value("${rodano.config.version:0}") final Integer configVersion,
 		final ObjectMapper objectMapper,
 		final Configurator configurator,
-		final ProjectIdResolver projectIdResolver
-
-	) throws IOException {
+		final ProjectIdResolver projectIdResolver,
+		final DatabaseStudyLoader databaseStudyLoader
+	) {
 		this.objectMapper = objectMapper;
 		this.configurationResource = configurationResource;
+		this.configSource = configSource;
 		this.configVersion = configVersion;
 		this.configurator = configurator;
 		this.projectIdResolver = projectIdResolver;
-		load();
+		this.databaseStudyLoader = databaseStudyLoader;
+	}
+
+	@PostConstruct
+	public void init() {
+		try {
+			load();
+		}
+		catch(IOException e) {
+			throw new RuntimeException("Failed to load study configuration", e);
+		}
 	}
 
 	/**
@@ -79,40 +96,84 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	 */
 	private void load() throws IOException {
 		// Load study
+		if("DATABASE".equalsIgnoreCase(configSource)) {
+			System.out.println("USING DATABASE CONFIG SOURCE");
+			logger.info("Using database config source");
+			loadFromDatabase();
+		}
+		else {
+			System.out.println("USING JSON CONFIG SOURCE");
+			logger.info("Using json config source");
+			loadFromJson();
+		}
+
+		study.init();
+		checkConfiguration();
+
+		if(Environment.DEV.equals(configurator.getEnvironment())) {
+			giveAllRightsToAdmin();
+		}
+	}
+
+	private void loadFromJson() throws IOException {
 		try(final var is = ResourceUtils.readResource(configurationResource)) {
 			try {
 				final var md = MessageDigest.getInstance("SHA-1");
 				final var watchedIs = new DigestInputStream(is, md);
 
 				study = objectMapper.readValue(watchedIs, Study.class);
-				study.init();
-
 				study.setProjectId(projectIdResolver.id());
 
 				studyChecksum = Hex.encodeHexString(md.digest());
-
-				checkConfiguration();
-
-				if(Environment.DEV.equals(configurator.getEnvironment())) {
-					giveAllRightsToAdmin();
-				}
 			}
 			catch(final NoSuchAlgorithmException e) {
-				//no way to come here, SHA-1 exists
 				logger.error(e.getLocalizedMessage(), e);
 			}
 		}
 	}
 
+	private void loadFromDatabase() {
+		logger.info("Loading study configuration from database");
+
+		final UUID projectId = projectIdResolver.id();
+
+		study = databaseStudyLoader.loadStudy(projectId);
+
+		study.setConfigVersion(configVersion);
+
+		try {
+			final var md = MessageDigest.getInstance("SHA-1");
+			final String studyJson = objectMapper.writeValueAsString(study);
+			studyChecksum = Hex.encodeHexString(md.digest(studyJson.getBytes()));
+		}
+		catch(final Exception e) {
+			logger.warn("Could not calculate study checksum from database", e);
+			studyChecksum = "database-loaded";
+		}
+
+		logger.info("Successfully loaded study configuration from database for project: {}", projectId);
+	}
+
 	@Override
-	public void read(final OutputStream os) throws FileNotFoundException, IOException {
-		try(var is = ResourceUtils.readResource(configurationResource)) {
-			is.transferTo(os);
+	public void read(final OutputStream os) throws IOException {
+		if("DATABASE".equalsIgnoreCase(configSource)) {
+			final String studyJson = objectMapper.writeValueAsString(study);
+			os.write(studyJson.getBytes());
+		}
+		else {
+			try(var is = ResourceUtils.readResource(configurationResource)) {
+				is.transferTo(os);
+			}
 		}
 	}
 
 	@Override
 	public void save(final InputStream is, final boolean compressed) throws IOException {
+		if("DATABASE".equalsIgnoreCase(configSource)) {
+			throw new UnsupportedOperationException("Saving configuration is not supported when using DATABASE source. " +
+				"Please use the Configurator API to modify database configuration.");
+		}
+
 		// Manage compression
 		if(compressed) {
 			// Retrieve array of codes
@@ -247,6 +308,6 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 
 	@Override
 	public void contribute(final Builder builder) {
-		builder.withDetail("config", Map.of("sha1", studyChecksum, "date", study.getConfigDate()));
+		builder.withDetail("config", Map.of("source", configSource, "sha1", studyChecksum, "date", study.getConfigDate()));
 	}
 }

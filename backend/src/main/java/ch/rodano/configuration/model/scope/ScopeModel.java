@@ -196,6 +196,14 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		return String.format("%s (%s)", id, localizedShortname);
 	}
 
+	@JsonIgnore
+	public UUID getDefaultParentUuid() {
+		if(isRoot() || defaultParentId == null || defaultParentId.isBlank()) {
+			return null;
+		}
+		return deterministic(this.study.getProjectId(), "SCOPE_MODEL", this.defaultParentId);
+	}
+
 	public final String getDefaultParentId() {
 		return defaultParentId;
 	}
@@ -270,6 +278,14 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	@JsonManagedReference
 	public final List<EventGroup> getEventGroups() {
 		return eventGroups;
+	}
+
+	@JsonIgnore
+	public EventGroup getEventGroup(final UUID eventGroupId) {
+		return eventGroups.stream()
+			.filter(e -> eventGroupId != null && eventGroupId.equals(e.getEventGroupId()))
+			.findAny()
+			.orElseThrow(() -> new NoNodeException(this, Entity.EVENT_GROUP, eventGroupId != null ? eventGroupId.toString() : "null"));
 	}
 
 	@JsonIgnore
@@ -362,7 +378,15 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		if(isRoot()) {
 			throw new NoNodeException(Entity.SCOPE_MODEL, String.format("No default parent for root scope model %s", getId()));
 		}
-		return study.getScopeModel(defaultParentId);
+		if(defaultParentId == null || defaultParentId.isBlank()) {
+			return null;
+		}
+
+		final UUID defaultParentUuid = getDefaultParentUuid();
+		if(defaultParentUuid == null) {
+			return null;
+		}
+		return study.getScopeModel(defaultParentUuid);
 	}
 
 	@JsonIgnore
@@ -372,6 +396,9 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		}
 		final List<ScopeModel> ancestors = new ArrayList<>();
 		final var defaultParent = getDefaultParent();
+		if(defaultParent == null) {
+			return ancestors;
+		}
 		ancestors.add(defaultParent);
 		ancestors.addAll(defaultParent.getDefaultAncestors());
 		return ancestors;
@@ -454,6 +481,9 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		if(isRoot()) {
 			return 0;
 		}
+		if(defaultParentId == null || defaultParentId.isBlank()) {
+			return 1;
+		}
 		return 1 + getDefaultParent().getDepth();
 	}
 
@@ -498,7 +528,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	@JsonIgnore
 	public List<FormModel> getFormModels() {
-		return study.getNodesFromIds(Entity.FORM_MODEL, formModelIds);
+		return study.getNodesFromCodes(Entity.FORM_MODEL, formModelIds);
 	}
 
 	@Override
@@ -513,7 +543,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	@Override
 	@JsonIgnore
 	public final List<Workflow> getWorkflows() {
-		return getStudy().getNodesFromIds(Entity.WORKFLOW, getWorkflowIds());
+		return getStudy().getNodesFromCodes(Entity.WORKFLOW, getWorkflowIds());
 	}
 
 	@Override

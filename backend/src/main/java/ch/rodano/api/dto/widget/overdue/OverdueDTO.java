@@ -1,14 +1,15 @@
 package ch.rodano.api.dto.widget.overdue;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 
 public record OverdueDTO(
-	@NotNull String parentScopeModelId,
+	@NotNull UUID parentScopeModelId,
 	@NotNull Long parentScopePk,
 	@NotNull String parentScopeCode,
-	@NotNull String scopeModelId,
+	@NotNull UUID scopeModelId,
 	@NotNull Long scopePk,
 	@NotNull String scopeCode,
 	@NotNull Long eventPk,

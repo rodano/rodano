@@ -22,7 +22,10 @@ public class DatasetSubmissionException extends Exception implements ManagedExce
 
 	public DatasetSubmissionException(final List<BlockingErrorDTO> blockingErrorDTOS) {
 		super("Some fields are invalid");
-		final var fieldModelIds = blockingErrorDTOS.stream().map(BlockingErrorDTO::fieldModelId).collect(Collectors.joining(", "));
+		final var fieldModelIds = blockingErrorDTOS.stream()
+			.map(BlockingErrorDTO::fieldModelId)
+			.map(uuid -> uuid != null ? uuid.toString() : null)
+			.collect(Collectors.joining(", "));
 		logger.warn(String.format("The following fields are invalid: %s", fieldModelIds));
 		this.blockingErrorDTOS = blockingErrorDTOS;
 	}

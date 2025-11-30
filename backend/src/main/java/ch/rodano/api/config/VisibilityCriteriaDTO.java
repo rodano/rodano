@@ -1,6 +1,7 @@
 package ch.rodano.api.config;
 
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -9,6 +10,8 @@ import ch.rodano.configuration.model.layout.VisibilityCriterionAction;
 import ch.rodano.configuration.model.rules.Operator;
 
 public class VisibilityCriteriaDTO {
+	@NotNull
+	private UUID formCellVisibilityCriteriaId;
 	@NotNull
 	private Operator operator;
 	@NotNull
@@ -21,11 +24,20 @@ public class VisibilityCriteriaDTO {
 	private List<String> targetCellIds;
 
 	public VisibilityCriteriaDTO(final VisibilityCriteria visibilityCriteria) {
+		this.formCellVisibilityCriteriaId = visibilityCriteria.getVisibilityCriteriaId();
 		this.operator = visibilityCriteria.getOperator();
 		this.values = visibilityCriteria.getValues();
 		this.action = visibilityCriteria.getAction();
 		this.targetLayoutIds = visibilityCriteria.getTargetLayoutIds();
 		this.targetCellIds = visibilityCriteria.getTargetCellIds();
+	}
+
+	public UUID getFormCellVisibilityCriteriaId() {
+		return formCellVisibilityCriteriaId;
+	}
+
+	public void setFormCellVisibilityCriteriaId(final UUID formCellVisibilityCriteriaId) {
+		this.formCellVisibilityCriteriaId = formCellVisibilityCriteriaId;
 	}
 
 	public Operator getOperator() {

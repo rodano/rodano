@@ -3,6 +3,7 @@ package ch.rodano.api.config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
@@ -11,6 +12,8 @@ import jakarta.validation.constraints.NotNull;
 import ch.rodano.core.configuration.core.Environment;
 
 public class PublicStudyDTO {
+	@NotNull
+	UUID projectId;
 	@NotBlank
 	String id;
 	@NotNull
@@ -41,7 +44,15 @@ public class PublicStudyDTO {
 	ScopeModelDTO leafScopeModel;
 
 	@Nullable
-	 ProfileDTO eproProfile;
+	ProfileDTO eproProfile;
+
+	public UUID getProjectId() {
+		return projectId;
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.projectId = projectId;
+	}
 
 	public String getId() {
 		return id;

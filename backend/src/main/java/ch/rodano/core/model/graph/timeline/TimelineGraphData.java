@@ -15,6 +15,7 @@ public class TimelineGraphData extends TimelineGraph {
 	private List<TimelineGraphDataSection> sections = new ArrayList<>();
 
 	public TimelineGraphData(final TimelineGraph graph) {
+		setStudy(graph.getStudy());
 		setId(graph.getId());
 		setShortname(graph.getShortname());
 		setLongname(graph.getLongname());

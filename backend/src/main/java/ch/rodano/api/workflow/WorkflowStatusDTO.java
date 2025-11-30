@@ -13,10 +13,10 @@ public class WorkflowStatusDTO {
 	@NotNull
 	Long pk;
 	@Schema(description = "The workflow ID")
-	@NotBlank
-	String workflowId;
+	@NotNull
+	UUID workflowId;
 	@Schema(description = "The workflow status ID")
-	@NotBlank
+	@NotNull
 	UUID statusId;
 	@Schema(description = "User message that was attached to the latest status change")
 	@NotBlank
@@ -68,11 +68,11 @@ public class WorkflowStatusDTO {
 		this.pk = pk;
 	}
 
-	public String getWorkflowId() {
+	public UUID getWorkflowId() {
 		return workflowId;
 	}
 
-	public void setWorkflowId(final String workflowId) {
+	public void setWorkflowId(final UUID workflowId) {
 		this.workflowId = workflowId;
 	}
 

@@ -38,17 +38,18 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 	@Override
 	public ScopeModelDTO createScopeModelDTO(final ScopeModel scopeModel, final ACL acl) {
 		final var dto = new ScopeModelDTO();
+		dto.scopeModelId = scopeModel.getScopeModelId();
 		dto.id = scopeModel.getId();
 		dto.shortname = scopeModel.getShortname();
 		dto.longname = scopeModel.getLongname();
 		dto.pluralShortname = scopeModel.getPluralShortname();
 		dto.description = scopeModel.getDescription();
 
-		dto.parentIds = scopeModel.getParentIds();
-		dto.defaultParentId = scopeModel.getDefaultParentId();
+		dto.parentIds = scopeModel.getParentUuids();
+		dto.defaultParentId = scopeModel.getDefaultParentUuid();
 		dto.childScopeModelIds = scopeModel.getStudy().getScopeModels().stream()
-			.filter(s -> s.getParentIds().contains(scopeModel.getId()))
-			.map(ScopeModel::getId)
+			.filter(s -> s.getParentUuids().contains(scopeModel.getScopeModelId()))
+			.map(ScopeModel::getScopeModelId)
 			.toList();
 
 		dto.root = scopeModel.isRoot();
@@ -62,11 +63,11 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 			.filter(e -> acl.hasRight(e, Rights.READ))
 			.map(EventModelDTO::new)
 			.toList();
-		dto.datasetModelIds = scopeModel.getDatasetModelIds();
-		dto.formModelIds = scopeModel.getFormModelIds();
-		dto.workflowIds = scopeModel.getWorkflowIds();
+		dto.datasetModelIds = scopeModel.getDatasetModelUuids();
+		dto.formModelIds = scopeModel.getFormModelUuids();
+		dto.workflowIds = scopeModel.getWorkflowUuids();
 
-		dto.defaultProfileId = scopeModel.getDefaultProfileId();
+		dto.defaultProfileId = scopeModel.getDefaultProfileUuid();
 
 		return dto;
 	}
@@ -76,6 +77,7 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 		final var languages = actorService.getLanguages(acl.actor());
 		final var dto = new DatasetModelDTO();
 
+		dto.datasetModelId = datasetModel.getDatasetModelId();
 		dto.id = datasetModel.getId();
 		dto.shortname = datasetModel.getShortname();
 		dto.multiple = datasetModel.isMultiple();
@@ -103,8 +105,9 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 	) {
 		final var dto = new LayoutDTO();
 
+		dto.formLayoutId = layout.getLayoutId();
 		dto.id = layout.getId();
-		dto.formModelId = layout.getFormModel().getId();
+		dto.formModelId = layout.getFormModel().getFormModelId();
 		dto.description = layout.getDescription();
 
 		dto.type = layout.getType();
@@ -149,9 +152,10 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 
 	private CellDTO createCellDTO(final Cell cell, final String[] languages) {
 		final var dto = new CellDTO();
+		dto.formLayoutCellId = cell.getLayoutCellId();
 		dto.id = cell.getId();
-		dto.datasetModelId = cell.getDatasetModelId();
-		dto.fieldModelId = cell.getFieldModelId();
+		dto.datasetModelId = cell.getDatasetModelUuid();
+		dto.fieldModelId = cell.getFieldModelUuid();
 
 		dto.textBefore = cell.getTextBefore();
 		dto.textAfter = cell.getTextAfter();

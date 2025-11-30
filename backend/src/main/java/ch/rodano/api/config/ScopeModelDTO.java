@@ -2,6 +2,7 @@ package ch.rodano.api.config;
 
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public class ScopeModelDTO {
+	@NotNull
+	UUID scopeModelId;
 	@NotBlank
 	String id;
 	@NotNull
@@ -19,11 +22,11 @@ public class ScopeModelDTO {
 	SortedMap<String, String> pluralShortname;
 
 	@NotNull
-	List<String> parentIds;
-	@NotBlank
-	String defaultParentId;
+	List<UUID> parentIds;
 	@NotNull
-	List<String> childScopeModelIds;
+	UUID defaultParentId;
+	@NotNull
+	List<UUID> childScopeModelIds;
 
 	@NotNull
 	boolean root;
@@ -40,14 +43,22 @@ public class ScopeModelDTO {
 	List<EventModelDTO> eventModels;
 
 	@NotNull
-	List<String> datasetModelIds;
+	List<UUID> datasetModelIds;
 	@NotNull
-	List<String> formModelIds;
+	List<UUID> formModelIds;
 	@NotNull
-	List<String> workflowIds;
+	List<UUID> workflowIds;
 
-	@NotBlank
-	String defaultProfileId;
+	@NotNull
+	UUID defaultProfileId;
+
+	public UUID getScopeModelId() {
+		return scopeModelId;
+	}
+
+	public void setScopeModelId(final UUID scopeModelId) {
+		this.scopeModelId = scopeModelId;
+	}
 
 	public String getId() {
 		return id;
@@ -89,27 +100,27 @@ public class ScopeModelDTO {
 		this.pluralShortname = pluralShortname;
 	}
 
-	public List<String> getParentIds() {
+	public List<UUID> getParentIds() {
 		return parentIds;
 	}
 
-	public void setParentIds(final List<String> parentIds) {
+	public void setParentIds(final List<UUID> parentIds) {
 		this.parentIds = parentIds;
 	}
 
-	public String getDefaultParentId() {
+	public UUID getDefaultParentId() {
 		return defaultParentId;
 	}
 
-	public void setDefaultParentId(final String defaultParentId) {
+	public void setDefaultParentId(final UUID defaultParentId) {
 		this.defaultParentId = defaultParentId;
 	}
 
-	public String getDefaultProfileId() {
+	public UUID getDefaultProfileId() {
 		return defaultProfileId;
 	}
 
-	public void setDefaultProfileId(final String defaultProfileId) {
+	public void setDefaultProfileId(final UUID defaultProfileId) {
 		this.defaultProfileId = defaultProfileId;
 	}
 
@@ -153,35 +164,35 @@ public class ScopeModelDTO {
 		this.eventModels = eventModels;
 	}
 
-	public List<String> getDatasetModelIds() {
+	public List<UUID> getDatasetModelIds() {
 		return datasetModelIds;
 	}
 
-	public void setDatasetModelIds(final List<String> datasetModelIds) {
+	public void setDatasetModelIds(final List<UUID> datasetModelIds) {
 		this.datasetModelIds = datasetModelIds;
 	}
 
-	public List<String> getFormModelIds() {
+	public List<UUID> getFormModelIds() {
 		return formModelIds;
 	}
 
-	public void setFormModelIds(final List<String> formModelIds) {
+	public void setFormModelIds(final List<UUID> formModelIds) {
 		this.formModelIds = formModelIds;
 	}
 
-	public List<String> getWorkflowIds() {
+	public List<UUID> getWorkflowIds() {
 		return workflowIds;
 	}
 
-	public void setWorkflowIds(final List<String> workflowIds) {
+	public void setWorkflowIds(final List<UUID> workflowIds) {
 		this.workflowIds = workflowIds;
 	}
 
-	public List<String> getChildScopeModelIds() {
+	public List<UUID> getChildScopeModelIds() {
 		return childScopeModelIds;
 	}
 
-	public void setChildScopeModelIds(final List<String> childScopeModelIds) {
+	public void setChildScopeModelIds(final List<UUID> childScopeModelIds) {
 		this.childScopeModelIds = childScopeModelIds;
 	}
 }

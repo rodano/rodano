@@ -2,6 +2,7 @@ package ch.rodano.api.timeline;
 
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,6 +15,8 @@ import ch.rodano.core.model.graph.timeline.TimelineGraphDataSection;
 
 @Schema(description = "Timeline graph data")
 public class TimelineGraphDataDTO {
+	@NotNull
+	private final UUID timelineGraphId;
 	@NotBlank
 	private final String id;
 
@@ -22,8 +25,8 @@ public class TimelineGraphDataDTO {
 	@NotNull
 	private final SortedMap<String, String> longname;
 	private final SortedMap<String, String> description;
-	@NotBlank
-	private final String scopeModelId;
+	@NotNull
+	private final UUID scopeModelId;
 
 	private final String studyStartEventModelId;
 	private final String studyStopEventModelId;
@@ -44,11 +47,12 @@ public class TimelineGraphDataDTO {
 	private final List<TimelineGraphDataPeriod> periods;
 
 	public TimelineGraphDataDTO(final TimelineGraphData timelineGraphData) {
+		this.timelineGraphId = timelineGraphData.getTimelineGraphId();
 		this.id = timelineGraphData.getId();
 		this.shortname = timelineGraphData.getShortname();
 		this.longname = timelineGraphData.getLongname();
 		this.description = timelineGraphData.getDescription();
-		this.scopeModelId = timelineGraphData.getScopeModelId();
+		this.scopeModelId = timelineGraphData.getScopeModelUuid();
 		this.studyStartEventModelId = timelineGraphData.getStudyStartEventModelId();
 		this.studyStopEventModelId = timelineGraphData.getStudyStopEventModelId();
 		this.studyPeriodIsDefault = timelineGraphData.isStudyPeriodIsDefault();
@@ -60,6 +64,10 @@ public class TimelineGraphDataDTO {
 		this.footNote = timelineGraphData.getFootNote();
 		this.sections = timelineGraphData.getDataSections();
 		this.periods = timelineGraphData.getPeriods();
+	}
+
+	public UUID getTimelineGraphId() {
+		return timelineGraphId;
 	}
 
 	public String getId() {
@@ -78,7 +86,7 @@ public class TimelineGraphDataDTO {
 		return description;
 	}
 
-	public String getScopeModelId() {
+	public UUID getScopeModelId() {
 		return scopeModelId;
 	}
 

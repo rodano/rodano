@@ -142,7 +142,7 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 
 		dto.datasetPk = dataset.getPk();
 		dto.datasetId = dataset.getId();
-		dto.datasetModelId = dataset.getDatasetModel().getId();
+		dto.datasetModelId = dataset.getDatasetModel().getDatasetModelId();
 
 		dto.pk = field.getPk();
 
@@ -155,7 +155,7 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		}
 
 		dto.model = new FieldModelDTO(model, languages);
-		dto.modelId = model.getId();
+		dto.modelId = model.getFieldModelId();
 
 		final var timeframe = acl.getTimeframe(dataset.getDatasetModel(), Rights.READ);
 		final var possibleValues = fieldService.getPossibleValues(scope, event, dataset, field);
@@ -181,7 +181,7 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		dto.possibleWorkflows = model.getWorkflows()
 			.stream()
 			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getWorkflowId())))
 			.filter(w -> acl.hasRight(w.getAction()))
 			.sorted(workflowComparator)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))

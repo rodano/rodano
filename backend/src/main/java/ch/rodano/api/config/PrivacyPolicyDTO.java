@@ -3,6 +3,7 @@ package ch.rodano.api.config;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -14,6 +15,9 @@ import ch.rodano.configuration.model.policy.PrivacyPolicy;
 
 @Schema(description = "Defines a privacy policy that is presented to users")
 public record PrivacyPolicyDTO(
+	@Schema(description = "Privacy policy UUID")
+	@NotNull
+	UUID policyId,
 	@Schema(description = "Privacy policy ID")
 	@NotBlank
 	String id,
@@ -33,6 +37,7 @@ public record PrivacyPolicyDTO(
 ) {
 	public PrivacyPolicyDTO(final PrivacyPolicy privacyPolicy) {
 		this(
+			privacyPolicy.getPrivacyPolicyId(),
 			privacyPolicy.getId(),
 			privacyPolicy.getShortname(),
 			privacyPolicy.getLongname(),

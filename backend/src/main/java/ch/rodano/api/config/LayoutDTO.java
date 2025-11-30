@@ -2,6 +2,7 @@ package ch.rodano.api.config;
 
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,13 +11,16 @@ import ch.rodano.configuration.model.layout.LayoutType;
 
 public class LayoutDTO {
 	@NotNull
+	UUID formLayoutId;
+
+	@NotNull
 	Long scopePk;
 	Long eventPk;
 
 	@NotBlank
 	String id;
-	@NotBlank
-	String formModelId;
+	@NotNull
+	UUID formModelId;
 
 	SortedMap<String, String> description;
 
@@ -40,11 +44,19 @@ public class LayoutDTO {
 
 	String cssCode;
 
-	public String getFormModelId() {
+	public UUID getFormLayoutId() {
+		return formLayoutId;
+	}
+
+	public void setFormLayoutId(final UUID formLayoutId) {
+		this.formLayoutId = formLayoutId;
+	}
+
+	public UUID getFormModelId() {
 		return formModelId;
 	}
 
-	public void setFormModelId(final String formModelId) {
+	public void setFormModelId(final UUID formModelId) {
 		this.formModelId = formModelId;
 	}
 

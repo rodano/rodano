@@ -3,6 +3,7 @@ package ch.rodano.api.report;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,7 @@ public class ReportController extends AbstractSecuredController {
 	@GetMapping("transfers")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getTransferReport(
-		@RequestParam final String scopeModelId,
+		@RequestParam final UUID scopeModelId,
 		@RequestParam final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
@@ -90,7 +91,7 @@ public class ReportController extends AbstractSecuredController {
 	@GetMapping("events")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getEventsReport(
-		@RequestParam final String scopeModelId,
+		@RequestParam final UUID scopeModelId,
 		@RequestParam final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();

@@ -1,6 +1,7 @@
 package ch.rodano.api.config;
 
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,8 @@ import jakarta.validation.constraints.NotNull;
 import ch.rodano.configuration.model.event.EventGroup;
 
 public class EventGroupDTO {
+	@NotNull
+	private UUID eventGroupId;
 	@NotBlank
 	private String id;
 	@NotNull
@@ -21,8 +24,17 @@ public class EventGroupDTO {
 	}
 
 	public EventGroupDTO(final EventGroup eventGroup) {
+		eventGroupId = eventGroup.getEventGroupId();
 		id = eventGroup.getId();
 		shortname = eventGroup.getShortname();
+	}
+
+	public UUID getEventGroupId() {
+		return eventGroupId;
+	}
+
+	public void setEventGroupId(final UUID eventGroupId) {
+		this.eventGroupId = eventGroupId;
 	}
 
 	public String getId() {

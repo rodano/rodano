@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -146,8 +147,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@Operation(summary = "Search workflows")
 	@GetMapping("workflows")
 	public PagedResult<WorkflowStatusDTO> search(
-		@Parameter(description = "Workflow IDs") @RequestParam final Optional<List<String>> workflowIds,
-		@Parameter(description = "State IDs") @RequestParam final Optional<List<String>> stateIds,
+		@Parameter(description = "Workflow IDs") @RequestParam final Optional<List<UUID>> workflowIds,
+		@Parameter(description = "State IDs") @RequestParam final Optional<List<UUID>> stateIds,
 		@Parameter(description = "Ancestor scope PKs") @RequestParam final Optional<List<Long>> ancestorScopePks,
 		@Parameter(description = "Scope PKs") @RequestParam final Optional<List<Long>> scopePks,
 		@Parameter(description = "Event PKs") @RequestParam final Optional<List<Long>> eventPks,
@@ -356,8 +357,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	public EventDTO doActionOnEventAggregateWorkflow(
 		@PathVariable final Long scopePk,
 		@PathVariable final Long eventPk,
-		@PathVariable final String workflowId,
-		@PathVariable final String actionId,
+		@PathVariable final UUID workflowId,
+		@PathVariable final UUID actionId,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -465,8 +466,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		@PathVariable final Long scopePk,
 		@PathVariable final Optional<Long> eventPk,
 		@PathVariable final Long formPk,
-		@PathVariable final String workflowId,
-		@PathVariable final String actionId,
+		@PathVariable final UUID workflowId,
+		@PathVariable final UUID actionId,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -561,8 +562,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@Transactional
 	public ScopeDTO doActionOnScopeAggregateWorkflow(
 		@PathVariable final Long scopePk,
-		@PathVariable final String workflowId,
-		@PathVariable final String actionId,
+		@PathVariable final UUID workflowId,
+		@PathVariable final UUID actionId,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -646,7 +647,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		final DataFamily family,
 		final Workflowable workflowable,
 		final Long workflowStatusPk,
-		final String actionId,
+		final UUID actionId,
 		final String rationale,
 		final String email,
 		final String password
@@ -679,8 +680,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		final ACL acl,
 		final DataFamily family,
 		final Workflowable workflowable,
-		final String workflowId,
-		final String actionId,
+		final UUID workflowId,
+		final UUID actionId,
 		final String rationale,
 		final String email,
 		final String password
@@ -710,11 +711,11 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		final DataFamily family,
 		final Workflowable workflowable,
 		final ACL acl,
-		final String actionId,
+		final UUID actionId,
 		final String rationale,
 		final String email,
 		final String password,
-		final String workflowId
+		final UUID workflowId
 	) {
 
 		// Retrieve workflow and check rights

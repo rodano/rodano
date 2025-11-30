@@ -2,11 +2,13 @@ package ch.rodano.api.config;
 
 import java.util.List;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public record MenuDTO(
+	@NotNull UUID menuId,
 	@NotEmpty String id,
 	@NotNull SortedMap<String, String> shortname,
 	SortedMap<String, String> longname,
@@ -27,6 +29,6 @@ public record MenuDTO(
 		if(orderBy != menu.orderBy) {
 			return orderBy - menu.orderBy;
 		}
-		return id.compareTo(menu.id);
+		return menuId.compareTo(menu.menuId);
 	}
 }

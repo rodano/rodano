@@ -1,7 +1,9 @@
 package ch.rodano.api.actor;
 
-import jakarta.validation.constraints.NotBlank;
+import java.util.UUID;
 
-public record ImpersonationDTO(@NotBlank String profileId) {
+import jakarta.validation.constraints.NotNull;
+
+public record ImpersonationDTO(@NotNull UUID profileId) {
 
 }

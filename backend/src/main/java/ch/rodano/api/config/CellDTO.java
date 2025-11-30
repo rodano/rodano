@@ -3,6 +3,7 @@ package ch.rodano.api.config;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,13 +12,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "A cell in the CRF display. Can contain a field or static information. Can be displayed conditionally based on specified criteria.")
 public class CellDTO {
+	@NotNull
+	UUID formLayoutCellId;
+
 	@NotBlank
 	String id;
 
-	@NotBlank
-	String datasetModelId;
-	@NotBlank
-	String fieldModelId;
+	@NotNull
+	UUID datasetModelId;
+	@NotNull
+	UUID fieldModelId;
 
 	SortedMap<String, String> textBefore;
 	SortedMap<String, String> textAfter;
@@ -47,6 +51,14 @@ public class CellDTO {
 	String cssCodeForLabel;
 	String cssCodeForInput;
 
+	public UUID getFormLayoutCellId() {
+		return formLayoutCellId;
+	}
+
+	public void setFormLayoutCellId(final UUID formLayoutCellId) {
+		this.formLayoutCellId = formLayoutCellId;
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -55,19 +67,19 @@ public class CellDTO {
 		this.id = id;
 	}
 
-	public String getDatasetModelId() {
+	public UUID getDatasetModelId() {
 		return datasetModelId;
 	}
 
-	public void setDatasetModelId(final String datasetModelId) {
+	public void setDatasetModelId(final UUID datasetModelId) {
 		this.datasetModelId = datasetModelId;
 	}
 
-	public String getFieldModelId() {
+	public UUID getFieldModelId() {
 		return fieldModelId;
 	}
 
-	public void setFieldModelId(final String fieldModelId) {
+	public void setFieldModelId(final UUID fieldModelId) {
 		this.fieldModelId = fieldModelId;
 	}
 

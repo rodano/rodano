@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rights.Rights;
 
 public record ProfileDTO(
+	@NotNull UUID profileId,
 	@NotBlank String id,
 	@NotNull SortedMap<String, String> shortname,
 	SortedMap<String, String> longname,
@@ -27,6 +29,7 @@ public record ProfileDTO(
 
 	public ProfileDTO(final Profile profile) {
 		this(
+			profile.getProfileId(),
 			profile.getId(),
 			profile.getShortname(),
 			profile.getLongname(),

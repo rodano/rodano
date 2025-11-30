@@ -91,7 +91,7 @@ public class StaticEntityDefiner extends AbstractStaticEntityDefiner {
 					final Feature feature = study.getFeature((String) parameters.get("FEATURE_ID"));
 
 					//retrieve profiles having feature
-					final var profileIds = study.getProfiles().stream().filter(profile -> profile.hasRight(feature)).map(Profile::getId).collect(Collectors.toSet());
+					final var profileIds = study.getProfiles().stream().filter(profile -> profile.hasRight(feature)).map(Profile::getProfileId).collect(Collectors.toSet());
 
 					final Set<String> emails = new HashSet<>();
 

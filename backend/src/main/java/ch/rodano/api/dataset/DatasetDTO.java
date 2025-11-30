@@ -2,6 +2,7 @@ package ch.rodano.api.dataset;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -46,8 +47,8 @@ public class DatasetDTO {
 	@NotNull
 	DatasetModelDTO model;
 	@Schema(description = "Dataset model ID")
-	@NotBlank
-	String modelId;
+	@NotNull
+	UUID modelId;
 
 	@NotNull
 	boolean removed;
@@ -125,11 +126,11 @@ public class DatasetDTO {
 		this.model = model;
 	}
 
-	public final String getModelId() {
+	public final UUID getModelId() {
 		return modelId;
 	}
 
-	public final void setModelId(final String modelId) {
+	public final void setModelId(final UUID modelId) {
 		this.modelId = modelId;
 	}
 

@@ -147,7 +147,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 					scope -> fieldDAOService.getFieldsByScopePk(scope.getPk()).stream()
 						.filter(
 							field -> getSearchableFieldModels().stream()
-								.anyMatch(fieldModel -> fieldModel.getDatasetModel().equals(field.getDatasetModel()) && fieldModel.getId().equals(field.getFieldModelId()))
+								.anyMatch(fieldModel -> fieldModel.getDatasetModel().equals(field.getDatasetModel()) && fieldModel.getFieldModelId().equals(field.getFieldModelId()))
 						)
 						.toList()
 				)
@@ -244,7 +244,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 		dto.possibleWorkflows = model.getWorkflows()
 			.stream()
 			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getWorkflowId())))
 			.filter(w -> acl.hasRight(w.getAction()))
 			.sorted(workflowComparator)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
@@ -252,7 +252,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 
 		//retrieve user linked to this scope
 		//used in scope list to display the user in charge of the scope
-		dto.defaultProfileId = scope.getScopeModel().getDefaultProfileId();
+		dto.defaultProfileId = scope.getScopeModel().getDefaultProfileUuid();
 		if(dto.defaultProfileId != null) {
 			final var search = new UserSearch()
 				.enforceScopePks(Collections.singleton(scope.getPk()))

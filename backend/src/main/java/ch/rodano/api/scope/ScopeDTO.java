@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -62,7 +63,7 @@ public class ScopeDTO extends ScopeMiniDTO {
 
 	@NotNull
 	List<SubscriptionRestriction> subscriptionRestrictions = new ArrayList<>();
-	String defaultProfileId;
+	UUID defaultProfileId;
 
 	@NotNull
 	List<WorkflowStatusDTO> workflowStatuses;
@@ -209,11 +210,11 @@ public class ScopeDTO extends ScopeMiniDTO {
 		this.subscriptionRestrictions = subscriptionRestrictions;
 	}
 
-	public String getDefaultProfileId() {
+	public UUID getDefaultProfileId() {
 		return defaultProfileId;
 	}
 
-	public void setDefaultProfileId(final String defaultProfileId) {
+	public void setDefaultProfileId(final UUID defaultProfileId) {
 		this.defaultProfileId = defaultProfileId;
 	}
 

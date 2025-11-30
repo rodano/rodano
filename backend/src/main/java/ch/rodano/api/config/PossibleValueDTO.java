@@ -2,6 +2,7 @@ package ch.rodano.api.config;
 
 import java.util.Map;
 import java.util.SortedMap;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import ch.rodano.configuration.model.field.PossibleValue;
 
 public class PossibleValueDTO {
+	@NotNull
+	private UUID possibleValueId;
 	@NotBlank
 	private String id;
 	@NotNull
@@ -24,9 +27,18 @@ public class PossibleValueDTO {
 	}
 
 	public PossibleValueDTO(final PossibleValue possibleValue) {
+		this.possibleValueId = possibleValue.getPossibleValueId();
 		this.id = possibleValue.getId();
 		this.shortname = possibleValue.getShortname();
 		this.specify = possibleValue.isSpecify();
+	}
+
+	public UUID getPossibleValueId() {
+		return possibleValueId;
+	}
+
+	public void setPossibleValueId(final UUID possibleValueId) {
+		this.possibleValueId = possibleValueId;
 	}
 
 	public String getId() {

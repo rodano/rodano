@@ -27,7 +27,7 @@ public class ScopeMiniDTO {
 	protected String longname;
 
 	@Schema(description = "Scope model ID")
-	@NotBlank
+	@NotNull
 	protected UUID modelId;
 	@NotNull
 	protected boolean virtual;

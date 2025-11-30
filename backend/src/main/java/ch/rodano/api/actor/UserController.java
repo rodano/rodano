@@ -2,6 +2,7 @@ package ch.rodano.api.actor;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -102,7 +103,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<UserDTO> search(
 		@Parameter(description = "Scope PKs") @RequestParam final Optional<Set<Long>> scopePks,
-		@Parameter(description = "Profile IDs") @RequestParam final Optional<Set<String>> profileIds,
+		@Parameter(description = "Profile IDs") @RequestParam final Optional<Set<UUID>> profileIds,
 		@Parameter(description = "Role statuses") @RequestParam final Optional<Set<RoleStatus>> states,
 		@Parameter(description = "User e-mail") @RequestParam final Optional<String> email,
 		@Parameter(description = "Full text search on name and e-mail") @RequestParam final Optional<String> fullText,
@@ -139,7 +140,7 @@ public class UserController extends AbstractSecuredController {
 	@GetMapping("export")
 	public ResponseEntity<StreamingResponseBody> exportUsers(
 		@Parameter(description = "Scope PKs") @RequestParam final Optional<Set<Long>> scopePks,
-		@Parameter(description = "Profile IDs") @RequestParam final Optional<Set<String>> profileIds,
+		@Parameter(description = "Profile IDs") @RequestParam final Optional<Set<UUID>> profileIds,
 		@Parameter(description = "Role statuses") @RequestParam final Optional<Set<RoleStatus>> states,
 		@Parameter(description = "User e-mail") @RequestParam final Optional<String> email,
 		@Parameter(description = "Full text search on name and e-mail") @RequestParam final Optional<String> fullText,

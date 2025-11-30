@@ -190,7 +190,12 @@ public class ExportViewServiceImpl implements ExportViewService {
 
 	private Field<?> typedColumn(final FieldModel fieldModel) {
 		final var rawValue = DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getFieldModelId()));
-		if(OperandType.NUMBER.equals(fieldModel.getDataType())) {
+
+		final OperandType dataType = fieldModel.getDataType();
+		if(dataType == null) {
+			return rawValue.cast(SQLDataType.CHAR(255));
+		}
+		if(OperandType.NUMBER.equals(dataType)) {
 			return DSL.case_().when(rawValue.notEqual(""), rawValue.cast(SQLDataType.DECIMAL(18, 9)));
 		}
 		switch(fieldModel.getDataType()) {

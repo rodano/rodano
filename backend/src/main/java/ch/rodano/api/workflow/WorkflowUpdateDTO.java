@@ -1,16 +1,18 @@
 package ch.rodano.api.workflow;
 
+import java.util.UUID;
+
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record WorkflowUpdateDTO(
-	@Schema(description = "Workflow id when creating a new workflow") @NotBlank
-	String workflowId,
+	@Schema(description = "Workflow id when creating a new workflow") @NotNull
+	UUID workflowId,
 
 	@Schema(description = "Action id")
-	String actionId,
+	UUID actionId,
 
 	@Schema(description = "Rationale")
 	String rationale,
@@ -19,6 +21,6 @@ public record WorkflowUpdateDTO(
 	String email,
 
 	@Schema(description = "User password for authentication")
-	String password 
+	String password
 ) {
 }

@@ -21,6 +21,7 @@ import ch.rodano.core.services.dao.strategy.DAOStrategy;
 
 import static ch.rodano.core.model.jooq.Tables.RESOURCE;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
+import static ch.rodano.core.model.jooq.tables.Scope.SCOPE;
 
 @Service
 public class ResourceDAOServiceImpl extends AbstractDAOService<Resource, ResourceRecord> implements ResourceDAOService {
@@ -66,11 +67,17 @@ public class ResourceDAOServiceImpl extends AbstractDAOService<Resource, Resourc
 			conditions.add(RESOURCE.CATEGORY_ID.eq(categoryId));
 		});
 
+		search.getFullText().ifPresent(fullText -> {
+			final var pattern = "%" + fullText + "%";
+			conditions.add(RESOURCE.TITLE.likeIgnoreCase(pattern).or(RESOURCE.DESCRIPTION.likeIgnoreCase(pattern)));
+		});
+
 		if(!search.getIncludeDeleted()) {
 			conditions.add(RESOURCE.DELETED.isFalse());
 		}
 
 		final var query = create.selectDistinct(RESOURCE.asterisk(), DSL.count().over().as("total")).from(RESOURCE)
+			.leftJoin(SCOPE).on(RESOURCE.SCOPE_FK.eq(SCOPE.PK))
 			.leftJoin(saAbove).on(RESOURCE.SCOPE_FK.eq(saAbove.SCOPE_FK))
 			.leftJoin(saUnder).on(RESOURCE.SCOPE_FK.eq(saUnder.ANCESTOR_FK))
 			.where(conditions)

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,7 +75,7 @@ public class ExtractController extends AbstractSecuredController {
 	@GetMapping("dataset-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<DatasetModelDTO> getDatasetModelsPerScopeModel(
-		@Parameter(description = "Scope model ID") @RequestParam final String scopeModelId
+		@Parameter(description = "Scope model ID") @RequestParam final UUID scopeModelId
 	) {
 		final var scopeModel = studyService.getStudy().getScopeModel(scopeModelId);
 
@@ -106,7 +107,7 @@ public class ExtractController extends AbstractSecuredController {
 			Dataset model IDs.
 			If only one is provided, a CSV file is returned.
 			If more than one ID is provided, a ZIP file containing individual specifications is returned.
-			""") @RequestParam final List<String> datasetModelIds,
+			""") @RequestParam final List<UUID> datasetModelIds,
 		@Parameter(description = "Should the modification dates be included ?") @RequestParam final Optional<Boolean> withModificationDates
 	) {
 		final var currentActor = currentActor();
@@ -148,8 +149,7 @@ public class ExtractController extends AbstractSecuredController {
 			withModificationDates.orElse(false),
 			actorService.getLanguages(currentActor)
 		);
-		final var filename = ZIPPED_SPECIFICATIONS_FILENAME;
-		return exportResponse(ExportFormat.ZIP, stream, filename);
+		return exportResponse(ExportFormat.ZIP, stream, ZIPPED_SPECIFICATIONS_FILENAME);
 	}
 
 	@Operation(summary = "Extract dataset to CSV or ZIP")
@@ -160,7 +160,7 @@ public class ExtractController extends AbstractSecuredController {
 			Dataset model IDs.
 			If only one is provided, a CSV file is returned.
 			If more than one ID is provided, a ZIP file containing individual specifications is returned.
-			""") @RequestParam final List<String> datasetModelIds,
+			""") @RequestParam final List<UUID> datasetModelIds,
 		@Parameter(description = "Scope reference on which the export will be performed") @RequestParam final Optional<Long> scopePk,
 		@Parameter(description = "Should the modification dates be included ?") @RequestParam final Optional<Boolean> withModificationDates
 	) {
@@ -217,8 +217,7 @@ public class ExtractController extends AbstractSecuredController {
 			scopes,
 			withModificationDates.orElse(false)
 		);
-		final var filename = ZIPPED_EXTRACTS_FILENAME;
-		return exportResponse(ExportFormat.ZIP, stream, filename);
+		return exportResponse(ExportFormat.ZIP, stream, ZIPPED_EXTRACTS_FILENAME);
 	}
 
 }

@@ -44,6 +44,7 @@ import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.workflowStatus.AggregateWorkflowDAOService;
 import ch.rodano.core.utils.UtilsService;
 
+import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.EVENT;
 import static ch.rodano.core.model.jooq.Tables.FIELD;
@@ -221,18 +222,32 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			.forEach(e -> rootScopeValues.put(e.getKey(), rootScopeValues.get(e.getKey()) + e.getValue()));
 
 		final var summaryColumns = new ArrayList<SummaryColumnDTO>();
-		workflow.getStates().stream()
-			.map(
-				state -> new SummaryColumnDTO(
-					state.getId(),
-					state.getShortname(),
-					true,
-					false
-				)
-			)
-			.forEach(summaryColumns::add);
+		final var projectId = studyService.getStudy().getProjectId();
+		int colOrder = 0;
+		for(final var state : workflow.getStates()) {
+			final var summaryColumnId = deterministic(
+				projectId,
+				"WORKFLOW_SUMMARY_COLUMN",
+				workflow.getId() + "|" + colOrder
+			);
+			summaryColumns.add(new SummaryColumnDTO(
+				summaryColumnId,
+				state.getId(),
+				state.getShortname(),
+				true,
+				false
+			));
+			colOrder++;
+		}
+
+		final var totalColumnId = deterministic(
+			projectId,
+			"WORKFLOW_SUMMARY_COLUMN",
+			workflow.getId() + "|" + colOrder
+		);
 		summaryColumns.add(
 			new SummaryColumnDTO(
+				totalColumnId,
 				"total",
 				Collections.singletonMap(LanguageStatic.en.name(), "Total"),
 				false,
@@ -241,11 +256,12 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 		);
 
 		return new SummaryDTO(
+			summary.getWorkflowSummaryId(),
 			summary.getId(),
 			summary.getTitle(),
-			summary.getLeafScopeModelId(),
+			summary.getLeafScopeModelUuid(),
 			summaryColumns,
-			new ArrayList<SummaryRowDTO>(summaryByScopePk.values())
+			new ArrayList<>(summaryByScopePk.values())
 		);
 	}
 

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -201,7 +202,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/form-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<FormModelDTO> getFormModels(
-		@PathVariable final String scopeModelId
+		@PathVariable final UUID scopeModelId
 	) {
 		final var acl = rightsService.getACL(currentActor());
 
@@ -215,7 +216,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/dataset-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<DatasetModelDTO> getInceptiveDatasetModels(
-		@PathVariable final String scopeModelId
+		@PathVariable final UUID scopeModelId
 	) {
 		final var acl = rightsService.getACL(currentActor());
 
@@ -229,7 +230,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("menu/{menuId}/layout")
 	@ResponseStatus(HttpStatus.OK)
 	public CMSLayoutDTO getMenuLayout(
-		@PathVariable final String menuId
+		@PathVariable final UUID menuId
 	) {
 		final var roles = currentActiveRoles();
 		final var menu = studyService.getStudy().getAllMenu(menuId);
@@ -240,8 +241,8 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("dataset-models/{datasetModelId}/field-models/{fieldModelId}/autocomplete/{text}")
 	@ResponseStatus(HttpStatus.OK)
 	public List<String> getFieldModelAutocomplete(
-		@PathVariable final String datasetModelId,
-		@PathVariable final String fieldModelId,
+		@PathVariable final UUID datasetModelId,
+		@PathVariable final UUID fieldModelId,
 		@PathVariable final String text
 	) throws IOException {
 		final var fieldModel = studyService.getStudy().getDatasetModel(datasetModelId).getFieldModel(fieldModelId);

@@ -2,6 +2,7 @@ package ch.rodano.api.actor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -9,41 +10,46 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserRightsDTO {
-	@NotNull List<String> readProfilesIds = new ArrayList<>();
-	@NotNull List<String> writeProfilesIds = new ArrayList<>();
-	@NotNull List<String> readScopeModelIds = new ArrayList<>();
-	@NotNull List<String> writeScopeModelIds = new ArrayList<>();
-	@NotNull boolean canCreateUser;
+	@NotNull
+	List<UUID> readProfilesIds = new ArrayList<>();
+	@NotNull
+	List<UUID> writeProfilesIds = new ArrayList<>();
+	@NotNull
+	List<UUID> readScopeModelIds = new ArrayList<>();
+	@NotNull
+	List<UUID> writeScopeModelIds = new ArrayList<>();
+	@NotNull
+	boolean canCreateUser;
 
-	public List<String> getReadProfilesIds() {
+	public List<UUID> getReadProfilesIds() {
 		return readProfilesIds;
 	}
 
-	public void setReadProfilesIds(final List<String> readProfiles) {
+	public void setReadProfilesIds(final List<UUID> readProfiles) {
 		this.readProfilesIds = readProfiles;
 	}
 
-	public List<String> getWriteProfilesIds() {
+	public List<UUID> getWriteProfilesIds() {
 		return writeProfilesIds;
 	}
 
-	public void setWriteProfilesIds(final List<String> writeProfilesIds) {
+	public void setWriteProfilesIds(final List<UUID> writeProfilesIds) {
 		this.writeProfilesIds = writeProfilesIds;
 	}
 
-	public List<String> getReadScopeModelIds() {
+	public List<UUID> getReadScopeModelIds() {
 		return readScopeModelIds;
 	}
 
-	public void setReadScopeModelIds(final List<String> readScopeModelIds) {
+	public void setReadScopeModelIds(final List<UUID> readScopeModelIds) {
 		this.readScopeModelIds = readScopeModelIds;
 	}
 
-	public List<String> getWriteScopeModelIds() {
+	public List<UUID> getWriteScopeModelIds() {
 		return writeScopeModelIds;
 	}
 
-	public void setWriteScopeModelIds(final List<String> writeScopeModelIds) {
+	public void setWriteScopeModelIds(final List<UUID> writeScopeModelIds) {
 		this.writeScopeModelIds = writeScopeModelIds;
 	}
 

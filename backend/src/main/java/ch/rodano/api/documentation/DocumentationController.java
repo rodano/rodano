@@ -2,6 +2,7 @@ package ch.rodano.api.documentation;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -73,7 +74,7 @@ public class DocumentationController extends AbstractSecuredController {
 	@GetMapping("/crf-blank/{scopeModelId}")
 	@Transactional
 	public ResponseEntity<StreamingResponseBody> crfBlank(
-		@PathVariable final String scopeModelId,
+		@PathVariable final UUID scopeModelId,
 		@Parameter(description = "Annotated?") @RequestParam final boolean annotated
 	) {
 		final var scopeModel = studyService.getStudy().getScopeModel(scopeModelId);

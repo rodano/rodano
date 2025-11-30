@@ -3,6 +3,7 @@ package ch.rodano.api.file;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -298,7 +299,7 @@ public class FileController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> downloadAllFiles(
 		@PathVariable final Long scopePk,
-		@RequestParam final Optional<String> scopeModelId
+		@RequestParam final Optional<UUID> scopeModelId
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);

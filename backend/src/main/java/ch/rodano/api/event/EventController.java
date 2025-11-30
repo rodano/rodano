@@ -1,6 +1,7 @@
 package ch.rodano.api.event;
 
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.validation.Valid;
 
@@ -171,7 +172,7 @@ public class EventController extends AbstractSecuredController {
 	@Transactional
 	public EventDTO createEvent(
 		@PathVariable final Long scopePk,
-		@RequestParam final String eventModelId
+		@RequestParam final UUID eventModelId
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 
