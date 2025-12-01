@@ -46,4 +46,4 @@ docker compose --env-file env pull
 
 ## Deploy Rodano instances
 
-See the [ansible/README.md](dedicated documentation).
+See the [dedicated documentation](ansible/README.md).
