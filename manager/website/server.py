@@ -7,6 +7,7 @@ import messaging
 import tasks
 import applications
 import config
+import backups
 
 logger = logging.getLogger(__name__)
 base_url_path = os.getenv("BASE_URL_PATH", "/")
@@ -35,7 +36,7 @@ async def main():
 	server.listen(8081)
 
 	applications.start_log_streaming()
-	applications.start_periodic_backups()
+	backups.start_periodic_backups()
 
 	await asyncio.Event().wait()
 
