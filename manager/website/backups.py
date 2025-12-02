@@ -32,20 +32,21 @@ async def backup():
 
 #start the periodic backup scheduler
 def start_periodic_backups():
-	if config.BACKUP_CRON_EXPRESSION:
+	cron = config.BACKUP_CRON_EXPRESSION
+	if cron:
 		scheduler = AsyncIOScheduler()
-		trigger = CronTrigger.from_crontab(config.BACKUP_CRON_EXPRESSION)
+		trigger = CronTrigger.from_crontab(cron)
 
 		#add the job to scheduler
 		scheduler.add_job(
 			func=backup,
 			trigger=trigger,
-			id='backup_cron_job',
-			name='Periodic backup task',
+			id="backup_cron_job",
+			name="Periodic backup task",
 			replace_existing=False,
-			executor='default'
+			executor="default"
 		)
 
 		#start the scheduler
 		scheduler.start()
-		logger.info(f"Periodic backup scheduler started with cron expression {config.BACKUP_CRON_EXPRESSION}")
+		logger.info(f"Periodic backup scheduler started with cron expression {cron}")
