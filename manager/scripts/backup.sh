@@ -76,7 +76,7 @@ gzip --best "$backup_db"
 
 #generate backup description file
 echo "Creating backup description..."
-backup_description="$backup_build_dir/description.txt"
+backup_description="$backup_build_dir/description.ini"
 
 #build backup properties file
 {
@@ -93,7 +93,7 @@ backup_description="$backup_build_dir/description.txt"
 echo "Creating backup package..."
 backup_package_basename=$backup_id".zip"
 backup_package=$backup_build_dir"/"$backup_package_basename
-zip -j "$backup_package" "$backup_build_dir/description.txt" "$backup_build_dir/database.sql.gz" "$backup_build_dir/data.tar.gz"
+zip -j "$backup_package" "$backup_build_dir/description.ini" "$backup_build_dir/database.sql.gz" "$backup_build_dir/data.tar.gz"
 
 #store the backup to the backup storage
 echo "Moving backup package..."

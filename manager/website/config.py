@@ -36,6 +36,8 @@ DATABASE_NAME = os.getenv("DATABASE_NAME", "rodano")
 DATABASE_USER = os.getenv("DATABASE_USER", "root")
 DATABASE_PASSWORD = os.getenv("DATABASE_PASSWORD", "root")
 
+BACKUPS_PATH = os.getenv("BACKUPS_PATH", "/backups")
+
 BACKUP_CRON_EXPRESSION = os.getenv("BACKUP_CRON_EXPRESSION", "0 3 * * *")
 BACKUPS_STORAGE_PATH = os.getenv("BACKUPS_PATH", "/backups")
 TEMPORARY_BACKUP_FILE_PATH = "/tmp/restore.zip"

@@ -37,6 +37,7 @@ async def main():
 
 	applications.start_log_streaming()
 	backups.start_periodic_backups()
+	backups.start_backups_cleanup()
 
 	await asyncio.Event().wait()
 
