@@ -1,8 +1,6 @@
 import os
 import logging
 import asyncio
-import socket
-import aiodocker
 import tornado.web
 import tornado.httpserver
 import messaging
