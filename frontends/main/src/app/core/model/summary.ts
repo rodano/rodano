@@ -12,6 +12,7 @@ import { SummaryRow } from './summary-row';
 
 
 export interface Summary { 
+    workflowSummaryId: string;
     id: string;
     title: { [key: string]: string; };
     leafScopeModelId: string;

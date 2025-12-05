@@ -16,7 +16,8 @@ import { PossibleValue } from './possible-value';
  * Field model
  */
 export interface FieldModel { 
-    type: FieldModelType;
+    fieldModelId: string;
+    type?: FieldModelType;
     dataType: OperandType;
     datasetModelId: string;
     id: string;

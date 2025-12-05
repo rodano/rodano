@@ -2,11 +2,11 @@
 
 <mat-dialog-content>
 	<mat-list>
-		@for (event of events; track event.id) {
+		@for (event of events; track event.eventModelId) {
 			<mat-list-item>
 				<button
 					mat-stroked-button
-					[mat-dialog-close]="event.id">
+					[mat-dialog-close]="event.eventModelId">
 					{{ event.shortname | localizeMap }}
 				</button>
 			</mat-list-item>

@@ -167,10 +167,10 @@ export class SearchComponent implements OnInit {
 				const scopeModels = results.scopeModel;
 				this.leafScopeModel = scopeModels.find(scopeModel => scopeModel.leaf) ?? ({} as ScopeModel);
 				this.leafScopeForms = results.formModels;
-				this.leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.id === this.leafScopeModel.defaultParentId) ?? ({} as ScopeModel);
+				this.leafScopeModelParent = scopeModels.find(scopeModel => scopeModel.scopeModelId === this.leafScopeModel.defaultParentId) ?? ({} as ScopeModel);
 
-				this.workflows = results.workflows.filter(ws => this.leafScopeModel.workflowIds.includes(ws.id));
-				this.parentScopes = results.parentScopes.filter(scope => scope.modelId === this.leafScopeModelParent.id);
+				this.workflows = results.workflows.filter(ws => this.leafScopeModel.workflowIds.includes(ws.workflowId));
+				this.parentScopes = results.parentScopes.filter(scope => scope.modelId === this.leafScopeModelParent.scopeModelId);
 				this.searchableFields = results.searchableFields;
 
 				//fill in the fieldModelMap and the columnsToDisplay
@@ -180,20 +180,20 @@ export class SearchComponent implements OnInit {
 				});
 
 				this.workflows.forEach(workflow => {
-					this.columnsToDisplay.push(workflow.id);
-					this.workflowStatusModelMap.set(workflow.id, workflow.shortname);
+					this.columnsToDisplay.push(workflow.workflowId);
+					this.workflowStatusModelMap.set(workflow.workflowId, workflow.shortname);
 					workflow.states.forEach(state => {
-						this.statusModelMap.set(`${workflow.id}_${state.id}`, state.shortname);
+						this.statusModelMap.set(`${workflow.workflowId}_${state.workflowStateId}`, state.shortname);
 					});
 					//Handle the case where the workflow is an aggregator
 					if(workflow.aggregator && workflow.aggregatedWorkflowId) {
-						this.aggregatedWorkflowMap.set(workflow.id, workflow.aggregatedWorkflowId);
+						this.aggregatedWorkflowMap.set(workflow.workflowId, workflow.aggregatedWorkflowId);
 					}
 				});
 				this.setupFormListeners();
 				this.loadData();
 				//Now return the parentsWithWriteAccess observable
-				return this.scopeRelationService.getParents(this.leafScopeModel.id, Rights.WRITE).pipe(
+				return this.scopeRelationService.getParents(this.leafScopeModel.scopeModelId, Rights.WRITE).pipe(
 					map(parentsWithWriteAccess => ({
 						parentsWithWriteAccess
 					}))
@@ -246,7 +246,7 @@ export class SearchComponent implements OnInit {
 				}
 
 				//Always set the scope model to PATIENT
-				scopeSearchObj.scopeModelId = this.leafScopeModel.id;
+				scopeSearchObj.scopeModelId = this.leafScopeModel.scopeModelId;
 				this.syncFormAndUrl(scopeSearchObj);
 
 				return this.scopeService.search(scopeSearchObj);
@@ -260,11 +260,11 @@ export class SearchComponent implements OnInit {
 	}
 
 	getWSFormControlName(workflow: Workflow): string {
-		return `ws_${workflow.id}`;
+		return `ws_${workflow.workflowId}`;
 	}
 
 	getSFFormControlName(fieldModel: FieldModel): string {
-		return `${fieldModel.datasetModelId}/${fieldModel.id}`;
+		return `${fieldModel.datasetModelId}/${fieldModel.fieldModelId}`;
 	}
 
 	createPatient() {
@@ -294,7 +294,7 @@ export class SearchComponent implements OnInit {
 				if(!parentScope) {
 					return EMPTY;
 				}
-				return this.scopeService.getCandidate(parentScope.pk, this.leafScopeModel.id);
+				return this.scopeService.getCandidate(parentScope.pk, this.leafScopeModel.scopeModelId);
 			}),
 			switchMap(candidateScope => this.scopeService.create(candidateScope)),
 			switchMap(newScope =>
@@ -317,7 +317,7 @@ export class SearchComponent implements OnInit {
 	private createParentScopeFormControls(parentScopes: ScopeMini[]): Observable<any>[] {
 		return parentScopes.map(parentScope => {
 			const control = new FormControl();
-			this.searchForm.addControl(parentScope.id, control);
+			this.searchForm.addControl(parentScope.modelId, control);
 			return control.valueChanges;
 		});
 	}
@@ -413,14 +413,14 @@ export class SearchComponent implements OnInit {
 	private generateScopeSearch(): ScopeSearch {
 		const search = new ScopeSearch();
 		search.fullText = this.searchForm.controls.scopeCode.value;
-		search.scopeModelId = this.leafScopeModel.id;
+		search.scopeModelId = this.leafScopeModel.scopeModelId;
 		search.workflowStates = {};
 		search.fieldModelCriteria = '';
 
 		this.workflows.forEach(workflow => {
 			const control = this.searchForm.controls[this.getWSFormControlName(workflow)];
 			const value = control.value;
-			const aggregatedWorkflowId = this.aggregatedWorkflowMap.get(workflow.id);
+			const aggregatedWorkflowId = this.aggregatedWorkflowMap.get(workflow.workflowId);
 
 			if(value) {
 				//If the workflow is an aggregated workflow, use the aggregatedWorkflowId
@@ -428,13 +428,13 @@ export class SearchComponent implements OnInit {
 					search.workflowStates[aggregatedWorkflowId] = value;
 				}
 				else {
-					search.workflowStates[workflow.id] = value;
+					search.workflowStates[workflow.workflowId] = value;
 				}
 			}
 
 			//Clean up empty workflow states
-			if(!search.workflowStates[workflow.id]?.length) {
-				delete search.workflowStates[workflow.id];
+			if(!search.workflowStates[workflow.workflowId]?.length) {
+				delete search.workflowStates[workflow.workflowId];
 			}
 			if(aggregatedWorkflowId && !search.workflowStates[aggregatedWorkflowId]?.length) {
 				delete search.workflowStates[aggregatedWorkflowId];
@@ -456,7 +456,7 @@ export class SearchComponent implements OnInit {
 				const existingCriteria = this.fieldModelCriteria.find(
 					criteria =>
 						criteria.datasetModelId === fieldModel.datasetModelId
-						&& criteria.fieldModelId === fieldModel.id
+						&& criteria.fieldModelId === fieldModel.fieldModelId
 				);
 
 				if(existingCriteria) {
@@ -474,7 +474,7 @@ export class SearchComponent implements OnInit {
 							? Operator.CONTAINS
 							: Operator.EQUALS,
 						datasetModelId: fieldModel.datasetModelId,
-						fieldModelId: fieldModel.id
+						fieldModelId: fieldModel.fieldModelId
 					});
 				}
 				//Update the search object
@@ -500,7 +500,7 @@ export class SearchComponent implements OnInit {
 
 	private updateImportantWorkflows(): void {
 		const search = new WorkflowStatusSearch();
-		search.workflowIds = this.workflows.map(w => w.id);
+		search.workflowIds = this.workflows.map(w => w.workflowId);
 		search.ancestorScopePks = this.scopes.map(s => s.pk);
 		search.filterExpectedEvents = true;
 		search.pageSize = 20;
@@ -541,8 +541,8 @@ export class SearchComponent implements OnInit {
 
 	getValueShortname(datasetModelId: string, fieldId: string, field: any): Record<string, string> | undefined {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId && fieldModel.possibleValues) {
-				const value = fieldModel.possibleValues?.find(value => value.id === field)?.shortname;
+			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId && fieldModel.possibleValues) {
+				const value = fieldModel.possibleValues?.find(value => value.possibleValueId === field)?.shortname;
 				if(value) {
 					return value;
 				}
@@ -553,7 +553,7 @@ export class SearchComponent implements OnInit {
 
 	getDateObject(datasetModelId: string, fieldId: string, field: any): Date | undefined {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId && fieldModel.type === FieldModelType.DATE) {
+			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId && fieldModel.type === FieldModelType.DATE) {
 				const parsedDate = parse(field, 'dd.MM.yyyy', new Date());
 				return isValid(parsedDate) ? parsedDate : undefined;
 			}
@@ -563,7 +563,7 @@ export class SearchComponent implements OnInit {
 
 	getIsPossibleValue(datasetModelId: string, fieldId: string): boolean {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
+			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId) {
 				return fieldModel.possibleValues.length > 0;
 			}
 		}
@@ -572,7 +572,7 @@ export class SearchComponent implements OnInit {
 
 	getIsCompleteDate(datasetModelId: string, fieldId: string): boolean {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
+			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId) {
 				return (fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory;
 			}
 		}
@@ -581,7 +581,7 @@ export class SearchComponent implements OnInit {
 
 	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.id === fieldId && fieldModel.datasetModelId === datasetModelId) {
+			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId) {
 				return fieldModel;
 			}
 		}
@@ -590,7 +590,7 @@ export class SearchComponent implements OnInit {
 
 	getWorkflow(workflowId: string): Workflow | undefined {
 		for(const workflow of this.workflows) {
-			if(workflow.id === workflowId) {
+			if(workflow.workflowId === workflowId) {
 				return workflow;
 			}
 		}

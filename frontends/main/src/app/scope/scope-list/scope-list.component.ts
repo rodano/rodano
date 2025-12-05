@@ -93,8 +93,8 @@ export class ScopeListComponent implements OnInit, OnChanges {
 		forkJoin({
 			leafScopeModel: this.configurationService.getLeafScopeModel(),
 			defaultProfile: this.scopeModel.defaultProfileId ? this.configurationService.getProfile(this.scopeModel.defaultProfileId) : of(undefined),
-			parentScopes: this.scopeRelationService.getParents(this.scopeModel.id, Rights.READ),
-			parentsWithWriteAccess: this.scopeRelationService.getParents(this.scopeModel.id, Rights.WRITE)
+			parentScopes: this.scopeRelationService.getParents(this.scopeModel.scopeModelId, Rights.READ),
+			parentsWithWriteAccess: this.scopeRelationService.getParents(this.scopeModel.scopeModelId, Rights.WRITE)
 
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
@@ -129,7 +129,7 @@ export class ScopeListComponent implements OnInit, OnChanges {
 			startWith({}),
 			switchMap(() => {
 				const search = new ScopeSearch();
-				search.scopeModelId = this.scopeModel.id;
+				search.scopeModelId = this.scopeModel.scopeModelId;
 				search.fullText = this.searchForm.get('fullText')?.value;
 				const parentPk = this.searchForm.get('parentPk')?.value;
 				if(parentPk) {

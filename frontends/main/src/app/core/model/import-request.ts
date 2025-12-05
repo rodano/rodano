@@ -9,12 +9,12 @@
  */
 
 
-/**
- * Event groups
- */
-export interface EventGroup { 
-    eventGroupId: string;
-    id: string;
-    shortname: { [key: string]: string; };
+export interface ImportRequest { 
+    job?: string;
+    projectId?: string;
+    config?: string;
+    dbUrl?: string;
+    dbUser?: string;
+    dbPassword?: string;
 }
 

@@ -14,6 +14,7 @@ import { WidgetWidth } from './widget-width';
  * Widgets that are displayed in the layouts
  */
 export interface CMSWidget { 
+    menuWidgetId: string;
     /**
      * Type of widget
      */

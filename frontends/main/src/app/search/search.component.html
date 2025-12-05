@@ -101,8 +101,8 @@
 									<mat-form-field>
 										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
 										<mat-select [formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null">
-											@for (value of fieldModel?.possibleValues; track value.id) {
-												<mat-option [value]="value.id">
+											@for (value of fieldModel?.possibleValues; track value.possibleValueId) {
+												<mat-option [value]="value.possibleValueId">
 													{{ value.shortname | localizeMap }}
 												</mat-option>
 											}
@@ -122,8 +122,8 @@
 									<mat-select
 										[formControlName]="getWorkflow(column) ? getWSFormControlName(getWorkflow(column)!) : null"
 										multiple>
-										@for (state of getWorkflow(column)?.states || []; track state.id) {
-											<mat-option [value]="state.id">
+										@for (state of getWorkflow(column)?.states || []; track state.workflowStateId) {
+											<mat-option [value]="state.workflowStateId">
 												{{ state.shortname | localizeMap }}
 											</mat-option>
 										}
@@ -142,7 +142,7 @@
 							}
 							@for (datasetModelId of Object.keys(scope.searchableFields); track datasetModelId) {
 								@for (fieldId of Object.keys(scope.searchableFields[datasetModelId]); track fieldId) {
-									@if (fieldId === getSearchableFieldFromFormControlId(column)?.id) {
+									@if (fieldId === getSearchableFieldFromFormControlId(column)?.fieldModelId) {
 										@if (getIsPossibleValue(datasetModelId, fieldId)) {
 											{{
 												getValueShortname(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]) | localizeMap

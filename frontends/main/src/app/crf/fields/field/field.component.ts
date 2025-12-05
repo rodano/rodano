@@ -164,7 +164,7 @@ export class FieldComponent implements OnInit, OnChanges {
 
 	get creationActions(): WorkflowAction[] {
 		return this.field.possibleWorkflows.map(workflow => {
-			return workflow.actions.find(a => a.id === workflow.actionId) as WorkflowAction;
+			return workflow.actions.find(a => a.workflowActionId === workflow.actionId) as WorkflowAction;
 		});
 	}
 

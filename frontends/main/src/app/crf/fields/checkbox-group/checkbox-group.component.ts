@@ -40,13 +40,13 @@ export class CheckboxGroupComponent implements OnInit, OnChanges {
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe((values: Record<string, boolean>) => {
 			//retrieve all selected values except the one that asks for an other value
-			const fieldValues = this.field.model.possibleValues.map(v => v.id).filter(v => this.specifyValueId !== v && values[v]);
+			const fieldValues = this.field.model.possibleValues.map(v => v.possibleValueId).filter(v => this.specifyValueId !== v && values[v]);
 			if(this.specifyValueId && values[this.specifyValueId]) {
 				fieldValues.push(this.formGroup.get(this.otherControlName)?.value as string);
 			}
 			const fieldValue = fieldValues.join(',');
 			const fieldValueLabel = fieldValues.map(value => {
-				const possibleValue = this.field.model.possibleValues.find(v => v.id === value);
+				const possibleValue = this.field.model.possibleValues.find(v => v.possibleValueId === value);
 				return possibleValue ? new LocalizeMapPipe().transform(possibleValue.shortname) : value;
 			}).join(', ');
 			this.fieldUpdateService.updateField(this.field, fieldValue, fieldValueLabel);
@@ -55,20 +55,20 @@ export class CheckboxGroupComponent implements OnInit, OnChanges {
 
 	ngOnChanges() {
 		//retrieve the possible value that asks for a specify value if any
-		this.specifyValueId = this.field.model.possibleValues.find(v => v.specify)?.id;
+		this.specifyValueId = this.field.model.possibleValues.find(v => v.specify)?.possibleValueId;
 
 		//get the values of the field, and the "other" value if any
 		const fieldValues = this.field.value?.split(',') ?? [];
-		const otherValue = fieldValues.find(v => !this.field.model.possibleValues.some(pv => pv.id === v));
+		const otherValue = fieldValues.find(v => !this.field.model.possibleValues.some(pv => pv.possibleValueId === v));
 
 		const controls = {} as Record<string, FormControl<string | boolean | null>>;
 		this.field.model.possibleValues.forEach(value => {
 			if(value.specify) {
-				controls[value.id] = new FormControl<boolean>(!!otherValue);
+				controls[value.possibleValueId] = new FormControl<boolean>(!!otherValue);
 				controls[this.otherControlName] = new FormControl<string>(otherValue as string);
 			}
 			else {
-				controls[value.id] = new FormControl<boolean>(fieldValues.includes(value.id));
+				controls[value.possibleValueId] = new FormControl<boolean>(fieldValues.includes(value.possibleValueId));
 			}
 		});
 		this.formGroup = new FormGroup(controls);

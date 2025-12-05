@@ -43,12 +43,12 @@ export class CellLoadingService {
 		this.loadingCellIds = [];
 		const cellIds: string[] = [];
 		layouts.forEach(layout => {
-			const layoutCellIds = this.dataStateService.getLayoutCells(layout).map(c => c.id);
+			const layoutCellIds = this.dataStateService.getLayoutCells(layout).map(c => c.formLayoutCellId);
 			if(layout.type === LayoutType.SINGLE) {
 				cellIds.push(...layoutCellIds);
 			}
 			else {
-				datasets.filter(d => d.modelId === layout.datasetModel.id).forEach(() => {
+				datasets.filter(d => d.modelId === layout.datasetModel.datasetModelId).forEach(() => {
 					cellIds.push(...layoutCellIds);
 				});
 			}
@@ -63,7 +63,7 @@ export class CellLoadingService {
 	}
 
 	public registerLayoutCells(layout: Layout) {
-		const layoutCellIds = this.dataStateService.getLayoutCells(layout).map(c => c.id);
+		const layoutCellIds = this.dataStateService.getLayoutCells(layout).map(c => c.formLayoutCellId);
 		//layout may not contain any cell
 		if(layoutCellIds.length === 0) {
 			this.allCellsLoadedSource.next(true);

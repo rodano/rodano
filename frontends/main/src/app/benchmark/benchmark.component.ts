@@ -98,12 +98,12 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 	getFieldModel(index: number): FieldModel {
 		const criterion = this.criteria.controls[index] as FormArray;
 		const fieldModelId = criterion.controls[0].value;
-		return this.fieldModels.find(f => f.id === fieldModelId) as FieldModel;
+		return this.fieldModels.find(f => f.fieldModelId === fieldModelId) as FieldModel;
 	}
 
 	getOperators(index: number): Operator[] {
 		const fieldModel = this.getFieldModel(index);
-		if(!fieldModel) {
+		if(!fieldModel || !fieldModel.type) {
 			return [];
 		}
 		return operatorByType[fieldModel.type];
@@ -138,7 +138,7 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 			const fieldModel = this.getFieldModel(index);
 			return {
 				datasetModelId: fieldModel.datasetModelId,
-				fieldModelId: fieldModel.id,
+				fieldModelId: fieldModel.fieldModelId,
 				operator: criterion.controls[1].value,
 				value: criterion.controls[2].value
 			} as FieldModelCriterion;

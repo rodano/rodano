@@ -59,7 +59,7 @@ export class LayoutComponent implements OnInit {
 			}*/
 		//});
 
-		this.visibilityService.layoutVisibilityEvents$(this.layout.id).pipe(
+		this.visibilityService.layoutVisibilityEvents$(this.layout.formLayoutId).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
 			//deal only with single layout here

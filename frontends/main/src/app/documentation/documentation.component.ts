@@ -81,8 +81,8 @@ export class DocumentationComponent implements OnInit {
 			this.archiveMultipleCrfForm.get('rootScopePk')?.setValue(this.rootScopes[0].pk);
 			this.scopeModels = scopeModels;
 			const leafScopeModel = this.scopeModels[this.scopeModels.length - 1];
-			this.blankCrfForm.get('scopeModelId')?.setValue(leafScopeModel.id);
-			this.archiveMultipleCrfForm.get('scopeModelId')?.setValue(leafScopeModel.id);
+			this.blankCrfForm.get('scopeModelId')?.setValue(leafScopeModel.scopeModelId);
+			this.archiveMultipleCrfForm.get('scopeModelId')?.setValue(leafScopeModel.scopeModelId);
 		});
 
 		this.documentationService.getArchiveCrfStatus().pipe(
@@ -105,7 +105,7 @@ export class DocumentationComponent implements OnInit {
 	}
 
 	get blankCrfUrl(): string {
-		const scopeModelId = this.blankCrfForm.get('scopeModelId')?.value ?? this.scopeModels[0].id;
+		const scopeModelId = this.blankCrfForm.get('scopeModelId')?.value ?? this.scopeModels[0].scopeModelId;
 		const annotated = this.blankCrfForm.get('annotated')?.value ?? false;
 		return this.documentationService.getBlankCrfUrl(scopeModelId, annotated);
 	}
@@ -122,7 +122,7 @@ export class DocumentationComponent implements OnInit {
 
 	generateArchive() {
 		const rootScopePk = this.archiveMultipleCrfForm.get('rootScopePk')?.value as number;
-		const scopeModelId = this.archiveMultipleCrfForm.get('scopeModelId')?.value ?? this.scopeModels[0].id;
+		const scopeModelId = this.archiveMultipleCrfForm.get('scopeModelId')?.value ?? this.scopeModels[0].scopeModelId;
 		const withAuditTrails = this.archiveMultipleCrfForm.get('withAuditTrails')?.value ?? false;
 
 		this.documentationService.archiveCrfRequest([rootScopePk], scopeModelId, withAuditTrails)

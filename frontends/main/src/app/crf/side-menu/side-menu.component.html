@@ -68,7 +68,7 @@
 			</li>
 		}
 		<!-- Events -->
-		@for (eventGroup of eventGroups; track eventGroup.id) {
+		@for (eventGroup of eventGroups; track eventGroup.eventGroupId) {
 			<li class="starting-block">
 				<span>
 					<span class="main-content">
@@ -76,13 +76,13 @@
 					</span>
 					<button
 						mat-icon-button
-						(click)="toggleEventGroupSort(eventGroup.id)"
-						[matTooltip]="'Sort ' + (isSortedChronologically(eventGroup.id) ? 'descending' : 'ascending')">
-						<mat-icon>{{ isSortedChronologically(eventGroup.id) ? 'clock_arrow_up' : 'clock_arrow_down' }}</mat-icon>
+						(click)="toggleEventGroupSort(eventGroup.eventGroupId)"
+						[matTooltip]="'Sort ' + (isSortedChronologically(eventGroup.eventGroupId) ? 'descending' : 'ascending')">
+						<mat-icon>{{ isSortedChronologically(eventGroup.eventGroupId) ? 'clock_arrow_up' : 'clock_arrow_down' }}</mat-icon>
 					</button>
 				</span>
 			</li>
-			@for (event of getEvents(eventGroup.id); track event.pk) {
+			@for (event of getEvents(eventGroup.eventGroupId); track event.pk) {
 				<li class="ending-block-light">
 					<span>
 						<a

@@ -10,6 +10,7 @@
 
 
 export interface ResourceCategory { 
+    categoryId: string;
     id: string;
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };

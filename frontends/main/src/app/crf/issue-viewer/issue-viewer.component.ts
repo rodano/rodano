@@ -68,8 +68,8 @@ export class IssueViewerComponent implements OnInit {
 				workflows.forEach(workflow => {
 					workflow.states.forEach(state => {
 						if(state.important) {
-							this.workflowIds.push(workflow.id);
-							this.stateIds.push(state.id);
+							this.workflowIds.push(workflow.workflowId);
+							this.stateIds.push(state.workflowStateId);
 						}
 					});
 				});

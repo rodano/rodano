@@ -3,7 +3,7 @@
 		<button
 			mat-icon-button
 			inline="true"
-			[routerLink]="['/scopes', scopeModel.id]"
+			[routerLink]="['/scopes', scopeModel.scopeModelId]"
 			matTooltip="Go back">
 			<mat-icon>arrow_back</mat-icon>
 		</button>
@@ -30,7 +30,7 @@
 			[tabPanel]="tabPanel">
 			<a
 				mat-tab-link
-				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'settings']"
+				[routerLink]="['/scopes', scopeModel.scopeModelId, scope.pk, 'settings']"
 				routerLinkActive
 				#settingsRLA="routerLinkActive"
 				[active]="settingsRLA.isActive">
@@ -38,7 +38,7 @@
 			</a>
 			<a
 				mat-tab-link
-				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'parents']"
+				[routerLink]="['/scopes', scopeModel.scopeModelId, scope.pk, 'parents']"
 				routerLinkActive
 				#parentsRLA="routerLinkActive"
 				[active]="parentsRLA.isActive">
@@ -47,7 +47,7 @@
 			@for (form of forms; track form.pk) {
 				<a
 					mat-tab-link
-					[routerLink]="['/scopes', scopeModel.id, scope.pk, 'form', form.pk]"
+					[routerLink]="['/scopes', scopeModel.scopeModelId, scope.pk, 'form', form.pk]"
 					routerLinkActive
 					#formRLA="routerLinkActive"
 					[active]="formRLA.isActive">
@@ -56,7 +56,7 @@
 			}
 			<a
 				mat-tab-link
-				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'users']"
+				[routerLink]="['/scopes', scopeModel.scopeModelId, scope.pk, 'users']"
 				routerLinkActive
 				#usersRLA="routerLinkActive"
 				[active]="usersRLA.isActive">

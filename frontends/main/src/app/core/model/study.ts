@@ -18,6 +18,7 @@ import { Profile } from './profile';
 
 
 export interface Study { 
+    projectId: string;
     id: string;
     shortname: { [key: string]: string; };
     color: string;

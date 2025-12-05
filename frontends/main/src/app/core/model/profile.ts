@@ -12,6 +12,7 @@ import { PrivacyPolicy } from './privacy-policy';
 
 
 export interface Profile { 
+    profileId: string;
     id: string;
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };

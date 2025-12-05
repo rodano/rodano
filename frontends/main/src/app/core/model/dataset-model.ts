@@ -15,6 +15,10 @@ import { FieldModel } from './field-model';
  */
 export interface DatasetModel { 
     /**
+     * Unique document UUID
+     */
+    datasetModelId: string;
+    /**
      * Unique document ID
      */
     id: string;

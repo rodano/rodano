@@ -15,6 +15,7 @@ import { EventGroup } from './event-group';
  * Scope model
  */
 export interface ScopeModel { 
+    scopeModelId: string;
     id: string;
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };

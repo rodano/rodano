@@ -94,7 +94,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 			//this.crfService.mergeCurrentDatasets(this.datasets);
 		});*/
 
-		this.visibilityService.layoutVisibilityEvents$(this.layout.id).pipe(
+		this.visibilityService.layoutVisibilityEvents$(this.layout.formLayoutId).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
 			this.loggingService.info(`Multiple layout ${this.layout.id} receiving visibility event containing ${shown}`);
@@ -116,13 +116,15 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 				element = element.trim();
 				if(element.startsWith('fieldModelId:')) {
 					const fieldModelId = element.slice(13, -1);
-					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
-					this.fieldModelsToDisplay.push(fieldModel);
+					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.fieldModelId === fieldModelId) as FieldModel;
+					if(fieldModel) {
+						this.fieldModelsToDisplay.push(fieldModel);
+					}
 				}
 			}
 		});
-		this.columnsToDisplay = [...this.fieldModelsToDisplay.map(f => f.id), 'actions'];
-		this.multipleDatasets = this.datasets.filter(d => d.modelId === this.layout.datasetModel.id);
+		this.columnsToDisplay = [...this.fieldModelsToDisplay.map(f => f.fieldModelId), 'actions'];
+		this.multipleDatasets = this.datasets.filter(d => d.modelId === this.layout.datasetModel.datasetModelId);
 		if(this.fieldModelsToDisplay.length > 0) {
 			this.sortDatasets(this.fieldModelsToDisplay[0], true);
 		}
@@ -143,10 +145,11 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	}
 
 	addDataset() {
-		this.crfService.getCandidateCRFDataset(this.layout.scopePk, this.layout.eventPk, this.layout.datasetModel.id).subscribe(newDataset => {
+		this.crfService.getCandidateCRFDataset(this.layout.scopePk, this.layout.eventPk, this.layout.datasetModel.datasetModelId).subscribe(newDataset => {
 			newDataset.expanded = true;
 			this.datasets.push(newDataset);
 			this.multipleDatasets.push(newDataset);
+			this.dataSource.data = [...this.multipleDatasets];
 			this.dataSource._updateChangeSubscription();
 			//this.crfService.addDataset(newDataset);
 			this.cellLoadingService.registerLayoutCells(this.layout);
@@ -159,8 +162,13 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		if(!dataset.pk) {
 			this.datasets.splice(this.datasets.indexOf(dataset), 1);
 			//this.crfService.removeUncommitedDataset(dataset.id);
+			this.multipleDatasets.splice(this.multipleDatasets.indexOf(dataset), 1);
+			this.dataSource.data = [...this.multipleDatasets];
 		}
 		else {
+			dataset.removed = true;
+			this.dataSource.data = this.multipleDatasets.filter(d => !d.removed);
+
 			this.openRationaleDialog(true).subscribe((rationale?: string) => {
 				if(rationale) {
 					dataset.rationale = rationale;
@@ -193,8 +201,8 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		let comparator: (d1: CRFDataset, d2: CRFDataset) => number;
 		if(sortField) {
 			comparator = (d1, d2) => {
-				const v1 = d1.fields.find(f => f.modelId === sortField.id)?.value;
-				const v2 = d2.fields.find(f => f.modelId === sortField.id)?.value;
+				const v1 = d1.fields.find(f => f.modelId === sortField.fieldModelId)?.value;
+				const v2 = d2.fields.find(f => f.modelId === sortField.fieldModelId)?.value;
 				const comparison = this.compareFieldValues(sortField, v1, v2);
 				return direction ? comparison : -comparison;
 			};
@@ -209,7 +217,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		if(!sort.active && sort.direction === '') {
 			return;
 		}
-		const sortField = this.layout.datasetModel.fieldModels.find(f => f.id === sort.active) as FieldModel;
+		const sortField = this.layout.datasetModel.fieldModels.find(f => f.fieldModelId === sort.active) as FieldModel;
 		this.sortDatasets(sortField, sort.direction === 'asc');
 
 		//re-render the rows after the sorting is done

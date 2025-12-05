@@ -15,6 +15,7 @@ import { WorkflowWidgetColumn } from './workflow-widget-column';
  * Widget that shows workflows based on specified criteria
  */
 export interface WorkflowWidget { 
+    workflowWidgetId: string;
     /**
      * Widget ID
      */

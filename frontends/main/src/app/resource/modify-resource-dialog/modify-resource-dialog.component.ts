@@ -72,7 +72,7 @@ export class ModifyResourceDialogComponent implements OnInit {
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({scopes, categories}) => {
-			this.category = categories.find(c => c.id === this.resource.categoryId) as ResourceCategory;
+			this.category = categories.find(c => c.categoryId === this.resource.categoryId) as ResourceCategory;
 			this.scopes = scopes;
 			this.rootScope = this.scopes[0];
 		});

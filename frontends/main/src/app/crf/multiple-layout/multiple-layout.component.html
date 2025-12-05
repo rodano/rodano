@@ -20,8 +20,8 @@
 			</tr>
 		}
 
-		@for (fieldModel of fieldModelsToDisplay; track fieldModel.id) {
-			<ng-container [matColumnDef]="fieldModel.id">
+		@for (fieldModel of fieldModelsToDisplay; track fieldModel.fieldModelId) {
+			<ng-container [matColumnDef]="fieldModel.fieldModelId">
 				<th
 					mat-header-cell
 					*matHeaderCellDef
@@ -31,7 +31,7 @@
 				<td
 					mat-cell
 					*matCellDef="let dataset">
-					{{ getFieldValue(dataset, fieldModel.id) }}
+					{{ getFieldValue(dataset, fieldModel.fieldModelId) }}
 				</td>
 			</ng-container>
 		}
@@ -73,14 +73,16 @@
 				mat-cell
 				*matCellDef="let dataset"
 				[attr.colspan]="columnsToDisplay.length">
-				<div [@layoutExpand]="dataset.expanded ? 'expanded' : 'collapsed'">
-					<app-layout
-						[layout]="layout"
-						[datasets]="[dataset]"
-						[layoutUid]="layout.id + '_' + dataset.id"
-						[disabled]="dataset.removed || disabled">
-					</app-layout>
-				</div>
+				@if (!dataset.removed && dataset.expanded) {
+					<div [@layoutExpand]="dataset.expanded ? 'expanded' : 'collapsed'">
+						<app-layout
+							[layout]="layout"
+							[datasets]="datasets"
+							[layoutUid]="layout.formLayoutId + '_' + dataset.id"
+							[disabled]="dataset.removed || disabled">
+						</app-layout>
+					</div>
+				}
 			</td>
 		</ng-container>
 

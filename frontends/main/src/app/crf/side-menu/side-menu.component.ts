@@ -41,6 +41,7 @@ export class SideMenuComponent implements OnInit {
 	static EVENT_ORDERS_SETTING_KEY_PREFIX = 'eventOrders';
 
 	static ALL_EVENT_GROUP = {
+		eventGroupId: '00000000-0000-0000-0000-000000000001',
 		id: 'ALL',
 		shortname: {
 			en: 'Events'
@@ -48,6 +49,7 @@ export class SideMenuComponent implements OnInit {
 	} satisfies EventGroup;
 
 	static OTHER_EVENT_GROUP = {
+		eventGroupId: '00000000-0000-0000-0000-000000000002',
 		id: 'OTHER',
 		shortname: {
 			en: 'Other events'
@@ -170,7 +172,7 @@ export class SideMenuComponent implements OnInit {
 
 	getEvents(eventGroupId: string) {
 		let events: Event[];
-		if([SideMenuComponent.OTHER_EVENT_GROUP.id, SideMenuComponent.ALL_EVENT_GROUP.id].includes(eventGroupId)) {
+		if([SideMenuComponent.OTHER_EVENT_GROUP.eventGroupId, SideMenuComponent.ALL_EVENT_GROUP.eventGroupId].includes(eventGroupId)) {
 			events = this.events.filter(e => !e.model.eventGroupId);
 		}
 		else {

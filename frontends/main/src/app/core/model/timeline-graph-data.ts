@@ -14,6 +14,7 @@ import { TimelineGraphDataPeriod } from './timeline-graph-data-period';
  * Timeline graph data
  */
 export interface TimelineGraphData { 
+    timelineGraphId: string;
     id: string;
     shortname: { [key: string]: string; };
     longname: { [key: string]: string; };

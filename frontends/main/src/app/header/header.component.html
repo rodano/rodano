@@ -13,7 +13,7 @@
 
 	<div class="menus">
 		<!-- TODO the action.context should be simplified, this should be a single parameter instead of a nonsensical array-->
-		@for (menu of menus; track menu.id) {
+		@for (menu of menus; track menu.menuId) {
 			@if (menu.submenus.length === 0) {
 				<a
 					mat-button
@@ -31,7 +31,7 @@
 					<mat-icon inline="true">expand_more</mat-icon>
 				</button>
 				<mat-menu #subMenu="matMenu">
-					@for (submenu of menu.submenus; track submenu.id) {
+					@for (submenu of menu.submenus; track submenu.menuId) {
 						<a
 							mat-menu-item
 							[routerLink]="
@@ -71,11 +71,11 @@
 						(click)="switchProfile(adminProfileId)">
 						<span>Administrator</span>
 					</button>
-					@for (profile of profiles; track profile.id) {
+					@for (profile of profiles; track profile.profileId) {
 						<button
 							mat-menu-item
 							type="button"
-							(click)="switchProfile(profile.id)">
+							(click)="switchProfile(profile.profileId)">
 							<span>{{ profile.shortname | localizeMap }}</span>
 						</button>
 					}

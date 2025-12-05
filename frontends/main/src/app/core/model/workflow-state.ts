@@ -14,6 +14,7 @@ import { WorkflowAction } from './workflow-action';
  * Workflow state
  */
 export interface WorkflowState { 
+    workflowStateId: string;
     id: string;
     shortname: { [key: string]: string; };
     longname: { [key: string]: string; };

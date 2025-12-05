@@ -1,7 +1,7 @@
 import {PaginatedSearch} from './paginated-search';
 
 export class ResourceSearch extends PaginatedSearch {
-	static readonly DEFAULT_SORT_BY = 'title';
+	static readonly DEFAULT_SORT_BY = 'lastUpdateTime';
 	static readonly DEFAULT_SORT_ASCENDING = true;
 
 	categoryId?: string;

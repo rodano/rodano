@@ -13,7 +13,7 @@
 		</colgroup>
 		@for (line of layout.lines; track $index) {
 			<tr>
-				@for (cell of line.cells; track cell.id) {
+				@for (cell of line.cells; track cell.formLayoutCellId) {
 					<td [colSpan]="cell.colspan">
 						<app-cell
 							[cell]="cell"

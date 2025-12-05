@@ -11,6 +11,7 @@
 
 export interface DatasetAuditTrail { 
     deleted?: boolean;
+    projectId?: string;
     id?: string;
     scopeFk?: number;
     eventFk?: number;

@@ -6,12 +6,12 @@
 			{{ form.model.shortname | localizeMap }}
 			<app-audit-trail-button [form]="form" />
 		</h1>
-		@for (layout of layouts; track layout.id) {
+		@for (layout of layouts; track layout.formLayoutId) {
 			@if (layout.type === layoutType.SINGLE) {
 				<app-layout
 					[layout]="layout"
 					[datasets]="datasets"
-					[layoutUid]="layout.id"
+					[layoutUid]="layout.formLayoutId"
 					[disabled]="!form.canWrite">
 				</app-layout>
 			} @else {

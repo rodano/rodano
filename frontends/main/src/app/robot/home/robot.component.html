@@ -55,8 +55,8 @@
 				<mat-select
 					formControlName="profileId"
 					required>
-					@for (profile of profiles | sort: 'id'; track profile.id) {
-						<mat-option [value]="profile.id">
+					@for (profile of profiles | sort: 'id'; track profile.profileId) {
+						<mat-option [value]="profile.profileId">
 							{{ profile.shortname | localizeMap }}
 						</mat-option>
 					}

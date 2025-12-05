@@ -57,8 +57,8 @@
 					[formControl]="control"
 					panelWidth="">
 					<mat-option></mat-option>
-					@for (possibleValue of field.possibleValues; track possibleValue.id) {
-						<mat-option [value]="possibleValue.id">
+					@for (possibleValue of field.possibleValues; track possibleValue.possibleValueId) {
+						<mat-option [value]="possibleValue.possibleValueId">
 							{{ possibleValue.shortname | localizeMap }}
 						</mat-option>
 					}
@@ -75,9 +75,9 @@
 			<mat-radio-group
 				[formControl]="control"
 				[class.horizontal]="!cell.possibleValuesColumnNumber || cell.possibleValuesColumnNumber > 1">
-				@for (possibleValue of field.model.possibleValues; track possibleValue.id) {
+				@for (possibleValue of field.model.possibleValues; track possibleValue.possibleValueId) {
 					<mat-radio-button
-						[value]="possibleValue.id"
+						[value]="possibleValue.possibleValueId"
 						[disabled]="field.model.dynamic || field.model.readOnly || disabled">
 						{{ possibleValue.shortname | localizeMap }}
 					</mat-radio-button>
@@ -133,7 +133,7 @@
 		@if (hasActions) {
 			<mat-menu #appMenu="matMenu">
 				<!-- Add creation actions used to create new workflow statuses -->
-				@for (action of creationActions; track action.id) {
+				@for (action of creationActions; track action.workflowActionId) {
 					<button
 						mat-menu-item
 						type="button"

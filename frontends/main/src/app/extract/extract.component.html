@@ -3,11 +3,11 @@
 	<nav
 		mat-tab-nav-bar
 		[tabPanel]="tabPanel">
-		@for (scopeModel of scopeModels; track scopeModel.id) {
+		@for (scopeModel of scopeModels; track scopeModel.scopeModelId) {
 			<a
 				mat-tab-link
-				[routerLink]="['./', {scopeModelId: scopeModel.id}]"
-				[active]="scopeModel.id === selectedScopeModel.id">
+				[routerLink]="['./', {scopeModelId: scopeModel.scopeModelId}]"
+				[active]="scopeModel.scopeModelId === selectedScopeModel.scopeModelId">
 				{{ scopeModel.shortname | localizeMap }}
 			</a>
 		}
@@ -51,8 +51,8 @@
 			<mat-selection-list
 				#datasetModelList
 				formControlName="datasetModelIds">
-				@for (datasetModel of datasetModels; track datasetModel.id) {
-					<mat-list-option [value]="datasetModel.id">
+				@for (datasetModel of datasetModels; track datasetModel.datasetModelId) {
+					<mat-list-option [value]="datasetModel.datasetModelId">
 						{{ datasetModel.shortname | localizeMap }}
 					</mat-list-option>
 				}

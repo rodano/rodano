@@ -44,7 +44,7 @@ export class WorkflowSignatureComponent {
 	getResponse(): WorkflowUpdate {
 		return {
 			workflowId: this.data.action.workflowId,
-			actionId: this.data.action.id,
+			actionId: this.data.action.workflowActionId,
 			rationale: undefined,
 			email: this.passwordForm.controls.email.value,
 			password: this.passwordForm.controls.password.value

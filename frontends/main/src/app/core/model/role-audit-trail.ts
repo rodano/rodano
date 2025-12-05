@@ -11,6 +11,7 @@ import { RoleStatus } from './role-status';
 
 
 export interface RoleAuditTrail { 
+    projectId?: string;
     profileId?: string;
     status?: RoleStatus;
     userFk?: number;

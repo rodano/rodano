@@ -98,7 +98,7 @@ export class WorkflowStatusComponent implements OnChanges {
 		if(this.workflowStatus) {
 			return this.workflowStatus.state.possibleActions;
 		}
-		return [this.workflow?.actions.find(a => a.id === this.workflow?.actionId) as WorkflowAction];
+		return [this.workflow?.actions.find(a => a.workflowActionId === this.workflow?.actionId) as WorkflowAction];
 	}
 
 	get displayActions(): boolean {

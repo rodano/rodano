@@ -11,6 +11,7 @@
 
 export interface FormAuditTrail { 
     deleted?: boolean;
+    projectId?: string;
     scopeFk?: number;
     eventFk?: number;
     formModelId?: string;

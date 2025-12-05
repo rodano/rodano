@@ -11,6 +11,7 @@ import { MenuAction } from './menu-action';
 
 
 export interface Menu { 
+    menuId: string;
     id: string;
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };

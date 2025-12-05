@@ -3,13 +3,14 @@ import {HttpClient, HttpParams} from '@angular/common/http';
 import {APIService} from './api.service';
 import {Scope} from '../model/scope';
 import {ScopeSearch} from '../utilities/search/scope-search';
-import {Observable} from 'rxjs';
+import {concatMap, Observable} from 'rxjs';
 import {HttpParamsService} from './http-params.service';
 import {PagedResultScope} from '../model/paged-result-scope';
 import {TimelineGraphData} from '../model/timeline-graph-data';
 import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
+import {ConfigurationService} from '@core/services/configuration.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -20,13 +21,24 @@ export class ScopeService {
 	constructor(
 		private http: HttpClient,
 		private apiService: APIService,
-		private httpParamsService: HttpParamsService
+		private httpParamsService: HttpParamsService,
+		private configurationService: ConfigurationService,
 	) {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/scopes`;
 	}
 
 	@reviveDates
 	search(search: ScopeSearch): Observable<PagedResultScope> {
+		if(search.scopeModelId) {
+			return this.configurationService.getScopeModel(search.scopeModelId).pipe(
+				concatMap(scopeModel => {
+					const updateSearch = {...search, scopeModelId: scopeModel.scopeModelId};
+					const params = this.httpParamsService.toHttpParams(updateSearch);
+					return this.http.get<PagedResultScope>(this.serviceUrl, {params: params});
+				})
+			);
+		}
+
 		const params = this.httpParamsService.toHttpParams(search);
 		return this.http.get<PagedResultScope>(this.serviceUrl, {params});
 	}
@@ -42,10 +54,14 @@ export class ScopeService {
 	}
 
 	getCandidate(parentScopePk: number, scopeModelId: string): Observable<ScopeCandidate> {
-		const params = new HttpParams()
-			.set('parentScopePk', parentScopePk.toString())
-			.set('scopeModelId', scopeModelId);
-		return this.http.get<ScopeCandidate>(`${this.serviceUrl}/candidate`, {params});
+		return this.configurationService.getScopeModel(scopeModelId).pipe(
+			concatMap(scopeModel => {
+				const params = new HttpParams()
+					.set('parentScopePk', parentScopePk.toString())
+					.set('scopeModelId', scopeModel.scopeModelId);
+				return this.http.get<ScopeCandidate>(`${this.serviceUrl}/candidate`, {params});
+			})
+		);
 	}
 
 	@reviveDates

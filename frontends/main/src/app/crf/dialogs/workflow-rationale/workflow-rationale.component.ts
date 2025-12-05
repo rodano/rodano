@@ -40,7 +40,7 @@ export class WorkflowRationaleComponent {
 	getResponse(): WorkflowUpdate {
 		return {
 			workflowId: this.data.action.workflowId,
-			actionId: this.data.action.id,
+			actionId: this.data.action.workflowActionId,
 			rationale: this.rationale.value,
 			email: undefined,
 			password: undefined

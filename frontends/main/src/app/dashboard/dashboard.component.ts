@@ -30,7 +30,7 @@ export class DashboardComponent implements OnInit {
 		this.activatedRoute.params.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(params => {
-			this.selectedSection = this.layout.sections.find(s => s.id === params['sectionId']) ?? this.layout.sections[0];
+			this.selectedSection = this.layout.sections.find(s => s.menuSectionId === params['sectionId']) ?? this.layout.sections[0];
 		});
 	}
 

@@ -11,6 +11,7 @@ import { Cell } from './cell';
 
 
 export interface LayoutLine { 
+    formLayoutLineId: string;
     cells: Array<Cell>;
 }
 

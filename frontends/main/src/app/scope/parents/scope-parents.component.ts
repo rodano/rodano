@@ -90,7 +90,7 @@ export class ScopeParentsComponent implements OnInit {
 
 	ngOnInit(): void {
 		forkJoin({
-			allParentScopes: this.scopeRelationsService.getParents(this.scopeModel.id, Rights.WRITE, false),
+			allParentScopes: this.scopeRelationsService.getParents(this.scopeModel.scopeModelId, Rights.WRITE, false),
 			scopeRelations: this.scopeRelationsService.getParentRelations(this.scope.pk)
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)

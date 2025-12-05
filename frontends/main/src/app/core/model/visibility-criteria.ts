@@ -12,6 +12,7 @@ import { VisibilityCriterionAction } from './visibility-criterion-action';
 
 
 export interface VisibilityCriteria { 
+    formCellVisibilityCriteriaId: string;
     operator: Operator;
     values: Array<string>;
     action: VisibilityCriterionAction;

@@ -13,6 +13,7 @@
  * Possible values of the field, if the field type is a multiple
  */
 export interface PossibleValue { 
+    possibleValueId: string;
     id: string;
     shortname: { [key: string]: string; };
     specify: boolean;

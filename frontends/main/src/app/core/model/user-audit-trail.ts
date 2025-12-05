@@ -11,6 +11,7 @@
 
 export interface UserAuditTrail { 
     deleted?: boolean;
+    projectId?: string;
     name?: string;
     externallyManaged?: boolean;
     activated?: boolean;

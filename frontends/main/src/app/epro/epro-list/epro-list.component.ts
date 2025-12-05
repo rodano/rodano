@@ -86,7 +86,7 @@ export class EproListComponent implements OnInit {
 		this.configurationService.getStudy().pipe(
 			switchMap(study => {
 				return forkJoin({
-					parentScopes: this.scopeRelationsService.getParents(study.leafScopeModel.id, Rights.READ),
+					parentScopes: this.scopeRelationsService.getParents(study.leafScopeModel.scopeModelId, Rights.READ),
 					eproProfile: of(study.eproProfile),
 					eproEnabled: of(study.eproEnabled)
 				});

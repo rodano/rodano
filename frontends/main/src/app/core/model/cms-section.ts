@@ -14,6 +14,7 @@ import { CMSWidget } from './cms-widget';
  * A section contains labels and widgets
  */
 export interface CMSSection { 
+    menuSectionId: string;
     /**
      * Unique ID of the section
      */

@@ -113,7 +113,7 @@ export abstract class SummaryWidgetComponent implements OnInit {
 				})
 			).subscribe(({data, ancestors}) => {
 				this.columns = data.columns;
-				this.columnsToDisplay = ['scope', ...data.columns.map(c => c.id)];
+				this.columnsToDisplay = ['scope', ...data.columns.map(c => c.summaryColumnId)];
 				this.dataSource = new MatTableDataSource<SummaryRow>(data.rows);
 				this.dataSource.paginator = this.paginator;
 				this.ancestors = [...ancestors, this.getRootScope()];
@@ -147,7 +147,7 @@ export abstract class SummaryWidgetComponent implements OnInit {
 		if(column.total) {
 			return row.total;
 		}
-		return row.values[column.id];
+		return row.values[column.summaryColumnId];
 	}
 
 	getValue(row: SummaryRow, column: SummaryColumn): string {

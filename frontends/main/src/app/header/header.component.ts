@@ -74,7 +74,7 @@ export class HeaderComponent implements OnInit {
 			this.menus = menus;
 			this.user = user;
 			//remove admin profile from the list of profiles because it is hard-coded in the menu
-			this.profiles = profiles.filter(profile => profile.id !== this.adminProfileId);
+			this.profiles = profiles.filter(profile => profile.profileId !== this.adminProfileId);
 			this.pendingRolesNumber = AuthStateService.getUserPendingRolesNumber(user);
 		});
 	}

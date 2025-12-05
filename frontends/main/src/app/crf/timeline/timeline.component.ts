@@ -33,12 +33,13 @@ export class TimelineComponent implements OnInit {
 
 			setTimeout(() => {
 				this.graphs.forEach(graph => {
-					const container = document.getElementById(graph.id) as HTMLDivElement;
+					const container = document.getElementById(graph.timelineGraphId) as HTMLDivElement;
 					try {
-						new Timeline(container, graph, 'en-US').draw();
+						const plainGraph = JSON.parse(JSON.stringify(graph));
+						new Timeline(container, plainGraph, 'en-US').draw();
 					}
 					catch (e) {
-						this.loggingService.error(`Error drawing timeline ${graph.id}`, e);
+						this.loggingService.error(`Error drawing timeline ${graph.timelineGraphId}`, e);
 					}
 				});
 			}, 0);

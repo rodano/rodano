@@ -1,4 +1,4 @@
-@for (section of layout.sections; track section.id) {
+@for (section of layout.sections; track section.menuSectionId) {
 	<h1>{{ section.labels | localizeMap }}</h1>
 	<div class="cms-layout">
 		@for (widget of section.widgets; track $index) {

@@ -14,6 +14,7 @@ import { WorkflowWidgetColumnType } from './workflow-widget-column-type';
  * Workflow widget column configuration
  */
 export interface WorkflowWidgetColumn { 
+    workflowWidgetColumnId: string;
     /**
      * Column ID
      */

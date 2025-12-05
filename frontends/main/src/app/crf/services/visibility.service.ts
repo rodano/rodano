@@ -91,7 +91,7 @@ export class VisibilityService {
 
 	public triggerCellsVisibilityEvent(cells: Cell[], layoutUid: string, visible: boolean): void {
 		cells
-			.map(c => c.id)
+			.map(c => c.formLayoutCellId)
 			.forEach(c => this.triggerCellVisibilityEvent(c, layoutUid, visible));
 	}
 

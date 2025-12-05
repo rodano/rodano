@@ -17,8 +17,8 @@
 			<mat-select
 				formControlName="categoryId"
 				name="categoryId">
-				@for (category of categories; track category.id) {
-					<mat-option [value]="category.id">
+				@for (category of categories; track category.categoryId) {
+					<mat-option [value]="category.categoryId">
 						{{ category.shortname | localizeMap }}
 					</mat-option>
 				}
@@ -45,10 +45,10 @@
 		New...
 	</button>
 	<mat-menu #menu="matMenu">
-		@for (category of categories; track category.id) {
+		@for (category of categories; track category.categoryId) {
 			<button
 				mat-menu-item
-				(click)="createResource(category.id)">
+				(click)="createResource(category.categoryId)">
 				{{ category.shortname | localizeMap }}
 			</button>
 		}
@@ -68,8 +68,7 @@
 	<ng-container matColumnDef="title">
 		<th
 			mat-header-cell
-			*matHeaderCellDef
-			mat-sort-header>
+			*matHeaderCellDef>
 			Title
 		</th>
 		<td

@@ -16,7 +16,7 @@
 @else if (step === RegistrationStep.POLICIES) {
 	<div>
 		<h2>Review privacy policies</h2>
-		@for (policy of policies.values(); track policy.id) {
+		@for (policy of policies.values(); track policy.policyId) {
 			<p [innerHtml]="policy.content | localizeMap"></p>
 		}
 		<div>

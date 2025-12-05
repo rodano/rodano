@@ -15,6 +15,7 @@ import { FieldModel } from './field-model';
  * A cell in the CRF display. Can contain a field or static information. Can be displayed conditionally based on specified criteria.
  */
 export interface Cell { 
+    formLayoutCellId: string;
     id: string;
     datasetModelId: string;
     fieldModelId: string;

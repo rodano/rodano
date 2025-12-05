@@ -41,7 +41,7 @@
 
 	<button
 		mat-flat-button
-		[routerLink]="['/scopes', scopeModel.id, 'new']"
+		[routerLink]="['/scopes', scopeModel.scopeModelId, 'new']"
 		[disabled]="!writeAccessOnParent">
 		<mat-icon>add</mat-icon>
 		New {{ scopeModel.shortname | localizeMap | lowercase }}

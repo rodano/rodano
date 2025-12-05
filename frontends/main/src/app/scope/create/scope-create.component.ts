@@ -51,12 +51,12 @@ export class ScopeCreateComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		this.scopeRelationsService.getParents(this.scopeModel.id, Rights.READ).subscribe(s => this.parentScopes = s);
+		this.scopeRelationsService.getParents(this.scopeModel.scopeModelId, Rights.READ).subscribe(s => this.parentScopes = s);
 	}
 
 	save() {
 		const scopeCandidate = Object.assign({}, this.scopeCreationForm.value) as ScopeCandidate;
-		scopeCandidate.modelId = this.scopeModel.id;
+		scopeCandidate.modelId = this.scopeModel.scopeModelId;
 		//Set the scope start date to now
 		scopeCandidate.startDate = new Date();
 		this.scopeService.create(scopeCandidate).pipe(

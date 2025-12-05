@@ -15,6 +15,7 @@ import { Profile } from './profile';
 
 
 export interface PublicStudy { 
+    projectId: string;
     id: string;
     shortname: { [key: string]: string; };
     color: string;

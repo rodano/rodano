@@ -20,7 +20,7 @@ export class FieldService {
 	}
 
 	generateDateFormat(fieldModel: FieldModel): string {
-		if(![FieldModelType.DATE, FieldModelType.DATE_SELECT].includes(fieldModel.type)) {
+		if(!fieldModel.type || ![FieldModelType.DATE, FieldModelType.DATE_SELECT].includes(fieldModel.type)) {
 			throw new Error(`Generating a date format is not supported for field model ${fieldModel.id} of type ${fieldModel.type}`);
 		}
 		let format = '';
@@ -43,7 +43,7 @@ export class FieldService {
 	}
 
 	generateTimeFormat(fieldModel: FieldModel): string {
-		if(![FieldModelType.DATE, FieldModelType.DATE_SELECT].includes(fieldModel.type)) {
+		if(!fieldModel.type || ![FieldModelType.DATE, FieldModelType.DATE_SELECT].includes(fieldModel.type)) {
 			throw new Error(`Generating a time format is not supported for field model ${fieldModel.id} of type ${fieldModel.type}`);
 		}
 		let format = '';

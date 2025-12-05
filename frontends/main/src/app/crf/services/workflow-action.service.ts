@@ -72,7 +72,7 @@ export class WorkflowActionService {
 
 	private buildWorkflowUpdate(action: WorkflowAction, workflowStatus?: WorkflowStatus): Observable<WorkflowUpdate | undefined> {
 		if(!action.documentable && !action.requireSignature) {
-			return of({workflowId: action.workflowId, actionId: action.id});
+			return of({workflowId: action.workflowId, actionId: action.workflowActionId});
 		}
 		return this.openWorkflowActionDialog(action, workflowStatus);
 	}
@@ -184,17 +184,17 @@ export class WorkflowActionService {
 					switch(entity) {
 						case WorkflowableEntity.SCOPE:
 							if(workflowStatus.workflow.aggregator) {
-								return this.workflowStatusService.executeAggregateActionOnScope(workflowable as Scope, workflowStatus.workflow.id, workflowUpdate);
+								return this.workflowStatusService.executeAggregateActionOnScope(workflowable as Scope, workflowStatus.workflow.workflowId, workflowUpdate);
 							}
 							return this.workflowStatusService.executeActionOnScope(workflowable as Scope, workflowStatus.pk, workflowUpdate);
 						case WorkflowableEntity.EVENT:
 							if(workflowStatus.workflow.aggregator) {
-								return this.workflowStatusService.executeAggregateActionOnEvent(workflowable as Event, workflowStatus.workflow.id, workflowUpdate);
+								return this.workflowStatusService.executeAggregateActionOnEvent(workflowable as Event, workflowStatus.workflow.workflowId, workflowUpdate);
 							}
 							return this.workflowStatusService.executeActionOnEvent(workflowable as Event, workflowStatus.pk, workflowUpdate);
 						case WorkflowableEntity.FORM:
 							if(workflowStatus.workflow.aggregator) {
-								return this.workflowStatusService.executeAggregateActionOnForm(workflowable as Form, workflowStatus.workflow.id, workflowUpdate);
+								return this.workflowStatusService.executeAggregateActionOnForm(workflowable as Form, workflowStatus.workflow.workflowId, workflowUpdate);
 							}
 							return this.workflowStatusService.executeActionOnForm(workflowable as Form, workflowStatus.pk, workflowUpdate);
 						case WorkflowableEntity.FIELD:

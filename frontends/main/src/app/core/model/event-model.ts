@@ -15,6 +15,7 @@ import { ChronoUnit } from './chrono-unit';
  * Event models
  */
 export interface EventModel { 
+    eventModelId: string;
     id: string;
     shortname: { [key: string]: string; };
     eventGroupId?: string;

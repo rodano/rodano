@@ -10,6 +10,7 @@
 
 
 export interface FieldAuditTrail { 
+    projectId?: string;
     datasetFk?: number;
     datasetModelId?: string;
     fieldModelId?: string;

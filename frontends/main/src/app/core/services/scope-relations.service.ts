@@ -1,12 +1,13 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {concatMap, Observable} from 'rxjs';
 import {Scope} from '../model/scope';
 import {ScopeRelationCreation} from '../model/scope-relation-creation';
 import {ScopeRelation} from '../model/scope-relation';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {APIService} from './api.service';
 import {Rights} from '../model/rights';
+import {ConfigurationService} from '@core/services/configuration.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -16,7 +17,8 @@ export class ScopeRelationsService {
 
 	constructor(
 		private http: HttpClient,
-		private apiService: APIService
+		private apiService: APIService,
+		private configurationService: ConfigurationService
 	) {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/scopes`;
 	}
@@ -61,11 +63,15 @@ export class ScopeRelationsService {
 
 	@reviveDates
 	getParents(scopeModelId: string, right: Rights, onlyDefault = true): Observable<Scope[]> {
-		const params = new HttpParams()
-			.set('scopeModelId', scopeModelId)
-			.set('right', right)
-			.set('onlyDefault', onlyDefault);
-		return this.http.get<Scope[]>(`${this.serviceUrl}/relations/available-parents`, {params});
+		return this.configurationService.getScopeModel(scopeModelId).pipe(
+			concatMap(scopeModel => {
+				const params = new HttpParams()
+					.set('scopeModelId', scopeModel.scopeModelId)
+					.set('right', right)
+					.set('onlyDefault', onlyDefault);
+				return this.http.get<Scope[]>(`${this.serviceUrl}/relations/available-parents`, {params});
+			})
+		);
 	}
 
 	@reviveDates

@@ -10,10 +10,10 @@
 	#autocomplete="matAutocomplete"
 	[displayWith]="displayScope"
 	(optionSelected)="selectScope($event.option.value)">
-	@for (scopeModel of scopeModels; track scopeModel.id) {
-		@if (getScopes(scopeModel.id).length > 0) {
+	@for (scopeModel of scopeModels; track scopeModel.scopeModelId) {
+		@if (getScopes(scopeModel.scopeModelId).length > 0) {
 			<mat-optgroup [label]="scopeModel.shortname | localizeMap">
-				@for (scope of getScopes(scopeModel.id); track scope.pk) {
+				@for (scope of getScopes(scopeModel.scopeModelId); track scope.pk) {
 					<mat-option [value]="scope">
 						{{ scope | scopeCodeShortname }}
 					</mat-option>

@@ -81,7 +81,7 @@ export class OverdueComponent implements OnInit {
 		this.configService.getStudy().subscribe(config => {
 			this.scopeName = config.scopeModels.filter(s => s.leaf)[0].shortname['en'];
 			this.parentScopeName = config.scopeModels
-				.filter(s => s.id === config.scopeModels
+				.filter(s => s.scopeModelId === config.scopeModels
 					.filter(s => s.leaf)[0].defaultParentId)[0].shortname['en'];
 		});
 

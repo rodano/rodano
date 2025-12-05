@@ -51,7 +51,7 @@ export class ConfigurationService {
 	getScopeModel(scopeModelId: string): Observable<ScopeModel> {
 		return this.getScopeModels().pipe(
 			concatMap(identity),
-			first(s => s.id === scopeModelId)
+			first(s => s.scopeModelId === scopeModelId)
 		);
 	}
 
@@ -76,7 +76,7 @@ export class ConfigurationService {
 	getDatasetModel(datasetModelId: string): Observable<DatasetModel> {
 		return this.getDatasetModels().pipe(
 			concatMap(identity),
-			first(d => d.id === datasetModelId)
+			first(d => d.datasetModelId === datasetModelId)
 		);
 	}
 
@@ -85,7 +85,7 @@ export class ConfigurationService {
 	}
 
 	getLeafScopeModelFormModels(): Observable<FormModel[]> {
-		return this.getStudy().pipe(map(study => study.leafScopeModel.formModelIds.map(id => study.formModels.find(f => f.id === id)).filter(f => f !== undefined) as FormModel[]));
+		return this.getStudy().pipe(map(study => study.leafScopeModel.formModelIds.map(uuid => study.formModels.find(f => f.formModelId === uuid)).filter(f => f !== undefined) as FormModel[]));
 	}
 
 	getWorkflows(): Observable<Workflow[]> {
@@ -99,7 +99,7 @@ export class ConfigurationService {
 	getProfile(profileId: string): Observable<Profile> {
 		return this.getProfiles().pipe(
 			concatMap(identity),
-			first(p => p.id === profileId)
+			first(p => p.profileId === profileId)
 		);
 	}
 
@@ -131,7 +131,10 @@ export class ConfigurationService {
 		if(this.getScopeModelIsRoot(scopeModel)) {
 			return 0;
 		}
-		const parentScopeModel = scopeModels.find(s => s.id === scopeModel.defaultParentId) as ScopeModel;
+		const parentScopeModel = scopeModels.find(s => s.scopeModelId === scopeModel.defaultParentId) as ScopeModel;
+		if(!parentScopeModel) {
+			return 1;
+		}
 		return 1 + this.getScopeModelDepth(scopeModels, parentScopeModel);
 	}
 
@@ -141,7 +144,7 @@ export class ConfigurationService {
 				const depth1 = this.getScopeModelDepth(scopeModels, s1);
 				const depth2 = this.getScopeModelDepth(scopeModels, s2);
 				if(depth1 === depth2) {
-					return s1.id.localeCompare(s2.id);
+					return s1.scopeModelId.localeCompare(s2.scopeModelId);
 				}
 				return depth1 - depth2;
 			}))

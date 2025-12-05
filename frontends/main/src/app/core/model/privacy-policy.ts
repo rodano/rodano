@@ -14,6 +14,10 @@
  */
 export interface PrivacyPolicy { 
     /**
+     * Privacy policy UUID
+     */
+    policyId: string;
+    /**
      * Privacy policy ID
      */
     id: string;

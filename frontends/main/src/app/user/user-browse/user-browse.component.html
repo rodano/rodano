@@ -18,8 +18,8 @@
 				formControlName="profileId"
 				name="profileId">
 				<mat-option></mat-option>
-				@for (profile of profiles; track profile.id) {
-					<mat-option [value]="profile.id">{{ profile.shortname | localizeMap }}</mat-option>
+				@for (profile of profiles; track profile.profileId) {
+					<mat-option [value]="profile.profileId">{{ profile.shortname | localizeMap }}</mat-option>
 				}
 			</mat-select>
 		</mat-form-field>

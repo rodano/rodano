@@ -13,6 +13,7 @@
  * Form model
  */
 export interface FormModel { 
+    formModelId: string;
     id: string;
     shortname: { [key: string]: string; };
 }

@@ -29,7 +29,7 @@
 			</app-workflow-status>
 		}
 		<!-- Display workflows that can be created -->
-		@for (workflow of event.possibleWorkflows; track workflow.id) {
+		@for (workflow of event.possibleWorkflows; track workflow.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.EVENT"
 				[workflowable]="event"

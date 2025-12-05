@@ -13,6 +13,7 @@
  * An action that can be performed on a workflow
  */
 export interface WorkflowAction { 
+    workflowActionId: string;
     /**
      * Action ID
      */

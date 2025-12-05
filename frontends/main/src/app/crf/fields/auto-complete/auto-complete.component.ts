@@ -60,7 +60,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges {
 					if(!value) {
 						return of([]);
 					}
-					return this.configurationService.getAutocompleteOptions(this.field.model.datasetModelId, this.field.model.id, value);
+					return this.configurationService.getAutocompleteOptions(this.field.model.datasetModelId, this.field.model.fieldModelId, value);
 				}
 			})
 		).subscribe(options => {

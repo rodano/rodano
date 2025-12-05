@@ -196,7 +196,7 @@ export class CRFService {
 		switch(fieldModel.type) {
 			case FieldModelType.SELECT:
 			case FieldModelType.RADIO: {
-				const possibleValue = fieldModel.possibleValues.find(v => v.id === stringValue);
+				const possibleValue = fieldModel.possibleValues.find(v => v.possibleValueId === stringValue);
 				return possibleValue ? new LocalizeMapPipe().transform(possibleValue.shortname) : stringValue;
 			}
 			default:

@@ -14,6 +14,7 @@ import { DatasetModel } from './dataset-model';
 
 
 export interface Layout { 
+    formLayoutId: string;
     scopePk: number;
     eventPk?: number;
     id: string;

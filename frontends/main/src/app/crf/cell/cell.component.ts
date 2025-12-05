@@ -66,7 +66,7 @@ export class CellComponent implements OnInit, AfterViewInit {
 			}*/
 		//});
 
-		this.visibilityService.cellVisibilityEvents$(this.cell.id, this.layoutUid).pipe(
+		this.visibilityService.cellVisibilityEvents$(this.cell.formLayoutCellId, this.layoutUid).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
 			this.loggingService.info(`Cell ${this.cell.id} receiving visibility event containing ${shown}`);
@@ -104,7 +104,7 @@ export class CellComponent implements OnInit, AfterViewInit {
 	//consider cell to be loaded when this hook is triggered by Angular
 	//do not run this in an ngOnChanges, because in that case the cell is already loaded and ready to receive visibility events
 	ngAfterViewInit() {
-		this.cellLoadingService.cellLoadingComplete(this.cell.id);
+		this.cellLoadingService.cellLoadingComplete(this.cell.formLayoutCellId);
 	}
 
 	isEmptyObject(object: any): boolean {

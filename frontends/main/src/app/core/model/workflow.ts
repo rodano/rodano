@@ -15,6 +15,7 @@ import { WorkflowState } from './workflow-state';
  * The workflow model
  */
 export interface Workflow { 
+    workflowId: string;
     /**
      * The unique ID of the workflow
      */

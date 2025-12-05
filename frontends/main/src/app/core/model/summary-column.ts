@@ -10,6 +10,7 @@
 
 
 export interface SummaryColumn { 
+    summaryColumnId: string;
     id: string;
     label: { [key: string]: string; };
     percent: boolean;

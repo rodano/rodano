@@ -9,24 +9,24 @@
  */
 
 
-export type ChronoUnit = 'Nanos' | 'Micros' | 'Millis' | 'Seconds' | 'Minutes' | 'Hours' | 'HalfDays' | 'Days' | 'Weeks' | 'Months' | 'Years' | 'Decades' | 'Centuries' | 'Millennia' | 'Eras' | 'Forever';
+export type ChronoUnit = 'NANOS' | 'MICROS' | 'MILLIS' | 'SECONDS' | 'MINUTES' | 'HOURS' | 'HALF_DAYS' | 'DAYS' | 'WEEKS' | 'MONTHS' | 'YEARS' | 'DECADES' | 'CENTURIES' | 'MILLENNIA' | 'ERAS' | 'FOREVER';
 
 export const ChronoUnit = {
-    NANOS: 'Nanos' as ChronoUnit,
-    MICROS: 'Micros' as ChronoUnit,
-    MILLIS: 'Millis' as ChronoUnit,
-    SECONDS: 'Seconds' as ChronoUnit,
-    MINUTES: 'Minutes' as ChronoUnit,
-    HOURS: 'Hours' as ChronoUnit,
-    HALF_DAYS: 'HalfDays' as ChronoUnit,
-    DAYS: 'Days' as ChronoUnit,
-    WEEKS: 'Weeks' as ChronoUnit,
-    MONTHS: 'Months' as ChronoUnit,
-    YEARS: 'Years' as ChronoUnit,
-    DECADES: 'Decades' as ChronoUnit,
-    CENTURIES: 'Centuries' as ChronoUnit,
-    MILLENNIA: 'Millennia' as ChronoUnit,
-    ERAS: 'Eras' as ChronoUnit,
-    FOREVER: 'Forever' as ChronoUnit
+    NANOS: 'NANOS' as ChronoUnit,
+    MICROS: 'MICROS' as ChronoUnit,
+    MILLIS: 'MILLIS' as ChronoUnit,
+    SECONDS: 'SECONDS' as ChronoUnit,
+    MINUTES: 'MINUTES' as ChronoUnit,
+    HOURS: 'HOURS' as ChronoUnit,
+    HALF_DAYS: 'HALF_DAYS' as ChronoUnit,
+    DAYS: 'DAYS' as ChronoUnit,
+    WEEKS: 'WEEKS' as ChronoUnit,
+    MONTHS: 'MONTHS' as ChronoUnit,
+    YEARS: 'YEARS' as ChronoUnit,
+    DECADES: 'DECADES' as ChronoUnit,
+    CENTURIES: 'CENTURIES' as ChronoUnit,
+    MILLENNIA: 'MILLENNIA' as ChronoUnit,
+    ERAS: 'ERAS' as ChronoUnit,
+    FOREVER: 'FOREVER' as ChronoUnit
 };
 

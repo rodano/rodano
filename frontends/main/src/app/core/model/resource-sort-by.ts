@@ -9,12 +9,11 @@
  */
 
 
-export type ResourceSortBy = 'creationTime' | 'lastUpdateTime' | 'title' | 'category' | 'isPublic' | 'scopeShortname';
+export type ResourceSortBy = 'creationTime' | 'lastUpdateTime' | 'category' | 'isPublic' | 'scopeShortname';
 
 export const ResourceSortBy = {
     CREATION_TIME: 'creationTime' as ResourceSortBy,
     LAST_UPDATE_TIME: 'lastUpdateTime' as ResourceSortBy,
-    TITLE: 'title' as ResourceSortBy,
     CATEGORY: 'category' as ResourceSortBy,
     IS_PUBLIC: 'isPublic' as ResourceSortBy,
     SCOPE_SHORTNAME: 'scopeShortname' as ResourceSortBy

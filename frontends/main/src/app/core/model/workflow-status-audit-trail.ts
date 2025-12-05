@@ -11,6 +11,7 @@
 
 export interface WorkflowStatusAuditTrail { 
     deleted?: boolean;
+    projectId?: string;
     scopeFk?: number;
     fieldFk?: number;
     eventFk?: number;
@@ -18,7 +19,7 @@ export interface WorkflowStatusAuditTrail {
     userFk?: number;
     robotFk?: number;
     profileId?: string;
-    stateId?: string;
+    workflowStateId?: string;
     workflowId?: string;
     actionId?: string;
     validatorId?: string;

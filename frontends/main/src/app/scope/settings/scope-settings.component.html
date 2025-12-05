@@ -148,7 +148,7 @@
 			</app-workflow-status>
 		}
 		<!-- Display workflows that can be created -->
-		@for (workflow of scope.possibleWorkflows; track workflow.id) {
+		@for (workflow of scope.possibleWorkflows; track workflow.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.SCOPE"
 				[workflowable]="scope"

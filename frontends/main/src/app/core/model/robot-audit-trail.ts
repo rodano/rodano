@@ -11,6 +11,7 @@
 
 export interface RobotAuditTrail { 
     deleted?: boolean;
+    projectId?: string;
     name?: string;
     key?: string;
     pk?: number;
