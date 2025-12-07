@@ -9291,7 +9291,9 @@
 					"dataType": "BOOLEAN",
 					"plugin": false,
 					"possibleValues": [],
-					"validatorIds": [],
+					"validatorIds": [
+						"REQUIRED"
+					],
 					"workflowIds": [],
 					"rules": [],
 					"searchable": false,
