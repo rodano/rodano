@@ -22,16 +22,26 @@ import ch.rodano.core.services.bll.study.StudyService;
 public class ValidatorPluginServiceImpl implements ValidatorPluginService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	private final StudyService studyService;
 	private final Optional<ValidatorPlugin> validatorPlugin;
 
-	private final Map<String, Method> methods;
+	private Map<String, Method> methods;
+	private boolean initialized = false;
 
 	/**
 	 * Here is injected the validator plugin
 	 * If no bean is found, the validator plugin is not set
 	 */
 	public ValidatorPluginServiceImpl(final StudyService studyService, final Optional<ValidatorPlugin> validatorPlugin) {
+		this.studyService = studyService;
 		this.validatorPlugin = validatorPlugin;
+	}
+
+	private synchronized void initialize() {
+		if(initialized) {
+			return;
+		}
+
 		methods = new TreeMap<>();
 
 		final var study = studyService.getStudy();
@@ -58,6 +68,7 @@ public class ValidatorPluginServiceImpl implements ValidatorPluginService {
 				logger.error("Validator plugin is missing");
 			}
 		}
+		initialized = true;
 	}
 
 	/**
@@ -72,6 +83,10 @@ public class ValidatorPluginServiceImpl implements ValidatorPluginService {
 	 */
 	@Override
 	public Boolean validate(final Validator validator, final Scope scope, final Optional<Event> event, final Dataset dataset, final Field field) {
+		if(!initialized) {
+			initialize();
+		}
+
 		if(validatorPlugin.isEmpty()) {
 			logger.warn("No validator plugin registered");
 			return true;

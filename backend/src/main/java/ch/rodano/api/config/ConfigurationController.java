@@ -133,8 +133,11 @@ public class ConfigurationController extends AbstractSecuredController {
 	//warning: if you change this API endpoint, do not forget to change it in the WebConfigurer/SecurityConfiguration configuration classes!
 	@GetMapping("public-study")
 	@ResponseStatus(HttpStatus.OK)
-	public PublicStudyDTO getPublicStudy() {
-		return studyDTOService.createPublicStudyDTO(studyService.getStudy());
+	public ResponseEntity<PublicStudyDTO> getPublicStudy() {
+		if(!studyService.isStudyLoaded()) {
+			return ResponseEntity.noContent().build();
+		}
+		return ResponseEntity.ok(studyDTOService.createPublicStudyDTO(studyService.getStudy()));
 	}
 
 	@Operation(summary = "Get the study menus", description = "Get menus as defined in the study configuration")

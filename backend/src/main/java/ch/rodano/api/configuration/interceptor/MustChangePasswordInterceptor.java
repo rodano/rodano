@@ -11,6 +11,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import ch.rodano.core.model.exception.security.MustChangePasswordException;
 import ch.rodano.core.model.user.User;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.user.UserSecurityService;
 
 /**
@@ -20,15 +21,22 @@ import ch.rodano.core.services.bll.user.UserSecurityService;
 public class MustChangePasswordInterceptor implements HandlerInterceptor {
 
 	private final UserSecurityService userSecurityService;
+	private final StudyService studyService;
 
 	public MustChangePasswordInterceptor(
-		@Lazy final UserSecurityService userSecurityService
+		@Lazy final UserSecurityService userSecurityService,
+		final StudyService studyService
 	) {
 		this.userSecurityService = userSecurityService;
+		this.studyService = studyService;
 	}
 
 	@Override
 	public boolean preHandle(final HttpServletRequest request, final HttpServletResponse response, final Object handler) {
+		if(!studyService.isStudyLoaded()) {
+			return true;
+		}
+
 		// Get the authentication
 		final var authentication = SecurityContextHolder.getContext().getAuthentication();
 

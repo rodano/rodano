@@ -124,7 +124,7 @@ public class ProfileDAO implements BaseProjectDAO<Profile> {
 		model.setGrantedEventModelIdRights(loadEventModelRights(record.getProfileId()));
 		model.setGrantedFormModelIdRights(loadFormModelRights(record.getProfileId()));
 
-		model.setGrantedWorkflowIds(loadWorkflowGrants(record.getProfileId()));
+		model.setGrantedWorkflowIds(loadWorkflowGrants(record.getProjectId(), record.getProfileId()));
 
 		return model;
 	}
@@ -285,7 +285,7 @@ public class ProfileDAO implements BaseProjectDAO<Profile> {
 		return result;
 	}
 
-	private SortedMap<String, Right> loadWorkflowGrants(final UUID profileId) {
+	private SortedMap<String, Right> loadWorkflowGrants(final UUID projectId, final UUID profileId) {
 		final SortedMap<String, Right> result = new TreeMap<>();
 
 		final var records = dslContext.select(
@@ -304,7 +304,7 @@ public class ProfileDAO implements BaseProjectDAO<Profile> {
 			final Right right = new Right();
 			right.setRight(Boolean.TRUE.equals(hasRight));
 
-			final UUID workflowId = getWorkflowId(workflowCode);
+			final UUID workflowId = getWorkflowId(projectId, workflowCode);
 			final SortedMap<String, ProfileRight> childRights = loadWorkflowActionRights(profileId, workflowId);
 			right.setChildRights(childRights);
 
@@ -340,10 +340,11 @@ public class ProfileDAO implements BaseProjectDAO<Profile> {
 		return result;
 	}
 
-	private UUID getWorkflowId(final String workflowCode) {
+	private UUID getWorkflowId(final UUID projectId, final String workflowCode) {
 		return dslContext.select(WORKFLOW.WORKFLOW_ID)
 			.from(WORKFLOW)
-			.where(WORKFLOW.CODE.eq(workflowCode))
+			.where(WORKFLOW.CODE.eq(workflowCode)
+				.and(WORKFLOW.PROJECT_ID.eq(projectId)))
 			.fetchOne(WORKFLOW.WORKFLOW_ID);
 	}
 

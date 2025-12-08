@@ -10,12 +10,16 @@ import {EproEnabledGuard} from './guards/epro-enabled.guard';
 export const APP_ROUTES: Routes = [
 	{
 		path: '',
-		redirectTo: '/dashboard', pathMatch: 'full'
+		redirectTo: '/login', pathMatch: 'full'
 	},
 	{
 		path: 'login',
 		canActivate: [LoginGuard],
 		loadComponent: () => import('./login/login.component').then(m => m.LoginComponent)
+	},
+	{
+		path: 'projects',
+		loadComponent: () => import('./project-selection/project-selection.component').then(m => m.ProjectSelectionComponent)
 	},
 	{
 		path: 'bootstrap',

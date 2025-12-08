@@ -205,6 +205,20 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 	}
 
 	@Override
+	public UserDTO createMinimalUserDTO(final User user) {
+		final var dto = new UserDTO();
+		dto.setPk(user.getPk());
+		dto.setName(user.getName());
+		dto.setEmail(user.getEmail());
+		dto.setLanguageId(user.getLanguageId());
+		dto.setActivated(user.isActivated());
+		dto.setExternallyManaged(user.isExternallyManaged());
+		dto.setRemoved(user.getDeleted());
+		dto.setRoles(Collections.emptyList());
+		return dto;
+	}
+
+	@Override
 	public User generateUser(final UserCreationDTO userCreationDTO) {
 		final var generatedUser = new User();
 		generatedUser.setEmail(userCreationDTO.email());

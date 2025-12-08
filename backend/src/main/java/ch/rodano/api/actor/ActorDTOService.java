@@ -22,6 +22,8 @@ public interface ActorDTOService {
 
 	List<UserDTO> createUserDTOs(Collection<User> users, Actor actor, List<Role> roles);
 
+	UserDTO createMinimalUserDTO(User user);
+
 	User generateUser(UserCreationDTO userCreationDTO);
 
 	void updateUser(User user, UserUpdateDTO userUpdateDTO);

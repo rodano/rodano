@@ -11,6 +11,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
 
 /**
@@ -27,6 +28,10 @@ public class AuditActionTransactionManager extends DataSourceTransactionManager 
 	@Autowired
 	@Lazy
 	RequestContextService requestContextService;
+
+	@Autowired
+	@Lazy
+	StudyService studyService;
 
 	public AuditActionTransactionManager(
 		final DataSource dataSource
@@ -45,7 +50,7 @@ public class AuditActionTransactionManager extends DataSourceTransactionManager 
 		super.doBegin(transaction, definition);
 
 		// RequestContextHolder.getRequestAttributes() is used here to check if the spring REQUEST scope is available.
-		if(!existingTransaction && RequestContextHolder.getRequestAttributes() != null && requestContextService.isAuditedRequest()) {
+		if(!existingTransaction && RequestContextHolder.getRequestAttributes() != null && requestContextService.isAuditedRequest() && studyService.isStudyLoaded()) {
 
 			final var context = auditActionService.createAuditActionAndGenerateContext(requestContextService.getActor(), requestContextService.getRationale());
 			requestContextService.setDatabaseActionContext(context);

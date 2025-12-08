@@ -79,14 +79,20 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		this.databaseStudyLoader = databaseStudyLoader;
 	}
 
-	@PostConstruct
-	public void init() {
-		try {
-			load();
-		}
-		catch(IOException e) {
-			throw new RuntimeException("Failed to load study configuration", e);
-		}
+	@Override
+	public void loadStudyForProject(final UUID projectId) throws IOException {
+		projectIdResolver.setProjectId(projectId);
+		load();
+	}
+
+	@Override
+	public boolean isStudyLoaded() {
+		return study != null;
+	}
+
+	@Override
+	public UUID getCurrentProjectId() {
+		return study != null ? study.getProjectId() : null;
 	}
 
 	/**
@@ -303,6 +309,9 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 
 	@Override
 	public Study getStudy() {
+		if (study == null) {
+			throw new IllegalStateException("No study loaded. Please select a project first.");
+		}
 		return study;
 	}
 

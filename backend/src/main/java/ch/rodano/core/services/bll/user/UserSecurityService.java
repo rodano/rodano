@@ -97,15 +97,15 @@ public class UserSecurityService {
 	/**
 	 * Login a user
 	 *
-	 * @param email       User e-mail
-	 * @param password    User password
-	 * @param tsToken     2FA Token
-	 * @param tsCode      2FA Code
-	 * @param tsKey       2FA Key
-	 * @param contextURL  The current server URL
-	 * @param agent       User agent
-	 * @param context     Database context
-	 * @return            User session token
+	 * @param email      User e-mail
+	 * @param password   User password
+	 * @param tsToken    2FA Token
+	 * @param tsCode     2FA Code
+	 * @param tsKey      2FA Key
+	 * @param contextURL The current server URL
+	 * @param agent      User agent
+	 * @param context    Database context
+	 * @return User session token
 	 */
 	public String login(
 		final String email,
@@ -209,9 +209,9 @@ public class UserSecurityService {
 	/**
 	 * Log in the user and update his login status info.
 	 *
-	 * @param user      User to log in
-	 * @param agent     User agent
-	 * @param context   Database action context
+	 * @param user    User to log in
+	 * @param agent   User agent
+	 * @param context Database action context
 	 */
 	private void updateUserLoginInfo(
 		final User user,
@@ -228,16 +228,22 @@ public class UserSecurityService {
 		user.updateLoginDates(ZonedDateTime.now());
 		user.setUserAgent(agent);
 
-		// Execute new rule
-		final var study = studyService.getStudy();
+		if(studyService.isStudyLoaded()) {
+			// Execute new rule
+			final var study = studyService.getStudy();
 
-		if(study.getEventActions().containsKey(WorkflowAction.USER_LOGIN)) {
-			final var rules = study.getEventActions().get(WorkflowAction.USER_LOGIN);
+			if(study.getEventActions().containsKey(WorkflowAction.USER_LOGIN)) {
+				final var rules = study.getEventActions().get(WorkflowAction.USER_LOGIN);
 
-			final var rootScope = actorService.getRootScope(user).orElseThrow();
-			final var state = new DataState(rootScope);
-			ruleService.execute(state, rules, context);
+				final var rootScope = actorService.getRootScope(user).orElseThrow();
+				final var state = new DataState(rootScope);
+				ruleService.execute(state, rules, context);
+			}
 		}
+		else {
+			logger.info("Skipping USER_LOGIN rules - no study loaded yet (multi-project mode)");
+		}
+
 
 		//Save user modifications
 		userDAOService.saveUser(user, context, "Login");
@@ -245,9 +251,10 @@ public class UserSecurityService {
 
 	/**
 	 * Log out the user and delete the user session.
-	 * @param user      User to log out
-	 * @param token     User's session token
-	 * @param context   Database action context
+	 *
+	 * @param user    User to log out
+	 * @param token   User's session token
+	 * @param context Database action context
 	 */
 	public void logout(
 		final User user,
@@ -263,14 +270,15 @@ public class UserSecurityService {
 
 	/**
 	 * Authenticate a user
-	 * @param user          User to authenticate
-	 * @param password      User password
-	 * @param token         User 2FA token
-	 * @param code          User 2FA code
-	 * @param key           User 2FA key
-	 * @param url           The server URL (used for sending password recovery e-mails)
-	 * @param context       The database action context
-	 * @throws NoEnabledRoleException                 Thrown if the user does not have any enabled role
+	 *
+	 * @param user     User to authenticate
+	 * @param password User password
+	 * @param token    User 2FA token
+	 * @param code     User 2FA code
+	 * @param key      User 2FA key
+	 * @param url      The server URL (used for sending password recovery e-mails)
+	 * @param context  The database action context
+	 * @throws NoEnabledRoleException Thrown if the user does not have any enabled role
 	 */
 	private void authenticate(
 		final User user,
@@ -409,6 +417,10 @@ public class UserSecurityService {
 	}
 
 	public boolean mustChangePassword(final User user) {
+		if(!studyService.isStudyLoaded()) {
+			return false;
+		}
+
 		final var study = studyService.getStudy();
 
 		//user who have a password but are externally managed are exempted from changing their password
@@ -515,11 +527,12 @@ public class UserSecurityService {
 
 	/**
 	 * Set new e-mail for user
-	 * @param user                  User to modify
-	 * @param newEmail              The new e-mail
-	 * @param actorOfChange         The actor performing the modification
-	 * @param emailVerificationURL  The e-mail verification URL (used for e-mail notification)
-	 * @param context               Database action context
+	 *
+	 * @param user                 User to modify
+	 * @param newEmail             The new e-mail
+	 * @param actorOfChange        The actor performing the modification
+	 * @param emailVerificationURL The e-mail verification URL (used for e-mail notification)
+	 * @param context              Database action context
 	 */
 	public void changeEmail(
 		final User user,
@@ -543,10 +556,10 @@ public class UserSecurityService {
 	/**
 	 * Check the user's current password and set a new password.
 	 *
-	 * @param user              User to modify
-	 * @param currentPassword   User's current password
-	 * @param newPassword       New password
-	 * @param context           Database action context
+	 * @param user            User to modify
+	 * @param currentPassword User's current password
+	 * @param newPassword     New password
+	 * @param context         Database action context
 	 */
 	public void changePassword(
 		final User user,
@@ -575,10 +588,11 @@ public class UserSecurityService {
 
 	/**
 	 * Activate a user using the user activation code.
+	 *
 	 * @param activationCode The user activation code
 	 * @param acceptPolicies Did the user accept the privacy policies ?
-	 * @param password      Provided password
-	 * @param context       Database context
+	 * @param password       Provided password
+	 * @param context        Database context
 	 */
 	public void activateUser(
 		final String activationCode,
@@ -638,9 +652,10 @@ public class UserSecurityService {
 
 	/**
 	 * Set new user password. Used in cases where the user's current password is unavailable (e.g. user activation or reset by an admin).
-	 * @param user          Use to modify
-	 * @param newPassword   New password
-	 * @param context       Database action context
+	 *
+	 * @param user        Use to modify
+	 * @param newPassword New password
+	 * @param context     Database action context
 	 */
 	public void forceSetNewPassword(
 		final User user,
@@ -658,9 +673,10 @@ public class UserSecurityService {
 
 	/**
 	 * Check if the given user password is valid
-	 * @param user          The user
-	 * @param rawPassword   The password
-	 * @return              True if the password is valid, false otherwise
+	 *
+	 * @param user        The user
+	 * @param rawPassword The password
+	 * @return True if the password is valid, false otherwise
 	 */
 	public boolean isPasswordValid(
 		final User user,
@@ -685,11 +701,12 @@ public class UserSecurityService {
 
 	/**
 	 * Send an e-mail verification notification to the user.
-	 * @param user      User to modify
-	 * @param newEmail  New e-mail
-	 * @param actor     The actor performing the change
-	 * @param url       E-mail verification URL
-	 * @param context   Database action context
+	 *
+	 * @param user     User to modify
+	 * @param newEmail New e-mail
+	 * @param actor    The actor performing the change
+	 * @param url      E-mail verification URL
+	 * @param context  Database action context
 	 */
 	public void notifyOfPendingEmail(
 		final User user,
@@ -708,8 +725,9 @@ public class UserSecurityService {
 
 	/**
 	 * Validate password strength and uniqueness, encode the password and set new password for user
-	 * @param user          User to modify
-	 * @param newPassword   New password to validate and set
+	 *
+	 * @param user        User to modify
+	 * @param newPassword New password to validate and set
 	 */
 	private void validateAndSetPassword(
 		final User user,
@@ -790,8 +808,9 @@ public class UserSecurityService {
 
 	/**
 	 * Unblock user
-	 * @param user      User to unblock
-	 * @param context   Database action context
+	 *
+	 * @param user    User to unblock
+	 * @param context Database action context
 	 */
 	private void unblockUser(
 		final User user,
@@ -803,8 +822,9 @@ public class UserSecurityService {
 
 	/**
 	 * Set the given e-mail as pending.
-	 * @param user      User to modify
-	 * @param newEmail  New e-mail
+	 *
+	 * @param user     User to modify
+	 * @param newEmail New e-mail
 	 */
 	private void setPendingEmail(
 		final User user,

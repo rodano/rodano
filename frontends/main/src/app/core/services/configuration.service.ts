@@ -1,6 +1,6 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {identity, Observable} from 'rxjs';
+import {BehaviorSubject, identity, Observable} from 'rxjs';
 import {concatMap, map, first, shareReplay} from 'rxjs/operators';
 import {Menu} from '../model/menu';
 import {ScopeModel} from '../model/scope-model';
@@ -22,6 +22,8 @@ import {Language} from '../model/language';
 export class ConfigurationService {
 	private readonly serviceUrl: string;
 	private readonly publicStudy$: Observable<PublicStudy>;
+	private studySubject = new BehaviorSubject<PublicStudy | undefined>(undefined);
+	public study$ = this.studySubject.asObservable();
 
 	constructor(
 		private http: HttpClient,
@@ -33,11 +35,15 @@ export class ConfigurationService {
 	}
 
 	getPublicStudy(): Observable<PublicStudy> {
-		return this.publicStudy$;
+		return this.http.get<PublicStudy>('/api/config/public-study');
 	}
 
 	getStudy(): Observable<Study> {
 		return this.http.get<Study>(`${this.serviceUrl}/study`);
+	}
+
+	setStudy(study: PublicStudy): void {
+		this.studySubject.next(study);
 	}
 
 	getLanguages(): Observable<Language[]> {

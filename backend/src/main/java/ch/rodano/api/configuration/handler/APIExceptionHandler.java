@@ -46,10 +46,10 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 	private final StudyService studyService;
 	private final MailService mailService;
 	private final TransactionCacheDAOService transactionCacheDAOService;
+	private final AuditActionService auditActionService;
 	private final Configurator configurator;
 	private final boolean sendExceptionEmail;
 	private final String exceptionEmailRecipient;
-	private final DatabaseActionContext context;
 
 	public APIExceptionHandler(
 		final StudyService studyService,
@@ -63,12 +63,15 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		this.studyService = studyService;
 		this.mailService = mailService;
 		this.transactionCacheDAOService = transactionCacheDAOService;
+		this.auditActionService = auditActionService;
 		this.configurator = configurator;
 		this.sendExceptionEmail = sendExceptionEmail;
 		this.exceptionEmailRecipient = exceptionEmailRecipient;
+	}
 
+	private DatabaseActionContext getAuditContext() {
 		//a context must be provided to send an e-mail even it will not be used because e-mails are not audited
-		this.context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, INTERNAL_ERROR_MESSAGE);
+		return auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, INTERNAL_ERROR_MESSAGE);
 	}
 
 	@ExceptionHandler(value = { Exception.class })
@@ -120,35 +123,12 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
 		if(sendExceptionEmail) {
 			if(isExceptionWorthSendingEmail(e)) {
-				//send an e-mail to warn about this
-				final var study = studyService.getStudy();
-
-				//retrieve actor name
-				final var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-				//the principal is not an actor for public HTTP requests (it's the string "anonymousUser")
-				final String actorName = principal instanceof final Actor actor ? actor.getName() : (String) principal;
-
-				//build body
-				final var body = new StringWriter();
-				body.append(String.format("Request path: %s\n", path));
-				body.append(String.format("Actor name: %s\n", actorName));
-				body.append(String.format("Exception message: %s\n", e.getLocalizedMessage()));
-				body.append("Stack trace:\n");
-				final PrintWriter writer = new PrintWriter(body);
-				e.printStackTrace(writer);
-
-				final var mail = new Mail();
-				mail.setProjectId(study.getProjectId());
-				mail.setSender(study.getEmail());
-				mail.setReplyTo(study.getEmail());
-				mail.setRecipients(Collections.singleton(exceptionEmailRecipient));
-				mail.setOrigin(MailOrigin.USER);
-				mail.setIntent("Warn about an unexpected exception");
-				mail.setSubject(String.format("An unexpected exception occurred on study %s", study.getDefaultLocalizedShortname()));
-				mail.setTextBody(body.toString());
-				//send the e-mail directly and do not try to store it
-				//as the HTTP request failed, the transaction will be roll-backed and nothing will be saved in the database
-				mailService.sendMail(mail, context, !Environment.PROD.equals(configurator.getEnvironment()));
+				if(studyService.isStudyLoaded()) {
+					sendExceptionEmail(e, path);
+				}
+				else {
+					logger.warn("Cannot send exception email - no study loaded");
+				}
 			}
 		}
 
@@ -166,6 +146,38 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		catch(final Exception ex) {
 			return new ResponseEntity<>(new ErrorDetails(HttpStatus.INTERNAL_SERVER_ERROR, ex.getLocalizedMessage(), path), HttpStatus.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	private void sendExceptionEmail(final Exception e, final String path) {
+		//send an e-mail to warn about this
+		final var study = studyService.getStudy();
+
+		//retrieve actor name
+		final var principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		//the principal is not an actor for public HTTP requests (it's the string "anonymousUser")
+		final String actorName = principal instanceof final Actor actor ? actor.getName() : (String) principal;
+
+		//build body
+		final var body = new StringWriter();
+		body.append(String.format("Request path: %s\n", path));
+		body.append(String.format("Actor name: %s\n", actorName));
+		body.append(String.format("Exception message: %s\n", e.getLocalizedMessage()));
+		body.append("Stack trace:\n");
+		final PrintWriter writer = new PrintWriter(body);
+		e.printStackTrace(writer);
+
+		final var mail = new Mail();
+		mail.setProjectId(study.getProjectId());
+		mail.setSender(study.getEmail());
+		mail.setReplyTo(study.getEmail());
+		mail.setRecipients(Collections.singleton(exceptionEmailRecipient));
+		mail.setOrigin(MailOrigin.USER);
+		mail.setIntent("Warn about an unexpected exception");
+		mail.setSubject(String.format("An unexpected exception occurred on study %s", study.getDefaultLocalizedShortname()));
+		mail.setTextBody(body.toString());
+		//send the e-mail directly and do not try to store it
+		//as the HTTP request failed, the transaction will be roll-backed and nothing will be saved in the database
+		mailService.sendMail(mail, getAuditContext(), !Environment.PROD.equals(configurator.getEnvironment()));
 	}
 
 	@Override

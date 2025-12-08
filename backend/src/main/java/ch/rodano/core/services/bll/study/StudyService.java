@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.study.Study;
 
@@ -35,4 +36,10 @@ public interface StudyService {
 	 * @return the study
 	 */
 	Study getStudy();
+
+	void loadStudyForProject(UUID projectId) throws IOException;
+
+	UUID getCurrentProjectId();
+
+	boolean isStudyLoaded();
 }

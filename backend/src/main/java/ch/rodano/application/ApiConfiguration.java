@@ -12,6 +12,7 @@ import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.core.services.bll.export.views.AggregateWorkflowViewService;
 import ch.rodano.core.services.bll.export.views.ExportViewService;
 import ch.rodano.core.services.bll.scope.ScopeAncestorServiceImpl;
+import ch.rodano.core.services.bll.study.StudyService;
 
 @Profile({ "api" })
 @Configuration
@@ -25,17 +26,20 @@ public class ApiConfiguration implements InitializingBean {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final DatabaseInitializer databaseInitializer;
+	private final StudyService studyService;
 	private final ScopeAncestorServiceImpl scopeAncestorService;
 	private final AggregateWorkflowViewService aggregateWorkflowViewService;
 	private final ExportViewService exportViewService;
 
 	public ApiConfiguration(
 		final DatabaseInitializer databaseInitializer,
+		final StudyService studyService,
 		final ScopeAncestorServiceImpl scopeAncestorService,
 		final AggregateWorkflowViewService aggregateWorkflowViewService,
 		final ExportViewService exportViewService
 	) {
 		this.databaseInitializer = databaseInitializer;
+		this.studyService = studyService;
 		this.scopeAncestorService = scopeAncestorService;
 		this.aggregateWorkflowViewService = aggregateWorkflowViewService;
 		this.exportViewService = exportViewService;
@@ -51,9 +55,15 @@ public class ApiConfiguration implements InitializingBean {
 			databaseInitializer.initializeStructure();
 		}
 
-		//initialize views in all cases
-		scopeAncestorService.updateView();
-		aggregateWorkflowViewService.updateView();
-		exportViewService.updateViews();
+		if(studyService.isStudyLoaded()) {
+			logger.info("Study is loaded, initializing views");
+			//initialize views in all cases
+			scopeAncestorService.updateView();
+			aggregateWorkflowViewService.updateView();
+			exportViewService.updateViews();
+		}
+		else {
+			logger.info("No study loaded yet, skipping view initialization. Views will be initialized when a project is selected.");
+		}
 	}
 }

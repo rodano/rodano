@@ -43,6 +43,7 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 	}
 
 	private void updateDTO(final PublicStudyDTO dto, final Study study, final ACL acl) {
+		dto.projectId = study.getProjectId();
 		dto.id = study.getId();
 		dto.shortname = study.getShortname();
 		dto.color = study.getColor();

@@ -15,7 +15,6 @@ import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.Project;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
-import static ch.rodano.batch.helper.ModelResolvers.resolveProfileId;
 import static ch.rodano.core.model.jooq.tables.Project.PROJECT;
 import static ch.rodano.core.model.jooq.tables.ProjectLanguage.PROJECT_LANGUAGE;
 import static ch.rodano.core.model.jooq.tables.ProjectRuleTag.PROJECT_RULE_TAG;
@@ -48,8 +47,6 @@ public class ProjectWriter extends BaseWriter {
 					}
 				}
 
-				final UUID existingProfileId = resolveProfileId(tx, projectId, project.getEproProfileId());
-
 				tx.insertInto(PROJECT)
 					.set(PROJECT.PROJECT_ID, projectId)
 					.set(PROJECT.CODE, project.getId())
@@ -63,7 +60,6 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.PASSWORD_VALIDITY_DURATION, project.getPasswordValidityDuration())
 					.set(PROJECT.PASSWORD_UNIQUE, project.isPasswordUniqueness())
 					.set(PROJECT.EPRO_ENABLED, project.isEproEnabled())
-					.set(PROJECT.EPRO_PROFILE_ID, existingProfileId)
 					.set(PROJECT.CLIENT_NAME, project.getClient())
 					.set(PROJECT.CLIENT_EMAIL, project.getClientEmail())
 					.set(PROJECT.PROTOCOL_NO, project.getProtocolNo())
@@ -86,7 +82,6 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.PASSWORD_VALIDITY_DURATION, project.getPasswordValidityDuration())
 					.set(PROJECT.PASSWORD_UNIQUE, project.isPasswordUniqueness())
 					.set(PROJECT.EPRO_ENABLED, project.isEproEnabled())
-					.set(PROJECT.EPRO_PROFILE_ID, existingProfileId)
 					.set(PROJECT.CLIENT_NAME, project.getClient())
 					.set(PROJECT.CLIENT_EMAIL, project.getClientEmail())
 					.set(PROJECT.PROTOCOL_NO, project.getProtocolNo())

@@ -81,6 +81,13 @@
 					}
 				</mat-menu>
 				<button
+					(click)="switchProject()"
+					mat-icon-button
+					matTooltip="Change project">
+					<mat-icon>home</mat-icon>
+				</button>
+
+				<button
 					mat-icon-button
 					type="button"
 					[matMenuTriggerFor]="appMenu"

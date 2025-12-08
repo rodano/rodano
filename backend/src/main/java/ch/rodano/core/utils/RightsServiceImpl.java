@@ -3,13 +3,17 @@ package ch.rodano.core.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.feature.Feature;
 import ch.rodano.configuration.model.feature.FeatureStatic;
@@ -37,6 +41,8 @@ import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
 @Service
 public class RightsServiceImpl implements RightsService {
 
+	private static final Logger LOGGER =  LoggerFactory.getLogger(RightsServiceImpl.class);
+
 	private final DSLContext create;
 	private final StudyService studyService;
 	private final ScopeRelationService scopeRelationService;
@@ -56,6 +62,7 @@ public class RightsServiceImpl implements RightsService {
 
 	@Override
 	public ACL getACL(final Actor actor) {
+		final var currentProjectId = studyService.getCurrentProjectId();
 		final var conditions = new ArrayList<Condition>();
 		if(actor instanceof User) {
 			conditions.add(ROLE.USER_FK.eq(actor.getPk()));
@@ -64,20 +71,31 @@ public class RightsServiceImpl implements RightsService {
 			conditions.add(ROLE.ROBOT_FK.eq(actor.getPk()));
 		}
 		conditions.add(ROLE.STATUS.eq(RoleStatus.ENABLED));
+		conditions.add(ROLE.PROJECT_ID.eq(currentProjectId));
 
 		final var query = create.selectDistinct(ROLE.PROFILE_ID)
 			.from(ROLE)
 			.where(DSL.and(conditions));
 		final List<Permission> permissions = new ArrayList<>();
 		for(final var result : query.fetch()) {
-			final var profile = studyService.getStudy().getProfile(result.get(ROLE.PROFILE_ID));
-			permissions.add(new Permission(profile, Timeframe.INFINITE_TIMEFRAME));
+			final var profileId = result.get(ROLE.PROFILE_ID);
+			if(profileId == null) {
+				continue;
+			}
+			try {
+				final var profile = studyService.getStudy().getProfile(profileId);
+				permissions.add(new Permission(profile, Timeframe.INFINITE_TIMEFRAME));
+			}
+			catch(NoNodeException e) {
+				LOGGER.warn("Profile not present in this study", e);
+			}
 		}
 		return new ACL(actor, Optional.empty(), permissions);
 	}
 
 	@Override
 	public ACL getACL(final Actor actor, final Scope scope) {
+		final var currentProjectId = studyService.getCurrentProjectId();
 		final var conditions = new ArrayList<Condition>();
 		if(actor instanceof User) {
 			conditions.add(ROLE.USER_FK.eq(actor.getPk()));
@@ -86,6 +104,7 @@ public class RightsServiceImpl implements RightsService {
 			conditions.add(ROLE.ROBOT_FK.eq(actor.getPk()));
 		}
 		conditions.add(ROLE.STATUS.eq(RoleStatus.ENABLED));
+		conditions.add(ROLE.PROJECT_ID.eq(currentProjectId));
 
 		final List<Permission> permissions = new ArrayList<>();
 
@@ -94,19 +113,30 @@ public class RightsServiceImpl implements RightsService {
 			.leftJoin(SCOPE_ANCESTOR).on(ROLE.SCOPE_FK.eq(SCOPE_ANCESTOR.ANCESTOR_FK))
 			.where(DSL.and(ROLE.SCOPE_FK.eq(scope.getPk()).or(SCOPE_ANCESTOR.SCOPE_FK.eq(scope.getPk())), DSL.and(conditions)));
 		for(final var result : query.fetch()) {
-			final var profile = studyService.getStudy().getProfile(result.get(ROLE.PROFILE_ID));
-			final Timeframe timeframe;
-			//for the roles directly attached to the scope, SCOPE_ANCESTOR.START_DATE, SCOPE_ANCESTOR.END_DATE and SCOPE_ANCESTOR.VIRTUAL are null
-			final var virtual = Optional.ofNullable(result.get(SCOPE_ANCESTOR.VIRTUAL)).orElse(false);
-			if(virtual) {
-				timeframe = Timeframe.INFINITE_TIMEFRAME;
+			final var profileId = result.get(ROLE.PROFILE_ID);
+			if(profileId == null) {
+				continue;
 			}
-			else {
-				final var startDate = result.get(SCOPE_ANCESTOR.START_DATE);
-				final var stopDate = result.get(SCOPE_ANCESTOR.END_DATE);
-				timeframe = new Timeframe(Optional.ofNullable(startDate), Optional.ofNullable(stopDate));
+
+			try {
+				final var profile = studyService.getStudy().getProfile(profileId);
+
+				final Timeframe timeframe;
+				//for the roles directly attached to the scope, SCOPE_ANCESTOR.START_DATE, SCOPE_ANCESTOR.END_DATE and SCOPE_ANCESTOR.VIRTUAL are null
+				final var virtual = Optional.ofNullable(result.get(SCOPE_ANCESTOR.VIRTUAL)).orElse(false);
+				if(virtual) {
+					timeframe = Timeframe.INFINITE_TIMEFRAME;
+				}
+				else {
+					final var startDate = result.get(SCOPE_ANCESTOR.START_DATE);
+					final var stopDate = result.get(SCOPE_ANCESTOR.END_DATE);
+					timeframe = new Timeframe(Optional.ofNullable(startDate), Optional.ofNullable(stopDate));
+				}
+				permissions.add(new Permission(profile, timeframe));
 			}
-			permissions.add(new Permission(profile, timeframe));
+			catch(final NoNodeException e) {
+				LOGGER.warn("Profile not present in this study", e);
+			}
 		}
 		return new ACL(actor, Optional.of(scope), permissions);
 	}
@@ -240,7 +270,21 @@ public class RightsServiceImpl implements RightsService {
 
 	@Override
 	public boolean hasRightAdmin(final Collection<Role> roles) {
-		return roles.stream().map(Role::getProfile).anyMatch(p -> p.hasFeature(FeatureStatic.ADMIN.name()));
+		if(!studyService.isStudyLoaded()) {
+			return false;
+		}
+
+		final var study = studyService.getStudy();
+
+		return roles.stream()
+			.map(role -> {
+				if(role.getProfile() == null && role.getProfileId() != null) {
+					role.setProfile(study.getProfile(role.getProfileId()));
+				}
+				return role.getProfile();
+			})
+			.filter(Objects::nonNull)
+			.anyMatch(p -> p.hasFeature(FeatureStatic.ADMIN.name()));
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public abstract class AbstractDAOService<U extends IdentifiableObject, V extends
 		}
 
 		//set creation date and last update time
-		if(o instanceof final TimestampableObject to) {
+		if(context != null && o instanceof final TimestampableObject to) {
 			if(isInsert && to.getCreationTime() == null) {
 				to.setCreationTime(context.auditAction().getDate());
 			}
@@ -99,13 +99,18 @@ public abstract class AbstractDAOService<U extends IdentifiableObject, V extends
 		}
 
 		//warning, in a very few cases, the context could be null (for example, in interceptors)
-		logger.debug("Actor {} is {} {} with rationale: {}", context.getActorName(), isInsert ? "inserting" : "updating", o.getClass().getSimpleName(), rationale);
+		if(context != null) {
+			logger.debug("Actor {} is {} {} with rationale: {}", context.getActorName(), isInsert ? "inserting" : "updating", o.getClass().getSimpleName(), rationale);
+		}
+		else {
+			logger.debug("{} {} (no context available)", isInsert ? "Inserting" : "Updating", o.getClass().getSimpleName());
+		}
 
-		if(o instanceof final PersistentObject po) {
+		if(o instanceof final PersistentObject po && studyService.isStudyLoaded()) {
 			po.onPostUpdate(studyService.getStudy());
 		}
 
-		if(o instanceof AuditableObject) {
+		if(context != null && o instanceof AuditableObject) {
 			audit(o, context, rationale);
 		}
 

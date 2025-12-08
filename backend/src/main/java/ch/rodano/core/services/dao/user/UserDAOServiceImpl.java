@@ -59,7 +59,7 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 
 	@Override
 	public void saveUser(final User user, final DatabaseActionContext context, final String rationale) {
-		if(user.getProjectId() == null) {
+		if(user.getProjectId() == null && studyService.isStudyLoaded()) {
 			user.setProjectId(studyService.getStudy().getProjectId());
 		}
 

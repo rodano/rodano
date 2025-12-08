@@ -19,12 +19,16 @@ import {Environment} from '@core/model/environment';
 import {Profile} from '@core/model/profile';
 import {MeService} from '@core/services/me.service';
 import {NotificationService} from '../services/notification.service';
+import {CommonModule} from '@angular/common';
+import {ProjectService} from '@core/services/project.service';
 
 @Component({
 	selector: 'app-header',
+	standalone: true,
 	templateUrl: './header.component.html',
 	styleUrls: ['./header.component.scss'],
 	imports: [
+		CommonModule,
 		MatToolbarModule,
 		MatButtonModule,
 		MatTooltip,
@@ -44,7 +48,7 @@ export class HeaderComponent implements OnInit {
 
 	logo?: string;
 	user?: User;
-	menus?: Menu[];
+	menus?: Menu[] = [];
 	profiles: Profile[] = [];
 	pendingRolesNumber = 0;
 
@@ -54,11 +58,16 @@ export class HeaderComponent implements OnInit {
 		private meService: MeService,
 		private destroyRef: DestroyRef,
 		private notificationService: NotificationService,
-		private router: Router) {}
+		private router: Router,
+		private projectService: ProjectService) {}
 
 	ngOnInit() {
 		if(this.study.logo) {
 			this.logo = btoa(this.study.logo);
+		}
+
+		if(this.study?.color) {
+			document.documentElement.style.setProperty("--mat-sys-primary", this.study.color);
 		}
 
 		this.authStateService.listenConnectedUser().pipe(
@@ -83,6 +92,18 @@ export class HeaderComponent implements OnInit {
 		this.meService.impersonate(profileId).subscribe({
 			next: u => this.authStateService.updateUser(u),
 			error: () => this.notificationService.showError('Only superusers can switch profile')
+		});
+	}
+
+	switchProject(): void {
+		this.projectService.clearProjectSelection().subscribe({
+			next: () => {
+				this.router.navigate(['/projects']);
+			},
+			error: (error) => {
+				console.error('Error clearing project:', error);
+				this.router.navigate(['/projects']);
+			}
 		});
 	}
 

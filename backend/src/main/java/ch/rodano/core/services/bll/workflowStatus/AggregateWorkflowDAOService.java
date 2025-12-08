@@ -46,9 +46,11 @@ public class AggregateWorkflowDAOService {
 	private final DAOStrategy strategy;
 
 	private final WorkflowStatusService workflowStatusService;
+	private final StudyService studyService;
 
-	private final List<Workflow> aggregatorScopeWorkflows;
-	private final List<Workflow> aggregatorEventWorkflows;
+	private List<Workflow> aggregatorScopeWorkflows;
+	private List<Workflow> aggregatorEventWorkflows;
+	private boolean initialized = false;
 
 	public AggregateWorkflowDAOService(
 		final DSLContext create,
@@ -59,6 +61,20 @@ public class AggregateWorkflowDAOService {
 		this.create = create;
 		this.strategy = strategy;
 		this.workflowStatusService = workflowStatusService;
+		this.studyService = studyService;
+	}
+
+	private synchronized void initialize() {
+		if(initialized) {
+			return;
+		}
+
+		if(!studyService.isStudyLoaded()) {
+			aggregatorScopeWorkflows = Collections.emptyList();
+			aggregatorEventWorkflows = Collections.emptyList();
+			initialized = true;
+			return;
+		}
 
 		aggregatorScopeWorkflows = studyService.getStudy().getWorkflows().stream()
 			.filter(Workflow::isAggregator)
@@ -68,6 +84,14 @@ public class AggregateWorkflowDAOService {
 			.filter(Workflow::isAggregator)
 			.filter(w -> w.getWorkflowableEntities().contains(Entity.EVENT_MODEL))
 			.toList();
+
+		initialized = true;
+	}
+
+	private void ensureInitialized() {
+		if(!initialized) {
+			initialize();
+		}
 	}
 
 	private final GroupConcatOrderByStep STATE_IDS = DSL.groupConcatDistinct(WORKFLOW_STATUS.WORKFLOW_STATE_ID);
@@ -117,6 +141,8 @@ public class AggregateWorkflowDAOService {
 		final Optional<Workflow> workflow,
 		final Optional<Collection<Long>> scopePks
 	) {
+		ensureInitialized();
+
 		final var workflows = workflow.map(Collections::singletonList).orElse(aggregatorScopeWorkflows);
 		final var workflowCase = constructWorkflowField(workflows);
 		final var stateCases = constructStateCases(workflows);
@@ -186,6 +212,8 @@ public class AggregateWorkflowDAOService {
 		final Optional<Workflow> workflow,
 		final Optional<Collection<Long>> eventPks
 	) {
+		ensureInitialized();
+
 		final var workflows = workflow.map(Collections::singletonList).orElse(aggregatorEventWorkflows);
 		final var workflowCase = constructWorkflowField(workflows);
 		final var stateCases = constructStateCases(workflows);
@@ -256,6 +284,8 @@ public class AggregateWorkflowDAOService {
 	//public Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> generateFormQuery()
 
 	public List<AggregateWorkflowStatus> getAggregateWorkflowStatusByScopes(final Collection<Scope> scopes) {
+		ensureInitialized();
+
 		if(aggregatorScopeWorkflows.isEmpty()) {
 			return Collections.emptyList();
 		}
@@ -278,6 +308,8 @@ public class AggregateWorkflowDAOService {
 	}
 
 	public List<AggregateWorkflowStatus> getAggregateWorkflowStatusByEvents(final Collection<Event> events) {
+		ensureInitialized();
+
 		if(aggregatorEventWorkflows.isEmpty()) {
 			return Collections.emptyList();
 		}

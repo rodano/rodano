@@ -54,73 +54,115 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 		return Role.class;
 	}
 
+	private UUID currentProjectId() {
+		return studyService.isStudyLoaded() ? studyService.getStudy().getProjectId() : null;
+	}
+
 	@Override
 	public Role getRoleByPk(final Long pk) {
-		final var query = create.selectFrom(ROLE).where(ROLE.PK.eq(pk));
+		var condition = ROLE.PK.eq(pk);
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return findUnique(query);
 	}
 
 	@Override
 	public List<Role> getRolesByUserPk(final Long userPk) {
-		final var query = create.selectFrom(ROLE).where(ROLE.USER_FK.eq(userPk));
+		var condition = ROLE.USER_FK.eq(userPk);
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getRolesByUserPks(final Collection<Long> userPks) {
-		final var query = create.selectFrom(ROLE).where(ROLE.USER_FK.in(userPks));
+		var condition = ROLE.USER_FK.in(userPks);
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getRolesByRobotPk(final Long robotPk) {
-		final var query = create.selectFrom(ROLE).where(ROLE.ROBOT_FK.eq(robotPk));
+		var condition = ROLE.ROBOT_FK.eq(robotPk);
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getRolesByRobotPks(final Collection<Long> robotPks) {
-		final var query = create.selectFrom(ROLE).where(ROLE.ROBOT_FK.in(robotPks));
+		var condition = ROLE.ROBOT_FK.in(robotPks);
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getRolesByProfile(final UUID profileId) {
-		final var query = create.selectFrom(ROLE).where(ROLE.PROFILE_ID.eq(profileId));
+		var condition = ROLE.PROFILE_ID.eq(profileId);
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getRolesByScopePkAndProfiles(final Long scopePk, final Collection<String> profileIds) {
-		final var query = create.selectFrom(ROLE).where(ROLE.SCOPE_FK.eq(scopePk).and(ROLE.PROFILE_ID.in(profileIds)));
+		var condition = ROLE.SCOPE_FK.eq(scopePk).and(ROLE.PROFILE_ID.in(profileIds));
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
+		final var query = create.selectFrom(ROLE).where(condition);
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getActiveRolesByUserPkOverScopePk(final Long userPk, final Long scopePk) {
+		var condition =
+			ROLE.USER_FK.eq(userPk)
+				.and(ROLE.STATUS.eq(RoleStatus.ENABLED))
+				.and(ROLE.SCOPE_FK.eq(scopePk).or(SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)));
+
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
 		final var query = create.selectDistinct(ROLE.asterisk())
 			.from(ROLE)
 			.leftJoin(SCOPE_ANCESTOR).on(ROLE.SCOPE_FK.eq(SCOPE_ANCESTOR.ANCESTOR_FK))
-			.where(
-				ROLE.USER_FK.eq(userPk)
-					.and(ROLE.STATUS.eq(RoleStatus.ENABLED))
-					.and(ROLE.SCOPE_FK.eq(scopePk).or(SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)))
-			)
+			.where(condition)
 			.coerce(ROLE);
+
 		return find(query);
 	}
 
 	@Override
 	public List<Role> getActiveRolesByRobotPkOverScopePk(final Long robotPk, final Long scopePk) {
+		var condition =
+			ROLE.ROBOT_FK.eq(robotPk)
+				.and(ROLE.STATUS.eq(RoleStatus.ENABLED))
+				.and(ROLE.SCOPE_FK.eq(scopePk).or(SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)));
+
+		if (currentProjectId() != null) {
+			condition = condition.and(ROLE.PROJECT_ID.eq(currentProjectId()));
+		}
 		final var query = create.selectDistinct(ROLE.asterisk())
 			.from(ROLE)
 			.leftJoin(SCOPE_ANCESTOR).on(ROLE.SCOPE_FK.eq(SCOPE_ANCESTOR.ANCESTOR_FK))
-			.where(
-				ROLE.ROBOT_FK.eq(robotPk)
-					.and(ROLE.STATUS.eq(RoleStatus.ENABLED))
-					.and(ROLE.SCOPE_FK.eq(scopePk).or(SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)))
-			)
+			.where(condition)
 			.coerce(ROLE);
+
 		return find(query);
 	}
 

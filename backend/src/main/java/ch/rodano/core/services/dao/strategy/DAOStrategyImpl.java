@@ -45,7 +45,7 @@ public class DAOStrategyImpl implements DAOStrategy {
 	public <R extends org.jooq.Record, T extends IdentifiableObject> List<T> executeQuery(final ResultQuery<R> query, final Class<T> clazz) {
 		logger.trace("Executing untyped query: {}", query.toString());
 		final var objects = query.fetch().into(clazz);
-		if(PersistentObject.class.isAssignableFrom(clazz)) {
+		if(PersistentObject.class.isAssignableFrom(clazz) && studyService.isStudyLoaded()) {
 			for(final var o : objects) {
 				((PersistentObject) o).onPostLoad(studyService.getStudy());
 			}
@@ -60,7 +60,7 @@ public class DAOStrategyImpl implements DAOStrategy {
 		final var result = query.fetch();
 		cache.storeRecords(table, result);
 		final var objects = result.into(clazz);
-		if(PersistentObject.class.isAssignableFrom(clazz)) {
+		if(PersistentObject.class.isAssignableFrom(clazz) && studyService.isStudyLoaded()) {
 			for(final var o : objects) {
 				((PersistentObject) o).onPostLoad(studyService.getStudy());
 			}

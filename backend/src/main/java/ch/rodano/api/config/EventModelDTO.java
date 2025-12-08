@@ -19,7 +19,7 @@ public class EventModelDTO {
 	@NotNull
 	private SortedMap<String, String> shortname;
 
-	private String eventGroupId;
+	private UUID eventGroupId;
 
 	@NotNull
 	private List<UUID> datasetModelIds;
@@ -52,7 +52,7 @@ public class EventModelDTO {
 		id = eventModel.getId();
 		shortname = eventModel.getShortname();
 
-		eventGroupId = eventModel.getEventGroupId();
+		eventGroupId = eventModel.getEventGroupUuid();
 
 		datasetModelIds = eventModel.getDatasetModelUuids();
 		formModelIds = eventModel.getFormModelUuids();
@@ -94,11 +94,11 @@ public class EventModelDTO {
 		this.shortname = shortname;
 	}
 
-	public String getEventGroupId() {
+	public UUID getEventGroupId() {
 		return eventGroupId;
 	}
 
-	public void setEventGroupId(final String eventGroupId) {
+	public void setEventGroupId(final UUID eventGroupId) {
 		this.eventGroupId = eventGroupId;
 	}
 

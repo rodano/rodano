@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.UUID;
 
 import jakarta.batch.operations.JobOperator;
 import jakarta.batch.runtime.BatchRuntime;
@@ -49,11 +50,14 @@ public class BatchController {
 	public ResponseEntity<Map<String, Object>> startImport(@RequestBody(required = false) final ImportRequest request) {
 		final Properties params = new Properties();
 		params.setProperty("job", or(request != null ? request.job() : null, properties.getJob()));
-		params.setProperty("projectId", projectIdResolver.id().toString());
 		params.setProperty("config", or(request != null ? request.config() : null, properties.getConfig()));
 		params.setProperty("db.url", or(request != null ? request.dbUrl() : null, properties.getDb().getUrl()));
 		params.setProperty("db.user", or(request != null ? request.dbUser() : null, properties.getDb().getUser()));
 		params.setProperty("db.pass", or(request != null ? request.dbPassword() : null, properties.getDb().getPassword()));
+
+		final String finalProjectId = resolveProjectId(request != null ? request.projectId() : null);
+
+		params.setProperty("projectId", finalProjectId);
 
 		final String jobName = params.getProperty("job");
 		final long execId = jobOperator.start(jobName, params);
@@ -105,5 +109,51 @@ public class BatchController {
 			map.put(name, props.getProperty(name));
 		}
 		return map;
+	}
+
+	private String resolveProjectId(final String input) {
+		final String fromRequest = normalizeProjectId(input, true);
+		if(fromRequest != null) {
+			return fromRequest;
+		}
+
+		if(projectIdResolver.hasProject()) {
+			return projectIdResolver.id().toString();
+		}
+
+		final String fromProps = normalizeProjectId(properties.getProjectId(), false);
+		if(fromProps != null) {
+			return fromProps;
+		}
+
+		throw new IllegalStateException(
+			"No projectId provided, no project selected, and no default projectId configured"
+		);
+	}
+
+	private String normalizeProjectId(final String raw, final boolean allowCreateIfUnknown) {
+		if(raw == null || raw.isBlank()) {
+			return null;
+		}
+
+		try {
+			UUID.fromString(raw);
+			return raw;
+		}
+		catch(IllegalArgumentException ignore) {
+			System.out.println("Ignoring unknown project id: " + raw);
+		}
+
+		final UUID resolved = projectIdResolver.resolveCode(raw);
+		if(resolved != null) {
+			return resolved.toString();
+		}
+
+		if(allowCreateIfUnknown) {
+			final UUID random = UUID.randomUUID();
+			return random.toString();
+		}
+
+		throw new IllegalArgumentException("Unknown project code: " + raw);
 	}
 }

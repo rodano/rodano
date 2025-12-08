@@ -29,6 +29,7 @@ import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.session.SessionService;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.role.RoleDAOService;
 import ch.rodano.core.services.dao.user.UserDAOService;
 import ch.rodano.test.DatabaseTest;
@@ -56,6 +57,9 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 	@Autowired
 	private ScopeService scopeService;
+
+	@Autowired
+	private StudyService studyService;
 
 	private User createVerifiedUser() {
 		final var user = new User();
@@ -266,7 +270,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 	@Test
 	@DisplayName("MUST_CHANGE_PASSWORD")
 	public void testNeedToChangePassword() {
-		final var mustChangePasswordInterceptor = new MustChangePasswordInterceptor(userSecurityService);
+		final var mustChangePasswordInterceptor = new MustChangePasswordInterceptor(userSecurityService, studyService);
 
 		final var user = createVerifiedUser();
 		final var userPassword = "thePasswordLong1?";
@@ -346,7 +350,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 	@Test
 	@DisplayName("PASSWORD_DURATION")
 	public void testTimeToChangePassword() {
-		final var mustChangePasswordInterceptor = new MustChangePasswordInterceptor(userSecurityService);
+		final var mustChangePasswordInterceptor = new MustChangePasswordInterceptor(userSecurityService, studyService);
 
 		final var study = studyService.getStudy();
 		final var adminProfile = study.getProfile("ADMIN");

@@ -68,8 +68,21 @@ export class LoginComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		this.configurationService.getPublicStudy().subscribe(study => this.study = study);
-		this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '';
+		this.configurationService.getPublicStudy().subscribe({
+			next: (study) => {
+				this.study = study;
+			},
+			error: (error) => {
+				if(error.status === 204) {
+					console.log('No study loaded yet - will load after project selection');
+				}
+				else {
+					console.error('Error loading public study:', error);
+				}
+				this.study = undefined;
+			}
+		});
+		this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '/projects';
 	}
 
 	login() {
@@ -82,7 +95,7 @@ export class LoginComponent implements OnInit {
 		).subscribe(
 			{
 				next: () => {
-					this.router.navigate([this.returnUrl]);
+					this.router.navigate(['/projects']);
 				},
 				error: (response: any) => {
 					this.error = response.error.message;

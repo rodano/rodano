@@ -6,11 +6,15 @@ import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.WebApplicationContext;
 
 import static ch.rodano.core.model.jooq.tables.Project.PROJECT;
 
 @Component
+@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ProjectIdResolver {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectIdResolver.class);
@@ -55,5 +59,25 @@ public class ProjectIdResolver {
 			LOGGER.error("Failed to resolve project '{}' to UUID {}", code, id, e);
 			return null;
 		}
+	}
+
+	public UUID resolveCode(final String code) {
+		return dslContext
+			.select(PROJECT.PROJECT_ID)
+			.from(PROJECT)
+			.where(PROJECT.CODE.eq(code))
+			.fetchOne(PROJECT.PROJECT_ID);
+	}
+
+	public void setProjectId(final UUID projectId) {
+		this.id = projectId;
+	}
+
+	public boolean hasProject() {
+		return id != null;
+	}
+
+	public void clearProject() {
+		this.id = null;
 	}
 }

@@ -78,6 +78,11 @@ public class MeController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public UserDTO getCurrentUser() {
 		final var user = (User) currentActor();
+
+		if(!studyService.isStudyLoaded()) {
+			return actorDTOService.createMinimalUserDTO(user);
+		}
+
 		return actorDTOService.createUserDTO(user, user, currentActiveRoles());
 	}
 

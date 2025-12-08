@@ -22,17 +22,34 @@ import ch.rodano.core.services.bll.study.StudyService;
 public class ExportPluginServiceImpl implements ExportPluginService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	private final StudyService studyService;
 	private final Optional<ExportPlugin> exportPlugin;
 
-	private final Map<String, Method> methods;
+	private Map<String, Method> methods;
+	private boolean initialized = false;
 
 	/**
 	 * Here is injected the export plugin
 	 * If no bean is found, the export plugin is not set
 	 */
 	public ExportPluginServiceImpl(final StudyService studyService, final Optional<ExportPlugin> exportPlugin) {
+		this.studyService = studyService;
 		this.exportPlugin = exportPlugin;
+
+	}
+
+	private synchronized void initialize() {
+		if(initialized) {
+			return;
+		}
+
 		methods = new TreeMap<>();
+
+		if (!studyService.isStudyLoaded()) {
+			logger.warn("Study not loaded yet, export plugin initialization deferred");
+			initialized = true;
+			return;
+		}
 
 		final var study = studyService.getStudy();
 
@@ -60,10 +77,15 @@ public class ExportPluginServiceImpl implements ExportPluginService {
 				logger.error("Export plugin is missing");
 			}
 		}
+		initialized = true;
 	}
 
 	@Override
 	public String calculate(final Scope scope, final Optional<Event> event, final Dataset dataset, final Field field) {
+		if(!initialized) {
+			initialize();
+		}
+
 		if(exportPlugin.isEmpty()) {
 			logger.warn("No export plugin registered");
 			return "";

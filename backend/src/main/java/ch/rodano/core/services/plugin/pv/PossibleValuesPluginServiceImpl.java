@@ -25,16 +25,26 @@ import ch.rodano.core.services.bll.study.StudyService;
 public class PossibleValuesPluginServiceImpl implements PossibleValuesPluginService {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
+	private final StudyService studyService;
 	private final Optional<PossibleValuesPlugin> possibleValuePlugin;
 
-	private final Map<String, Method> methods;
+	private Map<String, Method> methods;
+	private boolean initialized = false;
 
 	/**
 	 * Here is injected the possible values plugin
 	 * If no bean is found, the possible values plugin is not set
 	 */
 	public PossibleValuesPluginServiceImpl(final StudyService studyService, final Optional<PossibleValuesPlugin> possibleValuePlugin) {
+		this.studyService = studyService;
 		this.possibleValuePlugin = possibleValuePlugin;
+	}
+
+	private synchronized void initialize() {
+		if(initialized) {
+			return;
+		}
+
 		methods = new TreeMap<>();
 
 		final var study = studyService.getStudy();
@@ -64,11 +74,16 @@ public class PossibleValuesPluginServiceImpl implements PossibleValuesPluginServ
 				logger.error("Possible values plugin is missing");
 			}
 		}
+		initialized = true;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<PossibleValue> provide(final Scope scope, final Optional<Event> event, final Dataset dataset, final Field field) {
+		if(!initialized) {
+			initialize();
+		}
+
 		if(possibleValuePlugin.isEmpty()) {
 			logger.warn("No possible values plugin registered");
 			return Collections.emptyList();

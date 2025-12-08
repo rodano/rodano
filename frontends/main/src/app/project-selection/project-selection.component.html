@@ -1,0 +1,69 @@
+<div class="project-selection-container">
+	<header class="top-header">
+		<div class="logo">
+			<span class="logo-text">Rodano</span>
+		</div>
+
+		<button
+			(click)="logout()"
+			mat-icon-button
+			matTooltip="Logout">
+			<mat-icon>exit_to_app</mat-icon>
+		</button>
+	</header>
+
+	<div class="content-wrapper">
+		<div class="page-header">
+			<h1>Select a Project</h1>
+			<p class="subtitle">Choose a study to continue</p>
+		</div>
+
+		@if (loading) {
+			<div class="loading-state">
+				<p>Loading projects...</p>
+			</div>
+		}
+
+		@if (!loading && projects.length === 0) {
+			<div class="empty-state">
+				<p>No projects available.</p>
+				<p class="empty-subtitle">Please contact your administrator.</p>
+			</div>
+		}
+
+		@if (!loading && projects.length > 0) {
+			<div class="projects-container">
+				@for (project of projects; track project.projectId) {
+					<div class="project-card"
+										[class.selecting]="selectingProject"
+										(click)="!selectingProject && selectProject(project.projectId)"
+					>
+						<div class="project-color-indicator" [style.background-color]="project.color"></div>
+						<div class="project-content">
+							<div class="project-headr">
+								<h2 class="project-title">{{ project.shortname['en'] || project.code }}</h2>
+							</div>
+							@if (project.introductionText) {
+								<div class="project-intro">
+									<h4 class="intro-title">{{ parseIntroductionText(project.introductionText).title }}</h4>
+									<p class="intro-description">{{ parseIntroductionText(project.introductionText).description }}</p>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		}
+	</div>
+
+	@if (selectingProject) {
+		<div class="loading-overlay">
+			<div class="spinner"></div>
+		</div>
+	}
+
+	<footer>
+		Powered by <a href="https://www.rodano.ch">Rodano</a>. Distributed under AGPLv3. Access source code
+		<a href="https://github.com/rodano/rodano">here</a>.
+	</footer>
+</div>

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository;
 
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.FieldModelType;
-import ch.rodano.configuration.model.field.PossibleValue;
 import ch.rodano.configuration.model.rules.OperandType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 import ch.rodano.core.model.jooq.tables.records.FieldModelRecord;
@@ -16,7 +15,6 @@ import ch.rodano.core.model.jooq.tables.records.FieldModelRecord;
 import static ch.rodano.core.model.jooq.tables.FieldModel.FIELD_MODEL;
 import static ch.rodano.core.model.jooq.tables.FieldModelValidator.FIELD_MODEL_VALIDATOR;
 import static ch.rodano.core.model.jooq.tables.FieldModelWorkflow.FIELD_MODEL_WORKFLOW;
-import static ch.rodano.core.model.jooq.tables.FieldPossibleValue.FIELD_POSSIBLE_VALUE;
 import static ch.rodano.core.model.jooq.tables.Validator.VALIDATOR;
 import static ch.rodano.core.model.jooq.tables.Workflow.WORKFLOW;
 
@@ -25,11 +23,16 @@ public class FieldModelDAO implements BaseProjectDAO<FieldModel> {
 
 	private final DSLContext dslContext;
 	private final MappingHelper mappingHelper;
+	private final PossibleValueDAO possibleValueDAO;
 	private final RuleDAO ruleDAO;
 
-	public FieldModelDAO(final DSLContext dslContext, final MappingHelper mappingHelper, final RuleDAO ruleDAO) {
+	public FieldModelDAO(final DSLContext dslContext,
+						 final MappingHelper mappingHelper,
+						 final PossibleValueDAO possibleValueDAO,
+						 final RuleDAO ruleDAO) {
 		this.dslContext = dslContext;
 		this.mappingHelper = mappingHelper;
+		this.possibleValueDAO = possibleValueDAO;
 		this.ruleDAO = ruleDAO;
 	}
 
@@ -130,7 +133,7 @@ public class FieldModelDAO implements BaseProjectDAO<FieldModel> {
 		model.setSecondsMandatory(record.getSecondsMandatory() != null ? record.getSecondsMandatory() : false);
 
 		if(record.getType() != null && isChoiceType(record.getType())) {
-			model.setPossibleValues(loadPossibleValues(record.getFieldModelId()));
+			model.setPossibleValues(possibleValueDAO.findByFieldModel(record.getFieldModelId()));
 		}
 
 		model.setValidatorIds(loadValidatorIds(record.getFieldModelId()));
@@ -146,18 +149,6 @@ public class FieldModelDAO implements BaseProjectDAO<FieldModel> {
 			"RADIO".equals(type) ||
 			"CHECKBOX_GROUP".equals(type) ||
 			"MULTISELECT".equals(type);
-	}
-
-	private List<PossibleValue> loadPossibleValues(final UUID fieldModelId) {
-		return dslContext.selectFrom(FIELD_POSSIBLE_VALUE)
-			.where(FIELD_POSSIBLE_VALUE.FIELD_MODEL_ID.eq(fieldModelId))
-			.orderBy(FIELD_POSSIBLE_VALUE.SORT_ORDER)
-			.fetch(record -> {
-				final PossibleValue pv = record.into(PossibleValue.class);
-				pv.setId(record.getCode());
-				pv.setShortname(mappingHelper.parseJsonToMap(record.getShortname()));
-				return pv;
-			});
 	}
 
 	private List<String> loadValidatorIds(final UUID fieldModelId) {

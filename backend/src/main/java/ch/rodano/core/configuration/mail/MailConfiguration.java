@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -40,30 +41,44 @@ public class MailConfiguration {
 	}
 
 	@Bean
+	@Lazy
 	public JavaMailSender getJavaMailSender() {
 		final var sender = new JavaMailSenderImpl();
 
-		final var study = studyService.getStudy();
-
-		sender.setHost(StringUtils.defaultIfBlank(study.getSmtpServer(), envSmtpServer));
-		sender.setPort(Optional.ofNullable(study.getSmtpPort()).orElse(envSmtpPort));
-
-		final var login = StringUtils.defaultIfBlank(study.getSmtpLogin(), envSmtpLogin);
-		if(StringUtils.isNotBlank(login)) {
-			sender.setUsername(login);
+		if(!studyService.isStudyLoaded()) {
+			logger.warn("Study not loaded yet, using environment SMTP configuration only");
+			sender.setHost(envSmtpServer);
+			sender.setPort(envSmtpPort);
+			if(StringUtils.isNotBlank(envSmtpLogin)) {
+				sender.setUsername(envSmtpLogin);
+			}
+			if(StringUtils.isNotBlank(envSmtpPassword)) {
+				sender.setPassword(envSmtpPassword);
+			}
 		}
+		else {
+			final var study = studyService.getStudy();
 
-		final var password = StringUtils.defaultIfBlank(study.getSmtpPassword(), envSmtpPassword);
-		if(StringUtils.isNotBlank(password)) {
-			sender.setPassword(password);
+			sender.setHost(StringUtils.defaultIfBlank(study.getSmtpServer(), envSmtpServer));
+			sender.setPort(Optional.ofNullable(study.getSmtpPort()).orElse(envSmtpPort));
+
+			final var login = StringUtils.defaultIfBlank(study.getSmtpLogin(), envSmtpLogin);
+			if(StringUtils.isNotBlank(login)) {
+				sender.setUsername(login);
+			}
+
+			final var password = StringUtils.defaultIfBlank(study.getSmtpPassword(), envSmtpPassword);
+			if(StringUtils.isNotBlank(password)) {
+				sender.setPassword(password);
+			}
+
+			final var properties = sender.getJavaMailProperties();
+			properties.put("mail.transport.protocol", "smtp");
+			properties.put("mail.smtp.auth", "true");
+			properties.put("mail.smtp.starttls.enable", study.getSmtpTLS());
+
+			sender.setJavaMailProperties(properties);
 		}
-
-		final var properties = sender.getJavaMailProperties();
-		properties.put("mail.transport.protocol", "smtp");
-		properties.put("mail.smtp.auth", "true");
-		properties.put("mail.smtp.starttls.enable", study.getSmtpTLS());
-
-		sender.setJavaMailProperties(properties);
 
 		logger.info("Mail sender initialized with host {}, port {}, login {}", sender.getHost(), sender.getPort(), sender.getUsername());
 		return sender;

@@ -1,5 +1,6 @@
 package ch.rodano.batch.processor;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -21,11 +22,11 @@ public class FeatureStaticProcessor implements ItemProcessor {
 	@Inject
 	private ProjectIdResolver projectIdResolver;
 
+	private UUID resolvedProjectId;
+
 	@Override
 	public Object processItem(final Object o) {
-		final UUID pid = projectId != null && !projectId.isBlank()
-			? UUID.fromString(projectId)
-			: projectIdResolver.id();
+		final UUID pid = resolveProjectId();
 
 		final FeatureStatic featureStatic = (FeatureStatic) o;
 
@@ -37,5 +38,25 @@ public class FeatureStaticProcessor implements ItemProcessor {
 		feature.setOptional(featureStatic.isOptional());
 
 		return new ProjectScoped<>(pid, feature);
+	}
+
+	private UUID resolveProjectId() {
+		if(resolvedProjectId != null) {
+			return resolvedProjectId;
+		}
+
+		if(projectId != null && !projectId.isBlank()) {
+			try {
+				resolvedProjectId = UUID.fromString(projectId);
+			}
+			catch(IllegalArgumentException ex) {
+				resolvedProjectId = UUID.nameUUIDFromBytes(("PROJECT:" + projectId).getBytes(StandardCharsets.UTF_8));
+			}
+		}
+		else {
+			resolvedProjectId = projectIdResolver.id();
+		}
+
+		return resolvedProjectId;
 	}
 }
