@@ -6,7 +6,7 @@ set FOREIGN_KEY_CHECKS=0;
    ========================================================== */
 drop table if exists project;
 create table if not exists project (
-    project_id uuid not null default uuid(),
+    project_id uuid not null,
     code varchar(128) not null,
     shortname json null,
     longname json null,
@@ -33,9 +33,6 @@ create table if not exists project (
     constraint pk_project primary key (project_id),
     constraint uq_project_code unique (code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
-
-insert ignore into project (project_id, code)
-values (UUID(), 'TEST');
 
 drop table if exists project_language;
 create table if not exists project_language (
@@ -137,6 +134,7 @@ create table if not exists scope_model (
     virtual boolean not null default false,
     max_number int null,
     scope_format varchar(512) null,
+	default_parent_id uuid null,
     default_profile_id uuid null,
     layout json null,
     constraint pk_scope_model primary key (project_id, scope_model_id),
@@ -487,7 +485,8 @@ create table if not exists field_possible_value (
     specify boolean not null default false,
     export_label varchar(256) null,
     sort_order int not null default 0,
-    constraint pk_field_possible_value primary key (project_id, field_model_id, possible_value_id)
+    constraint pk_field_possible_value primary key (project_id, field_model_id, possible_value_id),
+	constraint uq_field_possible_value_id unique (project_id, possible_value_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 drop table if exists field_model_validator;
@@ -610,7 +609,8 @@ create table if not exists form_layout_cell (
     possible_values_column_width int null,
     colspan int not null default 1,
     constraint pk_form_layout_cell primary key (project_id, form_model_id, form_layout_id, form_layout_line_id, form_layout_cell_id),
-    constraint uq_form_layout_cell_code unique (project_id, form_model_id, form_layout_id, form_layout_line_id, code)
+    constraint uq_form_layout_cell_code unique (project_id, form_model_id, form_layout_id, form_layout_line_id, code),
+	constraint uq_form_layout_cell_id unique (project_id, form_layout_cell_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 drop table if exists form_cell_visibility_criteria;
@@ -864,7 +864,8 @@ create table payment_step (
     description json null,
     sort_order int null,
     constraint pk_payment_step primary key (project_id, payment_plan_id, payment_step_id),
-    constraint uq_payment_step_code unique (project_id, code)
+    constraint uq_payment_step_code unique (project_id, code),
+	constraint uq_payment_step_id unique (project_id, payment_step_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 drop table if exists payment_step_distribution;
@@ -1732,14 +1733,14 @@ create table if not exists rule_action (
     rule_id uuid not null,
     code varchar(128) not null,
     action_id_code varchar(128) null,
-    static_action_id varchar(128) not null,
+    static_action_id varchar(128) null,
     optional boolean not null default false,
     label json null,
     condition_id uuid null,
     rulable_entity varchar(32) null,
     action_order int null,
     constraint pk_rule_action primary key (project_id, rule_action_id),
-    constraint uq_rule_action_code unique (project_id, code)
+    constraint uq_rule_action_code unique (project_id, rule_id, code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 drop table if exists rule_action_parameter;

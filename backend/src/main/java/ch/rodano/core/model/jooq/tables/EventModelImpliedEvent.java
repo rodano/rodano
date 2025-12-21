@@ -5,17 +5,26 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
 import ch.rodano.core.model.jooq.tables.records.EventModelImpliedEventRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +103,83 @@ public class EventModelImpliedEvent extends TableImpl<EventModelImpliedEventReco
 		this(DSL.name("event_model_implied_event"), null);
 	}
 
+	public <O extends Record> EventModelImpliedEvent(Table<O> path, ForeignKey<O, EventModelImpliedEventRecord> childPath, InverseForeignKey<O, EventModelImpliedEventRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_MODEL_IMPLIED_EVENT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventModelImpliedEventPath extends EventModelImpliedEvent implements Path<EventModelImpliedEventRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventModelImpliedEventPath(Table<O> path, ForeignKey<O, EventModelImpliedEventRecord> childPath, InverseForeignKey<O, EventModelImpliedEventRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventModelImpliedEventPath(Name alias, Table<EventModelImpliedEventRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventModelImpliedEventPath as(String alias) {
+			return new EventModelImpliedEventPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventModelImpliedEventPath as(Name alias) {
+			return new EventModelImpliedEventPath(alias, this);
+		}
+
+		@Override
+		public EventModelImpliedEventPath as(Table<?> alias) {
+			return new EventModelImpliedEventPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_MODEL_IMPLIED_EVENT_IDX_EVENT_MODEL_IMPL_EV_EVENT, Indexes.EVENT_MODEL_IMPLIED_EVENT_IDX_EVENT_MODEL_IMPL_EV_IMPLIED);
+	}
+
+	@Override
 	public UniqueKey<EventModelImpliedEventRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_MODEL_IMPLIED_EVENT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventModelImpliedEventRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_MODEL_IMPL_EVENT, Keys.FK_EVENT_MODEL_IMPL_EVENT_TARGET);
+	}
+
+	private transient EventModelPath _fkEventModelImplEvent;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_event_model_impl_event</code> key.
+	 */
+	public EventModelPath fkEventModelImplEvent() {
+		if (_fkEventModelImplEvent == null)
+			_fkEventModelImplEvent = new EventModelPath(this, Keys.FK_EVENT_MODEL_IMPL_EVENT, null);
+
+		return _fkEventModelImplEvent;
+	}
+
+	private transient EventModelPath _fkEventModelImplEventTarget;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_event_model_impl_event_target</code> key.
+	 */
+	public EventModelPath fkEventModelImplEventTarget() {
+		if (_fkEventModelImplEventTarget == null)
+			_fkEventModelImplEventTarget = new EventModelPath(this, Keys.FK_EVENT_MODEL_IMPL_EVENT_TARGET, null);
+
+		return _fkEventModelImplEventTarget;
 	}
 
 	@Override

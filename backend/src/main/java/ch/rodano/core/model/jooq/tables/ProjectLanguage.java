@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
 import ch.rodano.core.model.jooq.tables.records.ProjectLanguageRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,6 +101,39 @@ public class ProjectLanguage extends TableImpl<ProjectLanguageRecord> {
 		this(DSL.name("project_language"), null);
 	}
 
+	public <O extends Record> ProjectLanguage(Table<O> path, ForeignKey<O, ProjectLanguageRecord> childPath, InverseForeignKey<O, ProjectLanguageRecord> parentPath) {
+		super(path, childPath, parentPath, PROJECT_LANGUAGE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProjectLanguagePath extends ProjectLanguage implements Path<ProjectLanguageRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProjectLanguagePath(Table<O> path, ForeignKey<O, ProjectLanguageRecord> childPath, InverseForeignKey<O, ProjectLanguageRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProjectLanguagePath(Name alias, Table<ProjectLanguageRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProjectLanguagePath as(String alias) {
+			return new ProjectLanguagePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProjectLanguagePath as(Name alias) {
+			return new ProjectLanguagePath(alias, this);
+		}
+
+		@Override
+		public ProjectLanguagePath as(Table<?> alias) {
+			return new ProjectLanguagePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -102,6 +142,23 @@ public class ProjectLanguage extends TableImpl<ProjectLanguageRecord> {
 	@Override
 	public UniqueKey<ProjectLanguageRecord> getPrimaryKey() {
 		return Keys.KEY_PROJECT_LANGUAGE_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProjectLanguageRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROJ_LANG_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_PROJ_LANG_PROJECT, null);
+
+		return _project;
 	}
 
 	@Override

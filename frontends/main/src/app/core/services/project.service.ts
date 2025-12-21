@@ -22,16 +22,29 @@ export class ProjectService {
 	private currentProjectSubject = new BehaviorSubject<Project | null>(null);
 	public currentProject$ = this.currentProjectSubject.asObservable();
 
+	private currentProjectIdSubject = new BehaviorSubject<string | null>(
+		this.loadProjectIdFromStorage()
+	);
+
+	public currentProjectId$ = this.currentProjectIdSubject.asObservable();
+
 	constructor(private http: HttpClient) {}
 
-	getAccessibleProjects(): Observable<Project[]> {
+	private loadProjectIdFromStorage(): string | null {
+		return localStorage.getItem('currentProjectId');
+	}
+
+	getProjects(): Observable<Project[]> {
 		return this.http.get<Project[]>('/api/projects');
 	}
 
 	selectProject(projectId: string): Observable<PublicStudy> {
 		return this.http.post<PublicStudy>(`/api/projects/select/${projectId}`, {}).pipe(
 			tap(study => {
-				this.currentProjectSubject.next({
+				localStorage.setItem('currentProjectId', projectId);
+				this.currentProjectIdSubject.next(projectId);
+
+				const project: Project = {
 					projectId: study.projectId,
 					code: study.id,
 					shortname: study.shortname,
@@ -40,9 +53,18 @@ export class ProjectService {
 					url: study.url,
 					color: study.color,
 					introductionText: study.introductionText || ''
-				});
+				};
+				this.currentProjectSubject.next(project);
 			})
 		);
+	}
+
+	getCurrentProjectId(): string | null {
+		return this.currentProjectIdSubject.value;
+	}
+
+	getCurrentProject(): Project | null {
+		return this.currentProjectSubject.value;
 	}
 
 	clearProjectSelection(): Observable<void> {
@@ -51,11 +73,13 @@ export class ProjectService {
 		);
 	}
 
-	getCurrentProject(): Observable<Project | null> {
-		return this.http.get<Project>('/api/projects/current');
+	clearCurrentProject(): void {
+		localStorage.removeItem('currentProjectId');
+		this.currentProjectSubject.next(null);
+		this.currentProjectSubject.next(null);
 	}
 
-	clearCurrentProject(): void {
-		this.currentProjectSubject.next(null);
+	hasProjectSelected(): boolean {
+		return this.currentProjectIdSubject.value !== null;
 	}
 }

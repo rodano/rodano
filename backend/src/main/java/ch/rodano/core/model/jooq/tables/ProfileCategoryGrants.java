@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
+import ch.rodano.core.model.jooq.tables.ResourceCategory.ResourceCategoryPath;
 import ch.rodano.core.model.jooq.tables.records.ProfileCategoryGrantsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,6 +102,39 @@ public class ProfileCategoryGrants extends TableImpl<ProfileCategoryGrantsRecord
 		this(DSL.name("profile_category_grants"), null);
 	}
 
+	public <O extends Record> ProfileCategoryGrants(Table<O> path, ForeignKey<O, ProfileCategoryGrantsRecord> childPath, InverseForeignKey<O, ProfileCategoryGrantsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_CATEGORY_GRANTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfileCategoryGrantsPath extends ProfileCategoryGrants implements Path<ProfileCategoryGrantsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfileCategoryGrantsPath(Table<O> path, ForeignKey<O, ProfileCategoryGrantsRecord> childPath, InverseForeignKey<O, ProfileCategoryGrantsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfileCategoryGrantsPath(Name alias, Table<ProfileCategoryGrantsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfileCategoryGrantsPath as(String alias) {
+			return new ProfileCategoryGrantsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfileCategoryGrantsPath as(Name alias) {
+			return new ProfileCategoryGrantsPath(alias, this);
+		}
+
+		@Override
+		public ProfileCategoryGrantsPath as(Table<?> alias) {
+			return new ProfileCategoryGrantsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -102,6 +143,35 @@ public class ProfileCategoryGrants extends TableImpl<ProfileCategoryGrantsRecord
 	@Override
 	public UniqueKey<ProfileCategoryGrantsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_CATEGORY_GRANTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfileCategoryGrantsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_CATEGORY_GRANTS_CATEGORY, Keys.FK_PROFILE_CATEGORY_GRANTS_PROFILE);
+	}
+
+	private transient ResourceCategoryPath _resourceCategory;
+
+	/**
+	 * Get the implicit join path to the <code>resource_category</code> table.
+	 */
+	public ResourceCategoryPath resourceCategory() {
+		if (_resourceCategory == null)
+			_resourceCategory = new ResourceCategoryPath(this, Keys.FK_PROFILE_CATEGORY_GRANTS_CATEGORY, null);
+
+		return _resourceCategory;
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROFILE_CATEGORY_GRANTS_PROFILE, null);
+
+		return _profile;
 	}
 
 	@Override

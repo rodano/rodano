@@ -6,6 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.PaymentStepDistribution.PaymentStepDistributionPath;
+import ch.rodano.core.model.jooq.tables.PrivacyPolicyProfile.PrivacyPolicyProfilePath;
+import ch.rodano.core.model.jooq.tables.ProfileCategoryGrants.ProfileCategoryGrantsPath;
+import ch.rodano.core.model.jooq.tables.ProfileDatasetModelRights.ProfileDatasetModelRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileEventModelRights.ProfileEventModelRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileFeatureGrants.ProfileFeatureGrantsPath;
+import ch.rodano.core.model.jooq.tables.ProfileFormModelRights.ProfileFormModelRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileMenuGrants.ProfileMenuGrantsPath;
+import ch.rodano.core.model.jooq.tables.ProfilePaymentModelRights.ProfilePaymentModelRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileProfileRights.ProfileProfileRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileReportGrants.ProfileReportGrantsPath;
+import ch.rodano.core.model.jooq.tables.ProfileScopeModelRights.ProfileScopeModelRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileTimelineGraphGrants.ProfileTimelineGraphGrantsPath;
+import ch.rodano.core.model.jooq.tables.ProfileWorkflowActionRights.ProfileWorkflowActionRightsPath;
+import ch.rodano.core.model.jooq.tables.ProfileWorkflowRights.ProfileWorkflowRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.Role.RolePath;
+import ch.rodano.core.model.jooq.tables.RoleAudit.RoleAuditPath;
 import ch.rodano.core.model.jooq.tables.records.ProfileRecord;
 
 import java.util.Arrays;
@@ -16,9 +34,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -123,6 +145,39 @@ public class Profile extends TableImpl<ProfileRecord> {
 		this(DSL.name("profile"), null);
 	}
 
+	public <O extends Record> Profile(Table<O> path, ForeignKey<O, ProfileRecord> childPath, InverseForeignKey<O, ProfileRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfilePath extends Profile implements Path<ProfileRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfilePath(Table<O> path, ForeignKey<O, ProfileRecord> childPath, InverseForeignKey<O, ProfileRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfilePath(Name alias, Table<ProfileRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfilePath as(String alias) {
+			return new ProfilePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfilePath as(Name alias) {
+			return new ProfilePath(alias, this);
+		}
+
+		@Override
+		public ProfilePath as(Table<?> alias) {
+			return new ProfilePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -136,6 +191,257 @@ public class Profile extends TableImpl<ProfileRecord> {
 	@Override
 	public List<UniqueKey<ProfileRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_PROFILE_UQ_PROFILE_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<ProfileRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_PROFILE_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient PaymentStepDistributionPath _paymentStepDistribution;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>payment_step_distribution</code> table
+	 */
+	public PaymentStepDistributionPath paymentStepDistribution() {
+		if (_paymentStepDistribution == null)
+			_paymentStepDistribution = new PaymentStepDistributionPath(this, null, Keys.FK_PAYMENT_STEP_DIST_PROFILE.getInverseKey());
+
+		return _paymentStepDistribution;
+	}
+
+	private transient PrivacyPolicyProfilePath _privacyPolicyProfile;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>privacy_policy_profile</code> table
+	 */
+	public PrivacyPolicyProfilePath privacyPolicyProfile() {
+		if (_privacyPolicyProfile == null)
+			_privacyPolicyProfile = new PrivacyPolicyProfilePath(this, null, Keys.FK_PRIVACY_POLICY_PROFILE_PROFILE.getInverseKey());
+
+		return _privacyPolicyProfile;
+	}
+
+	private transient ProfileCategoryGrantsPath _profileCategoryGrants;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_category_grants</code> table
+	 */
+	public ProfileCategoryGrantsPath profileCategoryGrants() {
+		if (_profileCategoryGrants == null)
+			_profileCategoryGrants = new ProfileCategoryGrantsPath(this, null, Keys.FK_PROFILE_CATEGORY_GRANTS_PROFILE.getInverseKey());
+
+		return _profileCategoryGrants;
+	}
+
+	private transient ProfileDatasetModelRightsPath _profileDatasetModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_dataset_model_rights</code> table
+	 */
+	public ProfileDatasetModelRightsPath profileDatasetModelRights() {
+		if (_profileDatasetModelRights == null)
+			_profileDatasetModelRights = new ProfileDatasetModelRightsPath(this, null, Keys.FK_PROFILE_DATASET_MODEL_RIGHTS_PROFILE.getInverseKey());
+
+		return _profileDatasetModelRights;
+	}
+
+	private transient ProfileEventModelRightsPath _profileEventModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_event_model_rights</code> table
+	 */
+	public ProfileEventModelRightsPath profileEventModelRights() {
+		if (_profileEventModelRights == null)
+			_profileEventModelRights = new ProfileEventModelRightsPath(this, null, Keys.FK_PROFILE_EVENT_MODEL_RIGHTS_PROFILE.getInverseKey());
+
+		return _profileEventModelRights;
+	}
+
+	private transient ProfileFeatureGrantsPath _profileFeatureGrants;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_feature_grants</code> table
+	 */
+	public ProfileFeatureGrantsPath profileFeatureGrants() {
+		if (_profileFeatureGrants == null)
+			_profileFeatureGrants = new ProfileFeatureGrantsPath(this, null, Keys.FK_PROFILE_FEATURE_GRANTS_PROFILE.getInverseKey());
+
+		return _profileFeatureGrants;
+	}
+
+	private transient ProfileFormModelRightsPath _profileFormModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_form_model_rights</code> table
+	 */
+	public ProfileFormModelRightsPath profileFormModelRights() {
+		if (_profileFormModelRights == null)
+			_profileFormModelRights = new ProfileFormModelRightsPath(this, null, Keys.FK_PROFILE_FORM_MODEL_RIGHTS_PROFILE.getInverseKey());
+
+		return _profileFormModelRights;
+	}
+
+	private transient ProfileMenuGrantsPath _profileMenuGrants;
+
+	/**
+	 * Get the implicit to-many join path to the <code>profile_menu_grants</code>
+	 * table
+	 */
+	public ProfileMenuGrantsPath profileMenuGrants() {
+		if (_profileMenuGrants == null)
+			_profileMenuGrants = new ProfileMenuGrantsPath(this, null, Keys.FK_PROFILE_MENU_GRANTS_PROFILE.getInverseKey());
+
+		return _profileMenuGrants;
+	}
+
+	private transient ProfilePaymentModelRightsPath _profilePaymentModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_payment_model_rights</code> table
+	 */
+	public ProfilePaymentModelRightsPath profilePaymentModelRights() {
+		if (_profilePaymentModelRights == null)
+			_profilePaymentModelRights = new ProfilePaymentModelRightsPath(this, null, Keys.FK_PROFILE_PAYMENT_MODEL_RIGHTS_PROFILE.getInverseKey());
+
+		return _profilePaymentModelRights;
+	}
+
+	private transient ProfileProfileRightsPath _fkProfileProfileRightsProfile;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_profile_rights</code> table, via the
+	 * <code>fk_profile_profile_rights_profile</code> key
+	 */
+	public ProfileProfileRightsPath fkProfileProfileRightsProfile() {
+		if (_fkProfileProfileRightsProfile == null)
+			_fkProfileProfileRightsProfile = new ProfileProfileRightsPath(this, null, Keys.FK_PROFILE_PROFILE_RIGHTS_PROFILE.getInverseKey());
+
+		return _fkProfileProfileRightsProfile;
+	}
+
+	private transient ProfileProfileRightsPath _fkProfileProfileRightsTarget;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_profile_rights</code> table, via the
+	 * <code>fk_profile_profile_rights_target</code> key
+	 */
+	public ProfileProfileRightsPath fkProfileProfileRightsTarget() {
+		if (_fkProfileProfileRightsTarget == null)
+			_fkProfileProfileRightsTarget = new ProfileProfileRightsPath(this, null, Keys.FK_PROFILE_PROFILE_RIGHTS_TARGET.getInverseKey());
+
+		return _fkProfileProfileRightsTarget;
+	}
+
+	private transient ProfileReportGrantsPath _profileReportGrants;
+
+	/**
+	 * Get the implicit to-many join path to the <code>profile_report_grants</code>
+	 * table
+	 */
+	public ProfileReportGrantsPath profileReportGrants() {
+		if (_profileReportGrants == null)
+			_profileReportGrants = new ProfileReportGrantsPath(this, null, Keys.FK_PROFILE_REPORT_GRANTS_PROFILE.getInverseKey());
+
+		return _profileReportGrants;
+	}
+
+	private transient ProfileScopeModelRightsPath _profileScopeModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_scope_model_rights</code> table
+	 */
+	public ProfileScopeModelRightsPath profileScopeModelRights() {
+		if (_profileScopeModelRights == null)
+			_profileScopeModelRights = new ProfileScopeModelRightsPath(this, null, Keys.FK_PROFILE_SCOPE_MODEL_RIGHTS_PROFILE.getInverseKey());
+
+		return _profileScopeModelRights;
+	}
+
+	private transient ProfileTimelineGraphGrantsPath _profileTimelineGraphGrants;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_timeline_graph_grants</code> table
+	 */
+	public ProfileTimelineGraphGrantsPath profileTimelineGraphGrants() {
+		if (_profileTimelineGraphGrants == null)
+			_profileTimelineGraphGrants = new ProfileTimelineGraphGrantsPath(this, null, Keys.FK_PROFILE_TIMELINE_GRAPH_GRANTS_PROFILE.getInverseKey());
+
+		return _profileTimelineGraphGrants;
+	}
+
+	private transient ProfileWorkflowActionRightsPath _profileWorkflowActionRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_workflow_action_rights</code> table
+	 */
+	public ProfileWorkflowActionRightsPath profileWorkflowActionRights() {
+		if (_profileWorkflowActionRights == null)
+			_profileWorkflowActionRights = new ProfileWorkflowActionRightsPath(this, null, Keys.FK_PROFILE_WF_ACTION_RIGHTS_PROFILE.getInverseKey());
+
+		return _profileWorkflowActionRights;
+	}
+
+	private transient ProfileWorkflowRightsPath _profileWorkflowRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_workflow_rights</code> table
+	 */
+	public ProfileWorkflowRightsPath profileWorkflowRights() {
+		if (_profileWorkflowRights == null)
+			_profileWorkflowRights = new ProfileWorkflowRightsPath(this, null, Keys.FK_PROFILE_WF_RIGHTS_PROFILE.getInverseKey());
+
+		return _profileWorkflowRights;
+	}
+
+	private transient RoleAuditPath _roleAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>role_audit</code> table
+	 */
+	public RoleAuditPath roleAudit() {
+		if (_roleAudit == null)
+			_roleAudit = new RoleAuditPath(this, null, Keys.FK_ROLE_AUDIT_PROFILE_ID.getInverseKey());
+
+		return _roleAudit;
+	}
+
+	private transient RolePath _role;
+
+	/**
+	 * Get the implicit to-many join path to the <code>role</code> table
+	 */
+	public RolePath role() {
+		if (_role == null)
+			_role = new RolePath(this, null, Keys.FK_ROLE_PROFILE_ID.getInverseKey());
+
+		return _role;
 	}
 
 	@Override

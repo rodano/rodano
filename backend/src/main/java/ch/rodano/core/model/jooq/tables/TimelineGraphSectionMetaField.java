@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection.TimelineGraphSectionPath;
 import ch.rodano.core.model.jooq.tables.records.TimelineGraphSectionMetaFieldRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -106,6 +114,39 @@ public class TimelineGraphSectionMetaField extends TableImpl<TimelineGraphSectio
 		this(DSL.name("timeline_graph_section_meta_field"), null);
 	}
 
+	public <O extends Record> TimelineGraphSectionMetaField(Table<O> path, ForeignKey<O, TimelineGraphSectionMetaFieldRecord> childPath, InverseForeignKey<O, TimelineGraphSectionMetaFieldRecord> parentPath) {
+		super(path, childPath, parentPath, TIMELINE_GRAPH_SECTION_META_FIELD);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class TimelineGraphSectionMetaFieldPath extends TimelineGraphSectionMetaField implements Path<TimelineGraphSectionMetaFieldRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> TimelineGraphSectionMetaFieldPath(Table<O> path, ForeignKey<O, TimelineGraphSectionMetaFieldRecord> childPath, InverseForeignKey<O, TimelineGraphSectionMetaFieldRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private TimelineGraphSectionMetaFieldPath(Name alias, Table<TimelineGraphSectionMetaFieldRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public TimelineGraphSectionMetaFieldPath as(String alias) {
+			return new TimelineGraphSectionMetaFieldPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public TimelineGraphSectionMetaFieldPath as(Name alias) {
+			return new TimelineGraphSectionMetaFieldPath(alias, this);
+		}
+
+		@Override
+		public TimelineGraphSectionMetaFieldPath as(Table<?> alias) {
+			return new TimelineGraphSectionMetaFieldPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -114,6 +155,35 @@ public class TimelineGraphSectionMetaField extends TableImpl<TimelineGraphSectio
 	@Override
 	public UniqueKey<TimelineGraphSectionMetaFieldRecord> getPrimaryKey() {
 		return Keys.KEY_TIMELINE_GRAPH_SECTION_META_FIELD_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<TimelineGraphSectionMetaFieldRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_SECTION_META_FIELD_FIELD, Keys.FK_TIMELINE_GRAPH_SECTION_META_FIELD_GRAPH);
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_TIMELINE_GRAPH_SECTION_META_FIELD_FIELD, null);
+
+		return _fieldModel;
+	}
+
+	private transient TimelineGraphSectionPath _timelineGraphSection;
+
+	/**
+	 * Get the implicit join path to the <code>timeline_graph_section</code> table.
+	 */
+	public TimelineGraphSectionPath timelineGraphSection() {
+		if (_timelineGraphSection == null)
+			_timelineGraphSection = new TimelineGraphSectionPath(this, Keys.FK_TIMELINE_GRAPH_SECTION_META_FIELD_GRAPH, null);
+
+		return _timelineGraphSection;
 	}
 
 	@Override

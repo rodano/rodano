@@ -9,7 +9,6 @@ import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -70,17 +69,15 @@ public class DatabaseInitializer {
 	private final WorkflowStatusService workflowStatusService;
 	private final AuditActionService auditActionService;
 	private final UserCreatorService userCreatorService;
-	private final TestDataInitializer testDataInitializer;
-	private final DemoUsersInitializer demoUsersInitializer;
 	private final UserSecurityService userSecurityService;
 
 	private final String databaseName;
 
-	private final String usersPassword;
 	private final Boolean cleanPatchTable;
 	private final String internalPatchTable;
 
 	private final ProjectIdResolver projectIdResolver;
+	private final ProjectInitializer projectInitializer;
 
 	public DatabaseInitializer(
 		final DataSource dataSource,
@@ -93,15 +90,12 @@ public class DatabaseInitializer {
 		final WorkflowStatusService workflowStatusService,
 		final AuditActionService auditActionService,
 		final UserCreatorService userCreatorService,
-		final TestDataInitializer testDataInitializer,
-		final DemoUsersInitializer demoUsersInitializer,
 		@Value("${rodano.database.name}") final String databaseName,
-		@Value("${rodano.init.users-password:Password1!}") final String usersPassword,
 		@Value("${rodano.init.clean-patch-table:true}") final Boolean cleanPatchTable,
 		@Value("${rodano.migration.internal-patch-table}") final String internalPatchTable,
 		final UserSecurityService userSecurityService,
-		final ProjectIdResolver projectIdResolver
-	) {
+		final ProjectIdResolver projectIdResolver,
+		final ProjectInitializer projectInitializer) {
 		this.dataSource = dataSource;
 		this.create = create;
 		this.studyService = studyService;
@@ -112,17 +106,15 @@ public class DatabaseInitializer {
 		this.workflowStatusService = workflowStatusService;
 		this.auditActionService = auditActionService;
 		this.userCreatorService = userCreatorService;
-		this.testDataInitializer = testDataInitializer;
-		this.demoUsersInitializer = demoUsersInitializer;
 		this.userSecurityService = userSecurityService;
 		this.databaseName = databaseName;
-		this.usersPassword = StringUtils.defaultIfBlank(usersPassword, DEFAULT_PASSWORD);
 		this.cleanPatchTable = cleanPatchTable;
 		this.internalPatchTable = internalPatchTable;
 		this.projectIdResolver = projectIdResolver;
+		this.projectInitializer = projectInitializer;
 	}
 
-	private List<String> getTables() {
+	public List<String> getTables() {
 		//do not use create.meta(...) here as it will fetch all tables for all database
 		//see here https://stackoverflow.com/questions/24741761/how-to-check-if-a-table-exists-in-jooq
 		final var tableName = DSL.field("TABLE_NAME", String.class);
@@ -142,12 +134,22 @@ public class DatabaseInitializer {
 	}
 
 	public void initializeStructure() {
+		if (structureExists()) {
+			logger.warn("Database structure already exists. Skipping initialization.");
+			return;
+		}
+
 		logger.info("Initializing database structure");
 		final var databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.addScript(new ClassPathResource(DATABASE_SCRIPTS_PATH + "tables.sql"));
 		databasePopulator.addScript(new ClassPathResource(DATABASE_SCRIPTS_PATH + "indexes.sql"));
 		databasePopulator.addScript(new ClassPathResource(DATABASE_SCRIPTS_PATH + "foreign_keys.sql"));
 		databasePopulator.execute(this.dataSource);
+	}
+
+	public boolean structureExists() {
+		final List<String> tables = getTables();
+		return tables.contains("project") && tables.contains("scope");
 	}
 
 	private Scope createRootScope(final DatabaseActionContext context, final ZonedDateTime origin, final String scopeName) {
@@ -277,36 +279,24 @@ public class DatabaseInitializer {
 	@Transactional
 	public void initializeDatabaseContent(final boolean withUsers, final boolean withData) throws InvalidValueException, BadlyFormattedValue, IOException {
 		logger.info("Initializing database content");
-		// Set the reference date
-		final ZonedDateTime origin;
-		// If demo data, choose a date far in the past to let some room for demo event models
-		if(withData) {
-			origin = ZonedDateTime.now().minusYears(3).truncatedTo(ChronoUnit.MILLIS);
-		}
-		// If no demo data, use a date slightly in the past to make tests work properly
-		else {
-			origin = ZonedDateTime.now().minusMinutes(1).truncatedTo(ChronoUnit.MILLIS);
-		}
-
-		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE);
 
 		final Study study = studyService.getStudy();
-		ensureProjectExists(study);
-		ensureModelCatalogExists(study);
 
-		addRequiredData(context, origin, study);
+		final var options = ProjectInitializer.ProjectInitOptions.defaults().withAdminUser("Test user", TEST_USER_EMAIL, DEFAULT_PASSWORD);
 
 		// Add demo users
 		if(withUsers) {
 			logger.info("Add demo users");
-			demoUsersInitializer.initialize(TEST_USER_EMAIL, usersPassword, context);
+			options.withDemoUsers();
 		}
 
 		// Add demo data
 		if(withData) {
 			logger.info("Add demo data");
-			testDataInitializer.initialize(origin);
+			options.withDemoData();
 		}
+
+		projectInitializer.initializeProject(study, options);
 	}
 
 	/**

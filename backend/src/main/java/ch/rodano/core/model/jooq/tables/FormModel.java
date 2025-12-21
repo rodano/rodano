@@ -6,6 +6,14 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModelFormModel.EventModelFormModelPath;
+import ch.rodano.core.model.jooq.tables.Form.FormPath;
+import ch.rodano.core.model.jooq.tables.FormAudit.FormAuditPath;
+import ch.rodano.core.model.jooq.tables.FormLayout.FormLayoutPath;
+import ch.rodano.core.model.jooq.tables.FormModelWorkflow.FormModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.ProfileFormModelRights.ProfileFormModelRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelFormModel.ScopeModelFormModelPath;
 import ch.rodano.core.model.jooq.tables.records.FormModelRecord;
 
 import java.util.Arrays;
@@ -16,9 +24,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -123,6 +135,39 @@ public class FormModel extends TableImpl<FormModelRecord> {
 		this(DSL.name("form_model"), null);
 	}
 
+	public <O extends Record> FormModel(Table<O> path, ForeignKey<O, FormModelRecord> childPath, InverseForeignKey<O, FormModelRecord> parentPath) {
+		super(path, childPath, parentPath, FORM_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FormModelPath extends FormModel implements Path<FormModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FormModelPath(Table<O> path, ForeignKey<O, FormModelRecord> childPath, InverseForeignKey<O, FormModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FormModelPath(Name alias, Table<FormModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FormModelPath as(String alias) {
+			return new FormModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FormModelPath as(Name alias) {
+			return new FormModelPath(alias, this);
+		}
+
+		@Override
+		public FormModelPath as(Table<?> alias) {
+			return new FormModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -136,6 +181,111 @@ public class FormModel extends TableImpl<FormModelRecord> {
 	@Override
 	public List<UniqueKey<FormModelRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_FORM_MODEL_UQ_FORM_MODEL_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<FormModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FORM_MODEL_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_FORM_MODEL_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient EventModelFormModelPath _eventModelFormModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_form_model</code> table
+	 */
+	public EventModelFormModelPath eventModelFormModel() {
+		if (_eventModelFormModel == null)
+			_eventModelFormModel = new EventModelFormModelPath(this, null, Keys.FK_EVENT_MODEL_FORM_MODEL_FORM.getInverseKey());
+
+		return _eventModelFormModel;
+	}
+
+	private transient FormAuditPath _formAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_audit</code> table
+	 */
+	public FormAuditPath formAudit() {
+		if (_formAudit == null)
+			_formAudit = new FormAuditPath(this, null, Keys.FK_FORM_AUDIT_FORM_MODEL_ID.getInverseKey());
+
+		return _formAudit;
+	}
+
+	private transient FormPath _form;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form</code> table
+	 */
+	public FormPath form() {
+		if (_form == null)
+			_form = new FormPath(this, null, Keys.FK_FORM_FORM_MODEL_ID.getInverseKey());
+
+		return _form;
+	}
+
+	private transient FormLayoutPath _formLayout;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_layout</code> table
+	 */
+	public FormLayoutPath formLayout() {
+		if (_formLayout == null)
+			_formLayout = new FormLayoutPath(this, null, Keys.FK_FORM_LAYOUT_FORM.getInverseKey());
+
+		return _formLayout;
+	}
+
+	private transient FormModelWorkflowPath _formModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_model_workflow</code>
+	 * table
+	 */
+	public FormModelWorkflowPath formModelWorkflow() {
+		if (_formModelWorkflow == null)
+			_formModelWorkflow = new FormModelWorkflowPath(this, null, Keys.FK_FORM_MODEL_WF_FORM.getInverseKey());
+
+		return _formModelWorkflow;
+	}
+
+	private transient ProfileFormModelRightsPath _profileFormModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_form_model_rights</code> table
+	 */
+	public ProfileFormModelRightsPath profileFormModelRights() {
+		if (_profileFormModelRights == null)
+			_profileFormModelRights = new ProfileFormModelRightsPath(this, null, Keys.FK_PROFILE_FORM_MODEL_RIGHTS_FORM_MODEL.getInverseKey());
+
+		return _profileFormModelRights;
+	}
+
+	private transient ScopeModelFormModelPath _scopeModelFormModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>scope_model_form_model</code> table
+	 */
+	public ScopeModelFormModelPath scopeModelFormModel() {
+		if (_scopeModelFormModel == null)
+			_scopeModelFormModel = new ScopeModelFormModelPath(this, null, Keys.FK_SCOPE_MODEL_FORM_MODEL_FORM.getInverseKey());
+
+		return _scopeModelFormModel;
 	}
 
 	@Override

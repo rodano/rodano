@@ -5,7 +5,24 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.EventAudit.EventAuditPath;
+import ch.rodano.core.model.jooq.tables.EventGroup.EventGroupPath;
+import ch.rodano.core.model.jooq.tables.EventModelBlockedEvent.EventModelBlockedEventPath;
+import ch.rodano.core.model.jooq.tables.EventModelDatasetModel.EventModelDatasetModelPath;
+import ch.rodano.core.model.jooq.tables.EventModelDeadlineReference.EventModelDeadlineReferencePath;
+import ch.rodano.core.model.jooq.tables.EventModelFormModel.EventModelFormModelPath;
+import ch.rodano.core.model.jooq.tables.EventModelImpliedEvent.EventModelImpliedEventPath;
+import ch.rodano.core.model.jooq.tables.EventModelWorkflow.EventModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.PaymentStep.PaymentStepPath;
+import ch.rodano.core.model.jooq.tables.ProfileEventModelRights.ProfileEventModelRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraph.TimelineGraphPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionEvent.TimelineGraphSectionEventPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryFilterEventModel.WorkflowSummaryFilterEventModelPath;
 import ch.rodano.core.model.jooq.tables.records.EventModelRecord;
 
 import java.util.Arrays;
@@ -16,9 +33,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -183,9 +205,47 @@ public class EventModel extends TableImpl<EventModelRecord> {
 		this(DSL.name("event_model"), null);
 	}
 
+	public <O extends Record> EventModel(Table<O> path, ForeignKey<O, EventModelRecord> childPath, InverseForeignKey<O, EventModelRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventModelPath extends EventModel implements Path<EventModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventModelPath(Table<O> path, ForeignKey<O, EventModelRecord> childPath, InverseForeignKey<O, EventModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventModelPath(Name alias, Table<EventModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventModelPath as(String alias) {
+			return new EventModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventModelPath as(Name alias) {
+			return new EventModelPath(alias, this);
+		}
+
+		@Override
+		public EventModelPath as(Table<?> alias) {
+			return new EventModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_MODEL_IDX_EVENT_MODEL_GROUP, Indexes.EVENT_MODEL_IDX_EVENT_MODEL_SCOPE);
 	}
 
 	@Override
@@ -196,6 +256,257 @@ public class EventModel extends TableImpl<EventModelRecord> {
 	@Override
 	public List<UniqueKey<EventModelRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_EVENT_MODEL_UQ_EVENT_MODEL_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<EventModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_MODEL_GROUP, Keys.FK_EVENT_MODEL_PROJECT, Keys.FK_EVENT_MODEL_SCOPE);
+	}
+
+	private transient EventGroupPath _eventGroup;
+
+	/**
+	 * Get the implicit join path to the <code>event_group</code> table.
+	 */
+	public EventGroupPath eventGroup() {
+		if (_eventGroup == null)
+			_eventGroup = new EventGroupPath(this, Keys.FK_EVENT_MODEL_GROUP, null);
+
+		return _eventGroup;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_EVENT_MODEL_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_EVENT_MODEL_SCOPE, null);
+
+		return _scopeModel;
+	}
+
+	private transient EventAuditPath _eventAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_audit</code> table
+	 */
+	public EventAuditPath eventAudit() {
+		if (_eventAudit == null)
+			_eventAudit = new EventAuditPath(this, null, Keys.FK_EVENT_AUDIT_EVENT_MODEL_ID.getInverseKey());
+
+		return _eventAudit;
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event</code> table
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, null, Keys.FK_EVENT_EVENT_MODEL_ID.getInverseKey());
+
+		return _event;
+	}
+
+	private transient EventModelBlockedEventPath _fkEventModelBlockedEvent;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_blocked_event</code> table, via the
+	 * <code>fk_event_model_blocked_event</code> key
+	 */
+	public EventModelBlockedEventPath fkEventModelBlockedEvent() {
+		if (_fkEventModelBlockedEvent == null)
+			_fkEventModelBlockedEvent = new EventModelBlockedEventPath(this, null, Keys.FK_EVENT_MODEL_BLOCKED_EVENT.getInverseKey());
+
+		return _fkEventModelBlockedEvent;
+	}
+
+	private transient EventModelBlockedEventPath _fkEventModelBlockedEventTarget;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_blocked_event</code> table, via the
+	 * <code>fk_event_model_blocked_event_target</code> key
+	 */
+	public EventModelBlockedEventPath fkEventModelBlockedEventTarget() {
+		if (_fkEventModelBlockedEventTarget == null)
+			_fkEventModelBlockedEventTarget = new EventModelBlockedEventPath(this, null, Keys.FK_EVENT_MODEL_BLOCKED_EVENT_TARGET.getInverseKey());
+
+		return _fkEventModelBlockedEventTarget;
+	}
+
+	private transient EventModelDatasetModelPath _eventModelDatasetModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_dataset_model</code> table
+	 */
+	public EventModelDatasetModelPath eventModelDatasetModel() {
+		if (_eventModelDatasetModel == null)
+			_eventModelDatasetModel = new EventModelDatasetModelPath(this, null, Keys.FK_EVENT_MODEL_DATASET_MODEL_EVENT.getInverseKey());
+
+		return _eventModelDatasetModel;
+	}
+
+	private transient EventModelDeadlineReferencePath _fkEventModelDeadlineRefEvent;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_deadline_reference</code> table, via the
+	 * <code>fk_event_model_deadline_ref_event</code> key
+	 */
+	public EventModelDeadlineReferencePath fkEventModelDeadlineRefEvent() {
+		if (_fkEventModelDeadlineRefEvent == null)
+			_fkEventModelDeadlineRefEvent = new EventModelDeadlineReferencePath(this, null, Keys.FK_EVENT_MODEL_DEADLINE_REF_EVENT.getInverseKey());
+
+		return _fkEventModelDeadlineRefEvent;
+	}
+
+	private transient EventModelDeadlineReferencePath _fkEventModelDeadlineReference;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_deadline_reference</code> table, via the
+	 * <code>fk_event_model_deadline_reference</code> key
+	 */
+	public EventModelDeadlineReferencePath fkEventModelDeadlineReference() {
+		if (_fkEventModelDeadlineReference == null)
+			_fkEventModelDeadlineReference = new EventModelDeadlineReferencePath(this, null, Keys.FK_EVENT_MODEL_DEADLINE_REFERENCE.getInverseKey());
+
+		return _fkEventModelDeadlineReference;
+	}
+
+	private transient EventModelFormModelPath _eventModelFormModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_form_model</code> table
+	 */
+	public EventModelFormModelPath eventModelFormModel() {
+		if (_eventModelFormModel == null)
+			_eventModelFormModel = new EventModelFormModelPath(this, null, Keys.FK_EVENT_MODEL_FORM_MODEL_EVENT.getInverseKey());
+
+		return _eventModelFormModel;
+	}
+
+	private transient EventModelImpliedEventPath _fkEventModelImplEvent;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_implied_event</code> table, via the
+	 * <code>fk_event_model_impl_event</code> key
+	 */
+	public EventModelImpliedEventPath fkEventModelImplEvent() {
+		if (_fkEventModelImplEvent == null)
+			_fkEventModelImplEvent = new EventModelImpliedEventPath(this, null, Keys.FK_EVENT_MODEL_IMPL_EVENT.getInverseKey());
+
+		return _fkEventModelImplEvent;
+	}
+
+	private transient EventModelImpliedEventPath _fkEventModelImplEventTarget;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_implied_event</code> table, via the
+	 * <code>fk_event_model_impl_event_target</code> key
+	 */
+	public EventModelImpliedEventPath fkEventModelImplEventTarget() {
+		if (_fkEventModelImplEventTarget == null)
+			_fkEventModelImplEventTarget = new EventModelImpliedEventPath(this, null, Keys.FK_EVENT_MODEL_IMPL_EVENT_TARGET.getInverseKey());
+
+		return _fkEventModelImplEventTarget;
+	}
+
+	private transient EventModelWorkflowPath _eventModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_model_workflow</code>
+	 * table
+	 */
+	public EventModelWorkflowPath eventModelWorkflow() {
+		if (_eventModelWorkflow == null)
+			_eventModelWorkflow = new EventModelWorkflowPath(this, null, Keys.FK_EVENT_MODEL_WF_EVENT.getInverseKey());
+
+		return _eventModelWorkflow;
+	}
+
+	private transient PaymentStepPath _paymentStep;
+
+	/**
+	 * Get the implicit to-many join path to the <code>payment_step</code> table
+	 */
+	public PaymentStepPath paymentStep() {
+		if (_paymentStep == null)
+			_paymentStep = new PaymentStepPath(this, null, Keys.FK_PAYMENT_STEP_EVENT_MODEL.getInverseKey());
+
+		return _paymentStep;
+	}
+
+	private transient ProfileEventModelRightsPath _profileEventModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_event_model_rights</code> table
+	 */
+	public ProfileEventModelRightsPath profileEventModelRights() {
+		if (_profileEventModelRights == null)
+			_profileEventModelRights = new ProfileEventModelRightsPath(this, null, Keys.FK_PROFILE_EVENT_MODEL_RIGHTS_EVENT_MODEL.getInverseKey());
+
+		return _profileEventModelRights;
+	}
+
+	private transient TimelineGraphPath _timelineGraph;
+
+	/**
+	 * Get the implicit to-many join path to the <code>timeline_graph</code> table
+	 */
+	public TimelineGraphPath timelineGraph() {
+		if (_timelineGraph == null)
+			_timelineGraph = new TimelineGraphPath(this, null, Keys.FK_TIMELINE_GRAPH_EVENT_MODEL.getInverseKey());
+
+		return _timelineGraph;
+	}
+
+	private transient TimelineGraphSectionEventPath _timelineGraphSectionEvent;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section_event</code> table
+	 */
+	public TimelineGraphSectionEventPath timelineGraphSectionEvent() {
+		if (_timelineGraphSectionEvent == null)
+			_timelineGraphSectionEvent = new TimelineGraphSectionEventPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_EVENT_MODEL.getInverseKey());
+
+		return _timelineGraphSectionEvent;
+	}
+
+	private transient WorkflowSummaryFilterEventModelPath _workflowSummaryFilterEventModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_summary_filter_event_model</code> table
+	 */
+	public WorkflowSummaryFilterEventModelPath workflowSummaryFilterEventModel() {
+		if (_workflowSummaryFilterEventModel == null)
+			_workflowSummaryFilterEventModel = new WorkflowSummaryFilterEventModelPath(this, null, Keys.FK_WF_SUMMARY_FILTER_EVENT_MODEL.getInverseKey());
+
+		return _workflowSummaryFilterEventModel;
 	}
 
 	@Override

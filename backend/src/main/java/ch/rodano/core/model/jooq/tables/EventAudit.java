@@ -6,20 +6,34 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.EventAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -188,9 +202,47 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 		this(DSL.name("event_audit"), null);
 	}
 
+	public <O extends Record> EventAudit(Table<O> path, ForeignKey<O, EventAuditRecord> childPath, InverseForeignKey<O, EventAuditRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_AUDIT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventAuditPath extends EventAudit implements Path<EventAuditRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventAuditPath(Table<O> path, ForeignKey<O, EventAuditRecord> childPath, InverseForeignKey<O, EventAuditRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventAuditPath(Name alias, Table<EventAuditRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventAuditPath as(String alias) {
+			return new EventAuditPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventAuditPath as(Name alias) {
+			return new EventAuditPath(alias, this);
+		}
+
+		@Override
+		public EventAuditPath as(Table<?> alias) {
+			return new EventAuditPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_AUDIT_IDX_EVENT_AUDIT_EVENT_MODEL_ID, Indexes.EVENT_AUDIT_IDX_EVENT_AUDIT_SCOPE_MODEL_ID);
 	}
 
 	@Override
@@ -201,6 +253,83 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	@Override
 	public UniqueKey<EventAuditRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_AUDIT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventAuditRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_AUDIT_EVENT_MODEL_ID, Keys.FK_EVENT_AUDIT_OBJECT_FK, Keys.FK_EVENT_AUDIT_ROBOT_FK, Keys.FK_EVENT_AUDIT_SCOPE_MODEL_ID, Keys.FK_EVENT_AUDIT_USER_FK, Keys.FK_EVENT_TRAIL_AUDIT_ACTION_FK);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_EVENT_AUDIT_EVENT_MODEL_ID, null);
+
+		return _eventModel;
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit join path to the <code>event</code> table.
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, Keys.FK_EVENT_AUDIT_OBJECT_FK, null);
+
+		return _event;
+	}
+
+	private transient RobotPath _robot;
+
+	/**
+	 * Get the implicit join path to the <code>robot</code> table.
+	 */
+	public RobotPath robot() {
+		if (_robot == null)
+			_robot = new RobotPath(this, Keys.FK_EVENT_AUDIT_ROBOT_FK, null);
+
+		return _robot;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_EVENT_AUDIT_SCOPE_MODEL_ID, null);
+
+		return _scopeModel;
+	}
+
+	private transient UserPath _user;
+
+	/**
+	 * Get the implicit join path to the <code>user</code> table.
+	 */
+	public UserPath user() {
+		if (_user == null)
+			_user = new UserPath(this, Keys.FK_EVENT_AUDIT_USER_FK, null);
+
+		return _user;
+	}
+
+	private transient AuditActionPath _auditAction;
+
+	/**
+	 * Get the implicit join path to the <code>audit_action</code> table.
+	 */
+	public AuditActionPath auditAction() {
+		if (_auditAction == null)
+			_auditAction = new AuditActionPath(this, Keys.FK_EVENT_TRAIL_AUDIT_ACTION_FK, null);
+
+		return _auditAction;
 	}
 
 	@Override

@@ -5,17 +5,26 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelParentRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,14 +113,83 @@ public class ScopeModelParent extends TableImpl<ScopeModelParentRecord> {
 		this(DSL.name("scope_model_parent"), null);
 	}
 
+	public <O extends Record> ScopeModelParent(Table<O> path, ForeignKey<O, ScopeModelParentRecord> childPath, InverseForeignKey<O, ScopeModelParentRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_MODEL_PARENT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeModelParentPath extends ScopeModelParent implements Path<ScopeModelParentRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeModelParentPath(Table<O> path, ForeignKey<O, ScopeModelParentRecord> childPath, InverseForeignKey<O, ScopeModelParentRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeModelParentPath(Name alias, Table<ScopeModelParentRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeModelParentPath as(String alias) {
+			return new ScopeModelParentPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeModelParentPath as(Name alias) {
+			return new ScopeModelParentPath(alias, this);
+		}
+
+		@Override
+		public ScopeModelParentPath as(Table<?> alias) {
+			return new ScopeModelParentPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SCOPE_MODEL_PARENT_IDX_SCOPE_MODEL_CHILD, Indexes.SCOPE_MODEL_PARENT_IDX_SCOPE_MODEL_PARENT);
+	}
+
+	@Override
 	public UniqueKey<ScopeModelParentRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_MODEL_PARENT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ScopeModelParentRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_MODEL_CHILD, Keys.FK_SCOPE_MODEL_PARENT);
+	}
+
+	private transient ScopeModelPath _fkScopeModelChild;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table, via the
+	 * <code>fk_scope_model_child</code> key.
+	 */
+	public ScopeModelPath fkScopeModelChild() {
+		if (_fkScopeModelChild == null)
+			_fkScopeModelChild = new ScopeModelPath(this, Keys.FK_SCOPE_MODEL_CHILD, null);
+
+		return _fkScopeModelChild;
+	}
+
+	private transient ScopeModelPath _fkScopeModelParent;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table, via the
+	 * <code>fk_scope_model_parent</code> key.
+	 */
+	public ScopeModelPath fkScopeModelParent() {
+		if (_fkScopeModelParent == null)
+			_fkScopeModelParent = new ScopeModelPath(this, Keys.FK_SCOPE_MODEL_PARENT, null);
+
+		return _fkScopeModelParent;
 	}
 
 	@Override

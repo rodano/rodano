@@ -7,6 +7,8 @@ import {Credentials} from '../model/credentials';
 import {APIService} from './api.service';
 import {ResetPassword} from '../model/reset-password';
 import {ChangePassword} from '../model/change-password';
+import {ProjectService} from '@core/services/project.service';
+import {tap} from 'rxjs/operators';
 
 @Injectable({
 	providedIn: 'root'
@@ -14,7 +16,8 @@ import {ChangePassword} from '../model/change-password';
 export class AuthService {
 	constructor(
 		private http: HttpClient,
-		private apiService: APIService
+		private apiService: APIService,
+		private projectService: ProjectService
 	) {}
 
 	login(credentials: Credentials): Observable<Authentication> {
@@ -25,7 +28,11 @@ export class AuthService {
 	}
 
 	logout(): Observable<void> {
-		return this.http.delete<void>(`${this.apiService.getApiUrl()}/sessions`);
+		return this.http.delete<void>(`${this.apiService.getApiUrl()}/sessions`).pipe(
+			tap(() => {
+				this.projectService.clearCurrentProject();
+			})
+		);
 	}
 
 	recoverPassword(email: string): Observable<any> {

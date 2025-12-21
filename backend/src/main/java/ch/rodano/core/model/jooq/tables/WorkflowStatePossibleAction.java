@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.WorkflowAction.WorkflowActionPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowStatePossibleActionRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -96,14 +106,81 @@ public class WorkflowStatePossibleAction extends TableImpl<WorkflowStatePossible
 		this(DSL.name("workflow_state_possible_action"), null);
 	}
 
+	public <O extends Record> WorkflowStatePossibleAction(Table<O> path, ForeignKey<O, WorkflowStatePossibleActionRecord> childPath, InverseForeignKey<O, WorkflowStatePossibleActionRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_STATE_POSSIBLE_ACTION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowStatePossibleActionPath extends WorkflowStatePossibleAction implements Path<WorkflowStatePossibleActionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowStatePossibleActionPath(Table<O> path, ForeignKey<O, WorkflowStatePossibleActionRecord> childPath, InverseForeignKey<O, WorkflowStatePossibleActionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowStatePossibleActionPath(Name alias, Table<WorkflowStatePossibleActionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowStatePossibleActionPath as(String alias) {
+			return new WorkflowStatePossibleActionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowStatePossibleActionPath as(Name alias) {
+			return new WorkflowStatePossibleActionPath(alias, this);
+		}
+
+		@Override
+		public WorkflowStatePossibleActionPath as(Table<?> alias) {
+			return new WorkflowStatePossibleActionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.WORKFLOW_STATE_POSSIBLE_ACTION_IDX_WF_STATE_POSSIBLE_ACTION_ACTION, Indexes.WORKFLOW_STATE_POSSIBLE_ACTION_IDX_WF_STATE_POSSIBLE_ACTION_STATE);
+	}
+
+	@Override
 	public UniqueKey<WorkflowStatePossibleActionRecord> getPrimaryKey() {
 		return Keys.KEY_WORKFLOW_STATE_POSSIBLE_ACTION_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowStatePossibleActionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_STATE_POSSIBLE_ACTION_ACTION, Keys.FK_WF_STATE_POSSIBLE_ACTION_STATE);
+	}
+
+	private transient WorkflowActionPath _workflowAction;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_action</code> table.
+	 */
+	public WorkflowActionPath workflowAction() {
+		if (_workflowAction == null)
+			_workflowAction = new WorkflowActionPath(this, Keys.FK_WF_STATE_POSSIBLE_ACTION_ACTION, null);
+
+		return _workflowAction;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table.
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, Keys.FK_WF_STATE_POSSIBLE_ACTION_STATE, null);
+
+		return _workflowState;
 	}
 
 	@Override

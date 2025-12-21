@@ -5,18 +5,29 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.PaymentStep.PaymentStepPath;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
 import ch.rodano.core.model.jooq.tables.records.PaymentStepDistributionRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -111,14 +122,93 @@ public class PaymentStepDistribution extends TableImpl<PaymentStepDistributionRe
 		this(DSL.name("payment_step_distribution"), null);
 	}
 
+	public <O extends Record> PaymentStepDistribution(Table<O> path, ForeignKey<O, PaymentStepDistributionRecord> childPath, InverseForeignKey<O, PaymentStepDistributionRecord> parentPath) {
+		super(path, childPath, parentPath, PAYMENT_STEP_DISTRIBUTION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class PaymentStepDistributionPath extends PaymentStepDistribution implements Path<PaymentStepDistributionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> PaymentStepDistributionPath(Table<O> path, ForeignKey<O, PaymentStepDistributionRecord> childPath, InverseForeignKey<O, PaymentStepDistributionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private PaymentStepDistributionPath(Name alias, Table<PaymentStepDistributionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public PaymentStepDistributionPath as(String alias) {
+			return new PaymentStepDistributionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public PaymentStepDistributionPath as(Name alias) {
+			return new PaymentStepDistributionPath(alias, this);
+		}
+
+		@Override
+		public PaymentStepDistributionPath as(Table<?> alias) {
+			return new PaymentStepDistributionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.PAYMENT_STEP_DISTRIBUTION_IDX_PAYMENT_STEP_DIST_PROFILE, Indexes.PAYMENT_STEP_DISTRIBUTION_IDX_PAYMENT_STEP_DIST_SCOPE);
+	}
+
+	@Override
 	public UniqueKey<PaymentStepDistributionRecord> getPrimaryKey() {
 		return Keys.KEY_PAYMENT_STEP_DISTRIBUTION_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<PaymentStepDistributionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PAYMENT_STEP_DIST_PROFILE, Keys.FK_PAYMENT_STEP_DIST_SCOPE_MODEL, Keys.FK_PAYMENT_STEP_DIST_STEP);
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PAYMENT_STEP_DIST_PROFILE, null);
+
+		return _profile;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_PAYMENT_STEP_DIST_SCOPE_MODEL, null);
+
+		return _scopeModel;
+	}
+
+	private transient PaymentStepPath _paymentStep;
+
+	/**
+	 * Get the implicit join path to the <code>payment_step</code> table.
+	 */
+	public PaymentStepPath paymentStep() {
+		if (_paymentStep == null)
+			_paymentStep = new PaymentStepPath(this, Keys.FK_PAYMENT_STEP_DIST_STEP, null);
+
+		return _paymentStep;
 	}
 
 	@Override

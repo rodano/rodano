@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryColumn.WorkflowSummaryColumnPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowSummaryColumnStateRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,6 +102,39 @@ public class WorkflowSummaryColumnState extends TableImpl<WorkflowSummaryColumnS
 		this(DSL.name("workflow_summary_column_state"), null);
 	}
 
+	public <O extends Record> WorkflowSummaryColumnState(Table<O> path, ForeignKey<O, WorkflowSummaryColumnStateRecord> childPath, InverseForeignKey<O, WorkflowSummaryColumnStateRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_SUMMARY_COLUMN_STATE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowSummaryColumnStatePath extends WorkflowSummaryColumnState implements Path<WorkflowSummaryColumnStateRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowSummaryColumnStatePath(Table<O> path, ForeignKey<O, WorkflowSummaryColumnStateRecord> childPath, InverseForeignKey<O, WorkflowSummaryColumnStateRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowSummaryColumnStatePath(Name alias, Table<WorkflowSummaryColumnStateRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowSummaryColumnStatePath as(String alias) {
+			return new WorkflowSummaryColumnStatePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowSummaryColumnStatePath as(Name alias) {
+			return new WorkflowSummaryColumnStatePath(alias, this);
+		}
+
+		@Override
+		public WorkflowSummaryColumnStatePath as(Table<?> alias) {
+			return new WorkflowSummaryColumnStatePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -102,6 +143,36 @@ public class WorkflowSummaryColumnState extends TableImpl<WorkflowSummaryColumnS
 	@Override
 	public UniqueKey<WorkflowSummaryColumnStateRecord> getPrimaryKey() {
 		return Keys.KEY_WORKFLOW_SUMMARY_COLUMN_STATE_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowSummaryColumnStateRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_SUMMARY_COL_STATE_COLUMN, Keys.FK_WF_SUMMARY_COL_STATE_WORKFLOW_STATE);
+	}
+
+	private transient WorkflowSummaryColumnPath _workflowSummaryColumn;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_summary_column</code>
+	 * table.
+	 */
+	public WorkflowSummaryColumnPath workflowSummaryColumn() {
+		if (_workflowSummaryColumn == null)
+			_workflowSummaryColumn = new WorkflowSummaryColumnPath(this, Keys.FK_WF_SUMMARY_COL_STATE_COLUMN, null);
+
+		return _workflowSummaryColumn;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table.
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, Keys.FK_WF_SUMMARY_COL_STATE_WORKFLOW_STATE, null);
+
+		return _workflowState;
 	}
 
 	@Override

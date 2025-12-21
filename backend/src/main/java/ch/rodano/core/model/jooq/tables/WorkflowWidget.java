@@ -6,6 +6,9 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MenuLayoutSectionWidgetParameterPath;
+import ch.rodano.core.model.jooq.tables.WorkflowWidgetColumn.WorkflowWidgetColumnPath;
+import ch.rodano.core.model.jooq.tables.WorkflowWidgetStateSelector.WorkflowWidgetStateSelectorPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowWidgetRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -123,6 +130,39 @@ public class WorkflowWidget extends TableImpl<WorkflowWidgetRecord> {
 		this(DSL.name("workflow_widget"), null);
 	}
 
+	public <O extends Record> WorkflowWidget(Table<O> path, ForeignKey<O, WorkflowWidgetRecord> childPath, InverseForeignKey<O, WorkflowWidgetRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_WIDGET);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowWidgetPath extends WorkflowWidget implements Path<WorkflowWidgetRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowWidgetPath(Table<O> path, ForeignKey<O, WorkflowWidgetRecord> childPath, InverseForeignKey<O, WorkflowWidgetRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowWidgetPath(Name alias, Table<WorkflowWidgetRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowWidgetPath as(String alias) {
+			return new WorkflowWidgetPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowWidgetPath as(Name alias) {
+			return new WorkflowWidgetPath(alias, this);
+		}
+
+		@Override
+		public WorkflowWidgetPath as(Table<?> alias) {
+			return new WorkflowWidgetPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -136,6 +176,45 @@ public class WorkflowWidget extends TableImpl<WorkflowWidgetRecord> {
 	@Override
 	public List<UniqueKey<WorkflowWidgetRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_WORKFLOW_WIDGET_PK_WORKFLOW_WIDGET_CODE);
+	}
+
+	private transient MenuLayoutSectionWidgetParameterPath _menuLayoutSectionWidgetParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget_parameter</code> table
+	 */
+	public MenuLayoutSectionWidgetParameterPath menuLayoutSectionWidgetParameter() {
+		if (_menuLayoutSectionWidgetParameter == null)
+			_menuLayoutSectionWidgetParameter = new MenuLayoutSectionWidgetParameterPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WF_WIDGET.getInverseKey());
+
+		return _menuLayoutSectionWidgetParameter;
+	}
+
+	private transient WorkflowWidgetColumnPath _workflowWidgetColumn;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_widget_column</code> table
+	 */
+	public WorkflowWidgetColumnPath workflowWidgetColumn() {
+		if (_workflowWidgetColumn == null)
+			_workflowWidgetColumn = new WorkflowWidgetColumnPath(this, null, Keys.FK_WF_WIDGET_COL_WIDGET.getInverseKey());
+
+		return _workflowWidgetColumn;
+	}
+
+	private transient WorkflowWidgetStateSelectorPath _workflowWidgetStateSelector;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_widget_state_selector</code> table
+	 */
+	public WorkflowWidgetStateSelectorPath workflowWidgetStateSelector() {
+		if (_workflowWidgetStateSelector == null)
+			_workflowWidgetStateSelector = new WorkflowWidgetStateSelectorPath(this, null, Keys.FK_WF_WIDGET_STATE_SELECTOR_WIDGET.getInverseKey());
+
+		return _workflowWidgetStateSelector;
 	}
 
 	@Override

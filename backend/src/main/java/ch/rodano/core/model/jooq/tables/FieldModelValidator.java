@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.Validator.ValidatorPath;
 import ch.rodano.core.model.jooq.tables.records.FieldModelValidatorRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +104,81 @@ public class FieldModelValidator extends TableImpl<FieldModelValidatorRecord> {
 		this(DSL.name("field_model_validator"), null);
 	}
 
+	public <O extends Record> FieldModelValidator(Table<O> path, ForeignKey<O, FieldModelValidatorRecord> childPath, InverseForeignKey<O, FieldModelValidatorRecord> parentPath) {
+		super(path, childPath, parentPath, FIELD_MODEL_VALIDATOR);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FieldModelValidatorPath extends FieldModelValidator implements Path<FieldModelValidatorRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FieldModelValidatorPath(Table<O> path, ForeignKey<O, FieldModelValidatorRecord> childPath, InverseForeignKey<O, FieldModelValidatorRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FieldModelValidatorPath(Name alias, Table<FieldModelValidatorRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FieldModelValidatorPath as(String alias) {
+			return new FieldModelValidatorPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FieldModelValidatorPath as(Name alias) {
+			return new FieldModelValidatorPath(alias, this);
+		}
+
+		@Override
+		public FieldModelValidatorPath as(Table<?> alias) {
+			return new FieldModelValidatorPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.FIELD_MODEL_VALIDATOR_IDX_FIELD_MODEL_VALIDATOR_FIELD, Indexes.FIELD_MODEL_VALIDATOR_IDX_FIELD_MODEL_VALIDATOR_VALIDATOR);
+	}
+
+	@Override
 	public UniqueKey<FieldModelValidatorRecord> getPrimaryKey() {
 		return Keys.KEY_FIELD_MODEL_VALIDATOR_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FieldModelValidatorRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FIELD_MODEL_VALIDATOR_FIELD, Keys.FK_FIELD_MODEL_VALIDATOR_VALIDATOR);
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_FIELD_MODEL_VALIDATOR_FIELD, null);
+
+		return _fieldModel;
+	}
+
+	private transient ValidatorPath _validator;
+
+	/**
+	 * Get the implicit join path to the <code>validator</code> table.
+	 */
+	public ValidatorPath validator() {
+		if (_validator == null)
+			_validator = new ValidatorPath(this, Keys.FK_FIELD_MODEL_VALIDATOR_VALIDATOR, null);
+
+		return _validator;
 	}
 
 	@Override

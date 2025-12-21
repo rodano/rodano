@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.FormModel.FormModelPath;
 import ch.rodano.core.model.jooq.tables.records.EventModelFormModelRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +104,81 @@ public class EventModelFormModel extends TableImpl<EventModelFormModelRecord> {
 		this(DSL.name("event_model_form_model"), null);
 	}
 
+	public <O extends Record> EventModelFormModel(Table<O> path, ForeignKey<O, EventModelFormModelRecord> childPath, InverseForeignKey<O, EventModelFormModelRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_MODEL_FORM_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventModelFormModelPath extends EventModelFormModel implements Path<EventModelFormModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventModelFormModelPath(Table<O> path, ForeignKey<O, EventModelFormModelRecord> childPath, InverseForeignKey<O, EventModelFormModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventModelFormModelPath(Name alias, Table<EventModelFormModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventModelFormModelPath as(String alias) {
+			return new EventModelFormModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventModelFormModelPath as(Name alias) {
+			return new EventModelFormModelPath(alias, this);
+		}
+
+		@Override
+		public EventModelFormModelPath as(Table<?> alias) {
+			return new EventModelFormModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_MODEL_FORM_MODEL_IDX_EVENT_MODEL_FORM_MODEL_EVENT, Indexes.EVENT_MODEL_FORM_MODEL_IDX_EVENT_MODEL_FORM_MODEL_FORM);
+	}
+
+	@Override
 	public UniqueKey<EventModelFormModelRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_MODEL_FORM_MODEL_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventModelFormModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_MODEL_FORM_MODEL_EVENT, Keys.FK_EVENT_MODEL_FORM_MODEL_FORM);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_EVENT_MODEL_FORM_MODEL_EVENT, null);
+
+		return _eventModel;
+	}
+
+	private transient FormModelPath _formModel;
+
+	/**
+	 * Get the implicit join path to the <code>form_model</code> table.
+	 */
+	public FormModelPath formModel() {
+		if (_formModel == null)
+			_formModel = new FormModelPath(this, Keys.FK_EVENT_MODEL_FORM_MODEL_FORM, null);
+
+		return _formModel;
 	}
 
 	@Override

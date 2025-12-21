@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
 import ch.rodano.core.model.jooq.tables.records.ProfileProfileRightsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +111,39 @@ public class ProfileProfileRights extends TableImpl<ProfileProfileRightsRecord> 
 		this(DSL.name("profile_profile_rights"), null);
 	}
 
+	public <O extends Record> ProfileProfileRights(Table<O> path, ForeignKey<O, ProfileProfileRightsRecord> childPath, InverseForeignKey<O, ProfileProfileRightsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_PROFILE_RIGHTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfileProfileRightsPath extends ProfileProfileRights implements Path<ProfileProfileRightsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfileProfileRightsPath(Table<O> path, ForeignKey<O, ProfileProfileRightsRecord> childPath, InverseForeignKey<O, ProfileProfileRightsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfileProfileRightsPath(Name alias, Table<ProfileProfileRightsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfileProfileRightsPath as(String alias) {
+			return new ProfileProfileRightsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfileProfileRightsPath as(Name alias) {
+			return new ProfileProfileRightsPath(alias, this);
+		}
+
+		@Override
+		public ProfileProfileRightsPath as(Table<?> alias) {
+			return new ProfileProfileRightsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +152,37 @@ public class ProfileProfileRights extends TableImpl<ProfileProfileRightsRecord> 
 	@Override
 	public UniqueKey<ProfileProfileRightsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_PROFILE_RIGHTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfileProfileRightsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_PROFILE_RIGHTS_PROFILE, Keys.FK_PROFILE_PROFILE_RIGHTS_TARGET);
+	}
+
+	private transient ProfilePath _fkProfileProfileRightsProfile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table, via the
+	 * <code>fk_profile_profile_rights_profile</code> key.
+	 */
+	public ProfilePath fkProfileProfileRightsProfile() {
+		if (_fkProfileProfileRightsProfile == null)
+			_fkProfileProfileRightsProfile = new ProfilePath(this, Keys.FK_PROFILE_PROFILE_RIGHTS_PROFILE, null);
+
+		return _fkProfileProfileRightsProfile;
+	}
+
+	private transient ProfilePath _fkProfileProfileRightsTarget;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table, via the
+	 * <code>fk_profile_profile_rights_target</code> key.
+	 */
+	public ProfilePath fkProfileProfileRightsTarget() {
+		if (_fkProfileProfileRightsTarget == null)
+			_fkProfileProfileRightsTarget = new ProfilePath(this, Keys.FK_PROFILE_PROFILE_RIGHTS_TARGET, null);
+
+		return _fkProfileProfileRightsTarget;
 	}
 
 	@Override

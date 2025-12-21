@@ -5,17 +5,26 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
 import ch.rodano.core.model.jooq.tables.records.EventModelDeadlineReferenceRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -97,14 +106,83 @@ public class EventModelDeadlineReference extends TableImpl<EventModelDeadlineRef
 		this(DSL.name("event_model_deadline_reference"), null);
 	}
 
+	public <O extends Record> EventModelDeadlineReference(Table<O> path, ForeignKey<O, EventModelDeadlineReferenceRecord> childPath, InverseForeignKey<O, EventModelDeadlineReferenceRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_MODEL_DEADLINE_REFERENCE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventModelDeadlineReferencePath extends EventModelDeadlineReference implements Path<EventModelDeadlineReferenceRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventModelDeadlineReferencePath(Table<O> path, ForeignKey<O, EventModelDeadlineReferenceRecord> childPath, InverseForeignKey<O, EventModelDeadlineReferenceRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventModelDeadlineReferencePath(Name alias, Table<EventModelDeadlineReferenceRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventModelDeadlineReferencePath as(String alias) {
+			return new EventModelDeadlineReferencePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventModelDeadlineReferencePath as(Name alias) {
+			return new EventModelDeadlineReferencePath(alias, this);
+		}
+
+		@Override
+		public EventModelDeadlineReferencePath as(Table<?> alias) {
+			return new EventModelDeadlineReferencePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_MODEL_DEADLINE_REFERENCE_IDX_EVENT_MODEL_DEADLINE_REF_EVENT, Indexes.EVENT_MODEL_DEADLINE_REFERENCE_IDX_EVENT_MODEL_DEADLINE_REF_REF);
+	}
+
+	@Override
 	public UniqueKey<EventModelDeadlineReferenceRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_MODEL_DEADLINE_REFERENCE_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventModelDeadlineReferenceRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_MODEL_DEADLINE_REF_EVENT, Keys.FK_EVENT_MODEL_DEADLINE_REFERENCE);
+	}
+
+	private transient EventModelPath _fkEventModelDeadlineRefEvent;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_event_model_deadline_ref_event</code> key.
+	 */
+	public EventModelPath fkEventModelDeadlineRefEvent() {
+		if (_fkEventModelDeadlineRefEvent == null)
+			_fkEventModelDeadlineRefEvent = new EventModelPath(this, Keys.FK_EVENT_MODEL_DEADLINE_REF_EVENT, null);
+
+		return _fkEventModelDeadlineRefEvent;
+	}
+
+	private transient EventModelPath _fkEventModelDeadlineReference;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_event_model_deadline_reference</code> key.
+	 */
+	public EventModelPath fkEventModelDeadlineReference() {
+		if (_fkEventModelDeadlineReference == null)
+			_fkEventModelDeadlineReference = new EventModelPath(this, Keys.FK_EVENT_MODEL_DEADLINE_REFERENCE, null);
+
+		return _fkEventModelDeadlineReference;
 	}
 
 	@Override

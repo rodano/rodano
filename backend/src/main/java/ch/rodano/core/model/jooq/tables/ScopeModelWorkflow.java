@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelWorkflowRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +104,81 @@ public class ScopeModelWorkflow extends TableImpl<ScopeModelWorkflowRecord> {
 		this(DSL.name("scope_model_workflow"), null);
 	}
 
+	public <O extends Record> ScopeModelWorkflow(Table<O> path, ForeignKey<O, ScopeModelWorkflowRecord> childPath, InverseForeignKey<O, ScopeModelWorkflowRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_MODEL_WORKFLOW);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeModelWorkflowPath extends ScopeModelWorkflow implements Path<ScopeModelWorkflowRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeModelWorkflowPath(Table<O> path, ForeignKey<O, ScopeModelWorkflowRecord> childPath, InverseForeignKey<O, ScopeModelWorkflowRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeModelWorkflowPath(Name alias, Table<ScopeModelWorkflowRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeModelWorkflowPath as(String alias) {
+			return new ScopeModelWorkflowPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeModelWorkflowPath as(Name alias) {
+			return new ScopeModelWorkflowPath(alias, this);
+		}
+
+		@Override
+		public ScopeModelWorkflowPath as(Table<?> alias) {
+			return new ScopeModelWorkflowPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SCOPE_MODEL_WORKFLOW_IDX_SCOPE_MODEL_WF_SCOPE, Indexes.SCOPE_MODEL_WORKFLOW_IDX_SCOPE_MODEL_WF_WORKFLOW);
+	}
+
+	@Override
 	public UniqueKey<ScopeModelWorkflowRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_MODEL_WORKFLOW_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ScopeModelWorkflowRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_MODEL_WF_SCOPE, Keys.FK_SCOPE_MODEL_WF_WORKFLOW);
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_SCOPE_MODEL_WF_SCOPE, null);
+
+		return _scopeModel;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_SCOPE_MODEL_WF_WORKFLOW, null);
+
+		return _workflow;
 	}
 
 	@Override

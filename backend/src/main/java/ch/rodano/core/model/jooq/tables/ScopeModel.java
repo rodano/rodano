@@ -6,6 +6,25 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.EventAudit.EventAuditPath;
+import ch.rodano.core.model.jooq.tables.EventGroup.EventGroupPath;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MenuLayoutSectionWidgetParameterPath;
+import ch.rodano.core.model.jooq.tables.PaymentPlan.PaymentPlanPath;
+import ch.rodano.core.model.jooq.tables.PaymentStepDistribution.PaymentStepDistributionPath;
+import ch.rodano.core.model.jooq.tables.ProfileScopeModelRights.ProfileScopeModelRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
+import ch.rodano.core.model.jooq.tables.ScopeAudit.ScopeAuditPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.ScopeModelDatasetModelPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelFormModel.ScopeModelFormModelPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelParent.ScopeModelParentPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.ScopeModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelWorkflowStateSelector.ScopeModelWorkflowStateSelectorPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraph.TimelineGraphPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummary.WorkflowSummaryPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelRecord;
 
 import java.util.Arrays;
@@ -16,9 +35,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -105,6 +128,11 @@ public class ScopeModel extends TableImpl<ScopeModelRecord> {
 	public final TableField<ScopeModelRecord, String> SCOPE_FORMAT = createField(DSL.name("scope_format"), SQLDataType.VARCHAR(512).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
+	 * The column <code>scope_model.default_parent_id</code>.
+	 */
+	public final TableField<ScopeModelRecord, UUID> DEFAULT_PARENT_ID = createField(DSL.name("default_parent_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
+
+	/**
 	 * The column <code>scope_model.default_profile_id</code>.
 	 */
 	public final TableField<ScopeModelRecord, UUID> DEFAULT_PROFILE_ID = createField(DSL.name("default_profile_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
@@ -143,6 +171,39 @@ public class ScopeModel extends TableImpl<ScopeModelRecord> {
 		this(DSL.name("scope_model"), null);
 	}
 
+	public <O extends Record> ScopeModel(Table<O> path, ForeignKey<O, ScopeModelRecord> childPath, InverseForeignKey<O, ScopeModelRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeModelPath extends ScopeModel implements Path<ScopeModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeModelPath(Table<O> path, ForeignKey<O, ScopeModelRecord> childPath, InverseForeignKey<O, ScopeModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeModelPath(Name alias, Table<ScopeModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeModelPath as(String alias) {
+			return new ScopeModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeModelPath as(Name alias) {
+			return new ScopeModelPath(alias, this);
+		}
+
+		@Override
+		public ScopeModelPath as(Table<?> alias) {
+			return new ScopeModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -156,6 +217,275 @@ public class ScopeModel extends TableImpl<ScopeModelRecord> {
 	@Override
 	public List<UniqueKey<ScopeModelRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_SCOPE_MODEL_UQ_SCOPE_MODEL_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<ScopeModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_MODEL_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_SCOPE_MODEL_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ChartPath _fkChartLeafScopeModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart</code> table, via the
+	 * <code>fk_chart_leaf_scope_model</code> key
+	 */
+	public ChartPath fkChartLeafScopeModel() {
+		if (_fkChartLeafScopeModel == null)
+			_fkChartLeafScopeModel = new ChartPath(this, null, Keys.FK_CHART_LEAF_SCOPE_MODEL.getInverseKey());
+
+		return _fkChartLeafScopeModel;
+	}
+
+	private transient ChartPath _fkChartScopeModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart</code> table, via the
+	 * <code>fk_chart_scope_model</code> key
+	 */
+	public ChartPath fkChartScopeModel() {
+		if (_fkChartScopeModel == null)
+			_fkChartScopeModel = new ChartPath(this, null, Keys.FK_CHART_SCOPE_MODEL.getInverseKey());
+
+		return _fkChartScopeModel;
+	}
+
+	private transient EventGroupPath _eventGroup;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_group</code> table
+	 */
+	public EventGroupPath eventGroup() {
+		if (_eventGroup == null)
+			_eventGroup = new EventGroupPath(this, null, Keys.FK_EV_GROUP_SCOPE.getInverseKey());
+
+		return _eventGroup;
+	}
+
+	private transient EventAuditPath _eventAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_audit</code> table
+	 */
+	public EventAuditPath eventAudit() {
+		if (_eventAudit == null)
+			_eventAudit = new EventAuditPath(this, null, Keys.FK_EVENT_AUDIT_SCOPE_MODEL_ID.getInverseKey());
+
+		return _eventAudit;
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_model</code> table
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, null, Keys.FK_EVENT_MODEL_SCOPE.getInverseKey());
+
+		return _eventModel;
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event</code> table
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, null, Keys.FK_EVENT_SCOPE_MODEL_ID.getInverseKey());
+
+		return _event;
+	}
+
+	private transient MenuLayoutSectionWidgetParameterPath _menuLayoutSectionWidgetParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget_parameter</code> table
+	 */
+	public MenuLayoutSectionWidgetParameterPath menuLayoutSectionWidgetParameter() {
+		if (_menuLayoutSectionWidgetParameter == null)
+			_menuLayoutSectionWidgetParameter = new MenuLayoutSectionWidgetParameterPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_SCOPE.getInverseKey());
+
+		return _menuLayoutSectionWidgetParameter;
+	}
+
+	private transient PaymentPlanPath _paymentPlan;
+
+	/**
+	 * Get the implicit to-many join path to the <code>payment_plan</code> table
+	 */
+	public PaymentPlanPath paymentPlan() {
+		if (_paymentPlan == null)
+			_paymentPlan = new PaymentPlanPath(this, null, Keys.FK_PAYMENT_PLAN_SCOPE_MODEL.getInverseKey());
+
+		return _paymentPlan;
+	}
+
+	private transient PaymentStepDistributionPath _paymentStepDistribution;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>payment_step_distribution</code> table
+	 */
+	public PaymentStepDistributionPath paymentStepDistribution() {
+		if (_paymentStepDistribution == null)
+			_paymentStepDistribution = new PaymentStepDistributionPath(this, null, Keys.FK_PAYMENT_STEP_DIST_SCOPE_MODEL.getInverseKey());
+
+		return _paymentStepDistribution;
+	}
+
+	private transient ProfileScopeModelRightsPath _profileScopeModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_scope_model_rights</code> table
+	 */
+	public ProfileScopeModelRightsPath profileScopeModelRights() {
+		if (_profileScopeModelRights == null)
+			_profileScopeModelRights = new ProfileScopeModelRightsPath(this, null, Keys.FK_PROFILE_SCOPE_MODEL_RIGHTS_SCOPE_MODEL.getInverseKey());
+
+		return _profileScopeModelRights;
+	}
+
+	private transient ScopeAuditPath _scopeAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_audit</code> table
+	 */
+	public ScopeAuditPath scopeAudit() {
+		if (_scopeAudit == null)
+			_scopeAudit = new ScopeAuditPath(this, null, Keys.FK_SCOPE_AUDIT_SCOPE_MODEL_ID.getInverseKey());
+
+		return _scopeAudit;
+	}
+
+	private transient ScopeModelParentPath _fkScopeModelChild;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_model_parent</code>
+	 * table, via the <code>fk_scope_model_child</code> key
+	 */
+	public ScopeModelParentPath fkScopeModelChild() {
+		if (_fkScopeModelChild == null)
+			_fkScopeModelChild = new ScopeModelParentPath(this, null, Keys.FK_SCOPE_MODEL_CHILD.getInverseKey());
+
+		return _fkScopeModelChild;
+	}
+
+	private transient ScopeModelDatasetModelPath _scopeModelDatasetModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>scope_model_dataset_model</code> table
+	 */
+	public ScopeModelDatasetModelPath scopeModelDatasetModel() {
+		if (_scopeModelDatasetModel == null)
+			_scopeModelDatasetModel = new ScopeModelDatasetModelPath(this, null, Keys.FK_SCOPE_MODEL_DATASET_MODEL_SCOPE.getInverseKey());
+
+		return _scopeModelDatasetModel;
+	}
+
+	private transient ScopeModelFormModelPath _scopeModelFormModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>scope_model_form_model</code> table
+	 */
+	public ScopeModelFormModelPath scopeModelFormModel() {
+		if (_scopeModelFormModel == null)
+			_scopeModelFormModel = new ScopeModelFormModelPath(this, null, Keys.FK_SCOPE_MODEL_FORM_MODEL_SCOPE.getInverseKey());
+
+		return _scopeModelFormModel;
+	}
+
+	private transient ScopeModelParentPath _fkScopeModelParent;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_model_parent</code>
+	 * table, via the <code>fk_scope_model_parent</code> key
+	 */
+	public ScopeModelParentPath fkScopeModelParent() {
+		if (_fkScopeModelParent == null)
+			_fkScopeModelParent = new ScopeModelParentPath(this, null, Keys.FK_SCOPE_MODEL_PARENT.getInverseKey());
+
+		return _fkScopeModelParent;
+	}
+
+	private transient ScopeModelWorkflowPath _scopeModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_model_workflow</code>
+	 * table
+	 */
+	public ScopeModelWorkflowPath scopeModelWorkflow() {
+		if (_scopeModelWorkflow == null)
+			_scopeModelWorkflow = new ScopeModelWorkflowPath(this, null, Keys.FK_SCOPE_MODEL_WF_SCOPE.getInverseKey());
+
+		return _scopeModelWorkflow;
+	}
+
+	private transient ScopeModelWorkflowStateSelectorPath _scopeModelWorkflowStateSelector;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>scope_model_workflow_state_selector</code> table
+	 */
+	public ScopeModelWorkflowStateSelectorPath scopeModelWorkflowStateSelector() {
+		if (_scopeModelWorkflowStateSelector == null)
+			_scopeModelWorkflowStateSelector = new ScopeModelWorkflowStateSelectorPath(this, null, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_SCOPE.getInverseKey());
+
+		return _scopeModelWorkflowStateSelector;
+	}
+
+	private transient ScopePath _scope;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope</code> table
+	 */
+	public ScopePath scope() {
+		if (_scope == null)
+			_scope = new ScopePath(this, null, Keys.FK_SCOPE_SCOPE_MODEL_ID.getInverseKey());
+
+		return _scope;
+	}
+
+	private transient TimelineGraphPath _timelineGraph;
+
+	/**
+	 * Get the implicit to-many join path to the <code>timeline_graph</code> table
+	 */
+	public TimelineGraphPath timelineGraph() {
+		if (_timelineGraph == null)
+			_timelineGraph = new TimelineGraphPath(this, null, Keys.FK_TIMELINE_GRAPH_SCOPE_MODEL.getInverseKey());
+
+		return _timelineGraph;
+	}
+
+	private transient WorkflowSummaryPath _workflowSummary;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_summary</code>
+	 * table
+	 */
+	public WorkflowSummaryPath workflowSummary() {
+		if (_workflowSummary == null)
+			_workflowSummary = new WorkflowSummaryPath(this, null, Keys.FK_WF_SUMMARY_LEAF_SCOPE_MODEL.getInverseKey());
+
+		return _workflowSummary;
 	}
 
 	@Override

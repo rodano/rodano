@@ -6,17 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionReference.TimelineGraphSectionReferencePath;
 import ch.rodano.core.model.jooq.tables.records.TimelineGraphSectionReferenceEntryRecord;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -126,6 +133,39 @@ public class TimelineGraphSectionReferenceEntry extends TableImpl<TimelineGraphS
 		this(DSL.name("timeline_graph_section_reference_entry"), null);
 	}
 
+	public <O extends Record> TimelineGraphSectionReferenceEntry(Table<O> path, ForeignKey<O, TimelineGraphSectionReferenceEntryRecord> childPath, InverseForeignKey<O, TimelineGraphSectionReferenceEntryRecord> parentPath) {
+		super(path, childPath, parentPath, TIMELINE_GRAPH_SECTION_REFERENCE_ENTRY);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class TimelineGraphSectionReferenceEntryPath extends TimelineGraphSectionReferenceEntry implements Path<TimelineGraphSectionReferenceEntryRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> TimelineGraphSectionReferenceEntryPath(Table<O> path, ForeignKey<O, TimelineGraphSectionReferenceEntryRecord> childPath, InverseForeignKey<O, TimelineGraphSectionReferenceEntryRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private TimelineGraphSectionReferenceEntryPath(Name alias, Table<TimelineGraphSectionReferenceEntryRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public TimelineGraphSectionReferenceEntryPath as(String alias) {
+			return new TimelineGraphSectionReferenceEntryPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public TimelineGraphSectionReferenceEntryPath as(Name alias) {
+			return new TimelineGraphSectionReferenceEntryPath(alias, this);
+		}
+
+		@Override
+		public TimelineGraphSectionReferenceEntryPath as(Table<?> alias) {
+			return new TimelineGraphSectionReferenceEntryPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -134,6 +174,24 @@ public class TimelineGraphSectionReferenceEntry extends TableImpl<TimelineGraphS
 	@Override
 	public UniqueKey<TimelineGraphSectionReferenceEntryRecord> getPrimaryKey() {
 		return Keys.KEY_TIMELINE_GRAPH_SECTION_REFERENCE_ENTRY_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<TimelineGraphSectionReferenceEntryRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_SECTION_REF_ENTRY);
+	}
+
+	private transient TimelineGraphSectionReferencePath _timelineGraphSectionReference;
+
+	/**
+	 * Get the implicit join path to the
+	 * <code>timeline_graph_section_reference</code> table.
+	 */
+	public TimelineGraphSectionReferencePath timelineGraphSectionReference() {
+		if (_timelineGraphSectionReference == null)
+			_timelineGraphSectionReference = new TimelineGraphSectionReferencePath(this, Keys.FK_TIMELINE_GRAPH_SECTION_REF_ENTRY, null);
+
+		return _timelineGraphSectionReference;
 	}
 
 	@Override

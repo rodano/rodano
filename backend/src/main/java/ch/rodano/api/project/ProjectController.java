@@ -21,10 +21,8 @@ import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.services.bll.export.views.AggregateWorkflowViewService;
 import ch.rodano.core.services.bll.export.views.ExportViewService;
 import ch.rodano.core.services.bll.project.ProjectService;
-import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.scope.ScopeAncestorServiceImpl;
 import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.services.bll.user.UserSecurityService;
 import ch.rodano.core.services.project.ProjectIdResolver;
 
 @RestController
@@ -40,8 +38,6 @@ public class ProjectController {
 	private final ScopeAncestorServiceImpl scopeAncestorService;
 	private final AggregateWorkflowViewService aggregateWorkflowViewService;
 	private final ExportViewService exportViewService;
-	private final RoleService roleService;
-	private final UserSecurityService userSecurityService;
 
 	public ProjectController(final ProjectService projectService,
 							 final ProjectIdResolver projectIdResolver,
@@ -49,9 +45,7 @@ public class ProjectController {
 							 final ProjectMapper projectMapper,
 							 final ScopeAncestorServiceImpl scopeAncestorService,
 							 final AggregateWorkflowViewService aggregateWorkflowViewService,
-							 final ExportViewService exportViewService,
-							 final RoleService roleService,
-							 final UserSecurityService userSecurityService) {
+							 final ExportViewService exportViewService) {
 		this.projectService = projectService;
 		this.projectIdResolver = projectIdResolver;
 		this.studyService = studyService;
@@ -59,8 +53,6 @@ public class ProjectController {
 		this.scopeAncestorService = scopeAncestorService;
 		this.aggregateWorkflowViewService = aggregateWorkflowViewService;
 		this.exportViewService = exportViewService;
-		this.roleService = roleService;
-		this.userSecurityService = userSecurityService;
 	}
 
 	private Actor getCurrentActor() {

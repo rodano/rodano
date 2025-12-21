@@ -1,7 +1,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, identity, Observable} from 'rxjs';
-import {concatMap, map, first, shareReplay} from 'rxjs/operators';
+import {concatMap, first, map} from 'rxjs/operators';
 import {Menu} from '../model/menu';
 import {ScopeModel} from '../model/scope-model';
 import {Study} from '../model/study';
@@ -30,8 +30,27 @@ export class ConfigurationService {
 		private apiService: APIService
 	) {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/config`;
-		//cache public study
-		this.publicStudy$ = this.http.get<Study>(`${this.serviceUrl}/public-study`).pipe(shareReplay());
+
+		this.initializeStudy();
+	}
+
+	private initializeStudy(): void {
+		const projectId = localStorage.getItem('currentProjectId');
+
+		if(projectId) {
+			this.getPublicStudy().subscribe({
+				next: study => {
+					this.studySubject.next(study);
+				},
+				error: error => {
+					console.error('Failed to load study on init', error);
+					localStorage.removeItem('currentProjectId');
+				}
+			});
+		}
+		else {
+			console.log('No project selected, skipping study load');
+		}
 	}
 
 	getPublicStudy(): Observable<PublicStudy> {

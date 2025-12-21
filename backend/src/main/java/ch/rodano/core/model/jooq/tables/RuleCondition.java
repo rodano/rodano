@@ -5,18 +5,29 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
 import ch.rodano.core.model.jooq.enums.RuleConditionMode;
+import ch.rodano.core.model.jooq.tables.RuleCondition.RuleConditionPath;
+import ch.rodano.core.model.jooq.tables.RuleConditionList.RuleConditionListPath;
+import ch.rodano.core.model.jooq.tables.RuleCriterion.RuleCriterionPath;
 import ch.rodano.core.model.jooq.tables.records.RuleConditionRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -125,14 +136,93 @@ public class RuleCondition extends TableImpl<RuleConditionRecord> {
 		this(DSL.name("rule_condition"), null);
 	}
 
+	public <O extends Record> RuleCondition(Table<O> path, ForeignKey<O, RuleConditionRecord> childPath, InverseForeignKey<O, RuleConditionRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_CONDITION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleConditionPath extends RuleCondition implements Path<RuleConditionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleConditionPath(Table<O> path, ForeignKey<O, RuleConditionRecord> childPath, InverseForeignKey<O, RuleConditionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleConditionPath(Name alias, Table<RuleConditionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleConditionPath as(String alias) {
+			return new RuleConditionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleConditionPath as(Name alias) {
+			return new RuleConditionPath(alias, this);
+		}
+
+		@Override
+		public RuleConditionPath as(Table<?> alias) {
+			return new RuleConditionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.RULE_CONDITION_IDX_CONSTRAINT_CONDITION_PARENT);
+	}
+
+	@Override
 	public UniqueKey<RuleConditionRecord> getPrimaryKey() {
 		return Keys.KEY_RULE_CONDITION_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<RuleConditionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_CONSTRAINT_CONDITION_LIST_PARENT_CONDITION, Keys.FK_RULE_CONSTRAINT_CONDITION_LIST_CONDITION);
+	}
+
+	private transient RuleConditionPath _ruleCondition;
+
+	/**
+	 * Get the implicit join path to the <code>rule_condition</code> table.
+	 */
+	public RuleConditionPath ruleCondition() {
+		if (_ruleCondition == null)
+			_ruleCondition = new RuleConditionPath(this, Keys.FK_CONSTRAINT_CONDITION_LIST_PARENT_CONDITION, null);
+
+		return _ruleCondition;
+	}
+
+	private transient RuleConditionListPath _ruleConditionList;
+
+	/**
+	 * Get the implicit join path to the <code>rule_condition_list</code> table.
+	 */
+	public RuleConditionListPath ruleConditionList() {
+		if (_ruleConditionList == null)
+			_ruleConditionList = new RuleConditionListPath(this, Keys.FK_RULE_CONSTRAINT_CONDITION_LIST_CONDITION, null);
+
+		return _ruleConditionList;
+	}
+
+	private transient RuleCriterionPath _ruleCriterion;
+
+	/**
+	 * Get the implicit to-many join path to the <code>rule_criterion</code> table
+	 */
+	public RuleCriterionPath ruleCriterion() {
+		if (_ruleCriterion == null)
+			_ruleCriterion = new RuleCriterionPath(this, null, Keys.FK_CONSTRAINT_CONDITION_CRITERION.getInverseKey());
+
+		return _ruleCriterion;
 	}
 
 	@Override

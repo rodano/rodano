@@ -5,7 +5,11 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.PaymentPlan.PaymentPlanPath;
+import ch.rodano.core.model.jooq.tables.PaymentStepDistribution.PaymentStepDistributionPath;
 import ch.rodano.core.model.jooq.tables.records.PaymentStepRecord;
 
 import java.util.Arrays;
@@ -16,9 +20,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -133,9 +142,47 @@ public class PaymentStep extends TableImpl<PaymentStepRecord> {
 		this(DSL.name("payment_step"), null);
 	}
 
+	public <O extends Record> PaymentStep(Table<O> path, ForeignKey<O, PaymentStepRecord> childPath, InverseForeignKey<O, PaymentStepRecord> parentPath) {
+		super(path, childPath, parentPath, PAYMENT_STEP);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class PaymentStepPath extends PaymentStep implements Path<PaymentStepRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> PaymentStepPath(Table<O> path, ForeignKey<O, PaymentStepRecord> childPath, InverseForeignKey<O, PaymentStepRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private PaymentStepPath(Name alias, Table<PaymentStepRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public PaymentStepPath as(String alias) {
+			return new PaymentStepPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public PaymentStepPath as(Name alias) {
+			return new PaymentStepPath(alias, this);
+		}
+
+		@Override
+		public PaymentStepPath as(Table<?> alias) {
+			return new PaymentStepPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.PAYMENT_STEP_IDX_PAYMENT_STEP_EVENT, Indexes.PAYMENT_STEP_IDX_PAYMENT_STEP_PLAN);
 	}
 
 	@Override
@@ -145,7 +192,49 @@ public class PaymentStep extends TableImpl<PaymentStepRecord> {
 
 	@Override
 	public List<UniqueKey<PaymentStepRecord>> getUniqueKeys() {
-		return Arrays.asList(Keys.KEY_PAYMENT_STEP_UQ_PAYMENT_STEP_CODE);
+		return Arrays.asList(Keys.KEY_PAYMENT_STEP_UQ_PAYMENT_STEP_CODE, Keys.KEY_PAYMENT_STEP_UQ_PAYMENT_STEP_ID);
+	}
+
+	@Override
+	public List<ForeignKey<PaymentStepRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PAYMENT_STEP_EVENT_MODEL, Keys.FK_PAYMENT_STEP_PLAN);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_PAYMENT_STEP_EVENT_MODEL, null);
+
+		return _eventModel;
+	}
+
+	private transient PaymentPlanPath _paymentPlan;
+
+	/**
+	 * Get the implicit join path to the <code>payment_plan</code> table.
+	 */
+	public PaymentPlanPath paymentPlan() {
+		if (_paymentPlan == null)
+			_paymentPlan = new PaymentPlanPath(this, Keys.FK_PAYMENT_STEP_PLAN, null);
+
+		return _paymentPlan;
+	}
+
+	private transient PaymentStepDistributionPath _paymentStepDistribution;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>payment_step_distribution</code> table
+	 */
+	public PaymentStepDistributionPath paymentStepDistribution() {
+		if (_paymentStepDistribution == null)
+			_paymentStepDistribution = new PaymentStepDistributionPath(this, null, Keys.FK_PAYMENT_STEP_DIST_STEP.getInverseKey());
+
+		return _paymentStepDistribution;
 	}
 
 	@Override

@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Menu.MenuPath;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
 import ch.rodano.core.model.jooq.tables.records.ProfileMenuGrantsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,6 +102,39 @@ public class ProfileMenuGrants extends TableImpl<ProfileMenuGrantsRecord> {
 		this(DSL.name("profile_menu_grants"), null);
 	}
 
+	public <O extends Record> ProfileMenuGrants(Table<O> path, ForeignKey<O, ProfileMenuGrantsRecord> childPath, InverseForeignKey<O, ProfileMenuGrantsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_MENU_GRANTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfileMenuGrantsPath extends ProfileMenuGrants implements Path<ProfileMenuGrantsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfileMenuGrantsPath(Table<O> path, ForeignKey<O, ProfileMenuGrantsRecord> childPath, InverseForeignKey<O, ProfileMenuGrantsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfileMenuGrantsPath(Name alias, Table<ProfileMenuGrantsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfileMenuGrantsPath as(String alias) {
+			return new ProfileMenuGrantsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfileMenuGrantsPath as(Name alias) {
+			return new ProfileMenuGrantsPath(alias, this);
+		}
+
+		@Override
+		public ProfileMenuGrantsPath as(Table<?> alias) {
+			return new ProfileMenuGrantsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -102,6 +143,35 @@ public class ProfileMenuGrants extends TableImpl<ProfileMenuGrantsRecord> {
 	@Override
 	public UniqueKey<ProfileMenuGrantsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_MENU_GRANTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfileMenuGrantsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_MENU_GRANTS_MENU, Keys.FK_PROFILE_MENU_GRANTS_PROFILE);
+	}
+
+	private transient MenuPath _menu;
+
+	/**
+	 * Get the implicit join path to the <code>menu</code> table.
+	 */
+	public MenuPath menu() {
+		if (_menu == null)
+			_menu = new MenuPath(this, Keys.FK_PROFILE_MENU_GRANTS_MENU, null);
+
+		return _menu;
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROFILE_MENU_GRANTS_PROFILE, null);
+
+		return _profile;
 	}
 
 	@Override

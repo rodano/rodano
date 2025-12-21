@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.RuleCriterion.RuleCriterionPath;
 import ch.rodano.core.model.jooq.tables.records.RuleCriterionValueRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -99,6 +106,39 @@ public class RuleCriterionValue extends TableImpl<RuleCriterionValueRecord> {
 		this(DSL.name("rule_criterion_value"), null);
 	}
 
+	public <O extends Record> RuleCriterionValue(Table<O> path, ForeignKey<O, RuleCriterionValueRecord> childPath, InverseForeignKey<O, RuleCriterionValueRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_CRITERION_VALUE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleCriterionValuePath extends RuleCriterionValue implements Path<RuleCriterionValueRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleCriterionValuePath(Table<O> path, ForeignKey<O, RuleCriterionValueRecord> childPath, InverseForeignKey<O, RuleCriterionValueRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleCriterionValuePath(Name alias, Table<RuleCriterionValueRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleCriterionValuePath as(String alias) {
+			return new RuleCriterionValuePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleCriterionValuePath as(Name alias) {
+			return new RuleCriterionValuePath(alias, this);
+		}
+
+		@Override
+		public RuleCriterionValuePath as(Table<?> alias) {
+			return new RuleCriterionValuePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -107,6 +147,23 @@ public class RuleCriterionValue extends TableImpl<RuleCriterionValueRecord> {
 	@Override
 	public UniqueKey<RuleCriterionValueRecord> getPrimaryKey() {
 		return Keys.KEY_RULE_CRITERION_VALUE_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<RuleCriterionValueRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_CONSTRAINT_CONDITION_CRITERION_VALUE);
+	}
+
+	private transient RuleCriterionPath _ruleCriterion;
+
+	/**
+	 * Get the implicit join path to the <code>rule_criterion</code> table.
+	 */
+	public RuleCriterionPath ruleCriterion() {
+		if (_ruleCriterion == null)
+			_ruleCriterion = new RuleCriterionPath(this, Keys.FK_CONSTRAINT_CONDITION_CRITERION_VALUE, null);
+
+		return _ruleCriterion;
 	}
 
 	@Override

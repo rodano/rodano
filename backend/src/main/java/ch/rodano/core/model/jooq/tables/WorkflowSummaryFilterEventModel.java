@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummary.WorkflowSummaryPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowSummaryFilterEventModelRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -97,6 +105,39 @@ public class WorkflowSummaryFilterEventModel extends TableImpl<WorkflowSummaryFi
 		this(DSL.name("workflow_summary_filter_event_model"), null);
 	}
 
+	public <O extends Record> WorkflowSummaryFilterEventModel(Table<O> path, ForeignKey<O, WorkflowSummaryFilterEventModelRecord> childPath, InverseForeignKey<O, WorkflowSummaryFilterEventModelRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_SUMMARY_FILTER_EVENT_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowSummaryFilterEventModelPath extends WorkflowSummaryFilterEventModel implements Path<WorkflowSummaryFilterEventModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowSummaryFilterEventModelPath(Table<O> path, ForeignKey<O, WorkflowSummaryFilterEventModelRecord> childPath, InverseForeignKey<O, WorkflowSummaryFilterEventModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowSummaryFilterEventModelPath(Name alias, Table<WorkflowSummaryFilterEventModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowSummaryFilterEventModelPath as(String alias) {
+			return new WorkflowSummaryFilterEventModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowSummaryFilterEventModelPath as(Name alias) {
+			return new WorkflowSummaryFilterEventModelPath(alias, this);
+		}
+
+		@Override
+		public WorkflowSummaryFilterEventModelPath as(Table<?> alias) {
+			return new WorkflowSummaryFilterEventModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -105,6 +146,35 @@ public class WorkflowSummaryFilterEventModel extends TableImpl<WorkflowSummaryFi
 	@Override
 	public UniqueKey<WorkflowSummaryFilterEventModelRecord> getPrimaryKey() {
 		return Keys.KEY_WORKFLOW_SUMMARY_FILTER_EVENT_MODEL_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowSummaryFilterEventModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_SUMMARY_FILTER_EVENT_MODEL, Keys.FK_WF_SUMMARY_FILTER_EVENT_MODEL_SUMMARY);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_WF_SUMMARY_FILTER_EVENT_MODEL, null);
+
+		return _eventModel;
+	}
+
+	private transient WorkflowSummaryPath _workflowSummary;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_summary</code> table.
+	 */
+	public WorkflowSummaryPath workflowSummary() {
+		if (_workflowSummary == null)
+			_workflowSummary = new WorkflowSummaryPath(this, Keys.FK_WF_SUMMARY_FILTER_EVENT_MODEL_SUMMARY, null);
+
+		return _workflowSummary;
 	}
 
 	@Override

@@ -67,7 +67,7 @@ export class HeaderComponent implements OnInit {
 		}
 
 		if(this.study?.color) {
-			document.documentElement.style.setProperty("--mat-sys-primary", this.study.color);
+			document.documentElement.style.setProperty('--mat-sys-primary', this.study.color);
 		}
 
 		this.authStateService.listenConnectedUser().pipe(
@@ -100,7 +100,7 @@ export class HeaderComponent implements OnInit {
 			next: () => {
 				this.router.navigate(['/projects']);
 			},
-			error: (error) => {
+			error: error => {
 				console.error('Error clearing project:', error);
 				this.router.navigate(['/projects']);
 			}

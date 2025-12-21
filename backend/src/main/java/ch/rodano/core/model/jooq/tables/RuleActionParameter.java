@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.RuleAction.RuleActionPath;
 import ch.rodano.core.model.jooq.tables.records.RuleActionParameterRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -114,6 +121,39 @@ public class RuleActionParameter extends TableImpl<RuleActionParameterRecord> {
 		this(DSL.name("rule_action_parameter"), null);
 	}
 
+	public <O extends Record> RuleActionParameter(Table<O> path, ForeignKey<O, RuleActionParameterRecord> childPath, InverseForeignKey<O, RuleActionParameterRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_ACTION_PARAMETER);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleActionParameterPath extends RuleActionParameter implements Path<RuleActionParameterRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleActionParameterPath(Table<O> path, ForeignKey<O, RuleActionParameterRecord> childPath, InverseForeignKey<O, RuleActionParameterRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleActionParameterPath(Name alias, Table<RuleActionParameterRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleActionParameterPath as(String alias) {
+			return new RuleActionParameterPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleActionParameterPath as(Name alias) {
+			return new RuleActionParameterPath(alias, this);
+		}
+
+		@Override
+		public RuleActionParameterPath as(Table<?> alias) {
+			return new RuleActionParameterPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -122,6 +162,23 @@ public class RuleActionParameter extends TableImpl<RuleActionParameterRecord> {
 	@Override
 	public UniqueKey<RuleActionParameterRecord> getPrimaryKey() {
 		return Keys.KEY_RULE_ACTION_PARAMETER_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<RuleActionParameterRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_RULE_ACTION_PARAM_ACTION);
+	}
+
+	private transient RuleActionPath _ruleAction;
+
+	/**
+	 * Get the implicit join path to the <code>rule_action</code> table.
+	 */
+	public RuleActionPath ruleAction() {
+		if (_ruleAction == null)
+			_ruleAction = new RuleActionPath(this, Keys.FK_RULE_ACTION_PARAM_ACTION, null);
+
+		return _ruleAction;
 	}
 
 	@Override

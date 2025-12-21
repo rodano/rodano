@@ -6,16 +6,25 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
+import ch.rodano.core.model.jooq.tables.WorkflowWidget.WorkflowWidgetPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowWidgetStateSelectorRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -101,6 +110,39 @@ public class WorkflowWidgetStateSelector extends TableImpl<WorkflowWidgetStateSe
 		this(DSL.name("workflow_widget_state_selector"), null);
 	}
 
+	public <O extends Record> WorkflowWidgetStateSelector(Table<O> path, ForeignKey<O, WorkflowWidgetStateSelectorRecord> childPath, InverseForeignKey<O, WorkflowWidgetStateSelectorRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_WIDGET_STATE_SELECTOR);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowWidgetStateSelectorPath extends WorkflowWidgetStateSelector implements Path<WorkflowWidgetStateSelectorRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowWidgetStateSelectorPath(Table<O> path, ForeignKey<O, WorkflowWidgetStateSelectorRecord> childPath, InverseForeignKey<O, WorkflowWidgetStateSelectorRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowWidgetStateSelectorPath(Name alias, Table<WorkflowWidgetStateSelectorRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowWidgetStateSelectorPath as(String alias) {
+			return new WorkflowWidgetStateSelectorPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowWidgetStateSelectorPath as(Name alias) {
+			return new WorkflowWidgetStateSelectorPath(alias, this);
+		}
+
+		@Override
+		public WorkflowWidgetStateSelectorPath as(Table<?> alias) {
+			return new WorkflowWidgetStateSelectorPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -109,6 +151,47 @@ public class WorkflowWidgetStateSelector extends TableImpl<WorkflowWidgetStateSe
 	@Override
 	public UniqueKey<WorkflowWidgetStateSelectorRecord> getPrimaryKey() {
 		return Keys.KEY_WORKFLOW_WIDGET_STATE_SELECTOR_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowWidgetStateSelectorRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_WIDGET_STATE_SELECTOR_WF_STATE, Keys.FK_WF_WIDGET_STATE_SELECTOR_WIDGET, Keys.FK_WF_WIDGET_STATE_SELECTOR_WORKFLOW);
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table.
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, Keys.FK_WF_WIDGET_STATE_SELECTOR_WF_STATE, null);
+
+		return _workflowState;
+	}
+
+	private transient WorkflowWidgetPath _workflowWidget;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_widget</code> table.
+	 */
+	public WorkflowWidgetPath workflowWidget() {
+		if (_workflowWidget == null)
+			_workflowWidget = new WorkflowWidgetPath(this, Keys.FK_WF_WIDGET_STATE_SELECTOR_WIDGET, null);
+
+		return _workflowWidget;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_WF_WIDGET_STATE_SELECTOR_WORKFLOW, null);
+
+		return _workflow;
 	}
 
 	@Override

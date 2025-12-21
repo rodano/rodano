@@ -6,20 +6,34 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
+import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
+import ch.rodano.core.model.jooq.tables.User.UserPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowStatusAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -193,9 +207,47 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 		this(DSL.name("workflow_status_audit"), null);
 	}
 
+	public <O extends Record> WorkflowStatusAudit(Table<O> path, ForeignKey<O, WorkflowStatusAuditRecord> childPath, InverseForeignKey<O, WorkflowStatusAuditRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_STATUS_AUDIT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowStatusAuditPath extends WorkflowStatusAudit implements Path<WorkflowStatusAuditRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowStatusAuditPath(Table<O> path, ForeignKey<O, WorkflowStatusAuditRecord> childPath, InverseForeignKey<O, WorkflowStatusAuditRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowStatusAuditPath(Name alias, Table<WorkflowStatusAuditRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowStatusAuditPath as(String alias) {
+			return new WorkflowStatusAuditPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowStatusAuditPath as(Name alias) {
+			return new WorkflowStatusAuditPath(alias, this);
+		}
+
+		@Override
+		public WorkflowStatusAuditPath as(Table<?> alias) {
+			return new WorkflowStatusAuditPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.WORKFLOW_STATUS_AUDIT_IDX_WORKFLOW_STATUS_AUDIT_STATE_ID, Indexes.WORKFLOW_STATUS_AUDIT_IDX_WORKFLOW_STATUS_AUDIT_WORKFLOW_ID);
 	}
 
 	@Override
@@ -206,6 +258,83 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	@Override
 	public UniqueKey<WorkflowStatusAuditRecord> getPrimaryKey() {
 		return Keys.KEY_WORKFLOW_STATUS_AUDIT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowStatusAuditRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_STATUS_AUDIT_WORKFLOW_ID, Keys.FK_WF_STATUS_AUDIT_WORKFLOW_STATE_ID, Keys.FK_WORKFLOW_STATUS_AUDIT_OBJECT_FK, Keys.FK_WORKFLOW_STATUS_AUDIT_ROBOT_FK, Keys.FK_WORKFLOW_STATUS_AUDIT_USER_FK, Keys.FK_WORKFLOW_STATUS_TRAIL_AUDIT_ACTION_FK);
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_WF_STATUS_AUDIT_WORKFLOW_ID, null);
+
+		return _workflow;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table.
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, Keys.FK_WF_STATUS_AUDIT_WORKFLOW_STATE_ID, null);
+
+		return _workflowState;
+	}
+
+	private transient WorkflowStatusPath _workflowStatus;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_status</code> table.
+	 */
+	public WorkflowStatusPath workflowStatus() {
+		if (_workflowStatus == null)
+			_workflowStatus = new WorkflowStatusPath(this, Keys.FK_WORKFLOW_STATUS_AUDIT_OBJECT_FK, null);
+
+		return _workflowStatus;
+	}
+
+	private transient RobotPath _robot;
+
+	/**
+	 * Get the implicit join path to the <code>robot</code> table.
+	 */
+	public RobotPath robot() {
+		if (_robot == null)
+			_robot = new RobotPath(this, Keys.FK_WORKFLOW_STATUS_AUDIT_ROBOT_FK, null);
+
+		return _robot;
+	}
+
+	private transient UserPath _user;
+
+	/**
+	 * Get the implicit join path to the <code>user</code> table.
+	 */
+	public UserPath user() {
+		if (_user == null)
+			_user = new UserPath(this, Keys.FK_WORKFLOW_STATUS_AUDIT_USER_FK, null);
+
+		return _user;
+	}
+
+	private transient AuditActionPath _auditAction;
+
+	/**
+	 * Get the implicit join path to the <code>audit_action</code> table.
+	 */
+	public AuditActionPath auditAction() {
+		if (_auditAction == null)
+			_auditAction = new AuditActionPath(this, Keys.FK_WORKFLOW_STATUS_TRAIL_AUDIT_ACTION_FK, null);
+
+		return _auditAction;
 	}
 
 	@Override

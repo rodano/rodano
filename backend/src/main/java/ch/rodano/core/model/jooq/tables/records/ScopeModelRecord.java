@@ -161,31 +161,45 @@ public class ScopeModelRecord extends UpdatableRecordImpl<ScopeModelRecord> {
 	}
 
 	/**
+	 * Setter for <code>scope_model.default_parent_id</code>.
+	 */
+	public void setDefaultParentId(UUID value) {
+		set(10, value);
+	}
+
+	/**
+	 * Getter for <code>scope_model.default_parent_id</code>.
+	 */
+	public UUID getDefaultParentId() {
+		return (UUID) get(10);
+	}
+
+	/**
 	 * Setter for <code>scope_model.default_profile_id</code>.
 	 */
 	public void setDefaultProfileId(UUID value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>scope_model.default_profile_id</code>.
 	 */
 	public UUID getDefaultProfileId() {
-		return (UUID) get(10);
+		return (UUID) get(11);
 	}
 
 	/**
 	 * Setter for <code>scope_model.layout</code>.
 	 */
 	public void setLayout(String value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>scope_model.layout</code>.
 	 */
 	public String getLayout() {
-		return (String) get(11);
+		return (String) get(12);
 	}
 
 	// -------------------------------------------------------------------------
@@ -211,7 +225,7 @@ public class ScopeModelRecord extends UpdatableRecordImpl<ScopeModelRecord> {
 	/**
 	 * Create a detached, initialised ScopeModelRecord
 	 */
-	public ScopeModelRecord(UUID scopeModelId, UUID projectId, String code, String shortname, String longname, String description, String pluralShortname, Boolean virtual, Integer maxNumber, String scopeFormat, UUID defaultProfileId, String layout) {
+	public ScopeModelRecord(UUID scopeModelId, UUID projectId, String code, String shortname, String longname, String description, String pluralShortname, Boolean virtual, Integer maxNumber, String scopeFormat, UUID defaultParentId, UUID defaultProfileId, String layout) {
 		super(ScopeModel.SCOPE_MODEL);
 
 		setScopeModelId(scopeModelId);
@@ -224,6 +238,7 @@ public class ScopeModelRecord extends UpdatableRecordImpl<ScopeModelRecord> {
 		setVirtual(virtual);
 		setMaxNumber(maxNumber);
 		setScopeFormat(scopeFormat);
+		setDefaultParentId(defaultParentId);
 		setDefaultProfileId(defaultProfileId);
 		setLayout(layout);
 		resetChangedOnNotNull();

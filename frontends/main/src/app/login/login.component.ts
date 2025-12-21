@@ -14,6 +14,7 @@ import {AuthService} from '@core/services/auth.service';
 import {NotificationService} from '../services/notification.service';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {LogoComponent} from '../logo/logo.component';
 
 @Component({
 	selector: 'app-login',
@@ -26,7 +27,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 		MatError,
 		MatLabel,
 		MatButton,
-		LocalizeMapPipe
+		LocalizeMapPipe,
+		LogoComponent
 	]
 })
 export class LoginComponent implements OnInit {

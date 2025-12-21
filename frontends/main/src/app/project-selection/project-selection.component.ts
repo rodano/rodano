@@ -8,6 +8,7 @@ import {AuthStateService} from '../services/auth-state.service';
 import {MatIconButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
+import {LogoComponent} from '../logo/logo.component';
 
 @Component({
 	selector: 'app-project-selection',
@@ -18,7 +19,9 @@ import {MatTooltip} from '@angular/material/tooltip';
 		CommonModule,
 		MatIcon,
 		MatIconButton,
-		MatTooltip]
+		MatTooltip,
+		LogoComponent
+	]
 })
 export class ProjectSelectionComponent implements OnInit {
 	projects: Project[] = [];
@@ -39,7 +42,7 @@ export class ProjectSelectionComponent implements OnInit {
 
 	loadProjects(): void {
 		this.loading = true;
-		this.projectService.getAccessibleProjects().subscribe({
+		this.projectService.getProjects().subscribe({
 			next: (projects: Project[]) => {
 				this.projects = projects;
 				this.loading = false;

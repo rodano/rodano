@@ -13,11 +13,16 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rules.Operator;
+import ch.rodano.configuration.model.scope.ScopeModel;
+import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
 import ch.rodano.core.helpers.FieldSubmitterHelper;
 import ch.rodano.core.helpers.ScopeCreatorService;
@@ -59,6 +64,7 @@ import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 @Service
 public class TestDataInitializer {
 
+	private static final Logger LOGGER = LogManager.getLogger(TestDataInitializer.class);
 	private static final DateTimeFormatter DATE_FIELD_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
 	private final AuditActionService auditActionService;
@@ -140,15 +146,14 @@ public class TestDataInitializer {
 		return robot;
 	}
 
-	public void initialize(final ZonedDateTime origin) throws IOException,
+	public void initialize(final ZonedDateTime origin, final Scope root) throws IOException,
 		InvalidValueException, BadlyFormattedValue {
 
 		final var creator = userDAOService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL);
 		final var actionDate = origin.plusMonths(3);
 		final var study = studyService.getStudy();
-		var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, actionDate);
+		var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, actionDate, study.getProjectId());
 
-		final var root = ensureRootScope(study, origin, context);
 		final var adminProfile = study.getProfile("ADMIN");
 
 		final Function<String, UUID> cat = code -> deterministic(study.getProjectId(), "RESOURCE_CATEGORY", code);
@@ -263,7 +268,7 @@ public class TestDataInitializer {
 
 		//fr0103
 		var chronology = actionDate.plusDays(RandomUtils.nextInt(1, 30));
-		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
+		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology, study.getProjectId());
 
 		//demographics entry inputs
 		patientDocumentation = datasetService.getOrCreate(fr0103, patientDatasetModel, context, DatabaseInitializer.RATIONALE);
@@ -384,9 +389,9 @@ public class TestDataInitializer {
 		ruleService.execute(state, study.getEventActions().get(WorkflowAction.SAVE_FORM), context);
 		ruleService.execute(state, edss.getFormModel().getRules(), context);
 
-		final var visit6 = eventService.get(fr0103, visit6Event, 0);
+		final var visit6 = eventService.create(fr0103, visit6Event, context, "Test data initialization");
 		chronology = chronology.plusMonths(6).plusDays(RandomUtils.nextInt(0, 5));
-		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
+		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology, study.getProjectId());
 
 		//study status inputs
 		visitDocumentation = datasetService.getOrCreate(fr0103, visit6, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
@@ -478,9 +483,9 @@ public class TestDataInitializer {
 		//transfer fr0103
 		scopeRelationService.transfer(fr0103, fr02, chronology.plusMonths(3), context);
 
-		final var visit12 = eventService.get(fr0103, visit12Event, 0);
+		final var visit12 = eventService.create(fr0103, visit12Event, context, "Test data initialization");
 		chronology = chronology.plusMonths(6).plusDays(RandomUtils.nextInt(0, 5));
-		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
+		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology, study.getProjectId());
 
 		//study status inputs
 		visitDocumentation = datasetService.getOrCreate(fr0103, visit12, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
@@ -659,7 +664,7 @@ public class TestDataInitializer {
 		return studyService.getStudy().getFormModel(code).getFormModelId();
 	}
 
-	private Scope ensureRootScope(final ch.rodano.configuration.model.study.Study study,
+	private Scope ensureRootScope(final Study study,
 								  final ZonedDateTime origin,
 								  final DatabaseActionContext context) {
 		try {
@@ -667,13 +672,13 @@ public class TestDataInitializer {
 		}
 		catch(IllegalStateException notFound) {
 			final var rootModel = study.getScopeModels().stream()
-				.filter(ch.rodano.configuration.model.scope.ScopeModel::isRoot)
+				.filter(ScopeModel::isRoot)
 				.findFirst()
 				.orElseThrow(() -> new IllegalStateException("No root ScopeModel in study configuration"));
 
 			final var candidate = scopeService.createCandidate(rootModel, origin, null);
 
-			if(org.apache.commons.lang3.StringUtils.isBlank(candidate.getCode())) {
+			if(StringUtils.isBlank(candidate.getCode())) {
 				candidate.setCode(study.getId());
 				candidate.setShortname(study.getDefaultLocalizedShortname());
 			}

@@ -53,7 +53,7 @@ public class StatelessDatabaseTest {
 	}
 
 	protected DatabaseActionContext createDatabaseActionContext() {
-		return auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE);
+		return auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, studyService.getCurrentProjectId());
 	}
 
 	@BeforeEach
@@ -64,6 +64,5 @@ public class StatelessDatabaseTest {
 	@AfterEach
 	protected void emptyCacheAndReloadConfig() throws IOException {
 		transactionCacheDAOService.emptyCache();
-		studyService.reload();
 	}
 }

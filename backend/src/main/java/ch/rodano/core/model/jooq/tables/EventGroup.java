@@ -5,7 +5,10 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
 import ch.rodano.core.model.jooq.tables.records.EventGroupRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -118,14 +126,81 @@ public class EventGroup extends TableImpl<EventGroupRecord> {
 		this(DSL.name("event_group"), null);
 	}
 
+	public <O extends Record> EventGroup(Table<O> path, ForeignKey<O, EventGroupRecord> childPath, InverseForeignKey<O, EventGroupRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_GROUP);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventGroupPath extends EventGroup implements Path<EventGroupRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventGroupPath(Table<O> path, ForeignKey<O, EventGroupRecord> childPath, InverseForeignKey<O, EventGroupRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventGroupPath(Name alias, Table<EventGroupRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventGroupPath as(String alias) {
+			return new EventGroupPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventGroupPath as(Name alias) {
+			return new EventGroupPath(alias, this);
+		}
+
+		@Override
+		public EventGroupPath as(Table<?> alias) {
+			return new EventGroupPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_GROUP_IDX_EV_GROUP_SCOPE);
+	}
+
+	@Override
 	public UniqueKey<EventGroupRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_GROUP_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventGroupRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EV_GROUP_SCOPE);
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_EV_GROUP_SCOPE, null);
+
+		return _scopeModel;
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_model</code> table
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, null, Keys.FK_EVENT_MODEL_GROUP.getInverseKey());
+
+		return _eventModel;
 	}
 
 	@Override

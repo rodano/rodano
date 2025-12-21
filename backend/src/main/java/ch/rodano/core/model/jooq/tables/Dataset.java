@@ -6,7 +6,14 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.DatasetAudit.DatasetAuditPath;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.Field.FieldPath;
+import ch.rodano.core.model.jooq.tables.File.FilePath;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
 import ch.rodano.core.model.jooq.tables.records.DatasetRecord;
 
 import java.time.ZonedDateTime;
@@ -17,10 +24,15 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -129,9 +141,47 @@ public class Dataset extends TableImpl<DatasetRecord> {
 		this(DSL.name("dataset"), null);
 	}
 
+	public <O extends Record> Dataset(Table<O> path, ForeignKey<O, DatasetRecord> childPath, InverseForeignKey<O, DatasetRecord> parentPath) {
+		super(path, childPath, parentPath, DATASET);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class DatasetPath extends Dataset implements Path<DatasetRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> DatasetPath(Table<O> path, ForeignKey<O, DatasetRecord> childPath, InverseForeignKey<O, DatasetRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private DatasetPath(Name alias, Table<DatasetRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public DatasetPath as(String alias) {
+			return new DatasetPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public DatasetPath as(Name alias) {
+			return new DatasetPath(alias, this);
+		}
+
+		@Override
+		public DatasetPath as(Table<?> alias) {
+			return new DatasetPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.DATASET_IDX_DATASET_DELETED, Indexes.DATASET_IDX_DATASET_EVENT_FK, Indexes.DATASET_IDX_DATASET_MODEL_CODE, Indexes.DATASET_IDX_DATASET_SCOPE_FK);
 	}
 
 	@Override
@@ -147,6 +197,83 @@ public class Dataset extends TableImpl<DatasetRecord> {
 	@Override
 	public List<UniqueKey<DatasetRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_DATASET_U_DATASET_ID);
+	}
+
+	@Override
+	public List<ForeignKey<DatasetRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_DATASET_DATASET_MODEL, Keys.FK_DATASET_EVENT_FK, Keys.FK_DATASET_SCOPE_FK);
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_DATASET_DATASET_MODEL, null);
+
+		return _datasetModel;
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit join path to the <code>event</code> table.
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, Keys.FK_DATASET_EVENT_FK, null);
+
+		return _event;
+	}
+
+	private transient ScopePath _scope;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table.
+	 */
+	public ScopePath scope() {
+		if (_scope == null)
+			_scope = new ScopePath(this, Keys.FK_DATASET_SCOPE_FK, null);
+
+		return _scope;
+	}
+
+	private transient DatasetAuditPath _datasetAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>dataset_audit</code> table
+	 */
+	public DatasetAuditPath datasetAudit() {
+		if (_datasetAudit == null)
+			_datasetAudit = new DatasetAuditPath(this, null, Keys.FK_DATASET_AUDIT_OBJECT_FK.getInverseKey());
+
+		return _datasetAudit;
+	}
+
+	private transient FieldPath _field;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field</code> table
+	 */
+	public FieldPath field() {
+		if (_field == null)
+			_field = new FieldPath(this, null, Keys.FK_FIELD_DATASET_FK.getInverseKey());
+
+		return _field;
+	}
+
+	private transient FilePath _file;
+
+	/**
+	 * Get the implicit to-many join path to the <code>file</code> table
+	 */
+	public FilePath file() {
+		if (_file == null)
+			_file = new FilePath(this, null, Keys.FK_FILE_DATASET_FK.getInverseKey());
+
+		return _file;
 	}
 
 	@Override

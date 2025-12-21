@@ -5,7 +5,21 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.Field.FieldPath;
+import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
+import ch.rodano.core.model.jooq.tables.FieldModelValidator.FieldModelValidatorPath;
+import ch.rodano.core.model.jooq.tables.FieldModelWorkflow.FieldModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.FieldPossibleValue.FieldPossibleValuePath;
+import ch.rodano.core.model.jooq.tables.FormLayout.FormLayoutPath;
+import ch.rodano.core.model.jooq.tables.FormLayoutCell.FormLayoutCellPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.ReportField.ReportFieldPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection.TimelineGraphSectionPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionMetaField.TimelineGraphSectionMetaFieldPath;
 import ch.rodano.core.model.jooq.tables.records.FieldModelRecord;
 
 import java.math.BigDecimal;
@@ -17,9 +31,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -289,9 +308,47 @@ public class FieldModel extends TableImpl<FieldModelRecord> {
 		this(DSL.name("field_model"), null);
 	}
 
+	public <O extends Record> FieldModel(Table<O> path, ForeignKey<O, FieldModelRecord> childPath, InverseForeignKey<O, FieldModelRecord> parentPath) {
+		super(path, childPath, parentPath, FIELD_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FieldModelPath extends FieldModel implements Path<FieldModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FieldModelPath(Table<O> path, ForeignKey<O, FieldModelRecord> childPath, InverseForeignKey<O, FieldModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FieldModelPath(Name alias, Table<FieldModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FieldModelPath as(String alias) {
+			return new FieldModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FieldModelPath as(Name alias) {
+			return new FieldModelPath(alias, this);
+		}
+
+		@Override
+		public FieldModelPath as(Table<?> alias) {
+			return new FieldModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.FIELD_MODEL_IDX_FIELD_MODEL_ORDER, Indexes.FIELD_MODEL_IDX_FIELD_MODEL_PROJECT_DATASET_MODEL);
 	}
 
 	@Override
@@ -302,6 +359,216 @@ public class FieldModel extends TableImpl<FieldModelRecord> {
 	@Override
 	public List<UniqueKey<FieldModelRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_FIELD_MODEL_UQ_FIELD_MODEL_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<FieldModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FIELD_MODEL_DATASET, Keys.FK_FIELD_MODEL_PROJECT);
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_FIELD_MODEL_DATASET, null);
+
+		return _datasetModel;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_FIELD_MODEL_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart</code> table
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, null, Keys.FK_CHART_FIELD_MODEL.getInverseKey());
+
+		return _chart;
+	}
+
+	private transient FieldAuditPath _fieldAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_audit</code> table
+	 */
+	public FieldAuditPath fieldAudit() {
+		if (_fieldAudit == null)
+			_fieldAudit = new FieldAuditPath(this, null, Keys.FK_FIELD_AUDIT_FIELD_MODEL_ID.getInverseKey());
+
+		return _fieldAudit;
+	}
+
+	private transient FieldPath _field;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field</code> table
+	 */
+	public FieldPath field() {
+		if (_field == null)
+			_field = new FieldPath(this, null, Keys.FK_FIELD_FIELD_MODEL_ID.getInverseKey());
+
+		return _field;
+	}
+
+	private transient FieldModelValidatorPath _fieldModelValidator;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_model_validator</code>
+	 * table
+	 */
+	public FieldModelValidatorPath fieldModelValidator() {
+		if (_fieldModelValidator == null)
+			_fieldModelValidator = new FieldModelValidatorPath(this, null, Keys.FK_FIELD_MODEL_VALIDATOR_FIELD.getInverseKey());
+
+		return _fieldModelValidator;
+	}
+
+	private transient FieldModelWorkflowPath _fieldModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_model_workflow</code>
+	 * table
+	 */
+	public FieldModelWorkflowPath fieldModelWorkflow() {
+		if (_fieldModelWorkflow == null)
+			_fieldModelWorkflow = new FieldModelWorkflowPath(this, null, Keys.FK_FIELD_MODEL_WF_FIELD.getInverseKey());
+
+		return _fieldModelWorkflow;
+	}
+
+	private transient FormLayoutCellPath _formLayoutCell;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_layout_cell</code>
+	 * table
+	 */
+	public FormLayoutCellPath formLayoutCell() {
+		if (_formLayoutCell == null)
+			_formLayoutCell = new FormLayoutCellPath(this, null, Keys.FK_FORM_LAYOUT_CELL_FIELD.getInverseKey());
+
+		return _formLayoutCell;
+	}
+
+	private transient FormLayoutPath _formLayout;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_layout</code> table
+	 */
+	public FormLayoutPath formLayout() {
+		if (_formLayout == null)
+			_formLayout = new FormLayoutPath(this, null, Keys.FK_FORM_LAYOUT_SORT_FIELD.getInverseKey());
+
+		return _formLayout;
+	}
+
+	private transient FieldPossibleValuePath _fieldPossibleValue;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_possible_value</code>
+	 * table
+	 */
+	public FieldPossibleValuePath fieldPossibleValue() {
+		if (_fieldPossibleValue == null)
+			_fieldPossibleValue = new FieldPossibleValuePath(this, null, Keys.FK_POSSIBLE_VALUE_FIELD.getInverseKey());
+
+		return _fieldPossibleValue;
+	}
+
+	private transient ReportFieldPath _reportField;
+
+	/**
+	 * Get the implicit to-many join path to the <code>report_field</code> table
+	 */
+	public ReportFieldPath reportField() {
+		if (_reportField == null)
+			_reportField = new ReportFieldPath(this, null, Keys.FK_REPORT_FIELD_FIELD_MODEL.getInverseKey());
+
+		return _reportField;
+	}
+
+	private transient TimelineGraphSectionPath _fkTimelineGraphSectionDateField;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section</code> table, via the
+	 * <code>fk_timeline_graph_section_date_field</code> key
+	 */
+	public TimelineGraphSectionPath fkTimelineGraphSectionDateField() {
+		if (_fkTimelineGraphSectionDateField == null)
+			_fkTimelineGraphSectionDateField = new TimelineGraphSectionPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_DATE_FIELD.getInverseKey());
+
+		return _fkTimelineGraphSectionDateField;
+	}
+
+	private transient TimelineGraphSectionPath _fkTimelineGraphSectionEndDateField;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section</code> table, via the
+	 * <code>fk_timeline_graph_section_end_date_field</code> key
+	 */
+	public TimelineGraphSectionPath fkTimelineGraphSectionEndDateField() {
+		if (_fkTimelineGraphSectionEndDateField == null)
+			_fkTimelineGraphSectionEndDateField = new TimelineGraphSectionPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_END_DATE_FIELD.getInverseKey());
+
+		return _fkTimelineGraphSectionEndDateField;
+	}
+
+	private transient TimelineGraphSectionPath _fkTimelineGraphSectionLabelField;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section</code> table, via the
+	 * <code>fk_timeline_graph_section_label_field</code> key
+	 */
+	public TimelineGraphSectionPath fkTimelineGraphSectionLabelField() {
+		if (_fkTimelineGraphSectionLabelField == null)
+			_fkTimelineGraphSectionLabelField = new TimelineGraphSectionPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_LABEL_FIELD.getInverseKey());
+
+		return _fkTimelineGraphSectionLabelField;
+	}
+
+	private transient TimelineGraphSectionMetaFieldPath _timelineGraphSectionMetaField;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section_meta_field</code> table
+	 */
+	public TimelineGraphSectionMetaFieldPath timelineGraphSectionMetaField() {
+		if (_timelineGraphSectionMetaField == null)
+			_timelineGraphSectionMetaField = new TimelineGraphSectionMetaFieldPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_META_FIELD_FIELD.getInverseKey());
+
+		return _timelineGraphSectionMetaField;
+	}
+
+	private transient TimelineGraphSectionPath _fkTimelineGraphSectionValueField;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section</code> table, via the
+	 * <code>fk_timeline_graph_section_value_field</code> key
+	 */
+	public TimelineGraphSectionPath fkTimelineGraphSectionValueField() {
+		if (_fkTimelineGraphSectionValueField == null)
+			_fkTimelineGraphSectionValueField = new TimelineGraphSectionPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_VALUE_FIELD.getInverseKey());
+
+		return _fkTimelineGraphSectionValueField;
 	}
 
 	@Override

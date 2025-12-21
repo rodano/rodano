@@ -5,7 +5,21 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
+import ch.rodano.core.model.jooq.tables.EventModelDatasetModel.EventModelDatasetModelPath;
+import ch.rodano.core.model.jooq.tables.Field.FieldPath;
+import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.FormLayout.FormLayoutPath;
+import ch.rodano.core.model.jooq.tables.FormLayoutCell.FormLayoutCellPath;
+import ch.rodano.core.model.jooq.tables.ProfileDatasetModelRights.ProfileDatasetModelRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.Report.ReportPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.ScopeModelDatasetModelPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection.TimelineGraphSectionPath;
 import ch.rodano.core.model.jooq.tables.records.DatasetModelRecord;
 
 import java.util.Arrays;
@@ -16,9 +30,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -148,9 +167,47 @@ public class DatasetModel extends TableImpl<DatasetModelRecord> {
 		this(DSL.name("dataset_model"), null);
 	}
 
+	public <O extends Record> DatasetModel(Table<O> path, ForeignKey<O, DatasetModelRecord> childPath, InverseForeignKey<O, DatasetModelRecord> parentPath) {
+		super(path, childPath, parentPath, DATASET_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class DatasetModelPath extends DatasetModel implements Path<DatasetModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> DatasetModelPath(Table<O> path, ForeignKey<O, DatasetModelRecord> childPath, InverseForeignKey<O, DatasetModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private DatasetModelPath(Name alias, Table<DatasetModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public DatasetModelPath as(String alias) {
+			return new DatasetModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public DatasetModelPath as(Name alias) {
+			return new DatasetModelPath(alias, this);
+		}
+
+		@Override
+		public DatasetModelPath as(Table<?> alias) {
+			return new DatasetModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.DATASET_MODEL_IDX_DM_PROJECT_EXPORT, Indexes.DATASET_MODEL_IDX_DM_PROJECT_FAMILY);
 	}
 
 	@Override
@@ -161,6 +218,172 @@ public class DatasetModel extends TableImpl<DatasetModelRecord> {
 	@Override
 	public List<UniqueKey<DatasetModelRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_DATASET_MODEL_UQ_DATASET_MODEL_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<DatasetModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_DATASET_MODEL_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_DATASET_MODEL_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart</code> table
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, null, Keys.FK_CHART_DATASET_MODEL.getInverseKey());
+
+		return _chart;
+	}
+
+	private transient DatasetPath _dataset;
+
+	/**
+	 * Get the implicit to-many join path to the <code>dataset</code> table
+	 */
+	public DatasetPath dataset() {
+		if (_dataset == null)
+			_dataset = new DatasetPath(this, null, Keys.FK_DATASET_DATASET_MODEL.getInverseKey());
+
+		return _dataset;
+	}
+
+	private transient EventModelDatasetModelPath _eventModelDatasetModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>event_model_dataset_model</code> table
+	 */
+	public EventModelDatasetModelPath eventModelDatasetModel() {
+		if (_eventModelDatasetModel == null)
+			_eventModelDatasetModel = new EventModelDatasetModelPath(this, null, Keys.FK_EVENT_MODEL_DATASET_MODEL_DATASET.getInverseKey());
+
+		return _eventModelDatasetModel;
+	}
+
+	private transient FieldAuditPath _fieldAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_audit</code> table
+	 */
+	public FieldAuditPath fieldAudit() {
+		if (_fieldAudit == null)
+			_fieldAudit = new FieldAuditPath(this, null, Keys.FK_FIELD_AUDIT_DATASET_MODEL_ID.getInverseKey());
+
+		return _fieldAudit;
+	}
+
+	private transient FieldPath _field;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field</code> table
+	 */
+	public FieldPath field() {
+		if (_field == null)
+			_field = new FieldPath(this, null, Keys.FK_FIELD_DATASET_MODEL_ID.getInverseKey());
+
+		return _field;
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_model</code> table
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, null, Keys.FK_FIELD_MODEL_DATASET.getInverseKey());
+
+		return _fieldModel;
+	}
+
+	private transient FormLayoutCellPath _formLayoutCell;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_layout_cell</code>
+	 * table
+	 */
+	public FormLayoutCellPath formLayoutCell() {
+		if (_formLayoutCell == null)
+			_formLayoutCell = new FormLayoutCellPath(this, null, Keys.FK_FORM_LAYOUT_CELL_DATASET.getInverseKey());
+
+		return _formLayoutCell;
+	}
+
+	private transient FormLayoutPath _formLayout;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_layout</code> table
+	 */
+	public FormLayoutPath formLayout() {
+		if (_formLayout == null)
+			_formLayout = new FormLayoutPath(this, null, Keys.FK_FORM_LAYOUT_DATASET.getInverseKey());
+
+		return _formLayout;
+	}
+
+	private transient ProfileDatasetModelRightsPath _profileDatasetModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_dataset_model_rights</code> table
+	 */
+	public ProfileDatasetModelRightsPath profileDatasetModelRights() {
+		if (_profileDatasetModelRights == null)
+			_profileDatasetModelRights = new ProfileDatasetModelRightsPath(this, null, Keys.FK_PROFILE_DATASET_MODEL_RIGHTS_DATASET_MODEL.getInverseKey());
+
+		return _profileDatasetModelRights;
+	}
+
+	private transient ReportPath _report;
+
+	/**
+	 * Get the implicit to-many join path to the <code>report</code> table
+	 */
+	public ReportPath report() {
+		if (_report == null)
+			_report = new ReportPath(this, null, Keys.FK_REPORT_DATASET_MODEL.getInverseKey());
+
+		return _report;
+	}
+
+	private transient ScopeModelDatasetModelPath _scopeModelDatasetModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>scope_model_dataset_model</code> table
+	 */
+	public ScopeModelDatasetModelPath scopeModelDatasetModel() {
+		if (_scopeModelDatasetModel == null)
+			_scopeModelDatasetModel = new ScopeModelDatasetModelPath(this, null, Keys.FK_SCOPE_MODEL_DATASET_MODEL_DATASET.getInverseKey());
+
+		return _scopeModelDatasetModel;
+	}
+
+	private transient TimelineGraphSectionPath _timelineGraphSection;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section</code> table
+	 */
+	public TimelineGraphSectionPath timelineGraphSection() {
+		if (_timelineGraphSection == null)
+			_timelineGraphSection = new TimelineGraphSectionPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_DATASET.getInverseKey());
+
+		return _timelineGraphSection;
 	}
 
 	@Override

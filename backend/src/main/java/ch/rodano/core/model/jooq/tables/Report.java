@@ -6,6 +6,10 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.ProfileReportGrants.ProfileReportGrantsPath;
+import ch.rodano.core.model.jooq.tables.ReportField.ReportFieldPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.ReportRecord;
 
 import java.util.Arrays;
@@ -16,9 +20,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -123,6 +131,39 @@ public class Report extends TableImpl<ReportRecord> {
 		this(DSL.name("report"), null);
 	}
 
+	public <O extends Record> Report(Table<O> path, ForeignKey<O, ReportRecord> childPath, InverseForeignKey<O, ReportRecord> parentPath) {
+		super(path, childPath, parentPath, REPORT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ReportPath extends Report implements Path<ReportRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ReportPath(Table<O> path, ForeignKey<O, ReportRecord> childPath, InverseForeignKey<O, ReportRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ReportPath(Name alias, Table<ReportRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ReportPath as(String alias) {
+			return new ReportPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ReportPath as(Name alias) {
+			return new ReportPath(alias, this);
+		}
+
+		@Override
+		public ReportPath as(Table<?> alias) {
+			return new ReportPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -131,6 +172,60 @@ public class Report extends TableImpl<ReportRecord> {
 	@Override
 	public UniqueKey<ReportRecord> getPrimaryKey() {
 		return Keys.KEY_REPORT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ReportRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_REPORT_DATASET_MODEL, Keys.FK_REPORT_WORKFLOW);
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_REPORT_DATASET_MODEL, null);
+
+		return _datasetModel;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_REPORT_WORKFLOW, null);
+
+		return _workflow;
+	}
+
+	private transient ProfileReportGrantsPath _profileReportGrants;
+
+	/**
+	 * Get the implicit to-many join path to the <code>profile_report_grants</code>
+	 * table
+	 */
+	public ProfileReportGrantsPath profileReportGrants() {
+		if (_profileReportGrants == null)
+			_profileReportGrants = new ProfileReportGrantsPath(this, null, Keys.FK_PROFILE_REPORT_GRANTS_REPORT.getInverseKey());
+
+		return _profileReportGrants;
+	}
+
+	private transient ReportFieldPath _reportField;
+
+	/**
+	 * Get the implicit to-many join path to the <code>report_field</code> table
+	 */
+	public ReportFieldPath reportField() {
+		if (_reportField == null)
+			_reportField = new ReportFieldPath(this, null, Keys.FK_REPORT_FIELD_REPORT.getInverseKey());
+
+		return _reportField;
 	}
 
 	@Override

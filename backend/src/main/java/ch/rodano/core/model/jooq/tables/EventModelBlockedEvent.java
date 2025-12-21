@@ -5,17 +5,26 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
 import ch.rodano.core.model.jooq.tables.records.EventModelBlockedEventRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +103,83 @@ public class EventModelBlockedEvent extends TableImpl<EventModelBlockedEventReco
 		this(DSL.name("event_model_blocked_event"), null);
 	}
 
+	public <O extends Record> EventModelBlockedEvent(Table<O> path, ForeignKey<O, EventModelBlockedEventRecord> childPath, InverseForeignKey<O, EventModelBlockedEventRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_MODEL_BLOCKED_EVENT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventModelBlockedEventPath extends EventModelBlockedEvent implements Path<EventModelBlockedEventRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventModelBlockedEventPath(Table<O> path, ForeignKey<O, EventModelBlockedEventRecord> childPath, InverseForeignKey<O, EventModelBlockedEventRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventModelBlockedEventPath(Name alias, Table<EventModelBlockedEventRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventModelBlockedEventPath as(String alias) {
+			return new EventModelBlockedEventPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventModelBlockedEventPath as(Name alias) {
+			return new EventModelBlockedEventPath(alias, this);
+		}
+
+		@Override
+		public EventModelBlockedEventPath as(Table<?> alias) {
+			return new EventModelBlockedEventPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_MODEL_BLOCKED_EVENT_IDX_EVENT_MODEL_BLOCKED_EVENT, Indexes.EVENT_MODEL_BLOCKED_EVENT_IDX_EVENT_MODEL_BLOCKED_EVENT_BLOCKED);
+	}
+
+	@Override
 	public UniqueKey<EventModelBlockedEventRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_MODEL_BLOCKED_EVENT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventModelBlockedEventRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_MODEL_BLOCKED_EVENT, Keys.FK_EVENT_MODEL_BLOCKED_EVENT_TARGET);
+	}
+
+	private transient EventModelPath _fkEventModelBlockedEvent;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_event_model_blocked_event</code> key.
+	 */
+	public EventModelPath fkEventModelBlockedEvent() {
+		if (_fkEventModelBlockedEvent == null)
+			_fkEventModelBlockedEvent = new EventModelPath(this, Keys.FK_EVENT_MODEL_BLOCKED_EVENT, null);
+
+		return _fkEventModelBlockedEvent;
+	}
+
+	private transient EventModelPath _fkEventModelBlockedEventTarget;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_event_model_blocked_event_target</code> key.
+	 */
+	public EventModelPath fkEventModelBlockedEventTarget() {
+		if (_fkEventModelBlockedEventTarget == null)
+			_fkEventModelBlockedEventTarget = new EventModelPath(this, Keys.FK_EVENT_MODEL_BLOCKED_EVENT_TARGET, null);
+
+		return _fkEventModelBlockedEventTarget;
 	}
 
 	@Override

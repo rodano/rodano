@@ -5,17 +5,26 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
 import ch.rodano.core.model.jooq.tables.records.ChartColorRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -99,14 +108,69 @@ public class ChartColor extends TableImpl<ChartColorRecord> {
 		this(DSL.name("chart_color"), null);
 	}
 
+	public <O extends Record> ChartColor(Table<O> path, ForeignKey<O, ChartColorRecord> childPath, InverseForeignKey<O, ChartColorRecord> parentPath) {
+		super(path, childPath, parentPath, CHART_COLOR);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ChartColorPath extends ChartColor implements Path<ChartColorRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ChartColorPath(Table<O> path, ForeignKey<O, ChartColorRecord> childPath, InverseForeignKey<O, ChartColorRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ChartColorPath(Name alias, Table<ChartColorRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ChartColorPath as(String alias) {
+			return new ChartColorPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ChartColorPath as(Name alias) {
+			return new ChartColorPath(alias, this);
+		}
+
+		@Override
+		public ChartColorPath as(Table<?> alias) {
+			return new ChartColorPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.CHART_COLOR_IDX_CHART_COLOR_CHART);
+	}
+
+	@Override
 	public UniqueKey<ChartColorRecord> getPrimaryKey() {
 		return Keys.KEY_CHART_COLOR_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ChartColorRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_CHART_COLOR_CHART);
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit join path to the <code>chart</code> table.
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, Keys.FK_CHART_COLOR_CHART, null);
+
+		return _chart;
 	}
 
 	@Override

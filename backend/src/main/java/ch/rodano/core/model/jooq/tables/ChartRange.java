@@ -5,7 +5,9 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
 import ch.rodano.core.model.jooq.tables.records.ChartRangeRecord;
 
 import java.math.BigDecimal;
@@ -17,9 +19,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -134,9 +141,47 @@ public class ChartRange extends TableImpl<ChartRangeRecord> {
 		this(DSL.name("chart_range"), null);
 	}
 
+	public <O extends Record> ChartRange(Table<O> path, ForeignKey<O, ChartRangeRecord> childPath, InverseForeignKey<O, ChartRangeRecord> parentPath) {
+		super(path, childPath, parentPath, CHART_RANGE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ChartRangePath extends ChartRange implements Path<ChartRangeRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ChartRangePath(Table<O> path, ForeignKey<O, ChartRangeRecord> childPath, InverseForeignKey<O, ChartRangeRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ChartRangePath(Name alias, Table<ChartRangeRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ChartRangePath as(String alias) {
+			return new ChartRangePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ChartRangePath as(Name alias) {
+			return new ChartRangePath(alias, this);
+		}
+
+		@Override
+		public ChartRangePath as(Table<?> alias) {
+			return new ChartRangePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.CHART_RANGE_IDX_CHART_RANGE_SORT);
 	}
 
 	@Override
@@ -147,6 +192,23 @@ public class ChartRange extends TableImpl<ChartRangeRecord> {
 	@Override
 	public List<UniqueKey<ChartRangeRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_CHART_RANGE_UQ_CHART_RANGE_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<ChartRangeRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_CHART_RANGE_CHART);
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit join path to the <code>chart</code> table.
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, Keys.FK_CHART_RANGE_CHART, null);
+
+		return _chart;
 	}
 
 	@Override

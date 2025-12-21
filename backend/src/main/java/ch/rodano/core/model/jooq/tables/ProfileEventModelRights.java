@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
 import ch.rodano.core.model.jooq.tables.records.ProfileEventModelRightsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +112,39 @@ public class ProfileEventModelRights extends TableImpl<ProfileEventModelRightsRe
 		this(DSL.name("profile_event_model_rights"), null);
 	}
 
+	public <O extends Record> ProfileEventModelRights(Table<O> path, ForeignKey<O, ProfileEventModelRightsRecord> childPath, InverseForeignKey<O, ProfileEventModelRightsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_EVENT_MODEL_RIGHTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfileEventModelRightsPath extends ProfileEventModelRights implements Path<ProfileEventModelRightsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfileEventModelRightsPath(Table<O> path, ForeignKey<O, ProfileEventModelRightsRecord> childPath, InverseForeignKey<O, ProfileEventModelRightsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfileEventModelRightsPath(Name alias, Table<ProfileEventModelRightsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfileEventModelRightsPath as(String alias) {
+			return new ProfileEventModelRightsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfileEventModelRightsPath as(Name alias) {
+			return new ProfileEventModelRightsPath(alias, this);
+		}
+
+		@Override
+		public ProfileEventModelRightsPath as(Table<?> alias) {
+			return new ProfileEventModelRightsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +153,35 @@ public class ProfileEventModelRights extends TableImpl<ProfileEventModelRightsRe
 	@Override
 	public UniqueKey<ProfileEventModelRightsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_EVENT_MODEL_RIGHTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfileEventModelRightsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_EVENT_MODEL_RIGHTS_EVENT_MODEL, Keys.FK_PROFILE_EVENT_MODEL_RIGHTS_PROFILE);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_PROFILE_EVENT_MODEL_RIGHTS_EVENT_MODEL, null);
+
+		return _eventModel;
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROFILE_EVENT_MODEL_RIGHTS_PROFILE, null);
+
+		return _profile;
 	}
 
 	@Override

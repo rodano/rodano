@@ -5,8 +5,10 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
+import ch.rodano.core.model.jooq.tables.RuleAction.RuleActionPath;
 import ch.rodano.core.model.jooq.tables.records.RuleRecord;
 
 import java.util.Arrays;
@@ -17,9 +19,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -124,14 +131,64 @@ public class Rule extends TableImpl<RuleRecord> {
 		this(DSL.name("rule"), null);
 	}
 
+	public <O extends Record> Rule(Table<O> path, ForeignKey<O, RuleRecord> childPath, InverseForeignKey<O, RuleRecord> parentPath) {
+		super(path, childPath, parentPath, RULE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RulePath extends Rule implements Path<RuleRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RulePath(Table<O> path, ForeignKey<O, RuleRecord> childPath, InverseForeignKey<O, RuleRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RulePath(Name alias, Table<RuleRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RulePath as(String alias) {
+			return new RulePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RulePath as(Name alias) {
+			return new RulePath(alias, this);
+		}
+
+		@Override
+		public RulePath as(Table<?> alias) {
+			return new RulePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.RULE_IDX_RULE_ENTITY, Indexes.RULE_IDX_RULE_ENTITY_TYPE);
+	}
+
+	@Override
 	public UniqueKey<RuleRecord> getPrimaryKey() {
 		return Keys.KEY_RULE_PRIMARY;
+	}
+
+	private transient RuleActionPath _ruleAction;
+
+	/**
+	 * Get the implicit to-many join path to the <code>rule_action</code> table
+	 */
+	public RuleActionPath ruleAction() {
+		if (_ruleAction == null)
+			_ruleAction = new RuleActionPath(this, null, Keys.FK_RULE_ACTION_RULE.getInverseKey());
+
+		return _ruleAction;
 	}
 
 	@Override

@@ -5,7 +5,11 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Feature.FeaturePath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSection.MenuLayoutSectionPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MenuLayoutSectionWidgetParameterPath;
 import ch.rodano.core.model.jooq.tables.records.MenuLayoutSectionWidgetRecord;
 
 import java.util.Arrays;
@@ -15,9 +19,14 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -141,9 +150,47 @@ public class MenuLayoutSectionWidget extends TableImpl<MenuLayoutSectionWidgetRe
 		this(DSL.name("menu_layout_section_widget"), null);
 	}
 
+	public <O extends Record> MenuLayoutSectionWidget(Table<O> path, ForeignKey<O, MenuLayoutSectionWidgetRecord> childPath, InverseForeignKey<O, MenuLayoutSectionWidgetRecord> parentPath) {
+		super(path, childPath, parentPath, MENU_LAYOUT_SECTION_WIDGET);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class MenuLayoutSectionWidgetPath extends MenuLayoutSectionWidget implements Path<MenuLayoutSectionWidgetRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> MenuLayoutSectionWidgetPath(Table<O> path, ForeignKey<O, MenuLayoutSectionWidgetRecord> childPath, InverseForeignKey<O, MenuLayoutSectionWidgetRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private MenuLayoutSectionWidgetPath(Name alias, Table<MenuLayoutSectionWidgetRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public MenuLayoutSectionWidgetPath as(String alias) {
+			return new MenuLayoutSectionWidgetPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public MenuLayoutSectionWidgetPath as(Name alias) {
+			return new MenuLayoutSectionWidgetPath(alias, this);
+		}
+
+		@Override
+		public MenuLayoutSectionWidgetPath as(Table<?> alias) {
+			return new MenuLayoutSectionWidgetPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.MENU_LAYOUT_SECTION_WIDGET_IDX_MENU_WIDGET_FEATURE);
 	}
 
 	@Override
@@ -154,6 +201,48 @@ public class MenuLayoutSectionWidget extends TableImpl<MenuLayoutSectionWidgetRe
 	@Override
 	public List<UniqueKey<MenuLayoutSectionWidgetRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_MENU_LAYOUT_SECTION_WIDGET_UQ_MENU_WIDGET_ORDER);
+	}
+
+	@Override
+	public List<ForeignKey<MenuLayoutSectionWidgetRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_MENU_LAYOUT_SECTION_WIDGET_FEATURE, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_SECTION);
+	}
+
+	private transient FeaturePath _feature;
+
+	/**
+	 * Get the implicit join path to the <code>feature</code> table.
+	 */
+	public FeaturePath feature() {
+		if (_feature == null)
+			_feature = new FeaturePath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_FEATURE, null);
+
+		return _feature;
+	}
+
+	private transient MenuLayoutSectionPath _menuLayoutSection;
+
+	/**
+	 * Get the implicit join path to the <code>menu_layout_section</code> table.
+	 */
+	public MenuLayoutSectionPath menuLayoutSection() {
+		if (_menuLayoutSection == null)
+			_menuLayoutSection = new MenuLayoutSectionPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_SECTION, null);
+
+		return _menuLayoutSection;
+	}
+
+	private transient MenuLayoutSectionWidgetParameterPath _menuLayoutSectionWidgetParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget_parameter</code> table
+	 */
+	public MenuLayoutSectionWidgetParameterPath menuLayoutSectionWidgetParameter() {
+		if (_menuLayoutSectionWidgetParameter == null)
+			_menuLayoutSectionWidgetParameter = new MenuLayoutSectionWidgetParameterPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WIDGET.getInverseKey());
+
+		return _menuLayoutSectionWidgetParameter;
 	}
 
 	@Override

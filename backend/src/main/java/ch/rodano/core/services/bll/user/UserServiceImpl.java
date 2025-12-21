@@ -114,8 +114,6 @@ public class UserServiceImpl implements UserService {
 	) {
 		checkEmailCanBeUsed(user.getEmail());
 
-		user.setProjectId(studyService.getStudy().getProjectId());
-
 		// if the user is externally managed, activate them immediately, else set a new activation code
 		if(user.isExternallyManaged()) {
 			user.setActivated(true);
@@ -165,10 +163,6 @@ public class UserServiceImpl implements UserService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		if(user.getProjectId() == null) {
-			user.setProjectId(studyService.getStudy().getProjectId());
-		}
-
 		userDAOService.saveUser(user, context, rationale);
 	}
 

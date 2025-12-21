@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.FieldModelWorkflowRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,6 +102,39 @@ public class FieldModelWorkflow extends TableImpl<FieldModelWorkflowRecord> {
 		this(DSL.name("field_model_workflow"), null);
 	}
 
+	public <O extends Record> FieldModelWorkflow(Table<O> path, ForeignKey<O, FieldModelWorkflowRecord> childPath, InverseForeignKey<O, FieldModelWorkflowRecord> parentPath) {
+		super(path, childPath, parentPath, FIELD_MODEL_WORKFLOW);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FieldModelWorkflowPath extends FieldModelWorkflow implements Path<FieldModelWorkflowRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FieldModelWorkflowPath(Table<O> path, ForeignKey<O, FieldModelWorkflowRecord> childPath, InverseForeignKey<O, FieldModelWorkflowRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FieldModelWorkflowPath(Name alias, Table<FieldModelWorkflowRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FieldModelWorkflowPath as(String alias) {
+			return new FieldModelWorkflowPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FieldModelWorkflowPath as(Name alias) {
+			return new FieldModelWorkflowPath(alias, this);
+		}
+
+		@Override
+		public FieldModelWorkflowPath as(Table<?> alias) {
+			return new FieldModelWorkflowPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -102,6 +143,35 @@ public class FieldModelWorkflow extends TableImpl<FieldModelWorkflowRecord> {
 	@Override
 	public UniqueKey<FieldModelWorkflowRecord> getPrimaryKey() {
 		return Keys.KEY_FIELD_MODEL_WORKFLOW_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FieldModelWorkflowRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FIELD_MODEL_WF_FIELD, Keys.FK_FIELD_MODEL_WF_WORKFLOW);
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_FIELD_MODEL_WF_FIELD, null);
+
+		return _fieldModel;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_FIELD_MODEL_WF_WORKFLOW, null);
+
+		return _workflow;
 	}
 
 	@Override

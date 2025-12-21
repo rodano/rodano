@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FormModel.FormModelPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelFormModelRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +104,81 @@ public class ScopeModelFormModel extends TableImpl<ScopeModelFormModelRecord> {
 		this(DSL.name("scope_model_form_model"), null);
 	}
 
+	public <O extends Record> ScopeModelFormModel(Table<O> path, ForeignKey<O, ScopeModelFormModelRecord> childPath, InverseForeignKey<O, ScopeModelFormModelRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_MODEL_FORM_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeModelFormModelPath extends ScopeModelFormModel implements Path<ScopeModelFormModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeModelFormModelPath(Table<O> path, ForeignKey<O, ScopeModelFormModelRecord> childPath, InverseForeignKey<O, ScopeModelFormModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeModelFormModelPath(Name alias, Table<ScopeModelFormModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeModelFormModelPath as(String alias) {
+			return new ScopeModelFormModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeModelFormModelPath as(Name alias) {
+			return new ScopeModelFormModelPath(alias, this);
+		}
+
+		@Override
+		public ScopeModelFormModelPath as(Table<?> alias) {
+			return new ScopeModelFormModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SCOPE_MODEL_FORM_MODEL_IDX_SCOPE_MODEL_FORM_MODEL_FORM, Indexes.SCOPE_MODEL_FORM_MODEL_IDX_SCOPE_MODEL_FORM_MODEL_SCOPE);
+	}
+
+	@Override
 	public UniqueKey<ScopeModelFormModelRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_MODEL_FORM_MODEL_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ScopeModelFormModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_MODEL_FORM_MODEL_FORM, Keys.FK_SCOPE_MODEL_FORM_MODEL_SCOPE);
+	}
+
+	private transient FormModelPath _formModel;
+
+	/**
+	 * Get the implicit join path to the <code>form_model</code> table.
+	 */
+	public FormModelPath formModel() {
+		if (_formModel == null)
+			_formModel = new FormModelPath(this, Keys.FK_SCOPE_MODEL_FORM_MODEL_FORM, null);
+
+		return _formModel;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_SCOPE_MODEL_FORM_MODEL_SCOPE, null);
+
+		return _scopeModel;
 	}
 
 	@Override

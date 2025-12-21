@@ -6,19 +6,29 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Mail.MailPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
 import ch.rodano.core.model.jooq.tables.records.MailAttachmentRecord;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -117,9 +127,47 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 		this(DSL.name("mail_attachment"), null);
 	}
 
+	public <O extends Record> MailAttachment(Table<O> path, ForeignKey<O, MailAttachmentRecord> childPath, InverseForeignKey<O, MailAttachmentRecord> parentPath) {
+		super(path, childPath, parentPath, MAIL_ATTACHMENT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class MailAttachmentPath extends MailAttachment implements Path<MailAttachmentRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> MailAttachmentPath(Table<O> path, ForeignKey<O, MailAttachmentRecord> childPath, InverseForeignKey<O, MailAttachmentRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private MailAttachmentPath(Name alias, Table<MailAttachmentRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public MailAttachmentPath as(String alias) {
+			return new MailAttachmentPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public MailAttachmentPath as(Name alias) {
+			return new MailAttachmentPath(alias, this);
+		}
+
+		@Override
+		public MailAttachmentPath as(Table<?> alias) {
+			return new MailAttachmentPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.MAIL_ATTACHMENT_IDX_MAIL_ATTACH_PROJECT);
 	}
 
 	@Override
@@ -130,6 +178,35 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	@Override
 	public UniqueKey<MailAttachmentRecord> getPrimaryKey() {
 		return Keys.KEY_MAIL_ATTACHMENT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<MailAttachmentRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_MAIL_ATTACHMENT_MAIL_FK, Keys.FK_MAIL_ATTACHMENT_PROJECT);
+	}
+
+	private transient MailPath _mail;
+
+	/**
+	 * Get the implicit join path to the <code>mail</code> table.
+	 */
+	public MailPath mail() {
+		if (_mail == null)
+			_mail = new MailPath(this, Keys.FK_MAIL_ATTACHMENT_MAIL_FK, null);
+
+		return _mail;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_MAIL_ATTACHMENT_PROJECT, null);
+
+		return _project;
 	}
 
 	@Override

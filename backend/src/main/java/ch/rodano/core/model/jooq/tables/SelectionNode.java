@@ -5,7 +5,9 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.SelectionNode.SelectionNodePath;
 import ch.rodano.core.model.jooq.tables.records.SelectionNodeRecord;
 
 import java.util.Arrays;
@@ -15,9 +17,14 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -116,9 +123,47 @@ public class SelectionNode extends TableImpl<SelectionNodeRecord> {
 		this(DSL.name("selection_node"), null);
 	}
 
+	public <O extends Record> SelectionNode(Table<O> path, ForeignKey<O, SelectionNodeRecord> childPath, InverseForeignKey<O, SelectionNodeRecord> parentPath) {
+		super(path, childPath, parentPath, SELECTION_NODE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class SelectionNodePath extends SelectionNode implements Path<SelectionNodeRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> SelectionNodePath(Table<O> path, ForeignKey<O, SelectionNodeRecord> childPath, InverseForeignKey<O, SelectionNodeRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private SelectionNodePath(Name alias, Table<SelectionNodeRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public SelectionNodePath as(String alias) {
+			return new SelectionNodePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public SelectionNodePath as(Name alias) {
+			return new SelectionNodePath(alias, this);
+		}
+
+		@Override
+		public SelectionNodePath as(Table<?> alias) {
+			return new SelectionNodePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SELECTION_NODE_IDX_SELECTION_NODE_PARENT);
 	}
 
 	@Override
@@ -129,6 +174,23 @@ public class SelectionNode extends TableImpl<SelectionNodeRecord> {
 	@Override
 	public List<UniqueKey<SelectionNodeRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_SELECTION_NODE_UQ_SELECTION_NODE_SIBLING);
+	}
+
+	@Override
+	public List<ForeignKey<SelectionNodeRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SELECTION_NODE_PARENT);
+	}
+
+	private transient SelectionNodePath _selectionNode;
+
+	/**
+	 * Get the implicit join path to the <code>selection_node</code> table.
+	 */
+	public SelectionNodePath selectionNode() {
+		if (_selectionNode == null)
+			_selectionNode = new SelectionNodePath(this, Keys.FK_SELECTION_NODE_PARENT, null);
+
+		return _selectionNode;
 	}
 
 	@Override

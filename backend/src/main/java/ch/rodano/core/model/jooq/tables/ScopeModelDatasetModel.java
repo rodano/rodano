@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelDatasetModelRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +104,81 @@ public class ScopeModelDatasetModel extends TableImpl<ScopeModelDatasetModelReco
 		this(DSL.name("scope_model_dataset_model"), null);
 	}
 
+	public <O extends Record> ScopeModelDatasetModel(Table<O> path, ForeignKey<O, ScopeModelDatasetModelRecord> childPath, InverseForeignKey<O, ScopeModelDatasetModelRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_MODEL_DATASET_MODEL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeModelDatasetModelPath extends ScopeModelDatasetModel implements Path<ScopeModelDatasetModelRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeModelDatasetModelPath(Table<O> path, ForeignKey<O, ScopeModelDatasetModelRecord> childPath, InverseForeignKey<O, ScopeModelDatasetModelRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeModelDatasetModelPath(Name alias, Table<ScopeModelDatasetModelRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeModelDatasetModelPath as(String alias) {
+			return new ScopeModelDatasetModelPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeModelDatasetModelPath as(Name alias) {
+			return new ScopeModelDatasetModelPath(alias, this);
+		}
+
+		@Override
+		public ScopeModelDatasetModelPath as(Table<?> alias) {
+			return new ScopeModelDatasetModelPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SCOPE_MODEL_DATASET_MODEL_IDX_SCOPE_MODEL_DATASET_MODEL_DATASET, Indexes.SCOPE_MODEL_DATASET_MODEL_IDX_SCOPE_MODEL_DATASET_MODEL_SCOPE);
+	}
+
+	@Override
 	public UniqueKey<ScopeModelDatasetModelRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_MODEL_DATASET_MODEL_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ScopeModelDatasetModelRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_MODEL_DATASET_MODEL_DATASET, Keys.FK_SCOPE_MODEL_DATASET_MODEL_SCOPE);
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_SCOPE_MODEL_DATASET_MODEL_DATASET, null);
+
+		return _datasetModel;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_SCOPE_MODEL_DATASET_MODEL_SCOPE, null);
+
+		return _scopeModel;
 	}
 
 	@Override

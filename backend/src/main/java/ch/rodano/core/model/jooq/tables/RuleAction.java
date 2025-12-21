@@ -5,7 +5,10 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Rule.RulePath;
+import ch.rodano.core.model.jooq.tables.RuleActionParameter.RuleActionParameterPath;
 import ch.rodano.core.model.jooq.tables.records.RuleActionRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -82,7 +90,7 @@ public class RuleAction extends TableImpl<RuleActionRecord> {
 	/**
 	 * The column <code>rule_action.static_action_id</code>.
 	 */
-	public final TableField<RuleActionRecord, String> STATIC_ACTION_ID = createField(DSL.name("static_action_id"), SQLDataType.VARCHAR(128).nullable(false), this, "");
+	public final TableField<RuleActionRecord, String> STATIC_ACTION_ID = createField(DSL.name("static_action_id"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>rule_action.optional</code>.
@@ -138,9 +146,47 @@ public class RuleAction extends TableImpl<RuleActionRecord> {
 		this(DSL.name("rule_action"), null);
 	}
 
+	public <O extends Record> RuleAction(Table<O> path, ForeignKey<O, RuleActionRecord> childPath, InverseForeignKey<O, RuleActionRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_ACTION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleActionPath extends RuleAction implements Path<RuleActionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleActionPath(Table<O> path, ForeignKey<O, RuleActionRecord> childPath, InverseForeignKey<O, RuleActionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleActionPath(Name alias, Table<RuleActionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleActionPath as(String alias) {
+			return new RuleActionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleActionPath as(Name alias) {
+			return new RuleActionPath(alias, this);
+		}
+
+		@Override
+		public RuleActionPath as(Table<?> alias) {
+			return new RuleActionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.RULE_ACTION_IDX_RULE_ACTION_RULE);
 	}
 
 	@Override
@@ -151,6 +197,36 @@ public class RuleAction extends TableImpl<RuleActionRecord> {
 	@Override
 	public List<UniqueKey<RuleActionRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_RULE_ACTION_UQ_RULE_ACTION_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<RuleActionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_RULE_ACTION_RULE);
+	}
+
+	private transient RulePath _rule;
+
+	/**
+	 * Get the implicit join path to the <code>rule</code> table.
+	 */
+	public RulePath rule() {
+		if (_rule == null)
+			_rule = new RulePath(this, Keys.FK_RULE_ACTION_RULE, null);
+
+		return _rule;
+	}
+
+	private transient RuleActionParameterPath _ruleActionParameter;
+
+	/**
+	 * Get the implicit to-many join path to the <code>rule_action_parameter</code>
+	 * table
+	 */
+	public RuleActionParameterPath ruleActionParameter() {
+		if (_ruleActionParameter == null)
+			_ruleActionParameter = new RuleActionParameterPath(this, null, Keys.FK_RULE_ACTION_PARAM_ACTION.getInverseKey());
+
+		return _ruleActionParameter;
 	}
 
 	@Override

@@ -7,6 +7,11 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.Field.FieldPath;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
+import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.FileRecord;
 
 import java.time.ZonedDateTime;
@@ -16,10 +21,14 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -153,6 +162,39 @@ public class File extends TableImpl<FileRecord> {
 		this(DSL.name("file"), null);
 	}
 
+	public <O extends Record> File(Table<O> path, ForeignKey<O, FileRecord> childPath, InverseForeignKey<O, FileRecord> parentPath) {
+		super(path, childPath, parentPath, FILE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FilePath extends File implements Path<FileRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FilePath(Table<O> path, ForeignKey<O, FileRecord> childPath, InverseForeignKey<O, FileRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FilePath(Name alias, Table<FileRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FilePath as(String alias) {
+			return new FilePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FilePath as(Name alias) {
+			return new FilePath(alias, this);
+		}
+
+		@Override
+		public FilePath as(Table<?> alias) {
+			return new FilePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -171,6 +213,71 @@ public class File extends TableImpl<FileRecord> {
 	@Override
 	public List<UniqueKey<FileRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_FILE_U_UUID);
+	}
+
+	@Override
+	public List<ForeignKey<FileRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FILE_DATASET_FK, Keys.FK_FILE_EVENT_FK, Keys.FK_FILE_FIELD_FK, Keys.FK_FILE_SCOPE_FK, Keys.FK_FILE_USER_FK);
+	}
+
+	private transient DatasetPath _dataset;
+
+	/**
+	 * Get the implicit join path to the <code>dataset</code> table.
+	 */
+	public DatasetPath dataset() {
+		if (_dataset == null)
+			_dataset = new DatasetPath(this, Keys.FK_FILE_DATASET_FK, null);
+
+		return _dataset;
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit join path to the <code>event</code> table.
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, Keys.FK_FILE_EVENT_FK, null);
+
+		return _event;
+	}
+
+	private transient FieldPath _field;
+
+	/**
+	 * Get the implicit join path to the <code>field</code> table.
+	 */
+	public FieldPath field() {
+		if (_field == null)
+			_field = new FieldPath(this, Keys.FK_FILE_FIELD_FK, null);
+
+		return _field;
+	}
+
+	private transient ScopePath _scope;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table.
+	 */
+	public ScopePath scope() {
+		if (_scope == null)
+			_scope = new ScopePath(this, Keys.FK_FILE_SCOPE_FK, null);
+
+		return _scope;
+	}
+
+	private transient UserPath _user;
+
+	/**
+	 * Get the implicit join path to the <code>user</code> table.
+	 */
+	public UserPath user() {
+		if (_user == null)
+			_user = new UserPath(this, Keys.FK_FILE_USER_FK, null);
+
+		return _user;
 	}
 
 	@Override

@@ -6,6 +6,10 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.PaymentStep.PaymentStepPath;
+import ch.rodano.core.model.jooq.tables.ProfilePaymentModelRights.ProfilePaymentModelRightsPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.PaymentPlanRecord;
 
 import java.util.Arrays;
@@ -16,9 +20,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -138,6 +146,39 @@ public class PaymentPlan extends TableImpl<PaymentPlanRecord> {
 		this(DSL.name("payment_plan"), null);
 	}
 
+	public <O extends Record> PaymentPlan(Table<O> path, ForeignKey<O, PaymentPlanRecord> childPath, InverseForeignKey<O, PaymentPlanRecord> parentPath) {
+		super(path, childPath, parentPath, PAYMENT_PLAN);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class PaymentPlanPath extends PaymentPlan implements Path<PaymentPlanRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> PaymentPlanPath(Table<O> path, ForeignKey<O, PaymentPlanRecord> childPath, InverseForeignKey<O, PaymentPlanRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private PaymentPlanPath(Name alias, Table<PaymentPlanRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public PaymentPlanPath as(String alias) {
+			return new PaymentPlanPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public PaymentPlanPath as(Name alias) {
+			return new PaymentPlanPath(alias, this);
+		}
+
+		@Override
+		public PaymentPlanPath as(Table<?> alias) {
+			return new PaymentPlanPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -151,6 +192,60 @@ public class PaymentPlan extends TableImpl<PaymentPlanRecord> {
 	@Override
 	public List<UniqueKey<PaymentPlanRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_PAYMENT_PLAN_UQ_PAYMENT_PLAN_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<PaymentPlanRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PAYMENT_PLAN_SCOPE_MODEL, Keys.FK_PAYMENT_PLAN_WORKFLOW);
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_PAYMENT_PLAN_SCOPE_MODEL, null);
+
+		return _scopeModel;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_PAYMENT_PLAN_WORKFLOW, null);
+
+		return _workflow;
+	}
+
+	private transient PaymentStepPath _paymentStep;
+
+	/**
+	 * Get the implicit to-many join path to the <code>payment_step</code> table
+	 */
+	public PaymentStepPath paymentStep() {
+		if (_paymentStep == null)
+			_paymentStep = new PaymentStepPath(this, null, Keys.FK_PAYMENT_STEP_PLAN.getInverseKey());
+
+		return _paymentStep;
+	}
+
+	private transient ProfilePaymentModelRightsPath _profilePaymentModelRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_payment_model_rights</code> table
+	 */
+	public ProfilePaymentModelRightsPath profilePaymentModelRights() {
+		if (_profilePaymentModelRights == null)
+			_profilePaymentModelRights = new ProfilePaymentModelRightsPath(this, null, Keys.FK_PROFILE_PAYMENT_MODEL_RIGHTS_PAY_PLAN.getInverseKey());
+
+		return _profilePaymentModelRights;
 	}
 
 	@Override

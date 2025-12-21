@@ -6,18 +6,32 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.File.FilePath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.FieldRecord;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -121,9 +135,47 @@ public class Field extends TableImpl<FieldRecord> {
 		this(DSL.name("field"), null);
 	}
 
+	public <O extends Record> Field(Table<O> path, ForeignKey<O, FieldRecord> childPath, InverseForeignKey<O, FieldRecord> parentPath) {
+		super(path, childPath, parentPath, FIELD);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FieldPath extends Field implements Path<FieldRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FieldPath(Table<O> path, ForeignKey<O, FieldRecord> childPath, InverseForeignKey<O, FieldRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FieldPath(Name alias, Table<FieldRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FieldPath as(String alias) {
+			return new FieldPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FieldPath as(Name alias) {
+			return new FieldPath(alias, this);
+		}
+
+		@Override
+		public FieldPath as(Table<?> alias) {
+			return new FieldPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.FIELD_IDX_FIELD_DATASET_FK, Indexes.FIELD_IDX_FIELD_DATASET_MODEL_ID, Indexes.FIELD_IDX_FIELD_FIELD_MODEL_ID);
 	}
 
 	@Override
@@ -134,6 +186,83 @@ public class Field extends TableImpl<FieldRecord> {
 	@Override
 	public UniqueKey<FieldRecord> getPrimaryKey() {
 		return Keys.KEY_FIELD_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FieldRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FIELD_DATASET_FK, Keys.FK_FIELD_DATASET_MODEL_ID, Keys.FK_FIELD_FIELD_MODEL_ID);
+	}
+
+	private transient DatasetPath _dataset;
+
+	/**
+	 * Get the implicit join path to the <code>dataset</code> table.
+	 */
+	public DatasetPath dataset() {
+		if (_dataset == null)
+			_dataset = new DatasetPath(this, Keys.FK_FIELD_DATASET_FK, null);
+
+		return _dataset;
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_FIELD_DATASET_MODEL_ID, null);
+
+		return _datasetModel;
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_FIELD_FIELD_MODEL_ID, null);
+
+		return _fieldModel;
+	}
+
+	private transient FieldAuditPath _fieldAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_audit</code> table
+	 */
+	public FieldAuditPath fieldAudit() {
+		if (_fieldAudit == null)
+			_fieldAudit = new FieldAuditPath(this, null, Keys.FK_FIELD_AUDIT_OBJECT_FK.getInverseKey());
+
+		return _fieldAudit;
+	}
+
+	private transient FilePath _file;
+
+	/**
+	 * Get the implicit to-many join path to the <code>file</code> table
+	 */
+	public FilePath file() {
+		if (_file == null)
+			_file = new FilePath(this, null, Keys.FK_FILE_FIELD_FK.getInverseKey());
+
+		return _file;
+	}
+
+	private transient WorkflowStatusPath _workflowStatus;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_status</code> table
+	 */
+	public WorkflowStatusPath workflowStatus() {
+		if (_workflowStatus == null)
+			_workflowStatus = new WorkflowStatusPath(this, null, Keys.FK_WORKFLOW_STATUS_FIELD_FK.getInverseKey());
+
+		return _workflowStatus;
 	}
 
 	@Override

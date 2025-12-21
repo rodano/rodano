@@ -7,7 +7,18 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.helpers.configuration.StringScopeDataConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.File.FilePath;
+import ch.rodano.core.model.jooq.tables.Form.FormPath;
+import ch.rodano.core.model.jooq.tables.Resource.ResourcePath;
+import ch.rodano.core.model.jooq.tables.Role.RolePath;
+import ch.rodano.core.model.jooq.tables.ScopeAudit.ScopeAuditPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.ScopeRelation.ScopeRelationPath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.ScopeRecord;
 import ch.rodano.core.model.scope.ScopeData;
 
@@ -19,10 +30,15 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -176,9 +192,47 @@ public class Scope extends TableImpl<ScopeRecord> {
 		this(DSL.name("scope"), null);
 	}
 
+	public <O extends Record> Scope(Table<O> path, ForeignKey<O, ScopeRecord> childPath, InverseForeignKey<O, ScopeRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopePath extends Scope implements Path<ScopeRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopePath(Table<O> path, ForeignKey<O, ScopeRecord> childPath, InverseForeignKey<O, ScopeRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopePath(Name alias, Table<ScopeRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopePath as(String alias) {
+			return new ScopePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopePath as(Name alias) {
+			return new ScopePath(alias, this);
+		}
+
+		@Override
+		public ScopePath as(Table<?> alias) {
+			return new ScopePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SCOPE_IDX_SCOPE_DELETED, Indexes.SCOPE_IDX_SCOPE_SCOPE_MODEL_ID);
 	}
 
 	@Override
@@ -194,6 +248,145 @@ public class Scope extends TableImpl<ScopeRecord> {
 	@Override
 	public List<UniqueKey<ScopeRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_SCOPE_U_SCOPE_CODE, Keys.KEY_SCOPE_U_SCOPE_ID);
+	}
+
+	@Override
+	public List<ForeignKey<ScopeRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_SCOPE_MODEL_ID);
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_SCOPE_SCOPE_MODEL_ID, null);
+
+		return _scopeModel;
+	}
+
+	private transient DatasetPath _dataset;
+
+	/**
+	 * Get the implicit to-many join path to the <code>dataset</code> table
+	 */
+	public DatasetPath dataset() {
+		if (_dataset == null)
+			_dataset = new DatasetPath(this, null, Keys.FK_DATASET_SCOPE_FK.getInverseKey());
+
+		return _dataset;
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event</code> table
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, null, Keys.FK_EVENT_SCOPE_FK.getInverseKey());
+
+		return _event;
+	}
+
+	private transient FilePath _file;
+
+	/**
+	 * Get the implicit to-many join path to the <code>file</code> table
+	 */
+	public FilePath file() {
+		if (_file == null)
+			_file = new FilePath(this, null, Keys.FK_FILE_SCOPE_FK.getInverseKey());
+
+		return _file;
+	}
+
+	private transient FormPath _form;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form</code> table
+	 */
+	public FormPath form() {
+		if (_form == null)
+			_form = new FormPath(this, null, Keys.FK_FORM_SCOPE_FK.getInverseKey());
+
+		return _form;
+	}
+
+	private transient ResourcePath _resource;
+
+	/**
+	 * Get the implicit to-many join path to the <code>resource</code> table
+	 */
+	public ResourcePath resource() {
+		if (_resource == null)
+			_resource = new ResourcePath(this, null, Keys.FK_RESOURCE_SCOPE_FK.getInverseKey());
+
+		return _resource;
+	}
+
+	private transient RolePath _role;
+
+	/**
+	 * Get the implicit to-many join path to the <code>role</code> table
+	 */
+	public RolePath role() {
+		if (_role == null)
+			_role = new RolePath(this, null, Keys.FK_ROLE_SCOPE_FK.getInverseKey());
+
+		return _role;
+	}
+
+	private transient ScopeAuditPath _scopeAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_audit</code> table
+	 */
+	public ScopeAuditPath scopeAudit() {
+		if (_scopeAudit == null)
+			_scopeAudit = new ScopeAuditPath(this, null, Keys.FK_SCOPE_AUDIT_OBJECT_FK.getInverseKey());
+
+		return _scopeAudit;
+	}
+
+	private transient ScopeRelationPath _fkScopeRelationParentFk;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_relation</code> table,
+	 * via the <code>fk_scope_relation_parent_fk</code> key
+	 */
+	public ScopeRelationPath fkScopeRelationParentFk() {
+		if (_fkScopeRelationParentFk == null)
+			_fkScopeRelationParentFk = new ScopeRelationPath(this, null, Keys.FK_SCOPE_RELATION_PARENT_FK.getInverseKey());
+
+		return _fkScopeRelationParentFk;
+	}
+
+	private transient ScopeRelationPath _fkScopeRelationScopeFk;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_relation</code> table,
+	 * via the <code>fk_scope_relation_scope_fk</code> key
+	 */
+	public ScopeRelationPath fkScopeRelationScopeFk() {
+		if (_fkScopeRelationScopeFk == null)
+			_fkScopeRelationScopeFk = new ScopeRelationPath(this, null, Keys.FK_SCOPE_RELATION_SCOPE_FK.getInverseKey());
+
+		return _fkScopeRelationScopeFk;
+	}
+
+	private transient WorkflowStatusPath _workflowStatus;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_status</code> table
+	 */
+	public WorkflowStatusPath workflowStatus() {
+		if (_workflowStatus == null)
+			_workflowStatus = new WorkflowStatusPath(this, null, Keys.FK_WORKFLOW_STATUS_SCOPE_FK.getInverseKey());
+
+		return _workflowStatus;
 	}
 
 	@Override

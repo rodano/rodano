@@ -6,19 +6,28 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Payment.PaymentPath;
 import ch.rodano.core.model.jooq.tables.records.PaymentBatchRecord;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -142,9 +151,47 @@ public class PaymentBatch extends TableImpl<PaymentBatchRecord> {
 		this(DSL.name("payment_batch"), null);
 	}
 
+	public <O extends Record> PaymentBatch(Table<O> path, ForeignKey<O, PaymentBatchRecord> childPath, InverseForeignKey<O, PaymentBatchRecord> parentPath) {
+		super(path, childPath, parentPath, PAYMENT_BATCH);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class PaymentBatchPath extends PaymentBatch implements Path<PaymentBatchRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> PaymentBatchPath(Table<O> path, ForeignKey<O, PaymentBatchRecord> childPath, InverseForeignKey<O, PaymentBatchRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private PaymentBatchPath(Name alias, Table<PaymentBatchRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public PaymentBatchPath as(String alias) {
+			return new PaymentBatchPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public PaymentBatchPath as(Name alias) {
+			return new PaymentBatchPath(alias, this);
+		}
+
+		@Override
+		public PaymentBatchPath as(Table<?> alias) {
+			return new PaymentBatchPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.PAYMENT_BATCH_IDX_PAYMENT_BATCH_DELETED, Indexes.PAYMENT_BATCH_IDX_PAYMENT_BATCH_PAY_PLAN_ID);
 	}
 
 	@Override
@@ -155,6 +202,18 @@ public class PaymentBatch extends TableImpl<PaymentBatchRecord> {
 	@Override
 	public UniqueKey<PaymentBatchRecord> getPrimaryKey() {
 		return Keys.KEY_PAYMENT_BATCH_PRIMARY;
+	}
+
+	private transient PaymentPath _payment;
+
+	/**
+	 * Get the implicit to-many join path to the <code>payment</code> table
+	 */
+	public PaymentPath payment() {
+		if (_payment == null)
+			_payment = new PaymentPath(this, null, Keys.FK_PAYMENT_PAYMENT_BATCH_FK.getInverseKey());
+
+		return _payment;
 	}
 
 	@Override

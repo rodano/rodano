@@ -5,7 +5,13 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MenuLayoutSectionWidgetParameterPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryColumn.WorkflowSummaryColumnPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryFilterEventModel.WorkflowSummaryFilterEventModelPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryWorkflow.WorkflowSummaryWorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowSummaryRecord;
 
 import java.util.Arrays;
@@ -16,9 +22,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -128,9 +139,47 @@ public class WorkflowSummary extends TableImpl<WorkflowSummaryRecord> {
 		this(DSL.name("workflow_summary"), null);
 	}
 
+	public <O extends Record> WorkflowSummary(Table<O> path, ForeignKey<O, WorkflowSummaryRecord> childPath, InverseForeignKey<O, WorkflowSummaryRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_SUMMARY);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowSummaryPath extends WorkflowSummary implements Path<WorkflowSummaryRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowSummaryPath(Table<O> path, ForeignKey<O, WorkflowSummaryRecord> childPath, InverseForeignKey<O, WorkflowSummaryRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowSummaryPath(Name alias, Table<WorkflowSummaryRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowSummaryPath as(String alias) {
+			return new WorkflowSummaryPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowSummaryPath as(Name alias) {
+			return new WorkflowSummaryPath(alias, this);
+		}
+
+		@Override
+		public WorkflowSummaryPath as(Table<?> alias) {
+			return new WorkflowSummaryPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.WORKFLOW_SUMMARY_IDX_WF_SUMMARY_PROJECT);
 	}
 
 	@Override
@@ -141,6 +190,75 @@ public class WorkflowSummary extends TableImpl<WorkflowSummaryRecord> {
 	@Override
 	public List<UniqueKey<WorkflowSummaryRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_WORKFLOW_SUMMARY_UQ_WORKFLOW_SUMMARY_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowSummaryRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_SUMMARY_LEAF_SCOPE_MODEL);
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_WF_SUMMARY_LEAF_SCOPE_MODEL, null);
+
+		return _scopeModel;
+	}
+
+	private transient MenuLayoutSectionWidgetParameterPath _menuLayoutSectionWidgetParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget_parameter</code> table
+	 */
+	public MenuLayoutSectionWidgetParameterPath menuLayoutSectionWidgetParameter() {
+		if (_menuLayoutSectionWidgetParameter == null)
+			_menuLayoutSectionWidgetParameter = new MenuLayoutSectionWidgetParameterPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WF_SUMMARY.getInverseKey());
+
+		return _menuLayoutSectionWidgetParameter;
+	}
+
+	private transient WorkflowSummaryColumnPath _workflowSummaryColumn;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_summary_column</code> table
+	 */
+	public WorkflowSummaryColumnPath workflowSummaryColumn() {
+		if (_workflowSummaryColumn == null)
+			_workflowSummaryColumn = new WorkflowSummaryColumnPath(this, null, Keys.FK_WF_SUMMARY_COL_SUMMARY.getInverseKey());
+
+		return _workflowSummaryColumn;
+	}
+
+	private transient WorkflowSummaryFilterEventModelPath _workflowSummaryFilterEventModel;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_summary_filter_event_model</code> table
+	 */
+	public WorkflowSummaryFilterEventModelPath workflowSummaryFilterEventModel() {
+		if (_workflowSummaryFilterEventModel == null)
+			_workflowSummaryFilterEventModel = new WorkflowSummaryFilterEventModelPath(this, null, Keys.FK_WF_SUMMARY_FILTER_EVENT_MODEL_SUMMARY.getInverseKey());
+
+		return _workflowSummaryFilterEventModel;
+	}
+
+	private transient WorkflowSummaryWorkflowPath _workflowSummaryWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_summary_workflow</code> table
+	 */
+	public WorkflowSummaryWorkflowPath workflowSummaryWorkflow() {
+		if (_workflowSummaryWorkflow == null)
+			_workflowSummaryWorkflow = new WorkflowSummaryWorkflowPath(this, null, Keys.FK_WF_SUMMARY_WORKFLOW_SUMMARY.getInverseKey());
+
+		return _workflowSummaryWorkflow;
 	}
 
 	@Override

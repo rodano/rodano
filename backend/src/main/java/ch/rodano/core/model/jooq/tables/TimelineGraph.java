@@ -5,7 +5,12 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.ProfileTimelineGraphGrants.ProfileTimelineGraphGrantsPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection.TimelineGraphSectionPath;
 import ch.rodano.core.model.jooq.tables.records.TimelineGraphRecord;
 
 import java.util.Arrays;
@@ -16,9 +21,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -153,9 +163,47 @@ public class TimelineGraph extends TableImpl<TimelineGraphRecord> {
 		this(DSL.name("timeline_graph"), null);
 	}
 
+	public <O extends Record> TimelineGraph(Table<O> path, ForeignKey<O, TimelineGraphRecord> childPath, InverseForeignKey<O, TimelineGraphRecord> parentPath) {
+		super(path, childPath, parentPath, TIMELINE_GRAPH);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class TimelineGraphPath extends TimelineGraph implements Path<TimelineGraphRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> TimelineGraphPath(Table<O> path, ForeignKey<O, TimelineGraphRecord> childPath, InverseForeignKey<O, TimelineGraphRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private TimelineGraphPath(Name alias, Table<TimelineGraphRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public TimelineGraphPath as(String alias) {
+			return new TimelineGraphPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public TimelineGraphPath as(Name alias) {
+			return new TimelineGraphPath(alias, this);
+		}
+
+		@Override
+		public TimelineGraphPath as(Table<?> alias) {
+			return new TimelineGraphPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.TIMELINE_GRAPH_IDX_TIMELINE_GRAPH_SCOPE, Indexes.TIMELINE_GRAPH_IDX_TIMELINE_GRAPH_START_EVENT);
 	}
 
 	@Override
@@ -166,6 +214,61 @@ public class TimelineGraph extends TableImpl<TimelineGraphRecord> {
 	@Override
 	public List<UniqueKey<TimelineGraphRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_TIMELINE_GRAPH_UQ_TIMELINE_GRAPH_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<TimelineGraphRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_EVENT_MODEL, Keys.FK_TIMELINE_GRAPH_SCOPE_MODEL);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_TIMELINE_GRAPH_EVENT_MODEL, null);
+
+		return _eventModel;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_TIMELINE_GRAPH_SCOPE_MODEL, null);
+
+		return _scopeModel;
+	}
+
+	private transient ProfileTimelineGraphGrantsPath _profileTimelineGraphGrants;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_timeline_graph_grants</code> table
+	 */
+	public ProfileTimelineGraphGrantsPath profileTimelineGraphGrants() {
+		if (_profileTimelineGraphGrants == null)
+			_profileTimelineGraphGrants = new ProfileTimelineGraphGrantsPath(this, null, Keys.FK_PROFILE_TIMELINE_GRAPH_GRANTS_TIMELINE_GRAPH.getInverseKey());
+
+		return _profileTimelineGraphGrants;
+	}
+
+	private transient TimelineGraphSectionPath _timelineGraphSection;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section</code> table
+	 */
+	public TimelineGraphSectionPath timelineGraphSection() {
+		if (_timelineGraphSection == null)
+			_timelineGraphSection = new TimelineGraphSectionPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_GRAPH.getInverseKey());
+
+		return _timelineGraphSection;
 	}
 
 	@Override

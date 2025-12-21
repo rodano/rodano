@@ -5,7 +5,25 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.EventModelWorkflow.EventModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.FieldModelWorkflow.FieldModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.FormModelWorkflow.FormModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.PaymentPlan.PaymentPlanPath;
+import ch.rodano.core.model.jooq.tables.ProfileWorkflowRights.ProfileWorkflowRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.Report.ReportPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.ScopeModelWorkflowPath;
+import ch.rodano.core.model.jooq.tables.ScopeModelWorkflowStateSelector.ScopeModelWorkflowStateSelectorPath;
+import ch.rodano.core.model.jooq.tables.Validator.ValidatorPath;
+import ch.rodano.core.model.jooq.tables.WorkflowAction.WorkflowActionPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit.WorkflowStatusAuditPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummaryWorkflow.WorkflowSummaryWorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowWidgetStateSelector.WorkflowWidgetStateSelectorPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowRecord;
 
 import java.util.Arrays;
@@ -16,9 +34,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -148,9 +171,47 @@ public class Workflow extends TableImpl<WorkflowRecord> {
 		this(DSL.name("workflow"), null);
 	}
 
+	public <O extends Record> Workflow(Table<O> path, ForeignKey<O, WorkflowRecord> childPath, InverseForeignKey<O, WorkflowRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowPath extends Workflow implements Path<WorkflowRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowPath(Table<O> path, ForeignKey<O, WorkflowRecord> childPath, InverseForeignKey<O, WorkflowRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowPath(Name alias, Table<WorkflowRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowPath as(String alias) {
+			return new WorkflowPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowPath as(Name alias) {
+			return new WorkflowPath(alias, this);
+		}
+
+		@Override
+		public WorkflowPath as(Table<?> alias) {
+			return new WorkflowPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.WORKFLOW_IDX_WORKFLOW_AGGREGATE, Indexes.WORKFLOW_IDX_WORKFLOW_PROJECT);
 	}
 
 	@Override
@@ -161,6 +222,224 @@ public class Workflow extends TableImpl<WorkflowRecord> {
 	@Override
 	public List<UniqueKey<WorkflowRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_WORKFLOW_UQ_WORKFLOW_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WORKFLOW_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_WORKFLOW_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart</code> table
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, null, Keys.FK_CHART_WORKFLOW.getInverseKey());
+
+		return _chart;
+	}
+
+	private transient EventModelWorkflowPath _eventModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_model_workflow</code>
+	 * table
+	 */
+	public EventModelWorkflowPath eventModelWorkflow() {
+		if (_eventModelWorkflow == null)
+			_eventModelWorkflow = new EventModelWorkflowPath(this, null, Keys.FK_EVENT_MODEL_WF_WORKFLOW.getInverseKey());
+
+		return _eventModelWorkflow;
+	}
+
+	private transient FieldModelWorkflowPath _fieldModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_model_workflow</code>
+	 * table
+	 */
+	public FieldModelWorkflowPath fieldModelWorkflow() {
+		if (_fieldModelWorkflow == null)
+			_fieldModelWorkflow = new FieldModelWorkflowPath(this, null, Keys.FK_FIELD_MODEL_WF_WORKFLOW.getInverseKey());
+
+		return _fieldModelWorkflow;
+	}
+
+	private transient FormModelWorkflowPath _formModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_model_workflow</code>
+	 * table
+	 */
+	public FormModelWorkflowPath formModelWorkflow() {
+		if (_formModelWorkflow == null)
+			_formModelWorkflow = new FormModelWorkflowPath(this, null, Keys.FK_FORM_MODEL_WF_WORKFLOW.getInverseKey());
+
+		return _formModelWorkflow;
+	}
+
+	private transient PaymentPlanPath _paymentPlan;
+
+	/**
+	 * Get the implicit to-many join path to the <code>payment_plan</code> table
+	 */
+	public PaymentPlanPath paymentPlan() {
+		if (_paymentPlan == null)
+			_paymentPlan = new PaymentPlanPath(this, null, Keys.FK_PAYMENT_PLAN_WORKFLOW.getInverseKey());
+
+		return _paymentPlan;
+	}
+
+	private transient ProfileWorkflowRightsPath _profileWorkflowRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_workflow_rights</code> table
+	 */
+	public ProfileWorkflowRightsPath profileWorkflowRights() {
+		if (_profileWorkflowRights == null)
+			_profileWorkflowRights = new ProfileWorkflowRightsPath(this, null, Keys.FK_PROFILE_WF_RIGHTS_WORKFLOW.getInverseKey());
+
+		return _profileWorkflowRights;
+	}
+
+	private transient ReportPath _report;
+
+	/**
+	 * Get the implicit to-many join path to the <code>report</code> table
+	 */
+	public ReportPath report() {
+		if (_report == null)
+			_report = new ReportPath(this, null, Keys.FK_REPORT_WORKFLOW.getInverseKey());
+
+		return _report;
+	}
+
+	private transient ScopeModelWorkflowStateSelectorPath _scopeModelWorkflowStateSelector;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>scope_model_workflow_state_selector</code> table
+	 */
+	public ScopeModelWorkflowStateSelectorPath scopeModelWorkflowStateSelector() {
+		if (_scopeModelWorkflowStateSelector == null)
+			_scopeModelWorkflowStateSelector = new ScopeModelWorkflowStateSelectorPath(this, null, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_WORKFLOW.getInverseKey());
+
+		return _scopeModelWorkflowStateSelector;
+	}
+
+	private transient ScopeModelWorkflowPath _scopeModelWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_model_workflow</code>
+	 * table
+	 */
+	public ScopeModelWorkflowPath scopeModelWorkflow() {
+		if (_scopeModelWorkflow == null)
+			_scopeModelWorkflow = new ScopeModelWorkflowPath(this, null, Keys.FK_SCOPE_MODEL_WF_WORKFLOW.getInverseKey());
+
+		return _scopeModelWorkflow;
+	}
+
+	private transient ValidatorPath _validator;
+
+	/**
+	 * Get the implicit to-many join path to the <code>validator</code> table
+	 */
+	public ValidatorPath validator() {
+		if (_validator == null)
+			_validator = new ValidatorPath(this, null, Keys.FK_VALIDATOR_WORKFLOW.getInverseKey());
+
+		return _validator;
+	}
+
+	private transient WorkflowActionPath _workflowAction;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_action</code> table
+	 */
+	public WorkflowActionPath workflowAction() {
+		if (_workflowAction == null)
+			_workflowAction = new WorkflowActionPath(this, null, Keys.FK_WF_ACTION_WORKFLOW.getInverseKey());
+
+		return _workflowAction;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_state</code> table
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, null, Keys.FK_WF_STATE_WORKFLOW.getInverseKey());
+
+		return _workflowState;
+	}
+
+	private transient WorkflowStatusAuditPath _workflowStatusAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_status_audit</code>
+	 * table
+	 */
+	public WorkflowStatusAuditPath workflowStatusAudit() {
+		if (_workflowStatusAudit == null)
+			_workflowStatusAudit = new WorkflowStatusAuditPath(this, null, Keys.FK_WF_STATUS_AUDIT_WORKFLOW_ID.getInverseKey());
+
+		return _workflowStatusAudit;
+	}
+
+	private transient WorkflowStatusPath _workflowStatus;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_status</code> table
+	 */
+	public WorkflowStatusPath workflowStatus() {
+		if (_workflowStatus == null)
+			_workflowStatus = new WorkflowStatusPath(this, null, Keys.FK_WF_STATUS_WORKFLOW_ID.getInverseKey());
+
+		return _workflowStatus;
+	}
+
+	private transient WorkflowSummaryWorkflowPath _workflowSummaryWorkflow;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_summary_workflow</code> table
+	 */
+	public WorkflowSummaryWorkflowPath workflowSummaryWorkflow() {
+		if (_workflowSummaryWorkflow == null)
+			_workflowSummaryWorkflow = new WorkflowSummaryWorkflowPath(this, null, Keys.FK_WF_SUMMARY_WORKFLOW_WORKFLOW.getInverseKey());
+
+		return _workflowSummaryWorkflow;
+	}
+
+	private transient WorkflowWidgetStateSelectorPath _workflowWidgetStateSelector;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_widget_state_selector</code> table
+	 */
+	public WorkflowWidgetStateSelectorPath workflowWidgetStateSelector() {
+		if (_workflowWidgetStateSelector == null)
+			_workflowWidgetStateSelector = new WorkflowWidgetStateSelectorPath(this, null, Keys.FK_WF_WIDGET_STATE_SELECTOR_WORKFLOW.getInverseKey());
+
+		return _workflowWidgetStateSelector;
 	}
 
 	@Override

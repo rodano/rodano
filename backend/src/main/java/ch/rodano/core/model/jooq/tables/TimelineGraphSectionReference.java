@@ -5,7 +5,10 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection.TimelineGraphSectionPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSectionReferenceEntry.TimelineGraphSectionReferenceEntryPath;
 import ch.rodano.core.model.jooq.tables.records.TimelineGraphSectionReferenceRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -131,14 +139,96 @@ public class TimelineGraphSectionReference extends TableImpl<TimelineGraphSectio
 		this(DSL.name("timeline_graph_section_reference"), null);
 	}
 
+	public <O extends Record> TimelineGraphSectionReference(Table<O> path, ForeignKey<O, TimelineGraphSectionReferenceRecord> childPath, InverseForeignKey<O, TimelineGraphSectionReferenceRecord> parentPath) {
+		super(path, childPath, parentPath, TIMELINE_GRAPH_SECTION_REFERENCE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class TimelineGraphSectionReferencePath extends TimelineGraphSectionReference implements Path<TimelineGraphSectionReferenceRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> TimelineGraphSectionReferencePath(Table<O> path, ForeignKey<O, TimelineGraphSectionReferenceRecord> childPath, InverseForeignKey<O, TimelineGraphSectionReferenceRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private TimelineGraphSectionReferencePath(Name alias, Table<TimelineGraphSectionReferenceRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public TimelineGraphSectionReferencePath as(String alias) {
+			return new TimelineGraphSectionReferencePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public TimelineGraphSectionReferencePath as(Name alias) {
+			return new TimelineGraphSectionReferencePath(alias, this);
+		}
+
+		@Override
+		public TimelineGraphSectionReferencePath as(Table<?> alias) {
+			return new TimelineGraphSectionReferencePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.TIMELINE_GRAPH_SECTION_REFERENCE_IDX_TIMELINE_GRAPH_SECTION_REF_OWNER, Indexes.TIMELINE_GRAPH_SECTION_REFERENCE_IDX_TIMELINE_GRAPH_SECTION_REF_REF);
+	}
+
+	@Override
 	public UniqueKey<TimelineGraphSectionReferenceRecord> getPrimaryKey() {
 		return Keys.KEY_TIMELINE_GRAPH_SECTION_REFERENCE_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<TimelineGraphSectionReferenceRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_SECTION_REF_REF_SECTION, Keys.FK_TIMELINE_GRAPH_SECTION_REF_SECTION);
+	}
+
+	private transient TimelineGraphSectionPath _fkTimelineGraphSectionRefRefSection;
+
+	/**
+	 * Get the implicit join path to the <code>timeline_graph_section</code> table,
+	 * via the <code>fk_timeline_graph_section_ref_ref_section</code> key.
+	 */
+	public TimelineGraphSectionPath fkTimelineGraphSectionRefRefSection() {
+		if (_fkTimelineGraphSectionRefRefSection == null)
+			_fkTimelineGraphSectionRefRefSection = new TimelineGraphSectionPath(this, Keys.FK_TIMELINE_GRAPH_SECTION_REF_REF_SECTION, null);
+
+		return _fkTimelineGraphSectionRefRefSection;
+	}
+
+	private transient TimelineGraphSectionPath _fkTimelineGraphSectionRefSection;
+
+	/**
+	 * Get the implicit join path to the <code>timeline_graph_section</code> table,
+	 * via the <code>fk_timeline_graph_section_ref_section</code> key.
+	 */
+	public TimelineGraphSectionPath fkTimelineGraphSectionRefSection() {
+		if (_fkTimelineGraphSectionRefSection == null)
+			_fkTimelineGraphSectionRefSection = new TimelineGraphSectionPath(this, Keys.FK_TIMELINE_GRAPH_SECTION_REF_SECTION, null);
+
+		return _fkTimelineGraphSectionRefSection;
+	}
+
+	private transient TimelineGraphSectionReferenceEntryPath _timelineGraphSectionReferenceEntry;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>timeline_graph_section_reference_entry</code> table
+	 */
+	public TimelineGraphSectionReferenceEntryPath timelineGraphSectionReferenceEntry() {
+		if (_timelineGraphSectionReferenceEntry == null)
+			_timelineGraphSectionReferenceEntry = new TimelineGraphSectionReferenceEntryPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_REF_ENTRY.getInverseKey());
+
+		return _timelineGraphSectionReferenceEntry;
 	}
 
 	@Override

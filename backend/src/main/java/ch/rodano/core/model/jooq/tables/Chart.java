@@ -5,7 +5,17 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.ChartColor.ChartColorPath;
+import ch.rodano.core.model.jooq.tables.ChartRange.ChartRangePath;
+import ch.rodano.core.model.jooq.tables.ChartStateFilter.ChartStateFilterPath;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MenuLayoutSectionWidgetParameterPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.ChartRecord;
 
 import java.util.Arrays;
@@ -16,9 +26,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -173,9 +188,47 @@ public class Chart extends TableImpl<ChartRecord> {
 		this(DSL.name("chart"), null);
 	}
 
+	public <O extends Record> Chart(Table<O> path, ForeignKey<O, ChartRecord> childPath, InverseForeignKey<O, ChartRecord> parentPath) {
+		super(path, childPath, parentPath, CHART);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ChartPath extends Chart implements Path<ChartRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ChartPath(Table<O> path, ForeignKey<O, ChartRecord> childPath, InverseForeignKey<O, ChartRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ChartPath(Name alias, Table<ChartRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ChartPath as(String alias) {
+			return new ChartPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ChartPath as(Name alias) {
+			return new ChartPath(alias, this);
+		}
+
+		@Override
+		public ChartPath as(Table<?> alias) {
+			return new ChartPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.CHART_IDX_CHART_PROJECT);
 	}
 
 	@Override
@@ -186,6 +239,135 @@ public class Chart extends TableImpl<ChartRecord> {
 	@Override
 	public List<UniqueKey<ChartRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_CHART_UQ_CHART_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<ChartRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_CHART_DATASET_MODEL, Keys.FK_CHART_FIELD_MODEL, Keys.FK_CHART_LEAF_SCOPE_MODEL, Keys.FK_CHART_PROJECT, Keys.FK_CHART_SCOPE_MODEL, Keys.FK_CHART_WORKFLOW);
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_CHART_DATASET_MODEL, null);
+
+		return _datasetModel;
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_CHART_FIELD_MODEL, null);
+
+		return _fieldModel;
+	}
+
+	private transient ScopeModelPath _fkChartLeafScopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table, via the
+	 * <code>fk_chart_leaf_scope_model</code> key.
+	 */
+	public ScopeModelPath fkChartLeafScopeModel() {
+		if (_fkChartLeafScopeModel == null)
+			_fkChartLeafScopeModel = new ScopeModelPath(this, Keys.FK_CHART_LEAF_SCOPE_MODEL, null);
+
+		return _fkChartLeafScopeModel;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_CHART_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ScopeModelPath _fkChartScopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table, via the
+	 * <code>fk_chart_scope_model</code> key.
+	 */
+	public ScopeModelPath fkChartScopeModel() {
+		if (_fkChartScopeModel == null)
+			_fkChartScopeModel = new ScopeModelPath(this, Keys.FK_CHART_SCOPE_MODEL, null);
+
+		return _fkChartScopeModel;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_CHART_WORKFLOW, null);
+
+		return _workflow;
+	}
+
+	private transient ChartColorPath _chartColor;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart_color</code> table
+	 */
+	public ChartColorPath chartColor() {
+		if (_chartColor == null)
+			_chartColor = new ChartColorPath(this, null, Keys.FK_CHART_COLOR_CHART.getInverseKey());
+
+		return _chartColor;
+	}
+
+	private transient ChartRangePath _chartRange;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart_range</code> table
+	 */
+	public ChartRangePath chartRange() {
+		if (_chartRange == null)
+			_chartRange = new ChartRangePath(this, null, Keys.FK_CHART_RANGE_CHART.getInverseKey());
+
+		return _chartRange;
+	}
+
+	private transient ChartStateFilterPath _chartStateFilter;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart_state_filter</code>
+	 * table
+	 */
+	public ChartStateFilterPath chartStateFilter() {
+		if (_chartStateFilter == null)
+			_chartStateFilter = new ChartStateFilterPath(this, null, Keys.FK_CHART_STATE_FILTER_CHART.getInverseKey());
+
+		return _chartStateFilter;
+	}
+
+	private transient MenuLayoutSectionWidgetParameterPath _menuLayoutSectionWidgetParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget_parameter</code> table
+	 */
+	public MenuLayoutSectionWidgetParameterPath menuLayoutSectionWidgetParameter() {
+		if (_menuLayoutSectionWidgetParameter == null)
+			_menuLayoutSectionWidgetParameter = new MenuLayoutSectionWidgetParameterPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_CHART.getInverseKey());
+
+		return _menuLayoutSectionWidgetParameter;
 	}
 
 	@Override

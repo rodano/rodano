@@ -6,19 +6,32 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Event.EventPath;
+import ch.rodano.core.model.jooq.tables.FormAudit.FormAuditPath;
+import ch.rodano.core.model.jooq.tables.FormModel.FormModelPath;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.FormRecord;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -122,9 +135,47 @@ public class Form extends TableImpl<FormRecord> {
 		this(DSL.name("form"), null);
 	}
 
+	public <O extends Record> Form(Table<O> path, ForeignKey<O, FormRecord> childPath, InverseForeignKey<O, FormRecord> parentPath) {
+		super(path, childPath, parentPath, FORM);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FormPath extends Form implements Path<FormRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FormPath(Table<O> path, ForeignKey<O, FormRecord> childPath, InverseForeignKey<O, FormRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FormPath(Name alias, Table<FormRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FormPath as(String alias) {
+			return new FormPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FormPath as(Name alias) {
+			return new FormPath(alias, this);
+		}
+
+		@Override
+		public FormPath as(Table<?> alias) {
+			return new FormPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.FORM_IDX_FORM_DELETED, Indexes.FORM_IDX_FORM_EVENT_FK, Indexes.FORM_IDX_FORM_FORM_MODEL_ID, Indexes.FORM_IDX_FORM_SCOPE_FK);
 	}
 
 	@Override
@@ -135,6 +186,71 @@ public class Form extends TableImpl<FormRecord> {
 	@Override
 	public UniqueKey<FormRecord> getPrimaryKey() {
 		return Keys.KEY_FORM_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FormRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FORM_EVENT_FK, Keys.FK_FORM_FORM_MODEL_ID, Keys.FK_FORM_SCOPE_FK);
+	}
+
+	private transient EventPath _event;
+
+	/**
+	 * Get the implicit join path to the <code>event</code> table.
+	 */
+	public EventPath event() {
+		if (_event == null)
+			_event = new EventPath(this, Keys.FK_FORM_EVENT_FK, null);
+
+		return _event;
+	}
+
+	private transient FormModelPath _formModel;
+
+	/**
+	 * Get the implicit join path to the <code>form_model</code> table.
+	 */
+	public FormModelPath formModel() {
+		if (_formModel == null)
+			_formModel = new FormModelPath(this, Keys.FK_FORM_FORM_MODEL_ID, null);
+
+		return _formModel;
+	}
+
+	private transient ScopePath _scope;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table.
+	 */
+	public ScopePath scope() {
+		if (_scope == null)
+			_scope = new ScopePath(this, Keys.FK_FORM_SCOPE_FK, null);
+
+		return _scope;
+	}
+
+	private transient FormAuditPath _formAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_audit</code> table
+	 */
+	public FormAuditPath formAudit() {
+		if (_formAudit == null)
+			_formAudit = new FormAuditPath(this, null, Keys.FK_FORM_AUDIT_OBJECT_FK.getInverseKey());
+
+		return _formAudit;
+	}
+
+	private transient WorkflowStatusPath _workflowStatus;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_status</code> table
+	 */
+	public WorkflowStatusPath workflowStatus() {
+		if (_workflowStatus == null)
+			_workflowStatus = new WorkflowStatusPath(this, null, Keys.FK_WORKFLOW_STATUS_FORM_FK.getInverseKey());
+
+		return _workflowStatus;
 	}
 
 	@Override

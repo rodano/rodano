@@ -5,8 +5,10 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
 import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
+import ch.rodano.core.model.jooq.tables.RuleConditionList.RuleConditionListPath;
 import ch.rodano.core.model.jooq.tables.records.RuleConstraintRecord;
 
 import java.time.LocalDateTime;
@@ -18,9 +20,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -115,14 +122,65 @@ public class RuleConstraint extends TableImpl<RuleConstraintRecord> {
 		this(DSL.name("rule_constraint"), null);
 	}
 
+	public <O extends Record> RuleConstraint(Table<O> path, ForeignKey<O, RuleConstraintRecord> childPath, InverseForeignKey<O, RuleConstraintRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_CONSTRAINT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleConstraintPath extends RuleConstraint implements Path<RuleConstraintRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleConstraintPath(Table<O> path, ForeignKey<O, RuleConstraintRecord> childPath, InverseForeignKey<O, RuleConstraintRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleConstraintPath(Name alias, Table<RuleConstraintRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleConstraintPath as(String alias) {
+			return new RuleConstraintPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleConstraintPath as(Name alias) {
+			return new RuleConstraintPath(alias, this);
+		}
+
+		@Override
+		public RuleConstraintPath as(Table<?> alias) {
+			return new RuleConstraintPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.RULE_CONSTRAINT_IDX_CONSTRAINT_OWNER);
+	}
+
+	@Override
 	public UniqueKey<RuleConstraintRecord> getPrimaryKey() {
 		return Keys.KEY_RULE_CONSTRAINT_PRIMARY;
+	}
+
+	private transient RuleConditionListPath _ruleConditionList;
+
+	/**
+	 * Get the implicit to-many join path to the <code>rule_condition_list</code>
+	 * table
+	 */
+	public RuleConditionListPath ruleConditionList() {
+		if (_ruleConditionList == null)
+			_ruleConditionList = new RuleConditionListPath(this, null, Keys.FK_RULE_CONSTRAINT_CONDITION_LIST.getInverseKey());
+
+		return _ruleConditionList;
 	}
 
 	@Override

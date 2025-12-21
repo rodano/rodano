@@ -5,7 +5,10 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaValue.FormCellVisibilityCriteriaValuePath;
 import ch.rodano.core.model.jooq.tables.records.FieldPossibleValueRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -123,14 +131,87 @@ public class FieldPossibleValue extends TableImpl<FieldPossibleValueRecord> {
 		this(DSL.name("field_possible_value"), null);
 	}
 
+	public <O extends Record> FieldPossibleValue(Table<O> path, ForeignKey<O, FieldPossibleValueRecord> childPath, InverseForeignKey<O, FieldPossibleValueRecord> parentPath) {
+		super(path, childPath, parentPath, FIELD_POSSIBLE_VALUE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FieldPossibleValuePath extends FieldPossibleValue implements Path<FieldPossibleValueRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FieldPossibleValuePath(Table<O> path, ForeignKey<O, FieldPossibleValueRecord> childPath, InverseForeignKey<O, FieldPossibleValueRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FieldPossibleValuePath(Name alias, Table<FieldPossibleValueRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FieldPossibleValuePath as(String alias) {
+			return new FieldPossibleValuePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FieldPossibleValuePath as(Name alias) {
+			return new FieldPossibleValuePath(alias, this);
+		}
+
+		@Override
+		public FieldPossibleValuePath as(Table<?> alias) {
+			return new FieldPossibleValuePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.FIELD_POSSIBLE_VALUE_IDX_POSSIBLE_VALUE_FIELD);
+	}
+
+	@Override
 	public UniqueKey<FieldPossibleValueRecord> getPrimaryKey() {
 		return Keys.KEY_FIELD_POSSIBLE_VALUE_PRIMARY;
+	}
+
+	@Override
+	public List<UniqueKey<FieldPossibleValueRecord>> getUniqueKeys() {
+		return Arrays.asList(Keys.KEY_FIELD_POSSIBLE_VALUE_UQ_FIELD_POSSIBLE_VALUE_ID);
+	}
+
+	@Override
+	public List<ForeignKey<FieldPossibleValueRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_POSSIBLE_VALUE_FIELD);
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_POSSIBLE_VALUE_FIELD, null);
+
+		return _fieldModel;
+	}
+
+	private transient FormCellVisibilityCriteriaValuePath _formCellVisibilityCriteriaValue;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>form_cell_visibility_criteria_value</code> table
+	 */
+	public FormCellVisibilityCriteriaValuePath formCellVisibilityCriteriaValue() {
+		if (_formCellVisibilityCriteriaValue == null)
+			_formCellVisibilityCriteriaValue = new FormCellVisibilityCriteriaValuePath(this, null, Keys.FK_FC_VIS_CRITERIA_POS_VALUE.getInverseKey());
+
+		return _formCellVisibilityCriteriaValue;
 	}
 
 	@Override

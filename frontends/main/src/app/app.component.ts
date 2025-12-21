@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {filter} from 'rxjs/operators';
-import {ProjectService} from '@core/services/project.service';
 import {Environment} from '@core/model/environment';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {PublicStudy} from '@core/model/public-study';
@@ -27,7 +26,7 @@ export class AppComponent implements OnInit {
 	) {}
 
 	ngOnInit(): void {
-		//this.loadStudyConfiguration();
+		//document.documentElement.style.removeProperty('--mat-sys-primary');
 
 		this.router.events
 			.pipe(filter(event => event instanceof NavigationEnd))
@@ -39,26 +38,11 @@ export class AppComponent implements OnInit {
 			if(study) {
 				console.log('Study updated from service:', study);
 				this.study = study;
-				this.loadStudyConfiguration();
-			}
-		});
-	}
 
-	private loadStudyConfiguration(): void {
-		this.configurationService.getPublicStudy().subscribe({
-			next: study => {
-				console.log('Loaded study:', study);
-				this.study = study;
-				this.updateLayoutVisibility();
-			},
-			error: error => {
-				if(error.status === 204) {
-					console.log('No study loaded yet');
-					this.study = undefined;
+				if(study.color) {
+					document.documentElement.style.setProperty('--mat-sys-primary', study.color);
 				}
-				else {
-					console.error('Failed to load study configuration', error);
-				}
+
 				this.updateLayoutVisibility();
 			}
 		});

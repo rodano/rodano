@@ -6,20 +6,32 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
+import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.RobotAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -148,9 +160,47 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 		this(DSL.name("robot_audit"), null);
 	}
 
+	public <O extends Record> RobotAudit(Table<O> path, ForeignKey<O, RobotAuditRecord> childPath, InverseForeignKey<O, RobotAuditRecord> parentPath) {
+		super(path, childPath, parentPath, ROBOT_AUDIT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RobotAuditPath extends RobotAudit implements Path<RobotAuditRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RobotAuditPath(Table<O> path, ForeignKey<O, RobotAuditRecord> childPath, InverseForeignKey<O, RobotAuditRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RobotAuditPath(Name alias, Table<RobotAuditRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RobotAuditPath as(String alias) {
+			return new RobotAuditPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RobotAuditPath as(Name alias) {
+			return new RobotAuditPath(alias, this);
+		}
+
+		@Override
+		public RobotAuditPath as(Table<?> alias) {
+			return new RobotAuditPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.ROBOT_AUDIT_IDX_ROBOT_AUDIT_PROJECT);
 	}
 
 	@Override
@@ -161,6 +211,73 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	@Override
 	public UniqueKey<RobotAuditRecord> getPrimaryKey() {
 		return Keys.KEY_ROBOT_AUDIT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<RobotAuditRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_ROBOT_AUDIT_AUDIT_OBJECT_FK, Keys.FK_ROBOT_AUDIT_PROJECT, Keys.FK_ROBOT_AUDIT_ROBOT_FK, Keys.FK_ROBOT_AUDIT_USER_FK, Keys.FK_ROBOT_TRAIL_AUDIT_ACTION_FK);
+	}
+
+	private transient RobotPath _fkRobotAuditAuditObjectFk;
+
+	/**
+	 * Get the implicit join path to the <code>robot</code> table, via the
+	 * <code>fk_robot_audit_audit_object_fk</code> key.
+	 */
+	public RobotPath fkRobotAuditAuditObjectFk() {
+		if (_fkRobotAuditAuditObjectFk == null)
+			_fkRobotAuditAuditObjectFk = new RobotPath(this, Keys.FK_ROBOT_AUDIT_AUDIT_OBJECT_FK, null);
+
+		return _fkRobotAuditAuditObjectFk;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_ROBOT_AUDIT_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient RobotPath _fkRobotAuditRobotFk;
+
+	/**
+	 * Get the implicit join path to the <code>robot</code> table, via the
+	 * <code>fk_robot_audit_robot_fk</code> key.
+	 */
+	public RobotPath fkRobotAuditRobotFk() {
+		if (_fkRobotAuditRobotFk == null)
+			_fkRobotAuditRobotFk = new RobotPath(this, Keys.FK_ROBOT_AUDIT_ROBOT_FK, null);
+
+		return _fkRobotAuditRobotFk;
+	}
+
+	private transient UserPath _user;
+
+	/**
+	 * Get the implicit join path to the <code>user</code> table.
+	 */
+	public UserPath user() {
+		if (_user == null)
+			_user = new UserPath(this, Keys.FK_ROBOT_AUDIT_USER_FK, null);
+
+		return _user;
+	}
+
+	private transient AuditActionPath _auditAction;
+
+	/**
+	 * Get the implicit join path to the <code>audit_action</code> table.
+	 */
+	public AuditActionPath auditAction() {
+		if (_auditAction == null)
+			_auditAction = new AuditActionPath(this, Keys.FK_ROBOT_TRAIL_AUDIT_ACTION_FK, null);
+
+		return _auditAction;
 	}
 
 	@Override

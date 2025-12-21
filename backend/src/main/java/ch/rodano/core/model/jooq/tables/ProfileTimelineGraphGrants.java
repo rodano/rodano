@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
+import ch.rodano.core.model.jooq.tables.TimelineGraph.TimelineGraphPath;
 import ch.rodano.core.model.jooq.tables.records.ProfileTimelineGraphGrantsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,6 +102,39 @@ public class ProfileTimelineGraphGrants extends TableImpl<ProfileTimelineGraphGr
 		this(DSL.name("profile_timeline_graph_grants"), null);
 	}
 
+	public <O extends Record> ProfileTimelineGraphGrants(Table<O> path, ForeignKey<O, ProfileTimelineGraphGrantsRecord> childPath, InverseForeignKey<O, ProfileTimelineGraphGrantsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_TIMELINE_GRAPH_GRANTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfileTimelineGraphGrantsPath extends ProfileTimelineGraphGrants implements Path<ProfileTimelineGraphGrantsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfileTimelineGraphGrantsPath(Table<O> path, ForeignKey<O, ProfileTimelineGraphGrantsRecord> childPath, InverseForeignKey<O, ProfileTimelineGraphGrantsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfileTimelineGraphGrantsPath(Name alias, Table<ProfileTimelineGraphGrantsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfileTimelineGraphGrantsPath as(String alias) {
+			return new ProfileTimelineGraphGrantsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfileTimelineGraphGrantsPath as(Name alias) {
+			return new ProfileTimelineGraphGrantsPath(alias, this);
+		}
+
+		@Override
+		public ProfileTimelineGraphGrantsPath as(Table<?> alias) {
+			return new ProfileTimelineGraphGrantsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -102,6 +143,35 @@ public class ProfileTimelineGraphGrants extends TableImpl<ProfileTimelineGraphGr
 	@Override
 	public UniqueKey<ProfileTimelineGraphGrantsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_TIMELINE_GRAPH_GRANTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfileTimelineGraphGrantsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_TIMELINE_GRAPH_GRANTS_PROFILE, Keys.FK_PROFILE_TIMELINE_GRAPH_GRANTS_TIMELINE_GRAPH);
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROFILE_TIMELINE_GRAPH_GRANTS_PROFILE, null);
+
+		return _profile;
+	}
+
+	private transient TimelineGraphPath _timelineGraph;
+
+	/**
+	 * Get the implicit join path to the <code>timeline_graph</code> table.
+	 */
+	public TimelineGraphPath timelineGraph() {
+		if (_timelineGraph == null)
+			_timelineGraph = new TimelineGraphPath(this, Keys.FK_PROFILE_TIMELINE_GRAPH_GRANTS_TIMELINE_GRAPH, null);
+
+		return _timelineGraph;
 	}
 
 	@Override

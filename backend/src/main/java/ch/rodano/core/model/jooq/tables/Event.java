@@ -6,7 +6,16 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
+import ch.rodano.core.model.jooq.tables.EventAudit.EventAuditPath;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.File.FilePath;
+import ch.rodano.core.model.jooq.tables.Form.FormPath;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.records.EventRecord;
 
 import java.time.ZonedDateTime;
@@ -17,10 +26,15 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -164,9 +178,47 @@ public class Event extends TableImpl<EventRecord> {
 		this(DSL.name("event"), null);
 	}
 
+	public <O extends Record> Event(Table<O> path, ForeignKey<O, EventRecord> childPath, InverseForeignKey<O, EventRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventPath extends Event implements Path<EventRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventPath(Table<O> path, ForeignKey<O, EventRecord> childPath, InverseForeignKey<O, EventRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventPath(Name alias, Table<EventRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventPath as(String alias) {
+			return new EventPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventPath as(Name alias) {
+			return new EventPath(alias, this);
+		}
+
+		@Override
+		public EventPath as(Table<?> alias) {
+			return new EventPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_IDX_EVENT_BLOCKING, Indexes.EVENT_IDX_EVENT_DATE, Indexes.EVENT_IDX_EVENT_DELETED, Indexes.EVENT_IDX_EVENT_EVENT_MODEL_ID, Indexes.EVENT_IDX_EVENT_SCOPE_FK, Indexes.EVENT_IDX_EVENT_SCOPE_MODEL_ID);
 	}
 
 	@Override
@@ -182,6 +234,107 @@ public class Event extends TableImpl<EventRecord> {
 	@Override
 	public List<UniqueKey<EventRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_EVENT_U_EVENT_ID);
+	}
+
+	@Override
+	public List<ForeignKey<EventRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_EVENT_MODEL_ID, Keys.FK_EVENT_SCOPE_FK, Keys.FK_EVENT_SCOPE_MODEL_ID);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_EVENT_EVENT_MODEL_ID, null);
+
+		return _eventModel;
+	}
+
+	private transient ScopePath _scope;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table.
+	 */
+	public ScopePath scope() {
+		if (_scope == null)
+			_scope = new ScopePath(this, Keys.FK_EVENT_SCOPE_FK, null);
+
+		return _scope;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_EVENT_SCOPE_MODEL_ID, null);
+
+		return _scopeModel;
+	}
+
+	private transient DatasetPath _dataset;
+
+	/**
+	 * Get the implicit to-many join path to the <code>dataset</code> table
+	 */
+	public DatasetPath dataset() {
+		if (_dataset == null)
+			_dataset = new DatasetPath(this, null, Keys.FK_DATASET_EVENT_FK.getInverseKey());
+
+		return _dataset;
+	}
+
+	private transient EventAuditPath _eventAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_audit</code> table
+	 */
+	public EventAuditPath eventAudit() {
+		if (_eventAudit == null)
+			_eventAudit = new EventAuditPath(this, null, Keys.FK_EVENT_AUDIT_OBJECT_FK.getInverseKey());
+
+		return _eventAudit;
+	}
+
+	private transient FilePath _file;
+
+	/**
+	 * Get the implicit to-many join path to the <code>file</code> table
+	 */
+	public FilePath file() {
+		if (_file == null)
+			_file = new FilePath(this, null, Keys.FK_FILE_EVENT_FK.getInverseKey());
+
+		return _file;
+	}
+
+	private transient FormPath _form;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form</code> table
+	 */
+	public FormPath form() {
+		if (_form == null)
+			_form = new FormPath(this, null, Keys.FK_FORM_EVENT_FK.getInverseKey());
+
+		return _form;
+	}
+
+	private transient WorkflowStatusPath _workflowStatus;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_status</code> table
+	 */
+	public WorkflowStatusPath workflowStatus() {
+		if (_workflowStatus == null)
+			_workflowStatus = new WorkflowStatusPath(this, null, Keys.FK_WORKFLOW_STATUS_EVENT_FK.getInverseKey());
+
+		return _workflowStatus;
 	}
 
 	@Override

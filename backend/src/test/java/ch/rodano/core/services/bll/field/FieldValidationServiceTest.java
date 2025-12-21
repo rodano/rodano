@@ -70,8 +70,6 @@ public class FieldValidationServiceTest extends DatabaseTest {
 
 	@BeforeEach
 	public void initTest() throws IOException {
-		studyService.reload();
-
 		center = testHelperService.createCenter(context);
 		patient = testHelperService.createPatient(center, context);
 		patientDocumentation = datasetService.get(patient, studyService.getStudy().getDatasetModel("PATIENT_DOCUMENTATION"));

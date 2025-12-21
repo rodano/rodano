@@ -5,7 +5,11 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FieldModelValidator.FieldModelValidatorPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
 import ch.rodano.core.model.jooq.tables.records.ValidatorRecord;
 
 import java.util.Arrays;
@@ -16,9 +20,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -143,9 +152,47 @@ public class Validator extends TableImpl<ValidatorRecord> {
 		this(DSL.name("validator"), null);
 	}
 
+	public <O extends Record> Validator(Table<O> path, ForeignKey<O, ValidatorRecord> childPath, InverseForeignKey<O, ValidatorRecord> parentPath) {
+		super(path, childPath, parentPath, VALIDATOR);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ValidatorPath extends Validator implements Path<ValidatorRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ValidatorPath(Table<O> path, ForeignKey<O, ValidatorRecord> childPath, InverseForeignKey<O, ValidatorRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ValidatorPath(Name alias, Table<ValidatorRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ValidatorPath as(String alias) {
+			return new ValidatorPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ValidatorPath as(Name alias) {
+			return new ValidatorPath(alias, this);
+		}
+
+		@Override
+		public ValidatorPath as(Table<?> alias) {
+			return new ValidatorPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.VALIDATOR_IDX_VALIDATOR_WORKFLOW);
 	}
 
 	@Override
@@ -156,6 +203,62 @@ public class Validator extends TableImpl<ValidatorRecord> {
 	@Override
 	public List<UniqueKey<ValidatorRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_VALIDATOR_UQ_VALIDATOR_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<ValidatorRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_VALIDATOR_INVALID_STATE, Keys.FK_VALIDATOR_VALID_STATE, Keys.FK_VALIDATOR_WORKFLOW);
+	}
+
+	private transient WorkflowStatePath _fkValidatorInvalidState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table, via the
+	 * <code>fk_validator_invalid_state</code> key.
+	 */
+	public WorkflowStatePath fkValidatorInvalidState() {
+		if (_fkValidatorInvalidState == null)
+			_fkValidatorInvalidState = new WorkflowStatePath(this, Keys.FK_VALIDATOR_INVALID_STATE, null);
+
+		return _fkValidatorInvalidState;
+	}
+
+	private transient WorkflowStatePath _fkValidatorValidState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table, via the
+	 * <code>fk_validator_valid_state</code> key.
+	 */
+	public WorkflowStatePath fkValidatorValidState() {
+		if (_fkValidatorValidState == null)
+			_fkValidatorValidState = new WorkflowStatePath(this, Keys.FK_VALIDATOR_VALID_STATE, null);
+
+		return _fkValidatorValidState;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_VALIDATOR_WORKFLOW, null);
+
+		return _workflow;
+	}
+
+	private transient FieldModelValidatorPath _fieldModelValidator;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_model_validator</code>
+	 * table
+	 */
+	public FieldModelValidatorPath fieldModelValidator() {
+		if (_fieldModelValidator == null)
+			_fieldModelValidator = new FieldModelValidatorPath(this, null, Keys.FK_FIELD_MODEL_VALIDATOR_VALIDATOR.getInverseKey());
+
+		return _fieldModelValidator;
 	}
 
 	@Override

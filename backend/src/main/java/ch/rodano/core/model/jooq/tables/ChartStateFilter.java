@@ -5,18 +5,28 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
 import ch.rodano.core.model.jooq.enums.ChartStateFilterKind;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
 import ch.rodano.core.model.jooq.tables.records.ChartStateFilterRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -100,14 +110,81 @@ public class ChartStateFilter extends TableImpl<ChartStateFilterRecord> {
 		this(DSL.name("chart_state_filter"), null);
 	}
 
+	public <O extends Record> ChartStateFilter(Table<O> path, ForeignKey<O, ChartStateFilterRecord> childPath, InverseForeignKey<O, ChartStateFilterRecord> parentPath) {
+		super(path, childPath, parentPath, CHART_STATE_FILTER);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ChartStateFilterPath extends ChartStateFilter implements Path<ChartStateFilterRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ChartStateFilterPath(Table<O> path, ForeignKey<O, ChartStateFilterRecord> childPath, InverseForeignKey<O, ChartStateFilterRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ChartStateFilterPath(Name alias, Table<ChartStateFilterRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ChartStateFilterPath as(String alias) {
+			return new ChartStateFilterPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ChartStateFilterPath as(Name alias) {
+			return new ChartStateFilterPath(alias, this);
+		}
+
+		@Override
+		public ChartStateFilterPath as(Table<?> alias) {
+			return new ChartStateFilterPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.CHART_STATE_FILTER_IDX_CHART_STATE_FILTER_KIND);
+	}
+
+	@Override
 	public UniqueKey<ChartStateFilterRecord> getPrimaryKey() {
 		return Keys.KEY_CHART_STATE_FILTER_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ChartStateFilterRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_CHART_STATE_FILTER_CHART, Keys.FK_CHART_STATE_FILTER_WORKFLOW_STATE);
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit join path to the <code>chart</code> table.
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, Keys.FK_CHART_STATE_FILTER_CHART, null);
+
+		return _chart;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table.
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, Keys.FK_CHART_STATE_FILTER_WORKFLOW_STATE, null);
+
+		return _workflowState;
 	}
 
 	@Override

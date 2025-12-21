@@ -88,6 +88,12 @@ public class RuleServiceImpl implements RuleService {
 		final Set<String> blockedActions
 	) {
 		final List<Map<String, String>> messages = new ArrayList<>();
+
+		if (rules == null || rules.isEmpty()) {
+			logger.debug("No rules to execute");
+			return messages;
+		}
+
 		for(final var rule : rules) {
 			if(execute(state, rule, context, message, data, blockedActions)) {
 				if(rule.getMessage() != null) {

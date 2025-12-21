@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FormModel.FormModelPath;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
 import ch.rodano.core.model.jooq.tables.records.ProfileFormModelRightsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +112,39 @@ public class ProfileFormModelRights extends TableImpl<ProfileFormModelRightsReco
 		this(DSL.name("profile_form_model_rights"), null);
 	}
 
+	public <O extends Record> ProfileFormModelRights(Table<O> path, ForeignKey<O, ProfileFormModelRightsRecord> childPath, InverseForeignKey<O, ProfileFormModelRightsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_FORM_MODEL_RIGHTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfileFormModelRightsPath extends ProfileFormModelRights implements Path<ProfileFormModelRightsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfileFormModelRightsPath(Table<O> path, ForeignKey<O, ProfileFormModelRightsRecord> childPath, InverseForeignKey<O, ProfileFormModelRightsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfileFormModelRightsPath(Name alias, Table<ProfileFormModelRightsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfileFormModelRightsPath as(String alias) {
+			return new ProfileFormModelRightsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfileFormModelRightsPath as(Name alias) {
+			return new ProfileFormModelRightsPath(alias, this);
+		}
+
+		@Override
+		public ProfileFormModelRightsPath as(Table<?> alias) {
+			return new ProfileFormModelRightsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +153,35 @@ public class ProfileFormModelRights extends TableImpl<ProfileFormModelRightsReco
 	@Override
 	public UniqueKey<ProfileFormModelRightsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_FORM_MODEL_RIGHTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfileFormModelRightsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_FORM_MODEL_RIGHTS_FORM_MODEL, Keys.FK_PROFILE_FORM_MODEL_RIGHTS_PROFILE);
+	}
+
+	private transient FormModelPath _formModel;
+
+	/**
+	 * Get the implicit join path to the <code>form_model</code> table.
+	 */
+	public FormModelPath formModel() {
+		if (_formModel == null)
+			_formModel = new FormModelPath(this, Keys.FK_PROFILE_FORM_MODEL_RIGHTS_FORM_MODEL, null);
+
+		return _formModel;
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROFILE_FORM_MODEL_RIGHTS_PROFILE, null);
+
+		return _profile;
 	}
 
 	@Override

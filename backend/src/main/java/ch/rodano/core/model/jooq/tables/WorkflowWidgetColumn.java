@@ -6,6 +6,7 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.WorkflowWidget.WorkflowWidgetPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowWidgetColumnRecord;
 
 import java.util.Arrays;
@@ -16,9 +17,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -128,6 +133,39 @@ public class WorkflowWidgetColumn extends TableImpl<WorkflowWidgetColumnRecord> 
 		this(DSL.name("workflow_widget_column"), null);
 	}
 
+	public <O extends Record> WorkflowWidgetColumn(Table<O> path, ForeignKey<O, WorkflowWidgetColumnRecord> childPath, InverseForeignKey<O, WorkflowWidgetColumnRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_WIDGET_COLUMN);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowWidgetColumnPath extends WorkflowWidgetColumn implements Path<WorkflowWidgetColumnRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowWidgetColumnPath(Table<O> path, ForeignKey<O, WorkflowWidgetColumnRecord> childPath, InverseForeignKey<O, WorkflowWidgetColumnRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowWidgetColumnPath(Name alias, Table<WorkflowWidgetColumnRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowWidgetColumnPath as(String alias) {
+			return new WorkflowWidgetColumnPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowWidgetColumnPath as(Name alias) {
+			return new WorkflowWidgetColumnPath(alias, this);
+		}
+
+		@Override
+		public WorkflowWidgetColumnPath as(Table<?> alias) {
+			return new WorkflowWidgetColumnPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -141,6 +179,23 @@ public class WorkflowWidgetColumn extends TableImpl<WorkflowWidgetColumnRecord> 
 	@Override
 	public List<UniqueKey<WorkflowWidgetColumnRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_WORKFLOW_WIDGET_COLUMN_UQ_WORKFLOW_WIDGET_COLUMN_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowWidgetColumnRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_WIDGET_COL_WIDGET);
+	}
+
+	private transient WorkflowWidgetPath _workflowWidget;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_widget</code> table.
+	 */
+	public WorkflowWidgetPath workflowWidget() {
+		if (_workflowWidget == null)
+			_workflowWidget = new WorkflowWidgetPath(this, Keys.FK_WF_WIDGET_COL_WIDGET, null);
+
+		return _workflowWidget;
 	}
 
 	@Override

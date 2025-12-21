@@ -7,19 +7,29 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
+import ch.rodano.core.model.jooq.tables.Dataset.DatasetPath;
+import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
+import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.DatasetAuditRecord;
 import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -153,6 +163,39 @@ public class DatasetAudit extends TableImpl<DatasetAuditRecord> implements Audit
 		this(DSL.name("dataset_audit"), null);
 	}
 
+	public <O extends Record> DatasetAudit(Table<O> path, ForeignKey<O, DatasetAuditRecord> childPath, InverseForeignKey<O, DatasetAuditRecord> parentPath) {
+		super(path, childPath, parentPath, DATASET_AUDIT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class DatasetAuditPath extends DatasetAudit implements Path<DatasetAuditRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> DatasetAuditPath(Table<O> path, ForeignKey<O, DatasetAuditRecord> childPath, InverseForeignKey<O, DatasetAuditRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private DatasetAuditPath(Name alias, Table<DatasetAuditRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public DatasetAuditPath as(String alias) {
+			return new DatasetAuditPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public DatasetAuditPath as(Name alias) {
+			return new DatasetAuditPath(alias, this);
+		}
+
+		@Override
+		public DatasetAuditPath as(Table<?> alias) {
+			return new DatasetAuditPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -166,6 +209,59 @@ public class DatasetAudit extends TableImpl<DatasetAuditRecord> implements Audit
 	@Override
 	public UniqueKey<DatasetAuditRecord> getPrimaryKey() {
 		return Keys.KEY_DATASET_AUDIT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<DatasetAuditRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_DATASET_AUDIT_OBJECT_FK, Keys.FK_DATASET_AUDIT_ROBOT_FK, Keys.FK_DATASET_AUDIT_USER_FK, Keys.FK_DATASET_TRAIL_AUDIT_ACTION_FK);
+	}
+
+	private transient DatasetPath _dataset;
+
+	/**
+	 * Get the implicit join path to the <code>dataset</code> table.
+	 */
+	public DatasetPath dataset() {
+		if (_dataset == null)
+			_dataset = new DatasetPath(this, Keys.FK_DATASET_AUDIT_OBJECT_FK, null);
+
+		return _dataset;
+	}
+
+	private transient RobotPath _robot;
+
+	/**
+	 * Get the implicit join path to the <code>robot</code> table.
+	 */
+	public RobotPath robot() {
+		if (_robot == null)
+			_robot = new RobotPath(this, Keys.FK_DATASET_AUDIT_ROBOT_FK, null);
+
+		return _robot;
+	}
+
+	private transient UserPath _user;
+
+	/**
+	 * Get the implicit join path to the <code>user</code> table.
+	 */
+	public UserPath user() {
+		if (_user == null)
+			_user = new UserPath(this, Keys.FK_DATASET_AUDIT_USER_FK, null);
+
+		return _user;
+	}
+
+	private transient AuditActionPath _auditAction;
+
+	/**
+	 * Get the implicit join path to the <code>audit_action</code> table.
+	 */
+	public AuditActionPath auditAction() {
+		if (_auditAction == null)
+			_auditAction = new AuditActionPath(this, Keys.FK_DATASET_TRAIL_AUDIT_ACTION_FK, null);
+
+		return _auditAction;
 	}
 
 	@Override

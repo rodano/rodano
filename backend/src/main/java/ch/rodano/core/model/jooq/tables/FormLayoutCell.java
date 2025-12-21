@@ -5,7 +5,12 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteria.FormCellVisibilityCriteriaPath;
+import ch.rodano.core.model.jooq.tables.FormLayoutLine.FormLayoutLinePath;
 import ch.rodano.core.model.jooq.tables.records.FormLayoutCellRecord;
 
 import java.util.Arrays;
@@ -16,9 +21,14 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -173,9 +183,47 @@ public class FormLayoutCell extends TableImpl<FormLayoutCellRecord> {
 		this(DSL.name("form_layout_cell"), null);
 	}
 
+	public <O extends Record> FormLayoutCell(Table<O> path, ForeignKey<O, FormLayoutCellRecord> childPath, InverseForeignKey<O, FormLayoutCellRecord> parentPath) {
+		super(path, childPath, parentPath, FORM_LAYOUT_CELL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FormLayoutCellPath extends FormLayoutCell implements Path<FormLayoutCellRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FormLayoutCellPath(Table<O> path, ForeignKey<O, FormLayoutCellRecord> childPath, InverseForeignKey<O, FormLayoutCellRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FormLayoutCellPath(Name alias, Table<FormLayoutCellRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FormLayoutCellPath as(String alias) {
+			return new FormLayoutCellPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FormLayoutCellPath as(Name alias) {
+			return new FormLayoutCellPath(alias, this);
+		}
+
+		@Override
+		public FormLayoutCellPath as(Table<?> alias) {
+			return new FormLayoutCellPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.FORM_LAYOUT_CELL_IDX_FORM_LAYOUT_CELL_DATASET, Indexes.FORM_LAYOUT_CELL_IDX_FORM_LAYOUT_CELL_FIELD, Indexes.FORM_LAYOUT_CELL_IDX_FORM_LAYOUT_CELL_LINE);
 	}
 
 	@Override
@@ -185,7 +233,61 @@ public class FormLayoutCell extends TableImpl<FormLayoutCellRecord> {
 
 	@Override
 	public List<UniqueKey<FormLayoutCellRecord>> getUniqueKeys() {
-		return Arrays.asList(Keys.KEY_FORM_LAYOUT_CELL_UQ_FORM_LAYOUT_CELL_CODE);
+		return Arrays.asList(Keys.KEY_FORM_LAYOUT_CELL_UQ_FORM_LAYOUT_CELL_CODE, Keys.KEY_FORM_LAYOUT_CELL_UQ_FORM_LAYOUT_CELL_ID);
+	}
+
+	@Override
+	public List<ForeignKey<FormLayoutCellRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FORM_LAYOUT_CELL_DATASET, Keys.FK_FORM_LAYOUT_CELL_FIELD, Keys.FK_FORM_LAYOUT_CELL_LINE);
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit join path to the <code>dataset_model</code> table.
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, Keys.FK_FORM_LAYOUT_CELL_DATASET, null);
+
+		return _datasetModel;
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit join path to the <code>field_model</code> table.
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, Keys.FK_FORM_LAYOUT_CELL_FIELD, null);
+
+		return _fieldModel;
+	}
+
+	private transient FormLayoutLinePath _formLayoutLine;
+
+	/**
+	 * Get the implicit join path to the <code>form_layout_line</code> table.
+	 */
+	public FormLayoutLinePath formLayoutLine() {
+		if (_formLayoutLine == null)
+			_formLayoutLine = new FormLayoutLinePath(this, Keys.FK_FORM_LAYOUT_CELL_LINE, null);
+
+		return _formLayoutLine;
+	}
+
+	private transient FormCellVisibilityCriteriaPath _formCellVisibilityCriteria;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>form_cell_visibility_criteria</code> table
+	 */
+	public FormCellVisibilityCriteriaPath formCellVisibilityCriteria() {
+		if (_formCellVisibilityCriteria == null)
+			_formCellVisibilityCriteria = new FormCellVisibilityCriteriaPath(this, null, Keys.FK_FORM_CELL_VIS_CRIT_CELL.getInverseKey());
+
+		return _formCellVisibilityCriteria;
 	}
 
 	@Override

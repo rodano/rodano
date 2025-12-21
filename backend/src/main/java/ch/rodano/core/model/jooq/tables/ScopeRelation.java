@@ -7,18 +7,25 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
 import ch.rodano.core.model.jooq.tables.records.ScopeRelationRecord;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -127,6 +134,39 @@ public class ScopeRelation extends TableImpl<ScopeRelationRecord> {
 		this(DSL.name("scope_relation"), null);
 	}
 
+	public <O extends Record> ScopeRelation(Table<O> path, ForeignKey<O, ScopeRelationRecord> childPath, InverseForeignKey<O, ScopeRelationRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_RELATION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeRelationPath extends ScopeRelation implements Path<ScopeRelationRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeRelationPath(Table<O> path, ForeignKey<O, ScopeRelationRecord> childPath, InverseForeignKey<O, ScopeRelationRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeRelationPath(Name alias, Table<ScopeRelationRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeRelationPath as(String alias) {
+			return new ScopeRelationPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeRelationPath as(Name alias) {
+			return new ScopeRelationPath(alias, this);
+		}
+
+		@Override
+		public ScopeRelationPath as(Table<?> alias) {
+			return new ScopeRelationPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -140,6 +180,37 @@ public class ScopeRelation extends TableImpl<ScopeRelationRecord> {
 	@Override
 	public UniqueKey<ScopeRelationRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_RELATION_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ScopeRelationRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_RELATION_PARENT_FK, Keys.FK_SCOPE_RELATION_SCOPE_FK);
+	}
+
+	private transient ScopePath _fkScopeRelationParentFk;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table, via the
+	 * <code>fk_scope_relation_parent_fk</code> key.
+	 */
+	public ScopePath fkScopeRelationParentFk() {
+		if (_fkScopeRelationParentFk == null)
+			_fkScopeRelationParentFk = new ScopePath(this, Keys.FK_SCOPE_RELATION_PARENT_FK, null);
+
+		return _fkScopeRelationParentFk;
+	}
+
+	private transient ScopePath _fkScopeRelationScopeFk;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table, via the
+	 * <code>fk_scope_relation_scope_fk</code> key.
+	 */
+	public ScopePath fkScopeRelationScopeFk() {
+		if (_fkScopeRelationScopeFk == null)
+			_fkScopeRelationScopeFk = new ScopePath(this, Keys.FK_SCOPE_RELATION_SCOPE_FK, null);
+
+		return _fkScopeRelationScopeFk;
 	}
 
 	@Override

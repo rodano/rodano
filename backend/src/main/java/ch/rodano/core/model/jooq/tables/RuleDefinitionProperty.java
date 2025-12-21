@@ -6,6 +6,7 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
 import ch.rodano.core.model.jooq.tables.records.RuleDefinitionPropertyRecord;
 
 import java.util.Arrays;
@@ -15,9 +16,13 @@ import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -122,6 +127,39 @@ public class RuleDefinitionProperty extends TableImpl<RuleDefinitionPropertyReco
 		this(DSL.name("rule_definition_property"), null);
 	}
 
+	public <O extends Record> RuleDefinitionProperty(Table<O> path, ForeignKey<O, RuleDefinitionPropertyRecord> childPath, InverseForeignKey<O, RuleDefinitionPropertyRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_DEFINITION_PROPERTY);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleDefinitionPropertyPath extends RuleDefinitionProperty implements Path<RuleDefinitionPropertyRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleDefinitionPropertyPath(Table<O> path, ForeignKey<O, RuleDefinitionPropertyRecord> childPath, InverseForeignKey<O, RuleDefinitionPropertyRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleDefinitionPropertyPath(Name alias, Table<RuleDefinitionPropertyRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleDefinitionPropertyPath as(String alias) {
+			return new RuleDefinitionPropertyPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleDefinitionPropertyPath as(Name alias) {
+			return new RuleDefinitionPropertyPath(alias, this);
+		}
+
+		@Override
+		public RuleDefinitionPropertyPath as(Table<?> alias) {
+			return new RuleDefinitionPropertyPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -135,6 +173,23 @@ public class RuleDefinitionProperty extends TableImpl<RuleDefinitionPropertyReco
 	@Override
 	public List<UniqueKey<RuleDefinitionPropertyRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_RULE_DEFINITION_PROPERTY_UQ_RULE_DEFINITION_PROPERTY_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<RuleDefinitionPropertyRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_RULE_DEF_PROP_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_RULE_DEF_PROP_PROJECT, null);
+
+		return _project;
 	}
 
 	@Override

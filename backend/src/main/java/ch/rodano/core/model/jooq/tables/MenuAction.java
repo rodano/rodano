@@ -6,6 +6,7 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Menu.MenuPath;
 import ch.rodano.core.model.jooq.tables.records.MenuActionRecord;
 
 import java.util.Arrays;
@@ -16,9 +17,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -108,6 +113,39 @@ public class MenuAction extends TableImpl<MenuActionRecord> {
 		this(DSL.name("menu_action"), null);
 	}
 
+	public <O extends Record> MenuAction(Table<O> path, ForeignKey<O, MenuActionRecord> childPath, InverseForeignKey<O, MenuActionRecord> parentPath) {
+		super(path, childPath, parentPath, MENU_ACTION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class MenuActionPath extends MenuAction implements Path<MenuActionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> MenuActionPath(Table<O> path, ForeignKey<O, MenuActionRecord> childPath, InverseForeignKey<O, MenuActionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private MenuActionPath(Name alias, Table<MenuActionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public MenuActionPath as(String alias) {
+			return new MenuActionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public MenuActionPath as(Name alias) {
+			return new MenuActionPath(alias, this);
+		}
+
+		@Override
+		public MenuActionPath as(Table<?> alias) {
+			return new MenuActionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -116,6 +154,23 @@ public class MenuAction extends TableImpl<MenuActionRecord> {
 	@Override
 	public UniqueKey<MenuActionRecord> getPrimaryKey() {
 		return Keys.KEY_MENU_ACTION_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<MenuActionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_MENU_ACTION_MENU);
+	}
+
+	private transient MenuPath _menu;
+
+	/**
+	 * Get the implicit join path to the <code>menu</code> table.
+	 */
+	public MenuPath menu() {
+		if (_menu == null)
+			_menu = new MenuPath(this, Keys.FK_MENU_ACTION_MENU, null);
+
+		return _menu;
 	}
 
 	@Override

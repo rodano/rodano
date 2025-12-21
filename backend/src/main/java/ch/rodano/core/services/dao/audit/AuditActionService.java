@@ -2,6 +2,7 @@ package ch.rodano.core.services.dao.audit;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,22 @@ public class AuditActionService {
 	) {
 		this.create = create;
 		this.studyService = studyService;
+	}
+
+	public DatabaseActionContext createAuditActionAndGenerateContext(final Optional<Actor> actor,
+																	 final String rationale,
+																	 final ZonedDateTime date,
+																	 final UUID projectId) {
+		final var action = new AuditAction(actor, rationale, date);
+		final var record = create.newRecord(AUDIT_ACTION, action);
+		record.setProjectId(projectId);
+		record.store();
+		action.setPk(record.getPk());
+		return new DatabaseActionContext(action, actor);
+	}
+
+	public DatabaseActionContext createAuditActionAndGenerateContext(final Optional<Actor> actor, final String rationale, final UUID projectId) {
+		return createAuditActionAndGenerateContext(actor, rationale, ZonedDateTime.now(), projectId);
 	}
 
 	public DatabaseActionContext createAuditActionAndGenerateContext(final Optional<Actor> actor, final String rationale, final ZonedDateTime date) {

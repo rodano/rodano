@@ -48,7 +48,10 @@ export class AuthInterceptor implements HttpInterceptor {
 			}
 		}
 
-		const enhancedRequest = request.clone({headers});
+		const enhancedRequest = request.clone({
+			headers,
+			withCredentials: true
+		});
 
 		//if the skip error handling token is present in the request, skip the error handling of the request
 		if(skipErrorHandling) {

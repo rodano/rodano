@@ -6,6 +6,9 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Feature.FeaturePath;
+import ch.rodano.core.model.jooq.tables.Menu.MenuPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget.MenuLayoutSectionWidgetPath;
 import ch.rodano.core.model.jooq.tables.records.MenuLayoutSectionRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -133,6 +140,39 @@ public class MenuLayoutSection extends TableImpl<MenuLayoutSectionRecord> {
 		this(DSL.name("menu_layout_section"), null);
 	}
 
+	public <O extends Record> MenuLayoutSection(Table<O> path, ForeignKey<O, MenuLayoutSectionRecord> childPath, InverseForeignKey<O, MenuLayoutSectionRecord> parentPath) {
+		super(path, childPath, parentPath, MENU_LAYOUT_SECTION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class MenuLayoutSectionPath extends MenuLayoutSection implements Path<MenuLayoutSectionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> MenuLayoutSectionPath(Table<O> path, ForeignKey<O, MenuLayoutSectionRecord> childPath, InverseForeignKey<O, MenuLayoutSectionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private MenuLayoutSectionPath(Name alias, Table<MenuLayoutSectionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public MenuLayoutSectionPath as(String alias) {
+			return new MenuLayoutSectionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public MenuLayoutSectionPath as(Name alias) {
+			return new MenuLayoutSectionPath(alias, this);
+		}
+
+		@Override
+		public MenuLayoutSectionPath as(Table<?> alias) {
+			return new MenuLayoutSectionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -146,6 +186,48 @@ public class MenuLayoutSection extends TableImpl<MenuLayoutSectionRecord> {
 	@Override
 	public List<UniqueKey<MenuLayoutSectionRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_MENU_LAYOUT_SECTION_UQ_MENU_LAYOUT_SECTION_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<MenuLayoutSectionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_MENU_LAYOUT_SECTION_FEATURE, Keys.FK_MENU_LAYOUT_SECTION_MENU);
+	}
+
+	private transient FeaturePath _feature;
+
+	/**
+	 * Get the implicit join path to the <code>feature</code> table.
+	 */
+	public FeaturePath feature() {
+		if (_feature == null)
+			_feature = new FeaturePath(this, Keys.FK_MENU_LAYOUT_SECTION_FEATURE, null);
+
+		return _feature;
+	}
+
+	private transient MenuPath _menu;
+
+	/**
+	 * Get the implicit join path to the <code>menu</code> table.
+	 */
+	public MenuPath menu() {
+		if (_menu == null)
+			_menu = new MenuPath(this, Keys.FK_MENU_LAYOUT_SECTION_MENU, null);
+
+		return _menu;
+	}
+
+	private transient MenuLayoutSectionWidgetPath _menuLayoutSectionWidget;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget</code> table
+	 */
+	public MenuLayoutSectionWidgetPath menuLayoutSectionWidget() {
+		if (_menuLayoutSectionWidget == null)
+			_menuLayoutSectionWidget = new MenuLayoutSectionWidgetPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_SECTION.getInverseKey());
+
+		return _menuLayoutSectionWidget;
 	}
 
 	@Override

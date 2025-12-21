@@ -1,14 +1,8 @@
 package ch.rodano.core.services.bll.study;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
@@ -16,8 +10,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
@@ -31,8 +23,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Displayable;
-import ch.rodano.configuration.model.dataset.DatasetModel;
-import ch.rodano.configuration.model.layout.Layout;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.profile.ProfileRight;
 import ch.rodano.configuration.model.rights.Right;
@@ -41,18 +31,13 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.loader.DatabaseStudyLoader;
-import ch.rodano.core.model.configuration.LZW;
 import ch.rodano.core.services.project.ProjectIdResolver;
-import ch.rodano.core.utils.file.ResourceUtils;
 
 @Service
 public class StudyServiceImpl implements StudyService, InfoContributor {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final ObjectMapper objectMapper;
-
-	private final String configurationResource;
-	private final String configSource;
 	private final Integer configVersion;
 	private final Configurator configurator;
 	private final ProjectIdResolver projectIdResolver;
@@ -62,8 +47,6 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	private String studyChecksum;
 
 	public StudyServiceImpl(
-		@Value("${rodano.config:${rodano.config.jar}}") final String configurationResource,
-		@Value("${rodano.config.source:JSON}") final String configSource,
 		@Value("${rodano.config.version:0}") final Integer configVersion,
 		final ObjectMapper objectMapper,
 		final Configurator configurator,
@@ -71,8 +54,6 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		final DatabaseStudyLoader databaseStudyLoader
 	) {
 		this.objectMapper = objectMapper;
-		this.configurationResource = configurationResource;
-		this.configSource = configSource;
 		this.configVersion = configVersion;
 		this.configurator = configurator;
 		this.projectIdResolver = projectIdResolver;
@@ -81,8 +62,34 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 
 	@Override
 	public void loadStudyForProject(final UUID projectId) throws IOException {
+		logger.info("Loading study for project {}", projectId);
+
 		projectIdResolver.setProjectId(projectId);
-		load();
+		study = databaseStudyLoader.loadStudy(projectId);
+		study.setConfigVersion(configVersion);
+		study.init();
+
+		checkConfiguration();
+
+		if(Environment.DEV.equals(configurator.getEnvironment())) {
+			giveAllRightsToAdmin();
+		}
+
+		calculateChecksum();
+
+		logger.info("Study loaded successfully {}", study.getId());
+	}
+
+	private void calculateChecksum() {
+		try {
+			final var md = MessageDigest.getInstance("SHA-1");
+			final String studyJson = objectMapper.writeValueAsString(study);
+			studyChecksum = Hex.encodeHexString(md.digest(studyJson.getBytes()));
+		}
+		catch(final Exception e) {
+			logger.warn("Could not calculate study checksum", e);
+			studyChecksum = "checksum-unavailable";
+		}
 	}
 
 	@Override
@@ -95,125 +102,12 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		return study != null ? study.getProjectId() : null;
 	}
 
-	/**
-	 * Load the configuration file
-	 *
-	 * @throws IOException Thrown if an error occurred while reading the configuration resource
-	 */
-	private void load() throws IOException {
-		// Load study
-		if("DATABASE".equalsIgnoreCase(configSource)) {
-			System.out.println("USING DATABASE CONFIG SOURCE");
-			logger.info("Using database config source");
-			loadFromDatabase();
-		}
-		else {
-			System.out.println("USING JSON CONFIG SOURCE");
-			logger.info("Using json config source");
-			loadFromJson();
-		}
-
-		study.init();
-		checkConfiguration();
-
-		if(Environment.DEV.equals(configurator.getEnvironment())) {
-			giveAllRightsToAdmin();
-		}
-	}
-
-	private void loadFromJson() throws IOException {
-		try(final var is = ResourceUtils.readResource(configurationResource)) {
-			try {
-				final var md = MessageDigest.getInstance("SHA-1");
-				final var watchedIs = new DigestInputStream(is, md);
-
-				study = objectMapper.readValue(watchedIs, Study.class);
-				study.setProjectId(projectIdResolver.id());
-
-				studyChecksum = Hex.encodeHexString(md.digest());
-			}
-			catch(final NoSuchAlgorithmException e) {
-				logger.error(e.getLocalizedMessage(), e);
-			}
-		}
-	}
-
-	private void loadFromDatabase() {
-		logger.info("Loading study configuration from database");
-
-		final UUID projectId = projectIdResolver.id();
-
-		study = databaseStudyLoader.loadStudy(projectId);
-
-		study.setConfigVersion(configVersion);
-
-		try {
-			final var md = MessageDigest.getInstance("SHA-1");
-			final String studyJson = objectMapper.writeValueAsString(study);
-			studyChecksum = Hex.encodeHexString(md.digest(studyJson.getBytes()));
-		}
-		catch(final Exception e) {
-			logger.warn("Could not calculate study checksum from database", e);
-			studyChecksum = "database-loaded";
-		}
-
-		logger.info("Successfully loaded study configuration from database for project: {}", projectId);
-	}
-
 	@Override
-	public void read(final OutputStream os) throws IOException {
-		if("DATABASE".equalsIgnoreCase(configSource)) {
-			final String studyJson = objectMapper.writeValueAsString(study);
-			os.write(studyJson.getBytes());
+	public Study getStudy() {
+		if(study == null) {
+			throw new IllegalStateException("No study loaded. Please select a project first.");
 		}
-		else {
-			try(var is = ResourceUtils.readResource(configurationResource)) {
-				is.transferTo(os);
-			}
-		}
-	}
-
-	@Override
-	public void save(final InputStream is, final boolean compressed) throws IOException {
-		if("DATABASE".equalsIgnoreCase(configSource)) {
-			throw new UnsupportedOperationException("Saving configuration is not supported when using DATABASE source. " +
-				"Please use the Configurator API to modify database configuration.");
-		}
-
-		// Manage compression
-		if(compressed) {
-			// Retrieve array of codes
-			final var type = objectMapper.getTypeFactory().constructCollectionLikeType(List.class, Integer.class);
-			final List<Integer> integers = objectMapper.readValue(is, type);
-
-			// Uncompress
-			final var result = LZW.decompress(integers);
-
-			// Check data
-			//TODO improve this and avoid reading the configuration twice (here and in the call the reload method)
-			objectMapper.readValue(result, Study.class);
-
-			// Write to file
-			ResourceUtils.writeResource(configurationResource, result.getBytes());
-		}
-		else {
-			//load the input stream in memory so it can be used multiple times
-			final byte[] bytes = is.readAllBytes();
-			// Check data
-			//TODO improve this and avoid reading the configuration twice (here and in the call the reload method)
-			objectMapper.readValue(bytes, Study.class);
-
-			// Write to file
-			ResourceUtils.writeResource(configurationResource, bytes);
-		}
-
-		// Reload configuration
-		reload();
-	}
-
-	@Override
-	public void reload() throws IOException {
-		load();
+		return study;
 	}
 
 	/**
@@ -272,51 +166,47 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		}
 	}
 
-	/**
-	 * Remove scopes's contributions
-	 */
-	@SuppressWarnings("unused")
-	private void removeScopesContributions() {
-		// Remove from study
-		new ArrayList<>(study.getDatasetModels()).stream().filter(DatasetModel::isContribution).forEach(datasetModel -> {
-			// Remove dataset models
-			study.getDatasetModels().remove(datasetModel);
-
-			// Remove from event models
-			study.getEventModels().forEach(event -> event.getDatasetModelIds().remove(datasetModel.getId()));
-
-			// Remove from profiles
-			study.getProfiles().forEach(profile -> profile.getGrantedDatasetModelIdRights().remove(datasetModel.getId()));
-		});
-
-		// Remove form models and layouts
-		for(final var formModel : new ArrayList<>(study.getFormModels())) {
-			if(!formModel.isContribution()) {
-				new ArrayList<>(formModel.getLayouts()).stream().filter(Layout::isContribution).forEach(layout -> formModel.getLayouts().remove(layout));
-				continue;
-			}
-
-			// Remove from study
-			study.getFormModels().remove(formModel);
-
-			// Remove from event models
-			study.getEventModels().forEach(event -> event.getFormModelIds().remove(formModel.getId()));
-
-			// Remove from profiles
-			study.getProfiles().forEach(profile -> profile.getGrantedFormModelIdRights().remove(formModel.getId()));
-		}
-	}
-
 	@Override
-	public Study getStudy() {
-		if (study == null) {
-			throw new IllegalStateException("No study loaded. Please select a project first.");
+	public void reloadStudyFromDatabase() throws IOException {
+		if(study == null) {
+			throw new IllegalStateException("No study loaded. Cannot reload.");
 		}
-		return study;
+
+		logger.info("Reloading study from database for project {}", study.getId());
+
+		final UUID projectId = study.getProjectId();
+
+		study = databaseStudyLoader.loadStudy(projectId);
+		study.setConfigVersion(configVersion);
+		study.init();
+
+		checkConfiguration();
+
+		if(Environment.DEV.equals(configurator.getEnvironment())) {
+			giveAllRightsToAdmin();
+		}
+
+		calculateChecksum();
+
+		logger.info("Study reloaded successfully from database");
 	}
 
 	@Override
 	public void contribute(final Builder builder) {
-		builder.withDetail("config", Map.of("source", configSource, "sha1", studyChecksum, "date", study.getConfigDate()));
+		if(study != null) {
+			builder.withDetail("config", Map.of(
+				"sha1", studyChecksum != null ? studyChecksum : "not-calculated",
+				"date", study.getConfigDate(),
+				"projectId", study.getProjectId().toString(),
+				"code", study.getId(),
+				"version", configVersion
+			));
+		}
+		else {
+			builder.withDetail("config", Map.of(
+				"loaded", false,
+				"message", "No study loaded. Select a project to load configuration."
+			));
+		}
 	}
 }

@@ -19,21 +19,25 @@ public class ProjectIdResolver {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectIdResolver.class);
 
-	private final String code;
+	private final String defaultCode;
 	private final DSLContext dslContext;
 
 	private UUID id;
 
-	public ProjectIdResolver(final @Value("${rodano.project.code}") String code, final DSLContext dslContext) {
-		if(code == null || code.isBlank()) {
-			throw new IllegalStateException("rodano.project.code is missing/blank");
-		}
-		this.code = code.trim();
+	public ProjectIdResolver(final @Value("${rodano.project.code:}") String defaultCode, final DSLContext dslContext) {
+		this.defaultCode = defaultCode != null ? defaultCode.trim() : "";
 		this.dslContext = dslContext;
+
+		if(this.defaultCode.isBlank()) {
+			LOGGER.info("No default project code configured. Multi-project mode enabled.");
+		}
+		else {
+			LOGGER.info("Default project code configured: {}", this.defaultCode);
+		}
 	}
 
 	public String code() {
-		return code;
+		return defaultCode;
 	}
 
 	public UUID id() {
@@ -41,22 +45,27 @@ public class ProjectIdResolver {
 			return id;
 		}
 
+		if (defaultCode.isBlank()) {
+			LOGGER.debug("No project selected and no default code configured");
+			return null;
+		}
+
 		try {
 			id = dslContext.select(PROJECT.PROJECT_ID)
 				.from(PROJECT)
-				.where(PROJECT.CODE.eq(code))
+				.where(PROJECT.CODE.eq(defaultCode))
 				.fetchOne(PROJECT.PROJECT_ID);
 
 			if(id == null) {
-				LOGGER.error("Project with code {} not found in database", code);
-				throw new IllegalStateException("Project " + code + " not found in database");
+				LOGGER.error("Default project with code {} not found in database", defaultCode);
+				throw new IllegalStateException("Project " + defaultCode + " not found in database");
 			}
 
-			LOGGER.info("Resolved project '{}' to UUID {}", code, id);
+			LOGGER.info("Resolved default project '{}' to UUID {}", defaultCode, id);
 			return id;
 		}
 		catch(Exception e) {
-			LOGGER.error("Failed to resolve project '{}' to UUID {}", code, id, e);
+			LOGGER.error("Failed to resolve default project '{}' to UUID {}", defaultCode, id, e);
 			return null;
 		}
 	}

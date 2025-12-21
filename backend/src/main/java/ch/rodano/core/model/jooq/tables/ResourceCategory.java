@@ -6,6 +6,9 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MenuLayoutSectionWidgetParameterPath;
+import ch.rodano.core.model.jooq.tables.ProfileCategoryGrants.ProfileCategoryGrantsPath;
+import ch.rodano.core.model.jooq.tables.Resource.ResourcePath;
 import ch.rodano.core.model.jooq.tables.records.ResourceCategoryRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -118,6 +125,39 @@ public class ResourceCategory extends TableImpl<ResourceCategoryRecord> {
 		this(DSL.name("resource_category"), null);
 	}
 
+	public <O extends Record> ResourceCategory(Table<O> path, ForeignKey<O, ResourceCategoryRecord> childPath, InverseForeignKey<O, ResourceCategoryRecord> parentPath) {
+		super(path, childPath, parentPath, RESOURCE_CATEGORY);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ResourceCategoryPath extends ResourceCategory implements Path<ResourceCategoryRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ResourceCategoryPath(Table<O> path, ForeignKey<O, ResourceCategoryRecord> childPath, InverseForeignKey<O, ResourceCategoryRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ResourceCategoryPath(Name alias, Table<ResourceCategoryRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ResourceCategoryPath as(String alias) {
+			return new ResourceCategoryPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ResourceCategoryPath as(Name alias) {
+			return new ResourceCategoryPath(alias, this);
+		}
+
+		@Override
+		public ResourceCategoryPath as(Table<?> alias) {
+			return new ResourceCategoryPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -131,6 +171,44 @@ public class ResourceCategory extends TableImpl<ResourceCategoryRecord> {
 	@Override
 	public List<UniqueKey<ResourceCategoryRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_RESOURCE_CATEGORY_UQ_RESOURCE_CATEGORY_CODE);
+	}
+
+	private transient MenuLayoutSectionWidgetParameterPath _menuLayoutSectionWidgetParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget_parameter</code> table
+	 */
+	public MenuLayoutSectionWidgetParameterPath menuLayoutSectionWidgetParameter() {
+		if (_menuLayoutSectionWidgetParameter == null)
+			_menuLayoutSectionWidgetParameter = new MenuLayoutSectionWidgetParameterPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_CATEGORY.getInverseKey());
+
+		return _menuLayoutSectionWidgetParameter;
+	}
+
+	private transient ProfileCategoryGrantsPath _profileCategoryGrants;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_category_grants</code> table
+	 */
+	public ProfileCategoryGrantsPath profileCategoryGrants() {
+		if (_profileCategoryGrants == null)
+			_profileCategoryGrants = new ProfileCategoryGrantsPath(this, null, Keys.FK_PROFILE_CATEGORY_GRANTS_CATEGORY.getInverseKey());
+
+		return _profileCategoryGrants;
+	}
+
+	private transient ResourcePath _resource;
+
+	/**
+	 * Get the implicit to-many join path to the <code>resource</code> table
+	 */
+	public ResourcePath resource() {
+		if (_resource == null)
+			_resource = new ResourcePath(this, null, Keys.FK_RESOURCE_CATEGORY.getInverseKey());
+
+		return _resource;
 	}
 
 	@Override

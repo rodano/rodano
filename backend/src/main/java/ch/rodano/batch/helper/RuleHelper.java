@@ -125,12 +125,14 @@ public final class RuleHelper {
 
 		int order = 0;
 		for(RuleAction a : actions) {
-			final String actionKey = (a.getId() != null && !a.getId().isBlank()) ? a.getId() : "#" + order;
+			final String actionCode = (a.getId() == null || a.getId().trim().isEmpty()) ? a.getActionId() : a.getId();
+			final String actionKey = (a.getId() == null || a.getId().trim().isEmpty()) ? "#" + order : actionCode;
+
 			final UUID actionId = deterministic(projectId, "RULE_ACTION", ruleId + "|" + actionKey);
 
-			final String staticOrAction = (nz(a.getStaticActionId(), null) != null)
-				? a.getStaticActionId()
-				: nz(a.getActionId(), "");
+			final String staticActionId = (a.getStaticActionId() == null || a.getStaticActionId().trim().isEmpty())
+				? null
+				: a.getStaticActionId();
 
 			final UUID conditionId = resolveRuleConditionId(tx, projectId, ruleId, a.getConditionId());
 
@@ -138,24 +140,29 @@ public final class RuleHelper {
 				.set(RULE_ACTION.PROJECT_ID, projectId)
 				.set(RULE_ACTION.RULE_ACTION_ID, actionId)
 				.set(RULE_ACTION.RULE_ID, ruleId)
-				.set(RULE_ACTION.CODE, a.getId())
+				.set(RULE_ACTION.CODE, actionCode)
 				.set(RULE_ACTION.ACTION_ID_CODE, nz(a.getActionId(), a.getStaticActionId()))
 				.set(RULE_ACTION.CONDITION_ID, conditionId)
 				.set(RULE_ACTION.RULABLE_ENTITY, n2(a.getRulableEntity()))
 				.set(RULE_ACTION.ACTION_ORDER, order)
-				.set(RULE_ACTION.STATIC_ACTION_ID, staticOrAction)
+				.set(RULE_ACTION.STATIC_ACTION_ID, staticActionId)
 				.set(RULE_ACTION.OPTIONAL, a.isOptional())
 				.set(RULE_ACTION.LABEL, toJson(a.getLabel()))
-				.onDuplicateKeyUpdate()
-				.set(RULE_ACTION.CODE, a.getId())
-				.set(RULE_ACTION.ACTION_ID_CODE, nz(a.getActionId(), a.getStaticActionId()))
-				.set(RULE_ACTION.CONDITION_ID, conditionId)
-				.set(RULE_ACTION.RULABLE_ENTITY, n2(a.getRulableEntity()))
-				.set(RULE_ACTION.ACTION_ORDER, order)
-				.set(RULE_ACTION.STATIC_ACTION_ID, staticOrAction)
-				.set(RULE_ACTION.OPTIONAL, a.isOptional())
-				.set(RULE_ACTION.LABEL, toJson(a.getLabel()))
+				.onDuplicateKeyIgnore()
 				.execute();
+
+			final boolean exists = tx.fetchExists(
+				tx.selectOne()
+					.from(RULE_ACTION)
+					.where(RULE_ACTION.PROJECT_ID.eq(projectId))
+					.and(RULE_ACTION.RULE_ACTION_ID.eq(actionId))
+			);
+
+			if(!exists) {
+				System.out.println("Skipping parameters for duplicate/failed action:: " + actionId);
+				order++;
+				continue;
+			}
 
 			if(a.getParameters() != null && !a.getParameters().isEmpty()) {
 				int pi = 0;

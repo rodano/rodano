@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
 import ch.rodano.core.model.jooq.tables.records.EventModelWorkflowRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -94,14 +104,81 @@ public class EventModelWorkflow extends TableImpl<EventModelWorkflowRecord> {
 		this(DSL.name("event_model_workflow"), null);
 	}
 
+	public <O extends Record> EventModelWorkflow(Table<O> path, ForeignKey<O, EventModelWorkflowRecord> childPath, InverseForeignKey<O, EventModelWorkflowRecord> parentPath) {
+		super(path, childPath, parentPath, EVENT_MODEL_WORKFLOW);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class EventModelWorkflowPath extends EventModelWorkflow implements Path<EventModelWorkflowRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> EventModelWorkflowPath(Table<O> path, ForeignKey<O, EventModelWorkflowRecord> childPath, InverseForeignKey<O, EventModelWorkflowRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private EventModelWorkflowPath(Name alias, Table<EventModelWorkflowRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public EventModelWorkflowPath as(String alias) {
+			return new EventModelWorkflowPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public EventModelWorkflowPath as(Name alias) {
+			return new EventModelWorkflowPath(alias, this);
+		}
+
+		@Override
+		public EventModelWorkflowPath as(Table<?> alias) {
+			return new EventModelWorkflowPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.EVENT_MODEL_WORKFLOW_IDX_EVENT_MODEL_WF_EVENT, Indexes.EVENT_MODEL_WORKFLOW_IDX_EVENT_MODEL_WF_WORKFLOW);
+	}
+
+	@Override
 	public UniqueKey<EventModelWorkflowRecord> getPrimaryKey() {
 		return Keys.KEY_EVENT_MODEL_WORKFLOW_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<EventModelWorkflowRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_EVENT_MODEL_WF_EVENT, Keys.FK_EVENT_MODEL_WF_WORKFLOW);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_EVENT_MODEL_WF_EVENT, null);
+
+		return _eventModel;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_EVENT_MODEL_WF_WORKFLOW, null);
+
+		return _workflow;
 	}
 
 	@Override

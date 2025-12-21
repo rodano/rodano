@@ -37,6 +37,7 @@ import {MatDatepickerModule} from '@angular/material/datepicker';
 import {provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {AuthStateService} from './app/services/auth-state.service';
 import {MAT_ICON_DEFAULT_OPTIONS} from '@angular/material/icon';
+import {ProjectInterceptor} from '@core/interceptors/project.interceptor';
 
 if(environment.production) {
 	enableProdMode();
@@ -49,6 +50,7 @@ bootstrapApplication(AppComponent, {
 		importProvidersFrom(MatSnackBarModule, MatDialogModule, MatDatepickerModule, MatNativeDateModule),
 		{provide: ErrorHandler, useClass: GlobalErrorHandler},
 		{provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
+		{provide: HTTP_INTERCEPTORS, useClass: ProjectInterceptor, multi: true},
 		//customization of Material Design components
 		//only customize properties that are not related to styling here
 		//customization of styling should be done using SCSS rules in the styles.scss file, in the :root section

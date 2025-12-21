@@ -5,17 +5,27 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionAction.RuleDefinitionActionPath;
 import ch.rodano.core.model.jooq.tables.records.RuleDefinitionActionParameterRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -118,14 +128,81 @@ public class RuleDefinitionActionParameter extends TableImpl<RuleDefinitionActio
 		this(DSL.name("rule_definition_action_parameter"), null);
 	}
 
+	public <O extends Record> RuleDefinitionActionParameter(Table<O> path, ForeignKey<O, RuleDefinitionActionParameterRecord> childPath, InverseForeignKey<O, RuleDefinitionActionParameterRecord> parentPath) {
+		super(path, childPath, parentPath, RULE_DEFINITION_ACTION_PARAMETER);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class RuleDefinitionActionParameterPath extends RuleDefinitionActionParameter implements Path<RuleDefinitionActionParameterRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> RuleDefinitionActionParameterPath(Table<O> path, ForeignKey<O, RuleDefinitionActionParameterRecord> childPath, InverseForeignKey<O, RuleDefinitionActionParameterRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private RuleDefinitionActionParameterPath(Name alias, Table<RuleDefinitionActionParameterRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public RuleDefinitionActionParameterPath as(String alias) {
+			return new RuleDefinitionActionParameterPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public RuleDefinitionActionParameterPath as(Name alias) {
+			return new RuleDefinitionActionParameterPath(alias, this);
+		}
+
+		@Override
+		public RuleDefinitionActionParameterPath as(Table<?> alias) {
+			return new RuleDefinitionActionParameterPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.RULE_DEFINITION_ACTION_PARAMETER_IDX_RULE_DEF_ACTION_PARAM_PARENT);
+	}
+
+	@Override
 	public UniqueKey<RuleDefinitionActionParameterRecord> getPrimaryKey() {
 		return Keys.KEY_RULE_DEFINITION_ACTION_PARAMETER_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<RuleDefinitionActionParameterRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_RULE_DEF_ACTION_PARAM_ACTION, Keys.FK_RULE_DEF_ACTION_PARAM_PROJECT);
+	}
+
+	private transient RuleDefinitionActionPath _ruleDefinitionAction;
+
+	/**
+	 * Get the implicit join path to the <code>rule_definition_action</code> table.
+	 */
+	public RuleDefinitionActionPath ruleDefinitionAction() {
+		if (_ruleDefinitionAction == null)
+			_ruleDefinitionAction = new RuleDefinitionActionPath(this, Keys.FK_RULE_DEF_ACTION_PARAM_ACTION, null);
+
+		return _ruleDefinitionAction;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_RULE_DEF_ACTION_PARAM_PROJECT, null);
+
+		return _project;
 	}
 
 	@Override

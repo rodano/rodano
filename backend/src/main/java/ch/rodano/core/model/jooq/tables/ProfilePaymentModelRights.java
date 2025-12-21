@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.PaymentPlan.PaymentPlanPath;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
 import ch.rodano.core.model.jooq.tables.records.ProfilePaymentModelRightsRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +112,39 @@ public class ProfilePaymentModelRights extends TableImpl<ProfilePaymentModelRigh
 		this(DSL.name("profile_payment_model_rights"), null);
 	}
 
+	public <O extends Record> ProfilePaymentModelRights(Table<O> path, ForeignKey<O, ProfilePaymentModelRightsRecord> childPath, InverseForeignKey<O, ProfilePaymentModelRightsRecord> parentPath) {
+		super(path, childPath, parentPath, PROFILE_PAYMENT_MODEL_RIGHTS);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProfilePaymentModelRightsPath extends ProfilePaymentModelRights implements Path<ProfilePaymentModelRightsRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProfilePaymentModelRightsPath(Table<O> path, ForeignKey<O, ProfilePaymentModelRightsRecord> childPath, InverseForeignKey<O, ProfilePaymentModelRightsRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProfilePaymentModelRightsPath(Name alias, Table<ProfilePaymentModelRightsRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProfilePaymentModelRightsPath as(String alias) {
+			return new ProfilePaymentModelRightsPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProfilePaymentModelRightsPath as(Name alias) {
+			return new ProfilePaymentModelRightsPath(alias, this);
+		}
+
+		@Override
+		public ProfilePaymentModelRightsPath as(Table<?> alias) {
+			return new ProfilePaymentModelRightsPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +153,35 @@ public class ProfilePaymentModelRights extends TableImpl<ProfilePaymentModelRigh
 	@Override
 	public UniqueKey<ProfilePaymentModelRightsRecord> getPrimaryKey() {
 		return Keys.KEY_PROFILE_PAYMENT_MODEL_RIGHTS_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProfilePaymentModelRightsRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROFILE_PAYMENT_MODEL_RIGHTS_PAY_PLAN, Keys.FK_PROFILE_PAYMENT_MODEL_RIGHTS_PROFILE);
+	}
+
+	private transient PaymentPlanPath _paymentPlan;
+
+	/**
+	 * Get the implicit join path to the <code>payment_plan</code> table.
+	 */
+	public PaymentPlanPath paymentPlan() {
+		if (_paymentPlan == null)
+			_paymentPlan = new PaymentPlanPath(this, Keys.FK_PROFILE_PAYMENT_MODEL_RIGHTS_PAY_PLAN, null);
+
+		return _paymentPlan;
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROFILE_PAYMENT_MODEL_RIGHTS_PROFILE, null);
+
+		return _profile;
 	}
 
 	@Override

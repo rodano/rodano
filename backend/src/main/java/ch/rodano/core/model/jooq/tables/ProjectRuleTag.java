@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
 import ch.rodano.core.model.jooq.tables.records.ProjectRuleTagRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -89,6 +96,39 @@ public class ProjectRuleTag extends TableImpl<ProjectRuleTagRecord> {
 		this(DSL.name("project_rule_tag"), null);
 	}
 
+	public <O extends Record> ProjectRuleTag(Table<O> path, ForeignKey<O, ProjectRuleTagRecord> childPath, InverseForeignKey<O, ProjectRuleTagRecord> parentPath) {
+		super(path, childPath, parentPath, PROJECT_RULE_TAG);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProjectRuleTagPath extends ProjectRuleTag implements Path<ProjectRuleTagRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProjectRuleTagPath(Table<O> path, ForeignKey<O, ProjectRuleTagRecord> childPath, InverseForeignKey<O, ProjectRuleTagRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProjectRuleTagPath(Name alias, Table<ProjectRuleTagRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProjectRuleTagPath as(String alias) {
+			return new ProjectRuleTagPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProjectRuleTagPath as(Name alias) {
+			return new ProjectRuleTagPath(alias, this);
+		}
+
+		@Override
+		public ProjectRuleTagPath as(Table<?> alias) {
+			return new ProjectRuleTagPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -97,6 +137,23 @@ public class ProjectRuleTag extends TableImpl<ProjectRuleTagRecord> {
 	@Override
 	public UniqueKey<ProjectRuleTagRecord> getPrimaryKey() {
 		return Keys.KEY_PROJECT_RULE_TAG_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ProjectRuleTagRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROJ_RULE_TAG_PROJECT);
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_PROJ_RULE_TAG_PROJECT, null);
+
+		return _project;
 	}
 
 	@Override

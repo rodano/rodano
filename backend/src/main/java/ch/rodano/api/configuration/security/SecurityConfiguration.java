@@ -13,7 +13,6 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
 import ch.rodano.api.configuration.filter.BearerTokenAuthenticationFilter;
 
@@ -52,12 +51,7 @@ public class SecurityConfiguration {
 			)
 			//disable the default session management
 			.sessionManagement(
-				sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			)
-			//set the default security context repository to the attribute request
-			.securityContext(
-				securityContext -> securityContext
-					.securityContextRepository(new RequestAttributeSecurityContextRepository())
+				sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
 			)
 			//configure the public and private endpoints
 			.authorizeHttpRequests(
@@ -69,6 +63,7 @@ public class SecurityConfiguration {
 					//administration and database
 					.requestMatchers(HttpMethod.GET, "/administration/database/status", "/administration/maintenance", "/administration/debug", "/administration/is-online").permitAll()
 					.requestMatchers(HttpMethod.POST, "/administration/database/bootstrap").permitAll()
+					.requestMatchers(HttpMethod.POST, "/administration/projects/initialize").permitAll()
 					//sessions
 					.requestMatchers(HttpMethod.POST, "/sessions").permitAll()
 					.requestMatchers(HttpMethod.GET, "/sessions/delegated").permitAll()

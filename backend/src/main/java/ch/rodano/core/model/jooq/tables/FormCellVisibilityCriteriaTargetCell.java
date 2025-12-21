@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteria.FormCellVisibilityCriteriaPath;
 import ch.rodano.core.model.jooq.tables.records.FormCellVisibilityCriteriaTargetCellRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -113,6 +120,39 @@ public class FormCellVisibilityCriteriaTargetCell extends TableImpl<FormCellVisi
 		this(DSL.name("form_cell_visibility_criteria_target_cell"), null);
 	}
 
+	public <O extends Record> FormCellVisibilityCriteriaTargetCell(Table<O> path, ForeignKey<O, FormCellVisibilityCriteriaTargetCellRecord> childPath, InverseForeignKey<O, FormCellVisibilityCriteriaTargetCellRecord> parentPath) {
+		super(path, childPath, parentPath, FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FormCellVisibilityCriteriaTargetCellPath extends FormCellVisibilityCriteriaTargetCell implements Path<FormCellVisibilityCriteriaTargetCellRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FormCellVisibilityCriteriaTargetCellPath(Table<O> path, ForeignKey<O, FormCellVisibilityCriteriaTargetCellRecord> childPath, InverseForeignKey<O, FormCellVisibilityCriteriaTargetCellRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FormCellVisibilityCriteriaTargetCellPath(Name alias, Table<FormCellVisibilityCriteriaTargetCellRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FormCellVisibilityCriteriaTargetCellPath as(String alias) {
+			return new FormCellVisibilityCriteriaTargetCellPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FormCellVisibilityCriteriaTargetCellPath as(Name alias) {
+			return new FormCellVisibilityCriteriaTargetCellPath(alias, this);
+		}
+
+		@Override
+		public FormCellVisibilityCriteriaTargetCellPath as(Table<?> alias) {
+			return new FormCellVisibilityCriteriaTargetCellPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -121,6 +161,24 @@ public class FormCellVisibilityCriteriaTargetCell extends TableImpl<FormCellVisi
 	@Override
 	public UniqueKey<FormCellVisibilityCriteriaTargetCellRecord> getPrimaryKey() {
 		return Keys.KEY_FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FormCellVisibilityCriteriaTargetCellRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FCVC_TC_RULE);
+	}
+
+	private transient FormCellVisibilityCriteriaPath _formCellVisibilityCriteria;
+
+	/**
+	 * Get the implicit join path to the <code>form_cell_visibility_criteria</code>
+	 * table.
+	 */
+	public FormCellVisibilityCriteriaPath formCellVisibilityCriteria() {
+		if (_formCellVisibilityCriteria == null)
+			_formCellVisibilityCriteria = new FormCellVisibilityCriteriaPath(this, Keys.FK_FCVC_TC_RULE, null);
+
+		return _formCellVisibilityCriteria;
 	}
 
 	@Override

@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.TimelineGraphSection.TimelineGraphSectionPath;
 import ch.rodano.core.model.jooq.tables.records.TimelineGraphSectionEventRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +112,39 @@ public class TimelineGraphSectionEvent extends TableImpl<TimelineGraphSectionEve
 		this(DSL.name("timeline_graph_section_event"), null);
 	}
 
+	public <O extends Record> TimelineGraphSectionEvent(Table<O> path, ForeignKey<O, TimelineGraphSectionEventRecord> childPath, InverseForeignKey<O, TimelineGraphSectionEventRecord> parentPath) {
+		super(path, childPath, parentPath, TIMELINE_GRAPH_SECTION_EVENT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class TimelineGraphSectionEventPath extends TimelineGraphSectionEvent implements Path<TimelineGraphSectionEventRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> TimelineGraphSectionEventPath(Table<O> path, ForeignKey<O, TimelineGraphSectionEventRecord> childPath, InverseForeignKey<O, TimelineGraphSectionEventRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private TimelineGraphSectionEventPath(Name alias, Table<TimelineGraphSectionEventRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public TimelineGraphSectionEventPath as(String alias) {
+			return new TimelineGraphSectionEventPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public TimelineGraphSectionEventPath as(Name alias) {
+			return new TimelineGraphSectionEventPath(alias, this);
+		}
+
+		@Override
+		public TimelineGraphSectionEventPath as(Table<?> alias) {
+			return new TimelineGraphSectionEventPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +153,35 @@ public class TimelineGraphSectionEvent extends TableImpl<TimelineGraphSectionEve
 	@Override
 	public UniqueKey<TimelineGraphSectionEventRecord> getPrimaryKey() {
 		return Keys.KEY_TIMELINE_GRAPH_SECTION_EVENT_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<TimelineGraphSectionEventRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_SECTION_EVENT_MODEL, Keys.FK_TIMELINE_GRAPH_SECTION_EVENT_SECTION);
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table.
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, Keys.FK_TIMELINE_GRAPH_SECTION_EVENT_MODEL, null);
+
+		return _eventModel;
+	}
+
+	private transient TimelineGraphSectionPath _timelineGraphSection;
+
+	/**
+	 * Get the implicit join path to the <code>timeline_graph_section</code> table.
+	 */
+	public TimelineGraphSectionPath timelineGraphSection() {
+		if (_timelineGraphSection == null)
+			_timelineGraphSection = new TimelineGraphSectionPath(this, Keys.FK_TIMELINE_GRAPH_SECTION_EVENT_SECTION, null);
+
+		return _timelineGraphSection;
 	}
 
 	@Override

@@ -6,16 +6,28 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget.MenuLayoutSectionWidgetPath;
+import ch.rodano.core.model.jooq.tables.ResourceCategory.ResourceCategoryPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.WorkflowSummary.WorkflowSummaryPath;
+import ch.rodano.core.model.jooq.tables.WorkflowWidget.WorkflowWidgetPath;
 import ch.rodano.core.model.jooq.tables.records.MenuLayoutSectionWidgetParameterRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -149,6 +161,39 @@ public class MenuLayoutSectionWidgetParameter extends TableImpl<MenuLayoutSectio
 		this(DSL.name("menu_layout_section_widget_parameter"), null);
 	}
 
+	public <O extends Record> MenuLayoutSectionWidgetParameter(Table<O> path, ForeignKey<O, MenuLayoutSectionWidgetParameterRecord> childPath, InverseForeignKey<O, MenuLayoutSectionWidgetParameterRecord> parentPath) {
+		super(path, childPath, parentPath, MENU_LAYOUT_SECTION_WIDGET_PARAMETER);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class MenuLayoutSectionWidgetParameterPath extends MenuLayoutSectionWidgetParameter implements Path<MenuLayoutSectionWidgetParameterRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> MenuLayoutSectionWidgetParameterPath(Table<O> path, ForeignKey<O, MenuLayoutSectionWidgetParameterRecord> childPath, InverseForeignKey<O, MenuLayoutSectionWidgetParameterRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private MenuLayoutSectionWidgetParameterPath(Name alias, Table<MenuLayoutSectionWidgetParameterRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public MenuLayoutSectionWidgetParameterPath as(String alias) {
+			return new MenuLayoutSectionWidgetParameterPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public MenuLayoutSectionWidgetParameterPath as(Name alias) {
+			return new MenuLayoutSectionWidgetParameterPath(alias, this);
+		}
+
+		@Override
+		public MenuLayoutSectionWidgetParameterPath as(Table<?> alias) {
+			return new MenuLayoutSectionWidgetParameterPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -157,6 +202,84 @@ public class MenuLayoutSectionWidgetParameter extends TableImpl<MenuLayoutSectio
 	@Override
 	public UniqueKey<MenuLayoutSectionWidgetParameterRecord> getPrimaryKey() {
 		return Keys.KEY_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<MenuLayoutSectionWidgetParameterRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_CATEGORY, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_CHART, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_SCOPE, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WF_SUMMARY, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WF_WIDGET, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WIDGET);
+	}
+
+	private transient ResourceCategoryPath _resourceCategory;
+
+	/**
+	 * Get the implicit join path to the <code>resource_category</code> table.
+	 */
+	public ResourceCategoryPath resourceCategory() {
+		if (_resourceCategory == null)
+			_resourceCategory = new ResourceCategoryPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_CATEGORY, null);
+
+		return _resourceCategory;
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit join path to the <code>chart</code> table.
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_CHART, null);
+
+		return _chart;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_SCOPE, null);
+
+		return _scopeModel;
+	}
+
+	private transient WorkflowSummaryPath _workflowSummary;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_summary</code> table.
+	 */
+	public WorkflowSummaryPath workflowSummary() {
+		if (_workflowSummary == null)
+			_workflowSummary = new WorkflowSummaryPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WF_SUMMARY, null);
+
+		return _workflowSummary;
+	}
+
+	private transient WorkflowWidgetPath _workflowWidget;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_widget</code> table.
+	 */
+	public WorkflowWidgetPath workflowWidget() {
+		if (_workflowWidget == null)
+			_workflowWidget = new WorkflowWidgetPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WF_WIDGET, null);
+
+		return _workflowWidget;
+	}
+
+	private transient MenuLayoutSectionWidgetPath _menuLayoutSectionWidget;
+
+	/**
+	 * Get the implicit join path to the <code>menu_layout_section_widget</code>
+	 * table.
+	 */
+	public MenuLayoutSectionWidgetPath menuLayoutSectionWidget() {
+		if (_menuLayoutSectionWidget == null)
+			_menuLayoutSectionWidget = new MenuLayoutSectionWidgetPath(this, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_PARAMETER_WIDGET, null);
+
+		return _menuLayoutSectionWidget;
 	}
 
 	@Override

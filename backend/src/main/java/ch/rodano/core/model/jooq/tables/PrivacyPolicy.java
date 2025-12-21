@@ -6,6 +6,7 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.PrivacyPolicyProfile.PrivacyPolicyProfilePath;
 import ch.rodano.core.model.jooq.tables.records.PrivacyPolicyRecord;
 
 import java.util.Arrays;
@@ -16,9 +17,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -118,6 +123,39 @@ public class PrivacyPolicy extends TableImpl<PrivacyPolicyRecord> {
 		this(DSL.name("privacy_policy"), null);
 	}
 
+	public <O extends Record> PrivacyPolicy(Table<O> path, ForeignKey<O, PrivacyPolicyRecord> childPath, InverseForeignKey<O, PrivacyPolicyRecord> parentPath) {
+		super(path, childPath, parentPath, PRIVACY_POLICY);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class PrivacyPolicyPath extends PrivacyPolicy implements Path<PrivacyPolicyRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> PrivacyPolicyPath(Table<O> path, ForeignKey<O, PrivacyPolicyRecord> childPath, InverseForeignKey<O, PrivacyPolicyRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private PrivacyPolicyPath(Name alias, Table<PrivacyPolicyRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public PrivacyPolicyPath as(String alias) {
+			return new PrivacyPolicyPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public PrivacyPolicyPath as(Name alias) {
+			return new PrivacyPolicyPath(alias, this);
+		}
+
+		@Override
+		public PrivacyPolicyPath as(Table<?> alias) {
+			return new PrivacyPolicyPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -126,6 +164,19 @@ public class PrivacyPolicy extends TableImpl<PrivacyPolicyRecord> {
 	@Override
 	public UniqueKey<PrivacyPolicyRecord> getPrimaryKey() {
 		return Keys.KEY_PRIVACY_POLICY_PRIMARY;
+	}
+
+	private transient PrivacyPolicyProfilePath _privacyPolicyProfile;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>privacy_policy_profile</code> table
+	 */
+	public PrivacyPolicyProfilePath privacyPolicyProfile() {
+		if (_privacyPolicyProfile == null)
+			_privacyPolicyProfile = new PrivacyPolicyProfilePath(this, null, Keys.FK_PRIVACY_POLICY_PROFILE.getInverseKey());
+
+		return _privacyPolicyProfile;
 	}
 
 	@Override

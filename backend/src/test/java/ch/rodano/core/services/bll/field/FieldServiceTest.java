@@ -1,6 +1,5 @@
 package ch.rodano.core.services.bll.field;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Optional;
@@ -72,9 +71,7 @@ public class FieldServiceTest extends DatabaseTest {
 	private Scope patient;
 
 	@BeforeEach
-	public void initTest() throws IOException {
-		studyService.reload();
-
+	public void initTest() {
 		addressDatasetModel = studyService.getStudy().getDatasetModel("ADDRESS");
 		telephoneDatasetModel = studyService.getStudy().getDatasetModel("TELEPHONE_DOCUMENTATION");
 		patientDatasetModel = studyService.getStudy().getDatasetModel("PATIENT_DOCUMENTATION");

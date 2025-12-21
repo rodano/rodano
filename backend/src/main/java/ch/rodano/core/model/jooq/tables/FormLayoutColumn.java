@@ -6,16 +6,23 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FormLayout.FormLayoutPath;
 import ch.rodano.core.model.jooq.tables.records.FormLayoutColumnRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +111,39 @@ public class FormLayoutColumn extends TableImpl<FormLayoutColumnRecord> {
 		this(DSL.name("form_layout_column"), null);
 	}
 
+	public <O extends Record> FormLayoutColumn(Table<O> path, ForeignKey<O, FormLayoutColumnRecord> childPath, InverseForeignKey<O, FormLayoutColumnRecord> parentPath) {
+		super(path, childPath, parentPath, FORM_LAYOUT_COLUMN);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FormLayoutColumnPath extends FormLayoutColumn implements Path<FormLayoutColumnRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FormLayoutColumnPath(Table<O> path, ForeignKey<O, FormLayoutColumnRecord> childPath, InverseForeignKey<O, FormLayoutColumnRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FormLayoutColumnPath(Name alias, Table<FormLayoutColumnRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FormLayoutColumnPath as(String alias) {
+			return new FormLayoutColumnPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FormLayoutColumnPath as(Name alias) {
+			return new FormLayoutColumnPath(alias, this);
+		}
+
+		@Override
+		public FormLayoutColumnPath as(Table<?> alias) {
+			return new FormLayoutColumnPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +152,23 @@ public class FormLayoutColumn extends TableImpl<FormLayoutColumnRecord> {
 	@Override
 	public UniqueKey<FormLayoutColumnRecord> getPrimaryKey() {
 		return Keys.KEY_FORM_LAYOUT_COLUMN_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FormLayoutColumnRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FORM_LAYOUT_COL_LAYOUT);
+	}
+
+	private transient FormLayoutPath _formLayout;
+
+	/**
+	 * Get the implicit join path to the <code>form_layout</code> table.
+	 */
+	public FormLayoutPath formLayout() {
+		if (_formLayout == null)
+			_formLayout = new FormLayoutPath(this, Keys.FK_FORM_LAYOUT_COL_LAYOUT, null);
+
+		return _formLayout;
 	}
 
 	@Override

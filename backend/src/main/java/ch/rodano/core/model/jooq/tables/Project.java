@@ -6,6 +6,26 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
+import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
+import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
+import ch.rodano.core.model.jooq.tables.EventModel.EventModelPath;
+import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
+import ch.rodano.core.model.jooq.tables.FormModel.FormModelPath;
+import ch.rodano.core.model.jooq.tables.Mail.MailPath;
+import ch.rodano.core.model.jooq.tables.MailAttachment.MailAttachmentPath;
+import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
+import ch.rodano.core.model.jooq.tables.ProjectLanguage.ProjectLanguagePath;
+import ch.rodano.core.model.jooq.tables.ProjectRuleTag.ProjectRuleTagPath;
+import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
+import ch.rodano.core.model.jooq.tables.RobotAudit.RobotAuditPath;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionAction.RuleDefinitionActionPath;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionActionParameter.RuleDefinitionActionParameterPath;
+import ch.rodano.core.model.jooq.tables.RuleDefinitionProperty.RuleDefinitionPropertyPath;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowAction.WorkflowActionPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
 import ch.rodano.core.model.jooq.tables.records.ProjectRecord;
 
 import java.time.LocalDate;
@@ -17,9 +37,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -58,7 +82,7 @@ public class Project extends TableImpl<ProjectRecord> {
 	/**
 	 * The column <code>project.project_id</code>.
 	 */
-	public final TableField<ProjectRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false).defaultValue(DSL.field(DSL.raw("uuid()"), SQLDataType.UUID)), this, "");
+	public final TableField<ProjectRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>project.code</code>.
@@ -204,6 +228,39 @@ public class Project extends TableImpl<ProjectRecord> {
 		this(DSL.name("project"), null);
 	}
 
+	public <O extends Record> Project(Table<O> path, ForeignKey<O, ProjectRecord> childPath, InverseForeignKey<O, ProjectRecord> parentPath) {
+		super(path, childPath, parentPath, PROJECT);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ProjectPath extends Project implements Path<ProjectRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ProjectPath(Table<O> path, ForeignKey<O, ProjectRecord> childPath, InverseForeignKey<O, ProjectRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ProjectPath(Name alias, Table<ProjectRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ProjectPath as(String alias) {
+			return new ProjectPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ProjectPath as(Name alias) {
+			return new ProjectPath(alias, this);
+		}
+
+		@Override
+		public ProjectPath as(Table<?> alias) {
+			return new ProjectPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -217,6 +274,256 @@ public class Project extends TableImpl<ProjectRecord> {
 	@Override
 	public List<UniqueKey<ProjectRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_PROJECT_UQ_PROJECT_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<ProjectRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PROJECT_EPRO_PROFILE);
+	}
+
+	private transient ProfilePath _profile;
+
+	/**
+	 * Get the implicit join path to the <code>profile</code> table.
+	 */
+	public ProfilePath profile() {
+		if (_profile == null)
+			_profile = new ProfilePath(this, Keys.FK_PROJECT_EPRO_PROFILE, null);
+
+		return _profile;
+	}
+
+	private transient AuditActionPath _auditAction;
+
+	/**
+	 * Get the implicit to-many join path to the <code>audit_action</code> table
+	 */
+	public AuditActionPath auditAction() {
+		if (_auditAction == null)
+			_auditAction = new AuditActionPath(this, null, Keys.FK_AUDIT_ACTION_PROJECT.getInverseKey());
+
+		return _auditAction;
+	}
+
+	private transient ChartPath _chart;
+
+	/**
+	 * Get the implicit to-many join path to the <code>chart</code> table
+	 */
+	public ChartPath chart() {
+		if (_chart == null)
+			_chart = new ChartPath(this, null, Keys.FK_CHART_PROJECT.getInverseKey());
+
+		return _chart;
+	}
+
+	private transient DatasetModelPath _datasetModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>dataset_model</code> table
+	 */
+	public DatasetModelPath datasetModel() {
+		if (_datasetModel == null)
+			_datasetModel = new DatasetModelPath(this, null, Keys.FK_DATASET_MODEL_PROJECT.getInverseKey());
+
+		return _datasetModel;
+	}
+
+	private transient EventModelPath _eventModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>event_model</code> table
+	 */
+	public EventModelPath eventModel() {
+		if (_eventModel == null)
+			_eventModel = new EventModelPath(this, null, Keys.FK_EVENT_MODEL_PROJECT.getInverseKey());
+
+		return _eventModel;
+	}
+
+	private transient FieldModelPath _fieldModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>field_model</code> table
+	 */
+	public FieldModelPath fieldModel() {
+		if (_fieldModel == null)
+			_fieldModel = new FieldModelPath(this, null, Keys.FK_FIELD_MODEL_PROJECT.getInverseKey());
+
+		return _fieldModel;
+	}
+
+	private transient FormModelPath _formModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_model</code> table
+	 */
+	public FormModelPath formModel() {
+		if (_formModel == null)
+			_formModel = new FormModelPath(this, null, Keys.FK_FORM_MODEL_PROJECT.getInverseKey());
+
+		return _formModel;
+	}
+
+	private transient MailAttachmentPath _mailAttachment;
+
+	/**
+	 * Get the implicit to-many join path to the <code>mail_attachment</code> table
+	 */
+	public MailAttachmentPath mailAttachment() {
+		if (_mailAttachment == null)
+			_mailAttachment = new MailAttachmentPath(this, null, Keys.FK_MAIL_ATTACHMENT_PROJECT.getInverseKey());
+
+		return _mailAttachment;
+	}
+
+	private transient MailPath _mail;
+
+	/**
+	 * Get the implicit to-many join path to the <code>mail</code> table
+	 */
+	public MailPath mail() {
+		if (_mail == null)
+			_mail = new MailPath(this, null, Keys.FK_MAIL_PROJECT.getInverseKey());
+
+		return _mail;
+	}
+
+	private transient ProjectLanguagePath _projectLanguage;
+
+	/**
+	 * Get the implicit to-many join path to the <code>project_language</code>
+	 * table
+	 */
+	public ProjectLanguagePath projectLanguage() {
+		if (_projectLanguage == null)
+			_projectLanguage = new ProjectLanguagePath(this, null, Keys.FK_PROJ_LANG_PROJECT.getInverseKey());
+
+		return _projectLanguage;
+	}
+
+	private transient ProjectRuleTagPath _projectRuleTag;
+
+	/**
+	 * Get the implicit to-many join path to the <code>project_rule_tag</code>
+	 * table
+	 */
+	public ProjectRuleTagPath projectRuleTag() {
+		if (_projectRuleTag == null)
+			_projectRuleTag = new ProjectRuleTagPath(this, null, Keys.FK_PROJ_RULE_TAG_PROJECT.getInverseKey());
+
+		return _projectRuleTag;
+	}
+
+	private transient RobotAuditPath _robotAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>robot_audit</code> table
+	 */
+	public RobotAuditPath robotAudit() {
+		if (_robotAudit == null)
+			_robotAudit = new RobotAuditPath(this, null, Keys.FK_ROBOT_AUDIT_PROJECT.getInverseKey());
+
+		return _robotAudit;
+	}
+
+	private transient RobotPath _robot;
+
+	/**
+	 * Get the implicit to-many join path to the <code>robot</code> table
+	 */
+	public RobotPath robot() {
+		if (_robot == null)
+			_robot = new RobotPath(this, null, Keys.FK_ROBOT_PROJECT.getInverseKey());
+
+		return _robot;
+	}
+
+	private transient RuleDefinitionActionParameterPath _ruleDefinitionActionParameter;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>rule_definition_action_parameter</code> table
+	 */
+	public RuleDefinitionActionParameterPath ruleDefinitionActionParameter() {
+		if (_ruleDefinitionActionParameter == null)
+			_ruleDefinitionActionParameter = new RuleDefinitionActionParameterPath(this, null, Keys.FK_RULE_DEF_ACTION_PARAM_PROJECT.getInverseKey());
+
+		return _ruleDefinitionActionParameter;
+	}
+
+	private transient RuleDefinitionActionPath _ruleDefinitionAction;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>rule_definition_action</code> table
+	 */
+	public RuleDefinitionActionPath ruleDefinitionAction() {
+		if (_ruleDefinitionAction == null)
+			_ruleDefinitionAction = new RuleDefinitionActionPath(this, null, Keys.FK_RULE_DEF_ACTION_PROJECT.getInverseKey());
+
+		return _ruleDefinitionAction;
+	}
+
+	private transient RuleDefinitionPropertyPath _ruleDefinitionProperty;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>rule_definition_property</code> table
+	 */
+	public RuleDefinitionPropertyPath ruleDefinitionProperty() {
+		if (_ruleDefinitionProperty == null)
+			_ruleDefinitionProperty = new RuleDefinitionPropertyPath(this, null, Keys.FK_RULE_DEF_PROP_PROJECT.getInverseKey());
+
+		return _ruleDefinitionProperty;
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>scope_model</code> table
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, null, Keys.FK_SCOPE_MODEL_PROJECT.getInverseKey());
+
+		return _scopeModel;
+	}
+
+	private transient WorkflowActionPath _workflowAction;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_action</code> table
+	 */
+	public WorkflowActionPath workflowAction() {
+		if (_workflowAction == null)
+			_workflowAction = new WorkflowActionPath(this, null, Keys.FK_WORKFLOW_ACTION_PROJECT.getInverseKey());
+
+		return _workflowAction;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow</code> table
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, null, Keys.FK_WORKFLOW_PROJECT.getInverseKey());
+
+		return _workflow;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit to-many join path to the <code>workflow_state</code> table
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, null, Keys.FK_WORKFLOW_STATE_PROJECT.getInverseKey());
+
+		return _workflowState;
 	}
 
 	@Override

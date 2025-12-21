@@ -6,6 +6,10 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Menu.MenuPath;
+import ch.rodano.core.model.jooq.tables.MenuAction.MenuActionPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSection.MenuLayoutSectionPath;
+import ch.rodano.core.model.jooq.tables.ProfileMenuGrants.ProfileMenuGrantsPath;
 import ch.rodano.core.model.jooq.tables.records.MenuRecord;
 
 import java.util.Arrays;
@@ -16,9 +20,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -138,6 +146,39 @@ public class Menu extends TableImpl<MenuRecord> {
 		this(DSL.name("menu"), null);
 	}
 
+	public <O extends Record> Menu(Table<O> path, ForeignKey<O, MenuRecord> childPath, InverseForeignKey<O, MenuRecord> parentPath) {
+		super(path, childPath, parentPath, MENU);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class MenuPath extends Menu implements Path<MenuRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> MenuPath(Table<O> path, ForeignKey<O, MenuRecord> childPath, InverseForeignKey<O, MenuRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private MenuPath(Name alias, Table<MenuRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public MenuPath as(String alias) {
+			return new MenuPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public MenuPath as(Name alias) {
+			return new MenuPath(alias, this);
+		}
+
+		@Override
+		public MenuPath as(Table<?> alias) {
+			return new MenuPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -151,6 +192,61 @@ public class Menu extends TableImpl<MenuRecord> {
 	@Override
 	public List<UniqueKey<MenuRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_MENU_UQ_MENU_PROJECT_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<MenuRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_MENU_PARENT);
+	}
+
+	private transient MenuPath _menu;
+
+	/**
+	 * Get the implicit join path to the <code>menu</code> table.
+	 */
+	public MenuPath menu() {
+		if (_menu == null)
+			_menu = new MenuPath(this, Keys.FK_MENU_PARENT, null);
+
+		return _menu;
+	}
+
+	private transient MenuActionPath _menuAction;
+
+	/**
+	 * Get the implicit to-many join path to the <code>menu_action</code> table
+	 */
+	public MenuActionPath menuAction() {
+		if (_menuAction == null)
+			_menuAction = new MenuActionPath(this, null, Keys.FK_MENU_ACTION_MENU.getInverseKey());
+
+		return _menuAction;
+	}
+
+	private transient MenuLayoutSectionPath _menuLayoutSection;
+
+	/**
+	 * Get the implicit to-many join path to the <code>menu_layout_section</code>
+	 * table
+	 */
+	public MenuLayoutSectionPath menuLayoutSection() {
+		if (_menuLayoutSection == null)
+			_menuLayoutSection = new MenuLayoutSectionPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_MENU.getInverseKey());
+
+		return _menuLayoutSection;
+	}
+
+	private transient ProfileMenuGrantsPath _profileMenuGrants;
+
+	/**
+	 * Get the implicit to-many join path to the <code>profile_menu_grants</code>
+	 * table
+	 */
+	public ProfileMenuGrantsPath profileMenuGrants() {
+		if (_profileMenuGrants == null)
+			_profileMenuGrants = new ProfileMenuGrantsPath(this, null, Keys.FK_PROFILE_MENU_GRANTS_MENU.getInverseKey());
+
+		return _profileMenuGrants;
 	}
 
 	@Override

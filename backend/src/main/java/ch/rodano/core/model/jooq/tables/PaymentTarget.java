@@ -6,19 +6,28 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.Payment.PaymentPath;
 import ch.rodano.core.model.jooq.tables.records.PaymentTargetRecord;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -122,9 +131,47 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 		this(DSL.name("payment_target"), null);
 	}
 
+	public <O extends Record> PaymentTarget(Table<O> path, ForeignKey<O, PaymentTargetRecord> childPath, InverseForeignKey<O, PaymentTargetRecord> parentPath) {
+		super(path, childPath, parentPath, PAYMENT_TARGET);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class PaymentTargetPath extends PaymentTarget implements Path<PaymentTargetRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> PaymentTargetPath(Table<O> path, ForeignKey<O, PaymentTargetRecord> childPath, InverseForeignKey<O, PaymentTargetRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private PaymentTargetPath(Name alias, Table<PaymentTargetRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public PaymentTargetPath as(String alias) {
+			return new PaymentTargetPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public PaymentTargetPath as(Name alias) {
+			return new PaymentTargetPath(alias, this);
+		}
+
+		@Override
+		public PaymentTargetPath as(Table<?> alias) {
+			return new PaymentTargetPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.PAYMENT_TARGET_IDX_PAYMENT_TARGET_DELETED);
 	}
 
 	@Override
@@ -135,6 +182,23 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 	@Override
 	public UniqueKey<PaymentTargetRecord> getPrimaryKey() {
 		return Keys.KEY_PAYMENT_TARGET_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<PaymentTargetRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_PAYMENT_TARGET_PAYMENT_FK);
+	}
+
+	private transient PaymentPath _payment;
+
+	/**
+	 * Get the implicit join path to the <code>payment</code> table.
+	 */
+	public PaymentPath payment() {
+		if (_payment == null)
+			_payment = new PaymentPath(this, Keys.FK_PAYMENT_TARGET_PAYMENT_FK, null);
+
+		return _payment;
 	}
 
 	@Override

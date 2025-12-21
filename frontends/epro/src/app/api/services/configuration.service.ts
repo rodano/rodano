@@ -1,24 +1,27 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { concatMap, map, first } from 'rxjs/operators';
-import { APIService } from './api.service';
-import { PublicStudyDTO } from '../model/public-study-dto';
-import { CellDTO } from '../model/cell-dto';
-import { ScopeDTO } from '../model/scope-dto';
-import { DatasetModelDTO } from '../model/dataset-model-dto';
-import { EventModelDTO } from '../model/event-model-dto';
-import { FormModelDTO } from '../model/form-model-dto';
-import { ScopeModelDTO } from '../model/scope-model-dto';
-import { StudyDTO } from '../model/study-dto';
-import { LayoutDTO } from '../model/layout-dto';
-import { ProfileDTO } from '../model/profile-dto';
-import { WorkflowDTO } from '../model/workflow-dto';
-import { MenuDTO } from '../model/menu-dto';
-import { CMSLayoutDTO } from '../model/cms-layout-dto';
+import {HttpClient} from '@angular/common/http';
+import {Injectable} from '@angular/core';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {concatMap, map, first} from 'rxjs/operators';
+import {APIService} from './api.service';
+import {PublicStudyDTO} from '../model/public-study-dto';
+import {CellDTO} from '../model/cell-dto';
+import {ScopeDTO} from '../model/scope-dto';
+import {DatasetModelDTO} from '../model/dataset-model-dto';
+import {EventModelDTO} from '../model/event-model-dto';
+import {FormModelDTO} from '../model/form-model-dto';
+import {ScopeModelDTO} from '../model/scope-model-dto';
+import {StudyDTO} from '../model/study-dto';
+import {LayoutDTO} from '../model/layout-dto';
+import {ProfileDTO} from '../model/profile-dto';
+import {WorkflowDTO} from '../model/workflow-dto';
+import {MenuDTO} from '../model/menu-dto';
+import {CMSLayoutDTO} from '../model/cms-layout-dto';
 
 @Injectable()
 export class ConfigurationService {
+	private studySubject = new BehaviorSubject<PublicStudyDTO | undefined>(undefined);
+	public study$ = this.studySubject.asObservable();
+
 	constructor(
 		private http: HttpClient,
 		private apiService: APIService
@@ -26,6 +29,10 @@ export class ConfigurationService {
 
 	getPublicStudy(): Observable<PublicStudyDTO> {
 		return this.http.get<PublicStudyDTO>(`${this.apiService.getApiUrl()}/config/public-study`);
+	}
+
+	setStudy(study: PublicStudyDTO): void {
+		this.studySubject.next(study);
 	}
 
 	getStudy(): Observable<StudyDTO> {
@@ -60,8 +67,8 @@ export class ConfigurationService {
 	}
 
 	/**
-	 * @deprecated This endpoint will be removed on next release
-	 */
+		* @deprecated This endpoint will be removed on next release
+		*/
 	getRootScope(): Observable<ScopeDTO> {
 		return this.http.get<ScopeDTO>(`${this.apiService.getApiUrl()}/config/root-scope`);
 	}
@@ -84,14 +91,14 @@ export class ConfigurationService {
 
 	getLayoutCells(layout: LayoutDTO): CellDTO[] {
 		return layout.lines
-			.flatMap(l => l.columns)
-			.flatMap(c => c.cells);
+		.flatMap(l => l.columns)
+		.flatMap(c => c.cells);
 	}
 
 	constructDatasetFieldModelMap(layouts: LayoutDTO[]): Record<string, string[]> {
 		const datasetMap: Record<string, string[]> = {};
 		layouts.flatMap(l => this.getLayoutCells(l)).forEach(c => {
-			if(datasetMap[c.datasetModelId]) {
+			if (datasetMap[c.datasetModelId]) {
 				datasetMap[c.datasetModelId].push(c.fieldModelId);
 			} else {
 				datasetMap[c.datasetModelId] = [c.fieldModelId];

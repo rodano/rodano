@@ -5,17 +5,28 @@ package ch.rodano.core.model.jooq.tables;
 
 
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.ScopeModel.ScopeModelPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelWorkflowStateSelectorRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -102,14 +113,93 @@ public class ScopeModelWorkflowStateSelector extends TableImpl<ScopeModelWorkflo
 		this(DSL.name("scope_model_workflow_state_selector"), null);
 	}
 
+	public <O extends Record> ScopeModelWorkflowStateSelector(Table<O> path, ForeignKey<O, ScopeModelWorkflowStateSelectorRecord> childPath, InverseForeignKey<O, ScopeModelWorkflowStateSelectorRecord> parentPath) {
+		super(path, childPath, parentPath, SCOPE_MODEL_WORKFLOW_STATE_SELECTOR);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ScopeModelWorkflowStateSelectorPath extends ScopeModelWorkflowStateSelector implements Path<ScopeModelWorkflowStateSelectorRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ScopeModelWorkflowStateSelectorPath(Table<O> path, ForeignKey<O, ScopeModelWorkflowStateSelectorRecord> childPath, InverseForeignKey<O, ScopeModelWorkflowStateSelectorRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ScopeModelWorkflowStateSelectorPath(Name alias, Table<ScopeModelWorkflowStateSelectorRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ScopeModelWorkflowStateSelectorPath as(String alias) {
+			return new ScopeModelWorkflowStateSelectorPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ScopeModelWorkflowStateSelectorPath as(Name alias) {
+			return new ScopeModelWorkflowStateSelectorPath(alias, this);
+		}
+
+		@Override
+		public ScopeModelWorkflowStateSelectorPath as(Table<?> alias) {
+			return new ScopeModelWorkflowStateSelectorPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
 	}
 
 	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.SCOPE_MODEL_WORKFLOW_STATE_SELECTOR_IDX_SCOPE_MODEL_WF_STATE_SEL_STATE, Indexes.SCOPE_MODEL_WORKFLOW_STATE_SELECTOR_IDX_SCOPE_MODEL_WF_STATE_SEL_WORKFLOW);
+	}
+
+	@Override
 	public UniqueKey<ScopeModelWorkflowStateSelectorRecord> getPrimaryKey() {
 		return Keys.KEY_SCOPE_MODEL_WORKFLOW_STATE_SELECTOR_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<ScopeModelWorkflowStateSelectorRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_SCOPE_MODEL_WF_STATE_SEL_SCOPE, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_STATE, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_WORKFLOW);
+	}
+
+	private transient ScopeModelPath _scopeModel;
+
+	/**
+	 * Get the implicit join path to the <code>scope_model</code> table.
+	 */
+	public ScopeModelPath scopeModel() {
+		if (_scopeModel == null)
+			_scopeModel = new ScopeModelPath(this, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_SCOPE, null);
+
+		return _scopeModel;
+	}
+
+	private transient WorkflowStatePath _workflowState;
+
+	/**
+	 * Get the implicit join path to the <code>workflow_state</code> table.
+	 */
+	public WorkflowStatePath workflowState() {
+		if (_workflowState == null)
+			_workflowState = new WorkflowStatePath(this, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_STATE, null);
+
+		return _workflowState;
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_SCOPE_MODEL_WF_STATE_SEL_WORKFLOW, null);
+
+		return _workflow;
 	}
 
 	@Override

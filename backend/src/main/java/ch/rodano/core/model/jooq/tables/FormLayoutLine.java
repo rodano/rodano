@@ -6,16 +6,24 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.FormLayout.FormLayoutPath;
+import ch.rodano.core.model.jooq.tables.FormLayoutCell.FormLayoutCellPath;
 import ch.rodano.core.model.jooq.tables.records.FormLayoutLineRecord;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -104,6 +112,39 @@ public class FormLayoutLine extends TableImpl<FormLayoutLineRecord> {
 		this(DSL.name("form_layout_line"), null);
 	}
 
+	public <O extends Record> FormLayoutLine(Table<O> path, ForeignKey<O, FormLayoutLineRecord> childPath, InverseForeignKey<O, FormLayoutLineRecord> parentPath) {
+		super(path, childPath, parentPath, FORM_LAYOUT_LINE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FormLayoutLinePath extends FormLayoutLine implements Path<FormLayoutLineRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FormLayoutLinePath(Table<O> path, ForeignKey<O, FormLayoutLineRecord> childPath, InverseForeignKey<O, FormLayoutLineRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FormLayoutLinePath(Name alias, Table<FormLayoutLineRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FormLayoutLinePath as(String alias) {
+			return new FormLayoutLinePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FormLayoutLinePath as(Name alias) {
+			return new FormLayoutLinePath(alias, this);
+		}
+
+		@Override
+		public FormLayoutLinePath as(Table<?> alias) {
+			return new FormLayoutLinePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -112,6 +153,36 @@ public class FormLayoutLine extends TableImpl<FormLayoutLineRecord> {
 	@Override
 	public UniqueKey<FormLayoutLineRecord> getPrimaryKey() {
 		return Keys.KEY_FORM_LAYOUT_LINE_PRIMARY;
+	}
+
+	@Override
+	public List<ForeignKey<FormLayoutLineRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_FORM_LAYOUT_LINE_LAYOUT);
+	}
+
+	private transient FormLayoutPath _formLayout;
+
+	/**
+	 * Get the implicit join path to the <code>form_layout</code> table.
+	 */
+	public FormLayoutPath formLayout() {
+		if (_formLayout == null)
+			_formLayout = new FormLayoutPath(this, Keys.FK_FORM_LAYOUT_LINE_LAYOUT, null);
+
+		return _formLayout;
+	}
+
+	private transient FormLayoutCellPath _formLayoutCell;
+
+	/**
+	 * Get the implicit to-many join path to the <code>form_layout_cell</code>
+	 * table
+	 */
+	public FormLayoutCellPath formLayoutCell() {
+		if (_formLayoutCell == null)
+			_formLayoutCell = new FormLayoutCellPath(this, null, Keys.FK_FORM_LAYOUT_CELL_LINE.getInverseKey());
+
+		return _formLayoutCell;
 	}
 
 	@Override

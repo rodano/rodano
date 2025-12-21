@@ -2,12 +2,14 @@ package ch.rodano.test;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StopWatch;
 
 import ch.rodano.core.database.initializer.DatabaseInitializer;
@@ -23,6 +25,7 @@ import ch.rodano.core.services.dao.audit.AuditActionService;
 import ch.rodano.core.services.dao.commons.cache.transaction.TransactionCacheDAOService;
 import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
 import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
+import ch.rodano.core.services.project.ProjectIdResolver;
 
 /**
  * Class used to execute tests that require a database and care about its state
@@ -59,14 +62,25 @@ public class DatabaseTest {
 	@Autowired
 	protected ModelCatalogSyncService modelCatalogSyncService;
 
+	@Autowired
+	private ProjectIdResolver projectIdResolver;
+
+	@Value("${rodano.test.project-id:}")
+	private String testProjectIdConfig;
+
 	protected DatabaseActionContext context;
 	protected Scope rootScope;
+	protected UUID testProjectId;
 
 	@BeforeEach
 	public void setupDatabaseTest() throws InvalidValueException, BadlyFormattedValue, IOException {
 		if(!init) {
 			initializeDatabase();
 			init = true;
+		}
+
+		if(!studyService.isStudyLoaded()) {
+			studyService.loadStudyForProject(testProjectId);
 		}
 
 		ensureRootScopeAccessible();
@@ -81,18 +95,35 @@ public class DatabaseTest {
 		watch.start();
 		logger.info("Resetting the database by truncating all tables and re-adding required data");
 
-		final var study = studyService.getStudy();
+		if(testProjectIdConfig != null && !testProjectIdConfig.isBlank()) {
+			testProjectId = projectIdResolver.resolveCode(testProjectIdConfig);
+			if(testProjectId == null) {
+				testProjectId = UUID.randomUUID();
+				logger.info("Generated new test project ID: {}", testProjectId);
+			}
+		}
+		else {
+			testProjectId = UUID.randomUUID();
+			logger.info("No test project ID configured, using generated: {}", testProjectId);
+		}
 
-		//initialize database if it is blank
+		projectIdResolver.setProjectId(testProjectId);
+
 		if(databaseInitializer.isDatabaseBlank()) {
+			logger.info("Database is blank, creating structure");
 			databaseInitializer.initializeStructure();
 		}
-		// empty database
 		else {
+			logger.info("Database exists, truncating tables");
 			databaseInitializer.truncateTables();
 		}
+
+		logger.info("Loading test study configuration for project: {}", testProjectId);
+		studyService.loadStudyForProject(testProjectId);
+
+		final var study = studyService.getStudy();
+
 		databaseInitializer.initializeDatabaseContent(true, true);
-		exportViewService.updateViews();
 		aggregateWorkflowViewService.updateView();
 
 		modelCatalogSyncService.syncModelUuidsFromDatabase(study);
@@ -118,7 +149,7 @@ public class DatabaseTest {
 	}
 
 	protected DatabaseActionContext createDatabaseActionContext(final String rationale) {
-		return auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, rationale);
+		return auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, rationale, testProjectId);
 	}
 
 	protected DatabaseActionContext createDatabaseActionContext() {
@@ -133,15 +164,10 @@ public class DatabaseTest {
 	protected void emptyCacheAndReloadConfig() throws IOException {
 		transactionCacheDAOService.emptyCache();
 
-		final var originalProjectId = studyService.getStudy().getProjectId();
+		final var originalProjectId = studyService.getCurrentProjectId();
 
-		studyService.reload();
-
-		final var newProjectId = studyService.getStudy().getProjectId();
-		if(!originalProjectId.equals(newProjectId)) {
-			logger.warn("ProjectId changed after reload ({} -> {}). Restoring original.",
-				originalProjectId, newProjectId);
-			studyService.getStudy().setProjectId(originalProjectId);
+		if(originalProjectId != null) {
+			studyService.loadStudyForProject(originalProjectId);
 		}
 
 		try {

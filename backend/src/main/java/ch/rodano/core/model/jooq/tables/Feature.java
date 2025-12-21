@@ -6,6 +6,9 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSection.MenuLayoutSectionPath;
+import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget.MenuLayoutSectionWidgetPath;
+import ch.rodano.core.model.jooq.tables.ProfileFeatureGrants.ProfileFeatureGrantsPath;
 import ch.rodano.core.model.jooq.tables.records.FeatureRecord;
 
 import java.util.Arrays;
@@ -16,9 +19,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -118,6 +125,39 @@ public class Feature extends TableImpl<FeatureRecord> {
 		this(DSL.name("feature"), null);
 	}
 
+	public <O extends Record> Feature(Table<O> path, ForeignKey<O, FeatureRecord> childPath, InverseForeignKey<O, FeatureRecord> parentPath) {
+		super(path, childPath, parentPath, FEATURE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class FeaturePath extends Feature implements Path<FeatureRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> FeaturePath(Table<O> path, ForeignKey<O, FeatureRecord> childPath, InverseForeignKey<O, FeatureRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private FeaturePath(Name alias, Table<FeatureRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public FeaturePath as(String alias) {
+			return new FeaturePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public FeaturePath as(Name alias) {
+			return new FeaturePath(alias, this);
+		}
+
+		@Override
+		public FeaturePath as(Table<?> alias) {
+			return new FeaturePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -131,6 +171,45 @@ public class Feature extends TableImpl<FeatureRecord> {
 	@Override
 	public List<UniqueKey<FeatureRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_FEATURE_UQ_FEATURE_CODE);
+	}
+
+	private transient MenuLayoutSectionPath _menuLayoutSection;
+
+	/**
+	 * Get the implicit to-many join path to the <code>menu_layout_section</code>
+	 * table
+	 */
+	public MenuLayoutSectionPath menuLayoutSection() {
+		if (_menuLayoutSection == null)
+			_menuLayoutSection = new MenuLayoutSectionPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_FEATURE.getInverseKey());
+
+		return _menuLayoutSection;
+	}
+
+	private transient MenuLayoutSectionWidgetPath _menuLayoutSectionWidget;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>menu_layout_section_widget</code> table
+	 */
+	public MenuLayoutSectionWidgetPath menuLayoutSectionWidget() {
+		if (_menuLayoutSectionWidget == null)
+			_menuLayoutSectionWidget = new MenuLayoutSectionWidgetPath(this, null, Keys.FK_MENU_LAYOUT_SECTION_WIDGET_FEATURE.getInverseKey());
+
+		return _menuLayoutSectionWidget;
+	}
+
+	private transient ProfileFeatureGrantsPath _profileFeatureGrants;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_feature_grants</code> table
+	 */
+	public ProfileFeatureGrantsPath profileFeatureGrants() {
+		if (_profileFeatureGrants == null)
+			_profileFeatureGrants = new ProfileFeatureGrantsPath(this, null, Keys.FK_PROFILE_FEATURE_GRANTS_FEATURE.getInverseKey());
+
+		return _profileFeatureGrants;
 	}
 
 	@Override

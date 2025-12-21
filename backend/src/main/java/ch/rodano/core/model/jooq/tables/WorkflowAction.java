@@ -6,6 +6,10 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.ProfileWorkflowActionRights.ProfileWorkflowActionRightsPath;
+import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.Workflow.WorkflowPath;
+import ch.rodano.core.model.jooq.tables.WorkflowStatePossibleAction.WorkflowStatePossibleActionPath;
 import ch.rodano.core.model.jooq.tables.records.WorkflowActionRecord;
 
 import java.util.Arrays;
@@ -16,9 +20,13 @@ import java.util.UUID;
 import org.jooq.Check;
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -143,6 +151,39 @@ public class WorkflowAction extends TableImpl<WorkflowActionRecord> {
 		this(DSL.name("workflow_action"), null);
 	}
 
+	public <O extends Record> WorkflowAction(Table<O> path, ForeignKey<O, WorkflowActionRecord> childPath, InverseForeignKey<O, WorkflowActionRecord> parentPath) {
+		super(path, childPath, parentPath, WORKFLOW_ACTION);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class WorkflowActionPath extends WorkflowAction implements Path<WorkflowActionRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> WorkflowActionPath(Table<O> path, ForeignKey<O, WorkflowActionRecord> childPath, InverseForeignKey<O, WorkflowActionRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private WorkflowActionPath(Name alias, Table<WorkflowActionRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public WorkflowActionPath as(String alias) {
+			return new WorkflowActionPath(DSL.name(alias), this);
+		}
+
+		@Override
+		public WorkflowActionPath as(Name alias) {
+			return new WorkflowActionPath(alias, this);
+		}
+
+		@Override
+		public WorkflowActionPath as(Table<?> alias) {
+			return new WorkflowActionPath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
@@ -156,6 +197,61 @@ public class WorkflowAction extends TableImpl<WorkflowActionRecord> {
 	@Override
 	public List<UniqueKey<WorkflowActionRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_WORKFLOW_ACTION_UQ_WORKFLOW_ACTION_CODE);
+	}
+
+	@Override
+	public List<ForeignKey<WorkflowActionRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_WF_ACTION_WORKFLOW, Keys.FK_WORKFLOW_ACTION_PROJECT);
+	}
+
+	private transient WorkflowPath _workflow;
+
+	/**
+	 * Get the implicit join path to the <code>workflow</code> table.
+	 */
+	public WorkflowPath workflow() {
+		if (_workflow == null)
+			_workflow = new WorkflowPath(this, Keys.FK_WF_ACTION_WORKFLOW, null);
+
+		return _workflow;
+	}
+
+	private transient ProjectPath _project;
+
+	/**
+	 * Get the implicit join path to the <code>project</code> table.
+	 */
+	public ProjectPath project() {
+		if (_project == null)
+			_project = new ProjectPath(this, Keys.FK_WORKFLOW_ACTION_PROJECT, null);
+
+		return _project;
+	}
+
+	private transient ProfileWorkflowActionRightsPath _profileWorkflowActionRights;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>profile_workflow_action_rights</code> table
+	 */
+	public ProfileWorkflowActionRightsPath profileWorkflowActionRights() {
+		if (_profileWorkflowActionRights == null)
+			_profileWorkflowActionRights = new ProfileWorkflowActionRightsPath(this, null, Keys.FK_PROFILE_WF_ACTION_RIGHTS_WORKFLOW_ACTION.getInverseKey());
+
+		return _profileWorkflowActionRights;
+	}
+
+	private transient WorkflowStatePossibleActionPath _workflowStatePossibleAction;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>workflow_state_possible_action</code> table
+	 */
+	public WorkflowStatePossibleActionPath workflowStatePossibleAction() {
+		if (_workflowStatePossibleAction == null)
+			_workflowStatePossibleAction = new WorkflowStatePossibleActionPath(this, null, Keys.FK_WF_STATE_POSSIBLE_ACTION_ACTION.getInverseKey());
+
+		return _workflowStatePossibleAction;
 	}
 
 	@Override

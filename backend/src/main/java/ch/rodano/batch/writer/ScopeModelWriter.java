@@ -1,6 +1,5 @@
 package ch.rodano.batch.writer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,7 +44,6 @@ import static ch.rodano.core.model.jooq.tables.Rule.RULE;
 import static ch.rodano.core.model.jooq.tables.ScopeModel.SCOPE_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.SCOPE_MODEL_DATASET_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
-import static ch.rodano.core.model.jooq.tables.ScopeModelParent.SCOPE_MODEL_PARENT;
 import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.SCOPE_MODEL_WORKFLOW;
 import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflowStateSelector.SCOPE_MODEL_WORKFLOW_STATE_SELECTOR;
 import static ch.rodano.core.model.jooq.tables.Workflow.WORKFLOW;
@@ -106,36 +104,6 @@ public class ScopeModelWriter extends BaseWriter {
 				putScopeRules(tx, projectId, scopeModelId, scopeModelCode, scopeModel.getCreateRules(), "CREATE", "SCOPE_CREATE");
 				putScopeRules(tx, projectId, scopeModelId, scopeModelCode, scopeModel.getRemoveRules(), "REMOVE", "SCOPE_REMOVE");
 				putScopeRules(tx, projectId, scopeModelId, scopeModelCode, scopeModel.getRestoreRules(), "RESTORE", "SCOPE_RESTORE");
-
-				if(scopeModel.getParentIds() != null && !scopeModel.getParentIds().isEmpty()) {
-					final List<UUID> parentIds = new ArrayList<>();
-					for(String parentCode : scopeModel.getParentIds()) {
-						final UUID parentId = resolveScopeId(tx, projectId, parentCode);
-						if(parentId != null) {
-							parentIds.add(parentId);
-						}
-						else {
-							LOGGER.warn("Parent '{}' not found for scope '{}'", parentCode, scopeModelCode);
-						}
-					}
-
-					final UUID defaultParentId = scopeModel.getDefaultParentId() == null ? null : resolveScopeId(tx, projectId, scopeModel.getDefaultParentId());
-					if(defaultParentId == null) {
-						LOGGER.warn("Default parent '{}' not found for scope '{}'", scopeModel.getDefaultParentId(), scopeModelCode);
-					}
-
-					for(UUID parentId : parentIds) {
-						final boolean isDefault = parentId.equals(defaultParentId);
-						tx.insertInto(SCOPE_MODEL_PARENT)
-							.set(SCOPE_MODEL_PARENT.PROJECT_ID, projectId)
-							.set(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID, scopeModelId)
-							.set(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID, parentId)
-							.set(SCOPE_MODEL_PARENT.IS_DEFAULT, isDefault)
-							.onDuplicateKeyUpdate()
-							.set(SCOPE_MODEL_PARENT.IS_DEFAULT, isDefault)
-							.execute();
-					}
-				}
 
 				linkMany(tx, projectId, scopeModelId, scopeModelCode, scopeModel.getDatasetModelIds(),
 					DATASET_MODEL, DATASET_MODEL.DATASET_MODEL_ID, DATASET_MODEL.CODE,

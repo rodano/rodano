@@ -6,7 +6,7 @@
 }
 
 .top-header {
-	background-color: var(--mat-sys-primary);
+	background-color: #5bd4d4;
 	color: white;
 	padding: 1rem 2rem;
 	display: flex;
@@ -63,7 +63,7 @@
 
 .spinner {
 	border: 3px solid rgba(0, 0, 0, 0.08);
-	border-top: 3px solid var(--mat-sys-primary);
+	border-top: 3px solid #5bd4d4;
 	border-radius: 50%;
 	width: 40px;
 	height: 40px;
@@ -101,7 +101,7 @@
 .project-card:hover:not(.disabled):not(.selecting) {
 	box-shadow: var(--mat-sys-level3);
 	transform: translateY(-1px);
-	border-color: var(--mat-sys-primary);
+	border-color: #5bd4d4;
 }
 
 .project-card.disabled,
@@ -199,7 +199,7 @@ footer {
 	height: 1.5rem;
 	line-height: 1.5rem;
 	text-align: center;
-	background-color: var(--mat-sys-primary);
+	background-color: #5bd4d4;
 	color: rgba(255, 255, 255, 0.75);
 	font-size: small;
 

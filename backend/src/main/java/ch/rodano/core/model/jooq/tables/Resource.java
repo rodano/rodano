@@ -6,7 +6,11 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.tables.ResourceCategory.ResourceCategoryPath;
+import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
+import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.ResourceRecord;
 
 import java.time.ZonedDateTime;
@@ -16,10 +20,15 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
+import org.jooq.ForeignKey;
 import org.jooq.Identity;
+import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
+import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
 import org.jooq.Select;
@@ -148,9 +157,47 @@ public class Resource extends TableImpl<ResourceRecord> {
 		this(DSL.name("resource"), null);
 	}
 
+	public <O extends Record> Resource(Table<O> path, ForeignKey<O, ResourceRecord> childPath, InverseForeignKey<O, ResourceRecord> parentPath) {
+		super(path, childPath, parentPath, RESOURCE);
+	}
+
+	/**
+	 * A subtype implementing {@link Path} for simplified path-based joins.
+	 */
+	public static class ResourcePath extends Resource implements Path<ResourceRecord> {
+
+		private static final long serialVersionUID = 1L;
+		public <O extends Record> ResourcePath(Table<O> path, ForeignKey<O, ResourceRecord> childPath, InverseForeignKey<O, ResourceRecord> parentPath) {
+			super(path, childPath, parentPath);
+		}
+		private ResourcePath(Name alias, Table<ResourceRecord> aliased) {
+			super(alias, aliased);
+		}
+
+		@Override
+		public ResourcePath as(String alias) {
+			return new ResourcePath(DSL.name(alias), this);
+		}
+
+		@Override
+		public ResourcePath as(Name alias) {
+			return new ResourcePath(alias, this);
+		}
+
+		@Override
+		public ResourcePath as(Table<?> alias) {
+			return new ResourcePath(alias.getQualifiedName(), this);
+		}
+	}
+
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.RESOURCE_IDX_RESOURCE_DELETED, Indexes.RESOURCE_IDX_RESOURCE_PROJECT_UUID);
 	}
 
 	@Override
@@ -166,6 +213,47 @@ public class Resource extends TableImpl<ResourceRecord> {
 	@Override
 	public List<UniqueKey<ResourceRecord>> getUniqueKeys() {
 		return Arrays.asList(Keys.KEY_RESOURCE_U_RESOURCE_UUID);
+	}
+
+	@Override
+	public List<ForeignKey<ResourceRecord, ?>> getReferences() {
+		return Arrays.asList(Keys.FK_RESOURCE_CATEGORY, Keys.FK_RESOURCE_SCOPE_FK, Keys.FK_RESOURCE_USER_FK);
+	}
+
+	private transient ResourceCategoryPath _resourceCategory;
+
+	/**
+	 * Get the implicit join path to the <code>resource_category</code> table.
+	 */
+	public ResourceCategoryPath resourceCategory() {
+		if (_resourceCategory == null)
+			_resourceCategory = new ResourceCategoryPath(this, Keys.FK_RESOURCE_CATEGORY, null);
+
+		return _resourceCategory;
+	}
+
+	private transient ScopePath _scope;
+
+	/**
+	 * Get the implicit join path to the <code>scope</code> table.
+	 */
+	public ScopePath scope() {
+		if (_scope == null)
+			_scope = new ScopePath(this, Keys.FK_RESOURCE_SCOPE_FK, null);
+
+		return _scope;
+	}
+
+	private transient UserPath _user;
+
+	/**
+	 * Get the implicit join path to the <code>user</code> table.
+	 */
+	public UserPath user() {
+		if (_user == null)
+			_user = new UserPath(this, Keys.FK_RESOURCE_USER_FK, null);
+
+		return _user;
 	}
 
 	@Override

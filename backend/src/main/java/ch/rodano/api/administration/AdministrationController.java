@@ -1,6 +1,8 @@
 package ch.rodano.api.administration;
 
-import java.io.IOException;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -28,8 +30,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.LoggerContext;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.exception.http.BadArgumentException;
 import ch.rodano.api.request.context.RequestContextService;
@@ -70,19 +70,6 @@ public class AdministrationController extends AbstractSecuredController {
 		this.diskSpaceHealthIndicator = diskSpaceHealthIndicator;
 		this.dataSourceHealthIndicator = dataSourceHealthIndicator;
 		this.scheduledTaskHolder = scheduledTaskHolder;
-	}
-
-	@Operation(summary = "Reload configuration", description = "Reload the study configuration (only available to administrators)")
-	@PostMapping("reload")
-	@ResponseStatus(HttpStatus.ACCEPTED)
-	@Transactional
-	public void reloadConfiguration() throws IOException {
-		//TODO see if it is not possible to throw an exception (this will create a 403 instead of a 401)
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
-		studyService.reload();
 	}
 
 	@SecurityRequirements
