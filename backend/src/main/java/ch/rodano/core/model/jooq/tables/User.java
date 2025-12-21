@@ -13,7 +13,6 @@ import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -59,11 +58,6 @@ public class User extends TableImpl<UserRecord> {
 	 * The column <code>user.pk</code>.
 	 */
 	public final TableField<UserRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
-
-	/**
-	 * The column <code>user.project_id</code>.
-	 */
-	public final TableField<UserRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>user.creation_time</code>.

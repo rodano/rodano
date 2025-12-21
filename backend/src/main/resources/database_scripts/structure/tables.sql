@@ -916,7 +916,6 @@ create table role_audit (
 drop table if exists user;
 create table user (
 	pk bigint(20) not null auto_increment,
-    project_id uuid not null,
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	deleted boolean not null default false,
@@ -950,7 +949,6 @@ create table user (
 drop table if exists user_audit;
 create table user_audit (
 	pk bigint(20) not null auto_increment,
-    project_id uuid not null,
 	audit_action_fk bigint(20) not null,
 	audit_datetime datetime(3) not null,
 	audit_actor varchar(200) not null,
@@ -988,7 +986,6 @@ create table user_audit (
 drop table if exists user_session;
 create table user_session (
 	pk bigint(20) not null auto_increment,
-    project_id uuid not null,
 	creation_time datetime(3) not null default now(3),
 	token varchar(32) not null,
 	user_fk bigint(20) not null,

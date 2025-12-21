@@ -215,11 +215,3 @@ alter table internal_patch add index idx_internal_patch_project (project_id);
 alter table robot add index idx_robot_project (project_id);
 
 alter table robot_audit add index idx_robot_audit_project (project_id);
-
-/* user */
-alter table user add index idx_user_project (project_id);
-
-alter table user_audit add index idx_user_audit_project (project_id);
-
-alter table user_session add index idx_user_session_project (project_id);
-

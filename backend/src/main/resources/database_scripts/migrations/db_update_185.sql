@@ -397,15 +397,6 @@ alter table role
 alter table role_audit
 	add constraint fk_role_audit_profile_id foreign key (project_id, profile_id) references profile (project_id, profile_id);
 
-alter table user
-	add constraint fk_user_project foreign key (project_id) references project (project_id);
-
-alter table user_audit
-	add constraint fk_user_audit_project foreign key (project_id) references project (project_id);
-
-alter table user_session
-	add constraint fk_user_session_project foreign key (project_id) references project (project_id);
-
 alter table mail
 	add constraint fk_mail_project foreign key (project_id) references project (project_id);
 
@@ -514,15 +505,6 @@ alter table robot
 
 alter table robot_audit
 	add index idx_robot_audit_project (project_id);
-
-alter table user
-	add index idx_user_project (project_id);
-
-alter table user_audit
-	add index idx_user_audit_project (project_id);
-
-alter table user_session
-	add index idx_user_session_project (project_id);
 
 alter table scope_model_parent
 	add index idx_scope_model_parent (project_id, parent_scope_model_id);

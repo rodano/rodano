@@ -12,7 +12,6 @@ import ch.rodano.core.model.jooqutils.AuditTable;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -58,11 +57,6 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	 * The column <code>user_audit.pk</code>.
 	 */
 	public final TableField<UserAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
-
-	/**
-	 * The column <code>user_audit.project_id</code>.
-	 */
-	public final TableField<UserAuditRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>user_audit.audit_action_fk</code>.

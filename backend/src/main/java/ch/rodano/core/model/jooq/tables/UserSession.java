@@ -11,7 +11,6 @@ import ch.rodano.core.model.jooq.tables.records.UserSessionRecord;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.UUID;
 
 import org.jooq.Condition;
 import org.jooq.Field;
@@ -57,11 +56,6 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	 * The column <code>user_session.pk</code>.
 	 */
 	public final TableField<UserSessionRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
-
-	/**
-	 * The column <code>user_session.project_id</code>.
-	 */
-	public final TableField<UserSessionRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
 
 	/**
 	 * The column <code>user_session.creation_time</code>.

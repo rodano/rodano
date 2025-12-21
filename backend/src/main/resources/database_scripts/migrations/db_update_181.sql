@@ -31,9 +31,6 @@ alter table role_audit add column project_id uuid null first;
 alter table scope add column project_id uuid null first;
 alter table scope_audit add column project_id uuid null first;
 alter table scope_relation add column project_id uuid null first;
-alter table user add column project_id uuid null first;
-alter table user_audit add column project_id uuid null first;
-alter table user_session add column project_id uuid null first;
 alter table workflow_status add column project_id uuid null first;
 alter table workflow_status_audit add column project_id uuid null first;
 
@@ -62,9 +59,6 @@ update role_audit set project_id = @project_id where project_id is null;
 update scope set project_id = @project_id where project_id is null;
 update scope_audit set project_id = @project_id where project_id is null;
 update scope_relation set project_id = @project_id where project_id is null;
-update user set project_id = @project_id where project_id is null;
-update user_audit set project_id = @project_id where project_id is null;
-update user_session set project_id = @project_id where project_id is null;
 update workflow_status set project_id = @project_id where project_id is null;
 update workflow_status_audit set project_id = @project_id where project_id is null;
 
@@ -93,8 +87,5 @@ alter table role_audit modify column project_id uuid not null;
 alter table scope modify column project_id uuid not null;
 alter table scope_audit modify column project_id uuid not null;
 alter table scope_relation modify column project_id uuid not null;
-alter table user modify column project_id uuid not null;
-alter table user_audit modify column project_id uuid not null;
-alter table user_session modify column project_id uuid not null;
 alter table workflow_status modify column project_id uuid not null;
 alter table workflow_status_audit modify column project_id uuid not null;

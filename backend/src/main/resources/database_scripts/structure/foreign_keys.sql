@@ -267,18 +267,14 @@ alter table role_audit
 	add constraint fk_role_audit_profile_id foreign key (project_id, profile_id) references profile (project_id, profile_id);
 
 /* user */
-alter table user add constraint fk_user_project foreign key (project_id) references project (project_id);
-
 alter table user_audit
 	add constraint fk_user_audit_audit_object_fk foreign key (audit_object_fk) references user (pk),
 	add constraint fk_user_trail_audit_action_fk foreign key (audit_action_fk) references audit_action (pk),
 	add constraint fk_user_audit_user_fk foreign key (audit_user_fk) references user (pk),
-	add constraint fk_user_audit_robot_fk foreign key (audit_robot_fk) references robot (pk),
-	add constraint fk_user_audit_project foreign key (project_id) references project (project_id);
+	add constraint fk_user_audit_robot_fk foreign key (audit_robot_fk) references robot (pk);
 
 alter table user_session
-    add constraint fk_user_session_user_fk foreign key (user_fk) references user (pk),
-    add constraint fk_user_session_project foreign key (project_id) references project (project_id);
+    add constraint fk_user_session_user_fk foreign key (user_fk) references user (pk);
 
 /* mail */
 alter table mail add constraint fk_mail_project foreign key (project_id) references project (project_id);
