@@ -9,11 +9,11 @@ POST http://localhost:8080/api/batch/import
 Content-Type: application/json
 
 {
-  "projectId": "MS_REG",
-  "config": "file:/tmp/study.json",
+  "projectId": "TEST_FARIS",
+  "config": "classpath:config/config2.json",
   "dbUrl": "jdbc:mariadb://localhost:3306/rodano",
-  "dbUser": "rodano",
-  "dbPassword": "secret"
+  "dbUser": "root",
+  "dbPassword": "root"
 }
 
 ### Get status of job execution with id 1
