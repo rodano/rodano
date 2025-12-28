@@ -247,7 +247,7 @@ public class Scope extends TableImpl<ScopeRecord> {
 
 	@Override
 	public List<UniqueKey<ScopeRecord>> getUniqueKeys() {
-		return Arrays.asList(Keys.KEY_SCOPE_U_SCOPE_CODE, Keys.KEY_SCOPE_U_SCOPE_ID);
+		return Arrays.asList(Keys.KEY_SCOPE_U_SCOPE_CODE_PROJECT, Keys.KEY_SCOPE_U_SCOPE_ID);
 	}
 
 	@Override

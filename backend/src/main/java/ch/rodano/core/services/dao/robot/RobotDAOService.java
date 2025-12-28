@@ -2,6 +2,7 @@ package ch.rodano.core.services.dao.robot;
 
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.UUID;
 
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -15,8 +16,8 @@ public interface RobotDAOService {
 	/**
 	 * Create or update a robot
 	 *
-	 * @param robot   The robot to save
-	 * @param context The context in which the action takes place
+	 * @param robot     The robot to save
+	 * @param context   The context in which the action takes place
 	 * @param rationale The rationale for the operation
 	 */
 	void saveRobot(Robot robot, DatabaseActionContext context, String rationale);
@@ -24,8 +25,8 @@ public interface RobotDAOService {
 	/**
 	 * Delete a robot
 	 *
-	 * @param robot   The robot to delete
-	 * @param context The context in which the action takes place
+	 * @param robot     The robot to delete
+	 * @param context   The context in which the action takes place
 	 * @param rationale The rationale for the operation
 	 */
 	void deleteRobot(Robot robot, DatabaseActionContext context, String rationale);
@@ -33,8 +34,8 @@ public interface RobotDAOService {
 	/**
 	 * Restore a robot
 	 *
-	 * @param robot   The robot to restore
-	 * @param context The context in which the action takes place
+	 * @param robot     The robot to restore
+	 * @param context   The context in which the action takes place
 	 * @param rationale The rationale for the operation
 	 */
 	void restoreRobot(Robot robot, DatabaseActionContext context, String rationale);
@@ -42,7 +43,7 @@ public interface RobotDAOService {
 	/**
 	 * Get a robot by its pk
 	 *
-	 * @param pk      The pk of the robot
+	 * @param pk The pk of the robot
 	 * @return The wanted robot or null if doesn't exist
 	 */
 	Robot getRobotByPk(Long pk);
@@ -56,12 +57,30 @@ public interface RobotDAOService {
 	Robot getRobotByName(String name);
 
 	/**
+	 * Get a robot by its name
+	 *
+	 * @param name      The name of the robot
+	 * @param projectId Uuid of the project
+	 * @return The wanted robot or null if doesn't exist
+	 */
+	Robot getRobotByNameAndProject(String name, UUID projectId);
+
+	/**
 	 * Get a robot by its key
 	 *
 	 * @param key The key of the robot
 	 * @return The wanted robot or null if doesn't exist
 	 */
 	Robot getRobotByKey(String key);
+
+	/**
+	 * Get a robot by its key
+	 *
+	 * @param key       The key of the robot
+	 * @param projectId Uuid of the project
+	 * @return The wanted robot or null if doesn't exist
+	 */
+	Robot getRobotByKeyAndProject(String key, UUID projectId);
 
 	/**
 	 * Get a robot by its name and key

@@ -38,12 +38,13 @@ public class RobotServiceImpl implements RobotService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
+		robot.setProjectId(projectIdResolver.id());
+
 		// check if a robot with the same name exists already, if it exists throw
-		if(robotDAOService.getRobotByName(robot.getName()) != null) {
+		if(robotDAOService.getRobotByNameAndProject(robot.getName(), robot.getProjectId()) != null) {
 			throw new BadArgumentException("A robot with the same name already exists");
 		}
 		checkKeyUniqueness(robot);
-		robot.setProjectId(projectIdResolver.id());
 
 		robotDAOService.saveRobot(robot, context, rationale);
 
@@ -65,8 +66,12 @@ public class RobotServiceImpl implements RobotService {
 
 	@Override
 	public void saveRobot(final Robot robot, final DatabaseActionContext context, final String rationale) {
+		if(robot.getProjectId() == null) {
+			robot.setProjectId(projectIdResolver.id());
+		}
+
 		// check if a robot with the same name exists already
-		final var foundRobot = robotDAOService.getRobotByName(robot.getName());
+		final var foundRobot = robotDAOService.getRobotByNameAndProject(robot.getName(), robot.getProjectId());
 		// if it exists, and it's not the already existing robot...
 		// do not use the Robot::equals method to check if both robots are the same because this method only checks the name
 		// what we want here is to check that there is no other robot with the same name and a different pk
@@ -75,10 +80,6 @@ public class RobotServiceImpl implements RobotService {
 			throw new BadArgumentException("A robot with the same name already exists");
 		}
 		checkKeyUniqueness(robot);
-
-		if(robot.getProjectId() == null) {
-			robot.setProjectId(projectIdResolver.id());
-		}
 
 		robotDAOService.saveRobot(robot, context, rationale);
 	}
@@ -108,7 +109,7 @@ public class RobotServiceImpl implements RobotService {
 	 */
 	private void checkKeyUniqueness(final Robot updatedRobot) {
 		// check if a robot with the same key exists already
-		final var foundRobot = robotDAOService.getRobotByKey(updatedRobot.getKey());
+		final var foundRobot = robotDAOService.getRobotByKeyAndProject(updatedRobot.getKey(), updatedRobot.getProjectId());
 		// if it exists, and it's not the already existing robot...
 		if(foundRobot != null && !updatedRobot.equals(foundRobot)) {
 			// then reject it

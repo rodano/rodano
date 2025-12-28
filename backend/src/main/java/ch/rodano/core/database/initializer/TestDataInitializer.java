@@ -3,7 +3,6 @@ package ch.rodano.core.database.initializer;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +12,6 @@ import java.util.function.Function;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -21,8 +19,6 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rules.Operator;
-import ch.rodano.configuration.model.scope.ScopeModel;
-import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
 import ch.rodano.core.helpers.FieldSubmitterHelper;
 import ch.rodano.core.helpers.ScopeCreatorService;
@@ -34,6 +30,8 @@ import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.enrollment.EnrollmentModel;
 import ch.rodano.core.model.resource.Resource;
 import ch.rodano.core.model.robot.Robot;
+import ch.rodano.core.model.role.Role;
+import ch.rodano.core.model.role.RoleStatus;
 import ch.rodano.core.model.rules.data.DataState;
 import ch.rodano.core.model.scope.EnrollmentType;
 import ch.rodano.core.model.scope.FieldModelCriterion;
@@ -54,6 +52,7 @@ import ch.rodano.core.services.dao.audit.AuditActionService;
 import ch.rodano.core.services.dao.dataset.DatasetDAOService;
 import ch.rodano.core.services.dao.form.FormDAOService;
 import ch.rodano.core.services.dao.robot.RobotDAOService;
+import ch.rodano.core.services.dao.role.RoleDAOService;
 import ch.rodano.core.services.dao.user.UserDAOService;
 import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
 import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
@@ -86,6 +85,7 @@ public class TestDataInitializer {
 	private final ScopeCreatorService scopeCreatorService;
 	private final RobotService robotService;
 	private final RobotDAOService robotDAOService;
+	private final RoleDAOService roleDAOService;
 
 	public TestDataInitializer(
 		final AuditActionService auditActionService,
@@ -106,7 +106,8 @@ public class TestDataInitializer {
 		final UserCreatorService userCreatorService,
 		final ScopeCreatorService scopeCreatorService,
 		final RobotService robotService,
-		final RobotDAOService robotDAOService
+		final RobotDAOService robotDAOService,
+		final RoleDAOService roleDAOService
 	) {
 		super();
 		this.auditActionService = auditActionService;
@@ -128,6 +129,7 @@ public class TestDataInitializer {
 		this.scopeCreatorService = scopeCreatorService;
 		this.robotService = robotService;
 		this.robotDAOService = robotDAOService;
+		this.roleDAOService = roleDAOService;
 	}
 
 	private Robot createAndSaveRobot(final String name, final Scope scope, final Profile profile, final DatabaseActionContext context) {
@@ -543,57 +545,88 @@ public class TestDataInitializer {
 
 		final var encodedDefaultPassword = new BCryptPasswordEncoder(UserSecurityService.BCRYPT_STRENGTH).encode(DatabaseInitializer.DEFAULT_PASSWORD);
 
-		final var dataEntryMasterUser = UserBuilder.createUser("DataEntry Master", "test+dmaster@rodano.ch")
-			.setHashedPassword(encodedDefaultPassword)
-			.addRole(root, study.getProfile("DATAENTRY_MASTER"))
-			.addRole(root, study.getProfile("DATAENTRY_A"))
-			.addRole(root, study.getProfile("DATAENTRY_B"))
-			.getUserAndRoles();
-		final var dataEntryMaster = userCreatorService.createAndEnable(dataEntryMasterUser, context);
+		final var existingDataEntryMaster = userDAOService.getUserByEmail("test+dmaster@rodano.ch");
+		if(existingDataEntryMaster == null) {
+			final var dataEntryMasterUser = UserBuilder.createUser("DataEntry Master", "test+dmaster@rodano.ch")
+				.setHashedPassword(encodedDefaultPassword)
+				.addRole(root, study.getProfile("DATAENTRY_MASTER"))
+				.addRole(root, study.getProfile("DATAENTRY_A"))
+				.addRole(root, study.getProfile("DATAENTRY_B"))
+				.getUserAndRoles();
+			userCreatorService.createAndEnable(dataEntryMasterUser, context);
+		}
+		else {
+			LOGGER.info("User test+dmaster@rodano.ch already exists, adding roles for project {}", study.getId());
+			for(String profileCode : new String[] { "DATAENTRY_MASTER", "DATAENTRY_A", "DATAENTRY_B" }) {
+				final var role = new Role();
+				role.setProjectId(study.getProjectId());
+				role.setProfile(study.getProfile(profileCode));
+				role.setScopeFk(root.getPk());
+				role.setUserFk(existingDataEntryMaster.getPk());
+				role.setStatus(RoleStatus.ENABLED);
+				roleDAOService.saveRole(role, context, DatabaseInitializer.RATIONALE);
+			}
+		}
 
-		final var dataManagerUser = UserBuilder.createUser("Data Manager", "test+dm@rodano.ch")
-			.setHashedPassword(encodedDefaultPassword)
-			.addRole(root, study.getProfile("DATAMANAGER"))
-			.getUserAndRoles();
-		final var dataManager = userCreatorService.createAndEnable(dataManagerUser, context);
+		final var dataEntryMaster = existingDataEntryMaster != null ? existingDataEntryMaster : userDAOService.getUserByEmail("test+dmaster@rodano.ch");
 
-		//create default users
-		final var defaultUsers = new ArrayList<UserCreatorService.UserCreation>();
-		defaultUsers.add(
-			UserBuilder.createUser("Investigator", "test+iinves@rodano.ch")
+		createUserOrAddRole("Data Manager", "test+dm@rodano.ch", encodedDefaultPassword, root, study.getProfile("DATAMANAGER"), context);
+		final var dataManager = userDAOService.getUserByEmail("test+dm@rodano.ch");
+
+		final var existingInvestigator = userDAOService.getUserByEmail("test+iinves@rodano.ch");
+		if(existingInvestigator == null) {
+			final var investigatorUser = UserBuilder.createUser("Investigator", "test+iinves@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(fr01, study.getProfile("INVESTIGATOR"))
 				.addRole(fr01, study.getProfile("ESIGNATURE"))
-				.getUserAndRoles()
-		);
-		defaultUsers.add(
-			UserBuilder.createUser("Principal Investigator", "test+pinves@rodano.ch")
+				.getUserAndRoles();
+			userCreatorService.createAndEnable(investigatorUser, context);
+		}
+		else {
+			LOGGER.info("User test+iinves@rodano.ch already exists, adding roles for project {}", study.getId());
+			for(String profileCode : new String[] { "INVESTIGATOR", "ESIGNATURE" }) {
+				final var role = new Role();
+				role.setProjectId(study.getProjectId());
+				role.setProfile(study.getProfile(profileCode));
+				role.setScopeFk(fr01.getPk());
+				role.setUserFk(existingInvestigator.getPk());
+				role.setStatus(RoleStatus.ENABLED);
+				roleDAOService.saveRole(role, context, DatabaseInitializer.RATIONALE);
+			}
+		}
+
+		final var existingPrincipalInvestigator = userDAOService.getUserByEmail("test+pinves@rodano.ch");
+		if(existingPrincipalInvestigator == null) {
+			final var principalInvestigatorUser = UserBuilder.createUser("Principal Investigator", "test+pinves@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(fr02, study.getProfile("PRINCIPAL_INVESTIGATOR"))
 				.addRole(fr01, study.getProfile("ESIGNATURE"))
-				.getUserAndRoles()
-		);
-		defaultUsers.add(
-			UserBuilder.createUser("Sponsor", "test+sponsor@rodano.ch")
-				.setHashedPassword(encodedDefaultPassword)
-				.addRole(root, study.getProfile("SPONSOR"))
-				.getUserAndRoles()
-		);
-		defaultUsers.add(
-			UserBuilder.createUser("DataEntry A", "test+dentrya@rodano.ch")
-				.setHashedPassword(encodedDefaultPassword)
-				.addRole(root, study.getProfile("DATAENTRY_A"))
-				.getUserAndRoles()
-		);
-		defaultUsers.add(
-			UserBuilder.createUser("DataEntry B", "test+dentryb@rodano.ch")
-				.setHashedPassword(encodedDefaultPassword)
-				.addRole(root, study.getProfile("DATAENTRY_B"))
-				.getUserAndRoles()
-		);
+				.getUserAndRoles();
+			userCreatorService.createAndEnable(principalInvestigatorUser, context);
+		}
+		else {
+			LOGGER.info("User test+pinves@rodano.ch already exists, adding roles for project {}", study.getId());
 
-		//save the default users
-		userCreatorService.batchCreateAndEnable(defaultUsers, context);
+			final var role1 = new Role();
+			role1.setProjectId(study.getProjectId());
+			role1.setProfile(study.getProfile("PRINCIPAL_INVESTIGATOR"));
+			role1.setScopeFk(fr02.getPk());
+			role1.setUserFk(existingPrincipalInvestigator.getPk());
+			role1.setStatus(RoleStatus.ENABLED);
+			roleDAOService.saveRole(role1, context, DatabaseInitializer.RATIONALE);
+
+			final var role2 = new Role();
+			role2.setProjectId(study.getProjectId());
+			role2.setProfile(study.getProfile("ESIGNATURE"));
+			role2.setScopeFk(fr01.getPk());
+			role2.setUserFk(existingPrincipalInvestigator.getPk());
+			role2.setStatus(RoleStatus.ENABLED);
+			roleDAOService.saveRole(role2, context, DatabaseInitializer.RATIONALE);
+		}
+
+		createUserOrAddRole("Sponsor", "test+sponsor@rodano.ch", encodedDefaultPassword, root, study.getProfile("SPONSOR"), context);
+		createUserOrAddRole("DataEntry A", "test+dentrya@rodano.ch", encodedDefaultPassword, root, study.getProfile("DATAENTRY_A"), context);
+		createUserOrAddRole("DataEntry B", "test+dentryb@rodano.ch", encodedDefaultPassword, root, study.getProfile("DATAENTRY_B"), context);
 
 		//add resources
 		final Resource resourceStudy1 = new Resource();
@@ -660,32 +693,38 @@ public class TestDataInitializer {
 		resourceService.createResource(resourceCenter3, dataManager, context);
 	}
 
-	private UUID fmId(final String code) {
-		return studyService.getStudy().getFormModel(code).getFormModelId();
+	private void createUserOrAddRole(final String name,
+									 final String email,
+									 final String hashedPassword,
+									 final Scope scope,
+									 final Profile profile,
+									 final DatabaseActionContext context
+	) {
+		final var existingUser = userDAOService.getUserByEmail(email);
+
+		if(existingUser == null) {
+			LOGGER.info("Creating new user: {}", email);
+			final var userAndRoles = UserBuilder.createUser(name, email)
+				.setHashedPassword(hashedPassword)
+				.addRole(scope, profile)
+				.getUserAndRoles();
+			userCreatorService.createAndEnable(userAndRoles, context);
+		}
+		else {
+			LOGGER.info("User {} already exists, adding role for project {}", email, studyService.getStudy().getId());
+
+			final var role = new ch.rodano.core.model.role.Role();
+			role.setProjectId(studyService.getStudy().getProjectId());
+			role.setProfile(profile);
+			role.setScopeFk(scope.getPk());
+			role.setUserFk(existingUser.getPk());
+			role.setStatus(ch.rodano.core.model.role.RoleStatus.ENABLED);
+
+			roleDAOService.saveRole(role, context, DatabaseInitializer.RATIONALE);
+		}
 	}
 
-	private Scope ensureRootScope(final Study study,
-								  final ZonedDateTime origin,
-								  final DatabaseActionContext context) {
-		try {
-			return scopeService.getRootScope();
-		}
-		catch(IllegalStateException notFound) {
-			final var rootModel = study.getScopeModels().stream()
-				.filter(ScopeModel::isRoot)
-				.findFirst()
-				.orElseThrow(() -> new IllegalStateException("No root ScopeModel in study configuration"));
-
-			final var candidate = scopeService.createCandidate(rootModel, origin, null);
-
-			if(StringUtils.isBlank(candidate.getCode())) {
-				candidate.setCode(study.getId());
-				candidate.setShortname(study.getDefaultLocalizedShortname());
-			}
-
-			scopeService.create(candidate, null, context, "Create root scope");
-
-			return candidate;
-		}
+	private UUID fmId(final String code) {
+		return studyService.getStudy().getFormModel(code).getFormModelId();
 	}
 }

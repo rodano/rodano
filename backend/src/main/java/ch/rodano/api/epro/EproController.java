@@ -79,10 +79,13 @@ public class EproController extends AbstractSecuredController {
 		rightsService.checkRight(currentActor, currentRoles, leafScopeModel, Rights.READ);
 
 		// Retrieve all roles that are linked to a leaf scope
+		final var projectId = studyService.getStudy().getProjectId();
 		final var query = create.select(SCOPE.PK.as("scope_pk"), ROBOT.NAME.as("robot_name"), ROBOT.KEY.as("robot_key"))
 			.from(ROBOT)
 			.innerJoin(SCOPE).on(SCOPE.ID.eq(ROBOT.NAME))
-			.where(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId()).and(ROBOT.DELETED.isFalse()));
+			.where(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId())
+				.and(ROBOT.DELETED.isFalse())
+				.and(ROBOT.PROJECT_ID.eq(projectId)));
 
 		return query.fetchInto(EproRobotDTO.class);
 	}
@@ -100,7 +103,8 @@ public class EproController extends AbstractSecuredController {
 		@RequestParam final String key
 	) throws InvalidKeyException {
 		//retrieve robot
-		final var robot = robotDAOService.getRobotByKey(key);
+		final var projectId = studyService.getStudy().getProjectId();
+		final var robot = robotDAOService.getRobotByKeyAndProject(key, projectId);
 		if(robot == null) {
 			throw new InvalidKeyException(String.format("No robot found for key %s", key));
 		}
@@ -122,7 +126,8 @@ public class EproController extends AbstractSecuredController {
 		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
 
 		//check of a robot does not already exists
-		var robot = robotDAOService.getRobotByName(scope.getId());
+		final var projectId = studyService.getStudy().getProjectId();
+		var robot = robotDAOService.getRobotByNameAndProject(scope.getId(), projectId);
 
 		final var rationale = "Invite ePro user";
 		// Create robot if it does not already exist
@@ -167,7 +172,8 @@ public class EproController extends AbstractSecuredController {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		rightsService.checkRight(currentActor, currentRoles, scope.getScopeModel(), Rights.WRITE);
 
-		final var robot = robotDAOService.getRobotByName(scope.getId());
+		final var projectId = studyService.getStudy().getProjectId();
+		final var robot = robotDAOService.getRobotByNameAndProject(scope.getId(), projectId);
 		robotService.deleteRobot(robot, currentContext(), "Revoke user access to ePro");
 	}
 

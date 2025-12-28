@@ -89,3 +89,18 @@ alter table scope_audit modify column project_id uuid not null;
 alter table scope_relation modify column project_id uuid not null;
 alter table workflow_status modify column project_id uuid not null;
 alter table workflow_status_audit modify column project_id uuid not null;
+
+/* ==========================================================
+   UPDATE UNIQUE CONSTRAINTS TO BE PROJECT_SCOPED
+   ========================================================== */
+
+-- SCOPE
+alter table scope drop index u_scope_code;
+alter table scope add constraint u_scope_code_project unique (project_id, code);
+
+-- ROBOT
+alter table robot drop index u_robot_name;
+alter table robot add constraint u_robot_name_project unique (project_id, name);
+
+alter table robot drop index u_robot_key;
+alter table robot add constraint u_robot_key_project unique (project_id, `key`);

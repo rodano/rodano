@@ -91,7 +91,7 @@ create table scope (
 	data longtext not null,
 	constraint pk_scope primary key (pk),
 	constraint u_scope_id unique (id),
-	constraint u_scope_code unique (code)
+	constraint u_scope_code_project unique (project_id, code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 drop table if exists scope_audit;
@@ -1073,8 +1073,8 @@ create table robot (
 	`key` varchar(255) not null,
 	activated boolean default false,
 	constraint pk_robot primary key (pk),
-	constraint u_robot_name unique (name),
-	constraint u_robot_key unique (`key`)
+	constraint u_robot_name_project unique (project_id, name),
+	constraint u_robot_key_project unique (project_id, `key`)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 drop table if exists robot_audit;

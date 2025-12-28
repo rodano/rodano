@@ -198,7 +198,7 @@ public class Robot extends TableImpl<RobotRecord> {
 
 	@Override
 	public List<UniqueKey<RobotRecord>> getUniqueKeys() {
-		return Arrays.asList(Keys.KEY_ROBOT_U_ROBOT_KEY, Keys.KEY_ROBOT_U_ROBOT_NAME);
+		return Arrays.asList(Keys.KEY_ROBOT_U_ROBOT_KEY_PROJECT, Keys.KEY_ROBOT_U_ROBOT_NAME_PROJECT);
 	}
 
 	@Override
