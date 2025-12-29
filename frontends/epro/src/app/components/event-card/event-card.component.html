@@ -12,7 +12,7 @@
   </ion-card-header>
   <ion-card-content>
     <ion-list lines="none">
-      @for (dataset of datasets; track dataset.id) {
+      @for (dataset of datasets; track dataset.pk) {
         <ion-item
           (click)="onSelect(dataset)"
           button

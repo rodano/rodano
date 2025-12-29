@@ -21,7 +21,7 @@
 			</ion-text>
 		}
 		@if (events.length > 0) {
-			@for (event of events; track event.id) {
+			@for (event of events; track event.pk) {
 				<app-event-card
 					[scope]="scope"
 					[event]="event"
@@ -41,7 +41,7 @@
 				<ion-icon name="add"></ion-icon>
 			</ion-fab-button>
 			<ion-fab-list side="top">
-				@for (eventModel of availableEventModels; track eventModel.id) {
+				@for (eventModel of availableEventModels; track eventModel.eventModelId) {
 					<ion-fab-button
 						(click)="createEvent(eventModel)"
 						title="{{ eventModel.shortname | localizer:selectedLanguageId }}">

@@ -1,4 +1,4 @@
-import { RoleStatus } from '../../enums/role-status';
+import { RoleStatus } from '../../model/role-status-dto';
 import { PaginatedSearch } from './paginated-search';
 
 export class UserSearch extends PaginatedSearch {

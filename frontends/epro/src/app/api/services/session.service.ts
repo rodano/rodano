@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { SessionDTO } from '../model/session-dto';
+import { Session } from '../model/session-dto';
 import { APIService } from './api.service';
 
 @Injectable()
@@ -13,8 +13,8 @@ export class SessionService {
 	) {
 	}
 
-	get(): Observable<SessionDTO[]> {
-		return this.http.get<SessionDTO[]>(`${this.apiService.getApiUrl()}/sessions`);
+	get(): Observable<Session[]> {
+		return this.http.get<Session[]>(`${this.apiService.getApiUrl()}/sessions`);
 	}
 
 	delete(sessionPk: number) {

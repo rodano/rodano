@@ -4,14 +4,15 @@ import { switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../api/services/auth.service';
 import { RobotCredentials } from '../models/robotCredentials';
 import { AppService } from './app.service';
-import { AuthenticationDTO } from '../api/model/authentication-dto';
-import { CredentialsDTO } from '../api/model/credentials-dto';
+import { Authentication } from '../api/model/authentication-dto';
+import { Credentials } from '../api/model/credentials-dto';
 
 @Injectable()
 export class AuthStateService {
 
 	private static TOKEN_STORAGE_KEY = 'userToken';
 	private static API_KEY_STORAGE_KEY = 'robotCredentials';
+	private static PROJECT_ID_STORAGE_KEY = 'eproProjectId';
 
 	constructor(
 		private authService: AuthService,
@@ -22,6 +23,7 @@ export class AuthStateService {
 		return this.authService.getRobot(code).pipe(
 			tap(robotCred => {
 				this.setRobotCredentials(robotCred);
+				localStorage.setItem(AuthStateService.PROJECT_ID_STORAGE_KEY, robotCred.projectId);
 				this.appService.updateConnectedStatus();
 			}),
 			switchMap(robotCred => {
@@ -31,11 +33,11 @@ export class AuthStateService {
 	}
 
 	// Regular login
-	public userLogin(email: string, password: string): Observable<AuthenticationDTO> {
+	public userLogin(email: string, password: string): Observable<Authentication> {
 		const credentials = {
 			email,
 			password
-		} as CredentialsDTO;
+		} as Credentials;
 
 		return this.authService.getNewToken(credentials).pipe(
 			tap(authentication => this.setUserToken(authentication.token))
@@ -48,6 +50,7 @@ export class AuthStateService {
 
 	public deleteRobotCredentials() {
 		localStorage.removeItem(AuthStateService.API_KEY_STORAGE_KEY);
+		localStorage.removeItem(AuthStateService.PROJECT_ID_STORAGE_KEY);
 	}
 
 	public getRobotCredentials(): RobotCredentials | undefined {
@@ -60,6 +63,10 @@ export class AuthStateService {
 
 	public hasRobotCredentials(): boolean {
 		return !!this.getRobotCredentials();
+	}
+
+	public getProjectId(): string | null {
+		return localStorage.getItem(AuthStateService.API_KEY_STORAGE_KEY);
 	}
 
 	private setUserToken(token: string) {
@@ -85,5 +92,6 @@ export class AuthStateService {
 
 	public deleteUserToken() {
 		sessionStorage.removeItem(AuthStateService.TOKEN_STORAGE_KEY);
+		localStorage.removeItem(AuthStateService.PROJECT_ID_STORAGE_KEY);
 	}
 }

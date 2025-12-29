@@ -97,6 +97,8 @@
 						firstDayOfWeek="1"
 						showDefaultButtons="true"
 						showDefaultTitle="true"
+						[max]="maxDateTime()"
+						[min]="minDateTime()"
 						[disabled]="rootScope.locked || event.locked"
 						(ionChange)="setDatetimeValue(dateTimePicker.value)">
 					</ion-datetime>
@@ -206,7 +208,7 @@
 @if (isEQ5D) {
 	<ion-item class="footer">
 		<ion-text class="even-smaller-text" color="secondary">
-			© EuroQol Research Foundation. EQ-5D™ is a trade mark of the EuroQol Research Foundation 
+			© EuroQol Research Foundation. EQ-5D™ is a trade mark of the EuroQol Research Foundation
 		</ion-text>
 	</ion-item>
 }

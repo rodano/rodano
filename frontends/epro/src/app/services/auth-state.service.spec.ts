@@ -27,8 +27,8 @@ describe('AuthStateService', () => {
 	it('#robotLogin works', () => {
 		const key = 'a0989ccc';
 		const stubRobotCreds = {
-			name: 'TastyRobot',
-			key
+			robotName: 'TastyRobot',
+			robotKey: key
 		} as RobotCredentials;
 
 		authServiceSpy.getRobot.and.returnValue(of(stubRobotCreds));

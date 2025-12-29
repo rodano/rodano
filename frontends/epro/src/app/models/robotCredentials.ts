@@ -1,4 +1,6 @@
 export class RobotCredentials {
-	name: string;
-	key: string;
+	scopePk: number;
+	robotName: string;
+	robotKey: string;
+	projectId: string;
 }

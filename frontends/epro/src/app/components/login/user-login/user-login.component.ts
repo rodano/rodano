@@ -6,6 +6,7 @@ import { AuthStateService } from 'src/app/services/auth-state.service';
 
 @Component({
 	templateUrl: './user-login.component.html',
+	standalone: true,
 	styleUrls: ['./user-login.component.css']
 })
 export class UserLoginComponent implements OnInit {

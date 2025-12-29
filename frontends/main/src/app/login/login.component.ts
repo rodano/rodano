@@ -1,6 +1,6 @@
 import {Component, DestroyRef, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import {Router, ActivatedRoute} from '@angular/router';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {ActivatedRoute, Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {PublicStudy} from '@core/model/public-study';
 import {Credentials} from '@core/model/credentials';
@@ -71,10 +71,10 @@ export class LoginComponent implements OnInit {
 
 	ngOnInit() {
 		this.configurationService.getPublicStudy().subscribe({
-			next: (study) => {
+			next: study => {
 				this.study = study;
 			},
-			error: (error) => {
+			error: error => {
 				if(error.status === 204) {
 					console.log('No study loaded yet - will load after project selection');
 				}

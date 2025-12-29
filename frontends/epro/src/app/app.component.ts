@@ -3,7 +3,7 @@ import { AppService } from './services/app.service';
 import { ConfigurationService } from './api/services/configuration.service';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { ScopeModelDTO } from './api/model/scope-model-dto';
+import { ScopeModel } from './api/model/scope-model-dto';
 import { IonicModule } from '@ionic/angular';
 
 @Component({
@@ -15,7 +15,7 @@ import { IonicModule } from '@ionic/angular';
 })
 export class AppComponent implements OnInit, OnDestroy {
 
-	public leafScopeModel: ScopeModelDTO;
+	public leafScopeModel: ScopeModel;
 
 	unsubscribe$ = new Subject<void>();
 

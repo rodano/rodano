@@ -22,18 +22,34 @@ export class AuthInterceptor implements HttpInterceptor {
 		let enhancedRequest;
 		const robotCredentials = this.authStateService.getRobotCredentials();
 		const token = this.authStateService.getUserToken();
+		const projectId = localStorage.getItem('eproProjectId');
 
 		if(robotCredentials) {
 			// enhance request with authorization basic key
-			const basic = btoa(`${robotCredentials.name}:${robotCredentials.key}`);
-			enhancedRequest = request.clone({headers: request.headers.set('Authorization', `Basic ${basic}`)});
+			const basic = btoa(`${robotCredentials.robotName}:${robotCredentials.robotKey}`);
+			enhancedRequest = request.clone({
+				headers: request.headers
+					.set('Authorization', `Basic ${basic}`)
+					.set('X-Project-Id', projectId || '')
+			});
 		}
 		else if(token) {
 			// enhance request with authorization bearer token
-			enhancedRequest = request.clone({headers: request.headers.set('Authorization', `Bearer ${token.toString()}`)});
+			enhancedRequest = request.clone({
+				headers: request.headers
+					.set('Authorization', `Bearer ${token.toString()}`)
+					.set('X-Project-Id', projectId || '')
+			});
 		}
 		else {
-			enhancedRequest = request;
+			if(projectId) {
+				enhancedRequest = request.clone({
+					headers: request.headers.set('X-Project-Id', projectId)
+				});
+			}
+			else {
+				enhancedRequest = request;
+			}
 		}
 
 		const errToast = await this.toastCtrl.create({

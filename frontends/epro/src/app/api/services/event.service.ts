@@ -1,9 +1,9 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { EventDTO } from '../model/event-dto';
+import { Event } from '../model/event-dto';
 import { APIService } from './api.service';
-import { WorkflowStatusDTO } from '../model/workflow-status-dto';
+import { WorkflowStatus } from '../model/workflow-status-dto';
 import { isPast, sub } from 'date-fns';
 import { transformDates } from '../utilities/transform-dates';
 
@@ -18,24 +18,26 @@ export class EventService {
 	) { }
 
 	@transformDates
-	create(scopePk: number, eventModelId: string): Observable<EventDTO> {
+	create(scopePk: number, eventModelId: string): Observable<Event> {
 		const params = new HttpParams().set('eventModelId', eventModelId);
-		return this.http.post<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`, undefined, {params});
+		return this.http.post<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`, undefined, {params});
 	}
 
 	@transformDates
-	get(scopePk: number, eventPk: number): Observable<EventDTO> {
-		return this.http.get<EventDTO>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}`);
+	get(scopePk: number, eventPk: number): Observable<Event> {
+		return this.http.get<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}`);
 	}
 
 	@transformDates
-	getForScope(scopePk: number): Observable<EventDTO[]> {
-		return this.http.get<EventDTO[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`);
+	getForScope(scopePk: number): Observable<Event[]> {
+		return this.http.get<Event[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events`);
 	}
 
 	remove(scopePk: number, eventPk: number, rationale: string) {
-		const params = new HttpParams().set('rationale', rationale);
-		return this.http.put(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/remove`, undefined, {params});
+		return this.http.put(
+			`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/remove`,
+			{ message: rationale }
+		);
 	}
 
 	restore(scopePk: number, eventPk: number, rationale: string) {
@@ -52,7 +54,7 @@ export class EventService {
 	}
 
 	getContainedWorkflowStatus(scopePk: number, eventPk: number) {
-		return this.http.get<WorkflowStatusDTO[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/contained-workflows`);
+		return this.http.get<WorkflowStatus[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/contained-workflows`);
 	}
 
 	/**
@@ -60,7 +62,7 @@ export class EventService {
 	 * @param event The event
 	 * @returns True if the event is planned, false otherwise.
 	 */
-	isPlanned(event: EventDTO): boolean {
+	isPlanned(event: Event): boolean {
 		return !!event.model.deadline &&
 			!!event.model.deadlineUnit &&
 			!!event.model.deadlineReferenceEventModelIds &&
@@ -75,7 +77,7 @@ export class EventService {
 	 * @param event The event
 	 * @returns True if the event is planned and is due, false otherwise.
 	 */
-	isEventPlannedAndDue(event: EventDTO): boolean {
+	isEventPlannedAndDue(event: Event): boolean {
 		const eventDate = event.expectedDate ? event.expectedDate : event.date;
 
 		if(event.model.interval && event.model.intervalUnit) {

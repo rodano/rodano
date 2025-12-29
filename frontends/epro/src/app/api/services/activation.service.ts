@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Registration } from '../model/registration';
+import { UserPrivacyPolicies } from '../model/user-privacy-policies-dto';
 import { APIService } from './api.service';
 
 @Injectable({
@@ -13,8 +13,8 @@ export class ActivationService {
 		private apiService: APIService
 	) { }
 
-	getActivationPolicies(pinCode: string): Observable<Registration> {
-		return this.http.get<Registration>(`${this.apiService.getApiUrl()}/activation/${pinCode}/policies`);
+	getActivationPolicies(pinCode: string): Observable<UserPrivacyPolicies> {
+		return this.http.get<UserPrivacyPolicies>(`${this.apiService.getApiUrl()}/activation/${pinCode}/policies`);
 	}
 
 	activateRole(pinCode: string, password: string) {

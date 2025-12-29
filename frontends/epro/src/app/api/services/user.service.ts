@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { PagedResult } from '../model/paged-result';
-import { UserDTO } from '../model/user-dto';
-import { UserSearch } from '../model/user-search';
+import { PagedResultUser } from '../model/paged-result-user-dto';
+import { User } from '../model/user-dto';
 import { APIService } from './api.service';
 import { HttpParamsService } from './http-helper.service';
+import { UserSearch } from '../utilities/search/user-search';
 
 @Injectable({
 	providedIn: 'root'
@@ -17,8 +17,8 @@ export class UserService {
 		private apiService: APIService
 	) { }
 
-	search(predicate: UserSearch): Observable<PagedResult<UserDTO>> {
-		return this.http.get<PagedResult<UserDTO>>(`${this.apiService.getApiUrl()}/users`, {params: this.httpHelper.toHttpParams(predicate)});
+	search(predicate: UserSearch): Observable<PagedResultUser> {
+		return this.http.get<PagedResultUser>(`${this.apiService.getApiUrl()}/users`, {params: this.httpHelper.toHttpParams(predicate)});
 	}
 
 	getExportUrl(predicate: UserSearch): string {
@@ -26,20 +26,28 @@ export class UserService {
 		return `${this.apiService.getApiUrl()}/users/export?${parameters}`;
 	}
 
-	get(userPk: number): Observable<UserDTO> {
-		return this.http.get<UserDTO>(`${this.apiService.getApiUrl()}/users/${userPk}`);
+	get(userPk: number): Observable<User> {
+		return this.http.get<User>(`${this.apiService.getApiUrl()}/users/${userPk}`);
 	}
 
-	create(user: UserDTO, scopePk: number, profileId: string): Observable<UserDTO> {
-		return this.http.post<UserDTO>(`${this.apiService.getApiUrl()}/users`, user, {params: {scopePk: scopePk.toString(), profile: profileId}});
+	create(user: User, scopePk: number, profileId: string): Observable<User> {
+		return this.http.post<User>(`${this.apiService.getApiUrl()}/users`, user, {
+			params: {
+				scopePk: scopePk.toString(),
+				profile: profileId
+			}
+		});
 	}
 
-	save(userPk: number, user: UserDTO): Observable<UserDTO> {
-		return this.http.put<UserDTO>(`${this.apiService.getApiUrl()}/users/${userPk}`, user);
+	save(userPk: number, user: User): Observable<User> {
+		return this.http.put<User>(`${this.apiService.getApiUrl()}/users/${userPk}`, user);
 	}
 
 	changePassword(userPk: number, userPassword: string, password: string) {
-		return this.http.post(`${this.apiService.getApiUrl()}/users/${userPk}/password`, {oldPassword: userPassword, newPassword: password});
+		return this.http.post(`${this.apiService.getApiUrl()}/users/${userPk}/password`, {
+			oldPassword: userPassword,
+			newPassword: password
+		});
 	}
 
 	changeEmail(userPk: number, userPassword: string, email: string) {

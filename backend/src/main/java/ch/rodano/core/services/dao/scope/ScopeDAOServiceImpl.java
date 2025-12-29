@@ -473,6 +473,15 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 	}
 
 	@Override
+	public Scope getScopeByIdAndProject(final String id, final UUID projectId) {
+		return create.selectFrom(SCOPE)
+			.where(SCOPE.ID.eq(id)
+				.and(SCOPE.PROJECT_ID.eq(projectId))
+				.and(SCOPE.DELETED.isNull().or(SCOPE.DELETED.isFalse())))
+			.fetchOneInto(Scope.class);
+	}
+
+	@Override
 	public List<Scope> getScopesByIds(final Collection<String> ids) {
 		if(CollectionUtils.isEmpty(ids)) {
 			return Collections.emptyList();

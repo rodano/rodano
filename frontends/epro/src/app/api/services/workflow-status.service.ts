@@ -1,14 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { WorkflowAction } from '../model/configuration/workflow-action';
-import { FieldDTO } from '../model/field-dto';
-import { Form } from '../model/form';
-import { FormValueDTO } from '../model/form-value-dto';
-import { ScopeDTO } from '../model/scope-dto';
-import { EventDTO } from '../model/event-dto';
+import { WorkflowAction } from '../model/workflow-action-dto';
+import { Field } from '../model/field-dto';
+import { Form } from '../model/form-dto';
+import { FormInfo } from '../model/form-info-dto';
+import { Scope } from '../model/scope-dto';
+import { Event } from '../model/event-dto';
 import { APIService } from './api.service';
-import { WorkflowActionResponse } from '../model/workflow-action-response';
+import { WorkflowUpdate } from '../model/workflow-update-dto';
 
 @Injectable({
 	providedIn: 'root'
@@ -20,31 +20,31 @@ export class WorkflowStatusService {
 		private apiService: APIService
 	) { }
 
-	getFormForWorkflowStatus(statusPk: number): Observable<FormValueDTO> {
-		return this.http.get<FormValueDTO>(`${this.apiService.getApiUrl()}/workflows/${statusPk}/form`);
+	getFormForWorkflowStatus(statusPk: number): Observable<FormInfo> {
+		return this.http.get<FormInfo>(`${this.apiService.getApiUrl()}/workflows/${statusPk}/form`);
 	}
 
-	initWorkflowForField(field: FieldDTO, actionParams: WorkflowActionResponse): Observable<FieldDTO> {
+	initWorkflowForField(field: Field, actionParams: WorkflowUpdate): Observable<Field> {
 		let url = `${this.apiService.getApiUrl()}/scopes/${field.scopePk}`;
 		if(field.eventPk) {
 			url = `${url}/events/${field.eventPk}`;
 		}
-		url = `${url}/datasets/${field.datasetPk}/fields/${field.fieldPk}/workflows`;
+		url = `${url}/datasets/${field.datasetPk}/fields/${field.pk}/workflows`;
 
-		return this.http.post<FieldDTO>(url, actionParams);
+		return this.http.post<Field>(url, actionParams);
 	}
 
-	executeActionForField(workflowStatusPk: number, field: FieldDTO, actionParams: WorkflowActionResponse): Observable<FieldDTO> {
+	executeActionForField(workflowStatusPk: number, field: Field, actionParams: WorkflowUpdate): Observable<Field> {
 		let url = `${this.apiService.getApiUrl()}/scopes/${field.scopePk}`;
 		if(field.eventPk) {
 			url = `${url}/events/${field.eventPk}`;
 		}
-		url = `${url}/datasets/${field.datasetPk}/fields/${field.fieldPk}/workflows/${workflowStatusPk}`;
+		url = `${url}/datasets/${field.datasetPk}/fields/${field.pk}/workflows/${workflowStatusPk}`;
 
-		return this.http.put<FieldDTO>(url, actionParams);
+		return this.http.put<Field>(url, actionParams);
 	}
 
-	initWorkflowForForm(form: Form, actionParams: WorkflowActionResponse): Observable<Form> {
+	initWorkflowForForm(form: Form, actionParams: WorkflowUpdate): Observable<Form> {
 		let url = `${this.apiService.getApiUrl()}/scopes/${form.scopePk}`;
 		if(form.eventPk) {
 			url = `${url}/events/${form.eventPk}`;
@@ -54,53 +54,53 @@ export class WorkflowStatusService {
 		return this.http.post<Form>(url, actionParams);
 	}
 
-	executeActionForForm(form: Form, action: WorkflowAction, actionParams: WorkflowActionResponse): Observable<Form> {
+	executeActionForForm(form: Form, action: WorkflowAction, actionParams: WorkflowUpdate, workflowStatusPk: number | undefined): Observable<Form> {
 		let url = `${this.apiService.getApiUrl()}/scopes/${form.scopePk}`;
 		if(form.eventPk) {
 			url = `${url}/events/${form.eventPk}`;
 		}
 		url = `${url}/forms/${form.pk}/workflows`;
-		if(action.wsPk) {
-			url = `${url}/${action.wsPk}`;
+		if(workflowStatusPk) {
+			url = `${url}/${workflowStatusPk}`;
 		}
 		else {
-			url = `${url}/${action.workflowId}/${action.id}`;
+			url = `${url}/${action.workflowId}/${action.workflowActionId}`;
 		}
 
 		return this.http.put<Form>(url, actionParams);
 	}
 
-	initWorkflowForEvent(event: EventDTO, actionParams: WorkflowActionResponse): Observable<EventDTO> {
+	initWorkflowForEvent(event: Event, actionParams: WorkflowUpdate): Observable<Event> {
 		const url = `${this.apiService.getApiUrl()}/scopes/${event.scopePk}/events/${event.pk}/workflows`;
-		return this.http.post<EventDTO>(url, actionParams);
+		return this.http.post<Event>(url, actionParams);
 	}
 
-	executeActionForEvent(event: EventDTO, action: WorkflowAction, actionParams: WorkflowActionResponse): Observable<EventDTO> {
+	executeActionForEvent(event: Event, action: WorkflowAction, actionParams: WorkflowUpdate, workflowStatusPk: number | undefined): Observable<Event> {
 		let url = `${this.apiService.getApiUrl()}/scopes/${event.scopePk}/events/${event.pk}/workflows`;
-		if(action.wsPk) {
-			url = `${url}/${action.wsPk}`;
+		if(workflowStatusPk) {
+			url = `${url}/${workflowStatusPk}`;
 		}
 		else {
-			url = `${url}/${action.workflowId}/${action.id}`;
+			url = `${url}/${action.workflowId}/${action.workflowActionId}`;
 		}
 
-		return this.http.put<EventDTO>(url, actionParams);
+		return this.http.put<Event>(url, actionParams);
 	}
 
-	initWorkflowForScope(scope: ScopeDTO, actionParams: WorkflowActionResponse): Observable<ScopeDTO> {
+	initWorkflowForScope(scope: Scope, actionParams: WorkflowUpdate): Observable<Scope> {
 		const url = `${this.apiService.getApiUrl()}/scopes/${scope.pk}/workflows`;
-		return this.http.post<ScopeDTO>(url, actionParams);
+		return this.http.post<Scope>(url, actionParams);
 	}
 
-	executeActionForScope(scope: ScopeDTO, action: WorkflowAction, actionParams: WorkflowActionResponse): Observable<ScopeDTO> {
+	executeActionForScope(scope: Scope, action: WorkflowAction, actionParams: WorkflowUpdate, workflowStatusPk: number | undefined): Observable<Scope> {
 		let url = `${this.apiService.getApiUrl()}/scopes/${scope.pk}/workflows`;
-		if(action.wsPk) {
-			url = `${url}/${action.wsPk}`;
+		if(workflowStatusPk) {
+			url = `${url}/${workflowStatusPk}`;
 		}
 		else {
-			url = `${url}/${action.workflowId}/${action.id}`;
+			url = `${url}/${action.workflowId}/${action.workflowActionId}`;
 		}
 
-		return this.http.put<ScopeDTO>(url, actionParams);
+		return this.http.put<Scope>(url, actionParams);
 	}
 }

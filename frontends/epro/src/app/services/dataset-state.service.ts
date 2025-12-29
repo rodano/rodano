@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, forkJoin, identity, Observable, of } from 'rxjs';
 import { filter, mergeMap, switchMap, tap } from 'rxjs/operators';
-import { DatasetDTO } from '../api/model/dataset-dto';
-import { FieldDTO } from '../api/model/field-dto';
+import { Dataset } from '../api/model/dataset-dto';
+import { Field } from '../api/model/field-dto';
 import { DatasetService } from '../api/services/dataset.service';
-import { DatasetUpdateDTO } from '../api/model/dataset-update-dto';
-import { FieldUpdateDTO } from '../api/model/field-update-dto';
+import { DatasetUpdate } from '../api/model/dataset-update-dto';
+import { FieldUpdate } from '../api/model/field-update-dto';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class DatasetStateService {
 
-	private readonly _currentDatasets = new BehaviorSubject<DatasetDTO[]>([]);
+	private readonly _currentDatasets = new BehaviorSubject<Dataset[]>([]);
 
-	readonly currentDatasets$: Observable<DatasetDTO[]> = this._currentDatasets.asObservable();
+	readonly currentDatasets$: Observable<Dataset[]> = this._currentDatasets.asObservable();
 
-	private get currentDatasets(): DatasetDTO[] {
+	private get currentDatasets(): Dataset[] {
 		return this._currentDatasets.getValue();
 	}
 
@@ -24,13 +24,13 @@ export class DatasetStateService {
 		private datasetService: DatasetService
 	) { }
 
-	private setCurrentDatasets(newDatasets: DatasetDTO[]): void {
+	private setCurrentDatasets(newDatasets: Dataset[]): void {
 		newDatasets.sort((a, b) => a.pk - b.pk);
 		this._currentDatasets.next([...newDatasets]);
 	}
 
-	public pullDatasets(scopePk: number, eventPks?: number[]): Observable<DatasetDTO[]> {
-		let newDatasets$: Observable<DatasetDTO[]>;
+	public pullDatasets(scopePk: number, eventPks?: number[]): Observable<Dataset[]> {
+		let newDatasets$: Observable<Dataset[]>;
 		if(eventPks) {
 			if(eventPks.length === 0) {
 				return of([]);
@@ -55,7 +55,7 @@ export class DatasetStateService {
 		);
 	}
 
-	public saveDataset(dataset: DatasetDTO): Observable<DatasetDTO> {
+	public saveDataset(dataset: Dataset): Observable<Dataset> {
 		const datasetUpdate = this.convertToDatasetUpdate(dataset);
 
 		return this.datasetService.save(
@@ -70,52 +70,52 @@ export class DatasetStateService {
 		);
 	}
 
-	public saveField(dataset: DatasetDTO, field: FieldDTO): Observable<DatasetDTO> {
+	public saveField(dataset: Dataset, field: Field): Observable<Dataset> {
 		const datasetToSend = {...dataset, fields: [field]};
 		return this.saveDataset(datasetToSend);
 	}
 
-	public getDatasetsForEvent$(eventPk: number): Observable<DatasetDTO[]> {
+	public getDatasetsForEvent$(eventPk: number): Observable<Dataset[]> {
 		return this.currentDatasets$.pipe(
 			switchMap(datasets => of(datasets.filter(d => d.eventPk === eventPk)))
 		);
 	}
 
-	public getDatasetForEvent$(eventPk: number, datasetPk: number): Observable<DatasetDTO> {
+	public getDatasetForEvent$(eventPk: number, datasetPk: number): Observable<Dataset> {
 		return this.getDatasetsForEvent$(eventPk).pipe(
 			mergeMap(identity),
 			filter(d => d.pk === datasetPk)
 		);
 	}
 
-	public getDataset$(datasetPk: number): Observable<DatasetDTO> {
+	public getDataset$(datasetPk: number): Observable<Dataset> {
 		return this.currentDatasets$.pipe(
 			mergeMap(identity),
 			filter(d => d.pk === datasetPk)
 		);
 	}
 
-	public getDatasetsForEvent(eventPk: number): DatasetDTO[] {
+	public getDatasetsForEvent(eventPk: number): Dataset[] {
 		return this.currentDatasets.filter(d => d.eventPk === eventPk);
 	}
 
-	public getProgression(dataset: DatasetDTO): number {
+	public getProgression(dataset: Dataset): number {
 		return this.getCompletedFields(dataset).length / dataset.fields.length;
 	}
 
-	public getCompletedFields(dataset: DatasetDTO): FieldDTO[] {
+	public getCompletedFields(dataset: Dataset): Field[] {
 		return dataset.fields.filter(field => field.value !== undefined && field.value !== null);
 	}
 
-	public isStarted(dataset: DatasetDTO): boolean {
+	public isStarted(dataset: Dataset): boolean {
 		return this.getProgression(dataset) > 0;
 	}
 
-	public isCompleted(dataset: DatasetDTO): boolean {
+	public isCompleted(dataset: Dataset): boolean {
 		return this.getProgression(dataset) === 1;
 	}
 
-	private convertToDatasetUpdate(dataset: DatasetDTO): DatasetUpdateDTO {
+	private convertToDatasetUpdate(dataset: Dataset): DatasetUpdate {
 		const fieldUpdates = dataset.fields.map(field => {
 			return {
 				datasetPk: field.datasetPk,
@@ -124,12 +124,12 @@ export class DatasetStateService {
 				modelId: field.modelId,
 				value: field.value,
 				filePk: field.filePk
-			} as FieldUpdateDTO;
+			} as FieldUpdate;
 		});
 
 		return {
 			pk: dataset.pk,
 			fields: fieldUpdates
-		} as DatasetUpdateDTO;
+		} as DatasetUpdate;
 	}
 }

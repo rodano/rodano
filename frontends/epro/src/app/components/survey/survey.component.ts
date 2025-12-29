@@ -1,14 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastController, IonicModule } from '@ionic/angular';
-import { DatasetDTO } from '../../api/model/dataset-dto';
-import { FieldDTO } from '../../api/model/field-dto';
+import { Dataset } from '../../api/model/dataset-dto';
+import { Field } from '../../api/model/field-dto';
 import { switchMap, takeUntil } from 'rxjs/operators';
 import { combineLatest, Subject } from 'rxjs';
 import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { EventDTO } from 'src/app/api/model/event-dto';
+import { Event } from 'src/app/api/model/event-dto';
 import { EventService } from 'src/app/api/services/event.service';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
+import { Scope } from 'src/app/api/model/scope-dto';
 import { compareAsc } from 'date-fns';
 import { ConfigurationService } from 'src/app/api/services/configuration.service';
 import { LocalizerPipe } from '../../pipes/localizer.pipe';
@@ -26,15 +26,13 @@ import { QuestionComponent } from '../question/question.component';
 })
 export class SurveyComponent implements OnInit, OnDestroy {
 
-	rootScope: ScopeDTO;
-	event: EventDTO;
-	dataset: DatasetDTO;
-	datasetFields: FieldDTO[];
-	field: FieldDTO;
+	rootScope: Scope;
+	event: Event;
+	dataset: Dataset;
+	datasetFields: Field[];
+	field: Field;
 
 	loaded = false;
-
-	selectedLanguage = 'en';
 
 	unsubscribe$ = new Subject<void>();
 
@@ -55,7 +53,7 @@ export class SurveyComponent implements OnInit, OnDestroy {
 				const datasetPk = parseInt(params.datasetPk, 10);
 
 				return combineLatest([
-					this.configService.getRootScope(),
+					this.configService.getCurrentScope(),
 					this.eventService.get(scopePk, eventPk),
 					this.datasetStateService.pullDatasets(scopePk, [eventPk]).pipe(
 						switchMap(() => this.datasetStateService.getDatasetForEvent$(eventPk, datasetPk))
@@ -169,7 +167,7 @@ export class SurveyComponent implements OnInit, OnDestroy {
 			}
 
 			const nextField = this.datasetFields[nextIndex];
-			this.field = this.datasetFields.find(f => f.modelId === nextField.modelId) as FieldDTO;
+			this.field = this.datasetFields.find(f => f.modelId === nextField.modelId) as Field;
 		}
 	}
 

@@ -1,9 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { EproInvitation } from '../model/epro-invitation';
+import { EPROInvitation } from '../model/epro-invitation-dto';
 import { APIService } from './api.service';
-import { EproInvitationDetails } from '../model/epro-invitation-details';
 
 @Injectable({
 	providedIn: 'root'
@@ -14,20 +13,20 @@ export class EproService {
 		private apiService: APIService
 	) { }
 
-	getInvited(): Observable<EproInvitation[]> {
-		return this.http.get<EproInvitation[]>(`${this.apiService.getApiUrl()}/epro/management/invited`);
+	getInvited(): Observable<EPROInvitation[]> {
+		return this.http.get<EPROInvitation[]>(`${this.apiService.getApiUrl()}/epro/management/invited`);
 	}
 
-	invite(scopePk: number): Observable<EproInvitationDetails> {
-		return this.http.put<EproInvitationDetails>(`${this.apiService.getApiUrl()}/epro/management/${scopePk}/invite`, undefined);
+	invite(scopePk: number): Observable<EPROInvitation> {
+		return this.http.put<EPROInvitation>(`${this.apiService.getApiUrl()}/epro/management/${scopePk}/invite`, undefined);
 	}
 
 	uninvite(scopePk: number): Observable<void> {
 		return this.http.put<void>(`${this.apiService.getApiUrl()}/epro/management/${scopePk}/uninvite`, undefined);
 	}
 
-	getInvitationDetails(scopePk: number): Observable<EproInvitationDetails> {
-		return this.http.get<EproInvitationDetails>(`${this.apiService.getApiUrl()}/epro/management/details/${scopePk}`);
+	getInvitationDetails(scopePk: number): Observable<EPROInvitation> {
+		return this.http.get<EPROInvitation>(`${this.apiService.getApiUrl()}/epro/management/details/${scopePk}`);
 	}
 
 }

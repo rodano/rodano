@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { DatasetDTO } from '../api/model/dataset-dto';
+import { Dataset } from '../api/model/dataset-dto';
 import { DatasetService } from '../api/services/dataset.service';
 import { DatasetStateService } from './dataset-state.service';
 
@@ -24,7 +24,7 @@ describe('DatasetStateService', () => {
 		const d1 = {
 			pk: 1,
 			fields: []
-		} as unknown as DatasetDTO;
+		} as unknown as Dataset;
 
 		datasetServiceSpy.getDatasetsForEvent.and.returnValue(of([d1]));
 
@@ -42,13 +42,13 @@ describe('DatasetStateService', () => {
 			pk: 1,
 			eventPk: 1,
 			fields: []
-		} as unknown as DatasetDTO;
+		} as unknown as Dataset;
 
 		const d2 = {
 			pk: 2,
 			eventPk: 1,
 			fields: []
-		} as unknown as DatasetDTO;
+		} as unknown as Dataset;
 
 		datasetServiceSpy.getDatasetsForEvent.and.returnValue(of([d1]));
 
@@ -86,7 +86,7 @@ describe('DatasetStateService', () => {
 			pk: 1,
 			eventPk: 1,
 			fields: []
-		} as unknown as DatasetDTO;
+		} as unknown as Dataset;
 
 		/*
 		const d2 = {
@@ -99,7 +99,7 @@ describe('DatasetStateService', () => {
 			pk: 2,
 			eventPk: 2,
 			fields: []
-		} as unknown as DatasetDTO;
+		} as unknown as Dataset;
 
 		datasetServiceSpy.getDatasetsForEvent.and.returnValue(of([d1]));
 		datasetServiceSpy.save.and.returnValue(of(d2Modified));

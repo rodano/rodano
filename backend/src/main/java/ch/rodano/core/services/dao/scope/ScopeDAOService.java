@@ -58,6 +58,8 @@ public interface ScopeDAOService {
 
 	Scope getScopeById(String id);
 
+	Scope getScopeByIdAndProject(String id, UUID projectId);
+
 	List<Scope> getScopesByIds(Collection<String> ids);
 
 	List<Scope> getVirtualScopes();

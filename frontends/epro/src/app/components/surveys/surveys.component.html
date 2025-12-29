@@ -19,7 +19,7 @@
 			</ion-text>
 		}
 		@if (events.length > 0) {
-			@for (event of events; track event.id) {
+			@for (event of events; track event.pk) {
 				<app-event-card
 					[scope]="scope"
 					[event]="event"

@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { EventDTO } from '../../api/model/event-dto';
+import { Event } from '../../api/model/event-dto';
 import { EventService } from '../../api/services/event.service';
 import { filter, first, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
 import { AlertController, RefresherCustomEvent, ToastController, IonicModule } from '@ionic/angular';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
+import { Scope } from 'src/app/api/model/scope-dto';
 import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { DatasetDTO } from 'src/app/api/model/dataset-dto';
+import { Dataset } from 'src/app/api/model/dataset-dto';
 import { NavigationEnd, Router } from '@angular/router';
 import { ConfigurationService } from 'src/app/api/services/configuration.service';
 import { EventCardComponent } from '../event-card/event-card.component';
@@ -20,10 +20,10 @@ import { EventCardComponent } from '../event-card/event-card.component';
 export class SurveysComponent implements OnInit, OnDestroy {
 
 	selectedLanguageId: string;
-	scope: ScopeDTO;
-	events: EventDTO[];
+	scope: Scope;
+	events: Event[];
 
-	refresh$: Observable<{ events: EventDTO[]; datasets: DatasetDTO[]; }>;
+	refresh$: Observable<{ events: Event[]; datasets: Dataset[]; }>;
 
 	loading = false;
 
@@ -88,8 +88,8 @@ export class SurveysComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	private getUpdatedScopeAndEvents(): Observable<{ scope: ScopeDTO, events: EventDTO[]}> {
-		return this.configService.getRootScope().pipe(
+	private getUpdatedScopeAndEvents(): Observable<{ scope: Scope, events: Event[]}> {
+		return this.configService.getCurrentScope().pipe(
 			switchMap(scope => {
 				return forkJoin({
 					scope: of(scope),
@@ -115,7 +115,7 @@ export class SurveysComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	public async onDelete(event: EventDTO) {
+	public async onDelete(event: Event) {
 		const alert = await this.alertCtrl.create({
 			header: 'Delete event?',
 			message: 'Are you sure you want to delete this event?',

@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { AuthStateService } from 'src/app/services/auth-state.service';
 import { ConfigurationService } from '../../api/services/configuration.service';
 import { AppService } from '../../services/app.service';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
+import { Scope } from 'src/app/api/model/scope-dto';
 import { environment } from '../../../environments/environment';
-import { StudyDTO } from 'src/app/api/model/study-dto';
+import { Study } from 'src/app/api/model/study-dto';
 import { LocalizerPipe } from '../../pipes/localizer.pipe';
 import { IonicModule } from '@ionic/angular';
 
@@ -17,8 +17,8 @@ import { IonicModule } from '@ionic/angular';
 })
 export class HelpComponent implements OnInit {
 
-	study: StudyDTO;
-	scope: ScopeDTO;
+	study: Study;
+	scope: Scope;
 	platformInfo: string;
 	devMode: boolean;
 	selectedLanguage = 'en';
@@ -33,7 +33,7 @@ export class HelpComponent implements OnInit {
 
 	ngOnInit() {
 		this.configurationService.getStudy().subscribe(study => this.study = study);
-		this.configurationService.getRootScope().subscribe(scope => this.scope = scope);
+		this.configurationService.getCurrentScope().subscribe(scope => this.scope = scope);
 	}
 
 	public logout(): void {

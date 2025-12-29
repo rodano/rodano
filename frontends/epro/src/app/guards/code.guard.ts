@@ -4,6 +4,7 @@ import { AlertController } from '@ionic/angular';
 import { Observable, of } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AuthStateService } from '../services/auth-state.service';
+import { ConfigurationService } from '../api/services/configuration.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -13,7 +14,8 @@ export class CodeGuard {
 	constructor(
 		private router: Router,
 		private authStateService: AuthStateService,
-		private alertCtrl: AlertController
+		private alertCtrl: AlertController,
+		private configurationService: ConfigurationService
 	) { }
 
 	canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> | boolean | UrlTree {
@@ -27,6 +29,9 @@ export class CodeGuard {
 			const code = route.queryParamMap.get('code') as string;
 
 			return this.authStateService.robotLogin(code).pipe(
+				tap(() => {
+					this.configurationService.reloadStudy();
+				}),
 				switchMap(() => of(this.router.parseUrl('/main/surveys'))),
 				catchError(() => {
 					return of(true).pipe(

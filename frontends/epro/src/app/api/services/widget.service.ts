@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { Widget } from '../model/configuration/widget';
-import { WidgetChart } from '../model/widget-chart';
-import { WidgetWorkflowStatus } from '../model/widget-workflow-status';
+import { WorkflowWidget } from '../model/workflow-widget-dto';
+import { Chart } from '../model/chart-dto';
 import { APIService } from './api.service';
-import { PagedResult } from '../model/paged-result';
+import { PagedResultWorkflowStatus } from '../model/paged-result-workflow-status-dto';
 
 @Injectable({
 	providedIn: 'root'
@@ -16,8 +15,8 @@ export class WidgetService {
 		private apiService: APIService
 	) { }
 
-	getWorkflowWidget(widgetId: string): Observable<Widget> {
-		return this.http.get<Widget>(`${this.apiService.getApiUrl()}/widget/workflow/${widgetId}`);
+	getWorkflowWidget(widgetId: string): Observable<WorkflowWidget> {
+		return this.http.get<WorkflowWidget>(`${this.apiService.getApiUrl()}/widget/workflow/${widgetId}`);
 	}
 
 	getWorkflowWidgetData(
@@ -28,8 +27,8 @@ export class WidgetService {
 		descendant: boolean,
 		offset: number,
 		limit: number
-	): Observable<PagedResult<WidgetWorkflowStatus>> {
-		return this.http.get<PagedResult<WidgetWorkflowStatus>>(
+	): Observable<PagedResultWorkflowStatus> {
+		return this.http.get<PagedResultWorkflowStatus>(
 			`${this.apiService.getApiUrl()}/widget/workflow/${widgetId}/data`,
 			{
 				params: {
@@ -48,8 +47,8 @@ export class WidgetService {
 		return `${this.apiService.getApiUrl()}/widget/workflow/${widgetId}/export?scopePks=${scopePks}`;
 	}
 
-	getChartWidgetData(chartId: string, scopePks: number[], criteria): Observable<WidgetChart> {
-		return this.http.post<WidgetChart>(`${this.apiService.getApiUrl()}/widget/chart/${chartId}`, criteria, {params: {scopePks}});
+	getChart(chartId: string, scopePks: number[], criteria: any): Observable<Chart> {
+		return this.http.post<Chart>(`${this.apiService.getApiUrl()}/widget/chart/${chartId}`, criteria, {params: {scopePks}});
 	}
 
 }

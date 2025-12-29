@@ -1,16 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { EventDTO } from '../../api/model/event-dto';
+import { Event } from '../../api/model/event-dto';
 import { EventService } from '../../api/services/event.service';
-import { filter, first, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { filter, skip, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { forkJoin, Observable, of, Subject } from 'rxjs';
-import { AlertController, RefresherCustomEvent, ToastController, IonicModule } from '@ionic/angular';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
+import { AlertController, IonicModule, RefresherCustomEvent, ToastController } from '@ionic/angular';
+import { Scope } from 'src/app/api/model/scope-dto';
 import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { DatasetDTO } from 'src/app/api/model/dataset-dto';
 import { NavigationEnd, Router } from '@angular/router';
 import { ScopeService } from 'src/app/api/services/scope.service';
 import { ConfigurationService } from 'src/app/api/services/configuration.service';
-import { EventModelDTO } from 'src/app/api/model/event-model-dto';
+import { EventModel } from 'src/app/api/model/event-model-dto';
 import { LocalizerPipe } from '../../pipes/localizer.pipe';
 import { EventCardComponent } from '../event-card/event-card.component';
 
@@ -27,11 +26,10 @@ import { EventCardComponent } from '../event-card/event-card.component';
 export class JournalComponent implements OnInit, OnDestroy {
 
 	selectedLanguageId: string;
-	scope: ScopeDTO;
-	events: EventDTO[];
-	availableEventModels: EventModelDTO[];
+	scope: Scope;
+	events: Event[];
+	availableEventModels: EventModel[];
 
-	refresh$: Observable<{ events: EventDTO[]; datasets: DatasetDTO[]; }>;
 
 	loading = false;
 
@@ -48,11 +46,13 @@ export class JournalComponent implements OnInit, OnDestroy {
 	) { }
 
 	ngOnInit() {
+		console.log('🔵 Journal ngOnInit');
 		this.getUpdatedScopeAndEvents().pipe(
 			tap(() => this.loading = true),
 			switchMap(results => {
 				const scope = results.scope;
 				const events = results.events;
+				console.log('🔵 Initial load - events:', events.length);
 				const datasets$ = this.datasetStateService.pullDatasets(scope.pk, events.map(v => v.pk));
 
 				return forkJoin({
@@ -73,58 +73,75 @@ export class JournalComponent implements OnInit, OnDestroy {
 					return 1;
 				}
 			});
-
+			console.log('🔵 Initial load complete - events:', this.events.length, 'models:', this.availableEventModels.length);
 			this.loading = false;
-
-			this.refresh$ = this.getUpdatedScopeAndEvents().pipe(
-				switchMap(updatedResults => {
-					const events = updatedResults.events;
-					const datasets$ = this.datasetStateService.pullDatasets(this.scope.pk, events.map(event => event.pk));
-
-					return forkJoin({
-						events: of(events),
-						datasets: datasets$
-					});
-				}),
-				first()
-			);
 
 			// TODO Same proble as in the surveys component, they should be merged
 			this.router.events.pipe(
-				tap(() => this.loading = true),
+				tap(e => console.log('🟡 Router event:', e)),
 				filter(e => e instanceof NavigationEnd && e.url === '/main/journal'),
-				switchMap(() => this.refresh$),
+				tap(() => console.log('🟢 Navigation to journal detected!')),
+				skip(1),
+				tap(() => {
+					console.log('🟢 After skip(1) - will refresh');
+					this.loading = true;
+				}),
+				switchMap(() => this.getUpdatedScopeAndEvents()),
+				switchMap(updatedResults => {
+					const events = updatedResults.events;
+					console.log('🟢 Refresh - events:', events.length);
+					const datasets$ = this.datasetStateService.pullDatasets(this.scope.pk, events.map(event => event.pk));
+					const eventModels$ = this.scopeService.getAvailableEventModels(this.scope.pk);
+
+					return forkJoin({
+						events: of(events),
+						datasets: datasets$,
+						eventModels: eventModels$
+					});
+				}),
 				takeUntil(this.unsubscribe$)
 			).subscribe(refreshedResults => {
+				console.log('🟢 Refresh complete - events:', refreshedResults.events.length, 'models:', refreshedResults.eventModels.length);
 				this.events = refreshedResults.events;
-
+				this.availableEventModels = refreshedResults.eventModels.sort((a, b) => {
+					if(a.number && b.number) {
+						return a.number - b.number;
+					} else {
+						return 1;
+					}
+				});
 				this.loading = false;
 			});
 		});
 	}
 
-	createEvent(eventModel: EventModelDTO) {
-		this.eventService.create(this.scope.pk, eventModel.id).pipe(
+	createEvent(eventModel: EventModel) {
+		console.log('🔴 Creating event:', eventModel.id);
+		this.eventService.create(this.scope.pk, eventModel.eventModelId).pipe(
 			switchMap(newEvent => {
 				return forkJoin({
 					newEvent: of(newEvent),
-					refresh: this.refresh$
+					datasets: this.datasetStateService.pullDatasets(this.scope.pk, [newEvent.pk]),
 				});
 			}),
 			takeUntil(this.unsubscribe$)
 		).subscribe({
 			next: (results) => {
-				this.events = results.refresh.events;
-
+				console.log('🔴 Event created, navigating to survey');
 				const newEvent = results.newEvent;
 				const newDatasets = this.datasetStateService.getDatasetsForEvent(newEvent.pk);
 
-				this.router.navigate([
-					'/survey',
-					newEvent.scopePk,
-					newEvent.pk,
-					newDatasets[0].pk
-				]);
+				if(newDatasets && newDatasets.length > 0) {
+					this.router.navigate([
+						'/survey',
+						newEvent.scopePk,
+						newEvent.pk,
+						newDatasets[0].pk
+					]);
+				}
+				else {
+					console.error('No dataset found for event: ', newEvent);
+				}
 			},
 			error: async (error) => {
 				console.log(error.error.message);
@@ -142,8 +159,8 @@ export class JournalComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	private getUpdatedScopeAndEvents(): Observable<{ scope: ScopeDTO, events: EventDTO[]}> {
-		return this.configService.getRootScope().pipe(
+	private getUpdatedScopeAndEvents(): Observable<{ scope: Scope, events: Event[]}> {
+		return this.configService.getCurrentScope().pipe(
 			switchMap(scope => {
 				return forkJoin({
 					scope: of(scope),
@@ -162,13 +179,23 @@ export class JournalComponent implements OnInit, OnDestroy {
 	}
 
 	onRefreshEvent($event: RefresherCustomEvent) {
-		this.refresh$.subscribe(refreshedResults => {
+		this.getUpdatedScopeAndEvents().pipe(
+			switchMap(updatedResults => {
+				const events = updatedResults.events;
+				const datasets$ = this.datasetStateService.pullDatasets(this.scope.pk, events.map(event => event.pk));
+
+				return forkJoin({
+					events: of(events),
+					datasets: datasets$
+				});
+			})
+		).subscribe(refreshedResults => {
 			this.events = refreshedResults.events;
 			$event.target.complete();
 		});
 	}
 
-	public async onDelete(event: EventDTO) {
+	public async onDelete(event: Event) {
 		const alert = await this.alertCtrl.create({
 			header: 'Delete event?',
 			message: 'Are you sure you want to delete this event?',

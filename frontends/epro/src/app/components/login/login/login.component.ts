@@ -3,7 +3,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, Reactive
 import { Router, RouterLink } from '@angular/router';
 import { LoadingController, AlertController, IonicModule } from '@ionic/angular';
 import { Subject } from 'rxjs';
-import { PublicStudyDTO } from 'src/app/api/model/public-study-dto';
+import { PublicStudy } from 'src/app/api/model/public-study-dto';
 import { ConfigurationService } from 'src/app/api/services/configuration.service';
 import { AuthStateService } from 'src/app/services/auth-state.service';
 import { LocalizerPipe } from '../../../pipes/localizer.pipe';
@@ -23,7 +23,7 @@ import { LocalizerPipe } from '../../../pipes/localizer.pipe';
 export class LoginComponent implements OnInit, OnDestroy {
 	CODE_REGEX = /[a-z0-9]{8}/;
 
-	study: PublicStudyDTO;
+	study: PublicStudy;
 
 	loginForm: UntypedFormGroup;
 

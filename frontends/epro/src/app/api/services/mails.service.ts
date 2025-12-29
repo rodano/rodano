@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { HttpParamsService } from './http-helper.service';
 import { APIService } from './api.service';
 import { Observable } from 'rxjs';
-import { Mail } from '../model/mail';
-import { PagedResult } from '../model/paged-result';
-import { MailSearch } from '../model/mail-search';
+import { Mail } from '../model/mail-dto';
+import { PagedResultMail } from '../model/paged-result-mail-dto';
+import {MailSearch} from '../utilities/search/mail-search';
 
 @Injectable({
 	providedIn: 'root'
@@ -22,8 +22,8 @@ export class MailsService {
 		return this.http.get<Mail>(`${this.apiService.getApiUrl()}/mails/${mailPk}`);
 	}
 
-	search(predicate: MailSearch): Observable<PagedResult<Mail>> {
-		return this.http.get<PagedResult<Mail>>(`${this.apiService.getApiUrl()}/mails`, {params: this.httpHelper.toHttpParams(predicate)});
+	search(predicate: MailSearch): Observable<PagedResultMail> {
+		return this.http.get<PagedResultMail>(`${this.apiService.getApiUrl()}/mails`, {params: this.httpHelper.toHttpParams(predicate)});
 	}
 
 	getExportUrl(predicate: MailSearch): string {

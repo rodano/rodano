@@ -139,21 +139,20 @@
 				}
 			</div>
 
-			@if (study?.eproEnabled) {
-				<div class="nice-box secondary-box">
-					<h2>{{ study?.eproProfile?.shortname | localizeMap }} access</h2>
-					<p>
-						{{ study?.eproProfile?.shortname | localizeMap }} enrolled in this study can participate using dedicated access.
-					</p>
-					<p>
-						<a
-							mat-flat-button
-							href="/eproapp">
-							{{ study?.eproProfile?.shortname | localizeMap }} access
-						</a>
-					</p>
-				</div>
-			}
+			<div class="nice-box secondary-box">
+				<h2>{{ study?.eproProfile?.shortname | localizeMap }} access</h2>
+				<p>
+					{{ study?.eproProfile?.shortname | localizeMap }} enrolled in this study can participate using dedicated access.
+				</p>
+				<p>
+					<a
+						mat-flat-button
+						href="/eproapp">
+						{{ study?.eproProfile?.shortname | localizeMap }} access
+					</a>
+				</p>
+			</div>
+
 		</div>
 	</div>
 </div>

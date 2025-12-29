@@ -1,4 +1,4 @@
-import { MailOrigin } from '../../enums/mail-origin';
+import { MailOrigin } from '../../model/mail-origin-dto';
 import { PaginatedSearch } from './paginated-search';
 
 export class MailSearch extends PaginatedSearch {

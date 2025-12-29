@@ -99,17 +99,26 @@ public class EproController extends AbstractSecuredController {
 	@Operation(summary = "Get robot")
 	// Warning : if you change this API endpoint, do not forget to change it in the security configuration !
 	@PostMapping("/robot")
-	public EproRobotDTO getRobot(
+	public EproRobotAuthDTO getRobot(
 		@RequestParam final String key
 	) throws InvalidKeyException {
 		//retrieve robot
-		final var projectId = studyService.getStudy().getProjectId();
-		final var robot = robotDAOService.getRobotByKeyAndProject(key, projectId);
+		final var robot = robotDAOService.getRobotByKey(key);
 		if(robot == null) {
 			throw new InvalidKeyException(String.format("No robot found for key %s", key));
 		}
-		final var scope = scopeDAOService.getScopeById(robot.getName());
-		return new EproRobotDTO(scope.getPk(), robot.getName(), robot.getKey());
+		final var scope = scopeDAOService.getScopeByIdAndProject(robot.getName(), robot.getProjectId());
+
+		if(scope == null) {
+			throw new InvalidKeyException(String.format("Scope not found for robot %s", robot.getName()));
+		}
+
+		return new EproRobotAuthDTO(
+			scope.getPk(),
+			robot.getName(),
+			robot.getKey(),
+			robot.getProjectId()
+		);
 	}
 
 	@Operation(summary = "Invite a user")
