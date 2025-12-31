@@ -70,7 +70,7 @@
 .step-number {
 	width: 36px;
 	height: 36px;
-	border-radius: 999px;
+	border-radius: 50%;
 	background-color: var(--mat-sys-primary-container);
 	color: var(--mat-sys-primary);
 	border: 1px solid #98e4e4;
@@ -79,6 +79,7 @@
 	justify-content: center;
 	font: var(--mat-sys-title-small);
 	font-weight: 600;
+	flex-shrink: 0;
 }
 
 .step-content h3 {
@@ -116,8 +117,7 @@
 }
 
 .secondary-box {
-	margin-top: 1.5rem;
-	padding-top: 1.5rem;
+	padding-top: 2rem;
 	border-top: 1px solid rgba(15, 23, 42, 0.08);
 }
 

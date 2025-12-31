@@ -74,6 +74,7 @@ export class AuthStateService {
 			tap(() => {
 				sessionStorage.removeItem(AuthStateService.TOKEN_STORAGE_KEY);
 				this.emitUser(undefined);
+				document.documentElement.style.removeProperty('--mat-sys-primary');
 			})
 		);
 	}

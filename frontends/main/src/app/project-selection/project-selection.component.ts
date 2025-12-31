@@ -73,6 +73,7 @@ export class ProjectSelectionComponent implements OnInit {
 	}
 
 	logout(): void {
+		document.documentElement.style.removeProperty('--mat-sys-primary');
 		this.authStateService.logout().subscribe(
 			() => this.router.navigate(['/login'])
 		);

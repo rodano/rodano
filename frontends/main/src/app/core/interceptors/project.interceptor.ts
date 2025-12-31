@@ -18,7 +18,10 @@ export class ProjectInterceptor implements HttpInterceptor {
 			'/api/auth/recover',
 			'/api/projects/select',
 			'/api/projects',
-			'/api/config/public-file'
+			'/api/config/public-file',
+			'/api/config/public-study',
+			'/api/sessions',
+			'/api/administration'
 		];
 
 		const shouldExclude = excludedUrls.some(url => req.url.includes(url));
