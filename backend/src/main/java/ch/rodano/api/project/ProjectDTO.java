@@ -1,9 +1,13 @@
 package ch.rodano.api.project;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
+
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 
 public record ProjectDTO(
 	@NotNull UUID projectId,
@@ -13,5 +17,10 @@ public record ProjectDTO(
 	Map<String, String> description,
 	String url,
 	String color,
-	String introductionText
-) { }
+	String introductionText,
+	LocalDate versionDate,
+	Long configDate,
+	ProjectStatus status,
+	ZonedDateTime created
+) {
+}

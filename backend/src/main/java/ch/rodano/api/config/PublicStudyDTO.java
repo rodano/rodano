@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import ch.rodano.core.configuration.core.Environment;
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 
 public class PublicStudyDTO {
 	@NotNull
@@ -45,6 +46,9 @@ public class PublicStudyDTO {
 
 	@Nullable
 	ProfileDTO eproProfile;
+
+	@NotNull
+	ProjectStatus projectStatus;
 
 	public UUID getProjectId() {
 		return projectId;
@@ -165,5 +169,13 @@ public class PublicStudyDTO {
 
 	public void setEproProfile(@Nullable final ProfileDTO eproProfile) {
 		this.eproProfile = eproProfile;
+	}
+
+	public ProjectStatus getProjectStatus() {
+		return projectStatus;
+	}
+
+	public void setProjectStatus(final ProjectStatus projectStatus) {
+		this.projectStatus = projectStatus;
 	}
 }

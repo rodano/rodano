@@ -8,6 +8,9 @@ import {NotificationService} from '../services/notification.service';
 import {MailCreation} from '@core/model/mail-creation';
 import {MeService} from '@core/services/me.service';
 import {MailStatus} from '@core/model/mail-status';
+import {Observable} from 'rxjs';
+import { PermissionsService } from '@core/services/permission.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
 	templateUrl: './send-test-mail.component.html',
@@ -17,7 +20,8 @@ import {MailStatus} from '@core/model/mail-status';
 		MatLabel,
 		MatFormField,
 		MatInput,
-		MatButton
+		MatButton,
+		AsyncPipe
 	]
 })
 export class SendTestMailComponent implements OnInit {
@@ -28,13 +32,17 @@ export class SendTestMailComponent implements OnInit {
 		body: new FormControl('This is a test email. If you received this, it\'s working!', [Validators.required])
 	});
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private meService: MeService,
 		private mailService: MailsService,
-		private notificationService: NotificationService
+		private notificationService: NotificationService,
+		private permissionsService: PermissionsService
 	) { }
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		this.meService.get().subscribe(user => this.mailForm.controls.recipient.setValue(user.email));
 	}
 

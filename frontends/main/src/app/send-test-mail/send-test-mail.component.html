@@ -18,7 +18,8 @@
 					name="recipient"
 					formControlName="recipient"
 					autocomplete="off"
-					required />
+					required
+					[readonly]="(canWrite$ | async) === false"/>
 			</mat-form-field>
 		</p>
 
@@ -30,7 +31,8 @@
 					name="subject"
 					formControlName="subject"
 					autocomplete="off"
-					required />
+					required
+					[readonly]="(canWrite$ | async) === false"/>
 			</mat-form-field>
 		</p>
 
@@ -42,17 +44,20 @@
 					name="body"
 					formControlName="body"
 					autocomplete="off"
-					required></textarea>
+					required
+					[readonly]="(canWrite$ | async) === false"></textarea>
 			</mat-form-field>
 		</p>
 
-		<p class="actions">
-			<button
-				mat-flat-button
-				type="submit"
-				[disabled]="mailForm.invalid">
-				Send email
-			</button>
-		</p>
+		@if (canWrite$ | async) {
+			<p class="actions">
+				<button
+					mat-flat-button
+					type="submit"
+					[disabled]="mailForm.invalid">
+					Send email
+				</button>
+			</p>
+		}
 	</form>
 </div>

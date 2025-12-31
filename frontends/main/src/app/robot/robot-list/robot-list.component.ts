@@ -7,7 +7,7 @@ import {Profile} from '@core/model/profile';
 import {MatPaginator} from '@angular/material/paginator';
 import {PagedResultRobot} from '@core/model/paged-result-robot';
 import {RobotSearch} from '@core/utilities/search/robot-search';
-import {Subject, merge} from 'rxjs';
+import {Subject, merge, Observable} from 'rxjs';
 import {GetFieldPipe} from '../../pipes/get-field.pipe';
 import {LookupByIdPipe} from '../../pipes/lookup-by-id.pipe';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -27,6 +27,8 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './robot-list.component.html',
@@ -50,7 +52,8 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatPaginator,
 		LocalizeMapPipe,
 		LookupByIdPipe,
-		GetFieldPipe
+		GetFieldPipe,
+		AsyncPipe
 	]
 })
 export class RobotListComponent implements OnInit {
@@ -73,14 +76,18 @@ export class RobotListComponent implements OnInit {
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private configurationService: ConfigurationService,
 		private robotService: RobotService,
 		private notificationService: NotificationService,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private permissionsService: PermissionsService
 	) {}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		this.sort.active = RobotSearch.DEFAULT_SORT_BY;
 		this.sort.direction = PaginatedSearch.getSortDirection(RobotSearch.DEFAULT_SORT_ASCENDING);
 

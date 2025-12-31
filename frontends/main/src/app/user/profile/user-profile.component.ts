@@ -1,4 +1,5 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {Observable} from 'rxjs';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
@@ -13,6 +14,8 @@ import {Language} from '@core/model/language';
 import {MatOption} from '@angular/material/core';
 import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
 import {MatSelect} from '@angular/material/select';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './user-profile.component.html',
@@ -26,7 +29,8 @@ import {MatSelect} from '@angular/material/select';
 		MatButton,
 		MatOption,
 		AuditTrailButtonComponent,
-		LocalizeMapPipe
+		LocalizeMapPipe,
+		AsyncPipe
 	]
 })
 export class UserProfileComponent implements OnInit, OnChanges {
@@ -41,14 +45,18 @@ export class UserProfileComponent implements OnInit, OnChanges {
 		languageId: new FormControl('')
 	});
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private configurationService: ConfigurationService,
 		private userService: UserService,
 		private notificationService: NotificationService,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private permissionsService: PermissionsService
 	) {}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		this.configurationService.getLanguages().subscribe(languages => {
 			this.languages = languages;
 		});

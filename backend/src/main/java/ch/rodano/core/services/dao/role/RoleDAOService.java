@@ -83,6 +83,15 @@ public interface RoleDAOService {
 	List<Role> getActiveRolesByRobotPkOverScopePk(Long robotPk, Long scopePk);
 
 	/**
+	 * Get the active roles on or over the given user pk and project id
+	 *
+	 * @param userPk    The user pk
+	 * @param projectId The project uuid
+	 * @return The active roles of the user on or over the given user pk and project id
+	 */
+	List<Role> getRolesByUserPkAndProjectId(Long userPk, UUID projectId);
+
+	/**
 	 * Create or update a role
 	 *
 	 * @param role      The role to create or update

@@ -27,6 +27,8 @@ import {FieldModelType} from '@core/model/field-model-type';
 import {FieldService} from '@core/services/field.service';
 import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
 import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-multiple-layout',
@@ -49,7 +51,8 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 		SafeHtmlPipe,
 		LayoutComponent,
 		LocalizeMapPipe,
-		AuditTrailButtonComponent
+		AuditTrailButtonComponent,
+		AsyncPipe
 	]
 })
 export class MultipleLayoutComponent implements OnInit, OnChanges {
@@ -69,6 +72,8 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 
 	shown = true;
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private crfService: CRFService,
 		private visibilityService: VisibilityService,
@@ -77,10 +82,12 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		private fieldService: FieldService,
 		private loggingService: LoggingService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private permissionsService: PermissionsService
 	) {}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		//visibility criteria
 		/*this.visibilityService.layoutCriterionEvents$(this.layout.id).pipe(
 			takeUntilDestroyed(this.destroyRef)

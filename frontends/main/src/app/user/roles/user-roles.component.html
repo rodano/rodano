@@ -101,47 +101,49 @@
 		*matRowDef="let row; columns: displayedColumns"></tr>
 </table>
 
-<form
-	[formGroup]="roleForm"
-	(ngSubmit)="addRole()">
-	<mat-card appearance="outlined">
-		<mat-card-header>
-			<mat-card-title>Add a role</mat-card-title>
-		</mat-card-header>
-		<mat-card-content>
-			<div class="inline-fields">
-				<mat-form-field>
-					<mat-label>Profile</mat-label>
-					<mat-select
-						formControlName="profile"
-						required>
-						@for (profile of profiles | sort: 'id'; track profile.profileId) {
-							<mat-option [value]="profile.profileId">
-								{{ profile.shortname | localizeMap }}
-							</mat-option>
-						}
-					</mat-select>
-				</mat-form-field>
+@if (canWrite$ | async) {
+	<form
+		[formGroup]="roleForm"
+		(ngSubmit)="addRole()">
+		<mat-card appearance="outlined">
+			<mat-card-header>
+				<mat-card-title>Add a role</mat-card-title>
+			</mat-card-header>
+			<mat-card-content>
+				<div class="inline-fields">
+					<mat-form-field>
+						<mat-label>Profile</mat-label>
+						<mat-select
+							formControlName="profile"
+							required>
+							@for (profile of profiles | sort: 'id'; track profile.profileId) {
+								<mat-option [value]="profile.profileId">
+									{{ profile.shortname | localizeMap }}
+								</mat-option>
+							}
+						</mat-select>
+					</mat-form-field>
 
-				<span>on</span>
+					<span>on</span>
 
-				<mat-form-field class="scope-picker">
-					<mat-label>Scope</mat-label>
-					<app-scope-picker
-						formControlName="scopePk"
-						[scopes]="scopes"
-						required></app-scope-picker>
-				</mat-form-field>
-			</div>
-		</mat-card-content>
-		<mat-card-actions align="end">
-			<button
-				mat-flat-button
-				type="submit"
-				[disabled]="roleForm.invalid">
-				<mat-icon>add</mat-icon>
-				Add role
-			</button>
-		</mat-card-actions>
-	</mat-card>
-</form>
+					<mat-form-field class="scope-picker">
+						<mat-label>Scope</mat-label>
+						<app-scope-picker
+							formControlName="scopePk"
+							[scopes]="scopes"
+							required></app-scope-picker>
+					</mat-form-field>
+				</div>
+			</mat-card-content>
+			<mat-card-actions align="end">
+				<button
+					mat-flat-button
+					type="submit"
+					[disabled]="roleForm.invalid">
+					<mat-icon>add</mat-icon>
+					Add role
+				</button>
+			</mat-card-actions>
+		</mat-card>
+	</form>
+}

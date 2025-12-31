@@ -11,7 +11,9 @@ import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.helpers.time.TimeHelper;
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 import ch.rodano.core.model.role.Role;
+import ch.rodano.core.services.bll.project.ProjectService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.utils.ACL;
 import ch.rodano.core.utils.RightsService;
@@ -25,6 +27,7 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 	private final WorkflowDTOService workflowDTOService;
 	private final ConfigDTOService configDTOService;
 	private final Configurator configurator;
+	private final ProjectService projectService;
 
 	public StudyDTOServiceImpl(
 		final RightsService rightsService,
@@ -32,14 +35,15 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 		final WorkflowDTOService workflowDTOService,
 		final ConfigDTOService configDTOService,
 		final RoleService roleService,
-		final Configurator configurator
-	) {
+		final Configurator configurator,
+		final ProjectService projectService) {
 		this.roleService = roleService;
 		this.rightsService = rightsService;
 		this.menuDTOService = menuDTOService;
 		this.workflowDTOService = workflowDTOService;
 		this.configDTOService = configDTOService;
 		this.configurator = configurator;
+		this.projectService = projectService;
 	}
 
 	private void updateDTO(final PublicStudyDTO dto, final Study study, final ACL acl) {
@@ -68,6 +72,14 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 		dto.leafScopeModel = configDTOService.createScopeModelDTO(study.getLeafScopeModel(), acl);
 
 		dto.eproProfile = study.isEproEnabled() && StringUtils.isNotBlank(study.getEproProfileId()) ? new ProfileDTO(study.getEproProfile()) : null;
+
+		try {
+			final var project = projectService.getProjectById(study.getProjectId());
+			dto.projectStatus = project.getStatus();
+		}
+		catch(Exception e) {
+			dto.projectStatus = ProjectStatus.ACTIVE;
+		}
 	}
 
 	@Override

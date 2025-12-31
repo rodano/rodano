@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject, Observable, switchMap} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {PublicStudy} from '@core/model/public-study';
+import {ProjectStatus} from '@core/model/project-status';
 
 export interface Project {
 	projectId: string;
@@ -13,6 +14,10 @@ export interface Project {
 	url: string;
 	color: string;
 	introductionText: string;
+	versionDate?: string;
+	configDate?: number;
+	status?: ProjectStatus;
+	created?: Date;
 }
 
 @Injectable({
@@ -40,6 +45,7 @@ export class ProjectService {
 
 	selectProject(projectId: string): Observable<PublicStudy> {
 		return this.http.post<PublicStudy>(`/api/projects/select/${projectId}`, {}).pipe(
+			switchMap(() => this.http.get<PublicStudy>('/api/config/public-study')),
 			tap(study => {
 				localStorage.setItem('currentProjectId', projectId);
 				this.currentProjectIdSubject.next(projectId);
@@ -52,7 +58,8 @@ export class ProjectService {
 					description: {},
 					url: study.url,
 					color: study.color,
-					introductionText: study.introductionText || ''
+					introductionText: study.introductionText || '',
+					status: study.projectStatus
 				};
 				this.currentProjectSubject.next(project);
 			})
@@ -81,5 +88,9 @@ export class ProjectService {
 
 	hasProjectSelected(): boolean {
 		return this.currentProjectIdSubject.value !== null;
+	}
+
+	updateProjectStatus(projectId: string, status: ProjectStatus): Observable<Project> {
+		return this.http.put<Project>(`/api/projects/${projectId}/status`, {status});
 	}
 }

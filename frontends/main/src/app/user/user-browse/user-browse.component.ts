@@ -14,12 +14,14 @@ import {UserListComponent} from '../user-list/user-list.component';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
 import {ScopeMini} from '@core/model/scope-mini';
 import {MeService} from '@core/services/me.service';
-import {forkJoin} from 'rxjs';
+import {forkJoin, Observable} from 'rxjs';
 import {User} from '@core/model/user';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {RoleStatus} from '@core/model/role-status';
 import {getRoleStatusDisplay} from '../role-status-display';
 import {FeatureStatic} from '@core/model/feature-static';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './user-browse.component.html',
@@ -36,7 +38,8 @@ import {FeatureStatic} from '@core/model/feature-static';
 		MatIcon,
 		LocalizeMapPipe,
 		UserListComponent,
-		ScopePickerComponent
+		ScopePickerComponent,
+		AsyncPipe
 	]
 })
 export class UserBrowseComponent implements OnInit {
@@ -59,13 +62,17 @@ export class UserBrowseComponent implements OnInit {
 		externallyManaged: new FormControl('', {nonNullable: true})
 	});
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private configurationService: ConfigurationService,
 		private meService: MeService,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private permissionsService: PermissionsService
 	) {}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		forkJoin({
 			profiles: this.configurationService.getProfiles(),
 			scopes: this.meService.getScopes(undefined, true, false),

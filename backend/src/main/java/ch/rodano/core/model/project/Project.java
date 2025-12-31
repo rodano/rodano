@@ -1,7 +1,12 @@
 package ch.rodano.core.model.project;
 
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.UUID;
+
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
+
 
 public class Project {
 
@@ -14,6 +19,10 @@ public class Project {
 	private String email;
 	private String color;
 	private String introductionText;
+	private LocalDate versionDate;
+	private Long configDate;
+	private ProjectStatus status;
+	private ZonedDateTime createdDate;
 
 	public UUID getProjectId() {
 		return projectId;
@@ -85,5 +94,37 @@ public class Project {
 
 	public void setIntroductionText(final String introductionText) {
 		this.introductionText = introductionText;
+	}
+
+	public LocalDate getVersionDate() {
+		return versionDate;
+	}
+
+	public void setVersionDate(final LocalDate versionDate) {
+		this.versionDate = versionDate;
+	}
+
+	public Long getConfigDate() {
+		return configDate;
+	}
+
+	public void setConfigDate(final Long configDate) {
+		this.configDate = configDate;
+	}
+
+	public ProjectStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(final ProjectStatus status) {
+		this.status = status;
+	}
+
+	public ZonedDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(final ZonedDateTime createdDate) {
+		this.createdDate = createdDate;
 	}
 }

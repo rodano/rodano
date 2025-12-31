@@ -167,6 +167,15 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 	}
 
 	@Override
+	public List<Role> getRolesByUserPkAndProjectId(final Long userPk, final UUID projectId) {
+		final var query = create.selectFrom(ROLE)
+			.where(ROLE.USER_FK.eq(userPk))
+			.and(ROLE.PROJECT_ID.eq(projectId));
+
+		return find(query);
+	}
+
+	@Override
 	public void saveRole(final Role role, final DatabaseActionContext context, final String rationale) {
 		if(role.getProjectId() == null) {
 			role.setProjectId(studyService.getStudy().getProjectId());

@@ -30,6 +30,8 @@ create table if not exists project (
     config_version int null,
     config_date bigint null,
     config_user varchar(128) null,
+	status enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null default 'ACTIVE',
+	created datetime(3) not null default current_timestamp(3),
     constraint pk_project primary key (project_id),
     constraint uq_project_code unique (code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;

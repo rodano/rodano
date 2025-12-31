@@ -4,8 +4,10 @@
 package ch.rodano.core.model.jooq.tables;
 
 
+import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 import ch.rodano.core.model.jooq.tables.AuditAction.AuditActionPath;
 import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
 import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
@@ -29,6 +31,7 @@ import ch.rodano.core.model.jooq.tables.WorkflowState.WorkflowStatePath;
 import ch.rodano.core.model.jooq.tables.records.ProjectRecord;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -198,6 +201,16 @@ public class Project extends TableImpl<ProjectRecord> {
 	 * The column <code>project.config_user</code>.
 	 */
 	public final TableField<ProjectRecord, String> CONFIG_USER = createField(DSL.name("config_user"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
+	 * The column <code>project.status</code>.
+	 */
+	public final TableField<ProjectRecord, ProjectStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(8).nullable(false).defaultValue(DSL.field(DSL.raw("'ACTIVE'"), SQLDataType.VARCHAR)).asEnumDataType(ProjectStatus.class), this, "");
+
+	/**
+	 * The column <code>project.created</code>.
+	 */
+	public final TableField<ProjectRecord, ZonedDateTime> CREATED = createField(DSL.name("created"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
 
 	private Project(Name alias, Table<ProjectRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

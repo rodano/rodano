@@ -28,7 +28,8 @@
 			<input
 				matInput
 				formControlName="name"
-				required />
+				required
+				[readonly]="(canWrite$ | async) === false"/>
 		</mat-form-field>
 		@if (robot) {
 			<app-audit-trail-button
@@ -43,7 +44,8 @@
 			<input
 				matInput
 				formControlName="key"
-				placeholder="Key" />
+				placeholder="Key"
+				[readonly]="(canWrite$ | async) === false"/>
 			<mat-hint>Leave blank to auto generate a key</mat-hint>
 		</mat-form-field>
 	</p>
@@ -71,12 +73,14 @@
 		</p>
 	}
 
-	<p class="actions">
-		<button
-			mat-flat-button
-			type="submit"
-			[disabled]="robotForm.invalid">
-			Save
-		</button>
-	</p>
+	@if (canWrite$ | async) {
+		<p class="actions">
+			<button
+				mat-flat-button
+				type="submit"
+				[disabled]="robotForm.invalid">
+				Save
+			</button>
+		</p>
+	}
 </form>

@@ -11,40 +11,166 @@
 	</header>
 
 	<div class="content-wrapper">
-		<div class="page-header">
-			<h1>Select a Project</h1>
-			<p class="subtitle">Choose a study to continue</p>
-		</div>
-
-		@if (loading) {
-			<div class="loading-state">
-				<p>Loading projects...</p>
+		<aside class="sidebar">
+			<div class="filters-header">
+				<h3>Filters</h3>
+				@if (hasActiveFilters()) {
+					<button class="clear-filters" (click)="clearFilters()">
+						Clear All
+					</button>
+				}
 			</div>
-		}
 
-		@if (!loading && projects.length === 0) {
+			<div class="search-box">
+				<mat-icon>search</mat-icon>
+				<input
+					type="text"
+					placeholder="Search projects..."
+					[(ngModel)]="searchTerm"
+					(input)="applyFilters()" />
+			</div>
+
+			<div class="filter-section">
+				<h4>Status</h4>
+				<div class="filter-options">
+					<label class="status-toggle" [class.selected]="filters.showActive">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showActive"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge active">Active</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showClosed">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showClosed"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge closed">Closed</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showArchived">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showArchived"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge archived">Archived</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Created Date</h4>
+				<div class="date-filters">
+					<div class="date-input-group">
+						<label>From</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.createdAfter"
+							(change)="applyFilters()"
+							class="date-input" />
+					</div>
+					<div class="date-input-group">
+						<label>To</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.createdBefore"
+							(change)="applyFilters()"
+							class="date-input" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Sort By</h4>
+				<select
+					[(ngModel)]="sortBy"
+					(change)="applyFilters()"
+					class="sort-select">
+					<option value="name">Name (A-Z)</option>
+					<option value="nameDesc">Name (Z-A)</option>
+					<option value="createdNewest">Created (Newest First)</option>
+					<option value="createdOldest">Created (Oldest First)</option>
+					<option value="updatedNewest">Updated (Newest First)</option>
+					<option value="updatedOldest">Updated (Oldest First)</option>
+				</select>
+			</div>
+		</aside>
+
+		<main class="main-content">
+			<div class="page-header">
+				<h1>Select a Project</h1>
+				<p>Choose a study to continue</p>
+			</div>
+
+			@if (loading) {
+				<div class="loading-state">
+					<mat-spinner></mat-spinner>
+					<p>Loading projects...</p>
+				</div>
+			} @else if (filteredProjects.length === 0) {
 			<div class="empty-state">
-				<p>No projects available.</p>
-				<p class="empty-subtitle">Please contact your administrator.</p>
+				<mat-icon>folder_open</mat-icon>
+				<p>No projects found</p>
+				@if (hasActiveFilters()) {
+					<button
+						mat-stroked-button
+						(click)="clearFilters()">
+						Clear Filters
+					</button>
+				}
 			</div>
-		}
+		} @else {
+			<div class="projects-grid">
+				@for (project of filteredProjects; track project.projectId) {
+					<div
+						class="project-card"
+						[class.selecting]="selectingProject === project.projectId"
+						[style.border-top-color]="project.color"
+						(click)="selectProject(project.projectId)">
 
-		@if (!loading && projects.length > 0) {
-			<div class="projects-container">
-				@for (project of projects; track project.projectId) {
-					<div class="project-card"
-										[class.selecting]="selectingProject"
-										(click)="!selectingProject && selectProject(project.projectId)"
-					>
-						<div class="project-color-indicator" [style.background-color]="project.color"></div>
-						<div class="project-content">
-							<div class="project-headr">
-								<h2 class="project-title">{{ project.shortname['en'] || project.code }}</h2>
+						<div class="card-header">
+							<span class="status-badge"
+													[style.background-color]="project.color"
+													style="color: white"
+							>{{ project.shortname['en'] || project.code }}</span>
+							<span
+								class="status-badge"
+								[class.active]="project.status === 'ACTIVE'"
+								[class.closed]="project.status === 'CLOSED'"
+								[class.archived]="project.status === 'ARCHIVED'">
+								{{ project.status }}
+							</span>
+						</div>
+
+						<p class="project-subtitle">
+							{{ project.longname['en'] }}
+						</p>
+
+						<div class="project-description-wrapper">
+							<div
+								class="project-description"
+								[class.expanded]="expandedProjects.has(project.projectId)"
+								[innerHTML]="getDescription(project)">
 							</div>
-							@if (project.introductionText) {
-								<div class="project-intro">
-									<h4 class="intro-title">{{ parseIntroductionText(project.introductionText).title }}</h4>
-									<p class="intro-description">{{ parseIntroductionText(project.introductionText).description }}</p>
+							@if (shouldShowViewMore(project)) {
+								<button
+									class="view-more-btn"
+									(click)="toggleDescription($event, project.projectId)">
+									{{ expandedProjects.has(project.projectId) ? 'View Less' : 'View More' }}
+									<mat-icon>
+										{{ expandedProjects.has(project.projectId) ? 'expand_less' : 'expand_more' }}
+									</mat-icon>
+								</button>
+							}
+						</div>
+
+						<div class="card-footer">
+							@if (project.created) {
+								<div class="footer-item">
+									<mat-icon>event</mat-icon>
+									<span>Created: {{ project.created | date:'longDate' }}</span>
 								</div>
 							}
 						</div>
@@ -52,6 +178,7 @@
 				}
 			</div>
 		}
+		</main>
 	</div>
 
 	@if (selectingProject) {

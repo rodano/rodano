@@ -1,4 +1,5 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {Observable} from 'rxjs';
 import {Cell} from '@core/model/cell';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
@@ -38,6 +39,8 @@ import {WorkflowStatusImportantPipe} from 'src/app/pipes/workflow-status-importa
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusNotImportantPipe} from 'src/app/pipes/workflow-status-not-important';
 import {FeatureStatic} from '@core/model/feature-static';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-field',
@@ -63,7 +66,8 @@ import {FeatureStatic} from '@core/model/feature-static';
 		WorkflowStatusComponent,
 		WorkflowStatusImportantPipe,
 		WorkflowStatusNotImportantPipe,
-		LocalizeFieldModelPipe
+		LocalizeFieldModelPipe,
+		AsyncPipe
 	]
 })
 export class FieldComponent implements OnInit, OnChanges {
@@ -79,6 +83,9 @@ export class FieldComponent implements OnInit, OnChanges {
 	debug = undefined as string | undefined;
 	displayAuditTrail = false;
 
+	canWrite$: Observable<boolean>;
+	private canWriteValue = true;
+
 	constructor(
 		private crfService: CRFService,
 		private authStateService: AuthStateService,
@@ -86,11 +93,27 @@ export class FieldComponent implements OnInit, OnChanges {
 		private workflowActionService: WorkflowActionService,
 		private administrationService: AdministrationService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private permissionsService: PermissionsService
 	) {
 	}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
+
+		this.canWrite$.pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(canWrite => {
+			this.canWriteValue = canWrite;
+
+			if(this.getDisabled()) {
+				this.control.disable();
+			}
+			else {
+				this.control.enable();
+			}
+		});
+
 		//subscribe to value change only after the initial value is set
 		this.control.valueChanges.pipe(
 			takeUntilDestroyed(this.destroyRef)
@@ -173,7 +196,7 @@ export class FieldComponent implements OnInit, OnChanges {
 	}
 
 	getDisabled(): boolean {
-		return this.field.model.dynamic || this.field.model.readOnly || this.disabled;
+		return this.field.model.dynamic || this.field.model.readOnly || this.disabled || !this.canWriteValue;
 	}
 
 	isEmptyObject(object: any): boolean {

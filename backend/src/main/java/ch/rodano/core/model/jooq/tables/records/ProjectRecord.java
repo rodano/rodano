@@ -4,9 +4,11 @@
 package ch.rodano.core.model.jooq.tables.records;
 
 
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 import ch.rodano.core.model.jooq.tables.Project;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import org.jooq.Record1;
@@ -357,6 +359,34 @@ public class ProjectRecord extends UpdatableRecordImpl<ProjectRecord> {
 		return (String) get(23);
 	}
 
+	/**
+	 * Setter for <code>project.status</code>.
+	 */
+	public void setStatus(ProjectStatus value) {
+		set(24, value);
+	}
+
+	/**
+	 * Getter for <code>project.status</code>.
+	 */
+	public ProjectStatus getStatus() {
+		return (ProjectStatus) get(24);
+	}
+
+	/**
+	 * Setter for <code>project.created</code>.
+	 */
+	public void setCreated(ZonedDateTime value) {
+		set(25, value);
+	}
+
+	/**
+	 * Getter for <code>project.created</code>.
+	 */
+	public ZonedDateTime getCreated() {
+		return (ZonedDateTime) get(25);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -380,7 +410,7 @@ public class ProjectRecord extends UpdatableRecordImpl<ProjectRecord> {
 	/**
 	 * Create a detached, initialised ProjectRecord
 	 */
-	public ProjectRecord(UUID projectId, String code, String shortname, String longname, String description, String url, String email, String color, String introductionText, Boolean smtpTls, Boolean passwordStrong, Integer passwordLength, Integer passwordValidityDuration, Boolean passwordUnique, Boolean eproEnabled, UUID eproProfileId, String clientName, String clientEmail, String protocolNo, String versionNumber, LocalDate versionDate, Integer configVersion, Long configDate, String configUser) {
+	public ProjectRecord(UUID projectId, String code, String shortname, String longname, String description, String url, String email, String color, String introductionText, Boolean smtpTls, Boolean passwordStrong, Integer passwordLength, Integer passwordValidityDuration, Boolean passwordUnique, Boolean eproEnabled, UUID eproProfileId, String clientName, String clientEmail, String protocolNo, String versionNumber, LocalDate versionDate, Integer configVersion, Long configDate, String configUser, ProjectStatus status, ZonedDateTime created) {
 		super(Project.PROJECT);
 
 		setProjectId(projectId);
@@ -407,6 +437,8 @@ public class ProjectRecord extends UpdatableRecordImpl<ProjectRecord> {
 		setConfigVersion(configVersion);
 		setConfigDate(configDate);
 		setConfigUser(configUser);
+		setStatus(status);
+		setCreated(created);
 		resetChangedOnNotNull();
 	}
 }

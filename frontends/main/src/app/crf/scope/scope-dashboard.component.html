@@ -25,38 +25,40 @@
 		}
 	</div>
 
-	<p class="actions">
-		@if (scope.removed) {
-			<button
-				mat-flat-button
-				(click)="restore()"
-				type="button">
-				Restore
-			</button>
-		} @else {
-			@if (scope.locked) {
+	@if (canWrite$ | async) {
+		<p class="actions">
+			@if (scope.removed) {
 				<button
 					mat-flat-button
-					(click)="unlock()"
+					(click)="restore()"
 					type="button">
-					Unlock
+					Restore
 				</button>
 			} @else {
-				<button
-					mat-flat-button
-					(click)="remove()"
-					type="button">
-					Remove
-				</button>
-				<button
-					mat-flat-button
-					(click)="lock()"
-					type="button">
-					Lock
-				</button>
+				@if (scope.locked) {
+					<button
+						mat-flat-button
+						(click)="unlock()"
+						type="button">
+						Unlock
+					</button>
+				} @else {
+					<button
+						mat-flat-button
+						(click)="remove()"
+						type="button">
+						Remove
+					</button>
+					<button
+						mat-flat-button
+						(click)="lock()"
+						type="button">
+						Lock
+					</button>
+				}
 			}
-		}
-	</p>
+		</p>
+	}
 
 	<app-issue-viewer [scopePks]="[scope.pk]"></app-issue-viewer>
 </div>

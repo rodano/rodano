@@ -102,18 +102,21 @@
 			@if (hasBeenInvited(scope)) {
 				<button
 					(click)="invite(scope)"
-					mat-stroked-button>
+					mat-stroked-button
+					[disabled]="(canWrite$ | async) === false">
 					Show invitation
 				</button>
 				<button
 					(click)="revoke(scope)"
-					mat-stroked-button>
+					mat-stroked-button
+					[disabled]="(canWrite$ | async) === false">
 					Revoke
 				</button>
 			} @else {
 				<button
 					(click)="invite(scope)"
-					mat-stroked-button>
+					mat-stroked-button
+					[disabled]="(canWrite$ | async) === false">
 					Invite
 				</button>
 			}

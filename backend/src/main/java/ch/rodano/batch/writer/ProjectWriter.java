@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.Project;
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.core.model.jooq.tables.Project.PROJECT;
@@ -71,6 +72,7 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.SHORTNAME, toJson(project.getShortname()))
 					.set(PROJECT.LONGNAME, toJson(project.getLongname()))
 					.set(PROJECT.DESCRIPTION, toJson(project.getDescription()))
+					.set(PROJECT.STATUS, ProjectStatus.ACTIVE)
 					.onDuplicateKeyUpdate()
 					.set(PROJECT.URL, project.getUrl())
 					.set(PROJECT.EMAIL, project.getEmail())
@@ -93,6 +95,7 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.SHORTNAME, toJson(project.getShortname()))
 					.set(PROJECT.LONGNAME, toJson(project.getLongname()))
 					.set(PROJECT.DESCRIPTION, toJson(project.getDescription()))
+					.set(PROJECT.STATUS, ProjectStatus.ACTIVE)
 					.execute();
 
 				if(project.getLanguageIds() != null) {

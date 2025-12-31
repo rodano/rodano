@@ -40,11 +40,12 @@ import {Operator} from '@core/model/operator';
 import {DateUTCPipe} from '../pipes/date-utc.pipe';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
-import {LowerCasePipe} from '@angular/common';
+import {AsyncPipe, LowerCasePipe} from '@angular/common';
 import {FormModel} from '@core/model/form-model';
 import {FormService} from '@core/services/form.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
+import {PermissionsService} from '@core/services/permission.service';
 
 @Component({
 	selector: 'app-search',
@@ -72,7 +73,8 @@ import {Rights} from '@core/model/rights';
 		MatOption,
 		MatDatepickerModule,
 		DateUTCPipe,
-		LowerCasePipe
+		LowerCasePipe,
+		AsyncPipe
 	]
 })
 export class SearchComponent implements OnInit {
@@ -133,6 +135,8 @@ export class SearchComponent implements OnInit {
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private configurationService: ConfigurationService,
 		private scopeService: ScopeService,
@@ -145,10 +149,12 @@ export class SearchComponent implements OnInit {
 		private dialog: MatDialog,
 		private destroyRef: DestroyRef,
 		private formService: FormService,
-		private scopeRelationService: ScopeRelationsService
+		private scopeRelationService: ScopeRelationsService,
+		private permissionService: PermissionsService
 	) {}
 
 	ngOnInit(): void {
+		this.canWrite$ = this.permissionService.canWrite();
 		this.initializeData();
 		this.sort.active = 'scopeCode';
 		this.sort.direction = 'asc';

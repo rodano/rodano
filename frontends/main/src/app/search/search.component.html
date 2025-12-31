@@ -1,13 +1,15 @@
-<p>
-	<button
-		mat-flat-button
-		(click)="createPatient()"
-		[disabled]="!writeAccessOnParent"
-		type="button">
-		<mat-icon>add</mat-icon>
-		New {{ leafScopeModel.shortname | localizeMap | lowercase }}
-	</button>
-</p>
+@if (canWrite$ | async) {
+	<p>
+		<button
+			mat-flat-button
+			(click)="createPatient()"
+			[disabled]="!writeAccessOnParent"
+			type="button">
+			<mat-icon>add</mat-icon>
+			New {{ leafScopeModel.shortname | localizeMap | lowercase }}
+		</button>
+	</p>
+}
 
 @if (loading) {
 	<mat-progress-bar mode="indeterminate"></mat-progress-bar>

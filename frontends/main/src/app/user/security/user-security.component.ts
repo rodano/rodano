@@ -15,7 +15,9 @@ import {ChangePasswordComponent} from 'src/app/change-password/change-password.c
 import {ChangePasswordContext} from 'src/app/change-password/change-password-context';
 import {UserPasswordDialogResult} from '../dialogs/user-password-dialog-result';
 import {DeleteRestoreComponent} from 'src/app/crf/dialogs/delete-restore/delete-restore.component';
-import {of} from 'rxjs';
+import {of, Observable} from 'rxjs';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './user-security.component.html',
@@ -27,7 +29,8 @@ import {of} from 'rxjs';
 		MatFormField,
 		MatInput,
 		MatButton,
-		ChangePasswordComponent
+		ChangePasswordComponent,
+		AsyncPipe
 	]
 })
 export class UserSecurityComponent implements OnChanges {
@@ -45,14 +48,18 @@ export class UserSecurityComponent implements OnChanges {
 
 	passwordErrorMessage: string;
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private userService: UserService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private permissionsService: PermissionsService
 	) {}
 
 	ngOnChanges() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		this.emailForm.controls.email.setValue(this.user.pendingEmail || this.user.email);
 	}
 

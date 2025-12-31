@@ -16,7 +16,11 @@ public class ProjectMapper {
 			project.getDescription(),
 			project.getUrl(),
 			project.getColor(),
-			project.getIntroductionText()
+			project.getIntroductionText(),
+			project.getVersionDate(),
+			project.getConfigDate(),
+			project.getStatus(),
+			project.getCreatedDate()
 		);
 	}
 }

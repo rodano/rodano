@@ -13,6 +13,11 @@
 	</button>
 </p>
 
+@if (isAdmin) {
+	<h3>Project Status</h3>
+	<app-project-status-manager></app-project-status-manager>
+}
+
 <h3>Maintenance mode</h3>
 <p>
 	<button

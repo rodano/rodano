@@ -27,6 +27,8 @@ import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
 import {getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './user-roles.component.html',
@@ -48,7 +50,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 		MatIcon,
 		MatTooltip,
 		AuditTrailButtonComponent,
-		ScopePickerComponent
+		ScopePickerComponent,
+		AsyncPipe
 	]
 })
 export class UserRolesComponent implements OnInit {
@@ -80,15 +83,20 @@ export class UserRolesComponent implements OnInit {
 		})
 	});
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private configurationService: ConfigurationService,
 		private roleService: RoleService,
 		private notificationService: NotificationService,
 		private authStateService: AuthStateService,
 		private destroyRef: DestroyRef,
-		private meService: MeService) {}
+		private meService: MeService,
+		private permissionsService: PermissionsService
+	) {}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		forkJoin({
 			profiles: this.configurationService.getProfiles(),
 			scopes: this.meService.getScopes(undefined, true, false),

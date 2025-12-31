@@ -7,6 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ProjectStatus } from './project-status';
 import { Language } from './language';
 import { FormModel } from './form-model';
 import { ScopeModel } from './scope-model';
@@ -33,6 +34,7 @@ export interface Study {
     environment: Environment;
     leafScopeModel: ScopeModel;
     eproProfile?: Profile;
+    projectStatus: ProjectStatus;
     email: string;
     clientEmail: string;
     welcomeText: string;

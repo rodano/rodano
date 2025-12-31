@@ -12,4 +12,6 @@ public interface ProjectService {
 	List<Project> getProjectsForActor(Long actorPk);
 
 	Project getProjectById(UUID projectId);
+
+	void updateProject(Project project);
 }

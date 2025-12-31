@@ -10,10 +10,12 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {MatDialog} from '@angular/material/dialog';
 import {DeleteRestoreComponent} from 'src/app/crf/dialogs/delete-restore/delete-restore.component';
-import {of, switchMap} from 'rxjs';
+import {of, switchMap, Observable} from 'rxjs';
 import {WorkflowStatusComponent} from 'src/app/crf/workflow-status/workflow-status.component';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {Workflowable} from '@core/utilities/workflowable';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './scope-settings.component.html',
@@ -26,7 +28,8 @@ import {Workflowable} from '@core/utilities/workflowable';
 		MatButton,
 		MatDatepickerModule,
 		AuditTrailButtonComponent,
-		WorkflowStatusComponent
+		WorkflowStatusComponent,
+		AsyncPipe
 	]
 })
 export class ScopeSettingsComponent implements OnInit {
@@ -45,14 +48,18 @@ export class ScopeSettingsComponent implements OnInit {
 		stopDate: [new Date(), []]
 	});
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private formBuilder: FormBuilder,
 		private scopeService: ScopeService,
 		private notificationService: NotificationService,
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private permissionsService: PermissionsService
 	) { }
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		this.updateForm();
 	}
 

@@ -1,6 +1,7 @@
 package ch.rodano.core.services.bll.role;
 
 import java.util.List;
+import java.util.UUID;
 
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.profile.Profile;
@@ -25,6 +26,8 @@ public interface RoleService {
 	List<Role> getRoles(Actor actor, FeatureStatic feature);
 
 	List<Role> getRoles(Scope scope, Profile profile);
+
+	List<Role> getRolesForUser(Long userPk, UUID projectId);
 
 	/**
 	 * Get all the active roles associated with the actor

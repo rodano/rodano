@@ -1,4 +1,5 @@
 import {booleanAttribute, Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Observable} from 'rxjs';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowActionService} from '../services/workflow-action.service';
@@ -15,6 +16,8 @@ import {Form} from '@core/model/form';
 import {Field} from '@core/model/field';
 import {Workflow} from '@core/model/workflow';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-workflow-status',
@@ -25,7 +28,8 @@ import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-
 		MatFormFieldModule,
 		MatButton,
 		LocalizeMapPipe,
-		AuditTrailButtonComponent
+		AuditTrailButtonComponent,
+		AsyncPipe
 	]
 })
 export class WorkflowStatusComponent implements OnChanges {
@@ -42,12 +46,16 @@ export class WorkflowStatusComponent implements OnChanges {
 
 	@Output() actionResponse = new EventEmitter<Workflowable>();
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private workflowActionService: WorkflowActionService,
-		private crfChangeService: CRFChangeService
+		private crfChangeService: CRFChangeService,
+		private permissionsService: PermissionsService
 	) { }
 
 	ngOnChanges() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		if(this.workflowStatus) {
 			this.workflow = this.workflowStatus.workflow;
 		}

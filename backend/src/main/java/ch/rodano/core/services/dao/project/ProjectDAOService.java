@@ -25,4 +25,11 @@ public interface ProjectDAOService {
 	 * @param projectId The project's UUID
 	 */
 	Project getProjectById(UUID projectId);
+
+	/**
+	 * Update the project
+	 *
+	 * @param project Entire project
+	 */
+	void updateProject(Project project);
 }

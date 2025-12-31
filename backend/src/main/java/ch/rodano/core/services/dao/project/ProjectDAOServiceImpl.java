@@ -66,7 +66,19 @@ public class ProjectDAOServiceImpl implements ProjectDAOService {
 		project.setEmail(record.getEmail());
 		project.setColor(record.getColor());
 		project.setIntroductionText(record.getIntroductionText());
+		project.setVersionDate(record.getVersionDate());
+		project.setConfigDate(record.getConfigDate());
+		project.setStatus(record.getStatus());
+		project.setCreatedDate(record.getCreated());
 
 		return project;
+	}
+
+	@Override
+	public void updateProject(final Project project) {
+		create.update(PROJECT)
+			.set(PROJECT.STATUS, project.getStatus())
+			.where(PROJECT.PROJECT_ID.eq(project.getProjectId()))
+			.execute();
 	}
 }

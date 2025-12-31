@@ -12,6 +12,8 @@ import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {MatInput} from '@angular/material/input';
 import {DatabaseService} from '@core/services/database.service';
 import {DemoUserScheme} from '@core/model/demo-user-scheme';
+import {ProjectStatusManagerComponent} from '../../project-status-manager/project-status-manager.component';
+import { User } from '@core/model/user';
 
 @Component({
 	templateUrl: './management.component.html',
@@ -22,7 +24,8 @@ import {DemoUserScheme} from '@core/model/demo-user-scheme';
 		MatButton,
 		MatFormField,
 		MatLabel,
-		MatInput
+		MatInput,
+		ProjectStatusManagerComponent
 	]
 })
 export class ManagementComponent implements OnInit {
@@ -30,6 +33,7 @@ export class ManagementComponent implements OnInit {
 	editConfigurationLink: string;
 	inMaintenance: boolean;
 	inDebug: boolean;
+	isAdmin = false;
 	demoUserSchemeForm = new FormGroup({
 		baseEmail: new FormControl('info@rodano.ch', {nonNullable: true, validators: [Validators.required, Validators.email]}),
 		password: new FormControl('Password1!', {nonNullable: true, validators: [Validators.required]})
@@ -49,6 +53,12 @@ export class ManagementComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
+		this.authStateService.listenConnectedUser()
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(user => {
+				this.checkAdminRole(user);
+			});
+
 		forkJoin({
 			study: this.configurationService.getStudy(),
 			inMaintenance: this.administrationService.isInMaintenance(),
@@ -84,5 +94,16 @@ export class ManagementComponent implements OnInit {
 	generateRandomDatabaseData() {
 		const scale = this.randomDataGenerationForm.value.scale as number;
 		this.databaseService.generateRandomData(scale).subscribe(() => this.notificationService.showSuccess('Database fill-in process started'));
+	}
+
+	private checkAdminRole(user: User | undefined): void {
+		if(!user) {
+			this.isAdmin = false;
+			return;
+		}
+
+		this.isAdmin = user.roles?.some(role =>
+			role.profile.id === 'ADMIN' || role.profile.id === 'DATAMANAGER' || role.profile.id === 'DATAENTRY_MASTER'
+		) ?? false;
 	}
 }

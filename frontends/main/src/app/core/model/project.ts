@@ -7,6 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ProjectStatus } from './project-status';
 
 
 export interface Project { 
@@ -18,5 +19,12 @@ export interface Project {
     url?: string;
     color?: string;
     introductionText?: string;
+    versionDate?: string;
+    configDate?: number;
+    status?: ProjectStatus;
+    created?: Date;
 }
+export namespace Project {
+}
+
 

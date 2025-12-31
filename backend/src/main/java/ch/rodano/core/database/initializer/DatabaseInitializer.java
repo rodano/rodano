@@ -1,6 +1,5 @@
 package ch.rodano.core.database.initializer;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -37,17 +36,10 @@ import ch.rodano.core.services.bll.user.UserSecurityService;
 import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
-import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
-import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
 import ch.rodano.core.services.project.ProjectIdResolver;
 
-import static ch.rodano.core.model.jooq.Tables.DATASET_MODEL;
-import static ch.rodano.core.model.jooq.Tables.EVENT_MODEL;
-import static ch.rodano.core.model.jooq.Tables.FIELD_MODEL;
-import static ch.rodano.core.model.jooq.Tables.FORM_MODEL;
 import static ch.rodano.core.model.jooq.Tables.PROJECT;
 import static ch.rodano.core.model.jooq.Tables.SCOPE;
-import static ch.rodano.core.model.jooq.Tables.SCOPE_MODEL;
 
 @Component
 @Profile({ "api", "test", "database" })
@@ -73,11 +65,7 @@ public class DatabaseInitializer {
 
 	private final String databaseName;
 
-	private final Boolean cleanPatchTable;
-	private final String internalPatchTable;
-
 	private final ProjectIdResolver projectIdResolver;
-	private final ProjectInitializer projectInitializer;
 
 	public DatabaseInitializer(
 		final DataSource dataSource,
@@ -91,11 +79,8 @@ public class DatabaseInitializer {
 		final AuditActionService auditActionService,
 		final UserCreatorService userCreatorService,
 		@Value("${rodano.database.name}") final String databaseName,
-		@Value("${rodano.init.clean-patch-table:true}") final Boolean cleanPatchTable,
-		@Value("${rodano.migration.internal-patch-table}") final String internalPatchTable,
 		final UserSecurityService userSecurityService,
-		final ProjectIdResolver projectIdResolver,
-		final ProjectInitializer projectInitializer) {
+		final ProjectIdResolver projectIdResolver) {
 		this.dataSource = dataSource;
 		this.create = create;
 		this.studyService = studyService;
@@ -108,10 +93,7 @@ public class DatabaseInitializer {
 		this.userCreatorService = userCreatorService;
 		this.userSecurityService = userSecurityService;
 		this.databaseName = databaseName;
-		this.cleanPatchTable = cleanPatchTable;
-		this.internalPatchTable = internalPatchTable;
 		this.projectIdResolver = projectIdResolver;
-		this.projectInitializer = projectInitializer;
 	}
 
 	public List<String> getTables() {
@@ -134,7 +116,7 @@ public class DatabaseInitializer {
 	}
 
 	public void initializeStructure() {
-		if (structureExists()) {
+		if(structureExists()) {
 			logger.warn("Database structure already exists. Skipping initialization.");
 			return;
 		}
@@ -190,61 +172,6 @@ public class DatabaseInitializer {
 			.execute();
 	}
 
-	private void ensureModelCatalogExists(final Study study) {
-		final var projectId = study.getProjectId();
-
-		// SCOPE MODELS
-		for(ScopeModel sm : study.getScopeModels()) {
-			create.insertInto(SCOPE_MODEL)
-				.set(SCOPE_MODEL.PROJECT_ID, projectId)
-				.set(SCOPE_MODEL.SCOPE_MODEL_ID, sm.getScopeModelId())
-				.set(SCOPE_MODEL.CODE, sm.getId())
-				.onDuplicateKeyIgnore()
-				.execute();
-		}
-
-		// DATASET MODELS
-		study.getDatasetModels().forEach(dm -> {
-			create.insertInto(DATASET_MODEL)
-				.set(DATASET_MODEL.PROJECT_ID, projectId)
-				.set(DATASET_MODEL.DATASET_MODEL_ID, dm.getDatasetModelId())
-				.set(DATASET_MODEL.CODE, dm.getId())
-				.onDuplicateKeyIgnore()
-				.execute();
-		});
-
-		// EVENT MODELS
-		study.getEventModels().forEach(em -> {
-			create.insertInto(EVENT_MODEL)
-				.set(EVENT_MODEL.PROJECT_ID, projectId)
-				.set(EVENT_MODEL.EVENT_MODEL_ID, em.getEventModelId())
-				.set(EVENT_MODEL.CODE, em.getId())
-				.onDuplicateKeyIgnore()
-				.execute();
-		});
-
-		// FORM MODELS
-		study.getFormModels().forEach(fm -> {
-			create.insertInto(FORM_MODEL)
-				.set(FORM_MODEL.PROJECT_ID, projectId)
-				.set(FORM_MODEL.FORM_MODEL_ID, fm.getFormModelId())
-				.set(FORM_MODEL.CODE, fm.getId())
-				.onDuplicateKeyIgnore()
-				.execute();
-		});
-
-		// FIELD MODELS
-		study.getFieldModels().forEach(fm -> {
-			create.insertInto(FIELD_MODEL)
-				.set(FIELD_MODEL.PROJECT_ID, projectId)
-				.set(FIELD_MODEL.FIELD_MODEL_ID, fm.getFieldModelId())
-				.set(FIELD_MODEL.DATASET_MODEL_ID, fm.getDatasetModel().getDatasetModelId())
-				.set(FIELD_MODEL.CODE, fm.getId())
-				.onDuplicateKeyIgnore()
-				.execute();
-		});
-	}
-
 	/**
 	 * Bootstrap the database
 	 *
@@ -274,76 +201,5 @@ public class DatabaseInitializer {
 
 		// Save the first user
 		userCreatorService.batchCreateAndEnable(users, context);
-	}
-
-	@Transactional
-	public void initializeDatabaseContent(final boolean withUsers, final boolean withData) throws InvalidValueException, BadlyFormattedValue, IOException {
-		logger.info("Initializing database content");
-
-		final Study study = studyService.getStudy();
-
-		final var options = ProjectInitializer.ProjectInitOptions.defaults().withAdminUser("Test user", TEST_USER_EMAIL, DEFAULT_PASSWORD);
-
-		// Add demo users
-		if(withUsers) {
-			logger.info("Add demo users");
-			options.withDemoUsers();
-		}
-
-		// Add demo data
-		if(withData) {
-			logger.info("Add demo data");
-			options.withDemoData();
-		}
-
-		projectInitializer.initializeProject(study, options);
-	}
-
-	/**
-	 * Add required data to the database
-	 * This method requires the application to be started
-	 *
-	 * @param origin The origin date time
-	 */
-	private void addRequiredData(final DatabaseActionContext context, final ZonedDateTime origin, final Study study) {
-		logger.info("Add required data");
-
-		final var root = createRootScope(context, origin, study.getDefaultLocalizedShortname());
-
-		// Create the users
-		final var adminProfile = study.getProfile("ADMIN");
-		final var users = new ArrayList<UserCreatorService.UserCreation>();
-		users.add(
-			UserBuilder.createUser("Test user", TEST_USER_EMAIL)
-				.setHashedPassword(userSecurityService.encodePassword(DEFAULT_PASSWORD))
-				.setLanguage(LanguageStatic.en)
-				.addRole(root, adminProfile)
-				.getUserAndRoles()
-		);
-
-		// Save the users
-		userCreatorService.batchCreateAndEnable(users, context);
-	}
-
-	/**
-	 * Truncate all tables
-	 */
-	public void truncateTables() {
-		logger.info("Emptying database");
-		//retrieve list of all tables to truncate
-		final List<String> tables = getTables();
-		if(!cleanPatchTable) {
-			tables.remove(internalPatchTable);
-		}
-
-		// Disable foreign key checks
-		create.execute("set FOREIGN_KEY_CHECKS=0;");
-		for(final var table : tables) {
-			create.truncate(table).execute();
-		}
-		// Re-enable foreign key checks
-		create.execute("set FOREIGN_KEY_CHECKS=1;");
-
-		logger.info("Tables {} have been truncated successfully", tables);
 	}
 }

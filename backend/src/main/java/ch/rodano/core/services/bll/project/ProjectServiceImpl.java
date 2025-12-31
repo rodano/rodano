@@ -31,4 +31,9 @@ public class ProjectServiceImpl implements ProjectService {
 	public Project getProjectById(final UUID projectId) {
 		return projectDAOService.getProjectById(projectId);
 	}
+
+	@Override
+	public void updateProject(final Project project) {
+		projectDAOService.updateProject(project);
+	}
 }

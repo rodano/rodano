@@ -165,7 +165,7 @@
 		}
 	</ol>
 	<footer>
-		@if (scope.canWrite && !scope.removed && !scope.locked) {
+		@if (scope.canWrite && !scope.removed && !scope.locked && (canWrite$ | async)) {
 			<button
 				id="add-event"
 				mat-flat-button

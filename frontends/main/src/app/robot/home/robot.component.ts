@@ -23,6 +23,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
 import {ScopeFinderComponent} from 'src/app/scope-finder/scope-finder.component';
 import {RoleCreation} from '@core/model/role-creation';
+import {PermissionsService} from '@core/services/permission.service';
+import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './robot.component.html',
@@ -44,7 +46,8 @@ import {RoleCreation} from '@core/model/role-creation';
 		LocalizeMapPipe,
 		ArraySortPipe,
 		AuditTrailButtonComponent,
-		ScopeFinderComponent
+		ScopeFinderComponent,
+		AsyncPipe
 	]
 })
 export class RobotComponent implements OnInit {
@@ -65,14 +68,18 @@ export class RobotComponent implements OnInit {
 	scopeResult$: Observable<PagedResultScope>;
 	errorText: string;
 
+	canWrite$: Observable<boolean>;
+
 	constructor(
 		private router: Router,
 		private configurationService: ConfigurationService,
 		private robotService: RobotService,
-		private notificationService: NotificationService
+		private notificationService: NotificationService,
+		private permissionsService: PermissionsService
 	) {}
 
 	ngOnInit() {
+		this.canWrite$ = this.permissionsService.canWrite();
 		this.configurationService.getProfiles().subscribe(p => this.profiles = p);
 		if(this.robot) {
 			this.robotForm.removeControl('roleForm');

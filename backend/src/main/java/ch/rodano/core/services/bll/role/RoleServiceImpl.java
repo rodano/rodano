@@ -2,6 +2,7 @@ package ch.rodano.core.services.bll.role;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -105,6 +106,11 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public List<Role> getRoles(final Scope scope, final Profile profile) {
 		return roleDAOService.getRolesByScopePkAndProfiles(scope.getPk(), Collections.singleton(profile.getId()));
+	}
+
+	@Override
+	public List<Role> getRolesForUser(final Long userPk, final UUID projectId) {
+		return roleDAOService.getRolesByUserPkAndProjectId(userPk, projectId);
 	}
 
 	@Override

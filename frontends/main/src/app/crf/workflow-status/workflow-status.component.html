@@ -1,10 +1,11 @@
-<div
-	class="workflow-container"
-	[style]="style">
-	<mat-icon aria-hidden="false">
-		{{ icon }}
-	</mat-icon>
-	<span>
+@if (canWrite$ | async) {
+	<div
+		class="workflow-container"
+		[style]="style">
+		<mat-icon aria-hidden="false">
+			{{ icon }}
+		</mat-icon>
+		<span>
 		@if (workflowStatus && entity === workflowableEntity.FIELD) {
 			{{ workflowStatus.state.shortname | localizeMap }}: {{ workflowStatus.triggerMessage }}
 		} @else {
@@ -14,18 +15,19 @@
 			}
 		}
 	</span>
-	@if (displayActions) {
-		@for (action of actions; track action.workflowActionId) {
-			<button
-				type="button"
-				mat-flat-button
-				(click)="executeWorkflowAction(action)">
-				{{ action.shortname | localizeMap }}
-			</button>
+		@if (displayActions) {
+			@for (action of actions; track action.workflowActionId) {
+				<button
+					type="button"
+					mat-flat-button
+					(click)="executeWorkflowAction(action)">
+					{{ action.shortname | localizeMap }}
+				</button>
+			}
 		}
-	}
 
-	@if (workflowStatus) {
-		<app-audit-trail-button [workflowStatus]="workflowStatus" />
-	}
-</div>
+		@if (workflowStatus) {
+			<app-audit-trail-button [workflowStatus]="workflowStatus" />
+		}
+	</div>
+}

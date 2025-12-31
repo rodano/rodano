@@ -9,7 +9,8 @@
 			<input
 				matInput
 				formControlName="name"
-				required />
+				required
+				[readonly]="(canWrite$ | async) === false"/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[user]="user"
@@ -22,7 +23,8 @@
 			<input
 				matInput
 				type="phone"
-				formControlName="phone" />
+				formControlName="phone"
+				[readonly]="(canWrite$ | async) === false"/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[user]="user"
@@ -34,9 +36,10 @@
 			<mat-label>Language</mat-label>
 			<mat-select
 				formControlName="languageId"
-				required>
+				required
+				[disabled]="(canWrite$ | async) === false">
 				@for (language of languages; track language.id) {
-					<mat-option [value]="language.id">
+					<mat-option [value]="language.id" [disabled]="(canWrite$ | async) === false">
 						{{ language.shortname | localizeMap }}
 					</mat-option>
 				}
@@ -47,7 +50,7 @@
 			property="languageId" />
 	</p>
 
-	@if (canSave) {
+	@if (canSave && (canWrite$ | async)) {
 		<p class="actions">
 			<button
 				mat-flat-button

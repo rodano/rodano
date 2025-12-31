@@ -1,0 +1,53 @@
+<div class="status-manager">
+
+	<mat-form-field appearance="outline">
+		<mat-label>Status</mat-label>
+		<mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusChange()">
+			<mat-select-trigger>
+          <span class="status-option"
+																[class.active]="selectedStatus === 'ACTIVE'"
+																[class.closed]="selectedStatus === 'CLOSED'"
+																[class.archived]="selectedStatus === 'ARCHIVED'">
+            {{ getStatusLabel(selectedStatus) }}
+          </span>
+			</mat-select-trigger>
+
+			<mat-option value="ACTIVE">
+				<div class="option-container">
+					<span class="status-option active">Active</span>
+					<span class="status-description">Full access for all users</span>
+				</div>
+			</mat-option>
+			<mat-option value="CLOSED">
+				<div class="option-container">
+					<span class="status-option closed">Closed</span>
+					<span class="status-description">Admin/Data Manager only</span>
+				</div>
+			</mat-option>
+			<mat-option value="ARCHIVED">
+				<div class="option-container">
+					<span class="status-option archived">Archived</span>
+					<span class="status-description">Read-only access</span>
+				</div>
+			</mat-option>
+		</mat-select>
+	</mat-form-field>
+
+	<div class="status-info">
+		@if (selectedStatus === 'ACTIVE') {
+			<p class="info active">
+				<strong>Active Project:</strong> All users with roles can read and write based on their permissions.
+			</p>
+		}
+		@if (selectedStatus === 'CLOSED') {
+			<p class="info closed">
+				<strong>Closed Project:</strong> Only administrators and data curators can access and modify this project.
+			</p>
+		}
+		@if (selectedStatus === 'ARCHIVED') {
+			<p class="info archived">
+				<strong>Archived Project:</strong> All users can view data, but no modifications are allowed.
+			</p>
+		}
+	</div>
+</div>

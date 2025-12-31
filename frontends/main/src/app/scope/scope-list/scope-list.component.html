@@ -39,13 +39,15 @@
 		</button>
 	</form>
 
-	<button
-		mat-flat-button
-		[routerLink]="['/scopes', scopeModel.scopeModelId, 'new']"
-		[disabled]="!writeAccessOnParent">
-		<mat-icon>add</mat-icon>
-		New {{ scopeModel.shortname | localizeMap | lowercase }}
-	</button>
+	@if (canWrite$ | async) {
+		<button
+			mat-flat-button
+			[routerLink]="['/scopes', scopeModel.scopeModelId, 'new']"
+			[disabled]="!writeAccessOnParent">
+			<mat-icon>add</mat-icon>
+			New {{ scopeModel.shortname | localizeMap | lowercase }}
+		</button>
+	}
 </div>
 
 <table

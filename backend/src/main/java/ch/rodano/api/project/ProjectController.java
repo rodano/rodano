@@ -14,20 +14,29 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.api.controller.AbstractSecuredController;
+import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.model.actor.Actor;
+import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.export.views.AggregateWorkflowViewService;
 import ch.rodano.core.services.bll.export.views.ExportViewService;
 import ch.rodano.core.services.bll.project.ProjectService;
+import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.scope.ScopeAncestorServiceImpl;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.project.ProjectIdResolver;
+import ch.rodano.core.utils.RightsService;
 
 @RestController
 @RequestMapping("/projects")
-public class ProjectController {
+public class ProjectController extends AbstractSecuredController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProjectController.class);
 
@@ -45,7 +54,12 @@ public class ProjectController {
 							 final ProjectMapper projectMapper,
 							 final ScopeAncestorServiceImpl scopeAncestorService,
 							 final AggregateWorkflowViewService aggregateWorkflowViewService,
-							 final ExportViewService exportViewService) {
+							 final ExportViewService exportViewService,
+							 final RequestContextService requestContextService,
+							 final ActorService actorService,
+							 final RoleService roleService,
+							 final RightsService rightsService) {
+		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.projectService = projectService;
 		this.projectIdResolver = projectIdResolver;
 		this.studyService = studyService;
@@ -76,6 +90,7 @@ public class ProjectController {
 	}
 
 	@PostMapping("/select/{projectId}")
+	@SkipProjectAccessCheck
 	@Transactional
 	public ResponseEntity<ProjectDTO> selectProject(@PathVariable final UUID projectId) {
 		LOGGER.info("Project selection requested: {}", projectId);
@@ -127,9 +142,27 @@ public class ProjectController {
 	}
 
 	@PostMapping("/clear")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> clearProject() {
 		LOGGER.info("Clearing current project selection");
 		projectIdResolver.clearProject();
 		return ResponseEntity.ok().build();
+	}
+
+	@PutMapping("/{projectId}/status")
+	@SkipProjectAccessCheck
+	@ResponseStatus(HttpStatus.OK)
+	@Transactional
+	public ProjectDTO updateProjectStatus(@PathVariable final UUID projectId,
+										  @RequestBody final UpdateProjectStatusRequest request) {
+		final var actor = getCurrentActor();
+		final var currentRoles = currentActiveRoles();
+		rightsService.checkRightAdmin(actor, currentRoles);
+
+		final var project = projectService.getProjectById(projectId);
+		project.setStatus(request.status());
+		projectService.updateProject(project);
+
+		return projectMapper.toDTO(project);
 	}
 }

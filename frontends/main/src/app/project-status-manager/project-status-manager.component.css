@@ -1,0 +1,62 @@
+.status-manager {
+	background: white;
+	border-radius: 0.5rem;
+}
+
+mat-form-field {
+	width: 50%;
+}
+
+.status-option {
+	display: flex;
+	align-items: center;
+	gap: 1.5rem;
+	font-weight: 600;
+}
+
+.option-container {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+}
+
+.status-option.active { color: #059669; }
+.status-option.closed { color: #d97706; }
+.status-option.archived { color: #6b7280; }
+
+.status-description {
+	font-size: 0.75rem;
+	color: #9ca3af;
+	margin-left: 1.5rem;
+	display: block;
+}
+
+.status-info {
+	margin-top: 1.5rem;
+}
+
+.info {
+	padding: 1rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+
+.info.active {
+	background-color: #d1fae5;
+	color: #065f46;
+	border-left: 4px solid #059669;
+}
+
+.info.closed {
+	background-color: #fef3c7;
+	color: #92400e;
+	border-left: 4px solid #d97706;
+}
+
+.info.archived {
+	background-color: #f3f4f6;
+	color: #374151;
+	border-left: 4px solid #6b7280;
+}
