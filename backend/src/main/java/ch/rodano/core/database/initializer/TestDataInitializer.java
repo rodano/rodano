@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rules.Operator;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
@@ -235,19 +236,19 @@ public class TestDataInitializer {
 		var patientDocumentation = datasetService.getOrCreate(fr0101, patientDatasetModel, context, DatabaseInitializer.RATIONALE);
 		var submitter = new FieldSubmitterHelper(context, fr0101, Optional.of(baseline), fieldService, validationService);
 		final Map<String, String> inputs = new HashMap<>();
-		inputs.put("GENDER", "FEMALE");
+		inputs.put("GENDER", getPossibleValueUuid(patientDatasetModel, "GENDER", "FEMALE"));
 		inputs.put("BIRTH_DATE", "1980");
-		inputs.put("EDUCATION", "COLLEGE");
-		inputs.put("MARITAL_STATUS", "SINGLE");
-		inputs.put("EMPLOYMENT", "EMPLOYED");
-		inputs.put("EMPLOYMENT_TYPE", "FULL_TIME");
+		inputs.put("EDUCATION", getPossibleValueUuid(patientDatasetModel, "EDUCATION", "COLLEGE"));
+		inputs.put("MARITAL_STATUS", getPossibleValueUuid(patientDatasetModel, "MARITAL_STATUS", "SINGLE"));
+		inputs.put("EMPLOYMENT", getPossibleValueUuid(patientDatasetModel, "EMPLOYMENT", "EMPLOYED"));
+		inputs.put("EMPLOYMENT_TYPE", getPossibleValueUuid(patientDatasetModel, "EMPLOYMENT_TYPE", "FULL_TIME"));
 		inputs.put("EYES_COLOR", "Brown");
 		submitter.updateFields(patientDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		submitter = new FieldSubmitterHelper(context, fr0101, Optional.empty(), fieldService, validationService);
 		submitter.updateField(patientDocumentation, "NUMBER_RELAPSE_FIRST_10_YEARS", "1");
-		submitter.updateField(patientDocumentation, "FOLLOW_TREATMENT", "N");
-		submitter.updateField(patientDocumentation, "HISTORY_OF_DMT", "N");
+		submitter.updateField(patientDocumentation, "FOLLOW_TREATMENT", getPossibleValueUuid(patientDatasetModel, "FOLLOW_TREATMENT", "N"));
+		submitter.updateField(patientDocumentation, "HISTORY_OF_DMT", getPossibleValueUuid(patientDatasetModel, "HISTORY_OF_DMT", "N"));
 		submitter.updateField(patientDocumentation, "DATE_OF_FIRST_SYMPTOMS", "06.2000");
 		submitter.updateField(patientDocumentation, "DATE_OF_DIAGNOSIS", "07.2000");
 		submitter.updateField(patientDocumentation, "DATE_OF_FIRST_STUDY_DRUG", "20.10.2001");
@@ -256,7 +257,7 @@ public class TestDataInitializer {
 		var studyEntryDataset = datasetService.getOrCreate(fr0101, baseline, studyEntryDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0101, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
-		inputs.put("ELIGIBILITY_CRITERIA", "Y");
+		inputs.put("ELIGIBILITY_CRITERIA", getPossibleValueUuid(studyEntryDatasetModel, "ELIGIBILITY_CRITERIA", "Y"));
 		inputs.put("DATE_OF_ENROLLMENT", origin.plusDays(RandomUtils.nextInt(1, 30)).format(DATE_FIELD_FORMATTER));
 		submitter.updateFields(studyEntryDataset, inputs).submit(DatabaseInitializer.RATIONALE);
 
@@ -276,19 +277,19 @@ public class TestDataInitializer {
 		patientDocumentation = datasetService.getOrCreate(fr0103, patientDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.empty(), fieldService, validationService);
 		inputs.clear();
-		inputs.put("GENDER", "MALE");
+		inputs.put("GENDER", getPossibleValueUuid(patientDatasetModel, "GENDER", "MALE"));
 		inputs.put("BIRTH_DATE", "1975");
-		inputs.put("EDUCATION", "COLLEGE");
-		inputs.put("MARITAL_STATUS", "SINGLE");
-		inputs.put("EMPLOYMENT", "STUDENT");
+		inputs.put("EDUCATION", getPossibleValueUuid(patientDatasetModel, "EDUCATION", "COLLEGE"));
+		inputs.put("MARITAL_STATUS", getPossibleValueUuid(patientDatasetModel, "MARITAL_STATUS", "SINGLE"));
+		inputs.put("EMPLOYMENT", getPossibleValueUuid(patientDatasetModel, "EMPLOYMENT", "STUDENT"));
 		inputs.put("EYES_COLOR", "Blue");
 		submitter.updateFields(patientDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//ms history inputs
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.empty(), fieldService, validationService);
 		submitter.updateField(patientDocumentation, "NUMBER_RELAPSE_FIRST_10_YEARS", "2");
-		submitter.updateField(patientDocumentation, "FOLLOW_TREATMENT", "Y");
-		submitter.updateField(patientDocumentation, "HISTORY_OF_DMT", "Y");
+		submitter.updateField(patientDocumentation, "FOLLOW_TREATMENT", getPossibleValueUuid(patientDatasetModel, "FOLLOW_TREATMENT", "Y"));
+		submitter.updateField(patientDocumentation, "HISTORY_OF_DMT", getPossibleValueUuid(patientDatasetModel, "HISTORY_OF_DMT", "Y"));
 		submitter.updateField(patientDocumentation, "DATE_OF_FIRST_SYMPTOMS", "06.2010");
 		submitter.updateField(patientDocumentation, "DATE_OF_DIAGNOSIS", "07.2010");
 		submitter.updateField(patientDocumentation, "DATE_OF_FIRST_STUDY_DRUG", "20.10.2010");
@@ -304,7 +305,7 @@ public class TestDataInitializer {
 
 		final var dmt1 = datasetService.create(fr0103, dmtDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.empty(), fieldService, validationService);
-		submitter.updateField(dmt1, "DMT_TREATMENT", "AVONEX");
+		submitter.updateField(dmt1, "DMT_TREATMENT", getPossibleValueUuid(dmtDatasetModel, "DMT_TREATMENT", "AVONEX"));
 		submitter.updateField(dmt1, "DMT_BEGIN_DATE", "10.2011");
 		submitter.updateField(dmt1, "DMT_ONGOING", "true");
 		submitter.submit(DatabaseInitializer.RATIONALE);
@@ -313,7 +314,7 @@ public class TestDataInitializer {
 
 		final var dmt2 = datasetService.create(fr0103, dmtDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.empty(), fieldService, validationService);
-		submitter.updateField(dmt2, "DMT_TREATMENT", "BETAFERON");
+		submitter.updateField(dmt2, "DMT_TREATMENT", getPossibleValueUuid(dmtDatasetModel, "DMT_TREATMENT", "BETAFERON"));
 		submitter.updateField(dmt2, "DMT_BEGIN_DATE", "10.2014");
 		submitter.updateField(dmt2, "DMT_ONGOING", "false");
 		submitter.updateField(dmt2, "DMT_END_DATE", "08.2015");
@@ -344,7 +345,7 @@ public class TestDataInitializer {
 		studyEntryDataset = datasetService.getOrCreate(fr0103, baseline, studyEntryDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
-		inputs.put("ELIGIBILITY_CRITERIA", "Y");
+		inputs.put("ELIGIBILITY_CRITERIA", getPossibleValueUuid(studyEntryDatasetModel, "ELIGIBILITY_CRITERIA", "Y"));
 		inputs.put("DATE_OF_ENROLLMENT", chronology.format(DATE_FIELD_FORMATTER));
 		inputs.put("CONSENT_CERTIFICATE", "certificate.png");
 		inputs.put("CONSENT_CONFIRMED_BY", "Doctor Jones");
@@ -372,15 +373,15 @@ public class TestDataInitializer {
 		visitDocumentation = datasetService.getOrCreate(fr0103, baseline, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
-		inputs.put("KFS1", "3");
-		inputs.put("KFS2", "3");
-		inputs.put("KFS3", "1");
-		inputs.put("KFS4", "3");
-		inputs.put("KFS5", "2");
-		inputs.put("KFS6", "3");
-		inputs.put("KFS7", "1");
-		inputs.put("AMBULATION", "5");
-		inputs.put("EDSS_SCORE", "3.0");
+		inputs.put("KFS1", getPossibleValueUuid(visitDatasetModel, "KFS1", "3"));
+		inputs.put("KFS2", getPossibleValueUuid(visitDatasetModel, "KFS2", "3"));
+		inputs.put("KFS3", getPossibleValueUuid(visitDatasetModel, "KFS3", "1"));
+		inputs.put("KFS4", getPossibleValueUuid(visitDatasetModel, "KFS4", "3"));
+		inputs.put("KFS5", getPossibleValueUuid(visitDatasetModel, "KFS5", "2"));
+		inputs.put("KFS6", getPossibleValueUuid(visitDatasetModel, "KFS6", "3"));
+		inputs.put("KFS7", getPossibleValueUuid(visitDatasetModel, "KFS7", "1"));
+		inputs.put("AMBULATION", getPossibleValueUuid(visitDatasetModel, "AMBULATION", "5"));
+		inputs.put("EDSS_SCORE", getPossibleValueUuid(visitDatasetModel, "EDSS_SCORE", "3.0"));
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
@@ -400,8 +401,8 @@ public class TestDataInitializer {
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		inputs.clear();
 		inputs.put("DATE_OF_VISIT", chronology.format(DATE_FIELD_FORMATTER));
-		inputs.put("ACTUAL_MS_COURSE", "RR");
-		inputs.put("WITHDRAWAL", "N");
+		inputs.put("ACTUAL_MS_COURSE", getPossibleValueUuid(visitDatasetModel, "ACTUAL_MS_COURSE", "RR"));
+		inputs.put("WITHDRAWAL", getPossibleValueUuid(visitDatasetModel, "WITHDRAWAL", "N"));
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study status workflow
@@ -416,15 +417,15 @@ public class TestDataInitializer {
 		visitDocumentation = datasetService.getOrCreate(fr0103, visit6, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		inputs.clear();
-		inputs.put("KFS1", "3");
-		inputs.put("KFS2", "4");
-		inputs.put("KFS3", "1");
-		inputs.put("KFS4", "3");
-		inputs.put("KFS5", "2");
-		inputs.put("KFS6", "3");
-		inputs.put("KFS7", "3");
-		inputs.put("AMBULATION", "5");
-		inputs.put("EDSS_SCORE", "3.5");
+		inputs.put("KFS1", getPossibleValueUuid(visitDatasetModel, "KFS1", "3"));
+		inputs.put("KFS2", getPossibleValueUuid(visitDatasetModel, "KFS2", "4"));
+		inputs.put("KFS3", getPossibleValueUuid(visitDatasetModel, "KFS3", "1"));
+		inputs.put("KFS4", getPossibleValueUuid(visitDatasetModel, "KFS4", "3"));
+		inputs.put("KFS5", getPossibleValueUuid(visitDatasetModel, "KFS5", "2"));
+		inputs.put("KFS6", getPossibleValueUuid(visitDatasetModel, "KFS6", "3"));
+		inputs.put("KFS7", getPossibleValueUuid(visitDatasetModel, "KFS7", "3"));
+		inputs.put("AMBULATION", getPossibleValueUuid(visitDatasetModel, "AMBULATION", "5"));
+		inputs.put("EDSS_SCORE", getPossibleValueUuid(visitDatasetModel, "EDSS_SCORE", "3.5"));
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
@@ -438,16 +439,16 @@ public class TestDataInitializer {
 		//relapses inputs
 		visitDocumentation = datasetService.getOrCreate(fr0103, visit6, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
-		submitter.updateField(visitDocumentation, "RELAPSES_SINCE_LV", "Y");
+		submitter.updateField(visitDocumentation, "RELAPSES_SINCE_LV", getPossibleValueUuid(visitDatasetModel, "RELAPSES_SINCE_LV", "Y"));
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		final var relapse1 = datasetService.create(fr0103, visit6, relapseDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		submitter.updateField(relapse1, "RLP_START_DATE", "26.12.2013");
 		submitter.updateField(relapse1, "RLP_DATE_MAX_SEV", "30.12.2013");
-		submitter.updateField(relapse1, "RLP_SEVERITY", "Moderate");
-		submitter.updateField(relapse1, "RLP_IMPACT", "Unknown");
-		submitter.updateField(relapse1, "RLP_RECOVERY", "Complete");
+		submitter.updateField(relapse1, "RLP_SEVERITY", getPossibleValueUuid(relapseDatasetModel, "RLP_SEVERITY", "Moderate"));
+		submitter.updateField(relapse1, "RLP_IMPACT", getPossibleValueUuid(relapseDatasetModel, "RLP_IMPACT", "Unknown"));
+		submitter.updateField(relapse1, "RLP_RECOVERY", getPossibleValueUuid(relapseDatasetModel, "RLP_RECOVERY", "Complete"));
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		datasetDAOService.saveDataset(relapse1, context, DatabaseInitializer.RATIONALE);
@@ -456,9 +457,9 @@ public class TestDataInitializer {
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		submitter.updateField(relapse2, "RLP_START_DATE", "03.10.2014");
 		submitter.updateField(relapse2, "RLP_DATE_MAX_SEV", "10.10.2014");
-		submitter.updateField(relapse2, "RLP_SEVERITY", "Severe");
-		submitter.updateField(relapse2, "RLP_IMPACT", "Y");
-		submitter.updateField(relapse2, "RLP_RECOVERY", "Partial");
+		submitter.updateField(relapse2, "RLP_SEVERITY", getPossibleValueUuid(relapseDatasetModel, "RLP_SEVERITY", "Severe"));
+		submitter.updateField(relapse2, "RLP_IMPACT", getPossibleValueUuid(relapseDatasetModel, "RLP_IMPACT", "Y"));
+		submitter.updateField(relapse2, "RLP_RECOVERY", getPossibleValueUuid(relapseDatasetModel, "RLP_RECOVERY", "Partial"));
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		datasetDAOService.saveDataset(relapse2, context, DatabaseInitializer.RATIONALE);
@@ -467,9 +468,9 @@ public class TestDataInitializer {
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit6), fieldService, validationService);
 		submitter.updateField(relapse3, "RLP_START_DATE", "12.02.2016");
 		submitter.updateField(relapse3, "RLP_DATE_MAX_SEV", "14.02.2016");
-		submitter.updateField(relapse3, "RLP_SEVERITY", "Severe");
-		submitter.updateField(relapse3, "RLP_IMPACT", "Y");
-		submitter.updateField(relapse3, "RLP_RECOVERY", "Partial");
+		submitter.updateField(relapse3, "RLP_SEVERITY", getPossibleValueUuid(relapseDatasetModel, "RLP_SEVERITY", "Severe"));
+		submitter.updateField(relapse3, "RLP_IMPACT", getPossibleValueUuid(relapseDatasetModel, "RLP_IMPACT", "Y"));
+		submitter.updateField(relapse3, "RLP_RECOVERY", getPossibleValueUuid(relapseDatasetModel, "RLP_RECOVERY", "Partial"));
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		datasetDAOService.saveDataset(relapse3, context, DatabaseInitializer.RATIONALE);
@@ -494,8 +495,8 @@ public class TestDataInitializer {
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit12), fieldService, validationService);
 		inputs.clear();
 		inputs.put("DATE_OF_VISIT", chronology.format(DATE_FIELD_FORMATTER));
-		inputs.put("ACTUAL_MS_COURSE", "RR");
-		inputs.put("WITHDRAWAL", "N");
+		inputs.put("ACTUAL_MS_COURSE", getPossibleValueUuid(visitDatasetModel, "ACTUAL_MS_COURSE", "RR"));
+		inputs.put("WITHDRAWAL", getPossibleValueUuid(visitDatasetModel, "WITHDRAWAL", "N"));
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study status workflow
@@ -510,15 +511,15 @@ public class TestDataInitializer {
 		visitDocumentation = datasetService.getOrCreate(fr0103, visit12, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit12), fieldService, validationService);
 		inputs.clear();
-		inputs.put("KFS1", "4");
-		inputs.put("KFS2", "4");
-		inputs.put("KFS3", "2");
-		inputs.put("KFS4", "3");
-		inputs.put("KFS5", "2");
-		inputs.put("KFS6", "3");
-		inputs.put("KFS7", "3");
-		inputs.put("AMBULATION", "5");
-		inputs.put("EDSS_SCORE", "3.5");
+		inputs.put("KFS1", getPossibleValueUuid(visitDatasetModel, "KFS1", "4"));
+		inputs.put("KFS2", getPossibleValueUuid(visitDatasetModel, "KFS2", "4"));
+		inputs.put("KFS3", getPossibleValueUuid(visitDatasetModel, "KFS3", "2"));
+		inputs.put("KFS4", getPossibleValueUuid(visitDatasetModel, "KFS4", "3"));
+		inputs.put("KFS5", getPossibleValueUuid(visitDatasetModel, "KFS5", "2"));
+		inputs.put("KFS6", getPossibleValueUuid(visitDatasetModel, "KFS6", "3"));
+		inputs.put("KFS7", getPossibleValueUuid(visitDatasetModel, "KFS7", "3"));
+		inputs.put("AMBULATION", getPossibleValueUuid(visitDatasetModel, "AMBULATION", "5"));
+		inputs.put("EDSS_SCORE", getPossibleValueUuid(visitDatasetModel, "EDSS_SCORE", "3.5"));
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
@@ -532,7 +533,7 @@ public class TestDataInitializer {
 		//relapses inputs
 		visitDocumentation = datasetService.getOrCreate(fr0103, visit12, visitDatasetModel, context, DatabaseInitializer.RATIONALE);
 		submitter = new FieldSubmitterHelper(context, fr0103, Optional.of(visit12), fieldService, validationService);
-		submitter.updateField(visitDocumentation, "RELAPSES_SINCE_LV", "Y");
+		submitter.updateField(visitDocumentation, "RELAPSES_SINCE_LV", getPossibleValueUuid(visitDatasetModel, "RELAPSES_SINCE_LV", "Y"));
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		//relapse workflow
@@ -722,6 +723,11 @@ public class TestDataInitializer {
 
 			roleDAOService.saveRole(role, context, DatabaseInitializer.RATIONALE);
 		}
+	}
+
+	private String getPossibleValueUuid(final DatasetModel datasetModel, final String fieldCode, final String possibleValueCode) {
+		final var field = datasetModel.getFieldModel(fieldCode);
+		return field.getPossibleValue(possibleValueCode).getPossibleValueId().toString();
 	}
 
 	private UUID fmId(final String code) {

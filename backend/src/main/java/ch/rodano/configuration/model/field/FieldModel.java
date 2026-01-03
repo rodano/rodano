@@ -240,6 +240,13 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	}
 
 	@JsonIgnore
+	public final List<String> getPossibleValueUuids() {
+		return possibleValues.stream()
+			.map(pv -> pv.getPossibleValueId().toString())
+			.toList();
+	}
+
+	@JsonIgnore
 	public final boolean hasPossibleValuesOther() {
 		return possibleValues.stream().anyMatch(PossibleValue::isSpecify);
 	}
@@ -872,7 +879,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 			//select and radio must have their value among possible values
 			if(FieldModelType.SELECT.equals(type) || FieldModelType.RADIO.equals(type)) {
 				final var possibleValue = actualPossibleValues.stream()
-					.filter(p -> p.getId().equals(value))
+					.filter(p -> p.getPossibleValueId().toString().equals(value))
 					.findAny();
 				if(possibleValue.isEmpty()) {
 					return InvalidPossibleValue.impossibleValue(value);
@@ -889,7 +896,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 				final var values = new TreeSet<>(getPossibleValueComparator());
 				values.addAll(Arrays.asList(value.split(",")));
 				//check possible values and other option
-				final var possibleValueIds = getPossibleValueIds();
+				final var possibleValueIds = getPossibleValueUuids();
 				var otherValue = false;
 				for(final var partialValue : values) {
 					if(!possibleValueIds.contains(partialValue)) {
