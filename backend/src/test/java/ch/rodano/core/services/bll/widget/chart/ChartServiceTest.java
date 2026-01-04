@@ -117,8 +117,14 @@ public class ChartServiceTest extends DatabaseTest {
 		final var points = dataset.data();
 		assertEquals(3, points.size());
 
-		assertEquals((Integer) 1, dataset.getValue("MALE").orElseThrow());
-		assertEquals((Integer) 1, dataset.getValue("FEMALE").orElseThrow());
+		final var genderField = studyService.getStudy()
+			.getDatasetModel("PATIENT_DOCUMENTATION")
+			.getFieldModel("GENDER");
+		final var maleUuid = genderField.getPossibleValue("MALE").getPossibleValueId().toString();
+		final var femaleUuid = genderField.getPossibleValue("FEMALE").getPossibleValueId().toString();
+
+		assertEquals((Integer) 1, dataset.getValue(maleUuid).orElseThrow());
+		assertEquals((Integer) 1, dataset.getValue(femaleUuid).orElseThrow());
 		assertEquals((Integer) 2, dataset.getValue("").orElseThrow());
 
 		//statistics for 2 scopes

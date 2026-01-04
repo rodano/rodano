@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.configuration.model.event.EventModel;
+import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.helpers.ScopeCreatorService;
 import ch.rodano.core.helpers.builder.ScopeBuilder;
@@ -132,24 +133,22 @@ public class EventServiceTest extends DatabaseTest {
 		assertFalse(eventService.getEventModels(patient).contains(getBaselineEvent()));
 		assertThrows(
 			WrongDataConditionException.class,
-			() -> eventService.create(patient, getBaselineEvent(), context, "Test"), "We manage to add two times the same event group whereas its max occurrence is 1"
+			() -> eventService.create(patient, getBaselineEvent(), context, "Test"),
+			"We manage to add two times the same event group whereas its max occurrence is 1"
 		);
 
 		assertAll(
-			() -> assertEquals(5, eventService.getAll(patient).size()),
-			() -> assertEquals(getBaselineEvent().getEventModelId(), eventService.get(patient, getBaselineEvent(), 0).getEventModelId()),
-			() -> assertEquals(getTerminationEvent().getEventModelId(), eventService.get(patient, getTerminationEvent(), 0).getEventModelId())
+			() -> assertEquals(1, eventService.getAll(patient).size(), "Only mandatory events should be created"),
+			() -> assertEquals(getBaselineEvent().getEventModelId(),
+				eventService.get(patient, getBaselineEvent(), 0).getEventModelId(),
+				"Baseline event should be created")
 		);
 	}
 
 	@Test
 	@DisplayName("Event plannification (expected events) works")
 	public void eventExpected() {
-		final var center = scopeDAOService.getScopeByCode("FR-01");
-		final var patientModel = studyService.getStudy().getScopeModel("PATIENT");
-
-		final var patientCode = scopeService.getNextCode(patientModel, center);
-		final var patient = scopeCreatorService.createScope(new ScopeBuilder(context).createScope(patientModel, center, patientCode));
+		final var patient = createPatient();
 
 		//baseline event has a date when created because it has no deadline
 		final var baselineEvent = eventService.get(patient, getBaselineEvent(), 0);
@@ -163,11 +162,7 @@ public class EventServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Event ordering and navigation work")
 	public void eventOrderingAndNavigation() {
-		final var center = scopeDAOService.getScopeByCode("FR-01");
-		final var patientModel = studyService.getStudy().getScopeModel("PATIENT");
-
-		final var patientCode = scopeService.getNextCode(patientModel, center);
-		final var patient = scopeCreatorService.createScope(new ScopeBuilder(context).createScope(patientModel, center, patientCode));
+		final var patient = createPatient();
 
 		assertEquals("VISIT_6", eventService.get(patient, getVisit6Event(), 0).getEventModel().getId());
 
@@ -234,11 +229,7 @@ public class EventServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Event dates are set and calculated correctly")
 	public void eventDatesSettingAndCalculation() {
-		final var center = scopeDAOService.getScopeByCode("FR-01");
-		final var patientModel = studyService.getStudy().getScopeModel("PATIENT");
-
-		final var patientCode = scopeService.getNextCode(patientModel, center);
-		final var patient = scopeCreatorService.createScope(new ScopeBuilder(context).createScope(patientModel, center, patientCode));
+		final var patient = createPatient();
 
 		// Get the baseline and the termination events
 		final var baselineVisit = eventService.get(patient, getBaselineEvent(), 0);
@@ -384,12 +375,13 @@ public class EventServiceTest extends DatabaseTest {
 
 		// update another field and check progress
 		final var eligibilityFieldModel = dataset.getDatasetModel().getFieldModel("ELIGIBILITY_CRITERIA");
+		final var yesUuid = getPossibleValueUuid(eligibilityFieldModel, "Y");
 		fieldService.updateValue(
 			patient,
 			Optional.of(baselineVisit),
 			dataset,
 			fieldService.get(dataset, eligibilityFieldModel),
-			"Y",
+			yesUuid,
 			context,
 			TEST_RATIONALE
 		);
@@ -436,6 +428,10 @@ public class EventServiceTest extends DatabaseTest {
 		return getPatientScopeModel().getEventModel("VISIT_6");
 	}
 
+	private EventModel getVisit12Event() {
+		return getPatientScopeModel().getEventModel("VISIT_12");
+	}
+
 	private EventModel getTerminationEvent() {
 		return getPatientScopeModel().getEventModel("TERMINATION_VISIT");
 	}
@@ -449,6 +445,16 @@ public class EventServiceTest extends DatabaseTest {
 		final var patientModel = getPatientScopeModel();
 
 		final var patientCode = scopeService.getNextCode(patientModel, center);
-		return scopeCreatorService.createScope(new ScopeBuilder(context).createScope(patientModel, center, patientCode));
+		final var patient = scopeCreatorService.createScope(new ScopeBuilder(context).createScope(patientModel, center, patientCode));
+
+		eventService.create(patient, getVisit6Event(), context, "Test setup");
+		eventService.create(patient, getVisit12Event(), context, "Test setup");
+		eventService.create(patient, getTerminationEvent(), context, "Test setup");
+
+		return patient;
+	}
+
+	private String getPossibleValueUuid(final FieldModel fieldModel, final String code) {
+		return fieldModel.getPossibleValue(code).getPossibleValueId().toString();
 	}
 }

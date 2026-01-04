@@ -70,7 +70,30 @@ public class StudyTestPluginConfiguration {
 		public boolean FEMALE_EMPLOYED(final Scope scope, final Optional<Event> event, final Dataset dataset, final Field field) {
 			final var genderFieldModel = dataset.getDatasetModel().getFieldModel("GENDER");
 			final var gender = fieldService.get(dataset, genderFieldModel);
-			return !"FEMALE".equals(gender.getValue()) || "FEMALE".equals(gender.getValue()) && field.getValue().equals("EMPLOYED");
+
+			final var femalePossibleValue = genderFieldModel.getPossibleValues().stream()
+				.filter(pv -> "FEMALE".equals(pv.getId()))
+				.findFirst()
+				.orElse(null);
+
+			if (femalePossibleValue == null) {
+				return true;
+			}
+
+			final String femaleUuid = femalePossibleValue.getPossibleValueId().toString();
+
+			final var employedPossibleValue = field.getFieldModel().getPossibleValues().stream()
+				.filter(pv -> "EMPLOYED".equals(pv.getId()))
+				.findFirst()
+				.orElse(null);
+
+			if (employedPossibleValue == null) {
+				return true;
+			}
+
+			final String employedUuid = employedPossibleValue.getPossibleValueId().toString();
+
+			return !femaleUuid.equals(gender.getValue()) || femaleUuid.equals(gender.getValue()) && employedUuid.equals(field.getValue());
 		}
 
 		@SuppressWarnings("unused")

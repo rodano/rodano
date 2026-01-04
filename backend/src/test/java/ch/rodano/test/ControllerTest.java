@@ -20,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ControllerTest extends DatabaseTest {
 
-	protected final String adminOnStudyEmail = "test+test-admin@rodano.ch";
-	protected final String investigatorOnStudyEmail = "test+test-investigator@rodano.ch";
-	protected final String dataManagerOnStudyEmail = "test+test-datamanager@rodano.ch";
+	protected final String adminOnStudyEmail = "test+admin@rodano.ch";
+	protected final String investigatorOnStudyEmail = "test+investigator@rodano.ch";
+	protected final String dataManagerOnStudyEmail = "test+datamanager@rodano.ch";
 
 	@Value("${rodano.pagination.maximum-page-size}")
 	protected Integer MAX_PAGE_SIZE;
@@ -32,6 +32,9 @@ public class ControllerTest extends DatabaseTest {
 
 	@Autowired
 	protected TestRestTemplate restTemplate;
+
+	@Value("${rodano.test.project.id}")
+	protected String projectId;
 
 	/**
 	 * Clear the rest template authentication
@@ -64,6 +67,7 @@ public class ControllerTest extends DatabaseTest {
 		clearAuthentication();
 		restTemplate.getRestTemplate().setInterceptors(Collections.singletonList((request, body, execution) -> {
 			request.getHeaders().add(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+			request.getHeaders().add("X-Project-Id", projectId);
 			return execution.execute(request, body);
 		}));
 	}

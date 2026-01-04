@@ -8,13 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import ch.rodano.configuration.services.node.NodeCopyService;
 import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 
 @SpringTestConfiguration
-public class NodeCopyServiceTest {
+public class NodeCopyServiceTest extends DatabaseTest {
 	@Autowired
 	private StudyService studyService;
 

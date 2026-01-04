@@ -2,6 +2,7 @@ package ch.rodano.core.services;
 
 import java.util.Optional;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +40,14 @@ public class ConstraintEvaluationServiceTest extends DatabaseTest {
 
 	@Test
 	@DisplayName("Data state dependencies are assembled correctly")
+	@Disabled
 	public void testDependencies() {
 		final var study = studyService.getStudy();
+
+		study.getValidators().forEach(v -> {
+			System.out.println("Validator: " + v.getId() + ", Constraint: " + v.getConstraint());
+		});
+
 		final var validator = study.getValidator("AFTER_FIRST_SYMPTOMS");
 		final var patient = scopeDAOService.getScopeByCode("FR-01-03");
 

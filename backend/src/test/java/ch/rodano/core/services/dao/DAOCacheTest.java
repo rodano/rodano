@@ -6,12 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
+import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringTestConfiguration
-public class DAOCacheTest {
+public class DAOCacheTest extends DatabaseTest {
 
 	@Autowired
 	private StudyService studyService;

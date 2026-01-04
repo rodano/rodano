@@ -21,6 +21,7 @@ import ch.rodano.core.model.rules.data.DataState;
 import ch.rodano.core.model.rules.formula.FormulaParserService;
 import ch.rodano.core.model.rules.formula.exception.UnableToCalculateFormulaException;
 import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringTestConfiguration
-public class FormulaParserServiceTest {
+public class FormulaParserServiceTest extends DatabaseTest {
 	@Autowired
 	private StudyService studyService;
 

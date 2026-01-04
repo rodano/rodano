@@ -1099,6 +1099,11 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonManagedReference
 	public final void setValidators(final SortedSet<Validator> validators) {
 		this.validators = validators;
+		if(this.validators != null) {
+			for(final var validator : this.validators) {
+				validator.setStudy(this);
+			}
+		}
 	}
 
 	@JsonManagedReference

@@ -1,6 +1,7 @@
 package ch.rodano.test;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,7 +41,7 @@ public class StatelessDatabaseTest {
 	protected DatabaseActionContext context;
 
 	@BeforeAll
-	protected void initializeTests() {
+	protected void initializeTests() throws SQLException {
 		// Clear the transaction cache before initializing the database
 		transactionCacheDAOService.emptyCache();
 

@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +84,6 @@ public class FieldValidationServiceTest extends DatabaseTest {
 	}
 
 	@Test
-	@Disabled("AFTER_BIRTH validator doesn't find the fields to compare - constraint configuration issue")
 	@DisplayName("Field blocking validation works")
 	public void testBlockingValidation() throws InvalidValueException, BadlyFormattedValue {
 		final var dateOfBirth = fieldService.get(patientDocumentation, birthDateFieldModel);
@@ -133,7 +131,8 @@ public class FieldValidationServiceTest extends DatabaseTest {
 
 		//reset gender value
 		context = createDatabaseActionContext();
-		fieldService.updateValue(patient, Optional.empty(), patientDocumentation, genderField, "FEMALE", context, TEST_RATIONALE);
+		final var femaleUuid = getPossibleValueUuid(genderFieldModel, "FEMALE");
+		fieldService.updateValue(patient, Optional.empty(), patientDocumentation, genderField, femaleUuid, context, TEST_RATIONALE);
 
 		//set empty value on employment
 		final var employmentField = fieldService.get(patientDocumentation, employmentFieldModel);
@@ -174,7 +173,8 @@ public class FieldValidationServiceTest extends DatabaseTest {
 
 		//set a different wrong value
 		context = createDatabaseActionContext();
-		fieldService.updateValue(patient, Optional.empty(), patientDocumentation, employmentField, "STUDENT", context, TEST_RATIONALE);
+		final var studentUuid = getPossibleValueUuid(employmentFieldModel, "STUDENT");
+		fieldService.updateValue(patient, Optional.empty(), patientDocumentation, employmentField, studentUuid, context, TEST_RATIONALE);
 
 		//check updated workflow status
 		context = createDatabaseActionContext();
@@ -265,5 +265,9 @@ public class FieldValidationServiceTest extends DatabaseTest {
 			final var family = workflowStatusService.createDataFamily(ws);
 			workflowStatusService.updateState(family, ws, queryWorkflow.getState("CLOSED"), Collections.emptyMap(), context, "Close for tests");
 		}
+	}
+
+	private String getPossibleValueUuid(final FieldModel fieldModel, final String code) {
+		return fieldModel.getPossibleValue(code).getPossibleValueId().toString();
 	}
 }

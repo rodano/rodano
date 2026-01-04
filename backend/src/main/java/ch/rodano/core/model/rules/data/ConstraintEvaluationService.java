@@ -165,7 +165,18 @@ public class ConstraintEvaluationService {
 								}
 								catch(IllegalArgumentException e) {
 									final UUID convertedUuid = convertStringIdToUuid(state.reference(), value);
-									values.add(Objects.requireNonNullElse(convertedUuid, value));
+									if(convertedUuid != null) {
+										values.add(convertedUuid);
+									}
+									else {
+										if(state.reference() == RulableEntity.FIELD && "VALUE".equals(criterion.getProperty())) {
+											final UUID possibleValueUuid = convertPossibleValueToUuid(state, value);
+											values.add(Objects.requireNonNullElse(possibleValueUuid, value));
+										}
+										else {
+											values.add(value);
+										}
+									}
 								}
 								break;
 						}
@@ -271,5 +282,26 @@ public class ConstraintEvaluationService {
 				.orElse(null);
 			default -> null;
 		};
+	}
+
+	private UUID convertPossibleValueToUuid(final DataState state, final String possibleValueCode) {
+		if(state.getReferenceEvaluables().isEmpty()) {
+			return null;
+		}
+
+		try {
+			final var evaluable = state.getReferenceEvaluables().iterator().next();
+			if(evaluable instanceof ch.rodano.core.model.field.Field field) {
+				final var fieldModel = field.getFieldModel();
+				if(fieldModel != null && !fieldModel.getPossibleValues().isEmpty()) {
+					return fieldModel.getPossibleValue(possibleValueCode).getPossibleValueId();
+				}
+			}
+		}
+		catch(Exception e) {
+			logger.debug("Could not convert possible value code to UUID: {}", possibleValueCode, e);
+		}
+
+		return null;
 	}
 }

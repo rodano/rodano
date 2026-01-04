@@ -47,11 +47,18 @@ public class TestHelperService {
 
 	public Scope createCenter(final DatabaseActionContext context) {
 		final var study = studyService.getStudy();
-		final var centerScopeModel = study.getScopeModel("CENTER");
-		final var parentModel = centerScopeModel.getDefaultParent();
-		final var anyParent = scopeService.getAll(parentModel).getFirst();
 
-		return createCenter(anyParent, context);
+		final var countryScopeModel = study.getScopeModel("COUNTRY");
+		final var countries = scopeService.getAll(countryScopeModel);
+
+		final Scope parentScope;
+		if (!countries.isEmpty()) {
+			parentScope = countries.getFirst();
+		} else {
+			parentScope = createCountry(context);
+		}
+
+		return createCenter(parentScope, context);
 	}
 
 	public Scope createPatient(final Scope parentScope, final DatabaseActionContext context) {

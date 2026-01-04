@@ -94,12 +94,17 @@ public class FieldServiceTest extends DatabaseTest {
 		final var dataset = datasetService.get(center, addressDatasetModel);
 		final var field = fieldService.get(dataset, addressFieldModel);
 
+		final var originalMaxLength = addressFieldModel.getMaxLength();
+		addressFieldModel.setMaxLength(100);
+
 		fieldService.updateValue(center, Optional.empty(), dataset, field, "4, chemin de la tour de champel", context, TEST_RATIONALE);
 		assertEquals("4, chemin de la tour de champel", field.getValue());
 
 		//symbols are valid strings
 		fieldService.updateValue(center, Optional.empty(), dataset, field, "$%^+-*/?!", context, TEST_RATIONALE);
 		assertEquals("$%^+-*/?!", field.getValue(), "Symbols are valid strings");
+
+		addressFieldModel.setMaxLength(originalMaxLength);
 	}
 
 	@Test
@@ -134,6 +139,7 @@ public class FieldServiceTest extends DatabaseTest {
 		final var field = fieldService.get(dataset, dateOfPhoneCallFieldModel);
 
 		dateOfPhoneCallFieldModel.getValidatorIds().remove("AFTER_LAST_VISIT");
+		dateOfPhoneCallFieldModel.setAllowDateInFuture(false);
 
 		fieldService.updateValue(patient, Optional.of(visit), dataset, field, "01.02.2012", context, TEST_RATIONALE);
 
@@ -233,7 +239,8 @@ public class FieldServiceTest extends DatabaseTest {
 		final var dataset = datasetService.get(patient, patientDatasetModel);
 		final var field = fieldService.get(dataset, genderFieldModel);
 
-		fieldService.updateValue(patient, Optional.empty(), dataset, field, "MALE", context, TEST_RATIONALE);
+		final var maleUuid = getPossibleValueUuid(genderFieldModel, "MALE");
+		fieldService.updateValue(patient, Optional.empty(), dataset, field, maleUuid, context, TEST_RATIONALE);
 
 		//toto is not a possible value
 		assertThrows(
@@ -242,7 +249,7 @@ public class FieldServiceTest extends DatabaseTest {
 			"Value must not have been accepted"
 		);
 		//field has not been changed
-		assertEquals("MALE", field.getValue(), "Field has not been changed");
+		assertEquals(maleUuid, field.getValue(), "Field has not been changed");
 
 		//empty value is allowed
 		fieldService.updateValue(patient, Optional.empty(), dataset, field, "", context, TEST_RATIONALE);
@@ -348,9 +355,12 @@ public class FieldServiceTest extends DatabaseTest {
 		final var dataset = datasetService.get(patient, patientDatasetModel);
 		final var field = fieldService.get(dataset, educationFieldModel);
 
+		final var collegeUuid = getPossibleValueUuid(educationFieldModel, "COLLEGE");
+		final var universityUuid = getPossibleValueUuid(educationFieldModel, "UNIVERSITY");
+
 		// save a couple of values
-		fieldService.updateValue(patient, Optional.empty(), dataset, field, "COLLEGE", context, "2");
-		fieldService.updateValue(patient, Optional.empty(), dataset, field, "UNIVERSITY", context, "3");
+		fieldService.updateValue(patient, Optional.empty(), dataset, field, collegeUuid, context, "2");
+		fieldService.updateValue(patient, Optional.empty(), dataset, field, universityUuid, context, "3");
 
 		// check that the history of the field is recorded correctly
 		final var auditTrails = fieldDAOService.getAuditTrails(field, Optional.empty(), Optional.empty());
@@ -359,10 +369,10 @@ public class FieldServiceTest extends DatabaseTest {
 		final var firstTrail = auditTrails.pollFirst();
 		assertNull(firstTrail.getValue());
 		final var secondTrail = auditTrails.pollFirst();
-		assertEquals("COLLEGE", secondTrail.getValue());
+		assertEquals(collegeUuid, secondTrail.getValue());
 		assertEquals("2", secondTrail.getAuditContext());
 		final var thirdTrail = auditTrails.pollFirst();
-		assertEquals("UNIVERSITY", thirdTrail.getValue());
+		assertEquals(universityUuid, thirdTrail.getValue());
 		assertEquals(Actor.SYSTEM_USERNAME, thirdTrail.getAuditActor());
 		assertEquals("3", thirdTrail.getAuditContext());
 	}
@@ -373,15 +383,18 @@ public class FieldServiceTest extends DatabaseTest {
 		final var dataset = datasetService.get(patient, patientDatasetModel);
 		final var field = fieldService.get(dataset, educationFieldModel);
 
+		final var collegeUuid = getPossibleValueUuid(educationFieldModel, "COLLEGE");
+		final var universityUuid = getPossibleValueUuid(educationFieldModel, "UNIVERSITY");
+
 		// set a field value
-		fieldService.updateValue(patient, Optional.empty(), dataset, field, "COLLEGE", createDatabaseActionContext(), TEST_RATIONALE);
+		fieldService.updateValue(patient, Optional.empty(), dataset, field, collegeUuid, createDatabaseActionContext(), TEST_RATIONALE);
 		final var timestamp = ZonedDateTime.now();
 		final var oldPastValue = field.getValue();
 
 		// wait a bit, otherwise the save just goes too fast
 		Thread.sleep(100);
 		// set another field value
-		fieldService.updateValue(patient, Optional.empty(), dataset, field, "UNIVERSITY", createDatabaseActionContext(), TEST_RATIONALE);
+		fieldService.updateValue(patient, Optional.empty(), dataset, field, universityUuid, createDatabaseActionContext(), TEST_RATIONALE);
 
 		// get the past value
 		final var newPastValue = fieldService.getLatestValue(field, Optional.of(timestamp));
@@ -393,8 +406,9 @@ public class FieldServiceTest extends DatabaseTest {
 	public void testFieldRuleExecution() throws InvalidValueException, BadlyFormattedValue {
 		//activate visit 6
 		final var patientStatusWorkflow = studyService.getStudy().getWorkflow("PATIENT_STATUS");
-		final var event = patient.getScopeModel().getEventModel("VISIT_6");
-		final var visit = eventService.get(patient, event, 0);
+		final var eventModel = patient.getScopeModel().getEventModel("VISIT_6");
+
+		final var visit = eventService.create(patient, eventModel, context, TEST_RATIONALE);
 
 		eventService.updateDate(patient, visit, ZonedDateTime.now(), context, TEST_RATIONALE);
 		final var dataset = datasetService.get(visit, visitDatasetModel);
@@ -403,14 +417,18 @@ public class FieldServiceTest extends DatabaseTest {
 		final var patientStatus = workflowStatusService.getAll(patient, patientStatusWorkflow).getFirst();
 
 		assertEquals("REGISTERED", patientStatus.getState().getId());
-		fieldService.updateValue(patient, Optional.of(visit), dataset, field, "Y", context, TEST_RATIONALE);
+
+		final var withdrawalYesUuid = getPossibleValueUuid(withdrawalFieldModel, "Y");
+		final var withdrawalNoUuid = getPossibleValueUuid(withdrawalFieldModel, "N");
+
+		fieldService.updateValue(patient, Optional.of(visit), dataset, field, withdrawalYesUuid, context, TEST_RATIONALE);
 
 		final var family = new DataFamily(patient, Optional.of(visit), dataset, field);
 		final var withdrawnState = patientStatusWorkflow.getState("WITHDRAWN");
 		workflowStatusService.updateState(family, patientStatus, withdrawnState, Collections.emptyMap(), context, "Patient withdrawn");
 
 		assertEquals("WITHDRAWN", patientStatus.getState().getId());
-		fieldService.updateValue(patient, Optional.of(visit), dataset, field, "N", context, TEST_RATIONALE);
+		fieldService.updateValue(patient, Optional.of(visit), dataset, field, withdrawalNoUuid, context, TEST_RATIONALE);
 
 		final var ongoingState = patientStatusWorkflow.getState("ONGOING");
 		workflowStatusService.updateState(family, patientStatus, ongoingState, Collections.emptyMap(), context, "Patient ongoing");
@@ -421,5 +439,9 @@ public class FieldServiceTest extends DatabaseTest {
 	private Event createTelephoneVisit(final Scope patient) {
 		final var event = patient.getScopeModel().getEventModel("TELEPHONE_VISIT");
 		return eventService.create(patient, event, context, "Test");
+	}
+
+	private String getPossibleValueUuid(final FieldModel fieldModel, final String code) {
+		return fieldModel.getPossibleValue(code).getPossibleValueId().toString();
 	}
 }

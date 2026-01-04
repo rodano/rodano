@@ -1,5 +1,7 @@
 package ch.rodano.application;
 
+import java.sql.SQLException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -46,7 +48,7 @@ public class ApiConfiguration implements InitializingBean {
 	}
 
 	@Override
-	public void afterPropertiesSet() {
+	public void afterPropertiesSet() throws SQLException {
 		logger.info("Starting api profile");
 
 		//initialize database if it is blank

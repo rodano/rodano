@@ -2,8 +2,6 @@ package ch.rodano.api.config;
 
 import java.util.UUID;
 
-import jakarta.servlet.http.HttpSession;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;

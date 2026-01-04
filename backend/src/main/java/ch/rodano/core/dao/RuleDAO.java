@@ -131,6 +131,24 @@ public class RuleDAO {
 		return model;
 	}
 
+	public Map<RuleConstraintOwnerType, Map<UUID, RuleConstraint>> loadAllConstraintsForProject(final UUID projectId) {
+		final Map<RuleConstraintOwnerType, Map<UUID, RuleConstraint>> result = new TreeMap<>();
+
+		final var constraintRecords = dslContext
+			.selectFrom(RULE_CONSTRAINT)
+			.where(RULE_CONSTRAINT.PROJECT_ID.eq(projectId))
+			.fetch();
+
+		for(final var record : constraintRecords) {
+			final var constraint = mapConstraintToModel(record);
+
+			result.computeIfAbsent(record.getOwnerType(), k -> new TreeMap<>())
+				.put(record.getOwnerId(), constraint);
+		}
+
+		return result;
+	}
+
 	private Map<RulableEntity, RuleConditionList> loadConditionListsForConstraint(final UUID constraintId) {
 		final Map<RulableEntity, RuleConditionList> result = new TreeMap<>();
 

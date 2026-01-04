@@ -107,7 +107,7 @@ public class UserDAOServiceTest extends DatabaseTest {
 
 		assertAll(
 			"Find the investigators on study and descendants",
-			() -> assertTrue(users.stream().anyMatch(u -> u.getEmail().equals("test+test-investigator@rodano.ch"))),
+			() -> assertTrue(users.stream().anyMatch(u -> u.getEmail().equals("test+investigator@rodano.ch"))),
 			() -> assertTrue(users.stream().anyMatch(u -> u.getEmail().equals("test+iinves@rodano.ch")))
 		);
 	}
@@ -130,8 +130,8 @@ public class UserDAOServiceTest extends DatabaseTest {
 			"Find all the investigators on study and descendants",
 			() -> assertTrue(userEmails.contains("test+iinves@rodano.ch")),
 			() -> assertTrue(userEmails.contains("test+pinves@rodano.ch")),
-			() -> assertTrue(userEmails.contains("test+test-investigator@rodano.ch")),
-			() -> assertTrue(userEmails.contains("test+test-principal_investigator@rodano.ch"))
+			() -> assertTrue(userEmails.contains("test+investigator@rodano.ch")),
+			() -> assertTrue(userEmails.contains("test+principal_investigator@rodano.ch"))
 		);
 	}
 

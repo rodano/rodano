@@ -21,14 +21,14 @@ import ch.rodano.core.model.mail.Mail;
 import ch.rodano.core.model.mail.MailOrigin;
 import ch.rodano.core.model.mail.MailStatus;
 import ch.rodano.core.scheduler.task.mail.MailSenderTask;
+import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
-import ch.rodano.test.StatelessDatabaseTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringTestConfiguration
 @Transactional
-public class MailTest extends StatelessDatabaseTest {
+public class MailTest extends DatabaseTest {
 
 	@RegisterExtension
 	static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)

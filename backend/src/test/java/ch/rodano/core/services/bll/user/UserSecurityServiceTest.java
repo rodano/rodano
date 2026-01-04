@@ -26,7 +26,7 @@ public class UserSecurityServiceTest extends DatabaseTest {
 	@Test
 	@DisplayName("Deleted user can not log into the system")
 	public void deletedUserCanNotLogin() {
-		final var adminUser = userService.getUserByEmail("test+test-admin@rodano.ch");
+		final var adminUser = userService.getUserByEmail("test+admin@rodano.ch");
 
 		// See if the login works
 		final var sessionToken = userSecurityService.login(

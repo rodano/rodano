@@ -137,8 +137,8 @@ public class ScopeServiceTest extends DatabaseTest {
 		assertEquals(4, scopeRelationService.getDescendants(root, study.getScopeModel("PATIENT")).size());
 
 		//ancestors
-		assertEquals(5, scopeRelationService.getEnabledAncestors(descendant1).size());
-		assertEquals(5, scopeRelationService.getAncestors(descendant1).size());
+		assertEquals(4, scopeRelationService.getEnabledAncestors(descendant1).size());
+		assertEquals(4, scopeRelationService.getAncestors(descendant1).size());
 
 		assertEquals(4, scopeRelationService.getEnabledAncestors(descendant2).size());
 		assertEquals(5, scopeRelationService.getAncestors(descendant2).size());

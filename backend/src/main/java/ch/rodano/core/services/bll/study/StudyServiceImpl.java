@@ -32,6 +32,7 @@ import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.loader.DatabaseStudyLoader;
 import ch.rodano.core.services.project.ProjectIdResolver;
+import ch.rodano.core.services.rule.ConstraintLoaderService;
 
 @Service
 public class StudyServiceImpl implements StudyService, InfoContributor {
@@ -42,6 +43,7 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	private final Configurator configurator;
 	private final ProjectIdResolver projectIdResolver;
 	private final DatabaseStudyLoader databaseStudyLoader;
+	private final ConstraintLoaderService constraintLoaderService;
 
 	private Study study;
 	private String studyChecksum;
@@ -51,23 +53,27 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		final ObjectMapper objectMapper,
 		final Configurator configurator,
 		final ProjectIdResolver projectIdResolver,
-		final DatabaseStudyLoader databaseStudyLoader
+		final DatabaseStudyLoader databaseStudyLoader,
+		final ConstraintLoaderService constraintLoaderService
 	) {
 		this.objectMapper = objectMapper;
 		this.configVersion = configVersion;
 		this.configurator = configurator;
 		this.projectIdResolver = projectIdResolver;
 		this.databaseStudyLoader = databaseStudyLoader;
+		this.constraintLoaderService = constraintLoaderService;
 	}
 
 	@Override
-	public void loadStudyForProject(final UUID projectId) throws IOException {
+	public void loadStudyForProject(final UUID projectId) {
 		logger.info("Loading study for project {}", projectId);
 
 		projectIdResolver.setProjectId(projectId);
 		study = databaseStudyLoader.loadStudy(projectId);
 		study.setConfigVersion(configVersion);
 		study.init();
+
+		constraintLoaderService.loadAndAssignConstraints(study);
 
 		checkConfiguration();
 
@@ -179,6 +185,8 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		study = databaseStudyLoader.loadStudy(projectId);
 		study.setConfigVersion(configVersion);
 		study.init();
+
+		constraintLoaderService.loadAndAssignConstraints(study);
 
 		checkConfiguration();
 

@@ -29,9 +29,9 @@ public class NodeTest {
 		cron.getDescription().put(LanguageStatic.en.name(), "Test");
 		final ObjectMapper mapper = new ObjectMapper();
 		mapper.setSerializationInclusion(Include.NON_NULL);
-		assertEquals("{\"id\":\"TEST\",\"description\":{\"en\":\"Test\"},\"rules\":[],\"className\":\"Cron\"}", mapper.writeValueAsString(cron));
+		assertEquals("{\"id\":\"TEST\",\"description\":{\"en\":\"Test\"},\"rules\":[]}", mapper.writeValueAsString(cron));
 
-		mapper.readValue("{\"id\":\"TEST\",\"description\":{\"en\":\"Test\"},\"rules\":[],\"className\":\"Cron\"}", Cron.class);
+		mapper.readValue("{\"id\":\"TEST\",\"description\":{\"en\":\"Test\"},\"rules\":[]}", Cron.class);
 	}
 }
 
