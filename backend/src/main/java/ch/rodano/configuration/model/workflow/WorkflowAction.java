@@ -9,11 +9,6 @@ import ch.rodano.configuration.model.language.LanguageStatic;
 public enum WorkflowAction implements SuperDisplayable {
 	CREATE_SCOPE {
 		@Override
-		public String toString() {
-			return "Scope created";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -22,11 +17,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	REMOVE_SCOPE {
-		@Override
-		public String toString() {
-			return "Scope removed";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -37,11 +27,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	RESTORE_SCOPE {
 		@Override
-		public String toString() {
-			return "Scope restored";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -50,11 +35,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	CREATE_EVENT {
-		@Override
-		public String toString() {
-			return "Visit created";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -65,11 +45,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	REMOVE_EVENT {
 		@Override
-		public String toString() {
-			return "Visit removed";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -78,11 +53,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	RESTORE_EVENT {
-		@Override
-		public String toString() {
-			return "Visit restored";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -93,11 +63,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	CREATE_DATASET {
 		@Override
-		public String toString() {
-			return "Dataset created";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -106,11 +71,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	REMOVE_DATASET {
-		@Override
-		public String toString() {
-			return "Dataset removed";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -121,11 +81,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	RESTORE_DATASET {
 		@Override
-		public String toString() {
-			return "Dataset restored";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -134,11 +89,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	CREATE_WORKFLOW_STATUS {
-		@Override
-		public String toString() {
-			return "Workflow status created";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -149,11 +99,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	UPDATE_VALUE {
 		@Override
-		public String toString() {
-			return "Field updated";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -162,11 +107,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	SAVE_FORM {
-		@Override
-		public String toString() {
-			return "Form saved";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -177,11 +117,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	ROLE_CREATE {
 		@Override
-		public String toString() {
-			return "Role created";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -190,11 +125,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	ROLE_ENABLE {
-		@Override
-		public String toString() {
-			return "Role enabled";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
@@ -205,11 +135,6 @@ public enum WorkflowAction implements SuperDisplayable {
 	},
 	ROLE_DISABLE {
 		@Override
-		public String toString() {
-			return "Role disabled";
-		}
-
-		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), toString());
@@ -218,11 +143,6 @@ public enum WorkflowAction implements SuperDisplayable {
 		}
 	},
 	USER_LOGIN {
-		@Override
-		public String toString() {
-			return "User logged in";
-		}
-
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
