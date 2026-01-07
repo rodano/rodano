@@ -147,6 +147,7 @@ public class ProjectController extends AbstractSecuredController {
 	public ResponseEntity<Void> clearProject() {
 		LOGGER.info("Clearing current project selection");
 		projectIdResolver.clearProject();
+		studyService.clearStudy();
 		return ResponseEntity.ok().build();
 	}
 

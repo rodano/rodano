@@ -96,20 +96,19 @@ export class HeaderComponent implements OnInit {
 	}
 
 	switchProject(): void {
-		this.projectService.clearProjectSelection().subscribe({
-			next: () => {
-				this.router.navigate(['/projects']);
-			},
-			error: error => {
-				console.error('Error clearing project:', error);
-				this.router.navigate(['/projects']);
-			}
-		});
+		this.projectService.clearCurrentProject();
+		this.configurationService.clearStudy();
+		this.router.navigate(['/projects']);
 	}
 
 	logout(): void {
+		this.projectService.clearCurrentProject();
+		this.configurationService.clearStudy();
+
 		this.authStateService.logout().subscribe(
-			() => this.router.navigate(['/login'])
+			() => {
+				this.router.navigate(['/login']);
+			}
 		);
 	}
 }

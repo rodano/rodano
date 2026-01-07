@@ -72,6 +72,9 @@ export class LoginComponent implements OnInit {
 	ngOnInit() {
 		document.documentElement.style.removeProperty('--mat-sys-primary');
 
+		this.configurationService.clearStudy();
+		this.study = undefined;
+
 		this.configurationService.getPublicStudy().subscribe({
 			next: study => {
 				this.study = study;

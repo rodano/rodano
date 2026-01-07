@@ -39,6 +39,7 @@ import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.user.UserSecurityService;
 import ch.rodano.core.services.bll.user.UserService;
 import ch.rodano.core.services.dao.user.UserDAOService;
+import ch.rodano.core.services.project.ProjectIdResolver;
 import ch.rodano.core.utils.RightsService;
 
 @Tag(name = "Session", description = "Used to manage API sessions")
@@ -53,6 +54,7 @@ public class SessionController extends AbstractSecuredController {
 	private final SessionService sessionService;
 	private final Configurator configurator;
 	private final String autologinEmail;
+	private final ProjectIdResolver projectIdResolver;
 
 	public SessionController(
 		final RequestContextService requestContextService,
@@ -65,7 +67,8 @@ public class SessionController extends AbstractSecuredController {
 		final UserSecurityService userSecurityService,
 		final SessionService sessionService,
 		final Configurator configurator,
-		@Value("${rodano.sso.autologin:}") final String autologinEmail
+		@Value("${rodano.sso.autologin:}") final String autologinEmail,
+		final ProjectIdResolver projectIdResolver
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.userDAOService = userDAOService;
@@ -74,6 +77,7 @@ public class SessionController extends AbstractSecuredController {
 		this.sessionService = sessionService;
 		this.configurator = configurator;
 		this.autologinEmail = autologinEmail;
+		this.projectIdResolver = projectIdResolver;
 	}
 
 	/**
@@ -197,6 +201,9 @@ public class SessionController extends AbstractSecuredController {
 		final var user = (User) currentActor();
 
 		userSecurityService.logout(user, token, currentContext());
+
+		projectIdResolver.clearProject();
+		studyService.clearStudy();
 	}
 
 	@Operation(summary = "Delete a user session", description = "Available for admins only", hidden = true)

@@ -65,6 +65,10 @@ export class ConfigurationService {
 		this.studySubject.next(study);
 	}
 
+	clearStudy(): void {
+		this.studySubject.next(undefined);
+	}
+
 	getLanguages(): Observable<Language[]> {
 		return this.getStudy().pipe(map(study => study.activatedLanguages));
 	}

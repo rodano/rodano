@@ -76,7 +76,11 @@ export class ProjectService {
 
 	clearProjectSelection(): Observable<void> {
 		return this.http.post<void>('/api/projects/clear', {}).pipe(
-			tap(() => this.currentProjectSubject.next(null))
+			tap(() => {
+				localStorage.removeItem('currentProjectId');
+				this.currentProjectSubject.next(null);
+				this.currentProjectIdSubject.next(null);
+			})
 		);
 	}
 

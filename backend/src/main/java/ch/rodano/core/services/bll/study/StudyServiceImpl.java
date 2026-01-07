@@ -217,4 +217,10 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 			));
 		}
 	}
+
+	@Override
+	public void clearStudy() {
+		this.study = null;
+		this.studyChecksum = null;
+	}
 }

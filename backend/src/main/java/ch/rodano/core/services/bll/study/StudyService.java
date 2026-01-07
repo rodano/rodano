@@ -19,4 +19,6 @@ public interface StudyService {
 	boolean isStudyLoaded();
 
 	void reloadStudyFromDatabase() throws IOException;
+
+	void clearStudy();
 }
