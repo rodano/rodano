@@ -59,10 +59,15 @@ public class MailSenderTask implements ScheduledTask, DisposableBean {
 				return true;
 			}
 
-			final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, "Running mail sender task");
 			final var simulate = !Environment.PROD.equals(configurator.getEnvironment());
 
 			for(final var mail : mails) {
+				final var context = auditActionService.createAuditActionAndGenerateContext(
+					Actor.SYSTEM,
+					"Running mail sender task",
+					mail.getProjectId()
+				);
+
 				mailService.sendMail(mail, context, simulate);
 			}
 
