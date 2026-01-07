@@ -72,26 +72,28 @@
 	height: 36px;
 	border-radius: 50%;
 	background-color: var(--mat-sys-primary-container);
-	color: var(--mat-sys-primary);
+	color: var(--mat-sys-on-primary-fixed);
 	border: 1px solid #98e4e4;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	font: var(--mat-sys-title-small);
 	font-weight: 600;
+	font-size: 1rem;
 	flex-shrink: 0;
 }
 
 .step-content h3 {
 	margin: 0 0 0.3rem 0;
 	font: var(--mat-sys-title-medium);
-	color: var(--mat-sys-surface-container);
+	font-weight: 600;
+	color: var(--mat-sys-on-primary-fixed);
 }
 
 .step-content p {
 	margin: 0;
 	font: var(--mat-sys-body-medium);
-	color:  var(--mat-sys-primary);
+	color: var(--mat-sys-surface-container);
 	line-height: 1.5;
 }
 
