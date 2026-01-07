@@ -27,6 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.exception.security.WrongCredentialsException;
@@ -85,6 +86,7 @@ public class SessionController extends AbstractSecuredController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional(noRollbackFor = WrongCredentialsException.class)
+	@SkipProjectAccessCheck
 	public AuthenticationDTO login(
 		@Valid @RequestBody final CredentialsDTO credentials,
 		@RequestHeader("User-Agent") final String agent,
@@ -144,6 +146,7 @@ public class SessionController extends AbstractSecuredController {
 	@PostMapping("delegated")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
+	@SkipProjectAccessCheck
 	public AuthenticationDTO delegateLogin(
 		@Valid @RequestBody final DelegateLoginDTO delegateLogin,
 		@RequestHeader("User-Agent") final String agent
@@ -182,6 +185,7 @@ public class SessionController extends AbstractSecuredController {
 	@DeleteMapping
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
+	@SkipProjectAccessCheck
 	public void logout(
 		@RequestHeader("Authorization") final String bearerToken
 	) {
@@ -199,6 +203,7 @@ public class SessionController extends AbstractSecuredController {
 	@DeleteMapping("{pk}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
+	@SkipProjectAccessCheck
 	public void deleteToken(
 		@PathVariable final Long pk
 	) {
