@@ -12,7 +12,6 @@ import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
 import {LoginDisplay} from './login-display';
 import {AuthService} from '@core/services/auth.service';
 import {NotificationService} from '../services/notification.service';
-import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {LogoComponent} from '../logo/logo.component';
 
@@ -27,7 +26,6 @@ import {LogoComponent} from '../logo/logo.component';
 		MatError,
 		MatLabel,
 		MatButton,
-		LocalizeMapPipe,
 		LogoComponent
 	]
 })
