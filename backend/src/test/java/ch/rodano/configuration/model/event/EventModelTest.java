@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @Tag("configuration")
-public class EventTest {
+public class EventModelTest {
 	private static final String LANGUAGE_ID = LanguageStatic.en.name();
 
 	private static final String EVENT_MODEL_FIRST_ID = "EVENT_FIRST";
