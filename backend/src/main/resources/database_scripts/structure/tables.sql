@@ -36,6 +36,24 @@ create table if not exists project (
     constraint uq_project_code unique (code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
+drop table if exists project_audit;
+create table if not exists project_audit (
+	pk bigint(20) not null auto_increment,
+	project_id uuid not null,
+	audit_action_fk bigint(20) not null,
+	audit_datetime datetime(3) not null,
+	audit_actor varchar(200) not null,
+	audit_user_fk bigint(20) null,
+	audit_robot_fk bigint(20) null,
+	audit_context text not null,
+	audit_object_fk bigint(20) null,
+	code varchar(128) not null,
+	status enum('ACTIVE', 'CLOSED', 'ARCHIVED') not null,
+	shortname json null,
+	created datetime(3) not null,
+	constraint pk_project_audit primary key (pk)
+) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
+
 drop table if exists project_language;
 create table if not exists project_language (
     project_id uuid not null,

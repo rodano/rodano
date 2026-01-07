@@ -73,6 +73,7 @@ import ch.rodano.core.model.jooq.tables.ProfileTimelineGraphGrants;
 import ch.rodano.core.model.jooq.tables.ProfileWorkflowActionRights;
 import ch.rodano.core.model.jooq.tables.ProfileWorkflowRights;
 import ch.rodano.core.model.jooq.tables.Project;
+import ch.rodano.core.model.jooq.tables.ProjectAudit;
 import ch.rodano.core.model.jooq.tables.ProjectLanguage;
 import ch.rodano.core.model.jooq.tables.ProjectRuleTag;
 import ch.rodano.core.model.jooq.tables.Report;
@@ -481,6 +482,11 @@ public class Tables {
 	 * The table <code>project</code>.
 	 */
 	public static final Project PROJECT = Project.PROJECT;
+
+	/**
+	 * The table <code>project_audit</code>.
+	 */
+	public static final ProjectAudit PROJECT_AUDIT = ProjectAudit.PROJECT_AUDIT;
 
 	/**
 	 * The table <code>project_language</code>.

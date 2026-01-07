@@ -1,6 +1,7 @@
 package ch.rodano.api.project;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import jakarta.transaction.Transactional;
@@ -160,8 +161,13 @@ public class ProjectController extends AbstractSecuredController {
 		rightsService.checkRightAdmin(actor, currentRoles);
 
 		final var project = projectService.getProjectById(projectId);
+		final var oldStatus = project.getStatus();
+
 		project.setStatus(request.status());
-		projectService.updateProject(project);
+
+		final String auditContext = String.format("Status changed from %s to %s", oldStatus, request.status());
+
+		projectService.updateProjectWithActor(project, Optional.of(actor), auditContext);
 
 		return projectMapper.toDTO(project);
 	}

@@ -73,6 +73,7 @@ import ch.rodano.core.model.jooq.tables.ProfileTimelineGraphGrants;
 import ch.rodano.core.model.jooq.tables.ProfileWorkflowActionRights;
 import ch.rodano.core.model.jooq.tables.ProfileWorkflowRights;
 import ch.rodano.core.model.jooq.tables.Project;
+import ch.rodano.core.model.jooq.tables.ProjectAudit;
 import ch.rodano.core.model.jooq.tables.ProjectLanguage;
 import ch.rodano.core.model.jooq.tables.ProjectRuleTag;
 import ch.rodano.core.model.jooq.tables.Report;
@@ -497,6 +498,11 @@ public class DefaultSchema extends SchemaImpl {
 	public final Project PROJECT = Project.PROJECT;
 
 	/**
+	 * The table <code>project_audit</code>.
+	 */
+	public final ProjectAudit PROJECT_AUDIT = ProjectAudit.PROJECT_AUDIT;
+
+	/**
 	 * The table <code>project_language</code>.
 	 */
 	public final ProjectLanguage PROJECT_LANGUAGE = ProjectLanguage.PROJECT_LANGUAGE;
@@ -861,6 +867,7 @@ public class DefaultSchema extends SchemaImpl {
 			ProfileWorkflowActionRights.PROFILE_WORKFLOW_ACTION_RIGHTS,
 			ProfileWorkflowRights.PROFILE_WORKFLOW_RIGHTS,
 			Project.PROJECT,
+			ProjectAudit.PROJECT_AUDIT,
 			ProjectLanguage.PROJECT_LANGUAGE,
 			ProjectRuleTag.PROJECT_RULE_TAG,
 			Report.REPORT,

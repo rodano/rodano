@@ -1,3 +1,9 @@
+/* project */
+alter table project_audit add index idx_project_audit_project_id (project_id);
+alter table project_audit add index idx_project_audit_audit_action (audit_action_fk);
+alter table project_audit add index idx_project_audit_audit_user (audit_user_fk);
+alter table project_audit add index idx_project_audit_audit_robot (audit_robot_fk);
+
 /* scope */
 alter table scope add index idx_scope_scope_model_id (project_id, scope_model_id);
 

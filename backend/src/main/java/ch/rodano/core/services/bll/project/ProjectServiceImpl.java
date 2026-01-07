@@ -1,20 +1,30 @@
 package ch.rodano.core.services.bll.project;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
+import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.project.Project;
+import ch.rodano.core.services.dao.audit.AuditActionService;
+import ch.rodano.core.services.dao.project.ProjectAuditDAOService;
 import ch.rodano.core.services.dao.project.ProjectDAOService;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
 
 	private final ProjectDAOService projectDAOService;
+	private final AuditActionService auditActionService;
+	private final ProjectAuditDAOService projectAuditDAOService;
 
-	public ProjectServiceImpl(final ProjectDAOService projectDAOService) {
+	public ProjectServiceImpl(final ProjectDAOService projectDAOService,
+							  final AuditActionService auditActionService,
+							  final ProjectAuditDAOService projectAuditDAOService) {
 		this.projectDAOService = projectDAOService;
+		this.auditActionService = auditActionService;
+		this.projectAuditDAOService = projectAuditDAOService;
 	}
 
 	@Override
@@ -35,5 +45,18 @@ public class ProjectServiceImpl implements ProjectService {
 	@Override
 	public void updateProject(final Project project) {
 		projectDAOService.updateProject(project);
+	}
+
+	@Override
+	public void updateProjectWithActor(final Project project, final Optional<Actor> actor, final String auditContext) {
+		projectDAOService.updateProject(project);
+
+		final var actionContext = auditActionService.createAuditActionAndGenerateContext(
+			actor,
+			auditContext,
+			project.getProjectId()
+		);
+
+		projectAuditDAOService.createAudit(project.getProjectId(), actionContext);
 	}
 }

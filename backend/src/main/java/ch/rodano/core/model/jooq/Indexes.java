@@ -38,6 +38,7 @@ import ch.rodano.core.model.jooq.tables.PaymentBatch;
 import ch.rodano.core.model.jooq.tables.PaymentStep;
 import ch.rodano.core.model.jooq.tables.PaymentStepDistribution;
 import ch.rodano.core.model.jooq.tables.PaymentTarget;
+import ch.rodano.core.model.jooq.tables.ProjectAudit;
 import ch.rodano.core.model.jooq.tables.Resource;
 import ch.rodano.core.model.jooq.tables.Robot;
 import ch.rodano.core.model.jooq.tables.RobotAudit;
@@ -158,6 +159,10 @@ public class Indexes {
 	public static final Index PAYMENT_STEP_IDX_PAYMENT_STEP_PLAN = Internal.createIndex(DSL.name("idx_payment_step_plan"), PaymentStep.PAYMENT_STEP, new OrderField[] { PaymentStep.PAYMENT_STEP.PROJECT_ID, PaymentStep.PAYMENT_STEP.PAYMENT_PLAN_ID, PaymentStep.PAYMENT_STEP.SORT_ORDER }, false);
 	public static final Index PAYMENT_TARGET_IDX_PAYMENT_TARGET_DELETED = Internal.createIndex(DSL.name("idx_payment_target_deleted"), PaymentTarget.PAYMENT_TARGET, new OrderField[] { PaymentTarget.PAYMENT_TARGET.DELETED }, false);
 	public static final Index FIELD_POSSIBLE_VALUE_IDX_POSSIBLE_VALUE_FIELD = Internal.createIndex(DSL.name("idx_possible_value_field"), FieldPossibleValue.FIELD_POSSIBLE_VALUE, new OrderField[] { FieldPossibleValue.FIELD_POSSIBLE_VALUE.PROJECT_ID, FieldPossibleValue.FIELD_POSSIBLE_VALUE.FIELD_MODEL_ID, FieldPossibleValue.FIELD_POSSIBLE_VALUE.SORT_ORDER }, false);
+	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_AUDIT_ACTION = Internal.createIndex(DSL.name("idx_project_audit_audit_action"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.AUDIT_ACTION_FK }, false);
+	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_AUDIT_ROBOT = Internal.createIndex(DSL.name("idx_project_audit_audit_robot"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.AUDIT_ROBOT_FK }, false);
+	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_AUDIT_USER = Internal.createIndex(DSL.name("idx_project_audit_audit_user"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.AUDIT_USER_FK }, false);
+	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_PROJECT_ID = Internal.createIndex(DSL.name("idx_project_audit_project_id"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.PROJECT_ID }, false);
 	public static final Index RESOURCE_IDX_RESOURCE_DELETED = Internal.createIndex(DSL.name("idx_resource_deleted"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.DELETED }, false);
 	public static final Index RESOURCE_IDX_RESOURCE_PROJECT_UUID = Internal.createIndex(DSL.name("idx_resource_project_uuid"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.PROJECT_ID, Resource.RESOURCE.UUID }, false);
 	public static final Index ROBOT_AUDIT_IDX_ROBOT_AUDIT_PROJECT = Internal.createIndex(DSL.name("idx_robot_audit_project"), RobotAudit.ROBOT_AUDIT, new OrderField[] { RobotAudit.ROBOT_AUDIT.PROJECT_ID }, false);

@@ -2,6 +2,11 @@
 alter table project
     add constraint fk_project_epro_profile foreign key (project_id, epro_profile_id) references profile (project_id, profile_id);
 
+alter table project_audit
+	add constraint fk_project_audit_action foreign key (audit_action_fk) references audit_action (pk),
+	add constraint fk_project_audit_user foreign key (audit_user_fk) references user (pk),
+	add constraint fk_project_audit_robot foreign key (audit_robot_fk) references robot (pk);
+
 alter table project_language
     add constraint fk_proj_lang_project foreign key (project_id) references project (project_id);
 

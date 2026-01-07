@@ -13,6 +13,7 @@ import ch.rodano.core.model.jooq.tables.EventAudit.EventAuditPath;
 import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
 import ch.rodano.core.model.jooq.tables.FormAudit.FormAuditPath;
 import ch.rodano.core.model.jooq.tables.Project.ProjectPath;
+import ch.rodano.core.model.jooq.tables.ProjectAudit.ProjectAuditPath;
 import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
 import ch.rodano.core.model.jooq.tables.RobotAudit.RobotAuditPath;
 import ch.rodano.core.model.jooq.tables.RoleAudit.RoleAuditPath;
@@ -272,6 +273,18 @@ public class AuditAction extends TableImpl<AuditActionRecord> {
 			_formAudit = new FormAuditPath(this, null, Keys.FK_FORM_TRAIL_AUDIT_ACTION_FK.getInverseKey());
 
 		return _formAudit;
+	}
+
+	private transient ProjectAuditPath _projectAudit;
+
+	/**
+	 * Get the implicit to-many join path to the <code>project_audit</code> table
+	 */
+	public ProjectAuditPath projectAudit() {
+		if (_projectAudit == null)
+			_projectAudit = new ProjectAuditPath(this, null, Keys.FK_PROJECT_AUDIT_ACTION.getInverseKey());
+
+		return _projectAudit;
 	}
 
 	private transient RobotAuditPath _robotAudit;
