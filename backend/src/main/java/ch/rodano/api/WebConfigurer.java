@@ -29,6 +29,7 @@ import freemarker.template.TemplateException;
 import ch.rodano.api.configuration.interceptor.MustChangePasswordInterceptor;
 import ch.rodano.api.configuration.interceptor.RequestContextInterceptor;
 import ch.rodano.api.configuration.interceptor.TransactionCacheHandlerInterceptor;
+import ch.rodano.api.project.ProjectIdInterceptor;
 
 @Profile({ "api", "test" })
 @Configuration
@@ -38,6 +39,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 	private final MustChangePasswordInterceptor mustChangePasswordInterceptor;
 	private final TransactionCacheHandlerInterceptor transactionCacheHandlerInterceptor;
 	private final RequestContextInterceptor requestContextInterceptor;
+	private final ProjectIdInterceptor projectIdInterceptor;
 
 	private final Integer corePoolSize;
 	private final Integer maxPoolSize;
@@ -51,6 +53,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 		final MustChangePasswordInterceptor mustChangePasswordInterceptor,
 		final TransactionCacheHandlerInterceptor transactionCacheHandlerInterceptor,
 		final RequestContextInterceptor requestContextInterceptor,
+		final ProjectIdInterceptor projectIdInterceptor,
 		@Value("${rodano.controller.pool.core-size:-1}") final Integer corePoolSize,
 		@Value("${rodano.controller.pool.max-size:40}") final Integer maxPoolSize,
 		@Value("${rodano.controller.pool.queue-capacity:15}") final Integer poolQueueCapacity,
@@ -62,6 +65,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 		this.mustChangePasswordInterceptor = mustChangePasswordInterceptor;
 		this.transactionCacheHandlerInterceptor = transactionCacheHandlerInterceptor;
 		this.requestContextInterceptor = requestContextInterceptor;
+		this.projectIdInterceptor = projectIdInterceptor;
 		this.corePoolSize = corePoolSize;
 		this.maxPoolSize = maxPoolSize;
 		this.poolQueueCapacity = poolQueueCapacity;
@@ -88,6 +92,9 @@ public class WebConfigurer implements WebMvcConfigurer {
 		registry.addInterceptor(mustChangePasswordInterceptor).excludePathPatterns("/auth/password/change", "/me", "/config/study", "/config/public-study");
 		registry.addInterceptor(transactionCacheHandlerInterceptor);
 		registry.addInterceptor(requestContextInterceptor);
+		registry.addInterceptor(projectIdInterceptor)
+			.addPathPatterns("/config/**")
+			.excludePathPatterns("/config/public-study");
 	}
 
 	/**
