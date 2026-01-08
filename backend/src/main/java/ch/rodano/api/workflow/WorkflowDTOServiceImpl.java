@@ -53,6 +53,8 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.message = workflow.getMessage();
 		dto.icon = workflow.getIcon();
 
+		dto.searchable = workflow.isSearchable();
+
 		dto.states = createWorkflowStateDTOs(workflow.getStates(), acl);
 		dto.actions = WorkflowActionDTO.fromActions(workflow.getActions());
 

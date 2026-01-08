@@ -581,6 +581,11 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	}
 
 	@JsonIgnore
+	public List<Workflow> getSearchableWorkflowsOnScopeModel(final String ScopeModelId) {
+		return getScopeModel(ScopeModelId).getWorkflows().stream().filter(workflow -> !workflow.isAggregator()).filter(Workflow::isSearchable).toList();
+	}
+
+	@JsonIgnore
 	public List<FieldModel> getSearchableFieldsOnScopeModel(final String ScopeModelId) {
 		return getScopeModel(ScopeModelId).getDatasetModels().stream()
 			.flatMap(d -> d.getFieldModels().stream())

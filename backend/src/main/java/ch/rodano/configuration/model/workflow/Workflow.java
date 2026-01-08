@@ -67,6 +67,7 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	private boolean mandatory;
 	private String actionId;
 	private boolean unique;
+	private boolean searchable;
 
 	private String aggregateWorkflowId;
 
@@ -203,6 +204,14 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 
 	public void setUnique(final boolean unique) {
 		this.unique = unique;
+	}
+
+	public final boolean isSearchable() {
+		return searchable;
+	}
+
+	public final void setSearchable(final boolean searchable) {
+		this.searchable = searchable;
 	}
 
 	@JsonIgnore

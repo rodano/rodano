@@ -3,6 +3,7 @@ import {Utils} from '../utils.js';
 import {DisplayableNode} from '../node_displayable.js';
 import {Entities} from '../entities.js';
 import {RuleEntities} from '../rule_entities.js';
+import {Search} from '../../../search.js';
 
 function draw_workflow_state(state, languages) {
 	const state_html = document.createFullElement('li', {style: 'float: left;'});
@@ -29,6 +30,7 @@ export class Workflow extends DisplayableNode {
 			initialStateId: {type: 'string'},
 			actionId: {type: 'string'},
 			unique: {type: 'boolean'},
+			searchable: {type: 'boolean'},
 			aggregateWorkflowId: {type: 'string'},
 			message: {type: 'object'},
 			icon: {type: 'string'},
@@ -61,6 +63,7 @@ export class Workflow extends DisplayableNode {
 		this.aggregateWorkflowId = undefined;
 		this.message = {};
 		this.icon = undefined;
+		this.searchable = false;
 		EntitiesHooks?.CreateNode.call(this, values);
 	}
 
@@ -236,6 +239,9 @@ export class Workflow extends DisplayableNode {
 		//unused
 		if(!this.isUsed()) {
 			report.addInfo(`Workflow ${this.id} is unused`, this, this['delete'], 'Delete workflow');
+		}
+		if (typeof this.searchable !== 'boolean') {
+			report.addError(`Workflow ${this.id} has an invalid 'searchable' property. It must be a boolean.`);
 		}
 		return report;
 	}

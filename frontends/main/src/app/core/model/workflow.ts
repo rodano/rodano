@@ -34,6 +34,10 @@ export interface Workflow {
      * Is the workflow mandatory?
      */
     mandatory: boolean;
+    /**
+     * Is the workflow searchable?
+     */
+    searchable: boolean;
     actionId?: string;
     /**
      * Message attached to the workflow
