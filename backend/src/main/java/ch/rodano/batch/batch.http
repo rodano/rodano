@@ -2,7 +2,9 @@
 POST http://localhost:8080/api/batch/import
 Content-Type: application/json
 
-{}
+{
+  "projectId": "TEST"
+}
 
 ### Start import job with overrides
 POST http://localhost:8080/api/batch/import
@@ -21,3 +23,16 @@ GET http://localhost:8080/api/batch/execution/1
 
 ### Stop execution with id 1
 POST http://localhost:8080/api/batch/execution/1/stop
+
+### Initialize project runtime data
+POST http://localhost:8080/administration/projects/initialize
+Content-Type: application/json
+
+{
+  "projectCode": "TEST_FARIS",
+  "adminName": "Test User",
+  "adminEmail": "test@rodano.ch",
+  "adminPassword": "Password1!",
+  "withDemoUsers": true,
+  "withDemoData": true
+}
