@@ -42,6 +42,7 @@ import freemarker.template.TemplateExceptionHandler;
 import ch.rodano.api.controller.user.exception.InvalidEmailException;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.configuration.model.feature.FeatureStatic;
+import ch.rodano.core.configuration.mail.GlobalMailConfiguration;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.mail.CustomizedTemplatedMail;
 import ch.rodano.core.model.mail.DefinedTemplatedMail;
@@ -74,6 +75,7 @@ public class MailServiceImpl implements MailService {
 	private final MailAttachmentDAOService mailAttachmentDAOService;
 	private final ScopeDAOService scopeDAOService;
 	private final UserDAOService userDAOService;
+	private final GlobalMailConfiguration globalMailConfiguration;
 
 	public MailServiceImpl(
 		final JavaMailSender sender,
@@ -83,7 +85,8 @@ public class MailServiceImpl implements MailService {
 		final MailDAOService mailDAOService,
 		final MailAttachmentDAOService mailAttachmentDAOService,
 		final ScopeDAOService scopeDAOService,
-		final UserDAOService userDAOService
+		final UserDAOService userDAOService,
+		final GlobalMailConfiguration globalMailConfiguration
 	) {
 		this.sender = sender;
 		this.resourceLoader = resourceLoader;
@@ -93,6 +96,7 @@ public class MailServiceImpl implements MailService {
 		this.mailAttachmentDAOService = mailAttachmentDAOService;
 		this.scopeDAOService = scopeDAOService;
 		this.userDAOService = userDAOService;
+		this.globalMailConfiguration = globalMailConfiguration;
 
 		freemarkerConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 	}
@@ -190,6 +194,30 @@ public class MailServiceImpl implements MailService {
 		mail.setProjectId(study.getProjectId());
 		mail.setSender(study.getEmail());
 		mail.setReplyTo(study.getEmail());
+
+		return mailDAOService.saveMail(mail, context, rationale);
+	}
+
+	private Mail createGlobalMail(final DefinedTemplatedMail definedTemplatedMail, final DatabaseActionContext context, final String rationale) {
+		final var mail = new Mail(definedTemplatedMail);
+		final var template = definedTemplatedMail.getTemplate();
+		final var templateParameters = definedTemplatedMail.getTemplateParameters();
+
+		final var stl = new SpringTemplateLoader(resourceLoader, "classpath:emails/");
+		final var sl = new StringTemplateLoader();
+		sl.putTemplate("subject", template.getSubject());
+		final var loader = new MultiTemplateLoader(new TemplateLoader[] { stl, sl });
+
+		mail.setProjectId(null);
+
+		mail.setSubject(readTemplate("subject", templateParameters, loader));
+		mail.setTextBody(readTemplate(template.getBodyTextFilename(), templateParameters, loader));
+		mail.setHtmlBody(readTemplate(template.getBodyHTMLFilename(), templateParameters, loader));
+
+		mail.setStatus(MailStatus.PENDING);
+		final var contextDate = context.auditAction().getDate();
+		mail.setCreationTime(contextDate);
+		mail.setLastUpdateTime(contextDate);
 
 		return mailDAOService.saveMail(mail, context, rationale);
 	}
@@ -388,7 +416,7 @@ public class MailServiceImpl implements MailService {
 			Map.entry("expiry_limit_in_minutes", expiryTimeInMinutes)
 		);
 
-		final var mail = prepareMail(
+		final var mail = prepareGlobalMail(
 			recipient,
 			MailTemplate.PASSWORD_RESET,
 			templateVars,
@@ -396,7 +424,7 @@ public class MailServiceImpl implements MailService {
 			"Send password reset instructions"
 		);
 
-		createMail(mail, context, "Send password reset instructions");
+		createGlobalMail(mail, context, "Send password reset instructions");
 	}
 
 	@Override
@@ -407,7 +435,7 @@ public class MailServiceImpl implements MailService {
 			Map.entry("recovery_url", url)
 		);
 
-		final var mail = prepareMail(
+		final var mail = prepareGlobalMail(
 			recipient,
 			MailTemplate.ACCOUNT_LOCKED,
 			templateVars,
@@ -415,7 +443,7 @@ public class MailServiceImpl implements MailService {
 			"Send account unlocking instructions"
 		);
 
-		createMail(mail, context, "Send account recovery instructions");
+		createGlobalMail(mail, context, "Send account recovery instructions");
 	}
 
 	@Override
@@ -423,7 +451,7 @@ public class MailServiceImpl implements MailService {
 		final User recipient,
 		final DatabaseActionContext context
 	) {
-		final var mail = prepareMail(
+		final var mail = prepareGlobalMail(
 			recipient,
 			MailTemplate.EXTERNAL_USER_CANNOT_RECOVER_PASSWORD,
 			Collections.emptyMap(),
@@ -431,7 +459,7 @@ public class MailServiceImpl implements MailService {
 			"Externally managed user cannot recover their password"
 		);
 
-		createMail(mail, context, "Externally managed user cannot recover their password");
+		createGlobalMail(mail, context, "Externally managed user cannot recover their password");
 	}
 
 	@Override
@@ -603,6 +631,37 @@ public class MailServiceImpl implements MailService {
 
 		return mail;
 	}
+
+	private DefinedTemplatedMail prepareGlobalMail(final User recipientUser,
+												   final MailTemplate template,
+												   final Map<String, Object> templateVars,
+												   final Set<String> recipients,
+												   final String intent) {
+
+		final Map<String, Object> baseVars = Map.ofEntries(
+			Map.entry("application_name", globalMailConfiguration.getApplicationName()),
+			Map.entry("global_reply_to", globalMailConfiguration.getReplyTo()),
+			Map.entry("user", recipientUser)
+		);
+
+		final var finalTemplateVars = Stream.concat(baseVars.entrySet().stream(), templateVars.entrySet().stream())
+			.collect(
+				Collectors.toMap(
+					Map.Entry::getKey,
+					Map.Entry::getValue,
+					(_, v2) -> v2
+				)
+			);
+
+		final var mail = new DefinedTemplatedMail(template, finalTemplateVars);
+		mail.setSender(globalMailConfiguration.getFrom());
+		mail.setReplyTo(globalMailConfiguration.getReplyTo());
+		mail.setRecipients(recipients);
+		mail.setOrigin(MailOrigin.SYSTEM);
+		mail.setIntent(intent);
+		return mail;
+	}
+
 
 	@Override
 	public void exportMails(final OutputStream out, final List<Mail> mails) throws IOException {

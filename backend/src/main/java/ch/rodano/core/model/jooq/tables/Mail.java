@@ -76,7 +76,7 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.project_id</code>.
 	 */
-	public final TableField<MailRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
+	public final TableField<MailRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>mail.creation_time</code>.

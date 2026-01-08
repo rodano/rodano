@@ -7,9 +7,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -36,9 +34,6 @@ import ch.rodano.core.model.exception.security.TooManyAttemptsException;
 import ch.rodano.core.model.exception.security.WeakPasswordException;
 import ch.rodano.core.model.exception.security.WrongCredentialsException;
 import ch.rodano.core.model.exception.security.WrongPasswordException;
-import ch.rodano.core.model.mail.DefinedTemplatedMail;
-import ch.rodano.core.model.mail.MailOrigin;
-import ch.rodano.core.model.mail.MailTemplate;
 import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.rules.data.DataState;
 import ch.rodano.core.model.user.User;
@@ -447,8 +442,6 @@ public class UserSecurityService {
 	}
 
 	public void triggerPasswordReset(final User user, final String url, final DatabaseActionContext context) {
-		final var study = studyService.getStudy();
-
 		//external user
 		if(user.isExternallyManaged()) {
 			mailService.sendExternalUserCanNotRecoverPasswordNotification(user, context);
@@ -458,20 +451,8 @@ public class UserSecurityService {
 
 		//user not activated
 		if(!user.isActivated()) {
-			final var mail = new DefinedTemplatedMail(
-				MailTemplate.VALIDATE_REGISTRATION_FIRST, Map.ofEntries(
-				Map.entry("study", study),
-				Map.entry("user", user)
-			)
-			);
-			mail.setSender(study.getEmail());
-			mail.setRecipients(Collections.singleton(user.getEmail()));
-			mail.setOrigin(MailOrigin.SYSTEM);
-			mail.setIntent("Validate registration to recover password");
-			mailService.createMail(mail, context, "Validate registration to recover password");
-
 			logger.info("User {} tried to reset his password but has not validated his account", user.getEmail());
-			return;
+			throw new IllegalStateException("Please activate your account first.");
 		}
 
 		// Normal case

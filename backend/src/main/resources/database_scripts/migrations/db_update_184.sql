@@ -3,28 +3,49 @@
    ========================================================== */
 
 alter table project
-	add column shortname                  json         null after code,
-	add column longname                   json         null,
-	add column description                json         null,
-	add column url                        varchar(512) null,
-	add column email                      varchar(255) null,
-	add column color                      varchar(9)   null,
-	add column introduction_text          mediumtext   null,
-	add column smtp_tls                   boolean      not null default false,
-	add column password_strong            boolean      not null default false,
-	add column password_length            int          null,
-	add column password_validity_duration int          null,
-	add column password_unique            boolean      not null default false,
-	add column epro_enabled               boolean      not null default false,
-	add column epro_profile_id            uuid         null,
-	add column client_name                varchar(255) null,
-	add column client_email               varchar(255) null,
-	add column protocol_no                varchar(64)  null,
-	add column version_number             varchar(32)  null,
-	add column version_date               date         null,
-	add column config_version             int          null,
-	add column config_date                bigint       null,
-	add column config_user                varchar(128) null;
+	add column shortname                  json                                  null after code,
+	add column longname                   json                                  null,
+	add column description                json                                  null,
+	add column url                        varchar(512)                          null,
+	add column email                      varchar(255)                          null,
+	add column color                      varchar(9)                            null,
+	add column introduction_text          mediumtext                            null,
+	add column smtp_tls                   boolean                               not null default false,
+	add column password_strong            boolean                               not null default false,
+	add column password_length            int                                   null,
+	add column password_validity_duration int                                   null,
+	add column password_unique            boolean                               not null default false,
+	add column epro_enabled               boolean                               not null default false,
+	add column epro_profile_id            uuid                                  null,
+	add column client_name                varchar(255)                          null,
+	add column client_email               varchar(255)                          null,
+	add column protocol_no                varchar(64)                           null,
+	add column version_number             varchar(32)                           null,
+	add column version_date               date                                  null,
+	add column config_version             int                                   null,
+	add column config_date                bigint                                null,
+	add column config_user                varchar(128)                          null,
+	add column status                     enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null default 'ACTIVE',
+	add column created                    datetime(3)                           not null default current_timestamp(3);
+
+create table if not exists project_audit (
+	pk              bigint(20)                            not null auto_increment,
+	project_id      uuid                                  not null,
+	audit_action_fk bigint(20)                            not null,
+	audit_datetime  datetime(3)                           not null,
+	audit_actor     varchar(200)                          not null,
+	audit_user_fk   bigint(20)                            null,
+	audit_robot_fk  bigint(20)                            null,
+	audit_context   text                                  not null,
+	audit_object_fk bigint(20)                            null,
+	code            varchar(128)                          not null,
+	status          enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null,
+	shortname       json                                  null,
+	created         datetime(3)                           not null,
+	constraint pk_project_audit primary key (pk)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
 
 create table if not exists project_language (
 	project_id uuid       not null,

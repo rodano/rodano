@@ -63,7 +63,6 @@ update workflow_status set project_id = @project_id where project_id is null;
 update workflow_status_audit set project_id = @project_id where project_id is null;
 
 -- Make project_id not null
-alter table audit_action modify column project_id uuid not null;
 alter table dataset modify column project_id uuid not null;
 alter table dataset_audit modify column project_id uuid not null;
 alter table event modify column project_id uuid not null;
@@ -74,8 +73,6 @@ alter table file modify column project_id uuid not null;
 alter table form modify column project_id uuid not null;
 alter table form_audit modify column project_id uuid not null;
 alter table internal_patch modify column project_id uuid not null;
-alter table mail modify column project_id uuid not null;
-alter table mail_attachment modify column project_id uuid not null;
 alter table payment modify column project_id uuid not null;
 alter table payment_batch modify column project_id uuid not null;
 alter table payment_target modify column project_id uuid not null;

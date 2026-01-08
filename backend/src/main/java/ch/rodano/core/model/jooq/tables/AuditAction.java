@@ -82,7 +82,7 @@ public class AuditAction extends TableImpl<AuditActionRecord> {
 	/**
 	 * The column <code>audit_action.project_id</code>.
 	 */
-	public final TableField<AuditActionRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
+	public final TableField<AuditActionRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>audit_action.date</code>.

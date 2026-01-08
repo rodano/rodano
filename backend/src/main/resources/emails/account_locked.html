@@ -7,16 +7,16 @@
 	<body>
 		<p>Dear ${user.name},</p>
 
-		<p>We would like to inform that someone tried to log in to <b>${study.defaultLocalizedLongname}</b> with your account multiple times with an invalid password. As a security measure, we locked your account.</p>
+		<p>We would like to inform that someone tried to log in to <b>${application_name}</b> with your account multiple times with an invalid password. As a security measure, we locked your account.</p>
 
 		<p>If it was you that tried to log in and you forgot your password, you must go to the login page and click "I forgot my password". We will send you a password reset link to reset your password. In that case, you can disregard this e-mail.</p>
 
 		<p>Otherwise, you must unlock your account by clicking <a href="${recovery_url}">here</a>.</p>
 
-		<p>In case of trouble, please send an e-mail to <a href="mailto:${study.email}">${study.email}</a>.</p>
+		<p>In case of trouble, please send an e-mail to <a href="mailto:${global_reply_to}">${global_reply_to}</a>.</p>
 
 		<p>With our best regards,</p>
-		<p>The <b>${study.defaultLocalizedLongname}</b> support team.</p>
+		<p>The <b>${application_name}</b> support team.</p>
 
 		<p>*** This is an automatic notification, please do not reply ***</p>
 	</body>

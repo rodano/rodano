@@ -71,7 +71,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	/**
 	 * The column <code>mail_attachment.project_id</code>.
 	 */
-	public final TableField<MailAttachmentRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.nullable(false), this, "");
+	public final TableField<MailAttachmentRecord, UUID> PROJECT_ID = createField(DSL.name("project_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>mail_attachment.creation_time</code>.

@@ -1018,7 +1018,7 @@ create table user_session (
 drop table if exists mail;
 create table mail (
 	pk bigint(20) not null auto_increment,
-    project_id uuid not null,
+    project_id uuid null,
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	attempts int(11) not null default '0',
@@ -1039,7 +1039,7 @@ create table mail (
 drop table if exists mail_attachment;
 create table mail_attachment (
 	pk bigint(20) not null auto_increment,
-    project_id uuid not null,
+    project_id uuid null,
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	mail_fk bigint(20) not null,
@@ -1139,7 +1139,7 @@ create table file (
 drop table if exists audit_action;
 create table audit_action (
 	pk bigint(20) not null auto_increment,
-    project_id uuid not null,
+    project_id uuid null,
 	date datetime(3) not null default now(3),
 	user_fk bigint(20) default null,
 	robot_fk bigint(20) default null,

@@ -10,6 +10,11 @@ set FOREIGN_KEY_CHECKS = 1;
 alter table project
 	add constraint fk_project_epro_profile foreign key (project_id, epro_profile_id) references profile (project_id, profile_id);
 
+alter table project_audit
+	add constraint fk_project_audit_action foreign key (audit_action_fk) references audit_action (pk),
+	add constraint fk_project_audit_user foreign key (audit_user_fk) references user (pk),
+	add constraint fk_project_audit_robot foreign key (audit_robot_fk) references robot (pk);
+
 alter table project_language
 	add constraint fk_proj_lang_project foreign key (project_id) references project (project_id);
 
@@ -421,6 +426,13 @@ alter table internal_patch
 -- ============================================================
 -- INDEXES
 -- ============================================================
+
+alter table project_audit
+	add index idx_project_audit_project_id (project_id),
+	add index idx_project_audit_audit_action (audit_action_fk),
+	add index idx_project_audit_audit_user (audit_user_fk),
+	add index idx_project_audit_audit_robot (audit_robot_fk);
+
 alter table scope
 	add index idx_scope_scope_model_id (project_id, scope_model_id);
 

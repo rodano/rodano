@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS `audit_action`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `audit_action` (
   `pk` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_id` uuid NOT NULL,
+  `project_id` uuid NULL,
   `date` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `user_fk` bigint(20) DEFAULT NULL,
   `robot_fk` bigint(20) DEFAULT NULL,
@@ -3902,7 +3902,7 @@ DROP TABLE IF EXISTS `mail`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mail` (
   `pk` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_id` uuid NOT NULL,
+  `project_id` uuid NULL,
   `creation_time` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `last_update_time` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `attempts` int(11) NOT NULL DEFAULT 0,
@@ -3998,7 +3998,7 @@ DROP TABLE IF EXISTS `mail_attachment`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `mail_attachment` (
   `pk` bigint(20) NOT NULL AUTO_INCREMENT,
-  `project_id` uuid NOT NULL,
+  `project_id` uuid NULL,
   `creation_time` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `last_update_time` datetime(3) NOT NULL DEFAULT current_timestamp(3),
   `mail_fk` bigint(20) NOT NULL,
