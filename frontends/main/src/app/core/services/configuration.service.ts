@@ -94,6 +94,12 @@ export class ConfigurationService {
 		return this.http.get<Workflow[]>(`${this.serviceUrl}/workflows/${scopeModel.id}`);
 	}
 
+	getSearchableWorkflowsOnScope(scopeModel: ScopeModel): Observable<Workflow[]> {
+		return this.getWorkflowsOnScope(scopeModel).pipe(
+			map(workflows => workflows.filter(w => w.searchable))
+		);
+	}
+
 	getProfiles(): Observable<Profile[]> {
 		return this.getStudy().pipe(map(study => study.profiles));
 	}

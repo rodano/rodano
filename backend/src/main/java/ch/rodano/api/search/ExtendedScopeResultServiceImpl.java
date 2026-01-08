@@ -120,7 +120,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		final var now = ZonedDateTime.now();
 		final List<Condition> conditions = new ArrayList<>();
 
-		final var workflowsOnScopeModel = studyService.getStudy().getWorkflowsOnScopeModel(scopeModel.getId());
+		final var workflowsOnScopeModel = studyService.getStudy().getSearchableWorkflowsOnScopeModel(scopeModel.getId());
 		final var searchableFieldsOnScopeModel = studyService.getStudy().getSearchableFieldsOnScopeModel(scopeModel.getId());
 
 		// if no criteria are provided, add default criteria to only retrieve scopes

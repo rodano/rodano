@@ -35,6 +35,10 @@ export interface Workflow {
      */
     mandatory: boolean;
     /**
+     * Is the workflow searchable?
+     */
+    searchable: boolean;
+    /**
      * ID of the action than can be used to create the workflow
      */
     actionId?: string;

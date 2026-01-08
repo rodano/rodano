@@ -168,7 +168,7 @@ export class SearchComponent implements OnInit {
 	private initializeData(): void {
 		forkJoin({
 			scopeModel: this.configurationService.getScopeModels(),
-			workflows: this.configurationService.getWorkflowsOnScope(this.leafScopeModel),
+			workflows: this.configurationService.getSearchableWorkflowsOnScope(this.leafScopeModel),
 			parentScopes: this.meService.getScopes(undefined, true, false),
 			searchableFields: this.configurationService.getSearchableFieldModels(),
 			formModels: this.configurationService.getLeafScopeModelFormModels()
