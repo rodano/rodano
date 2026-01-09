@@ -61,7 +61,7 @@ export class LoginComponent implements OnInit {
 		private configurationService: ConfigurationService,
 		private authStateService: AuthStateService,
 		private router: Router,
-		private route: ActivatedRoute,
+		private activatedRoute: ActivatedRoute,
 		private authService: AuthService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
@@ -69,7 +69,7 @@ export class LoginComponent implements OnInit {
 
 	ngOnInit() {
 		this.configurationService.getPublicStudy().subscribe(study => this.study = study);
-		this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '';
+		this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '';
 	}
 
 	login() {
