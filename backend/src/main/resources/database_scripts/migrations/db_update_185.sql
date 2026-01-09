@@ -8,7 +8,8 @@ set FOREIGN_KEY_CHECKS = 1;
 -- FOREIGN KEYS
 -- ============================================================
 alter table project
-	add constraint fk_project_epro_profile foreign key (project_id, epro_profile_id) references profile (project_id, profile_id);
+	add constraint fk_project_epro_profile foreign key (project_id, epro_profile_id) references profile (project_id, profile_id),
+	add constraint fk_project_active_config_version foreign key (active_config_version_fk) references project_config_version (pk);
 
 alter table project_audit
 	add constraint fk_project_audit_action foreign key (audit_action_fk) references audit_action (pk),
@@ -20,6 +21,11 @@ alter table project_language
 
 alter table project_rule_tag
 	add constraint fk_proj_rule_tag_project foreign key (project_id) references project (project_id);
+
+alter table project_config_version
+	add constraint fk_project_config_version_project foreign key (project_id) references project (project_id),
+	add constraint fk_project_config_version_created foreign key (created_by) references user (pk),
+	add constraint fk_project_config_version_published foreign key (published_by) references user (pk);
 
 alter table scope_model
 	add constraint fk_scope_model_project foreign key (project_id) references project (project_id);
@@ -426,6 +432,9 @@ alter table internal_patch
 -- ============================================================
 -- INDEXES
 -- ============================================================
+
+alter table project_config_version
+	add index idx_project_config_version_project_status (project_id, status);
 
 alter table project_audit
 	add index idx_project_audit_project_id (project_id),

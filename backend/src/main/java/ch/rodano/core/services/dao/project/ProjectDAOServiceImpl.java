@@ -67,7 +67,6 @@ public class ProjectDAOServiceImpl implements ProjectDAOService {
 		project.setColor(record.getColor());
 		project.setIntroductionText(record.getIntroductionText());
 		project.setVersionDate(record.getVersionDate());
-		project.setConfigDate(record.getConfigDate());
 		project.setStatus(record.getStatus());
 		project.setCreatedDate(record.getCreated());
 

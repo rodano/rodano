@@ -1,4 +1,6 @@
 /* project */
+alter table project_config_version add index idx_project_config_version_project_status (project_id, status);
+
 alter table project_audit add index idx_project_audit_project_id (project_id);
 alter table project_audit add index idx_project_audit_audit_action (audit_action_fk);
 alter table project_audit add index idx_project_audit_audit_user (audit_user_fk);

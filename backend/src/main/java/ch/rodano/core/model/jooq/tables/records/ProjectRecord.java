@@ -318,73 +318,45 @@ public class ProjectRecord extends UpdatableRecordImpl<ProjectRecord> {
 	}
 
 	/**
-	 * Setter for <code>project.config_version</code>.
-	 */
-	public void setConfigVersion(Integer value) {
-		set(21, value);
-	}
-
-	/**
-	 * Getter for <code>project.config_version</code>.
-	 */
-	public Integer getConfigVersion() {
-		return (Integer) get(21);
-	}
-
-	/**
-	 * Setter for <code>project.config_date</code>.
-	 */
-	public void setConfigDate(Long value) {
-		set(22, value);
-	}
-
-	/**
-	 * Getter for <code>project.config_date</code>.
-	 */
-	public Long getConfigDate() {
-		return (Long) get(22);
-	}
-
-	/**
-	 * Setter for <code>project.config_user</code>.
-	 */
-	public void setConfigUser(String value) {
-		set(23, value);
-	}
-
-	/**
-	 * Getter for <code>project.config_user</code>.
-	 */
-	public String getConfigUser() {
-		return (String) get(23);
-	}
-
-	/**
 	 * Setter for <code>project.status</code>.
 	 */
 	public void setStatus(ProjectStatus value) {
-		set(24, value);
+		set(21, value);
 	}
 
 	/**
 	 * Getter for <code>project.status</code>.
 	 */
 	public ProjectStatus getStatus() {
-		return (ProjectStatus) get(24);
+		return (ProjectStatus) get(21);
 	}
 
 	/**
 	 * Setter for <code>project.created</code>.
 	 */
 	public void setCreated(ZonedDateTime value) {
-		set(25, value);
+		set(22, value);
 	}
 
 	/**
 	 * Getter for <code>project.created</code>.
 	 */
 	public ZonedDateTime getCreated() {
-		return (ZonedDateTime) get(25);
+		return (ZonedDateTime) get(22);
+	}
+
+	/**
+	 * Setter for <code>project.active_config_version_fk</code>.
+	 */
+	public void setActiveConfigVersionFk(Long value) {
+		set(23, value);
+	}
+
+	/**
+	 * Getter for <code>project.active_config_version_fk</code>.
+	 */
+	public Long getActiveConfigVersionFk() {
+		return (Long) get(23);
 	}
 
 	// -------------------------------------------------------------------------
@@ -410,7 +382,7 @@ public class ProjectRecord extends UpdatableRecordImpl<ProjectRecord> {
 	/**
 	 * Create a detached, initialised ProjectRecord
 	 */
-	public ProjectRecord(UUID projectId, String code, String shortname, String longname, String description, String url, String email, String color, String introductionText, Boolean smtpTls, Boolean passwordStrong, Integer passwordLength, Integer passwordValidityDuration, Boolean passwordUnique, Boolean eproEnabled, UUID eproProfileId, String clientName, String clientEmail, String protocolNo, String versionNumber, LocalDate versionDate, Integer configVersion, Long configDate, String configUser, ProjectStatus status, ZonedDateTime created) {
+	public ProjectRecord(UUID projectId, String code, String shortname, String longname, String description, String url, String email, String color, String introductionText, Boolean smtpTls, Boolean passwordStrong, Integer passwordLength, Integer passwordValidityDuration, Boolean passwordUnique, Boolean eproEnabled, UUID eproProfileId, String clientName, String clientEmail, String protocolNo, String versionNumber, LocalDate versionDate, ProjectStatus status, ZonedDateTime created, Long activeConfigVersionFk) {
 		super(Project.PROJECT);
 
 		setProjectId(projectId);
@@ -434,11 +406,9 @@ public class ProjectRecord extends UpdatableRecordImpl<ProjectRecord> {
 		setProtocolNo(protocolNo);
 		setVersionNumber(versionNumber);
 		setVersionDate(versionDate);
-		setConfigVersion(configVersion);
-		setConfigDate(configDate);
-		setConfigUser(configUser);
 		setStatus(status);
 		setCreated(created);
+		setActiveConfigVersionFk(activeConfigVersionFk);
 		resetChangedOnNotNull();
 	}
 }

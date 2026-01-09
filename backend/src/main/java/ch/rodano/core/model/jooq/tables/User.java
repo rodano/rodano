@@ -15,6 +15,7 @@ import ch.rodano.core.model.jooq.tables.FieldAudit.FieldAuditPath;
 import ch.rodano.core.model.jooq.tables.File.FilePath;
 import ch.rodano.core.model.jooq.tables.FormAudit.FormAuditPath;
 import ch.rodano.core.model.jooq.tables.ProjectAudit.ProjectAuditPath;
+import ch.rodano.core.model.jooq.tables.ProjectConfigVersion.ProjectConfigVersionPath;
 import ch.rodano.core.model.jooq.tables.Resource.ResourcePath;
 import ch.rodano.core.model.jooq.tables.RobotAudit.RobotAuditPath;
 import ch.rodano.core.model.jooq.tables.Role.RolePath;
@@ -80,6 +81,11 @@ public class User extends TableImpl<UserRecord> {
 	 * The column <code>user.pk</code>.
 	 */
 	public final TableField<UserRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+
+	/**
+	 * The column <code>user.is_superuser</code>.
+	 */
+	public final TableField<UserRecord, Boolean> IS_SUPERUSER = createField(DSL.name("is_superuser"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>user.creation_time</code>.
@@ -380,6 +386,34 @@ public class User extends TableImpl<UserRecord> {
 			_projectAudit = new ProjectAuditPath(this, null, Keys.FK_PROJECT_AUDIT_USER.getInverseKey());
 
 		return _projectAudit;
+	}
+
+	private transient ProjectConfigVersionPath _fkProjectConfigVersionCreated;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>project_config_version</code> table, via the
+	 * <code>fk_project_config_version_created</code> key
+	 */
+	public ProjectConfigVersionPath fkProjectConfigVersionCreated() {
+		if (_fkProjectConfigVersionCreated == null)
+			_fkProjectConfigVersionCreated = new ProjectConfigVersionPath(this, null, Keys.FK_PROJECT_CONFIG_VERSION_CREATED.getInverseKey());
+
+		return _fkProjectConfigVersionCreated;
+	}
+
+	private transient ProjectConfigVersionPath _fkProjectConfigVersionPublished;
+
+	/**
+	 * Get the implicit to-many join path to the
+	 * <code>project_config_version</code> table, via the
+	 * <code>fk_project_config_version_published</code> key
+	 */
+	public ProjectConfigVersionPath fkProjectConfigVersionPublished() {
+		if (_fkProjectConfigVersionPublished == null)
+			_fkProjectConfigVersionPublished = new ProjectConfigVersionPath(this, null, Keys.FK_PROJECT_CONFIG_VERSION_PUBLISHED.getInverseKey());
+
+		return _fkProjectConfigVersionPublished;
 	}
 
 	private transient ResourcePath _resource;

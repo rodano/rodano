@@ -39,6 +39,7 @@ import ch.rodano.core.model.jooq.tables.PaymentStep;
 import ch.rodano.core.model.jooq.tables.PaymentStepDistribution;
 import ch.rodano.core.model.jooq.tables.PaymentTarget;
 import ch.rodano.core.model.jooq.tables.ProjectAudit;
+import ch.rodano.core.model.jooq.tables.ProjectConfigVersion;
 import ch.rodano.core.model.jooq.tables.Resource;
 import ch.rodano.core.model.jooq.tables.Robot;
 import ch.rodano.core.model.jooq.tables.RobotAudit;
@@ -163,6 +164,7 @@ public class Indexes {
 	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_AUDIT_ROBOT = Internal.createIndex(DSL.name("idx_project_audit_audit_robot"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.AUDIT_ROBOT_FK }, false);
 	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_AUDIT_USER = Internal.createIndex(DSL.name("idx_project_audit_audit_user"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.AUDIT_USER_FK }, false);
 	public static final Index PROJECT_AUDIT_IDX_PROJECT_AUDIT_PROJECT_ID = Internal.createIndex(DSL.name("idx_project_audit_project_id"), ProjectAudit.PROJECT_AUDIT, new OrderField[] { ProjectAudit.PROJECT_AUDIT.PROJECT_ID }, false);
+	public static final Index PROJECT_CONFIG_VERSION_IDX_PROJECT_CONFIG_VERSION_PROJECT_STATUS = Internal.createIndex(DSL.name("idx_project_config_version_project_status"), ProjectConfigVersion.PROJECT_CONFIG_VERSION, new OrderField[] { ProjectConfigVersion.PROJECT_CONFIG_VERSION.PROJECT_ID, ProjectConfigVersion.PROJECT_CONFIG_VERSION.STATUS }, false);
 	public static final Index RESOURCE_IDX_RESOURCE_DELETED = Internal.createIndex(DSL.name("idx_resource_deleted"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.DELETED }, false);
 	public static final Index RESOURCE_IDX_RESOURCE_PROJECT_UUID = Internal.createIndex(DSL.name("idx_resource_project_uuid"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.PROJECT_ID, Resource.RESOURCE.UUID }, false);
 	public static final Index ROBOT_AUDIT_IDX_ROBOT_AUDIT_PROJECT = Internal.createIndex(DSL.name("idx_robot_audit_project"), RobotAudit.ROBOT_AUDIT, new OrderField[] { RobotAudit.ROBOT_AUDIT.PROJECT_ID }, false);

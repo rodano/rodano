@@ -17,6 +17,7 @@ import ch.rodano.core.model.jooq.tables.FormModel.FormModelPath;
 import ch.rodano.core.model.jooq.tables.Mail.MailPath;
 import ch.rodano.core.model.jooq.tables.MailAttachment.MailAttachmentPath;
 import ch.rodano.core.model.jooq.tables.Profile.ProfilePath;
+import ch.rodano.core.model.jooq.tables.ProjectConfigVersion.ProjectConfigVersionPath;
 import ch.rodano.core.model.jooq.tables.ProjectLanguage.ProjectLanguagePath;
 import ch.rodano.core.model.jooq.tables.ProjectRuleTag.ProjectRuleTagPath;
 import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
@@ -188,21 +189,6 @@ public class Project extends TableImpl<ProjectRecord> {
 	public final TableField<ProjectRecord, LocalDate> VERSION_DATE = createField(DSL.name("version_date"), SQLDataType.LOCALDATE.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATE)), this, "");
 
 	/**
-	 * The column <code>project.config_version</code>.
-	 */
-	public final TableField<ProjectRecord, Integer> CONFIG_VERSION = createField(DSL.name("config_version"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
-	/**
-	 * The column <code>project.config_date</code>.
-	 */
-	public final TableField<ProjectRecord, Long> CONFIG_DATE = createField(DSL.name("config_date"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
-
-	/**
-	 * The column <code>project.config_user</code>.
-	 */
-	public final TableField<ProjectRecord, String> CONFIG_USER = createField(DSL.name("config_user"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
-
-	/**
 	 * The column <code>project.status</code>.
 	 */
 	public final TableField<ProjectRecord, ProjectStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(8).nullable(false).defaultValue(DSL.field(DSL.raw("'ACTIVE'"), SQLDataType.VARCHAR)).asEnumDataType(ProjectStatus.class), this, "");
@@ -211,6 +197,11 @@ public class Project extends TableImpl<ProjectRecord> {
 	 * The column <code>project.created</code>.
 	 */
 	public final TableField<ProjectRecord, ZonedDateTime> CREATED = createField(DSL.name("created"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
+
+	/**
+	 * The column <code>project.active_config_version_fk</code>.
+	 */
+	public final TableField<ProjectRecord, Long> ACTIVE_CONFIG_VERSION_FK = createField(DSL.name("active_config_version_fk"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
 
 	private Project(Name alias, Table<ProjectRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
@@ -291,7 +282,19 @@ public class Project extends TableImpl<ProjectRecord> {
 
 	@Override
 	public List<ForeignKey<ProjectRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_PROJECT_EPRO_PROFILE);
+		return Arrays.asList(Keys.FK_PROJECT_ACTIVE_CONFIG_VERSION, Keys.FK_PROJECT_EPRO_PROFILE);
+	}
+
+	private transient ProjectConfigVersionPath _projectConfigVersion;
+
+	/**
+	 * Get the implicit join path to the <code>project_config_version</code> table.
+	 */
+	public ProjectConfigVersionPath projectConfigVersion() {
+		if (_projectConfigVersion == null)
+			_projectConfigVersion = new ProjectConfigVersionPath(this, Keys.FK_PROJECT_ACTIVE_CONFIG_VERSION, null);
+
+		return _projectConfigVersion;
 	}
 
 	private transient ProfilePath _profile;

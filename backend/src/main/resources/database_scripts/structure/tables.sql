@@ -27,11 +27,9 @@ create table if not exists project (
     protocol_no varchar(64) null,
     version_number varchar(32) null,
     version_date date null,
-    config_version int null,
-    config_date bigint null,
-    config_user varchar(128) null,
 	status enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null default 'ACTIVE',
 	created datetime(3) not null default current_timestamp(3),
+	active_config_version_fk bigint(20) null,
     constraint pk_project primary key (project_id),
     constraint uq_project_code unique (code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
@@ -67,6 +65,22 @@ create table if not exists project_rule_tag (
     project_id uuid not null,
     tag varchar(64) not null,
     constraint pk_project_rule_tag primary key (project_id, tag)
+) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
+
+drop table if exists project_config_version;
+create table if not exists project_config_version (
+	pk bigint(20) not null auto_increment,
+	project_id uuid not null,
+	version_number int not null,
+	status enum('DRAFT', 'PUBLISHED', 'ARCHIVED') not null,
+	created_by bigint(20) not null,
+	created_at datetime(3) null,
+	published_at datetime(3) null,
+	published_by bigint(20) null,
+	config_snapshot longtext not null,
+	change_summary text null,
+	constraint pk_project_config_version primary key (pk),
+	constraint u_project_version unique (project_id, version_number)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 /* internal patch */
@@ -937,6 +951,7 @@ create table role_audit (
 drop table if exists user;
 create table user (
 	pk bigint(20) not null auto_increment,
+	is_superuser boolean not null default false,
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	deleted boolean not null default false,

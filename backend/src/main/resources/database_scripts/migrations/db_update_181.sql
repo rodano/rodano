@@ -101,3 +101,9 @@ alter table robot add constraint u_robot_name_project unique (project_id, name);
 
 alter table robot drop index u_robot_key;
 alter table robot add constraint u_robot_key_project unique (project_id, `key`);
+
+/* ==========================================================
+   UPDATE USER TABLE
+   ========================================================== */
+
+alter table user add column is_superuser boolean not null default false;

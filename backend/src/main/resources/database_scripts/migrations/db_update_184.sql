@@ -22,11 +22,9 @@ alter table project
 	add column protocol_no                varchar(64)                           null,
 	add column version_number             varchar(32)                           null,
 	add column version_date               date                                  null,
-	add column config_version             int                                   null,
-	add column config_date                bigint                                null,
-	add column config_user                varchar(128)                          null,
 	add column status                     enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null default 'ACTIVE',
-	add column created                    datetime(3)                           not null default current_timestamp(3);
+	add column created                    datetime(3)                           not null default current_timestamp(3),
+	add column active_config_version_fk   bigint(20)                            null;
 
 create table if not exists project_audit (
 	pk              bigint(20)                            not null auto_increment,
@@ -60,6 +58,23 @@ create table if not exists project_rule_tag (
 	project_id uuid        not null,
 	tag        varchar(64) not null,
 	constraint pk_project_rule_tag primary key (project_id, tag)
+) engine = InnoDB
+  default charset = utf8mb4
+  collate = utf8mb4_unicode_ci;
+
+create table if not exists project_config_version (
+	pk              bigint(20)                              not null auto_increment,
+	project_id      uuid                                    not null,
+	version_number  int                                     not null,
+	status          enum ('DRAFT', 'PUBLISHED', 'ARCHIVED') not null,
+	created_by      bigint(20)                              not null,
+	created_at      datetime(3)                             null,
+	published_at    datetime(3)                             null,
+	published_by    bigint(20)                              null,
+	config_snapshot longtext                                not null,
+	change_summary  text                                    null,
+	constraint pk_project_config_version primary key (pk),
+	constraint u_project_version unique (project_id, version_number)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;

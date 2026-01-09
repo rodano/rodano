@@ -1,6 +1,7 @@
 /* project */
 alter table project
-    add constraint fk_project_epro_profile foreign key (project_id, epro_profile_id) references profile (project_id, profile_id);
+    add constraint fk_project_epro_profile foreign key (project_id, epro_profile_id) references profile (project_id, profile_id),
+    add constraint fk_project_active_config_version foreign key (active_config_version_fk) references project_config_version (pk);
 
 alter table project_audit
 	add constraint fk_project_audit_action foreign key (audit_action_fk) references audit_action (pk),
@@ -12,6 +13,11 @@ alter table project_language
 
 alter table project_rule_tag
     add constraint fk_proj_rule_tag_project foreign key (project_id) references project (project_id);
+
+alter table project_config_version
+	add constraint fk_project_config_version_project foreign key (project_id) references project (project_id),
+	add constraint fk_project_config_version_created foreign key (created_by) references user (pk),
+	add constraint fk_project_config_version_published foreign key (published_by) references user (pk);
 
 /* rule definition */
 alter table rule_definition_property

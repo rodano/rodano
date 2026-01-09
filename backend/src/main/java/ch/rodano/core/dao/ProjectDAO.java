@@ -1,7 +1,6 @@
 package ch.rodano.core.dao;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -74,13 +73,6 @@ public class ProjectDAO {
 		if(record.getVersionDate() != null) {
 			study.setVersionDate(record.getVersionDate().toString());
 		}
-
-		study.setConfigVersion(record.getConfigVersion());
-
-		if(record.getConfigDate() != null) {
-			study.setConfigDate(new Date(record.getConfigDate()));
-		}
-		study.setConfigUser(record.getConfigUser());
 
 		study.setRuleTags(new TreeSet<>(loadRuleTags(record.getProjectId())));
 		loadLanguages(study, record.getProjectId());

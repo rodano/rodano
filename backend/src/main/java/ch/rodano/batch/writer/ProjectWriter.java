@@ -1,6 +1,9 @@
 package ch.rodano.batch.writer;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -13,10 +16,12 @@ import org.slf4j.LoggerFactory;
 
 import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.Project;
+import ch.rodano.core.model.jooq.enums.ProjectConfigVersionStatus;
 import ch.rodano.core.model.jooq.enums.ProjectStatus;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.core.model.jooq.tables.Project.PROJECT;
+import static ch.rodano.core.model.jooq.tables.ProjectConfigVersion.PROJECT_CONFIG_VERSION;
 import static ch.rodano.core.model.jooq.tables.ProjectLanguage.PROJECT_LANGUAGE;
 import static ch.rodano.core.model.jooq.tables.ProjectRuleTag.PROJECT_RULE_TAG;
 
@@ -48,6 +53,23 @@ public class ProjectWriter extends BaseWriter {
 					}
 				}
 
+				ZonedDateTime configDateTime;
+				if(project.getConfigDate() != null) {
+					try {
+						configDateTime = ZonedDateTime.ofInstant(
+							Instant.ofEpochMilli(project.getConfigDate()),
+							ZoneId.systemDefault()
+						);
+					}
+					catch(Exception e) {
+						LOGGER.warn("Invalid config date '{}' for project {} - using current time", project.getConfigDate(), projectId);
+						configDateTime = ZonedDateTime.now();
+					}
+				}
+				else {
+					configDateTime = ZonedDateTime.now();
+				}
+
 				tx.insertInto(PROJECT)
 					.set(PROJECT.PROJECT_ID, projectId)
 					.set(PROJECT.CODE, project.getId())
@@ -66,9 +88,6 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.PROTOCOL_NO, project.getProtocolNo())
 					.set(PROJECT.VERSION_NUMBER, project.getVersionNumber())
 					.set(PROJECT.VERSION_DATE, versionDate)
-					.set(PROJECT.CONFIG_VERSION, project.getConfigVersion())
-					.set(PROJECT.CONFIG_DATE, project.getConfigDate())
-					.set(PROJECT.CONFIG_USER, project.getConfigUser())
 					.set(PROJECT.SHORTNAME, toJson(project.getShortname()))
 					.set(PROJECT.LONGNAME, toJson(project.getLongname()))
 					.set(PROJECT.DESCRIPTION, toJson(project.getDescription()))
@@ -89,13 +108,34 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.PROTOCOL_NO, project.getProtocolNo())
 					.set(PROJECT.VERSION_NUMBER, project.getVersionNumber())
 					.set(PROJECT.VERSION_DATE, versionDate)
-					.set(PROJECT.CONFIG_VERSION, project.getConfigVersion())
-					.set(PROJECT.CONFIG_DATE, project.getConfigDate())
-					.set(PROJECT.CONFIG_USER, project.getConfigUser())
 					.set(PROJECT.SHORTNAME, toJson(project.getShortname()))
 					.set(PROJECT.LONGNAME, toJson(project.getLongname()))
 					.set(PROJECT.DESCRIPTION, toJson(project.getDescription()))
 					.set(PROJECT.STATUS, ProjectStatus.ACTIVE)
+					.execute();
+
+				final Long configVersionPk = tx.insertInto(PROJECT_CONFIG_VERSION)
+					.set(PROJECT_CONFIG_VERSION.PROJECT_ID, projectId)
+					.set(PROJECT_CONFIG_VERSION.VERSION_NUMBER, project.getConfigVersion() != null ? project.getConfigVersion() : 1)
+					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
+					.set(PROJECT_CONFIG_VERSION.CREATED_AT, configDateTime)
+					.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, configDateTime)
+					.set(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT, "{}")
+					.set(PROJECT_CONFIG_VERSION.CHANGE_SUMMARY,
+						project.getConfigUser() != null
+							? String.format("Migrated from JSON configuration by %s", project.getConfigUser())
+							: "Migrated from JSON configuration"
+					)
+					.onDuplicateKeyUpdate()
+					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
+					.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, configDateTime)
+					.returning(PROJECT_CONFIG_VERSION.PK)
+					.fetchOne()
+					.getPk();
+
+				tx.update(PROJECT)
+					.set(PROJECT.ACTIVE_CONFIG_VERSION_FK, configVersionPk)
+					.where(PROJECT.PROJECT_ID.eq(projectId))
 					.execute();
 
 				if(project.getLanguageIds() != null) {

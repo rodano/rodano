@@ -18,6 +18,7 @@ public final class User extends UserRecord implements DeletableObject, Timestamp
 		.thenComparing(User::getPk);
 
 	private Long pk;
+	private boolean isSuperuser = false;
 	private ZonedDateTime creationTime;
 	private ZonedDateTime lastUpdateTime;
 
@@ -38,6 +39,14 @@ public final class User extends UserRecord implements DeletableObject, Timestamp
 	@Override
 	public void setPk(final Long pk) {
 		this.pk = pk;
+	}
+
+	public boolean isSuperuser() {
+		return isSuperuser;
+	}
+
+	public void setSuperuser(final boolean superuser) {
+		isSuperuser = superuser;
 	}
 
 	@Override
