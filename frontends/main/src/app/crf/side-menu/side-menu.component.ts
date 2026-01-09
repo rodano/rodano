@@ -1,8 +1,8 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {Component, DestroyRef, Input, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
-import {combineLatest, forkJoin, of, switchMap} from 'rxjs';
+import {BehaviorSubject, combineLatest, forkJoin, of, switchMap} from 'rxjs';
 import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -36,7 +36,7 @@ import {SettingsService} from '@core/services/settings.service';
 		DateUTCPipe
 	]
 })
-export class SideMenuComponent implements OnInit, OnChanges {
+export class SideMenuComponent implements OnInit {
 	static EXPANDED_EVENT_PKS_PARAMETER = 'expandedEventPks';
 	static EVENT_ORDERS_SETTING_KEY_PREFIX = 'eventOrders';
 
@@ -54,13 +54,31 @@ export class SideMenuComponent implements OnInit, OnChanges {
 		}
 	} satisfies EventGroup;
 
-	@Input() scope: Scope;
+	private scopeSubject$ = new BehaviorSubject<Scope | null>(null);
+	public scope$ = this.scopeSubject$.asObservable();
+	private _scope: Scope;
+
+	@Input()
+	set scope(value: Scope) {
+		this._scope = value;
+		if(value) {
+			this.scopeSubject$.next(value);
+		}
+	}
+
+	get scope(): Scope {
+		return this._scope;
+	}
+
 	eventGroups: EventGroup[] = [];
 	scopeForms: Form[];
 	events: Event[];
 	eventsForms: Record<number, Form[]> = {};
-	expandedEventPks: number[] = [];
+
 	eventOrdersByEventGroupId: Record<string, boolean> = {};
+
+	expandedEventPks: number[] = [];
+	eventPk: number | undefined = undefined;
 
 	constructor(
 		private activatedRoute: ActivatedRoute,
@@ -86,40 +104,54 @@ export class SideMenuComponent implements OnInit, OnChanges {
 			if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {
 				this.scope = typedWorkflowable.workflowable as Scope;
 			}
-			this.loadSortSettings();
-			this.refresh();
 		});
-	}
 
-	ngOnChanges() {
-		this.loadSortSettings();
-		this.refresh();
-	}
-
-	refresh() {
 		combineLatest([
-			this.formService.searchOnScope(this.scope.pk),
-			this.eventService.search(this.scope.pk),
-			this.activatedRoute.queryParams
-		]).subscribe(([forms, events, queryParams]) => {
+			this.scope$,
+			this.activatedRoute.queryParams,
+			//watch active route params to detect when parameters change, including child routes
+			this.activatedRoute.params
+		]).pipe(
+			switchMap(([scope, queryParams]) => {
+				return combineLatest([
+					of(scope),
+					scope !== null ? this.formService.searchOnScope(scope.pk) : of([]),
+					scope !== null ? this.eventService.search(scope.pk) : of([]),
+					of(queryParams)
+				]);
+			}),
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(([scope, forms, events, queryParams]) => {
 			this.scopeForms = forms;
 			this.events = events;
-			this.updateEventGroups();
-			//retrieve and manage expanded event pks
-			const expandedEventPks: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
-			this.expandedEventPks = expandedEventPks.split(',').filter(p => !!p).map(p => parseInt(p));
-			//manage selected event pk parameter
-			/*const eventPk = parameters['eventPk'] ? parseInt(parameters['eventPk']) : undefined;
-			if(eventPk && !this.expandedEventPks.includes(eventPk)) {
-				this.expandedEventPks.push(eventPk);
-			}*/
-			this.expandedEventPks.forEach(eventPk => {
-				if(!this.eventsForms[eventPk]) {
-					this.formService.searchOnEvent(this.scope.pk, eventPk).subscribe(forms => {
-						this.eventsForms[eventPk] = forms;
+			if(scope !== null) {
+				this.loadSortSettings();
+				this.updateEventGroups();
+				//retrieve and manage expanded event pks
+				const expandedEventPks: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
+				this.expandedEventPks = expandedEventPks.split(',').filter(p => !!p).map(p => parseInt(p));
+				//if the event is selected, open it
+				//do not used the observed parameters, use the active route snapshot to access the child route parameters instead
+				const params = this.activatedRoute.firstChild?.snapshot.params || {};
+				this.eventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
+				if(this.eventPk && !this.expandedEventPks.includes(this.eventPk)) {
+					this.router.navigate([], {
+						queryParams: {
+							[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: [...this.expandedEventPks, this.eventPk].join(',')
+						},
+						queryParamsHandling: 'merge'
 					});
 				}
-			});
+				else {
+					this.expandedEventPks.forEach(eventPk => {
+						if(!this.eventsForms[eventPk]) {
+							this.formService.searchOnEvent(scope.pk, eventPk).subscribe(forms => {
+								this.eventsForms[eventPk] = forms;
+							});
+						}
+					});
+				}
+			}
 		});
 	}
 

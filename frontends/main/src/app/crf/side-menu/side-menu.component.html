@@ -88,7 +88,8 @@
 						<a
 							[routerLink]="[]"
 							[queryParams]="generateToggleParameters(event.pk)"
-							[matTooltip]="expandedEventPks.includes(event.pk) ? 'Collapse forms' : 'Expand forms'">
+							[matTooltip]="expandedEventPks.includes(event.pk) ? 'Collapse forms' : 'Expand forms'"
+							[class.disabled]="eventPk === event.pk">
 							<mat-icon>
 								@if (expandedEventPks.includes(event.pk)) {
 									expand_circle_down
@@ -107,7 +108,7 @@
 							{{ event.longname }}
 							<span class="statuses">
 								@if (event.locked) {
-									<mat-icon matTooltip="Locked"> lock </mat-icon>
+									<mat-icon matTooltip="Locked">lock</mat-icon>
 								}
 								<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
 								@for (status of event.workflowStatuses; track status.pk || status.workflowId) {
