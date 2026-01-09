@@ -19,6 +19,10 @@ public class NotFoundException extends RuntimeException implements ManagedExcept
 		super("Unable to find " + clazz.getSimpleName().toLowerCase() + " with id=" + id);
 	}
 
+	public NotFoundException(final String message) {
+		super(message);
+	}
+
 	@Override
 	public HttpStatus getHttpErrorStatus() {
 		return HttpStatus.NOT_FOUND;

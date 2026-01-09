@@ -11,6 +11,7 @@ import ch.rodano.core.model.project.Project;
 import ch.rodano.core.services.dao.audit.AuditActionService;
 import ch.rodano.core.services.dao.project.ProjectAuditDAOService;
 import ch.rodano.core.services.dao.project.ProjectDAOService;
+import ch.rodano.core.services.dao.user.UserDAOService;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -18,13 +19,16 @@ public class ProjectServiceImpl implements ProjectService {
 	private final ProjectDAOService projectDAOService;
 	private final AuditActionService auditActionService;
 	private final ProjectAuditDAOService projectAuditDAOService;
+	private final UserDAOService userDAOService;
 
 	public ProjectServiceImpl(final ProjectDAOService projectDAOService,
 							  final AuditActionService auditActionService,
-							  final ProjectAuditDAOService projectAuditDAOService) {
+							  final ProjectAuditDAOService projectAuditDAOService,
+							  final UserDAOService userDAOService) {
 		this.projectDAOService = projectDAOService;
 		this.auditActionService = auditActionService;
 		this.projectAuditDAOService = projectAuditDAOService;
+		this.userDAOService = userDAOService;
 	}
 
 	@Override
@@ -34,6 +38,12 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	public List<Project> getProjectsForActor(final Long actorPk) {
+		final var user = userDAOService.getUserByPk(actorPk);
+
+		if (user.isSuperuser()) {
+			return projectDAOService.getAllProjects();
+		}
+
 		return projectDAOService.getProjectsForActor(actorPk);
 	}
 

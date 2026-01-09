@@ -16,6 +16,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -844,6 +845,55 @@ public class UserSecurityService {
 	private void migratePasswordHashToBCrypt(final User user, final String rawPassword) {
 		final var encodedPassword = new BCryptPasswordEncoder(BCRYPT_STRENGTH).encode(rawPassword);
 		user.setPassword(encodedPassword);
+	}
+
+	/**
+	 * Check if the current authenticated user is a superuser
+	 */
+	public boolean isSuperuser() {
+		try {
+			final var authrntication = SecurityContextHolder.getContext().getAuthentication();
+			if(authrntication == null || !authrntication.isAuthenticated()) {
+				return false;
+			}
+
+			final var principal = authrntication.getPrincipal();
+			if(principal instanceof User user) {
+				return user.isSuperuser();
+			}
+
+			return false;
+		}
+		catch(Exception e) {
+			logger.warn("Error checking superuser status", e);
+			return false;
+		}
+	}
+
+	/**
+	 * Get the current authenticated user from the security context
+	 *
+	 * @return The current authenticated user
+	 * @throws UnauthorizedException if no user is authenticated
+	 */
+	public User getCurrentUser() {
+		try {
+			final var authentication = SecurityContextHolder.getContext().getAuthentication();
+			if(authentication == null || !authentication.isAuthenticated()) {
+				throw new UnauthorizedException("No authenticated user found");
+			}
+
+			final var principal = authentication.getPrincipal();
+			if(principal instanceof User user) {
+				return user;
+			}
+
+			throw new UnauthorizedException("Invalid authentication principal");
+		}
+		catch(Exception e) {
+			logger.error("Error getting current user", e);
+			throw new UnauthorizedException("Unable to get current user: " + e.getMessage());
+		}
 	}
 
 	// TODO 2FA
