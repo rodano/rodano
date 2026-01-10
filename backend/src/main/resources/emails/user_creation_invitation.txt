@@ -1,0 +1,16 @@
+Dear ${user.name},
+
+An administrator has created an account for you on ${application_name}.
+
+To get started, please activate your account by visiting the following link and setting your password:
+
+${user_activation_url}
+
+Once your account is activated, you will be granted access to specific projects and can start using the platform.
+
+If you have any questions, please contact us at ${global_reply_to}
+
+With our best regards,
+The ${application_name} support team.
+
+*** This is an automatic notification, please do not reply ***

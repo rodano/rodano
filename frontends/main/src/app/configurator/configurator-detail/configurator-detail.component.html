@@ -1,0 +1,33 @@
+<div class="detail-container">
+	@if (!selectedNode) {
+		<div class="welcome-state">
+			<div class="welcome-card">
+				<mat-icon>settings_suggest</mat-icon>
+				<h1>Welcome to the Configurator</h1>
+				<p>Start by configuring your project settings or add configuration entities.</p>
+				<div class="welcome-hint">
+					<span class="hint-text">Select an item from the tree to get started</span>
+				</div>
+			</div>
+		</div>
+	} @else {
+		@switch (selectedNodeType) {
+			@case ('project-settings') {
+				<app-project-settings-detail
+					[projectId]="projectId"
+					[project]="project"
+					[modifiedFields]="modifiedFields"
+					(fieldsUpdated)="fieldsUpdated.emit($event)">
+				</app-project-settings-detail>
+			}
+			@default {
+				<div class="detail-header">
+					<h2>{{ selectedNode }}</h2>
+				</div>
+				<div class="tab-content">
+					<p>Configuration for {{ selectedNode }}</p>
+				</div>
+			}
+		}
+	}
+</div>

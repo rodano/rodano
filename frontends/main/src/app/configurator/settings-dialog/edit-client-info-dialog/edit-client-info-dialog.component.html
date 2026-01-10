@@ -1,0 +1,63 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Client Information</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Client Name</label>
+				<input
+					type="text"
+					formControlName="clientName"
+					placeholder="Your Corporation">
+				<span class="hint">Name of the organization or sponsor</span>
+			</div>
+
+			<div class="form-field">
+				<label>Client Email</label>
+				<input
+					type="email"
+					formControlName="clientEmail"
+					placeholder="contact@client.com">
+				<span class="hint">Primary contact email for the client</span>
+				@if (form.get('clientEmail')?.hasError('email') && form.get('clientEmail')?.touched) {
+					<span class="error-message">Please enter a valid email address</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Protocol Number</label>
+				<input
+					type="text"
+					formControlName="protocolNo"
+					placeholder="PROTO-2024-001">
+				<span class="hint">Study protocol identifier</span>
+			</div>
+
+			<div class="form-field">
+				<label>Version Number</label>
+				<input
+					type="text"
+					formControlName="versionNumber"
+					placeholder="1.0.0">
+				<span class="hint">Protocol version number</span>
+			</div>
+
+			<div class="form-field">
+				<label>Version Date</label>
+				<input
+					type="date"
+					formControlName="versionDate">
+				<span class="hint">Date of the protocol version</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!form.valid">
+			Save Changes
+		</button>
+	</div>
+</div>

@@ -1,0 +1,149 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Basic Information</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Project Code *</label>
+				<input
+					type="text"
+					formControlName="code"
+					placeholder="MY_PROJECT"
+					(input)="onCodeInput($event)"
+					style="text-transform: uppercase;">
+				<span class="hint">Uppercase letters, numbers, and underscores only (e.g., TEST, STUDY_2024)</span>
+				@if (form.get('code')?.hasError('required') && form.get('code')?.touched) {
+					<span class="error-message">Project code is required</span>
+				}
+				@if (form.get('code')?.hasError('pattern') && form.get('code')?.touched) {
+					<span class="error-message">Only uppercase letters, numbers, and underscores allowed</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>URL</label>
+				<input
+					type="url"
+					formControlName="url"
+					placeholder="https://example.com">
+				<span class="hint">Project website URL (must start with http:// or https://)</span>
+				@if (form.get('url')?.hasError('pattern') && form.get('url')?.touched) {
+					<span class="error-message">Please enter a valid URL starting with http:// or https://</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Color</label>
+				<div class="color-picker-wrapper">
+					<button
+						type="button"
+						class="color-button"
+						[style.background-color]="form.get('color')?.value"
+						(click)="colorPicker.click()"
+						[title]="'Current color: ' + form.get('color')?.value">
+					</button>
+					<input
+						#colorPicker
+						type="color"
+						formControlName="color"
+						class="color-input-hidden">
+					<input
+						type="text"
+						[value]="form.get('color')?.value"
+						(input)="onColorInput($event)"
+						placeholder="#5bd4d4"
+						maxlength="7"
+						class="color-text-input">
+				</div>
+				<span class="hint">Project theme color (default: #5bd4d4)</span>
+			</div>
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				@if (availableLanguages.length === 1) {
+					<div class="language-fields">
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<div [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Short Name</label>
+										<input
+											type="text"
+											formControlName="shortname"
+											placeholder="Study Name">
+										<span class="hint">Brief display name for the project</span>
+									</div>
+
+									<div class="form-field">
+										<label>Long Name</label>
+										<input
+											type="text"
+											formControlName="longname"
+											placeholder="Full Study Title">
+										<span class="hint">Full descriptive name for the project</span>
+									</div>
+
+									<div class="form-field">
+										<label>Description</label>
+										<textarea
+											formControlName="description"
+											placeholder="Brief description of the project"
+											rows="3"></textarea>
+										<span class="hint">Optional project description</span>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				} @else {
+					<mat-tab-group>
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+										<div class="form-field">
+											<label>Short Name</label>
+											<input
+												type="text"
+												formControlName="shortname"
+												placeholder="Study Name">
+											<span class="hint">Brief display name for the project</span>
+										</div>
+
+										<div class="form-field">
+											<label>Long Name</label>
+											<input
+												type="text"
+												formControlName="longname"
+												placeholder="Full Study Title">
+											<span class="hint">Full descriptive name for the project</span>
+										</div>
+
+										<div class="form-field">
+											<label>Description</label>
+											<textarea
+												formControlName="description"
+												placeholder="Brief description of the project"
+												rows="3"></textarea>
+											<span class="hint">Optional project description</span>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
+				}
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!form.valid">
+			Save Changes
+		</button>
+	</div>
+</div>

@@ -7,20 +7,27 @@ import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.jooq.JSON;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.rodano.api.configurator.ConfiguratorProjectDTO;
 import ch.rodano.api.configurator.CreateProjectRequest;
 import ch.rodano.api.configurator.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.ProjectLanguageDTO;
+import ch.rodano.api.configurator.ProjectRuleTagDTO;
+import ch.rodano.api.configurator.UpdateProjectRequest;
 import ch.rodano.core.model.jooq.enums.ProjectConfigVersionStatus;
 import ch.rodano.core.model.jooq.enums.ProjectStatus;
 
 import static ch.rodano.core.model.jooq.Tables.PROJECT;
 import static ch.rodano.core.model.jooq.Tables.PROJECT_CONFIG_VERSION;
 import static ch.rodano.core.model.jooq.Tables.USER;
+import static ch.rodano.core.model.jooq.tables.ProjectLanguage.PROJECT_LANGUAGE;
+import static ch.rodano.core.model.jooq.tables.ProjectRuleTag.PROJECT_RULE_TAG;
 
 @Service
 public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
@@ -65,33 +72,73 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 				PROJECT.CREATED,
 				activeVersion.PK.as("activeConfigVersionId"),
 				activeVersion.VERSION_NUMBER.as("activeVersionNumber"),
+				activeVersion.STATUS.as("activeConfigVersionStatus"),
 				draftVersion.PK.as("draftConfigVersionId"),
-				draftVersion.VERSION_NUMBER.as("draftVersionNumber")
+				draftVersion.VERSION_NUMBER.as("draftVersionNumber"),
+				draftVersion.STATUS.as("draftConfigVersionStatus"),
+				DSL.exists(DSL.selectOne()
+					.from(PROJECT_CONFIG_VERSION)
+					.where(PROJECT_CONFIG_VERSION.PROJECT_ID.eq(PROJECT.PROJECT_ID)
+						.and(PROJECT_CONFIG_VERSION.STATUS.eq(ProjectConfigVersionStatus.ARCHIVED)))
+				).as("hasArchivedVersion"),
+				PROJECT.EMAIL,
+				PROJECT.SMTP_TLS,
+				PROJECT.PASSWORD_STRONG,
+				PROJECT.PASSWORD_LENGTH,
+				PROJECT.PASSWORD_VALIDITY_DURATION,
+				PROJECT.PASSWORD_UNIQUE,
+				PROJECT.EPRO_ENABLED,
+				PROJECT.EPRO_PROFILE_ID,
+				PROJECT.CLIENT_NAME,
+				PROJECT.CLIENT_EMAIL,
+				PROJECT.PROTOCOL_NO,
+				PROJECT.VERSION_NUMBER
 			)
 			.from(PROJECT)
 			.leftJoin(activeVersion)
 			.on(activeVersion.PK.eq(PROJECT.ACTIVE_CONFIG_VERSION_FK))
 			.leftJoin(draftVersion)
 			.on(draftVersion.PROJECT_ID.eq(PROJECT.PROJECT_ID)
-				.and(draftVersion.STATUS.eq(ProjectConfigVersionStatus.DRAFT)))
+				.and(draftVersion.STATUS.in(ProjectConfigVersionStatus.DRAFT, ProjectConfigVersionStatus.ARCHIVED))
+				.and(draftVersion.PK.ne(activeVersion.PK).or(activeVersion.PK.isNull())))
 			.orderBy(PROJECT.CREATED.desc())
-			.fetch(record -> new ConfiguratorProjectDTO(
-				record.get(PROJECT.PROJECT_ID),
-				record.get(PROJECT.CODE),
-				parseJsonToMap(record.get(PROJECT.SHORTNAME, JSON.class)),
-				parseJsonToMap(record.get(PROJECT.LONGNAME, JSON.class)),
-				parseJsonToMap(record.get(PROJECT.DESCRIPTION, JSON.class)),
-				record.get(PROJECT.URL),
-				record.get(PROJECT.COLOR),
-				record.get(PROJECT.INTRODUCTION_TEXT),
-				record.get(PROJECT.VERSION_DATE),
-				record.get(PROJECT.STATUS),
-				record.get(PROJECT.CREATED),
-				record.get("activeConfigVersionId", Long.class),
-				record.get("activeVersionNumber", Integer.class),
-				record.get("draftConfigVersionId", Long.class),
-				record.get("draftVersionNumber", Integer.class)
-			));
+			.fetch(record -> {
+				final var projectId = record.get(PROJECT.PROJECT_ID);
+				return new ConfiguratorProjectDTO(
+					projectId,
+					record.get(PROJECT.CODE),
+					parseJsonToMap(record.get(PROJECT.SHORTNAME, JSON.class)),
+					parseJsonToMap(record.get(PROJECT.LONGNAME, JSON.class)),
+					parseJsonToMap(record.get(PROJECT.DESCRIPTION, JSON.class)),
+					record.get(PROJECT.URL),
+					record.get(PROJECT.COLOR),
+					record.get(PROJECT.INTRODUCTION_TEXT),
+					record.get(PROJECT.VERSION_DATE),
+					record.get(PROJECT.STATUS),
+					record.get(PROJECT.CREATED),
+					record.get("activeConfigVersionId", Long.class),
+					record.get("activeVersionNumber", Integer.class),
+					record.get("activeConfigVersionStatus", ProjectConfigVersionStatus.class),
+					record.get("draftConfigVersionId", Long.class),
+					record.get("draftVersionNumber", Integer.class),
+					record.get("draftConfigVersionStatus", ProjectConfigVersionStatus.class),
+					record.get("hasArchivedVersion", Boolean.class),
+					record.get(PROJECT.EMAIL),
+					record.get(PROJECT.SMTP_TLS),
+					record.get(PROJECT.PASSWORD_STRONG),
+					record.get(PROJECT.PASSWORD_LENGTH),
+					record.get(PROJECT.PASSWORD_VALIDITY_DURATION),
+					record.get(PROJECT.PASSWORD_UNIQUE),
+					record.get(PROJECT.EPRO_ENABLED),
+					record.get(PROJECT.EPRO_PROFILE_ID),
+					record.get(PROJECT.CLIENT_NAME),
+					record.get(PROJECT.CLIENT_EMAIL),
+					record.get(PROJECT.PROTOCOL_NO),
+					record.get(PROJECT.VERSION_NUMBER),
+					getProjectLanguages(projectId),
+					getProjectRuleTags(projectId)
+				);
+			});
 	}
 
 	@Override
@@ -113,15 +160,35 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 				PROJECT.CREATED,
 				activeVersion.PK.as("activeConfigVersionId"),
 				activeVersion.VERSION_NUMBER.as("activeVersionNumber"),
+				activeVersion.STATUS.as("activeConfigVersionStatus"),
 				draftVersion.PK.as("draftConfigVersionId"),
-				draftVersion.VERSION_NUMBER.as("draftVersionNumber")
+				draftVersion.VERSION_NUMBER.as("draftVersionNumber"),
+				draftVersion.STATUS.as("draftConfigVersionStatus"),
+				DSL.exists(DSL.selectOne()
+					.from(PROJECT_CONFIG_VERSION)
+					.where(PROJECT_CONFIG_VERSION.PROJECT_ID.eq(PROJECT.PROJECT_ID)
+						.and(PROJECT_CONFIG_VERSION.STATUS.eq(ProjectConfigVersionStatus.ARCHIVED)))
+				).as("hasArchivedVersion"),
+				PROJECT.EMAIL,
+				PROJECT.SMTP_TLS,
+				PROJECT.PASSWORD_STRONG,
+				PROJECT.PASSWORD_LENGTH,
+				PROJECT.PASSWORD_VALIDITY_DURATION,
+				PROJECT.PASSWORD_UNIQUE,
+				PROJECT.EPRO_ENABLED,
+				PROJECT.EPRO_PROFILE_ID,
+				PROJECT.CLIENT_NAME,
+				PROJECT.CLIENT_EMAIL,
+				PROJECT.PROTOCOL_NO,
+				PROJECT.VERSION_NUMBER
 			)
 			.from(PROJECT)
 			.leftJoin(activeVersion)
 			.on(activeVersion.PK.eq(PROJECT.ACTIVE_CONFIG_VERSION_FK))
 			.leftJoin(draftVersion)
 			.on(draftVersion.PROJECT_ID.eq(PROJECT.PROJECT_ID)
-				.and(draftVersion.STATUS.eq(ProjectConfigVersionStatus.DRAFT)))
+				.and(draftVersion.STATUS.in(ProjectConfigVersionStatus.DRAFT, ProjectConfigVersionStatus.ARCHIVED))
+				.and(draftVersion.PK.ne(activeVersion.PK).or(activeVersion.PK.isNull())))
 			.where(PROJECT.PROJECT_ID.eq(projectId))
 			.fetchOne(record -> new ConfiguratorProjectDTO(
 				record.get(PROJECT.PROJECT_ID),
@@ -137,8 +204,25 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 				record.get(PROJECT.CREATED),
 				record.get("activeConfigVersionId", Long.class),
 				record.get("activeVersionNumber", Integer.class),
+				record.get("activeConfigVersionStatus", ProjectConfigVersionStatus.class),
 				record.get("draftConfigVersionId", Long.class),
-				record.get("draftVersionNumber", Integer.class)
+				record.get("draftVersionNumber", Integer.class),
+				record.get("draftConfigVersionStatus", ProjectConfigVersionStatus.class),
+				record.get("hasArchivedVersion", Boolean.class),
+				record.get(PROJECT.EMAIL),
+				record.get(PROJECT.SMTP_TLS),
+				record.get(PROJECT.PASSWORD_STRONG),
+				record.get(PROJECT.PASSWORD_LENGTH),
+				record.get(PROJECT.PASSWORD_VALIDITY_DURATION),
+				record.get(PROJECT.PASSWORD_UNIQUE),
+				record.get(PROJECT.EPRO_ENABLED),
+				record.get(PROJECT.EPRO_PROFILE_ID),
+				record.get(PROJECT.CLIENT_NAME),
+				record.get(PROJECT.CLIENT_EMAIL),
+				record.get(PROJECT.PROTOCOL_NO),
+				record.get(PROJECT.VERSION_NUMBER),
+				getProjectLanguages(projectId),
+				getProjectRuleTags(projectId)
 			));
 	}
 
@@ -173,26 +257,29 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 				.set(PROJECT.PASSWORD_VALIDITY_DURATION, 0)
 				.set(PROJECT.PASSWORD_UNIQUE, false)
 				.set(PROJECT.EPRO_ENABLED, false)
-				.set(PROJECT.STATUS, ProjectStatus.ACTIVE)
+				.set(PROJECT.STATUS, (ProjectStatus) null)
 				.set(PROJECT.CREATED, now)
 				.execute();
 
-			final var versionPk = dsl.insertInto(PROJECT_CONFIG_VERSION)
+			if(request.languages() != null && !request.languages().isEmpty()) {
+				var insert = dsl.insertInto(PROJECT_LANGUAGE,
+					PROJECT_LANGUAGE.PROJECT_ID,
+					PROJECT_LANGUAGE.LANGUAGE,
+					PROJECT_LANGUAGE.IS_DEFAULT);
+
+				for(final var lang : request.languages()) {
+					insert = insert.values(projectId, lang.languageCode(), lang.isDefault());
+				}
+				insert.execute();
+			}
+
+			dsl.insertInto(PROJECT_CONFIG_VERSION)
 				.set(PROJECT_CONFIG_VERSION.PROJECT_ID, projectId)
 				.set(PROJECT_CONFIG_VERSION.VERSION_NUMBER, 1)
-				.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
+				.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.DRAFT)
 				.set(PROJECT_CONFIG_VERSION.CREATED_AT, now)
-				.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, now)
 				.set(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT, "{}")
 				.set(PROJECT_CONFIG_VERSION.CHANGE_SUMMARY, "Initial configuration")
-				.returning(PROJECT_CONFIG_VERSION.PK)
-				.fetchOne()
-				.getPk();
-
-
-			dsl.update(PROJECT)
-				.set(PROJECT.ACTIVE_CONFIG_VERSION_FK, versionPk)
-				.where(PROJECT.PROJECT_ID.eq(projectId))
 				.execute();
 
 			return getProject(projectId);
@@ -200,6 +287,89 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 		}
 		catch(Exception e) {
 			throw new RuntimeException("Failed to create project", e);
+		}
+	}
+
+	@Override
+	public void updateProject(final UUID projectId, final UpdateProjectRequest request) {
+		try {
+			final var query = dsl.updateQuery(PROJECT);
+
+			if(request.code() != null) {
+				query.addValue(PROJECT.CODE, request.code());
+			}
+			if(request.shortname() != null) {
+				query.addValue(PROJECT.SHORTNAME, objectMapper.writeValueAsString(request.shortname()));
+			}
+			if(request.longname() != null) {
+				query.addValue(PROJECT.LONGNAME, objectMapper.writeValueAsString(request.longname()));
+			}
+			if(request.description() != null) {
+				query.addValue(PROJECT.DESCRIPTION, objectMapper.writeValueAsString(request.description()));
+			}
+			if(request.url() != null) {
+				query.addValue(PROJECT.URL, request.url());
+			}
+			if(request.color() != null) {
+				query.addValue(PROJECT.COLOR, request.color());
+			}
+			if(request.introductionText() != null) {
+				query.addValue(PROJECT.INTRODUCTION_TEXT, request.introductionText());
+			}
+			if(request.versionDate() != null) {
+				query.addValue(PROJECT.VERSION_DATE, request.versionDate());
+			}
+			if(request.email() != null) {
+				query.addValue(PROJECT.EMAIL, request.email());
+			}
+			if(request.smtpTls() != null) {
+				query.addValue(PROJECT.SMTP_TLS, request.smtpTls());
+			}
+			if(request.passwordStrong() != null) {
+				query.addValue(PROJECT.PASSWORD_STRONG, request.passwordStrong());
+			}
+			if(request.passwordLength() != null) {
+				query.addValue(PROJECT.PASSWORD_LENGTH, request.passwordLength());
+			}
+			if(request.passwordValidityDuration() != null) {
+				query.addValue(PROJECT.PASSWORD_VALIDITY_DURATION, request.passwordValidityDuration());
+			}
+			if(request.passwordUnique() != null) {
+				query.addValue(PROJECT.PASSWORD_UNIQUE, request.passwordUnique());
+			}
+			if(request.eproEnabled() != null) {
+				query.addValue(PROJECT.EPRO_ENABLED, request.eproEnabled());
+			}
+			if(request.eproProfileId() != null) {
+				query.addValue(PROJECT.EPRO_PROFILE_ID, request.eproProfileId());
+			}
+			if(request.clientName() != null) {
+				query.addValue(PROJECT.CLIENT_NAME, request.clientName());
+			}
+			if(request.clientEmail() != null) {
+				query.addValue(PROJECT.CLIENT_EMAIL, request.clientEmail());
+			}
+			if(request.protocolNo() != null) {
+				query.addValue(PROJECT.PROTOCOL_NO, request.protocolNo());
+			}
+			if(request.versionNumber() != null) {
+				query.addValue(PROJECT.VERSION_NUMBER, request.versionNumber());
+			}
+
+			query.addConditions(PROJECT.PROJECT_ID.eq(projectId));
+			query.execute();
+
+			if(request.languages() != null) {
+				updateProjectLanguages(projectId, request.languages());
+			}
+
+			if(request.ruleTags() != null) {
+				updateProjectRuleTags(projectId, request.ruleTags());
+			}
+
+		}
+		catch(JsonProcessingException e) {
+			throw new RuntimeException("Failed to serialize JSON fields", e);
 		}
 	}
 
@@ -313,6 +483,14 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	public void restoreDraft(final Long versionId) {
+		dsl.update(PROJECT_CONFIG_VERSION)
+			.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.DRAFT)
+			.where(PROJECT_CONFIG_VERSION.PK.eq(versionId))
+			.execute();
+	}
+
+	@Override
 	public void updateProjectActiveVersion(final UUID projectId, final Long versionId) {
 		dsl.update(PROJECT)
 			.set(PROJECT.ACTIVE_CONFIG_VERSION_FK, versionId)
@@ -390,5 +568,98 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 				record.get("publishedByName", String.class),
 				record.get(PROJECT_CONFIG_VERSION.CHANGE_SUMMARY)
 			));
+	}
+
+	@Override
+	public void updateProjectStatus(final UUID projectId, final ProjectStatus status) {
+		dsl.update(PROJECT)
+			.set(PROJECT.STATUS, status)
+			.where(PROJECT.PROJECT_ID.eq(projectId))
+			.execute();
+	}
+
+	@Override
+	public String getConfigSnapshot(final Long versionId) {
+		return dsl.select(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT)
+			.from(PROJECT_CONFIG_VERSION)
+			.where(PROJECT_CONFIG_VERSION.PK.eq(versionId))
+			.fetchOne(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT);
+	}
+
+	@Override
+	public void updateConfigSnapshot(final Long versionId, final String snapshotJson) {
+		dsl.update(PROJECT_CONFIG_VERSION)
+			.set(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT, snapshotJson)
+			.where(PROJECT_CONFIG_VERSION.PK.eq(versionId))
+			.execute();
+	}
+
+	@Override
+	public void incrementVersionNumber(final Long versionId) {
+		dsl.update(PROJECT_CONFIG_VERSION)
+			.set(PROJECT_CONFIG_VERSION.VERSION_NUMBER, PROJECT_CONFIG_VERSION.VERSION_NUMBER.plus(1))
+			.where(PROJECT_CONFIG_VERSION.PK.eq(versionId))
+			.execute();
+	}
+
+	private List<ProjectLanguageDTO> getProjectLanguages(final UUID projectId) {
+		return dsl.select(
+				PROJECT_LANGUAGE.LANGUAGE,
+				PROJECT_LANGUAGE.IS_DEFAULT
+			)
+			.from(PROJECT_LANGUAGE)
+			.where(PROJECT_LANGUAGE.PROJECT_ID.eq(projectId))
+			.orderBy(PROJECT_LANGUAGE.IS_DEFAULT.desc(), PROJECT_LANGUAGE.LANGUAGE.asc())
+			.fetch(record -> new ProjectLanguageDTO(
+				record.get(PROJECT_LANGUAGE.LANGUAGE),
+				record.get(PROJECT_LANGUAGE.IS_DEFAULT)
+			));
+	}
+
+	private List<ProjectRuleTagDTO> getProjectRuleTags(final UUID projectId) {
+		return dsl.select(PROJECT_RULE_TAG.TAG)
+			.from(PROJECT_RULE_TAG)
+			.where(PROJECT_RULE_TAG.PROJECT_ID.eq(projectId))
+			.orderBy(PROJECT_RULE_TAG.TAG.asc())
+			.fetch(record -> new ProjectRuleTagDTO(
+				record.get(PROJECT_RULE_TAG.TAG)
+			));
+	}
+
+	private void updateProjectLanguages(final UUID projectId, final List<ProjectLanguageDTO> languages) {
+		dsl.deleteFrom(PROJECT_LANGUAGE)
+			.where(PROJECT_LANGUAGE.PROJECT_ID.eq(projectId))
+			.execute();
+
+		if(!languages.isEmpty()) {
+			var insert = dsl.insertInto(PROJECT_LANGUAGE,
+				PROJECT_LANGUAGE.PROJECT_ID,
+				PROJECT_LANGUAGE.LANGUAGE,
+				PROJECT_LANGUAGE.IS_DEFAULT);
+
+			for(final var lang : languages) {
+				insert = insert.values(projectId, lang.languageCode(), lang.isDefault());
+			}
+
+			insert.execute();
+		}
+	}
+
+	private void updateProjectRuleTags(final UUID projectId, final List<ProjectRuleTagDTO> ruleTags) {
+		dsl.deleteFrom(PROJECT_RULE_TAG)
+			.where(PROJECT_RULE_TAG.PROJECT_ID.eq(projectId))
+			.execute();
+
+		if(!ruleTags.isEmpty()) {
+			var insert = dsl.insertInto(PROJECT_RULE_TAG,
+				PROJECT_RULE_TAG.PROJECT_ID,
+				PROJECT_RULE_TAG.TAG);
+
+			for(final var tag : ruleTags) {
+				insert = insert.values(projectId, tag.tag());
+			}
+
+			insert.execute();
+		}
 	}
 }

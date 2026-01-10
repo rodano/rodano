@@ -6,6 +6,7 @@ import {ErrorContext} from './error/error-context';
 import {CMSLayoutResolver} from './resolvers/cms-layout-resolver';
 import {MeResolver} from './resolvers/me-resolver';
 import {EproEnabledGuard} from './guards/epro-enabled.guard';
+import {superuserGuard} from './guards/superuser.guard';
 
 export const APP_ROUTES: Routes = [
 	{
@@ -135,6 +136,21 @@ export const APP_ROUTES: Routes = [
 		path: 'administration',
 		canActivate: [AuthGuard],
 		loadChildren: () => import('./administration/administration-routes')
+	},
+	{
+		path: 'user-management',
+		canActivate: [AuthGuard, superuserGuard],
+		loadComponent: () => import('./user-management/user-list/user-list.component').then(m => m.UserListComponent)
+	},
+	{
+		path: 'configurator',
+		canActivate: [AuthGuard, superuserGuard],
+		loadComponent: () => import('./configurator/configurator-list/configurator-list.component').then(m => m.ConfiguratorListComponent)
+	},
+	{
+		path: 'configurator/projects/:projectId/edit',
+		canActivate: [AuthGuard, superuserGuard],
+		loadComponent: () => import('./configurator/configurator-editor/configurator-editor.component').then(m => m.ConfiguratorEditorComponent)
 	},
 	{
 		path: 'error',

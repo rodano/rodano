@@ -27,7 +27,7 @@ header {
 	overflow: auto;
 
 	/* content is padded, except for pages that have an aside section (as the dashboard) */
-	&:not(:has(aside)):not(:has(app-project-selection)):not(:has(app-login)) {
+	&:not(:has(aside)):not(:has(app-project-selection)):not(:has(app-login)):not(:has(app-configurator-editor)):not(:has(app-configurator-list)) {
 		padding: 1rem;
 	}
 }

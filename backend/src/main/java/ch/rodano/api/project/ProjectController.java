@@ -82,12 +82,14 @@ public class ProjectController extends AbstractSecuredController {
 	public ResponseEntity<List<ProjectDTO>> getAccessibleProjects() {
 		final var actor = getCurrentActor();
 		final var projects = projectService.getProjectsForActor(actor.getPk());
-		final var projectDTOs = projects.stream()
+
+		final var publishedProjects = projects.stream()
+			.filter(project -> project.getActiveConfigVersionFk() != null)
 			.map(projectMapper::toDTO)
 			.toList();
 
-		LOGGER.info("Retrieved {} accessible projects for user {}", projectDTOs.size(), actor.getPk());
-		return ResponseEntity.ok(projectDTOs);
+		LOGGER.info("Retrieved {} accessible projects for user {}", publishedProjects.size(), actor.getPk());
+		return ResponseEntity.ok(publishedProjects);
 	}
 
 	@PostMapping("/select/{projectId}")

@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.user;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -9,6 +10,7 @@ import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.api.dto.paging.PagedResult;
+import ch.rodano.api.user.management.UserManagementDTO;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.UserAuditTrail;
@@ -19,6 +21,7 @@ import ch.rodano.core.model.role.RoleStatus;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.model.user.UserSearch;
 import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.core.services.bll.user.UserSecurityService;
 import ch.rodano.core.services.dao.commons.AuditableDAOService;
 import ch.rodano.core.services.dao.strategy.DAOStrategy;
 
@@ -203,4 +206,41 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 		return new PagedResult<>(users, search.getPageSize(), search.getPageIndex(), total);
 	}
 
+	@Override
+	public List<UserManagementDTO> getAllUsersForManagement() {
+		return create.select(
+				USER.PK,
+				USER.NAME,
+				USER.EMAIL,
+				USER.IS_SUPERUSER,
+				USER.ACTIVATED,
+				USER.DELETED,
+				USER.EXTERNALLY_MANAGED,
+				DSL.field(USER.PASSWORD_ATTEMPTS.ge(UserSecurityService.PASSWORD_MAX_ATTEMPTS)).as("blocked"),
+				DSL.field(USER.PASSWORD.isNotNull().and(USER.PASSWORD.ne(""))).as("has_password"),
+				USER.CREATION_TIME,
+				USER.LAST_UPDATE_TIME,
+				USER.LOGIN_DATE,
+				USER.LANGUAGE_ID,
+				USER.PHONE
+			)
+			.from(USER)
+			.orderBy(USER.CREATION_TIME.desc())
+			.fetch(record -> new UserManagementDTO(
+				record.get(USER.PK),
+				record.get(USER.NAME),
+				record.get(USER.EMAIL),
+				record.get(USER.IS_SUPERUSER),
+				record.get(USER.ACTIVATED),
+				record.get(USER.DELETED),
+				record.get(USER.EXTERNALLY_MANAGED),
+				record.get("blocked", Boolean.class),
+				record.get("has_password", Boolean.class),
+				record.get(USER.CREATION_TIME),
+				record.get(USER.LAST_UPDATE_TIME),
+				record.get(USER.LOGIN_DATE),
+				record.get(USER.LANGUAGE_ID),
+				record.get(USER.PHONE)
+			));
+	}
 }

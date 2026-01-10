@@ -24,6 +24,7 @@ public interface MailService {
 	/**
 	 * Check if a mail address appear to be valid
 	 * This only checks the syntax of the address, and is by no means a guarantee that e-mails sent to this address will be received
+	 *
 	 * @param email The mail to check
 	 */
 	void checkEmailAddress(String email);
@@ -39,8 +40,8 @@ public interface MailService {
 	 * Create a simple mail
 	 *
 	 * @param recipients The recipients
-	 * @param subject The subject
-	 * @param body The body
+	 * @param subject    The subject
+	 * @param body       The body
 	 * @return The mail to send
 	 */
 	Mail createMail(Set<String> recipients, String subject, String body, DatabaseActionContext context, String rationale);
@@ -75,8 +76,8 @@ public interface MailService {
 	/**
 	 * Build and send an email
 	 *
-	 * @param mail The mail
-	 * @param context The context
+	 * @param mail     The mail
+	 * @param context  The context
 	 * @param simulate If true, the e-mail won't actually be sent
 	 */
 	Mail sendMail(Mail mail, DatabaseActionContext context, boolean simulate);
@@ -131,24 +132,27 @@ public interface MailService {
 
 	/**
 	 * Send an e-mail verification e-mail to the user (sent to his pending e-mail address)
-	 * @param user                      The recipient user
-	 * @param pendingEmailExpiryLimit   The pending e-mail expiration time limit (in days)
-	 * @param contextURL                The context URL (used to formulate the e-mail activation e-mail)
-	 * @param context The context
+	 *
+	 * @param user                    The recipient user
+	 * @param pendingEmailExpiryLimit The pending e-mail expiration time limit (in days)
+	 * @param contextURL              The context URL (used to formulate the e-mail activation e-mail)
+	 * @param context                 The context
 	 */
 	void sendUserEmailVerificationEmail(User user, int pendingEmailExpiryLimit, String contextURL, DatabaseActionContext context);
 
 	/**
 	 * Send a password reset e-mail to the user (sent to his e-mail address)
-	 * @param recipient                 The recipient user
+	 *
+	 * @param recipient           The recipient user
 	 * @param expiryTimeInMinutes
-	 * @param contextURL                The context URL (used to formulate the e-mail activation e-mail)
-	 * @param context The context
+	 * @param contextURL          The context URL (used to formulate the e-mail activation e-mail)
+	 * @param context             The context
 	 */
 	void sendPasswordResetEmail(User recipient, int expiryTimeInMinutes, String contextURL, DatabaseActionContext context);
 
 	/**
-	 * 	Send an account locked e-mail to the user (sent to his e-mail address)
+	 * Send an account locked e-mail to the user (sent to his e-mail address)
+	 *
 	 * @param recipient
 	 * @param contextURL
 	 * @param context
@@ -162,11 +166,12 @@ public interface MailService {
 
 	/**
 	 * Send an e-mail to the user which notifies him of the e-mail change
-	 * @param user                      The recipient user
-	 * @param actor                     The actor of the change
-	 * @param newEmail                  The new e-mail of the user
-	 * @param pendingEmailExpiryLimit   The pending e-mail expiration time limit (in days)
-	 * @param context The context
+	 *
+	 * @param user                    The recipient user
+	 * @param actor                   The actor of the change
+	 * @param newEmail                The new e-mail of the user
+	 * @param pendingEmailExpiryLimit The pending e-mail expiration time limit (in days)
+	 * @param context                 The context
 	 */
 	void sendEmailChangeNotification(User user, User actor, String newEmail, int pendingEmailExpiryLimit, DatabaseActionContext context);
 
@@ -178,18 +183,20 @@ public interface MailService {
 
 	/**
 	 * Send a confirmation when a user role is enabled
-	 * @param user          The recipient user
-	 * @param role          The role enabled
-	 * @param context       The context
+	 *
+	 * @param user    The recipient user
+	 * @param role    The role enabled
+	 * @param context The context
 	 */
 	void sendRoleEnableConfirmation(User user, Role role, DatabaseActionContext context);
 
 	/**
 	 * Send an e-mail notifying privileged users of a user role activation
-	 * @param recipient     The recipient user
-	 * @param user          The actor of the change
-	 * @param role          The role enabled
-	 * @param context The context
+	 *
+	 * @param recipient The recipient user
+	 * @param user      The actor of the change
+	 * @param role      The role enabled
+	 * @param context   The context
 	 */
 	void sendRoleEnableNotificationToPrivilegedUser(User recipient, User user, Role role, DatabaseActionContext context);
 
@@ -198,7 +205,7 @@ public interface MailService {
 	 *
 	 * @param user     The user executing the action
 	 * @param resource The published resource
-	 * @param context The context
+	 * @param context  The context
 	 */
 	void sendResourcePublicationNotification(User user, Resource resource, DatabaseActionContext context);
 
@@ -209,4 +216,13 @@ public interface MailService {
 	 * @param mails The mails
 	 */
 	void exportMails(OutputStream out, List<Mail> mails) throws IOException;
+
+	/**
+	 * Send user creation invitation email (for superuser-created users)
+	 *
+	 * @param recipient  The user who was just created
+	 * @param contextURL The application URL
+	 * @param context    Database action context
+	 */
+	void sendUserCreationInvitation(User recipient, String contextURL, DatabaseActionContext context);
 }

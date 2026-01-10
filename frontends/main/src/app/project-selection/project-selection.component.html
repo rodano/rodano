@@ -96,6 +96,21 @@
 					<option value="updatedOldest">Updated (Oldest First)</option>
 				</select>
 			</div>
+
+			@if (isSuperuser) {
+				<div class="superuser-section">
+					<button class="user-management-btn" (click)="navigateToUserManagement()">
+						<mat-icon>account_circle</mat-icon>
+						<span>User Management</span>
+					</button>
+
+					<button
+						class="configurator-btn" (click)="navigateToConfigurator()">
+						<mat-icon>settings</mat-icon>
+						<span>Configurator</span>
+					</button>
+				</div>
+			}
 		</aside>
 
 		<main class="main-content">
@@ -134,7 +149,7 @@
 							<span class="status-badge"
 													[style.background-color]="project.color"
 													style="color: white"
-							>{{ project.shortname['en'] || project.code }}</span>
+							>{{ project.shortname[getDefaultLanguage(project)] || project.code }}</span>
 							<span
 								class="status-badge"
 								[class.active]="project.status === 'ACTIVE'"
@@ -143,10 +158,6 @@
 								{{ project.status }}
 							</span>
 						</div>
-
-						<p class="project-subtitle">
-							{{ project.longname['en'] }}
-						</p>
 
 						<div class="project-description-wrapper">
 							<div

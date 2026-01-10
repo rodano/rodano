@@ -93,6 +93,7 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.DESCRIPTION, toJson(project.getDescription()))
 					.set(PROJECT.STATUS, ProjectStatus.ACTIVE)
 					.onDuplicateKeyUpdate()
+					.set(PROJECT.CODE, project.getId())
 					.set(PROJECT.URL, project.getUrl())
 					.set(PROJECT.EMAIL, project.getEmail())
 					.set(PROJECT.COLOR, project.getColor())
@@ -119,7 +120,9 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT_CONFIG_VERSION.VERSION_NUMBER, project.getConfigVersion() != null ? project.getConfigVersion() : 1)
 					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
 					.set(PROJECT_CONFIG_VERSION.CREATED_AT, configDateTime)
+					.set(PROJECT_CONFIG_VERSION.CREATED_BY, (Long) null)
 					.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, configDateTime)
+					.set(PROJECT_CONFIG_VERSION.PUBLISHED_BY, (Long) null)
 					.set(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT, "{}")
 					.set(PROJECT_CONFIG_VERSION.CHANGE_SUMMARY,
 						project.getConfigUser() != null
@@ -129,6 +132,7 @@ public class ProjectWriter extends BaseWriter {
 					.onDuplicateKeyUpdate()
 					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
 					.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, configDateTime)
+					.set(PROJECT_CONFIG_VERSION.PUBLISHED_BY, (Long) null)
 					.returning(PROJECT_CONFIG_VERSION.PK)
 					.fetchOne()
 					.getPk();

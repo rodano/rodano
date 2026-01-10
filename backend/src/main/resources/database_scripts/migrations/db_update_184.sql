@@ -22,9 +22,36 @@ alter table project
 	add column protocol_no                varchar(64)                           null,
 	add column version_number             varchar(32)                           null,
 	add column version_date               date                                  null,
-	add column status                     enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null default 'ACTIVE',
+	add column status                     enum ('ACTIVE', 'CLOSED', 'ARCHIVED') null default null,
 	add column created                    datetime(3)                           not null default current_timestamp(3),
 	add column active_config_version_fk   bigint(20)                            null;
+
+insert into project (
+	project_id,
+	code,
+	shortname,
+	longname,
+	description,
+	smtp_tls,
+	password_strong,
+	password_unique,
+	epro_enabled,
+	status,
+	created
+) values (
+			 UNHEX(REPLACE('00000000-0000-0000-0000-000000000000', '-', '')),
+			 'SYSTEM',
+			 '{"en": "System Administration"}',
+			 '{"en": "System Administration Project"}',
+			 '{"en": "Internal system project for administrative operations"}',
+			 FALSE,
+			 FALSE,
+			 FALSE,
+			 FALSE,
+			 'ACTIVE',
+			 NOW()
+		 )
+on duplicate key update code = code;
 
 create table if not exists project_audit (
 	pk              bigint(20)                            not null auto_increment,
@@ -67,7 +94,7 @@ create table if not exists project_config_version (
 	project_id      uuid                                    not null,
 	version_number  int                                     not null,
 	status          enum ('DRAFT', 'PUBLISHED', 'ARCHIVED') not null,
-	created_by      bigint(20)                              not null,
+	created_by      bigint(20)                              null,
 	created_at      datetime(3)                             null,
 	published_at    datetime(3)                             null,
 	published_by    bigint(20)                              null,

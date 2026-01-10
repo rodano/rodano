@@ -1,0 +1,49 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Configuration Snapshots</h2>
+
+	<div class="dialog-content">
+		@if (!data.snapshots.snapshots || data.snapshots.snapshots.length === 0) {
+			<div class="empty-state">
+				<mat-icon>photo_camera</mat-icon>
+				<p class="empty-message">No snapshots yet</p>
+				<p class="hint">Create your first snapshot to save the current configuration state</p>
+			</div>
+		} @else {
+			<mat-list class="snapshots-list">
+				@for (snapshot of data.snapshots.snapshots; track $index) {
+					<mat-list-item
+						class="snapshot-item"
+						[class.current]="$index === data.snapshots.currentIndex"
+						[class.selected]="$index === selectedIndex"
+						(click)="onSelectSnapshot($index)">
+						<mat-icon matListItemIcon class="snapshot-icon">
+							{{ $index === selectedIndex ? 'radio_button_checked' : 'radio_button_unchecked' }}
+						</mat-icon>
+						<div matListItemTitle class="snapshot-info">
+							<span class="snapshot-summary">{{ snapshot.summary }}</span>
+							@if ($index === data.snapshots.currentIndex) {
+								<span class="current-badge">Current</span>
+							}
+						</div>
+						<div matListItemLine class="snapshot-time">
+							{{ snapshot.timestamp | date:'medium' }}
+						</div>
+					</mat-list-item>
+				}
+			</mat-list>
+		}
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onClose()">
+			Close
+		</button>
+		<button
+			class="btn-primary"
+			(click)="onRestore()"
+			[disabled]="!canRestore">
+			<mat-icon>restore</mat-icon>
+			Restore Snapshot
+		</button>
+	</div>
+</div>

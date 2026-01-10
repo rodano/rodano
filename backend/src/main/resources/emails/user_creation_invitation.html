@@ -1,0 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    </head>
+    <body>
+        <p>Dear ${user.name},</p>
+
+        <p>An administrator has created an account for you on <b>${application_name}</b>.</p>
+
+        <p>To get started, please activate your account by clicking the link below and setting your password:</p>
+
+        <p><a href="${user_activation_url}" style="display: inline-block; padding: 10px 20px; background-color: #3B82F6; color: white; text-decoration: none; border-radius: 5px;">Activate My Account</a></p>
+
+        <p>Or copy and paste this URL into your browser:<br/>
+            <a href="${user_activation_url}">${user_activation_url}</a>
+        </p>
+
+        <p>Once your account is activated, you will be granted access to specific projects and can start using the platform.</p>
+
+        <p>If you have any questions, please contact us at <a href="mailto:${global_reply_to}">${global_reply_to}</a>.</p>
+
+        <p>With our best regards,</p>
+        <p>The <b>${application_name}</b> support team.</p>
+
+        <p>*** This is an automatic notification, please do not reply ***</p>
+    </body>
+</html>

@@ -13,13 +13,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.api.configurator.ConfigSnapshotDTO;
 import ch.rodano.api.configurator.ConfiguratorProjectDTO;
 import ch.rodano.api.configurator.CreateProjectRequest;
 import ch.rodano.api.configurator.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.UpdateProjectRequest;
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.ConfiguratorService;
 
 @RestController
-@RequestMapping("/api/configurator")
+@RequestMapping("/superuser/configurator")
 @PreAuthorize("@userSecurityService.isSuperuser()")
 public class ConfiguratorController {
 
@@ -51,9 +54,23 @@ public class ConfiguratorController {
 	 * Create new project with initial configuration
 	 */
 	@PostMapping("/projects")
+	@SkipProjectAccessCheck
 	public ResponseEntity<ConfiguratorProjectDTO> createProject(@RequestBody final CreateProjectRequest request) {
 		final var project = configuratorService.createProject(request);
 		return ResponseEntity.ok(project);
+	}
+
+	/**
+	 * Update an existing project
+	 */
+	@PutMapping("/projects/{projectId}")
+	@SkipProjectAccessCheck
+	public ResponseEntity<ConfiguratorProjectDTO> updateProject(
+		@PathVariable final UUID projectId,
+		@RequestBody final UpdateProjectRequest request
+	) {
+		final var updatedProject = configuratorService.updateProject(projectId, request);
+		return ResponseEntity.ok(updatedProject);
 	}
 
 	/**
@@ -68,15 +85,42 @@ public class ConfiguratorController {
 	}
 
 	/**
-	 * Publish draft version, making it the active configuration
+	 * Publish draft version, making it an active project
 	 */
 	@PutMapping("/projects/{projectId}/versions/{versionId}/publish")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> publishDraft(
 		@PathVariable final UUID projectId,
 		@PathVariable final Long versionId,
 		@RequestBody final PublishRequest request
 	) {
 		configuratorService.publishDraft(projectId, versionId, request.changeSummary());
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * Archive a draft configuration version
+	 */
+	@PutMapping("/projects/{projectId}/versions/{versionId}/archive")
+	@SkipProjectAccessCheck
+	public ResponseEntity<Void> archiveDraft(
+		@PathVariable final UUID projectId,
+		@PathVariable final Long versionId
+	) {
+		configuratorService.archiveDraft(projectId, versionId);
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * Restore an archived draft configuration version
+	 */
+	@PutMapping("/projects/{projectId}/versions/{versionId}/restore")
+	@SkipProjectAccessCheck
+	public ResponseEntity<Void> restoreDraftVersion(
+		@PathVariable final UUID projectId,
+		@PathVariable final Long versionId
+	) {
+		configuratorService.restoreDraft(projectId, versionId);
 		return ResponseEntity.ok().build();
 	}
 
@@ -102,8 +146,68 @@ public class ConfiguratorController {
 	}
 
 	/**
+	 * Create a snapshot of the current draft state
+	 */
+	@PostMapping("/projects/{projectId}/versions/{versionId}/snapshot")
+	@SkipProjectAccessCheck
+	public ResponseEntity<Void> createSnapshot(
+		@PathVariable final UUID projectId,
+		@PathVariable final Long versionId,
+		@RequestBody final SnapshotRequest request
+	) {
+		configuratorService.createSnapshot(projectId, versionId, request.summary());
+		return ResponseEntity.ok().build();
+	}
+
+	/**
+	 * Rollback to previous snapshot
+	 */
+	@PostMapping("/projects/{projectId}/versions/{versionId}/rollback")
+	@SkipProjectAccessCheck
+	public ResponseEntity<ConfiguratorProjectDTO> rollbackSnapshot(
+		@PathVariable final UUID projectId,
+		@PathVariable final Long versionId
+	) {
+		configuratorService.rollbackSnapshot(projectId, versionId);
+		final var project = configuratorService.getProject(projectId);
+		return ResponseEntity.ok(project);
+	}
+
+	/**
+	 * Roll forward to next snapshot
+	 */
+	@PostMapping("/projects/{projectId}/versions/{versionId}/rollforward")
+	@SkipProjectAccessCheck
+	public ResponseEntity<ConfiguratorProjectDTO> rollForwardSnapshot(
+		@PathVariable final UUID projectId,
+		@PathVariable final Long versionId
+	) {
+		configuratorService.rollForwardSnapshot(projectId, versionId);
+		final var project = configuratorService.getProject(projectId);
+		return ResponseEntity.ok(project);
+	}
+
+	/**
+	 * Get all snapshots
+	 */
+	@GetMapping("/projects/{projectId}/versions/{versionId}/snapshots")
+	public ResponseEntity<ConfigSnapshotDTO> getSnapshots(
+		@PathVariable final UUID projectId,
+		@PathVariable final Long versionId
+	) {
+		final var snapshots = configuratorService.getSnapshots(projectId, versionId);
+		return ResponseEntity.ok(snapshots);
+	}
+
+	/**
 	 * Request record for publishing a draft
 	 */
 	public record PublishRequest(String changeSummary) {
+	}
+
+	/**
+	 * Request record for creating a snapshot
+	 */
+	public record SnapshotRequest(String summary) {
 	}
 }

@@ -7,11 +7,17 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import ch.rodano.api.configurator.ConfigSnapshotDTO;
 import ch.rodano.api.configurator.ConfiguratorProjectDTO;
 import ch.rodano.api.configurator.CreateProjectRequest;
 import ch.rodano.api.configurator.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.UpdateProjectRequest;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.model.jooq.enums.ProjectConfigVersionStatus;
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 import ch.rodano.core.services.bll.user.UserSecurityService;
 import ch.rodano.core.services.dao.configurator.ConfiguratorDAOService;
 
@@ -21,13 +27,17 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 
 	private final ConfiguratorDAOService configuratorDAOService;
 	private final UserSecurityService userSecurityService;
+	private final ObjectMapper objectMapper;
 
 	public ConfiguratorServiceImpl(
 		final ConfiguratorDAOService configuratorDAOService,
-		final UserSecurityService userSecurityService
+		final UserSecurityService userSecurityService,
+		final ObjectMapper objectMapper
 	) {
 		this.configuratorDAOService = configuratorDAOService;
 		this.userSecurityService = userSecurityService;
+		this.objectMapper = new ObjectMapper();
+		this.objectMapper.registerModule(new JavaTimeModule());
 	}
 
 	@Override
@@ -63,6 +73,18 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 		}
 
 		return configuratorDAOService.createProject(request);
+	}
+
+	@Override
+	public ConfiguratorProjectDTO updateProject(final UUID projectId, final UpdateProjectRequest request) {
+		final var existingProject = configuratorDAOService.getProject(projectId);
+		if(existingProject == null) {
+			throw new NotFoundException("Project not found: " + projectId);
+		}
+
+		configuratorDAOService.updateProject(projectId, request);
+
+		return configuratorDAOService.getProject(projectId);
 	}
 
 	@Override
@@ -107,6 +129,9 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 
 		final var currentUser = userSecurityService.getCurrentUser();
 
+		final var project = configuratorDAOService.getProject(projectId);
+		final boolean isFirstPublish = project.status() == null;
+
 		final var currentActive = configuratorDAOService.getActiveVersion(projectId);
 		if(currentActive != null) {
 			configuratorDAOService.archiveVersion(currentActive.pk());
@@ -124,6 +149,38 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 		);
 
 		configuratorDAOService.updateProjectActiveVersion(projectId, versionId);
+
+		if(isFirstPublish) {
+			configuratorDAOService.updateProjectStatus(projectId, ProjectStatus.ACTIVE);
+		}
+	}
+
+	@Override
+	public void archiveDraft(final UUID projectId, final Long versionId) {
+		final var version = configuratorDAOService.getVersion(projectId, versionId);
+		if(version == null) {
+			throw new NotFoundException("Version not found: " + versionId);
+		}
+
+		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
+			throw new IllegalStateException("Can only archive DRAFT versions, current status: " + version.status());
+		}
+
+		configuratorDAOService.archiveVersion(versionId);
+	}
+
+	@Override
+	public void restoreDraft(final UUID projectId, final Long versionId) {
+		final var version = configuratorDAOService.getVersion(projectId, versionId);
+		if(version == null) {
+			throw new NotFoundException("Version not found: " + versionId);
+		}
+
+		if(version.status() != ProjectConfigVersionStatus.ARCHIVED) {
+			throw new IllegalStateException("Can only restore ARCHIVED versions, current status: " + version.status());
+		}
+
+		configuratorDAOService.restoreDraft(versionId);
 	}
 
 	@Override
@@ -138,5 +195,166 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 			throw new NotFoundException("Version not found: " + versionId);
 		}
 		return version;
+	}
+
+	@Override
+	public void createSnapshot(final UUID projectId, final Long versionId, final String summary) {
+		final var project = configuratorDAOService.getProject(projectId);
+		final var version = configuratorDAOService.getVersion(projectId, versionId);
+
+		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
+			throw new IllegalStateException("Can only create snapshots for DRAFT versions");
+		}
+
+		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
+
+		ConfigSnapshotDTO snapshots;
+		try {
+			if(configSnapshotJson == null || configSnapshotJson.isEmpty() || "{}".equals(configSnapshotJson)) {
+				snapshots = new ConfigSnapshotDTO(new java.util.ArrayList<>(), -1);
+			}
+			else {
+				snapshots = objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+			}
+		}
+		catch(Exception e) {
+			snapshots = new ConfigSnapshotDTO(new java.util.ArrayList<>(), -1);
+		}
+
+		final var snapshotList = new java.util.ArrayList<>(snapshots.snapshots());
+		if(snapshots.currentIndex() >= 0 && snapshots.currentIndex() < snapshotList.size() - 1) {
+			snapshotList.subList(snapshots.currentIndex() + 1, snapshotList.size()).clear();
+		}
+
+		final var newSnapshot = new ConfigSnapshotDTO.SnapshotEntry(
+			ZonedDateTime.now(),
+			summary,
+			project
+		);
+		snapshotList.add(newSnapshot);
+
+		final var updatedSnapshots = new ConfigSnapshotDTO(
+			snapshotList,
+			snapshotList.size() - 1
+		);
+
+		try {
+			final var snapshotJson = objectMapper.writeValueAsString(updatedSnapshots);
+			configuratorDAOService.updateConfigSnapshot(versionId, snapshotJson);
+			incrementVersionNumber(versionId);
+		}
+		catch(Exception e) {
+			throw new RuntimeException("Failed to create snapshot", e);
+		}
+	}
+
+	private void incrementVersionNumber(final Long versionId) {
+		configuratorDAOService.incrementVersionNumber(versionId);
+	}
+
+	@Override
+	public void rollbackSnapshot(final UUID projectId, final Long versionId) {
+		final var version = configuratorDAOService.getVersion(projectId, versionId);
+
+		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
+			throw new IllegalStateException("Can only rollback DRAFT versions");
+		}
+
+		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
+
+		try {
+			final var snapshots = objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+
+			if(snapshots.currentIndex() == null || snapshots.currentIndex() <= 0) {
+				throw new IllegalStateException("No previous snapshot to rollback to");
+			}
+
+			final var newIndex = snapshots.currentIndex() - 1;
+			final var snapshotToRestore = snapshots.snapshots().get(newIndex);
+
+			final var updateRequest = buildUpdateRequest(snapshotToRestore.data());
+
+			configuratorDAOService.updateProject(projectId, updateRequest);
+
+			final var updated = new ConfigSnapshotDTO(snapshots.snapshots(), newIndex);
+			configuratorDAOService.updateConfigSnapshot(versionId, objectMapper.writeValueAsString(updated));
+		}
+		catch(Exception e) {
+			throw new RuntimeException("Failed to rollback snapshot", e);
+		}
+	}
+
+	@Override
+	public void rollForwardSnapshot(final UUID projectId, final Long versionId) {
+		final var version = configuratorDAOService.getVersion(projectId, versionId);
+
+		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
+			throw new IllegalStateException("Can only roll forward DRAFT versions");
+		}
+
+		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
+
+		try {
+			final var snapshots = objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+
+			if(snapshots.currentIndex() == null || snapshots.currentIndex() >= snapshots.snapshots().size() - 1) {
+				throw new IllegalStateException("No next snapshot to roll forward to");
+			}
+
+			final var newIndex = snapshots.currentIndex() + 1;
+			final var snapshotToRestore = snapshots.snapshots().get(newIndex);
+
+			final var updateRequest = buildUpdateRequest(snapshotToRestore.data());
+
+			configuratorDAOService.updateProject(projectId, updateRequest);
+
+			final var updated = new ConfigSnapshotDTO(snapshots.snapshots(), newIndex);
+			configuratorDAOService.updateConfigSnapshot(versionId, objectMapper.writeValueAsString(updated));
+		}
+		catch(Exception e) {
+			throw new RuntimeException("Failed to roll forward snapshot", e);
+		}
+	}
+
+	@Override
+	public ConfigSnapshotDTO getSnapshots(final UUID projectId, final Long versionId) {
+		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
+
+		try {
+			if(configSnapshotJson == null || configSnapshotJson.isEmpty() || "{}".equals(configSnapshotJson)) {
+				return new ConfigSnapshotDTO(List.of(), -1);
+			}
+			return objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+		}
+		catch(Exception e) {
+			return new ConfigSnapshotDTO(List.of(), -1);
+		}
+	}
+
+	private UpdateProjectRequest buildUpdateRequest(final ConfiguratorProjectDTO data) {
+		return new UpdateProjectRequest(
+			data.code(),
+			data.shortname(),
+			data.longname(),
+			data.description(),
+			data.url(),
+			data.color(),
+			data.introductionText(),
+			data.versionDate(),
+			data.email(),
+			data.smtpTls(),
+			data.passwordStrong(),
+			data.passwordLength(),
+			data.passwordValidityDuration(),
+			data.passwordUnique(),
+			data.eproEnabled(),
+			data.eproProfileId(),
+			data.clientName(),
+			data.clientEmail(),
+			data.protocolNo(),
+			data.versionNumber(),
+			data.languages(),
+			data.ruleTags()
+		);
 	}
 }

@@ -52,5 +52,6 @@ export interface User {
     rights: UserRights;
     blocked: boolean;
     admin?: boolean;
+    superuser?: boolean;
 }
 

@@ -38,6 +38,8 @@ public class UserDTO extends ActorDTO {
 	@NotNull
 	boolean isAdmin;
 	@NotNull
+	boolean isSuperuser;
+	@NotNull
 	UserRightsDTO rights;
 
 	@NotNull
@@ -169,5 +171,13 @@ public class UserDTO extends ActorDTO {
 
 	public void setRights(final UserRightsDTO rights) {
 		this.rights = rights;
+	}
+
+	public boolean isSuperuser() {
+		return isSuperuser;
+	}
+
+	public void setSuperuser(final boolean superuser) {
+		isSuperuser = superuser;
 	}
 }

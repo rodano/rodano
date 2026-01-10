@@ -1,0 +1,93 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">{{ isEditMode ? 'Edit User' : 'Create New User' }}</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="userForm" class="user-form">
+			<div class="form-field">
+				<label>Name *</label>
+				<input
+					type="text"
+					formControlName="name"
+					placeholder="Enter full name">
+				@if (userForm.get('name')?.invalid && userForm.get('name')?.touched) {
+					<span class="error-message">{{ getErrorMessage('name') }}</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Email *</label>
+				<input
+					type="email"
+					formControlName="email"
+					placeholder="user@example.com">
+				@if (isEditMode) {
+					<span class="hint">Email cannot be changed</span>
+				}
+				@if (userForm.get('email')?.invalid && userForm.get('email')?.touched) {
+					<span class="error-message">{{ getErrorMessage('email') }}</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Language *</label>
+				<select formControlName="languageId" class="form-select">
+					@for (lang of availableLanguages; track lang.code) {
+						<option [value]="lang.code">{{ lang.name }}</option>
+					}
+				</select>
+				@if (userForm.get('languageId')?.invalid && userForm.get('languageId')?.touched) {
+					<span class="error-message">Please select a language</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Phone</label>
+				<input
+					type="tel"
+					formControlName="phone"
+					placeholder="+41 79 123 45 67">
+				<span class="hint">Optional contact phone number</span>
+			</div>
+
+			<div class="checkbox-field">
+				<label class="checkbox-label">
+					<input type="checkbox" formControlName="isSuperuser">
+					<span class="checkbox-text">
+            <mat-icon class="checkbox-icon">admin_panel_settings</mat-icon>
+            Grant Superuser Privileges
+          </span>
+				</label>
+				<span class="hint">Superusers have full administrative access to the system</span>
+			</div>
+
+			@if (!isEditMode) {
+				<div class="checkbox-field">
+					<label class="checkbox-label">
+						<input type="checkbox" formControlName="sendActivationEmail">
+						<span class="checkbox-text">
+              <mat-icon class="checkbox-icon">email</mat-icon>
+              Send Activation Email
+            </span>
+					</label>
+					<span class="hint">User will receive an email with a link to activate their account</span>
+				</div>
+			}
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()" [disabled]="loading">
+			Cancel
+		</button>
+		<button
+			class="btn-primary"
+			(click)="onSubmit()"
+			[disabled]="loading || userForm.invalid">
+			@if (loading) {
+				<mat-spinner diameter="20"></mat-spinner>
+			} @else {
+				<span>{{ isEditMode ? 'Update User' : 'Create User' }}</span>
+			}
+		</button>
+	</div>
+</div>

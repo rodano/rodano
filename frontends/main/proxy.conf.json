@@ -1,16 +1,18 @@
 {
-	"/api": {
+	"/api/**": {
 		"target": "http://localhost:8080",
 		"pathRewrite": {
 			"^/api": ""
 		},
-		"secure": false
+		"secure": false,
+		"changeOrigin": true
 	},
-	"/config": {
+	"/config/**": {
 		"target": "http://localhost:1337",
 		"pathRewrite": {
 			"^/config": ""
 		},
-		"secure": false
+		"secure": false,
+		"changeOrigin": true
 	}
 }

@@ -5,7 +5,7 @@ import {Router} from '@angular/router';
 import {PublicStudy} from '@core/model/public-study';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {AuthStateService} from '../services/auth-state.service';
-import {MatIconButton} from '@angular/material/button';
+import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {LogoComponent} from '../logo/logo.component';
@@ -24,7 +24,8 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 		MatIconButton,
 		MatTooltipModule,
 		MatProgressSpinnerModule,
-		LogoComponent
+		LogoComponent,
+		MatButton
 	]
 })
 export class ProjectSelectionComponent implements OnInit {
@@ -32,12 +33,14 @@ export class ProjectSelectionComponent implements OnInit {
 	filteredProjects: Project[] = [];
 	loading = false;
 	selectingProject: string | null = null;
+	isSuperuser = false;
 
 	searchTerm = '';
 	filters = {
 		showActive: true,
 		showClosed: true,
 		showArchived: false,
+
 		createdAfter: null as string | null,
 		createdBefore: null as string | null
 	};
@@ -56,6 +59,21 @@ export class ProjectSelectionComponent implements OnInit {
 	ngOnInit(): void {
 		document.documentElement.style.removeProperty('--mat-sys-primary');
 		this.loadProjects();
+		this.checkSuperuserStatus();
+	}
+
+	checkSuperuserStatus(): void {
+		this.authStateService.listenConnectedUser().subscribe(user => {
+			this.isSuperuser = user?.superuser || false;
+		});
+	}
+
+	navigateToUserManagement(): void {
+		this.router.navigate(['/user-management']);
+	}
+
+	navigateToConfigurator(): void {
+		this.router.navigate(['/configurator']);
 	}
 
 	loadProjects(): void {
@@ -78,11 +96,10 @@ export class ProjectSelectionComponent implements OnInit {
 
 		if(this.searchTerm.trim()) {
 			const term = this.searchTerm.toLowerCase();
-			filtered = filtered.filter(p =>
-				p.code.toLowerCase().includes(term)
-				|| p.shortname['en']?.toLowerCase().includes(term)
-				|| p.longname['en']?.toLowerCase().includes(term)
-				|| p.description['en']?.toLowerCase().includes(term)
+			filtered = filtered.filter(p => {
+				const lang = this.getDefaultLanguage(p);
+				return p.description[lang]?.toLowerCase().includes(term) || p.longname[lang]?.toLowerCase().includes(term) || p.shortname[lang]?.toLowerCase().includes(term) || p.code.toLowerCase().includes(term);
+			}
 			);
 		}
 
@@ -113,16 +130,15 @@ export class ProjectSelectionComponent implements OnInit {
 					return false;
 				}
 			}
-
 			return true;
 		});
 
 		filtered.sort((a, b) => {
 			switch(this.sortBy) {
 				case 'name':
-					return (a.shortname['en'] || a.code).localeCompare(b.shortname['en'] || b.code);
+					return (a.shortname[this.getDefaultLanguage(a)] || a.code).localeCompare(b.shortname[this.getDefaultLanguage(b)] || b.code);
 				case 'nameDesc':
-					return (b.shortname['en'] || b.code).localeCompare(a.shortname['en'] || a.code);
+					return (b.shortname[this.getDefaultLanguage(b)] || b.code).localeCompare(a.shortname[this.getDefaultLanguage(a)] || a.code);
 				case 'createdNewest':
 					return this.getCreatedTimestamp(b) - this.getCreatedTimestamp(a);
 				case 'createdOldest':
@@ -178,10 +194,7 @@ export class ProjectSelectionComponent implements OnInit {
 	}
 
 	getDescription(project: Project): string {
-		const tmp = document.createElement('DIV');
-		tmp.innerHTML = project.introductionText;
-		const pElement = tmp.querySelector('p');
-		return pElement?.textContent || project.description['en'] || '';
+		return project.introductionText || project.description['en'] || '';
 	}
 
 	toggleDescription(event: Event, projectId: string): void {
@@ -201,5 +214,10 @@ export class ProjectSelectionComponent implements OnInit {
 
 	private getCreatedTimestamp(project: Project): number {
 		return project.created ? new Date(project.created).getTime() : 0;
+	}
+
+	getDefaultLanguage(project: Project): string {
+		const defaultLang = project.languages?.find(l => l.isDefault);
+		return defaultLang?.languageCode || project.languages?.[0]?.languageCode || 'en';
 	}
 }

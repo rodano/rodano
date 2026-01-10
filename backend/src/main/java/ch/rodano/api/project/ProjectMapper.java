@@ -20,7 +20,8 @@ public class ProjectMapper {
 			project.getVersionDate(),
 			project.getConfigDate(),
 			project.getStatus(),
-			project.getCreatedDate()
+			project.getCreatedDate(),
+			project.getActiveConfigVersionFk()
 		);
 	}
 }

@@ -6,6 +6,11 @@ public enum MailTemplate {
 		"scope_transferred.txt",
 		"scope_transferred.html"
 	),
+	USER_CREATION_INVITATION(
+		"Account Created - Activate your account",
+		"user_creation_invitation.txt",
+		"user_creation_invitation.html"
+	),
 	USER_ACTIVATION_INVITATION(
 		"${study.defaultLocalizedLongname} account activation",
 		"user_activation_invitation.txt",

@@ -7,6 +7,8 @@ import java.util.UUID;
 import ch.rodano.api.configurator.ConfiguratorProjectDTO;
 import ch.rodano.api.configurator.CreateProjectRequest;
 import ch.rodano.api.configurator.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.UpdateProjectRequest;
+import ch.rodano.core.model.jooq.enums.ProjectStatus;
 
 public interface ConfiguratorDAOService {
 
@@ -29,6 +31,11 @@ public interface ConfiguratorDAOService {
 	 * Create a new project
 	 */
 	ConfiguratorProjectDTO createProject(CreateProjectRequest request);
+
+	/**
+	 * Update created project
+	 */
+	void updateProject(UUID projectId, UpdateProjectRequest request);
 
 	/**
 	 * Get the current draft version for a project (if any)
@@ -59,6 +66,11 @@ public interface ConfiguratorDAOService {
 	void archiveVersion(Long versionId);
 
 	/**
+	 * Restore an archived version back to draft status
+	 */
+	void restoreDraft(Long versionId);
+
+	/**
 	 * Update the project's active config version pointer
 	 */
 	void updateProjectActiveVersion(UUID projectId, Long versionId);
@@ -72,4 +84,21 @@ public interface ConfiguratorDAOService {
 	 * Get a specific version
 	 */
 	ProjectConfigVersionDTO getVersion(UUID projectId, Long versionId);
+
+	/**
+	 * Updates the project status - ACTIVE, CLOSED, ARCHIVED
+	 */
+	void updateProjectStatus(UUID projectId, ProjectStatus status);
+
+	/**
+	 * Get the config snapshot JSON for a version
+	 */
+	String getConfigSnapshot(Long versionId);
+
+	/**
+	 * Update the config snapshot JSON for a version
+	 */
+	void updateConfigSnapshot(Long versionId, String snapshotJson);
+
+	void incrementVersionNumber(Long versionId);
 }

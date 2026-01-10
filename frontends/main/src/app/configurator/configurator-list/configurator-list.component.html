@@ -1,0 +1,259 @@
+<div class="configurator-container">
+	<header class="top-header">
+		<h1>Configurator</h1>
+
+		<button
+			(click)="navigateToProjects()"
+			mat-icon-button
+			matTooltip="Back to Projects">
+			<mat-icon>arrow_back</mat-icon>
+		</button>
+	</header>
+
+	<div class="content-wrapper">
+		<aside class="sidebar">
+			<div class="filters-header">
+				<h3>Filters</h3>
+				@if (hasActiveFilters()) {
+					<button class="clear-filters" (click)="clearFilters()">
+						Clear All
+					</button>
+				}
+			</div>
+
+			<div class="search-box">
+				<mat-icon>search</mat-icon>
+				<input
+					type="text"
+					placeholder="Search projects..."
+					[(ngModel)]="searchTerm"
+					(input)="applyFilters()"/>
+			</div>
+
+			<div class="filter-section">
+				<h4>Project Status</h4>
+				<div class="filter-options">
+					<label class="status-toggle" [class.selected]="filters.showActive">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showActive"
+							(change)="applyFilters()"
+							class="visually-hidden"/>
+						<span class="status-badge active">Active</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showClosed">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showClosed"
+							(change)="applyFilters()"
+							class="visually-hidden"/>
+						<span class="status-badge closed">Closed</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showArchived">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showArchived"
+							(change)="applyFilters()"
+							class="visually-hidden"/>
+						<span class="status-badge archived">Archived</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Configuration Status</h4>
+				<div class="filter-options">
+					<label class="status-toggle" [class.selected]="filters.showDraft">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showDraft"
+							(change)="applyFilters()"
+							class="visually-hidden"/>
+						<span class="status-badge draft">Draft</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showPublished">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showPublished"
+							(change)="applyFilters()"
+							class="visually-hidden"/>
+						<span class="status-badge published">Published</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showConfigArchived">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showConfigArchived"
+							(change)="applyFilters()"
+							class="visually-hidden"/>
+						<span class="status-badge config-archived">Archived</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Created Date</h4>
+				<div class="date-filters">
+					<div class="date-input-group">
+						<label>From</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.createdAfter"
+							(change)="applyFilters()"
+							class="date-input"/>
+					</div>
+					<div class="date-input-group">
+						<label>To</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.createdBefore"
+							(change)="applyFilters()"
+							class="date-input"/>
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Sort By</h4>
+				<select
+					[(ngModel)]="sortBy"
+					(change)="applyFilters()"
+					class="sort-select">
+					<option value="nameAsc">Name (A-Z)</option>
+					<option value="nameDesc">Name (Z-A)</option>
+					<option value="newestFirst">Newest First</option>
+					<option value="oldestFirst">Oldest First</option>
+				</select>
+			</div>
+		</aside>
+
+		<main class="main-content">
+			<div class="page-header">
+				<h1>Project Configurations</h1>
+				<p>Create and manage project configurations</p>
+			</div>
+
+			@if (loading) {
+				<div class="loading-state">
+					<mat-spinner></mat-spinner>
+					<p>Loading projects...</p>
+				</div>
+			} @else if (filteredProjects.length === 0 && !hasActiveFilters()) {
+				<div class="empty-state">
+					<mat-icon>folder_open</mat-icon>
+					<p>No projects found</p>
+				</div>
+			} @else {
+				<div class="projects-grid">
+					<div class="project-card create-card" (click)="openCreateDialog()">
+						<div class="create-content">
+							<mat-icon>add_circle_outline</mat-icon>
+							<h3>Create New Project</h3>
+							<p>Set up a new project configuration</p>
+						</div>
+					</div>
+
+					@for (project of filteredProjects; track project.projectId) {
+						<div class="project-card" [style.border-top-color]="project.color || '#5bd4d4'">
+							<div class="card-header">
+								<div class="project-info">
+									<h3>{{ getTranslatedName(project.shortname) }}</h3>
+									<p class="project-code">{{ project.code }}</p>
+								</div>
+								<button
+									mat-icon-button
+									[matMenuTriggerFor]="menu"
+									aria-label="Actions">
+									<mat-icon>more_vert</mat-icon>
+								</button>
+								<mat-menu #menu="matMenu">
+									<button mat-menu-item (click)="editProject(project)">
+										<mat-icon>edit</mat-icon>
+										<span>Edit Configuration</span>
+									</button>
+									<button mat-menu-item (click)="viewVersions(project)">
+										<mat-icon>history</mat-icon>
+										<span>View Versions</span>
+									</button>
+									<button mat-menu-item (click)="copyProject(project)">
+										<mat-icon>content_copy</mat-icon>
+										<span>Copy Project</span>
+									</button>
+									@if (project.draftConfigVersionStatus === 'DRAFT' || !project.draftConfigVersionStatus) {
+										<button mat-menu-item (click)="archiveProject(project)">
+											<mat-icon>archive</mat-icon>
+											<span>Archive Draft</span>
+										</button>
+									}
+
+									@if (project.draftConfigVersionStatus === 'ARCHIVED') {
+										<button mat-menu-item (click)="restoreProject(project)">
+											<mat-icon>unarchive</mat-icon>
+											<span>Restore Draft</span>
+										</button>
+									}
+								</mat-menu>
+							</div>
+
+							<div class="card-body">
+								<div class="project-badges">
+									@if (project.status) {
+										<span
+											class="status-badge project-status"
+											[class.active]="project.status === 'ACTIVE'"
+											[class.closed]="project.status === 'CLOSED'"
+											[class.archived]="project.status === 'ARCHIVED'">
+            {{ project.status }}
+          </span>
+									}
+
+									<span
+										class="status-badge"
+										[class.draft]="(project.draftConfigVersionStatus || project.activeConfigVersionStatus || 'DRAFT') === 'DRAFT'"
+										[class.published]="(project.draftConfigVersionStatus || project.activeConfigVersionStatus) === 'PUBLISHED'"
+										[class.config-archived]="(project.draftConfigVersionStatus || project.activeConfigVersionStatus) === 'ARCHIVED'">
+										{{ project.draftConfigVersionStatus || project.activeConfigVersionStatus || 'DRAFT' }}
+									</span>
+
+									@if ((project.draftConfigVersionStatus === 'DRAFT' || !project.draftConfigVersionStatus) && project.draftVersionNumber) {
+										<span class="status-badge draft-indicator">
+											v{{ project.draftVersionNumber }}
+										</span>
+									}
+								</div>
+
+								<div class="project-details">
+									<div class="detail-item">
+										<mat-icon>check_circle</mat-icon>
+										<span>Active: {{ project.activeVersionNumber ? 'v' + project.activeVersionNumber : 'None' }}</span>
+									</div>
+									@if (project.created) {
+										<div class="detail-item">
+											<mat-icon>event</mat-icon>
+											<span>Created: {{ project.created | date:'short' }}</span>
+										</div>
+									}
+									@if (project.url) {
+										<div class="detail-item">
+											<mat-icon>link</mat-icon>
+											<span>{{ project.url }}</span>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+
+				@if (filteredProjects.length === 0 && hasActiveFilters()) {
+					<div class="empty-state">
+						<mat-icon>filter_list_off</mat-icon>
+						<p>No projects match your filters</p>
+						<button mat-stroked-button (click)="clearFilters()">
+							Clear Filters
+						</button>
+					</div>
+				}
+			}
+		</main>
+	</div>
+</div>

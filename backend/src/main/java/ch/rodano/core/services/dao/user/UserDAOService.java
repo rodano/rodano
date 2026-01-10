@@ -1,9 +1,11 @@
 package ch.rodano.core.services.dao.user;
 
+import java.util.List;
 import java.util.NavigableSet;
 import java.util.Optional;
 
 import ch.rodano.api.dto.paging.PagedResult;
+import ch.rodano.api.user.management.UserManagementDTO;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.UserAuditTrail;
 import ch.rodano.core.model.event.Timeframe;
@@ -59,5 +61,10 @@ public interface UserDAOService {
 	PagedResult<User> search(UserSearch search);
 
 	NavigableSet<UserAuditTrail> getAuditTrails(User user, Optional<Timeframe> empty, Optional<Long> actorPk);
+
+	/**
+	 * Get all users for management view
+	 */
+	List<UserManagementDTO> getAllUsersForManagement();
 
 }

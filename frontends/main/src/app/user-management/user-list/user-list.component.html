@@ -1,0 +1,318 @@
+<div class="user-management-container">
+	<header class="top-header">
+		<h1>User Management</h1>
+
+		<button
+			(click)="navigateToProjects()"
+			mat-icon-button matTooltip="Back to Projects">
+			<mat-icon>arrow_back</mat-icon>
+		</button>
+	</header>
+
+	<div class="content-wrapper">
+		<aside class="sidebar">
+			<div class="filters-header">
+				<h3>Filters</h3>
+				@if (hasActiveFilters()) {
+					<button class="clear-filters" (click)="clearFilters()">
+						Clear All
+					</button>
+				}
+			</div>
+
+			<div class="search-box">
+				<mat-icon>search</mat-icon>
+				<input
+					type="text"
+					placeholder="Search users..."
+					[(ngModel)]="searchTerm"
+					(input)="applyFilters()" />
+			</div>
+
+			<div class="filter-section">
+				<h4>Status</h4>
+				<div class="filter-options">
+					<label class="status-toggle" [class.selected]="filters.showActive">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showActive"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge active">Active</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showDeleted">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showDeleted"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge deleted">Deleted</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Activation</h4>
+				<div class="filter-options">
+					<label class="status-toggle" [class.selected]="filters.showActivated">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showActivated"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge activated">Activated</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showPending">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showPending"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge pending">Pending</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>User Type</h4>
+				<div class="filter-options">
+					<label class="status-toggle" [class.selected]="filters.showSuperusers">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showSuperusers"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge superuser">Superusers</span>
+					</label>
+					<label class="status-toggle" [class.selected]="filters.showRegularUsers">
+						<input
+							type="checkbox"
+							[(ngModel)]="filters.showRegularUsers"
+							(change)="applyFilters()"
+							class="visually-hidden" />
+						<span class="status-badge regular">Regular Users</span>
+					</label>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Language</h4>
+				<select
+					[(ngModel)]="filters.languageId"
+					(change)="applyFilters()"
+					class="sort-select">
+					<option value="">All Languages</option>
+					<option value="en">English</option>
+					<option value="de">German</option>
+					<option value="fr">French</option>
+					<option value="it">Italian</option>
+				</select>
+			</div>
+
+			<div class="filter-section">
+				<h4>Created Date</h4>
+				<div class="date-filters">
+					<div class="date-input-group">
+						<label>From</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.createdAfter"
+							(change)="applyFilters()"
+							class="date-input" />
+					</div>
+					<div class="date-input-group">
+						<label>To</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.createdBefore"
+							(change)="applyFilters()"
+							class="date-input" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Last Login</h4>
+				<div class="date-filters">
+					<div class="date-input-group">
+						<label>From</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.loginAfter"
+							(change)="applyFilters()"
+							class="date-input" />
+					</div>
+					<div class="date-input-group">
+						<label>To</label>
+						<input
+							type="date"
+							[(ngModel)]="filters.loginBefore"
+							(change)="applyFilters()"
+							class="date-input" />
+					</div>
+				</div>
+			</div>
+
+			<div class="filter-section">
+				<h4>Sort By</h4>
+				<select
+					[(ngModel)]="sortBy"
+					(change)="applyFilters()"
+					class="sort-select">
+					<option value="name">Name (A-Z)</option>
+					<option value="nameDesc">Name (Z-A)</option>
+					<option value="emailAsc">Email (A-Z)</option>
+					<option value="emailDesc">Email (Z-A)</option>
+					<option value="createdNewest">Created (Newest First)</option>
+					<option value="createdOldest">Created (Oldest First)</option>
+					<option value="loginNewest">Last Login (Newest First)</option>
+					<option value="loginOldest">Last Login (Oldest First)</option>
+				</select>
+			</div>
+		</aside>
+
+		<main class="main-content">
+			<div class="page-header">
+				<h1>Manage Users</h1>
+				<p>Create, edit, and manage user accounts</p>
+			</div>
+
+			@if (loading) {
+				<div class="loading-state">
+					<mat-spinner></mat-spinner>
+					<p>Loading users...</p>
+				</div>
+			} @else if (filteredUsers.length === 0 && !hasActiveFilters()) {
+				<div class="empty-state">
+					<mat-icon>people_outline</mat-icon>
+					<p>No users found</p>
+				</div>
+			} @else {
+				<div class="users-grid">
+
+					<div class="user-card create-card" (click)="openCreateDialog()">
+						<div class="create-content">
+							<mat-icon>add_circle_outline</mat-icon>
+							<h3>Create New User</h3>
+							<p>Add a new user account</p>
+						</div>
+					</div>
+
+					@for (user of filteredUsers; track user.pk) {
+						<div class="user-card" [class.superuser-card]="user.isSuperuser" [class.deleted-card]="user.isDeleted">
+
+							<div class="card-header">
+								<div class="user-info">
+									<div class="name-wrapper">
+										<h3>{{ user.name }}</h3>
+										@if (user.isSuperuser) {
+											<mat-icon class="superuser-icon" matTooltip="Superuser">admin_panel_settings</mat-icon>
+										}
+										@if (user.blocked) {
+											<mat-icon class="blocked-icon" matTooltip="User is blocked">lock</mat-icon>
+										}
+									</div>
+									<p class="email">{{ user.email }}</p>
+								</div>
+								<button
+									mat-icon-button
+									[matMenuTriggerFor]="menu"
+									aria-label="Actions">
+									<mat-icon>more_vert</mat-icon>
+								</button>
+								<mat-menu #menu="matMenu">
+									<button mat-menu-item (click)="openEditDialog(user)">
+										<mat-icon>edit</mat-icon>
+										<span>Edit</span>
+									</button>
+									@if (user.blocked) {
+										<button mat-menu-item (click)="unblockUser(user)">
+											<mat-icon>lock_open</mat-icon>
+											<span>Unblock User</span>
+										</button>
+									}
+									@if (!user.isDeleted) {
+										<button mat-menu-item (click)="deleteUser(user)">
+											<mat-icon>delete</mat-icon>
+											<span>Delete</span>
+										</button>
+									} @else {
+										<button mat-menu-item (click)="restoreUser(user)">
+											<mat-icon>restore</mat-icon>
+											<span>Restore</span>
+										</button>
+									}
+									<button mat-menu-item (click)="toggleSuperuser(user)">
+										<mat-icon>{{ user.isSuperuser ? 'remove_moderator' : 'add_moderator' }}</mat-icon>
+										<span>{{ user.isSuperuser ? 'Revoke' : 'Grant' }} Superuser</span>
+									</button>
+								</mat-menu>
+							</div>
+
+							<div class="card-body">
+								<div class="user-badges">
+									<span
+										class="status-badge"
+										[class.active]="!user.isDeleted"
+										[class.deleted]="user.isDeleted">
+										{{ user.isDeleted ? 'Deleted' : 'Active' }}
+									</span>
+									@if (user.isActivated) {
+										<span class="status-badge activated">Activated</span>
+									} @else {
+										<span class="status-badge pending">Pending</span>
+									}
+									@if (user.isExternallyManaged) {
+										<span class="status-badge external">External</span>
+									}
+								</div>
+
+								<div class="user-details">
+									<div class="detail-item">
+										<mat-icon>language</mat-icon>
+										<span>{{ user.languageId || '-' }}</span>
+									</div>
+									<div class="detail-item">
+										<mat-icon>phone</mat-icon>
+										<span>{{ user.phone || '-' }}</span>
+									</div>
+									@if (user.creationTime) {
+										<div class="detail-item">
+											<mat-icon>event</mat-icon>
+											<span>Created: {{ user.creationTime | date:'short' }}</span>
+										</div>
+									}
+									<div class="detail-item">
+										<mat-icon>login</mat-icon>
+										<span>Last login: {{ user.loginDate ? (user.loginDate | date:'short') : 'Never' }}</span>
+									</div>
+									@if (user.hasPassword) {
+										<div class="detail-item">
+											<mat-icon>key</mat-icon>
+											<span>Password set</span>
+										</div>
+									} @else {
+										<div class="detail-item">
+											<mat-icon>key_off</mat-icon>
+											<span>No password</span>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+					}
+				</div>
+
+				@if (filteredUsers.length === 0 && hasActiveFilters()) {
+					<div class="empty-state">
+						<mat-icon>filter_list_off</mat-icon>
+						<p>No users match your filters</p>
+						<button mat-stroked-button (click)="clearFilters()">
+							Clear Filters
+						</button>
+					</div>
+				}
+			}
+		</main>
+	</div>
+</div>

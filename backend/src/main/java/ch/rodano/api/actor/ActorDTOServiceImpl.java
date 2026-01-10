@@ -189,6 +189,7 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 		dto.loginDate = user.getLoginDate();
 		dto.userAgent = user.getUserAgent();
 		dto.isAdmin = rightsService.hasRightAdmin(userActiveRoles);
+		dto.isSuperuser = user.isSuperuser();
 		dto.rights = createUserRightDTO(userActiveRoles);
 
 		dto.blocked = user.getPasswordAttempts() >= UserSecurityService.PASSWORD_MAX_ATTEMPTS;
@@ -214,6 +215,9 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 		dto.setActivated(user.isActivated());
 		dto.setExternallyManaged(user.isExternallyManaged());
 		dto.setRemoved(user.getDeleted());
+		dto.setSuperuser(user.isSuperuser());
+		dto.setBlocked(user.getPasswordAttempts() >= UserSecurityService.PASSWORD_MAX_ATTEMPTS);
+		dto.setHasPassword(StringUtils.isNotEmpty(user.getPassword()));
 		dto.setRoles(Collections.emptyList());
 		return dto;
 	}

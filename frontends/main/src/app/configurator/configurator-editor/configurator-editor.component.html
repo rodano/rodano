@@ -1,0 +1,97 @@
+<div class="editor-container">
+	@if (loading) {
+		<div class="loading-container">
+			<mat-spinner diameter="50"></mat-spinner>
+			<p>Loading project configuration...</p>
+		</div>
+	} @else {
+		<div class="editor-header">
+			<div class="header-left">
+				<button
+					class="btn-back"
+					mat-icon-button
+					(click)="onBack()"
+					matTooltip="Back to Overview">
+					<mat-icon>arrow_back</mat-icon>
+				</button>
+				<div class="project-info">
+					<h1 class="project-title">{{ getTranslatedName(project?.shortname) }}</h1>
+					<span class="project-code">{{ project?.code }}</span>
+				</div>
+			</div>
+			<div class="header-right">
+				@if (hasModifications) {
+					<div class="modifications-indicator">
+						<mat-icon>create</mat-icon>
+						<span>{{ modifiedFields.size }} field(s) modified</span>
+					</div>
+				}
+				<div class="draft-indicator">
+					<mat-icon>edit_note</mat-icon>
+					<span>Draft v{{ draftVersion?.versionNumber }}</span>
+				</div>
+				<button
+					class="btn-icon"
+					mat-icon-button
+					(click)="onDiscardChanges()"
+					[disabled]="saving"
+					matTooltip="Discard Changes">
+					<mat-icon>undo</mat-icon>
+				</button>
+				<button
+					class="btn-icon"
+					mat-icon-button
+					(click)="onSaveDraft()"
+					[disabled]="saving"
+					matTooltip="Save Draft">
+					@if (saving) {
+						<mat-spinner diameter="20"></mat-spinner>
+					} @else {
+						<mat-icon>save</mat-icon>
+					}
+				</button>
+				<button
+					class="btn-icon"
+					mat-icon-button
+					(click)="onCreateSnapshot()"
+					[disabled]="saving"
+					matTooltip="Create Snapshot">
+					<mat-icon>photo_camera</mat-icon>
+				</button>
+				<button
+					class="btn-icon"
+					mat-icon-button
+					(click)="onViewSnapshots()"
+					[disabled]="saving"
+					matTooltip="View Snapshots">
+					<mat-icon>photo_library</mat-icon>
+				</button>
+				<button class="btn-primary" (click)="onPublish()" [disabled]="saving">
+					<mat-icon>publish</mat-icon>
+					Publish
+				</button>
+			</div>
+		</div>
+
+		<div class="editor-content">
+			<div class="editor-sidebar">
+				<app-configurator-tree
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onNodeSelected($event)">
+				</app-configurator-tree>
+			</div>
+
+			<div class="editor-main">
+				<app-configurator-detail
+					[projectId]="projectId"
+					[project]="workingProject"
+					[selectedNode]="selectedNode"
+					[modifiedFields]="modifiedFields"
+					(fieldsUpdated)="onFieldsUpdated($event)">
+				</app-configurator-detail>
+			</div>
+		</div>
+	}
+</div>

@@ -4,6 +4,7 @@ import {HttpClient} from '@angular/common/http';
 import {tap} from 'rxjs/operators';
 import {PublicStudy} from '@core/model/public-study';
 import {ProjectStatus} from '@core/model/project-status';
+import {ProjectLanguage} from '@core/model/project-language';
 
 export interface Project {
 	projectId: string;
@@ -18,6 +19,7 @@ export interface Project {
 	configDate?: number;
 	status?: ProjectStatus;
 	created?: Date;
+	languages?: ProjectLanguage[];
 }
 
 @Injectable({
@@ -50,6 +52,11 @@ export class ProjectService {
 				localStorage.setItem('currentProjectId', projectId);
 				this.currentProjectIdSubject.next(projectId);
 
+				const languages = study.activatedLanguages.map(lang => ({
+					languageCode: lang.id,
+					isDefault: lang.id === study.defaultLanguage.id
+				}));
+
 				const project: Project = {
 					projectId: study.projectId,
 					code: study.id,
@@ -59,7 +66,8 @@ export class ProjectService {
 					url: study.url,
 					color: study.color,
 					introductionText: study.introductionText || '',
-					status: study.projectStatus
+					status: study.projectStatus,
+					languages: languages
 				};
 				this.currentProjectSubject.next(project);
 			})

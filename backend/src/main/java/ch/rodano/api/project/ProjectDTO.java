@@ -21,6 +21,7 @@ public record ProjectDTO(
 	LocalDate versionDate,
 	Long configDate,
 	ProjectStatus status,
-	ZonedDateTime created
+	ZonedDateTime created,
+	Long activeConfigVersionFk
 ) {
 }

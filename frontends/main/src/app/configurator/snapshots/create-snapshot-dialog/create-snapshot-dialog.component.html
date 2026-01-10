@@ -1,0 +1,27 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Create Snapshot</h2>
+
+	<div class="dialog-content">
+		<p class="dialog-description">Create a checkpoint of the current configuration state.</p>
+
+		<div class="form-field">
+			<label>Snapshot Description *</label>
+			<input
+				type="text"
+				[(ngModel)]="summary"
+				placeholder="e.g., After configuring email settings"
+				maxlength="200"
+				(keyup.enter)="onConfirm()">
+			<span class="hint">Describe what changes this snapshot represents (max 200 characters)</span>
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onConfirm()" [disabled]="!summary.trim()">
+			Create Snapshot
+		</button>
+	</div>
+</div>

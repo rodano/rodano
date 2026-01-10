@@ -43,6 +43,7 @@ import ch.rodano.api.controller.user.exception.InvalidEmailException;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.core.configuration.mail.GlobalMailConfiguration;
+import ch.rodano.core.constants.SystemConstants;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.mail.CustomizedTemplatedMail;
 import ch.rodano.core.model.mail.DefinedTemplatedMail;
@@ -208,7 +209,9 @@ public class MailServiceImpl implements MailService {
 		sl.putTemplate("subject", template.getSubject());
 		final var loader = new MultiTemplateLoader(new TemplateLoader[] { stl, sl });
 
-		mail.setProjectId(null);
+		mail.setProjectId(SystemConstants.SYSTEM_PROJECT_ID);
+		mail.setSender(definedTemplatedMail.getSender());
+		mail.setReplyTo(definedTemplatedMail.getReplyTo());
 
 		mail.setSubject(readTemplate("subject", templateParameters, loader));
 		mail.setTextBody(readTemplate(template.getBodyTextFilename(), templateParameters, loader));
@@ -700,5 +703,23 @@ public class MailServiceImpl implements MailService {
 				writer.writeNext(line);
 			}
 		}
+	}
+
+	@Override
+	public void sendUserCreationInvitation(final User recipient, final String contextURL, final DatabaseActionContext context) {
+		final var url = String.format("%s/register/%s", contextURL, recipient.getActivationCode());
+
+		final Map<String, Object> templateVars = Map.of("user_activation_url", url);
+
+		final String creationText = "Send user creation invitation mail";
+		final var mail = prepareGlobalMail(
+			recipient,
+			MailTemplate.USER_CREATION_INVITATION,
+			templateVars,
+			Collections.singleton(recipient.getEmail()),
+			creationText
+		);
+
+		createGlobalMail(mail, context, creationText);
 	}
 }

@@ -23,6 +23,7 @@ public class Project {
 	private Long configDate;
 	private ProjectStatus status;
 	private ZonedDateTime createdDate;
+	private Long activeConfigVersionFk;
 
 	public UUID getProjectId() {
 		return projectId;
@@ -126,5 +127,13 @@ public class Project {
 
 	public void setCreatedDate(final ZonedDateTime createdDate) {
 		this.createdDate = createdDate;
+	}
+
+	public Long getActiveConfigVersionFk() {
+		return activeConfigVersionFk;
+	}
+
+	public void setActiveConfigVersionFk(final Long activeConfigVersionFk) {
+		this.activeConfigVersionFk = activeConfigVersionFk;
 	}
 }

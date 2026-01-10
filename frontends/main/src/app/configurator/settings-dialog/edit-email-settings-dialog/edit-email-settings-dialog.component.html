@@ -1,0 +1,38 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Email Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Project Email</label>
+				<input
+					type="email"
+					formControlName="email"
+					placeholder="admin@example.com">
+				<span class="hint">Email address for project communications</span>
+				@if (form.get('email')?.hasError('email') && form.get('email')?.touched) {
+					<span class="error-message">Please enter a valid email address</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>SMTP TLS</label>
+				<div class="toggle-wrapper">
+					<mat-slide-toggle formControlName="smtpTls">
+						{{ form.get('smtpTls')?.value ? 'Enabled' : 'Disabled' }}
+					</mat-slide-toggle>
+				</div>
+				<span class="hint">Enable TLS encryption for SMTP connections</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!form.valid">
+			Save Changes
+		</button>
+	</div>
+</div>

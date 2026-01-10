@@ -23,6 +23,7 @@ export interface Project {
     configDate?: number;
     status?: ProjectStatus;
     created?: Date;
+    activeConfigVersionFk?: number;
 }
 export namespace Project {
 }

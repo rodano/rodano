@@ -1,0 +1,193 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Create New Project</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="projectForm" class="project-form">
+			<div class="form-field">
+				<label>Project Code *</label>
+				<input
+					type="text"
+					formControlName="code"
+					placeholder="MY_PROJECT"
+					style="text-transform: uppercase;">
+				<span class="hint">Uppercase letters, numbers, and underscores only (e.g., TEST, STUDY_2024)</span>
+				@if (projectForm.get('code')?.invalid && projectForm.get('code')?.touched) {
+					<span class="error-message">{{ getErrorMessage('code') }}</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>URL</label>
+				<input
+					type="url"
+					formControlName="url"
+					placeholder="https://example.com">
+				<span class="hint">Optional project website URL</span>
+				@if (projectForm.get('url')?.invalid && projectForm.get('url')?.touched) {
+					<span class="error-message">{{ getErrorMessage('url') }}</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Color</label>
+				<div class="color-picker-wrapper">
+					<button
+						type="button"
+						class="color-button"
+						[style.background-color]="projectForm.get('color')?.value"
+						(click)="colorPicker.click()"
+						[title]="'Current color: ' + projectForm.get('color')?.value">
+					</button>
+					<input
+						#colorPicker
+						type="color"
+						formControlName="color"
+						class="color-input-hidden">
+					<input
+						type="text"
+						[value]="projectForm.get('color')?.value"
+						(input)="onColorInput($event)"
+						placeholder="#5bd4d4"
+						maxlength="7"
+						class="color-text-input">
+				</div>
+				<span class="hint">Project theme color (default: #5bd4d4)</span>
+			</div>
+
+			<div class="form-field">
+				<label>Languages *</label>
+				<div class="language-selector">
+					@if (selectedLanguages.length > 0) {
+						<div class="selected-languages">
+							@for (lang of selectedLanguages; track lang.code) {
+								<div class="language-chip" [class.default-language]="lang.isDefault">
+									<button
+										type="button"
+										class="star-button"
+										(click)="setDefaultLanguage(lang.code)"
+										[class.is-default]="lang.isDefault"
+										[matTooltip]="lang.isDefault ? 'Default language' : 'Set as default'">
+										<mat-icon>{{ lang.isDefault ? 'star' : 'star_border' }}</mat-icon>
+									</button>
+									<span>{{ lang.name }} ({{ lang.code }})</span>
+									<button type="button" class="chip-remove" (click)="removeLanguage(lang.code)">
+										<mat-icon>close</mat-icon>
+									</button>
+								</div>
+							}
+						</div>
+					}
+
+					@if (getAvailableLanguages().length > 0) {
+						<div class="add-language-dropdown">
+							<mat-icon>add</mat-icon>
+							<select (change)="onLanguageSelected($event)" class="language-select">
+								<option value="">Add a language...</option>
+								@for (lang of getAvailableLanguages(); track lang.code) {
+									<option [value]="lang.code">{{ lang.name }}</option>
+								}
+							</select>
+						</div>
+					}
+				</div>
+				<span class="hint">Click the star to set a language as default</span>
+			</div>
+
+			@if (selectedLanguages.length > 0) {
+				<div class="form-field">
+					<label>Translations *</label>
+
+					@if (selectedLanguages.length === 1) {
+						<div class="language-fields" [formGroup]="languageForms.get(selectedLanguages[0].code)!">
+							<div class="form-field">
+								<label>Short Name</label>
+								<input
+									type="text"
+									formControlName="shortname"
+									placeholder="Study Name">
+								@if (languageForms.get(selectedLanguages[0].code)?.get('shortname')?.invalid && languageForms.get(selectedLanguages[0].code)?.get('shortname')?.touched) {
+									<span class="error-message">Short name is required</span>
+								}
+							</div>
+
+							<div class="form-field">
+								<label>Long Name</label>
+								<input
+									type="text"
+									formControlName="longname"
+									placeholder="Full Study Title">
+								@if (languageForms.get(selectedLanguages[0].code)?.get('longname')?.invalid && languageForms.get(selectedLanguages[0].code)?.get('longname')?.touched) {
+									<span class="error-message">Long name is required</span>
+								}
+							</div>
+
+							<div class="form-field">
+								<label>Description</label>
+								<textarea
+									formControlName="description"
+									placeholder="Brief description of the project"
+									rows="3"></textarea>
+								<span class="hint">Optional project description</span>
+							</div>
+						</div>
+					} @else {
+						<mat-tab-group>
+							@for (lang of selectedLanguages; track lang.code) {
+								<mat-tab [label]="getLanguageLabel(lang.code, lang.isDefault)">
+									<div class="tab-content" [formGroup]="languageForms.get(lang.code)!">
+										<div class="form-field">
+											<label>Short Name</label>
+											<input
+												type="text"
+												formControlName="shortname"
+												placeholder="Study Name">
+											@if (languageForms.get(lang.code)?.get('shortname')?.invalid && languageForms.get(lang.code)?.get('shortname')?.touched) {
+												<span class="error-message">Short name is required</span>
+											}
+										</div>
+
+										<div class="form-field">
+											<label>Long Name</label>
+											<input
+												type="text"
+												formControlName="longname"
+												placeholder="Full Study Title">
+											@if (languageForms.get(lang.code)?.get('longname')?.invalid && languageForms.get(lang.code)?.get('longname')?.touched) {
+												<span class="error-message">Long name is required</span>
+											}
+										</div>
+
+										<div class="form-field">
+											<label>Description</label>
+											<textarea
+												formControlName="description"
+												placeholder="Brief description of the project"
+												rows="3"></textarea>
+											<span class="hint">Optional project description</span>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						</mat-tab-group>
+					}
+				</div>
+			}
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()" [disabled]="loading">
+			Cancel
+		</button>
+		<button
+			class="btn-primary"
+			(click)="onSubmit()"
+			[disabled]="loading || !isFormValid()">
+			@if (loading) {
+				<mat-spinner diameter="20"></mat-spinner>
+			} @else {
+				<span>Create & Configure</span>
+			}
+		</button>
+	</div>
+</div>

@@ -1,0 +1,120 @@
+.detail-container {
+	display: flex;
+	flex-direction: column;
+	background-color: #f8f9fa;
+	margin: 1rem;
+	border-radius: 0.5rem;
+	min-height: calc(100vh - 10rem);
+}
+
+.welcome-state {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	padding: 4rem 2rem;
+	background: linear-gradient(135deg, #ffffff 0%, #f0fffe 100%);
+	border-radius: 0.5rem;
+	position: relative;
+	overflow: hidden;
+}
+
+.welcome-state::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	right: -20%;
+	width: 400px;
+	height: 400px;
+	background: radial-gradient(circle, rgba(91, 212, 212, 0.1) 0%, transparent 70%);
+	border-radius: 50%;
+}
+
+.welcome-state::after {
+	content: '';
+	position: absolute;
+	bottom: -30%;
+	left: -10%;
+	width: 300px;
+	height: 300px;
+	background: radial-gradient(circle, rgba(91, 212, 212, 0.08) 0%, transparent 70%);
+	border-radius: 50%;
+}
+
+.welcome-card {
+	background: white;
+	border-radius: 1rem;
+	padding: 3rem 2.5rem;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+	max-width: 600px;
+	text-align: center;
+	position: relative;
+	z-index: 1;
+	border: 1px solid rgba(91, 212, 212, 0.1);
+}
+
+.welcome-card mat-icon:first-child {
+	font-size: 6rem;
+	width: 6rem;
+	height: 6rem;
+	color: #5bd4d4;
+	margin-bottom: 1.5rem;
+	filter: drop-shadow(0 4px 12px rgba(91, 212, 212, 0.2));
+}
+
+.welcome-card h1 {
+	font-size: 2.25rem;
+	font-weight: 700;
+	color: #111827;
+	margin: 0 0 1rem 0;
+}
+
+.welcome-card p {
+	font-size: 1.125rem;
+	color: #6b7280;
+	margin: 0 0 2rem 0;
+	line-height: 1.6;
+}
+
+.welcome-hint {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 1rem 1.5rem;
+	background: linear-gradient(135deg, #f0fffe 0%, #e6f9f8 100%);
+	border-radius: 0.5rem;
+	color: #0d9488;
+	font-size: 1.25rem;
+	font-weight: 500;
+	border: 1px solid rgba(91, 212, 212, 0.2);
+}
+
+.hint-text {
+	line-height: 1.25rem;
+}
+
+@media (max-width: 768px) {
+	.welcome-state {
+		padding: 2rem 1rem;
+	}
+
+	.welcome-card {
+		padding: 2rem 1.5rem;
+	}
+
+	.welcome-card mat-icon:first-child {
+		font-size: 4rem;
+		width: 4rem;
+		height: 4rem;
+	}
+
+	.welcome-card h1 {
+		font-size: 1.75rem;
+	}
+
+	.welcome-card p {
+		font-size: 1rem;
+	}
+}

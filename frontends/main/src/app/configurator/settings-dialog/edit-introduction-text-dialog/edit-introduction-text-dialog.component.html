@@ -1,0 +1,47 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Introduction Text</h2>
+
+	<div class="dialog-content">
+		<mat-tab-group>
+			<mat-tab label="Edit">
+				<div class="tab-content">
+					<form [formGroup]="form" class="settings-form">
+						<div class="form-field">
+							<label>Introduction Text (HTML)</label>
+							<textarea
+								formControlName="introductionText"
+								placeholder="Enter HTML content for the introduction text..."
+								rows="15"
+								class="html-textarea"></textarea>
+							<span class="hint">You can use HTML tags to format the introduction text. Leave empty to clear the introduction text.</span>
+						</div>
+					</form>
+				</div>
+			</mat-tab>
+
+			<mat-tab label="Preview">
+				<div class="tab-content">
+					<div class="preview-container">
+						@if (form.get('introductionText')?.value) {
+							<div [innerHTML]="form.get('introductionText')?.value" class="preview-content"></div>
+						} @else {
+							<div class="empty-preview">
+								<mat-icon>visibility_off</mat-icon>
+								<p>No content to preview</p>
+							</div>
+						}
+					</div>
+				</div>
+			</mat-tab>
+		</mat-tab-group>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

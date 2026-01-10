@@ -1,0 +1,53 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Manage Rule Tags</h2>
+
+	<div class="dialog-content">
+		<div class="settings-form">
+			<div class="form-field">
+				<label>Rule Tags *</label>
+				<div class="tag-selector">
+					@if (selectedTags.length > 0) {
+						<div class="selected-tags">
+							@for (tag of selectedTags; track tag) {
+								<div class="tag-chip">
+									<span>{{ tag }}</span>
+									<button type="button" class="chip-remove" (click)="removeTag(tag)">
+										<mat-icon>close</mat-icon>
+									</button>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-state">
+							<mat-icon>label</mat-icon>
+							<p>No tags selected. Add at least one tag to continue.</p>
+						</div>
+					}
+
+					<div class="add-tag-input">
+						<input
+							type="text"
+							[(ngModel)]="newTagInput"
+							(keypress)="onKeyPress($event)"
+							placeholder="Enter tag name (e.g., INCLUSION, EXCLUSION)"
+							class="tag-input">
+						<button type="button" class="btn-add-tag" (click)="addTag()" [disabled]="!newTagInput.trim()">
+							<mat-icon>add</mat-icon>
+							Add Tag
+						</button>
+					</div>
+				</div>
+				<span class="hint">Tags are used for categorizing configuration rules. Press Enter or click Add Tag to add. At least one tag is required.</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!isValid()">
+			Save Changes
+		</button>
+	</div>
+</div>

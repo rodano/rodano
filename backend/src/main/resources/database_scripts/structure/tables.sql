@@ -27,12 +27,39 @@ create table if not exists project (
     protocol_no varchar(64) null,
     version_number varchar(32) null,
     version_date date null,
-	status enum ('ACTIVE', 'CLOSED', 'ARCHIVED') not null default 'ACTIVE',
+	status enum ('ACTIVE', 'CLOSED', 'ARCHIVED') null default null,
 	created datetime(3) not null default current_timestamp(3),
 	active_config_version_fk bigint(20) null,
     constraint pk_project primary key (project_id),
     constraint uq_project_code unique (code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
+
+insert into project (
+	project_id,
+	code,
+	shortname,
+	longname,
+	description,
+	smtp_tls,
+	password_strong,
+	password_unique,
+	epro_enabled,
+	status,
+	created
+) values (
+			 UNHEX(REPLACE('00000000-0000-0000-0000-000000000000', '-', '')),
+			 'SYSTEM',
+			 '{"en": "System Administration"}',
+			 '{"en": "System Administration Project"}',
+			 '{"en": "Internal system project for administrative operations"}',
+			 FALSE,
+			 FALSE,
+			 FALSE,
+			 FALSE,
+			 'ACTIVE',
+			 NOW()
+		 )
+on duplicate key update code = code;
 
 drop table if exists project_audit;
 create table if not exists project_audit (
@@ -73,7 +100,7 @@ create table if not exists project_config_version (
 	project_id uuid not null,
 	version_number int not null,
 	status enum('DRAFT', 'PUBLISHED', 'ARCHIVED') not null,
-	created_by bigint(20) not null,
+	created_by bigint(20) null,
 	created_at datetime(3) null,
 	published_at datetime(3) null,
 	published_by bigint(20) null,
@@ -1033,7 +1060,7 @@ create table user_session (
 drop table if exists mail;
 create table mail (
 	pk bigint(20) not null auto_increment,
-    project_id uuid null,
+    project_id uuid not null,
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	attempts int(11) not null default '0',
@@ -1054,7 +1081,7 @@ create table mail (
 drop table if exists mail_attachment;
 create table mail_attachment (
 	pk bigint(20) not null auto_increment,
-    project_id uuid null,
+    project_id uuid not null,
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	mail_fk bigint(20) not null,
@@ -1154,7 +1181,7 @@ create table file (
 drop table if exists audit_action;
 create table audit_action (
 	pk bigint(20) not null auto_increment,
-    project_id uuid null,
+    project_id uuid not null,
 	date datetime(3) not null default now(3),
 	user_fk bigint(20) default null,
 	robot_fk bigint(20) default null,

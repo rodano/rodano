@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Service;
 
+import ch.rodano.core.constants.SystemConstants;
 import ch.rodano.core.dao.MappingHelper;
 import ch.rodano.core.model.jooq.tables.records.ProjectRecord;
 import ch.rodano.core.model.project.Project;
@@ -27,6 +28,7 @@ public class ProjectDAOServiceImpl implements ProjectDAOService {
 	@Override
 	public List<Project> getAllProjects() {
 		return create.selectFrom(PROJECT)
+			.where(PROJECT.PROJECT_ID.ne(SystemConstants.SYSTEM_PROJECT_ID))
 			.fetch(this::mapToProject);
 	}
 
@@ -38,6 +40,7 @@ public class ProjectDAOServiceImpl implements ProjectDAOService {
 			.where(ROLE.USER_FK.eq(actorPk)
 				.or(ROLE.ROBOT_FK.eq(actorPk))
 			)
+			.and(PROJECT.PROJECT_ID.ne(SystemConstants.SYSTEM_PROJECT_ID))
 			.fetchInto(PROJECT)
 			.stream()
 			.map(this::mapToProject)
@@ -69,6 +72,7 @@ public class ProjectDAOServiceImpl implements ProjectDAOService {
 		project.setVersionDate(record.getVersionDate());
 		project.setStatus(record.getStatus());
 		project.setCreatedDate(record.getCreated());
+		project.setActiveConfigVersionFk(record.getActiveConfigVersionFk());
 
 		return project;
 	}

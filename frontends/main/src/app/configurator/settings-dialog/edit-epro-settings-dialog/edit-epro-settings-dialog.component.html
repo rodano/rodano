@@ -1,0 +1,47 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit ePRO Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>ePRO Enabled</label>
+				<div class="toggle-wrapper">
+					<mat-slide-toggle formControlName="eproEnabled" color="primary">
+						{{ form.get('eproEnabled')?.value ? 'Enabled' : 'Disabled' }}
+					</mat-slide-toggle>
+				</div>
+				<span class="hint">Enable electronic Patient Reported Outcomes (ePRO) functionality for this project</span>
+			</div>
+
+			@if (hasProfiles) {
+				<div class="form-field">
+					<label>ePRO Profile</label>
+					<select formControlName="eproProfileId" class="form-select">
+						<option [value]="null">Select a profile...</option>
+						@for (profile of data.availableProfiles; track profile.id) {
+							<option [value]="profile.id">{{ profile.shortname }}</option>
+						}
+					</select>
+					<span class="hint">Select the ePRO profile configuration for this project</span>
+				</div>
+			} @else {
+				<div class="info-note">
+					<mat-icon>info</mat-icon>
+					<div>
+						<strong>No ePRO Profiles Available</strong>
+						<p>ePRO profiles must be created before they can be assigned to a project. Create profiles in the ePRO Profile Management section first.</p>
+					</div>
+				</div>
+			}
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!form.valid">
+			Save Changes
+		</button>
+	</div>
+</div>

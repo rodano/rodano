@@ -3,9 +3,11 @@ package ch.rodano.core.services.bll.project;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import ch.rodano.core.constants.SystemConstants;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.project.Project;
 import ch.rodano.core.services.dao.audit.AuditActionService;
@@ -33,18 +35,27 @@ public class ProjectServiceImpl implements ProjectService {
 
 	@Override
 	public List<Project> getAllProjects() {
-		return projectDAOService.getAllProjects();
+		return projectDAOService.getAllProjects()
+			.stream()
+			.filter(p -> !SystemConstants.SYSTEM_PROJECT_ID.equals(p.getProjectId()))
+			.collect(Collectors.toList());
 	}
 
 	@Override
 	public List<Project> getProjectsForActor(final Long actorPk) {
 		final var user = userDAOService.getUserByPk(actorPk);
 
-		if (user.isSuperuser()) {
-			return projectDAOService.getAllProjects();
+		final List<Project> projects;
+		if(user.isSuperuser()) {
+			projects = projectDAOService.getAllProjects();
+		}
+		else {
+			projects = projectDAOService.getProjectsForActor(actorPk);
 		}
 
-		return projectDAOService.getProjectsForActor(actorPk);
+		return projects.stream()
+			.filter(p -> !SystemConstants.SYSTEM_PROJECT_ID.equals(p.getProjectId()))
+			.collect(Collectors.toList());
 	}
 
 	@Override
