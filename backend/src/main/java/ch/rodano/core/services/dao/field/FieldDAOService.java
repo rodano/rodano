@@ -1,7 +1,5 @@
 package ch.rodano.core.services.dao.field;
 
-import ch.rodano.configuration.model.scope.ScopeModel;
-import ch.rodano.core.model.dataset.Dataset;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -9,8 +7,10 @@ import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.function.Function;
 
+import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.FieldAuditTrail;
+import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Timeframe;
 import ch.rodano.core.model.field.Field;
 

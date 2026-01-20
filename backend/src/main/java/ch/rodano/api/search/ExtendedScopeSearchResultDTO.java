@@ -1,10 +1,9 @@
 package ch.rodano.api.search;
 
 import java.util.List;
+import java.util.Map;
 
 import ch.rodano.api.scope.ScopeDTO;
-
-import java.util.Map;
 
 public class ExtendedScopeSearchResultDTO {
 	private ScopeDTO scope;
@@ -14,7 +13,7 @@ public class ExtendedScopeSearchResultDTO {
 
 	public ExtendedScopeSearchResultDTO() {}
 
-	public ExtendedScopeSearchResultDTO(ScopeDTO scope, List<Map<String, String>> workflowStatuses, Map<String, Map<String, String>> fieldValues) {
+	public ExtendedScopeSearchResultDTO(final ScopeDTO scope, final List<Map<String, String>> workflowStatuses, final Map<String, Map<String, String>> fieldValues) {
 		this.workflowStatuses = workflowStatuses;
 		this.fieldValues = fieldValues;
 		this.scope = scope;
@@ -32,7 +31,7 @@ public class ExtendedScopeSearchResultDTO {
 		return workflowStatuses;
 	}
 
-	public void setWorkflowStatuses(List<Map<String, String>> workflowStatuses) {
+	public void setWorkflowStatuses(final List<Map<String, String>> workflowStatuses) {
 		this.workflowStatuses = workflowStatuses;
 	}
 
@@ -40,7 +39,7 @@ public class ExtendedScopeSearchResultDTO {
 		return fieldValues;
 	}
 
-	public void setFieldValues(Map<String, Map<String, String>> fieldValues) {
+	public void setFieldValues(final Map<String, Map<String, String>> fieldValues) {
 		this.fieldValues = fieldValues;
 	}
 }

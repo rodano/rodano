@@ -1,21 +1,5 @@
 package ch.rodano.api.config;
 
-import ch.rodano.api.cms.CMSDTOService;
-import ch.rodano.api.cms.CMSLayoutDTO;
-import ch.rodano.api.controller.AbstractSecuredController;
-import ch.rodano.api.exception.http.ForbiddenOperationException;
-import ch.rodano.api.request.context.RequestContextService;
-import ch.rodano.api.workflow.WorkflowDTO;
-import ch.rodano.api.workflow.WorkflowDTOService;
-import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.configuration.model.rights.Rights;
-import ch.rodano.core.configuration.core.Configurator;
-import ch.rodano.core.configuration.core.Environment;
-import ch.rodano.core.model.role.Role;
-import ch.rodano.core.services.bll.actor.ActorService;
-import ch.rodano.core.services.bll.role.RoleService;
-import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.utils.RightsService;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +25,23 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import ch.rodano.api.cms.CMSDTOService;
+import ch.rodano.api.cms.CMSLayoutDTO;
+import ch.rodano.api.controller.AbstractSecuredController;
+import ch.rodano.api.exception.http.ForbiddenOperationException;
+import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.api.workflow.WorkflowDTO;
+import ch.rodano.api.workflow.WorkflowDTOService;
+import ch.rodano.configuration.model.feature.FeatureStatic;
+import ch.rodano.configuration.model.rights.Rights;
+import ch.rodano.core.configuration.core.Configurator;
+import ch.rodano.core.configuration.core.Environment;
+import ch.rodano.core.model.role.Role;
+import ch.rodano.core.services.bll.actor.ActorService;
+import ch.rodano.core.services.bll.role.RoleService;
+import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.core.utils.RightsService;
 
 @Tag(name = "Configuration")
 @RestController

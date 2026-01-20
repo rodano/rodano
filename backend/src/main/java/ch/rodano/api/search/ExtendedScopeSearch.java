@@ -11,7 +11,7 @@ public class ExtendedScopeSearch {
 	public ExtendedScopeSearch() {
 	}
 
-	public ExtendedScopeSearch(List<Map<String, String>> workflowStatuses, Map<String, Object> fieldValues) {
+	public ExtendedScopeSearch(final List<Map<String, String>> workflowStatuses, final Map<String, Object> fieldValues) {
 		this.workflowStatuses = workflowStatuses;
 		this.fieldValues = fieldValues;
 	}
@@ -20,7 +20,7 @@ public class ExtendedScopeSearch {
 		return workflowStatuses;
 	}
 
-	public void setWorkflowStatuses(List<Map<String, String>> workflowStatuses) {
+	public void setWorkflowStatuses(final List<Map<String, String>> workflowStatuses) {
 		this.workflowStatuses = workflowStatuses;
 	}
 
@@ -28,7 +28,7 @@ public class ExtendedScopeSearch {
 		return fieldValues;
 	}
 
-	public void setFieldValues(Map<String, Object> fieldValues) {
+	public void setFieldValues(final Map<String, Object> fieldValues) {
 		this.fieldValues = fieldValues;
 	}
 }

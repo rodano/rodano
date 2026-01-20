@@ -1,5 +1,19 @@
 package ch.rodano.api.search;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.field.FieldDTOService;
 import ch.rodano.api.scope.ScopeDTO;
@@ -14,44 +28,24 @@ import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.core.model.jooqutils.JOOQTranslator;
 import ch.rodano.core.model.scope.FieldModelCriterion;
-import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.scope.ScopeSearch;
 import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.field.FieldService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
-import ch.rodano.core.utils.ACL;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import static ch.rodano.core.model.jooq.Tables.DATASET;
+import static ch.rodano.core.model.jooq.Tables.FIELD;
 import static ch.rodano.core.model.jooq.Tables.SCOPE;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_RELATION;
 import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATUS;
-import static ch.rodano.core.model.jooq.Tables.FIELD;
-import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static org.jooq.impl.DSL.field;
 
 @Service
 @Transactional(readOnly = true)
 public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultService {
-
-	private static final Logger log = LoggerFactory.getLogger(ExtendedScopeResultServiceImpl.class);
 
 	private final ScopeDTOService scopeDTOService;
 	private final FieldService fieldService;
@@ -65,12 +59,14 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 
 	public ExtendedScopeResultServiceImpl(
 		final ScopeDTOService scopeDTOService,
-		final FieldService fieldService, FieldDAOService fieldDAOService,
+		final FieldService fieldService,
+		final FieldDAOService fieldDAOService,
 		final WorkflowDTOService workflowDTOService,
 		final WorkflowStatusDAOService workflowStatusDAOService,
 		final FieldDTOService fieldDTOService,
 		final DatasetService datasetService,
-		final StudyService studyService, DSLContext create) {
+		final StudyService studyService,
+		final DSLContext create) {
 		this.scopeDTOService = scopeDTOService;
 		this.fieldService = fieldService;
 		this.fieldDAOService = fieldDAOService;
@@ -82,16 +78,16 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		this.create = create;
 	}
 
-	private static String sqlWorkflowsStateColumnAlias(String workflowId) {
+	private static String sqlWorkflowsStateColumnAlias(final String workflowId) {
 		return String.format("%s_%s", "ws", workflowId);
 	}
 
-	private static String sqlFieldValueColumnAlias(String datasetModelId, String fieldId) {
+	private static String sqlFieldValueColumnAlias(final String datasetModelId, final String fieldId) {
 		return String.format("%s.%s", datasetModelId.toLowerCase(), fieldId.toLowerCase());
 	}
 
-	private static List<FieldModelCriterion> defaultFieldCriteria(ScopeSearch search,
-								      List<FieldModel> searchableFieldsOnScopeModel) {
+	private static List<FieldModelCriterion> defaultFieldCriteria(final ScopeSearch search,
+								      final List<FieldModel> searchableFieldsOnScopeModel) {
 		final var criteria = new ArrayList<FieldModelCriterion>();
 		for (var fieldModel : searchableFieldsOnScopeModel) {
 			final var fieldCriterion = new FieldModelCriterion(fieldModel,
@@ -101,12 +97,10 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		return criteria;
 	}
 
-	private static Map<String, List<String>> defaultWorkflowStateCriteria(ScopeSearch search,
-									      List<Workflow> workflowsOnScopeModel) {
-		Map<String, List<String>> workflowStates = new HashMap<>();
+	private static Map<String, List<String>> defaultWorkflowStateCriteria(final List<Workflow> workflowsOnScopeModel) {
+		final Map<String, List<String>> workflowStates = new HashMap<>();
 		for (var workflow : workflowsOnScopeModel) {
 			workflowStates.put(workflow.getId(), workflow.getStates().stream().map(WorkflowState::getId).toList());
-			search.setWorkflowStates(Optional.of(workflowStates));
 		}
 		return workflowStates;
 	}
@@ -132,7 +126,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		// if no criteria are provided, add default criteria to only retrieve scopes
 		// that have workflow statuses
 		if (search.workflowStates.isEmpty()) {
-			search.setWorkflowStates(Optional.of(defaultWorkflowStateCriteria(search, workflowsOnScopeModel)));
+			search.setWorkflowStates(Optional.of(defaultWorkflowStateCriteria(workflowsOnScopeModel)));
 		}
 
 		final var sqlWorkflowsStateColumnAlias = workflowsOnScopeModel.stream()
@@ -140,7 +134,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			.toList();
 
 		// Add workflowIds as selected fields: ws_<workflowId>.*
-		var selectFields = new ArrayList<>(List.of(SCOPE.asterisk(), DSL.count().over().as("total")));
+		final var selectFields = new ArrayList<>(List.of(SCOPE.asterisk(), DSL.count().over().as("total")));
 		for (String sqlWorkflowsStateColumn : sqlWorkflowsStateColumnAlias) {
 			// Expose workflow state with a stable alias so it can be used in ORDER BY
 			final var workflowStateAlias = sqlWorkflowsStateColumn + ".state_id";
@@ -202,7 +196,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 					.and(workflowJoin.DELETED.isFalse()));
 		});
 
-		var workflowJoins = new ArrayList();
+		final var workflowJoins = new ArrayList<org.jooq.Table<?>>();
 		if (!search.getWorkflowStates().get().isEmpty()) {
 			for (final var entry : search.getWorkflowStates().get().entrySet()) {
 				final var workflowJoin = WORKFLOW_STATUS.as(sqlWorkflowsStateColumnAlias(entry.getKey() + ".state_id"));
@@ -279,7 +273,8 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 						fieldTable.DATASET_FK.eq(datasetTable.field("pk", Long.class))
 							.and(fieldTable.FIELD_MODEL_ID.eq(fieldModel.getId()))
 							.and(fieldCondition));
-				} else {
+				}
+				else {
 					// Field has no criterion: join without condition (just to populate select values)
 					query.leftJoin(fieldTable).on(
 						fieldTable.DATASET_FK.eq(datasetTable.field("pk", Long.class))
@@ -331,7 +326,8 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			final var leafId = studyService.getStudy().getLeafScopeModel().getId();
 			if (leaf) {
 				conditions.add(SCOPE.SCOPE_MODEL_ID.eq(leafId));
-			} else {
+			}
+			else {
 				conditions.add(SCOPE.SCOPE_MODEL_ID.notEqual(leafId));
 			}
 		});
@@ -344,7 +340,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 
 		// group results by unique scope pk to avoid duplicates
 		query.where(conditions).groupBy(SCOPE.PK);
-		
+
 		// Apply sorting - use extendedSortBy if provided, otherwise use default sortBy
 		if (search.getExtendedSortBy() != null && !search.getExtendedSortBy().isEmpty()) {
 			// Dynamic field sorting
@@ -355,15 +351,17 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			if (!sortTarget.contains(".")) { //Workflos state sort
 				if (workflowIds.contains(sortTarget)) {
 					sortTarget = sqlWorkflowsStateColumnAlias(sortTarget) + ".state_id";
-				} else if (sortTarget.startsWith("ws_")) {
+				}
+				else if (sortTarget.startsWith("ws_")) {
 					sortTarget = sortTarget + ".state_id";
 				}
-			} else { // Field sort
+			}
+			else { // Field sort
 				final var parts = sortTarget.split("\\.");
 				if (parts.length == 2 && fieldIds.contains(parts[1])) {
-					var sortColumn = DSL.field(String.format("%s_%s.value",parts[0], parts[1]));
+					final var sortColumn = DSL.field(String.format("%s_%s.value", parts[0], parts[1]));
 					// get configuration to check field type
-					var fieldmodel = studyService.getStudy().getDatasetModel(parts[0]).getFieldModel(parts[1]);
+					final var fieldmodel = studyService.getStudy().getDatasetModel(parts[0]).getFieldModel(parts[1]);
 					if (FieldModelType.NUMBER.equals(fieldmodel.getType())) {
 						// cast to double for numeric sorting
 						sortTarget = "CAST(" + DSL.field(sortColumn) + " AS DOUBLE)";
@@ -379,28 +377,28 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 				}
 			}
 
-			final var sortField = DSL.field((sortTarget));
+			final var sortField = DSL.field(sortTarget);
 
 			query.orderBy(search.getOrder() == org.jooq.SortOrder.ASC ? sortField.asc() : sortField.desc());
-		} else {
+		}
+		else {
 			// Standard field sorting
 			query.orderBy(search.getSortBy().getField().sort(search.getOrder()));
 		}
-		
+
 		query.limit(search.getLimitField())
 			.offset(search.getOffsetField());
 
-		final var result = query.fetch();
+		final var records = query.fetch();
 		var total = 0;
-		if (result.size() > 0) {
-			total = result.get(0).getValue("total", Integer.class);
+		if (!records.isEmpty()) {
+			total = records.get(0).getValue("total", Integer.class);
 		}
-		var records = query.fetch();
-		List<ExtendedScopeSearchResultDTO> results = new ArrayList<>();
+		final List<ExtendedScopeSearchResultDTO> results = new ArrayList<>();
 
 		for (var record : records) {
-			ExtendedScopeSearchResultDTO dto = new ExtendedScopeSearchResultDTO();
-			ScopeDTO scopeDTO = new ScopeDTO();
+			final ExtendedScopeSearchResultDTO dto = new ExtendedScopeSearchResultDTO();
+			final ScopeDTO scopeDTO = new ScopeDTO();
 			scopeDTO.setCode(record.get("code").toString());
 			scopeDTO.setPk(Long.parseLong(record.get("pk").toString()));
 			scopeDTO.setId(record.get("id").toString());
@@ -421,7 +419,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			// TODO fix date parsing
 			scopeDTO.setStartDate(
 				record.get("start_date") != null ? ZonedDateTime.parse(record.get("start_date").toString()) : null);
-			scopeDTO.setStartDate(
+			scopeDTO.setStopDate(
 				record.get("stop_date") != null ? ZonedDateTime.parse(record.get("stop_date").toString()) : null);
 
 			dto.setScope(scopeDTO);
@@ -458,10 +456,4 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		}
 		return new PagedResult<>(results, search.getPageSize(), search.getPageIndex(), total);
 	}
-
-	@Override
-	public ExtendedScopeSearchResultDTO createDTO(Scope scope, List<ACL> acls) {
-		return null;
-	}
-
 }

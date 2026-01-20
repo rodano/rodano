@@ -197,7 +197,7 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 		return extendedSortBy;
 	}
 
-	public void setExtendedSortBy(String extendedSortBy) {
+	public void setExtendedSortBy(final String extendedSortBy) {
 		this.extendedSortBy = extendedSortBy;
 	}
 }
