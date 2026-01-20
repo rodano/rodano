@@ -1,9 +1,7 @@
 package ch.rodano.api.scope;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,8 +42,6 @@ import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.configuration.model.export.ExportFormat;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.rights.Rights;
-import ch.rodano.configuration.model.scope.ScopeModel;
-import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.scope.ScopeSearch;

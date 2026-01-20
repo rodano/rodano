@@ -1,25 +1,5 @@
 package ch.rodano.api.search;
 
-import ch.rodano.api.controller.AbstractSecuredController;
-import ch.rodano.api.dto.paging.PagedResult;
-import ch.rodano.api.request.context.RequestContextService;
-import ch.rodano.api.scope.ScopeDTOService;
-import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.core.model.scope.FieldModelCriterion;
-import ch.rodano.core.model.scope.ScopeSearch;
-import ch.rodano.core.model.scope.ScopeSortBy;
-import ch.rodano.core.services.bll.actor.ActorService;
-import ch.rodano.core.services.bll.event.EventService;
-import ch.rodano.core.services.bll.export.scope.ScopeExportService;
-import ch.rodano.core.services.bll.role.RoleService;
-import ch.rodano.core.services.bll.scope.ScopeRelationService;
-import ch.rodano.core.services.bll.scope.ScopeService;
-import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.services.bll.study.SubstudyService;
-import ch.rodano.core.services.dao.scope.ScopeDAOService;
-import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
-import ch.rodano.core.utils.RightsService;
-import ch.rodano.core.utils.UtilsService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -45,13 +25,34 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import ch.rodano.api.controller.AbstractSecuredController;
+import ch.rodano.api.dto.paging.PagedResult;
+import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.api.scope.ScopeDTOService;
+import ch.rodano.configuration.model.feature.FeatureStatic;
+import ch.rodano.core.model.scope.FieldModelCriterion;
+import ch.rodano.core.model.scope.ScopeSearch;
+import ch.rodano.core.model.scope.ScopeSortBy;
+import ch.rodano.core.services.bll.actor.ActorService;
+import ch.rodano.core.services.bll.event.EventService;
+import ch.rodano.core.services.bll.export.scope.ScopeExportService;
+import ch.rodano.core.services.bll.role.RoleService;
+import ch.rodano.core.services.bll.scope.ScopeRelationService;
+import ch.rodano.core.services.bll.scope.ScopeService;
+import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.core.services.bll.study.SubstudyService;
+import ch.rodano.core.services.dao.scope.ScopeDAOService;
+import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
+import ch.rodano.core.utils.RightsService;
+import ch.rodano.core.utils.UtilsService;
+
 
 @Tag(name = "Search")
 @RestController
 @RequestMapping(value = "/extended-search")
 @Transactional(readOnly = true)
 public class ExtendedScopeSearchController extends AbstractSecuredController {
-	private static final Logger log = LoggerFactory.getLogger(ExtendedScopeSearchController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ExtendedScopeSearchController.class);
 
 	final DSLContext create;
 	final Integer defaultPageSize;
@@ -78,14 +79,14 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 					     final ScopeDAOService scopeDAOService,
 					     final WorkflowStatusDAOService workflowStatusDAOService,
 					     @Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize,
-					     final DSLContext create, WorkflowStatusDAOService workflowStatusDAOService1
+					     final DSLContext create
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.create = create;
 		this.defaultPageSize = defaultPageSize;
 		this.extendedScopeResultService = extendedScopeResultService;
 		this.mapper = mapper;
-		this.workflowStatusDAOService = workflowStatusDAOService1;
+		this.workflowStatusDAOService = workflowStatusDAOService;
 		this.scopeService = scopeService;
 	}
 
@@ -93,7 +94,8 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		final var string = UriUtils.decode(input, "UTF-8");
 		try {
 			return mapper.readValue(string, type);
-		} catch (final JsonProcessingException e) {
+		}
+		catch (final JsonProcessingException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
@@ -116,10 +118,9 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
 	) {
 
-		log.info("ExtendedScopeSearchController.search by actor pk {}", currentActor().getPk());
-		log.info("fieldModelCriteria ", fieldModelCriteria);
+		LOG.info("ExtendedScopeSearchController.search by actor pk {}", currentActor().getPk());
+		LOG.info("fieldModelCriteria ", fieldModelCriteria);
 		final var acl = rightsService.getACL(currentActor());
-		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
 
 		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
@@ -135,8 +136,8 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 			.setAncestorPks(ancestorPks)
 			.setScopeModelId(scopeModelId)
 			.setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, scopeModelId))
-			.setWorkflowStates(workflowStatesMap) //this makes the Optional<> method useless
-			.setFieldModelCriteria(fieldModelCriterionList) // here too
+			.setWorkflowStates(workflowStatesMap)
+			.setFieldModelCriteria(fieldModelCriterionList)
 			.setLeaf(leaf)
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
 			.setIncludeDeleted(acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA))
@@ -147,7 +148,8 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		sortBy.ifPresent(sort -> {
 			if (Arrays.stream(ScopeSortBy.class.getEnumConstants()).anyMatch(e -> e.name().equals(sort))) {
 				search.setSortBy(ScopeSortBy.valueOf(sort));
-			} else {
+			}
+			else {
 				search.setExtendedSortBy(sort);
 			}
 		});

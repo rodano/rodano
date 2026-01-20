@@ -1,13 +1,10 @@
 package ch.rodano.core.services.dao.field;
 
-import ch.rodano.configuration.model.field.FieldModel;
-import ch.rodano.configuration.model.scope.ScopeModel;
-
-import ch.rodano.core.model.dataset.Dataset;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -16,8 +13,11 @@ import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
+import ch.rodano.configuration.model.field.FieldModel;
+import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.FieldAuditTrail;
+import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.jooq.Tables;
 import ch.rodano.core.model.jooq.tables.records.FieldAuditRecord;
@@ -25,7 +25,6 @@ import ch.rodano.core.model.jooq.tables.records.FieldRecord;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.commons.AuditableDAOService;
 import ch.rodano.core.services.dao.strategy.DAOStrategy;
-import java.util.stream.Collectors;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.FIELD;
@@ -147,7 +146,7 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	@Override
 
 	@Override
-	public Map<Long, List<Dataset>> getSearchableFieldsOnScope(ScopeModel scopeModel) {
+	public Map<Long, List<Dataset>> getSearchableFieldsOnScope(final ScopeModel scopeModel) {
 		final var dsOnScope = studyService.getStudy().getScopeModel(scopeModel.getId()).getDatasetModels().stream().toList();
 
 		// Map of dataset model IDs and searchable field model IDs

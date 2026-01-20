@@ -3,7 +3,6 @@ import {Utils} from '../utils.js';
 import {DisplayableNode} from '../node_displayable.js';
 import {Entities} from '../entities.js';
 import {RuleEntities} from '../rule_entities.js';
-import {Search} from '../../../search.js';
 
 function draw_workflow_state(state, languages) {
 	const state_html = document.createFullElement('li', {style: 'float: left;'});

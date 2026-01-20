@@ -59,7 +59,7 @@
 							mat-header-cell
 							*matHeaderCellDef
 							mat-sort-header>
-							<mat-form-field>
+						<mat-form-field (click)="$event.stopPropagation()">
 								<input
 									matInput
 									type="text"
@@ -85,7 +85,7 @@
 							@if (fieldModelMap.has(column)) {
 								@let fieldModel = getSearchableFieldFromFormControlId(column);
 								@if (fieldModel?.type === FieldModelType.DATE || fieldModel?.type === FieldModelType.DATE_SELECT) {
-									<mat-form-field>
+									<mat-form-field (click)="$event.stopPropagation()">
 										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
 										<input
 											matInput
@@ -99,7 +99,7 @@
 											[startAt]="getStartDate()"></mat-datepicker>
 									</mat-form-field>
 								} @else if (fieldModel?.type === FieldModelType.SELECT || fieldModel?.type === FieldModelType.RADIO) {
-									<mat-form-field>
+									<mat-form-field (click)="$event.stopPropagation()">
 										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
 										<mat-select [formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null">
 											@for (value of fieldModel?.possibleValues; track value.id) {
@@ -110,7 +110,7 @@
 										</mat-select>
 									</mat-form-field>
 								} @else {
-									<mat-form-field>
+									<mat-form-field (click)="$event.stopPropagation()">
 										<mat-label>{{ fieldModel?.shortname | localizeMap }}</mat-label>
 										<input
 											matInput
@@ -118,7 +118,7 @@
 									</mat-form-field>
 								}
 							} @else if (workflowStatusModelMap.has(column)) {
-								<mat-form-field>
+								<mat-form-field (click)="$event.stopPropagation()">
 									<mat-label>{{ workflowStatusModelMap.get(column) | localizeMap }}</mat-label>
 									<mat-select
 										[formControlName]="getWorkflow(column) ? getWSFormControlName(getWorkflow(column)!) : null"
