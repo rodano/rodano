@@ -39,3 +39,15 @@ alter table workflow_status add index aggregate_event (workflow_id, removed, eve
 
 /* user session */
 alter table user_session add unique index idx_user_session_token (token);
+
+/* indices for search optimization*/
+alter table scope_relation add index idx_scope_relation_parent_start (parent_fk, start_date);
+alter table scope_relation add index idx_scope_relation_parent_end (parent_fk, end_date);
+
+alter table workflow_status add index idx_workflow_status_scope_workflow (scope_fk, workflow_id);
+alter table workflow_status add index idx_workflow_status_filter (workflow_id, deleted, state_id, scope_fk);
+
+alter table dataset add index idx_dataset_scope_model (scope_fk, dataset_model_id);
+
+alter table field add index idx_field_dataset_model (dataset_fk, field_model_id);
+alter table field add index idx_field_value (value);
