@@ -1,6 +1,6 @@
 import {Component, DestroyRef, OnInit, ViewChild} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
-import {Subject, merge, Observable} from 'rxjs';
+import {merge, Subject} from 'rxjs';
 import {startWith, switchMap} from 'rxjs/operators';
 import {PagedResultResource} from '@core/model/paged-result-resource';
 import {ResourceCategory} from '@core/model/resource-category';
@@ -29,8 +29,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-resource-list',
@@ -53,8 +51,7 @@ import {AsyncPipe} from '@angular/common';
 		MatPaginatorModule,
 		LocalizeMapPipe,
 		MatSort,
-		MatSortHeader,
-		AsyncPipe
+		MatSortHeader
 	]
 })
 export class ResourceListComponent implements OnInit {
@@ -79,19 +76,15 @@ export class ResourceListComponent implements OnInit {
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private configurationService: ConfigurationService,
 		private resourceService: ResourceService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef,
-		private permissionsService: PermissionsService
+		private destroyRef: DestroyRef
 	) {}
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		this.sort.active = ResourceSearch.DEFAULT_SORT_BY;
 		this.sort.direction = PaginatedSearch.getSortDirection(ResourceSearch.DEFAULT_SORT_ASCENDING);
 

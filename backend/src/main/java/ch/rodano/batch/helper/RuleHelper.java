@@ -15,6 +15,7 @@ import ch.rodano.batch.pojo.RuleConstraint;
 import ch.rodano.core.model.jooq.enums.RuleConditionListDomain;
 import ch.rodano.core.model.jooq.enums.RuleConditionListMode;
 import ch.rodano.core.model.jooq.enums.RuleConditionMode;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
@@ -39,7 +40,8 @@ public final class RuleHelper {
 		final UUID projectId,
 		final String ownerTypeLiteral,  // "RULE","FIELD_MODEL","VALIDATOR","FORM_LAYOUT","FORM_LAYOUT_CELL"
 		final UUID ownerId,
-		final RuleConstraint constraint
+		final RuleConstraint constraint,
+		final RuleConstraintConstraintType constraintType
 	) {
 
 		if(constraint == null) {
@@ -56,13 +58,14 @@ public final class RuleHelper {
 			.fetchOne(RULE_CONSTRAINT.CONSTRAINT_ID);
 
 		if(resolvedConstraintId == null) {
-			final UUID candidateId = deterministic(projectId, "RULE_CONSTRAINT", ownerId.toString());
+			final UUID candidateId = deterministic(projectId, "RULE_CONSTRAINT", ownerId.toString() + "|" + constraintType.name());
 
 			tx.insertInto(RULE_CONSTRAINT)
 				.set(RULE_CONSTRAINT.PROJECT_ID, projectId)
 				.set(RULE_CONSTRAINT.CONSTRAINT_ID, candidateId)
 				.set(RULE_CONSTRAINT.OWNER_TYPE, ownerType)
 				.set(RULE_CONSTRAINT.OWNER_ID, ownerId)
+				.set(RULE_CONSTRAINT.CONSTRAINT_TYPE, constraintType)
 				.onDuplicateKeyIgnore()
 				.execute();
 
@@ -72,11 +75,12 @@ public final class RuleHelper {
 				.where(RULE_CONSTRAINT.PROJECT_ID.eq(projectId))
 				.and(RULE_CONSTRAINT.OWNER_TYPE.eq(ownerType))
 				.and(RULE_CONSTRAINT.OWNER_ID.eq(ownerId))
+				.and(RULE_CONSTRAINT.CONSTRAINT_TYPE.eq(constraintType))
 				.fetchOne(RULE_CONSTRAINT.CONSTRAINT_ID);
 
 			if(resolvedConstraintId == null) {
 				throw new IllegalStateException("rule_constraint not found after insert: project="
-					+ projectId + ", ownerType=" + ownerType + ", ownerId=" + ownerId);
+					+ projectId + ", ownerType=" + ownerType + ", ownerId=" + ownerId + ", constraintType=" + constraintType);
 			}
 		}
 

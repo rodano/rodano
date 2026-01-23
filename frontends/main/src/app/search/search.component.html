@@ -1,15 +1,13 @@
-@if (canWrite$ | async) {
-	<p>
-		<button
-			mat-flat-button
-			(click)="createPatient()"
-			[disabled]="!writeAccessOnParent"
-			type="button">
-			<mat-icon>add</mat-icon>
-			New {{ leafScopeModel.shortname | localizeMap | lowercase }}
-		</button>
-	</p>
-}
+<p>
+	<button
+		mat-flat-button
+		(click)="createPatient()"
+		[disabled]="!writeAccessOnParent"
+		type="button">
+		<mat-icon>add</mat-icon>
+		New {{ leafScopeModel.shortname | localizeMap | lowercase }}
+	</button>
+</p>
 
 @if (loading) {
 	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
@@ -144,7 +142,7 @@
 							}
 							@for (datasetModelId of Object.keys(scope.searchableFields); track datasetModelId) {
 								@for (fieldId of Object.keys(scope.searchableFields[datasetModelId]); track fieldId) {
-									@if (fieldId === getSearchableFieldFromFormControlId(column)?.fieldModelId) {
+									@if (fieldId === getSearchableFieldFromFormControlId(column)?.id) {
 										@if (getIsPossibleValue(datasetModelId, fieldId)) {
 											{{
 												getValueShortname(datasetModelId, fieldId, scope.searchableFields[datasetModelId][fieldId]) | localizeMap

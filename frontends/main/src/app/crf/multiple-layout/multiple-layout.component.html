@@ -102,7 +102,7 @@
 			class="expanded-dataset"></tr>
 	</table>
 
-	@if (!disabled && layout.datasetModel.canWrite && (canWrite$ | async)) {
+	@if (!disabled && layout.datasetModel.canWrite) {
 		<div class="footer">
 			<button
 				(click)="addDataset()"

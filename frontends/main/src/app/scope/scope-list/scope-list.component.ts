@@ -1,13 +1,13 @@
-import {Component, ViewChild, Input, OnChanges, DestroyRef, OnInit} from '@angular/core';
+import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {RouterLink} from '@angular/router';
 import {ScopeModel} from '@core/model/scope-model';
-import {forkJoin, merge, of, startWith, Subject, switchMap, Observable} from 'rxjs';
+import {forkJoin, merge, of, startWith, Subject, switchMap} from 'rxjs';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
 import {PagedResultScope} from '@core/model/paged-result-scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
-import {AsyncPipe, LowerCasePipe} from '@angular/common';
+import {LowerCasePipe} from '@angular/common';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {MatDivider} from '@angular/material/divider';
 import {MatHeaderCell, MatTable, MatTableModule} from '@angular/material/table';
@@ -28,7 +28,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {Rights} from '@core/model/rights';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
-import {PermissionsService} from '@core/services/permission.service';
 
 @Component({
 	selector: 'app-scope-list',
@@ -56,8 +55,7 @@ import {PermissionsService} from '@core/services/permission.service';
 		DownloadDirective,
 		LowerCasePipe,
 		LocalizeMapPipe,
-		ScopeCodeShortnamePipe,
-		AsyncPipe
+		ScopeCodeShortnamePipe
 	]
 })
 export class ScopeListComponent implements OnInit, OnChanges {
@@ -84,14 +82,11 @@ export class ScopeListComponent implements OnInit, OnChanges {
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private configurationService: ConfigurationService,
 		private scopeService: ScopeService,
 		private scopeRelationService: ScopeRelationsService,
-		private destroyRef: DestroyRef,
-		private permissionsService: PermissionsService
+		private destroyRef: DestroyRef
 	) { }
 
 	ngOnChanges() {
@@ -122,7 +117,6 @@ export class ScopeListComponent implements OnInit, OnChanges {
 	}
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		this.sort.active = ScopeSearch.DEFAULT_SORT_BY;
 		this.sort.direction = PaginatedSearch.getSortDirection(ScopeSearch.DEFAULT_SORT_ASCENDING);
 

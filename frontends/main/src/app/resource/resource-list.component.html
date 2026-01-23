@@ -38,14 +38,12 @@
 		</button>
 	</form>
 
-	@if (canWrite$ | async) {
-		<button
-			mat-flat-button
-			[matMenuTriggerFor]="menu">
-			<mat-icon>add</mat-icon>
-			New...
-		</button>
-	}
+	<button
+		mat-flat-button
+		[matMenuTriggerFor]="menu">
+		<mat-icon>add</mat-icon>
+		New...
+	</button>
 	<mat-menu #menu="matMenu">
 		@for (category of categories; track category.categoryId) {
 			<button
@@ -134,14 +132,12 @@
 			@if (!resource.removed) {
 				<button
 					mat-stroked-button
-					(click)="updateResource(resource)"
-					[disabled]="(canWrite$ | async) === false">
+					(click)="updateResource(resource)">
 					Update
 				</button>
 				<button
 					mat-stroked-button
-					(click)="removeResource($event, resource)"
-					[disabled]="(canWrite$ | async) === false">
+					(click)="removeResource($event, resource)">
 					Remove
 				</button>
 				@if (resource.filename) {

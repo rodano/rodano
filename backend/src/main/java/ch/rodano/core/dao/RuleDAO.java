@@ -351,4 +351,21 @@ public class RuleDAO {
 			.and(RULE_CONSTRAINT.OWNER_ID.eq(ownerId))
 			.fetchOne(this::mapConstraintToModel);
 	}
+
+	public Map<String, List<Rule>> findEventActionRulesForProject(final UUID projectId) {
+		final var records = dslContext.selectFrom(RULE)
+			.where(RULE.ENTITY_TYPE.eq(RuleEntityType.EVENT_ACTION))
+			.and(RULE.PROJECT_ID.eq(projectId))
+			.fetch();
+
+		final Map<String, List<Rule>> grouped = new TreeMap<>();
+
+		for(final var record : records) {
+			final String ruleType = record.getRuleType();
+			final Rule rule = mapToModel(record);
+			grouped.computeIfAbsent(ruleType, k -> new ArrayList<>()).add(rule);
+		}
+
+		return grouped;
+	}
 }

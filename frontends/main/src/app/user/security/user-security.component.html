@@ -48,8 +48,7 @@
 							matInput
 							type="email"
 							formControlName="email"
-							required
-							[readonly]="(canWrite$ | async) === false"/>
+							required/>
 					</mat-form-field>
 				</p>
 			</mat-card-content>
@@ -72,7 +71,7 @@
 		</app-change-password>
 	}
 
-	@if (user.canWrite && (canWrite$ | async)) {
+	@if (user.canWrite) {
 		<p class="actions">
 			@if (user.removed) {
 				<button

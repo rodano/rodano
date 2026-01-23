@@ -14,10 +14,8 @@ import {NotificationService} from 'src/app/services/notification.service';
 import {MatButton} from '@angular/material/button';
 import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.component';
 import {MatDialog} from '@angular/material/dialog';
-import {Observable, of, switchMap} from 'rxjs';
+import {of, switchMap} from 'rxjs';
 import {CRFChangeService} from '../services/crf-change.service';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-event-dashboard',
@@ -30,8 +28,7 @@ import {AsyncPipe} from '@angular/common';
 		IssueViewerComponent,
 		WorkflowStatusComponent,
 		DateUTCPipe,
-		AuditTrailButtonComponent,
-		AsyncPipe
+		AuditTrailButtonComponent
 	]
 })
 export class EventDashboardComponent implements OnChanges {
@@ -42,18 +39,14 @@ export class EventDashboardComponent implements OnChanges {
 
 	dateDifferenceInDays: number;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private eventService: EventService,
 		private notificationService: NotificationService,
 		private crfChangeService: CRFChangeService,
-		private dialog: MatDialog,
-		private permissionsService: PermissionsService
+		private dialog: MatDialog
 	) {}
 
 	ngOnChanges() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		const date = this.event.date ?? this.event.expectedDate;
 		this.dateDifferenceInDays = differenceInDays(date, new Date());
 	}

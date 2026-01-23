@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.Cron;
 import ch.rodano.batch.pojo.Rule;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
@@ -77,7 +78,7 @@ public class CronWriter extends BaseWriter {
 							.execute();
 
 						if(rule.getConstraint() != null) {
-							insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+							insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 						}
 
 						if(rule.getActions() != null && !rule.getActions().isEmpty()) {

@@ -1,5 +1,5 @@
-import {Component, Input, OnChanges, DestroyRef, OnInit} from '@angular/core';
-import {forkJoin, Observable} from 'rxjs';
+import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {forkJoin} from 'rxjs';
 import {Form} from '@core/model/form';
 import {Layout} from '@core/model/layout';
 import {FormService} from '@core/services/form.service';
@@ -24,8 +24,6 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {CRFChangeService} from '../services/crf-change.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-form',
@@ -38,8 +36,7 @@ import {AsyncPipe} from '@angular/common';
 		MultipleLayoutComponent,
 		LayoutComponent,
 		WorkflowStatusComponent,
-		AuditTrailButtonComponent,
-		AsyncPipe
+		AuditTrailButtonComponent
 	]
 })
 export class FormComponent implements OnInit, OnChanges {
@@ -59,8 +56,6 @@ export class FormComponent implements OnInit, OnChanges {
 	saveLoading = false;
 	dirty = false;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private crfService: CRFService,
 		private cellLoadingService: CellLoadingService,
@@ -68,12 +63,10 @@ export class FormComponent implements OnInit, OnChanges {
 		private notificationService: NotificationService,
 		private fieldUpdateService: FieldUpdateService,
 		private crfChangeService: CRFChangeService,
-		private destroyRef: DestroyRef,
-		private permissionsService: PermissionsService
+		private destroyRef: DestroyRef
 	) {}
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		this.fieldUpdateService.fieldUpdated$
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),

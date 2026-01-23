@@ -26,11 +26,15 @@ export class AppComponent implements OnInit {
 	) {}
 
 	ngOnInit(): void {
-		//document.documentElement.style.removeProperty('--mat-sys-primary');
-
 		this.router.events
 			.pipe(filter(event => event instanceof NavigationEnd))
-			.subscribe(() => {
+			.subscribe(event => {
+				const navEnd = event as NavigationEnd;
+				if(navEnd.url === '/projects') {
+					this.study = undefined;
+					this.configurationService.clearStudy();
+				}
+
 				this.updateLayoutVisibility();
 			});
 

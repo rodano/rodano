@@ -2,13 +2,15 @@ import {HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest}
 import {Injectable} from '@angular/core';
 import {ProjectService} from '@core/services/project.service';
 import {Router} from '@angular/router';
-import {catchError, Observable, throwError} from 'rxjs';
+import {catchError, EMPTY, Observable, throwError} from 'rxjs';
+import {NotificationService} from '../../services/notification.service';
 
 @Injectable()
 export class ProjectInterceptor implements HttpInterceptor {
 	constructor(
 		private projectService: ProjectService,
-		private router: Router
+		private router: Router,
+		private notificationService: NotificationService
 	) {}
 
 	intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -45,10 +47,22 @@ export class ProjectInterceptor implements HttpInterceptor {
 
 		return next.handle(modifiedReq).pipe(
 			catchError((error: HttpErrorResponse) => {
-				if(error.status === 403 && error.error?.message?.includes('project')) {
-					console.error('Project access denied or mismatch:', error.error.message);
-					this.projectService.clearCurrentProject();
-					this.router.navigate(['/projects']);
+				if(error.status === 403) {
+					const errorMessage = error.error?.message || '';
+
+					if(errorMessage.includes('No write access to this project')) {
+						console.log('✅ Project write access denied - showing notification');
+						this.notificationService.showError(
+							'This project is read-only. You do not have permission to make changes.'
+						);
+						return EMPTY;
+					}
+
+					else if(errorMessage.includes('project')) {
+						console.error('Project access denied or mismatch:', errorMessage);
+						this.projectService.clearCurrentProject();
+						this.router.navigate(['/projects']);
+					}
 				}
 
 				return throwError(() => error);

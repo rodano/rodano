@@ -24,6 +24,7 @@ import ch.rodano.configuration.model.rules.RuleBreakType;
 import ch.rodano.configuration.model.rules.RuleCondition;
 import ch.rodano.configuration.model.rules.RuleConditionListEvaluationMode;
 import ch.rodano.configuration.model.rules.RuleConstraint;
+import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.core.model.rules.Evaluable;
 import ch.rodano.core.model.rules.entity.EntityAttribute;
 import ch.rodano.core.model.rules.entity.EntityRelation;
@@ -56,7 +57,7 @@ public class ConstraintEvaluationService {
 
 		//store dependencies
 		dataEvaluation.dependencies = dataEvaluation.getDependenciesConditions().stream()
-			.map(RuleCondition::getId)
+			.map(c -> c.getRuleConditionId().toString())
 			.map(c -> dataEvaluation.getStates().get(c))
 			.filter(Objects::nonNull)
 			.flatMap(s -> s.getReferenceEvaluables().stream())
@@ -164,7 +165,7 @@ public class ConstraintEvaluationService {
 									values.add(UUID.fromString(value));
 								}
 								catch(IllegalArgumentException e) {
-									final UUID convertedUuid = convertStringIdToUuid(state.reference(), value);
+									final UUID convertedUuid = convertStringIdToUuid(state.reference(), criterion.getProperty(), value);
 									if(convertedUuid != null) {
 										values.add(convertedUuid);
 									}
@@ -233,6 +234,7 @@ public class ConstraintEvaluationService {
 		}
 		//save result
 		//TODO fix this
+		dataEvaluation.getStates().put(condition.getRuleConditionId().toString(), resultState);
 		dataEvaluation.getStates().put(condition.getId(), resultState);
 
 		//check validity
@@ -269,8 +271,17 @@ public class ConstraintEvaluationService {
 		return isValid && areChildrenValid;
 	}
 
-	private UUID convertStringIdToUuid(final RulableEntity entity, final String stringId) {
+	private UUID convertStringIdToUuid(final RulableEntity entity, final String property, final String stringId) {
 		final var study = studyService.getStudy();
+
+		if(entity == RulableEntity.WORKFLOW && "STATUS".equals(property)) {
+			return study.getWorkflows().stream()
+				.flatMap(w -> w.getStates().stream())
+				.filter(s -> s.getId().equals(stringId))
+				.findFirst()
+				.map(WorkflowState::getWorkflowStateId)
+				.orElse(null);
+		}
 
 		return switch(entity) {
 			case SCOPE -> study.getScopeModel(stringId).getScopeModelId();
@@ -280,6 +291,7 @@ public class ConstraintEvaluationService {
 				.findFirst()
 				.map(FieldModel::getFieldModelId)
 				.orElse(null);
+			case WORKFLOW -> study.getWorkflow(stringId).getWorkflowId();
 			default -> null;
 		};
 	}

@@ -87,7 +87,7 @@ public class ProjectConfigVersion extends TableImpl<ProjectConfigVersionRecord> 
 	/**
 	 * The column <code>project_config_version.created_by</code>.
 	 */
-	public final TableField<ProjectConfigVersionRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT.nullable(false), this, "");
+	public final TableField<ProjectConfigVersionRecord, Long> CREATED_BY = createField(DSL.name("created_by"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
 
 	/**
 	 * The column <code>project_config_version.created_at</code>.

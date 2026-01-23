@@ -1,6 +1,8 @@
 package ch.rodano.core.loader;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 
@@ -19,11 +21,13 @@ import ch.rodano.configuration.model.reports.Report;
 import ch.rodano.configuration.model.reports.WorkflowSummary;
 import ch.rodano.configuration.model.reports.WorkflowWidget;
 import ch.rodano.configuration.model.resource.ResourceCategory;
+import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.timelinegraph.TimelineGraph;
 import ch.rodano.configuration.model.validator.Validator;
 import ch.rodano.configuration.model.workflow.Workflow;
+import ch.rodano.configuration.model.workflow.WorkflowAction;
 import ch.rodano.core.dao.ChartDAO;
 import ch.rodano.core.dao.CronDAO;
 import ch.rodano.core.dao.DatasetModelDAO;
@@ -36,6 +40,7 @@ import ch.rodano.core.dao.ProfileDAO;
 import ch.rodano.core.dao.ProjectDAO;
 import ch.rodano.core.dao.ReportDAO;
 import ch.rodano.core.dao.ResourceCategoryDAO;
+import ch.rodano.core.dao.RuleDAO;
 import ch.rodano.core.dao.ScopeModelDAO;
 import ch.rodano.core.dao.TimelineGraphDAO;
 import ch.rodano.core.dao.ValidatorDAO;
@@ -64,6 +69,7 @@ public class DatabaseStudyLoader {
 	private final ChartDAO chartDAO;
 	private final ProfileDAO profileDAO;
 	private final ValidatorDAO validatorDAO;
+	private final RuleDAO ruleDAO;
 
 	public DatabaseStudyLoader(final ProjectDAO projectDAO,
 							   final ScopeModelDAO scopeModelDAO,
@@ -82,7 +88,8 @@ public class DatabaseStudyLoader {
 							   final MenuDAO menuDAO,
 							   final ChartDAO chartDAO,
 							   final ProfileDAO profileDAO,
-							   final ValidatorDAO validatorDAO) {
+							   final ValidatorDAO validatorDAO,
+							   final RuleDAO ruleDAO) {
 		this.projectDAO = projectDAO;
 		this.scopeModelDAO = scopeModelDAO;
 		this.datasetModelDAO = datasetModelDAO;
@@ -101,6 +108,7 @@ public class DatabaseStudyLoader {
 		this.chartDAO = chartDAO;
 		this.profileDAO = profileDAO;
 		this.validatorDAO = validatorDAO;
+		this.ruleDAO = ruleDAO;
 	}
 
 	public Study loadStudy(final UUID projectId) {
@@ -126,6 +134,7 @@ public class DatabaseStudyLoader {
 		loadCharts(study, projectId);
 		loadProfiles(study, projectId);
 		loadValidators(study, projectId);
+		loadEventActionRules(study, projectId);
 
 		wireRelationships(study);
 
@@ -232,6 +241,25 @@ public class DatabaseStudyLoader {
 		final List<Validator> validators = validatorDAO.findByProject(projectId);
 		study.setValidators(new TreeSet<>(validators));
 		System.out.println("   ✓ Loaded " + validators.size() + " validators");
+	}
+
+	private void loadEventActionRules(final Study study, final UUID projectId) {
+		final Map<String, List<Rule>> rulesByType = ruleDAO.findEventActionRulesForProject(projectId);
+
+		final Map<WorkflowAction, List<Rule>> eventActions = new TreeMap<>();
+
+		for(final Map.Entry<String, List<Rule>> entry : rulesByType.entrySet()) {
+			try {
+				final WorkflowAction action = WorkflowAction.valueOf(entry.getKey());
+				eventActions.put(action, entry.getValue());
+			}
+			catch(IllegalArgumentException e) {
+				System.err.println("Unknown WorkflowAction: " + entry.getKey());
+			}
+		}
+
+		study.setEventActions(eventActions);
+		System.out.println("   ✓ Loaded " + eventActions.size() + " event action types with rules");
 	}
 
 	private void wireRelationships(final Study study) {

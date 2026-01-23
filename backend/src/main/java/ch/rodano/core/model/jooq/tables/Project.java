@@ -191,7 +191,7 @@ public class Project extends TableImpl<ProjectRecord> {
 	/**
 	 * The column <code>project.status</code>.
 	 */
-	public final TableField<ProjectRecord, ProjectStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(8).nullable(false).defaultValue(DSL.field(DSL.raw("'ACTIVE'"), SQLDataType.VARCHAR)).asEnumDataType(ProjectStatus.class), this, "");
+	public final TableField<ProjectRecord, ProjectStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(8).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)).asEnumDataType(ProjectStatus.class), this, "");
 
 	/**
 	 * The column <code>project.created</code>.

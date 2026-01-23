@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
 import ch.rodano.core.model.jooq.tables.RuleConditionList.RuleConditionListPath;
 import ch.rodano.core.model.jooq.tables.records.RuleConstraintRecord;
@@ -82,6 +83,11 @@ public class RuleConstraint extends TableImpl<RuleConstraintRecord> {
 	 * The column <code>rule_constraint.owner_id</code>.
 	 */
 	public final TableField<RuleConstraintRecord, UUID> OWNER_ID = createField(DSL.name("owner_id"), SQLDataType.UUID.nullable(false), this, "");
+
+	/**
+	 * The column <code>rule_constraint.constraint_type</code>.
+	 */
+	public final TableField<RuleConstraintRecord, RuleConstraintConstraintType> CONSTRAINT_TYPE = createField(DSL.name("constraint_type"), SQLDataType.VARCHAR(13).nullable(false).defaultValue(DSL.field(DSL.raw("'DEFAULT'"), SQLDataType.VARCHAR)).asEnumDataType(RuleConstraintConstraintType.class), this, "");
 
 	/**
 	 * The column <code>rule_constraint.created_at</code>.

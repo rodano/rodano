@@ -1224,13 +1224,14 @@ create table if not exists selection_node (
   collate = utf8mb4_unicode_ci;
 
 create table if not exists rule_constraint (
-	constraint_id uuid                                  not null default uuid(),
-	project_id    uuid                                  not null,
-	owner_type    enum ('RULE', 'FIELD_MODEL',
-		'VALIDATOR', 'FORM_LAYOUT', 'FORM_LAYOUT_CELL') not null,
-	owner_id      uuid                                  not null, -- e.g. rule.rule_id or validator.validator_id
-	created_at    timestamp(3)                          not null default current_timestamp(3),
-	evaluations   json                                  null,
+	constraint_id   uuid                                                                  not null default uuid(),
+	project_id      uuid                                                                  not null,
+	owner_type      enum ('RULE', 'FIELD_MODEL',
+		'VALIDATOR', 'FORM_LAYOUT', 'FORM_LAYOUT_CELL')                                   not null,
+	owner_id        uuid                                                                  not null, -- e.g. rule.rule_id or validator.validator_id
+	constraint_type enum ('DEFAULT', 'VISIBILITY', 'VALUE_FORMULA', 'VALIDATION', 'RULE') not null default 'DEFAULT',
+	created_at      timestamp(3)                                                          not null default current_timestamp(3),
+	evaluations     json                                                                  null,
 	constraint pk_rule_constraint primary key (project_id, constraint_id)
 ) engine = InnoDB
   default charset = utf8mb4

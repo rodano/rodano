@@ -1,11 +1,12 @@
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpErrorResponse, HttpStatusCode} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Router} from '@angular/router';
-import {Observable, throwError} from 'rxjs';
+import {EMPTY, Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {AuthStateService} from '../services/auth-state.service';
 import {ErrorContext} from '../error/error-context';
 import {LoggingService} from '@core/services/logging.service';
+import {NotificationService} from '../services/notification.service';
 
 /**
  * This is the HTTP request header that lets any request possessing it skip the automatic addition of the authentication token
@@ -25,7 +26,8 @@ export class AuthInterceptor implements HttpInterceptor {
 	constructor(
 		private router: Router,
 		private authStateService: AuthStateService,
-		private loggingService: LoggingService
+		private loggingService: LoggingService,
+		private notificationService: NotificationService
 	) {}
 
 	intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
@@ -90,6 +92,13 @@ export class AuthInterceptor implements HttpInterceptor {
 					case HttpStatusCode.Forbidden:
 						if(response.error.message === 'Password must be changed') {
 							this.router.navigate(['/change-password/system']);
+						}
+						else if(response.error?.message?.includes('No write access to this project')) {
+							this.notificationService.showError(
+								'This project is read-only. You do not have permission to make changes.'
+							);
+							this.loggingService.error('Project write access denied');
+							return EMPTY;
 						}
 						else {
 							this.loggingService.error('Forbidden');

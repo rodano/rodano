@@ -2,7 +2,7 @@ import {Component, DestroyRef, Input, OnInit} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
-import {BehaviorSubject, combineLatest, forkJoin, Observable, of, switchMap} from 'rxjs';
+import {BehaviorSubject, combineLatest, forkJoin, of, switchMap} from 'rxjs';
 import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -20,8 +20,6 @@ import {NotificationService} from 'src/app/services/notification.service';
 import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {SettingsService} from '@core/services/settings.service';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-side-menu',
@@ -35,8 +33,7 @@ import {AsyncPipe} from '@angular/common';
 		RouterLinkActive,
 		MatTooltipModule,
 		LocalizeMapPipe,
-		DateUTCPipe,
-		AsyncPipe
+		DateUTCPipe
 	]
 })
 export class SideMenuComponent implements OnInit {
@@ -85,8 +82,6 @@ export class SideMenuComponent implements OnInit {
 	expandedEventPks: number[] = [];
 	eventPk: number | undefined = undefined;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private activatedRoute: ActivatedRoute,
 		private scopeService: ScopeService,
@@ -97,14 +92,10 @@ export class SideMenuComponent implements OnInit {
 		private notificationService: NotificationService,
 		private router: Router,
 		private dialog: MatDialog,
-		private settingsService: SettingsService,
-		private permissionsService: PermissionsService
+		private settingsService: SettingsService
 	) { }
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
-		this.canWrite$.subscribe(canWrite => {
-		});
 		//do no try to be smart
 		//when any workflowable is updated, refresh the whole menu
 		//that's because rules may change workflow states on any other workflowable

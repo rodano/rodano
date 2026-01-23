@@ -13,7 +13,14 @@
 		Configuration sha1: <strong>{{ info?.config?.sha1 }}</strong>
 	</li>
 	<li>
-		Configuration latest edition date: <strong>{{ info?.config?.date | dateTimeUTC }}</strong>
+		Configuration latest edition date:
+		<strong>
+			@if (info?.config?.date) {
+				{{ info?.config?.date | dateTimeUTC }}
+			} @else {
+				Not set
+			}
+	</strong>
 	</li>
 </ul>
 

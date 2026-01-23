@@ -8,6 +8,7 @@ import org.jooq.impl.DSL;
 
 import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.Validator;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.batch.helper.ModelResolvers.resolveWorkflowId;
@@ -65,7 +66,7 @@ public class ValidatorWriter extends BaseWriter {
 					.execute();
 
 				if(validator.getConstraint() != null) {
-					insertConstraintForOwner(tx, projectId, "VALIDATOR", validatorId, validator.getConstraint());
+					insertConstraintForOwner(tx, projectId, "VALIDATOR", validatorId, validator.getConstraint(), RuleConstraintConstraintType.VALIDATION);
 				}
 			}
 		});

@@ -1,6 +1,6 @@
-import {Component, ViewChild, DestroyRef, OnInit} from '@angular/core';
-import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
-import {Observable, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
+import {Component, DestroyRef, OnInit, ViewChild} from '@angular/core';
+import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {defer, EMPTY, forkJoin, fromEvent, iif, merge, Observable, of} from 'rxjs';
 import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Scope} from '@core/model/scope';
@@ -10,7 +10,7 @@ import {ScopeModel} from '@core/model/scope-model';
 import {Workflow} from '@core/model/workflow';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {HttpParamsService} from '@core/services/http-params.service';
-import {Router, ActivatedRoute, RouterLink, Routes} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink, Routes} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {SelectScopeComponent} from './dialogs/create-scope/select-scope.component';
 import {NotificationService} from 'src/app/services/notification.service';
@@ -32,20 +32,19 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {FieldModel} from '@core/model/field-model';
 import {FieldModelType} from '@core/model/field-model-type';
-import {MatSelect, MatOption} from '@angular/material/select';
+import {MatOption, MatSelect} from '@angular/material/select';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
-import {format, parse, isValid} from 'date-fns';
+import {format, isValid, parse} from 'date-fns';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {Operator} from '@core/model/operator';
 import {DateUTCPipe} from '../pipes/date-utc.pipe';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
-import {AsyncPipe, LowerCasePipe} from '@angular/common';
+import {LowerCasePipe} from '@angular/common';
 import {FormModel} from '@core/model/form-model';
 import {FormService} from '@core/services/form.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
-import {PermissionsService} from '@core/services/permission.service';
 
 @Component({
 	selector: 'app-search',
@@ -73,8 +72,7 @@ import {PermissionsService} from '@core/services/permission.service';
 		MatOption,
 		MatDatepickerModule,
 		DateUTCPipe,
-		LowerCasePipe,
-		AsyncPipe
+		LowerCasePipe
 	]
 })
 export class SearchComponent implements OnInit {
@@ -135,8 +133,6 @@ export class SearchComponent implements OnInit {
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private configurationService: ConfigurationService,
 		private scopeService: ScopeService,
@@ -149,12 +145,10 @@ export class SearchComponent implements OnInit {
 		private dialog: MatDialog,
 		private destroyRef: DestroyRef,
 		private formService: FormService,
-		private scopeRelationService: ScopeRelationsService,
-		private permissionService: PermissionsService
+		private scopeRelationService: ScopeRelationsService
 	) {}
 
 	ngOnInit(): void {
-		this.canWrite$ = this.permissionService.canWrite();
 		this.initializeData();
 		this.sort.active = 'scopeCode';
 		this.sort.direction = 'asc';
@@ -547,7 +541,7 @@ export class SearchComponent implements OnInit {
 
 	getValueShortname(datasetModelId: string, fieldId: string, field: any): Record<string, string> | undefined {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId && fieldModel.possibleValues) {
+			if(fieldModel.id === fieldId && fieldModel.possibleValues) {
 				const value = fieldModel.possibleValues?.find(value => value.possibleValueId === field)?.shortname;
 				if(value) {
 					return value;
@@ -569,7 +563,7 @@ export class SearchComponent implements OnInit {
 
 	getIsPossibleValue(datasetModelId: string, fieldId: string): boolean {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId) {
+			if(fieldModel.id === fieldId) {
 				return fieldModel.possibleValues.length > 0;
 			}
 		}
@@ -578,7 +572,7 @@ export class SearchComponent implements OnInit {
 
 	getIsCompleteDate(datasetModelId: string, fieldId: string): boolean {
 		for(const fieldModel of this.searchableFields) {
-			if(fieldModel.fieldModelId === fieldId && fieldModel.datasetModelId === datasetModelId) {
+			if(fieldModel.id === fieldId) {
 				return (fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory;
 			}
 		}

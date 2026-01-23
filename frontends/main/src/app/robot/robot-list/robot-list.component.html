@@ -39,14 +39,12 @@
 		</button>
 	</form>
 
-	@if (canWrite$ | async) {
-		<button
-			mat-flat-button
-			[routerLink]="['/robots', 'new']">
-			<mat-icon>add</mat-icon>
-			New robot
-		</button>
-	}
+	<button
+		mat-flat-button
+		[routerLink]="['/robots', 'new']">
+		<mat-icon>add</mat-icon>
+		New robot
+	</button>
 </div>
 
 <table
@@ -116,15 +114,13 @@
 			@if (robot.removed) {
 				<button
 					mat-stroked-button
-					(click)="restore(robot)"
-					[disabled]="(canWrite$ | async) === false">
+					(click)="restore(robot)">
 					Restore
 				</button>
 			} @else {
 				<button
 					mat-stroked-button
-					(click)="remove(robot)"
-					[disabled]="(canWrite$ | async) === false">
+					(click)="remove(robot)">
 					Remove
 				</button>
 			}

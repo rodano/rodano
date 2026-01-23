@@ -202,9 +202,11 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	@Override
 	public void contribute(final Builder builder) {
 		if(study != null) {
+			final var configDate = study.getConfigDate();
+
 			builder.withDetail("config", Map.of(
 				"sha1", studyChecksum != null ? studyChecksum : "not-calculated",
-				"date", study.getConfigDate(),
+				"date", configDate != null ? configDate.toString() : "not-set",
 				"projectId", study.getProjectId().toString(),
 				"code", study.getId(),
 				"version", configVersion

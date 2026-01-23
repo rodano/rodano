@@ -55,6 +55,7 @@ public class FieldModel {
 	private List<Rule> rules;
 
 	private RuleConstraint constraint;
+	private RuleConstraint valueConstraint;
 
 	public String getId() {
 		return id;
@@ -400,6 +401,14 @@ public class FieldModel {
 		this.constraint = constraint;
 	}
 
+	public RuleConstraint getValueConstraint() {
+		return valueConstraint;
+	}
+
+	public void setValueConstraint(final RuleConstraint valueConstraint) {
+		this.valueConstraint = valueConstraint;
+	}
+
 	@Override
 	public String toString() {
 		return "FieldModel{" +
@@ -446,6 +455,7 @@ public class FieldModel {
 			", workflowIds=" + workflowIds +
 			", rules=" + rules +
 			", constraint=" + constraint +
+			", valueConstraint=" + valueConstraint +
 			'}';
 	}
 }

@@ -1,6 +1,6 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {Layout} from '@core/model/layout';
-import {trigger, state, style, transition, animate} from '@angular/animations';
+import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MatSortModule, Sort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatIcon} from '@angular/material/icon';
@@ -27,8 +27,6 @@ import {FieldModelType} from '@core/model/field-model-type';
 import {FieldService} from '@core/services/field.service';
 import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
 import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-multiple-layout',
@@ -51,8 +49,7 @@ import {AsyncPipe} from '@angular/common';
 		SafeHtmlPipe,
 		LayoutComponent,
 		LocalizeMapPipe,
-		AuditTrailButtonComponent,
-		AsyncPipe
+		AuditTrailButtonComponent
 	]
 })
 export class MultipleLayoutComponent implements OnInit, OnChanges {
@@ -72,8 +69,6 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 
 	shown = true;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private crfService: CRFService,
 		private visibilityService: VisibilityService,
@@ -82,12 +77,10 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		private fieldService: FieldService,
 		private loggingService: LoggingService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef,
-		private permissionsService: PermissionsService
+		private destroyRef: DestroyRef
 	) {}
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		//visibility criteria
 		/*this.visibilityService.layoutCriterionEvents$(this.layout.id).pipe(
 			takeUntilDestroyed(this.destroyRef)

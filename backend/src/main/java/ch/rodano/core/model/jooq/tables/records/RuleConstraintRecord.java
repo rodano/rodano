@@ -4,6 +4,7 @@
 package ch.rodano.core.model.jooq.tables.records;
 
 
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
 import ch.rodano.core.model.jooq.tables.RuleConstraint;
 
@@ -79,31 +80,45 @@ public class RuleConstraintRecord extends UpdatableRecordImpl<RuleConstraintReco
 	}
 
 	/**
+	 * Setter for <code>rule_constraint.constraint_type</code>.
+	 */
+	public void setConstraintType(RuleConstraintConstraintType value) {
+		set(4, value);
+	}
+
+	/**
+	 * Getter for <code>rule_constraint.constraint_type</code>.
+	 */
+	public RuleConstraintConstraintType getConstraintType() {
+		return (RuleConstraintConstraintType) get(4);
+	}
+
+	/**
 	 * Setter for <code>rule_constraint.created_at</code>.
 	 */
 	public void setCreatedAt(LocalDateTime value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>rule_constraint.created_at</code>.
 	 */
 	public LocalDateTime getCreatedAt() {
-		return (LocalDateTime) get(4);
+		return (LocalDateTime) get(5);
 	}
 
 	/**
 	 * Setter for <code>rule_constraint.evaluations</code>.
 	 */
 	public void setEvaluations(String value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>rule_constraint.evaluations</code>.
 	 */
 	public String getEvaluations() {
-		return (String) get(5);
+		return (String) get(6);
 	}
 
 	// -------------------------------------------------------------------------
@@ -129,13 +144,14 @@ public class RuleConstraintRecord extends UpdatableRecordImpl<RuleConstraintReco
 	/**
 	 * Create a detached, initialised RuleConstraintRecord
 	 */
-	public RuleConstraintRecord(UUID constraintId, UUID projectId, RuleConstraintOwnerType ownerType, UUID ownerId, LocalDateTime createdAt, String evaluations) {
+	public RuleConstraintRecord(UUID constraintId, UUID projectId, RuleConstraintOwnerType ownerType, UUID ownerId, RuleConstraintConstraintType constraintType, LocalDateTime createdAt, String evaluations) {
 		super(RuleConstraint.RULE_CONSTRAINT);
 
 		setConstraintId(constraintId);
 		setProjectId(projectId);
 		setOwnerType(ownerType);
 		setOwnerId(ownerId);
+		setConstraintType(constraintType);
 		setCreatedAt(createdAt);
 		setEvaluations(evaluations);
 		resetChangedOnNotNull();

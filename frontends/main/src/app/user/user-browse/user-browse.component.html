@@ -71,15 +71,13 @@
 		</button>
 	</form>
 
-	@if (canWrite$ | async) {
-		<button
-			mat-flat-button
-			[routerLink]="['/users', 'new']"
-			[disabled]="!me?.rights?.canCreateUser">
-			<mat-icon>add</mat-icon>
-			New user
-		</button>
-	}
+	<button
+		mat-flat-button
+		[routerLink]="['/users', 'new']"
+		[disabled]="!me?.rights?.canCreateUser">
+		<mat-icon>add</mat-icon>
+		New user
+	</button>
 </div>
 
 <app-user-list

@@ -39,40 +39,38 @@
 		}
 	</div>
 
-	@if (canWrite$ | async) {
-		<p class="actions">
-			@if (event.removed) {
+	<p class="actions">
+		@if (event.removed) {
+			<button
+				mat-flat-button
+				(click)="restore()"
+				type="button">
+				Restore
+			</button>
+		} @else {
+			@if (event.locked) {
 				<button
 					mat-flat-button
-					(click)="restore()"
+					(click)="unlock()"
 					type="button">
-					Restore
+					Unlock
 				</button>
 			} @else {
-				@if (event.locked) {
-					<button
-						mat-flat-button
-						(click)="unlock()"
-						type="button">
-						Unlock
-					</button>
-				} @else {
-					<button
-						mat-flat-button
-						(click)="remove()"
-						type="button">
-						Remove
-					</button>
-					<button
-						mat-flat-button
-						(click)="lock()"
-						type="button">
-						Lock
-					</button>
-				}
+				<button
+					mat-flat-button
+					(click)="remove()"
+					type="button">
+					Remove
+				</button>
+				<button
+					mat-flat-button
+					(click)="lock()"
+					type="button">
+					Lock
+				</button>
 			}
-		</p>
-	}
+		}
+	</p>
 
 	<app-issue-viewer [eventPks]="[event.pk]"></app-issue-viewer>
 </div>

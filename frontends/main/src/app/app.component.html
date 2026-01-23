@@ -2,7 +2,7 @@
 	@if (study && showLayout && study.environment !== environment.PROD) {
 		<div id="stamp">{{ study.environment }}</div>
 	}
-	@if (showLayout) {
+	@if (showLayout && study) {
 		<header>
 			<app-header [study]="study"></app-header>
 		</header>

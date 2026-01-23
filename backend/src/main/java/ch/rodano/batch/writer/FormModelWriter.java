@@ -16,6 +16,7 @@ import ch.rodano.batch.pojo.FormModelLayoutCell;
 import ch.rodano.batch.pojo.FormModelLayoutColumn;
 import ch.rodano.batch.pojo.FormModelLayoutLine;
 import ch.rodano.batch.pojo.Rule;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
@@ -129,7 +130,7 @@ public class FormModelWriter extends BaseWriter {
 							.execute();
 
 						if(layout.getConstraint() != null) {
-							insertConstraintForOwner(tx, projectId, "FORM_LAYOUT", layoutId, layout.getConstraint());
+							insertConstraintForOwner(tx, projectId, "FORM_LAYOUT", layoutId, layout.getConstraint(), RuleConstraintConstraintType.DEFAULT);
 						}
 
 						if(layout.getColumns() != null && !layout.getColumns().isEmpty()) {
@@ -207,7 +208,7 @@ public class FormModelWriter extends BaseWriter {
 											.execute();
 
 										if(cell.getConstraint() != null) {
-											insertConstraintForOwner(tx, projectId, "FORM_LAYOUT_CELL", cellId, cell.getConstraint());
+											insertConstraintForOwner(tx, projectId, "FORM_LAYOUT_CELL", cellId, cell.getConstraint(), RuleConstraintConstraintType.DEFAULT);
 										}
 
 										final List<FormCellVisibilityCriteria> visCriteria = cell.getVisibilityCriteria();
@@ -374,7 +375,7 @@ public class FormModelWriter extends BaseWriter {
 				.execute();
 
 			if(rule.getConstraint() != null) {
-				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 			}
 			if(rule.getActions() != null && !rule.getActions().isEmpty()) {
 				insertRuleActions(tx, projectId, ruleId, rule.getActions());

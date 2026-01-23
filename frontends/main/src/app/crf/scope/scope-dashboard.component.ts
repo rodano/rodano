@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 import {NotificationService} from 'src/app/services/notification.service';
@@ -11,10 +11,8 @@ import {IssueViewerComponent} from '../issue-viewer/issue-viewer.component';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.component';
-import {Observable, of, switchMap} from 'rxjs';
+import {of, switchMap} from 'rxjs';
 import {CRFChangeService} from '../services/crf-change.service';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-scope-dashboard',
@@ -24,29 +22,21 @@ import {AsyncPipe} from '@angular/common';
 		WorkflowStatusComponent,
 		AuditTrailButtonComponent,
 		IssueViewerComponent,
-		MatButton,
-		AsyncPipe
+		MatButton
 	]
 })
-export class ScopeDashboardComponent implements OnInit {
+export class ScopeDashboardComponent {
 	workflowableEntity = WorkflowableEntity;
 
 	@Input() scope: Scope;
 	graphs: TimelineGraphData[] = [];
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private scopeService: ScopeService,
 		private crfChangeService: CRFChangeService,
 		private notificationService: NotificationService,
-		private dialog: MatDialog,
-		private permissionsService: PermissionsService
+		private dialog: MatDialog
 	) { }
-
-	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
-	}
 
 	remove() {
 		return this.dialog

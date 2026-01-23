@@ -78,7 +78,7 @@
 				@for (possibleValue of field.model.possibleValues; track possibleValue.possibleValueId) {
 					<mat-radio-button
 						[value]="possibleValue.possibleValueId"
-						[disabled]="field.model.dynamic || field.model.readOnly || disabled || (canWrite$ | async) === false">
+						[disabled]="field.model.dynamic || field.model.readOnly || disabled">
 						{{ possibleValue.shortname | localizeMap }}
 					</mat-radio-button>
 				}

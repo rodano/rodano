@@ -1,6 +1,6 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
-import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {forkJoin, Observable} from 'rxjs';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {forkJoin} from 'rxjs';
 import {ScopeModel} from '@core/model/scope-model';
 import {Scope} from '@core/model/scope';
 import {ScopeRelation} from '@core/model/scope-relation';
@@ -22,8 +22,6 @@ import {Rights} from '@core/model/rights';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	selector: 'app-scope-parents',
@@ -48,8 +46,7 @@ import {AsyncPipe} from '@angular/common';
 		DateUTCPipe,
 		ScopeCodeShortnamePipe,
 		ArraySortPipe,
-		ScopePickerComponent,
-		AsyncPipe
+		ScopePickerComponent
 	]
 })
 export class ScopeParentsComponent implements OnInit {
@@ -85,17 +82,13 @@ export class ScopeParentsComponent implements OnInit {
 	parentScopes: Scope[] = [];
 	transferParentScopes: Scope[] = [];
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private scopeRelationsService: ScopeRelationsService,
 		private notificationService: NotificationService,
-		private destroyRef: DestroyRef,
-		private permissionsService: PermissionsService
+		private destroyRef: DestroyRef
 	) { }
 
 	ngOnInit(): void {
-		this.canWrite$ = this.permissionsService.canWrite();
 		forkJoin({
 			allParentScopes: this.scopeRelationsService.getParents(this.scopeModel.scopeModelId, Rights.WRITE, false),
 			scopeRelations: this.scopeRelationsService.getParentRelations(this.scope.pk)

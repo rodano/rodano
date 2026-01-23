@@ -31,19 +31,11 @@ public class ProjectAccessServiceImpl implements ProjectAccessService {
 		final var project = projectService.getProjectById(projectId);
 		final var status = project.getStatus();
 
-		if(status == ProjectStatus.ACTIVE) {
-			return hasAnyRole(user, projectId);
-		}
-
 		if(status == ProjectStatus.CLOSED) {
-			return isAllowed(user, projectId);
+			return user.isSuperuser();
 		}
 
-		if(status == ProjectStatus.ARCHIVED) {
-			return hasAnyRole(user, projectId);
-		}
-
-		return false;
+		return hasAnyRole(user, projectId);
 	}
 
 	@Override
@@ -51,41 +43,25 @@ public class ProjectAccessServiceImpl implements ProjectAccessService {
 		final var project = projectService.getProjectById(projectId);
 		final var status = project.getStatus();
 
-		if(status == ProjectStatus.ACTIVE) {
-			return hasWritePermission(user, projectId);
-		}
-
-		if(status == ProjectStatus.CLOSED) {
-			return isAllowed(user, projectId);
-		}
-
 		if(status == ProjectStatus.ARCHIVED) {
 			return false;
 		}
 
-		return false;
+		if(status == ProjectStatus.CLOSED) {
+			return user.isSuperuser();
+		}
+
+		return hasWritePermission(user, projectId);
+	}
+
+	@Override
+	public boolean canChangeProjectStatus(final User user, final UUID projectId) {
+		return user.isSuperuser();
 	}
 
 	private boolean hasAnyRole(final User user, final UUID projectId) {
 		final var roles = roleService.getActiveRoles(user);
 		return roles.stream().anyMatch(role -> projectId.equals(role.getProjectId()));
-	}
-
-	private boolean isAllowed(final User user, final UUID projectId) {
-		final var roles = roleService.getRolesForUser(user.getPk(), projectId);
-		return roles.stream()
-			.filter(role -> projectId.equals(role.getProjectId()))
-			.anyMatch(role -> {
-					final var profile = role.getProfile();
-					if(profile == null) {
-						return false;
-					}
-					final var profileCode = profile.getId();
-					return "ADMIN".equalsIgnoreCase(profileCode) ||
-						"DATAMANAGER".equalsIgnoreCase(profileCode) ||
-						"DATAENTRY_MASTER".equalsIgnoreCase(profileCode);
-				}
-			);
 	}
 
 	private boolean hasWritePermission(final User user, final UUID projectId) {

@@ -1,6 +1,7 @@
 package ch.rodano.api.field;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,9 @@ import org.springframework.stereotype.Service;
 import ch.rodano.api.config.FieldModelDTO;
 import ch.rodano.api.config.PossibleValueDTO;
 import ch.rodano.api.workflow.WorkflowDTOService;
+import ch.rodano.configuration.model.field.FieldModel;
+import ch.rodano.configuration.model.field.FieldModelType;
+import ch.rodano.configuration.model.field.PossibleValue;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.core.model.dataset.Dataset;
@@ -161,7 +165,7 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		final var possibleValues = fieldService.getPossibleValues(scope, event, dataset, field);
 		final var value = fieldService.getInterpretedValue(scope, event, dataset, field, timeframe.flatMap(Timeframe::stopDate));
 		dto.possibleValues = possibleValues.stream().map(PossibleValueDTO::new).toList();
-		dto.value = value;
+		dto.value = convertCodeToUuid(value, model, possibleValues);
 		dto.valueLabel = field.getFieldModel().valueToLabel(possibleValues, value, languages);
 
 		//workflow statuses
@@ -200,6 +204,40 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		dto.inLocked = scope.getLocked() || event.isPresent() && event.get().getLocked();
 
 		return dto;
+	}
+
+	private String convertCodeToUuid(final String value, final FieldModel model, final List<PossibleValue> possibleValues) {
+		if(value == null || value.isEmpty() || possibleValues.isEmpty()) {
+			return value;
+		}
+
+		if(model.getType() == FieldModelType.SELECT || model.getType() == FieldModelType.RADIO) {
+			if(possibleValues.stream().anyMatch(pv -> pv.getPossibleValueId().toString().equals(value))) {
+				return value;
+			}
+			return possibleValues.stream()
+				.filter(pv -> pv.getId().equals(value))
+				.findFirst()
+				.map(pv -> pv.getPossibleValueId().toString())
+				.orElse(value);
+		}
+
+		if(model.getType() == FieldModelType.CHECKBOX_GROUP) {
+			return Arrays.stream(value.split(","))
+				.map(code -> {
+					if(possibleValues.stream().anyMatch(pv -> pv.getPossibleValueId().toString().equals(code))) {
+						return code;
+					}
+					return possibleValues.stream()
+						.filter(pv -> pv.getId().equals(code))
+						.findFirst()
+						.map(pv -> pv.getPossibleValueId().toString())
+						.orElse(code);
+				})
+				.collect(Collectors.joining(","));
+		}
+
+		return value;
 	}
 
 }

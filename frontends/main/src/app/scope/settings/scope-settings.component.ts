@@ -1,5 +1,5 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {ScopeModel} from '@core/model/scope-model';
 import {Scope} from '@core/model/scope';
 import {ScopeService} from '@core/services/scope.service';
@@ -10,12 +10,10 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {MatDialog} from '@angular/material/dialog';
 import {DeleteRestoreComponent} from 'src/app/crf/dialogs/delete-restore/delete-restore.component';
-import {of, switchMap, Observable} from 'rxjs';
+import {of, switchMap} from 'rxjs';
 import {WorkflowStatusComponent} from 'src/app/crf/workflow-status/workflow-status.component';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {Workflowable} from '@core/utilities/workflowable';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './scope-settings.component.html',
@@ -28,8 +26,7 @@ import {AsyncPipe} from '@angular/common';
 		MatButton,
 		MatDatepickerModule,
 		AuditTrailButtonComponent,
-		WorkflowStatusComponent,
-		AsyncPipe
+		WorkflowStatusComponent
 	]
 })
 export class ScopeSettingsComponent implements OnInit {
@@ -48,18 +45,14 @@ export class ScopeSettingsComponent implements OnInit {
 		stopDate: [new Date(), []]
 	});
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private formBuilder: FormBuilder,
 		private scopeService: ScopeService,
 		private notificationService: NotificationService,
-		private dialog: MatDialog,
-		private permissionsService: PermissionsService
+		private dialog: MatDialog
 	) { }
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		this.updateForm();
 	}
 

@@ -1,5 +1,5 @@
 import {Component, DestroyRef, Input, OnInit} from '@angular/core';
-import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {User} from '@core/model/user';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
@@ -27,8 +27,6 @@ import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
 import {getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './user-roles.component.html',
@@ -50,8 +48,7 @@ import {AsyncPipe} from '@angular/common';
 		MatIcon,
 		MatTooltip,
 		AuditTrailButtonComponent,
-		ScopePickerComponent,
-		AsyncPipe
+		ScopePickerComponent
 	]
 })
 export class UserRolesComponent implements OnInit {
@@ -83,20 +80,16 @@ export class UserRolesComponent implements OnInit {
 		})
 	});
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private configurationService: ConfigurationService,
 		private roleService: RoleService,
 		private notificationService: NotificationService,
 		private authStateService: AuthStateService,
 		private destroyRef: DestroyRef,
-		private meService: MeService,
-		private permissionsService: PermissionsService
+		private meService: MeService
 	) {}
 
 	ngOnInit() {
-		this.canWrite$ = this.permissionsService.canWrite();
 		forkJoin({
 			profiles: this.configurationService.getProfiles(),
 			scopes: this.meService.getScopes(undefined, true, false),

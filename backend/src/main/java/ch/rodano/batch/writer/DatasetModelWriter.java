@@ -13,6 +13,7 @@ import ch.rodano.batch.pojo.DatasetModel;
 import ch.rodano.batch.pojo.FieldModel;
 import ch.rodano.batch.pojo.PossibleValue;
 import ch.rodano.batch.pojo.Rule;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
@@ -123,7 +124,7 @@ public class DatasetModelWriter extends BaseWriter {
 				.execute();
 
 			if(rule.getConstraint() != null) {
-				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 			}
 			if(rule.getActions() != null && !rule.getActions().isEmpty()) {
 				insertRuleActions(tx, projectId, ruleId, rule.getActions());
@@ -232,7 +233,11 @@ public class DatasetModelWriter extends BaseWriter {
 		upsertPossibleValues(tx, projectId, fieldModelId, fieldModel.getPossibleValues());
 
 		if(fieldModel.getConstraint() != null) {
-			insertConstraintForOwner(tx, projectId, "FIELD_MODEL", fieldModelId, fieldModel.getConstraint());
+			insertConstraintForOwner(tx, projectId, "FIELD_MODEL", fieldModelId, fieldModel.getConstraint(), RuleConstraintConstraintType.VISIBILITY);
+		}
+
+		if(fieldModel.getValueConstraint() != null) {
+			insertConstraintForOwner(tx, projectId, "FIELD_MODEL", fieldModelId, fieldModel.getValueConstraint(), RuleConstraintConstraintType.VALUE_FORMULA);
 		}
 
 		putFieldRules(tx, projectId, datasetModel, fieldModel, fieldModelId);
@@ -299,7 +304,7 @@ public class DatasetModelWriter extends BaseWriter {
 				.execute();
 
 			if(rule.getConstraint() != null) {
-				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 			}
 
 			if(rule.getActions() != null && !rule.getActions().isEmpty()) {

@@ -283,7 +283,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 		for(final var field : fields) {
 			final var fieldModel = field.getFieldModel();
 			if(dto.searchableFields.containsKey(fieldModel.getDatasetModel().getId())) {
-				dto.searchableFields.get(fieldModel.getDatasetModel().getId()).put(field.getId(), field.getValue());
+				dto.searchableFields.get(fieldModel.getDatasetModel().getId()).put(fieldModel.getId(), field.getValue());
 			}
 			else {
 				final var map = new HashMap<String, String>();

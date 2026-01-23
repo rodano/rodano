@@ -8,6 +8,13 @@ export class DateTimeUTCPipe implements PipeTransform {
 		if(!date) {
 			return 'NA';
 		}
+
+		const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+		if(isNaN(dateObj.getTime())) {
+			return 'NA';
+		}
+
 		let label = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
 		label += ' ';
 		label += `${date.getUTCHours().toString().padStart(2, '0')}:${date.getUTCMinutes().toString().padStart(2, '0')}:${date.getUTCSeconds().toString().padStart(2, '0')}`;

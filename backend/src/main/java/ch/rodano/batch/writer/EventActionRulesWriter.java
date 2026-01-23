@@ -10,6 +10,7 @@ import ch.rodano.batch.helper.JsonWriter;
 import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.EventAction;
 import ch.rodano.batch.pojo.Rule;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.RuleHelper.insertConstraintForOwner;
@@ -49,7 +50,7 @@ public class EventActionRulesWriter extends BaseWriter {
 						upsertRule(tx, projectId, ruleId, eventActionId, eventActionCode, rule);
 
 						if(rule.getConstraint() != null) {
-							insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+							insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 						}
 
 						if(rule.getActions() != null && !rule.getActions().isEmpty()) {

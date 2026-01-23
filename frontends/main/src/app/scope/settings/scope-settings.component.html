@@ -9,8 +9,7 @@
 			<input
 				matInput
 				formControlName="code"
-				required
-				[readonly]="(canWrite$ | async) === false"/>
+				required/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[scope]="scope"
@@ -23,8 +22,7 @@
 			<input
 				matInput
 				formControlName="shortname"
-				required
-				[readonly]="(canWrite$ | async) === false"/>
+				required/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[scope]="scope"
@@ -37,8 +35,7 @@
 			<input
 				matInput
 				formControlName="longname"
-				required
-				[readonly]="(canWrite$ | async) === false"/>
+				required/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[scope]="scope"
@@ -50,8 +47,7 @@
 			<mat-label>Max number</mat-label>
 			<input
 				matInput
-				formControlName="maxNumber"
-				[readonly]="(canWrite$ | async) === false"/>
+				formControlName="maxNumber"/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[scope]="scope"
@@ -61,8 +57,7 @@
 			<mat-label>Expected number</mat-label>
 			<input
 				matInput
-				formControlName="expectedNumber"
-				[readonly]="(canWrite$ | async) === false"/>
+				formControlName="expectedNumber"/>
 		</mat-form-field>
 		<app-audit-trail-button
 			[scope]="scope"
@@ -75,8 +70,7 @@
 			<input
 				matInput
 				[matDatepicker]="startDatePicker"
-				formControlName="startDate"
-				[readonly]="(canWrite$ | async) === false"/>
+				formControlName="startDate"/>
 			<mat-datepicker-toggle
 				matSuffix
 				[for]="startDatePicker"></mat-datepicker-toggle>
@@ -91,8 +85,7 @@
 			<input
 				matInput
 				[matDatepicker]="stopDatePicker"
-				formControlName="stopDate"
-				[readonly]="(canWrite$ | async) === false"/>
+				formControlName="stopDate"/>
 			<mat-datepicker-toggle
 				matSuffix
 				[for]="stopDatePicker"></mat-datepicker-toggle>
@@ -103,48 +96,46 @@
 			property="stopDate" />
 	</p>
 
-	@if (canWrite$ |async) {
-		<p class="actions">
-			@if (scope.removed) {
+	<p class="actions">
+		@if (scope.removed) {
+			<button
+				mat-flat-button
+				(click)="restore()"
+				type="button">
+				Restore
+			</button>
+		} @else {
+			@if (scope.locked) {
 				<button
 					mat-flat-button
-					(click)="restore()"
+					(click)="unlock()"
 					type="button">
-					Restore
+					Unlock
 				</button>
 			} @else {
-				@if (scope.locked) {
-					<button
-						mat-flat-button
-						(click)="unlock()"
-						type="button">
-						Unlock
-					</button>
-				} @else {
-					<button
-						mat-flat-button
-						(click)="lock()"
-						type="button">
-						Lock
-					</button>
-				}
-
 				<button
 					mat-flat-button
-					(click)="remove()"
+					(click)="lock()"
 					type="button">
-					Remove
-				</button>
-
-				<button
-					mat-flat-button
-					type="submit"
-					[disabled]="scopeUpdateForm.invalid">
-					Save
+					Lock
 				</button>
 			}
-		</p>
-	}
+
+			<button
+				mat-flat-button
+				(click)="remove()"
+				type="button">
+				Remove
+			</button>
+
+			<button
+				mat-flat-button
+				type="submit"
+				[disabled]="scopeUpdateForm.invalid">
+				Save
+			</button>
+		}
+	</p>
 
 	<div class="workflow-statuses">
 		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->

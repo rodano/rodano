@@ -13,6 +13,7 @@ import ch.rodano.batch.pojo.Rule;
 import ch.rodano.batch.pojo.Workflow;
 import ch.rodano.batch.pojo.WorkflowAction;
 import ch.rodano.batch.pojo.WorkflowState;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
@@ -123,7 +124,7 @@ public class WorkflowWriter extends BaseWriter {
 									.execute();
 
 								if(rule.getConstraint() != null) {
-									insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+									insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 								}
 
 								if(rule.getActions() != null && !rule.getActions().isEmpty()) {
@@ -236,7 +237,7 @@ public class WorkflowWriter extends BaseWriter {
 							.execute();
 
 						if(rule.getConstraint() != null) {
-							insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint());
+							insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
 						}
 						if(rule.getActions() != null && !rule.getActions().isEmpty()) {
 							insertRuleActions(tx, projectId, ruleId, rule.getActions());

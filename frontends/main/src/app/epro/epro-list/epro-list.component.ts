@@ -8,7 +8,7 @@ import {ScopeSearch} from '@core/utilities/search/scope-search';
 import {EproRobot} from '@core/model/epro-robot';
 import {Scope} from '@core/model/scope';
 import {PagedResultScope} from '@core/model/paged-result-scope';
-import {Subject, forkJoin, merge, of, Observable} from 'rxjs';
+import {forkJoin, merge, of, Subject} from 'rxjs';
 import {EPROInvitation} from '@core/model/epro-invitation';
 import {EproInvitationComponent} from '../epro-invitation/epro-invitation.component';
 import {NotificationService} from 'src/app/services/notification.service';
@@ -28,8 +28,6 @@ import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {Rights} from '@core/model/rights';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 import {Profile} from '@core/model/profile';
-import {PermissionsService} from '@core/services/permission.service';
-import {AsyncPipe} from '@angular/common';
 
 @Component({
 	templateUrl: './epro-list.component.html',
@@ -47,8 +45,7 @@ import {AsyncPipe} from '@angular/common';
 		MatToolbar,
 		MatToolbarRow,
 		MatPaginator,
-		ScopeCodeShortnamePipe,
-		AsyncPipe
+		ScopeCodeShortnamePipe
 	]
 })
 export class EproListComponent implements OnInit {
@@ -75,8 +72,6 @@ export class EproListComponent implements OnInit {
 
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
-	canWrite$: Observable<boolean>;
-
 	constructor(
 		private configurationService: ConfigurationService,
 		private scopeService: ScopeService,
@@ -84,12 +79,10 @@ export class EproListComponent implements OnInit {
 		private eproService: EproService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef,
-		private permissionsService: PermissionsService
+		private destroyRef: DestroyRef
 	) {}
 
 	ngOnInit(): void {
-		this.canWrite$ = this.permissionsService.canWrite();
 		this.configurationService.getStudy().pipe(
 			switchMap(study => {
 				return forkJoin({
