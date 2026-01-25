@@ -191,6 +191,6 @@ mat-spinner {
 /* ==================== Main Panel ==================== */
 .editor-main {
 	flex: 1;
-	overflow-y: auto;
+	overflow: hidden;
 	background-color: #f8f9fa;
 }

@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatIcon} from '@angular/material/icon';
 import {ProjectSettingsDetailComponent} from './project-settings-detail/project-settings-detail.component';
+import {ScopeModelsListComponent} from '../scope-model/scope-model-list/scope-models-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -12,17 +13,25 @@ import {ProjectSettingsDetailComponent} from './project-settings-detail/project-
 	imports: [
 		CommonModule,
 		MatIcon,
-		ProjectSettingsDetailComponent
+		ProjectSettingsDetailComponent,
+		ScopeModelsListComponent
 	]
 })
 export class ConfiguratorDetailComponent implements OnChanges {
+	@ViewChild(ScopeModelsListComponent) scopeModelsListComponent?: ScopeModelsListComponent;
+
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
 	@Input() modifiedFields = new Set<string>();
 	@Output() fieldsUpdated = new EventEmitter<Partial<ConfiguratorProject>>();
+	@Output() nodeSelected = new EventEmitter<string | null>();
+	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() modificationCountChanged = new EventEmitter<number>();
 
-	selectedNodeType: 'project-settings' | 'scope-model' | 'menu' | 'section' | null = null;
+	selectedNodeType: 'project-settings' | 'scope-models' | 'overview' | null = null;
+
+	scopeModelModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -30,23 +39,38 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		}
 	}
 
+	onScopeModelSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onScopeModelsChanged(event: {modificationCount: number}): void {
+		this.scopeModelModificationCount = event.modificationCount;
+		this.scopeModelsChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
-			this.selectedNodeType = null;
+			this.selectedNodeType = 'overview';
+			return;
+		}
+
+		if(this.selectedNode.startsWith('scope-model-')) {
+			this.selectedNodeType = 'scope-models';
 			return;
 		}
 
 		if(this.selectedNode === 'project-settings') {
 			this.selectedNodeType = 'project-settings';
+			return;
 		}
-		else if(this.selectedNode.startsWith('scope-model-')) {
-			this.selectedNodeType = 'scope-model';
+
+		if(this.selectedNode === 'scope-models') {
+			this.selectedNodeType = 'scope-models';
+			return;
 		}
-		else if(this.selectedNode.startsWith('menu-')) {
-			this.selectedNodeType = 'menu';
-		}
-		else if(this.selectedNode.startsWith('section-')) {
-			this.selectedNodeType = 'section';
-		}
+
+		this.selectedNodeType = 'overview';
 	}
 }

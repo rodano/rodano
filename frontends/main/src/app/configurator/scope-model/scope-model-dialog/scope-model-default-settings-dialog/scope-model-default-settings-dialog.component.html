@@ -1,0 +1,29 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Default Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Default Profile</label>
+				<mat-select formControlName="defaultProfileId" placeholder="Select default profile">
+					<mat-option [value]="''">None</mat-option>
+					@for (profile of availableProfiles; track profile.id) {
+						<mat-option [value]="profile.id">
+							{{ profile.shortname }} ({{ profile.id }})
+						</mat-option>
+					}
+				</mat-select>
+				<span class="hint">The default profile for users in this scope (optional)</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()" [disabled]="saving">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="saving || form.invalid">
+			Save Changes
+		</button>
+	</div>
+</div>

@@ -2,9 +2,9 @@
 	display: flex;
 	flex-direction: column;
 	background-color: #f8f9fa;
-	margin: 1rem;
-	border-radius: 0.5rem;
-	min-height: calc(100vh - 10rem);
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
 }
 
 .welcome-state {
@@ -18,6 +18,7 @@
 	border-radius: 0.5rem;
 	position: relative;
 	overflow: hidden;
+	margin: 1rem;
 }
 
 .welcome-state::before {

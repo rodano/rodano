@@ -20,12 +20,24 @@
 					(fieldsUpdated)="fieldsUpdated.emit($event)">
 				</app-project-settings-detail>
 			}
+			@case ('scope-models') {
+				<app-scope-models-list
+					[projectId]="projectId"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onScopeModelSelected($event)"
+					(scopeModelsChanged)="onScopeModelsChanged($event)">
+				</app-scope-models-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>
 				</div>
 				<div class="tab-content">
-					<p>Configuration for {{ selectedNode }}</p>
+					<div class="empty-state">
+						<mat-icon>construction</mat-icon>
+						<h3>Coming Soon</h3>
+						<p>Configuration for {{ selectedNode }} will be available here</p>
+					</div>
 				</div>
 			}
 		}

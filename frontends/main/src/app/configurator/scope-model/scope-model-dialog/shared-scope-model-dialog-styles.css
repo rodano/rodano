@@ -1,0 +1,336 @@
+/* ==================== Dialog Container ==================== */
+.dialog-container {
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.dialog-title {
+	margin: 0;
+	padding: 1.5rem 1.5rem 1rem 1.5rem;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #111827;
+	border-bottom: 2px solid #5bd4d4;
+}
+
+.dialog-content {
+	padding: 1.5rem;
+	max-height: 70vh;
+	overflow-y: auto;
+}
+
+/* ==================== Form ==================== */
+.settings-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+.form-section {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+}
+
+.form-section h3 {
+	margin: 0 0 0.5rem 0;
+	font-size: 1rem;
+	font-weight: 600;
+	color: #111827;
+}
+
+.form-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.form-field label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #374151;
+}
+
+.form-field input,
+.form-field textarea {
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid #d1d5db;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	color: #111827;
+	background-color: #f9fafb;
+	transition: all 0.2s;
+	box-sizing: border-box;
+	font-family: inherit;
+}
+
+.form-field textarea {
+	resize: vertical;
+	min-height: 5rem;
+}
+
+.form-field input:focus,
+.form-field textarea:focus {
+	outline: none;
+	border-color: #5bd4d4;
+	box-shadow: 0 0 0 3px rgba(91, 212, 212, 0.1);
+	background-color: white;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+	color: #9ca3af;
+}
+
+.form-field input[disabled],
+.form-field input:disabled {
+	background-color: #e5e7eb;
+	cursor: not-allowed;
+	opacity: 0.7;
+}
+
+/* ==================== Material Select ==================== */
+::ng-deep .mat-mdc-select {
+	width: 100%;
+	padding: 0.75rem;
+	border: 1px solid #d1d5db;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	color: #111827;
+	background-color: #f9fafb;
+	transition: all 0.2s;
+	box-sizing: border-box;
+}
+
+::ng-deep .mat-mdc-select:focus {
+	outline: none;
+	border-color: #5bd4d4;
+	box-shadow: 0 0 0 3px rgba(91, 212, 212, 0.1);
+	background-color: white;
+}
+
+::ng-deep .mat-mdc-select-placeholder {
+	color: #9ca3af;
+}
+
+/* ==================== Checkbox Field ==================== */
+.checkbox-field {
+	flex-direction: row;
+	align-items: center;
+	gap: 0.75rem;
+}
+
+.checkbox-field .hint {
+	margin-top: 0;
+	margin-left: 0.25rem;
+}
+
+/* ==================== Tab Content ==================== */
+.tab-content {
+	padding: 1.5rem 0;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+}
+
+/* ==================== Material Tabs Styling ==================== */
+::ng-deep .mat-mdc-tab-group {
+	overflow-x: hidden;
+}
+
+::ng-deep .mat-mdc-tab-header {
+	border-bottom: none;
+}
+
+::ng-deep .mat-mdc-tab-labels {
+	gap: 0.5rem !important;
+}
+
+::ng-deep .mdc-tab {
+	min-width: auto !important;
+	padding: 0 1rem !important;
+	height: 3rem !important;
+}
+
+::ng-deep .mdc-tab__text-label {
+	font-size: 0.875rem !important;
+	font-weight: 500 !important;
+	color: #6b7280 !important;
+	transition: color 0.2s !important;
+}
+
+::ng-deep .mdc-tab:hover .mdc-tab__text-label {
+	color: #374151 !important;
+}
+
+::ng-deep .mdc-tab--active .mdc-tab__text-label {
+	color: #5bd4d4 !important;
+	font-weight: 600 !important;
+}
+
+::ng-deep .mdc-tab-indicator__content--underline {
+	border-top-width: 3px !important;
+	border-color: #5bd4d4 !important;
+	border-radius: 3px 3px 0 0 !important;
+}
+
+::ng-deep .mat-mdc-tab-body-content {
+	overflow-x: hidden !important;
+}
+
+/* ==================== Hints and Errors ==================== */
+.hint {
+	font-size: 0.75rem;
+	color: #6b7280;
+	font-style: italic;
+	margin-top: 0.25rem;
+}
+
+.error-message {
+	font-size: 0.75rem;
+	color: #dc2626;
+	font-weight: 500;
+	margin-top: 0.25rem;
+}
+
+/* ==================== Dialog Actions ==================== */
+.dialog-actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.75rem;
+	padding: 1rem 1.5rem 1.5rem 1.5rem;
+	border-top: 1px solid #e5e7eb;
+}
+
+.btn-secondary,
+.btn-primary {
+	padding: 0.625rem 1.25rem;
+	border-radius: 0.5rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	border: none;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.btn-secondary {
+	background-color: white;
+	color: #374151;
+	border: 1px solid #d1d5db;
+}
+
+.btn-secondary:hover:not(:disabled) {
+	background-color: #f9fafb;
+	border-color: #9ca3af;
+}
+
+.btn-secondary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.btn-primary {
+	background-color: #5bd4d4;
+	color: white;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.btn-primary:hover:not(:disabled) {
+	background-color: #4bc3c3;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+/* ==================== List Box ==================== */
+
+.dual-list-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 1.5rem;
+	margin-bottom: 1rem;
+	height: 250px;
+}
+
+.list-box {
+	border: 1px solid #e5e7eb;
+	border-radius: 6px;
+	background: #ffffff;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.list-box.selected {
+	border-color: #5bd4d4;
+	background: #f0fdfd;
+}
+
+.box-label {
+	padding: 8px 12px;
+	background: #f9fafb;
+	border-bottom: 1px solid #e5e7eb;
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #6b7280;
+	text-transform: uppercase;
+}
+
+.list-items {
+	flex: 1;
+	overflow-y: auto;
+}
+
+.list-item {
+	padding: 10px 12px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+	border-bottom: 1px solid #f3f4f6;
+	font-size: 0.875rem;
+	transition: background 0.2s;
+}
+
+.list-item:hover {
+	background: #f3f4f6;
+}
+
+.selected .list-item:hover {
+	background: #e0f2f2;
+}
+
+.item-text {
+	display: flex;
+	flex-direction: column;
+}
+
+.item-text small {
+	color: #9ca3af;
+	font-size: 0.7rem;
+}
+
+.action-icon {
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: #9ca3af;
+}
+
+.empty-placeholder {
+	padding: 20px;
+	text-align: center;
+	color: #9ca3af;
+	font-size: 0.875rem;
+	font-style: italic;
+}

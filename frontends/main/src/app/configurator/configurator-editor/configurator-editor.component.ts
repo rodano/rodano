@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
@@ -15,6 +15,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
 import {SnapshotsListDialogComponent} from '../snapshots/snapshots-list-dialog/snapshots-list-dialog.component';
 import {CreateSnapshotDialogComponent} from '../snapshots/create-snapshot-dialog/create-snapshot-dialog.component';
+import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
+import {ScopeModel} from '@core/model/scope-model';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -33,6 +35,9 @@ import {CreateSnapshotDialogComponent} from '../snapshots/create-snapshot-dialog
 	]
 })
 export class ConfiguratorEditorComponent implements OnInit {
+	@ViewChild(ConfiguratorTreeComponent) treeComponent!: ConfiguratorTreeComponent;
+	@ViewChild(ConfiguratorDetailComponent) detailComponent!: ConfiguratorDetailComponent;
+
 	projectId = '';
 	project: ConfiguratorProject | null = null;
 	workingProject: ConfiguratorProject | null = null;
@@ -41,6 +46,7 @@ export class ConfiguratorEditorComponent implements OnInit {
 	saving = false;
 	selectedNode: string | null = null;
 	modifiedFields = new Set<string>();
+	scopeModelModificationCount = 0;
 
 	canRollback = false;
 	canRollForward = false;
@@ -49,6 +55,7 @@ export class ConfiguratorEditorComponent implements OnInit {
 		private route: ActivatedRoute,
 		private router: Router,
 		private configuratorService: ConfiguratorService,
+		private configuratorConfigService: ConfiguratorConfigService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -111,8 +118,12 @@ export class ConfiguratorEditorComponent implements OnInit {
 		});
 	}
 
-	onNodeSelected(nodeId: string): void {
+	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
+	}
+
+	onScopeModelsChanged(event: {modificationCount: number}): void {
+		this.scopeModelModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -152,8 +163,14 @@ export class ConfiguratorEditorComponent implements OnInit {
 				this.project = updatedProject;
 				this.workingProject = {...updatedProject};
 				this.modifiedFields.clear();
-				this.saving = false;
-				this.snackBar.open('Draft saved', 'Close', {duration: 2000});
+
+				if(this.scopeModelModificationCount > 0) {
+					this.saveScopeModels();
+				}
+				else {
+					this.saving = false;
+					this.snackBar.open('Draft saved', 'Close', {duration: 2000});
+				}
 			},
 			error: error => {
 				console.error('Error saving draft:', error);
@@ -180,6 +197,14 @@ export class ConfiguratorEditorComponent implements OnInit {
 			if(confirmed) {
 				this.workingProject = {...this.project!};
 				this.modifiedFields.clear();
+
+				const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+				if(scopeModelsComponent) {
+					scopeModelsComponent.loadScopeModels();
+					scopeModelsComponent.modifiedScopeModelIds.clear();
+				}
+				this.scopeModelModificationCount = 0;
+
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
 			}
 		});
@@ -203,7 +228,11 @@ export class ConfiguratorEditorComponent implements OnInit {
 	}
 
 	get hasModifications(): boolean {
-		return this.modifiedFields.size > 0;
+		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0;
+	}
+
+	get totalModificationCount(): number {
+		return this.modifiedFields.size + this.scopeModelModificationCount;
 	}
 
 	onCreateSnapshot(): void {
@@ -331,6 +360,64 @@ export class ConfiguratorEditorComponent implements OnInit {
 				console.error('Error rolling forward:', error);
 				this.snackBar.open('Failed to restore snapshot', 'Close', {duration: 3000});
 			}
+		});
+	}
+
+	private saveScopeModels(): void {
+		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+
+		if(!scopeModelsComponent) {
+			this.saving = false;
+			this.snackBar.open('Draft saved', 'Close', {duration: 2000});
+			return;
+		}
+
+		const savePromises: Promise<any>[] = [];
+
+		scopeModelsComponent.modifiedScopeModelIds.forEach((id: string) => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = scopeModelsComponent.originalScopeModels.find((sm: ScopeModel) => sm.scopeModelId === originalId);
+				if(original) {
+					savePromises.push(
+						this.configuratorConfigService.deleteScopeModel(this.projectId, originalId).toPromise()
+					);
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const scopeModel = scopeModelsComponent.scopeModels.find((sm: ScopeModel) => sm.scopeModelId === id);
+				if(scopeModel) {
+					savePromises.push(
+						this.configuratorConfigService.createScopeModel(this.projectId, scopeModel).toPromise()
+					);
+				}
+			}
+			else {
+				const scopeModel = scopeModelsComponent.scopeModels.find((sm: ScopeModel) => sm.scopeModelId === id);
+				if(scopeModel) {
+					savePromises.push(
+						this.configuratorConfigService.updateScopeModel(this.projectId, id, scopeModel).toPromise()
+					);
+				}
+			}
+		});
+
+		Promise.all(savePromises).then(() => {
+			scopeModelsComponent.modifiedScopeModelIds.clear();
+			scopeModelsComponent.loadScopeModels();
+			this.scopeModelModificationCount = 0;
+
+			if(this.treeComponent) {
+				this.treeComponent.reloadScopeModels();
+			}
+
+			this.saving = false;
+			this.snackBar.open('Draft saved', 'Close', {duration: 2000});
+		}).catch((error: any) => {
+			console.error('Error saving scope models:', error);
+			console.error('Error details:', error.error);
+			this.snackBar.open('Failed to save scope models', 'Close', {duration: 3000});
+			this.saving = false;
 		});
 	}
 }

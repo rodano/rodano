@@ -1,0 +1,143 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">{{ isEditMode ? 'Edit Basic Information' : 'Create Scope Model' }}</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Code *</label>
+				<input
+					type="text"
+					formControlName="id"
+					placeholder="SCOPE_CODE"
+					(input)="onCodeInput($event)"
+					style="text-transform: uppercase;">
+				<span class="hint">Uppercase letters, numbers, and underscores only</span>
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+					<span class="error-message">Code is required</span>
+				}
+			</div>
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				@if (availableLanguages.length === 1) {
+					<div class="language-fields">
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<div [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+										<input
+											type="text"
+											formControlName="shortname"
+											placeholder="Patient">
+										<span class="hint">Brief display name</span>
+										@if (languageForms.get(lang.languageCode)?.get('shortname')?.hasError('required') && languageForms.get(lang.languageCode)?.get('shortname')?.touched) {
+											<span class="error-message">Short name is required</span>
+										}
+									</div>
+
+									<div class="form-field">
+										<label>Long Name</label>
+										<input
+											type="text"
+											formControlName="longname"
+											placeholder="Patient Record">
+										<span class="hint">Full descriptive name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Plural Short Name {{ lang.isDefault ? '*' : '' }}</label>
+										<input
+											type="text"
+											formControlName="pluralShortname"
+											placeholder="Patients">
+										<span class="hint">Plural form of the short name</span>
+										@if (languageForms.get(lang.languageCode)?.get('pluralShortname')?.hasError('required') && languageForms.get(lang.languageCode)?.get('pluralShortname')?.touched) {
+											<span class="error-message">Plural short name is required</span>
+										}
+									</div>
+
+									<div class="form-field">
+										<label>Description</label>
+										<textarea
+											formControlName="description"
+											placeholder="Brief description"
+											rows="3"></textarea>
+										<span class="hint">Optional description</span>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				} @else {
+					<mat-tab-group>
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+										<div class="form-field">
+											<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+											<input
+												type="text"
+												formControlName="shortname"
+												placeholder="Patient">
+											<span class="hint">Brief display name</span>
+											@if (languageForms.get(lang.languageCode)?.get('shortname')?.hasError('required') && languageForms.get(lang.languageCode)?.get('shortname')?.touched) {
+												<span class="error-message">Short name is required</span>
+											}
+										</div>
+
+										<div class="form-field">
+											<label>Long Name</label>
+											<input
+												type="text"
+												formControlName="longname"
+												placeholder="Patient Record">
+											<span class="hint">Full descriptive name</span>
+										</div>
+
+										<div class="form-field">
+											<label>Plural Short Name {{ lang.isDefault ? '*' : '' }}</label>
+											<input
+												type="text"
+												formControlName="pluralShortname"
+												placeholder="Patients">
+											<span class="hint">Plural form of the short name</span>
+											@if (languageForms.get(lang.languageCode)?.get('pluralShortname')?.hasError('required') && languageForms.get(lang.languageCode)?.get('pluralShortname')?.touched) {
+												<span class="error-message">Plural short name is required</span>
+											}
+										</div>
+
+										<div class="form-field">
+											<label>Description</label>
+											<textarea
+												formControlName="description"
+												placeholder="Brief description"
+												rows="3"></textarea>
+											<span class="hint">Optional description</span>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
+				}
+			</div>
+
+			<div class="form-field checkbox-field">
+				<mat-checkbox formControlName="virtual">Virtual Scope Model</mat-checkbox>
+				<span class="hint">Virtual scope models exist only logically</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()" [disabled]="saving">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="saving || form.invalid || !areLanguageFormsValid()">
+			{{ isEditMode ? 'Save Changes' : 'Create Scope Model' }}
+		</button>
+	</div>
+</div>

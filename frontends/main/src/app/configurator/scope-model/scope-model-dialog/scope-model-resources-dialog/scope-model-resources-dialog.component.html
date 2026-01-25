@@ -1,0 +1,65 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Resources</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Form Models</label>
+				<mat-select formControlName="formModelIds" multiple placeholder="Select form models">
+					@for (form of availableForms; track form.id) {
+						<mat-option [value]="form.id">
+							{{ form.name }}
+						</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Form models associated with this scope (coming soon)</span>
+			</div>
+
+			<div class="form-field">
+				<label>Dataset Models</label>
+				<mat-select formControlName="datasetModelIds" multiple placeholder="Select dataset models">
+					@for (dataset of availableDatasets; track dataset.id) {
+						<mat-option [value]="dataset.id">
+							{{ dataset.name }}
+						</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Dataset models associated with this scope (coming soon)</span>
+			</div>
+
+			<div class="form-field">
+				<label>Workflows</label>
+				<mat-select formControlName="workflowIds" multiple placeholder="Select workflows">
+					@for (workflow of availableWorkflows; track workflow.id) {
+						<mat-option [value]="workflow.id">
+							{{ workflow.name }}
+						</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Workflows associated with this scope (coming soon)</span>
+			</div>
+
+			<div class="form-field">
+				<label>Workflow States</label>
+				<mat-select formControlName="workflowStateIds" multiple placeholder="Select states from selected workflows">
+					@for (state of availableWorkflowStates; track state.id) {
+						<mat-option [value]="state.id">
+							<span class="state-label">{{ state.name }}</span>
+							<small class="workflow-origin">({{ state.workflowName }})</small>
+						</mat-option>
+					}
+				</mat-select>
+				<span class="hint">States available from the workflows selected above</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()" [disabled]="saving">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="saving || form.invalid">
+			Save Changes
+		</button>
+	</div>
+</div>

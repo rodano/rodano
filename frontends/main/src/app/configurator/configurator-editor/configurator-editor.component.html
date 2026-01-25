@@ -23,7 +23,7 @@
 				@if (hasModifications) {
 					<div class="modifications-indicator">
 						<mat-icon>create</mat-icon>
-						<span>{{ modifiedFields.size }} field(s) modified</span>
+						<span>{{ totalModificationCount }} field(s) modified</span>
 					</div>
 				}
 				<div class="draft-indicator">
@@ -89,7 +89,9 @@
 					[project]="workingProject"
 					[selectedNode]="selectedNode"
 					[modifiedFields]="modifiedFields"
-					(fieldsUpdated)="onFieldsUpdated($event)">
+					(fieldsUpdated)="onFieldsUpdated($event)"
+					(nodeSelected)="onNodeSelected($event)"
+					(scopeModelsChanged)="onScopeModelsChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>
