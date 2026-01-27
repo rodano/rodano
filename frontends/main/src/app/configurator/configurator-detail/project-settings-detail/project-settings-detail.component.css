@@ -310,27 +310,6 @@
 	margin-bottom: 0;
 }
 
-.language-dropdown-inline {
-	padding: 0.375rem 0.75rem;
-	border: 1px solid #d1d5db;
-	border-radius: 0.5rem;
-	font-size: 0.75rem;
-	color: #374151;
-	background-color: white;
-	cursor: pointer;
-	transition: all 0.2s;
-}
-
-.language-dropdown-inline:hover {
-	border-color: #9ca3af;
-}
-
-.language-dropdown-inline:focus {
-	outline: none;
-	border-color: #5bd4d4;
-	box-shadow: 0 0 0 3px rgba(91, 212, 212, 0.1);
-}
-
 .modified-icon {
 	font-size: 1rem;
 	width: 1rem;

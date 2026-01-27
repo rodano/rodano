@@ -18,6 +18,7 @@ import {CreateSnapshotDialogComponent} from '../snapshots/create-snapshot-dialog
 import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
 import {ScopeModel} from '@core/model/scope-model';
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
+import {LanguageService} from '../language/language.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -57,6 +58,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private router: Router,
 		private configuratorService: ConfiguratorService,
 		private configuratorConfigService: ConfiguratorConfigService,
+		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -91,6 +93,12 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: project => {
 				this.project = project;
 				this.workingProject = {...project};
+
+				if(project?.languages?.length) {
+					const defaultLanguage = project.languages.find(language => language.isDefault)?.languageCode || project.languages[0].languageCode || 'en';
+					this.languageService.setLanguage(defaultLanguage);
+				}
+
 				this.loadDraftVersion();
 			},
 			error: error => {
@@ -131,6 +139,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.canRollForward = false;
 			}
 		});
+	}
+
+	onLanguageChange(event: Event): void {
+		const select = event.target as HTMLSelectElement;
+		this.languageService.setLanguage(select.value);
 	}
 
 	onNodeSelected(nodeId: string | null): void {
@@ -239,7 +252,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		if(!translations) {
 			return '';
 		}
-		return translations['en'] || Object.values(translations)[0] || '';
+		const currentLanguage = this.languageService.currentLanguage;
+		return translations[currentLanguage] || translations['en'] || Object.values(translations)[0] || '';
 	}
 
 	get hasModifications(): boolean {

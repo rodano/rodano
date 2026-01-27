@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatTableModule} from '@angular/material/table';
 import {MatButtonModule} from '@angular/material/button';
@@ -23,6 +23,8 @@ import {
 import {
 	ScopeModelResourcesDialogComponent
 } from '../scope-model-dialog/scope-model-resources-dialog/scope-model-resources-dialog.component';
+import {Subscription} from 'rxjs';
+import {LanguageService} from '../../language/language.service';
 
 @Component({
 	selector: 'app-scope-models-list',
@@ -37,7 +39,7 @@ import {
 		MatTooltipModule
 	]
 })
-export class ScopeModelsListComponent implements OnInit, OnChanges {
+export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string | null>();
@@ -51,11 +53,14 @@ export class ScopeModelsListComponent implements OnInit, OnChanges {
 	loading = true;
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
+	private languageSubscription: Subscription;
+
 	selectedScopeModel: ScopeModel | null = null;
 
 	constructor(
 		private configuratorConfigService: ConfiguratorConfigService,
 		private configuratorService: ConfiguratorService,
+		private languageService: LanguageService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -63,6 +68,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges {
 	ngOnInit(): void {
 		this.loadProject();
 		this.loadScopeModels();
+
+		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
+			this.selectedLanguage = language;
+		});
 	}
 
 	ngOnChanges(changes: any): void {
@@ -81,17 +90,18 @@ export class ScopeModelsListComponent implements OnInit, OnChanges {
 		}
 	}
 
+	ngOnDestroy(): void {
+		this.languageSubscription.unsubscribe();
+	}
+
 	loadProject(): void {
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: (project: ConfiguratorProject) => {
 				this.projectLanguages = project.languages || [];
-				const defaultLang = this.projectLanguages.find(l => l.isDefault);
-				this.selectedLanguage = defaultLang?.languageCode || this.projectLanguages[0]?.languageCode || 'en';
 			},
 			error: (error: HttpErrorResponse) => {
 				console.error('Error loading project:', error);
 				this.projectLanguages = [{languageCode: 'en', isDefault: true}];
-				this.selectedLanguage = 'en';
 			}
 		});
 	}

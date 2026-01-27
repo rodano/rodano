@@ -136,8 +136,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 
 					const newScopeModelsNode = {
 						...currentNode,
-						children: newChildren,
-						expanded: true
+						children: newChildren
 					};
 
 					this.treeData = [

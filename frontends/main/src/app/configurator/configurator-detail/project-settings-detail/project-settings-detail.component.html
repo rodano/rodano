@@ -5,20 +5,8 @@
 
 <div class="settings-content">
 	<div class="settings-section">
-		<div class="section-header-inline">
+		<div class="section-header">
 			<h3>Basic Information</h3>
-			@if ((project?.languages?.length ?? 0) > 1) {
-				<select (change)="onLanguageChange($event)" [value]="selectedLanguage" class="language-dropdown-inline">
-					@for (lang of project?.languages; track lang.languageCode) {
-						<option [value]="lang.languageCode">
-							{{ getLanguageName(lang.languageCode) }}
-							@if (lang.isDefault) {
-								★
-							}
-						</option>
-					}
-				</select>
-			}
 		</div>
 		<div class="settings-grid">
 			<div class="setting-item" [class.modified]="isFieldModified('code')">

@@ -18,6 +18,20 @@
 					<h1 class="project-title">{{ getTranslatedName(project?.shortname) }}</h1>
 					<span class="project-code">{{ project?.code }}</span>
 				</div>
+
+				@if ((project?.languages?.length ?? 0) > 1) {
+					<div class="global-language-switcher">
+						<mat-icon>language</mat-icon>
+						<select (change)="onLanguageChange($event)" [value]="languageService.selectedLanguage$ | async">
+							@for (lang of project?.languages; track lang.languageCode) {
+								<option [value]="lang.languageCode">
+									{{ lang.languageCode?.toUpperCase() }} @if (lang.isDefault) { ★ }
+								</option>
+							}
+						</select>
+					</div>
+				}
+
 			</div>
 			<div class="header-right">
 				@if (hasModifications) {

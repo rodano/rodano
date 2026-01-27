@@ -19,7 +19,7 @@
 .tree-content {
 	flex: 1;
 	padding: 0.5rem;
-	overflow-y: auto;
+	overflow: hidden;
 }
 
 .tree-node {
@@ -108,7 +108,6 @@
 	top: 50%;
 	height: 100vh;
 	width: 1px;
-	background-color: white;
 }
 
 .child-node:hover {

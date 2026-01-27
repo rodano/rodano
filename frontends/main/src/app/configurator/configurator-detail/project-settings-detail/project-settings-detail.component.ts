@@ -1,10 +1,12 @@
-import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltip} from '@angular/material/tooltip';
 import {ProjectSettingsDialogService} from './project-settings-dialog.service';
+import {LanguageService} from '../../language/language.service';
+import {Subscription} from 'rxjs';
 
 @Component({
 	selector: 'app-project-settings-detail',
@@ -13,7 +15,7 @@ import {ProjectSettingsDialogService} from './project-settings-dialog.service';
 	styleUrls: ['./project-settings-detail.component.css'],
 	imports: [CommonModule, MatTabsModule, MatIconModule, MatTooltip]
 })
-export class ProjectSettingsDetailComponent implements OnChanges {
+export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
@@ -21,20 +23,27 @@ export class ProjectSettingsDetailComponent implements OnChanges {
 	@Output() fieldsUpdated = new EventEmitter<Partial<ConfiguratorProject>>();
 
 	selectedLanguage = '';
+	private languageSubscription: Subscription;
 
 	constructor(
-		private dialogService: ProjectSettingsDialogService
+		private dialogService: ProjectSettingsDialogService,
+		private languageService: LanguageService
 	) {}
+
+	ngOnInit(): void {
+		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
+			this.selectedLanguage = language;
+		});
+	}
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
 			console.log('Selected node:', this.selectedNode);
 		}
+	}
 
-		if(changes['project'] && this.project?.languages) {
-			const defaultLang = this.project.languages.find(l => l.isDefault);
-			this.selectedLanguage = defaultLang?.languageCode || this.project.languages[0]?.languageCode || '';
-		}
+	ngOnDestroy(): void {
+		this.languageSubscription.unsubscribe();
 	}
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {
