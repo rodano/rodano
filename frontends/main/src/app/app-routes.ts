@@ -7,6 +7,7 @@ import {CMSLayoutResolver} from './resolvers/cms-layout-resolver';
 import {MeResolver} from './resolvers/me-resolver';
 import {EproEnabledGuard} from './guards/epro-enabled.guard';
 import {superuserGuard} from './guards/superuser.guard';
+import { UnsavedChangesGuard } from './guards/unsaved-changes.guard';
 
 export const APP_ROUTES: Routes = [
 	{
@@ -150,6 +151,7 @@ export const APP_ROUTES: Routes = [
 	{
 		path: 'configurator/projects/:projectId/edit',
 		canActivate: [AuthGuard, superuserGuard],
+		canDeactivate: [UnsavedChangesGuard],
 		loadComponent: () => import('./configurator/configurator-editor/configurator-editor.component').then(m => m.ConfiguratorEditorComponent)
 	},
 	{

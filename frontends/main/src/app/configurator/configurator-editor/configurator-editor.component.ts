@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ActivatedRoute, Router} from '@angular/router';
 import {MatIconModule} from '@angular/material/icon';
@@ -17,6 +17,7 @@ import {SnapshotsListDialogComponent} from '../snapshots/snapshots-list-dialog/s
 import {CreateSnapshotDialogComponent} from '../snapshots/create-snapshot-dialog/create-snapshot-dialog.component';
 import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
 import {ScopeModel} from '@core/model/scope-model';
+import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -34,7 +35,7 @@ import {ScopeModel} from '@core/model/scope-model';
 		MatTooltipModule
 	]
 })
-export class ConfiguratorEditorComponent implements OnInit {
+export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactivate {
 	@ViewChild(ConfiguratorTreeComponent) treeComponent!: ConfiguratorTreeComponent;
 	@ViewChild(ConfiguratorDetailComponent) detailComponent!: ConfiguratorDetailComponent;
 
@@ -64,6 +65,20 @@ export class ConfiguratorEditorComponent implements OnInit {
 		this.projectId = this.route.snapshot.paramMap.get('projectId') || '';
 		if(this.projectId) {
 			this.initializeProject();
+		}
+	}
+
+	canDeactivate(): boolean {
+		if(this.hasModifications) {
+			return confirm('You have unsaved changes. Are you sure you want to leave?');
+		}
+		return true;
+	}
+
+	@HostListener('window:beforeunload', ['$event'])
+	unloadNotification($event: any): void {
+		if(this.hasModifications) {
+			$event.returnValue = true;
 		}
 	}
 
