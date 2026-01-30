@@ -6,6 +6,7 @@ import java.util.Map;
 import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -178,7 +179,7 @@ public class DocumentationController extends AbstractSecuredController {
 		//generate filename
 		final var versionNumber = StringUtils.defaultIfBlank(study.getVersionNumber(), "").replace(" ", "_");
 		final var versionDate = StringUtils.defaultIfBlank(study.getVersionDate(), "").replace(" ", "_");
-		final var studyLabel = StringUtils.replace(study.getDefaultLocalizedShortname().toLowerCase(), " ", "_");
+		final var studyLabel = Strings.CI.replace(study.getDefaultLocalizedShortname().toLowerCase(), " ", "_");
 		//do not user the filename generator from the study because this file must contain the date of the version
 		final var filename = String.format("%s_data_structure_%s_%s.csv", studyLabel, versionNumber, versionDate);
 		return exportResponse(ExportFormat.CSV, stream, filename);

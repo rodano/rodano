@@ -34,7 +34,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.type.TypeFactory;
 
 import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.controller.AbstractSecuredController;
@@ -151,9 +150,9 @@ public class ScopeController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		final var acl = rightsService.getACL(currentActor);
 
-		final var stateType = TypeFactory.createDefaultInstance().constructMapType(Map.class, String.class, List.class);
+		final var stateType = mapper.getTypeFactory().constructMapType(Map.class, String.class, List.class);
 		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
-		final var criteriaType = TypeFactory.createDefaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
+		final var criteriaType = mapper.getTypeFactory().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
 		final var search = new ScopeSearch()
@@ -199,9 +198,9 @@ public class ScopeController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 		final var acl = rightsService.getACL(currentActor);
 
-		final var stateType = TypeFactory.createDefaultInstance().constructMapType(Map.class, String.class, List.class);
+		final var stateType = mapper.getTypeFactory().constructMapType(Map.class, String.class, List.class);
 		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
-		final var criteriaType = TypeFactory.createDefaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
+		final var criteriaType = mapper.getTypeFactory().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
 		final var predicate = new ScopeSearch()

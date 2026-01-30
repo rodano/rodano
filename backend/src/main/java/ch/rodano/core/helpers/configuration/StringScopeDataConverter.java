@@ -5,7 +5,7 @@ import java.io.Serial;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Converter;
 
-import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.core.model.scope.ScopeData;
 
@@ -13,7 +13,7 @@ public class StringScopeDataConverter implements Converter<String, ScopeData> {
 	@Serial
 	private static final long serialVersionUID = -1001806323843788265L;
 
-	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private static final JsonMapper MAPPER = new JsonMapper();
 
 	@Override
 	public ScopeData from(final String string) {

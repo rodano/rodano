@@ -1129,7 +1129,7 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	@JsonIgnore
 	public String generateFilename(final String filename) {
-		final var studyLabel = Strings.CS.replace(getDefaultLocalizedShortname().toLowerCase(), " ", "_");
+		final var studyLabel = Strings.CI.replace(getDefaultLocalizedShortname().toLowerCase(), " ", "_");
 		final var date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 		return String.format("%s_%s_%s", studyLabel, filename, date);
 	}

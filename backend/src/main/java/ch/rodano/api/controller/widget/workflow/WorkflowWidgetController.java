@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -153,7 +153,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 
 		//send response
 		final StreamingResponseBody stream = os -> workflowWidgetService.getExport(os, widget, scopes, languages);
-		final var widgetLabel = StringUtils.replace(widget.getLocalizedShortname(languages).toLowerCase(), " ", "_");
+		final var widgetLabel = Strings.CI.replace(widget.getLocalizedShortname(languages).toLowerCase(), " ", "_");
 		final var filename = study.generateFilename(widgetLabel, ExportFormat.CSV);
 		return exportResponse(ExportFormat.CSV, stream, filename);
 	}

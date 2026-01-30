@@ -6,18 +6,18 @@ import ch.rodano.configuration.model.common.Node;
 
 public class NodeCopyService {
 
-	@SuppressWarnings("unchecked")
-	public static <T extends Node> T copy(final T node, final String newId) throws SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
-		final var mapper = new JsonMapper();
+	private static final JsonMapper MAPPER = new JsonMapper();
 
+	@SuppressWarnings("unchecked")
+	public static <T extends Node> T copy(final T node, final String newId) throws NoSuchFieldException, IllegalAccessException {
 		//serialize string
-		final var src = mapper.writeValueAsString(node);
+		final var src = MAPPER.writeValueAsString(node);
 
 		//change property directly in serialized string
 		//Pattern regex = Pattern.compile(String.format("\"id\" ?: ?\"%s\"", node.getId()));
 		//String dest = regex.matcher(src).replaceFirst(String.format("\"id\":\"%s\"", newId));
 		//deserialize string
-		final var newNode = (T) mapper.readValue(src, node.getClass());
+		final var newNode = (T) MAPPER.readValue(src, node.getClass());
 
 		//change property using reflexion
 		final var field = newNode.getClass().getDeclaredField("id");

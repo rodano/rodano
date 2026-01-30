@@ -17,11 +17,11 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.test.web.servlet.client.RestTestClient;
 
+import tools.jackson.databind.json.JsonMapper;
+
 import ch.rodano.api.authentication.AuthenticationDTO;
 import ch.rodano.api.authentication.CredentialsDTO;
 import ch.rodano.core.database.initializer.DatabaseInitializer;
-
-import tools.jackson.databind.json.JsonMapper;
 
 public class ControllerTest extends DatabaseTest {
 
@@ -87,7 +87,7 @@ public class ControllerTest extends DatabaseTest {
 			.returnResult()
 			.getResponseBody();
 
-		token = Optional.of(authenticationDTO.getToken());
+		token = Optional.of(authenticationDTO.token());
 	}
 
 	/**
