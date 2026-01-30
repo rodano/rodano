@@ -1,4 +1,55 @@
+:host {
+	--tree-line-colors: black;
+	--tree-line-height: 1rem;
+}
+
+li:has(ol.submenu) {
+	position: relative;
+
+	// extend vertical line down to connect with submenu
+	&::after {
+		content: '';
+		position: absolute;
+		left: 0.7rem;
+		top: 2rem;
+		bottom: 0.9rem;
+		width: 1px;
+		background-color: var(--tree-line-colors);
+	}
+}
+ol.submenu {
+	list-style-type: none;
+	margin-left: 0.7rem;
+	padding: 0;
+
+	& li {
+		position: relative;
+		padding-left: 1rem;
+
+		//horizontal line for each item
+		&::after {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: var(--tree-line-height);
+			width: 0.6rem;
+			height: 1px;
+			background-color: var(--tree-line-colors);
+		}
+
+		//remove bottom part of vertical line for last item
+		&:last-child::before {
+			bottom: auto;
+			height: var(--tree-line-height);
+		}
+
+		& .main-content {
+			padding: 0.2rem;
+		}
+	}
+}
 .time {
+	display: block;
 	font-size: 0.7rem;
 	color: #555;
 }

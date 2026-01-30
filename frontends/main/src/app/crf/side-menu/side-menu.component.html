@@ -92,9 +92,9 @@
 							[class.disabled]="eventPk === event.pk">
 							<mat-icon>
 								@if (expandedEventPks.includes(event.pk)) {
-									expand_circle_down
+									arrow_drop_down
 								} @else {
-									expand_circle_right
+									arrow_right
 								}
 							</mat-icon>
 						</a>
@@ -119,7 +119,6 @@
 									</mat-icon>
 								}
 							</span>
-							<br />
 							<span class="time">
 								@if (event.date) {
 									{{ event.date | dateUTC }}

@@ -313,7 +313,7 @@ nav.side-navigation {
 	flex-direction: column;
 	box-sizing: border-box;
 	border-right: 1px solid var(--mat-sys-primary);
-	h2 {
+	& > h2 {
 		padding: 0.5rem;
 		font-size: 1.5rem;
 		font-weight: normal;
@@ -327,20 +327,15 @@ nav.side-navigation {
 			color: inherit;
 		}
 	}
-	ol {
+	& > ol {
+		flex-grow: 1;
+		overflow: auto;
 		list-style-type: none;
 		margin: 0;
 		padding: 0;
-		flex-grow: 1;
-		overflow: auto;
 		box-sizing: border-box;
-		&.submenu {
-			& .main-content {
-				padding: 0.1rem;
-				padding-left: 2.5rem;
-			}
-		}
 	}
+
 	li {
 		&.starting-block {
 			border-top: 1px solid var(--light-border-color);
@@ -378,6 +373,7 @@ nav.side-navigation {
 			padding: 0.1rem 0.7rem;
 		}
 	}
+
 	footer {
 		text-align: right;
 		padding: 0.8rem 1rem;
