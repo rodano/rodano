@@ -99,11 +99,20 @@ export class SideMenuComponent implements OnInit {
 		//that's because rules may change workflow states on any other workflowable
 		//it may also add/remove forms and events
 		this.crfChangeService.updatedWorkflowable$.pipe(
+			switchMap(typedWorkflowable => {
+				//if the workflowable is a scope, use it as-is
+				if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {
+					return of(typedWorkflowable.workflowable as Scope);
+				}
+				//if not, refetch it to get the latest status
+				return this.scopeService.get(this.scope.pk);
+			}),
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(typedWorkflowable => {
-			if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {
-				this.scope = typedWorkflowable.workflowable as Scope;
-			}
+		).subscribe(scope => {
+			//clean-up event forms cache
+			this.eventsForms = {};
+			//setting the scope will trigger a menu refresh through the scope observable
+			this.scope = scope;
 		});
 
 		combineLatest([

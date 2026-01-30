@@ -5,10 +5,8 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {TypedWorkflowable} from './typed-workflowable';
 
 /**
- * Service used to monitor changes in the CRF
- * It emits 2 kinds of events:
- * - when a workflowable has been updated, and the updated object can be provided
- * - when a workflowable has been modified, and may need to be refreshed
+ * Service used to monitor entities changes in the CRF
+ * It allows to emit an event when a CRF (scope/event/form/workflow status) is updated
  */
 @Injectable({
 	providedIn: 'root'
