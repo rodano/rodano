@@ -9,7 +9,7 @@ import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {ConfiguratorProject} from '@core/model/configurator-project';
-import {ConfiguratorService} from '@core/services/configurator.service';
+import {ConfiguratorService} from '../services/configurator.service';
 import {Router} from '@angular/router';
 import {CreateProjectDialogComponent} from '../create-project-dialog/create-project-dialog.component';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';

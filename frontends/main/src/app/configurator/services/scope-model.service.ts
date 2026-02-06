@@ -6,7 +6,7 @@ import {Observable} from 'rxjs';
 @Injectable({
 	providedIn: 'root'
 })
-export class ConfiguratorConfigService {
+export class ScopeModelService {
 	constructor(private http: HttpClient) {}
 
 	getScopeModels(projectId: string): Observable<ScopeModel[]> {

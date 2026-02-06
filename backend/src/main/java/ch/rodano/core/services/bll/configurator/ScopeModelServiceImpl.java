@@ -8,15 +8,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.config.ScopeModelDTO;
 import ch.rodano.api.exception.http.NotFoundException;
-import ch.rodano.core.services.dao.configurator.ConfiguratorConfigDAOService;
+import ch.rodano.core.services.dao.configurator.ScopeModelDAOService;
 
 @Service
 @Transactional
-public class ConfiguratorConfigServiceImpl implements ConfiguratorConfigService {
+public class ScopeModelServiceImpl implements ScopeModelService {
 
-	private final ConfiguratorConfigDAOService configuratorConfigDAOService;
+	private final ScopeModelDAOService configuratorConfigDAOService;
 
-	public ConfiguratorConfigServiceImpl(final ConfiguratorConfigDAOService configuratorConfigDAOService) {
+	public ScopeModelServiceImpl(final ScopeModelDAOService configuratorConfigDAOService) {
 		this.configuratorConfigDAOService = configuratorConfigDAOService;
 	}
 

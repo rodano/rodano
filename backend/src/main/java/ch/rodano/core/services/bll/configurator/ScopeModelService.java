@@ -1,11 +1,11 @@
-package ch.rodano.core.services.dao.configurator;
+package ch.rodano.core.services.bll.configurator;
 
 import java.util.List;
 import java.util.UUID;
 
 import ch.rodano.api.config.ScopeModelDTO;
 
-public interface ConfiguratorConfigDAOService {
+public interface ScopeModelService {
 
 	List<ScopeModelDTO> getScopeModels(UUID projectId);
 

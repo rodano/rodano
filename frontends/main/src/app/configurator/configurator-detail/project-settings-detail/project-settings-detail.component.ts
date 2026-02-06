@@ -5,7 +5,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltip} from '@angular/material/tooltip';
 import {ProjectSettingsDialogService} from './project-settings-dialog.service';
-import {LanguageService} from '../../language/language.service';
+import {LanguageService} from '../../services/language.service';
 import {Subscription} from 'rxjs';
 
 @Component({

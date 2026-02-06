@@ -1,4 +1,4 @@
-package ch.rodano.api.config;
+package ch.rodano.api.configurator.controller;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,11 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.rodano.api.configurator.ConfigSnapshotDTO;
-import ch.rodano.api.configurator.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.CreateProjectRequest;
-import ch.rodano.api.configurator.ProjectConfigVersionDTO;
-import ch.rodano.api.configurator.UpdateProjectRequest;
+import ch.rodano.api.configurator.dto.ConfigSnapshotDTO;
+import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
+import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.request.UpdateProjectRequest;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.ConfiguratorService;
 

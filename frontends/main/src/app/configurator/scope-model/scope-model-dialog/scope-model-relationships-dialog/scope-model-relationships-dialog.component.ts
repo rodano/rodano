@@ -7,7 +7,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
-import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
+import {ScopeModelService} from '../../../services/scope-model.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MatIconModule} from '@angular/material/icon';
@@ -42,7 +42,7 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ScopeModelRelationshipsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
-		private configuratorConfigService: ConfiguratorConfigService,
+		private configuratorConfigService: ScopeModelService,
 		private snackBar: MatSnackBar
 	) {
 		this.form = this.fb.group({

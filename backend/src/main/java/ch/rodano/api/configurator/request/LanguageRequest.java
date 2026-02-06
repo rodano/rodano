@@ -1,4 +1,4 @@
-package ch.rodano.api.configurator;
+package ch.rodano.api.configurator.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

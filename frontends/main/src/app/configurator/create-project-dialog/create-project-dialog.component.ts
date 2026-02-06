@@ -5,7 +5,7 @@ import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {ConfiguratorService} from '@core/services/configurator.service';
+import {ConfiguratorService} from '../services/configurator.service';
 import {CreateProjectRequest} from '@core/model/create-project-request';
 import {MatTabsModule} from '@angular/material/tabs';
 import ISO6391 from 'iso-639-1';

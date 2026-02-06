@@ -5,7 +5,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
-import {ConfiguratorService} from '@core/services/configurator.service';
+import {ConfiguratorService} from '../services/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {ProjectConfigVersion} from '@core/model/project-config-version';
 import {ConfiguratorDetailComponent} from '../configurator-detail/configurator-detail.component';
@@ -15,10 +15,10 @@ import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
 import {SnapshotsListDialogComponent} from '../snapshots/snapshots-list-dialog/snapshots-list-dialog.component';
 import {CreateSnapshotDialogComponent} from '../snapshots/create-snapshot-dialog/create-snapshot-dialog.component';
-import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
+import {ScopeModelService} from '../services/scope-model.service';
 import {ScopeModel} from '@core/model/scope-model';
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
-import {LanguageService} from '../language/language.service';
+import {LanguageService} from '../services/language.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -57,7 +57,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private route: ActivatedRoute,
 		private router: Router,
 		private configuratorService: ConfiguratorService,
-		private configuratorConfigService: ConfiguratorConfigService,
+		private scopeModelService: ScopeModelService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -409,7 +409,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				const original = scopeModelsComponent.originalScopeModels.find((sm: ScopeModel) => sm.scopeModelId === originalId);
 				if(original) {
 					savePromises.push(
-						this.configuratorConfigService.deleteScopeModel(this.projectId, originalId).toPromise()
+						this.scopeModelService.deleteScopeModel(this.projectId, originalId).toPromise()
 					);
 				}
 			}
@@ -417,7 +417,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				const scopeModel = scopeModelsComponent.scopeModels.find((sm: ScopeModel) => sm.scopeModelId === id);
 				if(scopeModel) {
 					savePromises.push(
-						this.configuratorConfigService.createScopeModel(this.projectId, scopeModel).toPromise()
+						this.scopeModelService.createScopeModel(this.projectId, scopeModel).toPromise()
 					);
 				}
 			}
@@ -425,7 +425,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				const scopeModel = scopeModelsComponent.scopeModels.find((sm: ScopeModel) => sm.scopeModelId === id);
 				if(scopeModel) {
 					savePromises.push(
-						this.configuratorConfigService.updateScopeModel(this.projectId, id, scopeModel).toPromise()
+						this.scopeModelService.updateScopeModel(this.projectId, id, scopeModel).toPromise()
 					);
 				}
 			}

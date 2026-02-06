@@ -1,8 +1,8 @@
-import {Component, Input, Output, EventEmitter, OnInit, OnChanges, ChangeDetectorRef } from '@angular/core';
+import {Component, Input, Output, EventEmitter, OnInit, OnChanges, ChangeDetectorRef} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
-import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
+import {ScopeModelService} from '../services/scope-model.service';
 
 interface TreeNode {
 	id: string;
@@ -100,7 +100,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	];
 
 	constructor(
-		private configuratorConfigService: ConfiguratorConfigService,
+		private scopeModelService: ScopeModelService,
 		private changeDetectorRef: ChangeDetectorRef
 	) {}
 
@@ -126,7 +126,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	}
 
 	private loadScopeModels(): void {
-		this.configuratorConfigService.getScopeModels(this.projectId).subscribe({
+		this.scopeModelService.getScopeModels(this.projectId).subscribe({
 			next: scopeModels => {
 				const scopeModelsIndex = this.treeData.findIndex(node => node.id === 'scope-models');
 

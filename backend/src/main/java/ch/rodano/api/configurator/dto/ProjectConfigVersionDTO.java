@@ -1,4 +1,4 @@
-package ch.rodano.api.configurator;
+package ch.rodano.api.configurator.dto;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;

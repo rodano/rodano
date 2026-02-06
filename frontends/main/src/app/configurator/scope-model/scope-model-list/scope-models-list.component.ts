@@ -4,14 +4,14 @@ import {MatTableModule} from '@angular/material/table';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModel} from '@core/model/scope-model';
-import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
+import {ScopeModelService} from '../../services/scope-model.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {ScopeModelBasicInfoDialogComponent} from '../scope-model-dialog/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
-import {ConfiguratorService} from '@core/services/configurator.service';
+import {ConfiguratorService} from '../../services/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {
@@ -24,7 +24,7 @@ import {
 	ScopeModelResourcesDialogComponent
 } from '../scope-model-dialog/scope-model-resources-dialog/scope-model-resources-dialog.component';
 import {Subscription} from 'rxjs';
-import {LanguageService} from '../../language/language.service';
+import {LanguageService} from '../../services/language.service';
 
 @Component({
 	selector: 'app-scope-models-list',
@@ -58,7 +58,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedScopeModel: ScopeModel | null = null;
 
 	constructor(
-		private configuratorConfigService: ConfiguratorConfigService,
+		private scopeModelService: ScopeModelService,
 		private configuratorService: ConfiguratorService,
 		private languageService: LanguageService,
 		private dialog: MatDialog,
@@ -108,7 +108,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	loadScopeModels(): void {
 		this.loading = true;
-		this.configuratorConfigService.getScopeModels(this.projectId).subscribe({
+		this.scopeModelService.getScopeModels(this.projectId).subscribe({
 			next: (scopeModels: ScopeModel[]) => {
 				this.originalScopeModels = JSON.parse(JSON.stringify(scopeModels));
 				this.scopeModels = JSON.parse(JSON.stringify(scopeModels));
@@ -159,7 +159,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result: ScopeModel | null) => {
 			if(result) {
-				this.configuratorConfigService.createScopeModel(this.projectId, result).subscribe({
+				this.scopeModelService.createScopeModel(this.projectId, result).subscribe({
 					next: () => {
 						this.snackBar.open('Scope model created', 'Close', {duration: 2000});
 						this.loadScopeModels();
@@ -365,7 +365,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 				};
 
 				updatePromises.push(
-					this.configuratorConfigService.updateScopeModel(
+					this.scopeModelService.updateScopeModel(
 						this.projectId,
 						child.scopeModelId,
 						updatedChild
@@ -389,7 +389,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 				};
 
 				updatePromises.push(
-					this.configuratorConfigService.updateScopeModel(
+					this.scopeModelService.updateScopeModel(
 						this.projectId,
 						child.scopeModelId,
 						updatedChild
@@ -409,7 +409,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private performDelete(scopeModel: ScopeModel): void {
-		this.configuratorConfigService.deleteScopeModel(this.projectId, scopeModel.scopeModelId).subscribe({
+		this.scopeModelService.deleteScopeModel(this.projectId, scopeModel.scopeModelId).subscribe({
 			next: () => {
 				this.snackBar.open('Scope model deleted', 'Close', {duration: 2000});
 

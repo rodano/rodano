@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import ch.rodano.api.configurator.ConfigSnapshotDTO;
-import ch.rodano.api.configurator.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.CreateProjectRequest;
-import ch.rodano.api.configurator.ProjectConfigVersionDTO;
-import ch.rodano.api.configurator.UpdateProjectRequest;
+import ch.rodano.api.configurator.dto.ConfigSnapshotDTO;
+import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
+import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.request.UpdateProjectRequest;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.model.jooq.enums.ProjectConfigVersionStatus;
 import ch.rodano.core.model.jooq.enums.ProjectStatus;

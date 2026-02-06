@@ -3,11 +3,11 @@ package ch.rodano.core.services.bll.configurator;
 import java.util.List;
 import java.util.UUID;
 
-import ch.rodano.api.configurator.ConfigSnapshotDTO;
-import ch.rodano.api.configurator.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.CreateProjectRequest;
-import ch.rodano.api.configurator.ProjectConfigVersionDTO;
-import ch.rodano.api.configurator.UpdateProjectRequest;
+import ch.rodano.api.configurator.dto.ConfigSnapshotDTO;
+import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
+import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.request.UpdateProjectRequest;
 
 public interface ConfiguratorService {
 

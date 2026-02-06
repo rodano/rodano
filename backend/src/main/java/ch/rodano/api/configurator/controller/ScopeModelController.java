@@ -1,4 +1,4 @@
-package ch.rodano.api.config;
+package ch.rodano.api.configurator.controller;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,17 +14,18 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.api.config.ScopeModelDTO;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
-import ch.rodano.core.services.bll.configurator.ConfiguratorConfigService;
+import ch.rodano.core.services.bll.configurator.ScopeModelService;
 
 @RestController
 @RequestMapping("/superuser/configurator/projects/{projectId}/config")
 @PreAuthorize("@userSecurityService.isSuperuser()")
-public class ConfiguratorConfigController {
+public class ScopeModelController {
 
-	private final ConfiguratorConfigService configuratorConfigService;
+	private final ScopeModelService configuratorConfigService;
 
-	public ConfiguratorConfigController(final ConfiguratorConfigService configuratorConfigService) {
+	public ScopeModelController(final ScopeModelService configuratorConfigService) {
 		this.configuratorConfigService = configuratorConfigService;
 	}
 

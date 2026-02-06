@@ -1,4 +1,4 @@
-package ch.rodano.api.configurator;
+package ch.rodano.api.configurator.request;
 
 import java.util.List;
 import java.util.Map;

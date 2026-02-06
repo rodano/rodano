@@ -9,7 +9,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatInputModule} from '@angular/material/input';
-import {ConfiguratorConfigService} from '@core/services/configurator-config.service';
+import {ScopeModelService} from '../../../services/scope-model.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
@@ -50,7 +50,7 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ScopeModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
-		private configuratorConfigService: ConfiguratorConfigService,
+		private configuratorConfigService: ScopeModelService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.scopeModel;

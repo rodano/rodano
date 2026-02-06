@@ -22,12 +22,12 @@ import static ch.rodano.core.model.jooq.tables.ScopeModelParent.SCOPE_MODEL_PARE
 import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.SCOPE_MODEL_WORKFLOW;
 
 @Repository
-public class ConfiguratorConfigDAOServiceImpl implements ConfiguratorConfigDAOService {
+public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 
 	private final DSLContext dslContext;
 	private final ObjectMapper objectMapper;
 
-	public ConfiguratorConfigDAOServiceImpl(final DSLContext dslContext, final ObjectMapper objectMapper) {
+	public ScopeModelDAOServiceImpl(final DSLContext dslContext, final ObjectMapper objectMapper) {
 		this.dslContext = dslContext;
 		this.objectMapper = objectMapper;
 	}
