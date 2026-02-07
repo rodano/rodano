@@ -19,6 +19,10 @@ import {ScopeModelService} from '../services/scope-model.service';
 import {ScopeModel} from '@core/model/scope-model';
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
+import {EventModel} from '@core/model/event-model';
+import {EventModelService} from '../services/event-model.service';
+import {EventGroupService} from '../services/event-group.service';
+import {EventGroup} from '@core/model/event-group';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -50,6 +54,12 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	modifiedFields = new Set<string>();
 	scopeModelModificationCount = 0;
 
+	eventModels: any[] = [];
+	eventGroups: any[] = [];
+	selectedScopeModelId: string | null = null;
+	selectedEventModelId: string | null = null;
+	selectedEventGroupId: string | null = null;
+
 	canRollback = false;
 	canRollForward = false;
 
@@ -58,6 +68,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private router: Router,
 		private configuratorService: ConfiguratorService,
 		private scopeModelService: ScopeModelService,
+		private eventModelService: EventModelService,
+		private eventGroupService: EventGroupService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -148,6 +160,25 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
+
+		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+		if(!scopeModelsComponent) {
+			return;
+		}
+
+		if(nodeId?.startsWith('scope-model-')) {
+			const scopeModelId = nodeId.replace('scope-model-', '');
+			const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
+
+			if(scopeModel && scopeModelsComponent.selectedScopeModel?.scopeModelId !== scopeModelId) {
+				scopeModelsComponent.onSelectScopeModel(scopeModel);
+			}
+			else if(scopeModel) {
+				scopeModelsComponent.viewMode = 'scope-detail';
+				scopeModelsComponent.selectedEventModelId = null;
+				scopeModelsComponent.selectedEventGroupId = null;
+			}
+		}
 	}
 
 	onScopeModelsChanged(event: {modificationCount: number}): void {
@@ -193,7 +224,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.modifiedFields.clear();
 
 				if(this.scopeModelModificationCount > 0) {
-					this.saveScopeModels();
+					this.saveScopeModelsAndEventModels();
 				}
 				else {
 					this.saving = false;
@@ -228,11 +259,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
 				if(scopeModelsComponent) {
-					scopeModelsComponent.loadScopeModels();
-					scopeModelsComponent.modifiedScopeModelIds.clear();
-				}
-				this.scopeModelModificationCount = 0;
+					scopeModelsComponent.scopeModelManager.resetToOriginals();
+					scopeModelsComponent.eventModelManager.resetToOriginals();
+					scopeModelsComponent.eventGroupManager.resetToOriginals();
 
+					scopeModelsComponent.loadScopeModels();
+
+					if(scopeModelsComponent.selectedScopeModel) {
+						this.eventModelService.getEventModels(this.projectId).subscribe({
+							next: allEventModels => {
+								scopeModelsComponent.eventModelManager.setAll(allEventModels);
+								scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
+							}
+						});
+					}
+				}
+
+				this.scopeModelModificationCount = 0;
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
 			}
 		});
@@ -392,7 +435,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
-	private saveScopeModels(): void {
+	private saveScopeModelsAndEventModels(): void {
 		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
 
 		if(!scopeModelsComponent) {
@@ -431,9 +474,40 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			}
 		});
 
+		scopeModelsComponent.modifiedEventModelIds.forEach((id: string) => {
+			const eventModel = scopeModelsComponent.eventModels.find((em: EventModel) => em.eventModelId === id);
+			if(eventModel) {
+				savePromises.push(
+					this.eventModelService.updateEventModel(this.projectId, id, eventModel).toPromise()
+				);
+			}
+		});
+
+		scopeModelsComponent.modifiedEventGroupIds.forEach((id: string) => {
+			const eventGroup = scopeModelsComponent.eventGroups.find((eg: EventGroup) => eg.eventGroupId === id);
+			if(eventGroup) {
+				savePromises.push(
+					this.eventGroupService.updateEventGroup(this.projectId, id, eventGroup).toPromise()
+				);
+			}
+		});
+
 		Promise.all(savePromises).then(() => {
-			scopeModelsComponent.modifiedScopeModelIds.clear();
+			scopeModelsComponent.scopeModelManager.syncOriginalsWithCurrent();
+			scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
+			scopeModelsComponent.eventGroupManager.syncOriginalsWithCurrent();
+
 			scopeModelsComponent.loadScopeModels();
+
+			if(scopeModelsComponent.selectedScopeModel) {
+				this.eventModelService.getEventModels(this.projectId).subscribe({
+					next: allEventModels => {
+						scopeModelsComponent.eventModelManager.setAll(allEventModels);
+						scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
+					}
+				});
+			}
+
 			this.scopeModelModificationCount = 0;
 
 			if(this.treeComponent) {
@@ -443,10 +517,69 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.saving = false;
 			this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 		}).catch((error: any) => {
-			console.error('Error saving scope models:', error);
-			console.error('Error details:', error.error);
-			this.snackBar.open('Failed to save scope models', 'Close', {duration: 3000});
+			console.error('Error saving:', error);
+			this.snackBar.open('Failed to save changes', 'Close', {duration: 3000});
 			this.saving = false;
 		});
+	}
+
+	onEventModelSelectedFromTree(eventModelId: string): void {
+		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+		if(!scopeModelsComponent) {
+			return;
+		}
+
+		const eventModel = scopeModelsComponent.eventModels.find(em => em.eventModelId === eventModelId);
+		if(!eventModel) {
+			return;
+		}
+
+		const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === eventModel.scopeModelId);
+		if(scopeModel && scopeModelsComponent.selectedScopeModel?.scopeModelId !== scopeModel.scopeModelId) {
+			scopeModelsComponent.onSelectScopeModel(scopeModel);
+			setTimeout(() => {
+				scopeModelsComponent.onSelectEventModel(eventModelId);
+			}, 100);
+		}
+		else {
+			scopeModelsComponent.onSelectEventModel(eventModelId);
+		}
+	}
+
+	onEventGroupSelectedFromTree(eventGroupId: string): void {
+		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+		if(!scopeModelsComponent) {
+			return;
+		}
+
+		const eventGroup = scopeModelsComponent.eventGroups.find(eg => eg.eventGroupId === eventGroupId);
+		if(!eventGroup) {
+			return;
+		}
+
+		const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === eventGroup.scopeModelId);
+		if(scopeModel && scopeModelsComponent.selectedScopeModel?.scopeModelId !== scopeModel.scopeModelId) {
+			scopeModelsComponent.onSelectScopeModel(scopeModel);
+			setTimeout(() => {
+				scopeModelsComponent.onSelectEventGroup(eventGroupId);
+			}, 100);
+		}
+		else {
+			scopeModelsComponent.onSelectEventGroup(eventGroupId);
+		}
+	}
+
+	onScopeModelContextChanged(context: {
+		eventModels: any[];
+		eventGroups: any[];
+		selectedScopeModelId: string | null;
+		selectedEventModelId: string | null;
+		selectedEventGroupId: string | null;
+	}): void {
+		this.eventModels = context.eventModels;
+		this.eventGroups = context.eventGroups;
+		this.selectedScopeModelId = context.selectedScopeModelId;
+		this.selectedEventModelId = context.selectedEventModelId;
+		this.selectedEventGroupId = context.selectedEventGroupId;
 	}
 }

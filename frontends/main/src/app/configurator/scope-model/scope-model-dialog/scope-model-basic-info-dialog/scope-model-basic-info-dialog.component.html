@@ -129,6 +129,19 @@
 				<mat-checkbox formControlName="virtual">Virtual Scope Model</mat-checkbox>
 				<span class="hint">Virtual scope models exist only logically</span>
 			</div>
+
+			<div class="form-field">
+				<label>Maximum Number</label>
+				<input
+					type="number"
+					formControlName="maxNumber"
+					placeholder="e.g., 100"
+					min="0">
+				<span class="hint">Optional maximum number of instances for this scope model</span>
+				@if (form.get('maxNumber')?.hasError('min') && form.get('maxNumber')?.touched) {
+					<span class="error-message">Maximum number must be 0 or greater</span>
+				}
+			</div>
 		</form>
 	</div>
 

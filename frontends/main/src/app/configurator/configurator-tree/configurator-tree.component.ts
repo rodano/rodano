@@ -11,6 +11,10 @@ interface TreeNode {
 	children?: TreeNode[];
 	expanded?: boolean;
 	fixed?: boolean;
+	type?: 'scope-model' | 'event-model' | 'event-group' | 'category';
+	scopeModelId?: string;
+	eventModelId?: string;
+	eventGroupId?: string;
 }
 
 @Component({
@@ -24,7 +28,13 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
+	@Input() eventModels: any[] = [];
+	@Input() eventGroups: any[] = [];
+	@Input() selectedScopeModelId: string | null = null;
+	@Input() selectedEventModelId: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string>();
+	@Output() eventModelSelected = new EventEmitter<string>();
+	@Output() eventGroupSelected = new EventEmitter<string>();
 
 	loading = true;
 	scopeModels: any[] = [];
@@ -112,6 +122,10 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 		if(changes['selectedNode'] && this.selectedNode) {
 			this.expandParentsOfNode(this.selectedNode, this.treeData);
 		}
+
+		if(changes['eventModels'] || changes['eventGroups'] || changes['selectedScopeModelId']) {
+			this.rebuildScopeModelsWithEvents();
+		}
 	}
 
 	loadConfiguration(): void {
@@ -128,6 +142,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	private loadScopeModels(): void {
 		this.scopeModelService.getScopeModels(this.projectId).subscribe({
 			next: scopeModels => {
+				this.scopeModels = scopeModels;
 				const scopeModelsIndex = this.treeData.findIndex(node => node.id === 'scope-models');
 
 				if(scopeModelsIndex !== -1) {
@@ -191,13 +206,54 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 			id: `scope-model-${scopeModel.scopeModelId}`,
 			label: scopeModel.shortname['en'] || scopeModel.shortname['de'] || scopeModel.id,
 			icon: icon,
-			expanded: true
+			expanded: true,
+			type: 'scope-model',
+			scopeModelId: scopeModel.scopeModelId
 		};
 
-		if(children.length > 0) {
-			node.children = children.map(child =>
-				this.buildScopeModelNodeRecursive(child, allScopeModels)
-			);
+		const childScopeNodes = children.map(child =>
+			this.buildScopeModelNodeRecursive(child, allScopeModels)
+		);
+
+		if(this.selectedScopeModelId === scopeModel.scopeModelId) {
+			const eventNodes: TreeNode[] = [];
+
+			if(this.eventGroups && this.eventGroups.length > 0) {
+				this.eventGroups
+					.filter(eg => eg.scopeModelId === scopeModel.scopeModelId)
+					.forEach(eventGroup => {
+						eventNodes.push({
+							id: `event-group-${eventGroup.eventGroupId}`,
+							label: eventGroup.shortname['en'] || eventGroup.shortname['de'] || eventGroup.id,
+							icon: 'group',
+							type: 'event-group',
+							scopeModelId: scopeModel.scopeModelId,
+							eventGroupId: eventGroup.eventGroupId
+						});
+					});
+			}
+
+			if(this.eventModels && this.eventModels.length > 0) {
+				this.eventModels
+					.filter(em => em.scopeModelId === scopeModel.scopeModelId)
+					.forEach(eventModel => {
+						eventNodes.push({
+							id: `event-model-${eventModel.eventModelId}`,
+							label: eventModel.shortname['en'] || eventModel.shortname['de'] || eventModel.id,
+							icon: 'event',
+							type: 'event-model',
+							scopeModelId: scopeModel.scopeModelId,
+							eventModelId: eventModel.eventModelId
+						});
+					});
+			}
+
+			node.children = [...childScopeNodes, ...eventNodes];
+		}
+		else {
+			if(childScopeNodes.length > 0) {
+				node.children = childScopeNodes;
+			}
 		}
 
 		return node;
@@ -224,6 +280,20 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 			event.stopPropagation();
 		}
 
+		if(node.type === 'event-group') {
+			const eventGroupId = node.id.replace('event-group-', '');
+			this.eventGroupSelected.emit(eventGroupId);
+			this.nodeSelected.emit(node.id);
+			return;
+		}
+
+		if(node.type === 'event-model') {
+			const eventModelId = node.id.replace('event-model-', '');
+			this.eventModelSelected.emit(eventModelId);
+			this.nodeSelected.emit(node.id);
+			return;
+		}
+
 		const isTopLevel = this.treeData.includes(node);
 
 		if(isTopLevel) {
@@ -239,5 +309,37 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 		}
 
 		this.nodeSelected.emit(node.id);
+	}
+
+	private rebuildScopeModelsWithEvents(): void {
+		const scopeModelsIndex = this.treeData.findIndex(node => node.id === 'scope-models');
+
+		if(scopeModelsIndex !== -1 && this.scopeModels.length > 0) {
+			const currentNode = this.treeData[scopeModelsIndex];
+			const newChildren = this.buildScopeModelTree(this.scopeModels);
+
+			const newScopeModelsNode = {
+				...currentNode,
+				children: newChildren
+			};
+
+			this.treeData = [
+				...this.treeData.slice(0, scopeModelsIndex),
+				newScopeModelsNode,
+				...this.treeData.slice(scopeModelsIndex + 1)
+			];
+
+			this.changeDetectorRef.detectChanges();
+		}
+	}
+
+	isNodeSelected(node: TreeNode): boolean {
+		if(node.type === 'event-model') {
+			return this.selectedNode === node.id;
+		}
+		if(node.type === 'event-group') {
+			return this.selectedNode === node.id;
+		}
+		return this.selectedNode === node.id;
 	}
 }

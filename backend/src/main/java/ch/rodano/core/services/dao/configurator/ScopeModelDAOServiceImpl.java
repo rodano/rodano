@@ -1,5 +1,6 @@
 package ch.rodano.core.services.dao.configurator;
 
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -10,11 +11,14 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
+import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.config.ScopeModelDTO;
+import ch.rodano.configuration.model.event.DateAggregationFunction;
+import ch.rodano.core.model.jooq.tables.records.EventModelRecord;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelRecord;
 
+import static ch.rodano.core.model.jooq.tables.EventModel.EVENT_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModel.SCOPE_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.SCOPE_MODEL_DATASET_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
@@ -25,11 +29,11 @@ import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.SCOPE_MODEL_WO
 public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 
 	private final DSLContext dslContext;
-	private final ObjectMapper objectMapper;
+	private final JsonMapperService jsonMapperService;
 
-	public ScopeModelDAOServiceImpl(final DSLContext dslContext, final ObjectMapper objectMapper) {
+	public ScopeModelDAOServiceImpl(final DSLContext dslContext, final JsonMapperService jsonMapperService) {
 		this.dslContext = dslContext;
-		this.objectMapper = objectMapper;
+		this.jsonMapperService = jsonMapperService;
 	}
 
 	@Override
@@ -68,13 +72,16 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.set(SCOPE_MODEL.SCOPE_MODEL_ID, scopeModelId)
 			.set(SCOPE_MODEL.PROJECT_ID, projectId)
 			.set(SCOPE_MODEL.CODE, scopeModel.getId())
-			.set(SCOPE_MODEL.SHORTNAME, toJson(scopeModel.getShortname()))
-			.set(SCOPE_MODEL.LONGNAME, toJson(scopeModel.getLongname()))
-			.set(SCOPE_MODEL.DESCRIPTION, toJson(scopeModel.getDescription()))
-			.set(SCOPE_MODEL.PLURAL_SHORTNAME, toJson(scopeModel.getPluralShortname()))
+			.set(SCOPE_MODEL.SHORTNAME, jsonMapperService.toJson(scopeModel.getShortname()))
+			.set(SCOPE_MODEL.LONGNAME, jsonMapperService.toJson(scopeModel.getLongname()))
+			.set(SCOPE_MODEL.DESCRIPTION, jsonMapperService.toJson(scopeModel.getDescription()))
+			.set(SCOPE_MODEL.PLURAL_SHORTNAME, jsonMapperService.toJson(scopeModel.getPluralShortname()))
 			.set(SCOPE_MODEL.VIRTUAL, scopeModel.isVirtual())
 			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, scopeModel.getDefaultParentId())
 			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, scopeModel.getDefaultProfileId())
+			.set(SCOPE_MODEL.MAX_NUMBER, scopeModel.getMaxNumber())
+			.set(SCOPE_MODEL.SCOPE_FORMAT, scopeModel.getScopeFormat())
+			.set(SCOPE_MODEL.LAYOUT, scopeModel.getLayout())
 			.execute();
 
 		insertParents(projectId, scopeModelId, scopeModel.getParentIds(), scopeModel.getDefaultParentId());
@@ -89,13 +96,16 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 	public ScopeModelDTO updateScopeModel(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO scopeModel) {
 		dslContext.update(SCOPE_MODEL)
 			.set(SCOPE_MODEL.CODE, scopeModel.getId())
-			.set(SCOPE_MODEL.SHORTNAME, toJson(scopeModel.getShortname()))
-			.set(SCOPE_MODEL.LONGNAME, toJson(scopeModel.getLongname()))
-			.set(SCOPE_MODEL.DESCRIPTION, toJson(scopeModel.getDescription()))
-			.set(SCOPE_MODEL.PLURAL_SHORTNAME, toJson(scopeModel.getPluralShortname()))
+			.set(SCOPE_MODEL.SHORTNAME, jsonMapperService.toJson(scopeModel.getShortname()))
+			.set(SCOPE_MODEL.LONGNAME, jsonMapperService.toJson(scopeModel.getLongname()))
+			.set(SCOPE_MODEL.DESCRIPTION, jsonMapperService.toJson(scopeModel.getDescription()))
+			.set(SCOPE_MODEL.PLURAL_SHORTNAME, jsonMapperService.toJson(scopeModel.getPluralShortname()))
 			.set(SCOPE_MODEL.VIRTUAL, scopeModel.isVirtual())
 			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, scopeModel.getDefaultParentId())
 			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, scopeModel.getDefaultProfileId())
+			.set(SCOPE_MODEL.MAX_NUMBER, scopeModel.getMaxNumber())
+			.set(SCOPE_MODEL.SCOPE_FORMAT, scopeModel.getScopeFormat())
+			.set(SCOPE_MODEL.LAYOUT, scopeModel.getLayout())
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
 			.and(SCOPE_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
 			.execute();
@@ -210,13 +220,16 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var dto = new ScopeModelDTO();
 		dto.setScopeModelId(record.getScopeModelId());
 		dto.setId(record.getCode());
-		dto.setShortname(fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setLongname(fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setDescription(fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setPluralShortname(fromJson(record.getPluralShortname(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setPluralShortname(jsonMapperService.fromJson(record.getPluralShortname(), new TypeReference<TreeMap<String, String>>() {}));
 		dto.setVirtual(record.getVirtual());
 		dto.setDefaultParentId(record.getDefaultParentId());
 		dto.setDefaultProfileId(record.getDefaultProfileId());
+		dto.setMaxNumber(record.getMaxNumber());
+		dto.setScopeFormat(record.getScopeFormat());
+		dto.setLayout(record.getLayout());
 
 		final var parentIds = loadParentIds(projectId, record.getScopeModelId());
 		dto.setParentIds(parentIds);
@@ -236,9 +249,11 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		dto.setRoot(parentIds.isEmpty());
 		dto.setLeaf(childIds.isEmpty());
 
-		// TODO: Load event groups and event models if needed
+		final var eventModels = loadEventModels(projectId, record.getScopeModelId());
+		dto.setEventModels(eventModels);
+
+		// TODO: Load event groups if needed
 		dto.setEventGroups(new ArrayList<>());
-		dto.setEventModels(new ArrayList<>());
 
 		return dto;
 	}
@@ -284,27 +299,42 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.fetch(SCOPE_MODEL_WORKFLOW.WORKFLOW_ID);
 	}
 
-	private String toJson(final Object obj) {
-		if(obj == null) {
-			return null;
-		}
-		try {
-			return objectMapper.writeValueAsString(obj);
-		}
-		catch(Exception e) {
-			throw new RuntimeException("Failed to serialize to JSON", e);
-		}
+	private List<EventModelDTO> loadEventModels(final UUID projectId, final UUID scopeModelId) {
+		final var eventModelRecords = dslContext.selectFrom(EVENT_MODEL)
+			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
+			.and(EVENT_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
+			.fetch();
+
+		return eventModelRecords.stream()
+			.map(record -> mapEventModelToDTO(record, projectId))
+			.collect(Collectors.toList());
 	}
 
-	private <T> T fromJson(final String json, final TypeReference<T> typeRef) {
-		if(json == null || json.isEmpty()) {
-			return null;
-		}
-		try {
-			return objectMapper.readValue(json, typeRef);
-		}
-		catch(Exception e) {
-			throw new RuntimeException("Failed to deserialize JSON", e);
-		}
+	private EventModelDTO mapEventModelToDTO(final EventModelRecord record, final UUID projectId) {
+		final var dto = new EventModelDTO();
+		dto.setEventModelId(record.getEventModelId());
+		dto.setId(record.getCode());
+		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setEventGroupId(record.getEventGroupId());
+		dto.setScopeModelId(record.getScopeModelId());
+		dto.setInceptive(record.getInceptive());
+		dto.setNumber(record.getNumber());
+		dto.setMandatory(record.getMandatory());
+		dto.setMaxOccurrence(record.getMaxOccurrence());
+		dto.setPreventAdd(record.getPreventAdd());
+		dto.setDeadline(record.getDeadlineValue());
+		dto.setDeadlineUnit(record.getDeadlineUnit() != null ? ChronoUnit.valueOf(record.getDeadlineUnit()) : null);
+		dto.setDeadlineAggregationFunction(record.getDeadlineAggrFnct() != null ? DateAggregationFunction.valueOf(record.getDeadlineAggrFnct()) : null);
+		dto.setInterval(record.getIntervalValue());
+		dto.setIntervalUnit(record.getIntervalUnit() != null ? ChronoUnit.valueOf(record.getIntervalUnit()) : null);
+		dto.setLabelPattern(record.getLabelPattern());
+		dto.setIcon(record.getIcon());
+
+		dto.setDatasetModelIds(new ArrayList<>());
+		dto.setFormModelIds(new ArrayList<>());
+		dto.setWorkflowIds(new ArrayList<>());
+		return dto;
 	}
 }

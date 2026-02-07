@@ -18,8 +18,11 @@ public class EventModelDTO {
 	private String id;
 	@NotNull
 	private SortedMap<String, String> shortname;
+	private SortedMap<String, String> longname;
+	private SortedMap<String, String> description;
 
 	private UUID eventGroupId;
+	private UUID scopeModelId;
 
 	@NotNull
 	private List<UUID> datasetModelIds;
@@ -31,11 +34,19 @@ public class EventModelDTO {
 	private Integer deadline;
 	private ChronoUnit deadlineUnit;
 	private List<UUID> deadlineReferenceEventModelIds;
+	private List<UUID> blockedEventModelIds;
+	private List<UUID> impliedEventModelIds;
 	private DateAggregationFunction deadlineAggregationFunction;
 
+	private boolean inceptive;
+	private boolean mandatory;
+	private boolean preventAdd;
+
+	private Integer maxOccurrence;
 	private Integer interval;
 	private ChronoUnit intervalUnit;
 
+	private String labelPattern;
 	private String icon;
 	// TODO number doesn't mean anything, this property should be renamed
 	private int number;
@@ -43,7 +54,7 @@ public class EventModelDTO {
 	/**
 	 * Default constructor, needed by some serializer
 	 */
-	EventModelDTO() {
+	public EventModelDTO() {
 
 	}
 
@@ -94,12 +105,36 @@ public class EventModelDTO {
 		this.shortname = shortname;
 	}
 
+	public SortedMap<String, String> getLongname() {
+		return longname;
+	}
+
+	public void setLongname(final SortedMap<String, String> longname) {
+		this.longname = longname;
+	}
+
+	public SortedMap<String, String> getDescription() {
+		return description;
+	}
+
+	public void setDescription(final SortedMap<String, String> description) {
+		this.description = description;
+	}
+
 	public UUID getEventGroupId() {
 		return eventGroupId;
 	}
 
 	public void setEventGroupId(final UUID eventGroupId) {
 		this.eventGroupId = eventGroupId;
+	}
+
+	public UUID getScopeModelId() {
+		return scopeModelId;
+	}
+
+	public void setScopeModelId(final UUID scopeModelId) {
+		this.scopeModelId = scopeModelId;
 	}
 
 	public List<UUID> getDatasetModelIds() {
@@ -150,12 +185,60 @@ public class EventModelDTO {
 		this.deadlineReferenceEventModelIds = deadlineReferenceEventModelIds;
 	}
 
+	public List<UUID> getBlockedEventModelIds() {
+		return blockedEventModelIds;
+	}
+
+	public void setBlockedEventModelIds(final List<UUID> blockedEventModelIds) {
+		this.blockedEventModelIds = blockedEventModelIds;
+	}
+
+	public List<UUID> getImpliedEventModelIds() {
+		return impliedEventModelIds;
+	}
+
+	public void setImpliedEventModelIds(final List<UUID> impliedEventModelIds) {
+		this.impliedEventModelIds = impliedEventModelIds;
+	}
+
 	public DateAggregationFunction getDeadlineAggregationFunction() {
 		return deadlineAggregationFunction;
 	}
 
 	public void setDeadlineAggregationFunction(final DateAggregationFunction deadlineAggregationFunction) {
 		this.deadlineAggregationFunction = deadlineAggregationFunction;
+	}
+
+	public boolean isInceptive() {
+		return inceptive;
+	}
+
+	public void setInceptive(final boolean inceptive) {
+		this.inceptive = inceptive;
+	}
+
+	public boolean isMandatory() {
+		return mandatory;
+	}
+
+	public void setMandatory(final boolean mandatory) {
+		this.mandatory = mandatory;
+	}
+
+	public boolean isPreventAdd() {
+		return preventAdd;
+	}
+
+	public void setPreventAdd(final boolean preventAdd) {
+		this.preventAdd = preventAdd;
+	}
+
+	public Integer getMaxOccurrence() {
+		return maxOccurrence;
+	}
+
+	public void setMaxOccurrence(final Integer maxOccurrence) {
+		this.maxOccurrence = maxOccurrence;
 	}
 
 	public Integer getInterval() {
@@ -172,6 +255,14 @@ public class EventModelDTO {
 
 	public void setIntervalUnit(final ChronoUnit intervalUnit) {
 		this.intervalUnit = intervalUnit;
+	}
+
+	public String getLabelPattern() {
+		return labelPattern;
+	}
+
+	public void setLabelPattern(final String labelPattern) {
+		this.labelPattern = labelPattern;
 	}
 
 	public String getIcon() {

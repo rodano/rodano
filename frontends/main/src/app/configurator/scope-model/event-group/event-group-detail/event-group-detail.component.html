@@ -1,0 +1,123 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ draftEventGroup ? getTranslatedValue(draftEventGroup.shortname) : '' }}</h2>
+		<span class="detail-code">{{ draftEventGroup?.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (draftEventGroup) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('id')">
+					<label>
+						Code
+						@if (isFieldModified('id')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ draftEventGroup.id }}</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
+					<label>
+						Short Name
+						@if (isFieldModified('shortname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventGroup.shortname)">
+						@if (!getTranslatedValue(draftEventGroup.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftEventGroup.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('longname')">
+					<label>
+						Long Name
+						@if (isFieldModified('longname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventGroup.longname)">
+						@if (!getTranslatedValue(draftEventGroup.longname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftEventGroup.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+					<label>
+						Description
+						@if (isFieldModified('description')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventGroup.description)">
+						@if (!getTranslatedValue(draftEventGroup.description)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftEventGroup.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				@if (availableLanguages.length > 1) {
+					<div class="setting-item full-width">
+						<label>All Translations</label>
+						<div class="relationship-box">
+							<div class="translations-list">
+								@for (lang of availableLanguages; track lang.code) {
+									<div class="translation-item">
+										<div class="translation-language">
+											<mat-icon class="language-icon">language</mat-icon>
+											<span class="language-label">{{ lang.name }}</span>
+											@if (lang.isDefault) {
+												<mat-icon class="default-icon" matTooltip="Default language">star</mat-icon>
+											}
+										</div>
+										<div class="translation-values">
+											<div class="translation-value">
+												<span class="value-label">Short:</span>
+												<span [class.empty-value]="!getTranslatedValue(draftEventGroup.shortname, lang.code)">
+													{{ getTranslatedValue(draftEventGroup.shortname, lang.code) || 'Not set' }}
+												</span>
+											</div>
+											<div class="translation-value">
+												<span class="value-label">Long:</span>
+												<span [class.empty-value]="!getTranslatedValue(draftEventGroup.longname, lang.code)">
+													{{ getTranslatedValue(draftEventGroup.longname, lang.code) || 'Not set' }}
+												</span>
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section danger-section">
+			<h3>Delete Event Group</h3>
+			<p class="danger-text">Deleting this event group is permanent and cannot be undone.</p>
+			<button class="btn-delete" (click)="onDelete()">
+				<mat-icon>delete</mat-icon>
+				Delete
+			</button>
+		</div>
+	</div>
+}

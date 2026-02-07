@@ -7,7 +7,7 @@ import {CMSLayoutResolver} from './resolvers/cms-layout-resolver';
 import {MeResolver} from './resolvers/me-resolver';
 import {EproEnabledGuard} from './guards/epro-enabled.guard';
 import {superuserGuard} from './guards/superuser.guard';
-import { UnsavedChangesGuard } from './guards/unsaved-changes.guard';
+import {UnsavedChangesGuard} from './guards/unsaved-changes.guard';
 
 export const APP_ROUTES: Routes = [
 	{

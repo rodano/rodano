@@ -93,7 +93,13 @@
 					[projectId]="projectId"
 					[project]="project"
 					[selectedNode]="selectedNode"
-					(nodeSelected)="onNodeSelected($event)">
+					[eventModels]="eventModels"
+					[eventGroups]="eventGroups"
+					[selectedScopeModelId]="selectedScopeModelId"
+					[selectedEventModelId]="selectedEventModelId"
+					(nodeSelected)="onNodeSelected($event)"
+					(eventModelSelected)="onEventModelSelectedFromTree($event)"
+					(eventGroupSelected)="onEventGroupSelectedFromTree($event)">
 				</app-configurator-tree>
 			</div>
 
@@ -105,7 +111,8 @@
 					[modifiedFields]="modifiedFields"
 					(fieldsUpdated)="onFieldsUpdated($event)"
 					(nodeSelected)="onNodeSelected($event)"
-					(scopeModelsChanged)="onScopeModelsChanged($event)">
+					(scopeModelsChanged)="onScopeModelsChanged($event)"
+					(scopeModelContextChanged)="onScopeModelContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

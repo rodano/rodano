@@ -25,7 +25,9 @@
 <ng-template #nodeTemplate let-node>
 	<div
 		class="child-node"
-		[class.selected]="selectedNode === node.id"
+		[class.selected]="isNodeSelected(node)"
+		[class.event-model-node]="node.type === 'event-model'"
+		[class.event-group-node]="node.type === 'event-group'"
 		(click)="onNodeClick(node, $event)">
 		@if (node.icon) {
 			<mat-icon class="node-icon">{{ node.icon }}</mat-icon>

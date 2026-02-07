@@ -1,0 +1,109 @@
+.timeline-container {
+	overflow-x: auto;
+	overflow-y: hidden;
+	background: #1a1a1a;
+	border-radius: 8px;
+	padding: 0.5rem;
+	margin-bottom: 2rem;
+}
+
+.timeline-svg {
+	display: block;
+	min-width: fit-content;
+}
+
+.grid-line {
+	stroke: #404040;
+	stroke-width: 1;
+}
+
+.timeline-axis {
+	stroke: #f59e0b;
+	stroke-width: 3;
+}
+
+.timeline-arrow {
+	fill: #f59e0b;
+}
+
+.time-label {
+	font-size: 13px;
+	fill: #f59e0b;
+	text-anchor: middle;
+	font-weight: 600;
+}
+
+.month-number {
+	font-size: 13px;
+	fill: #d1d5db;
+	text-anchor: middle;
+	font-weight: 600;
+}
+
+.month-label-text {
+	font-size: 11px;
+	fill: #9ca3af;
+	text-anchor: middle;
+	font-weight: 500;
+}
+
+.event-label-text {
+	fill: #ffffff;
+	font-size: 12px;
+	font-weight: 600;
+	text-anchor: middle;
+	pointer-events: none;
+}
+
+.event-group.selected .event-label-text {
+	fill: #f59e0b;
+}
+
+.event-group {
+	cursor: pointer;
+}
+
+.event-bar {
+	stroke-width: 2;
+	cursor: pointer;
+	transition: all 0.2s;
+	filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.event-bar:hover {
+	filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+	opacity: 0.85;
+}
+
+.event-group.selected .event-bar {
+	stroke: #f59e0b;
+	stroke-width: 4;
+	filter: drop-shadow(0 6px 12px rgba(245, 158, 11, 0.5));
+}
+
+.timeline-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 4rem;
+	color: #9ca3af;
+	background: #1a1a1a;
+	border-radius: 8px;
+	border: 2px dashed #404040;
+}
+
+.timeline-empty mat-icon {
+	font-size: 64px;
+	width: 64px;
+	height: 64px;
+	margin-bottom: 1rem;
+	color: #6b7280;
+}
+
+.timeline-empty p {
+	margin: 0;
+	font-size: 15px;
+	font-weight: 500;
+	color: #9ca3af;
+}

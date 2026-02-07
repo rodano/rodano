@@ -16,5 +16,8 @@ export interface EventGroup {
     eventGroupId: string;
     id: string;
     shortname: { [key: string]: string; };
+    longname?: { [key: string]: string; };
+    description?: { [key: string]: string; };
+    scopeModelId?: string;
 }
 

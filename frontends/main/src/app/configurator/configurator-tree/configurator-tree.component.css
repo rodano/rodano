@@ -173,3 +173,21 @@
 	color: #9ca3af;
 	font-style: italic;
 }
+
+.child-node.event-model-node.selected {
+	background-color: #f5f3ff;
+	color: #7c3aed;
+}
+
+.child-node.event-model-node .node-icon {
+	color: #8b5cf6 !important;
+}
+
+.child-node.event-group-node.selected {
+	background-color: #ecfdf5;
+	color: #059669;
+}
+
+.child-node.event-group-node .node-icon {
+	color: #10b981 !important;
+}

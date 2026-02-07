@@ -23,10 +23,10 @@ import ch.rodano.core.services.bll.configurator.ScopeModelService;
 @PreAuthorize("@userSecurityService.isSuperuser()")
 public class ScopeModelController {
 
-	private final ScopeModelService configuratorConfigService;
+	private final ScopeModelService scopeModelService;
 
-	public ScopeModelController(final ScopeModelService configuratorConfigService) {
-		this.configuratorConfigService = configuratorConfigService;
+	public ScopeModelController(final ScopeModelService scopeModelService) {
+		this.scopeModelService = scopeModelService;
 	}
 
 	/**
@@ -34,7 +34,7 @@ public class ScopeModelController {
 	 */
 	@GetMapping("/scope-models")
 	public ResponseEntity<List<ScopeModelDTO>> getScopeModels(@PathVariable final UUID projectId) {
-		final var scopeModels = configuratorConfigService.getScopeModels(projectId);
+		final var scopeModels = scopeModelService.getScopeModels(projectId);
 		return ResponseEntity.ok(scopeModels);
 	}
 
@@ -46,7 +46,7 @@ public class ScopeModelController {
 		@PathVariable final UUID projectId,
 		@PathVariable final UUID scopeModelId
 	) {
-		final var scopeModel = configuratorConfigService.getScopeModel(projectId, scopeModelId);
+		final var scopeModel = scopeModelService.getScopeModel(projectId, scopeModelId);
 		return ResponseEntity.ok(scopeModel);
 	}
 
@@ -59,7 +59,7 @@ public class ScopeModelController {
 		@PathVariable final UUID projectId,
 		@RequestBody final ScopeModelDTO scopeModel
 	) {
-		final var created = configuratorConfigService.createScopeModel(projectId, scopeModel);
+		final var created = scopeModelService.createScopeModel(projectId, scopeModel);
 		return ResponseEntity.ok(created);
 	}
 
@@ -73,7 +73,7 @@ public class ScopeModelController {
 		@PathVariable final UUID scopeModelId,
 		@RequestBody final ScopeModelDTO scopeModel
 	) {
-		final var updated = configuratorConfigService.updateScopeModel(projectId, scopeModelId, scopeModel);
+		final var updated = scopeModelService.updateScopeModel(projectId, scopeModelId, scopeModel);
 		return ResponseEntity.ok(updated);
 	}
 
@@ -86,7 +86,7 @@ public class ScopeModelController {
 		@PathVariable final UUID projectId,
 		@PathVariable final UUID scopeModelId
 	) {
-		configuratorConfigService.deleteScopeModel(projectId, scopeModelId);
+		scopeModelService.deleteScopeModel(projectId, scopeModelId);
 		return ResponseEntity.noContent().build();
 	}
 }

@@ -57,7 +57,8 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 
 		this.form = this.fb.group({
 			id: ['', [Validators.required]],
-			virtual: [false]
+			virtual: [false],
+			maxNumber: [null, [Validators.min(0)]]
 		});
 	}
 
@@ -114,7 +115,8 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 
 		this.form.patchValue({
 			id: scopeModel.id,
-			virtual: scopeModel.virtual
+			virtual: scopeModel.virtual,
+			maxNumber: scopeModel.maxNumber || null
 		});
 
 		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
@@ -169,7 +171,8 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 			longname,
 			description,
 			pluralShortname,
-			virtual: formValue.virtual
+			virtual: formValue.virtual,
+			maxNumber: formValue.maxNumber
 		};
 
 		this.dialogRef.close(result);

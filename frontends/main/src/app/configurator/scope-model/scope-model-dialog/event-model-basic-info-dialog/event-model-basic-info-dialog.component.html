@@ -1,0 +1,123 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Basic Information</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Code *</label>
+				<input
+					type="text"
+					formControlName="id"
+					placeholder="EVENT_CODE"
+					required>
+				<span class="hint">Unique identifier for this event model</span>
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+					<span class="error-message">Code is required</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Number</label>
+				<input
+					type="number"
+					formControlName="number"
+					placeholder="1">
+				<span class="hint">Optional numeric identifier</span>
+			</div>
+
+			<div class="form-field">
+				<label>Icon</label>
+				<input
+					type="text"
+					formControlName="icon"
+					placeholder="event">
+				<span class="hint">Material icon name (e.g., event, calendar_today, schedule)</span>
+			</div>
+
+			<div class="form-field">
+				<label>Event Group</label>
+				<select formControlName="eventGroupId">
+					<option [value]="null">None</option>
+					@for (group of eventGroups; track group.id) {
+						<option [value]="group.id">{{ group.name }}</option>
+					}
+				</select>
+				<span class="hint">Optional grouping for related events</span>
+			</div>
+
+			<div class="form-field">
+				<label>Maximum Occurrences</label>
+				<input type="number" formControlName="maxOccurrence" min="0" placeholder="0 = unlimited">
+				<span class="hint">Maximum number of times this event can occur (0 or empty = unlimited)</span>
+				@if (form.get('maxOccurrence')?.hasError('min')) {
+					<span class="error-message">Must be 0 or greater</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="preventAdd">Prevent Manual Addition</mat-checkbox>
+				<span class="hint">If checked, users cannot manually create instances of this event</span>
+			</div>
+
+			<div class="form-field checkbox-field">
+				<mat-checkbox formControlName="mandatory">Mandatory Event</mat-checkbox>
+				<span class="hint">This event must occur in the study</span>
+			</div>
+
+			<div class="form-field checkbox-field">
+				<mat-checkbox formControlName="inceptive">Inceptive Event</mat-checkbox>
+				<span class="hint">This event marks the beginning of a timeline</span>
+			</div>
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+										<input
+											type="text"
+											formControlName="shortname"
+											placeholder="Baseline Visit">
+										<span class="hint">Brief display name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Long Name</label>
+										<input
+											type="text"
+											formControlName="longname"
+											placeholder="Baseline Study Visit">
+										<span class="hint">Full descriptive name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Description</label>
+										<textarea
+											formControlName="description"
+											placeholder="Detailed description of this event"
+											rows="3"></textarea>
+										<span class="hint">Optional description</span>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+			Save Changes
+		</button>
+	</div>
+</div>

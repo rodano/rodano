@@ -11,9 +11,6 @@ import { EventModel } from './event-model';
 import { EventGroup } from './event-group';
 
 
-/**
- * Scope model
- */
 export interface ScopeModel { 
     scopeModelId: string;
     id: string;
@@ -27,6 +24,9 @@ export interface ScopeModel {
     root: boolean;
     leaf: boolean;
     virtual: boolean;
+    maxNumber?: number;
+    scopeFormat?: string;
+    layout?: string;
     /**
      * Event groups
      */

@@ -22,19 +22,11 @@
 	gap: 1rem;
 }
 
-.card-header-badges {
-	display: flex;
-	gap: 0.25rem;
-	flex-shrink: 0;
-}
-
-.content-container.detail-open .card-badges {
-	gap: 0.25rem;
-	margin-bottom: 0.5rem;
-}
-
+/* ==================== Status Badges ==================== */
 .status-badge {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	padding: 0.25rem 0.75rem;
 	border-radius: 9999px;
 	font-size: 0.75rem;
@@ -43,10 +35,55 @@
 	letter-spacing: 0.05em;
 }
 
-.content-container.detail-open .status-badge {
-	padding: 0.125rem 0.5rem;
+.badge-full {
+	display: inline;
+}
+
+.badge-short {
+	display: none;
+}
+
+/* Scope cards badges at level 2 */
+.content-container.detail-open .scope-card .status-badge,
+.content-container.event-list-open .scope-card .status-badge,
+.content-container.event-group-list-open .scope-card .status-badge {
+	width: 1.5rem;
+	height: 1.5rem;
+	padding: 0;
 	font-size: 0.625rem;
-	transition: padding 0.3s, font-size 0.3s;
+	border-radius: 50%;
+}
+
+.content-container.detail-open .scope-card .badge-full,
+.content-container.event-list-open .scope-card .badge-full,
+.content-container.event-group-list-open .scope-card .badge-full {
+	display: none;
+}
+
+.content-container.detail-open .scope-card .badge-short,
+.content-container.event-list-open .scope-card .badge-short,
+.content-container.event-group-list-open .scope-card .badge-short {
+	display: inline;
+}
+
+/* Event cards badges at level 2 (both event models and event groups) */
+.content-container.event-detail-open .event-card .status-badge,
+.content-container.event-group-detail-open .event-card .status-badge {
+	width: 1.5rem;
+	height: 1.5rem;
+	padding: 0;
+	font-size: 0.625rem;
+	border-radius: 50%;
+}
+
+.content-container.event-detail-open .event-card .badge-full,
+.content-container.event-group-detail-open .event-card .badge-full {
+	display: none;
+}
+
+.content-container.event-detail-open .event-card .badge-short,
+.content-container.event-group-detail-open .event-card .badge-short {
+	display: inline;
 }
 
 .status-badge.standalone {
@@ -74,6 +111,16 @@
 	color: #991b1b;
 }
 
+.status-badge.mandatory {
+	background-color: #fef3c7;
+	color: #92400e;
+}
+
+.status-badge.inceptive {
+	background-color: #dbeafe;
+	color: #1e40af;
+}
+
 /* ==================== Content Container ==================== */
 .content-container {
 	display: flex;
@@ -83,41 +130,64 @@
 	position: relative;
 }
 
-/* ==================== Cards Container ==================== */
+/* ==================== Cards Container (Scope Models Column) ==================== */
 .cards-container {
 	flex: 1;
 	overflow-y: auto;
 	padding: 2rem;
+	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.content-container.detail-open .cards-container {
+/* Level 2: Scope cards when any detail/list is open (250px) */
+.content-container.detail-open .cards-container,
+.content-container.event-list-open .cards-container,
+.content-container.event-group-list-open .cards-container {
 	flex: 0 0 250px;
 	max-width: 250px;
 	min-width: 250px;
 	padding: 1rem;
-	transition: flex 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Level 3: Scope cards when event/event-group detail is open (100px) */
+.content-container.event-detail-open .cards-container,
+.content-container.event-group-detail-open .cards-container {
+	flex: 0 0 100px;
+	max-width: 100px;
+	min-width: 100px;
+	padding: 0.5rem;
 }
 
 /* ==================== Grid ==================== */
-.scope-models-grid {
+.scope-models-grid,
+.event-models-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
 	gap: 1.5rem;
 	justify-content: start;
 }
 
-.content-container.detail-open .scope-models-grid {
+/* Level 2: Compact grid for scope cards */
+.content-container.detail-open .scope-models-grid,
+.content-container.event-list-open .scope-models-grid,
+.content-container.event-group-list-open .scope-models-grid {
 	grid-template-columns: 1fr;
 	gap: 0.75rem;
 }
 
-/* ==================== Cards ==================== */
-.scope-card {
+/* Level 3: Ultra-compact grid for scope cards */
+.content-container.event-detail-open .scope-models-grid,
+.content-container.event-group-detail-open .scope-models-grid {
+	grid-template-columns: 1fr;
+	gap: 0.5rem;
+}
+
+/* ==================== Universal Card Base Styles ==================== */
+.scope-card,
+.event-card {
 	background-color: white;
-	border-top: 4px solid #5bd4d4;
 	padding: 1.5rem;
 	cursor: pointer;
-	transition: transform 0.2s, box-shadow 0.2s;
+	transition: all 0.3s ease;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 	display: flex;
 	flex-direction: column;
@@ -125,55 +195,215 @@
 	position: relative;
 }
 
-.content-container.detail-open .card-body,
-.content-container.detail-open .card-selection-icon,
-.content-container.detail-open .card-modified-indicator {
+.scope-card {
+	border-top: 4px solid #5bd4d4;
+}
+
+.event-card {
+	border-top: 4px solid #8b5cf6;
+}
+
+.event-card.event-group-card {
+	border-top-color: #10b981;
+}
+
+.scope-card:hover,
+.event-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.event-card.event-group-card .card-body {
 	display: none !important;
 }
 
-.content-container.detail-open .scope-card {
+.event-card.event-group-card .card-header {
+	border-bottom: none !important;
+	margin-bottom: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+.event-card.event-group-card {
+	height: auto;
+	min-height: 80px;
+	padding-bottom: 1rem;
+}
+
+/* ==================== Scope Cards Level 2 (Compact) ==================== */
+.content-container.detail-open .scope-card,
+.content-container.event-list-open .scope-card,
+.content-container.event-group-list-open .scope-card {
 	height: auto;
 	min-height: 0;
 	padding: 1rem;
-	transition: all 0.2s ease;
 }
 
-.content-container.detail-open .card-code {
-	display: block;
-	font-size: 0.7rem;
-	margin-top: 0.25rem;
-	opacity: 0.7;
+.content-container.detail-open .scope-card .card-body,
+.content-container.event-list-open .scope-card .card-body,
+.content-container.event-group-list-open .scope-card .card-body {
+	display: none !important;
 }
 
-.content-container.detail-open .card-header {
+.content-container.detail-open .scope-card .card-selection-icon,
+.content-container.event-list-open .scope-card .card-selection-icon,
+.content-container.event-group-list-open .scope-card .card-selection-icon {
+	top: 2px;
+	right: 5px;
+}
+
+.content-container.detail-open .scope-card .card-header,
+.content-container.event-list-open .scope-card .card-header,
+.content-container.event-group-list-open .scope-card .card-header {
 	margin-bottom: 0;
 	padding-bottom: 0;
 	border-bottom: none;
 }
 
-.scope-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.content-container.detail-open .scope-card .card-info h3,
+.content-container.event-list-open .scope-card .card-info h3,
+.content-container.event-group-list-open .scope-card .card-info h3 {
+	font-size: 0.875rem;
 }
 
+.content-container.detail-open .scope-card .card-code,
+.content-container.event-list-open .scope-card .card-code,
+.content-container.event-group-list-open .scope-card .card-code {
+	font-size: 0.7rem;
+	opacity: 0.7;
+}
+
+/* ==================== Scope Cards Level 3 (Ultra-Compact) ==================== */
+.content-container.event-detail-open .scope-card,
+.content-container.event-group-detail-open .scope-card {
+	height: auto;
+	min-height: 0;
+	padding: 0.5rem;
+}
+
+.content-container.event-detail-open .scope-card .card-body,
+.content-container.event-detail-open .scope-card .card-selection-icon,
+.content-container.event-detail-open .scope-card .card-modified-indicator,
+.content-container.event-detail-open .scope-card .card-header-badges,
+.content-container.event-group-detail-open .scope-card .card-body,
+.content-container.event-group-detail-open .scope-card .card-selection-icon,
+.content-container.event-group-detail-open .scope-card .card-modified-indicator,
+.content-container.event-group-detail-open .scope-card .card-header-badges {
+	display: none !important;
+}
+
+.content-container.event-detail-open .scope-card .card-header,
+.content-container.event-group-detail-open .scope-card .card-header {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.content-container.event-detail-open .scope-card .card-info h3,
+.content-container.event-group-detail-open .scope-card .card-info h3 {
+	font-size: 0.9rem;
+	line-height: 1.2;
+}
+
+.content-container.event-detail-open .scope-card .card-code,
+.content-container.event-group-detail-open .scope-card .card-code {
+	font-size: 0.75rem;
+	opacity: 0.7;
+	margin-top: 0.125rem;
+}
+
+.content-container.event-detail-open .scope-card.selected::after,
+.content-container.event-group-detail-open .scope-card.selected::after {
+	border-width: 0 20px 20px 0;
+}
+
+.content-container.event-detail-open .scope-card.create-card,
+.content-container.event-group-detail-open .scope-card.create-card {
+	height: auto;
+	min-height: 60px;
+	padding: 0.5rem;
+}
+
+.content-container.event-detail-open .scope-card.create-card .create-content h3,
+.content-container.event-detail-open .scope-card.create-card .create-content p,
+.content-container.event-group-detail-open .scope-card.create-card .create-content h3,
+.content-container.event-group-detail-open .scope-card.create-card .create-content p {
+	display: none !important;
+}
+
+.content-container.event-detail-open .scope-card.create-card .create-content mat-icon,
+.content-container.event-group-detail-open .scope-card.create-card .create-content mat-icon {
+	font-size: 2rem;
+	width: 2rem;
+	height: 2rem;
+	margin-bottom: 0;
+}
+
+/* ==================== Event Cards Level 2 (Compact - Shared for Event Models & Event Groups) ==================== */
+.content-container.event-detail-open .event-card,
+.content-container.event-group-detail-open .event-card {
+	height: auto;
+	min-height: 0;
+	padding: 1rem;
+}
+
+.content-container.event-detail-open .event-card .card-body,
+.content-container.event-group-detail-open .event-card .card-body {
+	display: none !important;
+}
+
+.content-container.event-detail-open .event-card .card-selection-icon,
+.content-container.event-group-detail-open .event-card .card-selection-icon {
+	top: 2px;
+	right: 5px;
+}
+
+.content-container.event-detail-open .event-card .card-header,
+.content-container.event-group-detail-open .event-card .card-header {
+	margin-bottom: 0;
+	padding-bottom: 0;
+	border-bottom: none;
+}
+
+.content-container.event-detail-open .event-card .card-info h3,
+.content-container.event-group-detail-open .event-card .card-info h3 {
+	font-size: 0.875rem;
+}
+
+.content-container.event-detail-open .event-card .card-code,
+.content-container.event-group-detail-open .event-card .card-code {
+	font-size: 0.7rem;
+	opacity: 0.7;
+}
+
+.content-container.event-detail-open .event-card.create-card,
+.content-container.event-group-detail-open .event-card.create-card {
+	height: auto;
+	min-height: 80px;
+	padding: 1rem;
+}
+
+.content-container.event-detail-open .event-card.create-card .create-content p,
+.content-container.event-group-detail-open .event-card.create-card .create-content p {
+	display: none !important;
+}
+
+.content-container.event-detail-open .event-card.create-card .create-content mat-icon,
+.content-container.event-group-detail-open .event-card.create-card .create-content mat-icon {
+	font-size: 1.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	margin-bottom: 0.25rem;
+}
+
+.content-container.event-detail-open .event-card.create-card .create-content h3,
+.content-container.event-group-detail-open .event-card.create-card .create-content h3 {
+	font-size: 0.875rem;
+}
+
+/* ==================== Selected State ==================== */
 .scope-card.selected {
-	border-top-color: #5bd4d4;
 	box-shadow: 0 4px 12px rgba(91, 212, 212, 0.3);
-}
-
-.scope-card.modified.selected {
-	border-top-color: #f59e0b;
-	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.scope-card.virtual-card.selected {
-	border-top-color: #3b82f6;
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.scope-card.modified.virtual-card.selected {
-	border-top-color: #f59e0b;
-	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+	background-color: #e0f2f1;
 }
 
 .scope-card.selected::after {
@@ -181,26 +411,43 @@
 	position: absolute;
 	top: 0;
 	right: 0;
-	width: 0;
-	height: 0;
 	border-style: solid;
 	border-width: 0 40px 40px 0;
 	border-color: transparent #5bd4d4 transparent transparent;
 }
 
-.scope-card.modified.selected::after {
-	border-color: transparent #f59e0b transparent transparent;
+.content-container.detail-open .scope-card.selected::after,
+.content-container.event-list-open .scope-card.selected::after,
+.content-container.event-group-list-open .scope-card.selected::after {
+	border-width: 0 30px 30px 0;
 }
 
-.scope-card.virtual-card.selected::after {
-	border-color: transparent #3b82f6 transparent transparent;
+.event-card.selected {
+	box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+	background-color: #f5f3ff;
 }
 
-.scope-card.modified.virtual-card.selected::after {
-	border-color: transparent #f59e0b transparent transparent;
+.event-card.event-group-card.selected {
+	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+	background-color: #d1fae5;
 }
 
-.content-container.detail-open .scope-card.selected::after {
+.event-card.selected::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	border-style: solid;
+	border-width: 0 40px 40px 0;
+	border-color: transparent #8b5cf6 transparent transparent;
+}
+
+.event-card.event-group-card.selected::after {
+	border-color: transparent #10b981 transparent transparent;
+}
+
+.content-container.event-detail-open .event-card.selected::after,
+.content-container.event-group-detail-open .event-card.selected::after {
 	border-width: 0 30px 30px 0;
 }
 
@@ -222,25 +469,39 @@
 	font-weight: bold;
 }
 
-.content-container.detail-open .card-selection-icon {
-	top: 2px;
-	right: 5px;
-}
-
-.content-container.detail-open .card-selection-icon mat-icon {
-	font-size: 0.75rem !important;
-	width: 0.75rem !important;
-	height: 0.75rem !important;
-}
-
-.content-container.detail-open .scope-card.selected::before {
-	top: 2px;
-	right: 5px;
-	font-size: 0.75rem;
-}
-
-.scope-card.modified {
+/* ==================== Modified State ==================== */
+.scope-card.modified,
+.event-card.modified,
+.event-card.event-group-card.modified {
 	background-color: #fffbeb;
+}
+
+.scope-card.modified.selected,
+.event-card.modified.selected {
+	border-top-color: #f59e0b;
+	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.scope-card.modified.selected::after,
+.event-card.modified.selected::after {
+	border-color: transparent #f59e0b transparent transparent;
+}
+
+.scope-card.virtual-card.selected {
+	border-top-color: #3b82f6;
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.scope-card.virtual-card.selected::after {
+	border-color: transparent #3b82f6 transparent transparent;
+}
+
+.scope-card.modified.virtual-card.selected {
+	border-top-color: #f59e0b;
+}
+
+.scope-card.modified.virtual-card.selected::after {
+	border-color: transparent #f59e0b transparent transparent;
 }
 
 .card-modified-indicator {
@@ -264,45 +525,51 @@
 	color: white !important;
 }
 
-/* ==================== Create Card ==================== */
-.create-card {
-	background-color: #f9fafb;
-	border: 2px dashed #d1d5db;
-	cursor: pointer;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 200px;
-	transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
-}
-
-.content-container.detail-open .create-card {
-	height: auto;
-	min-height: 80px;
-	padding: 1rem;
-}
-
-.content-container.detail-open .create-content p {
+.content-container.detail-open .card-modified-indicator,
+.content-container.event-list-open .card-modified-indicator,
+.content-container.event-group-list-open .card-modified-indicator {
 	display: none !important;
 }
 
-.content-container.detail-open .create-content mat-icon {
-	font-size: 1.5rem;
-	width: 1.5rem;
-	height: 1.5rem;
-	margin-bottom: 0.25rem;
+/* ==================== Create Card ==================== */
+.create-card {
+	background-color: #f9fafb !important;
+	border: 2px dashed #d1d5db !important;
+	border-top: 2px dashed #d1d5db !important;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	height: 200px;
 }
 
 .create-card:hover {
-	background-color: #f3f4f6;
-	border-color: #5bd4d4;
+	background-color: #f3f4f6 !important;
 	transform: translateY(-2px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
 }
 
-.create-card.selected::after,
-.create-card.selected::before {
-	display: none;
+.scope-card.create-card:hover {
+	border-color: #5bd4d4 !important;
+}
+
+.event-card.create-card:hover {
+	border-color: #8b5cf6 !important;
+}
+
+.event-card.event-group-card.create-card {
+	height: 80px;
+}
+
+.content-container.event-group-list-open .event-card.event-group-card.create-card .create-content p {
+	display: none !important;
+}
+
+.event-card.event-group-card.create-card:hover {
+	border-color: #10b981 !important;
+}
+
+.create-card.selected::after {
+	display: none !important;
 }
 
 .create-content {
@@ -318,8 +585,16 @@
 	margin-bottom: 0.75rem;
 }
 
-.create-card:hover .create-content mat-icon {
+.scope-card.create-card:hover .create-content mat-icon {
 	color: #5bd4d4 !important;
+}
+
+.event-card.create-card:hover .create-content mat-icon {
+	color: #8b5cf6 !important;
+}
+
+.event-card.event-group-card.create-card:hover .create-content mat-icon {
+	color: #10b981 !important;
 }
 
 .create-content h3 {
@@ -329,16 +604,41 @@
 	color: #374151;
 }
 
-.content-container.detail-open .create-content h3 {
-	font-size: 0.875rem;
-	transition: font-size 0.3s;
-}
-
 .create-content p {
 	margin: 0;
 	opacity: 0.8;
 	font-size: 0.875rem;
 	color: #6b7280;
+}
+
+/* Compact create cards for scope cards at level 2 */
+.content-container.detail-open .scope-card.create-card,
+.content-container.event-list-open .scope-card.create-card,
+.content-container.event-group-list-open .scope-card.create-card {
+	height: auto;
+	min-height: 50px;
+	padding: 1rem;
+}
+
+.content-container.detail-open .scope-card.create-card .create-content p,
+.content-container.event-list-open .scope-card.create-card .create-content p,
+.content-container.event-group-list-open .scope-card.create-card .create-content p {
+	display: none !important;
+}
+
+.content-container.detail-open .scope-card.create-card .create-content mat-icon,
+.content-container.event-list-open .scope-card.create-card .create-content mat-icon,
+.content-container.event-group-list-open .scope-card.create-card .create-content mat-icon {
+	font-size: 1.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	margin-bottom: 0.25rem;
+}
+
+.content-container.detail-open .scope-card.create-card .create-content h3,
+.content-container.event-list-open .scope-card.create-card .create-content h3,
+.content-container.event-group-list-open .scope-card.create-card .create-content h3 {
+	font-size: 0.875rem;
 }
 
 /* ==================== Card Header ==================== */
@@ -350,11 +650,6 @@
 	padding-bottom: 0.75rem;
 	border-bottom: 1px solid #e5e7eb;
 	gap: 0.5rem;
-}
-
-.content-container.detail-open .card-header {
-	margin-bottom: 0.5rem;
-	padding-bottom: 0.5rem;
 }
 
 .card-info {
@@ -369,11 +664,6 @@
 	color: #111827;
 }
 
-.content-container.detail-open .card-info h3 {
-	font-size: 0.875rem;
-	transition: font-size 0.3s;
-}
-
 .card-code {
 	margin: 0;
 	font-size: 0.875rem;
@@ -381,9 +671,10 @@
 	font-family: monospace;
 }
 
-.content-container.detail-open .card-code {
-	font-size: 0.75rem;
-	transition: font-size 0.3s;
+.card-header-badges {
+	display: flex;
+	gap: 0.25rem;
+	flex-shrink: 0;
 }
 
 /* ==================== Card Body ==================== */
@@ -400,10 +691,6 @@
 	flex: 1;
 }
 
-.content-container.detail-open .card-details {
-	gap: 0.25rem;
-}
-
 .detail-item {
 	display: flex;
 	align-items: center;
@@ -412,24 +699,11 @@
 	color: #6b7280;
 }
 
-.content-container.detail-open .detail-item {
-	gap: 0.375rem;
-	font-size: 0.75rem;
-	transition: gap 0.3s, font-size 0.3s;
-}
-
 .detail-item mat-icon {
 	font-size: 1.125rem !important;
 	width: 1.125rem !important;
 	height: 1.125rem !important;
 	color: #9ca3af !important;
-}
-
-.content-container.detail-open .detail-item mat-icon {
-	font-size: 0.875rem !important;
-	width: 0.875rem !important;
-	height: 0.875rem !important;
-	transition: font-size 0.3s, width 0.3s, height 0.3s;
 }
 
 /* ==================== Detail Panel ==================== */
@@ -463,9 +737,9 @@
 }
 
 .detail-title {
-	display: flex;
+	display: grid;
 	align-items: center;
-	gap: 1rem;
+	gap: 0.5rem;
 }
 
 .detail-title h2 {
@@ -484,6 +758,51 @@
 	border-radius: 0.375rem;
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
+}
+
+/* ==================== Header Actions Buttons ==================== */
+.header-actions {
+	display: flex;
+	gap: 0.5rem;
+	align-items: center;
+}
+
+.btn-view-event-models,
+.btn-view-event-groups {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 1rem;
+	border: none;
+	border-radius: 0.375rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+	color: white;
+}
+
+.btn-view-event-models {
+	background-color: #8b5cf6;
+}
+
+.btn-view-event-models:hover {
+	background-color: #7c3aed;
+}
+
+.btn-view-event-groups {
+	background-color: #10b981;
+}
+
+.btn-view-event-groups:hover {
+	background-color: #059669;
+}
+
+.btn-view-event-models mat-icon,
+.btn-view-event-groups mat-icon {
+	font-size: 1.125rem;
+	width: 1.125rem;
+	height: 1.125rem;
 }
 
 .btn-close {
@@ -525,22 +844,19 @@
 	border: 1px solid #e5e7eb;
 	border-radius: 0.5rem;
 	padding: 1.5rem;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .settings-section h3 {
-	margin: 0 0 1.5rem 0;
+	margin: 0 0 1rem 0;
 	font-size: 1.125rem;
 	font-weight: 600;
 	color: #111827;
-	padding-bottom: 0.75rem;
-	border-bottom: 1px solid #e5e7eb;
 }
 
 .settings-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-	gap: 1.5rem;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
 	margin-bottom: 1.5rem;
 }
 
@@ -550,91 +866,47 @@
 	gap: 0.5rem;
 }
 
-.setting-item label {
-	font-size: 0.75rem;
-	font-weight: 600;
-	color: #6b7280;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-}
-
 .setting-item.full-width {
 	grid-column: 1 / -1;
 }
 
-.setting-item.modified {
-	position: relative;
-	padding: 0.5rem;
-	border-right: 0.25rem solid #f59e0b;
-	background-color: #fffbeb;
-	border-radius: 0.25rem;
-}
-
-.modified-icon {
-	font-size: 1rem !important;
-	width: 1rem !important;
-	height: 1rem !important;
-	color: #f59e0b !important;
-	margin-left: 0.25rem;
-	vertical-align: middle;
+.setting-item label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #374151;
 }
 
 .setting-value {
 	font-size: 0.875rem;
 	color: #111827;
-	padding: 0.5rem 0;
+	padding: 0.5rem;
+	background-color: #f9fafb;
+	border-radius: 0.375rem;
+	border: 1px solid #e5e7eb;
 }
 
 .setting-value.not-configured {
-	color: #f59e0b;
-	font-style: italic;
+	color: #dc2626;
+	background-color: #fef2f2;
+	border-color: #fecaca;
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 }
 
-.warning-icon {
-	font-size: 1.5rem !important;
-	width: 1.5rem !important;
-	height: 1.5rem !important;
-	color: #f59e0b !important;
-}
-
 /* ==================== Relationships ==================== */
-.relationship-group {
-	margin-bottom: 1.5rem;
-}
-
-.relationship-group:last-of-type {
-	margin-bottom: 1.5rem;
-}
-
-.relationship-group label {
-	font-size: 0.75rem;
-	font-weight: 600;
-	color: #6b7280;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-	margin-bottom: 0.75rem;
-	display: block;
-}
-
 .relationship-box {
-	min-height: 60px;
-	background-color: #f9fafb;
-	border: 1px dashed #d1d5db;
-	border-radius: 0.5rem;
 	padding: 0.75rem;
-	display: flex;
-	align-items: center;
-	justify-content: center;
+	background-color: #f9fafb;
+	border-radius: 0.375rem;
+	border: 1px solid #e5e7eb;
+	min-height: 3rem;
 }
 
 .chip-container {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.5rem;
-	align-items: center;
 }
 
 .chip {
@@ -642,11 +914,12 @@
 	align-items: center;
 	gap: 0.375rem;
 	padding: 0.375rem 0.75rem;
-	background-color: #e5e7eb;
-	color: #374151;
-	border-radius: 1rem;
-	font-size: 0.875rem;
+	background-color: white;
+	border: 1px solid #d1d5db;
+	border-radius: 0.375rem;
+	font-size: 0.75rem;
 	font-weight: 500;
+	color: #374151;
 }
 
 .chip.default-chip {
@@ -666,85 +939,51 @@
 	color: #f59e0b !important;
 }
 
-/* ==================== Resources ==================== */
-.resource-list {
-	display: flex;
-	gap: 1rem;
-	flex-wrap: wrap;
-	margin-bottom: 1.5rem;
-}
-
-.resource-item {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-size: 0.875rem;
-	color: #6b7280;
-	padding: 0.75rem 1rem;
-	background-color: #f9fafb;
-	border: 1px solid #e5e7eb;
-	border-radius: 0.5rem;
-}
-
-.resource-item mat-icon {
-	font-size: 1.25rem !important;
-	width: 1.25rem !important;
-	height: 1.25rem !important;
-	color: #9ca3af !important;
-}
-
-.resource-count {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-.resource-count mat-icon {
-	font-size: 1.25rem !important;
-	width: 1.25rem !important;
-	height: 1.25rem !important;
-	color: #6b7280 !important;
-}
-
 /* ==================== Buttons ==================== */
-.btn-edit,
+.btn-edit {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.625rem 1rem;
+	background-color: #f3f4f6;
+	color: #374151;
+	border: 1px solid #d1d5db;
+	border-radius: 0.375rem;
+	font-size: 0.875rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s;
+}
+
+.btn-edit:hover {
+	background-color: #e5e7eb;
+}
+
+.btn-edit mat-icon {
+	font-size: 1.125rem;
+	width: 1.125rem;
+	height: 1.125rem;
+}
+
 .btn-delete {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
 	padding: 0.625rem 1rem;
-	border-radius: 0.5rem;
+	background-color: #dc2626;
+	color: white;
+	border: none;
+	border-radius: 0.375rem;
 	font-size: 0.875rem;
 	font-weight: 600;
 	cursor: pointer;
 	transition: all 0.2s;
-	border: none;
-}
-
-.btn-edit {
-	background-color: white;
-	color: #374151;
-	border: 1px solid #d1d5db;
-}
-
-.btn-edit:hover {
-	background-color: #f9fafb;
-	border-color: #5bd4d4;
-	color: #5bd4d4;
-}
-
-.btn-delete {
-	background-color: white;
-	color: #dc2626;
-	border: 1px solid #fca5a5;
 }
 
 .btn-delete:hover {
-	background-color: #fef2f2;
-	border-color: #dc2626;
+	background-color: #b91c1c;
 }
 
-.btn-edit mat-icon,
 .btn-delete mat-icon {
 	font-size: 1.125rem;
 	width: 1.125rem;
@@ -753,137 +992,121 @@
 
 /* ==================== Danger Zone ==================== */
 .danger-section {
-	border: 1px solid #fca5a5 !important;
-	background-color: #fef2f2 !important;
+	border-color: #fecaca;
+	background-color: #fef2f2;
 }
 
 .danger-section h3 {
-	color: #dc2626;
-	border-bottom-color: #fca5a5;
+	color: #991b1b;
 }
 
 .danger-text {
-	color: #991b1b;
+	margin: 0 0 1rem 0;
 	font-size: 0.875rem;
-	margin-bottom: 1rem;
+	color: #dc2626;
 }
 
 /* ==================== Empty States ==================== */
-.empty-state {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
-	padding: 4rem 2rem;
-	gap: 1rem;
-	color: #9ca3af;
-	flex: 1;
-	width: 100%;
-}
-
-.empty-state mat-icon {
-	font-size: 4rem;
-	width: 4rem;
-	height: 4rem;
-	color: #d1d5db !important;
-}
-
-.empty-state h3 {
-	margin: 0;
-	font-size: 1.25rem;
-	font-weight: 600;
-	color: #6b7280;
-}
-
-.empty-state p {
-	margin: 0;
-	font-size: 0.875rem;
-	color: #9ca3af;
-	max-width: 300px;
-	text-align: center;
-}
-
-.empty-message-inline {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	color: #f59e0b;
-	font-size: 0.875rem;
-	font-style: italic;
-}
-
-.empty-message-inline .warning-icon,
-.empty-message-inline .info-icon {
-	font-size: 1.25rem !important;
-	width: 1.25rem !important;
-	height: 1.25rem !important;
-}
-
-.empty-message-inline .warning-icon {
-	color: #f59e0b !important;
-}
-
-.empty-message-inline .info-icon {
-	color: #6b7280 !important;
+.warning-icon {
+	font-size: 1rem !important;
+	width: 1rem !important;
+	height: 1rem !important;
+	color: #dc2626 !important;
 }
 
 .empty-message-centered {
 	display: flex;
-	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	gap: 0.5rem;
-	color: #6b7280;
+	color: #9ca3af;
 	font-size: 0.875rem;
-	font-style: italic;
+	padding: 0.5rem;
 }
 
 .empty-message-centered .warning-icon {
 	font-size: 2rem !important;
 	width: 2rem !important;
 	height: 2rem !important;
+	color: #dc2626 !important;
+}
+
+/* ==================== Modified Indicator ==================== */
+.setting-item.modified {
+	position: relative;
+	border-right: 0.25rem solid #f59e0b;
+	background-color: #fffbeb;
+	border-radius: 0.25rem;
+}
+
+.modified-icon {
+	font-size: 1rem !important;
+	width: 1rem !important;
+	height: 1rem !important;
 	color: #f59e0b !important;
+	margin-left: 0.25rem;
+	vertical-align: middle;
 }
 
-.empty-message-centered .info-icon {
-	font-size: 2rem !important;
-	width: 2rem !important;
-	height: 2rem !important;
-	color: #6b7280 !important;
+/* ==================== Workflow State Selections ==================== */
+.workflow-state-selections {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 }
 
-/* ==================== Responsive ==================== */
-@media (max-width: 1200px) {
-	.content-container.detail-open .cards-container {
-		flex: 0 0 350px;
-		max-width: 350px;
-		min-width: 350px;
-	}
-
-	.scope-models-grid {
-		grid-template-columns: 1fr;
-	}
+.workflow-state-group {
+	background-color: #f9fafb;
+	border-radius: 0.5rem;
+	padding: 1rem;
+	border-left: 3px solid #5bd4d4;
 }
 
-@media (max-width: 768px) {
-	.header-title-row {
-		flex-direction: column;
-		gap: 1rem;
-	}
+.workflow-header {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	margin-bottom: 0.75rem;
+	font-weight: 600;
+	color: #111827;
+}
 
-	.content-container.detail-open .cards-container {
-		display: none;
-	}
+.workflow-header .resource-icon {
+	color: #5bd4d4;
+	font-size: 1.25rem;
+}
 
-	.detail-panel {
-		flex: 1;
-	}
+.workflow-name {
+	font-size: 0.875rem;
+}
 
-	.scope-models-grid {
-		grid-template-columns: 1fr;
-	}
+.states-chips {
+	margin-left: 1.75rem;
+}
 
-	.settings-grid {
-		grid-template-columns: 1fr;
-	}
+.state-chip {
+	background-color: #eff6ff;
+	border: 1px solid #bfdbfe;
+}
+
+.state-chip .state-icon {
+	color: #3b82f6;
+	font-size: 1rem;
+	width: 1rem;
+	height: 1rem;
+}
+
+/* ==================== Code Format Display ==================== */
+.code-format-display {
+	padding: 0.75rem;
+	background-color: #1f2937;
+	border-radius: 0.375rem;
+	border: 1px solid #374151;
+}
+
+.code-format-display code {
+	font-family: 'Courier New', monospace;
+	font-size: 0.875rem;
+	color: #10b981;
+	font-weight: 500;
 }

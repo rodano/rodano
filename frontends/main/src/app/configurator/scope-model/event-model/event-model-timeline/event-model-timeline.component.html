@@ -1,0 +1,86 @@
+<div class="timeline-container">
+	@if (timelineEvents.length === 0) {
+		<div class="timeline-empty">
+			<mat-icon>timeline</mat-icon>
+			<p>No events to display on timeline</p>
+		</div>
+	} @else {
+		<svg [attr.width]="getTimelineWidth()" [attr.height]="220" class="timeline-svg">
+			<g class="grid-lines">
+				@for (month of getMonthMarkers(); track month) {
+					<line
+						[attr.x1]="getMonthPosition(month)"
+						y1="95"
+						[attr.x2]="getMonthPosition(month)"
+						y2="145"
+						class="grid-line"
+					/>
+				}
+			</g>
+
+			<line
+				[attr.x1]="getAxisStartX()"
+				y1="120"
+				[attr.x2]="getAxisEndX()"
+				y2="120"
+				class="timeline-axis"
+			/>
+
+			<polygon
+				[attr.points]="(getAxisEndX() + 20) + ',120 ' + getAxisEndX() + ',112 ' + getAxisEndX() + ',128'"
+				class="timeline-arrow"
+			/>
+
+			<g class="month-labels">
+				@for (month of getMonthMarkers(); track month) {
+					<text
+						[attr.x]="getMonthPosition(month)"
+						y="170"
+						class="month-number"
+					>
+						{{ month }}
+					</text>
+				}
+			</g>
+
+			<text
+				[attr.x]="(getAxisStartX() + getAxisEndX()) / 2"
+				y="195"
+				class="time-label"
+			>
+				Time (Months)
+			</text>
+
+			<g class="timeline-events">
+				@for (event of timelineEvents; track event.eventModel.eventModelId; let i = $index) {
+					@let position = getEventPosition(event);
+					@let layer = labelLayers.get(event.eventModel.eventModelId) ?? 0;
+					<g
+						class="event-group"
+						[class.selected]="isSelected(event)"
+						(click)="onEventClick(event)"
+					>
+						<rect
+							[attr.x]="position.left"
+							y="95"
+							[attr.width]="position.width"
+							height="50"
+							rx="8"
+							fill="#5bd4d4"
+							stroke="#5bd4d4"
+							class="event-bar"
+						/>
+
+						<text
+							[attr.x]="position.left + (position.width / 2)"
+							[attr.y]="getLabelYPosition(layer)"
+							class="event-label-text"
+						>
+							{{ event.label }}
+						</text>
+					</g>
+				}
+			</g>
+		</svg>
+	}
+</div>

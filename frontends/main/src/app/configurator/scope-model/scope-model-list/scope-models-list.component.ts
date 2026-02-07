@@ -4,11 +4,12 @@ import {MatTableModule} from '@angular/material/table';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModel} from '@core/model/scope-model';
-import {ScopeModelService} from '../../services/scope-model.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
-import {ScopeModelBasicInfoDialogComponent} from '../scope-model-dialog/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
+import {
+	ScopeModelBasicInfoDialogComponent
+} from '../scope-model-dialog/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
 import {ConfiguratorService} from '../../services/configurator.service';
@@ -21,44 +22,81 @@ import {
 	ScopeModelDefaultSettingsDialogComponent
 } from '../scope-model-dialog/scope-model-default-settings-dialog/scope-model-default-settings-dialog.component';
 import {
-	ScopeModelResourcesDialogComponent
+	ScopeModelResourcesDialogComponent,
+	WorkflowStateSelection
 } from '../scope-model-dialog/scope-model-resources-dialog/scope-model-resources-dialog.component';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
+import {EventModel} from '@core/model/event-model';
+import {
+	EventModelCreateDialogComponent
+} from '../scope-model-dialog/event-model-create-dialog/event-model-create-dialog.component';
+import {EventModelTimelineComponent} from '../event-model/event-model-timeline/event-model-timeline.component';
+import {EventModelDetailComponent} from '../event-model/event-model-detail/event-model-detail.component';
+import {
+	ScopeModelPatternDialogComponent
+} from '../scope-model-dialog/scope-model-pattern-dialog/scope-model-pattern-dialog.component';
+import {EventGroup} from '@core/model/event-group';
+import {EventGroupDialogComponent} from '../scope-model-dialog/event-group-dialog/event-group-dialog.component';
+import {EventGroupDetailComponent} from '../event-group/event-group-detail/event-group-detail.component';
+import {ScopeModelManagerService} from '../../services/scope-model-manager.service';
+import {EventModelManagerService} from '../../services/event-model-manager.service';
+import {EventGroupManagerService} from '../../services/event-group-manager.service';
+
+export type ViewMode = 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
+
+interface WorkflowStateGroup {
+	workflowId: string;
+	workflowName: string;
+	states: {id: string; name: string}[];
+}
 
 @Component({
 	selector: 'app-scope-models-list',
 	standalone: true,
 	templateUrl: './scope-models-list.component.html',
-	styleUrls: ['./scope-models-list.component.css'],
+	styleUrls: ['./scope-models-list.component.css', './scope-models-list-event-models.component.css'],
 	imports: [
 		CommonModule,
 		MatTableModule,
 		MatButtonModule,
 		MatIconModule,
-		MatTooltipModule
+		MatTooltipModule,
+		EventModelTimelineComponent,
+		EventModelDetailComponent,
+		EventGroupDetailComponent
 	]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
+	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string | null>();
 	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() scopeModelContextChanged = new EventEmitter<{
+		eventModels: any[];
+		eventGroups: any[];
+		selectedScopeModelId: string | null;
+		selectedEventModelId: string | null;
+		selectedEventGroupId: string | null;
+	}>();
 
-	originalScopeModels: ScopeModel[] = [];
-	scopeModels: ScopeModel[] = [];
-	modifiedScopeModelIds = new Set<string>();
-	modifiedFieldsByScopeModel = new Map<string, Set<string>>();
-
+	selectedScopeModel: ScopeModel | null = null;
+	selectedEventModelId: string | null = null;
+	selectedEventGroupId: string | null = null;
+	viewMode: ViewMode = 'scope-detail';
 	loading = true;
+
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
 
-	selectedScopeModel: ScopeModel | null = null;
+	private workflowStateSelectionsMap = new Map<string, WorkflowStateSelection[]>();
 
 	constructor(
-		private scopeModelService: ScopeModelService,
+		public scopeModelManager: ScopeModelManagerService,
+		public eventModelManager: EventModelManagerService,
+		public eventGroupManager: EventGroupManagerService,
 		private configuratorService: ConfiguratorService,
 		private languageService: LanguageService,
 		private dialog: MatDialog,
@@ -94,6 +132,54 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription.unsubscribe();
 	}
 
+	get scopeModels(): ScopeModel[] {
+		return this.scopeModelManager.getAll();
+	}
+
+	get eventModels(): EventModel[] {
+		return this.eventModelManager.getAll();
+	}
+
+	get eventGroups(): EventGroup[] {
+		return this.eventGroupManager.getAll();
+	}
+
+	get modifiedScopeModelIds(): Set<string> {
+		return this.scopeModelManager.getModifiedIds();
+	}
+
+	get modifiedFieldsByScopeModel(): Map<string, Set<string>> {
+		return this.scopeModelManager.getModifiedFieldsMap();
+	}
+
+	get originalScopeModels(): ScopeModel[] {
+		return this.scopeModelManager.getOriginals();
+	}
+
+	get modifiedEventModelIds(): Set<string> {
+		return this.eventModelManager.getModifiedIds();
+	}
+
+	get modifiedFieldsByEventModel(): Map<string, Set<string>> {
+		return this.eventModelManager.getModifiedFieldsMap();
+	}
+
+	get originalEventModels(): EventModel[] {
+		return this.eventModelManager.getOriginals();
+	}
+
+	get modifiedEventGroupIds(): Set<string> {
+		return this.eventGroupManager.getModifiedIds();
+	}
+
+	get originalEventGroups(): EventGroup[] {
+		return this.eventGroupManager.getOriginals();
+	}
+
+	get totalModificationCount(): number {
+		return this.scopeModelManager.getModificationCount() + this.eventModelManager.getModificationCount() + this.eventGroupManager.getModificationCount();
+	}
+
 	loadProject(): void {
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: (project: ConfiguratorProject) => {
@@ -108,20 +194,13 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	loadScopeModels(): void {
 		this.loading = true;
-		this.scopeModelService.getScopeModels(this.projectId).subscribe({
+		this.scopeModelManager.load(this.projectId).subscribe({
 			next: (scopeModels: ScopeModel[]) => {
-				this.originalScopeModels = JSON.parse(JSON.stringify(scopeModels));
-				this.scopeModels = JSON.parse(JSON.stringify(scopeModels));
-
-				this.modifiedScopeModelIds.clear();
-				this.modifiedFieldsByScopeModel.clear();
-
 				if(this.selectedScopeModel) {
-					this.selectedScopeModel = this.scopeModels.find(
+					this.selectedScopeModel = scopeModels.find(
 						sm => sm.scopeModelId === this.selectedScopeModel!.scopeModelId
 					) || null;
 				}
-
 				this.loading = false;
 			},
 			error: (error: HttpErrorResponse) => {
@@ -133,14 +212,57 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onSelectScopeModel(scopeModel: ScopeModel): void {
-		if(this.isSelected(scopeModel)) {
-			this.selectedScopeModel = null;
-			this.nodeSelected.emit('scope-models');
+		if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
+			this.clearSelection();
 		}
 		else {
-			this.selectedScopeModel = scopeModel;
-			this.nodeSelected.emit(`scope-model-${scopeModel.scopeModelId}`);
+			this.selectScopeModel(scopeModel);
 		}
+		this.emitContext();
+	}
+
+	private clearSelection(): void {
+		this.selectedScopeModel = null;
+		this.selectedEventModelId = null;
+		this.selectedEventGroupId = null;
+		this.viewMode = 'scope-detail';
+		this.nodeSelected.emit('scope-models');
+	}
+
+	private selectScopeModel(scopeModel: ScopeModel): void {
+		const previousScopeModelId = this.selectedScopeModel?.scopeModelId;
+
+		this.selectedScopeModel = scopeModel;
+		this.selectedEventModelId = null;
+		this.selectedEventGroupId = null;
+
+		if(previousScopeModelId !== scopeModel.scopeModelId) {
+			this.viewMode = 'scope-detail';
+			this.eventModelManager.setAll([]);
+			this.eventGroupManager.setAll([]);
+		}
+
+		this.emitContext();
+
+		this.eventModelManager.loadForScope(this.projectId, scopeModel.scopeModelId).subscribe({
+			next: () => this.emitContext(),
+			error: error => {
+				console.error('Error loading event models:', error);
+				this.eventModelManager.setAll([]);
+				this.emitContext();
+			}
+		});
+
+		this.eventGroupManager.loadForScope(this.projectId, scopeModel.scopeModelId).subscribe({
+			next: () => this.emitContext(),
+			error: error => {
+				console.error('Error loading event groups:', error);
+				this.eventGroupManager.setAll([]);
+				this.emitContext();
+			}
+		});
+
+		this.nodeSelected.emit(`scope-model-${scopeModel.scopeModelId}`);
 	}
 
 	isSelected(scopeModel: ScopeModel): boolean {
@@ -159,11 +281,11 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result: ScopeModel | null) => {
 			if(result) {
-				this.scopeModelService.createScopeModel(this.projectId, result).subscribe({
+				this.scopeModelManager.create(this.projectId, result).subscribe({
 					next: () => {
 						this.snackBar.open('Scope model created', 'Close', {duration: 2000});
 						this.loadScopeModels();
-						this.scopeModelsChanged.emit({modificationCount: 0});
+						this.emitModificationChange();
 					},
 					error: (error: HttpErrorResponse) => {
 						console.error('Error creating scope model:', error);
@@ -186,27 +308,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result: any) => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {
-					...scopeModel,
-					...result
-				};
-
-				this.scopeModels = this.scopeModels.map(sm =>
-					sm.scopeModelId === scopeModel.scopeModelId ? updatedScopeModel : sm
-				);
-
-				const original = this.originalScopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId);
-
-				if(original) {
-					this.trackFieldChanges(scopeModel.scopeModelId, original, updatedScopeModel);
-				}
-
-				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.selectedScopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId) || null;
-				}
-
-				this.scopeModelsChanged.emit({modificationCount: this.totalModifiedFieldsCount});
-				this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
+				this.scopeModelManager.update(updatedScopeModel);
+				this.refreshSelectedScopeModel();
+				this.showStagedMessage();
 			}
 		});
 	}
@@ -222,27 +327,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result: any) => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {
-					...scopeModel,
-					...result
-				};
-
-				this.scopeModels = this.scopeModels.map(sm =>
-					sm.scopeModelId === scopeModel.scopeModelId ? updatedScopeModel : sm
-				);
-
-				const original = this.originalScopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId);
-
-				if(original) {
-					this.trackFieldChanges(scopeModel.scopeModelId, original, updatedScopeModel);
-				}
-
-				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.selectedScopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId) || null;
-				}
-
-				this.scopeModelsChanged.emit({modificationCount: this.totalModifiedFieldsCount});
-				this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
+				this.scopeModelManager.update(updatedScopeModel);
+				this.refreshSelectedScopeModel();
+				this.showStagedMessage();
 			}
 		});
 	}
@@ -258,63 +346,60 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		dialogRef.afterClosed().subscribe((result: any) => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {
-					...scopeModel,
-					...result
-				};
-
-				this.scopeModels = this.scopeModels.map(sm =>
-					sm.scopeModelId === scopeModel.scopeModelId ? updatedScopeModel : sm
-				);
-
-				const original = this.originalScopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId);
-
-				if(original) {
-					this.trackFieldChanges(scopeModel.scopeModelId, original, updatedScopeModel);
-				}
-
-				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.selectedScopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId) || null;
-				}
-
-				this.scopeModelsChanged.emit({modificationCount: this.totalModifiedFieldsCount});
-				this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
+				this.scopeModelManager.update(updatedScopeModel);
+				this.refreshSelectedScopeModel();
+				this.showStagedMessage();
 			}
 		});
 	}
 
-	onEditResources(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
-			width: '600px',
+	onEditPattern(scopeModel: ScopeModel): void {
+		const dialogRef = this.dialog.open(ScopeModelPatternDialogComponent, {
+			width: '500px',
 			data: {
-				projectId: this.projectId,
 				scopeModel: JSON.parse(JSON.stringify(scopeModel))
 			}
 		});
 
 		dialogRef.afterClosed().subscribe((result: any) => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {
-					...scopeModel,
-					...result
-				};
+				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
+				this.scopeModelManager.update(updatedScopeModel);
+				this.refreshSelectedScopeModel();
+				this.showStagedMessage();
+			}
+		});
+	}
 
-				this.scopeModels = this.scopeModels.map(sm =>
-					sm.scopeModelId === scopeModel.scopeModelId ? updatedScopeModel : sm
-				);
+	onEditResources(scopeModel: ScopeModel): void {
+		const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
+			data: {
+				scopeModel: this.scopeModelManager.getById(scopeModel.scopeModelId),
+				availableForms: [],
+				availableDatasets: [],
+				availableWorkflows: [],
+				workflowStateSelections: this.workflowStateSelectionsMap.get(scopeModel.scopeModelId) || []
+			},
+			width: '500px',
+			maxHeight: '90vh',
+			disableClose: true
+		});
 
-				const original = this.originalScopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId);
+		dialogRef.afterClosed().subscribe(result => {
+			if(result) {
+				const draft = this.scopeModelManager.getById(scopeModel.scopeModelId);
+				if(draft) {
+					Object.assign(draft, result);
 
-				if(original) {
-					this.trackFieldChanges(scopeModel.scopeModelId, original, updatedScopeModel);
+					if(result.workflowStateSelections !== undefined) {
+						this.workflowStateSelectionsMap.set(scopeModel.scopeModelId, result.workflowStateSelections);
+					}
+
+					this.scopeModelManager.update(draft);
+					this.refreshSelectedScopeModel();
+					this.showStagedMessage();
 				}
-
-				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.selectedScopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModel.scopeModelId) || null;
-				}
-
-				this.scopeModelsChanged.emit({modificationCount: this.totalModifiedFieldsCount});
-				this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
 			}
 		});
 	}
@@ -365,11 +450,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 				};
 
 				updatePromises.push(
-					this.scopeModelService.updateScopeModel(
-						this.projectId,
-						child.scopeModelId,
-						updatedChild
-					).toPromise()
+					this.scopeModelManager.updateOnServer(this.projectId, child.scopeModelId, updatedChild).toPromise()
 				);
 			});
 		}
@@ -389,11 +470,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 				};
 
 				updatePromises.push(
-					this.scopeModelService.updateScopeModel(
-						this.projectId,
-						child.scopeModelId,
-						updatedChild
-					).toPromise()
+					this.scopeModelManager.updateOnServer(this.projectId, child.scopeModelId, updatedChild).toPromise()
 				);
 			});
 		}
@@ -409,22 +486,232 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private performDelete(scopeModel: ScopeModel): void {
-		this.scopeModelService.deleteScopeModel(this.projectId, scopeModel.scopeModelId).subscribe({
+		this.scopeModelManager.delete(this.projectId, scopeModel.scopeModelId).subscribe({
 			next: () => {
 				this.snackBar.open('Scope model deleted', 'Close', {duration: 2000});
 
 				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.selectedScopeModel = null;
-					this.nodeSelected.emit('scope-models');
+					this.clearSelection();
 				}
 
 				this.loadScopeModels();
-				this.scopeModelsChanged.emit({modificationCount: 0});
+				this.emitModificationChange();
 			},
 			error: (error: HttpErrorResponse) => {
 				console.error('Error deleting scope model:', error);
 				this.snackBar.open('Failed to delete scope model', 'Close', {duration: 3000});
 			}
+		});
+	}
+
+	onCreateEventModel(): void {
+		if(!this.selectedScopeModel) {
+			return;
+		}
+
+		const dialogRef = this.dialog.open(EventModelCreateDialogComponent, {
+			width: '500px',
+			data: {
+				projectId: this.projectId,
+				scopeModelId: this.selectedScopeModel.scopeModelId,
+				eventModel: null,
+				languages: this.projectLanguages
+			}
+		});
+
+		dialogRef.afterClosed().subscribe((result: any) => {
+			if(result) {
+				const newEventModel: EventModel = {
+					eventModelId: '',
+					scopeModelId: this.selectedScopeModel!.scopeModelId,
+					eventGroupId: '',
+					number: this.eventModels.length + 1,
+					...result,
+					formModelIds: [],
+					datasetModelIds: [],
+					workflowIds: [],
+					deadlineReferenceEventModelIds: [],
+					blockedEventModelIds: [],
+					impliedEventModelIds: []
+				};
+
+				this.eventModelManager.create(this.projectId, newEventModel).subscribe({
+					next: () => {
+						this.snackBar.open('Event model created', 'Close', {duration: 2000});
+					},
+					error: error => {
+						console.error('Error creating event model:', error);
+						this.snackBar.open('Failed to create event model', 'Close', {duration: 3000});
+					}
+				});
+			}
+		});
+	}
+
+	onEventModelUpdated(updatedEventModel: EventModel): void {
+		if(!updatedEventModel) {
+			return;
+		}
+		this.eventModelManager.update(updatedEventModel);
+		this.showStagedMessage();
+	}
+
+	onEventModelDeleted(eventModelId: string): void {
+		this.eventModelManager.delete(this.projectId, eventModelId).subscribe({
+			next: () => {
+				this.snackBar.open('Event model deleted', 'Close', {duration: 2000});
+
+				if(this.selectedEventModelId === eventModelId) {
+					this.selectedEventModelId = null;
+					this.viewMode = 'event-list';
+				}
+
+				this.emitModificationChange();
+				this.emitContext();
+			},
+			error: (error: HttpErrorResponse) => {
+				console.error('Error deleting event model:', error);
+				this.snackBar.open('Failed to delete event model', 'Close', {duration: 3000});
+			}
+		});
+	}
+
+	onCreateEventGroup(): void {
+		if(!this.selectedScopeModel) {
+			return;
+		}
+
+		const dialogRef = this.dialog.open(EventGroupDialogComponent, {
+			width: '500px',
+			data: {
+				projectId: this.projectId,
+				scopeModelId: this.selectedScopeModel.scopeModelId,
+				eventGroup: null,
+				languages: this.projectLanguages
+			}
+		});
+
+		dialogRef.afterClosed().subscribe((result: any) => {
+			if(result) {
+				const newEventGroup: EventGroup = {
+					eventGroupId: '',
+					scopeModelId: this.selectedScopeModel!.scopeModelId,
+					...result
+				};
+
+				this.eventGroupManager.create(this.projectId, newEventGroup).subscribe({
+					next: () => {
+						this.snackBar.open('Event group created', 'Close', {duration: 2000});
+					},
+					error: error => {
+						console.error('Error creating event group:', error);
+						this.snackBar.open('Failed to create event group', 'Close', {duration: 3000});
+					}
+				});
+			}
+		});
+	}
+
+	onEventGroupUpdated(updatedEventGroup: EventGroup): void {
+		if(!updatedEventGroup) {
+			return;
+		}
+		this.eventGroupManager.update(updatedEventGroup);
+		this.showStagedMessage();
+	}
+
+	onEventGroupDeleted(eventGroupId: string): void {
+		this.eventGroupManager.delete(this.projectId, eventGroupId).subscribe({
+			next: () => {
+				this.snackBar.open('Event group deleted', 'Close', {duration: 2000});
+
+				if(this.selectedEventGroupId === eventGroupId) {
+					this.selectedEventGroupId = null;
+					this.viewMode = 'event-group-list';
+				}
+
+				this.emitModificationChange();
+			},
+			error: (error: HttpErrorResponse) => {
+				console.error('Error deleting event group:', error);
+				this.snackBar.open('Failed to delete event group', 'Close', {duration: 3000});
+			}
+		});
+	}
+
+	switchToEventModelView(): void {
+		if(!this.selectedScopeModel) {
+			return;
+		}
+		this.viewMode = 'event-list';
+		this.emitContext();
+	}
+
+	onSelectEventModel(eventModelId: string): void {
+		if(this.selectedEventModelId === eventModelId) {
+			this.selectedEventModelId = null;
+			this.viewMode = 'event-list';
+		}
+		else {
+			this.selectedEventModelId = eventModelId;
+			this.viewMode = 'event-detail';
+			this.nodeSelected.emit(`event-model-${eventModelId}`);
+		}
+		this.emitContext();
+	}
+
+	switchToEventGroupView(): void {
+		if(!this.selectedScopeModel) {
+			return;
+		}
+		this.viewMode = 'event-group-list';
+		this.emitContext();
+	}
+
+	onSelectEventGroup(eventGroupId: string): void {
+		if(this.selectedEventGroupId === eventGroupId) {
+			this.selectedEventGroupId = null;
+			this.viewMode = 'event-group-list';
+		}
+		else {
+			this.selectedEventGroupId = eventGroupId;
+			this.viewMode = 'event-group-detail';
+			this.nodeSelected.emit(`event-group-${eventGroupId}`);
+		}
+		this.emitContext();
+	}
+
+	backToScopeDetail(): void {
+		this.viewMode = 'scope-detail';
+		this.selectedEventModelId = null;
+		this.selectedEventGroupId = null;
+		this.emitContext();
+	}
+
+	private refreshSelectedScopeModel(): void {
+		if(this.selectedScopeModel) {
+			this.selectedScopeModel = this.scopeModelManager.getById(
+				this.selectedScopeModel.scopeModelId
+			) || null;
+		}
+	}
+
+	private showStagedMessage(): void {
+		this.emitModificationChange();
+		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+	}
+
+	private emitModificationChange(): void {
+		this.scopeModelsChanged.emit({modificationCount: this.totalModificationCount});
+	}
+
+	private emitContext(): void {
+		this.scopeModelContextChanged.emit({
+			eventModels: this.eventModels,
+			eventGroups: this.eventGroups,
+			selectedScopeModelId: this.selectedScopeModel?.scopeModelId || null,
+			selectedEventModelId: this.selectedEventModelId,
+			selectedEventGroupId: this.selectedEventGroupId
 		});
 	}
 
@@ -459,91 +746,43 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		}
 	}
 
-	private trackFieldChanges(scopeModelId: string, original: ScopeModel, updated: ScopeModel): void {
-		const modifiedFields = new Set<string>();
+	getWorkflowStateSelections(scopeModel: ScopeModel): WorkflowStateGroup[] {
+		const selections = this.workflowStateSelectionsMap.get(scopeModel.scopeModelId) || [];
 
-		const simpleFieldsToCompare: (keyof ScopeModel)[] = [
-			'id', 'virtual', 'defaultParentId', 'defaultProfileId'
-		];
+		const grouped = new Map<string, {id: string; name: string}[]>();
 
-		simpleFieldsToCompare.forEach(field => {
-			const originalValue = original[field];
-			const updatedValue = updated[field];
-
-			if(JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
-				modifiedFields.add(field as string);
+		selections.forEach(selection => {
+			if(!grouped.has(selection.workflowId)) {
+				grouped.set(selection.workflowId, []);
 			}
+
+			grouped.get(selection.workflowId)!.push({
+				id: selection.workflowStateId,
+				name: selection.workflowStateId
+			});
 		});
 
-		const translationFields: (keyof ScopeModel)[] = [
-			'shortname', 'longname', 'description', 'pluralShortname'
-		];
-
-		translationFields.forEach(field => {
-			const originalValue = original[field] as Record<string, string> | undefined;
-			const updatedValue = updated[field] as Record<string, string> | undefined;
-
-			if(originalValue && updatedValue) {
-				const allLanguages = new Set([
-					...Object.keys(originalValue),
-					...Object.keys(updatedValue)
-				]);
-
-				allLanguages.forEach(lang => {
-					if(originalValue[lang] !== updatedValue[lang]) {
-						modifiedFields.add(`${field as string}.${lang}`);
-					}
-				});
-			}
-			else if(originalValue !== updatedValue) {
-				modifiedFields.add(field as string);
-			}
+		const result: WorkflowStateGroup[] = [];
+		grouped.forEach((states, workflowId) => {
+			result.push({
+				workflowId,
+				workflowName: workflowId,
+				states
+			});
 		});
 
-		const arrayFieldsToCompare: (keyof ScopeModel)[] = [
-			'parentIds', 'datasetModelIds', 'formModelIds', 'workflowIds'
-		];
-
-		arrayFieldsToCompare.forEach(field => {
-			const originalValue = original[field];
-			const updatedValue = updated[field];
-
-			if(JSON.stringify(originalValue) !== JSON.stringify(updatedValue)) {
-				modifiedFields.add(field as string);
-			}
-		});
-
-		if(modifiedFields.size > 0) {
-			this.modifiedFieldsByScopeModel.set(scopeModelId, modifiedFields);
-			this.modifiedScopeModelIds.add(scopeModelId);
-		}
-		else {
-			this.modifiedFieldsByScopeModel.delete(scopeModelId);
-			this.modifiedScopeModelIds.delete(scopeModelId);
-		}
-	}
-
-	get totalModifiedFieldsCount(): number {
-		let count = 0;
-		this.modifiedFieldsByScopeModel.forEach((fields: Set<string>) => {
-			count += fields.size;
-		});
-		return count;
+		return result;
 	}
 
 	isFieldModifiedForScopeModel(scopeModelId: string, fieldName: string): boolean {
-		const modifiedFields = this.modifiedFieldsByScopeModel.get(scopeModelId);
+		return this.scopeModelManager.isFieldModified(scopeModelId, fieldName);
+	}
 
-		if(!modifiedFields) {
-			return false;
-		}
+	isEventModelModified(eventModelId: string): boolean {
+		return this.eventModelManager.isModified(eventModelId);
+	}
 
-		if(modifiedFields.has(fieldName)) {
-			return true;
-		}
-
-		const languageFieldPattern = new RegExp(`^${fieldName}\\.`);
-
-		return Array.from(modifiedFields).some(field => languageFieldPattern.test(field));
+	isEventGroupModified(eventGroupId: string): boolean {
+		return this.eventGroupManager.isModified(eventGroupId);
 	}
 }

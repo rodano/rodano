@@ -35,6 +35,10 @@ public class ScopeModelDTO {
 	@NotNull
 	boolean virtual;
 
+	Integer maxNumber;
+	String scopeFormat;
+	String layout;
+
 	@Schema(description = "Event groups")
 	@NotNull
 	List<EventGroupDTO> eventGroups;
@@ -146,6 +150,30 @@ public class ScopeModelDTO {
 
 	public void setVirtual(final boolean virtual) {
 		this.virtual = virtual;
+	}
+
+	public Integer getMaxNumber() {
+		return maxNumber;
+	}
+
+	public void setMaxNumber(final Integer maxNumber) {
+		this.maxNumber = maxNumber;
+	}
+
+	public String getScopeFormat() {
+		return scopeFormat;
+	}
+
+	public void setScopeFormat(final String scopeFormat) {
+		this.scopeFormat = scopeFormat;
+	}
+
+	public String getLayout() {
+		return layout;
+	}
+
+	public void setLayout(final String layout) {
+		this.layout = layout;
 	}
 
 	public List<EventGroupDTO> getEventGroups() {

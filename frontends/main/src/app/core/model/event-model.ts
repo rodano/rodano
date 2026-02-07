@@ -18,16 +18,26 @@ export interface EventModel {
     eventModelId: string;
     id: string;
     shortname: { [key: string]: string; };
+    longname?: { [key: string]: string; };
+    description?: { [key: string]: string; };
     eventGroupId?: string;
+    scopeModelId?: string;
     datasetModelIds: Array<string>;
     formModelIds: Array<string>;
     workflowIds: Array<string>;
     deadline?: number;
     deadlineUnit?: ChronoUnit;
     deadlineReferenceEventModelIds?: Array<string>;
+    blockedEventModelIds?: Array<string>;
+    impliedEventModelIds?: Array<string>;
     deadlineAggregationFunction?: DateAggregationFunction;
+    inceptive?: boolean;
+    mandatory?: boolean;
+    preventAdd?: boolean;
+    maxOccurrence?: number;
     interval?: number;
     intervalUnit?: ChronoUnit;
+    labelPattern?: string;
     icon?: string;
     number?: number;
 }

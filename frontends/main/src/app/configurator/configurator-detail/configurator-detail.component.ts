@@ -28,6 +28,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@Output() nodeSelected = new EventEmitter<string | null>();
 	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() modificationCountChanged = new EventEmitter<number>();
+	@Output() scopeModelContextChanged = new EventEmitter<{
+		eventModels: any[];
+		eventGroups: any[];
+		selectedScopeModelId: string | null;
+		selectedEventModelId: string | null;
+		selectedEventGroupId: string | null;
+	}>();
 
 	selectedNodeType: 'project-settings' | 'scope-models' | 'overview' | null = null;
 
@@ -56,7 +63,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
-		if(this.selectedNode.startsWith('scope-model-')) {
+		if(this.selectedNode.startsWith('scope-model-') || this.selectedNode.startsWith('event-model-') || this.selectedNode.startsWith('event-group-')) {
 			this.selectedNodeType = 'scope-models';
 			return;
 		}
@@ -72,5 +79,15 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		}
 
 		this.selectedNodeType = 'overview';
+	}
+
+	onScopeModelContextChanged(context: {
+		eventModels: any[];
+		eventGroups: any[];
+		selectedScopeModelId: string | null;
+		selectedEventModelId: string | null;
+		selectedEventGroupId: string | null;
+	}): void {
+		this.scopeModelContextChanged.emit(context);
 	}
 }

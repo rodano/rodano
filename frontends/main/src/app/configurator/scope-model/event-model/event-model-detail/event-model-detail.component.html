@@ -1,0 +1,474 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ draftEventModel ? getTranslatedValue(draftEventModel.shortname) : '' }}</h2>
+		<span class="detail-code">{{ draftEventModel?.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (draftEventModel) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('id')">
+					<label>
+						Code
+						@if (isFieldModified('id')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ draftEventModel.id }}</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('number')">
+					<label>
+						Number
+						@if (isFieldModified('number')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="draftEventModel.number === undefined || draftEventModel.number === null">
+						@if (draftEventModel.number === undefined || draftEventModel.number === null) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.number ?? 'Not configured' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('eventGroupId')">
+					<label>
+						Event Group
+						@if (isFieldModified('eventGroupId')) {
+							<mat-icon class="modified-icon">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						{{ getEventGroupName(draftEventModel.eventGroupId) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('shortname')">
+					<label>
+						Short Name
+						@if (isFieldModified('shortname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventModel.shortname)">
+						@if (!getTranslatedValue(draftEventModel.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftEventModel.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
+					<label>
+						Long Name
+						@if (isFieldModified('longname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventModel.longname)">
+						@if (!getTranslatedValue(draftEventModel.longname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftEventModel.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+					<label>
+						Description
+						@if (isFieldModified('description')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventModel.description)">
+						@if (!getTranslatedValue(draftEventModel.description)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftEventModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('mandatory')">
+					<label>
+						Mandatory
+						@if (isFieldModified('mandatory')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftEventModel.mandatory) {
+							<span class="status-badge mandatory">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('inceptive')">
+					<label>
+						Inceptive
+						@if (isFieldModified('inceptive')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftEventModel.inceptive) {
+							<span class="status-badge inceptive">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('maxOccurrence')">
+					<label>
+						Max Occurrence
+						@if (isFieldModified('maxOccurrence')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="draftEventModel.maxOccurrence === undefined || draftEventModel.maxOccurrence === null">
+						@if (draftEventModel.maxOccurrence === undefined || draftEventModel.maxOccurrence === null) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.maxOccurrence ?? 'Unlimited' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('preventAdd')">
+					<label>
+						Prevent Manual Addition
+						@if (isFieldModified('preventAdd')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ draftEventModel.preventAdd ? 'Yes' : 'No' }}</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<!-- Scheduling Section -->
+		<div class="settings-section">
+			<h3>Scheduling</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('deadline')">
+					<label>
+						Deadline Value
+						@if (isFieldModified('deadline')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftEventModel.deadline">
+						@if (!draftEventModel.deadline) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.deadline || 'Not set' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('deadlineUnit')">
+					<label>
+						Deadline Unit
+						@if (isFieldModified('deadlineUnit')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftEventModel.deadlineUnit">
+						@if (!draftEventModel.deadlineUnit) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.deadlineUnit || 'Not set' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('deadlineAggregationFunction')">
+					<label>
+						Deadline Aggregation Function
+						@if (isFieldModified('deadlineAggregationFunction')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftEventModel.deadlineAggregationFunction">
+						@if (!draftEventModel.deadlineAggregationFunction) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.deadlineAggregationFunction || 'Not set' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('interval')">
+					<label>
+						Interval Value
+						@if (isFieldModified('interval')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftEventModel.interval">
+						@if (!draftEventModel.interval) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.interval || 'Not set' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('intervalUnit')">
+					<label>
+						Interval Unit
+						@if (isFieldModified('intervalUnit')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftEventModel.intervalUnit">
+						@if (!draftEventModel.intervalUnit) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.intervalUnit || 'Not set' }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('deadlineReferenceEventModelIds')">
+					<label>
+						Deadline Reference Events
+						@if (isFieldModified('deadlineReferenceEventModelIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftEventModel.deadlineReferenceEventModelIds?.length) {
+							<div class="chip-container">
+								@for (refId of draftEventModel.deadlineReferenceEventModelIds; track refId) {
+									<div class="chip deadline-ref-chip">
+										<mat-icon class="resource-icon">schedule</mat-icon>
+										<span class="language-name">{{ getEventModelCode(refId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No deadline reference events</span>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditScheduling()">
+				<mat-icon>edit</mat-icon>
+				Edit Scheduling
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Pattern</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('labelPattern')">
+					<label>
+						Label Pattern
+						@if (isFieldModified('labelPattern')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftEventModel.labelPattern">
+						@if (!draftEventModel.labelPattern) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.labelPattern || 'Not configured' }}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('icon')">
+					<label>
+						Icon
+						@if (isFieldModified('icon')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftEventModel.icon) {
+							<div class="icon-preview">
+								<mat-icon>{{ draftEventModel.icon }}</mat-icon>
+								<span>{{ draftEventModel.icon }}</span>
+							</div>
+						} @else {
+							<span class="not-configured">Not set</span>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditLabelPattern()">
+				<mat-icon>edit</mat-icon>
+				Edit Pattern
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Associated Resources</h3>
+			<div class="settings-grid">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('formModelIds')">
+					<label>
+						Form Models
+						@if (isFieldModified('formModelIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftEventModel.formModelIds && draftEventModel.formModelIds.length > 0) {
+							<div class="chip-container">
+								@for (formId of draftEventModel.formModelIds; track formId) {
+									<div class="chip">
+										<mat-icon class="resource-icon">description</mat-icon>
+										<span class="language-name">{{ formId }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No form models configured</span>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('datasetModelIds')">
+					<label>
+						Dataset Models
+						@if (isFieldModified('datasetModelIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftEventModel.datasetModelIds && draftEventModel.datasetModelIds.length > 0) {
+							<div class="chip-container">
+								@for (datasetId of draftEventModel.datasetModelIds; track datasetId) {
+									<div class="chip">
+										<mat-icon class="resource-icon">dataset</mat-icon>
+										<span class="language-name">{{ datasetId }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No dataset models configured</span>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('workflowIds')">
+					<label>
+						Workflows
+						@if (isFieldModified('workflowIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftEventModel.workflowIds && draftEventModel.workflowIds.length > 0) {
+							<div class="chip-container">
+								@for (workflowId of draftEventModel.workflowIds; track workflowId) {
+									<div class="chip">
+										<mat-icon class="resource-icon">account_tree</mat-icon>
+										<span class="language-name">{{ workflowId }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No workflows configured</span>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditResources()">
+				<mat-icon>edit</mat-icon>
+				Edit Resources
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Event Relationships</h3>
+			<div class="settings-grid">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('blockedEventModelIds')">
+					<label>
+						Blocked Events
+						@if (isFieldModified('blockedEventModelIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftEventModel.blockedEventModelIds && draftEventModel.blockedEventModelIds.length > 0) {
+							<div class="chip-container">
+								@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
+									<div class="chip blocked-chip">
+										<mat-icon class="resource-icon">block</mat-icon>
+										<span class="language-name">{{ getEventModelName(blockedId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No blocked events</span>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('impliedEventModelIds')">
+					<label>
+						Implied Events
+						@if (isFieldModified('impliedEventModelIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftEventModel.impliedEventModelIds && draftEventModel.impliedEventModelIds.length > 0) {
+							<div class="chip-container">
+								@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
+									<div class="chip implied-chip">
+										<mat-icon class="resource-icon">arrow_forward</mat-icon>
+										<span class="language-name">{{ getEventModelName(impliedId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No implied events</span>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditRelationships()">
+				<mat-icon>edit</mat-icon>
+				Edit Relationships
+			</button>
+		</div>
+
+		<div class="settings-section danger-section">
+			<h3>Delete Event Model</h3>
+			<p class="danger-text">Deleting this event model is permanent and cannot be undone.</p>
+			<button class="btn-delete" (click)="onDelete()">
+				<mat-icon>delete</mat-icon>
+				Delete
+			</button>
+		</div>
+	</div>
+}

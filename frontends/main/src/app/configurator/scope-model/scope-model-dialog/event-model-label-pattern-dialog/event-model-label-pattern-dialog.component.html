@@ -1,0 +1,51 @@
+<h2 class="dialog-title">Edit Label Pattern</h2>
+
+<div class="dialog-content">
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-section">
+			<h3>Available Patterns</h3>
+			<p class="hint">Click on a pattern to insert it into the label pattern field</p>
+
+			<div class="pattern-chips">
+				@for (option of patternOptions; track option.pattern) {
+					<button type="button" class="pattern-chip" (click)="insertPattern(option.pattern)" [title]="option.description">
+						{{ option.pattern }}
+					</button>
+				}
+			</div>
+		</div>
+
+		<div class="form-section">
+			<h3>Label Pattern</h3>
+			<p class="hint">Define how event instances should be labeled. Use the patterns above or type your own text.</p>
+
+			<div class="form-field">
+				<label>Label Pattern</label>
+				<input type="text" formControlName="labelPattern" placeholder='e.g., "Visit ${number}"'>
+				<span class="hint">Combine text with patterns to create dynamic labels</span>
+			</div>
+		</div>
+
+		<div class="form-section">
+			<h3>Icon</h3>
+			<p class="hint">Specify a Material Icon name to represent this event</p>
+
+			<div class="form-field">
+				<label>Icon</label>
+				<input type="text" formControlName="icon" placeholder='e.g., "event", "medical_services"'>
+				<span class="hint">Browse icons at <a href="https://fonts.google.com/icons"
+																																										target="_blank">Material Icons</a></span>
+			</div>
+		</div>
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">
+		Cancel
+	</button>
+	<button class="btn-primary" (click)="onSave()" [disabled]="!form.valid">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

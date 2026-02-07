@@ -14,20 +14,20 @@ import ch.rodano.core.services.dao.configurator.ScopeModelDAOService;
 @Transactional
 public class ScopeModelServiceImpl implements ScopeModelService {
 
-	private final ScopeModelDAOService configuratorConfigDAOService;
+	private final ScopeModelDAOService scopeModelDAOService;
 
-	public ScopeModelServiceImpl(final ScopeModelDAOService configuratorConfigDAOService) {
-		this.configuratorConfigDAOService = configuratorConfigDAOService;
+	public ScopeModelServiceImpl(final ScopeModelDAOService scopeModelDAOService) {
+		this.scopeModelDAOService = scopeModelDAOService;
 	}
 
 	@Override
 	public List<ScopeModelDTO> getScopeModels(final UUID projectId) {
-		return configuratorConfigDAOService.getScopeModels(projectId);
+		return scopeModelDAOService.getScopeModels(projectId);
 	}
 
 	@Override
 	public ScopeModelDTO getScopeModel(final UUID projectId, final UUID scopeModelId) {
-		final var scopeModel = configuratorConfigDAOService.getScopeModel(projectId, scopeModelId);
+		final var scopeModel = scopeModelDAOService.getScopeModel(projectId, scopeModelId);
 		if(scopeModel == null) {
 			throw new NotFoundException("Scope model not found: " + scopeModelId);
 		}
@@ -44,12 +44,12 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 			throw new IllegalArgumentException("Scope model shortname is required");
 		}
 
-		return configuratorConfigDAOService.createScopeModel(projectId, scopeModel);
+		return scopeModelDAOService.createScopeModel(projectId, scopeModel);
 	}
 
 	@Override
 	public ScopeModelDTO updateScopeModel(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO scopeModel) {
-		final var existing = configuratorConfigDAOService.getScopeModel(projectId, scopeModelId);
+		final var existing = scopeModelDAOService.getScopeModel(projectId, scopeModelId);
 		if(existing == null) {
 			throw new NotFoundException("Scope model not found: " + scopeModelId);
 		}
@@ -62,16 +62,16 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 			throw new IllegalArgumentException("Scope model shortname is required");
 		}
 
-		return configuratorConfigDAOService.updateScopeModel(projectId, scopeModelId, scopeModel);
+		return scopeModelDAOService.updateScopeModel(projectId, scopeModelId, scopeModel);
 	}
 
 	@Override
 	public void deleteScopeModel(final UUID projectId, final UUID scopeModelId) {
-		final var existing = configuratorConfigDAOService.getScopeModel(projectId, scopeModelId);
+		final var existing = scopeModelDAOService.getScopeModel(projectId, scopeModelId);
 		if(existing == null) {
 			throw new NotFoundException("Scope model not found: " + scopeModelId);
 		}
 
-		configuratorConfigDAOService.deleteScopeModel(projectId, scopeModelId);
+		scopeModelDAOService.deleteScopeModel(projectId, scopeModelId);
 	}
 }
