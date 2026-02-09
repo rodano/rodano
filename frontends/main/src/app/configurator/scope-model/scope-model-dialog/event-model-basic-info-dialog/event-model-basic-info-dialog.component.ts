@@ -54,7 +54,7 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 		this.loadProjectLanguages();
 
 		this.form = this.fb.group({
-			id: [this.data.eventModel.id, Validators.required],
+			id: [this.data.eventModel.id, [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
 			number: [this.data.eventModel.number],
 			icon: [this.data.eventModel.icon],
 			eventGroupId: [this.data.eventModel.eventGroupId],
@@ -112,6 +112,13 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 			}
 		});
 		return allValid;
+	}
+
+	onIdInput(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const uppercaseValue = input.value.toUpperCase();
+		input.value = uppercaseValue;
+		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
 	}
 
 	onCancel(): void {

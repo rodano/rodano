@@ -1,12 +1,10 @@
 import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatTableModule} from '@angular/material/table';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModel} from '@core/model/scope-model';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {
 	ScopeModelBasicInfoDialogComponent
 } from '../scope-model-dialog/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
@@ -15,16 +13,6 @@ import {ProjectLanguage} from '@core/model/project-language';
 import {ConfiguratorService} from '../../services/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {
-	ScopeModelRelationshipsDialogComponent
-} from '../scope-model-dialog/scope-model-relationships-dialog/scope-model-relationships-dialog.component';
-import {
-	ScopeModelDefaultSettingsDialogComponent
-} from '../scope-model-dialog/scope-model-default-settings-dialog/scope-model-default-settings-dialog.component';
-import {
-	ScopeModelResourcesDialogComponent,
-	WorkflowStateSelection
-} from '../scope-model-dialog/scope-model-resources-dialog/scope-model-resources-dialog.component';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {EventModel} from '@core/model/event-model';
@@ -33,38 +21,30 @@ import {
 } from '../scope-model-dialog/event-model-create-dialog/event-model-create-dialog.component';
 import {EventModelTimelineComponent} from '../event-model/event-model-timeline/event-model-timeline.component';
 import {EventModelDetailComponent} from '../event-model/event-model-detail/event-model-detail.component';
-import {
-	ScopeModelPatternDialogComponent
-} from '../scope-model-dialog/scope-model-pattern-dialog/scope-model-pattern-dialog.component';
 import {EventGroup} from '@core/model/event-group';
 import {EventGroupDialogComponent} from '../scope-model-dialog/event-group-dialog/event-group-dialog.component';
 import {EventGroupDetailComponent} from '../event-group/event-group-detail/event-group-detail.component';
 import {ScopeModelManagerService} from '../../services/scope-model-manager.service';
 import {EventModelManagerService} from '../../services/event-model-manager.service';
 import {EventGroupManagerService} from '../../services/event-group-manager.service';
+import {ScopeModelDetailComponent} from '../scope-model-detail/scope-model-detail.component';
 
 export type ViewMode = 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
-
-interface WorkflowStateGroup {
-	workflowId: string;
-	workflowName: string;
-	states: {id: string; name: string}[];
-}
 
 @Component({
 	selector: 'app-scope-models-list',
 	standalone: true,
 	templateUrl: './scope-models-list.component.html',
-	styleUrls: ['./scope-models-list.component.css', './scope-models-list-event-models.component.css'],
+	styleUrls: ['./scope-models-list.component.css'],
 	imports: [
 		CommonModule,
-		MatTableModule,
 		MatButtonModule,
 		MatIconModule,
 		MatTooltipModule,
 		EventModelTimelineComponent,
 		EventModelDetailComponent,
-		EventGroupDetailComponent
+		EventGroupDetailComponent,
+		ScopeModelDetailComponent
 	]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
@@ -90,8 +70,6 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
-
-	private workflowStateSelectionsMap = new Map<string, WorkflowStateSelection[]>();
 
 	constructor(
 		public scopeModelManager: ScopeModelManagerService,
@@ -132,6 +110,22 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription.unsubscribe();
 	}
 
+	get viewLevel(): number {
+		if(!this.selectedScopeModel) {
+			return 0;
+		}
+
+		if(this.viewMode === 'scope-detail' || this.viewMode === 'event-list' || this.viewMode === 'event-group-list') {
+			return 2;
+		}
+
+		if(this.viewMode === 'event-detail' || this.viewMode === 'event-group-detail') {
+			return 3;
+		}
+
+		return 0;
+	}
+
 	get scopeModels(): ScopeModel[] {
 		return this.scopeModelManager.getAll();
 	}
@@ -148,10 +142,6 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		return this.scopeModelManager.getModifiedIds();
 	}
 
-	get modifiedFieldsByScopeModel(): Map<string, Set<string>> {
-		return this.scopeModelManager.getModifiedFieldsMap();
-	}
-
 	get originalScopeModels(): ScopeModel[] {
 		return this.scopeModelManager.getOriginals();
 	}
@@ -160,16 +150,12 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		return this.eventModelManager.getModifiedIds();
 	}
 
-	get modifiedFieldsByEventModel(): Map<string, Set<string>> {
-		return this.eventModelManager.getModifiedFieldsMap();
+	get modifiedEventGroupIds(): Set<string> {
+		return this.eventGroupManager.getModifiedIds();
 	}
 
 	get originalEventModels(): EventModel[] {
 		return this.eventModelManager.getOriginals();
-	}
-
-	get modifiedEventGroupIds(): Set<string> {
-		return this.eventGroupManager.getModifiedIds();
 	}
 
 	get originalEventGroups(): EventGroup[] {
@@ -296,138 +282,25 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	onEditBasicInfo(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ScopeModelBasicInfoDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: JSON.parse(JSON.stringify(scopeModel)),
-				languages: this.projectLanguages
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
-			if(result) {
-				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.refreshSelectedScopeModel();
-				this.showStagedMessage();
-			}
-		});
+	onScopeModelUpdated(updatedScopeModel: ScopeModel): void {
+		this.selectedScopeModel = this.scopeModelManager.getById(updatedScopeModel.scopeModelId) || null;
+		this.emitModificationChange();
 	}
 
-	onEditRelationships(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ScopeModelRelationshipsDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: JSON.parse(JSON.stringify(scopeModel))
-			}
-		});
+	onScopeModelDeleted(scopeModelId: string): void {
+		const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
+		if(!scopeModel) {
+			return;
+		}
 
-		dialogRef.afterClosed().subscribe((result: any) => {
-			if(result) {
-				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.refreshSelectedScopeModel();
-				this.showStagedMessage();
-			}
-		});
-	}
+		const hasChildren = scopeModel.childScopeModelIds && scopeModel.childScopeModelIds.length > 0;
 
-	onEditDefaultSettings(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ScopeModelDefaultSettingsDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: JSON.parse(JSON.stringify(scopeModel))
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
-			if(result) {
-				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.refreshSelectedScopeModel();
-				this.showStagedMessage();
-			}
-		});
-	}
-
-	onEditPattern(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ScopeModelPatternDialogComponent, {
-			width: '500px',
-			data: {
-				scopeModel: JSON.parse(JSON.stringify(scopeModel))
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
-			if(result) {
-				const updatedScopeModel: ScopeModel = {...scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.refreshSelectedScopeModel();
-				this.showStagedMessage();
-			}
-		});
-	}
-
-	onEditResources(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
-			data: {
-				scopeModel: this.scopeModelManager.getById(scopeModel.scopeModelId),
-				availableForms: [],
-				availableDatasets: [],
-				availableWorkflows: [],
-				workflowStateSelections: this.workflowStateSelectionsMap.get(scopeModel.scopeModelId) || []
-			},
-			width: '500px',
-			maxHeight: '90vh',
-			disableClose: true
-		});
-
-		dialogRef.afterClosed().subscribe(result => {
-			if(result) {
-				const draft = this.scopeModelManager.getById(scopeModel.scopeModelId);
-				if(draft) {
-					Object.assign(draft, result);
-
-					if(result.workflowStateSelections !== undefined) {
-						this.workflowStateSelectionsMap.set(scopeModel.scopeModelId, result.workflowStateSelections);
-					}
-
-					this.scopeModelManager.update(draft);
-					this.refreshSelectedScopeModel();
-					this.showStagedMessage();
-				}
-			}
-		});
-	}
-
-	onDeleteScopeModel(scopeModel: ScopeModel): void {
-		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-			width: '500px',
-			data: {
-				title: 'Delete Scope Model',
-				message: `Are you sure you want to delete "${this.getTranslatedName(scopeModel.shortname)}"?`,
-				confirmText: 'Delete',
-				cancelText: 'Cancel',
-				type: 'danger'
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-			if(confirmed && scopeModel.scopeModelId) {
-				const hasChildren = scopeModel.childScopeModelIds && scopeModel.childScopeModelIds.length > 0;
-
-				if(hasChildren) {
-					this.deleteScopeModelWithChildren(scopeModel);
-				}
-				else {
-					this.performDelete(scopeModel);
-				}
-			}
-		});
+		if(hasChildren) {
+			this.deleteScopeModelWithChildren(scopeModel);
+		}
+		else {
+			this.performDelete(scopeModel);
+		}
 	}
 
 	private deleteScopeModelWithChildren(scopeModel: ScopeModel): void {
@@ -553,7 +426,8 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 		this.eventModelManager.update(updatedEventModel);
-		this.showStagedMessage();
+		this.emitModificationChange();
+		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
 	}
 
 	onEventModelDeleted(eventModelId: string): void {
@@ -617,7 +491,8 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 		this.eventGroupManager.update(updatedEventGroup);
-		this.showStagedMessage();
+		this.emitModificationChange();
+		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
 	}
 
 	onEventGroupDeleted(eventGroupId: string): void {
@@ -688,19 +563,6 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.emitContext();
 	}
 
-	private refreshSelectedScopeModel(): void {
-		if(this.selectedScopeModel) {
-			this.selectedScopeModel = this.scopeModelManager.getById(
-				this.selectedScopeModel.scopeModelId
-			) || null;
-		}
-	}
-
-	private showStagedMessage(): void {
-		this.emitModificationChange();
-		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
-	}
-
 	private emitModificationChange(): void {
 		this.scopeModelsChanged.emit({modificationCount: this.totalModificationCount});
 	}
@@ -716,71 +578,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
-	getScopeModelLabel(scopeModelId: string): string {
-		const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
-		if(!scopeModel) {
-			return scopeModelId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(scopeModel.shortname) || scopeModel.id;
-		return `${name} (${scopeModel.id})`;
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
-	}
-
-	getWorkflowStateSelections(scopeModel: ScopeModel): WorkflowStateGroup[] {
-		const selections = this.workflowStateSelectionsMap.get(scopeModel.scopeModelId) || [];
-
-		const grouped = new Map<string, {id: string; name: string}[]>();
-
-		selections.forEach(selection => {
-			if(!grouped.has(selection.workflowId)) {
-				grouped.set(selection.workflowId, []);
-			}
-
-			grouped.get(selection.workflowId)!.push({
-				id: selection.workflowStateId,
-				name: selection.workflowStateId
-			});
-		});
-
-		const result: WorkflowStateGroup[] = [];
-		grouped.forEach((states, workflowId) => {
-			result.push({
-				workflowId,
-				workflowName: workflowId,
-				states
-			});
-		});
-
-		return result;
-	}
-
-	isFieldModifiedForScopeModel(scopeModelId: string, fieldName: string): boolean {
-		return this.scopeModelManager.isFieldModified(scopeModelId, fieldName);
+		return this.languageService.getDefaultTranslation(translations) || '';
 	}
 
 	isEventModelModified(eventModelId: string): boolean {

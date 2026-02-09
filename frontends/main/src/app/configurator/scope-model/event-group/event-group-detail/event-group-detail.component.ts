@@ -22,7 +22,7 @@ import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confi
 		MatTooltipModule
 	],
 	templateUrl: './event-group-detail.component.html',
-	styleUrls: ['../../event-detail-shared.css', './event-group-detail.component.css']
+	styleUrls: ['./event-group-detail.component.css']
 })
 export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

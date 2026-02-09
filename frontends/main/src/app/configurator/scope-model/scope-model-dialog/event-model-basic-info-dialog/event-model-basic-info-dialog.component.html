@@ -9,7 +9,8 @@
 					type="text"
 					formControlName="id"
 					placeholder="EVENT_CODE"
-					required>
+					required
+					(input)="onIdInput($event)">
 				<span class="hint">Unique identifier for this event model</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
 					<span class="error-message">Code is required</span>

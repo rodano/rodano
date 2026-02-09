@@ -1,91 +1,68 @@
-/* ==================== Header ==================== */
-.detail-header {
-	padding: 1.5rem;
-	border-bottom: 2px solid #e5e7eb;
+@import '../../entity-list-base.css';
+
+/* ==================== Scope Model Specific Card Styles ==================== */
+.scope-card {
+	border-top: 4px solid #5bd4d4;
 }
 
-.detail-header h1 {
-	margin: 0;
+.scope-card:hover {
+	border-top-color: #5bd4d4;
 }
 
-.detail-subtitle {
-	margin: 0.5rem 0 0 0;
-	font-size: 0.875rem;
-	color: #6b7280;
-	font-weight: normal;
+.scope-card.create-card:hover {
+	border-color: #5bd4d4 !important;
 }
 
-.header-title-row {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
-	gap: 1rem;
+.scope-card.create-card:hover .create-content mat-icon {
+	color: #5bd4d4 !important;
 }
 
-/* ==================== Status Badges ==================== */
-.status-badge {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	padding: 0.25rem 0.75rem;
-	border-radius: 9999px;
-	font-size: 0.75rem;
-	font-weight: 600;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
+.scope-card.selected {
+	box-shadow: 0 4px 12px rgba(91, 212, 212, 0.3);
+	background-color: #e0f2f1;
 }
 
-.badge-full {
-	display: inline;
+.scope-card.selected::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	border-style: solid;
+	border-width: 0 40px 40px 0;
+	border-color: transparent #5bd4d4 transparent transparent;
 }
 
-.badge-short {
-	display: none;
+.content-container.level-2 .scope-card.selected::after {
+	border-width: 0 30px 30px 0;
 }
 
-/* Scope cards badges at level 2 */
-.content-container.detail-open .scope-card .status-badge,
-.content-container.event-list-open .scope-card .status-badge,
-.content-container.event-group-list-open .scope-card .status-badge {
-	width: 1.5rem;
-	height: 1.5rem;
-	padding: 0;
-	font-size: 0.625rem;
-	border-radius: 50%;
+.scope-card.modified.selected {
+	border-top-color: #f59e0b;
+	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.content-container.detail-open .scope-card .badge-full,
-.content-container.event-list-open .scope-card .badge-full,
-.content-container.event-group-list-open .scope-card .badge-full {
-	display: none;
+.scope-card.modified.selected::after {
+	border-color: transparent #f59e0b transparent transparent;
 }
 
-.content-container.detail-open .scope-card .badge-short,
-.content-container.event-list-open .scope-card .badge-short,
-.content-container.event-group-list-open .scope-card .badge-short {
-	display: inline;
+.scope-card.virtual-card.selected {
+	border-top-color: #3b82f6;
+	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
-/* Event cards badges at level 2 (both event models and event groups) */
-.content-container.event-detail-open .event-card .status-badge,
-.content-container.event-group-detail-open .event-card .status-badge {
-	width: 1.5rem;
-	height: 1.5rem;
-	padding: 0;
-	font-size: 0.625rem;
-	border-radius: 50%;
+.scope-card.virtual-card.selected::after {
+	border-color: transparent #3b82f6 transparent transparent;
 }
 
-.content-container.event-detail-open .event-card .badge-full,
-.content-container.event-group-detail-open .event-card .badge-full {
-	display: none;
+.scope-card.modified.virtual-card.selected {
+	border-top-color: #f59e0b;
 }
 
-.content-container.event-detail-open .event-card .badge-short,
-.content-container.event-group-detail-open .event-card .badge-short {
-	display: inline;
+.scope-card.modified.virtual-card.selected::after {
+	border-color: transparent #f59e0b transparent transparent;
 }
 
+/* ==================== Card Status Badges ==================== */
 .status-badge.standalone {
 	background-color: #e5e7eb;
 	color: #374151;
@@ -111,325 +88,26 @@
 	color: #991b1b;
 }
 
-.status-badge.mandatory {
-	background-color: #fef3c7;
-	color: #92400e;
-}
-
-.status-badge.inceptive {
-	background-color: #dbeafe;
-	color: #1e40af;
-}
-
-/* ==================== Content Container ==================== */
-.content-container {
-	display: flex;
-	height: calc(100vh - 200px);
-	background-color: #f8f9fa;
-	overflow: hidden;
-	position: relative;
-}
-
-/* ==================== Cards Container (Scope Models Column) ==================== */
-.cards-container {
-	flex: 1;
-	overflow-y: auto;
-	padding: 2rem;
-	transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Level 2: Scope cards when any detail/list is open (250px) */
-.content-container.detail-open .cards-container,
-.content-container.event-list-open .cards-container,
-.content-container.event-group-list-open .cards-container {
-	flex: 0 0 250px;
-	max-width: 250px;
-	min-width: 250px;
-	padding: 1rem;
-}
-
-/* Level 3: Scope cards when event/event-group detail is open (100px) */
-.content-container.event-detail-open .cards-container,
-.content-container.event-group-detail-open .cards-container {
-	flex: 0 0 100px;
-	max-width: 100px;
-	min-width: 100px;
-	padding: 0.5rem;
-}
-
-/* ==================== Grid ==================== */
-.scope-models-grid,
-.event-models-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-	gap: 1.5rem;
-	justify-content: start;
-}
-
-/* Level 2: Compact grid for scope cards */
-.content-container.detail-open .scope-models-grid,
-.content-container.event-list-open .scope-models-grid,
-.content-container.event-group-list-open .scope-models-grid {
-	grid-template-columns: 1fr;
-	gap: 0.75rem;
-}
-
-/* Level 3: Ultra-compact grid for scope cards */
-.content-container.event-detail-open .scope-models-grid,
-.content-container.event-group-detail-open .scope-models-grid {
-	grid-template-columns: 1fr;
-	gap: 0.5rem;
-}
-
-/* ==================== Universal Card Base Styles ==================== */
-.scope-card,
-.event-card {
-	background-color: white;
-	padding: 1.5rem;
-	cursor: pointer;
-	transition: all 0.3s ease;
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	display: flex;
-	flex-direction: column;
-	height: 200px;
-	position: relative;
-}
-
-.scope-card {
-	border-top: 4px solid #5bd4d4;
-}
-
+/* ==================== Event Model Card Styles ==================== */
 .event-card {
 	border-top: 4px solid #8b5cf6;
 }
 
-.event-card.event-group-card {
-	border-top-color: #10b981;
-}
-
-.scope-card:hover,
 .event-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	border-top-color: #8b5cf6;
 }
 
-.event-card.event-group-card .card-body {
-	display: none !important;
+.event-card.create-card:hover {
+	border-color: #8b5cf6 !important;
 }
 
-.event-card.event-group-card .card-header {
-	border-bottom: none !important;
-	margin-bottom: 0 !important;
-	padding-bottom: 0 !important;
-}
-
-.event-card.event-group-card {
-	height: auto;
-	min-height: 80px;
-	padding-bottom: 1rem;
-}
-
-/* ==================== Scope Cards Level 2 (Compact) ==================== */
-.content-container.detail-open .scope-card,
-.content-container.event-list-open .scope-card,
-.content-container.event-group-list-open .scope-card {
-	height: auto;
-	min-height: 0;
-	padding: 1rem;
-}
-
-.content-container.detail-open .scope-card .card-body,
-.content-container.event-list-open .scope-card .card-body,
-.content-container.event-group-list-open .scope-card .card-body {
-	display: none !important;
-}
-
-.content-container.detail-open .scope-card .card-selection-icon,
-.content-container.event-list-open .scope-card .card-selection-icon,
-.content-container.event-group-list-open .scope-card .card-selection-icon {
-	top: 2px;
-	right: 5px;
-}
-
-.content-container.detail-open .scope-card .card-header,
-.content-container.event-list-open .scope-card .card-header,
-.content-container.event-group-list-open .scope-card .card-header {
-	margin-bottom: 0;
-	padding-bottom: 0;
-	border-bottom: none;
-}
-
-.content-container.detail-open .scope-card .card-info h3,
-.content-container.event-list-open .scope-card .card-info h3,
-.content-container.event-group-list-open .scope-card .card-info h3 {
-	font-size: 0.875rem;
-}
-
-.content-container.detail-open .scope-card .card-code,
-.content-container.event-list-open .scope-card .card-code,
-.content-container.event-group-list-open .scope-card .card-code {
-	font-size: 0.7rem;
-	opacity: 0.7;
-}
-
-/* ==================== Scope Cards Level 3 (Ultra-Compact) ==================== */
-.content-container.event-detail-open .scope-card,
-.content-container.event-group-detail-open .scope-card {
-	height: auto;
-	min-height: 0;
-	padding: 0.5rem;
-}
-
-.content-container.event-detail-open .scope-card .card-body,
-.content-container.event-detail-open .scope-card .card-selection-icon,
-.content-container.event-detail-open .scope-card .card-modified-indicator,
-.content-container.event-detail-open .scope-card .card-header-badges,
-.content-container.event-group-detail-open .scope-card .card-body,
-.content-container.event-group-detail-open .scope-card .card-selection-icon,
-.content-container.event-group-detail-open .scope-card .card-modified-indicator,
-.content-container.event-group-detail-open .scope-card .card-header-badges {
-	display: none !important;
-}
-
-.content-container.event-detail-open .scope-card .card-header,
-.content-container.event-group-detail-open .scope-card .card-header {
-	margin-bottom: 0;
-	padding-bottom: 0;
-	border-bottom: none;
-}
-
-.content-container.event-detail-open .scope-card .card-info h3,
-.content-container.event-group-detail-open .scope-card .card-info h3 {
-	font-size: 0.9rem;
-	line-height: 1.2;
-}
-
-.content-container.event-detail-open .scope-card .card-code,
-.content-container.event-group-detail-open .scope-card .card-code {
-	font-size: 0.75rem;
-	opacity: 0.7;
-	margin-top: 0.125rem;
-}
-
-.content-container.event-detail-open .scope-card.selected::after,
-.content-container.event-group-detail-open .scope-card.selected::after {
-	border-width: 0 20px 20px 0;
-}
-
-.content-container.event-detail-open .scope-card.create-card,
-.content-container.event-group-detail-open .scope-card.create-card {
-	height: auto;
-	min-height: 60px;
-	padding: 0.5rem;
-}
-
-.content-container.event-detail-open .scope-card.create-card .create-content h3,
-.content-container.event-detail-open .scope-card.create-card .create-content p,
-.content-container.event-group-detail-open .scope-card.create-card .create-content h3,
-.content-container.event-group-detail-open .scope-card.create-card .create-content p {
-	display: none !important;
-}
-
-.content-container.event-detail-open .scope-card.create-card .create-content mat-icon,
-.content-container.event-group-detail-open .scope-card.create-card .create-content mat-icon {
-	font-size: 2rem;
-	width: 2rem;
-	height: 2rem;
-	margin-bottom: 0;
-}
-
-/* ==================== Event Cards Level 2 (Compact - Shared for Event Models & Event Groups) ==================== */
-.content-container.event-detail-open .event-card,
-.content-container.event-group-detail-open .event-card {
-	height: auto;
-	min-height: 0;
-	padding: 1rem;
-}
-
-.content-container.event-detail-open .event-card .card-body,
-.content-container.event-group-detail-open .event-card .card-body {
-	display: none !important;
-}
-
-.content-container.event-detail-open .event-card .card-selection-icon,
-.content-container.event-group-detail-open .event-card .card-selection-icon {
-	top: 2px;
-	right: 5px;
-}
-
-.content-container.event-detail-open .event-card .card-header,
-.content-container.event-group-detail-open .event-card .card-header {
-	margin-bottom: 0;
-	padding-bottom: 0;
-	border-bottom: none;
-}
-
-.content-container.event-detail-open .event-card .card-info h3,
-.content-container.event-group-detail-open .event-card .card-info h3 {
-	font-size: 0.875rem;
-}
-
-.content-container.event-detail-open .event-card .card-code,
-.content-container.event-group-detail-open .event-card .card-code {
-	font-size: 0.7rem;
-	opacity: 0.7;
-}
-
-.content-container.event-detail-open .event-card.create-card,
-.content-container.event-group-detail-open .event-card.create-card {
-	height: auto;
-	min-height: 80px;
-	padding: 1rem;
-}
-
-.content-container.event-detail-open .event-card.create-card .create-content p,
-.content-container.event-group-detail-open .event-card.create-card .create-content p {
-	display: none !important;
-}
-
-.content-container.event-detail-open .event-card.create-card .create-content mat-icon,
-.content-container.event-group-detail-open .event-card.create-card .create-content mat-icon {
-	font-size: 1.5rem;
-	width: 1.5rem;
-	height: 1.5rem;
-	margin-bottom: 0.25rem;
-}
-
-.content-container.event-detail-open .event-card.create-card .create-content h3,
-.content-container.event-group-detail-open .event-card.create-card .create-content h3 {
-	font-size: 0.875rem;
-}
-
-/* ==================== Selected State ==================== */
-.scope-card.selected {
-	box-shadow: 0 4px 12px rgba(91, 212, 212, 0.3);
-	background-color: #e0f2f1;
-}
-
-.scope-card.selected::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	right: 0;
-	border-style: solid;
-	border-width: 0 40px 40px 0;
-	border-color: transparent #5bd4d4 transparent transparent;
-}
-
-.content-container.detail-open .scope-card.selected::after,
-.content-container.event-list-open .scope-card.selected::after,
-.content-container.event-group-list-open .scope-card.selected::after {
-	border-width: 0 30px 30px 0;
+.event-card.create-card:hover .create-content mat-icon {
+	color: #8b5cf6 !important;
 }
 
 .event-card.selected {
 	box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 	background-color: #f5f3ff;
-}
-
-.event-card.event-group-card.selected {
-	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-	background-color: #d1fae5;
 }
 
 .event-card.selected::after {
@@ -442,125 +120,69 @@
 	border-color: transparent #8b5cf6 transparent transparent;
 }
 
-.event-card.event-group-card.selected::after {
-	border-color: transparent #10b981 transparent transparent;
-}
-
-.content-container.event-detail-open .event-card.selected::after,
-.content-container.event-group-detail-open .event-card.selected::after {
+.content-container.level-3 .event-card.selected::after {
 	border-width: 0 30px 30px 0;
 }
 
-.card-selection-icon {
-	position: absolute;
-	top: 8px;
-	right: 8px;
-	z-index: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.card-selection-icon mat-icon {
-	font-size: 0.875rem !important;
-	width: 0.875rem !important;
-	height: 0.875rem !important;
-	color: white !important;
-	font-weight: bold;
-}
-
-/* ==================== Modified State ==================== */
-.scope-card.modified,
-.event-card.modified,
-.event-card.event-group-card.modified {
-	background-color: #fffbeb;
-}
-
-.scope-card.modified.selected,
 .event-card.modified.selected {
 	border-top-color: #f59e0b;
 	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
-.scope-card.modified.selected::after,
 .event-card.modified.selected::after {
 	border-color: transparent #f59e0b transparent transparent;
 }
 
-.scope-card.virtual-card.selected {
-	border-top-color: #3b82f6;
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+.status-badge.mandatory {
+	background-color: #fef3c7;
+	color: #92400e;
 }
 
-.scope-card.virtual-card.selected::after {
-	border-color: transparent #3b82f6 transparent transparent;
+.status-badge.inceptive {
+	background-color: #dbeafe;
+	color: #1e40af;
 }
 
-.scope-card.modified.virtual-card.selected {
-	border-top-color: #f59e0b;
+.content-container.level-3 .timeline-wrapper {
+	display: none;
 }
 
-.scope-card.modified.virtual-card.selected::after {
-	border-color: transparent #f59e0b transparent transparent;
+/* ==================== Event Group Card Styles ==================== */
+.event-card.event-group-card {
+	border-top-color: #10b981;
+	height: auto;
+	min-height: 80px;
+	padding-bottom: 1rem;
 }
 
-.card-modified-indicator {
-	position: absolute;
-	bottom: 0.75rem;
-	right: 0.75rem;
-	width: 2rem;
-	height: 2rem;
-	background-color: #f59e0b;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.card-modified-indicator mat-icon {
-	font-size: 1rem !important;
-	width: 1rem !important;
-	height: 1rem !important;
-	color: white !important;
-}
-
-.content-container.detail-open .card-modified-indicator,
-.content-container.event-list-open .card-modified-indicator,
-.content-container.event-group-list-open .card-modified-indicator {
+.event-card.event-group-card .card-body {
 	display: none !important;
 }
 
-/* ==================== Create Card ==================== */
-.create-card {
-	background-color: #f9fafb !important;
-	border: 2px dashed #d1d5db !important;
-	border-top: 2px dashed #d1d5db !important;
-	display: flex !important;
-	align-items: center;
-	justify-content: center;
-	height: 200px;
+.event-card.event-group-card .card-header {
+	border-bottom: none !important;
+	margin-bottom: 0 !important;
+	padding-bottom: 0 !important;
 }
 
-.create-card:hover {
-	background-color: #f3f4f6 !important;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.scope-card.create-card:hover {
-	border-color: #5bd4d4 !important;
-}
-
-.event-card.create-card:hover {
-	border-color: #8b5cf6 !important;
+.content-container.level-3 .event-card.event-group-card {
+	min-height: 0;
+	height: auto;
+	padding: 0.75rem;
 }
 
 .event-card.event-group-card.create-card {
 	height: 80px;
+	min-height: 80px;
 }
 
-.content-container.event-group-list-open .event-card.event-group-card.create-card .create-content p {
+.content-container.level-3 .event-card.event-group-card.create-card {
+	height: auto;
+	min-height: 60px;
+	padding: 0.75rem;
+}
+
+.content-container.level-2 .event-card.event-group-card.create-card .create-content p {
 	display: none !important;
 }
 
@@ -568,557 +190,15 @@
 	border-color: #10b981 !important;
 }
 
-.create-card.selected::after {
-	display: none !important;
-}
-
-.create-content {
-	text-align: center;
-	color: #6b7280;
-}
-
-.create-content mat-icon {
-	font-size: 3rem;
-	width: 3rem;
-	height: 3rem;
-	color: #9ca3af !important;
-	margin-bottom: 0.75rem;
-}
-
-.scope-card.create-card:hover .create-content mat-icon {
-	color: #5bd4d4 !important;
-}
-
-.event-card.create-card:hover .create-content mat-icon {
-	color: #8b5cf6 !important;
-}
-
 .event-card.event-group-card.create-card:hover .create-content mat-icon {
 	color: #10b981 !important;
 }
 
-.create-content h3 {
-	margin: 0 0 0.25rem 0;
-	font-size: 1.125rem;
-	font-weight: 600;
-	color: #374151;
+.event-card.event-group-card.selected {
+	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+	background-color: #d1fae5;
 }
 
-.create-content p {
-	margin: 0;
-	opacity: 0.8;
-	font-size: 0.875rem;
-	color: #6b7280;
-}
-
-/* Compact create cards for scope cards at level 2 */
-.content-container.detail-open .scope-card.create-card,
-.content-container.event-list-open .scope-card.create-card,
-.content-container.event-group-list-open .scope-card.create-card {
-	height: auto;
-	min-height: 50px;
-	padding: 1rem;
-}
-
-.content-container.detail-open .scope-card.create-card .create-content p,
-.content-container.event-list-open .scope-card.create-card .create-content p,
-.content-container.event-group-list-open .scope-card.create-card .create-content p {
-	display: none !important;
-}
-
-.content-container.detail-open .scope-card.create-card .create-content mat-icon,
-.content-container.event-list-open .scope-card.create-card .create-content mat-icon,
-.content-container.event-group-list-open .scope-card.create-card .create-content mat-icon {
-	font-size: 1.5rem;
-	width: 1.5rem;
-	height: 1.5rem;
-	margin-bottom: 0.25rem;
-}
-
-.content-container.detail-open .scope-card.create-card .create-content h3,
-.content-container.event-list-open .scope-card.create-card .create-content h3,
-.content-container.event-group-list-open .scope-card.create-card .create-content h3 {
-	font-size: 0.875rem;
-}
-
-/* ==================== Card Header ==================== */
-.card-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-bottom: 1rem;
-	padding-bottom: 0.75rem;
-	border-bottom: 1px solid #e5e7eb;
-	gap: 0.5rem;
-}
-
-.card-info {
-	flex: 1;
-	min-width: 0;
-}
-
-.card-info h3 {
-	margin: 0 0 0.25rem 0;
-	font-size: 1.125rem;
-	font-weight: 600;
-	color: #111827;
-}
-
-.card-code {
-	margin: 0;
-	font-size: 0.875rem;
-	color: #6b7280;
-	font-family: monospace;
-}
-
-.card-header-badges {
-	display: flex;
-	gap: 0.25rem;
-	flex-shrink: 0;
-}
-
-/* ==================== Card Body ==================== */
-.card-body {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-}
-
-.card-details {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-	flex: 1;
-}
-
-.detail-item {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	font-size: 0.875rem;
-	color: #6b7280;
-}
-
-.detail-item mat-icon {
-	font-size: 1.125rem !important;
-	width: 1.125rem !important;
-	height: 1.125rem !important;
-	color: #9ca3af !important;
-}
-
-/* ==================== Detail Panel ==================== */
-.detail-panel {
-	flex: 1;
-	border-left: 1px solid #e5e7eb;
-	display: flex;
-	flex-direction: column;
-	animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-	overflow: hidden;
-}
-
-@keyframes slideIn {
-	from {
-		transform: translateX(100%);
-		opacity: 0;
-	}
-	to {
-		transform: translateX(0);
-		opacity: 1;
-	}
-}
-
-.detail-panel-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1.5rem;
-	border-bottom: 2px solid #e5e7eb;
-	flex-shrink: 0;
-}
-
-.detail-title {
-	display: grid;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-.detail-title h2 {
-	margin: 0;
-	font-size: 1.5rem;
-	font-weight: 600;
-	color: #111827;
-}
-
-.detail-code {
-	font-size: 0.875rem;
-	font-weight: 700;
-	color: white;
-	background-color: #5bd4d4;
-	padding: 0.375rem 0.75rem;
-	border-radius: 0.375rem;
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
-}
-
-/* ==================== Header Actions Buttons ==================== */
-.header-actions {
-	display: flex;
-	gap: 0.5rem;
-	align-items: center;
-}
-
-.btn-view-event-models,
-.btn-view-event-groups {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.625rem 1rem;
-	border: none;
-	border-radius: 0.375rem;
-	font-size: 0.875rem;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s;
-	color: white;
-}
-
-.btn-view-event-models {
-	background-color: #8b5cf6;
-}
-
-.btn-view-event-models:hover {
-	background-color: #7c3aed;
-}
-
-.btn-view-event-groups {
-	background-color: #10b981;
-}
-
-.btn-view-event-groups:hover {
-	background-color: #059669;
-}
-
-.btn-view-event-models mat-icon,
-.btn-view-event-groups mat-icon {
-	font-size: 1.125rem;
-	width: 1.125rem;
-	height: 1.125rem;
-}
-
-.btn-close {
-	background: none;
-	border: none;
-	cursor: pointer;
-	padding: 0.5rem;
-	border-radius: 0.375rem;
-	transition: all 0.2s;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.btn-close:hover {
-	background-color: #f3f4f6;
-}
-
-.btn-close mat-icon {
-	font-size: 1.5rem !important;
-	width: 1.5rem !important;
-	height: 1.5rem !important;
-	color: #6b7280 !important;
-}
-
-.detail-content {
-	flex: 1;
-	overflow-y: auto;
-	padding: 1.5rem;
-	display: flex;
-	flex-direction: column;
-	gap: 1.5rem;
-	background-color: #f8f9fa;
-}
-
-/* ==================== Settings Sections ==================== */
-.settings-section {
-	background-color: white;
-	border: 1px solid #e5e7eb;
-	border-radius: 0.5rem;
-	padding: 1.5rem;
-}
-
-.settings-section h3 {
-	margin: 0 0 1rem 0;
-	font-size: 1.125rem;
-	font-weight: 600;
-	color: #111827;
-}
-
-.settings-grid {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	gap: 1rem;
-	margin-bottom: 1.5rem;
-}
-
-.setting-item {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-.setting-item.full-width {
-	grid-column: 1 / -1;
-}
-
-.setting-item label {
-	font-size: 0.875rem;
-	font-weight: 600;
-	color: #374151;
-}
-
-.setting-value {
-	font-size: 0.875rem;
-	color: #111827;
-	padding: 0.5rem;
-	background-color: #f9fafb;
-	border-radius: 0.375rem;
-	border: 1px solid #e5e7eb;
-}
-
-.setting-value.not-configured {
-	color: #dc2626;
-	background-color: #fef2f2;
-	border-color: #fecaca;
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-}
-
-/* ==================== Relationships ==================== */
-.relationship-box {
-	padding: 0.75rem;
-	background-color: #f9fafb;
-	border-radius: 0.375rem;
-	border: 1px solid #e5e7eb;
-	min-height: 3rem;
-}
-
-.chip-container {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 0.5rem;
-}
-
-.chip {
-	display: inline-flex;
-	align-items: center;
-	gap: 0.375rem;
-	padding: 0.375rem 0.75rem;
-	background-color: white;
-	border: 1px solid #d1d5db;
-	border-radius: 0.375rem;
-	font-size: 0.75rem;
-	font-weight: 500;
-	color: #374151;
-}
-
-.chip.parent-chip {
-background-color: #e0f2f1;
-color: #047857;
-border: 1px solid #5bd4d4;
-}
-
-.chip.child-chip {
-	background-color: #f5f3ff;
-	color: #6b21a8;
-	border: 1px solid #8b5cf6;
-}
-
-.chip.default-chip {
-	background-color: #fef3c7;
-	color: #92400e;
-	border: 1px solid #fcd34d;
-}
-
-.language-name {
-	font-weight: 500;
-}
-
-.default-icon {
-	font-size: 1rem !important;
-	width: 1rem !important;
-	height: 1rem !important;
-	color: #f59e0b !important;
-}
-
-/* ==================== Buttons ==================== */
-.btn-edit {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.625rem 1rem;
-	background-color: #f3f4f6;
-	color: #374151;
-	border: 1px solid #d1d5db;
-	border-radius: 0.375rem;
-	font-size: 0.875rem;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s;
-}
-
-.btn-edit:hover {
-	background-color: #e5e7eb;
-}
-
-.btn-edit mat-icon {
-	font-size: 1.125rem;
-	width: 1.125rem;
-	height: 1.125rem;
-}
-
-.btn-delete {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	padding: 0.625rem 1rem;
-	background-color: #dc2626;
-	color: white;
-	border: none;
-	border-radius: 0.375rem;
-	font-size: 0.875rem;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s;
-}
-
-.btn-delete:hover {
-	background-color: #b91c1c;
-}
-
-.btn-delete mat-icon {
-	font-size: 1.125rem;
-	width: 1.125rem;
-	height: 1.125rem;
-}
-
-/* ==================== Danger Zone ==================== */
-.danger-section {
-	border-color: #fecaca;
-	background-color: #fef2f2;
-}
-
-.danger-section h3 {
-	color: #991b1b;
-}
-
-.danger-text {
-	margin: 0 0 1rem 0;
-	font-size: 0.875rem;
-	color: #dc2626;
-}
-
-/* ==================== Empty States ==================== */
-.warning-icon {
-	font-size: 1rem !important;
-	width: 1rem !important;
-	height: 1rem !important;
-	color: #dc2626 !important;
-}
-
-.empty-message-centered {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.5rem;
-	color: #9ca3af;
-	font-size: 0.875rem;
-	padding: 0.5rem;
-}
-
-.empty-message-centered .warning-icon {
-	font-size: 2rem !important;
-	width: 2rem !important;
-	height: 2rem !important;
-	color: #dc2626 !important;
-}
-
-/* ==================== Modified Indicator ==================== */
-.setting-item.modified {
-	position: relative;
-	border-right: 0.25rem solid #f59e0b;
-	background-color: #fffbeb;
-	border-radius: 0.25rem;
-}
-
-.modified-icon {
-	font-size: 1rem !important;
-	width: 1rem !important;
-	height: 1rem !important;
-	color: #f59e0b !important;
-	margin-left: 0.25rem;
-	vertical-align: middle;
-}
-
-/* ==================== Workflow State Selections ==================== */
-.workflow-state-selections {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
-}
-
-.workflow-state-group {
-	background-color: #f9fafb;
-	border-radius: 0.5rem;
-	padding: 1rem;
-	border-left: 3px solid #5bd4d4;
-}
-
-.workflow-header {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	margin-bottom: 0.75rem;
-	font-weight: 600;
-	color: #111827;
-}
-
-.workflow-header .resource-icon {
-	color: #5bd4d4;
-	font-size: 1.25rem;
-}
-
-.workflow-name {
-	font-size: 0.875rem;
-}
-
-.states-chips {
-	margin-left: 1.75rem;
-}
-
-.state-chip {
-	background-color: #eff6ff;
-	border: 1px solid #bfdbfe;
-}
-
-.state-chip .state-icon {
-	color: #3b82f6;
-	font-size: 1rem;
-	width: 1rem;
-	height: 1rem;
-}
-
-/* ==================== Code Format Display ==================== */
-.code-format-display {
-	padding: 0.75rem;
-	background-color: #1f2937;
-	border-radius: 0.375rem;
-	border: 1px solid #374151;
-}
-
-.code-format-display code {
-	font-family: 'Courier New', monospace;
-	font-size: 0.875rem;
-	color: #10b981;
-	font-weight: 500;
+.event-card.event-group-card.selected::after {
+	border-color: transparent #10b981 transparent transparent;
 }

@@ -32,7 +32,7 @@ import {EventGroup} from '@core/model/event-group';
 	selector: 'app-event-model-detail',
 	standalone: true,
 	templateUrl: './event-model-detail.component.html',
-	styleUrls: ['../../event-detail-shared.css', './event-model-detail.component.css'],
+	styleUrls: ['./event-model-detail.component.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule]
 })
 export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
