@@ -15,7 +15,7 @@ import {ProjectLanguage} from '@core/model/project-language';
 interface EventModelBasicInfoDialogData {
 	eventModel: EventModel;
 	languages: ProjectLanguage[];
-	eventGroups: {id: string; name: string}[];
+	eventGroups: {id: string; name: string; code: string}[];
 }
 
 @Component({
@@ -40,7 +40,7 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 	form: FormGroup;
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
-	eventGroups: {id: string; name: string}[];
+	eventGroups: {id: string; name: string; code: string}[];
 
 	constructor(
 		private fb: FormBuilder,

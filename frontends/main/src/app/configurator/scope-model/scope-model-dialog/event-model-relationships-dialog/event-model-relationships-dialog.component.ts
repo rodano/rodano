@@ -4,6 +4,7 @@ import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {LanguageService} from '../../../services/language.service';
 
 export interface EventModelRelationshipsDialogData {
 	eventModel: EventModel;
@@ -30,6 +31,7 @@ export class EventModelRelationshipsDialogComponent implements OnInit {
 	selectedImpliedEventModels: EventModel[] = [];
 
 	constructor(
+		private languageService: LanguageService,
 		private dialogRef: MatDialogRef<EventModelRelationshipsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelRelationshipsDialogData
 	) {}
@@ -84,7 +86,8 @@ export class EventModelRelationshipsDialogComponent implements OnInit {
 	}
 
 	getEventModelName(eventModel: EventModel): string {
-		return eventModel.shortname?.['en'] || eventModel.id || 'Unnamed Event';
+		const name = this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id;
+		return `${name} (${eventModel.id})`;
 	}
 
 	onSave(): void {

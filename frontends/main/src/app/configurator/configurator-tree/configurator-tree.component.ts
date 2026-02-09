@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {ScopeModelService} from '../services/scope-model.service';
+import {LanguageService} from '../services/language.service';
 
 interface TreeNode {
 	id: string;
@@ -111,6 +112,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 
 	constructor(
 		private scopeModelService: ScopeModelService,
+		private languageService: LanguageService,
 		private changeDetectorRef: ChangeDetectorRef
 	) {}
 
@@ -204,7 +206,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 
 		const node: TreeNode = {
 			id: `scope-model-${scopeModel.scopeModelId}`,
-			label: scopeModel.shortname['en'] || scopeModel.shortname['de'] || scopeModel.id,
+			label: this.languageService.getDefaultTranslation(scopeModel.shortname) || scopeModel.id,
 			icon: icon,
 			expanded: true,
 			type: 'scope-model',
@@ -224,7 +226,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 					.forEach(eventGroup => {
 						eventNodes.push({
 							id: `event-group-${eventGroup.eventGroupId}`,
-							label: eventGroup.shortname['en'] || eventGroup.shortname['de'] || eventGroup.id,
+							label: this.languageService.getDefaultTranslation(eventGroup.shortname) || eventGroup.id,
 							icon: 'group',
 							type: 'event-group',
 							scopeModelId: scopeModel.scopeModelId,
@@ -239,7 +241,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 					.forEach(eventModel => {
 						eventNodes.push({
 							id: `event-model-${eventModel.eventModelId}`,
-							label: eventModel.shortname['en'] || eventModel.shortname['de'] || eventModel.id,
+							label: this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id,
 							icon: 'event',
 							type: 'event-model',
 							scopeModelId: scopeModel.scopeModelId,

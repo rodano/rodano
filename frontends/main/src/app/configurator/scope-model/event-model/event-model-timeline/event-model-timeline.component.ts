@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {EventModel} from '@core/model/event-model';
 import {color} from 'chart.js/helpers';
+import {LanguageService} from '../../../services/language.service';
 
 interface TimelineEvent {
 	eventModel: EventModel;
@@ -31,6 +32,10 @@ export class EventModelTimelineComponent implements OnChanges {
 	rightMargin = 55;
 	axisY = 100;
 
+	constructor(
+		private languageService: LanguageService
+	) {}
+
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['eventModels']) {
 			this.buildTimeline();
@@ -53,7 +58,7 @@ export class EventModelTimelineComponent implements OnChanges {
 				eventModel: em,
 				deadlineMonth,
 				intervalMonths,
-				label: em.shortname?.['en'] || em.shortname?.['de'] || em.id
+				label: this.languageService.getDefaultTranslation(em.shortname) || em.id
 			};
 		});
 

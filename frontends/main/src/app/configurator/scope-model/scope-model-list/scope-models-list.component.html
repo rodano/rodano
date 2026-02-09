@@ -448,7 +448,7 @@
 									@if (!selectedScopeModel.defaultParentId) {
 										<mat-icon class="warning-icon">report</mat-icon>
 									}
-									{{ selectedScopeModel.defaultParentId ? getScopeModelCode(selectedScopeModel.defaultParentId) : 'Not configured' }}
+									{{ selectedScopeModel.defaultParentId ? getScopeModelLabel(selectedScopeModel.defaultParentId) : 'Not configured' }}
 								</div>
 							</div>
 
@@ -464,11 +464,15 @@
 									@if (selectedScopeModel.parentIds.length > 0) {
 										<div class="chip-container">
 											@for (parentId of selectedScopeModel.parentIds; track parentId) {
-												<div class="chip" [class.default-chip]="parentId === selectedScopeModel.defaultParentId">
-													<span class="language-name">{{ getScopeModelCode(parentId) }}</span>
+												<div class="chip"
+																	[class.default-chip]="parentId === selectedScopeModel.defaultParentId"
+																	[class.parent-chip]="parentId !== selectedScopeModel.defaultParentId">
 													@if (parentId === selectedScopeModel.defaultParentId) {
-														<mat-icon class="default-icon">star</mat-icon>
+														<mat-icon class="resource-icon">star</mat-icon>
+													} @else {
+														<mat-icon class="resource-icon">arrow_upward</mat-icon>
 													}
+													<span class="language-name">{{ getScopeModelLabel(parentId) }}</span>
 												</div>
 											}
 										</div>
@@ -487,8 +491,9 @@
 									@if (selectedScopeModel.childScopeModelIds.length > 0) {
 										<div class="chip-container">
 											@for (childId of selectedScopeModel.childScopeModelIds; track childId) {
-												<div class="chip">
-													<span class="language-name">{{ getScopeModelCode(childId) }}</span>
+												<div class="chip child-chip">
+													<mat-icon class="resource-icon">arrow_downward</mat-icon>
+													<span class="language-name">{{ getScopeModelLabel(childId) }}</span>
 												</div>
 											}
 										</div>
@@ -513,7 +518,7 @@
 							<div class="setting-item"
 												[class.modified]="isFieldModifiedForScopeModel(selectedScopeModel.scopeModelId, 'defaultProfileId')">
 								<label>
-									Default Profile ID
+									Default Profile
 									@if (isFieldModifiedForScopeModel(selectedScopeModel.scopeModelId, 'defaultProfileId')) {
 										<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 									}

@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {LanguageService} from '../../../services/language.service';
 
 export interface EventModelSchedulingDialogData {
 	eventModel: EventModel;
@@ -46,6 +47,7 @@ export class EventModelSchedulingDialogComponent implements OnInit {
 	selectedEventModels: EventModel[] = [];
 
 	constructor(
+		private languageService: LanguageService,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<EventModelSchedulingDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelSchedulingDialogData
@@ -96,7 +98,7 @@ export class EventModelSchedulingDialogComponent implements OnInit {
 	}
 
 	getEventModelLabel(eventModel: EventModel): string {
-		const shortname = eventModel.shortname?.['en'] || eventModel.id;
+		const shortname = this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id;
 		return `${shortname} (${eventModel.id})`;
 	}
 

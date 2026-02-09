@@ -727,9 +727,14 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		return translations[lang] || '';
 	}
 
-	getScopeModelCode(scopeModelId: string): string {
+	getScopeModelLabel(scopeModelId: string): string {
 		const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
-		return scopeModel ? scopeModel.id : scopeModelId;
+		if(!scopeModel) {
+			return scopeModelId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(scopeModel.shortname) || scopeModel.id;
+		return `${name} (${scopeModel.id})`;
 	}
 
 	getLanguageName(code: string | undefined): string {

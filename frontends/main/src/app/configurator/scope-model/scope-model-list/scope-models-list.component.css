@@ -922,6 +922,18 @@
 	color: #374151;
 }
 
+.chip.parent-chip {
+background-color: #e0f2f1;
+color: #047857;
+border: 1px solid #5bd4d4;
+}
+
+.chip.child-chip {
+	background-color: #f5f3ff;
+	color: #6b21a8;
+	border: 1px solid #8b5cf6;
+}
+
 .chip.default-chip {
 	background-color: #fef3c7;
 	color: #92400e;

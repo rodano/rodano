@@ -107,6 +107,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.workingProject = {...project};
 
 				if(project?.languages?.length) {
+					this.languageService.setProjectLanguages(project.languages);
+
 					const defaultLanguage = project.languages.find(language => language.isDefault)?.languageCode || project.languages[0].languageCode || 'en';
 					this.languageService.setLanguage(defaultLanguage);
 				}
@@ -296,7 +298,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			return '';
 		}
 		const currentLanguage = this.languageService.currentLanguage;
-		return translations[currentLanguage] || translations['en'] || Object.values(translations)[0] || '';
+		const defaultLanguage = this.languageService.getDefaultLanguageCode();
+
+		return translations[currentLanguage] || translations[defaultLanguage] || Object.values(translations)[0] || '';
 	}
 
 	get hasModifications(): boolean {

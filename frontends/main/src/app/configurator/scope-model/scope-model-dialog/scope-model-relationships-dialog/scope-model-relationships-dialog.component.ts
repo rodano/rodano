@@ -11,6 +11,7 @@ import {ScopeModelService} from '../../../services/scope-model.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 import {MatIconModule} from '@angular/material/icon';
+import {LanguageService} from '../../../services/language.service';
 
 interface DialogData {
 	projectId: string;
@@ -39,6 +40,7 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 	availableParents: ScopeModel[] = [];
 
 	constructor(
+		private languageService: LanguageService,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ScopeModelRelationshipsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -116,9 +118,11 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 	}
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {
-		if(!translations) {
-			return '';
-		}
-		return translations['en'] || Object.values(translations)[0] || '';
+		return this.languageService.getDefaultTranslation(translations) || '';
+	}
+
+	getScopeModelLabel(scopeModel: ScopeModel): string {
+		const shortname = this.languageService.getDefaultTranslation(scopeModel.shortname) || scopeModel.id;
+		return `${shortname} (${scopeModel.id})`;
 	}
 }

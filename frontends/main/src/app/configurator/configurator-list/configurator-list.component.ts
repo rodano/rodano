@@ -14,6 +14,7 @@ import {Router} from '@angular/router';
 import {CreateProjectDialogComponent} from '../create-project-dialog/create-project-dialog.component';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
 import {SnapshotsListDialogComponent} from '../snapshots/snapshots-list-dialog/snapshots-list-dialog.component';
+import {LanguageService} from '../services/language.service';
 
 @Component({
 	selector: 'app-configurator-list',
@@ -55,6 +56,7 @@ export class ConfiguratorListComponent implements OnInit {
 
 	constructor(
 		private configuratorService: ConfiguratorService,
+		private languageService: LanguageService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar,
 		private router: Router
@@ -303,10 +305,7 @@ export class ConfiguratorListComponent implements OnInit {
 	}
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {
-		if(!translations) {
-			return '';
-		}
-		return translations['en'] || Object.values(translations)[0] || '';
+		return this.languageService.getDefaultTranslation(translations) || '';
 	}
 
 	private getTimestamp(date: Date | undefined): number {

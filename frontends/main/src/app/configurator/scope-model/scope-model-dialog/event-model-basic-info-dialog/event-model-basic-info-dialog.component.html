@@ -39,7 +39,7 @@
 				<select formControlName="eventGroupId">
 					<option [value]="null">None</option>
 					@for (group of eventGroups; track group.id) {
-						<option [value]="group.id">{{ group.name }}</option>
+						<option [value]="group.id">{{ group.name }} ({{ group.code }})</option>
 					}
 				</select>
 				<span class="hint">Optional grouping for related events</span>

@@ -14,8 +14,7 @@
 								@if (!isParentSelected(parent.scopeModelId)) {
 									<div class="list-item" (click)="toggleParent(parent.scopeModelId)">
 										<span class="item-text">
-											{{ getTranslatedName(parent.shortname) }}
-											<small>({{ parent.id }})</small>
+											{{ getScopeModelLabel(parent) }}
 										</span>
 										<mat-icon class="action-icon">chevron_right</mat-icon>
 									</div>
@@ -35,7 +34,7 @@
 									<div class="list-item" (click)="toggleParent(parent.scopeModelId)">
 										<mat-icon class="action-icon">chevron_left</mat-icon>
 										<span class="item-text">
-											{{ getTranslatedName(parent.shortname) }}
+											{{ getScopeModelLabel(parent) }}
 										</span>
 									</div>
 								}
@@ -52,7 +51,7 @@
 					<mat-option [value]="''">None</mat-option>
 					@for (parent of getSelectedParents(); track parent.scopeModelId) {
 						<mat-option [value]="parent.scopeModelId">
-							{{ getTranslatedName(parent.shortname) }} ({{ parent.id }})
+							{{ getScopeModelLabel(parent) }}
 						</mat-option>
 					}
 				</mat-select>

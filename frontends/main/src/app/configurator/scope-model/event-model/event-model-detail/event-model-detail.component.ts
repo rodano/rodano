@@ -119,16 +119,22 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 
 	getEventModelName(eventModelId: string): string {
 		const em = this.eventModels.find(e => e.eventModelId === eventModelId);
-		return em ? (em.shortname?.['en'] || em.shortname?.['de'] || em.id) : eventModelId;
+		if(!em) {
+			return eventModelId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(em.shortname) || em.id;
+		return `${name} (${em.id})`;
 	}
 
 	getEventModelCode(eventModelId: string): string {
 		const eventModel = this.eventModels.find(em => em.eventModelId === eventModelId);
-		if(eventModel) {
-			const shortname = eventModel.shortname?.['en'] || eventModel.id;
-			return `${shortname} (${eventModel.id})`;
+		if(!eventModel) {
+			return eventModelId;
 		}
-		return eventModelId;
+
+		const shortname = this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id;
+		return `${shortname} (${eventModel.id})`;
 	}
 
 	getEventGroupName(eventGroupId: string | undefined): string {
@@ -136,13 +142,19 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			return 'None';
 		}
 		const eventGroup = this.eventGroups.find(eg => eg.eventGroupId === eventGroupId);
-		return eventGroup ? (eventGroup.shortname?.['en'] || eventGroup.shortname?.['de'] || eventGroup.id) : eventGroupId;
+		if(!eventGroup) {
+			return eventGroupId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(eventGroup.shortname) || eventGroup.id;
+		return `${name} (${eventGroup.id})`;
 	}
 
 	onEditBasicInfo(): void {
 		const formattedEventGroups = this.eventGroups.map(eg => ({
 			id: eg.eventGroupId,
-			name: eg.shortname?.['en'] || eg.shortname?.['de'] || eg.id
+			name: this.languageService.getDefaultTranslation(eg.shortname) || eg.id,
+			code: eg.id
 		}));
 
 		const dialogRef = this.dialog.open(EventModelBasicInfoDialogComponent, {
