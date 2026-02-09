@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import ch.rodano.api.config.EventGroupDTO;
 import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.config.ScopeModelDTO;
 import ch.rodano.configuration.model.event.DateAggregationFunction;
@@ -30,10 +31,14 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 
 	private final DSLContext dslContext;
 	private final JsonMapperService jsonMapperService;
+	private final EventGroupDAOService eventGroupDAOService;
 
-	public ScopeModelDAOServiceImpl(final DSLContext dslContext, final JsonMapperService jsonMapperService) {
+	public ScopeModelDAOServiceImpl(final DSLContext dslContext,
+									final JsonMapperService jsonMapperService,
+									final EventGroupDAOService eventGroupDAOService) {
 		this.dslContext = dslContext;
 		this.jsonMapperService = jsonMapperService;
+		this.eventGroupDAOService = eventGroupDAOService;
 	}
 
 	@Override
@@ -220,10 +225,14 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var dto = new ScopeModelDTO();
 		dto.setScopeModelId(record.getScopeModelId());
 		dto.setId(record.getCode());
-		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setPluralShortname(jsonMapperService.fromJson(record.getPluralShortname(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setPluralShortname(jsonMapperService.fromJson(record.getPluralShortname(), new TypeReference<TreeMap<String, String>>() {
+		}));
 		dto.setVirtual(record.getVirtual());
 		dto.setDefaultParentId(record.getDefaultParentId());
 		dto.setDefaultProfileId(record.getDefaultProfileId());
@@ -252,8 +261,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var eventModels = loadEventModels(projectId, record.getScopeModelId());
 		dto.setEventModels(eventModels);
 
-		// TODO: Load event groups if needed
-		dto.setEventGroups(new ArrayList<>());
+		final var eventGroups = loadEventGroups(projectId, record.getScopeModelId());
+		dto.setEventGroups(eventGroups);
 
 		return dto;
 	}
@@ -306,11 +315,15 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.fetch();
 
 		return eventModelRecords.stream()
-			.map(record -> mapEventModelToDTO(record, projectId))
+			.map(this::mapEventModelToDTO)
 			.collect(Collectors.toList());
 	}
 
-	private EventModelDTO mapEventModelToDTO(final EventModelRecord record, final UUID projectId) {
+	private List<EventGroupDTO> loadEventGroups(final UUID projectId, final UUID scopeModelId) {
+		return eventGroupDAOService.getEventGroupsByScopeModel(projectId, scopeModelId);
+	}
+
+	private EventModelDTO mapEventModelToDTO(final EventModelRecord record) {
 		final var dto = new EventModelDTO();
 		dto.setEventModelId(record.getEventModelId());
 		dto.setId(record.getCode());

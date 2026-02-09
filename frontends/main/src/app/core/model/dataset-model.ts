@@ -23,6 +23,8 @@ export interface DatasetModel {
      */
     id: string;
     shortname: { [key: string]: string; };
+    longname?: { [key: string]: string; };
+    description?: { [key: string]: string; };
     /**
      * Is the document repeatable?
      */
@@ -31,6 +33,9 @@ export interface DatasetModel {
      * Can the document be exported?
      */
     exportable: boolean;
+    master?: boolean;
+    exportOrder?: number;
+    family?: string;
     /**
      * Is the document attached directly to a scope?
      */

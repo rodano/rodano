@@ -19,12 +19,21 @@ public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
 	String id;
 	@NotNull
 	SortedMap<String, String> shortname;
+
+	SortedMap<String, String> longname;
+	SortedMap<String, String> description;
+
 	@Schema(description = "Is the document repeatable?")
 	@NotNull
 	boolean multiple;
 	@Schema(description = "Can the document be exported?")
 	@NotNull
 	boolean exportable;
+
+	boolean master;
+	Integer exportOrder;
+	String family;
+
 	@Schema(description = "Is the document attached directly to a scope?")
 	@NotNull
 	boolean scopeDocumentation;
@@ -74,6 +83,30 @@ public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
 		this.exportable = exportable;
 	}
 
+	public boolean isMaster() {
+		return master;
+	}
+
+	public void setMaster(final boolean master) {
+		this.master = master;
+	}
+
+	public Integer getExportOrder() {
+		return exportOrder;
+	}
+
+	public void setExportOrder(final Integer exportOrder) {
+		this.exportOrder = exportOrder;
+	}
+
+	public String getFamily() {
+		return family;
+	}
+
+	public void setFamily(final String family) {
+		this.family = family;
+	}
+
 	public boolean isScopeDocumentation() {
 		return scopeDocumentation;
 	}
@@ -96,6 +129,22 @@ public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
 
 	public void setShortname(final SortedMap<String, String> shortname) {
 		this.shortname = shortname;
+	}
+
+	public SortedMap<String, String> getLongname() {
+		return longname;
+	}
+
+	public void setLongname(final SortedMap<String, String> longname) {
+		this.longname = longname;
+	}
+
+	public SortedMap<String, String> getDescription() {
+		return description;
+	}
+
+	public void setDescription(final SortedMap<String, String> description) {
+		this.description = description;
 	}
 
 	public String getExpandedLabelPattern() {

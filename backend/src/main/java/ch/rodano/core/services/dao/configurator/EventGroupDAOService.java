@@ -16,4 +16,6 @@ public interface EventGroupDAOService {
 	EventGroupDTO updateEventGroup(UUID projectId, UUID eventGroupId, EventGroupDTO eventGroup);
 
 	void deleteEventGroup(UUID projectId, UUID eventGroupId);
+
+	List<EventGroupDTO> getEventGroupsByScopeModel(UUID projectId, UUID scopeModelId);
 }

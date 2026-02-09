@@ -34,7 +34,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 			.fetch();
 
 		return eventGroups.stream()
-			.map(record -> mapToDTO(record, projectId))
+			.map(this::mapToDTO)
 			.collect(Collectors.toList());
 	}
 
@@ -49,7 +49,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 			return null;
 		}
 
-		return mapToDTO(record, projectId);
+		return mapToDTO(record);
 	}
 
 	@Override
@@ -94,7 +94,20 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 			.execute();
 	}
 
-	private EventGroupDTO mapToDTO(final EventGroupRecord record, final UUID projectId) {
+	@Override
+	public List<EventGroupDTO> getEventGroupsByScopeModel(final UUID projectId, final UUID scopeModelId) {
+		final var eventGroups = dslContext.selectFrom(EVENT_GROUP)
+			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
+			.and(EVENT_GROUP.SCOPE_MODEL_ID.eq(scopeModelId))
+			.orderBy(EVENT_GROUP.CODE)
+			.fetch();
+
+		return eventGroups.stream()
+			.map(this::mapToDTO)
+			.collect(Collectors.toList());
+	}
+
+	private EventGroupDTO mapToDTO(final EventGroupRecord record) {
 		final var dto = new EventGroupDTO();
 		dto.setEventGroupId(record.getEventGroupId());
 		dto.setId(record.getCode());

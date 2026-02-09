@@ -13,7 +13,7 @@ import { PossibleValue } from './possible-value';
 
 
 /**
- * Field model
+ * Field models
  */
 export interface FieldModel { 
     fieldModelId: string;
