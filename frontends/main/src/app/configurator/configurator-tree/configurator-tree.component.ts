@@ -2,7 +2,7 @@ import {Component, Input, Output, EventEmitter, OnInit, OnChanges, ChangeDetecto
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
-import {ScopeModelService} from '../services/scope-model.service';
+import {ScopeModelService} from '../services/api/scope-model.service';
 import {LanguageService} from '../services/language.service';
 
 interface TreeNode {

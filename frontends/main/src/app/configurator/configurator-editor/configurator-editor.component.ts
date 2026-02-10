@@ -5,7 +5,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
-import {ConfiguratorService} from '../services/configurator.service';
+import {ConfiguratorService} from '../services/api/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {ProjectConfigVersion} from '@core/model/project-config-version';
 import {ConfiguratorDetailComponent} from '../configurator-detail/configurator-detail.component';
@@ -13,15 +13,15 @@ import {ConfiguratorTreeComponent} from '../configurator-tree/configurator-tree.
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
-import {SnapshotsListDialogComponent} from '../snapshots/snapshots-list-dialog/snapshots-list-dialog.component';
-import {CreateSnapshotDialogComponent} from '../snapshots/create-snapshot-dialog/create-snapshot-dialog.component';
-import {ScopeModelService} from '../services/scope-model.service';
+import {SnapshotsListDialogComponent} from '../dialogs/base/snapshots-list-dialog/snapshots-list-dialog.component';
+import {CreateSnapshotDialogComponent} from '../dialogs/base/create-snapshot-dialog/create-snapshot-dialog.component';
+import {ScopeModelService} from '../services/api/scope-model.service';
 import {ScopeModel} from '@core/model/scope-model';
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
 import {EventModel} from '@core/model/event-model';
-import {EventModelService} from '../services/event-model.service';
-import {EventGroupService} from '../services/event-group.service';
+import {EventModelService} from '../services/api/event-model.service';
+import {EventGroupService} from '../services/api/event-group.service';
 import {EventGroup} from '@core/model/event-group';
 
 @Component({

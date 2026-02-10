@@ -3,31 +3,26 @@ import {CommonModule} from '@angular/common';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModel} from '@core/model/scope-model';
-import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {
-	ScopeModelBasicInfoDialogComponent
-} from '../scope-model-dialog/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
-import {ConfiguratorService} from '../../services/configurator.service';
+import {ConfiguratorService} from '../../services/api/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {EventModel} from '@core/model/event-model';
-import {
-	EventModelCreateDialogComponent
-} from '../scope-model-dialog/event-model-create-dialog/event-model-create-dialog.component';
 import {EventModelTimelineComponent} from '../event-model/event-model-timeline/event-model-timeline.component';
 import {EventModelDetailComponent} from '../event-model/event-model-detail/event-model-detail.component';
 import {EventGroup} from '@core/model/event-group';
-import {EventGroupDialogComponent} from '../scope-model-dialog/event-group-dialog/event-group-dialog.component';
 import {EventGroupDetailComponent} from '../event-group/event-group-detail/event-group-detail.component';
-import {ScopeModelManagerService} from '../../services/scope-model-manager.service';
-import {EventModelManagerService} from '../../services/event-model-manager.service';
-import {EventGroupManagerService} from '../../services/event-group-manager.service';
+import {ScopeModelManagerService} from '../../services/manager/scope-model-manager.service';
+import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
+import {EventGroupManagerService} from '../../services/manager/event-group-manager.service';
 import {ScopeModelDetailComponent} from '../scope-model-detail/scope-model-detail.component';
+import {EventModelDialogService} from '../../services/dialogs/event-model-dialog.service';
+import {EventGroupDialogService} from '../../services/dialogs/event-group-dialog.service';
+import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
 
 export type ViewMode = 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
 
@@ -77,7 +72,9 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		public eventGroupManager: EventGroupManagerService,
 		private configuratorService: ConfiguratorService,
 		private languageService: LanguageService,
-		private dialog: MatDialog,
+		private scopeModelDialogService: ScopeModelDialogService,
+		private eventModelDialogService: EventModelDialogService,
+		private eventGroupDialogService: EventGroupDialogService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -256,16 +253,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onCreateScopeModel(): void {
-		const dialogRef = this.dialog.open(ScopeModelBasicInfoDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: null,
-				languages: this.projectLanguages
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: ScopeModel | null) => {
+		this.scopeModelDialogService.openCreateDialog(
+			this.projectId,
+			this.projectLanguages
+		).subscribe((result: ScopeModel | null) => {
 			if(result) {
 				this.scopeModelManager.create(this.projectId, result).subscribe({
 					next: () => {
@@ -382,23 +373,23 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const dialogRef = this.dialog.open(EventModelCreateDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModelId: this.selectedScopeModel.scopeModelId,
-				eventModel: null,
-				languages: this.projectLanguages
-			}
-		});
+		const formattedEventGroups = this.eventGroups.map(eg => ({
+			id: eg.eventGroupId,
+			name: this.getTranslatedName(eg.shortname),
+			code: eg.id
+		}));
 
-		dialogRef.afterClosed().subscribe((result: any) => {
+		this.eventModelDialogService.openCreateDialog(
+			this.projectId,
+			this.selectedScopeModel.scopeModelId,
+			this.projectLanguages,
+			formattedEventGroups
+		).subscribe((result: any) => {
 			if(result) {
 				const newEventModel: EventModel = {
 					eventModelId: '',
 					scopeModelId: this.selectedScopeModel!.scopeModelId,
-					eventGroupId: '',
-					number: this.eventModels.length + 1,
+					number: result.number || this.eventModels.length + 1,
 					...result,
 					formModelIds: [],
 					datasetModelIds: [],
@@ -455,17 +446,11 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const dialogRef = this.dialog.open(EventGroupDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModelId: this.selectedScopeModel.scopeModelId,
-				eventGroup: null,
-				languages: this.projectLanguages
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
+		this.eventGroupDialogService.openCreateDialog(
+			this.projectId,
+			this.selectedScopeModel.scopeModelId,
+			this.projectLanguages
+		).subscribe((result: any) => {
 			if(result) {
 				const newEventGroup: EventGroup = {
 					eventGroupId: '',

@@ -1,4 +1,4 @@
-import {Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, OnDestroy} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -8,32 +8,22 @@ import {ScopeModel} from '@core/model/scope-model';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatDialog} from '@angular/material/dialog';
 import {Subscription} from 'rxjs';
-import {
-	EventModelBasicInfoDialogComponent
-} from '../../scope-model-dialog/event-model-basic-info-dialog/event-model-basic-info-dialog.component';
 import {LanguageService} from '../../../services/language.service';
-import {
-	EventModelSchedulingDialogComponent
-} from '../../scope-model-dialog/event-model-scheduling-dialog/event-model-scheduling-dialog.component';
-import {
-	EventModelLabelPatternDialogComponent
-} from '../../scope-model-dialog/event-model-label-pattern-dialog/event-model-label-pattern-dialog.component';
-import {
-	EventModelResourcesDialogComponent
-} from '../../scope-model-dialog/event-model-resources-dialog/event-model-resources-dialog.component';
-import {
-	EventModelRelationshipsDialogComponent
-} from '../../scope-model-dialog/event-model-relationships-dialog/event-model-relationships-dialog.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {EventGroup} from '@core/model/event-group';
+import {EventModelDialogService} from '../../../services/dialogs/event-model-dialog.service';
 
 @Component({
 	selector: 'app-event-model-detail',
 	standalone: true,
 	templateUrl: './event-model-detail.component.html',
 	styleUrls: ['./event-model-detail.component.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule]
+	imports: [
+		CommonModule,
+		MatIconModule,
+		MatButtonModule,
+		MatTooltipModule]
 })
 export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -54,6 +44,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 
 	constructor(
 		private languageService: LanguageService,
+		private eventModelDialogService: EventModelDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -151,23 +142,23 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onEditBasicInfo(): void {
+		if(!this.draftEventModel || !this.scopeModel) {
+			return;
+		}
+
 		const formattedEventGroups = this.eventGroups.map(eg => ({
 			id: eg.eventGroupId,
 			name: this.languageService.getDefaultTranslation(eg.shortname) || eg.id,
 			code: eg.id
 		}));
 
-		const dialogRef = this.dialog.open(EventModelBasicInfoDialogComponent, {
-			data: {
-				eventModel: this.draftEventModel,
-				languages: this.project?.languages || [],
-				eventGroups: formattedEventGroups
-			},
-			width: '500px',
-			disableClose: true
-		});
-
-		dialogRef.afterClosed().subscribe(result => {
+		this.eventModelDialogService.openBasicInfoDialog(
+			this.draftEventModel,
+			this.projectId,
+			this.scopeModel.scopeModelId,
+			this.project?.languages || [],
+			formattedEventGroups
+		).subscribe(result => {
 			if(result && this.draftEventModel) {
 				this.draftEventModel = {
 					...this.draftEventModel,
@@ -179,16 +170,14 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onEditScheduling(): void {
-		const dialogRef = this.dialog.open(EventModelSchedulingDialogComponent, {
-			data: {
-				eventModel: this.draftEventModel,
-				allEventModels: this.eventModels
-			},
-			width: '500px',
-			disableClose: true
-		});
+		if(!this.draftEventModel) {
+			return;
+		}
 
-		dialogRef.afterClosed().subscribe(result => {
+		this.eventModelDialogService.openSchedulingDialog(
+			this.draftEventModel,
+			this.eventModels
+		).subscribe(result => {
 			if(result && this.draftEventModel) {
 				this.draftEventModel = {
 					...this.draftEventModel,
@@ -200,15 +189,13 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onEditLabelPattern(): void {
-		const dialogRef = this.dialog.open(EventModelLabelPatternDialogComponent, {
-			data: {
-				eventModel: this.draftEventModel
-			},
-			width: '500px',
-			disableClose: true
-		});
+		if(!this.draftEventModel) {
+			return;
+		}
 
-		dialogRef.afterClosed().subscribe(result => {
+		this.eventModelDialogService.openLabelPatternDialog(
+			this.draftEventModel
+		).subscribe(result => {
 			if(result && this.draftEventModel) {
 				this.draftEventModel = {
 					...this.draftEventModel,
@@ -220,19 +207,13 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onEditResources(): void {
-		const dialogRef = this.dialog.open(EventModelResourcesDialogComponent, {
-			data: {
-				eventModel: this.draftEventModel,
-				availableFormModels: [],
-				availableDatasetModels: [],
-				availableWorkflows: []
-			},
-			width: '500px',
-			maxHeight: '90vh',
-			disableClose: true
-		});
+		if(!this.draftEventModel) {
+			return;
+		}
 
-		dialogRef.afterClosed().subscribe(result => {
+		this.eventModelDialogService.openResourcesDialog(
+			this.draftEventModel
+		).subscribe(result => {
 			if(result && this.draftEventModel) {
 				this.draftEventModel = {
 					...this.draftEventModel,
@@ -244,17 +225,14 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onEditRelationships(): void {
-		const dialogRef = this.dialog.open(EventModelRelationshipsDialogComponent, {
-			width: '500px',
-			maxHeight: '90vh',
-			data: {
-				eventModel: JSON.parse(JSON.stringify(this.draftEventModel)),
-				availableEventModels: this.eventModels
-			},
-			disableClose: true
-		});
+		if(!this.draftEventModel) {
+			return;
+		}
 
-		dialogRef.afterClosed().subscribe(result => {
+		this.eventModelDialogService.openRelationshipsDialog(
+			this.draftEventModel,
+			this.eventModels
+		).subscribe(result => {
 			if(result && this.draftEventModel) {
 				this.draftEventModel = {
 					...this.draftEventModel,

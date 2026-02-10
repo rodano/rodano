@@ -9,11 +9,11 @@ import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {ConfiguratorProject} from '@core/model/configurator-project';
-import {ConfiguratorService} from '../services/configurator.service';
+import {ConfiguratorService} from '../services/api/configurator.service';
 import {Router} from '@angular/router';
-import {CreateProjectDialogComponent} from '../create-project-dialog/create-project-dialog.component';
+import {CreateProjectDialogComponent} from '../dialogs/project/create-project-dialog/create-project-dialog.component';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
-import {SnapshotsListDialogComponent} from '../snapshots/snapshots-list-dialog/snapshots-list-dialog.component';
+import {SnapshotsListDialogComponent} from '../dialogs/base/snapshots-list-dialog/snapshots-list-dialog.component';
 import {LanguageService} from '../services/language.service';
 
 @Component({

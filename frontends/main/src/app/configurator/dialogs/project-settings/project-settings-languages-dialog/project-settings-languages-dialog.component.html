@@ -1,0 +1,59 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Manage Languages</h2>
+
+	<div class="dialog-content">
+		<div class="settings-form">
+			<div class="form-field">
+				<label>Languages *</label>
+				<div class="language-selector">
+					@if (selectedLanguages.length > 0) {
+						<div class="selected-languages">
+							@for (lang of selectedLanguages; track lang.code) {
+								<div class="language-chip" [class.default-language]="lang.isDefault">
+									<button
+										type="button"
+										class="star-button"
+										(click)="setDefaultLanguage(lang.code)"
+										[class.is-default]="lang.isDefault"
+										[matTooltip]="lang.isDefault ? 'Default language' : 'Set as default'">
+										<mat-icon>{{ lang.isDefault ? 'star' : 'star_border' }}</mat-icon>
+									</button>
+									<span>{{ lang.name }} ({{ lang.code }})</span>
+									<button type="button" class="chip-remove" (click)="removeLanguage(lang.code)">
+										<mat-icon>close</mat-icon>
+									</button>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-state">
+							<mat-icon>translate</mat-icon>
+							<p>No languages selected. Add at least one language to continue.</p>
+						</div>
+					}
+
+					@if (getAvailableLanguages().length > 0) {
+						<div class="add-language-dropdown">
+							<mat-icon>add</mat-icon>
+							<mat-select (change)="onLanguageSelected($event)" placeholder="Add a language...">
+								@for (lang of getAvailableLanguages(); track lang.code) {
+									<mat-option [value]="lang.code">{{ lang.name }}</mat-option>
+								}
+							</mat-select>
+						</div>
+					}
+				</div>
+				<span class="hint">Click the star to set a language as default. At least one language is required.</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!isValid()">
+			Save Changes
+		</button>
+	</div>
+</div>

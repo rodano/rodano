@@ -7,26 +7,14 @@ import {ScopeModel} from '@core/model/scope-model';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {Subscription} from 'rxjs';
 import {
-	ScopeModelResourcesDialogComponent,
 	WorkflowStateSelection
-} from '../scope-model-dialog/scope-model-resources-dialog/scope-model-resources-dialog.component';
-import {ScopeModelManagerService} from '../../services/scope-model-manager.service';
+} from '../../dialogs/scope-model/scope-model-resources-dialog/scope-model-resources-dialog.component';
+import {ScopeModelManagerService} from '../../services/manager/scope-model-manager.service';
 import {LanguageService} from '../../services/language.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {
-	ScopeModelBasicInfoDialogComponent
-} from '../scope-model-dialog/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
-import {
-	ScopeModelRelationshipsDialogComponent
-} from '../scope-model-dialog/scope-model-relationships-dialog/scope-model-relationships-dialog.component';
-import {
-	ScopeModelDefaultSettingsDialogComponent
-} from '../scope-model-dialog/scope-model-default-settings-dialog/scope-model-default-settings-dialog.component';
-import {
-	ScopeModelPatternDialogComponent
-} from '../scope-model-dialog/scope-model-pattern-dialog/scope-model-pattern-dialog.component';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
+import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -64,6 +52,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	constructor(
 		public scopeModelManager: ScopeModelManagerService,
 		private languageService: LanguageService,
+		private scopeModelDialogService: ScopeModelDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -79,16 +68,11 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onEditBasicInfo(): void {
-		const dialogRef = this.dialog.open(ScopeModelBasicInfoDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: JSON.parse(JSON.stringify(this.scopeModel)),
-				languages: this.project?.languages || []
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
+		this.scopeModelDialogService.openBasicInfoDialog(
+			this.projectId,
+			this.scopeModel,
+			this.project?.languages || []
+		).subscribe((result: any) => {
 			if(result) {
 				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
 				this.scopeModelManager.update(updatedScopeModel);
@@ -99,15 +83,10 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onEditRelationships(): void {
-		const dialogRef = this.dialog.open(ScopeModelRelationshipsDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: JSON.parse(JSON.stringify(this.scopeModel))
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
+		this.scopeModelDialogService.openRelationshipsDialog(
+			this.projectId,
+			this.scopeModel
+		).subscribe((result: any) => {
 			if(result) {
 				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
 				this.scopeModelManager.update(updatedScopeModel);
@@ -118,15 +97,10 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onEditDefaultSettings(): void {
-		const dialogRef = this.dialog.open(ScopeModelDefaultSettingsDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModel: JSON.parse(JSON.stringify(this.scopeModel))
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
+		this.scopeModelDialogService.openDefaultSettingsDialog(
+			this.projectId,
+			this.scopeModel
+		).subscribe((result: any) => {
 			if(result) {
 				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
 				this.scopeModelManager.update(updatedScopeModel);
@@ -137,14 +111,9 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onEditPattern(): void {
-		const dialogRef = this.dialog.open(ScopeModelPatternDialogComponent, {
-			width: '500px',
-			data: {
-				scopeModel: JSON.parse(JSON.stringify(this.scopeModel))
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((result: any) => {
+		this.scopeModelDialogService.openPatternDialog(
+			this.scopeModel
+		).subscribe((result: any) => {
 			if(result) {
 				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
 				this.scopeModelManager.update(updatedScopeModel);
@@ -155,20 +124,13 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onEditResources(): void {
-		const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
-			data: {
-				scopeModel: this.scopeModelManager.getById(this.scopeModel.scopeModelId),
-				availableForms: [],
-				availableDatasets: [],
-				availableWorkflows: [],
-				workflowStateSelections: this.workflowStateSelectionsMap.get(this.scopeModel.scopeModelId) || []
-			},
-			width: '500px',
-			maxHeight: '90vh',
-			disableClose: true
-		});
+		const currentDraft = this.scopeModelManager.getById(this.scopeModel.scopeModelId);
+		const workflowStateSelections = this.workflowStateSelectionsMap.get(this.scopeModel.scopeModelId) || [];
 
-		dialogRef.afterClosed().subscribe(result => {
+		this.scopeModelDialogService.openResourcesDialog(
+			currentDraft || this.scopeModel,
+			workflowStateSelections
+		).subscribe(result => {
 			if(result) {
 				const draft = this.scopeModelManager.getById(this.scopeModel.scopeModelId);
 				if(draft) {

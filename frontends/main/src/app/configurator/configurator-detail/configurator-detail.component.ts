@@ -2,7 +2,7 @@ import {Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewCh
 import {CommonModule} from '@angular/common';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatIcon} from '@angular/material/icon';
-import {ProjectSettingsDetailComponent} from './project-settings-detail/project-settings-detail.component';
+import {ProjectSettingsDetailComponent} from '../project-settings/project-settings-detail/project-settings-detail.component';
 import {ScopeModelsListComponent} from '../scope-model/scope-model-list/scope-models-list.component';
 
 @Component({

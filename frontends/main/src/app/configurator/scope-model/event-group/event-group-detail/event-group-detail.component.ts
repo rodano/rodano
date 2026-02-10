@@ -9,8 +9,8 @@ import {ConfiguratorProject} from '@core/model/configurator-project';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../../services/language.service';
 import {MatDialog} from '@angular/material/dialog';
-import {EventGroupDialogComponent} from '../../scope-model-dialog/event-group-dialog/event-group-dialog.component';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
+import {EventGroupDialogService} from '../../../services/dialogs/event-group-dialog.service';
 
 @Component({
 	selector: 'app-event-group-detail',
@@ -47,6 +47,7 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 
 	constructor(
 		private languageService: LanguageService,
+		private eventGroupDialogService: EventGroupDialogService,
 		private dialog: MatDialog
 	) {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
@@ -156,17 +157,19 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const dialogRef = this.dialog.open(EventGroupDialogComponent, {
-			width: '500px',
-			data: {
-				projectId: this.projectId,
-				scopeModelId: this.draftEventGroup.scopeModelId,
-				eventGroup: JSON.parse(JSON.stringify(this.draftEventGroup)),
-				languages: this.project?.languages || []
-			}
-		});
+		const scopeModelId = this.draftEventGroup.scopeModelId || this.scopeModel?.scopeModelId;
 
-		dialogRef.afterClosed().subscribe((result: any) => {
+		if(!scopeModelId) {
+			console.error('No scope model ID available');
+			return;
+		}
+
+		this.eventGroupDialogService.openEditDialog(
+			this.projectId,
+			scopeModelId,
+			this.draftEventGroup,
+			this.project?.languages || []
+		).subscribe((result: any) => {
 			if(result && this.draftEventGroup) {
 				const updatedEventGroup: EventGroup = {
 					...this.draftEventGroup,
