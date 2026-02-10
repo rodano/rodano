@@ -97,17 +97,12 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 				[Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]
 			],
 			number: [em?.number || null],
-			icon: [em?.icon || ''],
 			eventGroupId: [em?.eventGroupId || null],
 			mandatory: [em?.mandatory || false],
 			inceptive: [em?.inceptive || false],
 			maxOccurrence: [em?.maxOccurrence || null],
 			preventAdd: [em?.preventAdd || false]
 		});
-
-		if(this.isEditMode) {
-			this.form.get('id')?.disable();
-		}
 	}
 
 	initializeLanguageForms(): void {
@@ -180,7 +175,7 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 		const formValue = this.form.getRawValue();
 		const code = formValue.id.toUpperCase();
 
-		if(!this.isEditMode && this.isCodeDuplicate(code)) {
+		if(this.isCodeDuplicate(code)) {
 			this.snackBar.open(`An event model with code "${code}" already exists`, 'Close', {duration: 3000});
 			return;
 		}
@@ -205,7 +200,6 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 		const result = {
 			id: code,
 			number: formValue.number,
-			icon: formValue.icon,
 			eventGroupId: formValue.eventGroupId,
 			shortname,
 			longname,

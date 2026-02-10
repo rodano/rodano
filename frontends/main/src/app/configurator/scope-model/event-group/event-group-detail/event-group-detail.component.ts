@@ -32,7 +32,7 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() scopeModel: ScopeModel | null = null;
 	@Input() project: ConfiguratorProject | null = null;
 
-	@Output() _close = new EventEmitter<void>();
+	@Output() closed = new EventEmitter<void>();
 	@Output() eventGroupUpdated = new EventEmitter<EventGroup>();
 	@Output() eventGroupDeleted = new EventEmitter<string>();
 
@@ -149,7 +149,7 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onClose(): void {
-		this._close.emit();
+		this.closed.emit();
 	}
 
 	onEditBasicInfo(): void {

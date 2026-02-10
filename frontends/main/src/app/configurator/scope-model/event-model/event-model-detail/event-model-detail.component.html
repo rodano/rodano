@@ -274,18 +274,24 @@
 		<div class="settings-section">
 			<h3>Pattern</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('labelPattern')">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('labelPattern')">
 					<label>
 						Label Pattern
 						@if (isFieldModified('labelPattern')) {
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!draftEventModel.labelPattern">
-						@if (!draftEventModel.labelPattern) {
-							<mat-icon class="warning-icon">report</mat-icon>
+					<div class="relationship-box">
+						@if (draftEventModel.labelPattern) {
+							<div class="code-format-display">
+								<code>{{ draftEventModel.labelPattern }}</code>
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No label pattern configured</span>
+							</div>
 						}
-						{{ draftEventModel.labelPattern || 'Not configured' }}
 					</div>
 				</div>
 
@@ -303,14 +309,17 @@
 								<span>{{ draftEventModel.icon }}</span>
 							</div>
 						} @else {
-							<span class="not-configured">Not set</span>
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No icon configured</span>
+							</div>
 						}
 					</div>
 				</div>
 			</div>
 			<button class="btn-edit" (click)="onEditLabelPattern()">
 				<mat-icon>edit</mat-icon>
-				Edit Pattern
+				Edit Label Pattern
 			</button>
 		</div>
 

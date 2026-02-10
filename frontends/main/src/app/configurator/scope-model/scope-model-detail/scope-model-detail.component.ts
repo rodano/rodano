@@ -41,7 +41,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	@Input() allScopeModels: ScopeModel[] = [];
 	@Output() scopeModelUpdated = new EventEmitter<ScopeModel>();
 	@Output() scopeModelDeleted = new EventEmitter<string>();
-	@Output() _close = new EventEmitter<void>();
+	@Output() closed = new EventEmitter<void>();
 	@Output() switchToEventModels = new EventEmitter<void>();
 	@Output() switchToEventGroups = new EventEmitter<void>();
 
@@ -168,7 +168,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onClose(): void {
-		this._close.emit();
+		this.closed.emit();
 	}
 
 	onSwitchToEventModels(): void {

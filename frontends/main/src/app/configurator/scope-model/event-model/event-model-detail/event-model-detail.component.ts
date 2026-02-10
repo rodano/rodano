@@ -33,7 +33,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() originalEventModels: EventModel[] = [];
 	@Input() scopeModel: ScopeModel | null = null;
 	@Input() project: ConfiguratorProject | null = null;
-	@Output() _close = new EventEmitter<void>();
+	@Output() closed = new EventEmitter<void>();
 	@Output() eventModelUpdated = new EventEmitter<any>();
 	@Output() eventModelDeleted = new EventEmitter<string>();
 
@@ -84,7 +84,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	onClose(): void {
-		this._close.emit();
+		this.closed.emit();
 	}
 
 	getTranslatedValue(translations: Record<string, string> | undefined): string {

@@ -286,7 +286,7 @@
 					[allScopeModels]="scopeModels"
 					(scopeModelUpdated)="onScopeModelUpdated($event)"
 					(scopeModelDeleted)="onScopeModelDeleted($event)"
-					(close)="onSelectScopeModel(selectedScopeModel)"
+					(closed)="onSelectScopeModel(selectedScopeModel)"
 					(switchToEventModels)="switchToEventModelView()"
 					(switchToEventGroups)="switchToEventGroupView()">
 				</app-scope-model-detail>
@@ -303,7 +303,7 @@
 					[originalEventModels]="originalEventModels"
 					[scopeModel]="selectedScopeModel"
 					[project]="project"
-					(_close)="backToScopeDetail()"
+					(closed)="backToScopeDetail()"
 					(eventModelUpdated)="onEventModelUpdated($event)"
 					(eventModelDeleted)="onEventModelDeleted($event)">
 				</app-event-model-detail>
@@ -319,7 +319,7 @@
 					[originalEventGroups]="originalEventGroups"
 					[scopeModel]="selectedScopeModel"
 					[project]="project"
-					(_close)="backToScopeDetail()"
+					(closed)="backToScopeDetail()"
 					(eventGroupUpdated)="onEventGroupUpdated($event)"
 					(eventGroupDeleted)="onEventGroupDeleted($event)">
 				</app-event-group-detail>
