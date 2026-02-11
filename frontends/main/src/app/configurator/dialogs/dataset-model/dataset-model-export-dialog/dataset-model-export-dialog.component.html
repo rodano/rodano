@@ -1,0 +1,31 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Export Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field checkbox-field">
+				<mat-checkbox formControlName="exportable">Exportable</mat-checkbox>
+				<span class="hint">Allow this dataset to be included in data exports</span>
+			</div>
+
+			<div class="form-field">
+				<label [class.disabled]="!form.get('exportable')?.value">Export Order</label>
+				<input
+					type="number"
+					formControlName="exportOrder"
+					placeholder="Enter export order"
+					[class.disabled]="form.get('exportOrder')?.disabled">
+				<span class="hint">Determines the order of this dataset in exports (lower numbers appear first)</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

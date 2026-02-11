@@ -23,6 +23,8 @@ import {EventModel} from '@core/model/event-model';
 import {EventModelService} from '../services/api/event-model.service';
 import {EventGroupService} from '../services/api/event-group.service';
 import {EventGroup} from '@core/model/event-group';
+import {DatasetModel} from '@core/model/dataset-model';
+import {DatasetModelService} from '../services/api/dataset-model.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -53,12 +55,15 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedNode: string | null = null;
 	modifiedFields = new Set<string>();
 	scopeModelModificationCount = 0;
+	datasetModelModificationCount = 0;
 
 	eventModels: any[] = [];
 	eventGroups: any[] = [];
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
 	selectedEventGroupId: string | null = null;
+
+	selectedDatasetModelId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -70,6 +75,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private scopeModelService: ScopeModelService,
 		private eventModelService: EventModelService,
 		private eventGroupService: EventGroupService,
+		private datasetModelService: DatasetModelService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -164,11 +170,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.selectedNode = nodeId;
 
 		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-		if(!scopeModelsComponent) {
-			return;
-		}
-
-		if(nodeId?.startsWith('scope-model-')) {
+		if(scopeModelsComponent && nodeId?.startsWith('scope-model-')) {
 			const scopeModelId = nodeId.replace('scope-model-', '');
 			const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
 
@@ -181,10 +183,27 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				scopeModelsComponent.selectedEventGroupId = null;
 			}
 		}
+
+		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+		if(datasetModelsComponent && nodeId?.startsWith('dataset-model-')) {
+			const datasetModelId = nodeId.replace('dataset-model-', '');
+			const datasetModel = datasetModelsComponent.datasetModels.find(dm => dm.datasetModelId === datasetModelId);
+
+			if(datasetModel && datasetModelsComponent.selectedDatasetModel?.datasetModelId !== datasetModelId) {
+				datasetModelsComponent.onSelectDatasetModel(datasetModel);
+			}
+			else if(datasetModel) {
+				datasetModelsComponent.viewMode = 'detail';
+			}
+		}
 	}
 
 	onScopeModelsChanged(event: {modificationCount: number}): void {
 		this.scopeModelModificationCount = event.modificationCount;
+	}
+
+	onDatasetModelsChanged(event: {modificationCount: number}): void {
+		this.datasetModelModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -225,8 +244,25 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.workingProject = {...updatedProject};
 				this.modifiedFields.clear();
 
+				const savePromises: Promise<any>[] = [];
+
 				if(this.scopeModelModificationCount > 0) {
-					this.saveScopeModelsAndEventModels();
+					savePromises.push(this.saveScopeModelsAndEventModels());
+				}
+
+				if(this.datasetModelModificationCount > 0) {
+					savePromises.push(this.saveDatasetModels());
+				}
+
+				if(savePromises.length > 0) {
+					Promise.all(savePromises).then(() => {
+						this.saving = false;
+						this.snackBar.open('Draft saved', 'Close', {duration: 2000});
+					}).catch((error: any) => {
+						console.error('Error saving:', error);
+						this.snackBar.open('Failed to save changes', 'Close', {duration: 3000});
+						this.saving = false;
+					});
 				}
 				else {
 					this.saving = false;
@@ -264,20 +300,17 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					scopeModelsComponent.scopeModelManager.resetToOriginals();
 					scopeModelsComponent.eventModelManager.resetToOriginals();
 					scopeModelsComponent.eventGroupManager.resetToOriginals();
-
 					scopeModelsComponent.loadScopeModels();
+				}
 
-					if(scopeModelsComponent.selectedScopeModel) {
-						this.eventModelService.getEventModels(this.projectId).subscribe({
-							next: allEventModels => {
-								scopeModelsComponent.eventModelManager.setAll(allEventModels);
-								scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
-							}
-						});
-					}
+				const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+				if(datasetModelsComponent) {
+					datasetModelsComponent.datasetModelManager.resetToOriginals();
+					datasetModelsComponent.loadDatasetModels();
 				}
 
 				this.scopeModelModificationCount = 0;
+				this.datasetModelModificationCount = 0;
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
 			}
 		});
@@ -304,11 +337,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	get hasModifications(): boolean {
-		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0;
+		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0 || this.datasetModelModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
-		return this.modifiedFields.size + this.scopeModelModificationCount;
+		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount;
 	}
 
 	onCreateSnapshot(): void {
@@ -439,13 +472,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
-	private saveScopeModelsAndEventModels(): void {
+	private saveScopeModelsAndEventModels(): Promise<any> {
 		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
 
 		if(!scopeModelsComponent) {
-			this.saving = false;
-			this.snackBar.open('Draft saved', 'Close', {duration: 2000});
-			return;
+			return Promise.resolve();
 		}
 
 		const savePromises: Promise<any>[] = [];
@@ -496,7 +527,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			}
 		});
 
-		Promise.all(savePromises).then(() => {
+		return Promise.all(savePromises).then(() => {
 			scopeModelsComponent.scopeModelManager.syncOriginalsWithCurrent();
 			scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
 			scopeModelsComponent.eventGroupManager.syncOriginalsWithCurrent();
@@ -517,13 +548,54 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			if(this.treeComponent) {
 				this.treeComponent.reloadScopeModels();
 			}
+		});
+	}
 
-			this.saving = false;
-			this.snackBar.open('Draft saved', 'Close', {duration: 2000});
-		}).catch((error: any) => {
-			console.error('Error saving:', error);
-			this.snackBar.open('Failed to save changes', 'Close', {duration: 3000});
-			this.saving = false;
+	private saveDatasetModels(): Promise<any> {
+		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+
+		if(!datasetModelsComponent) {
+			return Promise.resolve();
+		}
+
+		const savePromises: Promise<any>[] = [];
+
+		datasetModelsComponent.modifiedDatasetModelIds.forEach((id: string) => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = datasetModelsComponent.originalDatasetModels.find((dm: DatasetModel) => dm.datasetModelId === originalId);
+				if(original) {
+					savePromises.push(
+						this.datasetModelService.deleteDatasetModel(this.projectId, originalId).toPromise()
+					);
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const datasetModel = datasetModelsComponent.datasetModels.find((dm: DatasetModel) => dm.datasetModelId === id);
+				if(datasetModel) {
+					savePromises.push(
+						this.datasetModelService.createDatasetModel(this.projectId, datasetModel).toPromise()
+					);
+				}
+			}
+			else {
+				const datasetModel = datasetModelsComponent.datasetModels.find((dm: DatasetModel) => dm.datasetModelId === id);
+				if(datasetModel) {
+					savePromises.push(
+						this.datasetModelService.updateDatasetModel(this.projectId, id, datasetModel).toPromise()
+					);
+				}
+			}
+		});
+
+		return Promise.all(savePromises).then(() => {
+			datasetModelsComponent.datasetModelManager.syncOriginalsWithCurrent();
+			datasetModelsComponent.loadDatasetModels();
+			this.datasetModelModificationCount = 0;
+
+			if(this.treeComponent) {
+				this.treeComponent.reloadDatasetModels();
+			}
 		});
 	}
 
@@ -585,5 +657,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.selectedScopeModelId = context.selectedScopeModelId;
 		this.selectedEventModelId = context.selectedEventModelId;
 		this.selectedEventGroupId = context.selectedEventGroupId;
+	}
+
+	onDatasetModelContextChanged(context: {
+		selectedDatasetModelId: string | null;
+	}): void {
+		this.selectedDatasetModelId = context.selectedDatasetModelId;
 	}
 }

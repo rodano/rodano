@@ -4,6 +4,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {ScopeModelService} from '../services/api/scope-model.service';
 import {LanguageService} from '../services/language.service';
+import {DatasetModelService} from '../services/api/dataset-model.service';
 
 interface TreeNode {
 	id: string;
@@ -12,10 +13,11 @@ interface TreeNode {
 	children?: TreeNode[];
 	expanded?: boolean;
 	fixed?: boolean;
-	type?: 'scope-model' | 'event-model' | 'event-group' | 'category';
+	type?: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'category';
 	scopeModelId?: string;
 	eventModelId?: string;
 	eventGroupId?: string;
+	datasetModelId?: string;
 }
 
 @Component({
@@ -33,12 +35,15 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	@Input() eventGroups: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
+	@Input() selectedDatasetModelId: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string>();
 	@Output() eventModelSelected = new EventEmitter<string>();
 	@Output() eventGroupSelected = new EventEmitter<string>();
+	@Output() datasetModelSelected = new EventEmitter<string>();
 
 	loading = true;
 	scopeModels: any[] = [];
+	datasetModels: any[] = [];
 	formModels: any[] = [];
 	workflows: any[] = [];
 
@@ -60,6 +65,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 			id: 'dataset-models',
 			label: 'Dataset Models',
 			icon: 'dataset',
+			expanded: false,
 			children: []
 		},
 		{
@@ -112,6 +118,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 
 	constructor(
 		private scopeModelService: ScopeModelService,
+		private datasetModelService: DatasetModelService,
 		private languageService: LanguageService,
 		private changeDetectorRef: ChangeDetectorRef
 	) {}
@@ -133,6 +140,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	loadConfiguration(): void {
 		this.loading = true;
 		this.loadScopeModels();
+		this.loadDatasetModels();
 
 		//TODO: Load configuration entities from backend
 		this.formModels = [];
@@ -171,6 +179,50 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 				this.loading = false;
 			}
 		});
+	}
+
+	private loadDatasetModels(): void {
+		this.datasetModelService.getDatasetModels(this.projectId).subscribe({
+			next: datasetModels => {
+				this.datasetModels = datasetModels;
+				const datasetModelsIndex = this.treeData.findIndex(node => node.id === 'dataset-models');
+
+				if(datasetModelsIndex !== -1) {
+					const currentNode = this.treeData[datasetModelsIndex];
+					const newChildren = this.buildDatasetModelNodes(datasetModels);
+
+					const newDatasetModelsNode = {
+						...currentNode,
+						children: newChildren
+					};
+
+					this.treeData = [
+						...this.treeData.slice(0, datasetModelsIndex),
+						newDatasetModelsNode,
+						...this.treeData.slice(datasetModelsIndex + 1)
+					];
+
+					this.changeDetectorRef.detectChanges();
+				}
+			},
+			error: error => {
+				console.error('Error loading dataset models:', error);
+			}
+		});
+	}
+
+	private buildDatasetModelNodes(datasetModels: any[]): TreeNode[] {
+		return datasetModels.map(dm => ({
+			id: `dataset-model-${dm.datasetModelId}`,
+			label: this.languageService.getDefaultTranslation(dm.shortname) || dm.id,
+			icon: 'table_chart',
+			type: 'dataset-model',
+			datasetModelId: dm.datasetModelId
+		}));
+	}
+
+	public reloadDatasetModels(): void {
+		this.loadDatasetModels();
 	}
 
 	public reloadScopeModels(): void {
@@ -282,6 +334,13 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 			event.stopPropagation();
 		}
 
+		if(node.type === 'dataset-model') {
+			const datasetModelId = node.id.replace('dataset-model-', '');
+			this.datasetModelSelected.emit(datasetModelId);
+			this.nodeSelected.emit(node.id);
+			return;
+		}
+
 		if(node.type === 'event-group') {
 			const eventGroupId = node.id.replace('event-group-', '');
 			this.eventGroupSelected.emit(eventGroupId);
@@ -336,6 +395,10 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	}
 
 	isNodeSelected(node: TreeNode): boolean {
+		if(node.type === 'dataset-model') {
+			return this.selectedNode === node.id;
+		}
+
 		if(node.type === 'event-model') {
 			return this.selectedNode === node.id;
 		}

@@ -91,3 +91,13 @@
 	width: 1rem;
 	height: 1rem;
 }
+
+.status-badge.virtual {
+	background-color: #dbeafe;
+	color: #1e40af;
+}
+
+.status-badge.inceptive {
+	background-color: #dbeafe;
+	color: #1e40af;
+}

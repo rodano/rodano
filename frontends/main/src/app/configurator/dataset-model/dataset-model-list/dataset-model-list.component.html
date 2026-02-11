@@ -1,0 +1,120 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Dataset Models</h1>
+			<p class="detail-subtitle">Configure datasets for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<div class="empty-state">
+			<mat-icon>hourglass_empty</mat-icon>
+			<p>Loading dataset models...</p>
+		</div>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card" (click)="onCreateDatasetModel()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Dataset Model</h3>
+						<p>Add a new dataset</p>
+					</div>
+				</div>
+
+				@for (datasetModel of datasetModels; track datasetModel.datasetModelId) {
+					<div class="primary-card"
+										[class.selected]="isSelected(datasetModel)"
+										[class.modified]="modifiedDatasetModelIds.has(datasetModel.datasetModelId)"
+										[style.border-top-color]="modifiedDatasetModelIds.has(datasetModel.datasetModelId) ? '#f59e0b' : ''"
+										(click)="onSelectDatasetModel(datasetModel)">
+
+						@if (isSelected(datasetModel)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ getTranslatedName(datasetModel.shortname) }}</h3>
+								<p class="card-code">{{ datasetModel.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (datasetModel.multiple) {
+									<span class="status-badge multiple" matTooltip="Multiple instances allowed">
+										<span class="badge-full">Multiple</span>
+										<mat-icon class="badge-short">stack</mat-icon>
+									</span>
+								}
+								@if (datasetModel.master) {
+									<span class="status-badge master" matTooltip="Master dataset">
+										<span class="badge-full">Master</span>
+										<mat-icon class="badge-short">star</mat-icon>
+									</span>
+								}
+								@if (datasetModel.exportable) {
+									<span class="status-badge exportable" matTooltip="Exportable">
+										<span class="badge-full">Exportable</span>
+										<mat-icon class="badge-short">arrow_upward</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item" [class.unset]="!datasetModel.family">
+									<mat-icon>folder</mat-icon>
+									<span>{{ datasetModel.family || 'No family' }}</span>
+								</div>
+								<div class="detail-item" [class.unset]="datasetModel.exportOrder === null || datasetModel.exportOrder === undefined">
+									<mat-icon>sort</mat-icon>
+									<span>Export Order: {{ datasetModel.exportOrder !== null && datasetModel.exportOrder !== undefined ? datasetModel.exportOrder : 'Not exportable' }}</span>
+								</div>
+								<div class="detail-item" [class.unset]="!hasLabelPatterns(datasetModel)">
+									<mat-icon>label</mat-icon>
+									<span>{{ hasLabelPatterns(datasetModel) ? 'Patterns configured' : 'No patterns' }}</span>
+								</div>
+								<div class="detail-item" [class.unset]="!datasetModel.fieldModels || datasetModel.fieldModels.length === 0">
+									<mat-icon>view_list</mat-icon>
+									<span>{{ datasetModel.fieldModels.length || 0 }} {{ (datasetModel.fieldModels.length || 0) === 1 ? 'Field' : 'Fields' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (modifiedDatasetModelIds.has(datasetModel.datasetModelId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (datasetModels.length === 0) {
+			<div class="empty-state">
+				<mat-icon>dataset</mat-icon>
+				<h3>No Dataset Models</h3>
+				<p>Create your first dataset model to start collecting data</p>
+			</div>
+			}
+		</div>
+
+		@if (viewMode === 'detail' && selectedDatasetModel) {
+			<div class="detail-panel">
+				<app-dataset-model-detail
+					[projectId]="projectId"
+					[datasetModel]="selectedDatasetModel"
+					[project]="project"
+					(datasetModelUpdated)="onDatasetModelUpdated($event)"
+					(datasetModelDeleted)="onDatasetModelDeleted($event)"
+					(closed)="backToDatasetDetail()">
+				</app-dataset-model-detail>
+			</div>
+		}
+	}
+</div>

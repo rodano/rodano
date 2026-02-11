@@ -1,0 +1,51 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Label Patterns</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="pattern-info">
+				<span>For patterns, use</span>
+				<div class="pattern-chips">
+					@for (option of patternOptions; track option.pattern) {
+						<button type="button"
+														class="pattern-chip"
+														(click)="insertPattern(option.pattern)"
+														[title]="option.description">
+							{{ option.pattern }}
+						</button>
+					}
+				</div>
+				<span class="hint">Click a pattern to insert it into the focused field</span>
+			</div>
+
+			<div class="form-field">
+				<label>Collapsed Label Pattern</label>
+				<input
+					#collapsedInput
+					type="text"
+					formControlName="collapsedLabelPattern"
+					placeholder="${{'{shortname}'}}">
+				<span class="hint">Pattern for collapsed/compact display of dataset instances</span>
+			</div>
+
+			<div class="form-field">
+				<label>Expanded Label Pattern</label>
+				<input
+					#expandedInput
+					type="text"
+					formControlName="expandedLabelPattern"
+					placeholder="${{'{longname}'}} - ${{'{description}'}}">
+				<span class="hint">Pattern for expanded/detailed display of dataset instances</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

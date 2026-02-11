@@ -3,3 +3,13 @@
 .detail-code {
 	background-color: #8b5cf6;
 }
+
+.status-badge.mandatory {
+	background-color: #fef3c7;
+	color: #92400e;
+}
+
+.status-badge.inceptive {
+	background-color: #dbeafe;
+	color: #1e40af;
+}

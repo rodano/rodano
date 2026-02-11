@@ -1,0 +1,31 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Family Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Family</label>
+				<input
+					type="text"
+					formControlName="family"
+					placeholder="Enter family name"
+					maxlength="128">
+				<span class="hint">Group related datasets together using a family name</span>
+			</div>
+
+			<div class="form-field checkbox-field">
+				<mat-checkbox formControlName="master">Master Dataset</mat-checkbox>
+				<span class="hint">Mark this as the master dataset within its family</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

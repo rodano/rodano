@@ -15,16 +15,10 @@
 			<mat-icon>hourglass_empty</mat-icon>
 			<p>Loading scope models...</p>
 		</div>
-	} @else if (scopeModels.length === 0) {
-		<div class="empty-state">
-			<mat-icon>account_tree</mat-icon>
-			<h3>No Scope Models</h3>
-			<p>Create your first scope model to define the project hierarchy</p>
-		</div>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
-				<div class="primary-card scope-card create-card" (click)="onCreateScopeModel()">
+				<div class="primary-card create-card" (click)="onCreateScopeModel()">
 					<div class="create-content">
 						<mat-icon>add_circle_outline</mat-icon>
 						<h3>Create Scope Model</h3>
@@ -33,11 +27,11 @@
 				</div>
 
 				@for (scopeModel of scopeModels; track scopeModel.scopeModelId) {
-					<div class="primary-card scope-card"
+					<div class="primary-card"
 										[class.selected]="isSelected(scopeModel)"
 										[class.modified]="modifiedScopeModelIds.has(scopeModel.scopeModelId)"
 										[class.virtual-card]="scopeModel.virtual"
-										[style.border-top-color]="modifiedScopeModelIds.has(scopeModel.scopeModelId) ? '#f59e0b' : (scopeModel.virtual ? '#3b82f6' : '#5bd4d4')"
+										[style.border-top-color]="modifiedScopeModelIds.has(scopeModel.scopeModelId) ? '#f59e0b' : (scopeModel.virtual ? '#3b82f6' : '')"
 										(click)="onSelectScopeModel(scopeModel)">
 
 						@if (isSelected(scopeModel)) {
@@ -55,28 +49,28 @@
 								@if (scopeModel.virtual) {
 									<span class="status-badge virtual" matTooltip="Virtual">
 										<span class="badge-full">Virtual</span>
-										<span class="badge-short">V</span>
+										<mat-icon class="badge-short">visibility_off</mat-icon>
 									</span>
 								}
 								@if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length === 0) {
 									<span class="status-badge standalone" matTooltip="Standalone">
 										<span class="badge-full">Standalone</span>
-										<span class="badge-short">S</span>
+										<mat-icon class="badge-short">crop_square</mat-icon>
 									</span>
 								} @else if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length > 0) {
 									<span class="status-badge root" matTooltip="Root">
 										<span class="badge-full">Root</span>
-										<span class="badge-short">R</span>
+										<mat-icon class="badge-short">vertical_align_top</mat-icon>
 									</span>
 								} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length === 0) {
 									<span class="status-badge leaf" matTooltip="Leaf">
 										<span class="badge-full">Leaf</span>
-										<span class="badge-short">L</span>
+										<mat-icon class="badge-short">vertical_align_bottom</mat-icon>
 									</span>
 								} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length > 0) {
 									<span class="status-badge intermediate" matTooltip="Intermediate">
 										<span class="badge-full">Intermediate</span>
-										<span class="badge-short">I</span>
+										<mat-icon class="badge-short">swap_vert</mat-icon>
 									</span>
 								}
 							</div>
@@ -114,6 +108,14 @@
 					</div>
 				}
 			</div>
+
+			@if (scopeModels.length === 0) {
+				<div class="empty-state">
+					<mat-icon>account_tree</mat-icon>
+					<h3>No Scope Models</h3>
+					<p>Create your first scope model to define the project hierarchy</p>
+				</div>
+			}
 		</div>
 
 		@if (viewMode === 'event-list' || viewMode === 'event-detail') {
@@ -171,13 +173,13 @@
 										@if (eventModel.mandatory) {
 											<span class="status-badge mandatory" matTooltip="Mandatory">
 												<span class="badge-full">Mandatory</span>
-												<span class="badge-short">M</span>
+												<mat-icon class="badge-short">priority_high</mat-icon>
 											</span>
 										}
 										@if (eventModel.inceptive) {
 											<span class="status-badge inceptive" matTooltip="Inceptive">
 												<span class="badge-full">Inceptive</span>
-												<span class="badge-short">I</span>
+												<mat-icon class="badge-short">flag</mat-icon>
 											</span>
 										}
 									</div>

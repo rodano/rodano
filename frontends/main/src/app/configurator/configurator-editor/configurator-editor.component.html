@@ -108,10 +108,9 @@
 					[projectId]="projectId"
 					[project]="workingProject"
 					[selectedNode]="selectedNode"
-					[modifiedFields]="modifiedFields"
 					(fieldsUpdated)="onFieldsUpdated($event)"
-					(nodeSelected)="onNodeSelected($event)"
 					(scopeModelsChanged)="onScopeModelsChanged($event)"
+					(datasetModelsChanged)="onDatasetModelsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)">
 				</app-configurator-detail>
 			</div>

@@ -4,6 +4,7 @@ import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatIcon} from '@angular/material/icon';
 import {ProjectSettingsDetailComponent} from '../project-settings/project-settings-detail/project-settings-detail.component';
 import {ScopeModelsListComponent} from '../scope-model/scope-model-list/scope-models-list.component';
+import {DatasetModelListComponent} from '../dataset-model/dataset-model-list/dataset-model-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -14,11 +15,13 @@ import {ScopeModelsListComponent} from '../scope-model/scope-model-list/scope-mo
 		CommonModule,
 		MatIcon,
 		ProjectSettingsDetailComponent,
-		ScopeModelsListComponent
+		ScopeModelsListComponent,
+		DatasetModelListComponent
 	]
 })
 export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(ScopeModelsListComponent) scopeModelsListComponent?: ScopeModelsListComponent;
+	@ViewChild(DatasetModelListComponent) datasetModelsListComponent?: DatasetModelListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -26,8 +29,9 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@Input() modifiedFields = new Set<string>();
 	@Output() fieldsUpdated = new EventEmitter<Partial<ConfiguratorProject>>();
 	@Output() nodeSelected = new EventEmitter<string | null>();
-	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() modificationCountChanged = new EventEmitter<number>();
+
+	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() scopeModelContextChanged = new EventEmitter<{
 		eventModels: any[];
 		eventGroups: any[];
@@ -36,9 +40,15 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedEventGroupId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'overview' | null = null;
+	@Output() datasetModelsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() datasetModelContextChanged = new EventEmitter<{
+		selectedDatasetModelId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
+	datasetModelModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -57,6 +67,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
+	onDatasetModelSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onDatasetModelsChanged(event: {modificationCount: number}): void {
+		this.datasetModelModificationCount = event.modificationCount;
+		this.datasetModelsChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -68,6 +89,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
+		if(this.selectedNode.startsWith('dataset-model-')) {
+			this.selectedNodeType = 'dataset-models';
+			return;
+		}
+
 		if(this.selectedNode === 'project-settings') {
 			this.selectedNodeType = 'project-settings';
 			return;
@@ -75,6 +101,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'scope-models') {
 			this.selectedNodeType = 'scope-models';
+			return;
+		}
+
+		if(this.selectedNode === 'dataset-models') {
+			this.selectedNodeType = 'dataset-models';
 			return;
 		}
 
@@ -89,5 +120,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedEventGroupId: string | null;
 	}): void {
 		this.scopeModelContextChanged.emit(context);
+	}
+
+	onDatasetModelContextChanged(context: {
+		selectedDatasetModelId: string | null;
+	}): void {
+		this.datasetModelContextChanged.emit(context);
 	}
 }

@@ -115,6 +115,9 @@
 	background-color: #f9fafb;
 	border-radius: 0.375rem;
 	border: 1px solid #e5e7eb;
+	min-height: 1.75rem;
+	align-content: center;
+	justify-content: center;
 }
 
 .setting-value.not-configured {
@@ -173,16 +176,6 @@
 	font-weight: 600;
 	background-color: #e5e7eb;
 	color: #374151;
-}
-
-.status-badge.mandatory {
-	background-color: #fef3c7;
-	color: #92400e;
-}
-
-.status-badge.inceptive {
-	background-color: #dbeafe;
-	color: #1e40af;
 }
 
 /* ==================== Relationships ==================== */

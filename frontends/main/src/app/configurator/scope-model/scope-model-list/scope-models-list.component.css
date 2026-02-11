@@ -1,64 +1,27 @@
 @import '../../shared/entity-list-base.css';
 
-/* ==================== Scope Model Specific Card Styles ==================== */
-.scope-card {
-	border-top: 4px solid #5bd4d4;
+/* ==================== Scope Model Specific Styles ==================== */
+
+/* Virtual scope model styling */
+.primary-card.virtual-card {
+	border-top-color: #3b82f6;
 }
 
-.scope-card:hover {
-	border-top-color: #5bd4d4;
-}
-
-.scope-card.create-card:hover {
-	border-color: #5bd4d4 !important;
-}
-
-.scope-card.create-card:hover .create-content mat-icon {
-	color: #5bd4d4 !important;
-}
-
-.scope-card.selected {
-	box-shadow: 0 4px 12px rgba(91, 212, 212, 0.3);
-	background-color: #e0f2f1;
-}
-
-.scope-card.selected::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	right: 0;
-	border-style: solid;
-	border-width: 0 40px 40px 0;
-	border-color: transparent #5bd4d4 transparent transparent;
-}
-
-.content-container.level-2 .scope-card.selected::after {
-	border-width: 0 30px 30px 0;
-}
-
-.scope-card.modified.selected {
-	border-top-color: #f59e0b;
-	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.scope-card.modified.selected::after {
-	border-color: transparent #f59e0b transparent transparent;
-}
-
-.scope-card.virtual-card.selected {
+.primary-card.virtual-card.selected {
 	border-top-color: #3b82f6;
 	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+	background-color: #dbeafe;
 }
 
-.scope-card.virtual-card.selected::after {
+.primary-card.virtual-card.selected::after {
 	border-color: transparent #3b82f6 transparent transparent;
 }
 
-.scope-card.modified.virtual-card.selected {
+.primary-card.modified.virtual-card.selected {
 	border-top-color: #f59e0b;
 }
 
-.scope-card.modified.virtual-card.selected::after {
+.primary-card.modified.virtual-card.selected::after {
 	border-color: transparent #f59e0b transparent transparent;
 }
 

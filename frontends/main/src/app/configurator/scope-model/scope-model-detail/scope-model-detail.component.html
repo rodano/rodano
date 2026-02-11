@@ -102,7 +102,13 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value">{{ scopeModel.virtual ? 'Yes' : 'No' }}</div>
+				<div class="setting-value">
+					@if (scopeModel.virtual) {
+						<span class="status-badge virtual">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</div>
 			</div>
 
 			<div class="setting-item" [class.modified]="isFieldModified('maxNumber')">
