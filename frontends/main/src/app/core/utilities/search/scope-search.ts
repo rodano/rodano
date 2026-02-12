@@ -14,6 +14,7 @@ export class ScopeSearch extends PaginatedSearch {
 	workflowStates: Record<string, string[]> = {};
 	fieldModelCriteria?: string;
 	leaf?: boolean;
+	includeDeleted?: boolean = false;
 
 	constructor() {
 		super();

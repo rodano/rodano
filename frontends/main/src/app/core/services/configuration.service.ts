@@ -129,6 +129,10 @@ export class ConfigurationService {
 		return this.http.get<FieldModel[]>(`${this.serviceUrl}/searchable-field-models`);
 	}
 
+	getSearchableFieldModelsOnScope(scopeModel: ScopeModel): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`${this.serviceUrl}/searchable-field-models/${scopeModel.id}`);
+	}
+
 	getAutocompleteOptions(datasetModelId: string, fieldModelId: string, value: string): Observable<string[]> {
 		return this.http.get<string[]>(`${this.serviceUrl}/dataset-models/${datasetModelId}/field-models/${fieldModelId}/autocomplete/${value}`);
 	}
