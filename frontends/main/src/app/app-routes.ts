@@ -36,7 +36,7 @@ export const APP_ROUTES: Routes = [
 	{
 		path: 'search',
 		canActivate: [AuthGuard],
-		loadChildren: () => import('./search/search.component').then(m => m.SearchComponent.ROUTES)
+		loadChildren: () => import('./search/search-routes')
 	},
 	{
 		path: 'crf',

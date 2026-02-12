@@ -28,23 +28,16 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.request.context.RequestContextService;
-import ch.rodano.api.scope.ScopeDTOService;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 import ch.rodano.core.model.scope.ScopeSearch;
 import ch.rodano.core.model.scope.ScopeSortBy;
 import ch.rodano.core.services.bll.actor.ActorService;
-import ch.rodano.core.services.bll.event.EventService;
-import ch.rodano.core.services.bll.export.scope.ScopeExportService;
 import ch.rodano.core.services.bll.role.RoleService;
-import ch.rodano.core.services.bll.scope.ScopeRelationService;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.services.bll.study.SubstudyService;
-import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
 import ch.rodano.core.utils.RightsService;
-import ch.rodano.core.utils.UtilsService;
 
 
 @Tag(name = "Search")
@@ -67,16 +60,9 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 					     final ActorService actorService,
 					     final RoleService roleService,
 					     final RightsService rightsService,
-					     final SubstudyService substudyService,
 					     final ScopeService scopeService,
-					     final ScopeExportService scopeExportService,
-					     final ScopeDTOService scopeDTOService,
 					     final ExtendedScopeResultService extendedScopeResultService,
-					     final ScopeRelationService scopeRelationService,
 					     final ObjectMapper mapper,
-					     final EventService eventService,
-					     final UtilsService utilsService,
-					     final ScopeDAOService scopeDAOService,
 					     final WorkflowStatusDAOService workflowStatusDAOService,
 					     @Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize,
 					     final DSLContext create
@@ -112,21 +98,27 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		@Parameter(description = "Scope workflow states") @RequestParam final Optional<String> workflowStates,
 		@Parameter(description = "Field model criteria in a serialized form") @RequestParam final Optional<String> fieldModelCriteria,
 		@Parameter(description = "Only include the leaf scopes?") @RequestParam final Optional<Boolean> leaf,
+		@Parameter(description = "Include removed (deleted) scopes? Requires MANAGE_DELETED_DATA feature") @RequestParam final Optional<Boolean> includeDeleted,
 		@Parameter(description = "Order the results by which property?") @RequestParam final Optional<String> sortBy,
 		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
 		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
 		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
 	) {
 
-		LOG.info("ExtendedScopeSearchController.search by actor pk {}", currentActor().getPk());
-		LOG.info("fieldModelCriteria ", fieldModelCriteria);
 		final var acl = rightsService.getACL(currentActor());
 		final var currentRoles = currentActiveRoles();
+
+		// Determine whether removed scopes should be included. Only allow including removed scopes
+		// when the actor actually has the MANAGE_DELETED_DATA right.
+		final var canManageDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
+		final boolean includeDeletedFinal = includeDeleted.map(val -> canManageDeleted && val).orElse(canManageDeleted);
 
 		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
 		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));
 		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
+
+		LOG.info(scopeModelId.isEmpty() ? "Searching scopes with provided criteria" : "Searching scopes of model {} with provided criteria", scopeModelId.orElse(""));
 
 		final var search = new ScopeSearch()
 			.setCode(code.filter(StringUtils::isNotBlank))
@@ -140,9 +132,10 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 			.setFieldModelCriteria(fieldModelCriterionList)
 			.setLeaf(leaf)
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA))
+			.setIncludeDeleted(includeDeletedFinal)
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
-			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
+			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex)
+			.setScopeModelId(scopeModelId.isEmpty()? Optional.ofNullable(studyService.getStudy().getLeafScopeModel().getId()) : scopeModelId);
 
 		//set sort if provided
 		sortBy.ifPresent(sort -> {
