@@ -131,6 +131,10 @@ export class ConfigurationService {
 		return this.http.get<FormModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/form-models`);
 	}
 
+	getSearchableFieldModelsOnScope(scopeModel: ScopeModel): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`${this.serviceUrl}/searchable-field-models/${scopeModel.id}`);
+	}
+
 	getScopeModelDatasetModels(scopeModelId: string): Observable<DatasetModel[]> {
 		return this.http.get<DatasetModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/dataset-models`);
 	}

@@ -476,5 +476,5 @@ public class ScopeController extends AbstractSecuredController {
 		final var string = UriUtils.decode(input, "UTF-8");
 		return mapper.readValue(string, type);
 	}
-	}}
+}
 

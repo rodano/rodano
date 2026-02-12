@@ -15,11 +15,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.dto.paging.PagedResult;
-import ch.rodano.api.field.FieldDTOService;
 import ch.rodano.api.scope.ScopeDTO;
-import ch.rodano.api.scope.ScopeDTOService;
 import ch.rodano.api.scope.ScopeTinyDTO;
-import ch.rodano.api.workflow.WorkflowDTOService;
 import ch.rodano.api.workflow.WorkflowStatusDTO;
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.FieldModelType;
@@ -29,11 +26,7 @@ import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.core.model.jooqutils.JOOQTranslator;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 import ch.rodano.core.model.scope.ScopeSearch;
-import ch.rodano.core.services.bll.dataset.DatasetService;
-import ch.rodano.core.services.bll.field.FieldService;
 import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.services.dao.field.FieldDAOService;
-import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.FIELD;
@@ -47,33 +40,12 @@ import static org.jooq.impl.DSL.field;
 @Transactional(readOnly = true)
 public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultService {
 
-	private final ScopeDTOService scopeDTOService;
-	private final FieldService fieldService;
-	private final FieldDAOService fieldDAOService;
-	private final WorkflowDTOService workflowDTOService;
-	private final WorkflowStatusDAOService workflowStatusDAOService;
-	private final FieldDTOService fieldDTOService;
-	private final DatasetService datasetService;
 	private final StudyService studyService;
 	private final DSLContext create;
 
 	public ExtendedScopeResultServiceImpl(
-		final ScopeDTOService scopeDTOService,
-		final FieldService fieldService,
-		final FieldDAOService fieldDAOService,
-		final WorkflowDTOService workflowDTOService,
-		final WorkflowStatusDAOService workflowStatusDAOService,
-		final FieldDTOService fieldDTOService,
-		final DatasetService datasetService,
 		final StudyService studyService,
 		final DSLContext create) {
-		this.scopeDTOService = scopeDTOService;
-		this.fieldService = fieldService;
-		this.fieldDAOService = fieldDAOService;
-		this.workflowDTOService = workflowDTOService;
-		this.workflowStatusDAOService = workflowStatusDAOService;
-		this.fieldDTOService = fieldDTOService;
-		this.datasetService = datasetService;
 		this.studyService = studyService;
 		this.create = create;
 	}
@@ -86,13 +58,15 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		return String.format("%s.%s", datasetModelId.toLowerCase(), fieldId.toLowerCase());
 	}
 
-	private static List<FieldModelCriterion> defaultFieldCriteria(final ScopeSearch search,
-								      final List<FieldModel> searchableFieldsOnScopeModel) {
+	private static List<FieldModelCriterion> defaultFieldCriteria(final List<FieldModel> searchableFieldsOnScopeModel) {
 		final var criteria = new ArrayList<FieldModelCriterion>();
 		for (var fieldModel : searchableFieldsOnScopeModel) {
-			final var fieldCriterion = new FieldModelCriterion(fieldModel,
+			final var fieldCriterionNotNull = new FieldModelCriterion(fieldModel,
 				Operator.NOT_NULL, null);
-			criteria.add(fieldCriterion);
+			criteria.add(fieldCriterionNotNull);
+			final var fieldCriterionIsNull = new FieldModelCriterion(fieldModel,
+				Operator.NULL, null);
+			criteria.add(fieldCriterionIsNull);
 		}
 		return criteria;
 	}
@@ -108,8 +82,6 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 	@Override
 	public PagedResult<ExtendedScopeSearchResultDTO> search(final ScopeSearch search) {
 
-		search.setScopeModelId(Optional.of("PATIENT"));
-
 		final var scopeModel = studyService.getStudy().getScopeModel(search.getScopeModelId().orElse(null));
 		final var now = ZonedDateTime.now();
 		final List<Condition> conditions = new ArrayList<>();
@@ -120,7 +92,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		// if no criteria are provided, add default criteria to only retrieve scopes
 		// that have values for the searchable fields
 		if (search.fieldModelCriteria.isEmpty()) {
-			search.setFieldModelCriteria(Optional.of(defaultFieldCriteria(search, searchableFieldsOnScopeModel)));
+			search.setFieldModelCriteria(Optional.of(defaultFieldCriteria(searchableFieldsOnScopeModel)));
 		}
 
 		// if no criteria are provided, add default criteria to only retrieve scopes
@@ -133,10 +105,9 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			.map(wf -> sqlWorkflowsStateColumnAlias(wf.getId()))
 			.toList();
 
-		// Add workflowIds as selected fields: ws_<workflowId>.*
 		final var selectFields = new ArrayList<>(List.of(SCOPE.asterisk(), DSL.count().over().as("total")));
 		for (String sqlWorkflowsStateColumn : sqlWorkflowsStateColumnAlias) {
-			// Expose workflow state with a stable alias so it can be used in ORDER BY
+			// Expose workflow state with an alias so it can be used in ORDER BY
 			final var workflowStateAlias = sqlWorkflowsStateColumn + ".state_id";
 			selectFields.add(DSL.field(DSL.name(sqlWorkflowsStateColumn, "state_id")).as(workflowStateAlias));
 		}
@@ -149,15 +120,20 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			selectFields.add(DSL.field(fieldAlias + ".value").as(selectAlias));
 		}
 
+		// handle rights with scope ancestor table
 		final var sa = SCOPE_ANCESTOR.as("scope_ancestor");
 		final var ancestor = SCOPE.as("ancestor");
+		final var sr = SCOPE_RELATION.as("scope_default_parent");
+		final var default_parent_scope = SCOPE.as("default_scope_parent");
 
 		// add ancestor columns to the select list so they are available in the result
-		selectFields.add(ancestor.PK.as("ancestor_pk"));
-		selectFields.add(ancestor.ID.as("ancestor_id"));
-		selectFields.add(ancestor.CODE.as("ancestor_code"));
-		selectFields.add(ancestor.SHORTNAME.as("ancestor_shortname"));
-		selectFields.add(ancestor.LONGNAME.as("ancestor_longname"));
+		selectFields.add(default_parent_scope.PK.as("default_parent_sc_pk"));
+		selectFields.add(default_parent_scope.ID.as("default_parent_sc_id"));
+		selectFields.add(default_parent_scope.CODE.as("ancestor_code"));
+		selectFields.add(default_parent_scope.SHORTNAME.as("default_parent_sc_shortname"));
+		selectFields.add(default_parent_scope.LONGNAME.as("default_parent_sc_longname"));
+		selectFields.add(default_parent_scope.CODE.as("default_parent_sc_code"));
+
 
 		final var query = create.select(selectFields)
 			.from(SCOPE)
@@ -167,15 +143,31 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			.leftJoin(ancestor).on(sa.ANCESTOR_FK.eq(ancestor.PK));
 
 
-		// join tables if necessary
-		search.getParentPks().ifPresent(parentPks -> {
-			// perform an inner join because the goal is to filter scopes
-			query.innerJoin(SCOPE_RELATION)
+		// two things:
+		// - We get the default parent to retrieve the parent info
+		// - if parentPks are provided, then we need to join the scope_relation table
+		//   to filter the scopes that have the specified parents as default parents
+
+		search.getParentPks().ifPresentOrElse(parentPks -> {// perform an inner join because the goal is to filter scopes
+				query.innerJoin(sr)
 				.on(
-					SCOPE.PK.eq(SCOPE_RELATION.SCOPE_FK)
-						.and(SCOPE_RELATION.PARENT_FK.in(parentPks))
-						.and(SCOPE_RELATION.END_DATE.isNull().or(SCOPE_RELATION.END_DATE.ge(now))));
-		});
+					SCOPE.PK.eq(sr.SCOPE_FK)
+						.and(sr.PARENT_FK.in(parentPks))
+						.and(sr.DEFAULT)
+						.and(sr.END_DATE.isNull().or(sr.END_DATE.ge(now))))
+					.leftJoin(default_parent_scope)
+					.on(default_parent_scope.PK.eq(sr.PARENT_FK));
+		},
+			() -> {
+				// always join to get the default parent info
+				query.leftJoin(sr)
+				.on(
+					SCOPE.PK.eq(sr.SCOPE_FK)
+						.and(sr.DEFAULT)
+						.and(sr.END_DATE.isNull().or(sr.END_DATE.ge(now))))
+				.leftJoin(default_parent_scope)
+				.on(default_parent_scope.PK.eq(sr.PARENT_FK));
+			});
 
 		search.getAncestorPks().ifPresent(ancestorPks -> {
 			final var aliasedTable = SCOPE_ANCESTOR.as("SA");
@@ -244,7 +236,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 				if (!datasetTables.containsKey(datasetModelId)) {
 					final var datasetTable = DATASET.as(datasetAlias);
 					datasetTables.put(datasetModelId, datasetTable);
-					query.innerJoin(datasetTable).on(
+					query.leftJoin(datasetTable).on(
 						SCOPE.PK.eq(datasetTable.SCOPE_FK)
 							.and(datasetTable.DATASET_MODEL_ID.eq(datasetModelId)));
 				}
@@ -254,25 +246,27 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 				final var fieldTable = FIELD.as(fieldAlias);
 				final var datasetTable = datasetTables.get(datasetModelId);
 
-				// Check if this field has a criterion
-				final var criterionOpt = criteria.stream()
+				// Check if this field has criteria
+				final var fieldCriteria = criteria.stream()
 					.filter(c -> c.datasetModelId().equals(datasetModelId) && c.fieldModelId().equals(fieldModel.getId()))
-					.findFirst();
+					.toList();
 
-				if (criterionOpt.isPresent()) {
-					// Field has a criterion: join with the condition
-					final var criterion = criterionOpt.get();
-					final var operator = criterion.operator();
-					final var criterionValue = criterion.value();
-
+				if (!fieldCriteria.isEmpty()) {
+					// Field has criteria: join with the condition(s) combined with OR
 					final var operatedFieldName = String.format("%s.value", fieldAlias);
 					final var operatedField = field(operatedFieldName, String.class);
-					final var fieldCondition = JOOQTranslator.translate(operator, fieldModel, operatedField, criterionValue);
+					
+					// Build OR condition from all criteria for this field
+					Condition combinedCondition = null;
+					for (var criterion : fieldCriteria) {
+						final var fieldCondition = JOOQTranslator.translate(criterion.operator(), fieldModel, operatedField, criterion.value());
+						combinedCondition = combinedCondition == null ? fieldCondition : combinedCondition.or(fieldCondition);
+					}
 
-					query.innerJoin(fieldTable).on(
+					query.join(fieldTable).on(
 						fieldTable.DATASET_FK.eq(datasetTable.field("pk", Long.class))
 							.and(fieldTable.FIELD_MODEL_ID.eq(fieldModel.getId()))
-							.and(fieldCondition));
+							.and(combinedCondition));
 				}
 				else {
 					// Field has no criterion: join without condition (just to populate select values)
@@ -388,7 +382,6 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 
 		query.limit(search.getLimitField())
 			.offset(search.getOffsetField());
-
 		final var records = query.fetch();
 		var total = 0;
 		if (!records.isEmpty()) {
@@ -406,15 +399,16 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			scopeDTO.setLongname(record.get("longname") != null ? record.get("longname").toString() : null);
 			scopeDTO.setModelId(record.get("scope_model_id").toString());
 			scopeDTO.setVirtual((Boolean) record.get("virtual"));
-			final ScopeTinyDTO ancestorDTO = new ScopeTinyDTO(
-				record.get("ancestor_pk", Long.class),
-				record.get("ancestor_id", String.class),
-				record.get("ancestor_code", String.class),
-				record.get("ancestor_shortname", String.class),
-				record.get("ancestor_longname", String.class)
+			scopeDTO.setRemoved(((Boolean)record.get("deleted")) != null ? (Boolean) record.get("deleted") : false);
+			final ScopeTinyDTO parentDTO = new ScopeTinyDTO(
+				record.get("default_parent_sc_pk", Long.class),
+				record.get("default_parent_sc_id", String.class),
+				record.get("default_parent_sc_code", String.class),
+				record.get("default_parent_sc_shortname", String.class),
+				record.get("default_parent_sc_longname", String.class)
 			);
 
-			scopeDTO.setParentScope(ancestorDTO);
+			scopeDTO.setParentScope(parentDTO);
 
 			// TODO fix date parsing
 			scopeDTO.setStartDate(

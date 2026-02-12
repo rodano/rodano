@@ -187,6 +187,24 @@ public class ConfigurationController extends AbstractSecuredController {
 			.toList();
 	}
 
+	@Operation(summary = "Get searchable field models on the scope model")
+	@GetMapping("searchable-field-models/{scopeModelId}")
+	@ResponseStatus(HttpStatus.OK)
+	public List<FieldModelDTO> getSearchableFieldModelsOnScopeModel(
+		@PathVariable final String scopeModelId
+	) {
+		final var acl = rightsService.getACL(currentActor());
+		final var languages = actorService.getLanguages(acl.actor());
+
+		return studyService.getStudy().getSearchableFieldModels().stream()
+			.filter(f -> acl.hasRight(f.getDatasetModel(), Rights.READ))
+			.filter(f -> f.getDatasetModel().getScopeModels().stream().anyMatch(sm -> sm.getId().equals(scopeModelId)))
+			.map(f -> new FieldModelDTO(f, languages))
+			.toList();
+	}
+
+
+
 	@Operation(summary = "Get the study workflow models")
 	@GetMapping("workflows")
 	public List<WorkflowDTO> getWorkflows() {

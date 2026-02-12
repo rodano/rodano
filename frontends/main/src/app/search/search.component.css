@@ -16,3 +16,11 @@ table th {
 	text-align: left;
 	padding-left: 2.5em;
 }
+
+.clickable:hover {
+	cursor: pointer !important;
+}
+
+.filter-options {
+	padding-right: 15px;
+}
