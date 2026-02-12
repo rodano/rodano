@@ -1,10 +1,10 @@
-import {Component, DestroyRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTable, MatTableModule} from '@angular/material/table';
-import {merge} from 'rxjs';
-import {startWith, switchMap} from 'rxjs/operators';
+import {merge, Subject} from 'rxjs';
+import {map, startWith, switchMap} from 'rxjs/operators';
 import {PagedResultWorkflowStatus} from '@core/model/paged-result-workflow-status';
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
@@ -33,12 +33,10 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		DateUTCPipe
 	]
 })
-export class IssueViewerComponent implements OnInit {
+export class IssueViewerComponent implements OnInit, OnChanges {
 	@Input() scopePks: number[];
 	@Input() eventPks?: number[];
 
-	workflowIds: string[] = [];
-	stateIds: string[] = [];
 	loading = false;
 	columnsToDisplay = [
 		'eventShortname',
@@ -48,6 +46,8 @@ export class IssueViewerComponent implements OnInit {
 		'stateId',
 		'triggerMessage'
 	];
+
+	refreshSearch$ = new Subject<void>();
 
 	workflowStatuses: PagedResultWorkflowStatus = EMPTY_PAGED_RESULT;
 
@@ -65,40 +65,50 @@ export class IssueViewerComponent implements OnInit {
 		this.sort.active = WorkflowStatusSearch.DEFAULT_SORT_BY;
 		this.sort.direction = PaginatedSearch.getSortDirection(WorkflowStatusSearch.DEFAULT_SORT_ASCENDING);
 
-		this.configurationService.getWorkflows().subscribe(
-			workflows => {
+		this.configurationService.getWorkflows().pipe(
+			takeUntilDestroyed(this.destroyRef),
+			switchMap(workflows => {
+				const workflowIds: string[] = [];
+				const stateIds: string[] = [];
+
 				//display only workflows with at least one important states
 				workflows.forEach(workflow => {
 					workflow.states.forEach(state => {
 						if(state.important) {
-							this.workflowIds.push(workflow.id);
-							this.stateIds.push(state.id);
+							workflowIds.push(workflow.id);
+							stateIds.push(state.id);
 						}
 					});
 				});
 
-				merge(
+				return merge(
+					this.refreshSearch$.asObservable(),
 					this.sort.sortChange,
 					this.paginator.page
 				).pipe(
-					takeUntilDestroyed(this.destroyRef),
 					startWith({}),
-					switchMap(() => {
-						this.loading = true;
-						const search = new WorkflowStatusSearch();
-						search.workflowIds = this.workflowIds;
-						search.stateIds = this.stateIds;
-						search.scopePks = this.scopePks;
-						search.eventPks = this.eventPks;
-						search.pageIndex = this.paginator.pageIndex;
-						search.sortBy = this.sort.active;
-						search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
-						return this.workflowStatusService.search(search);
-					})
-				).subscribe(statuses => {
-					this.workflowStatuses = statuses;
-					this.loading = false;
-				});
-			});
+					map(() => ({workflowIds, stateIds}))
+				);
+			}),
+			switchMap(({workflowIds, stateIds}) => {
+				this.loading = true;
+				const search = new WorkflowStatusSearch();
+				search.workflowIds = workflowIds;
+				search.stateIds = stateIds;
+				search.scopePks = this.scopePks;
+				search.eventPks = this.eventPks;
+				search.pageIndex = this.paginator.pageIndex;
+				search.sortBy = this.sort.active;
+				search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
+				return this.workflowStatusService.search(search);
+			})
+		).subscribe(statuses => {
+			this.workflowStatuses = statuses;
+			this.loading = false;
+		});
+	}
+
+	ngOnChanges() {
+		this.refreshSearch$.next();
 	}
 }
