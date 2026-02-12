@@ -28,7 +28,6 @@ import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.event.Progression;
 import ch.rodano.core.model.exception.LockedObjectException;
-import ch.rodano.core.model.exception.MissingDataException;
 import ch.rodano.core.model.exception.WrongDataConditionException;
 import ch.rodano.core.model.form.Form;
 import ch.rodano.core.model.rules.data.ConstraintEvaluationService;
@@ -379,9 +378,7 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		//do not consider inceptive event
-		//this event is now used to store data directly related to scope but its date is not relevant in the timeline of the scope
-		if(date != null && !event.getEventModel().isInceptive() && !scope.getVirtual()) {
+		if(date != null && !scope.getVirtual()) {
 			//move oldest physical start date if necessary
 			final var baseRationale = "Oldest physical date of the scope aligned to its oldest event";
 			final var enhancedRationale = StringUtils.isBlank(rationale) ? baseRationale : String.format("%s: %s", baseRationale, rationale);
@@ -467,13 +464,6 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public List<Event> getAllIncludingRemoved(final Scope scope, final EventModel eventModel) {
 		return eventDAOService.getAllEventsByScopePkAndEventModelId(scope.getPk(), eventModel.getId());
-	}
-
-	@Override
-	public Event getInceptive(final Scope scope) {
-		return getAll(scope).stream()
-			.filter(e -> e.getEventModel().isInceptive()).findFirst()
-			.orElseThrow(() -> new MissingDataException(String.format("No inceptive event for scope %s", scope.getCode())));
 	}
 
 	@Override

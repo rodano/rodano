@@ -502,13 +502,6 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
-	public final List<EventModel> getInceptiveEventModels() {
-		return getEventModels().stream()
-			.filter(EventModel::isInceptive)
-			.toList();
-	}
-
-	@JsonIgnore
 	public Optional<Profile> getDefaultProfile() {
 		return Optional.ofNullable(defaultProfileId).map(study::getProfile);
 	}

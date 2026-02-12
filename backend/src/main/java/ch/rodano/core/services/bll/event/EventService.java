@@ -163,13 +163,6 @@ public interface EventService {
 	 */
 	List<Event> getAll(Scope scope, EventModel eventModel);
 
-	/**
-	 * Get the inceptive event, as defined in the configuration.
-	 * @param scope The scope
-	 * @return The inceptive event
-	 */
-	Event getInceptive(Scope scope);
-
 	ZonedDateTime getTheoreticalDate(Scope scope, Event event);
 
 	/**

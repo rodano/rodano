@@ -623,9 +623,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 			return new FormInfoDTO(fieldDTO, scope.getPk(), null, form.getPk());
 		}
 		else {
-			//if the workflow is attached to the scope (not attached to a event) and has not been found in the scope forms, search in all events starting from the inceptive event
+			//if the workflow is attached to the scope (not attached to a event) and has not been found in the scope forms, search in all events
 			final var events = new ArrayList<Event>();
-			events.add(eventService.getInceptive(scope));
 			events.addAll(eventService.getAll(scope));
 			for(final var e : events) {
 				final var formModel = e.getEventModel().getFormModels().stream()

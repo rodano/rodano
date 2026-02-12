@@ -214,7 +214,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@Operation(summary = "Get dataset models for a scope model")
 	@GetMapping("/scope-model/{scopeModelId}/dataset-models")
 	@ResponseStatus(HttpStatus.OK)
-	public List<DatasetModelDTO> getInceptiveDatasetModels(
+	public List<DatasetModelDTO> getDatasetModels(
 		@PathVariable final String scopeModelId
 	) {
 		final var acl = rightsService.getACL(currentActor());

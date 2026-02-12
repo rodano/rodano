@@ -109,11 +109,6 @@ const RuleEntities = Object.freeze({
 				target: 'FORM'
 			},
 			{
-				id: 'INCEPTIVE_EVENT',
-				label: 'Inceptive event',
-				target: 'EVENT'
-			},
-			{
 				id: 'FIELD_HAVING_VALUE',
 				label: 'Fields having a value',
 				target: 'FIELD',

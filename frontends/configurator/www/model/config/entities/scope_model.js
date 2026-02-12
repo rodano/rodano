@@ -140,15 +140,6 @@ export class ScopeModel extends DisplayableNode {
 	getFormModels() {
 		return this.formModelIds.map(Study.prototype.getFormModel, this.study);
 	}
-	getInceptiveEventModel() {
-		const inceptive_event_model = this.eventModels.find(e => e.inceptive);
-		if(inceptive_event_model) {
-			return inceptive_event_model;
-		}
-		else {
-			throw new Error(`No inceptive event model for scope model ${this.id}`);
-		}
-	}
 
 	//rulable and layoutable
 	getStudy() {

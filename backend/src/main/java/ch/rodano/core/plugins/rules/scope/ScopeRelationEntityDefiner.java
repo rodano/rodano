@@ -193,28 +193,6 @@ public class ScopeRelationEntityDefiner extends AbstractScopeEntityDefiner {
 			new EntityRelation() {
 				@Override
 				public RulableEntity getTargetEntity() {
-					return RulableEntity.EVENT;
-				}
-
-				@Override
-				public Set<Evaluable> getTargetEvaluables(final Evaluable evaluable) {
-					final Scope scope = (Scope) evaluable;
-					//it's not required for scope models to have an inceptive event
-					if(scope.getScopeModel().getInceptiveEventModels().isEmpty()) {
-						return Collections.emptySet();
-					}
-					return Collections.singleton(eventService.getInceptive((Scope) evaluable));
-
-				}
-
-				@Override
-				public String getId() {
-					return "INCEPTIVE_VISIT";
-				}
-			},
-			new EntityRelation() {
-				@Override
-				public RulableEntity getTargetEntity() {
 					return RulableEntity.DATASET;
 				}
 

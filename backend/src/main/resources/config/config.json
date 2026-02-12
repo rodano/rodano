@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 120,
-	"configDate": 1763985376091,
+	"configDate": 1770911978591,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -2005,7 +2005,6 @@
 					"longname": {},
 					"description": {},
 					"eventGroupId": "MEDICAL_VISITS",
-					"inceptive": false,
 					"datasetModelIds": [
 						"STUDY_ENTRY",
 						"VISIT_DOCUMENTATION",
@@ -2057,7 +2056,6 @@
 					},
 					"description": {},
 					"eventGroupId": "MEDICAL_VISITS",
-					"inceptive": false,
 					"datasetModelIds": [
 						"VISIT_DOCUMENTATION",
 						"RELAPSES_GRID",
@@ -2104,7 +2102,6 @@
 					"longname": {},
 					"description": {},
 					"eventGroupId": "MEDICAL_VISITS",
-					"inceptive": false,
 					"datasetModelIds": [
 						"VISIT_DOCUMENTATION",
 						"RELAPSES_GRID",
@@ -2151,7 +2148,6 @@
 					"longname": {},
 					"description": {},
 					"eventGroupId": "MEDICAL_VISITS",
-					"inceptive": false,
 					"datasetModelIds": [
 						"VISIT_DOCUMENTATION",
 						"RELAPSES_GRID",
@@ -2198,7 +2194,6 @@
 					"longname": {},
 					"description": {},
 					"eventGroupId": "MEDICAL_VISITS",
-					"inceptive": false,
 					"datasetModelIds": [
 						"VISIT_DOCUMENTATION",
 						"RELAPSES_GRID",
@@ -2245,7 +2240,6 @@
 					},
 					"longname": {},
 					"description": {},
-					"inceptive": false,
 					"datasetModelIds": [
 						"TELEPHONE_DOCUMENTATION"
 					],
@@ -2618,7 +2612,6 @@
 					},
 					"longname": {},
 					"description": {},
-					"inceptive": false,
 					"datasetModelIds": [
 						"EARLY_TERMINATION"
 					],
@@ -2655,7 +2648,6 @@
 					},
 					"longname": {},
 					"description": {},
-					"inceptive": false,
 					"datasetModelIds": [
 						"SLEEP_QUALITY"
 					],

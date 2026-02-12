@@ -17,7 +17,6 @@ export class EventModel extends DisplayableNode {
 			longname: {type: 'object'},
 			description: {type: 'object'},
 			eventGroupId: {type: 'string'},
-			inceptive: {type: 'boolean'},
 			datasetModelIds: {type: 'array'},
 			formModelIds: {type: 'array'},
 			workflowIds: {type: 'array'},
@@ -63,7 +62,6 @@ export class EventModel extends DisplayableNode {
 		this.longname = {};
 		this.description = {};
 		this.eventGroupId = undefined;
-		this.inceptive = undefined;
 		this.datasetModelIds = [];
 		this.formModelIds = [];
 		this.workflowIds = [];
@@ -244,15 +242,5 @@ export class EventModel extends DisplayableNode {
 		this.createRules.removeElement(event.node);
 		this.removeRules.removeElement(event.node);
 		this.restoreRules.removeElement(event.node);
-	}
-
-	//report
-	report(settings) {
-		const report = super.report(settings);
-		//event group must be mandatory if event is inceptive
-		if(!this.mandatory && this.inceptive) {
-			report.addError(`Event model ${this.id} is not mandatory whereas it is the inceptive event`);
-		}
-		return report;
 	}
 }

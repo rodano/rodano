@@ -51,7 +51,6 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 	private SortedMap<String, String> description;
 
 	private String eventGroupId;
-	private boolean inceptive;
 	private int number;
 
 	private boolean mandatory;
@@ -150,14 +149,6 @@ public class EventModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	public void setEventGroupId(final String eventGroupId) {
 		this.eventGroupId = eventGroupId;
-	}
-
-	public final boolean isInceptive() {
-		return inceptive;
-	}
-
-	public final void setInceptive(final boolean inceptive) {
-		this.inceptive = inceptive;
 	}
 
 	public Set<String> getImpliedEventModelIds() {
