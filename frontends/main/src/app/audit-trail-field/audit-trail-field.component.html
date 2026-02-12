@@ -3,6 +3,9 @@
 </h1>
 
 <mat-dialog-content>
+	<mat-progress-bar
+		mode="indeterminate"
+		[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
 	<table
 		mat-table
 		[dataSource]="events">

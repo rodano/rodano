@@ -17,6 +17,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatCardModule} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatTableModule} from '@angular/material/table';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
@@ -36,6 +37,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 		MatButton,
 		ReactiveFormsModule,
 		MatCardModule,
+		MatProgressBar,
 		MatLabel,
 		MatFormField,
 		MatSelect,
@@ -55,6 +57,7 @@ export class UserRolesComponent implements OnInit {
 	@Input() user: User;
 	me: User;
 	roles: Role[] = [];
+	loading = false;
 
 	displayedColumns: string[] = [
 		'profile',
@@ -89,6 +92,7 @@ export class UserRolesComponent implements OnInit {
 		private meService: MeService) {}
 
 	ngOnInit() {
+		this.loading = true;
 		forkJoin({
 			profiles: this.configurationService.getProfiles(),
 			scopes: this.meService.getScopes(undefined, true, false),
@@ -99,6 +103,7 @@ export class UserRolesComponent implements OnInit {
 			this.me = me;
 			//initialize the table only when all data is available
 			this.roles = this.user.roles;
+			this.loading = false;
 		});
 	}
 
@@ -106,6 +111,7 @@ export class UserRolesComponent implements OnInit {
 		const profileId = this.roleForm.controls.profile.value;
 		const scopePk = this.roleForm.controls.scopePk.value;
 
+		this.loading = true;
 		this.roleService.create(this.user.pk, profileId, scopePk).pipe(
 			switchMap(() => this.roleService.getRoles(this.user.pk)),
 			takeUntilDestroyed(this.destroyRef)
@@ -113,6 +119,7 @@ export class UserRolesComponent implements OnInit {
 			this.roleForm.reset();
 			this.roles = roles;
 			this.notificationService.showSuccess('New role created');
+			this.loading = false;
 		});
 	}
 
@@ -129,22 +136,24 @@ export class UserRolesComponent implements OnInit {
 	}
 
 	private performRoleAction(role$: Observable<Role>) {
+		this.loading = true;
 		role$.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe({
 			next: updatedRole => {
 				const roleIndex = this.roles.findIndex(role => role.pk === updatedRole.pk);
 				this.roles[roleIndex] = updatedRole;
-				//Refresh the mat-table datasource
+				//refresh the mat-table datasource
 				this.roles = [...this.roles];
 				this.user.roles = this.roles;
 				this.authStateService.updateUser(this.user);
 				this.notificationService.showSuccess('Role updated');
+				this.loading = false;
 			},
 			error: result => {
 				this.notificationService.showError(`Unable to update role: ${result.error.message}`);
+				this.loading = false;
 			}
-		}
-		);
+		});
 	}
 }

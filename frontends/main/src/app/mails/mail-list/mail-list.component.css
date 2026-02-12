@@ -1,5 +1,5 @@
-table {
-	padding-top: 0.5em;
+.mat-expansion-panel {
+	margin-bottom: 0.5em;
 }
 .mat-column-selected {
 	width: 8rem;

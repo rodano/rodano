@@ -15,6 +15,7 @@ import {MatButton} from '@angular/material/button';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {RouterLink} from '@angular/router';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -31,6 +32,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatFormField,
 		MatInput,
 		ReactiveFormsModule,
+		MatProgressBar,
 		MatTableModule,
 		MatSort,
 		MatToolbar,
@@ -51,6 +53,7 @@ export class WorkflowWidgetComponent implements OnInit {
 	widget: WorkflowWidget;
 	columnsToDisplay: string[] = [];
 	workflowStatuses: PagedResultWorkflowStatusInfo = EMPTY_PAGED_RESULT;
+	loading = false;
 
 	filter = new FormControl('', {nonNullable: true});
 
@@ -100,6 +103,7 @@ export class WorkflowWidgetComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new WorkflowWidgetSearch();
 				search.fullText = this.filter.value;
 				search.scopePks = scopePks;
@@ -114,6 +118,7 @@ export class WorkflowWidgetComponent implements OnInit {
 			//as at least one workflow is found
 			this.workflowsLoaded.emit(this.workflowStatuses.paging.total);
 			this.workflowsLoaded.complete();
+			this.loading = false;
 		});
 	}
 

@@ -16,6 +16,7 @@ import {MatButton} from '@angular/material/button';
 import {MatInput, MatLabel} from '@angular/material/input';
 import {MatFormField} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {DownloadDirective} from 'src/app/directives/download.component';
@@ -39,6 +40,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatFormField,
 		MatInput,
 		MatButton,
+		MatProgressBar,
 		MatSort,
 		MatSortHeader,
 		MatTableModule,
@@ -77,6 +79,7 @@ export class ScopeListComponent implements OnInit, OnChanges {
 	refreshSearch$ = new Subject<void>();
 
 	scopes: PagedResultScope = EMPTY_PAGED_RESULT;
+	loading = false;
 	columnsToDisplay: string[] = [];
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -128,6 +131,7 @@ export class ScopeListComponent implements OnInit, OnChanges {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new ScopeSearch();
 				search.scopeModelId = this.scopeModel.id;
 				search.fullText = this.searchForm.get('fullText')?.value;
@@ -141,7 +145,10 @@ export class ScopeListComponent implements OnInit, OnChanges {
 				this.exportUrl = this.scopeService.getExportUrl(search);
 				return this.scopeService.search(search);
 			})
-		).subscribe(s => this.scopes = s);
+		).subscribe(scopes => {
+			this.scopes = scopes;
+			this.loading = false;
+		});
 	}
 
 	search() {

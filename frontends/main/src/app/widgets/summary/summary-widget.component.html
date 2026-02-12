@@ -18,9 +18,9 @@
 	style="margin-bottom: 1rem">
 </app-scope-breadcrumb>
 
-@if (loading) {
-	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
-}
+<mat-progress-bar
+	mode="indeterminate"
+	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table

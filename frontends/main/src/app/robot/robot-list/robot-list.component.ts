@@ -22,6 +22,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {NotificationService} from 'src/app/services/notification.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
@@ -38,6 +39,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatSortHeader,
 		MatInput,
 		MatLabel,
+		MatProgressBar,
 		MatSelect,
 		MatOption,
 		MatButton,
@@ -63,6 +65,7 @@ export class RobotListComponent implements OnInit {
 	refreshSearch$ = new Subject<void>();
 
 	robots: PagedResultRobot = EMPTY_PAGED_RESULT;
+	loading = false;
 	columnsToDisplay: string[] = [
 		'name',
 		'profileId',
@@ -96,6 +99,7 @@ export class RobotListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new RobotSearch();
 				Object.assign(search, this.searchForm.value);
 				search.sortBy = this.sort.active;
@@ -103,7 +107,10 @@ export class RobotListComponent implements OnInit {
 				search.pageIndex = this.paginator.pageIndex;
 				return this.robotService.search(search);
 			})
-		).subscribe(r => this.robots = r);
+		).subscribe(robots => {
+			this.robots = robots;
+			this.loading = false;
+		});
 	}
 
 	search() {

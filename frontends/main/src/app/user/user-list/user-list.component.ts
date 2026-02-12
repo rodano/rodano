@@ -15,6 +15,7 @@ import {MatTableModule} from '@angular/material/table';
 import {MatIcon} from '@angular/material/icon';
 import {RouterLink} from '@angular/router';
 import {MatButton} from '@angular/material/button';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {merge, startWith, Subject, switchMap} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
@@ -34,6 +35,7 @@ import {YesNoPipe} from 'src/app/pipes/yes-no.pipe';
 		MatIcon,
 		MatSort,
 		MatSortHeader,
+		MatProgressBar,
 		MatTableModule,
 		MatTooltip,
 		MatDivider,
@@ -59,6 +61,7 @@ export class UserListComponent implements OnInit, OnChanges {
 	getRoleStatusDisplay = getRoleStatusDisplay;
 
 	users: PagedResultUser = EMPTY_PAGED_RESULT;
+	loading = false;
 	columnsToDisplay: string[] = [
 		'name',
 		'email',
@@ -92,13 +95,17 @@ export class UserListComponent implements OnInit, OnChanges {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				this.predicate.sortBy = this.sort.active;
 				this.predicate.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 				this.predicate.pageIndex = this.paginator.pageIndex;
 				this.exportUrl = this.userService.getExportUrl(this.predicate);
 				return this.userService.search(this.predicate);
 			})
-		).subscribe(u => this.users = u);
+		).subscribe(users => {
+			this.users = users;
+			this.loading = false;
+		});
 	}
 
 	ngOnChanges() {

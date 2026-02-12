@@ -1,5 +1,6 @@
 import {Component, DestroyRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTable, MatTableModule} from '@angular/material/table';
 import {merge} from 'rxjs';
@@ -24,6 +25,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	imports: [
 		MatTableModule,
 		MatSortModule,
+		MatProgressBar,
 		RouterLink,
 		MatPaginator,
 		LocalizeMapPipe,
@@ -37,6 +39,7 @@ export class IssueViewerComponent implements OnInit {
 
 	workflowIds: string[] = [];
 	stateIds: string[] = [];
+	loading = false;
 	columnsToDisplay = [
 		'eventShortname',
 		'eventDate',
@@ -81,6 +84,7 @@ export class IssueViewerComponent implements OnInit {
 					takeUntilDestroyed(this.destroyRef),
 					startWith({}),
 					switchMap(() => {
+						this.loading = true;
 						const search = new WorkflowStatusSearch();
 						search.workflowIds = this.workflowIds;
 						search.stateIds = this.stateIds;
@@ -91,8 +95,9 @@ export class IssueViewerComponent implements OnInit {
 						search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 						return this.workflowStatusService.search(search);
 					})
-				).subscribe(result => {
-					this.workflowStatuses = result;
+				).subscribe(statuses => {
+					this.workflowStatuses = statuses;
+					this.loading = false;
 				});
 			});
 	}

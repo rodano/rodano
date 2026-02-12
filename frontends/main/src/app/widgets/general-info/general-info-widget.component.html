@@ -1,4 +1,7 @@
 <h2>General information</h2>
+<mat-progress-bar
+	mode="indeterminate"
+	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
 	[dataSource]="info">

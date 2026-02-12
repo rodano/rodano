@@ -2,6 +2,7 @@ import {Component, Inject, OnInit} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {Field} from '@core/model/field';
 import {DateTimeUTCPipe} from '../pipes/date-time-utc.pipe';
 import {MatTableModule} from '@angular/material/table';
@@ -20,6 +21,7 @@ export interface WorkflowRationaleData {
 	imports: [
 		MatDialogModule,
 		MatButton,
+		MatProgressBar,
 		MatTableModule,
 		LocalizeMapPipe,
 		DateTimeUTCPipe
@@ -28,6 +30,7 @@ export interface WorkflowRationaleData {
 export class AuditTrailFieldComponent implements OnInit {
 	events: FieldEventAuditTrail[];
 	selectedEntityPk: number | undefined;
+	loading = false;
 	columnsToDisplay = ['event', 'value', 'by', 'date', 'context'];
 
 	constructor(
@@ -37,7 +40,11 @@ export class AuditTrailFieldComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.auditTrailService.getForField(this.field).subscribe(e => this.events = e);
+		this.loading = true;
+		this.auditTrailService.getForField(this.field).subscribe(events => {
+			this.events = events;
+			this.loading = false;
+		});
 	}
 
 	highlightRelatedEvents(event: FieldEventAuditTrail) {

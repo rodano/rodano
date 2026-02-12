@@ -23,6 +23,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {Rights} from '@core/model/rights';
@@ -40,6 +41,7 @@ import {Profile} from '@core/model/profile';
 		MatSelect,
 		MatOption,
 		MatButton,
+		MatProgressBar,
 		MatTableModule,
 		MatDivider,
 		MatToolbar,
@@ -57,6 +59,7 @@ export class EproListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 	scopes: PagedResultScope = EMPTY_PAGED_RESULT;
+	loading = false;
 
 	robots: EproRobot[];
 	columnsToDisplay: string[] = [
@@ -104,6 +107,7 @@ export class EproListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new ScopeSearch();
 				search.leaf = true;
 				search.fullText = this.searchForm.get('fullText')?.value;
@@ -120,6 +124,7 @@ export class EproListComponent implements OnInit {
 		).subscribe(({robots, scopes}) => {
 			this.robots = robots;
 			this.scopes = scopes;
+			this.loading = false;
 		});
 	}
 

@@ -25,6 +25,7 @@ import {MatFormField} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatExpansionModule} from '@angular/material/expansion';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {NotificationService} from 'src/app/services/notification.service';
@@ -46,6 +47,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatOption,
 		MatCheckbox,
 		MatButton,
+		MatProgressBar,
 		MatTableModule,
 		MatDivider,
 		MatToolbar,
@@ -82,6 +84,7 @@ export class MailListComponent implements OnInit {
 	refreshSearch$ = new Subject<void>();
 
 	mails: PagedResultMail = EMPTY_PAGED_RESULT;
+	loading = false;
 	columnsToDisplay: string[] = [
 		'selected',
 		'status',
@@ -117,6 +120,7 @@ export class MailListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new MailSearch();
 				Object.assign(search, this.searchForm.value);
 				search.sortBy = this.sort.active;
@@ -125,7 +129,10 @@ export class MailListComponent implements OnInit {
 				this.exportUrl = this.mailsService.getExportUrl(search);
 				return this.mailsService.search(search);
 			})
-		).subscribe(m => this.mails = m);
+		).subscribe(mails => {
+			this.mails = mails;
+			this.loading = false;
+		});
 	}
 
 	search() {

@@ -4,6 +4,7 @@ import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatPaginator} from '@angular/material/paginator';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatSort, MatSortModule} from '@angular/material/sort';
 import {MatTable, MatTableModule} from '@angular/material/table';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
@@ -29,6 +30,7 @@ import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
 		DownloadDirective,
 		MatInput,
 		MatButton,
+		MatProgressBar,
 		MatTableModule,
 		MatSortModule,
 		MatToolbar,
@@ -49,6 +51,7 @@ export class OverdueComponent implements OnInit {
 
 	scopeOverdue: PagedResultOverdue = EMPTY_PAGED_RESULT;
 	overdueType: string;
+	loading = false;
 
 	scopeName: string;
 	parentScopeName: string;
@@ -96,6 +99,7 @@ export class OverdueComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new OverdueWidgetSearch();
 				search.fullText = this.filter.value;
 				search.scopePks = scopePks;
@@ -107,6 +111,7 @@ export class OverdueComponent implements OnInit {
 			this.scopeOverdue = result;
 			this.scopesLoaded.emit(this.scopeOverdue.paging.total);
 			this.scopesLoaded.complete();
+			this.loading = false;
 		});
 	}
 }

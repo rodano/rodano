@@ -1,13 +1,18 @@
+<mat-progress-bar
+	mode="indeterminate"
+	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
 	[dataSource]="workflowStatuses.objects"
 	matSort
 	matSortDisableClear>
-	<tr
-		*matNoDataRow
-		class="no-data-row">
-		<td [attr.colspan]="columnsToDisplay.length">No data</td>
-	</tr>
+	@if (!loading) {
+		<tr
+			*matNoDataRow
+			class="no-data-row">
+			<td [attr.colspan]="columnsToDisplay.length">No data</td>
+		</tr>
+	}
 
 	<ng-container matColumnDef="eventShortname">
 		<th

@@ -22,6 +22,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {DownloadDirective} from '../directives/download.component';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {ModifyResourceDialogComponent} from './modify-resource-dialog/modify-resource-dialog.component';
@@ -42,6 +43,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatSelect,
 		MatOption,
 		MatButton,
+		MatProgressBar,
 		MatMenuModule,
 		MatIcon,
 		MatTableModule,
@@ -65,6 +67,7 @@ export class ResourceListComponent implements OnInit {
 	refreshSearch$ = new Subject<void>();
 
 	resources: PagedResultResource = EMPTY_PAGED_RESULT;
+	loading = false;
 	columnsToDisplay = [
 		'title',
 		'category',
@@ -100,6 +103,7 @@ export class ResourceListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
+				this.loading = true;
 				const search = new ResourceSearch();
 				Object.assign(search, this.searchForm.value);
 				search.removed = true;
@@ -108,7 +112,10 @@ export class ResourceListComponent implements OnInit {
 				search.pageIndex = this.paginator.pageIndex;
 				return this.resourceService.search(search);
 			})
-		).subscribe(r => this.resources = r);
+		).subscribe(resources => {
+			this.resources = resources;
+			this.loading = false;
+		});
 	}
 
 	search() {

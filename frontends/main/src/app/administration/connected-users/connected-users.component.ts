@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Session} from '@core/model/session';
 import {SessionService} from '@core/services/session.service';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {AuthStateService} from 'src/app/services/auth-state.service';
 import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 import {MatButton} from '@angular/material/button';
@@ -12,6 +13,7 @@ import {MatTableModule} from '@angular/material/table';
 	imports: [
 		MatTableModule,
 		MatButton,
+		MatProgressBar,
 		DateTimeUTCPipe
 	]
 })
@@ -25,6 +27,7 @@ export class ConnectedUsersComponent implements OnInit {
 	];
 
 	sessions: Session[];
+	loading = false;
 
 	constructor(
 		private sessionService: SessionService,
@@ -32,7 +35,11 @@ export class ConnectedUsersComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		this.sessionService.get().subscribe(sessions => this.sessions = sessions);
+		this.loading = true;
+		this.sessionService.get().subscribe(sessions => {
+			this.sessions = sessions;
+			this.loading = false;
+		});
 	}
 
 	isCurrentSession(session: Session) {
