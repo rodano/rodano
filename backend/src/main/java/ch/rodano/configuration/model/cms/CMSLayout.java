@@ -9,16 +9,11 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class CMSLayout implements Node {
 	@Serial
 	private static final long serialVersionUID = 7253496770406322390L;

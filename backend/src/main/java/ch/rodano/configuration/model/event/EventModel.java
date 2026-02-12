@@ -19,9 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
 import ch.rodano.configuration.model.common.Entity;
@@ -37,8 +34,6 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class EventModel implements Serializable, SuperDisplayable, WorkflowableModel, RightAssignable<EventModel>, Node, Comparable<EventModel> {
 	@Serial
 	private static final long serialVersionUID = -5437648376925328189L;

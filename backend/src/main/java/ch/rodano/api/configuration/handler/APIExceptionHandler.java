@@ -81,7 +81,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		// Handle exceptions thrown from controllers via the ResponseStatusException API
 		if(e instanceof final ResponseStatusException rse) {
 			logger.info(e.getLocalizedMessage(), e);
-			return new ResponseEntity<>(new ErrorDetails(HttpStatus.valueOf(rse.getStatusCode().value()), rse.getReason(), path), rse.getResponseHeaders(), rse.getStatusCode().value());
+			return new ResponseEntity<>(new ErrorDetails(HttpStatus.valueOf(rse.getStatusCode().value()), rse.getReason(), path), rse.getHeaders(), rse.getStatusCode().value());
 		}
 
 		// Handle the form submission exception that sends out its own response entities

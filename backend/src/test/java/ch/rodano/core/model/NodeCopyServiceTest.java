@@ -1,7 +1,5 @@
 package ch.rodano.core.model;
 
-import java.io.IOException;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +18,7 @@ public class NodeCopyServiceTest {
 
 	@Test
 	@DisplayName("Copy nodes")
-	public void copyNodes() throws NoSuchFieldException, IllegalAccessException, IOException {
+	public void copyNodes() throws NoSuchFieldException, IllegalAccessException {
 		final var study = studyService.getStudy();
 
 		//one level node

@@ -2,13 +2,10 @@ package ch.rodano.api.role;
 
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import ch.rodano.api.config.ProfileDTO;
 import ch.rodano.api.scope.ScopeMiniDTO;
 import ch.rodano.core.model.role.RoleStatus;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class RoleDTO extends RoleCreationDTO {
 	@NotNull
 	Long pk;

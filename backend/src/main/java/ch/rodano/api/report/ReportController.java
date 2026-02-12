@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,7 +81,7 @@ public class ReportController extends AbstractSecuredController {
 
 		//send response
 		final StreamingResponseBody stream = os -> reportService.getTransferReport(os, scopes, scopeModel);
-		final var scopeModelLabel = StringUtils.replace(scopeModel.getDefaultLocalizedShortname().toLowerCase(), " ", "_");
+		final var scopeModelLabel = Strings.CI.replace(scopeModel.getDefaultLocalizedShortname().toLowerCase(), " ", "_");
 		final var filename = study.generateFilename(String.format("%s_transfers", scopeModelLabel), ExportFormat.CSV);
 		return exportResponse(ExportFormat.CSV, stream, filename);
 	}
@@ -113,7 +113,7 @@ public class ReportController extends AbstractSecuredController {
 
 		//send response
 		final StreamingResponseBody stream = os -> reportService.getVisitReport(os, scopes, scopeModel);
-		final var scopeModelLabel = StringUtils.replace(scopeModel.getDefaultLocalizedShortname().toLowerCase(), " ", "_");
+		final var scopeModelLabel = Strings.CI.replace(scopeModel.getDefaultLocalizedShortname().toLowerCase(), " ", "_");
 		final var filename = study.generateFilename(String.format("%s_events", scopeModelLabel), ExportFormat.CSV);
 		return exportResponse(ExportFormat.CSV, stream, filename);
 	}

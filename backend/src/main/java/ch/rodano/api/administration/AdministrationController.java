@@ -6,10 +6,10 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.actuate.health.HealthEndpoint;
-import org.springframework.boot.actuate.health.Status;
-import org.springframework.boot.actuate.jdbc.DataSourceHealthIndicator;
-import org.springframework.boot.actuate.system.DiskSpaceHealthIndicator;
+import org.springframework.boot.health.actuate.endpoint.HealthEndpoint;
+import org.springframework.boot.health.application.DiskSpaceHealthIndicator;
+import org.springframework.boot.health.contributor.Status;
+import org.springframework.boot.jdbc.health.DataSourceHealthIndicator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.config.ScheduledTaskHolder;

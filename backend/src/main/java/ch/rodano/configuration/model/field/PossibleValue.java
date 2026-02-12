@@ -10,16 +10,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class PossibleValue implements Node {
 	@Serial
 	private static final long serialVersionUID = -10498351329495800L;

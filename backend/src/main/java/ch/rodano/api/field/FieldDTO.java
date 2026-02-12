@@ -6,8 +6,6 @@ import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.api.config.FieldModelDTO;
@@ -15,7 +13,6 @@ import ch.rodano.api.config.PossibleValueDTO;
 import ch.rodano.api.workflow.WorkflowDTO;
 import ch.rodano.api.workflow.WorkflowStatusDTO;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class FieldDTO {
 	@Schema(description = "Scope reference")
 	@NotNull

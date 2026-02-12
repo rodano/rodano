@@ -9,8 +9,6 @@ import java.util.SortedMap;
 
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.api.config.ScopeModelDTO;
@@ -21,7 +19,6 @@ import ch.rodano.core.model.enrollment.EnrollmentTarget;
 import ch.rodano.core.model.enrollment.SubscriptionRestriction;
 
 //TODO split this DTO into a DTO that the server receives and a DTO that the server sends
-@JsonIgnoreProperties(ignoreUnknown = true)
 public class ScopeDTO extends ScopeMiniDTO {
 	@Schema(description = "Scope model")
 	@NotNull

@@ -1,22 +1,15 @@
 package ch.rodano.configuration.services.node;
 
-import java.io.IOException;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.configuration.model.common.Node;
 
 public class NodeCopyService {
-	private static final ObjectMapper MAPPER = new ObjectMapper();
 
-	static {
-		MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		MAPPER.configure(SerializationFeature.INDENT_OUTPUT, false);
-	}
+	private static final JsonMapper MAPPER = new JsonMapper();
 
 	@SuppressWarnings("unchecked")
-	public static <T extends Node> T copy(final T node, final String newId) throws IOException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+	public static <T extends Node> T copy(final T node, final String newId) throws NoSuchFieldException, IllegalAccessException {
 		//serialize string
 		final var src = MAPPER.writeValueAsString(node);
 

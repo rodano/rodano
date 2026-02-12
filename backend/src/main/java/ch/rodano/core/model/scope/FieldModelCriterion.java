@@ -5,13 +5,11 @@ import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.rules.Operator;
 import ch.rodano.configuration.model.study.Study;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 public record FieldModelCriterion(
 	String datasetModelId,
 	String fieldModelId,

@@ -2,7 +2,6 @@ package ch.rodano.api;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -10,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverters;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.config.annotation.AsyncSupportConfigurer;
@@ -22,9 +21,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.handler.MappedInterceptor;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import freemarker.template.TemplateException;
+
+import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.api.configuration.interceptor.MustChangePasswordInterceptor;
 import ch.rodano.api.configuration.interceptor.RequestContextInterceptor;
@@ -34,7 +33,7 @@ import ch.rodano.api.configuration.interceptor.TransactionCacheHandlerIntercepto
 @Configuration
 @EnableWebMvc
 public class WebConfigurer implements WebMvcConfigurer {
-	private final ObjectMapper objectMapper;
+	private final JsonMapper mapper;
 	private final MustChangePasswordInterceptor mustChangePasswordInterceptor;
 	private final TransactionCacheHandlerInterceptor transactionCacheHandlerInterceptor;
 	private final RequestContextInterceptor requestContextInterceptor;
@@ -47,7 +46,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 	private final Integer poolTimeoutDuration; // In seconds
 
 	public WebConfigurer(
-		final ObjectMapper objectMapper,
+		final JsonMapper mapper,
 		final MustChangePasswordInterceptor mustChangePasswordInterceptor,
 		final TransactionCacheHandlerInterceptor transactionCacheHandlerInterceptor,
 		final RequestContextInterceptor requestContextInterceptor,
@@ -58,7 +57,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 		@Value("${rodano.controller.pool.timeout:true}") final Boolean poolTimeoutActive,
 		@Value("${rodano.controller.pool.timeout.duration:120}") final Integer poolTimeoutDuration
 	) {
-		this.objectMapper = objectMapper;
+		this.mapper = mapper;
 		this.mustChangePasswordInterceptor = mustChangePasswordInterceptor;
 		this.transactionCacheHandlerInterceptor = transactionCacheHandlerInterceptor;
 		this.requestContextInterceptor = requestContextInterceptor;
@@ -90,19 +89,9 @@ public class WebConfigurer implements WebMvcConfigurer {
 		registry.addInterceptor(requestContextInterceptor);
 	}
 
-	/**
-	 * A hook for extending or modifying the list of converters after it has been
-	 * configured. This may be useful for example to allow default converters to
-	 * be registered and then insert a custom converter through this method.
-	 *
-	 * @param converters the list of configured converters to extend.
-	 * @since 4.1.3
-	 */
 	@Override
-	public void extendMessageConverters(final List<HttpMessageConverter<?>> converters) {
-		converters.stream().filter(converter -> converter instanceof MappingJackson2HttpMessageConverter).forEach(
-			converter -> ((MappingJackson2HttpMessageConverter) converter).setObjectMapper(objectMapper)
-		);
+	public void configureMessageConverters(final HttpMessageConverters.ServerBuilder builder) {
+		builder.withJsonConverter(new JacksonJsonHttpMessageConverter(mapper));
 	}
 
 	/**

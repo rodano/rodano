@@ -25,7 +25,7 @@ import org.springframework.boot.actuate.info.Info.Builder;
 import org.springframework.boot.actuate.info.InfoContributor;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Displayable;
@@ -45,7 +45,7 @@ import ch.rodano.core.utils.file.ResourceUtils;
 public class StudyServiceImpl implements StudyService, InfoContributor {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	private final ObjectMapper objectMapper;
+	private final JsonMapper mapper;
 
 	private final String configurationResource;
 	private final Integer configVersion;
@@ -57,11 +57,11 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	public StudyServiceImpl(
 		@Value("${rodano.config:${rodano.config.jar}}") final String configurationResource,
 		@Value("${rodano.config.version:0}") final Integer configVersion,
-		final ObjectMapper objectMapper,
+		final JsonMapper mapper,
 		final Configurator configurator
 
 	) throws IOException {
-		this.objectMapper = objectMapper;
+		this.mapper = mapper;
 		this.configurationResource = configurationResource;
 		this.configVersion = configVersion;
 		this.configurator = configurator;
@@ -75,13 +75,12 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	 * @throws IOException Thrown if an error occurred while reading the configuration resource
 	 */
 	private void load() throws IOException {
-		// Load study
 		try(final var is = ResourceUtils.readResource(configurationResource)) {
 			try {
 				final var md = MessageDigest.getInstance("SHA-1");
 				final var watchedIs = new DigestInputStream(is, md);
 
-				study = objectMapper.readValue(watchedIs, Study.class);
+				study = mapper.readValue(watchedIs, Study.class);
 				study.init();
 				studyChecksum = Hex.encodeHexString(md.digest());
 
@@ -110,15 +109,15 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		// Manage compression
 		if(compressed) {
 			// Retrieve array of codes
-			final var type = objectMapper.getTypeFactory().constructCollectionLikeType(List.class, Integer.class);
-			final List<Integer> integers = objectMapper.readValue(is, type);
+			final var type = mapper.getTypeFactory().constructCollectionLikeType(List.class, Integer.class);
+			final List<Integer> integers = mapper.readValue(is, type);
 
 			// Uncompress
 			final var result = LZW.decompress(integers);
 
 			// Check data
 			//TODO improve this and avoid reading the configuration twice (here and in the call the reload method)
-			objectMapper.readValue(result, Study.class);
+			mapper.readValue(result, Study.class);
 
 			// Write to file
 			ResourceUtils.writeResource(configurationResource, result.getBytes());
@@ -128,7 +127,7 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 			final byte[] bytes = is.readAllBytes();
 			// Check data
 			//TODO improve this and avoid reading the configuration twice (here and in the call the reload method)
-			objectMapper.readValue(bytes, Study.class);
+			mapper.readValue(bytes, Study.class);
 
 			// Write to file
 			ResourceUtils.writeResource(configurationResource, bytes);

@@ -6,11 +6,8 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonInclude(Include.NON_NULL)
 public class TimelineGraphDataPeriod implements Serializable {
 	@Serial
 	private static final long serialVersionUID = -2982982586763193668L;

@@ -17,9 +17,6 @@ import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
@@ -45,8 +42,6 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.timelinegraph.TimelineGraph;
 import ch.rodano.configuration.model.workflow.Workflow;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class Profile implements SuperDisplayable, Payable, PayableModel, Node, RightAssignable<Profile> {
 	@Serial
 	private static final long serialVersionUID = -213015124204792366L;

@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Entity;
@@ -26,7 +25,6 @@ import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-@JsonPropertyOrder(alphabetic = true)
 public class Chart implements Node, Comparable<Chart> {
 	@Serial
 	private static final long serialVersionUID = 3353079861292862954L;

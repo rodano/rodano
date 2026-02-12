@@ -1,0 +1,7 @@
+Architectures: amd64
+Components: main
+X-Repolib-Name: nodejs
+Signed-By: /etc/apt/keyrings/nodejs.gpg
+Suites: nodistro
+Types: deb
+URIs: https://deb.nodesource.com/node_25.x

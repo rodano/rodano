@@ -2,11 +2,8 @@ package ch.rodano.api.field;
 
 import jakarta.validation.constraints.NotBlank;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "Field update")
 public class FieldUpdateDTO {
 

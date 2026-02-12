@@ -1,34 +1,35 @@
 package ch.rodano.api;
 
-import java.util.Collections;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
 
 import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @SpringTestConfiguration
 public class AdministrationControllerTest extends ControllerTest {
+
+	private final ParameterizedTypeReference<Map<String, Boolean>> dictionaryType = new ParameterizedTypeReference<Map<String, Boolean>>() {
+		//don't care
+	};
 
 	@Test
 	@DisplayName("Maintenance mode toggle endpoint works")
 	void toggleMaintenanceAndMaintenance() {
 		authenticate(adminOnStudyEmail);
-		executePostAndReturnBody("/administration/maintenance", Collections.singletonMap("state", true), Void.class);
-		Map<String, Boolean> inMaintenance = executeGetAndReturnBody("/administration/maintenance", new ParameterizedTypeReference<Map<String, Boolean>>() {});
+		client.post().uri("/administration/maintenance").body(Map.of("state", true)).exchange().expectStatus().isAccepted();
+
+		Map<String, Boolean> inMaintenance = get("/administration/maintenance", dictionaryType);
 		assertTrue(inMaintenance.get("state"));
 
-		executePostAndReturnBody("/administration/maintenance", Collections.singletonMap("state", false), Void.class);
-		inMaintenance = executeGetAndReturnBody("/administration/maintenance", new ParameterizedTypeReference<Map<String, Boolean>>() {});
+		client.post().uri("/administration/maintenance").body(Map.of("state", false)).exchange().expectStatus().isAccepted();
+		inMaintenance = get("/administration/maintenance", dictionaryType);
 		assertFalse(inMaintenance.get("state"));
 	}
 
@@ -36,12 +37,12 @@ public class AdministrationControllerTest extends ControllerTest {
 	@DisplayName("Debug mode toggle endpoint works")
 	void toggleDebugAndGetDebug() {
 		authenticate(adminOnStudyEmail);
-		executePostAndReturnBody("/administration/debug", Collections.singletonMap("state", true), Void.class);
-		Map<String, Boolean> inDebug = executeGetAndReturnBody("/administration/debug", new ParameterizedTypeReference<Map<String, Boolean>>() {});
+		client.post().uri("/administration/debug").body(Map.of("state", true)).exchange().expectStatus().isAccepted();
+		Map<String, Boolean> inDebug = get("/administration/debug", dictionaryType);
 		assertTrue(inDebug.get("state"));
 
-		executePostAndReturnBody("/administration/debug", Collections.singletonMap("state", false), Void.class);
-		inDebug = executeGetAndReturnBody("/administration/debug", new ParameterizedTypeReference<Map<String, Boolean>>() {});
+		client.post().uri("/administration/debug").body(Map.of("state", false)).exchange().expectStatus().isAccepted();
+		inDebug = get("/administration/debug", dictionaryType);
 		assertFalse(inDebug.get("state"));
 	}
 
@@ -49,7 +50,6 @@ public class AdministrationControllerTest extends ControllerTest {
 	@DisplayName("Configuration reload endpoint works")
 	void reloadConfiguration() {
 		authenticate(adminOnStudyEmail);
-		final var response = executePost("/administration/reload", HttpEntity.EMPTY, Void.class);
-		assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
+		client.post().uri("/administration/reload").exchange().expectStatus().isAccepted();
 	}
 }

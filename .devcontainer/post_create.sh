@@ -14,7 +14,7 @@ password=root
 EOT
 
 mysql -uroot -proot -e "create database rodano;"
-mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.jvmArguments="-Dspring.profiles.active=database,local -Drodano.init.with-data=true"
+mvn -f backend/pom.xml spring-boot:run -Dspring-boot.run.profiles=database,local -Dspring-boot.run.jvmArguments=" -Drodano.init.with-data=true"
 
 
 ### FRONT-END

@@ -14,9 +14,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
@@ -28,8 +25,6 @@ import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class Validator implements Serializable, SuperDisplayable, Node, Comparable<Validator> {
 	@Serial
 	private static final long serialVersionUID = -7922512122647649002L;

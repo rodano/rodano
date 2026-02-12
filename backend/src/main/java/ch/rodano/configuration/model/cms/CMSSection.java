@@ -12,16 +12,11 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class CMSSection implements Node, Comparable<CMSSection>, Cloneable {
 	@Serial
 	private static final long serialVersionUID = -8381830978095030796L;

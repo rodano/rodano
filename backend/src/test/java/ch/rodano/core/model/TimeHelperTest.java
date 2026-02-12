@@ -20,10 +20,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.helpers.time.TimeHelper;
 
@@ -35,11 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TimeHelperTest {
 	//To get the util.Date fields we need a calendar
 	private static final Calendar CALENDAR = Calendar.getInstance();
-	private static final ObjectMapper MAPPER = new ObjectMapper();
 
 	static {
-		MAPPER.registerModule(new JavaTimeModule());
-		MAPPER.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		CALENDAR.setTimeZone(TimeZone.getTimeZone("UTC"));
 	}
 

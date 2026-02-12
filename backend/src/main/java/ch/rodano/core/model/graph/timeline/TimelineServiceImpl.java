@@ -15,9 +15,6 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import io.micrometer.common.util.StringUtils;
 
 import ch.rodano.configuration.model.field.FieldModel;
@@ -38,15 +35,8 @@ import static ch.rodano.core.model.jooq.tables.Event.EVENT;
 import static ch.rodano.core.model.jooq.tables.Field.FIELD;
 import static ch.rodano.core.model.jooq.tables.Form.FORM;
 
-
 @Service
 public class TimelineServiceImpl implements TimelineService {
-	private static final JavaTimeModule TIME_MODULE = new JavaTimeModule();
-	private static final ObjectMapper MAPPER = new ObjectMapper();
-
-	static {
-		MAPPER.registerModule(TIME_MODULE);
-	}
 
 	private final DSLContext create;
 	private final ActorService actorService;
@@ -123,9 +113,9 @@ public class TimelineServiceImpl implements TimelineService {
 
 		//retrieve forms by events and form model ids
 		final Map<Long, Map<String, Long>> formsByEventPkAndFormModelId = create.select(
-				FORM.EVENT_FK,
-				DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
-			).from(FORM)
+			FORM.EVENT_FK,
+			DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
+		).from(FORM)
 			.join(EVENT).on(FORM.EVENT_FK.eq(EVENT.PK))
 			.where(EVENT.SCOPE_FK.eq(scope.getPk()))
 			.groupBy(FORM.EVENT_FK)

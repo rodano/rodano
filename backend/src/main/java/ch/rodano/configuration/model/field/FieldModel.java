@@ -29,10 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Entity;
@@ -53,8 +50,6 @@ import ch.rodano.configuration.model.validator.ValueCheck;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializable, Node, Comparable<FieldModel> {
 	@Serial
 	private static final long serialVersionUID = -3499790065637274737L;
@@ -333,7 +328,6 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 		this.matcherMessage = matcherMessage;
 	}
 
-
 	public int getMaxIntegerDigits() {
 		return maxIntegerDigits;
 	}
@@ -349,7 +343,6 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 	public void setMaxDecimalDigits(final int maxDecimalDigits) {
 		this.maxDecimalDigits = maxDecimalDigits;
 	}
-
 
 	public final Double getMinValue() {
 		return minValue;
@@ -787,7 +780,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 			//value can be a ZonedDateTime or a PartialDate
 			//in any case, we need a ZonedDateTime at the end
 			final ZonedDateTime date;
-			if(value instanceof PartialDate partialDate) {
+			if(value instanceof final PartialDate partialDate) {
 				//if partial date is not anchored in time, it is not possible to transform it into a real date
 				if(!partialDate.isAnchoredInTime()) {
 					return "";

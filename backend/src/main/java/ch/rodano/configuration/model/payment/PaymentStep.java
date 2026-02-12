@@ -11,17 +11,12 @@ import java.util.TreeMap;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class PaymentStep implements Serializable, SuperDisplayable, Node, Comparable<PaymentStep> {
 	@Serial
 	private static final long serialVersionUID = -3643822784996243315L;

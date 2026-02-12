@@ -4,37 +4,24 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import ch.rodano.configuration.builder.StudyBuilder;
-import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.study.Study;
+import ch.rodano.test.SpringTestConfiguration;
+import tools.jackson.databind.json.JsonMapper;
 
+@SpringTestConfiguration
 public class StudySerializationTest {
-	private static ObjectMapper mapper;
-
-	@BeforeAll
-	public static void initialize() {
-		mapper = new ObjectMapper();
-		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
-		mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-		mapper.configure(SerializationFeature.WRITE_ENUMS_USING_TO_STRING, false);
-		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, true);
-	}
+	@Autowired
+	private JsonMapper mapper;
 
 	@Test
 	@DisplayName("Study is serializable")
-	public void studyIsSerializable() throws JsonProcessingException {
+	public void studyIsSerializable() {
 		final var study = StudyBuilder.buildStudy().getStudy();
 
 		final var studySerialized = mapper.writeValueAsString(study);
@@ -43,7 +30,7 @@ public class StudySerializationTest {
 
 	@Test
 	@DisplayName("Study is deserializable")
-	public void studyIsDeserializable() throws IOException, NoNodeException {
+	public void studyIsDeserializable() {
 		final var originalStudy = StudyBuilder.buildStudy().getStudy();
 		final var studySerialized = mapper.writeValueAsString(originalStudy);
 

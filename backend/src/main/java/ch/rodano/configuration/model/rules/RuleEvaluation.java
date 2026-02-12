@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 public class RuleEvaluation {
-	private static final Logger LOGGER = LoggerFactory.getLogger(RuleEvaluation.class);
+	private final Logger logger = LoggerFactory.getLogger(RuleEvaluation.class);
 
 	private String conditionId;
 	private Operator operator;
@@ -39,10 +39,7 @@ public class RuleEvaluation {
 	@JsonAnySetter
 	public final void setAnySetter(final String key, final Object value) {
 		if(!"entity".equals(key)) {
-			final var message = "RuleEvaluation - Unknown property : " + key +
-				" - " +
-				value;
-			LOGGER.error(message);
+			logger.error("Unknown property {} (value {}) in class {}", key, value, getClass().getSimpleName());
 		}
 	}
 

@@ -20,10 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
@@ -35,8 +32,6 @@ import ch.rodano.configuration.model.rights.Attributable;
 import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.study.Study;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class Workflow implements SuperDisplayable, Serializable, Attributable<Workflow>, Node {
 	@Serial
 	private static final long serialVersionUID = -2909356306271744756L;

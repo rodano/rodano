@@ -7,14 +7,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.api.config.DatasetModelDTO;
 import ch.rodano.api.field.FieldDTO;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
 @Schema(description = "A dataset is a semantic grouping of fields.")
 public class DatasetDTO {
 	@Schema(description = "Scope reference")

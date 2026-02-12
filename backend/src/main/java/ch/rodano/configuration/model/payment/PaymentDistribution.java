@@ -6,17 +6,12 @@ import java.util.Collections;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.scope.ScopeModel;
 
-@JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder(alphabetic = true)
 public class PaymentDistribution implements Node {
 	@Serial
 	private static final long serialVersionUID = -7856978742306432331L;

@@ -1,0 +1,7 @@
+Architectures: amd64
+Components: main
+X-Repolib-Name: mariadb
+Signed-By: /etc/apt/keyrings/mariadb.gpg
+Suites: trixie
+Types: deb
+URIs: https://mirror.mva-n.net/mariadb/repo/12.1/debian
