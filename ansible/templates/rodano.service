@@ -4,8 +4,8 @@ Description=Rodano
 [Service]
 WorkingDirectory={{ rodano_path }}
 #do not use -d (daemon mode) for Docker command to let systemd handle the process
-ExecStart=/usr/bin/docker compose --env-file {{ rodano_path }}/env up
-ExecStop=/usr/bin/docker compose --env-file {{ rodano_path }}/env down
+ExecStart=/usr/bin/docker compose --env-file {{ rodano_path }}/.env up
+ExecStop=/usr/bin/docker compose --env-file {{ rodano_path }}/.env down
 SyslogIdentifier=rodano
 #restart service if the app crashes
 Restart=always

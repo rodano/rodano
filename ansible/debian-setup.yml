@@ -217,8 +217,8 @@
 
     - name: Create Docker Compose environment file
       ansible.builtin.template:
-        src: "templates/env"
-        dest: "{{ rodano_path }}/env"
+        src: "templates/.env"
+        dest: "{{ rodano_path }}/.env"
         mode: "0600"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
@@ -228,7 +228,7 @@
       community.docker.docker_compose_v2_pull:
         project_src: "{{ rodano_path }}"
         env_files:
-          - "{{ rodano_path }}/env"
+          - "{{ rodano_path }}/.env"
 
     # Set up Nginx
     - name: Setup Let's Encrypt certificate
