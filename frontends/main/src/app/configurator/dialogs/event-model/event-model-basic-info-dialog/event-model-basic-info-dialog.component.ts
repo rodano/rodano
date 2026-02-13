@@ -27,7 +27,7 @@ export interface EventModelBasicInfoDialogData {
 	selector: 'app-event-model-basic-info-dialog',
 	standalone: true,
 	templateUrl: './event-model-basic-info-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,

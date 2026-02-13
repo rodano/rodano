@@ -19,7 +19,7 @@ export interface DatasetModelFamilyDialogData {
 		MatCheckbox
 	],
 	templateUrl: './dataset-model-family-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class DatasetModelFamilyDialogComponent implements OnInit {
 	form: FormGroup;

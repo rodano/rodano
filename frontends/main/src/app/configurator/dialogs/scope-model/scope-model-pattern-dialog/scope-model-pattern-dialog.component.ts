@@ -26,7 +26,7 @@ interface PatternOption {
 		ReactiveFormsModule
 	],
 	templateUrl: './scope-model-pattern-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ScopeModelPatternDialogComponent implements OnInit {
 	form: FormGroup;

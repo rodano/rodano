@@ -13,7 +13,7 @@ export interface IntroductionTextDialogData {
 	selector: 'app-edit-introduction-text-dialog',
 	standalone: true,
 	templateUrl: './project-settings-intro-text-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,

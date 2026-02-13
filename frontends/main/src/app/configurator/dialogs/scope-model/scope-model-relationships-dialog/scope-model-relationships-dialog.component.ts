@@ -22,7 +22,7 @@ interface DialogData {
 	selector: 'app-scope-model-relationships-dialog',
 	standalone: true,
 	templateUrl: './scope-model-relationships-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,

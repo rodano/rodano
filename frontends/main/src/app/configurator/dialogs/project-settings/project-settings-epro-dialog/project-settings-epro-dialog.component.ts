@@ -23,7 +23,7 @@ export interface EproSettingsDialogData {
 		MatSelectModule
 	],
 	templateUrl: './project-settings-epro-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ProjectSettingsEproDialogComponent {
 	form: FormGroup;

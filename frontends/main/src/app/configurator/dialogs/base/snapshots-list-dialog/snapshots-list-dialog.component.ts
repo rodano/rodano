@@ -23,7 +23,7 @@ export interface SnapshotsListDialogData {
 		MatTooltipModule
 	],
 	templateUrl: './snapshots-list-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class SnapshotsListDialogComponent {
 	selectedIndex: number | null = null;

@@ -26,7 +26,7 @@ interface PatternOption {
 		MatIconModule
 	],
 	templateUrl: './dataset-model-label-patterns-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class DatasetModelLabelPatternsDialogComponent implements OnInit, AfterViewInit {
 	@ViewChild('collapsedInput') collapsedInput!: ElementRef<HTMLInputElement>;

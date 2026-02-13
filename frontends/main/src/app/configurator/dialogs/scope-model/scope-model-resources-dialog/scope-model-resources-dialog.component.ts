@@ -37,7 +37,7 @@ export interface ScopeModelResourcesDialogData {
 		MatSelectModule
 	],
 	templateUrl: './scope-model-resources-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ScopeModelResourcesDialogComponent implements OnInit {
 	availableFormModels: {id: string; name: string}[] = [];

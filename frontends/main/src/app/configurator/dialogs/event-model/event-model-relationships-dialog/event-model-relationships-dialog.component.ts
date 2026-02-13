@@ -21,7 +21,7 @@ export interface EventModelRelationshipsDialogData {
 		MatIconModule
 	],
 	templateUrl: './event-model-relationships-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class EventModelRelationshipsDialogComponent implements OnInit {
 	availableBlockedEventModels: EventModel[] = [];

@@ -19,7 +19,7 @@ export interface DatasetModelExportDialogData {
 		MatCheckbox
 	],
 	templateUrl: './dataset-model-export-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class DatasetModelExportDialogComponent implements OnInit {
 	form: FormGroup;

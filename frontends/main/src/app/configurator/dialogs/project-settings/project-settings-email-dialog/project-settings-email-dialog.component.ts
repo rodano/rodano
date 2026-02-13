@@ -19,7 +19,7 @@ export interface EmailSettingsDialogData {
 		MatSlideToggleModule
 	],
 	templateUrl: './project-settings-email-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ProjectSettingsEmailDialogComponent {
 	form: FormGroup;

@@ -25,7 +25,7 @@ export interface BasicInfoDialogData {
 		MatTabsModule
 	],
 	templateUrl: './project-settings-basic-info-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ProjectSettingsBasicInfoDialogComponent implements OnInit {
 	form: FormGroup;

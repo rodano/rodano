@@ -18,7 +18,7 @@ import {MatInputModule} from '@angular/material/input';
 		MatInputModule
 	],
 	templateUrl: './create-snapshot-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class CreateSnapshotDialogComponent {
 	summary = '';

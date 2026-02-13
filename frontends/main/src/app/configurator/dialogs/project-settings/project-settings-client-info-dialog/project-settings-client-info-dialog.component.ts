@@ -20,7 +20,7 @@ export interface ClientInfoDialogData {
 		MatDialogModule
 	],
 	templateUrl: './project-settings-client-info-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ProjectSettingsClientInfoDialogComponent {
 	form: FormGroup;

@@ -20,7 +20,7 @@ export interface DatasetModelBasicInfoDialogData {
 	selector: 'app-dataset-model-basic-info-dialog',
 	standalone: true,
 	templateUrl: './dataset-model-basic-info-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,

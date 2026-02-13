@@ -25,7 +25,7 @@ export interface EventModelSchedulingDialogData {
 		MatSelectModule
 	],
 	templateUrl: './event-model-scheduling-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class EventModelSchedulingDialogComponent implements OnInit {
 	form: FormGroup;

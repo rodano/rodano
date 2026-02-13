@@ -24,7 +24,7 @@ interface DialogData {
 	selector: 'app-scope-model-basic-info-dialog',
 	standalone: true,
 	templateUrl: './scope-model-basic-info-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,

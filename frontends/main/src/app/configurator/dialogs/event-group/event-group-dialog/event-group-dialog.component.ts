@@ -29,7 +29,7 @@ export interface EventGroupDialogData {
 		MatTabsModule
 	],
 	templateUrl: './event-group-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class EventGroupDialogComponent implements OnInit {
 	form: FormGroup;

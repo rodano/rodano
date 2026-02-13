@@ -22,7 +22,7 @@ export interface EventModelResourcesDialogData {
 		MatIconModule
 	],
 	templateUrl: './event-model-resources-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class EventModelResourcesDialogComponent implements OnInit {
 	availableFormModels: {id: string; name: string}[] = [];

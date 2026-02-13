@@ -21,7 +21,7 @@ export interface PasswordPoliciesDialogData {
 		MatSlideToggleModule
 	],
 	templateUrl: './project-settings-password-policies-dialog.component.html',
-	styleUrls: ['../../shared-dialog-styles.css']
+	styleUrls: ['../../dialog-shared.css']
 })
 export class ProjectSettingsPasswordPoliciesDialogComponent {
 	form: FormGroup;
