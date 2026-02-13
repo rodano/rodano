@@ -10,9 +10,9 @@ if [ ! -f pom.xml ]; then
 	exit 0
 fi
 
-mvn compile -o -DskipTests
+mvn compile -DskipTests
 if [ $? -ne 0 ]; then
-	echo "Compilation of plugins failed, remember that the only available dependencies are the one available in the Rodano project"
+	echo "Compilation of plugins failed"
 	exit 1
 fi
 echo "Plugins compiled successfully"
