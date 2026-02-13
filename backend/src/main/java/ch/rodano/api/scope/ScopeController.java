@@ -345,8 +345,8 @@ public class ScopeController extends AbstractSecuredController {
 		return scopeDTOService.createDTO(scope, acl);
 	}
 
-	@Operation(summary = "Auto enroll", description = "Enroll a scope in a substudy")
-	@PostMapping("{scopePk}/enrollment/auto")
+	@Operation(summary = "Enroll all scopes", description = "Enroll all scopes in a substudy")
+	@PostMapping("{scopePk}/enrollment/enroll")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public void autoEnroll(
@@ -360,12 +360,11 @@ public class ScopeController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor(), scope);
 		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
 
-		substudyService.enrollScopesInSubstudy(scope, currentContext(), "Auto enrollment");
+		substudyService.enrollScopesInSubstudy(scope, currentContext(), "Perform automatic enrollment");
 	}
 
-	// TODO leave is a more appropriate verb
-	@Operation(summary = "Clean enroll", description = "Un-enroll a scope from a substudy")
-	@PostMapping("{scopePk}/enrollment/clean")
+	@Operation(summary = "Unenroll all scopes", description = "Unenroll all scopes from a substudy")
+	@PostMapping("{scopePk}/enrollment/unenroll")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public void cleanEnroll(

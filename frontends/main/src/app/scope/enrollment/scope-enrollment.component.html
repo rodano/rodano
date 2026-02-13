@@ -1,9 +1,6 @@
+<h2>Configuration</h2>
 <form [formGroup]="enrollmentForm">
 	<p>
-		Automatic: enroll automatically scopes as soon as they match the criteria.
-		<br />
-		Manual: require a user to manually enroll a scope.
-		<br />
 		<mat-form-field>
 			<mat-label>Type</mat-label>
 			<mat-select formControlName="type">
@@ -14,14 +11,18 @@
 				}
 			</mat-select>
 		</mat-form-field>
+		<mat-icon
+			matTooltip="Automatic: enroll automatically scopes as soon as they match the criteria. Manual: require a user to manually enroll a scope."
+			>info</mat-icon
+		>
 	</p>
 
 	<p>
-		If checked, bypass white list of containers (useful for groups managed by the system).
-		<br />
-		If not checked, the scope to enroll must be a descendant of one of the container in the white list.
-		<br />
 		<mat-checkbox formControlName="system"> System enrollment </mat-checkbox>
+		<mat-icon
+			matTooltip="If checked, bypass white list of containers (useful for groups managed by the system). If not checked, only descendants of one the container in the white list can be enrolled."
+			>info</mat-icon
+		>
 	</p>
 
 	@if (!enrollmentForm.get('system')?.value) {
@@ -101,9 +102,22 @@
 		<button
 			mat-flat-button
 			(click)="addCriterion()">
-			<mat-icon>add</mat-icon>
 			Add criterion
 		</button>
+	</p>
+
+	<p>
+		@if (childScopeModel) {
+			@if (enrollableCount !== undefined) {
+				{{ enrollableCount }}
+			} @else {
+				Loading
+			}
+			enrollable {{ childScopeModel.pluralShortname | localizeMap | lowercase }}
+		}
+	</p>
+
+	<p>
 		<button
 			mat-flat-button
 			[disabled]="!enrollmentForm.valid"
@@ -112,3 +126,86 @@
 		</button>
 	</p>
 </form>
+
+<h2>Status</h2>
+<p>
+	<button
+		mat-flat-button
+		(click)="enroll()">
+		Perform enrollment
+	</button>
+	<button
+		mat-flat-button
+		(click)="unenroll()">
+		Clean enrollment
+	</button>
+</p>
+
+<table
+	mat-table
+	[dataSource]="childScopes">
+	<tr
+		*matNoDataRow
+		class="no-data-row">
+		<td [attr.colspan]="columnsToDisplay.length">No data</td>
+	</tr>
+
+	<ng-container matColumnDef="code">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Code
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.code }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="shortname">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Name
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.shortname }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="startDate">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Start Date
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.startDate | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="stopDate">
+		<th
+			mat-header-cell
+			*matHeaderCellDef>
+			Stop Date
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let scope">
+			{{ scope.stopDate | dateTimeUTC }}
+		</td>
+	</ng-container>
+
+	<tr
+		mat-header-row
+		*matHeaderRowDef="columnsToDisplay"></tr>
+	<tr
+		mat-row
+		*matRowDef="let row; columns: columnsToDisplay"></tr>
+</table>

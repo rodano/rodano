@@ -110,7 +110,6 @@ public class ScopeRelationsController extends AbstractSecuredController {
 		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
 		acl.checkRight(parent.getScopeModel(), Rights.WRITE);
 
-		// TODO Use the @Valid validation for the request body
 		final Optional<ZonedDateTime> endDate = newRelation.endDate() == null ? Optional.empty() : Optional.of(newRelation.endDate());
 		scopeRelationService.createRelation(scope, parent, newRelation.startDate(), endDate, currentContext(), "Create scope relation");
 

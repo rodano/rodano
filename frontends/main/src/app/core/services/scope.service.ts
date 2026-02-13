@@ -10,6 +10,7 @@ import {TimelineGraphData} from '../model/timeline-graph-data';
 import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
+import {FieldModelCriterion} from '@core/model/field-model-criterion';
 
 @Injectable({
 	providedIn: 'root'
@@ -76,6 +77,18 @@ export class ScopeService {
 	@reviveDates
 	unlock(scopePk: number): Observable<Scope> {
 		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}/unlock`, {});
+	}
+
+	enroll(scopePk: number): Observable<void> {
+		return this.http.post<void>(`${this.serviceUrl}/${scopePk}/enrollment/enroll`, {});
+	}
+
+	unenroll(scopePk: number): Observable<void> {
+		return this.http.post<void>(`${this.serviceUrl}/${scopePk}/enrollment/unenroll`, {});
+	}
+
+	countEnrollable(scopePk: number, criteria: FieldModelCriterion[]): Observable<number> {
+		return this.http.post<number>(`${this.serviceUrl}/${scopePk}/enrollment/count`, criteria);
 	}
 
 	getGraphs(scopePk: number): Observable<TimelineGraphData[]> {

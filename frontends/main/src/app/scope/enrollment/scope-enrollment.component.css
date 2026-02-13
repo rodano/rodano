@@ -1,3 +1,8 @@
 button + button {
 	margin-left: var(--gap);
 }
+
+mat-icon {
+	vertical-align: middle;
+	margin-left: 0.5rem;
+}
