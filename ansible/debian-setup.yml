@@ -165,6 +165,13 @@
         append: true
       become: true
 
+    - name: Limit Docker log size
+      ansible.builtin.template:
+        src: "templates/daemon.json"
+        dest: "/etc/docker/daemon.json"
+        mode: "0644"
+      become: true
+
     # Git
     - name: Install Git
       ansible.builtin.apt:
