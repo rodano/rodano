@@ -300,12 +300,11 @@
         XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
         DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
 
-    - name: Reset database
-      ansible.builtin.file:
+    - name: Reset database volume
+      community.docker.docker_volume:
+        name: "{{ (rodano_path | basename) }}_database"
         state: absent
-        dest: "{{ study_path }}/database"
       when: reset_database | bool
-      become: true
 
     - name: Start the rodano service
       ansible.builtin.systemd:
