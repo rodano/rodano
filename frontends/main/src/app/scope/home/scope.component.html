@@ -44,6 +44,16 @@
 				[active]="parentsRLA.isActive">
 				Parents
 			</a>
+			@if (scope.model.virtual) {
+				<a
+					mat-tab-link
+					[routerLink]="['/scopes', scopeModel.id, scope.pk, 'enrollment']"
+					routerLinkActive
+					#enrollmentRLA="routerLinkActive"
+					[active]="enrollmentRLA.isActive">
+					Enrollment
+				</a>
+			}
 			@for (form of forms; track form.pk) {
 				<a
 					mat-tab-link

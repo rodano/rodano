@@ -12,10 +12,9 @@ import { EnrollmentType } from './enrollment-type';
 
 
 export interface EnrollmentModel { 
-    draft?: boolean;
     system?: boolean;
     type?: EnrollmentType;
-    scopesContainerIds?: Set<string>;
+    scopesContainerIds?: Array<string>;
     criteria?: Array<FieldModelCriterion>;
 }
 export namespace EnrollmentModel {

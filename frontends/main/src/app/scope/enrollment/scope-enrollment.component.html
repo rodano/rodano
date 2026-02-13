@@ -1,0 +1,114 @@
+<form [formGroup]="enrollmentForm">
+	<p>
+		Automatic: enroll automatically scopes as soon as they match the criteria.
+		<br />
+		Manual: require a user to manually enroll a scope.
+		<br />
+		<mat-form-field>
+			<mat-label>Type</mat-label>
+			<mat-select formControlName="type">
+				@for (enrollmentType of enrollmentTypes; track enrollmentType) {
+					<mat-option [value]="enrollmentType">
+						{{ enrollmentType | capitalizeFirst }}
+					</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+	</p>
+
+	<p>
+		If checked, bypass white list of containers (useful for groups managed by the system).
+		<br />
+		If not checked, the scope to enroll must be a descendant of one of the container in the white list.
+		<br />
+		<mat-checkbox formControlName="system"> System enrollment </mat-checkbox>
+	</p>
+
+	@if (!enrollmentForm.get('system')?.value) {
+		<p>
+			<mat-form-field>
+				<mat-label>Scopes</mat-label>
+				<mat-select
+					formControlName="rootScopeIds"
+					multiple>
+					@for (scopeModel of scopeModels; track scopeModel.id) {
+						@if (getScopes(scopeModel.id).length > 0) {
+							<mat-optgroup [label]="scopeModel.shortname | localizeMap">
+								@for (scope of getScopes(scopeModel.id); track scope.id) {
+									<mat-option [value]="scope.id">
+										{{ scope.shortname }}
+									</mat-option>
+								}
+							</mat-optgroup>
+						}
+					}
+				</mat-select>
+			</mat-form-field>
+		</p>
+	}
+
+	@for (criterion of criteria.controls; track $index; let i = $index) {
+		<p class="inline-fields">
+			<mat-form-field>
+				<mat-label>Field</mat-label>
+				<mat-select [formControl]="getControl(i, 0)">
+					@for (fieldModel of fieldModels; track fieldModel.id) {
+						<mat-option [value]="fieldModel.id">
+							{{ fieldModel.shortname | localizeMap }}
+						</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+			<mat-form-field>
+				<mat-label>Operator</mat-label>
+				<mat-select [formControl]="getControl(i, 1)">
+					@for (operator of getOperators(i); track operator) {
+						<mat-option [value]="operator">
+							{{ operator | capitalizeFirst }}
+						</mat-option>
+					}
+				</mat-select>
+			</mat-form-field>
+			@if (getControl(i, 0).value && getPossibleValues(i).length > 0) {
+				<mat-form-field>
+					<mat-label>Value</mat-label>
+					<mat-select [formControl]="getControl(i, 2)">
+						@for (possibleValue of getPossibleValues(i); track possibleValue.id) {
+							<mat-option [value]="possibleValue.id">
+								{{ possibleValue.id | capitalizeFirst }}
+							</mat-option>
+						}
+					</mat-select>
+				</mat-form-field>
+			}
+			@if (!getControl(i, 0).value || getPossibleValues(i).length === 0) {
+				<mat-form-field>
+					<mat-label>Value</mat-label>
+					<input
+						matInput
+						[formControl]="getControl(i, 2)" />
+				</mat-form-field>
+			}
+			<button
+				mat-flat-button
+				(click)="deleteCriterion(i)">
+				Remove
+			</button>
+		</p>
+	}
+
+	<p>
+		<button
+			mat-flat-button
+			(click)="addCriterion()">
+			<mat-icon>add</mat-icon>
+			Add criterion
+		</button>
+		<button
+			mat-flat-button
+			[disabled]="!enrollmentForm.valid"
+			(click)="save()">
+			Save
+		</button>
+	</p>
+</form>

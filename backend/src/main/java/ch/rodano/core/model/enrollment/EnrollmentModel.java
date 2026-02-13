@@ -4,11 +4,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 
+import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.model.scope.EnrollmentType;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 
@@ -16,14 +18,14 @@ public class EnrollmentModel implements Serializable {
 	@Serial
 	private static final long serialVersionUID = 8815322291100222508L;
 
-	private boolean draft;
+	private final Logger logger = LoggerFactory.getLogger(Study.class);
+
 	private boolean system;
 	private EnrollmentType type;
-	private Set<String> scopesContainerIds = new TreeSet<>();
+	private List<String> scopesContainerIds = new ArrayList<>();
 	private List<FieldModelCriterion> criteria = new ArrayList<>();
 
-	public EnrollmentModel() {
-	}
+	public EnrollmentModel() {}
 
 	public final boolean isSystem() {
 		return system;
@@ -33,20 +35,12 @@ public class EnrollmentModel implements Serializable {
 		this.system = system;
 	}
 
-	public final Set<String> getScopesContainerIds() {
+	public final List<String> getScopesContainerIds() {
 		return scopesContainerIds;
 	}
 
-	public final void setScopesContainerIds(final Set<String> scopesContainerIds) {
+	public final void setScopesContainerIds(final List<String> scopesContainerIds) {
 		this.scopesContainerIds = scopesContainerIds;
-	}
-
-	public final boolean isDraft() {
-		return draft;
-	}
-
-	public void setDraft(final boolean draft) {
-		this.draft = draft;
 	}
 
 	public final EnrollmentType getType() {
@@ -67,10 +61,6 @@ public class EnrollmentModel implements Serializable {
 
 	@JsonAnySetter
 	public void setAnySetter(final String key, final Object value) {
-		final var message = new StringBuilder("EnrollmentModel - Unknown property : ");
-		message.append(key);
-		message.append(" - ");
-		message.append(value);
-		System.err.println(message);
+		logger.error("Unknown property {} (value {}) in class {}", key, value, getClass().getSimpleName());
 	}
 }

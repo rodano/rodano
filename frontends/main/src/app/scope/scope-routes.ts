@@ -10,6 +10,7 @@ import {ScopeCreateComponent} from './create/scope-create.component';
 import {ScopeUsersComponent} from './users/scope-users.component';
 import {FormResolver} from '../resolvers/form-resolver';
 import {FormComponent} from '../crf/form/form.component';
+import {ScopeEnrollmentComponent} from './enrollment/scope-enrollment.component';
 
 export default [
 	{
@@ -50,6 +51,10 @@ export default [
 			{
 				path: 'parents',
 				component: ScopeParentsComponent
+			},
+			{
+				path: 'enrollment',
+				component: ScopeEnrollmentComponent
 			},
 			{
 				path: 'users',

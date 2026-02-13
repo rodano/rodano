@@ -225,6 +225,22 @@ public class ConfigurationController extends AbstractSecuredController {
 			.toList();
 	}
 
+	@Operation(summary = "Get field models for a scope model")
+	@GetMapping("/scope-model/{scopeModelId}/field-models")
+	@ResponseStatus(HttpStatus.OK)
+	public List<FieldModelDTO> getFieldModels(
+		@PathVariable final String scopeModelId
+	) {
+		final var acl = rightsService.getACL(currentActor());
+		final var languages = actorService.getLanguages(acl.actor());
+
+		return studyService.getStudy().getScopeModel(scopeModelId).getDatasetModels().stream()
+			.filter(p -> acl.hasRight(p, Rights.READ))
+			.flatMap(d -> d.getFieldModels().stream())
+			.map(f -> new FieldModelDTO(f, languages))
+			.toList();
+	}
+
 	@Operation(summary = "Get menu layout")
 	@GetMapping("menu/{menuId}/layout")
 	@ResponseStatus(HttpStatus.OK)

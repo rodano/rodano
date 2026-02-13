@@ -117,7 +117,6 @@ public class SubstudyServiceImpl implements SubstudyService {
 
 	@Override
 	public List<Scope> findPotentialScopes(final Collection<Scope> rootScopes, final ScopeModel targetScopeModel, final List<FieldModelCriterion> substudyCriteria) {
-
 		final var scopePredicate = new ScopeSearch()
 			.enforceAncestorPks(rootScopes.stream().map(Scope::getPk).toList())
 			.enforceScopeModelId(targetScopeModel.getId())

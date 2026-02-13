@@ -119,6 +119,18 @@ export class ConfigurationService {
 		return this.http.get<FieldModel[]>(`${this.serviceUrl}/searchable-field-models`);
 	}
 
+	getScopeModelFormModels(scopeModelId: string): Observable<FormModel[]> {
+		return this.http.get<FormModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/form-models`);
+	}
+
+	getScopeModelDatasetModels(scopeModelId: string): Observable<DatasetModel[]> {
+		return this.http.get<DatasetModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/dataset-models`);
+	}
+
+	getScopeModelFieldModels(scopeModelId: string): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/field-models`);
+	}
+
 	getAutocompleteOptions(datasetModelId: string, fieldModelId: string, value: string): Observable<string[]> {
 		return this.http.get<string[]>(`${this.serviceUrl}/dataset-models/${datasetModelId}/field-models/${fieldModelId}/autocomplete/${value}`);
 	}
