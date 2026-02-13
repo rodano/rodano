@@ -1,0 +1,52 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Calculated Value</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="info-section">
+				<p>The value of the field can be calculated by the system.</p>
+				<p>If the field model is not dynamic, the formula will be used to calculate the default value of the field.</p>
+				<p>If the field model is dynamic, the formula below will be used to calculate the value.</p>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="plugin">
+					Dynamic
+				</mat-checkbox>
+				<span class="hint">Enable dynamic calculation</span>
+			</div>
+
+			<div class="form-field">
+				<label>Value Formula</label>
+				<textarea
+					formControlName="valueFormula"
+					placeholder='Start with "=" to see formula suggestions'
+					rows="4"
+					[matAutocomplete]="auto"></textarea>
+				<span class="hint">A formula can be a static text (such as "my_value" or "true") or the result of a function (starting with an "=").</span>
+
+				<mat-autocomplete #auto="matAutocomplete" (optionSelected)="onProposalSelected($event)">
+					@for (proposal of filteredProposals$ | async; track proposal.id) {
+						<mat-option [value]="proposal">
+							<div class="proposal-option">
+								<span class="proposal-label">{{ proposal.label }}</span>
+								<br>
+								<span class="proposal-category">{{ proposal.category }}</span>
+								<span class="proposal-id">{{ proposal.id }}</span>
+							</div>
+						</mat-option>
+					}
+				</mat-autocomplete>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

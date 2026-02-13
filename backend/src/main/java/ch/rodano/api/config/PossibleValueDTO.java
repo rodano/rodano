@@ -19,10 +19,15 @@ public class PossibleValueDTO {
 	@NotNull
 	private boolean specify;
 
+	private UUID fieldModelId;
+
+	private String exportLabel;
+	private Integer sortOrder;
+
 	/**
 	 * Default constructor, needed by some serializer
 	 */
-	PossibleValueDTO() {
+	public PossibleValueDTO() {
 
 	}
 
@@ -49,6 +54,14 @@ public class PossibleValueDTO {
 		this.id = id;
 	}
 
+	public UUID getFieldModelId() {
+		return fieldModelId;
+	}
+
+	public void setFieldModelId(final UUID fieldModelId) {
+		this.fieldModelId = fieldModelId;
+	}
+
 	public Map<String, String> getShortname() {
 		return shortname;
 	}
@@ -63,5 +76,21 @@ public class PossibleValueDTO {
 
 	public void setSpecify(final boolean specify) {
 		this.specify = specify;
+	}
+
+	public String getExportLabel() {
+		return exportLabel;
+	}
+
+	public void setExportLabel(final String exportLabel) {
+		this.exportLabel = exportLabel;
+	}
+
+	public Integer getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(final Integer sortOrder) {
+		this.sortOrder = sortOrder;
 	}
 }

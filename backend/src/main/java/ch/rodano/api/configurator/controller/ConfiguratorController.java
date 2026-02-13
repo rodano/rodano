@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.configurator.dto.ConfigSnapshotDTO;
 import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.request.UpdateProjectRequest;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.ConfiguratorService;

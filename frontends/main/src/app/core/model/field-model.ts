@@ -12,23 +12,27 @@ import { OperandType } from './operand-type';
 import { PossibleValue } from './possible-value';
 
 
-/**
- * Field models
- */
 export interface FieldModel { 
     fieldModelId: string;
-    type?: FieldModelType;
+    type: FieldModelType;
     dataType: OperandType;
     datasetModelId: string;
     id: string;
+    validatorIds?: Array<string>;
+    workflowIds?: Array<string>;
     shortname: { [key: string]: string; };
     longname: { [key: string]: string; };
     description?: { [key: string]: string; };
+    matcherMessage?: { [key: string]: string; };
     /**
      * Possible values of the field, if the field type is a multiple
      */
     possibleValues: Array<PossibleValue>;
+    possibleValuesProvider?: string;
+    possibleValuesProviderDescription?: string;
     dictionary?: string;
+    matcher?: string;
+    valueFormula?: string;
     readOnly: boolean;
     dynamic: boolean;
     order?: number;
@@ -36,10 +40,12 @@ export interface FieldModel {
      * Can the field be found in search
      */
     searchable: boolean;
+    plugin?: boolean;
     /**
      * Is the field model included in the exports
      */
     exportable: boolean;
+    exportOrder?: number;
     required: boolean;
     maxLength?: number;
     inlineHelp?: string;

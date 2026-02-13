@@ -48,28 +48,28 @@
 							<div class="card-header-badges">
 								@if (scopeModel.virtual) {
 									<span class="status-badge virtual" matTooltip="Virtual">
-										<span class="badge-full">Virtual</span>
+										<mat-icon class="badge-full">visibility_off</mat-icon>
 										<mat-icon class="badge-short">visibility_off</mat-icon>
 									</span>
 								}
 								@if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length === 0) {
 									<span class="status-badge standalone" matTooltip="Standalone">
-										<span class="badge-full">Standalone</span>
+										<mat-icon class="badge-full">crop_square</mat-icon>
 										<mat-icon class="badge-short">crop_square</mat-icon>
 									</span>
 								} @else if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length > 0) {
 									<span class="status-badge root" matTooltip="Root">
-										<span class="badge-full">Root</span>
+										<mat-icon class="badge-full">vertical_align_top</mat-icon>
 										<mat-icon class="badge-short">vertical_align_top</mat-icon>
 									</span>
 								} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length === 0) {
 									<span class="status-badge leaf" matTooltip="Leaf">
-										<span class="badge-full">Leaf</span>
+										<mat-icon class="badge-full">vertical_align_bottom</mat-icon>
 										<mat-icon class="badge-short">vertical_align_bottom</mat-icon>
 									</span>
 								} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length > 0) {
 									<span class="status-badge intermediate" matTooltip="Intermediate">
-										<span class="badge-full">Intermediate</span>
+										<mat-icon class="badge-full">swap_vert</mat-icon>
 										<mat-icon class="badge-short">swap_vert</mat-icon>
 									</span>
 								}
@@ -94,7 +94,7 @@
 									<span>{{ scopeModel.datasetModelIds.length }} {{ scopeModel.datasetModelIds.length === 1 ? 'Dataset' : 'Datasets' }}</span>
 								</div>
 								<div class="detail-item">
-									<mat-icon>account_tree</mat-icon>
+									<mat-icon>settings</mat-icon>
 									<span>{{ scopeModel.workflowIds.length }} {{ scopeModel.workflowIds.length === 1 ? 'Workflow' : 'Workflows' }}</span>
 								</div>
 							</div>
@@ -172,13 +172,13 @@
 									<div class="card-header-badges">
 										@if (eventModel.mandatory) {
 											<span class="status-badge mandatory" matTooltip="Mandatory">
-												<span class="badge-full">Mandatory</span>
+												<mat-icon class="badge-full">priority_high</mat-icon>
 												<mat-icon class="badge-short">priority_high</mat-icon>
 											</span>
 										}
 										@if (eventModel.inceptive) {
 											<span class="status-badge inceptive" matTooltip="Inceptive">
-												<span class="badge-full">Inceptive</span>
+												<mat-icon class="badge-full">flag</mat-icon>
 												<mat-icon class="badge-short">flag</mat-icon>
 											</span>
 										}

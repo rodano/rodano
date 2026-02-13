@@ -42,7 +42,9 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 	@Output() datasetModelsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() datasetModelContextChanged = new EventEmitter<{
+		fieldModels: any[];
 		selectedDatasetModelId: string | null;
+		selectedFieldModelId: string | null;
 	}>();
 
 	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'overview' | null = null;
@@ -89,7 +91,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
-		if(this.selectedNode.startsWith('dataset-model-')) {
+		if(this.selectedNode.startsWith('dataset-model-') || this.selectedNode.startsWith('field-model-')) {
 			this.selectedNodeType = 'dataset-models';
 			return;
 		}
@@ -123,7 +125,9 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	}
 
 	onDatasetModelContextChanged(context: {
+		fieldModels: any[];
 		selectedDatasetModelId: string | null;
+		selectedFieldModelId: string | null;
 	}): void {
 		this.datasetModelContextChanged.emit(context);
 	}

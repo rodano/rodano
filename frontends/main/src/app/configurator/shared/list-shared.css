@@ -254,6 +254,8 @@
 	height: auto;
 	min-height: 0;
 	padding: 0.5rem;
+	max-width: 100%;
+	overflow: hidden;
 }
 
 .content-container.level-3 .primary-card .card-body,
@@ -267,17 +269,26 @@
 	margin-bottom: 0;
 	padding-bottom: 0;
 	border-bottom: none;
+	min-width: 0;
 }
 
 .content-container.level-3 .primary-card .card-info h3 {
 	font-size: 0.9rem;
 	line-height: 1.2;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 
 .content-container.level-3 .primary-card .card-code {
 	font-size: 0.75rem;
 	opacity: 0.7;
 	margin-top: 0.125rem;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 
 .content-container.level-3 .primary-card.selected::after {
@@ -322,15 +333,24 @@
 	margin-bottom: 0;
 	padding-bottom: 0;
 	border-bottom: none;
+	min-width: 0;
 }
 
 .content-container.level-3 .secondary-card .card-info h3 {
 	font-size: 0.875rem;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 
 .content-container.level-3 .secondary-card .card-code {
 	font-size: 0.7rem;
 	opacity: 0.7;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 
 /* More compact for event group cards at level 3 */

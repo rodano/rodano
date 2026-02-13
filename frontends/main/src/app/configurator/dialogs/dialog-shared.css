@@ -169,6 +169,13 @@
 	padding-left: 0;
 }
 
+.checkbox-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 1rem;
+	margin: 1rem 0;
+}
+
 /* ==================== Material Checkbox Alignment Fix ==================== */
 ::ng-deep .mat-mdc-checkbox {
 	display: inline-flex !important;

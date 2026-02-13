@@ -13,11 +13,12 @@ interface TreeNode {
 	children?: TreeNode[];
 	expanded?: boolean;
 	fixed?: boolean;
-	type?: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'category';
+	type?: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'field-model' | 'category';
 	scopeModelId?: string;
 	eventModelId?: string;
 	eventGroupId?: string;
 	datasetModelId?: string;
+	fieldModelId?: string;
 }
 
 @Component({
@@ -33,13 +34,16 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	@Input() selectedNode: string | null = null;
 	@Input() eventModels: any[] = [];
 	@Input() eventGroups: any[] = [];
+	@Input() fieldModels: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedDatasetModelId: string | null = null;
+	@Input() selectedFieldModelId: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string>();
 	@Output() eventModelSelected = new EventEmitter<string>();
 	@Output() eventGroupSelected = new EventEmitter<string>();
 	@Output() datasetModelSelected = new EventEmitter<string>();
+	@Output() fieldModelSelected = new EventEmitter<string>();
 
 	loading = true;
 	scopeModels: any[] = [];
@@ -51,7 +55,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 		{
 			id: 'project-settings',
 			label: 'Project Settings',
-			icon: 'settings',
+			icon: 'menu_book',
 			fixed: true
 		},
 		{
@@ -87,7 +91,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 		{
 			id: 'workflows',
 			label: 'Workflows',
-			icon: 'account_tree',
+			icon: 'settings',
 			children: []
 		},
 		{
@@ -134,6 +138,10 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 
 		if(changes['eventModels'] || changes['eventGroups'] || changes['selectedScopeModelId']) {
 			this.rebuildScopeModelsWithEvents();
+		}
+
+		if(changes['fieldModels'] || changes['selectedDatasetModelId']) {
+			this.rebuildDatasetModelsWithFields();
 		}
 	}
 
@@ -204,21 +212,67 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 
 					this.changeDetectorRef.detectChanges();
 				}
+				this.loading = false;
 			},
 			error: error => {
 				console.error('Error loading dataset models:', error);
+				this.loading = false;
 			}
 		});
 	}
 
 	private buildDatasetModelNodes(datasetModels: any[]): TreeNode[] {
-		return datasetModels.map(dm => ({
-			id: `dataset-model-${dm.datasetModelId}`,
-			label: this.languageService.getDefaultTranslation(dm.shortname) || dm.id,
-			icon: 'table_chart',
-			type: 'dataset-model',
-			datasetModelId: dm.datasetModelId
-		}));
+		return datasetModels.map(dm => {
+			const node: TreeNode = {
+				id: `dataset-model-${dm.datasetModelId}`,
+				label: this.languageService.getDefaultTranslation(dm.shortname) || dm.id,
+				icon: 'table_chart',
+				type: 'dataset-model',
+				datasetModelId: dm.datasetModelId
+			};
+
+			if(this.selectedDatasetModelId === dm.datasetModelId && this.fieldModels && this.fieldModels.length > 0) {
+				const fieldNodes: TreeNode[] = this.fieldModels
+					.filter(fm => fm.datasetModelId === dm.datasetModelId)
+					.map(fieldModel => ({
+						id: `field-model-${fieldModel.fieldModelId}`,
+						label: this.languageService.getDefaultTranslation(fieldModel.shortname) || fieldModel.id,
+						icon: 'text_ad',
+						type: 'field-model',
+						datasetModelId: dm.datasetModelId,
+						fieldModelId: fieldModel.fieldModelId
+					}));
+
+				if(fieldNodes.length > 0) {
+					node.children = fieldNodes;
+					node.expanded = true;
+				}
+			}
+
+			return node;
+		});
+	}
+
+	private rebuildDatasetModelsWithFields(): void {
+		const datasetModelsIndex = this.treeData.findIndex(node => node.id === 'dataset-models');
+
+		if(datasetModelsIndex !== -1 && this.datasetModels.length > 0) {
+			const currentNode = this.treeData[datasetModelsIndex];
+			const newChildren = this.buildDatasetModelNodes(this.datasetModels);
+
+			const newDatasetModelsNode = {
+				...currentNode,
+				children: newChildren
+			};
+
+			this.treeData = [
+				...this.treeData.slice(0, datasetModelsIndex),
+				newDatasetModelsNode,
+				...this.treeData.slice(datasetModelsIndex + 1)
+			];
+
+			this.changeDetectorRef.detectChanges();
+		}
 	}
 
 	public reloadDatasetModels(): void {
@@ -341,6 +395,13 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 			return;
 		}
 
+		if(node.type === 'field-model') {
+			const fieldModelId = node.id.replace('field-model-', '');
+			this.fieldModelSelected.emit(fieldModelId);
+			this.nodeSelected.emit(node.id);
+			return;
+		}
+
 		if(node.type === 'event-group') {
 			const eventGroupId = node.id.replace('event-group-', '');
 			this.eventGroupSelected.emit(eventGroupId);
@@ -395,7 +456,7 @@ export class ConfiguratorTreeComponent implements OnInit, OnChanges {
 	}
 
 	isNodeSelected(node: TreeNode): boolean {
-		if(node.type === 'dataset-model') {
+		if(node.type === 'field-model') {
 			return this.selectedNode === node.id;
 		}
 

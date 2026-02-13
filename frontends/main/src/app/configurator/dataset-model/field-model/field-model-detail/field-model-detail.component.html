@@ -1,0 +1,668 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ draftFieldModel ? getTranslatedValue(draftFieldModel.shortname) : '' }}</h2>
+		<span class="detail-code">{{ draftFieldModel?.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (draftFieldModel) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('id')">
+					<label>
+						Code
+						@if (isFieldModified('id')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ draftFieldModel.id }}</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('type')">
+					<label>
+						Type
+						@if (isFieldModified('type')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ getTypeLabel(draftFieldModel.type) }}</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('dataType')">
+					<label>
+						Data Type
+						@if (isFieldModified('dataType')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ getDataTypeLabel(draftFieldModel.dataType) }}</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('readOnly')">
+					<label>
+						Read Only
+						@if (isFieldModified('readOnly')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftFieldModel.readOnly) {
+							<span class="status-badge read-only">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('shortname')">
+					<label>
+						Short Name
+						@if (isFieldModified('shortname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.shortname)">
+						@if (!getTranslatedValue(draftFieldModel.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftFieldModel.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
+					<label>
+						Long Name
+						@if (isFieldModified('longname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.longname)">
+						@if (!getTranslatedValue(draftFieldModel.longname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftFieldModel.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+					<label>
+						Description
+						@if (isFieldModified('description')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.description)">
+						@if (!getTranslatedValue(draftFieldModel.description)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftFieldModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		@if (draftFieldModel && hasValidationSettings()) {
+			<div class="settings-section">
+				<h3>Validation</h3>
+
+				<div class="settings-grid">
+					@if (showStringValidation() || showTextAreaValidation()) {
+						<div class="setting-item" [class.modified]="isFieldModified('maxLength')">
+							<label>
+								Maximum Length
+								@if (isFieldModified('maxLength')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxLength">
+								@if (!draftFieldModel.maxLength) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.maxLength || 'Not configured' }}
+							</div>
+						</div>
+					}
+
+					@if (showStringValidation() || showNumberValidation()) {
+						<div class="setting-item" [class.modified]="isFieldModified('matcher')">
+							<label>
+								Matcher (Regex)
+								@if (isFieldModified('matcher')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.matcher">
+								@if (!draftFieldModel.matcher) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.matcher || 'Not configured' }}
+							</div>
+						</div>
+					}
+
+					@if (showStringValidation() || showNumberValidation()) {
+						<div class="setting-item full-width" [class.modified]="isFieldModified('matcherMessage')">
+							<label>
+								Matcher Message
+								@if (isFieldModified('matcherMessage')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.matcherMessage)">
+								@if (!getTranslatedValue(draftFieldModel.matcherMessage)) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ getTranslatedValue(draftFieldModel.matcherMessage) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+							</div>
+						</div>
+					}
+
+					@if (showNumberValidation()) {
+						<div class="setting-item" [class.modified]="isFieldModified('maxIntegerDigits')">
+							<label>
+								Max. Integer Digits
+								@if (isFieldModified('maxIntegerDigits')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxIntegerDigits">
+								@if (!draftFieldModel.maxIntegerDigits) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.maxIntegerDigits || 'Not configured' }}
+							</div>
+						</div>
+
+						<div class="setting-item" [class.modified]="isFieldModified('maxDecimalDigits')">
+							<label>
+								Max. Decimal Digits
+								@if (isFieldModified('maxDecimalDigits')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxDecimalDigits">
+								@if (!draftFieldModel.maxDecimalDigits) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.maxDecimalDigits || 'Not configured' }}
+							</div>
+						</div>
+
+						<div class="setting-item" [class.modified]="isFieldModified('minValue')">
+							<label>
+								Minimum Value
+								@if (isFieldModified('minValue')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.minValue">
+								@if (!draftFieldModel.minValue) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.minValue ?? 'Not configured' }}
+							</div>
+						</div>
+
+						<div class="setting-item" [class.modified]="isFieldModified('maxValue')">
+							<label>
+								Maximum Value
+								@if (isFieldModified('maxValue')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxValue">
+								@if (!draftFieldModel.maxValue) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.maxValue ?? 'Not configured' }}
+							</div>
+						</div>
+					}
+
+					@if (showDateValidation() || showDateSelectValidation()) {
+						<div class="setting-item full-width" [class.modified]="isFieldModified('withYears') || isFieldModified('withMonths') || isFieldModified('withDays') || isFieldModified('withHours') || isFieldModified('withMinutes') || isFieldModified('withSeconds')">
+							<label>
+								Date Configuration
+								@if (isFieldModified('withYears') || isFieldModified('withMonths') || isFieldModified('withDays') || isFieldModified('withHours') || isFieldModified('withMinutes') || isFieldModified('withSeconds')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value">
+								<div class="chip-container">
+									@if (draftFieldModel.withYears) {
+										<span class="chip">Years</span>
+									}
+									@if (draftFieldModel.withMonths) {
+										<span class="chip">Months</span>
+									}
+									@if (draftFieldModel.withDays) {
+										<span class="chip">Days</span>
+									}
+									@if (draftFieldModel.withHours) {
+										<span class="chip">Hours</span>
+									}
+									@if (draftFieldModel.withMinutes) {
+										<span class="chip">Minutes</span>
+									}
+									@if (draftFieldModel.withSeconds) {
+										<span class="chip">Seconds</span>
+									}
+									@if (!draftFieldModel.withYears && !draftFieldModel.withMonths && !draftFieldModel.withDays && !draftFieldModel.withHours && !draftFieldModel.withMinutes && !draftFieldModel.withSeconds) {
+										<div class="empty-message-centered">
+											<mat-icon class="warning-icon">report</mat-icon>
+											<span>No date parts configured</span>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+					}
+
+					@if (showDateSelectValidation()) {
+						<div class="setting-item full-width" [class.modified]="isFieldModified('yearsMandatory') || isFieldModified('monthsMandatory') || isFieldModified('daysMandatory') || isFieldModified('hoursMandatory') || isFieldModified('minutesMandatory') || isFieldModified('secondsMandatory')">
+							<label>
+								Mandatory Fields
+								@if (isFieldModified('yearsMandatory') || isFieldModified('monthsMandatory') || isFieldModified('daysMandatory') || isFieldModified('hoursMandatory') || isFieldModified('minutesMandatory') || isFieldModified('secondsMandatory')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value">
+								<div class="chip-container">
+									@if (draftFieldModel.yearsMandatory) {
+										<span class="chip">Years</span>
+									}
+									@if (draftFieldModel.monthsMandatory) {
+										<span class="chip">Months</span>
+									}
+									@if (draftFieldModel.daysMandatory) {
+										<span class="chip">Days</span>
+									}
+									@if (draftFieldModel.hoursMandatory) {
+										<span class="chip">Hours</span>
+									}
+									@if (draftFieldModel.minutesMandatory) {
+										<span class="chip">Minutes</span>
+									}
+									@if (draftFieldModel.secondsMandatory) {
+										<span class="chip">Seconds</span>
+									}
+									@if (!draftFieldModel.yearsMandatory && !draftFieldModel.monthsMandatory && !draftFieldModel.daysMandatory && !draftFieldModel.hoursMandatory && !draftFieldModel.minutesMandatory && !draftFieldModel.secondsMandatory) {
+										<div class="empty-message-centered">
+											<mat-icon class="warning-icon">report</mat-icon>
+											<span>No mandatory fields</span>
+										</div>
+									}
+								</div>
+							</div>
+						</div>
+					}
+
+					@if (showDateValidation() || showDateSelectValidation()) {
+						<div class="setting-item" [class.modified]="isFieldModified('minYear')">
+							<label>
+								Minimum Year
+								@if (isFieldModified('minYear')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.minYear">
+								@if (!draftFieldModel.minYear) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.minYear || 'Not configured' }}
+							</div>
+						</div>
+
+						<div class="setting-item" [class.modified]="isFieldModified('maxYear')">
+							<label>
+								Maximum Year
+								@if (isFieldModified('maxYear')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxYear">
+								@if (!draftFieldModel.maxYear) {
+									<mat-icon class="warning-icon">report</mat-icon>
+								}
+								{{ draftFieldModel.maxYear || 'Not configured' }}
+							</div>
+						</div>
+
+						<div class="setting-item" [class.modified]="isFieldModified('allowDateInFuture')">
+							<label>
+								Allow Date in Future
+								@if (isFieldModified('allowDateInFuture')) {
+									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+								}
+							</label>
+							<div class="setting-value">{{ draftFieldModel.allowDateInFuture ? 'Yes' : 'No' }}</div>
+						</div>
+					}
+				</div>
+
+				<button class="btn-edit" (click)="onEditValidation()">
+					<mat-icon>edit</mat-icon>
+					Edit Validation
+				</button>
+			</div>
+		}
+
+		<div class="settings-section">
+			<h3>Calculated Value</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('plugin')">
+					<label>
+						Dynamic
+						@if (isFieldModified('plugin')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftFieldModel.plugin) {
+							<span class="status-badge dynamic">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('valueFormula')">
+					<label>
+						Value Formula
+						@if (isFieldModified('valueFormula')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftFieldModel.valueFormula">
+						@if (!draftFieldModel.valueFormula) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							<code>{{ draftFieldModel.valueFormula }}</code>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditCalculatedValue()">
+				<mat-icon>edit</mat-icon>
+				Edit Calculated Value
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Export and Use</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('exportable')">
+					<label>
+						Exportable
+						@if (isFieldModified('exportable')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftFieldModel.exportable) {
+							<span class="status-badge exportable">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('exportOrder')">
+					<label>
+						Export Order
+						@if (isFieldModified('exportOrder')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="draftFieldModel.exportOrder === null || draftFieldModel.exportOrder === undefined">
+						@if (draftFieldModel.exportOrder === null || draftFieldModel.exportOrder === undefined) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							{{ draftFieldModel.exportOrder }}
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('searchable')">
+					<label>
+						Searchable
+						@if (isFieldModified('searchable')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (draftFieldModel.searchable) {
+							<span class="status-badge searchable">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditExport()">
+				<mat-icon>edit</mat-icon>
+				Edit Export and Use
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Help</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('inlineHelp')">
+					<label>
+						Inline Help
+						@if (isFieldModified('inlineHelp')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftFieldModel.inlineHelp">
+						@if (!draftFieldModel.inlineHelp) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							{{ draftFieldModel.inlineHelp }}
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('advancedHelp')">
+					<label>
+						Advanced Help
+						@if (isFieldModified('advancedHelp')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!hasAdvancedHelp()">
+						@if (!hasAdvancedHelp()) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							{{ getAdvancedHelpText() }}
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditHelp()">
+				<mat-icon>edit</mat-icon>
+				Edit Help
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Possible Values Configuration</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('dictionary')">
+					<label>
+						Dictionary
+						@if (isFieldModified('dictionary')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftFieldModel.dictionary">
+						@if (!draftFieldModel.dictionary) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							{{ draftFieldModel.dictionary }}
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('possibleValuesProvider')">
+					<label>
+						Provider
+						@if (isFieldModified('possibleValuesProvider')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftFieldModel.possibleValuesProvider">
+						@if (!draftFieldModel.possibleValuesProvider) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							<code>{{ draftFieldModel.possibleValuesProvider }}</code>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('possibleValuesProviderDescription')">
+					<label>
+						Provider Description
+						@if (isFieldModified('possibleValuesProviderDescription')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!draftFieldModel.possibleValuesProviderDescription">
+						@if (!draftFieldModel.possibleValuesProviderDescription) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						} @else {
+							{{ draftFieldModel.possibleValuesProviderDescription }}
+						}
+					</div>
+				</div>
+
+				@if (draftFieldModel.possibleValues && draftFieldModel.possibleValues.length > 0) {
+					<div class="setting-item full-width" [class.modified]="isFieldModified('possibleValues')">
+						<label>
+							Defined Possible Values
+							@if (isFieldModified('possibleValues')) {
+								<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+							}
+						</label>
+						<div class="setting-value">
+							<div class="possible-values-display">
+								@for (pv of getSortedPossibleValues(); track pv.id) {
+									<div class="possible-value-card">
+										<div class="pv-header">
+											<span class="pv-name">
+												{{ getPossibleValueLabel(pv) }}
+											</span>
+											<div class="pv-badges">
+												@if (pv.specify) {
+													<span class="badge badge-info" title="User can specify additional information">
+														<mat-icon>edit_note</mat-icon>
+														Specify
+													</span>
+												}
+												@if (pv.exportLabel) {
+													<span class="badge badge-secondary" [title]="'Export label: ' + pv.exportLabel">
+														<mat-icon>file_download</mat-icon>
+														{{ pv.exportLabel }}
+													</span>
+												}
+											</div>
+										</div>
+									</div>
+								}
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+			<button class="btn-edit" (click)="onEditPossibleValues()">
+				<mat-icon>edit</mat-icon>
+				Edit Possible Values Configuration
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Validators & Workflows</h3>
+			<div class="settings-grid">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('validatorIds')">
+					<label>
+						Validators
+						@if (isFieldModified('validatorIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftFieldModel.validatorIds && draftFieldModel.validatorIds.length > 0) {
+							<div class="chip-container">
+								@for (validatorId of draftFieldModel.validatorIds; track validatorId) {
+									<div class="chip">
+										<mat-icon class="resource-icon">verified</mat-icon>
+										<span class="language-name">{{ getValidatorName(validatorId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No validators assigned</span>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('workflowIds')">
+					<label>
+						Workflows
+						@if (isFieldModified('workflowIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (draftFieldModel.workflowIds && draftFieldModel.workflowIds.length > 0) {
+							<div class="chip-container">
+								@for (workflowId of draftFieldModel.workflowIds; track workflowId) {
+									<div class="chip">
+										<mat-icon class="resource-icon">account_tree</mat-icon>
+										<span class="language-name">{{ getWorkflowName(workflowId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No workflows assigned</span>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="settings-section danger-section">
+			<h3>Delete Field Model</h3>
+			<p class="danger-text">Deleting this field model is permanent and cannot be undone.</p>
+			<button class="btn-delete" (click)="onDelete()">
+				<mat-icon>delete</mat-icon>
+				Delete
+			</button>
+		</div>
+	</div>
+}

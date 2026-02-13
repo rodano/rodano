@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -6,10 +6,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {DatasetModel} from '@core/model/dataset-model';
 import {Subscription} from 'rxjs';
-import {DatasetModelService} from '../../services/api/dataset-model.service';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {LanguageService} from '../../services/language.service';
-import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {DatasetModelDetailComponent} from '../dataset-model-detail/dataset-model-detail.component';
 import {DatasetModelDialogService} from '../../services/dialogs/dataset-model-dialog.service';
@@ -17,8 +15,12 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {ProjectLanguage} from '@core/model/project-language';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ConfiguratorService} from '../../services/api/configurator.service';
+import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
+import {FieldModel} from '@core/model/field-model';
+import {FieldModelDialogService} from '../../services/dialogs/field-model-dialog.service';
+import {FieldModelDetailComponent} from '../field-model/field-model-detail/field-model-detail.component';
 
-type ViewMode = 'list' | 'detail';
+type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 
 @Component({
 	selector: 'app-dataset-model-list',
@@ -31,6 +33,7 @@ type ViewMode = 'list' | 'detail';
 		MatButtonModule,
 		MatTooltipModule,
 		DatasetModelDetailComponent,
+		FieldModelDetailComponent,
 		MatProgressSpinnerModule
 	]
 })
@@ -41,11 +44,14 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@Output() nodeSelected = new EventEmitter<string>();
 	@Output() datasetModelChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() datasetModelContextChanged = new EventEmitter<{
+		fieldModels: any[];
 		selectedDatasetModelId: string | null;
+		selectedFieldModelId: string | null;
 	}>();
 
 	selectedDatasetModel: DatasetModel | null = null;
-	viewMode: ViewMode = 'list';
+	selectedFieldModelId: string | null = null;
+	viewMode: ViewMode = 'dataset-detail';
 	loading = false;
 
 	projectLanguages: ProjectLanguage[] = [];
@@ -53,12 +59,12 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	private languageSubscription: Subscription;
 
 	constructor(
-		private datasetModelService: DatasetModelService,
 		public datasetModelManager: DatasetModelManagerService,
+		public fieldModelManager: FieldModelManagerService,
 		private configuratorService: ConfiguratorService,
 		private datasetModelDialogService: DatasetModelDialogService,
+		private fieldModelDialogService: FieldModelDialogService,
 		private languageService: LanguageService,
-		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -71,7 +77,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	ngOnChanges(changes: SimpleChanges): void {
+	ngOnChanges(changes: any): void {
 		if(changes['selectedNode'] && this.datasetModels.length > 0) {
 			const nodeId = this.selectedNode;
 			if(nodeId?.startsWith('dataset-model-')) {
@@ -92,11 +98,27 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	get viewLevel(): number {
-		return this.viewMode === 'detail' ? 2 : 0;
+		if(!this.selectedDatasetModel) {
+			return 0;
+		}
+
+		if(this.viewMode === 'dataset-detail' || this.viewMode === 'field-list') {
+			return 2;
+		}
+
+		if(this.viewMode === 'field-detail') {
+			return 3;
+		}
+
+		return 0;
 	}
 
 	get datasetModels(): DatasetModel[] {
 		return this.datasetModelManager.getAll();
+	}
+
+	get fieldModels(): FieldModel[] {
+		return this.fieldModelManager.getAll();
 	}
 
 	get modifiedDatasetModelIds(): Set<string> {
@@ -107,8 +129,16 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		return this.datasetModelManager.getOriginals();
 	}
 
+	get modifiedFieldModels(): Set<string> {
+		return this.fieldModelManager.getModifiedIds();
+	}
+
+	get originalFieldModels(): FieldModel[] {
+		return this.fieldModelManager.getOriginals();
+	}
+
 	get totalModificationCount(): number {
-		return this.datasetModelManager.getModificationCount();
+		return this.datasetModelManager.getModificationCount() + this.fieldModelManager.getModificationCount();
 	}
 
 	loadProject(): void {
@@ -154,12 +184,14 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	private clearSelection(): void {
 		this.selectedDatasetModel = null;
-		this.viewMode = 'list';
+		this.selectedFieldModelId = null;
+		this.viewMode = 'dataset-detail';
 		this.nodeSelected.emit('dataset-models');
 	}
 
 	backToDatasetDetail(): void {
-		this.viewMode = 'list';
+		this.viewMode = 'dataset-detail';
+		this.selectedFieldModelId = null;
 		this.emitContext();
 	}
 
@@ -167,12 +199,23 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		const previousDatasetModelId = this.selectedDatasetModel?.datasetModelId;
 
 		this.selectedDatasetModel = datasetModel;
+		this.selectedFieldModelId = null;
 
 		if(previousDatasetModelId !== datasetModel.datasetModelId) {
-			this.viewMode = 'detail';
+			this.viewMode = 'dataset-detail';
+			this.fieldModelManager.setAll([]);
 		}
 
 		this.emitContext();
+
+		this.fieldModelManager.loadForDataset(this.projectId, datasetModel.datasetModelId).subscribe({
+			next: () => this.emitContext(),
+			error: error => {
+				console.error('Error loading field models:', error);
+				this.fieldModelManager.setAll([]);
+				this.emitContext();
+			}
+		});
 
 		this.nodeSelected.emit(`dataset-model-${datasetModel.datasetModelId}`);
 	}
@@ -234,13 +277,98 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
+	onCreateFieldModel(): void {
+		if(!this.selectedDatasetModel) {
+			return;
+		}
+
+		this.fieldModelDialogService.openCreateDialog(
+			this.projectId,
+			this.selectedDatasetModel.datasetModelId,
+			this.projectLanguages
+		).subscribe((result: any) => {
+			if(result) {
+				const newFieldModel: FieldModel = {
+					fieldModelId: '',
+					datasetModelId: this.selectedDatasetModel!.datasetModelId,
+					...result,
+					validatorIds: [],
+					workflowIds: [],
+					possibleValues: []
+				};
+
+				this.fieldModelManager.create(this.projectId, newFieldModel).subscribe({
+					next: () => {
+						this.snackBar.open('Field model created', 'Close', {duration: 2000});
+					},
+					error: error => {
+						console.error('Error creating fied model:', error);
+						this.snackBar.open('Failed to create fied model', 'Close', {duration: 3000});
+					}
+				});
+			}
+		});
+	}
+
+	onFieldModelUpdated(updatedFieldModel: FieldModel): void {
+		if(!updatedFieldModel) {
+			return;
+		}
+		this.fieldModelManager.update(updatedFieldModel);
+		this.emitModificationChange();
+		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+	}
+
+	onFieldModelDeleted(fieldModelId: string): void {
+		this.fieldModelManager.delete(this.projectId, fieldModelId).subscribe({
+			next: () => {
+				this.snackBar.open('Field model deleted', 'Close', {duration: 2000});
+
+				if(this.selectedFieldModelId === fieldModelId) {
+					this.selectedFieldModelId = null;
+					this.viewMode = 'field-list';
+				}
+
+				this.emitModificationChange();
+				this.emitContext();
+			},
+			error: (error: HttpErrorResponse) => {
+				console.error('Error deleting field model:', error);
+				this.snackBar.open('Failed to delete field model', 'Close', {duration: 3000});
+			}
+		});
+	}
+
+	switchToFieldModelView(): void {
+		if(!this.selectedDatasetModel) {
+			return;
+		}
+		this.viewMode = 'field-list';
+		this.emitContext();
+	}
+
+	onSelectFieldModel(fieldModelId: string): void {
+		if(this.selectedFieldModelId === fieldModelId) {
+			this.selectedFieldModelId = null;
+			this.viewMode = 'field-list';
+		}
+		else {
+			this.selectedFieldModelId = fieldModelId;
+			this.viewMode = 'field-detail';
+			this.nodeSelected.emit(`field-model-${fieldModelId}`);
+		}
+		this.emitContext();
+	}
+
 	private emitModificationChange(): void {
 		this.datasetModelChanged.emit({modificationCount: this.totalModificationCount});
 	}
 
 	private emitContext(): void {
 		this.datasetModelContextChanged.emit({
-			selectedDatasetModelId: this.selectedDatasetModel?.datasetModelId || null
+			fieldModels: this.fieldModels,
+			selectedDatasetModelId: this.selectedDatasetModel?.datasetModelId || null,
+			selectedFieldModelId: this.selectedFieldModelId
 		});
 	}
 
@@ -250,5 +378,37 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	hasLabelPatterns(datasetModel: DatasetModel): boolean {
 		return !!(datasetModel.collapsedLabelPattern || datasetModel.expandedLabelPattern);
+	}
+
+	getTypeLabel(type: string): string {
+		const typeMap: Record<string, string> = {
+			STRING: 'String',
+			AUTO_COMPLETION: 'Autocompleted String',
+			DATE: 'Date',
+			DATE_SELECT: 'Date with Selection',
+			NUMBER: 'Number',
+			SELECT: 'Combobox',
+			RADIO: 'Radio',
+			CHECKBOX: 'Checkbox',
+			CHECKBOX_GROUP: 'Checkbox Group',
+			TEXTAREA: 'Text Area',
+			FILE: 'File'
+		};
+		return typeMap[type] || type;
+	}
+
+	getDataTypeLabel(dataType: string): string {
+		const dataTypeMap: Record<string, string> = {
+			STRING: 'String',
+			DATE: 'Date',
+			NUMBER: 'Number',
+			BOOLEAN: 'Boolean',
+			BLOB: 'Blob'
+		};
+		return dataTypeMap[dataType] || dataType;
+	}
+
+	isFieldModelModified(fieldModelId: string): boolean {
+		return this.fieldModelManager.isModified(fieldModelId);
 	}
 }

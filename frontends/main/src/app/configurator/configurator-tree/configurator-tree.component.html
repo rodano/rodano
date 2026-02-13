@@ -29,6 +29,7 @@
 		[class.event-model-node]="node.type === 'event-model'"
 		[class.event-group-node]="node.type === 'event-group'"
 		[class.dataset-model-node]="node.type === 'dataset-model'"
+		[class.field-model-node]="node.type === 'field-model'"
 		(click)="onNodeClick(node, $event)">
 		@if (node.icon) {
 			<mat-icon class="node-icon">{{ node.icon }}</mat-icon>

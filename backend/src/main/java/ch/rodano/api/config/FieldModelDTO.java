@@ -16,7 +16,6 @@ import ch.rodano.configuration.model.rules.OperandType;
 public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	@NotNull
 	private UUID fieldModelId;
-	@NotNull
 	@Schema(description = "Field type")
 	@NotNull
 	private FieldModelType type;
@@ -28,16 +27,26 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	@NotBlank
 	private String id;
 
+	private List<UUID> validatorIds;
+	private List<UUID> workflowIds;
+
 	@NotNull
 	private Map<String, String> shortname;
 	@NotNull
 	private Map<String, String> longname;
 	private Map<String, String> description;
 
+	private Map<String, String> matcherMessage;
+
 	@Schema(description = "Possible values of the field, if the field type is a multiple")
 	@NotNull
 	private List<PossibleValueDTO> possibleValues;
+	private String possibleValuesProvider;
+	private String possibleValuesProviderDescription;
+
 	private String dictionary;
+	private String matcher;
+	private String valueFormula;
 
 	@NotNull
 	private boolean readOnly;
@@ -50,10 +59,14 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	@NotNull
 	private boolean searchable;
 
+	private boolean plugin;
+
 	//export
 	@Schema(description = "Is the field model included in the exports")
 	@NotNull
 	private boolean exportable;
+
+	private Integer exportOrder;
 
 	@NotNull
 	private boolean required;
@@ -107,7 +120,7 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	/**
 	 * Default constructor, needed by some serializer
 	 */
-	FieldModelDTO() {
+	public FieldModelDTO() {
 
 	}
 
@@ -224,6 +237,22 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 
 	public void setId(final String id) {
 		this.id = id;
+	}
+
+	public List<UUID> getValidatorIds() {
+		return validatorIds;
+	}
+
+	public void setValidatorIds(final List<UUID> validatorIds) {
+		this.validatorIds = validatorIds;
+	}
+
+	public List<UUID> getWorkflowIds() {
+		return workflowIds;
+	}
+
+	public void setWorkflowIds(final List<UUID> workflowIds) {
+		this.workflowIds = workflowIds;
 	}
 
 	public Map<String, String> getShortname() {
@@ -482,4 +511,59 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 		this.advancedHelp = advancedHelp;
 	}
 
+	public Map<String, String> getMatcherMessage() {
+		return matcherMessage;
+	}
+
+	public void setMatcherMessage(final Map<String, String> matcherMessage) {
+		this.matcherMessage = matcherMessage;
+	}
+
+	public String getPossibleValuesProvider() {
+		return possibleValuesProvider;
+	}
+
+	public void setPossibleValuesProvider(final String possibleValuesProvider) {
+		this.possibleValuesProvider = possibleValuesProvider;
+	}
+
+	public String getPossibleValuesProviderDescription() {
+		return possibleValuesProviderDescription;
+	}
+
+	public void setPossibleValuesProviderDescription(final String possibleValuesProviderDescription) {
+		this.possibleValuesProviderDescription = possibleValuesProviderDescription;
+	}
+
+	public String getMatcher() {
+		return matcher;
+	}
+
+	public void setMatcher(final String matcher) {
+		this.matcher = matcher;
+	}
+
+	public String getValueFormula() {
+		return valueFormula;
+	}
+
+	public void setValueFormula(final String valueFormula) {
+		this.valueFormula = valueFormula;
+	}
+
+	public boolean isPlugin() {
+		return plugin;
+	}
+
+	public void setPlugin(final boolean plugin) {
+		this.plugin = plugin;
+	}
+
+	public Integer getExportOrder() {
+		return exportOrder;
+	}
+
+	public void setExportOrder(final Integer exportOrder) {
+		this.exportOrder = exportOrder;
+	}
 }

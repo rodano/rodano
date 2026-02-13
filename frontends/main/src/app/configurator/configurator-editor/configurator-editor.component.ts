@@ -25,6 +25,8 @@ import {EventGroupService} from '../services/api/event-group.service';
 import {EventGroup} from '@core/model/event-group';
 import {DatasetModel} from '@core/model/dataset-model';
 import {DatasetModelService} from '../services/api/dataset-model.service';
+import {FieldModelService} from '../services/api/field-model.service';
+import {FieldModel} from '@core/model/field-model';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -63,7 +65,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedEventModelId: string | null = null;
 	selectedEventGroupId: string | null = null;
 
+	fieldModels: any[] = [];
 	selectedDatasetModelId: string | null = null;
+	selectedFieldModelId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -76,6 +80,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private eventModelService: EventModelService,
 		private eventGroupService: EventGroupService,
 		private datasetModelService: DatasetModelService,
+		private fieldModelService: FieldModelService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -193,7 +198,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				datasetModelsComponent.onSelectDatasetModel(datasetModel);
 			}
 			else if(datasetModel) {
-				datasetModelsComponent.viewMode = 'detail';
+				datasetModelsComponent.viewMode = 'dataset-detail';
+				datasetModelsComponent.selectedFieldModelId = null;
 			}
 		}
 	}
@@ -251,7 +257,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				}
 
 				if(this.datasetModelModificationCount > 0) {
-					savePromises.push(this.saveDatasetModels());
+					savePromises.push(this.saveDatasetModelsAndFieldModels());
 				}
 
 				if(savePromises.length > 0) {
@@ -306,6 +312,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
 				if(datasetModelsComponent) {
 					datasetModelsComponent.datasetModelManager.resetToOriginals();
+					datasetModelsComponent.fieldModelManager.resetToOriginals();
 					datasetModelsComponent.loadDatasetModels();
 				}
 
@@ -551,7 +558,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
-	private saveDatasetModels(): Promise<any> {
+	private saveDatasetModelsAndFieldModels(): Promise<any> {
 		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
 
 		if(!datasetModelsComponent) {
@@ -588,9 +595,30 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			}
 		});
 
+		datasetModelsComponent.modifiedFieldModels.forEach((id: string) => {
+			const fieldModel = datasetModelsComponent.fieldModels.find((fm: FieldModel) => fm.fieldModelId === id);
+			if(fieldModel) {
+				savePromises.push(
+					this.fieldModelService.updateFieldModel(this.projectId, id, fieldModel).toPromise()
+				);
+			}
+		});
+
 		return Promise.all(savePromises).then(() => {
 			datasetModelsComponent.datasetModelManager.syncOriginalsWithCurrent();
+			datasetModelsComponent.fieldModelManager.syncOriginalsWithCurrent();
+
 			datasetModelsComponent.loadDatasetModels();
+
+			if(datasetModelsComponent.selectedDatasetModel) {
+				this.fieldModelService.getFieldModels(this.projectId).subscribe({
+					next: allFieldModels => {
+						datasetModelsComponent.fieldModelManager.setAll(allFieldModels);
+						datasetModelsComponent.fieldModelManager.syncOriginalsWithCurrent();
+					}
+				});
+			}
+
 			this.datasetModelModificationCount = 0;
 
 			if(this.treeComponent) {
@@ -645,6 +673,45 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		}
 	}
 
+	onDatasetModelSelectedFromTree(datasetModelId: string): void {
+		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+		if(!datasetModelsComponent) {
+			return;
+		}
+
+		const datasetModel = datasetModelsComponent.datasetModels.find(dm => dm.datasetModelId === datasetModelId);
+		if(!datasetModel) {
+			return;
+		}
+
+		if(datasetModelsComponent.selectedDatasetModel?.datasetModelId !== datasetModel.datasetModelId) {
+			datasetModelsComponent.onSelectDatasetModel(datasetModel);
+		}
+	}
+
+	onFieldModelSelectedFromTree(fieldModelId: string): void {
+		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+		if(!datasetModelsComponent) {
+			return;
+		}
+
+		const fieldModel = datasetModelsComponent.fieldModels.find(fm => fm.fieldModelId === fieldModelId);
+		if(!fieldModel) {
+			return;
+		}
+
+		const datasetModel = datasetModelsComponent.datasetModels.find(dm => dm.datasetModelId === fieldModel.datasetModelId);
+		if(datasetModel && datasetModelsComponent.selectedDatasetModel?.datasetModelId !== datasetModel.datasetModelId) {
+			datasetModelsComponent.onSelectDatasetModel(datasetModel);
+			setTimeout(() => {
+				datasetModelsComponent.onSelectFieldModel(fieldModelId);
+			}, 100);
+		}
+		else {
+			datasetModelsComponent.onSelectFieldModel(fieldModelId);
+		}
+	}
+
 	onScopeModelContextChanged(context: {
 		eventModels: any[];
 		eventGroups: any[];
@@ -660,8 +727,12 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	onDatasetModelContextChanged(context: {
+		fieldModels: any[];
 		selectedDatasetModelId: string | null;
+		selectedFieldModelId: string | null;
 	}): void {
+		this.fieldModels = context.fieldModels;
 		this.selectedDatasetModelId = context.selectedDatasetModelId;
+		this.selectedFieldModelId = context.selectedFieldModelId;
 	}
 }

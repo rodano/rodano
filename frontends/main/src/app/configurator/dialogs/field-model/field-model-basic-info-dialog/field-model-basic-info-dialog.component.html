@@ -1,0 +1,99 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">{{ isEditMode ? 'Edit Basic Information' : 'Create Field Model' }}</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Code *</label>
+				<input
+					type="text"
+					formControlName="id"
+					placeholder="FIELD_MODEL_CODE"
+					required
+					(input)="onIdInput($event)">
+				<span class="hint">Unique identifier for this field model</span>
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+					<span class="error-message">Code is required</span>
+				}
+			</div>
+
+			<div class="form-row">
+				<div class="form-field">
+					<label>Type *</label>
+					<mat-select formControlName="type" required placeholder="Select field type">
+						@for (option of typeOptions; track option.value) {
+							<mat-option [value]="option.value">{{ option.label }}</mat-option>
+						}
+					</mat-select>
+					<span class="hint">Field input type</span>
+				</div>
+
+				<div class="form-field">
+					<label>Data Type *</label>
+					<mat-select formControlName="dataType" required placeholder="Select field data type">
+						@for (option of dataTypeOptions; track option.value) {
+							<mat-option [value]="option.value">{{ option.label }}</mat-option>
+						}
+					</mat-select>
+					<span class="hint">Data storage type</span>
+				</div>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="readOnly">Read Only</mat-checkbox>
+				<span class="hint">Field cannot be edited by users</span>
+			</div>
+
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+										<input
+											type="text"
+											formControlName="shortname"
+											placeholder="Employment type">
+										<span class="hint">Brief display name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Long Name</label>
+										<input
+											type="text"
+											formControlName="longname"
+											placeholder="Type of employment">
+										<span class="hint">Full descriptive name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Description</label>
+										<textarea
+											formControlName="description"
+											placeholder="Detailed description of this field model"
+											rows="3"></textarea>
+										<span class="hint">Optional description</span>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+			Save Changes
+		</button>
+	</div>
+</div>

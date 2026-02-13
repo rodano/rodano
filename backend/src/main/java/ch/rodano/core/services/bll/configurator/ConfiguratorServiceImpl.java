@@ -12,8 +12,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import ch.rodano.api.configurator.dto.ConfigSnapshotDTO;
 import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.request.UpdateProjectRequest;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.model.jooq.enums.ProjectConfigVersionStatus;

@@ -7,7 +7,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -35,6 +38,8 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "eventModels", key = "#projectId")
 	public List<EventModelDTO> getEventModels(final UUID projectId) {
 		final var eventModels = dslContext.selectFrom(EVENT_MODEL)
 			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
@@ -47,6 +52,8 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "eventModel", key = "#projectId + '-' + #eventModelId")
 	public EventModelDTO getEventModel(final UUID projectId, final UUID eventModelId) {
 		final var record = dslContext.selectFrom(EVENT_MODEL)
 			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
@@ -61,6 +68,8 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "eventModels", "eventModel" }, allEntries = true)
 	public EventModelDTO createEventModel(final UUID projectId, final EventModelDTO eventModel) {
 		final var eventModelId = eventModel.getEventModelId() != null
 			? eventModel.getEventModelId()
@@ -100,6 +109,8 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "eventModels", "eventModel" }, allEntries = true)
 	public EventModelDTO updateEventModel(final UUID projectId, final UUID eventModelId, final EventModelDTO eventModel) {
 		dslContext.update(EVENT_MODEL)
 			.set(EVENT_MODEL.CODE, eventModel.getId())
@@ -137,6 +148,8 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "eventModels", "eventModel" }, allEntries = true)
 	public void deleteEventModel(final UUID projectId, final UUID eventModelId) {
 		deleteRelationships(projectId, eventModelId);
 
@@ -281,9 +294,12 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 		final var dto = new EventModelDTO();
 		dto.setEventModelId(record.getEventModelId());
 		dto.setId(record.getCode());
-		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
+		}));
 		dto.setEventGroupId(record.getEventGroupId());
 		dto.setScopeModelId(record.getScopeModelId());
 		dto.setInceptive(record.getInceptive());

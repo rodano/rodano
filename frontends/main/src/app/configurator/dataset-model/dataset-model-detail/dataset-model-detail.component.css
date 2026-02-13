@@ -23,6 +23,16 @@
 	border: 1px solid #fcd34d;
 }
 
+.btn-view-field-models {
+	background-color: #8b5cf6;
+	color: white;
+	border-color: #8b5cf6;
+}
+
+.btn-view-field-models:hover {
+	background-color: #7c3aed;
+}
+
 .status-badge.multiple {
 	background-color: #dbeafe;
 	color: #1e40af;

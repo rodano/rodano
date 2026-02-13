@@ -17,5 +17,8 @@ export interface PossibleValue {
     id: string;
     shortname: { [key: string]: string; };
     specify: boolean;
+    fieldModelId?: string;
+    exportLabel?: string;
+    sortOrder?: number;
 }
 

@@ -1,0 +1,125 @@
+<div class="dialog-container large-dialog">
+	<h2 class="dialog-title">Edit Possible Values Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-section">
+				<h3>Possible Values Configuration</h3>
+
+				<div class="form-field">
+					<label>Dictionary</label>
+					<input type="text" formControlName="dictionary" placeholder="names.txt">
+					<span class="hint">Dictionary file for autocomplete (used for AUTO_COMPLETION field type)</span>
+				</div>
+
+				<div class="form-field">
+					<label>Provider</label>
+					<input type="text" formControlName="possibleValuesProvider" placeholder="ProviderClassName">
+					<span class="hint">Java class name that provides dynamic possible values</span>
+				</div>
+
+				<div class="form-field">
+					<label>Provider Description</label>
+					<textarea
+						formControlName="possibleValuesProviderDescription"
+						placeholder="Description of the provider"
+						rows="3"></textarea>
+					<span class="hint">Description of how the provider generates possible values</span>
+				</div>
+			</div>
+
+			@if (showPossibleValuesSection) {
+				<div class="form-section">
+					<div class="section-header">
+						<h3>Possible Values</h3>
+						<button type="button" class="btn-add" (click)="addPossibleValue()">
+							<mat-icon>add</mat-icon>
+							Add Possible Value
+						</button>
+					</div>
+
+					<div class="possible-values-list" formArrayName="possibleValues">
+						@for (pvGroup of possibleValuesArray.controls; track pvGroup.get('code')?.value || $index; let i = $index) {
+							<div class="possible-value-item" [formGroupName]="i">
+								<div class="pv-header">
+									<div class="pv-controls">
+										<button type="button" class="btn-icon" (click)="movePossibleValueUp(i)" [disabled]="i === 0">
+											<mat-icon>arrow_upward</mat-icon>
+										</button>
+										<button type="button" class="btn-icon" (click)="movePossibleValueDown(i)" [disabled]="i === possibleValuesArray.length - 1">
+											<mat-icon>arrow_downward</mat-icon>
+										</button>
+										<button type="button" class="btn-icon btn-danger" (click)="removePossibleValue(i)">
+											<mat-icon>delete</mat-icon>
+										</button>
+									</div>
+									<span class="pv-number">Value {{ pvGroup.get('sortOrder')?.value + 1 }}</span>
+								</div>
+
+								<div class="pv-content">
+									<div class="form-row">
+										<div class="form-field">
+											<label>Code *</label>
+											<input type="text"
+																		formControlName="code"
+																		placeholder="VALUE_1"
+																		(input)="onCodeInput($event, i)"
+																		style="text-transform: uppercase">
+										</div>
+
+										@if (hasMultipleValues()) {
+											<div class="form-field">
+												<label>Export Label</label>
+												<input type="text" formControlName="exportLabel" placeholder="Export label">
+											</div>
+										}
+									</div>
+
+									<div class="form-field">
+										<label>Short Name</label>
+										<mat-tab-group>
+											@for (lang of availableLanguages; track lang.languageCode) {
+												@if (lang.languageCode) {
+													<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+														<div class="tab-content">
+															<input
+																type="text"
+																[formControlName]="'shortname_' + lang.languageCode"
+																[placeholder]="'Short name in ' + getLanguageName(lang.languageCode)">
+														</div>
+													</mat-tab>
+												}
+											}
+										</mat-tab-group>
+									</div>
+
+									@if (data.fieldModel.type === 'CHECKBOX_GROUP') {
+										<div class="form-field">
+											<mat-checkbox formControlName="specify">Specify</mat-checkbox>
+											<span class="hint">Allow user to specify additional information</span>
+										</div>
+									}
+								</div>
+							</div>
+						}
+
+						@if (possibleValuesArray.length === 0) {
+							<div class="empty-state-small">
+								<p>No possible values defined. Click "Add Possible Value" to create one.</p>
+							</div>
+						}
+					</div>
+				</div>
+			}
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

@@ -33,6 +33,7 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 	@Output() datasetModelUpdated = new EventEmitter<DatasetModel>();
 	@Output() datasetModelDeleted = new EventEmitter<string>();
 	@Output() closed = new EventEmitter<void>();
+	@Output() switchToFieldModels = new EventEmitter<void>();
 
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
@@ -130,6 +131,10 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 
 	onClose(): void {
 		this.closed.emit();
+	}
+
+	onSwitchToFieldModels(): void {
+		this.switchToFieldModels.emit();
 	}
 
 	private showStagedMessage(): void {

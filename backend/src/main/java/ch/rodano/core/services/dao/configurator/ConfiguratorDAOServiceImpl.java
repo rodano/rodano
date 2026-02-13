@@ -8,17 +8,21 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.jooq.JSON;
 import org.jooq.impl.DSL;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
 import ch.rodano.api.configurator.dto.ProjectLanguageDTO;
 import ch.rodano.api.configurator.dto.ProjectRuleTagDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.request.UpdateProjectRequest;
 import ch.rodano.core.model.jooq.enums.ProjectConfigVersionStatus;
 import ch.rodano.core.model.jooq.enums.ProjectStatus;
@@ -54,6 +58,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "projects")
 	public List<ConfiguratorProjectDTO> getAllProjects() {
 		final var activeVersion = PROJECT_CONFIG_VERSION.as("active_version");
 		final var draftVersion = PROJECT_CONFIG_VERSION.as("draft_version");
@@ -142,6 +148,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "project", key = "#projectId")
 	public ConfiguratorProjectDTO getProject(final UUID projectId) {
 		final var activeVersion = PROJECT_CONFIG_VERSION.as("active_version");
 		final var draftVersion = PROJECT_CONFIG_VERSION.as("draft_version");
@@ -227,6 +235,7 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public boolean projectCodeExists(final String code) {
 		return dsl.fetchExists(
 			dsl.selectFrom(PROJECT)
@@ -235,6 +244,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = "projects", allEntries = true)
 	public ConfiguratorProjectDTO createProject(final CreateProjectRequest request) {
 		final var projectId = UUID.randomUUID();
 		final var now = ZonedDateTime.now();
@@ -291,6 +302,11 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "projects", allEntries = true),
+		@CacheEvict(value = "project", key = "#projectId")
+	})
 	public void updateProject(final UUID projectId, final UpdateProjectRequest request) {
 		try {
 			final var query = dsl.updateQuery(PROJECT);
@@ -374,6 +390,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "draftVersion", key = "#projectId")
 	public ProjectConfigVersionDTO getDraftVersion(final UUID projectId) {
 		final var createdByUser = USER.as("created_by_user");
 
@@ -406,6 +424,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "activeVersion", key = "#projectId")
 	public ProjectConfigVersionDTO getActiveVersion(final UUID projectId) {
 		final var createdByUser = USER.as("created_by_user");
 		final var publishedByUser = USER.as("published_by_user");
@@ -442,6 +462,11 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "draftVersion", key = "#draft.projectId"),
+		@CacheEvict(value = "projectVersions", key = "#draft.projectId")
+	})
 	public ProjectConfigVersionDTO createVersion(final ProjectConfigVersionDTO draft, final Long basedOnVersionId) {
 		final var baseConfigSnapshot = dsl.select(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT)
 			.from(PROJECT_CONFIG_VERSION)
@@ -463,6 +488,15 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "projects", allEntries = true),
+		@CacheEvict(value = "project", allEntries = true),
+		@CacheEvict(value = "draftVersion", allEntries = true),
+		@CacheEvict(value = "activeVersion", allEntries = true),
+		@CacheEvict(value = "projectVersions", allEntries = true),
+		@CacheEvict(value = "projectVersion", allEntries = true)
+	})
 	public void publishVersion(final Long versionId, final Long publishedByUserId,
 							   final ZonedDateTime publishedAt, final String changeSummary) {
 		dsl.update(PROJECT_CONFIG_VERSION)
@@ -475,6 +509,15 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "projects", allEntries = true),
+		@CacheEvict(value = "project", allEntries = true),
+		@CacheEvict(value = "draftVersion", allEntries = true),
+		@CacheEvict(value = "activeVersion", allEntries = true),
+		@CacheEvict(value = "projectVersions", allEntries = true),
+		@CacheEvict(value = "projectVersion", allEntries = true)
+	})
 	public void archiveVersion(final Long versionId) {
 		dsl.update(PROJECT_CONFIG_VERSION)
 			.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.ARCHIVED)
@@ -483,6 +526,12 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "draftVersion", allEntries = true),
+		@CacheEvict(value = "projectVersions", allEntries = true),
+		@CacheEvict(value = "projectVersion", allEntries = true)
+	})
 	public void restoreDraft(final Long versionId) {
 		dsl.update(PROJECT_CONFIG_VERSION)
 			.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.DRAFT)
@@ -491,6 +540,12 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "projects", allEntries = true),
+		@CacheEvict(value = "project", key = "#projectId"),
+		@CacheEvict(value = "activeVersion", key = "#projectId")
+	})
 	public void updateProjectActiveVersion(final UUID projectId, final Long versionId) {
 		dsl.update(PROJECT)
 			.set(PROJECT.ACTIVE_CONFIG_VERSION_FK, versionId)
@@ -499,6 +554,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "projectVersions", key = "#projectId")
 	public List<ProjectConfigVersionDTO> getVersions(final UUID projectId) {
 		final var createdByUser = USER.as("created_by_user");
 		final var publishedByUser = USER.as("published_by_user");
@@ -535,6 +592,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "projectVersion", key = "#projectId + '-' + #versionId")
 	public ProjectConfigVersionDTO getVersion(final UUID projectId, final Long versionId) {
 		final var createdByUser = USER.as("created_by_user");
 		final var publishedByUser = USER.as("published_by_user");
@@ -571,6 +630,11 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "projects", allEntries = true),
+		@CacheEvict(value = "project", key = "#projectId")
+	})
 	public void updateProjectStatus(final UUID projectId, final ProjectStatus status) {
 		dsl.update(PROJECT)
 			.set(PROJECT.STATUS, status)
@@ -579,6 +643,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "configSnapshot", key = "#versionId")
 	public String getConfigSnapshot(final Long versionId) {
 		return dsl.select(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT)
 			.from(PROJECT_CONFIG_VERSION)
@@ -587,6 +653,8 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = "configSnapshot", key = "#versionId")
 	public void updateConfigSnapshot(final Long versionId, final String snapshotJson) {
 		dsl.update(PROJECT_CONFIG_VERSION)
 			.set(PROJECT_CONFIG_VERSION.CONFIG_SNAPSHOT, snapshotJson)
@@ -595,6 +663,11 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 	}
 
 	@Override
+	@Transactional
+	@Caching(evict = {
+		@CacheEvict(value = "projectVersions", allEntries = true),
+		@CacheEvict(value = "projectVersion", allEntries = true)
+	})
 	public void incrementVersionNumber(final Long versionId) {
 		dsl.update(PROJECT_CONFIG_VERSION)
 			.set(PROJECT_CONFIG_VERSION.VERSION_NUMBER, PROJECT_CONFIG_VERSION.VERSION_NUMBER.plus(1))

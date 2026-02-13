@@ -6,7 +6,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -27,6 +30,8 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "eventGroups", key = "#projectId")
 	public List<EventGroupDTO> getEventGroups(final UUID projectId) {
 		final var eventGroups = dslContext.selectFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
@@ -39,6 +44,8 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "eventGroup", key = "#projectId + '-' + #eventGroupId")
 	public EventGroupDTO getEventGroup(final UUID projectId, final UUID eventGroupId) {
 		final var record = dslContext.selectFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
@@ -53,6 +60,8 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "eventGroups", "eventGroup", "eventGroupsByScopeModel" }, allEntries = true)
 	public EventGroupDTO createEventGroup(final UUID projectId, final EventGroupDTO eventGroup) {
 		final var eventGroupId = eventGroup.getEventGroupId() != null
 			? eventGroup.getEventGroupId()
@@ -72,6 +81,8 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "eventGroups", "eventGroup", "eventGroupsByScopeModel" }, allEntries = true)
 	public EventGroupDTO updateEventGroup(final UUID projectId, final UUID eventGroupId, final EventGroupDTO eventGroup) {
 		dslContext.update(EVENT_GROUP)
 			.set(EVENT_GROUP.CODE, eventGroup.getId())
@@ -87,6 +98,8 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "eventGroups", "eventGroup", "eventGroupsByScopeModel" }, allEntries = true)
 	public void deleteEventGroup(final UUID projectId, final UUID eventGroupId) {
 		dslContext.deleteFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
@@ -95,6 +108,8 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "eventGroupsByScopeModel", key = "#projectId + '-' + #scopeModelId")
 	public List<EventGroupDTO> getEventGroupsByScopeModel(final UUID projectId, final UUID scopeModelId) {
 		final var eventGroups = dslContext.selectFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
@@ -112,9 +127,12 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 		dto.setEventGroupId(record.getEventGroupId());
 		dto.setId(record.getCode());
 		dto.setScopeModelId(record.getScopeModelId());
-		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
+		}));
 
 		return dto;
 	}

@@ -1,0 +1,29 @@
+@import "../../dialog-shared.css";
+
+.no-validation-message {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	padding: 2rem;
+	background-color: #f3f4f6;
+	border-radius: 0.5rem;
+	color: #6b7280;
+}
+
+.no-validation-message mat-icon {
+	font-size: 2rem;
+	width: 2rem;
+	height: 2rem;
+	color: #9ca3af;
+}
+
+.no-validation-message p {
+	margin: 0;
+	font-size: 0.875rem;
+}
+
+.empty-message {
+	color: #9ca3af;
+	font-style: italic;
+	font-size: 0.875rem;
+}

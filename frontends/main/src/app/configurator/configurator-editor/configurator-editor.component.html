@@ -95,11 +95,16 @@
 					[selectedNode]="selectedNode"
 					[eventModels]="eventModels"
 					[eventGroups]="eventGroups"
+					[fieldModels]="fieldModels"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
+					[selectedDatasetModelId]="selectedDatasetModelId"
+					[selectedFieldModelId]="selectedFieldModelId"
 					(nodeSelected)="onNodeSelected($event)"
 					(eventModelSelected)="onEventModelSelectedFromTree($event)"
-					(eventGroupSelected)="onEventGroupSelectedFromTree($event)">
+					(eventGroupSelected)="onEventGroupSelectedFromTree($event)"
+					(datasetModelSelected)="onDatasetModelSelectedFromTree($event)"
+					(fieldModelSelected)="onFieldModelSelectedFromTree($event)">
 				</app-configurator-tree>
 			</div>
 
@@ -111,7 +116,8 @@
 					(fieldsUpdated)="onFieldsUpdated($event)"
 					(scopeModelsChanged)="onScopeModelsChanged($event)"
 					(datasetModelsChanged)="onDatasetModelsChanged($event)"
-					(scopeModelContextChanged)="onScopeModelContextChanged($event)">
+					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
+					(datasetModelContextChanged)="onDatasetModelContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

@@ -1,0 +1,221 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Validation Settings</h2>
+
+	<div class="dialog-content">
+		@if (!hasValidation()) {
+			<div class="no-validation-message">
+				<mat-icon>info</mat-icon>
+				<p>This field type does not have validation settings.</p>
+			</div>
+		} @else {
+			<form [formGroup]="form" class="settings-form">
+				@if (showStringValidation()) {
+					<div class="form-section">
+						<h3>Validation</h3>
+
+						<div class="form-field">
+							<label>Max. Length</label>
+							<input type="number" formControlName="maxLength" placeholder="255">
+							<span class="hint">Maximum number of characters</span>
+						</div>
+
+						<div class="form-field">
+							<label>Matcher (Regex)</label>
+							<input type="text" formControlName="matcher" placeholder="^[A-Z0-9]+$">
+							<span class="hint">Regular expression for validation</span>
+						</div>
+
+						<div class="form-section">
+							<h4>Matcher Message</h4>
+							<mat-tab-group>
+								@for (lang of availableLanguages; track lang.languageCode) {
+									@if (lang.languageCode) {
+										<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+											<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+												<div class="form-field">
+													<label>Error Message</label>
+													<textarea
+														formControlName="matcherMessage"
+														placeholder="Please enter a valid value"
+														rows="2"></textarea>
+													<span class="hint">Message shown when validation fails</span>
+												</div>
+											</div>
+										</mat-tab>
+									}
+								}
+							</mat-tab-group>
+						</div>
+					</div>
+				}
+
+				@if (showTextAreaValidation()) {
+					<div class="form-section">
+						<h3>Validation</h3>
+
+						<div class="form-field">
+							<label>Max. Length</label>
+							<input type="number" formControlName="maxLength" placeholder="1000">
+							<span class="hint">For a file, max. length is the maximum length for the name of the file</span>
+						</div>
+					</div>
+				}
+
+				@if (showDateValidation()) {
+					<div class="form-section">
+						<h3>Date Configuration</h3>
+
+						<div class="checkbox-grid">
+							<mat-checkbox formControlName="withYears">Collect years</mat-checkbox>
+							<mat-checkbox formControlName="withDays">Collect days</mat-checkbox>
+							<mat-checkbox formControlName="withMonths">Collect months</mat-checkbox>
+							<mat-checkbox formControlName="withHours">Collect hours</mat-checkbox>
+							<mat-checkbox formControlName="withMinutes">Collect minutes</mat-checkbox>
+							<mat-checkbox formControlName="withSeconds">Collect seconds</mat-checkbox>
+						</div>
+					</div>
+
+					<div class="form-section">
+						<h3>Validation</h3>
+
+						<div class="form-row">
+							<div class="form-field">
+								<label>Min. Year</label>
+								<input type="number" formControlName="minYear" placeholder="1900">
+							</div>
+
+							<div class="form-field">
+								<label>Max. Year</label>
+								<input type="number" formControlName="maxYear" placeholder="2100">
+							</div>
+						</div>
+
+						<mat-checkbox formControlName="allowDateInFuture">Allow date in future</mat-checkbox>
+					</div>
+				}
+
+				@if (showDateSelectValidation()) {
+					<div class="form-section">
+						<h3>Date Configuration</h3>
+
+						<div class="checkbox-grid">
+							<mat-checkbox formControlName="withYears">Collect years</mat-checkbox>
+							<mat-checkbox formControlName="withDays">Collect days</mat-checkbox>
+							<mat-checkbox formControlName="withMonths">Collect months</mat-checkbox>
+							<mat-checkbox formControlName="withHours">Collect hours</mat-checkbox>
+							<mat-checkbox formControlName="withMinutes">Collect minutes</mat-checkbox>
+							<mat-checkbox formControlName="withSeconds">Collect seconds</mat-checkbox>
+						</div>
+					</div>
+
+					<div class="form-section">
+						<h3>Date Select Configuration</h3>
+
+						<div class="checkbox-grid">
+							<mat-checkbox formControlName="yearsMandatory">Year is mandatory</mat-checkbox>
+							<mat-checkbox formControlName="monthsMandatory">Month is mandatory</mat-checkbox>
+							<mat-checkbox formControlName="daysMandatory">Day is mandatory</mat-checkbox>
+							<mat-checkbox formControlName="hoursMandatory">Hour is mandatory</mat-checkbox>
+							<mat-checkbox formControlName="minutesMandatory">Minute is mandatory</mat-checkbox>
+							<mat-checkbox formControlName="secondsMandatory">Second is mandatory</mat-checkbox>
+						</div>
+					</div>
+
+					<div class="form-section">
+						<h3>Validation</h3>
+
+						<div class="form-row">
+							<div class="form-field">
+								<label>Min. Year</label>
+								<input type="number" formControlName="minYear" placeholder="1900">
+							</div>
+
+							<div class="form-field">
+								<label>Max. Year</label>
+								<input type="number" formControlName="maxYear" placeholder="2100">
+							</div>
+						</div>
+
+						<mat-checkbox formControlName="allowDateInFuture">Allow date in future</mat-checkbox>
+					</div>
+				}
+
+				@if (showNumberValidation()) {
+					<div class="form-section">
+						<h3>Number Configuration</h3>
+
+						<div class="form-row">
+							<div class="form-field">
+								<label>Max. Number of Integer Digits</label>
+								<input type="number" formControlName="maxIntegerDigits" placeholder="10">
+							</div>
+
+							<div class="form-field">
+								<label>Max. Number of Decimal Digits</label>
+								<input type="number" formControlName="maxDecimalDigits" placeholder="2">
+							</div>
+						</div>
+					</div>
+
+					<div class="form-section">
+						<h3>Validation</h3>
+
+						<div class="form-row">
+							<div class="form-field">
+								<label>Min. Value</label>
+								<input type="number" formControlName="minValue" placeholder="0">
+							</div>
+
+							<div class="form-field">
+								<label>Max. Value</label>
+								<input type="number" formControlName="maxValue" placeholder="999999">
+							</div>
+						</div>
+
+						<div class="form-field">
+							<label>Matcher (Regex)</label>
+							<input type="text" formControlName="matcher" placeholder="^[0-9]+$">
+							<span class="hint">Regular expression for validation</span>
+							@if (form.get('matcher')?.hasError('invalidRegex') && form.get('matcher')?.touched) {
+								<span class="error-message">Invalid regular expression syntax</span>
+							}
+						</div>
+
+						<div class="form-section">
+							<h4>Matcher Message</h4>
+							<mat-tab-group>
+								@for (lang of availableLanguages; track lang.languageCode) {
+									@if (lang.languageCode) {
+										<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+											<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+												<div class="form-field">
+													<label>Error Message</label>
+													<textarea
+														formControlName="matcherMessage"
+														placeholder="Please enter a valid number"
+														rows="2"></textarea>
+													<span class="hint">Message shown when validation fails</span>
+												</div>
+											</div>
+										</mat-tab>
+									}
+								}
+							</mat-tab-group>
+						</div>
+					</div>
+				}
+			</form>
+		}
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		@if (hasValidation()) {
+			<button class="btn-primary" (click)="onSave()">
+				Save Changes
+			</button>
+		}
+	</div>
+</div>

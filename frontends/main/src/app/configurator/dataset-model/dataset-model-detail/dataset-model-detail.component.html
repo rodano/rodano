@@ -4,6 +4,12 @@
 		<span class="detail-code">{{ datasetModel.id }}</span>
 	</div>
 	<div class="header-actions">
+		<button class="btn-view-secondary btn-view-field-models" (click)="onSwitchToFieldModels()"
+										matTooltip="View Field Models">
+			<mat-icon>text_ad</mat-icon>
+			<span>Field Models</span>
+		</button>
+
 		<button class="btn-close" (click)="onClose()">
 			<mat-icon>close</mat-icon>
 		</button>

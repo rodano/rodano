@@ -1,0 +1,45 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Help Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-section">
+				<h3>Help</h3>
+
+				<div class="form-field">
+					<label>Inline Help</label>
+					<input type="text" formControlName="inlineHelp" placeholder="Brief help text shown inline">
+					<span class="hint">Short help text displayed next to the field</span>
+				</div>
+
+				<div class="form-field">
+					<label>Advanced Help</label>
+					<mat-tab-group>
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content">
+										<textarea
+											[formControlName]="'advancedHelp_' + lang.languageCode"
+											[placeholder]="'Advanced help in ' + getLanguageName(lang.languageCode)"
+											rows="5"></textarea>
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
+					<span class="hint">Detailed help text shown in help popup or extended documentation</span>
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			Save Changes
+		</button>
+	</div>
+</div>

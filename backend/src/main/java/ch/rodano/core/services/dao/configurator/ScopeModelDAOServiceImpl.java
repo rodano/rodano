@@ -8,7 +8,10 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
@@ -42,6 +45,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "scopeModels", key = "#projectId")
 	public List<ScopeModelDTO> getScopeModels(final UUID projectId) {
 		final var scopeModels = dslContext.selectFrom(SCOPE_MODEL)
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
@@ -54,6 +59,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "scopeModel", key = "#projectId + '-' + #scopeModelId")
 	public ScopeModelDTO getScopeModel(final UUID projectId, final UUID scopeModelId) {
 		final var record = dslContext.selectFrom(SCOPE_MODEL)
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
@@ -68,6 +75,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "scopeModels", "scopeModel" }, allEntries = true)
 	public ScopeModelDTO createScopeModel(final UUID projectId, final ScopeModelDTO scopeModel) {
 		final var scopeModelId = scopeModel.getScopeModelId() != null
 			? scopeModel.getScopeModelId()
@@ -98,6 +107,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "scopeModels", "scopeModel" }, allEntries = true)
 	public ScopeModelDTO updateScopeModel(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO scopeModel) {
 		dslContext.update(SCOPE_MODEL)
 			.set(SCOPE_MODEL.CODE, scopeModel.getId())
@@ -126,6 +137,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 	}
 
 	@Override
+	@Transactional
+	@CacheEvict(value = { "scopeModels", "scopeModel" }, allEntries = true)
 	public void deleteScopeModel(final UUID projectId, final UUID scopeModelId) {
 		deleteRelationships(projectId, scopeModelId);
 
@@ -327,9 +340,12 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var dto = new EventModelDTO();
 		dto.setEventModelId(record.getEventModelId());
 		dto.setId(record.getCode());
-		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {}));
-		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {}));
+		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {
+		}));
+		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
+		}));
 		dto.setEventGroupId(record.getEventGroupId());
 		dto.setScopeModelId(record.getScopeModelId());
 		dto.setInceptive(record.getInceptive());

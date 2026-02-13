@@ -1,18 +1,18 @@
 {
-	"id": "TEST_FARIS",
+	"id": "TEST_REAL",
 	"shortname": {
-		"en": "Test Faris"
+		"en": "Test"
 	},
 	"longname": {
-		"en": "Test study created by Faris for Rodano"
+		"en": "Test study for Rodano"
 	},
 	"description": {
-		"en": "Test study created by Faris used to show the features of Rodano"
+		"en": "Test study used to show the features of Rodano"
 	},
 	"url": "https://test.rodano.ch",
 	"email": "info@rodano.ch",
-	"color": "#FF5555",
-	"introductionText": "<h1>Rodano Test Study created by Faris</h1><p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et.</p>",
+	"color": "#5bd4d4",
+	"introductionText": "<h3>Rodano Test Study</h3><p>This study is not a real study, all data are dummy records. The purpose of this website is to illustrate the features of a typical study built with Rodano.</p>",
 	"smtpTLS": false,
 	"passwordStrong": true,
 	"passwordLength": 8,
@@ -26,8 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 120,
-	"configDate": 1763985376091,
-	"configUser": "NA",
+	"configDate": 1769185782419,
 	"configChangelogs": [],
 	"languageIds": [
 		"en",
@@ -8780,7 +8779,7 @@
 				{
 					"id": "RELAPSES_SINCE_LV",
 					"shortname": {
-						"en": "Has the patient experienced relapses since the last visit?"
+						"en": "Has the patient experienced relapses since the last visit ?"
 					},
 					"longname": {},
 					"description": {},
@@ -9262,40 +9261,6 @@
 					"yearsMandatory": false,
 					"monthsMandatory": false,
 					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "GRADUATED",
-					"shortname": {
-						"en": "Has the patient graduated?"
-					},
-					"longname": {},
-					"description": {},
-					"type": "CHECKBOX",
-					"dataType": "BOOLEAN",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": true,
-					"monthsMandatory": true,
-					"daysMandatory": true,
 					"hoursMandatory": true,
 					"minutesMandatory": true,
 					"secondsMandatory": true,
@@ -11455,25 +11420,33 @@
 					"plugin": false,
 					"possibleValues": [
 						{
-							"id": "PHONE",
+							"id": "CLINICAL_FINDINGS",
 							"shortname": {
-								"en": "Phone"
+								"en": "Clinical findings"
 							},
 							"specify": false,
 							"className": "PossibleValue"
 						},
 						{
-							"id": "PAPER",
+							"id": "MRI",
 							"shortname": {
-								"en": "Paper"
+								"en": "MRI"
 							},
 							"specify": false,
 							"className": "PossibleValue"
 						},
 						{
-							"id": "MOBILE",
+							"id": "CSF",
 							"shortname": {
-								"en": "Mobile"
+								"en": "CSF"
+							},
+							"specify": false,
+							"className": "PossibleValue"
+						},
+						{
+							"id": "VEP",
+							"shortname": {
+								"en": "VEP"
 							},
 							"specify": false,
 							"className": "PossibleValue"
@@ -15318,122 +15291,9 @@
 						{
 							"cells": [
 								{
-									"id": "VISIT_DOCUMENTATION_GRADUATED",
-									"datasetModelId": "VISIT_DOCUMENTATION",
-									"fieldModelId": "GRADUATED",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"constraint": {
-										"conditions": {
-											"SCOPE": {
-												"mode": "OR",
-												"conditions": [
-													{
-														"id": "11",
-														"criterion": {
-															"property": "DATASET",
-															"values": [],
-															"className": "RuleConditionCriterion"
-														},
-														"inverse": false,
-														"dependency": false,
-														"breakType": "NONE",
-														"mode": "OR",
-														"conditions": [
-															{
-																"id": "111",
-																"criterion": {
-																	"property": "ID",
-																	"operator": "EQUALS",
-																	"values": [
-																		"PATIENT_DOCUMENTATION"
-																	],
-																	"className": "RuleConditionCriterion"
-																},
-																"inverse": false,
-																"dependency": false,
-																"breakType": "NONE",
-																"mode": "OR",
-																"conditions": [
-																	{
-																		"id": "1111",
-																		"criterion": {
-																			"property": "FIELD",
-																			"values": [],
-																			"className": "RuleConditionCriterion"
-																		},
-																		"inverse": false,
-																		"dependency": false,
-																		"breakType": "NONE",
-																		"mode": "OR",
-																		"conditions": [
-																			{
-																				"id": "11111",
-																				"criterion": {
-																					"property": "ID",
-																					"operator": "EQUALS",
-																					"values": [
-																						"EMPLOYMENT"
-																					],
-																					"className": "RuleConditionCriterion"
-																				},
-																				"inverse": false,
-																				"dependency": false,
-																				"breakType": "NONE",
-																				"mode": "OR",
-																				"conditions": [
-																					{
-																						"id": "111111",
-																						"criterion": {
-																							"property": "VALUE",
-																							"operator": "EQUALS",
-																							"values": [
-																								"STUDENT"
-																							],
-																							"className": "RuleConditionCriterion"
-																						},
-																						"inverse": false,
-																						"dependency": false,
-																						"breakType": "NONE",
-																						"mode": "OR",
-																						"conditions": [],
-																						"className": "RuleCondition"
-																					}
-																				],
-																				"className": "RuleCondition"
-																			}
-																		],
-																		"className": "RuleCondition"
-																	}
-																],
-																"className": "RuleCondition"
-															}
-														],
-														"className": "RuleCondition"
-													}
-												],
-												"className": "RuleConditionList"
-											}
-										},
-										"evaluations": [],
-										"className": "RuleConstraint"
-									},
-									"cssCodeForLabel": "width: 365px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
 									"id": "HEADING",
 									"textBefore": {
-										"en": "<h3>Patient withdrawal</h3>"
+										"en": "Patient withdrawal"
 									},
 									"textAfter": {},
 									"visibilityCriteria": [],
@@ -15589,23 +15449,6 @@
 						}
 					],
 					"lines": [
-						{
-							"cells": [
-								{
-									"id": "BMI_LAYOUT_TITLE",
-									"textBefore": {
-										"en": "<h3>BMI</h3>"
-									},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
 						{
 							"cells": [
 								{
@@ -16485,7 +16328,7 @@
 						{
 							"cells": [
 								{
-									"id": "CHILD_CHILD_CERTIFICATE",
+									"id": "CHILD_CHILD_CERTIFICA_0",
 									"datasetModelId": "CHILD",
 									"fieldModelId": "CHILD_CERTIFICATE",
 									"textBefore": {},

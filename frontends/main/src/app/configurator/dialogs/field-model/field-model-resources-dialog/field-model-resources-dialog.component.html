@@ -1,0 +1,97 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Validators & Workflows</h2>
+
+	<div class="dialog-content">
+		<div class="form-section">
+			<h3>Validators</h3>
+			<p class="hint">Select which validators should be applied to this field</p>
+
+			<div class="dual-list-container">
+				<div class="list-box">
+					<div class="box-label">Available</div>
+					<div class="list-items">
+						@if (availableValidators.length === 0) {
+							<div class="empty-placeholder">No available validators</div>
+						}
+						@for (validator of availableValidators; track validator.id) {
+							<div class="list-item" (click)="onAddValidator(validator)">
+								<div class="item-text">
+									<span>{{ validator.name || validator.id }}</span>
+								</div>
+								<mat-icon class="action-icon">add_circle_outline</mat-icon>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="list-box selected">
+					<div class="box-label">Selected</div>
+					<div class="list-items">
+						@if (selectedValidators.length === 0) {
+							<div class="empty-placeholder">No validators selected</div>
+						}
+						@for (validator of selectedValidators; track validator.id) {
+							<div class="list-item" (click)="onRemoveValidator(validator)">
+								<div class="item-text">
+									<span>{{ validator.name || validator.id }}</span>
+								</div>
+								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-section">
+			<h3>Workflows</h3>
+			<p class="hint">Select which workflows should be associated with this field</p>
+
+			<div class="dual-list-container">
+				<div class="list-box">
+					<div class="box-label">Available</div>
+					<div class="list-items">
+						@if (availableWorkflows.length === 0) {
+							<div class="empty-placeholder">No available workflows</div>
+						}
+						@for (workflow of availableWorkflows; track workflow.id) {
+							<div class="list-item" (click)="onAddWorkflow(workflow)">
+								<div class="item-text">
+									<span>{{ workflow.name || workflow.id }}</span>
+								</div>
+								<mat-icon class="action-icon">add_circle_outline</mat-icon>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="list-box selected">
+					<div class="box-label">Selected</div>
+					<div class="list-items">
+						@if (selectedWorkflows.length === 0) {
+							<div class="empty-placeholder">No workflows selected</div>
+						}
+						@for (workflow of selectedWorkflows; track workflow.id) {
+							<div class="list-item" (click)="onRemoveWorkflow(workflow)">
+								<div class="item-text">
+									<span>{{ workflow.name || workflow.id }}</span>
+								</div>
+								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>
