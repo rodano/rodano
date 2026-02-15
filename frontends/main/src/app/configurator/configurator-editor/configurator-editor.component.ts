@@ -9,7 +9,7 @@ import {ConfiguratorService} from '../services/api/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {ProjectConfigVersion} from '@core/model/project-config-version';
 import {ConfiguratorDetailComponent} from '../configurator-detail/configurator-detail.component';
-import {ConfiguratorTreeComponent} from '../configurator-tree/configurator-tree.component';
+import {ConfiguratorTreeComponent} from '../tree/configurator-tree/configurator-tree.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
@@ -174,33 +174,46 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-		if(scopeModelsComponent && nodeId?.startsWith('scope-model-')) {
-			const scopeModelId = nodeId.replace('scope-model-', '');
-			const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
+		if(nodeId === 'scope-models') {
+			this.selectedScopeModelId = null;
+			this.selectedEventModelId = null;
+			this.selectedEventGroupId = null;
+			this.selectedDatasetModelId = null;
+			this.selectedFieldModelId = null;
+			this.eventModels = [];
+			this.eventGroups = [];
+			this.fieldModels = [];
 
-			if(scopeModel && scopeModelsComponent.selectedScopeModel?.scopeModelId !== scopeModelId) {
-				scopeModelsComponent.onSelectScopeModel(scopeModel);
+			const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+			if(scopeModelsComponent) {
+				scopeModelsComponent.clearSelection();
 			}
-			else if(scopeModel) {
-				scopeModelsComponent.viewMode = 'scope-detail';
-				scopeModelsComponent.selectedEventModelId = null;
-				scopeModelsComponent.selectedEventGroupId = null;
+			const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+			if(datasetModelsComponent) {
+				datasetModelsComponent.clearSelection();
 			}
+			return;
 		}
 
-		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-		if(datasetModelsComponent && nodeId?.startsWith('dataset-model-')) {
-			const datasetModelId = nodeId.replace('dataset-model-', '');
-			const datasetModel = datasetModelsComponent.datasetModels.find(dm => dm.datasetModelId === datasetModelId);
+		if(nodeId === 'dataset-models') {
+			this.selectedScopeModelId = null;
+			this.selectedEventModelId = null;
+			this.selectedEventGroupId = null;
+			this.selectedDatasetModelId = null;
+			this.selectedFieldModelId = null;
+			this.eventModels = [];
+			this.eventGroups = [];
+			this.fieldModels = [];
 
-			if(datasetModel && datasetModelsComponent.selectedDatasetModel?.datasetModelId !== datasetModelId) {
-				datasetModelsComponent.onSelectDatasetModel(datasetModel);
+			const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
+			if(datasetModelsComponent) {
+				datasetModelsComponent.clearSelection();
 			}
-			else if(datasetModel) {
-				datasetModelsComponent.viewMode = 'dataset-detail';
-				datasetModelsComponent.selectedFieldModelId = null;
+			const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
+			if(scopeModelsComponent) {
+				scopeModelsComponent.clearSelection();
 			}
+			return;
 		}
 	}
 
@@ -625,91 +638,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.treeComponent.reloadDatasetModels();
 			}
 		});
-	}
-
-	onEventModelSelectedFromTree(eventModelId: string): void {
-		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-		if(!scopeModelsComponent) {
-			return;
-		}
-
-		const eventModel = scopeModelsComponent.eventModels.find(em => em.eventModelId === eventModelId);
-		if(!eventModel) {
-			return;
-		}
-
-		const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === eventModel.scopeModelId);
-		if(scopeModel && scopeModelsComponent.selectedScopeModel?.scopeModelId !== scopeModel.scopeModelId) {
-			scopeModelsComponent.onSelectScopeModel(scopeModel);
-			setTimeout(() => {
-				scopeModelsComponent.onSelectEventModel(eventModelId);
-			}, 100);
-		}
-		else {
-			scopeModelsComponent.onSelectEventModel(eventModelId);
-		}
-	}
-
-	onEventGroupSelectedFromTree(eventGroupId: string): void {
-		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-		if(!scopeModelsComponent) {
-			return;
-		}
-
-		const eventGroup = scopeModelsComponent.eventGroups.find(eg => eg.eventGroupId === eventGroupId);
-		if(!eventGroup) {
-			return;
-		}
-
-		const scopeModel = scopeModelsComponent.scopeModels.find(sm => sm.scopeModelId === eventGroup.scopeModelId);
-		if(scopeModel && scopeModelsComponent.selectedScopeModel?.scopeModelId !== scopeModel.scopeModelId) {
-			scopeModelsComponent.onSelectScopeModel(scopeModel);
-			setTimeout(() => {
-				scopeModelsComponent.onSelectEventGroup(eventGroupId);
-			}, 100);
-		}
-		else {
-			scopeModelsComponent.onSelectEventGroup(eventGroupId);
-		}
-	}
-
-	onDatasetModelSelectedFromTree(datasetModelId: string): void {
-		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-		if(!datasetModelsComponent) {
-			return;
-		}
-
-		const datasetModel = datasetModelsComponent.datasetModels.find(dm => dm.datasetModelId === datasetModelId);
-		if(!datasetModel) {
-			return;
-		}
-
-		if(datasetModelsComponent.selectedDatasetModel?.datasetModelId !== datasetModel.datasetModelId) {
-			datasetModelsComponent.onSelectDatasetModel(datasetModel);
-		}
-	}
-
-	onFieldModelSelectedFromTree(fieldModelId: string): void {
-		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-		if(!datasetModelsComponent) {
-			return;
-		}
-
-		const fieldModel = datasetModelsComponent.fieldModels.find(fm => fm.fieldModelId === fieldModelId);
-		if(!fieldModel) {
-			return;
-		}
-
-		const datasetModel = datasetModelsComponent.datasetModels.find(dm => dm.datasetModelId === fieldModel.datasetModelId);
-		if(datasetModel && datasetModelsComponent.selectedDatasetModel?.datasetModelId !== datasetModel.datasetModelId) {
-			datasetModelsComponent.onSelectDatasetModel(datasetModel);
-			setTimeout(() => {
-				datasetModelsComponent.onSelectFieldModel(fieldModelId);
-			}, 100);
-		}
-		else {
-			datasetModelsComponent.onSelectFieldModel(fieldModelId);
-		}
 	}
 
 	onScopeModelContextChanged(context: {

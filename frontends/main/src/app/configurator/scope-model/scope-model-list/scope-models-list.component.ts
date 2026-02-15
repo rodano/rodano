@@ -204,7 +204,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.emitContext();
 	}
 
-	private clearSelection(): void {
+	clearSelection(): void {
 		this.selectedScopeModel = null;
 		this.selectedEventModelId = null;
 		this.selectedEventGroupId = null;

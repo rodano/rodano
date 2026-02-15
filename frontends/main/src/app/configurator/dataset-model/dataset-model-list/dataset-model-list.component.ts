@@ -182,7 +182,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		this.emitContext();
 	}
 
-	private clearSelection(): void {
+	clearSelection(): void {
 		this.selectedDatasetModel = null;
 		this.selectedFieldModelId = null;
 		this.viewMode = 'dataset-detail';

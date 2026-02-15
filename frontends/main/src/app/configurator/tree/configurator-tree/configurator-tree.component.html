@@ -1,0 +1,76 @@
+<div class="tree-content">
+
+	<app-project-settings-tree
+		[selected]="selectedNode === 'project-settings'"
+		(categoryClicked)="onCategoryClick('project-settings')">
+	</app-project-settings-tree>
+
+	<app-scope-models-tree
+		[projectId]="projectId"
+		[expanded]="expandedCategory === 'scope-models'"
+		[eventModels]="eventModels"
+		[eventGroups]="eventGroups"
+		[selectedScopeModelId]="selectedScopeModelId"
+		[selectedEventModelId]="selectedEventModelId"
+		[selectedEventGroupId]="selectedEventGroupId"
+		(categoryClicked)="onScopeModelsClicked()">
+	</app-scope-models-tree>
+
+	<app-dataset-models-tree
+		[projectId]="projectId"
+		[expanded]="expandedCategory === 'dataset-models'"
+		[fieldModels]="fieldModels"
+		[selectedDatasetModelId]="selectedDatasetModelId"
+		[selectedFieldModelId]="selectedFieldModelId"
+		(categoryClicked)="onDatasetModelsClicked()">
+	</app-dataset-models-tree>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('validators')">
+			<mat-icon class="node-icon">rule</mat-icon>
+			<span class="node-label">Validators</span>
+		</div>
+	</div>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('form-models')">
+			<mat-icon class="node-icon">description</mat-icon>
+			<span class="node-label">Form Models</span>
+		</div>
+	</div>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('workflows')">
+			<mat-icon class="node-icon">settings</mat-icon>
+			<span class="node-label">Workflows</span>
+		</div>
+	</div>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('profiles')">
+			<mat-icon class="node-icon">badge</mat-icon>
+			<span class="node-label">Profiles</span>
+		</div>
+	</div>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('features')">
+			<mat-icon class="node-icon">star</mat-icon>
+			<span class="node-label">Features</span>
+		</div>
+	</div>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('languages')">
+			<mat-icon class="node-icon">language</mat-icon>
+			<span class="node-label">Languages</span>
+		</div>
+	</div>
+
+	<div class="tree-node">
+		<div class="node-content clickable" (click)="onCategoryClick('menus')">
+			<mat-icon class="node-icon">menu</mat-icon>
+			<span class="node-label">Menus</span>
+		</div>
+	</div>
+</div>

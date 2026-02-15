@@ -221,7 +221,7 @@
 					[allDatasetModels]="datasetModels"
 					(datasetModelUpdated)="onDatasetModelUpdated($event)"
 					(datasetModelDeleted)="onDatasetModelDeleted($event)"
-					(closed)="backToDatasetDetail()"
+					(closed)="onSelectDatasetModel(selectedDatasetModel)"
 					(switchToFieldModels)="switchToFieldModelView()">
 				</app-dataset-model-detail>
 			</div>

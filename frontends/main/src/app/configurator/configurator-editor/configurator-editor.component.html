@@ -91,20 +91,16 @@
 			<div class="editor-sidebar">
 				<app-configurator-tree
 					[projectId]="projectId"
-					[project]="project"
 					[selectedNode]="selectedNode"
 					[eventModels]="eventModels"
 					[eventGroups]="eventGroups"
 					[fieldModels]="fieldModels"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
+					[selectedEventGroupId]="selectedEventGroupId"
 					[selectedDatasetModelId]="selectedDatasetModelId"
 					[selectedFieldModelId]="selectedFieldModelId"
-					(nodeSelected)="onNodeSelected($event)"
-					(eventModelSelected)="onEventModelSelectedFromTree($event)"
-					(eventGroupSelected)="onEventGroupSelectedFromTree($event)"
-					(datasetModelSelected)="onDatasetModelSelectedFromTree($event)"
-					(fieldModelSelected)="onFieldModelSelectedFromTree($event)">
+					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
 			</div>
 

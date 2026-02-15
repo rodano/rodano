@@ -43,9 +43,17 @@
 }
 
 .node-content.selected {
-	background-color: #e0f2f1;
+	background-color: rgba(25, 118, 210, 0.12);
 	border-left: 3px solid #5bd4d4;
 	font-weight: 700;
+}
+
+.node-content.clickable {
+	cursor: pointer;
+}
+
+.node-content.clickable:hover {
+	background-color: rgba(0, 0, 0, 0.04);
 }
 
 .node-content .node-icon {
@@ -78,12 +86,12 @@
 	background-color: #cbd5e1;
 }
 
-.child-node {
+.node {
 	display: flex;
 	align-items: center;
 	padding: 0.5rem 0.75rem;
 	border-radius: 0.375rem;
-	cursor: pointer;
+	cursor: default;
 	transition: all 0.15s;
 	user-select: none;
 	position: relative;
@@ -91,7 +99,7 @@
 	margin-bottom: 0.125rem;
 }
 
-.child-node::before {
+.node::before {
 	content: '';
 	position: absolute;
 	left: -1.375rem;
@@ -101,7 +109,7 @@
 	background-color: #cbd5e1;
 }
 
-.child-node:last-child::after {
+.node:last-child::after {
 	content: '';
 	position: absolute;
 	left: -1.375rem;
@@ -110,17 +118,13 @@
 	width: 1px;
 }
 
-.child-node:hover {
-	background-color: #f9fafb;
-}
-
-.child-node.selected {
+.node.selected {
 	background-color: #e0f2f1;
 	color: #0d9488;
 	font-weight: 500;
 }
 
-.child-node .node-icon {
+.node .node-icon {
 	font-size: 0.875rem !important;
 	width: 0.875rem !important;
 	height: 0.875rem !important;
@@ -128,16 +132,16 @@
 	color: #9ca3af !important;
 }
 
-.child-node.selected .node-icon {
+.node.selected .node-icon {
 	color: #5bd4d4 !important;
 }
 
-.child-node .node-label {
+.node .node-label {
 	font-size: 0.875rem;
 	color: #374151;
 }
 
-.child-node.selected .node-label {
+.node.selected .node-label {
 	color: #0d9488;
 	font-weight: 500;
 }
@@ -174,20 +178,29 @@
 	font-style: italic;
 }
 
-.child-node.event-model-node.selected {
+.node.primary-node.selected {
 	background-color: #f5f3ff;
 	color: #7c3aed;
 }
 
-.child-node.event-model-node .node-icon {
+.node.primary-node .node-icon {
 	color: #8b5cf6 !important;
 }
 
-.child-node.event-group-node.selected {
+.node.secondary-node.selected {
 	background-color: #ecfdf5;
 	color: #059669;
 }
 
-.child-node.event-group-node .node-icon {
+.node.secondary-node .node-icon {
 	color: #10b981 !important;
+}
+
+.node.tertiary-node.selected {
+	background-color: #eff6ff;
+	color: #1d4ed8;
+}
+
+.node.tertiary-node .node-icon {
+	color: #3b82f6 !important;
 }
