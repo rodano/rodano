@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ScopeModel} from '@core/model/scope-model';
-import {Observable} from 'rxjs';
+import {catchError, forkJoin, Observable, of} from 'rxjs';
 import {
 	ScopeModelBasicInfoDialogComponent
 } from '../../dialogs/scope-model/scope-model-basic-info-dialog/scope-model-basic-info-dialog.component';
@@ -17,13 +17,18 @@ import {
 import {
 	ScopeModelResourcesDialogComponent, WorkflowStateSelection
 } from '../../dialogs/scope-model/scope-model-resources-dialog/scope-model-resources-dialog.component';
+import {switchMap, map} from 'rxjs/operators';
+import {DatasetModelManagerService} from '../manager/dataset-model-manager.service';
+import {LanguageService} from '../language.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ScopeModelDialogService {
 	constructor(
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private datasetModelManager: DatasetModelManagerService,
+		private languageService: LanguageService
 	) {}
 
 	openCreateDialog(
@@ -101,22 +106,49 @@ export class ScopeModelDialogService {
 	}
 
 	openResourcesDialog(
+		projectId: string,
 		scopeModel: ScopeModel,
 		workflowStateSelections: WorkflowStateSelection[]
 	): Observable<any> {
-		const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
-			width: '500px',
-			maxHeight: '90vh',
-			disableClose: true,
-			data: {
-				scopeModel,
-				availableForms: [],
-				availableDatasets: [],
-				availableWorkflows: [],
-				workflowStateSelections
-			}
-		});
+		return this.loadResourcesForDialog(projectId).pipe(
+			switchMap(resources => {
+				const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
+					width: '500px',
+					disableClose: true,
+					data: {
+						scopeModel,
+						availableForms: resources.forms,
+						availableDatasets: resources.datasets,
+						availableWorkflows: resources.workflows,
+						workflowStateSelections
+					}
+				});
 
-		return dialogRef.afterClosed();
+				return dialogRef.afterClosed();
+			})
+		);
+	}
+
+	private loadResourcesForDialog(projectId: string): Observable<{
+		datasets: {id: string; name: string}[];
+		forms: {id: string; name: string}[];
+		workflows: {id: string; name: string; states: {id: string; name: string}[]}[];
+	}> {
+		return forkJoin({
+			datasets: this.datasetModelManager.load(projectId).pipe(
+				map(datasetModels => datasetModels.map(dm => ({
+					id: dm.datasetModelId,
+					name: this.languageService.getDefaultTranslation(dm.shortname) || dm.id
+				}))),
+				catchError(error => {
+					console.error('Error loading dataset models:', error);
+					return of([]);
+				})
+			),
+			//TODO: Add form models when ready
+			forms: of([]),
+			//TODO: Add workflows when ready
+			workflows: of([])
+		});
 	}
 }

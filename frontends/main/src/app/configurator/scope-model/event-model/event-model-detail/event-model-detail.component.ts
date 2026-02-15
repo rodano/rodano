@@ -13,6 +13,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {EventGroup} from '@core/model/event-group';
 import {EventModelDialogService} from '../../../services/dialogs/event-model-dialog.service';
+import {DatasetModelManagerService} from '../../../services/manager/dataset-model-manager.service';
 
 @Component({
 	selector: 'app-event-model-detail',
@@ -45,6 +46,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	constructor(
 		private languageService: LanguageService,
 		private eventModelDialogService: EventModelDialogService,
+		private datasetModelManager: DatasetModelManagerService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -54,6 +56,10 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			this.selectedLanguage = language;
 		});
 		this.loadEventModel();
+
+		this.datasetModelManager.load(this.projectId).subscribe({
+			error: error => console.error('Error loading dataset models:', error)
+		});
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
@@ -212,6 +218,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		}
 
 		this.eventModelDialogService.openResourcesDialog(
+			this.projectId,
 			this.draftEventModel
 		).subscribe(result => {
 			if(result && this.draftEventModel) {
@@ -266,5 +273,25 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 				this.eventModelDeleted.emit(this.draftEventModel.eventModelId);
 			}
 		});
+	}
+
+	getDatasetModelLabel(datasetModelId: string): string {
+		const datasetModel = this.datasetModelManager.getById(datasetModelId);
+		if(!datasetModel) {
+			return datasetModelId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(datasetModel.shortname) || datasetModel.id;
+		return `${name} (${datasetModel.id})`;
+	}
+
+	getFormModelLabel(formModelId: string): string {
+		//TODO: Implement when form models are ready
+		return formModelId;
+	}
+
+	getWorkflowLabel(workflowId: string): string {
+		//TODO: Implement when workflows are ready
+		return workflowId;
 	}
 }

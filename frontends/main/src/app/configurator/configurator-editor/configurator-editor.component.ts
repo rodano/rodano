@@ -16,7 +16,6 @@ import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmatio
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
 import {SnapshotManagerService} from '../services/manager/snapshot-manager.service';
-import {DraftSaveService} from '../services/draft-save.service';
 import {forkJoin} from 'rxjs';
 import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrator.service';
 
@@ -50,6 +49,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	modifiedFields = new Set<string>();
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
+	validatorModificationCount = 0;
 
 	eventModels: any[] = [];
 	eventGroups: any[] = [];
@@ -61,6 +61,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedDatasetModelId: string | null = null;
 	selectedFieldModelId: string | null = null;
 
+	selectedValidatorId: string | null = null;
+
 	canRollback = false;
 	canRollForward = false;
 
@@ -69,7 +71,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private router: Router,
 		private configuratorService: ConfiguratorService,
 		private snapshotManager: SnapshotManagerService,
-		private draftSaveService: DraftSaveService,
 		private entitySaveOrchestratorService: EntitySaveOrchestratorService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
@@ -158,18 +159,20 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
 			this.selectedDatasetModelId = null;
 			this.selectedFieldModelId = null;
+			this.selectedValidatorId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
+			this.detailComponent?.validatorsListComponent?.clearSelection();
 		}
 	}
 
@@ -179,6 +182,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onDatasetModelsChanged(event: {modificationCount: number}): void {
 		this.datasetModelModificationCount = event.modificationCount;
+	}
+
+	onValidatorsChanged(event: {modificationCount: number}): void {
+		this.validatorModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -229,11 +236,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveDatasetModelsAndFields());
 				}
 
+				if(this.validatorModificationCount > 0) {
+					saveObservables.push(this.saveValidators());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
 							this.scopeModelModificationCount = 0;
 							this.datasetModelModificationCount = 0;
+							this.validatorModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -300,6 +312,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveValidators(): Promise<void> {
+		const component = this.detailComponent?.validatorsListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveValidators(this.projectId, {
+			validatorManager: component.validatorManager,
+			validators: component.validators,
+			originalValidators: component.originalValidators,
+			modifiedValidatorIds: component.modifiedValidatorIds
+		}).toPromise().then(() => {
+			component.loadValidators();
+			this.treeComponent?.reloadValidators();
+		});
+	}
+
 	onDiscardChanges(): void {
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
@@ -349,8 +378,20 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					datasetComponent.loadDatasetModels();
 				}
 
+				const validatorComponent = this.detailComponent?.validatorsListComponent;
+				if(validatorComponent) {
+					this.entitySaveOrchestratorService.resetValidatorsToOriginals({
+						validatorManager: validatorComponent.validatorManager,
+						validators: validatorComponent.validators,
+						originalValidators: validatorComponent.originalValidators,
+						modifiedValidatorIds: validatorComponent.modifiedValidatorIds
+					});
+					validatorComponent.loadValidators();
+				}
+
 				this.scopeModelModificationCount = 0;
 				this.datasetModelModificationCount = 0;
+				this.validatorModificationCount = 0;
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
 			}
 		});
@@ -418,11 +459,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	get hasModifications(): boolean {
-		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0 || this.datasetModelModificationCount > 0;
+		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0 || this.datasetModelModificationCount > 0 || this.validatorModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
-		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount;
+		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount + this.validatorModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -437,5 +478,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.fieldModels = context.fieldModels;
 		this.selectedDatasetModelId = context.selectedDatasetModelId;
 		this.selectedFieldModelId = context.selectedFieldModelId;
+	}
+
+	onValidatorContextChanged(context: any): void {
+		this.selectedValidatorId = context.selectedValidatorId;
 	}
 }

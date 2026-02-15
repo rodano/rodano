@@ -1,0 +1,142 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">{{ isEditMode ? 'Edit Basic Information' : 'Create Validator' }}</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Code *</label>
+				<input
+					type="text"
+					formControlName="id"
+					placeholder="VALIDATOR_CODE"
+					(input)="onIdInput($event)"
+					style="text-transform: uppercase;">
+				<span class="hint">Uppercase letters, numbers, and underscores only</span>
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+					<span class="error-message">Code is required</span>
+				}
+				@if (form.get('id')?.hasError('pattern') && form.get('id')?.touched) {
+					<span class="error-message">Invalid format. Use uppercase letters, numbers, and underscores.</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="required">Required</mat-checkbox>
+				<span class="hint">If checked, this validator is required</span>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="script">Script</mat-checkbox>
+				<span class="hint">If checked, this validator is a script</span>
+			</div>
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				@if (availableLanguages.length === 1) {
+					<div class="language-fields">
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<div [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+										<input
+											type="text"
+											formControlName="shortname"
+											placeholder="File is a PDF">
+										<span class="hint">Brief display name</span>
+										@if (languageForms.get(lang.languageCode)?.get('shortname')?.hasError('required') && languageForms.get(lang.languageCode)?.get('shortname')?.touched) {
+											<span class="error-message">Short name is required</span>
+										}
+									</div>
+
+									<div class="form-field">
+										<label>Long Name</label>
+										<input
+											type="text"
+											formControlName="longname">
+										<span class="hint">Full descriptive name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Description</label>
+										<textarea
+											formControlName="description"
+											rows="3"></textarea>
+										<span class="hint">Optional description</span>
+									</div>
+
+									<div class="form-field">
+										<label>Invalid Message</label>
+										<textarea
+											formControlName="message"
+											placeholder="File must be a PDF."
+											rows="3"></textarea>
+										<span class="hint">Description when the validation is invalid</span>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				} @else {
+					<mat-tab-group>
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+										<div class="form-field">
+											<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+											<input
+												type="text"
+												formControlName="shortname"
+												placeholder="File is a PDF">
+											<span class="hint">Brief display name</span>
+											@if (languageForms.get(lang.languageCode)?.get('shortname')?.hasError('required') && languageForms.get(lang.languageCode)?.get('shortname')?.touched) {
+												<span class="error-message">Short name is required</span>
+											}
+										</div>
+
+										<div class="form-field">
+											<label>Long Name</label>
+											<input
+												type="text"
+												formControlName="longname">
+											<span class="hint">Full descriptive name</span>
+										</div>
+
+										<div class="form-field">
+											<label>Description</label>
+											<textarea
+												formControlName="description"
+												placeholder="Brief description"
+												rows="3"></textarea>
+											<span class="hint">Optional description</span>
+										</div>
+
+										<div class="form-field">
+											<label>Invalid Message</label>
+											<textarea
+												formControlName="message"
+												placeholder="File must be a PDF."
+												rows="3"></textarea>
+											<span class="hint">Description when the validation is invalid</span>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
+				}
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+			{{ isEditMode ? 'Save Changes' : 'Create Validator' }}
+		</button>
+	</div>
+</div>

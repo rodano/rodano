@@ -15,6 +15,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
+import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -53,6 +54,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		public scopeModelManager: ScopeModelManagerService,
 		private languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
+		private datasetModelManager: DatasetModelManagerService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -60,6 +62,10 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	ngOnInit(): void {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
+		});
+
+		this.datasetModelManager.load(this.projectId).subscribe({
+			error: error => console.error('Error loading dataset models:', error)
 		});
 	}
 
@@ -128,6 +134,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		const workflowStateSelections = this.workflowStateSelectionsMap.get(this.scopeModel.scopeModelId) || [];
 
 		this.scopeModelDialogService.openResourcesDialog(
+			this.projectId,
 			currentDraft || this.scopeModel,
 			workflowStateSelections
 		).subscribe(result => {
@@ -249,5 +256,25 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		});
 
 		return result;
+	}
+
+	getDatasetModelLabel(datasetModelId: string): string {
+		const datasetModel = this.datasetModelManager.getById(datasetModelId);
+		if(!datasetModel) {
+			return datasetModelId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(datasetModel.shortname) || datasetModel.id;
+		return `${name} (${datasetModel.id})`;
+	}
+
+	getFormModelLabel(formModelId: string): string {
+		//TODO: Implement when form models are ready
+		return formModelId;
+	}
+
+	getWorkflowLabel(workflowId: string): string {
+		//TODO: Implement when workflows are ready
+		return workflowId;
 	}
 }

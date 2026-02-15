@@ -1,0 +1,119 @@
+<h2 class="dialog-title">Edit Workflow Configuration</h2>
+
+<div class="dialog-content">
+	<div class="form-section">
+		<div class="form-field">
+			<label>Workflow</label>
+			<mat-select
+				[value]="selectedWorkflowId"
+				(selectionChange)="onWorkflowSelected($event.value)"
+				placeholder="Select a workflow">
+				<mat-option [value]="''">None</mat-option>
+				@for (workflow of data.availableWorkflows; track workflow.id) {
+					<mat-option [value]="workflow.id">
+						{{ workflow.name || workflow.id }}
+					</mat-option>
+				}
+			</mat-select>
+			<span class="hint">Select a workflow for validation (optional)</span>
+			@if (selectedWorkflowId) {
+				<button type="button" class="btn-clear-validator" (click)="clearConfiguration()">
+					<mat-icon>clear</mat-icon>
+					Clear Configuration
+				</button>
+			}
+		</div>
+
+		@if (selectedWorkflowId) {
+			<div class="form-field">
+				<label>Invalid States</label>
+				<p class="hint">States that indicate invalid/failed validation</p>
+				<div class="dual-list-container">
+					<div class="list-box">
+						<div class="box-label">Available</div>
+						<div class="list-items">
+							@if (availableInvalidStates.length === 0) {
+								<div class="empty-placeholder">No available states</div>
+							}
+							@for (state of availableInvalidStates; track state.id) {
+								<div class="list-item" (click)="onAddInvalidState(state)">
+									<div class="item-text">
+										<span>{{ state.name }}</span>
+									</div>
+									<mat-icon class="action-icon">add_circle_outline</mat-icon>
+								</div>
+							}
+						</div>
+					</div>
+
+					<div class="list-box selected">
+						<div class="box-label">Selected</div>
+						<div class="list-items">
+							@if (selectedInvalidStates.length === 0) {
+								<div class="empty-placeholder">No states selected</div>
+							}
+							@for (state of selectedInvalidStates; track state.id) {
+								<div class="list-item" (click)="onRemoveInvalidState(state)">
+									<div class="item-text">
+										<span>{{ state.name }}</span>
+									</div>
+									<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-field">
+				<label>Valid States</label>
+				<p class="hint">States that indicate valid/passed validation</p>
+				<div class="dual-list-container">
+					<div class="list-box">
+						<div class="box-label">Available</div>
+						<div class="list-items">
+							@if (availableValidStates.length === 0) {
+								<div class="empty-placeholder">No available states</div>
+							}
+							@for (state of availableValidStates; track state.id) {
+								<div class="list-item" (click)="onAddValidState(state)">
+									<div class="item-text">
+										<span>{{ state.name }}</span>
+									</div>
+									<mat-icon class="action-icon">add_circle_outline</mat-icon>
+								</div>
+							}
+						</div>
+					</div>
+
+					<div class="list-box selected">
+						<div class="box-label">Selected</div>
+						<div class="list-items">
+							@if (selectedValidStates.length === 0) {
+								<div class="empty-placeholder">No states selected</div>
+							}
+							@for (state of selectedValidStates; track state.id) {
+								<div class="list-item" (click)="onRemoveValidState(state)">
+									<div class="item-text">
+										<span>{{ state.name }}</span>
+									</div>
+									<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+								</div>
+							}
+						</div>
+					</div>
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">
+		Cancel
+	</button>
+	<button class="btn-primary" (click)="onSave()">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

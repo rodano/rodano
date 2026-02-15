@@ -48,8 +48,8 @@ public class DatasetModelServiceImpl implements DatasetModelService {
 
 	@Override
 	public DatasetModelDTO updateDatasetModel(final UUID projectId, final UUID datasetModelId, final DatasetModelDTO datasetModel) {
-		final var exisiting = datasetModelDAOService.getDatasetModel(projectId, datasetModelId);
-		if(exisiting == null) {
+		final var existing = datasetModelDAOService.getDatasetModel(projectId, datasetModelId);
+		if(existing == null) {
 			throw new NotFoundException("Dataset model not found: " + datasetModelId);
 		}
 

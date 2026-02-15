@@ -79,7 +79,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		this.loadProject();
+		//this.loadProject();
 		this.loadScopeModels();
 
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {

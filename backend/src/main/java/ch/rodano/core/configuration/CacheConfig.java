@@ -36,7 +36,10 @@ public class CacheConfig {
 
 			"fieldModels",
 			"fieldModel",
-			"fieldModelsByDatasetModel"
+			"fieldModelsByDatasetModel",
+
+			"validators",
+			"validator"
 		);
 	}
 }

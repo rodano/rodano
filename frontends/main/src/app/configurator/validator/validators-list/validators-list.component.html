@@ -1,0 +1,111 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Validators</h1>
+			<p class="detail-subtitle">Configure validators for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<div class="empty-state">
+			<mat-icon>hourglass_empty</mat-icon>
+			<p>Loading validators...</p>
+		</div>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card" (click)="onCreateValidator()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Validator</h3>
+						<p>Add a new validator</p>
+					</div>
+				</div>
+
+				@for (validator of validators; track validator.validatorId) {
+					<div class="primary-card"
+										[class.selected]="isSelected(validator)"
+										[class.modified]="modifiedValidatorIds.has(validator.validatorId)"
+										[style.border-top-color]="modifiedValidatorIds.has(validator.validatorId) ? '#f59e0b' : ''"
+										(click)="onSelectValidator(validator)">
+
+						@if (isSelected(validator)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ getTranslatedName(validator.shortname) }}</h3>
+								<p class="card-code">{{ validator.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (validator.required) {
+									<span class="status-badge required" matTooltip="Required">
+										<mat-icon class="badge-full">asterisk</mat-icon>
+										<mat-icon class="badge-short">asterisk</mat-icon>
+									</span>
+								}
+								@if (validator.script) {
+									<span class="status-badge script" matTooltip="Script">
+										<mat-icon class="badge-full">code</mat-icon>
+										<mat-icon class="badge-short">code</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>settings</mat-icon>
+									<span>Workflow: {{ getWorkflowDisplayName(validator.validatorId) }}</span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>cancel</mat-icon>
+									<span>Invalid: {{ getInvalidStatesDisplay(validator.validatorId) }}</span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>check_circle</mat-icon>
+									<span>Valid: {{ getValidStatesDisplay(validator.validatorId) }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (modifiedValidatorIds.has(validator.validatorId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (validators.length === 0) {
+				<div class="empty-state">
+					<mat-icon>rule</mat-icon>
+					<h3>No Validators</h3>
+					<p>Create your first validator to start collecting data</p>
+				</div>
+			}
+		</div>
+
+		@if (selectedValidator && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-validator-detail
+					[validator]="selectedValidator"
+					[projectId]="projectId"
+					[project]="project"
+					[allValidators]="validators"
+					(validatorUpdated)="onValidatorUpdated($event)"
+					(validatorDeleted)="onValidatorDeleted($event)"
+					(closed)="onSelectValidator(selectedValidator)">
+				</app-validator-detail>
+			</div>
+		}
+	}
+</div>

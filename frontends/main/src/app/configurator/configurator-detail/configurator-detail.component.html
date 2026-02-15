@@ -40,6 +40,16 @@
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)">
 				</app-dataset-model-list>
 			}
+			@case ('validators') {
+				<app-validators-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onValidatorSelected($event)"
+					(validatorsChanged)="onValidatorsChanged($event)"
+					(validatorContextChanged)="onValidatorContextChanged($event)">
+				</app-validators-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

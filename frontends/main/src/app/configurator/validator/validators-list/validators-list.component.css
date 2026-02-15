@@ -1,0 +1,12 @@
+@import '../../shared/list-shared.css';
+
+/* ==================== Dataset Model Specific Badges ==================== */
+.status-badge.required {
+	background-color: #dcfce7;
+	color: #166534;
+}
+
+.status-badge.script {
+	background-color: #dbeafe;
+	color: #1e40af;
+}

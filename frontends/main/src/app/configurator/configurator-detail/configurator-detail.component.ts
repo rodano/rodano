@@ -5,6 +5,7 @@ import {MatIcon} from '@angular/material/icon';
 import {ProjectSettingsDetailComponent} from '../project-settings/project-settings-detail/project-settings-detail.component';
 import {ScopeModelsListComponent} from '../scope-model/scope-model-list/scope-models-list.component';
 import {DatasetModelListComponent} from '../dataset-model/dataset-model-list/dataset-model-list.component';
+import {ValidatorsListComponent} from '../validator/validators-list/validators-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -16,12 +17,14 @@ import {DatasetModelListComponent} from '../dataset-model/dataset-model-list/dat
 		MatIcon,
 		ProjectSettingsDetailComponent,
 		ScopeModelsListComponent,
-		DatasetModelListComponent
+		DatasetModelListComponent,
+		ValidatorsListComponent
 	]
 })
 export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(ScopeModelsListComponent) scopeModelsListComponent?: ScopeModelsListComponent;
 	@ViewChild(DatasetModelListComponent) datasetModelsListComponent?: DatasetModelListComponent;
+	@ViewChild(ValidatorsListComponent) validatorsListComponent?: ValidatorsListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -47,10 +50,16 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFieldModelId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'overview' | null = null;
+	@Output() validatorsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() validatorContextChanged = new EventEmitter<{
+		selectedValidatorId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
+	validatorModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -77,6 +86,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	onDatasetModelsChanged(event: {modificationCount: number}): void {
 		this.datasetModelModificationCount = event.modificationCount;
 		this.datasetModelsChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
+	onValidatorSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onValidatorsChanged(event: {modificationCount: number}): void {
+		this.validatorModificationCount = event.modificationCount;
+		this.validatorsChanged.emit(event);
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
@@ -111,6 +131,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
+		if(this.selectedNode === 'validators') {
+			this.selectedNodeType = 'validators';
+			return;
+		}
+
 		this.selectedNodeType = 'overview';
 	}
 
@@ -130,5 +155,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFieldModelId: string | null;
 	}): void {
 		this.datasetModelContextChanged.emit(context);
+	}
+
+	onValidatorContextChanged(context: {
+		selectedValidatorId: string | null;
+	}): void {
+		this.validatorContextChanged.emit(context);
 	}
 }

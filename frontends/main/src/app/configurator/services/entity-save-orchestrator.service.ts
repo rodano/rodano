@@ -4,6 +4,7 @@ import {forkJoin, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {ScopeModelContext} from './contexts/scope-model-context';
 import {DatasetModelContext} from './contexts/dataset-model-context';
+import {ValidatorContext} from './contexts/validator-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -57,6 +58,21 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveValidators(projectId: string, context: ValidatorContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveValidators(
+				projectId,
+				context.modifiedValidatorIds,
+				context.validators,
+				context.originalValidators
+			)
+		]).pipe(
+			map(() => {
+				context.validatorManager.syncOriginalsWithCurrent();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -66,5 +82,9 @@ export class EntitySaveOrchestratorService {
 	resetDatasetModelsToOriginals(context: DatasetModelContext): void {
 		context.datasetModelManager.resetToOriginals();
 		context.fieldModelManager.resetToOriginals();
+	}
+
+	resetValidatorsToOriginals(context: ValidatorContext): void {
+		context.validatorManager.resetToOriginals();
 	}
 }

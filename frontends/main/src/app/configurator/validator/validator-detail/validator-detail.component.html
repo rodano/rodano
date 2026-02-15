@@ -1,0 +1,187 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ getTranslatedName(validator.shortname) }}</h2>
+		<span class="detail-code">{{ validator.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('id')">
+				<label>
+					Code
+					@if (isFieldModified('id')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">{{ validator.id }}</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
+				<label>
+					Short Name
+					@if (isFieldModified('shortname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.shortname)">
+					@if (!getTranslatedValue(validator.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getTranslatedValue(validator.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('longname')">
+				<label>
+					Long Name
+					@if (isFieldModified('longname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.longname)">
+					@if (!getTranslatedValue(validator.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getTranslatedValue(validator.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+				<label>
+					Description
+					@if (isFieldModified('description')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.description)">
+					@if (!getTranslatedValue(validator.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getTranslatedValue(validator.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item full-width" [class.modified]="isFieldModified('message')">
+				<label>
+					Invalid Message
+					@if (isFieldModified('message')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.message)">
+					@if (!getTranslatedValue(validator.message)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getTranslatedValue(validator.message) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('required')">
+				<label>
+					Required
+					@if (isFieldModified('required')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">
+					@if (validator.required) {
+						<span class="status-badge required">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('script')">
+				<label>
+					Script
+					@if (isFieldModified('script')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">
+					@if (validator.script) {
+						<span class="status-badge script">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</div>
+			</div>
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Workflow Configuration</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('workflowId')">
+				<label>
+					Workflow
+					@if (isFieldModified('workflowId')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getWorkflowConfiguration()?.workflowId">
+					@if (!getWorkflowConfiguration()?.workflowId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getWorkflowConfiguration()?.workflowId || 'Not configured' }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('invalidWorkflowStateIds')">
+				<label>
+					Invalid States
+					@if (isFieldModified('invalidWorkflowStateIds')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getInvalidStatesDisplay()">
+					@if (!getInvalidStatesDisplay()) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getInvalidStatesDisplay() || 'Not configured' }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('validWorkflowStateIds')">
+				<label>
+					Valid States
+					@if (isFieldModified('validWorkflowStateIds')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getValidStatesDisplay()">
+					@if (!getValidStatesDisplay()) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getValidStatesDisplay() || 'Not configured' }}
+				</div>
+			</div>
+		</div>
+		<button class="btn-edit" (click)="onEditWorkflow()">
+			<mat-icon>edit</mat-icon>
+			Edit Workflow Configuration
+		</button>
+	</div>
+
+	<div class="settings-section danger-section">
+		<h3>Delete Validator</h3>
+		<p class="danger-text">Deleting this validator is permanent and cannot be undone.</p>
+		<button class="btn-delete" (click)="onDelete()">
+			<mat-icon>delete</mat-icon>
+			Delete
+		</button>
+	</div>
+</div>

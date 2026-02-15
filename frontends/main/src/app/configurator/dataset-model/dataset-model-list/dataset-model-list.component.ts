@@ -69,7 +69,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		this.loadProject();
+		//this.loadProject();
 		this.loadDatasetModels();
 
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
@@ -163,6 +163,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 					) || null;
 				}
 				this.loading = false;
+				this.emitContext();
 			},
 			error: error => {
 				console.error('Error loading dataset models:', error);

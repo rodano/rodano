@@ -25,12 +25,12 @@
 		(categoryClicked)="onDatasetModelsClicked()">
 	</app-dataset-models-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('validators')">
-			<mat-icon class="node-icon">rule</mat-icon>
-			<span class="node-label">Validators</span>
-		</div>
-	</div>
+	<app-validator-tree
+		[projectId]="projectId"
+		[expanded]="expandedCategory === 'validators'"
+		[selectedValidatorId]="selectedValidatorId"
+		(categoryClicked)="onValidatorsClicked()">
+	</app-validator-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('form-models')">

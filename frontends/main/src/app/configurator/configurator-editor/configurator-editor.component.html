@@ -100,6 +100,7 @@
 					[selectedEventGroupId]="selectedEventGroupId"
 					[selectedDatasetModelId]="selectedDatasetModelId"
 					[selectedFieldModelId]="selectedFieldModelId"
+					[selectedValidatorId]="selectedValidatorId"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
 			</div>
@@ -112,8 +113,10 @@
 					(fieldsUpdated)="onFieldsUpdated($event)"
 					(scopeModelsChanged)="onScopeModelsChanged($event)"
 					(datasetModelsChanged)="onDatasetModelsChanged($event)"
+					(validatorsChanged)="onValidatorsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
-					(datasetModelContextChanged)="onDatasetModelContextChanged($event)">
+					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
+					(validatorContextChanged)="onValidatorContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

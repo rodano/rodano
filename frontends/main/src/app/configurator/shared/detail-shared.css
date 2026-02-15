@@ -206,24 +206,6 @@
 	color: #374151;
 }
 
-.chip.deadline-ref-chip {
-	background-color: #fef3c7;
-	color: #92400e;
-	border: 1px solid #fcd34d;
-}
-
-.chip.blocked-chip {
-	background-color: #fee2e2;
-	color: #991b1b;
-	border: 1px solid #fca5a5;
-}
-
-.chip.implied-chip {
-	background-color: #dbeafe;
-	color: #1e40af;
-	border: 1px solid #93c5fd;
-}
-
 .resource-icon {
 	font-size: 1rem !important;
 	width: 1rem !important;

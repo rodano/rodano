@@ -1,13 +1,14 @@
 package ch.rodano.core.services.dao.configurator;
 
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
+import org.jooq.Record2;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
@@ -18,11 +19,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import ch.rodano.api.config.EventGroupDTO;
 import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.config.ScopeModelDTO;
-import ch.rodano.configuration.model.event.DateAggregationFunction;
 import ch.rodano.core.model.jooq.tables.records.EventModelRecord;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelRecord;
 
 import static ch.rodano.core.model.jooq.tables.EventModel.EVENT_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventModelDatasetModel.EVENT_MODEL_DATASET_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventModelFormModel.EVENT_MODEL_FORM_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventModelWorkflow.EVENT_MODEL_WORKFLOW;
 import static ch.rodano.core.model.jooq.tables.ScopeModel.SCOPE_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.SCOPE_MODEL_DATASET_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
@@ -325,10 +328,34 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var eventModelRecords = dslContext.selectFrom(EVENT_MODEL)
 			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
 			.and(EVENT_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
+			.orderBy(EVENT_MODEL.CODE)
 			.fetch();
 
+		if(eventModelRecords.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		final var eventModelIds = eventModelRecords.stream()
+			.map(EventModelRecord::getEventModelId)
+			.collect(Collectors.toList());
+
+		final var datasetsByEvent = loadAllEventModelDatasets(projectId, eventModelIds);
+		final var formsByEvent = loadAllEventModelForms(projectId, eventModelIds);
+		final var workflowsByEvent = loadAllEventModelWorkflows(projectId, eventModelIds);
+
 		return eventModelRecords.stream()
-			.map(this::mapEventModelToDTO)
+			.map(record -> {
+				final var dto = new EventModelDTO();
+				dto.setEventModelId(record.getEventModelId());
+				dto.setId(record.getCode());
+				dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
+				}));
+				dto.setDatasetModelIds(datasetsByEvent.getOrDefault(record.getEventModelId(), new ArrayList<>()));
+				dto.setFormModelIds(formsByEvent.getOrDefault(record.getEventModelId(), new ArrayList<>()));
+				dto.setWorkflowIds(workflowsByEvent.getOrDefault(record.getEventModelId(), new ArrayList<>()));
+
+				return dto;
+			})
 			.collect(Collectors.toList());
 	}
 
@@ -336,34 +363,42 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		return eventGroupDAOService.getEventGroupsByScopeModel(projectId, scopeModelId);
 	}
 
-	private EventModelDTO mapEventModelToDTO(final EventModelRecord record) {
-		final var dto = new EventModelDTO();
-		dto.setEventModelId(record.getEventModelId());
-		dto.setId(record.getCode());
-		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
-		}));
-		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {
-		}));
-		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
-		}));
-		dto.setEventGroupId(record.getEventGroupId());
-		dto.setScopeModelId(record.getScopeModelId());
-		dto.setInceptive(record.getInceptive());
-		dto.setNumber(record.getNumber());
-		dto.setMandatory(record.getMandatory());
-		dto.setMaxOccurrence(record.getMaxOccurrence());
-		dto.setPreventAdd(record.getPreventAdd());
-		dto.setDeadline(record.getDeadlineValue());
-		dto.setDeadlineUnit(record.getDeadlineUnit() != null ? ChronoUnit.valueOf(record.getDeadlineUnit()) : null);
-		dto.setDeadlineAggregationFunction(record.getDeadlineAggrFnct() != null ? DateAggregationFunction.valueOf(record.getDeadlineAggrFnct()) : null);
-		dto.setInterval(record.getIntervalValue());
-		dto.setIntervalUnit(record.getIntervalUnit() != null ? ChronoUnit.valueOf(record.getIntervalUnit()) : null);
-		dto.setLabelPattern(record.getLabelPattern());
-		dto.setIcon(record.getIcon());
+	private Map<UUID, List<UUID>> loadAllEventModelDatasets(final UUID projectId, final List<UUID> eventModelIds) {
+		return dslContext.select(EVENT_MODEL_DATASET_MODEL.EVENT_MODEL_ID, EVENT_MODEL_DATASET_MODEL.DATASET_MODEL_ID)
+			.from(EVENT_MODEL_DATASET_MODEL)
+			.where(EVENT_MODEL_DATASET_MODEL.PROJECT_ID.eq(projectId))
+			.and(EVENT_MODEL_DATASET_MODEL.EVENT_MODEL_ID.in(eventModelIds))
+			.fetch()
+			.stream()
+			.collect(Collectors.groupingBy(
+				Record2::value1,
+				Collectors.mapping(Record2::value2, Collectors.toList())
+			));
+	}
 
-		dto.setDatasetModelIds(new ArrayList<>());
-		dto.setFormModelIds(new ArrayList<>());
-		dto.setWorkflowIds(new ArrayList<>());
-		return dto;
+	private Map<UUID, List<UUID>> loadAllEventModelForms(final UUID projectId, final List<UUID> eventModelIds) {
+		return dslContext.select(EVENT_MODEL_FORM_MODEL.EVENT_MODEL_ID, EVENT_MODEL_FORM_MODEL.FORM_MODEL_ID)
+			.from(EVENT_MODEL_FORM_MODEL)
+			.where(EVENT_MODEL_FORM_MODEL.PROJECT_ID.eq(projectId))
+			.and(EVENT_MODEL_FORM_MODEL.EVENT_MODEL_ID.in(eventModelIds))
+			.fetch()
+			.stream()
+			.collect(Collectors.groupingBy(
+				Record2::value1,
+				Collectors.mapping(Record2::value2, Collectors.toList())
+			));
+	}
+
+	private Map<UUID, List<UUID>> loadAllEventModelWorkflows(final UUID projectId, final List<UUID> eventModelIds) {
+		return dslContext.select(EVENT_MODEL_WORKFLOW.EVENT_MODEL_ID, EVENT_MODEL_WORKFLOW.WORKFLOW_ID)
+			.from(EVENT_MODEL_WORKFLOW)
+			.where(EVENT_MODEL_WORKFLOW.PROJECT_ID.eq(projectId))
+			.and(EVENT_MODEL_WORKFLOW.EVENT_MODEL_ID.in(eventModelIds))
+			.fetch()
+			.stream()
+			.collect(Collectors.groupingBy(
+				Record2::value1,
+				Collectors.mapping(Record2::value2, Collectors.toList())
+			));
 	}
 }

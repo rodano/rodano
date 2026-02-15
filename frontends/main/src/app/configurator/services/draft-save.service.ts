@@ -10,6 +10,8 @@ import {EventModel} from '@core/model/event-model';
 import {EventGroup} from '@core/model/event-group';
 import {DatasetModel} from '@core/model/dataset-model';
 import {FieldModel} from '@core/model/field-model';
+import {Validator} from '@core/model/validator';
+import {ValidatorService} from './api/validator.service';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -18,7 +20,8 @@ export class DraftSaveService {
 		private eventModelService: EventModelService,
 		private eventGroupService: EventGroupService,
 		private datasetModelService: DatasetModelService,
-		private fieldModelService: FieldModelService
+		private fieldModelService: FieldModelService,
+		private validatorService: ValidatorService
 	) {}
 
 	saveScopeModels(
@@ -140,6 +143,41 @@ export class DraftSaveService {
 			const fieldModel = fieldModels.find(fm => fm.fieldModelId === id);
 			if(fieldModel) {
 				saveObservables.push(this.fieldModelService.updateFieldModel(projectId, id, fieldModel));
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveValidators(
+		projectId: string,
+		modifiedIds: Set<string>,
+		validators: Validator[],
+		originalValidators: Validator[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalValidators.find(v => v.validatorId === originalId);
+				if(original) {
+					saveObservables.push(this.validatorService.deleteValidator(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const validator = validators.find(v => v.validatorId === id);
+				if(validator) {
+					saveObservables.push(this.validatorService.createValidator(projectId, validator));
+				}
+			}
+			else {
+				const validator = validators.find(v => v.validatorId === id);
+				if(validator) {
+					saveObservables.push(this.validatorService.updateValidator(projectId, id, validator));
+				}
 			}
 		});
 

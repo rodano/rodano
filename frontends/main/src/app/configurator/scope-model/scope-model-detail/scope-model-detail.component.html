@@ -320,7 +320,7 @@
 							@for (datasetId of scopeModel.datasetModelIds; track datasetId) {
 								<div class="chip">
 									<mat-icon class="resource-icon">dataset</mat-icon>
-									<span class="language-name">{{ datasetId }}</span>
+									<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
 								</div>
 							}
 						</div>
