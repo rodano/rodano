@@ -13,20 +13,12 @@ import {ConfiguratorTreeComponent} from '../tree/configurator-tree/configurator-
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmation-dialog.component';
-import {SnapshotsListDialogComponent} from '../dialogs/base/snapshots-list-dialog/snapshots-list-dialog.component';
-import {CreateSnapshotDialogComponent} from '../dialogs/base/create-snapshot-dialog/create-snapshot-dialog.component';
-import {ScopeModelService} from '../services/api/scope-model.service';
-import {ScopeModel} from '@core/model/scope-model';
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
-import {EventModel} from '@core/model/event-model';
-import {EventModelService} from '../services/api/event-model.service';
-import {EventGroupService} from '../services/api/event-group.service';
-import {EventGroup} from '@core/model/event-group';
-import {DatasetModel} from '@core/model/dataset-model';
-import {DatasetModelService} from '../services/api/dataset-model.service';
-import {FieldModelService} from '../services/api/field-model.service';
-import {FieldModel} from '@core/model/field-model';
+import {SnapshotManagerService} from '../services/manager/snapshot-manager.service';
+import {DraftSaveService} from '../services/draft-save.service';
+import {forkJoin} from 'rxjs';
+import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrator.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -76,11 +68,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private route: ActivatedRoute,
 		private router: Router,
 		private configuratorService: ConfiguratorService,
-		private scopeModelService: ScopeModelService,
-		private eventModelService: EventModelService,
-		private eventGroupService: EventGroupService,
-		private datasetModelService: DatasetModelService,
-		private fieldModelService: FieldModelService,
+		private snapshotManager: SnapshotManagerService,
+		private draftSaveService: DraftSaveService,
+		private entitySaveOrchestratorService: EntitySaveOrchestratorService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -109,7 +99,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	initializeProject(): void {
 		this.loading = true;
-
 		localStorage.setItem('configProjectId', this.projectId);
 
 		this.configuratorService.getProject(this.projectId).subscribe({
@@ -119,8 +108,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(project?.languages?.length) {
 					this.languageService.setProjectLanguages(project.languages);
-
-					const defaultLanguage = project.languages.find(language => language.isDefault)?.languageCode || project.languages[0].languageCode || 'en';
+					const defaultLanguage = project.languages.find(l => l.isDefault)?.languageCode || project.languages[0].languageCode || 'en';
 					this.languageService.setLanguage(defaultLanguage);
 				}
 
@@ -154,14 +142,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			return;
 		}
 
-		this.configuratorService.getSnapshots(this.projectId, this.draftVersion.pk!).subscribe({
-			next: snapshots => {
-				this.canRollback = snapshots.currentIndex !== undefined && snapshots.currentIndex > 0;
-				this.canRollForward = snapshots.currentIndex !== undefined && snapshots.snapshots !== undefined && snapshots.currentIndex < snapshots.snapshots.length - 1;
-			},
-			error: () => {
-				this.canRollback = false;
-				this.canRollForward = false;
+		this.snapshotManager.getSnapshotState(this.projectId, this.draftVersion.pk!).subscribe({
+			next: state => {
+				this.canRollback = state.canRollback;
+				this.canRollForward = state.canRollForward;
 			}
 		});
 	}
@@ -174,7 +158,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -184,36 +168,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.eventGroups = [];
 			this.fieldModels = [];
 
-			const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-			if(scopeModelsComponent) {
-				scopeModelsComponent.clearSelection();
-			}
-			const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-			if(datasetModelsComponent) {
-				datasetModelsComponent.clearSelection();
-			}
-			return;
-		}
-
-		if(nodeId === 'dataset-models') {
-			this.selectedScopeModelId = null;
-			this.selectedEventModelId = null;
-			this.selectedEventGroupId = null;
-			this.selectedDatasetModelId = null;
-			this.selectedFieldModelId = null;
-			this.eventModels = [];
-			this.eventGroups = [];
-			this.fieldModels = [];
-
-			const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-			if(datasetModelsComponent) {
-				datasetModelsComponent.clearSelection();
-			}
-			const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-			if(scopeModelsComponent) {
-				scopeModelsComponent.clearSelection();
-			}
-			return;
+			this.detailComponent?.scopeModelsListComponent?.clearSelection();
+			this.detailComponent?.datasetModelsListComponent?.clearSelection();
 		}
 	}
 
@@ -263,24 +219,29 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.workingProject = {...updatedProject};
 				this.modifiedFields.clear();
 
-				const savePromises: Promise<any>[] = [];
+				const saveObservables: any[] = [];
 
 				if(this.scopeModelModificationCount > 0) {
-					savePromises.push(this.saveScopeModelsAndEventModels());
+					saveObservables.push(this.saveScopeModelsAndEvents());
 				}
 
 				if(this.datasetModelModificationCount > 0) {
-					savePromises.push(this.saveDatasetModelsAndFieldModels());
+					saveObservables.push(this.saveDatasetModelsAndFields());
 				}
 
-				if(savePromises.length > 0) {
-					Promise.all(savePromises).then(() => {
-						this.saving = false;
-						this.snackBar.open('Draft saved', 'Close', {duration: 2000});
-					}).catch((error: any) => {
-						console.error('Error saving:', error);
-						this.snackBar.open('Failed to save changes', 'Close', {duration: 3000});
-						this.saving = false;
+				if(saveObservables.length > 0) {
+					forkJoin(saveObservables).subscribe({
+						next: () => {
+							this.scopeModelModificationCount = 0;
+							this.datasetModelModificationCount = 0;
+							this.saving = false;
+							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
+						},
+						error: error => {
+							console.error('Error saving:', error);
+							this.snackBar.open('Failed to save changes', 'Close', {duration: 3000});
+							this.saving = false;
+						}
 					});
 				}
 				else {
@@ -293,6 +254,49 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.snackBar.open('Failed to save draft', 'Close', {duration: 3000});
 				this.saving = false;
 			}
+		});
+	}
+
+	private saveScopeModelsAndEvents(): Promise<void> {
+		const component = this.detailComponent?.scopeModelsListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveScopeModels(this.projectId, {
+			scopeModelManager: component.scopeModelManager,
+			eventModelManager: component.eventModelManager,
+			eventGroupManager: component.eventGroupManager,
+			scopeModels: component.scopeModels,
+			eventModels: component.eventModels,
+			eventGroups: component.eventGroups,
+			originalScopeModels: component.originalScopeModels,
+			modifiedScopeModelIds: component.modifiedScopeModelIds,
+			modifiedEventModelIds: component.modifiedEventModelIds,
+			modifiedEventGroupIds: component.modifiedEventGroupIds
+		}).toPromise().then(() => {
+			component.loadScopeModels();
+			this.treeComponent?.reloadScopeModels();
+		});
+	}
+
+	private saveDatasetModelsAndFields(): Promise<void> {
+		const component = this.detailComponent?.datasetModelsListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveDatasetModels(this.projectId, {
+			datasetModelManager: component.datasetModelManager,
+			fieldModelManager: component.fieldModelManager,
+			datasetModels: component.datasetModels,
+			fieldModels: component.fieldModels,
+			originalDatasetModels: component.originalDatasetModels,
+			modifiedDatasetModelIds: component.modifiedDatasetModelIds,
+			modifiedFieldModels: component.modifiedFieldModels
+		}).toPromise().then(() => {
+			component.loadDatasetModels();
+			this.treeComponent?.reloadDatasetModels();
 		});
 	}
 
@@ -314,19 +318,35 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.workingProject = {...this.project!};
 				this.modifiedFields.clear();
 
-				const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-				if(scopeModelsComponent) {
-					scopeModelsComponent.scopeModelManager.resetToOriginals();
-					scopeModelsComponent.eventModelManager.resetToOriginals();
-					scopeModelsComponent.eventGroupManager.resetToOriginals();
-					scopeModelsComponent.loadScopeModels();
+				const scopeComponent = this.detailComponent?.scopeModelsListComponent;
+				if(scopeComponent) {
+					this.entitySaveOrchestratorService.resetScopeModelsToOriginals({
+						scopeModelManager: scopeComponent.scopeModelManager,
+						eventModelManager: scopeComponent.eventModelManager,
+						eventGroupManager: scopeComponent.eventGroupManager,
+						scopeModels: scopeComponent.scopeModels,
+						eventModels: scopeComponent.eventModels,
+						eventGroups: scopeComponent.eventGroups,
+						originalScopeModels: scopeComponent.originalScopeModels,
+						modifiedScopeModelIds: scopeComponent.modifiedScopeModelIds,
+						modifiedEventModelIds: scopeComponent.modifiedEventModelIds,
+						modifiedEventGroupIds: scopeComponent.modifiedEventGroupIds
+					});
+					scopeComponent.loadScopeModels();
 				}
 
-				const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-				if(datasetModelsComponent) {
-					datasetModelsComponent.datasetModelManager.resetToOriginals();
-					datasetModelsComponent.fieldModelManager.resetToOriginals();
-					datasetModelsComponent.loadDatasetModels();
+				const datasetComponent = this.detailComponent?.datasetModelsListComponent;
+				if(datasetComponent) {
+					this.entitySaveOrchestratorService.resetDatasetModelsToOriginals({
+						datasetModelManager: datasetComponent.datasetModelManager,
+						fieldModelManager: datasetComponent.fieldModelManager,
+						datasetModels: datasetComponent.datasetModels,
+						fieldModels: datasetComponent.fieldModels,
+						originalDatasetModels: datasetComponent.originalDatasetModels,
+						modifiedDatasetModelIds: datasetComponent.modifiedDatasetModelIds,
+						modifiedFieldModels: datasetComponent.modifiedFieldModels
+					});
+					datasetComponent.loadDatasetModels();
 				}
 
 				this.scopeModelModificationCount = 0;
@@ -336,8 +356,50 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	onCreateSnapshot(): void {
+		if(!this.draftVersion) {
+			return;
+		}
+
+		this.snapshotManager.createSnapshot(this.projectId, this.draftVersion.pk!).subscribe({
+			next: () => this.loadSnapshotState()
+		});
+	}
+
+	onViewSnapshots(): void {
+		if(!this.draftVersion) {
+			return;
+		}
+
+		this.snapshotManager.viewSnapshots(this.projectId, this.draftVersion.pk!).subscribe({
+			next: targetIndex => {
+				if(targetIndex !== null) {
+					this.restoreSnapshot(targetIndex);
+				}
+			}
+		});
+	}
+
+	private restoreSnapshot(targetIndex: number): void {
+		if(!this.draftVersion) {
+			return;
+		}
+
+		this.snapshotManager.restoreToSnapshot(
+			this.projectId,
+			this.draftVersion.pk!,
+			targetIndex
+		).subscribe({
+			next: updatedProject => {
+				this.project = updatedProject;
+				this.workingProject = {...updatedProject};
+				this.modifiedFields.clear();
+				this.loadSnapshotState();
+			}
+		});
+	}
+
 	onPublish(): void {
-		//TODO: Open publish dialog
 		console.log('Publish clicked');
 	}
 
@@ -352,7 +414,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		}
 		const currentLanguage = this.languageService.currentLanguage;
 		const defaultLanguage = this.languageService.getDefaultLanguageCode();
-
 		return translations[currentLanguage] || translations[defaultLanguage] || Object.values(translations)[0] || '';
 	}
 
@@ -364,289 +425,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount;
 	}
 
-	onCreateSnapshot(): void {
-		const dialogRef = this.dialog.open(CreateSnapshotDialogComponent, {
-			width: '500px'
-		});
-
-		dialogRef.afterClosed().subscribe(summary => {
-			if(summary && this.draftVersion) {
-				this.configuratorService.createSnapshot(
-					this.projectId,
-					this.draftVersion.pk!,
-					summary
-				).subscribe({
-					next: () => {
-						this.snackBar.open('Snapshot created', 'Close', {duration: 2000});
-						this.loadSnapshotState();
-					},
-					error: error => {
-						console.error('Error creating snapshot:', error);
-						this.snackBar.open('Failed to create snapshot', 'Close', {duration: 3000});
-					}
-				});
-			}
-		});
-	}
-
-	onViewSnapshots(): void {
-		if(!this.draftVersion) {
-			return;
-		}
-
-		this.configuratorService.getSnapshots(this.projectId, this.draftVersion.pk!).subscribe({
-			next: snapshots => {
-				const dialogRef = this.dialog.open(SnapshotsListDialogComponent, {
-					width: '600px',
-					data: {snapshots}
-				});
-
-				dialogRef.afterClosed().subscribe(result => {
-					if(result?.action === 'restore') {
-						this.restoreSnapshot(result.index);
-					}
-				});
-			},
-			error: error => {
-				console.error('Error loading snapshots:', error);
-				this.snackBar.open('Failed to load snapshots', 'Close', {duration: 3000});
-			}
-		});
-	}
-
-	private restoreSnapshot(targetIndex: number): void {
-		if(!this.draftVersion) {
-			return;
-		}
-
-		this.configuratorService.getSnapshots(this.projectId, this.draftVersion.pk!).subscribe({
-			next: snapshots => {
-				const currentIndex = snapshots.currentIndex;
-
-				if(currentIndex === undefined) {
-					this.snackBar.open('Invalid snapshot state', 'Close', {duration: 3000});
-					return;
-				}
-
-				if(targetIndex < currentIndex) {
-					const stepsBack = currentIndex - targetIndex;
-					this.performRollback(stepsBack);
-				}
-				else if(targetIndex > currentIndex) {
-					const stepsForward = targetIndex - currentIndex;
-					this.performRollForward(stepsForward);
-				}
-			}
-		});
-	}
-
-	private performRollback(steps: number): void {
-		if(steps <= 0 || !this.draftVersion) {
-			return;
-		}
-
-		this.configuratorService.rollbackSnapshot(this.projectId, this.draftVersion.pk!).subscribe({
-			next: updatedProject => {
-				this.project = updatedProject;
-				this.workingProject = {...updatedProject};
-				this.modifiedFields.clear();
-
-				if(steps > 1) {
-					this.performRollback(steps - 1);
-				}
-				else {
-					this.snackBar.open('Restored to snapshot', 'Close', {duration: 2000});
-					this.loadSnapshotState();
-				}
-			},
-			error: error => {
-				console.error('Error rolling back:', error);
-				this.snackBar.open('Failed to restore snapshot', 'Close', {duration: 3000});
-			}
-		});
-	}
-
-	private performRollForward(steps: number): void {
-		if(steps <= 0 || !this.draftVersion) {
-			return;
-		}
-
-		this.configuratorService.rollForwardSnapshot(this.projectId, this.draftVersion.pk!).subscribe({
-			next: updatedProject => {
-				this.project = updatedProject;
-				this.workingProject = {...updatedProject};
-				this.modifiedFields.clear();
-
-				if(steps > 1) {
-					this.performRollForward(steps - 1);
-				}
-				else {
-					this.snackBar.open('Restored to snapshot', 'Close', {duration: 2000});
-					this.loadSnapshotState();
-				}
-			},
-			error: error => {
-				console.error('Error rolling forward:', error);
-				this.snackBar.open('Failed to restore snapshot', 'Close', {duration: 3000});
-			}
-		});
-	}
-
-	private saveScopeModelsAndEventModels(): Promise<any> {
-		const scopeModelsComponent = this.detailComponent?.scopeModelsListComponent;
-
-		if(!scopeModelsComponent) {
-			return Promise.resolve();
-		}
-
-		const savePromises: Promise<any>[] = [];
-
-		scopeModelsComponent.modifiedScopeModelIds.forEach((id: string) => {
-			if(id.endsWith('-deleted')) {
-				const originalId = id.replace('-deleted', '');
-				const original = scopeModelsComponent.originalScopeModels.find((sm: ScopeModel) => sm.scopeModelId === originalId);
-				if(original) {
-					savePromises.push(
-						this.scopeModelService.deleteScopeModel(this.projectId, originalId).toPromise()
-					);
-				}
-			}
-			else if(id.startsWith('temp-')) {
-				const scopeModel = scopeModelsComponent.scopeModels.find((sm: ScopeModel) => sm.scopeModelId === id);
-				if(scopeModel) {
-					savePromises.push(
-						this.scopeModelService.createScopeModel(this.projectId, scopeModel).toPromise()
-					);
-				}
-			}
-			else {
-				const scopeModel = scopeModelsComponent.scopeModels.find((sm: ScopeModel) => sm.scopeModelId === id);
-				if(scopeModel) {
-					savePromises.push(
-						this.scopeModelService.updateScopeModel(this.projectId, id, scopeModel).toPromise()
-					);
-				}
-			}
-		});
-
-		scopeModelsComponent.modifiedEventModelIds.forEach((id: string) => {
-			const eventModel = scopeModelsComponent.eventModels.find((em: EventModel) => em.eventModelId === id);
-			if(eventModel) {
-				savePromises.push(
-					this.eventModelService.updateEventModel(this.projectId, id, eventModel).toPromise()
-				);
-			}
-		});
-
-		scopeModelsComponent.modifiedEventGroupIds.forEach((id: string) => {
-			const eventGroup = scopeModelsComponent.eventGroups.find((eg: EventGroup) => eg.eventGroupId === id);
-			if(eventGroup) {
-				savePromises.push(
-					this.eventGroupService.updateEventGroup(this.projectId, id, eventGroup).toPromise()
-				);
-			}
-		});
-
-		return Promise.all(savePromises).then(() => {
-			scopeModelsComponent.scopeModelManager.syncOriginalsWithCurrent();
-			scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
-			scopeModelsComponent.eventGroupManager.syncOriginalsWithCurrent();
-
-			scopeModelsComponent.loadScopeModels();
-
-			if(scopeModelsComponent.selectedScopeModel) {
-				this.eventModelService.getEventModels(this.projectId).subscribe({
-					next: allEventModels => {
-						scopeModelsComponent.eventModelManager.setAll(allEventModels);
-						scopeModelsComponent.eventModelManager.syncOriginalsWithCurrent();
-					}
-				});
-			}
-
-			this.scopeModelModificationCount = 0;
-
-			if(this.treeComponent) {
-				this.treeComponent.reloadScopeModels();
-			}
-		});
-	}
-
-	private saveDatasetModelsAndFieldModels(): Promise<any> {
-		const datasetModelsComponent = this.detailComponent?.datasetModelsListComponent;
-
-		if(!datasetModelsComponent) {
-			return Promise.resolve();
-		}
-
-		const savePromises: Promise<any>[] = [];
-
-		datasetModelsComponent.modifiedDatasetModelIds.forEach((id: string) => {
-			if(id.endsWith('-deleted')) {
-				const originalId = id.replace('-deleted', '');
-				const original = datasetModelsComponent.originalDatasetModels.find((dm: DatasetModel) => dm.datasetModelId === originalId);
-				if(original) {
-					savePromises.push(
-						this.datasetModelService.deleteDatasetModel(this.projectId, originalId).toPromise()
-					);
-				}
-			}
-			else if(id.startsWith('temp-')) {
-				const datasetModel = datasetModelsComponent.datasetModels.find((dm: DatasetModel) => dm.datasetModelId === id);
-				if(datasetModel) {
-					savePromises.push(
-						this.datasetModelService.createDatasetModel(this.projectId, datasetModel).toPromise()
-					);
-				}
-			}
-			else {
-				const datasetModel = datasetModelsComponent.datasetModels.find((dm: DatasetModel) => dm.datasetModelId === id);
-				if(datasetModel) {
-					savePromises.push(
-						this.datasetModelService.updateDatasetModel(this.projectId, id, datasetModel).toPromise()
-					);
-				}
-			}
-		});
-
-		datasetModelsComponent.modifiedFieldModels.forEach((id: string) => {
-			const fieldModel = datasetModelsComponent.fieldModels.find((fm: FieldModel) => fm.fieldModelId === id);
-			if(fieldModel) {
-				savePromises.push(
-					this.fieldModelService.updateFieldModel(this.projectId, id, fieldModel).toPromise()
-				);
-			}
-		});
-
-		return Promise.all(savePromises).then(() => {
-			datasetModelsComponent.datasetModelManager.syncOriginalsWithCurrent();
-			datasetModelsComponent.fieldModelManager.syncOriginalsWithCurrent();
-
-			datasetModelsComponent.loadDatasetModels();
-
-			if(datasetModelsComponent.selectedDatasetModel) {
-				this.fieldModelService.getFieldModels(this.projectId).subscribe({
-					next: allFieldModels => {
-						datasetModelsComponent.fieldModelManager.setAll(allFieldModels);
-						datasetModelsComponent.fieldModelManager.syncOriginalsWithCurrent();
-					}
-				});
-			}
-
-			this.datasetModelModificationCount = 0;
-
-			if(this.treeComponent) {
-				this.treeComponent.reloadDatasetModels();
-			}
-		});
-	}
-
-	onScopeModelContextChanged(context: {
-		eventModels: any[];
-		eventGroups: any[];
-		selectedScopeModelId: string | null;
-		selectedEventModelId: string | null;
-		selectedEventGroupId: string | null;
-	}): void {
+	onScopeModelContextChanged(context: any): void {
 		this.eventModels = context.eventModels;
 		this.eventGroups = context.eventGroups;
 		this.selectedScopeModelId = context.selectedScopeModelId;
@@ -654,11 +433,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.selectedEventGroupId = context.selectedEventGroupId;
 	}
 
-	onDatasetModelContextChanged(context: {
-		fieldModels: any[];
-		selectedDatasetModelId: string | null;
-		selectedFieldModelId: string | null;
-	}): void {
+	onDatasetModelContextChanged(context: any): void {
 		this.fieldModels = context.fieldModels;
 		this.selectedDatasetModelId = context.selectedDatasetModelId;
 		this.selectedFieldModelId = context.selectedFieldModelId;
