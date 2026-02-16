@@ -7,7 +7,11 @@ import ch.rodano.api.config.FieldModelDTO;
 
 public interface FieldModelService {
 
-	List<FieldModelDTO> getFieldModels(UUID projectId);
+	List<FieldModelDTO> getFieldModels(UUID projectId, String view);
+
+	default List<FieldModelDTO> getFieldModels(final UUID projectId) {
+		return getFieldModels(projectId, "summary");
+	}
 
 	FieldModelDTO getFieldModel(UUID projectId, UUID fieldModelId);
 

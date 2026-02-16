@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {ScopeModelService} from '../../services/api/scope-model.service';
 import {LanguageService} from '../../services/language.service';
 import {TreeNode} from '../tree-node';
 
@@ -12,8 +11,9 @@ import {TreeNode} from '../tree-node';
 	templateUrl: './scope-models-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class ScopeModelsTreeComponent implements OnInit, OnChanges {
+export class ScopeModelsTreeComponent implements OnChanges {
 	@Input() projectId = '';
+	@Input() scopeModels: any[] = [];
 	@Input() expanded = false;
 	@Input() eventModels: any[] = [];
 	@Input() eventGroups: any[] = [];
@@ -22,30 +22,12 @@ export class ScopeModelsTreeComponent implements OnInit, OnChanges {
 	@Input() selectedEventGroupId: string | null = null;
 	@Output() categoryClicked = new EventEmitter<void>();
 
-	scopeModels: any[] = [];
 	treeNodes: TreeNode[] = [];
 
-	constructor(
-		private scopeModelService: ScopeModelService,
-		private languageService: LanguageService
-	) {}
-
-	ngOnInit(): void {
-		this.loadScopeModels();
-	}
+	constructor(private languageService: LanguageService) {}
 
 	ngOnChanges(): void {
 		this.buildTree();
-	}
-
-	loadScopeModels(): void {
-		this.scopeModelService.getScopeModels(this.projectId).subscribe({
-			next: models => {
-				this.scopeModels = models;
-				this.buildTree();
-			},
-			error: error => console.error('Error loading scope models:', error)
-		});
 	}
 
 	onCategoryClick(): void {
@@ -118,9 +100,5 @@ export class ScopeModelsTreeComponent implements OnInit, OnChanges {
 		}
 
 		return node;
-	}
-
-	reload(): void {
-		this.loadScopeModels();
 	}
 }

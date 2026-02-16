@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.DatasetModelDTO;
@@ -33,8 +34,11 @@ public class DatasetModelController {
 	 * Get all dataset models for a project
 	 */
 	@GetMapping("/dataset-models")
-	public ResponseEntity<List<DatasetModelDTO>> getDatasetModels(@PathVariable final UUID projectId) {
-		final var DatasetModels = datasetModelService.getDatasetModels(projectId);
+	public ResponseEntity<List<DatasetModelDTO>> getDatasetModels(
+		@PathVariable final UUID projectId,
+		@RequestParam(name = "view", required = false, defaultValue = "summary") final String view
+	) {
+		final var DatasetModels = datasetModelService.getDatasetModels(projectId, view);
 		return ResponseEntity.ok(DatasetModels);
 	}
 

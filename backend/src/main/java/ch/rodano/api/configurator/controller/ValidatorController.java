@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.ValidatorDTO;
@@ -33,8 +34,11 @@ public class ValidatorController {
 	 * Get all validators for a project
 	 */
 	@GetMapping("/validators")
-	public ResponseEntity<List<ValidatorDTO>> getValidators(@PathVariable final UUID projectId) {
-		final var Validators = validatorService.getValidators(projectId);
+	public ResponseEntity<List<ValidatorDTO>> getValidators(
+		@PathVariable final UUID projectId,
+		@RequestParam(name = "view", required = false, defaultValue = "summary") final String view
+	) {
+		final var Validators = validatorService.getValidators(projectId, view);
 		return ResponseEntity.ok(Validators);
 	}
 

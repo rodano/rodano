@@ -33,6 +33,10 @@ export class EntitySaveOrchestratorService {
 				context.scopeModelManager.syncOriginalsWithCurrent();
 				context.eventModelManager.syncOriginalsWithCurrent();
 				context.eventGroupManager.syncOriginalsWithCurrent();
+
+				context.scopeModelManager.invalidate();
+				context.eventModelManager.invalidate();
+				context.eventGroupManager.invalidate();
 			})
 		);
 	}
@@ -54,6 +58,9 @@ export class EntitySaveOrchestratorService {
 			map(() => {
 				context.datasetModelManager.syncOriginalsWithCurrent();
 				context.fieldModelManager.syncOriginalsWithCurrent();
+
+				context.datasetModelManager.invalidate();
+				context.fieldModelManager.invalidate();
 			})
 		);
 	}
@@ -69,6 +76,8 @@ export class EntitySaveOrchestratorService {
 		]).pipe(
 			map(() => {
 				context.validatorManager.syncOriginalsWithCurrent();
+
+				context.validatorManager.invalidate();
 			})
 		);
 	}
@@ -77,14 +86,23 @@ export class EntitySaveOrchestratorService {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
 		context.eventGroupManager.resetToOriginals();
+
+		context.scopeModelManager.invalidate();
+		context.eventModelManager.invalidate();
+		context.eventGroupManager.invalidate();
 	}
 
 	resetDatasetModelsToOriginals(context: DatasetModelContext): void {
 		context.datasetModelManager.resetToOriginals();
 		context.fieldModelManager.resetToOriginals();
+
+		context.datasetModelManager.invalidate();
+		context.fieldModelManager.invalidate();
 	}
 
 	resetValidatorsToOriginals(context: ValidatorContext): void {
 		context.validatorManager.resetToOriginals();
+
+		context.validatorManager.invalidate();
 	}
 }

@@ -10,7 +10,9 @@ export class DatasetModelService {
 	constructor(private http: HttpClient) {}
 
 	getDatasetModels(projectId: string): Observable<DatasetModel[]> {
-		return this.http.get<DatasetModel[]>(`/api/superuser/configurator/projects/${projectId}/config/dataset-models`);
+		return this.http.get<DatasetModel[]>(`/api/superuser/configurator/projects/${projectId}/config/dataset-models`, {
+			params: {view: 'summary'}
+		});
 	}
 
 	getDatasetModel(projectId: string, DatasetModelId: string): Observable<DatasetModel> {

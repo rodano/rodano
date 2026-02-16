@@ -1,15 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModel} from '@core/model/scope-model';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
-import {ProjectLanguage} from '@core/model/project-language';
-import {ConfiguratorService} from '../../services/api/configurator.service';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {Subscription} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {EventModel} from '@core/model/event-model';
 import {EventModelTimelineComponent} from '../event-model/event-model-timeline/event-model-timeline.component';
@@ -23,8 +17,9 @@ import {ScopeModelDetailComponent} from '../scope-model-detail/scope-model-detai
 import {EventModelDialogService} from '../../services/dialogs/event-model-dialog.service';
 import {EventGroupDialogService} from '../../services/dialogs/event-group-dialog.service';
 import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
+import {forkJoin} from 'rxjs';
 
-export type ViewMode = 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
+type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
 
 @Component({
 	selector: 'app-scope-models-list',
@@ -33,16 +28,15 @@ export type ViewMode = 'scope-detail' | 'event-list' | 'event-detail' | 'event-g
 	styleUrls: ['./scope-models-list.component.css'],
 	imports: [
 		CommonModule,
-		MatButtonModule,
 		MatIconModule,
-		MatTooltipModule,
-		EventModelTimelineComponent,
+		ScopeModelDetailComponent,
 		EventModelDetailComponent,
+		EventModelTimelineComponent,
 		EventGroupDetailComponent,
-		ScopeModelDetailComponent
+		MatTooltipModule
 	]
 })
-export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
+export class ScopeModelsListComponent implements OnInit, OnChanges {
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
@@ -56,196 +50,131 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		selectedEventGroupId: string | null;
 	}>();
 
+	loading = true;
+	scopeModels: ScopeModel[] = [];
+	originalScopeModels: ScopeModel[] = [];
+	eventModels: EventModel[] = [];
+	originalEventModels: EventModel[] = [];
+	eventGroups: EventGroup[] = [];
+	originalEventGroups: EventGroup[] = [];
+
 	selectedScopeModel: ScopeModel | null = null;
 	selectedEventModelId: string | null = null;
 	selectedEventGroupId: string | null = null;
-	viewMode: ViewMode = 'scope-detail';
-	loading = true;
 
-	projectLanguages: ProjectLanguage[] = [];
-	selectedLanguage = '';
-	private languageSubscription: Subscription;
+	modifiedScopeModelIds = new Set<string>();
+	modifiedEventModelIds = new Set<string>();
+	modifiedEventGroupIds = new Set<string>();
+
+	viewMode: ViewMode = 'scope-list';
+	viewLevel = 1;
 
 	constructor(
 		public scopeModelManager: ScopeModelManagerService,
 		public eventModelManager: EventModelManagerService,
 		public eventGroupManager: EventGroupManagerService,
-		private configuratorService: ConfiguratorService,
-		private languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private eventModelDialogService: EventModelDialogService,
 		private eventGroupDialogService: EventGroupDialogService,
-		private snackBar: MatSnackBar
+		private languageService: LanguageService
 	) {}
 
 	ngOnInit(): void {
-		//this.loadProject();
 		this.loadScopeModels();
-
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
 	}
 
-	ngOnChanges(changes: any): void {
-		if(changes['selectedNode'] && this.scopeModels.length > 0) {
-			const nodeId = this.selectedNode;
-			if(nodeId?.startsWith('scope-model-')) {
-				const scopeModelId = nodeId.replace('scope-model-', '');
-				const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
-				if(scopeModel) {
-					this.selectedScopeModel = scopeModel;
-				}
-			}
-			else if(nodeId === 'scope-models') {
-				this.selectedScopeModel = null;
-			}
+	ngOnChanges(changes: SimpleChanges): void {
+		if(changes['selectedNode'] && this.selectedNode) {
+			this.handleNodeSelection(this.selectedNode);
 		}
-	}
-
-	ngOnDestroy(): void {
-		this.languageSubscription.unsubscribe();
-	}
-
-	get viewLevel(): number {
-		if(!this.selectedScopeModel) {
-			return 0;
-		}
-
-		if(this.viewMode === 'scope-detail' || this.viewMode === 'event-list' || this.viewMode === 'event-group-list') {
-			return 2;
-		}
-
-		if(this.viewMode === 'event-detail' || this.viewMode === 'event-group-detail') {
-			return 3;
-		}
-
-		return 0;
-	}
-
-	get scopeModels(): ScopeModel[] {
-		return this.scopeModelManager.getAll();
-	}
-
-	get eventModels(): EventModel[] {
-		return this.eventModelManager.getAll();
-	}
-
-	get eventGroups(): EventGroup[] {
-		return this.eventGroupManager.getAll();
-	}
-
-	get modifiedScopeModelIds(): Set<string> {
-		return this.scopeModelManager.getModifiedIds();
-	}
-
-	get originalScopeModels(): ScopeModel[] {
-		return this.scopeModelManager.getOriginals();
-	}
-
-	get modifiedEventModelIds(): Set<string> {
-		return this.eventModelManager.getModifiedIds();
-	}
-
-	get modifiedEventGroupIds(): Set<string> {
-		return this.eventGroupManager.getModifiedIds();
-	}
-
-	get originalEventModels(): EventModel[] {
-		return this.eventModelManager.getOriginals();
-	}
-
-	get originalEventGroups(): EventGroup[] {
-		return this.eventGroupManager.getOriginals();
-	}
-
-	get totalModificationCount(): number {
-		return this.scopeModelManager.getModificationCount() + this.eventModelManager.getModificationCount() + this.eventGroupManager.getModificationCount();
-	}
-
-	loadProject(): void {
-		this.configuratorService.getProject(this.projectId).subscribe({
-			next: (project: ConfiguratorProject) => {
-				this.projectLanguages = project.languages || [];
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading project:', error);
-				this.projectLanguages = [{languageCode: 'en', isDefault: true}];
-			}
-		});
 	}
 
 	loadScopeModels(): void {
 		this.loading = true;
-		this.scopeModelManager.load(this.projectId).subscribe({
-			next: (scopeModels: ScopeModel[]) => {
-				if(this.selectedScopeModel) {
-					this.selectedScopeModel = scopeModels.find(
-						sm => sm.scopeModelId === this.selectedScopeModel!.scopeModelId
-					) || null;
-				}
+
+		forkJoin({
+			scopeModels: this.scopeModelManager.load(this.projectId),
+			eventModels: this.eventModelManager.load(this.projectId),
+			eventGroups: this.eventGroupManager.load(this.projectId)
+		}).subscribe({
+			next: ({scopeModels, eventModels, eventGroups}) => {
+				this.scopeModels = scopeModels;
+				this.originalScopeModels = this.scopeModelManager.getOriginals();
+
+				this.originalEventModels = this.eventModelManager.getOriginals();
+				this.originalEventGroups = this.eventGroupManager.getOriginals();
+
+				this.modifiedScopeModelIds = this.scopeModelManager.getModifiedIds();
+				this.modifiedEventModelIds = this.eventModelManager.getModifiedIds();
+				this.modifiedEventGroupIds = this.eventGroupManager.getModifiedIds();
+
+				this.emitModificationCount();
 				this.loading = false;
 			},
-			error: (error: HttpErrorResponse) => {
+			error: error => {
 				console.error('Error loading scope models:', error);
-				this.snackBar.open('Failed to load scope models', 'Close', {duration: 3000});
 				this.loading = false;
 			}
 		});
 	}
 
-	onSelectScopeModel(scopeModel: ScopeModel): void {
-		if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
+	private handleNodeSelection(nodeId: string): void {
+		if(nodeId === 'scope-models') {
+			this.viewMode = 'scope-list';
+			this.viewLevel = 1;
 			this.clearSelection();
 		}
+		else if(nodeId.startsWith('scope-model-')) {
+			const scopeModelId = nodeId.replace('scope-model-', '');
+			const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
+			if(scopeModel) {
+				this.onSelectScopeModel(scopeModel);
+			}
+		}
+		else if(nodeId.startsWith('event-model-')) {
+			const eventModelId = nodeId.replace('event-model-', '');
+			this.onSelectEventModel(eventModelId);
+		}
+		else if(nodeId.startsWith('event-group-')) {
+			const eventGroupId = nodeId.replace('event-group-', '');
+			this.onSelectEventGroup(eventGroupId);
+		}
+	}
+
+	onSelectScopeModel(scopeModel: ScopeModel | null): void {
+		if(!scopeModel) {
+			this.viewMode = 'scope-list';
+			this.viewLevel = 1;
+			this.selectedScopeModel = null;
+			this.selectedEventModelId = null;
+			this.selectedEventGroupId = null;
+			this.eventModels = [];
+			this.eventGroups = [];
+			this.emitContext();
+			return;
+		}
+
+		if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId && this.viewMode === 'scope-detail') {
+			this.viewMode = 'scope-list';
+			this.viewLevel = 1;
+			this.selectedScopeModel = null;
+			this.selectedEventModelId = null;
+			this.selectedEventGroupId = null;
+			this.eventModels = [];
+			this.eventGroups = [];
+		}
 		else {
-			this.selectScopeModel(scopeModel);
-		}
-		this.emitContext();
-	}
-
-	clearSelection(): void {
-		this.selectedScopeModel = null;
-		this.selectedEventModelId = null;
-		this.selectedEventGroupId = null;
-		this.viewMode = 'scope-detail';
-		this.nodeSelected.emit('scope-models');
-	}
-
-	private selectScopeModel(scopeModel: ScopeModel): void {
-		const previousScopeModelId = this.selectedScopeModel?.scopeModelId;
-
-		this.selectedScopeModel = scopeModel;
-		this.selectedEventModelId = null;
-		this.selectedEventGroupId = null;
-
-		if(previousScopeModelId !== scopeModel.scopeModelId) {
+			this.selectedScopeModel = scopeModel;
 			this.viewMode = 'scope-detail';
-			this.eventModelManager.setAll([]);
-			this.eventGroupManager.setAll([]);
+			this.viewLevel = 2;
+			this.selectedEventModelId = null;
+			this.selectedEventGroupId = null;
+
+			this.eventModels = this.eventModelManager.getAllForScope(scopeModel.scopeModelId);
+			this.eventGroups = this.eventGroupManager.getAllForScope(scopeModel.scopeModelId);
 		}
 
 		this.emitContext();
-
-		this.eventModelManager.loadForScope(this.projectId, scopeModel.scopeModelId).subscribe({
-			next: () => this.emitContext(),
-			error: error => {
-				console.error('Error loading event models:', error);
-				this.eventModelManager.setAll([]);
-				this.emitContext();
-			}
-		});
-
-		this.eventGroupManager.loadForScope(this.projectId, scopeModel.scopeModelId).subscribe({
-			next: () => this.emitContext(),
-			error: error => {
-				console.error('Error loading event groups:', error);
-				this.eventGroupManager.setAll([]);
-				this.emitContext();
-			}
-		});
-
-		this.nodeSelected.emit(`scope-model-${scopeModel.scopeModelId}`);
 	}
 
 	isSelected(scopeModel: ScopeModel): boolean {
@@ -255,117 +184,115 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	onCreateScopeModel(): void {
 		this.scopeModelDialogService.openCreateDialog(
 			this.projectId,
-			this.projectLanguages
-		).subscribe((result: ScopeModel | null) => {
+			this.project?.languages || []
+		).subscribe(result => {
 			if(result) {
-				this.scopeModelManager.create(this.projectId, result).subscribe({
-					next: () => {
-						this.snackBar.open('Scope model created', 'Close', {duration: 2000});
-						this.loadScopeModels();
-						this.emitModificationChange();
-					},
-					error: (error: HttpErrorResponse) => {
-						console.error('Error creating scope model:', error);
-						this.snackBar.open('Failed to create scope model', 'Close', {duration: 3000});
-					}
-				});
+				const newScopeModel: ScopeModel = {
+					scopeModelId: `temp-${Date.now()}`,
+					...result,
+					parentIds: [],
+					childScopeModelIds: [],
+					datasetModelIds: [],
+					formModelIds: [],
+					workflowIds: []
+				};
+
+				this.scopeModels.push(newScopeModel);
+				this.scopeModelManager.update(newScopeModel);
+				this.modifiedScopeModelIds = this.scopeModelManager.getModifiedIds();
+				this.emitModificationCount();
 			}
 		});
 	}
 
 	onScopeModelUpdated(updatedScopeModel: ScopeModel): void {
-		this.selectedScopeModel = this.scopeModelManager.getById(updatedScopeModel.scopeModelId) || null;
-		this.emitModificationChange();
+		const index = this.scopeModels.findIndex(sm => sm.scopeModelId === updatedScopeModel.scopeModelId);
+		if(index !== -1) {
+			this.scopeModels[index] = updatedScopeModel;
+		}
+
+		this.selectedScopeModel = updatedScopeModel;
+		this.scopeModelManager.update(updatedScopeModel);
+		this.modifiedScopeModelIds = this.scopeModelManager.getModifiedIds();
+		this.emitModificationCount();
 	}
 
 	onScopeModelDeleted(scopeModelId: string): void {
-		const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
-		if(!scopeModel) {
-			return;
-		}
+		this.scopeModels = this.scopeModels.filter(sm => sm.scopeModelId !== scopeModelId);
 
-		const hasChildren = scopeModel.childScopeModelIds && scopeModel.childScopeModelIds.length > 0;
-
-		if(hasChildren) {
-			this.deleteScopeModelWithChildren(scopeModel);
+		const wasOriginal = this.originalScopeModels.some(sm => sm.scopeModelId === scopeModelId);
+		if(wasOriginal) {
+			this.modifiedScopeModelIds.add(`${scopeModelId}-deleted`);
 		}
 		else {
-			this.performDelete(scopeModel);
+			this.modifiedScopeModelIds.delete(scopeModelId);
 		}
+
+		this.selectedScopeModel = null;
+		this.viewMode = 'scope-list';
+		this.viewLevel = 1;
+		this.emitModificationCount();
+		this.emitContext();
 	}
 
-	private deleteScopeModelWithChildren(scopeModel: ScopeModel): void {
-		const isRoot = !scopeModel.parentIds || scopeModel.parentIds.length === 0;
-		const updatePromises: Promise<any>[] = [];
+	switchToEventModelView(): void {
+		this.viewMode = 'event-list';
+		this.viewLevel = 2;
+		this.emitContext();
+	}
 
-		if(isRoot) {
-			scopeModel.childScopeModelIds.forEach(childId => {
-				const child = this.scopeModels.find(sm => sm.scopeModelId === childId);
-				if(!child) {
-					return;
-				}
+	switchToEventGroupView(): void {
+		this.viewMode = 'event-group-list';
+		this.viewLevel = 2;
+		this.emitContext();
+	}
 
-				const updatedChild: ScopeModel = {
-					...child,
-					parentIds: [],
-					defaultParentId: '',
-					root: true,
-					leaf: child.childScopeModelIds.length === 0
-				};
+	backToScopeDetail(): void {
+		this.viewMode = 'scope-detail';
+		this.viewLevel = 2;
+		this.selectedEventModelId = null;
+		this.selectedEventGroupId = null;
+		this.emitContext();
+	}
 
-				updatePromises.push(
-					this.scopeModelManager.updateOnServer(this.projectId, child.scopeModelId, updatedChild).toPromise()
-				);
-			});
+	onSelectEventModel(eventModelId: string | null): void {
+		if(!eventModelId) {
+			this.viewMode = 'event-list';
+			this.viewLevel = 2;
+			this.selectedEventModelId = null;
+		}
+		else if(this.selectedEventModelId === eventModelId && this.viewMode === 'event-detail') {
+			this.viewMode = 'event-list';
+			this.viewLevel = 2;
+			this.selectedEventModelId = null;
 		}
 		else {
-			scopeModel.childScopeModelIds.forEach(childId => {
-				const child = this.scopeModels.find(sm => sm.scopeModelId === childId);
-				if(!child) {
-					return;
-				}
-
-				const updatedChild: ScopeModel = {
-					...child,
-					parentIds: scopeModel.parentIds,
-					defaultParentId: scopeModel.defaultParentId || scopeModel.parentIds[0],
-					root: false,
-					leaf: child.childScopeModelIds.length === 0
-				};
-
-				updatePromises.push(
-					this.scopeModelManager.updateOnServer(this.projectId, child.scopeModelId, updatedChild).toPromise()
-				);
-			});
+			this.selectedEventModelId = eventModelId;
+			this.viewMode = 'event-detail';
+			this.viewLevel = 3;
 		}
 
-		Promise.all(updatePromises)
-			.then(() => {
-				this.performDelete(scopeModel);
-			})
-			.catch(error => {
-				console.error('Error updating children:', error);
-				this.snackBar.open('Failed to update children', 'Close', {duration: 3000});
-			});
+		this.emitContext();
 	}
 
-	private performDelete(scopeModel: ScopeModel): void {
-		this.scopeModelManager.delete(this.projectId, scopeModel.scopeModelId).subscribe({
-			next: () => {
-				this.snackBar.open('Scope model deleted', 'Close', {duration: 2000});
+	onSelectEventGroup(eventGroupId: string | null): void {
+		if(!eventGroupId) {
+			this.viewMode = 'event-group-list';
+			this.viewLevel = 2;
+			this.selectedEventGroupId = null;
+		}
+		else if(this.selectedEventGroupId === eventGroupId && this.viewMode === 'event-group-detail') {
+			this.viewMode = 'event-group-list';
+			this.viewLevel = 2;
+			this.selectedEventGroupId = null;
+		}
+		else {
+			this.selectedEventGroupId = eventGroupId;
+			this.viewMode = 'event-group-detail';
+			this.viewLevel = 3;
+		}
 
-				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.clearSelection();
-				}
-
-				this.loadScopeModels();
-				this.emitModificationChange();
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error deleting scope model:', error);
-				this.snackBar.open('Failed to delete scope model', 'Close', {duration: 3000});
-			}
-		});
+		this.emitContext();
 	}
 
 	onCreateEventModel(): void {
@@ -375,70 +302,66 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		const formattedEventGroups = this.eventGroups.map(eg => ({
 			id: eg.eventGroupId,
-			name: this.getTranslatedName(eg.shortname),
+			name: this.languageService.getDefaultTranslation(eg.shortname) || eg.id,
 			code: eg.id
 		}));
 
 		this.eventModelDialogService.openCreateDialog(
 			this.projectId,
 			this.selectedScopeModel.scopeModelId,
-			this.projectLanguages,
+			this.project?.languages || [],
 			formattedEventGroups
-		).subscribe((result: any) => {
-			if(result) {
+		).subscribe(result => {
+			if(result && this.selectedScopeModel) {
 				const newEventModel: EventModel = {
-					eventModelId: '',
-					scopeModelId: this.selectedScopeModel!.scopeModelId,
-					number: result.number || this.eventModels.length + 1,
+					eventModelId: `temp-${Date.now()}`,
+					scopeModelId: this.selectedScopeModel.scopeModelId,
 					...result,
-					formModelIds: [],
 					datasetModelIds: [],
+					formModelIds: [],
 					workflowIds: [],
 					deadlineReferenceEventModelIds: [],
 					blockedEventModelIds: [],
 					impliedEventModelIds: []
 				};
 
-				this.eventModelManager.create(this.projectId, newEventModel).subscribe({
-					next: () => {
-						this.snackBar.open('Event model created', 'Close', {duration: 2000});
-					},
-					error: error => {
-						console.error('Error creating event model:', error);
-						this.snackBar.open('Failed to create event model', 'Close', {duration: 3000});
-					}
-				});
+				this.eventModels.push(newEventModel);
+				this.eventModelManager.update(newEventModel);
+				this.modifiedEventModelIds = this.eventModelManager.getModifiedIds();
+				this.emitModificationCount();
+				this.emitContext();
 			}
 		});
 	}
 
 	onEventModelUpdated(updatedEventModel: EventModel): void {
-		if(!updatedEventModel) {
-			return;
-		}
 		this.eventModelManager.update(updatedEventModel);
-		this.emitModificationChange();
-		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+
+		if(this.selectedScopeModel) {
+			this.eventModels = this.eventModelManager.getAllForScope(this.selectedScopeModel.scopeModelId);
+		}
+
+		this.modifiedEventModelIds = this.eventModelManager.getModifiedIds();
+		this.emitModificationCount();
+		this.emitContext();
 	}
 
 	onEventModelDeleted(eventModelId: string): void {
-		this.eventModelManager.delete(this.projectId, eventModelId).subscribe({
-			next: () => {
-				this.snackBar.open('Event model deleted', 'Close', {duration: 2000});
+		this.eventModels = this.eventModels.filter(em => em.eventModelId !== eventModelId);
 
-				if(this.selectedEventModelId === eventModelId) {
-					this.selectedEventModelId = null;
-					this.viewMode = 'event-list';
-				}
+		const wasOriginal = this.originalEventModels.some(em => em.eventModelId === eventModelId);
+		if(wasOriginal) {
+			this.modifiedEventModelIds.add(`${eventModelId}-deleted`);
+		}
+		else {
+			this.modifiedEventModelIds.delete(eventModelId);
+		}
 
-				this.emitModificationChange();
-				this.emitContext();
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error deleting event model:', error);
-				this.snackBar.open('Failed to delete event model', 'Close', {duration: 3000});
-			}
-		});
+		this.selectedEventModelId = null;
+		this.viewMode = 'event-list';
+		this.viewLevel = 2;
+		this.emitModificationCount();
+		this.emitContext();
 	}
 
 	onCreateEventGroup(): void {
@@ -449,107 +372,77 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.eventGroupDialogService.openCreateDialog(
 			this.projectId,
 			this.selectedScopeModel.scopeModelId,
-			this.projectLanguages
-		).subscribe((result: any) => {
-			if(result) {
+			this.project?.languages || []
+		).subscribe(result => {
+			if(result && this.selectedScopeModel) {
 				const newEventGroup: EventGroup = {
-					eventGroupId: '',
-					scopeModelId: this.selectedScopeModel!.scopeModelId,
+					eventGroupId: `temp-${Date.now()}`,
+					scopeModelId: this.selectedScopeModel.scopeModelId,
 					...result
 				};
 
-				this.eventGroupManager.create(this.projectId, newEventGroup).subscribe({
-					next: () => {
-						this.snackBar.open('Event group created', 'Close', {duration: 2000});
-					},
-					error: error => {
-						console.error('Error creating event group:', error);
-						this.snackBar.open('Failed to create event group', 'Close', {duration: 3000});
-					}
-				});
+				this.eventGroups.push(newEventGroup);
+				this.eventGroupManager.update(newEventGroup);
+				this.modifiedEventGroupIds = this.eventGroupManager.getModifiedIds();
+				this.emitModificationCount();
+				this.emitContext();
 			}
 		});
 	}
 
 	onEventGroupUpdated(updatedEventGroup: EventGroup): void {
-		if(!updatedEventGroup) {
-			return;
-		}
 		this.eventGroupManager.update(updatedEventGroup);
-		this.emitModificationChange();
-		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
+
+		if(this.selectedScopeModel) {
+			this.eventGroups = this.eventGroupManager.getAllForScope(this.selectedScopeModel.scopeModelId);
+		}
+
+		this.modifiedEventGroupIds = this.eventGroupManager.getModifiedIds();
+		this.emitModificationCount();
+		this.emitContext();
 	}
 
 	onEventGroupDeleted(eventGroupId: string): void {
-		this.eventGroupManager.delete(this.projectId, eventGroupId).subscribe({
-			next: () => {
-				this.snackBar.open('Event group deleted', 'Close', {duration: 2000});
+		this.eventGroups = this.eventGroups.filter(eg => eg.eventGroupId !== eventGroupId);
 
-				if(this.selectedEventGroupId === eventGroupId) {
-					this.selectedEventGroupId = null;
-					this.viewMode = 'event-group-list';
-				}
-
-				this.emitModificationChange();
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error deleting event group:', error);
-				this.snackBar.open('Failed to delete event group', 'Close', {duration: 3000});
-			}
-		});
-	}
-
-	switchToEventModelView(): void {
-		if(!this.selectedScopeModel) {
-			return;
-		}
-		this.viewMode = 'event-list';
-		this.emitContext();
-	}
-
-	onSelectEventModel(eventModelId: string): void {
-		if(this.selectedEventModelId === eventModelId) {
-			this.selectedEventModelId = null;
-			this.viewMode = 'event-list';
+		const wasOriginal = this.originalEventGroups.some(eg => eg.eventGroupId === eventGroupId);
+		if(wasOriginal) {
+			this.modifiedEventGroupIds.add(`${eventGroupId}-deleted`);
 		}
 		else {
-			this.selectedEventModelId = eventModelId;
-			this.viewMode = 'event-detail';
-			this.nodeSelected.emit(`event-model-${eventModelId}`);
+			this.modifiedEventGroupIds.delete(eventGroupId);
 		}
-		this.emitContext();
-	}
 
-	switchToEventGroupView(): void {
-		if(!this.selectedScopeModel) {
-			return;
-		}
+		this.selectedEventGroupId = null;
 		this.viewMode = 'event-group-list';
+		this.viewLevel = 2;
+		this.emitModificationCount();
 		this.emitContext();
 	}
 
-	onSelectEventGroup(eventGroupId: string): void {
-		if(this.selectedEventGroupId === eventGroupId) {
-			this.selectedEventGroupId = null;
-			this.viewMode = 'event-group-list';
-		}
-		else {
-			this.selectedEventGroupId = eventGroupId;
-			this.viewMode = 'event-group-detail';
-			this.nodeSelected.emit(`event-group-${eventGroupId}`);
-		}
-		this.emitContext();
+	isEventModelModified(eventModelId: string): boolean {
+		return this.modifiedEventModelIds.has(eventModelId);
 	}
 
-	backToScopeDetail(): void {
-		this.viewMode = 'scope-detail';
+	isEventGroupModified(eventGroupId: string): boolean {
+		return this.modifiedEventGroupIds.has(eventGroupId);
+	}
+
+	clearSelection(): void {
+		this.selectedScopeModel = null;
 		this.selectedEventModelId = null;
 		this.selectedEventGroupId = null;
+		this.eventModels = [];
+		this.eventGroups = [];
+		this.viewMode = 'scope-list';
+		this.viewLevel = 1;
 		this.emitContext();
 	}
 
-	private emitModificationChange(): void {
-		this.scopeModelsChanged.emit({modificationCount: this.totalModificationCount});
+	private emitModificationCount(): void {
+		const totalCount = this.modifiedScopeModelIds.size + this.modifiedEventModelIds.size + this.modifiedEventGroupIds.size;
+
+		this.scopeModelsChanged.emit({modificationCount: totalCount});
 	}
 
 	private emitContext(): void {
@@ -564,13 +457,5 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {
 		return this.languageService.getDefaultTranslation(translations) || '';
-	}
-
-	isEventModelModified(eventModelId: string): boolean {
-		return this.eventModelManager.isModified(eventModelId);
-	}
-
-	isEventGroupModified(eventGroupId: string): boolean {
-		return this.eventGroupManager.isModified(eventGroupId);
 	}
 }

@@ -10,7 +10,15 @@ export class FieldModelService {
 	constructor(private http: HttpClient) {}
 
 	getFieldModels(projectId: string): Observable<FieldModel[]> {
-		return this.http.get<FieldModel[]>(`/api/superuser/configurator/projects/${projectId}/config/field-models`);
+		return this.http.get<FieldModel[]>(`/api/superuser/configurator/projects/${projectId}/config/field-models`, {
+			params: {view: 'summary'}
+		});
+	}
+
+	getFieldModelsFull(projectId: string): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`/api/superuser/configurator/projects/${projectId}/config/field-models`, {
+			params: {view: 'full'}
+		});
 	}
 
 	getFieldModel(projectId: string, fieldModelId: string): Observable<FieldModel> {

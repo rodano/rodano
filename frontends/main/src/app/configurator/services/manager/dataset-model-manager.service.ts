@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {DatasetModel} from '@core/model/dataset-model';
 import {EntityModificationTracker} from '../entity-modification-tracker';
 import {DatasetModelService} from '../api/dataset-model.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Injectable({
@@ -10,6 +10,7 @@ import {map} from 'rxjs/operators';
 })
 export class DatasetModelManagerService {
 	private tracker: EntityModificationTracker<DatasetModel>;
+	private loaded = false;
 
 	constructor(private datasetModelService: DatasetModelService) {
 		this.tracker = new EntityModificationTracker<DatasetModel>(
@@ -21,12 +22,20 @@ export class DatasetModelManagerService {
 	}
 
 	load(projectId: string): Observable<DatasetModel[]> {
+		if(this.loaded) {
+			return of(this.tracker.getCurrent());
+		}
 		return this.datasetModelService.getDatasetModels(projectId).pipe(
 			map(models => {
 				this.tracker.initialize(models);
+				this.loaded = true;
 				return models;
 			})
 		);
+	}
+
+	invalidate(): void {
+		this.loaded = false;
 	}
 
 	create(projectId: string, datasetModel: DatasetModel): Observable<DatasetModel> {
@@ -68,6 +77,10 @@ export class DatasetModelManagerService {
 
 	resetToOriginals(): void {
 		this.tracker.resetToOriginals();
+	}
+
+	setAll(datasetModels: DatasetModel[]): void {
+		this.tracker.initialize(datasetModels);
 	}
 
 	getAll(): DatasetModel[] {

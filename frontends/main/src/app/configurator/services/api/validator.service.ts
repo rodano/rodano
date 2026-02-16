@@ -10,7 +10,9 @@ export class ValidatorService {
 	constructor(private http: HttpClient) {}
 
 	getValidators(projectId: string): Observable<Validator[]> {
-		return this.http.get<Validator[]>(`/api/superuser/configurator/projects/${projectId}/config/validators`);
+		return this.http.get<Validator[]>(`/api/superuser/configurator/projects/${projectId}/config/validators`, {
+			params: {view: 'full'}
+		});
 	}
 
 	getValidator(projectId: string, validatorId: string): Observable<Validator> {

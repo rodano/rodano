@@ -21,11 +21,13 @@ public class DatasetModelServiceImpl implements DatasetModelService {
 	}
 
 	@Override
-	public List<DatasetModelDTO> getDatasetModels(final UUID projectId) {
-		return datasetModelDAOService.getDatasetModels(projectId);
+	@Transactional(readOnly = true)
+	public List<DatasetModelDTO> getDatasetModels(final UUID projectId, final String view) {
+		return datasetModelDAOService.getDatasetModels(projectId, view);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public DatasetModelDTO getDatasetModel(final UUID projectId, final UUID datasetModelId) {
 		final var datasetModel = datasetModelDAOService.getDatasetModel(projectId, datasetModelId);
 		if(datasetModel == null) {
@@ -36,13 +38,6 @@ public class DatasetModelServiceImpl implements DatasetModelService {
 
 	@Override
 	public DatasetModelDTO createDatasetModel(final UUID projectId, final DatasetModelDTO datasetModel) {
-		if(datasetModel.getId() == null || datasetModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Dataset model code is required");
-		}
-		if(datasetModel.getShortname() == null || datasetModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Dataset model shortname is required");
-		}
-
 		return datasetModelDAOService.createDatasetModel(projectId, datasetModel);
 	}
 
@@ -52,14 +47,6 @@ public class DatasetModelServiceImpl implements DatasetModelService {
 		if(existing == null) {
 			throw new NotFoundException("Dataset model not found: " + datasetModelId);
 		}
-
-		if(datasetModel.getId() == null || datasetModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Dataset model code is required");
-		}
-		if(datasetModel.getShortname() == null || datasetModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Dataset model shortname is required");
-		}
-
 		return datasetModelDAOService.updateDatasetModel(projectId, datasetModelId, datasetModel);
 	}
 
@@ -69,7 +56,6 @@ public class DatasetModelServiceImpl implements DatasetModelService {
 		if(existing == null) {
 			throw new NotFoundException("Dataset model not found: " + datasetModelId);
 		}
-
 		datasetModelDAOService.deleteDatasetModel(projectId, datasetModelId);
 	}
 }

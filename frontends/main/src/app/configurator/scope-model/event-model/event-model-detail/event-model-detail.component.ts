@@ -9,11 +9,11 @@ import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatDialog} from '@angular/material/dialog';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../../services/language.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {EventGroup} from '@core/model/event-group';
 import {EventModelDialogService} from '../../../services/dialogs/event-model-dialog.service';
 import {DatasetModelManagerService} from '../../../services/manager/dataset-model-manager.service';
+import {EventModelManagerService} from '../../../services/manager/event-model-manager.service';
 
 @Component({
 	selector: 'app-event-model-detail',
@@ -46,24 +46,34 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	constructor(
 		private languageService: LanguageService,
 		private eventModelDialogService: EventModelDialogService,
+		private eventModelManager: EventModelManagerService,
 		private datasetModelManager: DatasetModelManagerService,
-		private dialog: MatDialog,
-		private snackBar: MatSnackBar
+		private dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
-		this.loadEventModel();
 
-		this.datasetModelManager.load(this.projectId).subscribe({
-			error: error => console.error('Error loading dataset models:', error)
+		this.eventModelManager.loadFull(this.projectId).subscribe({
+			next: () => {
+				this.loadEventModel();
+			},
+			error: error => console.error('Error loading full event models:', error)
 		});
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['eventModelId'] || changes['eventModels']) {
+		if(changes['eventModelId'] && this.eventModelId) {
+			this.eventModelManager.loadFull(this.projectId).subscribe({
+				next: () => {
+					this.loadEventModel();
+				},
+				error: error => console.error('Error loading full event models:', error)
+			});
+		}
+		else if(changes['eventModels']) {
 			this.loadEventModel();
 		}
 	}

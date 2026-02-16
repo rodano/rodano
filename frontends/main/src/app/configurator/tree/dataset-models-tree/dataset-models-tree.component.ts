@@ -1,7 +1,6 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {DatasetModelService} from '../../services/api/dataset-model.service';
 import {LanguageService} from '../../services/language.service';
 import {TreeNode} from '../tree-node';
 
@@ -12,38 +11,21 @@ import {TreeNode} from '../tree-node';
 	templateUrl: './dataset-models-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class DatasetModelsTreeComponent implements OnInit, OnChanges {
+export class DatasetModelsTreeComponent implements OnChanges {
 	@Input() projectId = '';
+	@Input() datasetModels: any[] = [];
 	@Input() expanded = false;
 	@Input() fieldModels: any[] = [];
 	@Input() selectedDatasetModelId: string | null = null;
 	@Input() selectedFieldModelId: string | null = null;
 	@Output() categoryClicked = new EventEmitter<void>();
 
-	datasetModels: any[] = [];
 	treeNodes: TreeNode[] = [];
 
-	constructor(
-		private datasetModelService: DatasetModelService,
-		private languageService: LanguageService
-	) {}
-
-	ngOnInit(): void {
-		this.loadDatasetModels();
-	}
+	constructor(private languageService: LanguageService) {}
 
 	ngOnChanges(): void {
 		this.buildTree();
-	}
-
-	loadDatasetModels(): void {
-		this.datasetModelService.getDatasetModels(this.projectId).subscribe({
-			next: models => {
-				this.datasetModels = models;
-				this.buildTree();
-			},
-			error: error => console.error('Error loading dataset models:', error)
-		});
 	}
 
 	onCategoryClick(): void {
@@ -85,9 +67,5 @@ export class DatasetModelsTreeComponent implements OnInit, OnChanges {
 
 			return node;
 		});
-	}
-
-	reload(): void {
-		this.loadDatasetModels();
 	}
 }

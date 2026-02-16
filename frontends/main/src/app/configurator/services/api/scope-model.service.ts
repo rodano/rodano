@@ -10,7 +10,9 @@ export class ScopeModelService {
 	constructor(private http: HttpClient) {}
 
 	getScopeModels(projectId: string): Observable<ScopeModel[]> {
-		return this.http.get<ScopeModel[]>(`/api/superuser/configurator/projects/${projectId}/config/scope-models`);
+		return this.http.get<ScopeModel[]>(`/api/superuser/configurator/projects/${projectId}/config/scope-models`, {
+			params: {view: 'full'}
+		});
 	}
 
 	getScopeModel(projectId: string, scopeModelId: string): Observable<ScopeModel> {

@@ -21,11 +21,13 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 	}
 
 	@Override
-	public List<ScopeModelDTO> getScopeModels(final UUID projectId) {
-		return scopeModelDAOService.getScopeModels(projectId);
+	@Transactional(readOnly = true)
+	public List<ScopeModelDTO> getScopeModels(final UUID projectId, final String view) {
+		return scopeModelDAOService.getScopeModels(projectId, view);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScopeModelDTO getScopeModel(final UUID projectId, final UUID scopeModelId) {
 		final var scopeModel = scopeModelDAOService.getScopeModel(projectId, scopeModelId);
 		if(scopeModel == null) {
@@ -36,14 +38,6 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 
 	@Override
 	public ScopeModelDTO createScopeModel(final UUID projectId, final ScopeModelDTO scopeModel) {
-		if(scopeModel.getId() == null || scopeModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Scope model code is required");
-		}
-
-		if(scopeModel.getShortname() == null || scopeModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Scope model shortname is required");
-		}
-
 		return scopeModelDAOService.createScopeModel(projectId, scopeModel);
 	}
 
@@ -53,15 +47,6 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 		if(existing == null) {
 			throw new NotFoundException("Scope model not found: " + scopeModelId);
 		}
-
-		if(scopeModel.getId() == null || scopeModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Scope model code is required");
-		}
-
-		if(scopeModel.getShortname() == null || scopeModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Scope model shortname is required");
-		}
-
 		return scopeModelDAOService.updateScopeModel(projectId, scopeModelId, scopeModel);
 	}
 
@@ -71,7 +56,6 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 		if(existing == null) {
 			throw new NotFoundException("Scope model not found: " + scopeModelId);
 		}
-
 		scopeModelDAOService.deleteScopeModel(projectId, scopeModelId);
 	}
 }

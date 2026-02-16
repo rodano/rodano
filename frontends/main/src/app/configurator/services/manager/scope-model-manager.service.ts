@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {EntityModificationTracker} from '../entity-modification-tracker';
 import {ScopeModel} from '@core/model/scope-model';
 import {ScopeModelService} from '../api/scope-model.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Injectable({
@@ -10,6 +10,7 @@ import {map} from 'rxjs/operators';
 })
 export class ScopeModelManagerService {
 	private tracker: EntityModificationTracker<ScopeModel>;
+	private loaded = false;
 
 	constructor(private scopeModelService: ScopeModelService) {
 		this.tracker = new EntityModificationTracker<ScopeModel>(
@@ -21,12 +22,20 @@ export class ScopeModelManagerService {
 	}
 
 	load(projectId: string): Observable<ScopeModel[]> {
+		if(this.loaded) {
+			return of(this.tracker.getCurrent());
+		}
 		return this.scopeModelService.getScopeModels(projectId).pipe(
 			map(models => {
 				this.tracker.initialize(models);
+				this.loaded = true;
 				return models;
 			})
 		);
+	}
+
+	invalidate(): void {
+		this.loaded = false;
 	}
 
 	create(projectId: string, scopeModel: ScopeModel): Observable<ScopeModel> {

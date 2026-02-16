@@ -21,11 +21,13 @@ public class EventModelServiceImpl implements EventModelService {
 	}
 
 	@Override
-	public List<EventModelDTO> getEventModels(final UUID projectId) {
-		return eventModelDAOService.getEventModels(projectId);
+	@Transactional(readOnly = true)
+	public List<EventModelDTO> getEventModels(final UUID projectId, final String view) {
+		return eventModelDAOService.getEventModels(projectId, view);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public EventModelDTO getEventModel(final UUID projectId, final UUID eventModelId) {
 		final var eventModel = eventModelDAOService.getEventModel(projectId, eventModelId);
 		if(eventModel == null) {
@@ -36,13 +38,6 @@ public class EventModelServiceImpl implements EventModelService {
 
 	@Override
 	public EventModelDTO createEventModel(final UUID projectId, final EventModelDTO eventModel) {
-		if(eventModel.getId() == null || eventModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Event model code is required");
-		}
-		if(eventModel.getShortname() == null || eventModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Event model shortname is required");
-		}
-
 		return eventModelDAOService.createEventModel(projectId, eventModel);
 	}
 
@@ -52,15 +47,6 @@ public class EventModelServiceImpl implements EventModelService {
 		if(existing == null) {
 			throw new NotFoundException("Event model not found:  " + eventModelId);
 		}
-
-		if(eventModel.getId() == null || eventModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Event model code is required");
-		}
-
-		if(eventModel.getShortname() == null || eventModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Event model shortname is required");
-		}
-
 		return eventModelDAOService.updateEventModel(projectId, eventModelId, eventModel);
 	}
 
@@ -70,7 +56,6 @@ public class EventModelServiceImpl implements EventModelService {
 		if(existing == null) {
 			throw new NotFoundException("Event model not found:  " + eventModelId);
 		}
-
 		eventModelDAOService.deleteEventModel(projectId, eventModelId);
 	}
 }

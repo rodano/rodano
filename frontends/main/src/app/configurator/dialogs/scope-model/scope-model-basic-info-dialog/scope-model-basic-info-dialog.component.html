@@ -146,10 +146,10 @@
 	</div>
 
 	<div class="dialog-actions">
-		<button class="btn-secondary" (click)="onCancel()" [disabled]="saving">
+		<button class="btn-secondary" (click)="onCancel()">
 			Cancel
 		</button>
-		<button class="btn-primary" (click)="onSave()" [disabled]="saving || form.invalid || !areLanguageFormsValid()">
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
 			{{ isEditMode ? 'Save Changes' : 'Create Scope Model' }}
 		</button>
 	</div>

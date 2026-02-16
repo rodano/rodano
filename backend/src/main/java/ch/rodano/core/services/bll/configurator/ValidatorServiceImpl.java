@@ -21,11 +21,13 @@ public class ValidatorServiceImpl implements ValidatorService {
 	}
 
 	@Override
-	public List<ValidatorDTO> getValidators(final UUID projectId) {
-		return validatorDAOService.getValidators(projectId);
+	@Transactional(readOnly = true)
+	public List<ValidatorDTO> getValidators(final UUID projectId, final String view) {
+		return validatorDAOService.getValidators(projectId, view);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ValidatorDTO getValidator(final UUID projectId, final UUID validatorId) {
 		final var validator = validatorDAOService.getValidator(projectId, validatorId);
 		if(validator == null) {
@@ -36,13 +38,6 @@ public class ValidatorServiceImpl implements ValidatorService {
 
 	@Override
 	public ValidatorDTO createValidator(final UUID projectId, final ValidatorDTO validator) {
-		if(validator.getId() == null || validator.getId().isBlank()) {
-			throw new IllegalArgumentException("Validator code is required");
-		}
-		if(validator.getShortname() == null || validator.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Validator shortname is required");
-		}
-
 		return validatorDAOService.createValidator(projectId, validator);
 	}
 
@@ -52,14 +47,6 @@ public class ValidatorServiceImpl implements ValidatorService {
 		if(existing == null) {
 			throw new NotFoundException("Validator not found: " + validatorId);
 		}
-
-		if(validator.getId() == null || validator.getId().isBlank()) {
-			throw new IllegalArgumentException("Validator code is required");
-		}
-		if(validator.getShortname() == null || validator.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Validator shortname is required");
-		}
-
 		return validatorDAOService.updateValidator(projectId, validatorId, validator);
 	}
 
@@ -69,7 +56,6 @@ public class ValidatorServiceImpl implements ValidatorService {
 		if(existing == null) {
 			throw new NotFoundException("Validator not found: " + validatorId);
 		}
-
 		validatorDAOService.deleteValidator(projectId, validatorId);
 	}
 }

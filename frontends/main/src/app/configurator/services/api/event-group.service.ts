@@ -10,7 +10,9 @@ export class EventGroupService {
 	constructor(private http: HttpClient) {}
 
 	getEventGroups(projectId: string): Observable<EventGroup[]> {
-		return this.http.get<EventGroup[]>(`/api/superuser/configurator/projects/${projectId}/config/event-groups`);
+		return this.http.get<EventGroup[]>(`/api/superuser/configurator/projects/${projectId}/config/event-groups`, {
+			params: {view: 'full'}
+		});
 	}
 
 	getEventGroup(projectId: string, eventGroupId: string): Observable<EventGroup> {

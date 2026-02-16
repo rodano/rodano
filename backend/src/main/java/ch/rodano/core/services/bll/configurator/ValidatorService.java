@@ -7,7 +7,11 @@ import ch.rodano.api.config.ValidatorDTO;
 
 public interface ValidatorService {
 
-	List<ValidatorDTO> getValidators(UUID projectId);
+	List<ValidatorDTO> getValidators(UUID projectId, String view);
+
+	default List<ValidatorDTO> getValidators(final UUID projectId) {
+		return getValidators(projectId, "summary");
+	}
 
 	ValidatorDTO getValidator(UUID projectId, UUID validatorId);
 

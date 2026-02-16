@@ -7,8 +7,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
-import {ValidatorService} from '../../../services/api/validator.service';
+import {ValidatorManagerService} from '../../../services/manager/validator-manager.service';
 
 export interface ValidatorBasicInfoDialogData {
 	projectId: string;
@@ -34,13 +33,12 @@ export class ValidatorBasicInfoDialogComponent implements OnInit {
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
-	allValidators: Validator[] = [];
 
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ValidatorBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: ValidatorBasicInfoDialogData,
-		private validatorService: ValidatorService,
+		private validatorManager: ValidatorManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.validator;
@@ -48,7 +46,6 @@ export class ValidatorBasicInfoDialogComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.loadProjectLanguages();
-		this.loadAllValidators();
 		this.initializeForm();
 	}
 
@@ -60,17 +57,6 @@ export class ValidatorBasicInfoDialogComponent implements OnInit {
 		}
 
 		this.initializeLanguageForms();
-	}
-
-	loadAllValidators(): void {
-		this.validatorService.getValidators(this.data.projectId).subscribe({
-			next: (validators: Validator[]) => {
-				this.allValidators = validators;
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading validators:', error);
-			}
-		});
 	}
 
 	initializeForm(): void {
@@ -106,7 +92,7 @@ export class ValidatorBasicInfoDialogComponent implements OnInit {
 
 	getLanguageLabel(code: string, isDefault: boolean): string {
 		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ★` : name;
+		return isDefault ? `${name} ☆` : name;
 	}
 
 	getLanguageName(code: string): string {
@@ -139,7 +125,7 @@ export class ValidatorBasicInfoDialogComponent implements OnInit {
 
 	isCodeDuplicate(code: string): boolean {
 		const currentValidatorId = this.data.validator?.validatorId;
-		return this.allValidators.some(v =>
+		return this.validatorManager.getAll().some(v =>
 			v.id.toUpperCase() === code.toUpperCase() && v.validatorId !== currentValidatorId
 		);
 	}

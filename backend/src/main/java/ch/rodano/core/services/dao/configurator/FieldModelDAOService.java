@@ -7,7 +7,11 @@ import ch.rodano.api.config.FieldModelDTO;
 
 public interface FieldModelDAOService {
 
-	List<FieldModelDTO> getFieldModels(UUID projectId);
+	List<FieldModelDTO> getFieldModels(UUID projectId, String view);
+
+	List<FieldModelDTO> getFieldModelsSummary(UUID projectId);
+
+	List<FieldModelDTO> getFieldModelsFull(UUID projectId);
 
 	FieldModelDTO getFieldModel(UUID projectId, UUID fieldModelId);
 
@@ -16,6 +20,4 @@ public interface FieldModelDAOService {
 	FieldModelDTO updateFieldModel(UUID projectId, UUID fieldModelId, FieldModelDTO fieldModel);
 
 	void deleteFieldModel(UUID projectId, UUID fieldModelId);
-
-	List<FieldModelDTO> getFieldModelsByDatasetModel(UUID projectId, UUID datasetModelId);
 }

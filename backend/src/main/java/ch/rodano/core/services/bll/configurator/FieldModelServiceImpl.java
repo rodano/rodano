@@ -21,11 +21,13 @@ public class FieldModelServiceImpl implements FieldModelService {
 	}
 
 	@Override
-	public List<FieldModelDTO> getFieldModels(final UUID projectId) {
-		return fieldModelDAOService.getFieldModels(projectId);
+	@Transactional(readOnly = true)
+	public List<FieldModelDTO> getFieldModels(final UUID projectId, final String view) {
+		return fieldModelDAOService.getFieldModels(projectId, view);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public FieldModelDTO getFieldModel(final UUID projectId, final UUID fieldModelId) {
 		final var fieldModel = fieldModelDAOService.getFieldModel(projectId, fieldModelId);
 		if(fieldModel == null) {
@@ -36,13 +38,6 @@ public class FieldModelServiceImpl implements FieldModelService {
 
 	@Override
 	public FieldModelDTO createFieldModel(final UUID projectId, final FieldModelDTO fieldModel) {
-		if(fieldModel.getId() == null || fieldModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Field model code is required");
-		}
-		if(fieldModel.getShortname() == null || fieldModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Field model shortname is required");
-		}
-
 		return fieldModelDAOService.createFieldModel(projectId, fieldModel);
 	}
 
@@ -52,15 +47,6 @@ public class FieldModelServiceImpl implements FieldModelService {
 		if(existing == null) {
 			throw new NotFoundException("Field model not found:  " + fieldModelId);
 		}
-
-		if(fieldModel.getId() == null || fieldModel.getId().isBlank()) {
-			throw new IllegalArgumentException("Field model code is required");
-		}
-
-		if(fieldModel.getShortname() == null || fieldModel.getShortname().isEmpty()) {
-			throw new IllegalArgumentException("Field model shortname is required");
-		}
-
 		return fieldModelDAOService.updateFieldModel(projectId, fieldModelId, fieldModel);
 	}
 
@@ -70,7 +56,6 @@ public class FieldModelServiceImpl implements FieldModelService {
 		if(existing == null) {
 			throw new NotFoundException("Field model not found:  " + fieldModelId);
 		}
-
 		fieldModelDAOService.deleteFieldModel(projectId, fieldModelId);
 	}
 }

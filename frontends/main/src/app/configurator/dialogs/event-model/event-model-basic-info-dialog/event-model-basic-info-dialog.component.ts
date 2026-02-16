@@ -11,9 +11,8 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatSelectModule} from '@angular/material/select';
 import {EventModel} from '@core/model/event-model';
 import {ProjectLanguage} from '@core/model/project-language';
-import {HttpErrorResponse} from '@angular/common/http';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {EventModelService} from '../../../services/api/event-model.service';
+import {EventModelManagerService} from '../../../services/manager/event-model-manager.service';
 
 export interface EventModelBasicInfoDialogData {
 	projectId: string;
@@ -48,13 +47,12 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 	eventGroups: {id: string; name: string; code: string}[];
 	isEditMode: boolean;
 	saving = false;
-	allEventModels: EventModel[] = [];
 
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<EventModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelBasicInfoDialogData,
-		private eventModelService: EventModelService,
+		private eventModelManager: EventModelManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.eventModel;
@@ -63,7 +61,6 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.loadProjectLanguages();
-		this.loadAllEventModels();
 		this.initializeForm();
 	}
 
@@ -75,17 +72,6 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 		}
 
 		this.initializeLanguageForms();
-	}
-
-	loadAllEventModels(): void {
-		this.eventModelService.getEventModels(this.data.projectId).subscribe({
-			next: (eventModels: EventModel[]) => {
-				this.allEventModels = eventModels;
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading event models:', error);
-			}
-		});
 	}
 
 	initializeForm(): void {
@@ -124,7 +110,7 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 
 	getLanguageLabel(code: string, isDefault: boolean): string {
 		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ★` : name;
+		return isDefault ? `${name} ☆` : name;
 	}
 
 	getLanguageName(code: string): string {
@@ -157,7 +143,7 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 
 	isCodeDuplicate(code: string): boolean {
 		const currentEventModelId = this.data.eventModel?.eventModelId;
-		return this.allEventModels.some(em =>
+		return this.eventModelManager.getAll().some(em =>
 			em.id.toUpperCase() === code.toUpperCase() && em.eventModelId !== currentEventModelId
 		);
 	}

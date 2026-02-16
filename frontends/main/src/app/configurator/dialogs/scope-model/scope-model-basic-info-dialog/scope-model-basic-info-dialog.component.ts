@@ -9,10 +9,9 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSelectModule} from '@angular/material/select';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatInputModule} from '@angular/material/input';
-import {ScopeModelService} from '../../../services/api/scope-model.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
+import {ScopeModelManagerService} from '../../../services/manager/scope-model-manager.service';
 
 interface DialogData {
 	projectId: string;
@@ -41,16 +40,13 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 	form: FormGroup;
 	languageForms = new Map<string, FormGroup>();
 	isEditMode: boolean;
-	saving = false;
-
-	allScopeModels: ScopeModel[] = [];
 	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ScopeModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
-		private configuratorConfigService: ScopeModelService,
+		private scopeModelManager: ScopeModelManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.scopeModel;
@@ -63,29 +59,11 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.loadProjectLanguages();
-		this.loadAllScopeModels();
-	}
-
-	loadProjectLanguages(): void {
-		this.availableLanguages = this.data.languages || [];
-
-		if(this.availableLanguages.length === 0) {
-			this.availableLanguages = [{languageCode: 'en', isDefault: true}];
-		}
+		this.availableLanguages = this.data.languages?.length
+			? this.data.languages
+			: [{languageCode: 'en', isDefault: true}];
 
 		this.initializeLanguageForms();
-	}
-
-	loadAllScopeModels(): void {
-		this.configuratorConfigService.getScopeModels(this.data.projectId).subscribe({
-			next: (scopeModels: ScopeModel[]) => {
-				this.allScopeModels = scopeModels;
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading scope models:', error);
-			}
-		});
 	}
 
 	initializeLanguageForms(): void {
@@ -197,8 +175,9 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 
 	isCodeDuplicate(code: string): boolean {
 		const currentScopeModelId = this.data.scopeModel?.scopeModelId;
-		return this.allScopeModels.some(sm =>
-			sm.id.toUpperCase() === code.toUpperCase() && sm.scopeModelId !== currentScopeModelId);
+		return this.scopeModelManager.getAll().some(sm =>
+			sm.id.toUpperCase() === code.toUpperCase() && sm.scopeModelId !== currentScopeModelId
+		);
 	}
 
 	onCancel(): void {
@@ -221,6 +200,6 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 
 	getLanguageLabel(code: string, isDefault: boolean): string {
 		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ★` : name;
+		return isDefault ? `${name} ☆` : name;
 	}
 }

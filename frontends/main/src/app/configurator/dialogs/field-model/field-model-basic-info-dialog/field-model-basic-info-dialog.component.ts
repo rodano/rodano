@@ -11,9 +11,8 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
 import {FieldModel} from '@core/model/field-model';
-import {FieldModelService} from '../../../services/api/field-model.service';
+import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
 
 export interface FieldModelBasicInfoDialogData {
 	projectId: string;
@@ -56,7 +55,6 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
 	saving = false;
-	allFieldModels: FieldModel[] = [];
 
 	typeOptions: TypeOption[] = [
 		{value: 'STRING', label: 'String'},
@@ -84,7 +82,7 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<FieldModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: FieldModelBasicInfoDialogData,
-		private fieldModelService: FieldModelService,
+		private fieldModelManager: FieldModelManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.fieldModel;
@@ -92,7 +90,6 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.loadProjectLanguages();
-		this.loadAllFieldModels();
 		this.initializeForm();
 	}
 
@@ -104,17 +101,6 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 		}
 
 		this.initializeLanguageForms();
-	}
-
-	loadAllFieldModels(): void {
-		this.fieldModelService.getFieldModels(this.data.projectId).subscribe({
-			next: (fieldModels: FieldModel[]) => {
-				this.allFieldModels = fieldModels;
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading field models:', error);
-			}
-		});
 	}
 
 	initializeForm(): void {
@@ -150,7 +136,7 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 
 	getLanguageLabel(code: string, isDefault: boolean): string {
 		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ★` : name;
+		return isDefault ? `${name} ☆` : name;
 	}
 
 	getLanguageName(code: string): string {
@@ -183,7 +169,7 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 
 	isCodeDuplicate(code: string): boolean {
 		const currentFieldModelId = this.data.fieldModel?.fieldModelId;
-		return this.allFieldModels.some(fm =>
+		return this.fieldModelManager.getAll().some(fm =>
 			fm.id.toUpperCase() === code.toUpperCase() && fm.fieldModelId !== currentFieldModelId
 		);
 	}

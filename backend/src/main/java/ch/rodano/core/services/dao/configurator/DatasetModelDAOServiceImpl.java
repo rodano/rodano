@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.configurator;
 
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -8,6 +9,7 @@ import java.util.stream.Collectors;
 import org.jooq.DSLContext;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,9 @@ import static ch.rodano.core.model.jooq.tables.DatasetModel.DATASET_MODEL;
 
 @Repository
 public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
+
+	private static final String VIEW_SUMMARY = "summary";
+	private static final String VIEW_FULL = "full";
 
 	private final DSLContext dslContext;
 	private final JsonMapperService jsonMapperService;
@@ -36,21 +41,59 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "datasetModels", key = "#projectId")
-	public List<DatasetModelDTO> getDatasetModels(final UUID projectId) {
-		final var datasetModels = dslContext.selectFrom(DATASET_MODEL)
+	public List<DatasetModelDTO> getDatasetModels(final UUID projectId, final String view) {
+		final var normalized = view == null ? VIEW_SUMMARY : view.trim().toLowerCase();
+		return switch(normalized) {
+			case VIEW_FULL -> getDatasetModelsFull(projectId);
+			case VIEW_SUMMARY -> getDatasetModelsSummary(projectId);
+			default -> getDatasetModelsSummary(projectId);
+		};
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "datasetModels", key = "#projectId.toString() + ':summary'")
+	public List<DatasetModelDTO> getDatasetModelsSummary(final UUID projectId) {
+		final var records = dslContext.selectFrom(DATASET_MODEL)
 			.where(DATASET_MODEL.PROJECT_ID.eq(projectId))
 			.orderBy(DATASET_MODEL.CODE)
 			.fetch();
 
-		return datasetModels.stream()
-			.map(record -> matToDTO(record, projectId))
+		return records.stream()
+			.map(record -> mapToDTO(record, List.of()))
 			.collect(Collectors.toList());
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "datasetModel", key = "#projectId + '-' + #datasetModelId")
+	@Cacheable(value = "datasetModels", key = "#projectId.toString() + ':full'")
+	public List<DatasetModelDTO> getDatasetModelsFull(final UUID projectId) {
+		final var records = dslContext.selectFrom(DATASET_MODEL)
+			.where(DATASET_MODEL.PROJECT_ID.eq(projectId))
+			.orderBy(DATASET_MODEL.CODE)
+			.fetch();
+
+		if(records.isEmpty()) {
+			return List.of();
+		}
+
+		final var allFields = fieldModelDAOService.getFieldModels(projectId, VIEW_FULL);
+
+		final Map<UUID, List<FieldModelDTO>> fieldsByDataset = allFields.stream()
+			.filter(f -> f.getDatasetModelId() != null)
+			.collect(Collectors.groupingBy(FieldModelDTO::getDatasetModelId));
+
+		return records.stream()
+			.map(record -> mapToDTO(
+				record,
+				fieldsByDataset.getOrDefault(record.getDatasetModelId(), List.of())
+			))
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "datasetModel", key = "#projectId.toString() + ':' + #datasetModelId.toString()")
 	public DatasetModelDTO getDatasetModel(final UUID projectId, final UUID datasetModelId) {
 		final var record = dslContext.selectFrom(DATASET_MODEL)
 			.where(DATASET_MODEL.PROJECT_ID.eq(projectId))
@@ -61,12 +104,18 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 			return null;
 		}
 
-		return matToDTO(record, projectId);
+		final var fields = fieldModelDAOService.getFieldModels(projectId, VIEW_FULL).stream()
+			.filter(f -> datasetModelId.equals(f.getDatasetModelId()))
+			.collect(Collectors.toList());
+		return mapToDTO(record, fields);
 	}
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "datasetModels", "datasetModel" }, allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "datasetModels", key = "#projectId.toString() + ':summary'"),
+		@CacheEvict(value = "datasetModels", key = "#projectId.toString() + ':full'")
+	})
 	public DatasetModelDTO createDatasetModel(final UUID projectId, final DatasetModelDTO datasetModel) {
 		final var datasetModelId = datasetModel.getDatasetModelId() != null
 			? datasetModel.getDatasetModelId()
@@ -89,12 +138,15 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 			.execute();
 
 		return getDatasetModel(projectId, datasetModelId);
-
 	}
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "datasetModels", "datasetModel" }, allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "datasetModels", key = "#projectId.toString() + ':summary'"),
+		@CacheEvict(value = "datasetModels", key = "#projectId.toString() + ':full'"),
+		@CacheEvict(value = "datasetModel", key = "#projectId.toString() + ':' + #datasetModelId.toString()")
+	})
 	public DatasetModelDTO updateDatasetModel(final UUID projectId, final UUID datasetModelId, final DatasetModelDTO datasetModel) {
 		dslContext.update(DATASET_MODEL)
 			.set(DATASET_MODEL.CODE, datasetModel.getId())
@@ -117,7 +169,11 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "datasetModels", "datasetModel" }, allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "datasetModels", key = "#projectId.toString() + ':summary'"),
+		@CacheEvict(value = "datasetModels", key = "#projectId.toString() + ':full'"),
+		@CacheEvict(value = "datasetModel", key = "#projectId.toString() + ':' + #datasetModelId.toString()")
+	})
 	public void deleteDatasetModel(final UUID projectId, final UUID datasetModelId) {
 		dslContext.deleteFrom(DATASET_MODEL)
 			.where(DATASET_MODEL.PROJECT_ID.eq(projectId))
@@ -125,7 +181,7 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 			.execute();
 	}
 
-	private DatasetModelDTO matToDTO(final DatasetModelRecord record, final UUID projectId) {
+	private DatasetModelDTO mapToDTO(final DatasetModelRecord record, final List<FieldModelDTO> fieldModels) {
 		final var dto = new DatasetModelDTO();
 		dto.setDatasetModelId(record.getDatasetModelId());
 		dto.setId(record.getCode());
@@ -143,13 +199,8 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 		dto.setCollapsedLabelPattern(record.getCollapsedLabelPattern());
 		dto.setExpandedLabelPattern(record.getExpandedLabelPattern());
 
-		final var fieldModels = loadFieldModels(projectId, record.getDatasetModelId());
-		dto.setFieldModels(fieldModels);
+		dto.setFieldModels(fieldModels != null ? fieldModels : List.of());
 
 		return dto;
-	}
-
-	private List<FieldModelDTO> loadFieldModels(final UUID projectId, final UUID datasetModelId) {
-		return fieldModelDAOService.getFieldModelsByDatasetModel(projectId, datasetModelId);
 	}
 }

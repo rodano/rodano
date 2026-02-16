@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {EntityModificationTracker} from '../entity-modification-tracker';
 import {EventModel} from '@core/model/event-model';
 import {EventModelService} from '../api/event-model.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Injectable({
@@ -10,6 +10,8 @@ import {map} from 'rxjs/operators';
 })
 export class EventModelManagerService {
 	private tracker: EntityModificationTracker<EventModel>;
+	private loaded = false;
+	private fullLoaded = false;
 
 	constructor(private eventModelService: EventModelService) {
 		this.tracker = new EntityModificationTracker<EventModel>(
@@ -27,14 +29,56 @@ export class EventModelManagerService {
 		);
 	}
 
-	loadForScope(projectId: string, scopeModelId: string): Observable<EventModel[]> {
+	load(projectId: string): Observable<EventModel[]> {
+		if(this.loaded) {
+			return of(this.tracker.getCurrent());
+		}
 		return this.eventModelService.getEventModels(projectId).pipe(
 			map(models => {
-				const filtered = models.filter(em => em.scopeModelId === scopeModelId);
-				this.tracker.initialize(filtered);
-				return filtered;
+				this.tracker.initialize(models);
+				this.loaded = true;
+				return models;
 			})
 		);
+	}
+
+	loadFull(projectId: string): Observable<EventModel[]> {
+		if(this.fullLoaded) {
+			return of(this.tracker.getCurrent());
+		}
+
+		return this.eventModelService.getEventModelsFull(projectId).pipe(
+			map(fullModels => {
+				fullModels.forEach(fullModel => {
+					const existing = this.tracker.getEntity(fullModel.eventModelId);
+					if(existing) {
+						Object.assign(existing, fullModel);
+					}
+
+					const original = this.tracker.getOriginals().find(o =>
+						(o as any).eventModelId === fullModel.eventModelId
+					);
+					if(original) {
+						Object.assign(original, fullModel);
+					}
+				});
+				this.fullLoaded = true;
+				return this.tracker.getCurrent();
+			})
+		);
+	}
+
+	invalidate(): void {
+		this.loaded = false;
+		this.fullLoaded = false;
+	}
+
+	getAllForScope(scopeModelId: string): EventModel[] {
+		return this.tracker.getCurrent().filter(em => em.scopeModelId === scopeModelId);
+	}
+
+	getOriginalsForScope(scopeModelId: string): EventModel[] {
+		return this.tracker.getOriginals().filter(em => em.scopeModelId === scopeModelId);
 	}
 
 	create(projectId: string, eventModel: EventModel): Observable<EventModel> {
@@ -80,6 +124,7 @@ export class EventModelManagerService {
 
 	setAll(eventModels: EventModel[]): void {
 		this.tracker.initialize(eventModels);
+		this.fullLoaded = false;
 	}
 
 	getAll(): EventModel[] {

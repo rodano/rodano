@@ -2,12 +2,13 @@ import {Injectable} from '@angular/core';
 import {Validator} from '@core/model/validator';
 import {EntityModificationTracker} from '../entity-modification-tracker';
 import {ValidatorService} from '../api/validator.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
 export class ValidatorManagerService {
 	private tracker: EntityModificationTracker<Validator>;
+	private loaded = false;
 
 	constructor(private validatorService: ValidatorService) {
 		this.tracker = new EntityModificationTracker<Validator>(
@@ -19,12 +20,20 @@ export class ValidatorManagerService {
 	}
 
 	load(projectId: string): Observable<Validator[]> {
+		if(this.loaded) {
+			return of(this.tracker.getCurrent());
+		}
 		return this.validatorService.getValidators(projectId).pipe(
 			map(validators => {
 				this.tracker.initialize(validators);
+				this.loaded = true;
 				return validators;
 			})
 		);
+	}
+
+	invalidate(): void {
+		this.loaded = false;
 	}
 
 	create(projectId: string, validator: Validator): Observable<Validator> {

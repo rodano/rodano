@@ -10,7 +10,15 @@ export class EventModelService {
 	constructor(private http: HttpClient) {}
 
 	getEventModels(projectId: string): Observable<EventModel[]> {
-		return this.http.get<EventModel[]>(`/api/superuser/configurator/projects/${projectId}/config/event-models`);
+		return this.http.get<EventModel[]>(`/api/superuser/configurator/projects/${projectId}/config/event-models`, {
+			params: {view: 'summary'}
+		});
+	}
+
+	getEventModelsFull(projectId: string): Observable<EventModel[]> {
+		return this.http.get<EventModel[]>(`/api/superuser/configurator/projects/${projectId}/config/event-models`, {
+			params: {view: 'full'}
+		});
 	}
 
 	getEventModel(projectId: string, eventModelId: string): Observable<EventModel> {

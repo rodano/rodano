@@ -7,11 +7,9 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatInputModule} from '@angular/material/input';
 import {MatButtonModule} from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
-import {ScopeModelService} from '../../../services/api/scope-model.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../../services/language.service';
+import {ScopeModelManagerService} from '../../../services/manager/scope-model-manager.service';
 
 interface DialogData {
 	projectId: string;
@@ -36,7 +34,6 @@ interface DialogData {
 })
 export class ScopeModelRelationshipsDialogComponent implements OnInit {
 	form: FormGroup;
-	saving = false;
 	availableParents: ScopeModel[] = [];
 
 	constructor(
@@ -44,8 +41,7 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ScopeModelRelationshipsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
-		private configuratorConfigService: ScopeModelService,
-		private snackBar: MatSnackBar
+		private scopeModelManager: ScopeModelManagerService
 	) {
 		this.form = this.fb.group({
 			parentIds: [[]],
@@ -54,21 +50,10 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.loadAvailableParents();
+		this.availableParents = this.scopeModelManager.getAll().filter(
+			sm => sm.scopeModelId !== this.data.scopeModel.scopeModelId
+		);
 		this.populateForm();
-	}
-
-	loadAvailableParents(): void {
-		this.configuratorConfigService.getScopeModels(this.data.projectId).subscribe({
-			next: (scopeModels: ScopeModel[]) => {
-				this.availableParents = scopeModels.filter(
-					sm => sm.scopeModelId !== this.data.scopeModel.scopeModelId
-				);
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading scope models:', error);
-			}
-		});
 	}
 
 	populateForm(): void {

@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {EventGroup} from '@core/model/event-group';
 import {EntityModificationTracker} from '../entity-modification-tracker';
 import {EventGroupService} from '../api/event-group.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 
 @Injectable({
@@ -10,6 +10,7 @@ import {map} from 'rxjs/operators';
 })
 export class EventGroupManagerService {
 	private tracker: EntityModificationTracker<EventGroup>;
+	private loaded = false;
 
 	constructor(private eventGroupService: EventGroupService) {
 		this.tracker = new EntityModificationTracker<EventGroup>(
@@ -20,14 +21,29 @@ export class EventGroupManagerService {
 		);
 	}
 
-	loadForScope(projectId: string, scopeModelId: string): Observable<EventGroup[]> {
+	load(projectId: string): Observable<EventGroup[]> {
+		if(this.loaded) {
+			return of(this.tracker.getCurrent());
+		}
 		return this.eventGroupService.getEventGroups(projectId).pipe(
 			map(groups => {
-				const filtered = groups.filter(eg => eg.scopeModelId === scopeModelId);
-				this.tracker.initialize(filtered);
-				return filtered;
+				this.tracker.initialize(groups);
+				this.loaded = true;
+				return groups;
 			})
 		);
+	}
+
+	invalidate(): void {
+		this.loaded = false;
+	}
+
+	getAllForScope(scopeModelId: string): EventGroup[] {
+		return this.tracker.getCurrent().filter(eg => eg.scopeModelId === scopeModelId);
+	}
+
+	getOriginalsForScope(scopeModelId: string): EventGroup[] {
+		return this.tracker.getOriginals().filter(eg => eg.scopeModelId === scopeModelId);
 	}
 
 	create(projectId: string, eventGroup: EventGroup): Observable<EventGroup> {

@@ -5,10 +5,9 @@ import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
-import {DatasetModelService} from '../../../services/api/dataset-model.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {HttpErrorResponse} from '@angular/common/http';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import {DatasetModelManagerService} from '../../../services/manager/dataset-model-manager.service';
 
 export interface DatasetModelBasicInfoDialogData {
 	projectId: string;
@@ -34,13 +33,12 @@ export class DatasetModelBasicInfoDialogComponent implements OnInit {
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
-	allDatasetModels: DatasetModel[] = [];
 
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<DatasetModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DatasetModelBasicInfoDialogData,
-		private datasetModelService: DatasetModelService,
+		private datasetModelManager: DatasetModelManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.datasetModel;
@@ -48,7 +46,6 @@ export class DatasetModelBasicInfoDialogComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.loadProjectLanguages();
-		this.loadAllDatasetModels();
 		this.initializeForm();
 	}
 
@@ -60,17 +57,6 @@ export class DatasetModelBasicInfoDialogComponent implements OnInit {
 		}
 
 		this.initializeLanguageForms();
-	}
-
-	loadAllDatasetModels(): void {
-		this.datasetModelService.getDatasetModels(this.data.projectId).subscribe({
-			next: (datasetModels: DatasetModel[]) => {
-				this.allDatasetModels = datasetModels;
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading dataset models:', error);
-			}
-		});
 	}
 
 	initializeForm(): void {
@@ -104,7 +90,7 @@ export class DatasetModelBasicInfoDialogComponent implements OnInit {
 
 	getLanguageLabel(code: string, isDefault: boolean): string {
 		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ★` : name;
+		return isDefault ? `${name} ☆` : name;
 	}
 
 	getLanguageName(code: string): string {
@@ -137,7 +123,7 @@ export class DatasetModelBasicInfoDialogComponent implements OnInit {
 
 	isCodeDuplicate(code: string): boolean {
 		const currentDatasetModelId = this.data.datasetModel?.datasetModelId;
-		return this.allDatasetModels.some(dm =>
+		return this.datasetModelManager.getAll().some(dm =>
 			dm.id.toUpperCase() === code.toUpperCase() && dm.datasetModelId !== currentDatasetModelId
 		);
 	}

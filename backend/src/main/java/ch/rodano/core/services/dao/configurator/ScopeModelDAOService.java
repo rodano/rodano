@@ -7,7 +7,11 @@ import ch.rodano.api.config.ScopeModelDTO;
 
 public interface ScopeModelDAOService {
 
-	List<ScopeModelDTO> getScopeModels(UUID projectId);
+	List<ScopeModelDTO> getScopeModels(UUID projectId, String view);
+
+	List<ScopeModelDTO> getScopeModelsSummary(UUID projectId);
+
+	List<ScopeModelDTO> getScopeModelsFull(UUID projectId);
 
 	ScopeModelDTO getScopeModel(UUID projectId, UUID scopeModelId);
 

@@ -63,10 +63,6 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
-
-		this.datasetModelManager.load(this.projectId).subscribe({
-			error: error => console.error('Error loading dataset models:', error)
-		});
 	}
 
 	ngOnDestroy(): void {

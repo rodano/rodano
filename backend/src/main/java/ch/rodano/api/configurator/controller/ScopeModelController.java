@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.ScopeModelDTO;
@@ -33,8 +34,11 @@ public class ScopeModelController {
 	 * Get all scope models for a project
 	 */
 	@GetMapping("/scope-models")
-	public ResponseEntity<List<ScopeModelDTO>> getScopeModels(@PathVariable final UUID projectId) {
-		final var scopeModels = scopeModelService.getScopeModels(projectId);
+	public ResponseEntity<List<ScopeModelDTO>> getScopeModels(
+		@PathVariable final UUID projectId,
+		@RequestParam(name = "view", required = false, defaultValue = "summary") final String view
+	) {
+		final var scopeModels = scopeModelService.getScopeModels(projectId, view);
 		return ResponseEntity.ok(scopeModels);
 	}
 

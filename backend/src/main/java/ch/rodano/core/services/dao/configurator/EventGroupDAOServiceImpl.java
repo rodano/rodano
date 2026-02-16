@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.jooq.DSLContext;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +32,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "eventGroups", key = "#projectId")
+	@Cacheable(value = "eventGroups", key = "#projectId.toString()")
 	public List<EventGroupDTO> getEventGroups(final UUID projectId) {
 		final var eventGroups = dslContext.selectFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
@@ -45,7 +46,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "eventGroup", key = "#projectId + '-' + #eventGroupId")
+	@Cacheable(value = "eventGroup", key = "#projectId.toString() + ':' + #eventGroupId.toString()")
 	public EventGroupDTO getEventGroup(final UUID projectId, final UUID eventGroupId) {
 		final var record = dslContext.selectFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
@@ -61,7 +62,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "eventGroups", "eventGroup", "eventGroupsByScopeModel" }, allEntries = true)
+	@Caching(evict = { @CacheEvict(value = "eventGroups", key = "#projectId.toString()") })
 	public EventGroupDTO createEventGroup(final UUID projectId, final EventGroupDTO eventGroup) {
 		final var eventGroupId = eventGroup.getEventGroupId() != null
 			? eventGroup.getEventGroupId()
@@ -82,7 +83,10 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "eventGroups", "eventGroup", "eventGroupsByScopeModel" }, allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "eventGroups", key = "#projectId.toString()"),
+		@CacheEvict(value = "eventGroup", key = "#projectId.toString() + ':' + #eventGroupId.toString()")
+	})
 	public EventGroupDTO updateEventGroup(final UUID projectId, final UUID eventGroupId, final EventGroupDTO eventGroup) {
 		dslContext.update(EVENT_GROUP)
 			.set(EVENT_GROUP.CODE, eventGroup.getId())
@@ -99,27 +103,15 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "eventGroups", "eventGroup", "eventGroupsByScopeModel" }, allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "eventGroups", key = "#projectId.toString()"),
+		@CacheEvict(value = "eventGroup", key = "#projectId.toString() + ':' + #eventGroupId.toString()")
+	})
 	public void deleteEventGroup(final UUID projectId, final UUID eventGroupId) {
 		dslContext.deleteFrom(EVENT_GROUP)
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
 			.and(EVENT_GROUP.EVENT_GROUP_ID.eq(eventGroupId))
 			.execute();
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	@Cacheable(value = "eventGroupsByScopeModel", key = "#projectId + '-' + #scopeModelId")
-	public List<EventGroupDTO> getEventGroupsByScopeModel(final UUID projectId, final UUID scopeModelId) {
-		final var eventGroups = dslContext.selectFrom(EVENT_GROUP)
-			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
-			.and(EVENT_GROUP.SCOPE_MODEL_ID.eq(scopeModelId))
-			.orderBy(EVENT_GROUP.CODE)
-			.fetch();
-
-		return eventGroups.stream()
-			.map(this::mapToDTO)
-			.collect(Collectors.toList());
 	}
 
 	private EventGroupDTO mapToDTO(final EventGroupRecord record) {

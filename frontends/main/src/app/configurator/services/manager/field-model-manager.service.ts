@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {EntityModificationTracker} from '../entity-modification-tracker';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {FieldModel} from '@core/model/field-model';
 import {FieldModelService} from '../api/field-model.service';
@@ -10,6 +10,8 @@ import {FieldModelService} from '../api/field-model.service';
 })
 export class FieldModelManagerService {
 	private tracker: EntityModificationTracker<FieldModel>;
+	private loaded = false;
+	private fullLoaded = false;
 
 	constructor(private fieldModelService: FieldModelService) {
 		this.tracker = new EntityModificationTracker<FieldModel>(
@@ -28,14 +30,56 @@ export class FieldModelManagerService {
 		);
 	}
 
-	loadForDataset(projectId: string, datasetModelId: string): Observable<FieldModel[]> {
+	load(projectId: string): Observable<FieldModel[]> {
+		if(this.loaded) {
+			return of(this.tracker.getCurrent());
+		}
 		return this.fieldModelService.getFieldModels(projectId).pipe(
-			map(groups => {
-				const filtered = groups.filter(fm => fm.datasetModelId === datasetModelId);
-				this.tracker.initialize(filtered);
-				return filtered;
+			map(models => {
+				this.tracker.initialize(models);
+				this.loaded = true;
+				return models;
 			})
 		);
+	}
+
+	loadFull(projectId: string): Observable<FieldModel[]> {
+		if(this.fullLoaded) {
+			return of(this.tracker.getCurrent());
+		}
+
+		return this.fieldModelService.getFieldModelsFull(projectId).pipe(
+			map(fullModels => {
+				fullModels.forEach(fullModel => {
+					const existing = this.tracker.getEntity(fullModel.fieldModelId);
+					if(existing) {
+						Object.assign(existing, fullModel);
+					}
+
+					const original = this.tracker.getOriginals().find(o =>
+						(o as any).fieldModelId === fullModel.fieldModelId
+					);
+					if(original) {
+						Object.assign(original, fullModel);
+					}
+				});
+				this.fullLoaded = true;
+				return this.tracker.getCurrent();
+			})
+		);
+	}
+
+	invalidate(): void {
+		this.loaded = false;
+		this.fullLoaded = false;
+	}
+
+	getAllForDataset(datasetModelId: string): FieldModel[] {
+		return this.tracker.getCurrent().filter(fm => fm.datasetModelId === datasetModelId);
+	}
+
+	getOriginalsForDataset(datasetModelId: string): FieldModel[] {
+		return this.tracker.getOriginals().filter(fm => fm.datasetModelId === datasetModelId);
 	}
 
 	create(projectId: string, fieldModel: FieldModel): Observable<FieldModel> {
@@ -77,6 +121,7 @@ export class FieldModelManagerService {
 
 	setAll(fieldModels: FieldModel[]): void {
 		this.tracker.initialize(fieldModels);
+		this.fullLoaded = false;
 	}
 
 	getAll(): FieldModel[] {

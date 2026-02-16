@@ -7,6 +7,7 @@
 
 	<app-scope-models-tree
 		[projectId]="projectId"
+		[scopeModels]="scopeModels"
 		[expanded]="expandedCategory === 'scope-models'"
 		[eventModels]="eventModels"
 		[eventGroups]="eventGroups"
@@ -18,6 +19,7 @@
 
 	<app-dataset-models-tree
 		[projectId]="projectId"
+		[datasetModels]="datasetModels"
 		[expanded]="expandedCategory === 'dataset-models'"
 		[fieldModels]="fieldModels"
 		[selectedDatasetModelId]="selectedDatasetModelId"
@@ -27,6 +29,7 @@
 
 	<app-validator-tree
 		[projectId]="projectId"
+		[validators]="validators"
 		[expanded]="expandedCategory === 'validators'"
 		[selectedValidatorId]="selectedValidatorId"
 		(categoryClicked)="onValidatorsClicked()">

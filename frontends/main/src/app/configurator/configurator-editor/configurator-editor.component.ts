@@ -18,6 +18,9 @@ import {LanguageService} from '../services/language.service';
 import {SnapshotManagerService} from '../services/manager/snapshot-manager.service';
 import {forkJoin} from 'rxjs';
 import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrator.service';
+import {ScopeModelManagerService} from '../services/manager/scope-model-manager.service';
+import {DatasetModelManagerService} from '../services/manager/dataset-model-manager.service';
+import {ValidatorManagerService} from '../services/manager/validator-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -51,16 +54,18 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	datasetModelModificationCount = 0;
 	validatorModificationCount = 0;
 
+	scopeModels: any[] = [];
+	datasetModels: any[] = [];
+	validators: any[] = [];
 	eventModels: any[] = [];
 	eventGroups: any[] = [];
+	fieldModels: any[] = [];
+
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
 	selectedEventGroupId: string | null = null;
-
-	fieldModels: any[] = [];
 	selectedDatasetModelId: string | null = null;
 	selectedFieldModelId: string | null = null;
-
 	selectedValidatorId: string | null = null;
 
 	canRollback = false;
@@ -72,6 +77,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private configuratorService: ConfiguratorService,
 		private snapshotManager: SnapshotManagerService,
 		private entitySaveOrchestratorService: EntitySaveOrchestratorService,
+		private scopeModelManager: ScopeModelManagerService,
+		private datasetModelManager: DatasetModelManagerService,
+		private validatorManager: ValidatorManagerService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -114,6 +122,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				}
 
 				this.loadDraftVersion();
+				this.loadTreeData();
 			},
 			error: error => {
 				console.error('Error selecting project:', error);
@@ -121,6 +130,29 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.loading = false;
 			}
 		});
+	}
+
+	private loadTreeData(): void {
+		this.scopeModelManager.load(this.projectId).subscribe({
+			next: models => this.scopeModels = models,
+			error: error => console.error('Error loading scope models:', error)
+		});
+
+		this.datasetModelManager.load(this.projectId).subscribe({
+			next: models => this.datasetModels = models,
+			error: error => console.error('Error loading dataset models:', error)
+		});
+
+		this.validatorManager.load(this.projectId).subscribe({
+			next: validators => this.validators = validators,
+			error: error => console.error('Error loading validators:', error)
+		});
+	}
+
+	private refreshTreeData(): void {
+		this.scopeModels = this.scopeModelManager.getAll();
+		this.datasetModels = this.datasetModelManager.getAll();
+		this.validators = this.validatorManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -288,7 +320,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			modifiedEventGroupIds: component.modifiedEventGroupIds
 		}).toPromise().then(() => {
 			component.loadScopeModels();
-			this.treeComponent?.reloadScopeModels();
+			this.scopeModels = this.scopeModelManager.getAll();
 		});
 	}
 
@@ -308,7 +340,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			modifiedFieldModels: component.modifiedFieldModels
 		}).toPromise().then(() => {
 			component.loadDatasetModels();
-			this.treeComponent?.reloadDatasetModels();
+			this.datasetModels = this.datasetModelManager.getAll();
 		});
 	}
 
@@ -325,7 +357,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			modifiedValidatorIds: component.modifiedValidatorIds
 		}).toPromise().then(() => {
 			component.loadValidators();
-			this.treeComponent?.reloadValidators();
+			this.validators = this.validatorManager.getAll();
 		});
 	}
 
@@ -392,6 +424,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.scopeModelModificationCount = 0;
 				this.datasetModelModificationCount = 0;
 				this.validatorModificationCount = 0;
+
+				this.refreshTreeData();
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
 			}
 		});
@@ -467,20 +501,26 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	onScopeModelContextChanged(context: any): void {
-		this.eventModels = context.eventModels;
-		this.eventGroups = context.eventGroups;
-		this.selectedScopeModelId = context.selectedScopeModelId;
-		this.selectedEventModelId = context.selectedEventModelId;
-		this.selectedEventGroupId = context.selectedEventGroupId;
+		setTimeout(() => {
+			this.eventModels = context.eventModels;
+			this.eventGroups = context.eventGroups;
+			this.selectedScopeModelId = context.selectedScopeModelId;
+			this.selectedEventModelId = context.selectedEventModelId;
+			this.selectedEventGroupId = context.selectedEventGroupId;
+		});
 	}
 
 	onDatasetModelContextChanged(context: any): void {
-		this.fieldModels = context.fieldModels;
-		this.selectedDatasetModelId = context.selectedDatasetModelId;
-		this.selectedFieldModelId = context.selectedFieldModelId;
+		setTimeout(() => {
+			this.fieldModels = context.fieldModels;
+			this.selectedDatasetModelId = context.selectedDatasetModelId;
+			this.selectedFieldModelId = context.selectedFieldModelId;
+		});
 	}
 
 	onValidatorContextChanged(context: any): void {
-		this.selectedValidatorId = context.selectedValidatorId;
+		setTimeout(() => {
+			this.selectedValidatorId = context.selectedValidatorId;
+		});
 	}
 }

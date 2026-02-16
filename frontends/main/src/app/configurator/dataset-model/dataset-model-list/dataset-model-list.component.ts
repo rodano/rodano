@@ -5,7 +5,7 @@ import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatButtonModule} from '@angular/material/button';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {DatasetModel} from '@core/model/dataset-model';
-import {Subscription} from 'rxjs';
+import {forkJoin, Subscription} from 'rxjs';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {LanguageService} from '../../services/language.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -58,6 +58,8 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
 
+	private currentFieldModels: FieldModel[] = [];
+
 	constructor(
 		public datasetModelManager: DatasetModelManagerService,
 		public fieldModelManager: FieldModelManagerService,
@@ -69,7 +71,6 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		//this.loadProject();
 		this.loadDatasetModels();
 
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
@@ -85,10 +86,12 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 				const datasetModel = this.datasetModels.find(dm => dm.datasetModelId === datasetModelId);
 				if(datasetModel) {
 					this.selectedDatasetModel = datasetModel;
+					this.updateFilteredFieldModels();
 				}
 			}
 			else if(nodeId === 'dataset-models') {
 				this.selectedDatasetModel = null;
+				this.currentFieldModels = [];
 			}
 		}
 	}
@@ -118,7 +121,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	get fieldModels(): FieldModel[] {
-		return this.fieldModelManager.getAll();
+		return this.currentFieldModels;
 	}
 
 	get modifiedDatasetModelIds(): Set<string> {
@@ -141,26 +144,19 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		return this.datasetModelManager.getModificationCount() + this.fieldModelManager.getModificationCount();
 	}
 
-	loadProject(): void {
-		this.configuratorService.getProject(this.projectId).subscribe({
-			next: (project: ConfiguratorProject) => {
-				this.projectLanguages = project.languages || [];
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading project:', error);
-				this.projectLanguages = [{languageCode: 'en', isDefault: true}];
-			}
-		});
-	}
-
 	loadDatasetModels(): void {
 		this.loading = true;
-		this.datasetModelManager.load(this.projectId).subscribe({
-			next: (datasetModels: DatasetModel[]) => {
+
+		forkJoin({
+			datasetModels: this.datasetModelManager.load(this.projectId),
+			fieldModels: this.fieldModelManager.load(this.projectId)
+		}).subscribe({
+			next: ({datasetModels}) => {
 				if(this.selectedDatasetModel) {
 					this.selectedDatasetModel = datasetModels.find(
 						dm => dm.datasetModelId === this.selectedDatasetModel!.datasetModelId
 					) || null;
+					this.updateFilteredFieldModels();
 				}
 				this.loading = false;
 				this.emitContext();
@@ -171,6 +167,14 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 				this.loading = false;
 			}
 		});
+	}
+
+	private updateFilteredFieldModels(): void {
+		if(!this.selectedDatasetModel) {
+			this.currentFieldModels = [];
+			return;
+		}
+		this.currentFieldModels = this.fieldModelManager.getAllForDataset(this.selectedDatasetModel.datasetModelId);
 	}
 
 	onSelectDatasetModel(datasetModel: DatasetModel): void {
@@ -186,6 +190,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	clearSelection(): void {
 		this.selectedDatasetModel = null;
 		this.selectedFieldModelId = null;
+		this.currentFieldModels = [];
 		this.viewMode = 'dataset-detail';
 		this.nodeSelected.emit('dataset-models');
 	}
@@ -204,20 +209,10 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 		if(previousDatasetModelId !== datasetModel.datasetModelId) {
 			this.viewMode = 'dataset-detail';
-			this.fieldModelManager.setAll([]);
 		}
 
+		this.updateFilteredFieldModels();
 		this.emitContext();
-
-		this.fieldModelManager.loadForDataset(this.projectId, datasetModel.datasetModelId).subscribe({
-			next: () => this.emitContext(),
-			error: error => {
-				console.error('Error loading field models:', error);
-				this.fieldModelManager.setAll([]);
-				this.emitContext();
-			}
-		});
-
 		this.nodeSelected.emit(`dataset-model-${datasetModel.datasetModelId}`);
 	}
 
@@ -301,10 +296,11 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 				this.fieldModelManager.create(this.projectId, newFieldModel).subscribe({
 					next: () => {
 						this.snackBar.open('Field model created', 'Close', {duration: 2000});
+						this.loadDatasetModels();
 					},
 					error: error => {
-						console.error('Error creating fied model:', error);
-						this.snackBar.open('Failed to create fied model', 'Close', {duration: 3000});
+						console.error('Error creating field model:', error);
+						this.snackBar.open('Failed to create field model', 'Close', {duration: 3000});
 					}
 				});
 			}
@@ -316,6 +312,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 		this.fieldModelManager.update(updatedFieldModel);
+		this.updateFilteredFieldModels();
 		this.emitModificationChange();
 		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
 	}
@@ -330,6 +327,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 					this.viewMode = 'field-list';
 				}
 
+				this.updateFilteredFieldModels();
 				this.emitModificationChange();
 				this.emitContext();
 			},
@@ -367,7 +365,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	private emitContext(): void {
 		this.datasetModelContextChanged.emit({
-			fieldModels: this.fieldModels,
+			fieldModels: this.currentFieldModels,
 			selectedDatasetModelId: this.selectedDatasetModel?.datasetModelId || null,
 			selectedFieldModelId: this.selectedFieldModelId
 		});

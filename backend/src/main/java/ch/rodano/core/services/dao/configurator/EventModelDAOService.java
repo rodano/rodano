@@ -7,7 +7,11 @@ import ch.rodano.api.config.EventModelDTO;
 
 public interface EventModelDAOService {
 
-	List<EventModelDTO> getEventModels(UUID projectId);
+	List<EventModelDTO> getEventModels(UUID projectId, String view);
+
+	List<EventModelDTO> getEventModelsSummary(UUID projectId);
+
+	List<EventModelDTO> getEventModelsFull(UUID projectId);
 
 	EventModelDTO getEventModel(UUID projectId, UUID eventModelId);
 

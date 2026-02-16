@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.EventModelDTO;
@@ -33,8 +34,11 @@ public class EventModelController {
 	 * Get all event models for a project
 	 */
 	@GetMapping("/event-models")
-	public ResponseEntity<List<EventModelDTO>> getEventModels(@PathVariable final UUID projectId) {
-		final var eventModels = eventModelService.getEventModels(projectId);
+	public ResponseEntity<List<EventModelDTO>> getEventModels(
+		@PathVariable final UUID projectId,
+		@RequestParam(name = "view", required = false, defaultValue = "summary") final String view
+	) {
+		final var eventModels = eventModelService.getEventModels(projectId, view);
 		return ResponseEntity.ok(eventModels);
 	}
 

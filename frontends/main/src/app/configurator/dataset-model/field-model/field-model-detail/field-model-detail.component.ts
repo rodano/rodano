@@ -7,12 +7,13 @@ import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatDialog} from '@angular/material/dialog';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../../services/language.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {FieldModel} from '@core/model/field-model';
 import {DatasetModel} from '@core/model/dataset-model';
 import {FieldModelDialogService} from '../../../services/dialogs/field-model-dialog.service';
 import {PossibleValue} from '@core/model/possible-value';
+import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
+import {ValidatorManagerService} from '../../../services/manager/validator-manager.service';
 
 @Component({
 	selector: 'app-field-model-detail',
@@ -42,27 +43,43 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
 
-	allValidators: {id: string; name: string}[] = [];
-	allWorkflows: {id: string; name: string}[] = [];
+	allValidators: {id: string; code: string; name: string}[] = [];
+	allWorkflows: {id: string; code: string; name: string}[] = [];
 
 	constructor(
 		private languageService: LanguageService,
 		private fieldModelDialogService: FieldModelDialogService,
-		private dialog: MatDialog,
-		private snackBar: MatSnackBar
+		private fieldModelManager: FieldModelManagerService,
+		private validatorManager: ValidatorManagerService,
+		private dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
-		this.loadFieldModel();
+
+		this.fieldModelManager.loadFull(this.projectId).subscribe({
+			next: () => {
+				this.loadFieldModel();
+			},
+			error: error => console.error('Error loading full field models:', error)
+		});
+
 		this.loadValidators();
 		this.loadWorkflows();
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['fieldModelId'] || changes['fieldModels']) {
+		if(changes['fieldModelId'] && this.fieldModelId) {
+			this.fieldModelManager.loadFull(this.projectId).subscribe({
+				next: () => {
+					this.loadFieldModel();
+				},
+				error: error => console.error('Error loading full field models:', error)
+			});
+		}
+		else if(changes['fieldModels']) {
 			this.loadFieldModel();
 		}
 	}
@@ -82,10 +99,20 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private loadValidators(): void {
-		this.allValidators = [];
+		this.validatorManager.load(this.projectId).subscribe({
+			next: validators => {
+				this.allValidators = validators.map(v => ({
+					id: v.validatorId,
+					code: v.id,
+					name: this.languageService.getDefaultTranslation(v.shortname) || v.id
+				}));
+			},
+			error: error => console.error('Error loading validators:', error)
+		});
 	}
 
 	private loadWorkflows(): void {
+		//TODO: Implement when workflows are ready
 		this.allWorkflows = [];
 	}
 
@@ -137,12 +164,18 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 
 	getValidatorName(validatorId: string): string {
 		const validator = this.allValidators.find(v => v.id === validatorId);
-		return validator?.name || validatorId;
+		if(!validator) {
+			return validatorId;
+		}
+		return `${validator.name} (${validator.code})`;
 	}
 
 	getWorkflowName(workflowId: string): string {
 		const workflow = this.allWorkflows.find(wf => wf.id === workflowId);
-		return workflow?.name || workflowId;
+		if(!workflow) {
+			return workflowId;
+		}
+		return `${workflow.name} (${workflow.code})`;
 	}
 
 	getTypeLabel(type: string): string {

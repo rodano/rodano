@@ -7,7 +7,11 @@ import ch.rodano.api.config.DatasetModelDTO;
 
 public interface DatasetModelService {
 
-	List<DatasetModelDTO> getDatasetModels(UUID projectId);
+	List<DatasetModelDTO> getDatasetModels(UUID projectId, String view);
+
+	default List<DatasetModelDTO> getDatasetModels(final UUID projectId) {
+		return getDatasetModels(projectId, "summary");
+	}
 
 	DatasetModelDTO getDatasetModel(UUID projectId, UUID datasetModelId);
 

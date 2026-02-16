@@ -1,31 +1,28 @@
 package ch.rodano.core.services.dao.configurator;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
-import org.jooq.Record2;
+import org.jooq.Record;
+import org.jooq.Table;
+import org.jooq.TableField;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-import ch.rodano.api.config.EventGroupDTO;
-import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.config.ScopeModelDTO;
-import ch.rodano.core.model.jooq.tables.records.EventModelRecord;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelRecord;
 
-import static ch.rodano.core.model.jooq.tables.EventModel.EVENT_MODEL;
-import static ch.rodano.core.model.jooq.tables.EventModelDatasetModel.EVENT_MODEL_DATASET_MODEL;
-import static ch.rodano.core.model.jooq.tables.EventModelFormModel.EVENT_MODEL_FORM_MODEL;
-import static ch.rodano.core.model.jooq.tables.EventModelWorkflow.EVENT_MODEL_WORKFLOW;
 import static ch.rodano.core.model.jooq.tables.ScopeModel.SCOPE_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.SCOPE_MODEL_DATASET_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
@@ -35,37 +32,79 @@ import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.SCOPE_MODEL_WO
 @Repository
 public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 
+	private static final String VIEW_SUMMARY = "summary";
+	private static final String VIEW_FULL = "full";
+
 	private final DSLContext dslContext;
 	private final JsonMapperService jsonMapperService;
-	private final EventGroupDAOService eventGroupDAOService;
 
-	public ScopeModelDAOServiceImpl(final DSLContext dslContext,
-									final JsonMapperService jsonMapperService,
-									final EventGroupDAOService eventGroupDAOService) {
+	public ScopeModelDAOServiceImpl(final DSLContext dslContext, final JsonMapperService jsonMapperService) {
 		this.dslContext = dslContext;
 		this.jsonMapperService = jsonMapperService;
-		this.eventGroupDAOService = eventGroupDAOService;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "scopeModels", key = "#projectId")
-	public List<ScopeModelDTO> getScopeModels(final UUID projectId) {
-		final var scopeModels = dslContext.selectFrom(SCOPE_MODEL)
+	public List<ScopeModelDTO> getScopeModels(final UUID projectId, final String view) {
+		final var normalized = view == null ? VIEW_SUMMARY : view.trim().toLowerCase();
+		return switch(normalized) {
+			case VIEW_FULL -> getScopeModelsFull(projectId);
+			case VIEW_SUMMARY -> getScopeModelsSummary(projectId);
+			default -> getScopeModelsSummary(projectId);
+		};
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "scopeModels", key = "#projectId.toString() + ':summary'")
+	public List<ScopeModelDTO> getScopeModelsSummary(final UUID projectId) {
+		final var scopeModelRecords = dslContext
+			.selectFrom(SCOPE_MODEL)
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
 			.orderBy(SCOPE_MODEL.CODE)
 			.fetch();
 
-		return scopeModels.stream()
-			.map(record -> mapToDTO(record, projectId))
-			.collect(Collectors.toList());
+		if(scopeModelRecords.isEmpty()) {
+			return List.of();
+		}
+
+		return scopeModelRecords.map(record -> mapToDTO(
+			record, Map.of(), Map.of(), Map.of(), Map.of(), Map.of()
+		));
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "scopeModel", key = "#projectId + '-' + #scopeModelId")
+	@Cacheable(value = "scopeModels", key = "#projectId.toString() + ':full'")
+	public List<ScopeModelDTO> getScopeModelsFull(final UUID projectId) {
+		final var scopeModelRecords = dslContext
+			.selectFrom(SCOPE_MODEL)
+			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
+			.orderBy(SCOPE_MODEL.CODE)
+			.fetch();
+
+		if(scopeModelRecords.isEmpty()) {
+			return List.of();
+		}
+
+		final var scopeModelIds = scopeModelRecords.map(ScopeModelRecord::getScopeModelId);
+		final var parentMap = loadParentIds(projectId, scopeModelIds);
+		final var childMap = loadChildIds(projectId, scopeModelIds);
+		final var datasetMap = loadDatasetModelIds(projectId, scopeModelIds);
+		final var formMap = loadFormModelIds(projectId, scopeModelIds);
+		final var workflowMap = loadWorkflowIds(projectId, scopeModelIds);
+
+		return scopeModelRecords.map(record -> mapToDTO(
+			record, parentMap, childMap, datasetMap, formMap, workflowMap
+		));
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	@Cacheable(value = "scopeModel", key = "#projectId.toString() + ':' + #scopeModelId.toString()")
 	public ScopeModelDTO getScopeModel(final UUID projectId, final UUID scopeModelId) {
-		final var record = dslContext.selectFrom(SCOPE_MODEL)
+		final var record = dslContext
+			.selectFrom(SCOPE_MODEL)
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
 			.and(SCOPE_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
 			.fetchOne();
@@ -74,76 +113,88 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			return null;
 		}
 
-		return mapToDTO(record, projectId);
+		final var scopeModelIds = List.of(scopeModelId);
+		final var parentMap = loadParentIds(projectId, scopeModelIds);
+		final var childMap = loadChildIds(projectId, scopeModelIds);
+		final var datasetMap = loadDatasetModelIds(projectId, scopeModelIds);
+		final var formMap = loadFormModelIds(projectId, scopeModelIds);
+		final var workflowMap = loadWorkflowIds(projectId, scopeModelIds);
+
+		return mapToDTO(record, parentMap, childMap, datasetMap, formMap, workflowMap);
 	}
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "scopeModels", "scopeModel" }, allEntries = true)
-	public ScopeModelDTO createScopeModel(final UUID projectId, final ScopeModelDTO scopeModel) {
-		final var scopeModelId = scopeModel.getScopeModelId() != null
-			? scopeModel.getScopeModelId()
-			: UUID.randomUUID();
+	@Caching(evict = {
+		@CacheEvict(value = "scopeModels", key = "#projectId.toString() + ':summary'"),
+		@CacheEvict(value = "scopeModels", key = "#projectId.toString() + ':full'")
+	})
+	public ScopeModelDTO createScopeModel(final UUID projectId, final ScopeModelDTO dto) {
+		final var scopeModelId = dto.getScopeModelId() != null ? dto.getScopeModelId() : UUID.randomUUID();
 
 		dslContext.insertInto(SCOPE_MODEL)
 			.set(SCOPE_MODEL.SCOPE_MODEL_ID, scopeModelId)
 			.set(SCOPE_MODEL.PROJECT_ID, projectId)
-			.set(SCOPE_MODEL.CODE, scopeModel.getId())
-			.set(SCOPE_MODEL.SHORTNAME, jsonMapperService.toJson(scopeModel.getShortname()))
-			.set(SCOPE_MODEL.LONGNAME, jsonMapperService.toJson(scopeModel.getLongname()))
-			.set(SCOPE_MODEL.DESCRIPTION, jsonMapperService.toJson(scopeModel.getDescription()))
-			.set(SCOPE_MODEL.PLURAL_SHORTNAME, jsonMapperService.toJson(scopeModel.getPluralShortname()))
-			.set(SCOPE_MODEL.VIRTUAL, scopeModel.isVirtual())
-			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, scopeModel.getDefaultParentId())
-			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, scopeModel.getDefaultProfileId())
-			.set(SCOPE_MODEL.MAX_NUMBER, scopeModel.getMaxNumber())
-			.set(SCOPE_MODEL.SCOPE_FORMAT, scopeModel.getScopeFormat())
-			.set(SCOPE_MODEL.LAYOUT, scopeModel.getLayout())
+			.set(SCOPE_MODEL.CODE, dto.getId())
+			.set(SCOPE_MODEL.SHORTNAME, jsonMapperService.toJson(dto.getShortname()))
+			.set(SCOPE_MODEL.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
+			.set(SCOPE_MODEL.DESCRIPTION, jsonMapperService.toJson(dto.getDescription()))
+			.set(SCOPE_MODEL.PLURAL_SHORTNAME, jsonMapperService.toJson(dto.getPluralShortname()))
+			.set(SCOPE_MODEL.VIRTUAL, dto.isVirtual())
+			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, dto.getDefaultParentId())
+			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, dto.getDefaultProfileId())
+			.set(SCOPE_MODEL.MAX_NUMBER, dto.getMaxNumber())
+			.set(SCOPE_MODEL.SCOPE_FORMAT, dto.getScopeFormat())
+			.set(SCOPE_MODEL.LAYOUT, dto.getLayout())
 			.execute();
 
-		insertParents(projectId, scopeModelId, scopeModel.getParentIds(), scopeModel.getDefaultParentId());
-		insertDatasetModels(projectId, scopeModelId, scopeModel.getDatasetModelIds());
-		insertFormModels(projectId, scopeModelId, scopeModel.getFormModelIds());
-		insertWorkflows(projectId, scopeModelId, scopeModel.getWorkflowIds());
+		replaceRelations(projectId, scopeModelId, dto);
 
 		return getScopeModel(projectId, scopeModelId);
 	}
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "scopeModels", "scopeModel" }, allEntries = true)
-	public ScopeModelDTO updateScopeModel(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO scopeModel) {
+	@Caching(evict = {
+		@CacheEvict(value = "scopeModels", key = "#projectId.toString() + ':summary'"),
+		@CacheEvict(value = "scopeModels", key = "#projectId.toString() + ':full'"),
+		@CacheEvict(value = "scopeModel", key = "#projectId.toString() + ':' + #scopeModelId.toString()")
+	})
+	public ScopeModelDTO updateScopeModel(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO dto) {
 		dslContext.update(SCOPE_MODEL)
-			.set(SCOPE_MODEL.CODE, scopeModel.getId())
-			.set(SCOPE_MODEL.SHORTNAME, jsonMapperService.toJson(scopeModel.getShortname()))
-			.set(SCOPE_MODEL.LONGNAME, jsonMapperService.toJson(scopeModel.getLongname()))
-			.set(SCOPE_MODEL.DESCRIPTION, jsonMapperService.toJson(scopeModel.getDescription()))
-			.set(SCOPE_MODEL.PLURAL_SHORTNAME, jsonMapperService.toJson(scopeModel.getPluralShortname()))
-			.set(SCOPE_MODEL.VIRTUAL, scopeModel.isVirtual())
-			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, scopeModel.getDefaultParentId())
-			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, scopeModel.getDefaultProfileId())
-			.set(SCOPE_MODEL.MAX_NUMBER, scopeModel.getMaxNumber())
-			.set(SCOPE_MODEL.SCOPE_FORMAT, scopeModel.getScopeFormat())
-			.set(SCOPE_MODEL.LAYOUT, scopeModel.getLayout())
+			.set(SCOPE_MODEL.CODE, dto.getId())
+			.set(SCOPE_MODEL.SHORTNAME, jsonMapperService.toJson(dto.getShortname()))
+			.set(SCOPE_MODEL.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
+			.set(SCOPE_MODEL.DESCRIPTION, jsonMapperService.toJson(dto.getDescription()))
+			.set(SCOPE_MODEL.PLURAL_SHORTNAME, jsonMapperService.toJson(dto.getPluralShortname()))
+			.set(SCOPE_MODEL.VIRTUAL, dto.isVirtual())
+			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, dto.getDefaultParentId())
+			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, dto.getDefaultProfileId())
+			.set(SCOPE_MODEL.MAX_NUMBER, dto.getMaxNumber())
+			.set(SCOPE_MODEL.SCOPE_FORMAT, dto.getScopeFormat())
+			.set(SCOPE_MODEL.LAYOUT, dto.getLayout())
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
 			.and(SCOPE_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
 			.execute();
 
-		deleteRelationships(projectId, scopeModelId);
-
-		insertParents(projectId, scopeModelId, scopeModel.getParentIds(), scopeModel.getDefaultParentId());
-		insertDatasetModels(projectId, scopeModelId, scopeModel.getDatasetModelIds());
-		insertFormModels(projectId, scopeModelId, scopeModel.getFormModelIds());
-		insertWorkflows(projectId, scopeModelId, scopeModel.getWorkflowIds());
+		replaceRelations(projectId, scopeModelId, dto);
 
 		return getScopeModel(projectId, scopeModelId);
 	}
 
 	@Override
 	@Transactional
-	@CacheEvict(value = { "scopeModels", "scopeModel" }, allEntries = true)
+	@Caching(evict = {
+		@CacheEvict(value = "scopeModels", key = "#projectId.toString() + ':summary'"),
+		@CacheEvict(value = "scopeModels", key = "#projectId.toString() + ':full'"),
+		@CacheEvict(value = "scopeModel", key = "#projectId.toString() + ':' + #scopeModelId.toString()")
+	})
 	public void deleteScopeModel(final UUID projectId, final UUID scopeModelId) {
-		deleteRelationships(projectId, scopeModelId);
+		dslContext.deleteFrom(SCOPE_MODEL_PARENT).where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+		dslContext.deleteFrom(SCOPE_MODEL_PARENT).where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+		dslContext.deleteFrom(SCOPE_MODEL_DATASET_MODEL).where(SCOPE_MODEL_DATASET_MODEL.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_DATASET_MODEL.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+		dslContext.deleteFrom(SCOPE_MODEL_FORM_MODEL).where(SCOPE_MODEL_FORM_MODEL.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_FORM_MODEL.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+		dslContext.deleteFrom(SCOPE_MODEL_WORKFLOW).where(SCOPE_MODEL_WORKFLOW.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
 
 		dslContext.deleteFrom(SCOPE_MODEL)
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
@@ -151,7 +202,7 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.execute();
 	}
 
-	private void deleteRelationships(final UUID projectId, final UUID scopeModelId) {
+	private void replaceRelations(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO dto) {
 		dslContext.deleteFrom(SCOPE_MODEL_PARENT)
 			.where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId))
 			.and(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID.eq(scopeModelId))
@@ -176,69 +227,72 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.where(SCOPE_MODEL_WORKFLOW.PROJECT_ID.eq(projectId))
 			.and(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID.eq(scopeModelId))
 			.execute();
+
+		batchInsert(projectId, scopeModelId, dto);
 	}
 
-	private void insertParents(final UUID projectId, final UUID scopeModelId, final List<UUID> parentIds, final UUID defaultParentId) {
-		if(parentIds == null || parentIds.isEmpty()) {
-			return;
+	private void batchInsert(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO dto) {
+		if(dto.getParentIds() != null) {
+			for(final var parentId : dto.getParentIds()) {
+				dslContext.insertInto(SCOPE_MODEL_PARENT)
+					.set(SCOPE_MODEL_PARENT.PROJECT_ID, projectId)
+					.set(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID, parentId)
+					.set(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID, scopeModelId)
+					.execute();
+			}
 		}
 
-		for(int i = 0; i < parentIds.size(); i++) {
-			final var parentId = parentIds.get(i);
-			dslContext.insertInto(SCOPE_MODEL_PARENT)
-				.set(SCOPE_MODEL_PARENT.PROJECT_ID, projectId)
-				.set(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID, scopeModelId)
-				.set(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID, parentId)
-				.set(SCOPE_MODEL_PARENT.IS_DEFAULT, parentId.equals(defaultParentId))
-				.set(SCOPE_MODEL_PARENT.PARENT_ORDER, i)
-				.execute();
-		}
-	}
-
-	private void insertDatasetModels(final UUID projectId, final UUID scopeModelId, final List<UUID> datasetModelIds) {
-		if(datasetModelIds == null || datasetModelIds.isEmpty()) {
-			return;
+		if(dto.getChildScopeModelIds() != null) {
+			for(final var childId : dto.getChildScopeModelIds()) {
+				dslContext.insertInto(SCOPE_MODEL_PARENT)
+					.set(SCOPE_MODEL_PARENT.PROJECT_ID, projectId)
+					.set(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID, childId)
+					.set(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID, scopeModelId)
+					.execute();
+			}
 		}
 
-		for(final var datasetModelId : datasetModelIds) {
-			dslContext.insertInto(SCOPE_MODEL_DATASET_MODEL)
-				.set(SCOPE_MODEL_DATASET_MODEL.PROJECT_ID, projectId)
-				.set(SCOPE_MODEL_DATASET_MODEL.SCOPE_MODEL_ID, scopeModelId)
-				.set(SCOPE_MODEL_DATASET_MODEL.DATASET_MODEL_ID, datasetModelId)
-				.execute();
-		}
-	}
-
-	private void insertFormModels(final UUID projectId, final UUID scopeModelId, final List<UUID> formModelIds) {
-		if(formModelIds == null || formModelIds.isEmpty()) {
-			return;
+		if(dto.getDatasetModelIds() != null) {
+			for(final var datasetId : dto.getDatasetModelIds()) {
+				dslContext.insertInto(SCOPE_MODEL_DATASET_MODEL)
+					.set(SCOPE_MODEL_DATASET_MODEL.PROJECT_ID, projectId)
+					.set(SCOPE_MODEL_DATASET_MODEL.SCOPE_MODEL_ID, scopeModelId)
+					.set(SCOPE_MODEL_DATASET_MODEL.DATASET_MODEL_ID, datasetId)
+					.execute();
+			}
 		}
 
-		for(final var formModelId : formModelIds) {
-			dslContext.insertInto(SCOPE_MODEL_FORM_MODEL)
-				.set(SCOPE_MODEL_FORM_MODEL.PROJECT_ID, projectId)
-				.set(SCOPE_MODEL_FORM_MODEL.SCOPE_MODEL_ID, scopeModelId)
-				.set(SCOPE_MODEL_FORM_MODEL.FORM_MODEL_ID, formModelId)
-				.execute();
-		}
-	}
-
-	private void insertWorkflows(final UUID projectId, final UUID scopeModelId, final List<UUID> workflowIds) {
-		if(workflowIds == null || workflowIds.isEmpty()) {
-			return;
+		if(dto.getFormModelIds() != null) {
+			for(final var formId : dto.getFormModelIds()) {
+				dslContext.insertInto(SCOPE_MODEL_FORM_MODEL)
+					.set(SCOPE_MODEL_FORM_MODEL.PROJECT_ID, projectId)
+					.set(SCOPE_MODEL_FORM_MODEL.SCOPE_MODEL_ID, scopeModelId)
+					.set(SCOPE_MODEL_FORM_MODEL.FORM_MODEL_ID, formId)
+					.execute();
+			}
 		}
 
-		for(final var workflowId : workflowIds) {
-			dslContext.insertInto(SCOPE_MODEL_WORKFLOW)
-				.set(SCOPE_MODEL_WORKFLOW.PROJECT_ID, projectId)
-				.set(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID, scopeModelId)
-				.set(SCOPE_MODEL_WORKFLOW.WORKFLOW_ID, workflowId)
-				.execute();
+		if(dto.getWorkflowIds() != null) {
+			for(final var workflowId : dto.getWorkflowIds()) {
+				dslContext.insertInto(SCOPE_MODEL_WORKFLOW)
+					.set(SCOPE_MODEL_WORKFLOW.PROJECT_ID, projectId)
+					.set(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID, scopeModelId)
+					.set(SCOPE_MODEL_WORKFLOW.WORKFLOW_ID, workflowId)
+					.execute();
+			}
 		}
 	}
 
-	private ScopeModelDTO mapToDTO(final ScopeModelRecord record, final UUID projectId) {
+	private ScopeModelDTO mapToDTO(
+		final ScopeModelRecord record,
+		final Map<UUID, List<UUID>> parentMap,
+		final Map<UUID, List<UUID>> childMap,
+		final Map<UUID, List<UUID>> datasetMap,
+		final Map<UUID, List<UUID>> formMap,
+		final Map<UUID, List<UUID>> workflowMap
+	) {
 		final var dto = new ScopeModelDTO();
+
 		dto.setScopeModelId(record.getScopeModelId());
 		dto.setId(record.getCode());
 		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
@@ -249,156 +303,108 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		}));
 		dto.setPluralShortname(jsonMapperService.fromJson(record.getPluralShortname(), new TypeReference<TreeMap<String, String>>() {
 		}));
+
 		dto.setVirtual(record.getVirtual());
-		dto.setDefaultParentId(record.getDefaultParentId());
-		dto.setDefaultProfileId(record.getDefaultProfileId());
 		dto.setMaxNumber(record.getMaxNumber());
 		dto.setScopeFormat(record.getScopeFormat());
-		dto.setLayout(record.getLayout());
+		dto.setDefaultParentId(record.getDefaultParentId());
+		dto.setDefaultProfileId(record.getDefaultProfileId());
 
-		final var parentIds = loadParentIds(projectId, record.getScopeModelId());
-		dto.setParentIds(parentIds);
-
-		final var childIds = loadChildIds(projectId, record.getScopeModelId());
-		dto.setChildScopeModelIds(childIds);
-
-		final var datasetModelIds = loadDatasetModelIds(projectId, record.getScopeModelId());
-		dto.setDatasetModelIds(datasetModelIds);
-
-		final var formModelIds = loadFormModelIds(projectId, record.getScopeModelId());
-		dto.setFormModelIds(formModelIds);
-
-		final var workflowIds = loadWorkflowIds(projectId, record.getScopeModelId());
-		dto.setWorkflowIds(workflowIds);
-
-		dto.setRoot(parentIds.isEmpty());
-		dto.setLeaf(childIds.isEmpty());
-
-		final var eventModels = loadEventModels(projectId, record.getScopeModelId());
-		dto.setEventModels(eventModels);
-
-		final var eventGroups = loadEventGroups(projectId, record.getScopeModelId());
-		dto.setEventGroups(eventGroups);
+		final var scopeModelId = record.getScopeModelId();
+		dto.setParentIds(parentMap.getOrDefault(scopeModelId, List.of()));
+		dto.setChildScopeModelIds(childMap.getOrDefault(scopeModelId, List.of()));
+		dto.setDatasetModelIds(datasetMap.getOrDefault(scopeModelId, List.of()));
+		dto.setFormModelIds(formMap.getOrDefault(scopeModelId, List.of()));
+		dto.setWorkflowIds(workflowMap.getOrDefault(scopeModelId, List.of()));
 
 		return dto;
 	}
 
-	private List<UUID> loadParentIds(final UUID projectId, final UUID scopeModelId) {
-		return dslContext.select(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID)
-			.from(SCOPE_MODEL_PARENT)
-			.where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId))
-			.and(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID.eq(scopeModelId))
-			.orderBy(SCOPE_MODEL_PARENT.PARENT_ORDER)
-			.fetch(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID);
+	private Map<UUID, List<UUID>> loadParentIds(final UUID projectId, final List<UUID> scopeModelIds) {
+		return fetchGroupedIds(
+			projectId,
+			scopeModelIds,
+			SCOPE_MODEL_PARENT,
+			SCOPE_MODEL_PARENT.PROJECT_ID,
+			SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID,
+			SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID
+		);
 	}
 
-	private List<UUID> loadChildIds(final UUID projectId, final UUID scopeModelId) {
-		return dslContext.select(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID)
-			.from(SCOPE_MODEL_PARENT)
-			.where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId))
-			.and(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID.eq(scopeModelId))
-			.fetch(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID);
+	private Map<UUID, List<UUID>> loadChildIds(final UUID projectId, final List<UUID> scopeModelIds) {
+		return fetchGroupedIds(
+			projectId,
+			scopeModelIds,
+			SCOPE_MODEL_PARENT,
+			SCOPE_MODEL_PARENT.PROJECT_ID,
+			SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID,
+			SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID
+		);
 	}
 
-	private List<UUID> loadDatasetModelIds(final UUID projectId, final UUID scopeModelId) {
-		return dslContext.select(SCOPE_MODEL_DATASET_MODEL.DATASET_MODEL_ID)
-			.from(SCOPE_MODEL_DATASET_MODEL)
-			.where(SCOPE_MODEL_DATASET_MODEL.PROJECT_ID.eq(projectId))
-			.and(SCOPE_MODEL_DATASET_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
-			.fetch(SCOPE_MODEL_DATASET_MODEL.DATASET_MODEL_ID);
+	private Map<UUID, List<UUID>> loadDatasetModelIds(final UUID projectId, final List<UUID> scopeModelIds) {
+		return fetchGroupedIds(
+			projectId,
+			scopeModelIds,
+			SCOPE_MODEL_DATASET_MODEL,
+			SCOPE_MODEL_DATASET_MODEL.PROJECT_ID,
+			SCOPE_MODEL_DATASET_MODEL.SCOPE_MODEL_ID,
+			SCOPE_MODEL_DATASET_MODEL.DATASET_MODEL_ID
+		);
 	}
 
-	private List<UUID> loadFormModelIds(final UUID projectId, final UUID scopeModelId) {
-		return dslContext.select(SCOPE_MODEL_FORM_MODEL.FORM_MODEL_ID)
-			.from(SCOPE_MODEL_FORM_MODEL)
-			.where(SCOPE_MODEL_FORM_MODEL.PROJECT_ID.eq(projectId))
-			.and(SCOPE_MODEL_FORM_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
-			.fetch(SCOPE_MODEL_FORM_MODEL.FORM_MODEL_ID);
+	private Map<UUID, List<UUID>> loadFormModelIds(final UUID projectId, final List<UUID> scopeModelIds) {
+		return fetchGroupedIds(
+			projectId,
+			scopeModelIds,
+			SCOPE_MODEL_FORM_MODEL,
+			SCOPE_MODEL_FORM_MODEL.PROJECT_ID,
+			SCOPE_MODEL_FORM_MODEL.SCOPE_MODEL_ID,
+			SCOPE_MODEL_FORM_MODEL.FORM_MODEL_ID
+		);
 	}
 
-	private List<UUID> loadWorkflowIds(final UUID projectId, final UUID scopeModelId) {
-		return dslContext.select(SCOPE_MODEL_WORKFLOW.WORKFLOW_ID)
-			.from(SCOPE_MODEL_WORKFLOW)
-			.where(SCOPE_MODEL_WORKFLOW.PROJECT_ID.eq(projectId))
-			.and(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID.eq(scopeModelId))
-			.fetch(SCOPE_MODEL_WORKFLOW.WORKFLOW_ID);
+	private Map<UUID, List<UUID>> loadWorkflowIds(final UUID projectId, final List<UUID> scopeModelIds) {
+		return fetchGroupedIds(
+			projectId,
+			scopeModelIds,
+			SCOPE_MODEL_WORKFLOW,
+			SCOPE_MODEL_WORKFLOW.PROJECT_ID,
+			SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID,
+			SCOPE_MODEL_WORKFLOW.WORKFLOW_ID
+		);
 	}
 
-	private List<EventModelDTO> loadEventModels(final UUID projectId, final UUID scopeModelId) {
-		final var eventModelRecords = dslContext.selectFrom(EVENT_MODEL)
-			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
-			.and(EVENT_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
-			.orderBy(EVENT_MODEL.CODE)
-			.fetch();
-
-		if(eventModelRecords.isEmpty()) {
-			return new ArrayList<>();
+	private <R extends Record, T extends Table<R>> Map<UUID, List<UUID>> fetchGroupedIds(
+		final UUID projectId,
+		final List<UUID> scopeModelIds,
+		final T table,
+		final TableField<R, UUID> projectIdField,
+		final TableField<R, UUID> scopeModelIdField,
+		final TableField<R, UUID> valueField
+	) {
+		if(scopeModelIds == null || scopeModelIds.isEmpty()) {
+			return Map.of();
 		}
 
-		final var eventModelIds = eventModelRecords.stream()
-			.map(EventModelRecord::getEventModelId)
-			.collect(Collectors.toList());
+		final var rows = dslContext
+			.select(scopeModelIdField, valueField)
+			.from(table)
+			.where(projectIdField.eq(projectId))
+			.and(scopeModelIdField.in(scopeModelIds))
+			.fetch();
 
-		final var datasetsByEvent = loadAllEventModelDatasets(projectId, eventModelIds);
-		final var formsByEvent = loadAllEventModelForms(projectId, eventModelIds);
-		final var workflowsByEvent = loadAllEventModelWorkflows(projectId, eventModelIds);
+		final Map<UUID, List<UUID>> result = new HashMap<>();
+		for(final var row : rows) {
+			result.computeIfAbsent(row.value1(), _ -> new ArrayList<>()).add(row.value2());
+		}
 
-		return eventModelRecords.stream()
-			.map(record -> {
-				final var dto = new EventModelDTO();
-				dto.setEventModelId(record.getEventModelId());
-				dto.setId(record.getCode());
-				dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
-				}));
-				dto.setDatasetModelIds(datasetsByEvent.getOrDefault(record.getEventModelId(), new ArrayList<>()));
-				dto.setFormModelIds(formsByEvent.getOrDefault(record.getEventModelId(), new ArrayList<>()));
-				dto.setWorkflowIds(workflowsByEvent.getOrDefault(record.getEventModelId(), new ArrayList<>()));
+		result.replaceAll((_, v) -> {
+			final var copy = new ArrayList<>(v);
+			Collections.sort(copy);
+			return copy;
+		});
 
-				return dto;
-			})
-			.collect(Collectors.toList());
-	}
-
-	private List<EventGroupDTO> loadEventGroups(final UUID projectId, final UUID scopeModelId) {
-		return eventGroupDAOService.getEventGroupsByScopeModel(projectId, scopeModelId);
-	}
-
-	private Map<UUID, List<UUID>> loadAllEventModelDatasets(final UUID projectId, final List<UUID> eventModelIds) {
-		return dslContext.select(EVENT_MODEL_DATASET_MODEL.EVENT_MODEL_ID, EVENT_MODEL_DATASET_MODEL.DATASET_MODEL_ID)
-			.from(EVENT_MODEL_DATASET_MODEL)
-			.where(EVENT_MODEL_DATASET_MODEL.PROJECT_ID.eq(projectId))
-			.and(EVENT_MODEL_DATASET_MODEL.EVENT_MODEL_ID.in(eventModelIds))
-			.fetch()
-			.stream()
-			.collect(Collectors.groupingBy(
-				Record2::value1,
-				Collectors.mapping(Record2::value2, Collectors.toList())
-			));
-	}
-
-	private Map<UUID, List<UUID>> loadAllEventModelForms(final UUID projectId, final List<UUID> eventModelIds) {
-		return dslContext.select(EVENT_MODEL_FORM_MODEL.EVENT_MODEL_ID, EVENT_MODEL_FORM_MODEL.FORM_MODEL_ID)
-			.from(EVENT_MODEL_FORM_MODEL)
-			.where(EVENT_MODEL_FORM_MODEL.PROJECT_ID.eq(projectId))
-			.and(EVENT_MODEL_FORM_MODEL.EVENT_MODEL_ID.in(eventModelIds))
-			.fetch()
-			.stream()
-			.collect(Collectors.groupingBy(
-				Record2::value1,
-				Collectors.mapping(Record2::value2, Collectors.toList())
-			));
-	}
-
-	private Map<UUID, List<UUID>> loadAllEventModelWorkflows(final UUID projectId, final List<UUID> eventModelIds) {
-		return dslContext.select(EVENT_MODEL_WORKFLOW.EVENT_MODEL_ID, EVENT_MODEL_WORKFLOW.WORKFLOW_ID)
-			.from(EVENT_MODEL_WORKFLOW)
-			.where(EVENT_MODEL_WORKFLOW.PROJECT_ID.eq(projectId))
-			.and(EVENT_MODEL_WORKFLOW.EVENT_MODEL_ID.in(eventModelIds))
-			.fetch()
-			.stream()
-			.collect(Collectors.groupingBy(
-				Record2::value1,
-				Collectors.mapping(Record2::value2, Collectors.toList())
-			));
+		return result;
 	}
 }

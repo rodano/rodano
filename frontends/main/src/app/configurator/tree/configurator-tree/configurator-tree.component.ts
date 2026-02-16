@@ -21,15 +21,14 @@ import {ValidatorTreeComponent} from '../validator-tree/validator-tree.component
 	styleUrls: ['../tree-shared.css']
 })
 export class ConfiguratorTreeComponent {
-	@ViewChild(ScopeModelsTreeComponent) scopeModelsTree!: ScopeModelsTreeComponent;
-	@ViewChild(DatasetModelsTreeComponent) datasetModelsTree!: DatasetModelsTreeComponent;
-	@ViewChild(ValidatorTreeComponent) validatorTree!: ValidatorTreeComponent;
-
 	@Input() projectId = '';
 	@Input() selectedNode: string | null = null;
+	@Input() scopeModels: any[] = [];
 	@Input() eventModels: any[] = [];
 	@Input() eventGroups: any[] = [];
+	@Input() datasetModels: any[] = [];
 	@Input() fieldModels: any[] = [];
+	@Input() validators: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -59,17 +58,5 @@ export class ConfiguratorTreeComponent {
 	onCategoryClick(categoryId: string): void {
 		this.expandedCategory = null;
 		this.categoryClicked.emit(categoryId);
-	}
-
-	reloadScopeModels(): void {
-		this.scopeModelsTree?.reload();
-	}
-
-	reloadDatasetModels(): void {
-		this.datasetModelsTree?.reload();
-	}
-
-	reloadValidators(): void {
-		this.validatorTree?.reload();
 	}
 }
