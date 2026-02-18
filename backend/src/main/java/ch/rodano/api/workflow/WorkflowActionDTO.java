@@ -50,7 +50,7 @@ public class WorkflowActionDTO {
 	@NotBlank
 	private String icon;
 
-	WorkflowActionDTO() {}
+	public WorkflowActionDTO() {}
 
 	public WorkflowActionDTO(final Action action) {
 		workflowActionId = action.getWorkflowActionId();

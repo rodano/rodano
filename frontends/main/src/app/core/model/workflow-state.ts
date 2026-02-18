@@ -19,6 +19,7 @@ export interface WorkflowState {
     shortname: { [key: string]: string; };
     longname: { [key: string]: string; };
     description: { [key: string]: string; };
+    workflowId: string;
     /**
      * Is the state hidden?
      */
@@ -37,5 +38,7 @@ export interface WorkflowState {
     possibleActions: Array<WorkflowAction>;
     icon: string;
     color: string;
+    aggregateStateId?: string;
+    aggregateStateMatcher?: string;
 }
 

@@ -5,6 +5,7 @@ import {map} from 'rxjs/operators';
 import {ScopeModelContext} from './contexts/scope-model-context';
 import {DatasetModelContext} from './contexts/dataset-model-context';
 import {ValidatorContext} from './contexts/validator-context';
+import {WorkflowContext} from './contexts/workflow-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -82,6 +83,37 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveWorkflows(projectId: string, context: WorkflowContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveWorkflows(
+				projectId,
+				context.modifiedWorkflowIds,
+				context.workflows,
+				context.originalWorkflows
+			),
+			this.draftSaveService.saveWorkflowStates(
+				projectId,
+				context.modifiedWorkflowStateIds,
+				context.workflowStates
+			),
+			this.draftSaveService.saveWorkflowActions(
+				projectId,
+				context.modifiedWorkflowActionIds,
+				context.workflowActions
+			)
+		]).pipe(
+			map(() => {
+				context.workflowManager.syncOriginalsWithCurrent();
+				context.workflowStateManager.syncOriginalsWithCurrent();
+				context.workflowActionManager.syncOriginalsWithCurrent();
+
+				context.workflowManager.invalidate();
+				context.workflowStateManager.invalidate();
+				context.workflowActionManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -104,5 +136,15 @@ export class EntitySaveOrchestratorService {
 		context.validatorManager.resetToOriginals();
 
 		context.validatorManager.invalidate();
+	}
+
+	resetWorkflowsToOriginals(context: WorkflowContext): void {
+		context.workflowManager.resetToOriginals();
+		context.workflowStateManager.resetToOriginals();
+		context.workflowActionManager.resetToOriginals();
+
+		context.workflowManager.invalidate();
+		context.workflowStateManager.invalidate();
+		context.workflowActionManager.invalidate();
 	}
 }

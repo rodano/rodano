@@ -23,6 +23,7 @@ export interface Workflow {
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };
     description?: { [key: string]: string; };
+    order?: number;
     /**
      * Is the workflow an aggregate workflow?
      */
@@ -32,9 +33,17 @@ export interface Workflow {
      */
     aggregatedWorkflowId?: string;
     /**
+     * Initial state Id
+     */
+    initialStateId?: string;
+    /**
      * Is the workflow mandatory?
      */
     mandatory: boolean;
+    /**
+     * Is the workflow unique?
+     */
+    unique: boolean;
     actionId?: string;
     /**
      * Message attached to the workflow

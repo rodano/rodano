@@ -21,6 +21,7 @@ import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrato
 import {ScopeModelManagerService} from '../services/manager/scope-model-manager.service';
 import {DatasetModelManagerService} from '../services/manager/dataset-model-manager.service';
 import {ValidatorManagerService} from '../services/manager/validator-manager.service';
+import {WorkflowManagerService} from '../services/manager/workflow-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -53,6 +54,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
 	validatorModificationCount = 0;
+	workflowModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -60,6 +62,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	eventModels: any[] = [];
 	eventGroups: any[] = [];
 	fieldModels: any[] = [];
+	workflows: any[] = [];
+	workflowStates: any[] = [];
+	workflowActions: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -67,6 +72,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedDatasetModelId: string | null = null;
 	selectedFieldModelId: string | null = null;
 	selectedValidatorId: string | null = null;
+	selectedWorkflowId: string | null = null;
+	selectedWorkflowStateId: string | null = null;
+	selectedWorkflowActionId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -80,6 +88,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private scopeModelManager: ScopeModelManagerService,
 		private datasetModelManager: DatasetModelManagerService,
 		private validatorManager: ValidatorManagerService,
+		private workflowManager: WorkflowManagerService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -147,12 +156,18 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: validators => this.validators = validators,
 			error: error => console.error('Error loading validators:', error)
 		});
+
+		this.workflowManager.load(this.projectId).subscribe({
+			next: workflows => this.workflows = workflows,
+			error: error => console.error('Error loading workflows:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
 		this.scopeModels = this.scopeModelManager.getAll();
 		this.datasetModels = this.datasetModelManager.getAll();
 		this.validators = this.validatorManager.getAll();
+		this.workflows = this.workflowManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -191,20 +206,26 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
 			this.selectedDatasetModelId = null;
 			this.selectedFieldModelId = null;
 			this.selectedValidatorId = null;
+			this.selectedWorkflowId = null;
+			this.selectedWorkflowStateId = null;
+			this.selectedWorkflowActionId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
+			this.workflowStates = [];
+			this.workflowActions = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
 			this.detailComponent?.validatorsListComponent?.clearSelection();
+			this.detailComponent?.workflowListComponent?.clearSelection();
 		}
 	}
 
@@ -218,6 +239,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onValidatorsChanged(event: {modificationCount: number}): void {
 		this.validatorModificationCount = event.modificationCount;
+	}
+
+	onWorkflowsChanged(event: {modificationCount: number}): void {
+		this.workflowModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -272,12 +297,17 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveValidators());
 				}
 
+				if(this.workflowModificationCount > 0) {
+					saveObservables.push(this.saveWorkflows());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
 							this.scopeModelModificationCount = 0;
 							this.datasetModelModificationCount = 0;
 							this.validatorModificationCount = 0;
+							this.workflowModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -361,6 +391,29 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveWorkflows(): Promise<void> {
+		const component = this.detailComponent?.workflowListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveWorkflows(this.projectId, {
+			workflowManager: component.workflowManager,
+			workflowStateManager: component.workflowStateManager,
+			workflowActionManager: component.workflowActionManager,
+			workflows: component.workflows,
+			workflowStates: component.workflowStates,
+			workflowActions: component.workflowActions,
+			originalWorkflows: component.originalWorkflows,
+			modifiedWorkflowIds: component.modifiedWorkflowIds,
+			modifiedWorkflowStateIds: component.modifiedWorkflowStateIds,
+			modifiedWorkflowActionIds: component.modifiedWorkflowActionIds
+		}).toPromise().then(() => {
+			component.loadWorkflows();
+			this.workflows = this.workflowManager.getAll();
+		});
+	}
+
 	onDiscardChanges(): void {
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
@@ -421,9 +474,27 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					validatorComponent.loadValidators();
 				}
 
+				const workflowComponent = this.detailComponent?.workflowListComponent;
+				if(workflowComponent) {
+					this.entitySaveOrchestratorService.resetWorkflowsToOriginals({
+						workflowManager: workflowComponent.workflowManager,
+						workflowStateManager: workflowComponent.workflowStateManager,
+						workflowActionManager: workflowComponent.workflowActionManager,
+						workflows: workflowComponent.workflows,
+						workflowStates: workflowComponent.workflowStates,
+						workflowActions: workflowComponent.workflowActions,
+						originalWorkflows: workflowComponent.originalWorkflows,
+						modifiedWorkflowIds: workflowComponent.modifiedWorkflowIds,
+						modifiedWorkflowStateIds: workflowComponent.modifiedWorkflowStateIds,
+						modifiedWorkflowActionIds: workflowComponent.modifiedWorkflowActionIds
+					});
+					workflowComponent.loadWorkflows();
+				}
+
 				this.scopeModelModificationCount = 0;
 				this.datasetModelModificationCount = 0;
 				this.validatorModificationCount = 0;
+				this.workflowModificationCount = 0;
 
 				this.refreshTreeData();
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
@@ -493,11 +564,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	get hasModifications(): boolean {
-		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0 || this.datasetModelModificationCount > 0 || this.validatorModificationCount > 0;
+		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0 || this.datasetModelModificationCount > 0 || this.validatorModificationCount > 0 || this.workflowModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
-		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount + this.validatorModificationCount;
+		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount + this.validatorModificationCount + this.workflowModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -521,6 +592,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onValidatorContextChanged(context: any): void {
 		setTimeout(() => {
 			this.selectedValidatorId = context.selectedValidatorId;
+		});
+	}
+
+	onWorkflowContextChanged(context: any): void {
+		setTimeout(() => {
+			this.workflowStates = context.workflowStates;
+			this.workflowActions = context.workflowActions;
+			this.selectedWorkflowId = context.selectedWorkflowId;
+			this.selectedWorkflowStateId = context.selectedWorkflowStateId;
+			this.selectedWorkflowActionId = context.selectedWorkflowActionId;
 		});
 	}
 }

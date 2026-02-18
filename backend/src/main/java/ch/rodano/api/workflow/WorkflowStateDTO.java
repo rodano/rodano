@@ -22,6 +22,9 @@ public class WorkflowStateDTO {
 	@NotNull
 	Map<String, String> description;
 
+	@NotNull
+	UUID workflowId;
+
 	@Schema(description = "Is the state hidden?")
 	@NotNull
 	boolean hidden;
@@ -39,6 +42,9 @@ public class WorkflowStateDTO {
 	String icon;
 	@NotBlank
 	String color;
+
+	UUID aggregateStateId;
+	String aggregateStateMatcher;
 
 	public boolean isHidden() {
 		return hidden;
@@ -126,5 +132,29 @@ public class WorkflowStateDTO {
 
 	public void setDescription(final Map<String, String> description) {
 		this.description = description;
+	}
+
+	public UUID getWorkflowId() {
+		return workflowId;
+	}
+
+	public void setWorkflowId(final UUID workflowId) {
+		this.workflowId = workflowId;
+	}
+
+	public UUID getAggregateStateId() {
+		return aggregateStateId;
+	}
+
+	public void setAggregateStateId(final UUID aggregateStateId) {
+		this.aggregateStateId = aggregateStateId;
+	}
+
+	public String getAggregateStateMatcher() {
+		return aggregateStateMatcher;
+	}
+
+	public void setAggregateStateMatcher(final String aggregateStateMatcher) {
+		this.aggregateStateMatcher = aggregateStateMatcher;
 	}
 }

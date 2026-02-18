@@ -12,6 +12,12 @@ import {DatasetModel} from '@core/model/dataset-model';
 import {FieldModel} from '@core/model/field-model';
 import {Validator} from '@core/model/validator';
 import {ValidatorService} from './api/validator.service';
+import {WorkflowService} from './api/workflow.service';
+import {WorkflowStateService} from './api/workflow-state.service';
+import {WorkflowActionService} from './api/workflow-action.service';
+import {Workflow} from '@core/model/workflow';
+import {WorkflowState} from '@core/model/workflow-state';
+import {WorkflowAction} from '@core/model/workflow-action';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -21,7 +27,10 @@ export class DraftSaveService {
 		private eventGroupService: EventGroupService,
 		private datasetModelService: DatasetModelService,
 		private fieldModelService: FieldModelService,
-		private validatorService: ValidatorService
+		private validatorService: ValidatorService,
+		private workflowService: WorkflowService,
+		private workflowStateService: WorkflowStateService,
+		private workflowActionService: WorkflowActionService
 	) {}
 
 	saveScopeModels(
@@ -178,6 +187,79 @@ export class DraftSaveService {
 				if(validator) {
 					saveObservables.push(this.validatorService.updateValidator(projectId, id, validator));
 				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveWorkflows(
+		projectId: string,
+		modifiedIds: Set<string>,
+		workflows: Workflow[],
+		originalWorkflows: Workflow[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalWorkflows.find(wf => wf.workflowId === originalId);
+				if(original) {
+					saveObservables.push(this.workflowService.deleteWorkflow(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const workflow = workflows.find(wf => wf.workflowId === id);
+				if(workflow) {
+					saveObservables.push(this.workflowService.createWorkflow(projectId, workflow));
+				}
+			}
+			else {
+				const workflow = workflows.find(wf => wf.workflowId === id);
+				if(workflow) {
+					saveObservables.push(this.workflowService.updateWorkflow(projectId, id, workflow));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveWorkflowStates(
+		projectId: string,
+		modifiedIds: Set<string>,
+		workflowStates: WorkflowState[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			const workflowState = workflowStates.find(wfs => wfs.workflowStateId === id);
+			if(workflowState) {
+				saveObservables.push(this.workflowStateService.updateWorkflowState(projectId, id, workflowState));
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveWorkflowActions(
+		projectId: string,
+		modifiedIds: Set<string>,
+		workflowActions: WorkflowAction[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			const workflowAction = workflowActions.find(wfa => wfa.workflowActionId === id);
+			if(workflowAction) {
+				saveObservables.push(this.workflowActionService.updateWorkflowAction(projectId, id, workflowAction));
 			}
 		});
 

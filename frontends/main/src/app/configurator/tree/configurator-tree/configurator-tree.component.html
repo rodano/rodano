@@ -42,12 +42,17 @@
 		</div>
 	</div>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('workflows')">
-			<mat-icon class="node-icon">settings</mat-icon>
-			<span class="node-label">Workflows</span>
-		</div>
-	</div>
+	<app-workflow-tree
+		[projectId]="projectId"
+		[workflows]="workflows"
+		[expanded]="expandedCategory === 'workflows'"
+		[workflowStates]="workflowStates"
+		[workflowActions]="workflowActions"
+		[selectedWorkflowId]="selectedWorkflowId"
+		[selectedWorkflowStateId]="selectedWorkflowStateId"
+		[selectedWorkflowActionId]="selectedWorkflowActionId"
+		(categoryClicked)="onWorkflowsClicked()">
+	</app-workflow-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('profiles')">

@@ -39,7 +39,14 @@ public class CacheConfig {
 			"fieldModelsByDatasetModel",
 
 			"validators",
-			"validator"
+			"validator",
+
+			"workflows",
+			"workflow",
+			"workflowStates",
+			"workflowState",
+			"workflowActions",
+			"workflowAction"
 		);
 	}
 }

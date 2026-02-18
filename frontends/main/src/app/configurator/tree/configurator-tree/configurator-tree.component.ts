@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, Output, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModelsTreeComponent} from '../scope-models-tree/scope-models-tree.component';
 import {DatasetModelsTreeComponent} from '../dataset-models-tree/dataset-models-tree.component';
 import {ProjectSettingsTreeComponent} from '../project-settings-tree/project-settings-tree.component';
 import {ValidatorTreeComponent} from '../validator-tree/validator-tree.component';
+import {WorkflowTreeComponent} from '../workflow-tree/workflow-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -15,7 +16,8 @@ import {ValidatorTreeComponent} from '../validator-tree/validator-tree.component
 		ProjectSettingsTreeComponent,
 		ScopeModelsTreeComponent,
 		DatasetModelsTreeComponent,
-		ValidatorTreeComponent
+		ValidatorTreeComponent,
+		WorkflowTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -29,16 +31,22 @@ export class ConfiguratorTreeComponent {
 	@Input() datasetModels: any[] = [];
 	@Input() fieldModels: any[] = [];
 	@Input() validators: any[] = [];
+	@Input() workflows: any[] = [];
+	@Input() workflowStates: any[] = [];
+	@Input() workflowActions: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
 	@Input() selectedDatasetModelId: string | null = null;
 	@Input() selectedFieldModelId: string | null = null;
 	@Input() selectedValidatorId: string | null = null;
+	@Input() selectedWorkflowId: string | null = null;
+	@Input() selectedWorkflowStateId: string | null = null;
+	@Input() selectedWorkflowActionId: string | null = null;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | null = null;
 
 	onScopeModelsClicked(): void {
 		this.expandedCategory = this.expandedCategory === 'scope-models' ? null : 'scope-models';
@@ -53,6 +61,11 @@ export class ConfiguratorTreeComponent {
 	onValidatorsClicked(): void {
 		this.expandedCategory = this.expandedCategory === 'validators' ? null : 'validators';
 		this.categoryClicked.emit('validators');
+	}
+
+	onWorkflowsClicked(): void {
+		this.expandedCategory = this.expandedCategory === 'workflows' ? null : 'workflows';
+		this.categoryClicked.emit('workflows');
 	}
 
 	onCategoryClick(categoryId: string): void {

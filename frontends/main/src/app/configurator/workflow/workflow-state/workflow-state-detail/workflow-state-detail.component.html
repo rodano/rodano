@@ -1,0 +1,102 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ draftWorkflowState ? getTranslatedValue(draftWorkflowState.shortname) : '' }}</h2>
+		<span class="detail-code">{{ draftWorkflowState?.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (draftWorkflowState) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('id')">
+					<label>
+						Code
+						@if (isFieldModified('id')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ draftWorkflowState.id }}</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('shortname')">
+					<label>
+						Short Name
+						@if (isFieldModified('shortname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftWorkflowState.shortname)">
+						@if (!getTranslatedValue(draftWorkflowState.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ getTranslatedValue(draftWorkflowState.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section danger-section">
+			<h3>Delete Workflow State</h3>
+			<p class="danger-text">Deleting this workflow state is permanent and cannot be undone.</p>
+			<button class="btn-delete" (click)="onDelete()">
+				<mat-icon>delete</mat-icon>
+				Delete
+			</button>
+		</div>
+	</div>
+}
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ draftWorkflowState ? getTranslatedValue(draftWorkflowState.shortname) : '' }}</h2>
+		<span class="detail-code">{{ draftWorkflowState?.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (draftWorkflowState) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('id')">
+					<label>
+						Code
+						@if (isFieldModified('id')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ draftWorkflowState.id }}</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section danger-section">
+			<h3>Delete Workflow State</h3>
+			<p class="danger-text">Deleting this workflow state is permanent and cannot be undone.</p>
+			<button class="btn-delete" (click)="onDelete()">
+				<mat-icon>delete</mat-icon>
+				Delete
+			</button>
+		</div>
+	</div>
+}
