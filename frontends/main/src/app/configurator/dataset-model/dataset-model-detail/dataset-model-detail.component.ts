@@ -12,12 +12,13 @@ import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {DatasetModelDialogService} from '../../services/dialogs/dataset-model-dialog.service';
+import {ProjectLanguage} from '@core/model/project-language';
 
 @Component({
 	selector: 'app-dataset-model-detail',
 	standalone: true,
 	templateUrl: './dataset-model-detail.component.html',
-	styleUrls: ['./dataset-model-detail.component.css'],
+	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,
@@ -36,6 +37,7 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 	@Output() switchToFieldModels = new EventEmitter<void>();
 
 	selectedLanguage = '';
+	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 
 	constructor(
@@ -47,6 +49,7 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
@@ -60,7 +63,7 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 		this.datasetModelDialogService.openBasicInfoDialog(
 			this.projectId,
 			this.datasetModel,
-			this.project?.languages || []
+			this.projectLanguages
 		).subscribe((result: any) => {
 			if(result) {
 				const updatedDatasetModel: DatasetModel = {...this.datasetModel, ...result};

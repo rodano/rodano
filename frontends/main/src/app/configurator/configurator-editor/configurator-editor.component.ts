@@ -22,6 +22,11 @@ import {ScopeModelManagerService} from '../services/manager/scope-model-manager.
 import {DatasetModelManagerService} from '../services/manager/dataset-model-manager.service';
 import {ValidatorManagerService} from '../services/manager/validator-manager.service';
 import {WorkflowManagerService} from '../services/manager/workflow-manager.service';
+import { EventModelManagerService } from '../services/manager/event-model-manager.service';
+import { EventGroupManagerService } from '../services/manager/event-group-manager.service';
+import { FieldModelManagerService } from '../services/manager/field-model-manager.service';
+import { WorkflowStateManagerService } from '../services/manager/workflow-state-manager.service';
+import { WorkflowActionManagerService } from '../services/manager/workflow-action-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -86,19 +91,26 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private snapshotManager: SnapshotManagerService,
 		private entitySaveOrchestratorService: EntitySaveOrchestratorService,
 		private scopeModelManager: ScopeModelManagerService,
+		private eventModelManager: EventModelManagerService,
+		private eventGroupManager: EventGroupManagerService,
 		private datasetModelManager: DatasetModelManagerService,
+		private fieldModelManager: FieldModelManagerService,
 		private validatorManager: ValidatorManagerService,
 		private workflowManager: WorkflowManagerService,
+		private workflowStateManager: WorkflowStateManagerService,
+		private workflowActionManager: WorkflowActionManagerService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
-		this.projectId = this.route.snapshot.paramMap.get('projectId') || '';
-		if(this.projectId) {
-			this.initializeProject();
-		}
+		this.route.paramMap.subscribe(params => {
+			this.projectId = params.get('projectId') || '';
+			if(this.projectId) {
+				this.initializeProject();
+			}
+		});
 	}
 
 	canDeactivate(): boolean {
@@ -118,6 +130,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	initializeProject(): void {
 		this.loading = true;
 		localStorage.setItem('configProjectId', this.projectId);
+
+		this.scopeModelManager.invalidate();
+		this.eventModelManager.invalidate();
+		this.eventGroupManager.invalidate();
+		this.datasetModelManager.invalidate();
+		this.fieldModelManager.invalidate();
+		this.validatorManager.invalidate();
+		this.workflowManager.invalidate();
+		this.workflowStateManager.invalidate();
+		this.workflowActionManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -346,8 +368,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			eventGroups: component.eventGroups,
 			originalScopeModels: component.originalScopeModels,
 			modifiedScopeModelIds: component.modifiedScopeModelIds,
-			modifiedEventModelIds: component.modifiedEventModelIds,
-			modifiedEventGroupIds: component.modifiedEventGroupIds
+			modifiedEventModels: component.modifiedEventModels,
+			modifiedEventGroups: component.modifiedEventGroups
 		}).toPromise().then(() => {
 			component.loadScopeModels();
 			this.scopeModels = this.scopeModelManager.getAll();
@@ -443,8 +465,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 						eventGroups: scopeComponent.eventGroups,
 						originalScopeModels: scopeComponent.originalScopeModels,
 						modifiedScopeModelIds: scopeComponent.modifiedScopeModelIds,
-						modifiedEventModelIds: scopeComponent.modifiedEventModelIds,
-						modifiedEventGroupIds: scopeComponent.modifiedEventGroupIds
+						modifiedEventModels: scopeComponent.modifiedEventModels,
+						modifiedEventGroups: scopeComponent.modifiedEventGroups
 					});
 					scopeComponent.loadScopeModels();
 				}
@@ -573,6 +595,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onScopeModelContextChanged(context: any): void {
 		setTimeout(() => {
+			this.scopeModels = context.scopeModels;
 			this.eventModels = context.eventModels;
 			this.eventGroups = context.eventGroups;
 			this.selectedScopeModelId = context.selectedScopeModelId;
@@ -583,6 +606,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onDatasetModelContextChanged(context: any): void {
 		setTimeout(() => {
+			this.datasetModels = context.datasetModels;
 			this.fieldModels = context.fieldModels;
 			this.selectedDatasetModelId = context.selectedDatasetModelId;
 			this.selectedFieldModelId = context.selectedFieldModelId;
@@ -591,6 +615,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onValidatorContextChanged(context: any): void {
 		setTimeout(() => {
+			this.validators = context.validators;
 			this.selectedValidatorId = context.selectedValidatorId;
 		});
 	}

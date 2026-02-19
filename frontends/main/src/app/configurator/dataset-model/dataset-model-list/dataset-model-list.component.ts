@@ -26,7 +26,7 @@ type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 	selector: 'app-dataset-model-list',
 	standalone: true,
 	templateUrl: './dataset-model-list.component.html',
-	styleUrls: ['./dataset-model-list.component.css'],
+	styleUrls: ['../../shared/list-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,
@@ -44,6 +44,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@Output() nodeSelected = new EventEmitter<string>();
 	@Output() datasetModelChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() datasetModelContextChanged = new EventEmitter<{
+		datasetModels: any[];
 		fieldModels: any[];
 		selectedDatasetModelId: string | null;
 		selectedFieldModelId: string | null;
@@ -73,6 +74,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	ngOnInit(): void {
 		this.loadDatasetModels();
 
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
@@ -365,6 +367,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	private emitContext(): void {
 		this.datasetModelContextChanged.emit({
+			datasetModels: [...this.datasetModels],
 			fieldModels: this.currentFieldModels,
 			selectedDatasetModelId: this.selectedDatasetModel?.datasetModelId || null,
 			selectedFieldModelId: this.selectedFieldModelId

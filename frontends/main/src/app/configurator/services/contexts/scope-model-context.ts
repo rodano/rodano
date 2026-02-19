@@ -14,6 +14,6 @@ export interface ScopeModelContext {
 	eventGroups: EventGroup[];
 	originalScopeModels: ScopeModel[];
 	modifiedScopeModelIds: Set<string>;
-	modifiedEventModelIds: Set<string>;
-	modifiedEventGroupIds: Set<string>;
+	modifiedEventModels: Set<string>;
+	modifiedEventGroups: Set<string>;
 }

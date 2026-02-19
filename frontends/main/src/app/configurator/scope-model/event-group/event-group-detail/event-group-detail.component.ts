@@ -22,7 +22,7 @@ import {EventGroupDialogService} from '../../../services/dialogs/event-group-dia
 		MatTooltipModule
 	],
 	templateUrl: './event-group-detail.component.html',
-	styleUrls: ['./event-group-detail.component.css']
+	styleUrls: ['../../../shared/detail-shared.css']
 })
 export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

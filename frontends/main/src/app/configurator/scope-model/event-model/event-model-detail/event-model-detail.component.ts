@@ -14,12 +14,13 @@ import {EventGroup} from '@core/model/event-group';
 import {EventModelDialogService} from '../../../services/dialogs/event-model-dialog.service';
 import {DatasetModelManagerService} from '../../../services/manager/dataset-model-manager.service';
 import {EventModelManagerService} from '../../../services/manager/event-model-manager.service';
+import {ProjectLanguage} from '@core/model/project-language';
 
 @Component({
 	selector: 'app-event-model-detail',
 	standalone: true,
 	templateUrl: './event-model-detail.component.html',
-	styleUrls: ['./event-model-detail.component.css'],
+	styleUrls: ['../../../shared/detail-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,
@@ -41,6 +42,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	originalEventModel: EventModel | null = null;
 	draftEventModel: EventModel | null = null;
 	selectedLanguage = '';
+	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 
 	constructor(
@@ -52,6 +54,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
@@ -172,7 +175,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			this.draftEventModel,
 			this.projectId,
 			this.scopeModel.scopeModelId,
-			this.project?.languages || [],
+			this.projectLanguages,
 			formattedEventGroups
 		).subscribe(result => {
 			if(result && this.draftEventModel) {

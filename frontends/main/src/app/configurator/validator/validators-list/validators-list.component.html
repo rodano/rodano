@@ -44,16 +44,16 @@
 								<p class="card-code">{{ validator.id }}</p>
 							</div>
 							<div class="card-header-badges">
-								@if (validator.required) {
-									<span class="status-badge required" matTooltip="Required">
-										<mat-icon class="badge-full">asterisk</mat-icon>
-										<mat-icon class="badge-short">asterisk</mat-icon>
-									</span>
-								}
 								@if (validator.script) {
-									<span class="status-badge script" matTooltip="Script">
+									<span class="status-badge first" matTooltip="Script">
 										<mat-icon class="badge-full">code</mat-icon>
 										<mat-icon class="badge-short">code</mat-icon>
+									</span>
+								}
+								@if (validator.required) {
+									<span class="status-badge second" matTooltip="Required">
+										<mat-icon class="badge-full">asterisk</mat-icon>
+										<mat-icon class="badge-short">asterisk</mat-icon>
 									</span>
 								}
 							</div>

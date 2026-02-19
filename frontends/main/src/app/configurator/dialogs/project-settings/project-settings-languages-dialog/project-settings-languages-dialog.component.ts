@@ -5,7 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import ISO6391 from 'iso-639-1';
-import {MatSelectModule} from '@angular/material/select';
+import {MatSelectChange, MatSelectModule} from '@angular/material/select';
 
 export interface LanguagesDialogData {
 	languages: ProjectLanguage[];
@@ -15,7 +15,7 @@ export interface LanguagesDialogData {
 	selector: 'app-edit-languages-dialog',
 	standalone: true,
 	templateUrl: './project-settings-languages-dialog.component.html',
-	styleUrls: ['./project-settings-languages-dialog.component.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		MatDialogModule,
@@ -55,13 +55,10 @@ export class ProjectSettingsLanguagesDialogComponent implements OnInit {
 			.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
-	onLanguageSelected(event: Event): void {
-		const select = event.target as HTMLSelectElement;
-		const code = select.value;
-
+	onLanguageSelected(event: MatSelectChange): void {
+		const code = event.value;
 		if(code) {
 			this.addLanguage(code);
-			select.value = '';
 		}
 	}
 

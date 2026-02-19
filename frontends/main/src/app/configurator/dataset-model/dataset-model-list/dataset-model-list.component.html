@@ -46,19 +46,19 @@
 							</div>
 							<div class="card-header-badges">
 								@if (datasetModel.multiple) {
-									<span class="status-badge multiple" matTooltip="Multiple instances allowed">
+									<span class="status-badge first" matTooltip="Multiple instances allowed">
 										<mat-icon class="badge-full">stack</mat-icon>
 										<mat-icon class="badge-short">stack</mat-icon>
 									</span>
 								}
 								@if (datasetModel.master) {
-									<span class="status-badge master" matTooltip="Master dataset">
+									<span class="status-badge second" matTooltip="Master dataset">
 										<mat-icon class="badge-full">star</mat-icon>
 										<mat-icon class="badge-short">star</mat-icon>
 									</span>
 								}
 								@if (datasetModel.exportable) {
-									<span class="status-badge exportable" matTooltip="Exportable">
+									<span class="status-badge third" matTooltip="Exportable">
 										<mat-icon class="badge-full">arrow_upward</mat-icon>
 										<mat-icon class="badge-short">arrow_upward</mat-icon>
 									</span>
@@ -121,7 +121,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card field-card create-card" (click)="onCreateFieldModel()">
+						<div class="secondary-card first-child-card create-card" (click)="onCreateFieldModel()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Field Model</h3>
@@ -130,7 +130,7 @@
 						</div>
 
 						@for (fieldModel of fieldModels; track fieldModel.fieldModelId) {
-							<div class="secondary-card field-card"
+							<div class="secondary-card first-child-card"
 												[class.selected]="selectedFieldModelId === fieldModel.fieldModelId"
 												[class.modified]="isFieldModelModified(fieldModel.fieldModelId)"
 												(click)="onSelectFieldModel(fieldModel.fieldModelId)">
@@ -148,27 +148,27 @@
 									</div>
 									<div class="card-header-badges">
 										@if (fieldModel.readOnly) {
-											<span class="status-badge read-only" matTooltip="Read Only">
+											<span class="status-badge first" matTooltip="Read Only">
 												<mat-icon class="badge-full">edit_off</mat-icon>
 												<mat-icon class="badge-short">edit_off</mat-icon>
 											</span>
 										}
+										@if (fieldModel.searchable) {
+											<span class="status-badge second" matTooltip="Searchable">
+												<mat-icon class="badge-full">search</mat-icon>
+												<mat-icon class="badge-short">search</mat-icon>
+											</span>
+										}
 										@if (fieldModel.exportable) {
-											<span class="status-badge exportable" matTooltip="Exportable">
+											<span class="status-badge third" matTooltip="Exportable">
 												<mat-icon class="badge-full">arrow_upwards</mat-icon>
 												<mat-icon class="badge-short">arrow_upwards</mat-icon>
 											</span>
 										}
 										@if (fieldModel.plugin) {
-											<span class="status-badge dynamic" matTooltip="Dynamic">
+											<span class="status-badge fourth" matTooltip="Dynamic">
 												<mat-icon class="badge-full">bolt</mat-icon>
 												<mat-icon class="badge-short">bolt</mat-icon>
-											</span>
-										}
-										@if (fieldModel.searchable) {
-											<span class="status-badge searchable" matTooltip="Searchable">
-												<mat-icon class="badge-full">search</mat-icon>
-												<mat-icon class="badge-short">search</mat-icon>
 											</span>
 										}
 									</div>

@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ draftFieldModel ? getTranslatedValue(draftFieldModel.shortname) : '' }}</h2>
-		<span class="detail-code">{{ draftFieldModel?.id }}</span>
+		<span class="detail-code first-child">{{ draftFieldModel?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -54,7 +54,7 @@
 					</label>
 					<div class="setting-value">
 						@if (draftFieldModel.readOnly) {
-							<span class="status-badge read-only">Yes</span>
+							<span class="status-badge first">Yes</span>
 						} @else {
 							<span class="status-badge">No</span>
 						}
@@ -370,7 +370,7 @@
 					</label>
 					<div class="setting-value">
 						@if (draftFieldModel.plugin) {
-							<span class="status-badge dynamic">Yes</span>
+							<span class="status-badge fourth">Yes</span>
 						} @else {
 							<span class="status-badge">No</span>
 						}
@@ -412,7 +412,7 @@
 					</label>
 					<div class="setting-value">
 						@if (draftFieldModel.exportable) {
-							<span class="status-badge exportable">Yes</span>
+							<span class="status-badge third">Yes</span>
 						} @else {
 							<span class="status-badge">No</span>
 						}
@@ -445,7 +445,7 @@
 					</label>
 					<div class="setting-value">
 						@if (draftFieldModel.searchable) {
-							<span class="status-badge searchable">Yes</span>
+							<span class="status-badge second">Yes</span>
 						} @else {
 							<span class="status-badge">No</span>
 						}

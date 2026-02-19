@@ -39,6 +39,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() scopeModelContextChanged = new EventEmitter<{
+		scopeModels: any[];
 		eventModels: any[];
 		eventGroups: any[];
 		selectedScopeModelId: string | null;
@@ -48,6 +49,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 	@Output() datasetModelsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() datasetModelContextChanged = new EventEmitter<{
+		datasetModels: any[];
 		fieldModels: any[];
 		selectedDatasetModelId: string | null;
 		selectedFieldModelId: string | null;
@@ -55,6 +57,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 	@Output() validatorsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() validatorContextChanged = new EventEmitter<{
+		validators: any[];
 		selectedValidatorId: string | null;
 	}>();
 
@@ -174,6 +177,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	}
 
 	onScopeModelContextChanged(context: {
+		scopeModels: any[];
 		eventModels: any[];
 		eventGroups: any[];
 		selectedScopeModelId: string | null;
@@ -184,6 +188,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	}
 
 	onDatasetModelContextChanged(context: {
+		datasetModels: any[];
 		fieldModels: any[];
 		selectedDatasetModelId: string | null;
 		selectedFieldModelId: string | null;
@@ -192,6 +197,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	}
 
 	onValidatorContextChanged(context: {
+		validators: any[];
 		selectedValidatorId: string | null;
 	}): void {
 		this.validatorContextChanged.emit(context);

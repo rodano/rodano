@@ -15,7 +15,7 @@ export class ScopeModelManagerService {
 	constructor(private scopeModelService: ScopeModelService) {
 		this.tracker = new EntityModificationTracker<ScopeModel>(
 			sm => sm.scopeModelId,
-			['id', 'virtual', 'defaultParentId', 'defaultProfileId', 'scopeFormat', 'maxNumber'],
+			['id', 'virtual', 'defaultParentId', 'defaultProfileId', 'scopeFormat', 'expectedNumber', 'maxNumber'],
 			['shortname', 'longname', 'description', 'pluralShortname'],
 			['parentIds', 'datasetModelIds', 'formModelIds', 'workflowIds']
 		);
@@ -77,6 +77,10 @@ export class ScopeModelManagerService {
 
 	resetToOriginals(): void {
 		this.tracker.resetToOriginals();
+	}
+
+	setAll(scopeModels: ScopeModel[]): void {
+		this.tracker.initialize(scopeModels);
 	}
 
 	getAll(): ScopeModel[] {

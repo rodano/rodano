@@ -14,6 +14,7 @@ import {FieldModelDialogService} from '../../../services/dialogs/field-model-dia
 import {PossibleValue} from '@core/model/possible-value';
 import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
 import {ValidatorManagerService} from '../../../services/manager/validator-manager.service';
+import {ProjectLanguage} from '@core/model/project-language';
 
 @Component({
 	selector: 'app-field-model-detail',
@@ -41,6 +42,7 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	originalFieldModel: FieldModel | null = null;
 	draftFieldModel: FieldModel | null = null;
 	selectedLanguage = '';
+	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 
 	allValidators: {id: string; code: string; name: string}[] = [];
@@ -55,6 +57,7 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
@@ -215,7 +218,7 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			this.draftFieldModel,
 			this.projectId,
 			this.datasetModel.datasetModelId,
-			this.project?.languages || []
+			this.projectLanguages
 		).subscribe(result => {
 			if(result && this.draftFieldModel) {
 				this.draftFieldModel = {

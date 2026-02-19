@@ -24,6 +24,7 @@ export interface ScopeModel {
     root: boolean;
     leaf: boolean;
     virtual: boolean;
+    expectedNumber?: number;
     maxNumber?: number;
     scopeFormat?: string;
     layout?: string;

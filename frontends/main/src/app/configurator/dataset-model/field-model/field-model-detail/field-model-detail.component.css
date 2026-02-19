@@ -1,29 +1,5 @@
 @import "../../../shared/detail-shared.css";
 
-.detail-code {
-	background-color: #8b5cf6;
-}
-
-.status-badge.read-only {
-	background-color: #dbeafe;
-	color: #1e40af;
-}
-
-.status-badge.exportable {
-	background-color: #fef3c7;
-	color: #92400e;
-}
-
-.status-badge.dynamic {
-	background-color: #fee2e2;
-	color: #991b1b;
-}
-
-.status-badge.searchable {
-	background-color: #dcfce7;
-	color: #15803d;
-}
-
 .possible-values-display {
 	display: flex;
 	flex-direction: column;

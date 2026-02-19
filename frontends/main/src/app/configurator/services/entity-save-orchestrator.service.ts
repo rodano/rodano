@@ -21,12 +21,12 @@ export class EntitySaveOrchestratorService {
 			),
 			this.draftSaveService.saveEventModels(
 				projectId,
-				context.modifiedEventModelIds,
+				context.modifiedEventModels,
 				context.eventModels
 			),
 			this.draftSaveService.saveEventGroups(
 				projectId,
-				context.modifiedEventGroupIds,
+				context.modifiedEventGroups,
 				context.eventGroups
 			)
 		]).pipe(

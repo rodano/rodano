@@ -1,49 +1,6 @@
 @import '../../shared/detail-shared.css';
 
 /* ==================== Scope Model Detail Overrides ==================== */
-.detail-code {
-	background-color: #5bd4d4;
-}
-
-.chip.parent-chip {
-	background-color: #e0f2f1;
-	color: #047857;
-	border: 1px solid #5bd4d4;
-}
-
-.chip.child-chip {
-	background-color: #f5f3ff;
-	color: #6b21a8;
-	border: 1px solid #8b5cf6;
-}
-
-.chip.default-chip {
-	background-color: #fef3c7;
-	color: #92400e;
-	border: 1px solid #fcd34d;
-}
-
-/* View action buttons */
-.btn-view-event-models {
-	background-color: #8b5cf6;
-	color: white;
-	border-color: #8b5cf6;
-}
-
-.btn-view-event-models:hover {
-	background-color: #7c3aed;
-}
-
-.btn-view-event-groups {
-	background-color: #10b981;
-	color: white;
-	border-color: #10b981;
-}
-
-.btn-view-event-groups:hover {
-	background-color: #059669;
-}
-
 /* Workflow state selections */
 .workflow-state-selections {
 	display: flex;
@@ -90,11 +47,6 @@
 	font-size: 1rem;
 	width: 1rem;
 	height: 1rem;
-}
-
-.status-badge.virtual {
-	background-color: #dbeafe;
-	color: #1e40af;
 }
 
 .status-badge.inceptive {

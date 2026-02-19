@@ -31,7 +31,7 @@ import {
 		ValidatorDetailComponent
 	],
 	templateUrl: './validators-list.component.html',
-	styleUrls: ['./validators-list.component.css']
+	styleUrls: ['../../shared/list-shared.css']
 })
 export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -39,7 +39,10 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string | null>();
 	@Output() validatorsChanged = new EventEmitter<{modificationCount: number}>();
-	@Output() validatorContextChanged = new EventEmitter<{selectedValidatorId: string | null}>();
+	@Output() validatorContextChanged = new EventEmitter<{
+		validators: any[];
+		selectedValidatorId: string | null;
+	}>();
 
 	selectedValidator: Validator | null = null;
 	viewMode = 'detail';
@@ -219,6 +222,7 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	private emitContext(): void {
 		this.validatorContextChanged.emit({
+			validators: [...this.validators],
 			selectedValidatorId: this.selectedValidator?.validatorId || null
 		});
 	}

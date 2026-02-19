@@ -9,9 +9,10 @@
 					type="text"
 					formControlName="code"
 					placeholder="MY_PROJECT"
+					(input)="onIdInput($event)"
 					style="text-transform: uppercase;">
 				<span class="hint">Uppercase letters, numbers, and underscores only (e.g., TEST, STUDY_2024)</span>
-				@if (projectForm.get('code')?.invalid && projectForm.get('code')?.touched) {
+				@if (projectForm.get('code')?.hasError('required') && projectForm.get('code')?.touched) {
 					<span class="error-message">{{ getErrorMessage('code') }}</span>
 				}
 			</div>
@@ -80,8 +81,7 @@
 
 					@if (getAvailableLanguages().length > 0) {
 						<div class="add-language-dropdown">
-							<mat-icon>add</mat-icon>
-							<mat-select (change)="onLanguageSelected($event)" placeholder="Add a language...">
+							<mat-select (selectionChange)="onLanguageSelected($event)" placeholder="Add a language...">
 								@for (lang of getAvailableLanguages(); track lang.code) {
 									<mat-option [value]="lang.code">{{ lang.name }}</mat-option>
 								}
@@ -179,9 +179,7 @@
 			Cancel
 		</button>
 		<button
-			class="btn-primary"
-			(click)="onSubmit()"
-			[disabled]="loading || !isFormValid()">
+			class="btn-primary" (click)="onSubmit()" [disabled]="loading || !isFormValid()">
 			@if (loading) {
 				<mat-spinner diameter="20"></mat-spinner>
 			} @else {

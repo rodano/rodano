@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ draftEventModel ? getTranslatedValue(draftEventModel.shortname) : '' }}</h2>
-		<span class="detail-code">{{ draftEventModel?.id }}</span>
+		<span class="detail-code first-child">{{ draftEventModel?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -106,7 +106,7 @@
 					</label>
 					<div class="setting-value">
 						@if (draftEventModel.mandatory) {
-							<span class="status-badge mandatory">Yes</span>
+							<span class="status-badge third">Yes</span>
 						} @else {
 							<span class="status-badge">No</span>
 						}
@@ -122,7 +122,7 @@
 					</label>
 					<div class="setting-value">
 						@if (draftEventModel.inceptive) {
-							<span class="status-badge inceptive">Yes</span>
+							<span class="status-badge first">Yes</span>
 						} @else {
 							<span class="status-badge">No</span>
 						}
@@ -249,7 +249,7 @@
 						@if (draftEventModel.deadlineReferenceEventModelIds?.length) {
 							<div class="chip-container">
 								@for (refId of draftEventModel.deadlineReferenceEventModelIds; track refId) {
-									<div class="chip deadline-ref-chip">
+									<div class="chip third">
 										<mat-icon class="resource-icon">schedule</mat-icon>
 										<span class="language-name">{{ getEventModelCode(refId) }}</span>
 									</div>
@@ -423,7 +423,7 @@
 						@if (draftEventModel.blockedEventModelIds && draftEventModel.blockedEventModelIds.length > 0) {
 							<div class="chip-container">
 								@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
-									<div class="chip blocked-chip">
+									<div class="chip fourth">
 										<mat-icon class="resource-icon">block</mat-icon>
 										<span class="language-name">{{ getEventModelName(blockedId) }}</span>
 									</div>
@@ -449,7 +449,7 @@
 						@if (draftEventModel.impliedEventModelIds && draftEventModel.impliedEventModelIds.length > 0) {
 							<div class="chip-container">
 								@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
-									<div class="chip implied-chip">
+									<div class="chip fifth">
 										<mat-icon class="resource-icon">arrow_forward</mat-icon>
 										<span class="language-name">{{ getEventModelName(impliedId) }}</span>
 									</div>

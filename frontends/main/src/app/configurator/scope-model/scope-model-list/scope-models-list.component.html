@@ -47,7 +47,7 @@
 							</div>
 							<div class="card-header-badges">
 								@if (scopeModel.virtual) {
-									<span class="status-badge virtual" matTooltip="Virtual">
+									<span class="status-badge first" matTooltip="Virtual">
 										<mat-icon class="badge-full">visibility_off</mat-icon>
 										<mat-icon class="badge-short">visibility_off</mat-icon>
 									</span>
@@ -144,7 +144,7 @@
 					}
 
 					<div class="secondary-cards-grid">
-						<div class="secondary-card event-card create-card" (click)="onCreateEventModel()">
+						<div class="secondary-card first-child-card create-card" (click)="onCreateEventModel()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Event Model</h3>
@@ -153,7 +153,7 @@
 						</div>
 
 						@for (eventModel of eventModels; track eventModel.eventModelId) {
-							<div class="secondary-card event-card"
+							<div class="secondary-card first-child-card"
 												[class.selected]="selectedEventModelId === eventModel.eventModelId"
 												[class.modified]="isEventModelModified(eventModel.eventModelId)"
 												(click)="onSelectEventModel(eventModel.eventModelId)">
@@ -171,13 +171,13 @@
 									</div>
 									<div class="card-header-badges">
 										@if (eventModel.mandatory) {
-											<span class="status-badge mandatory" matTooltip="Mandatory">
+											<span class="status-badge third" matTooltip="Mandatory">
 												<mat-icon class="badge-full">priority_high</mat-icon>
 												<mat-icon class="badge-short">priority_high</mat-icon>
 											</span>
 										}
 										@if (eventModel.inceptive) {
-											<span class="status-badge inceptive" matTooltip="Inceptive">
+											<span class="status-badge first" matTooltip="Inceptive">
 												<mat-icon class="badge-full">flag</mat-icon>
 												<mat-icon class="badge-short">flag</mat-icon>
 											</span>
@@ -239,7 +239,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card event-card event-group-card create-card" (click)="onCreateEventGroup()">
+						<div class="secondary-card second-child-card event-group-card create-card" (click)="onCreateEventGroup()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Event Group</h3>
@@ -248,7 +248,7 @@
 						</div>
 
 						@for (eventGroup of eventGroups; track eventGroup.eventGroupId) {
-							<div class="secondary-card event-card event-group-card"
+							<div class="secondary-card second-child-card event-group-card"
 												[class.selected]="selectedEventGroupId === eventGroup.eventGroupId"
 												[class.modified]="isEventGroupModified(eventGroup.eventGroupId)"
 												(click)="onSelectEventGroup(eventGroup.eventGroupId)">

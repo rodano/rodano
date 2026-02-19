@@ -18,6 +18,7 @@ export interface EventGroup {
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };
     description?: { [key: string]: string; };
+    icon?: string;
     scopeModelId?: string;
 }
 

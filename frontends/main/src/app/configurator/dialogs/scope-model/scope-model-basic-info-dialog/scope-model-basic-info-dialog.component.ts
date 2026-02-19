@@ -54,6 +54,7 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 		this.form = this.fb.group({
 			id: ['', [Validators.required]],
 			virtual: [false],
+			expectedNumber: [null, [Validators.min(0)]],
 			maxNumber: [null, [Validators.min(0)]]
 		});
 	}
@@ -94,6 +95,7 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 		this.form.patchValue({
 			id: scopeModel.id,
 			virtual: scopeModel.virtual,
+			expectedNumber: scopeModel.expectedNumber || null,
 			maxNumber: scopeModel.maxNumber || null
 		});
 
@@ -150,6 +152,7 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 			description,
 			pluralShortname,
 			virtual: formValue.virtual,
+			expectedNumber: formValue.expectedNumber,
 			maxNumber: formValue.maxNumber
 		};
 

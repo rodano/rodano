@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ getTranslatedName(validator.shortname) }}</h2>
-		<span class="detail-code">{{ validator.id }}</span>
+		<span class="detail-code parent">{{ validator.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -93,7 +93,7 @@
 				</label>
 				<div class="setting-value">
 					@if (validator.required) {
-						<span class="status-badge required">Yes</span>
+						<span class="status-badge second">Yes</span>
 					} @else {
 						<span class="status-badge">No</span>
 					}
@@ -109,7 +109,7 @@
 				</label>
 				<div class="setting-value">
 					@if (validator.script) {
-						<span class="status-badge script">Yes</span>
+						<span class="status-badge first">Yes</span>
 					} @else {
 						<span class="status-badge">No</span>
 					}

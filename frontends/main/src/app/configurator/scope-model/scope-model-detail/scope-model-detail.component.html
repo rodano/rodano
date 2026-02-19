@@ -1,16 +1,16 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ getTranslatedName(scopeModel.shortname) }}</h2>
-		<span class="detail-code">{{ scopeModel.id }}</span>
+		<span class="detail-code parent">{{ scopeModel.id }}</span>
 	</div>
 	<div class="header-actions">
-		<button class="btn-view-secondary btn-view-event-models" (click)="onSwitchToEventModels()"
+		<button class="btn-view first-child" (click)="onSwitchToEventModels()"
 										matTooltip="View Event Models">
 			<mat-icon>event</mat-icon>
 			<span>Event Models</span>
 		</button>
 
-		<button class="btn-view-secondary btn-view-event-groups" (click)="onSwitchToEventGroups()"
+		<button class="btn-view second-child" (click)="onSwitchToEventGroups()"
 										matTooltip="View Event Groups">
 			<mat-icon>group</mat-icon>
 			<span>Event Groups</span>
@@ -104,10 +104,25 @@
 				</label>
 				<div class="setting-value">
 					@if (scopeModel.virtual) {
-						<span class="status-badge virtual">Yes</span>
+						<span class="status-badge first">Yes</span>
 					} @else {
 						<span class="status-badge">No</span>
 					}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('expectedNumber')">
+				<label>
+					Expected Number
+					@if (isFieldModified('expectedNumber')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!scopeModel.expectedNumber">
+					@if (!scopeModel.expectedNumber) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ scopeModel.expectedNumber || 'Not configured' }}
 				</div>
 			</div>
 
@@ -177,8 +192,8 @@
 						<div class="chip-container">
 							@for (parentId of scopeModel.parentIds; track parentId) {
 								<div class="chip"
-													[class.default-chip]="parentId === scopeModel.defaultParentId"
-													[class.parent-chip]="parentId !== scopeModel.defaultParentId">
+													[class.third]="parentId === scopeModel.defaultParentId"
+													[class.first]="parentId !== scopeModel.defaultParentId">
 									@if (parentId === scopeModel.defaultParentId) {
 										<mat-icon class="resource-icon">star</mat-icon>
 									} @else {
@@ -203,7 +218,7 @@
 					@if (scopeModel.childScopeModelIds.length > 0) {
 						<div class="chip-container">
 							@for (childId of scopeModel.childScopeModelIds; track childId) {
-								<div class="chip child-chip">
+								<div class="chip second">
 									<mat-icon class="resource-icon">arrow_downward</mat-icon>
 									<span class="language-name">{{ getScopeModelLabel(childId) }}</span>
 								</div>

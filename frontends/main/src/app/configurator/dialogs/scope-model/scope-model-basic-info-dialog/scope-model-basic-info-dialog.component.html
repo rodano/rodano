@@ -131,6 +131,19 @@
 			</div>
 
 			<div class="form-field">
+				<label>Expected Number</label>
+				<input
+					type="number"
+					formControlName="expectedNumber"
+					placeholder="e.g., 100"
+					min="0">
+				<span class="hint">Optional expected number of instances for this scope model</span>
+				@if (form.get('expectedNumber')?.hasError('min') && form.get('expectedNumber')?.touched) {
+					<span class="error-message">Expected number must be 0 or greater</span>
+				}
+			</div>
+
+			<div class="form-field">
 				<label>Maximum Number</label>
 				<input
 					type="number"

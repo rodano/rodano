@@ -1,10 +1,10 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ getTranslatedName(datasetModel.shortname) }}</h2>
-		<span class="detail-code">{{ datasetModel.id }}</span>
+		<span class="detail-code parent">{{ datasetModel.id }}</span>
 	</div>
 	<div class="header-actions">
-		<button class="btn-view-secondary btn-view-field-models" (click)="onSwitchToFieldModels()"
+		<button class="btn-view first-child" (click)="onSwitchToFieldModels()"
 										matTooltip="View Field Models">
 			<mat-icon>text_ad</mat-icon>
 			<span>Field Models</span>
@@ -84,7 +84,7 @@
 				</label>
 				<div class="setting-value">
 					@if (datasetModel.multiple) {
-						<span class="status-badge multiple">Yes</span>
+						<span class="status-badge first">Yes</span>
 					} @else {
 						<span class="status-badge">No</span>
 					}
@@ -124,7 +124,7 @@
 				</label>
 				<div class="setting-value">
 					@if (datasetModel.master) {
-						<span class="status-badge master">Yes</span>
+						<span class="status-badge second">Yes</span>
 					} @else {
 						<span class="status-badge">No</span>
 					}
@@ -149,7 +149,7 @@
 				</label>
 				<div class="setting-value">
 					@if (datasetModel.exportable) {
-						<span class="status-badge exportable">Yes</span>
+						<span class="status-badge third">Yes</span>
 					} @else {
 						<span class="status-badge">No</span>
 					}

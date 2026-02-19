@@ -13,8 +13,8 @@ import {TreeNode} from '../tree-node';
 })
 export class ScopeModelsTreeComponent implements OnChanges {
 	@Input() projectId = '';
-	@Input() scopeModels: any[] = [];
 	@Input() expanded = false;
+	@Input() scopeModels: any[] = [];
 	@Input() eventModels: any[] = [];
 	@Input() eventGroups: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;

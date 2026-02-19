@@ -16,6 +16,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
+import { ProjectLanguage } from '@core/model/project-language';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -47,6 +48,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	@Output() switchToEventGroups = new EventEmitter<void>();
 
 	selectedLanguage = '';
+	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 	private workflowStateSelectionsMap = new Map<string, WorkflowStateSelection[]>();
 
@@ -60,6 +62,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});

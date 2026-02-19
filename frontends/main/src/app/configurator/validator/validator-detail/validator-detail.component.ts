@@ -20,7 +20,7 @@ import {
 	selector: 'app-validator-detail',
 	standalone: true,
 	templateUrl: './validator-detail.component.html',
-	styleUrls: ['./validator-detail.component.css'],
+	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,

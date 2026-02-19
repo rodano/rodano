@@ -36,11 +36,6 @@
 	color: #92400e;
 }
 
-.status-badge.virtual {
-	background-color: #dbeafe;
-	color: #1e40af;
-}
-
 .status-badge.root {
 	background-color: #dcfce7;
 	color: #15803d;
@@ -51,68 +46,13 @@
 	color: #991b1b;
 }
 
-/* ==================== Event Model Card Styles ==================== */
-.event-card {
-	border-top: 4px solid #8b5cf6;
-}
-
-.event-card:hover {
-	border-top-color: #8b5cf6;
-}
-
-.event-card.create-card:hover {
-	border-color: #8b5cf6 !important;
-}
-
-.event-card.create-card:hover .create-content mat-icon {
-	color: #8b5cf6 !important;
-}
-
-.event-card.selected {
-	box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
-	background-color: #f5f3ff;
-}
-
-.event-card.selected::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	right: 0;
-	border-style: solid;
-	border-width: 0 40px 40px 0;
-	border-color: transparent #8b5cf6 transparent transparent;
-}
-
-.content-container.level-3 .event-card.selected::after {
-	border-width: 0 30px 30px 0;
-}
-
-.event-card.modified.selected {
-	border-top-color: #f59e0b;
-	box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-}
-
-.event-card.modified.selected::after {
-	border-color: transparent #f59e0b transparent transparent;
-}
-
-.status-badge.mandatory {
-	background-color: #fef3c7;
-	color: #92400e;
-}
-
-.status-badge.inceptive {
-	background-color: #dbeafe;
-	color: #1e40af;
-}
-
+/* ==================== Event Model Timeline ==================== */
 .content-container.level-3 .timeline-wrapper {
 	display: none;
 }
 
 /* ==================== Event Group Card Styles ==================== */
-.event-card.event-group-card {
-	border-top-color: #10b981;
+.event-group-card {
 	height: auto;
 	min-height: 80px;
 	padding-bottom: 1rem;
@@ -122,46 +62,29 @@
 	display: none !important;
 }
 
-.event-card.event-group-card .card-header {
+.event-group-card .card-header {
 	border-bottom: none !important;
 	margin-bottom: 0 !important;
 	padding-bottom: 0 !important;
 }
 
-.content-container.level-3 .event-card.event-group-card {
+.content-container.level-3 .event-group-card {
 	min-height: 0;
 	height: auto;
 	padding: 0.75rem;
 }
 
-.event-card.event-group-card.create-card {
+.event-group-card.create-card {
 	height: 80px;
 	min-height: 80px;
 }
 
-.content-container.level-3 .event-card.event-group-card.create-card {
+.content-container.level-3 .event-group-card.create-card {
 	height: auto;
 	min-height: 60px;
 	padding: 0.75rem;
 }
 
-.content-container.level-2 .event-card.event-group-card.create-card .create-content p {
+.content-container.level-2 .event-group-card.create-card .create-content p {
 	display: none !important;
-}
-
-.event-card.event-group-card.create-card:hover {
-	border-color: #10b981 !important;
-}
-
-.event-card.event-group-card.create-card:hover .create-content mat-icon {
-	color: #10b981 !important;
-}
-
-.event-card.event-group-card.selected {
-	box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-	background-color: #d1fae5;
-}
-
-.event-card.event-group-card.selected::after {
-	border-color: transparent #10b981 transparent transparent;
 }

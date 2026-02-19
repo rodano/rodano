@@ -9,7 +9,7 @@ import {ConfiguratorService} from '../../../services/api/configurator.service';
 import {CreateProjectRequest} from '@core/model/create-project-request';
 import {MatTabsModule} from '@angular/material/tabs';
 import ISO6391 from 'iso-639-1';
-import {MatSelectModule} from '@angular/material/select';
+import {MatSelectChange, MatSelectModule} from '@angular/material/select';
 
 @Component({
 	selector: 'app-create-project-dialog',
@@ -45,6 +45,13 @@ export class CreateProjectDialogComponent {
 			url: ['', Validators.pattern(/^https?:\/\/.+/)],
 			color: ['#5bd4d4']
 		});
+	}
+
+	onIdInput(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const uppercaseValue = input.value.toUpperCase();
+		input.value = uppercaseValue;
+		this.projectForm.patchValue({code: uppercaseValue}, {emitEvent: false});
 	}
 
 	onSubmit(): void {
@@ -164,13 +171,10 @@ export class CreateProjectDialogComponent {
 			.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
-	onLanguageSelected(event: Event): void {
-		const select = event.target as HTMLSelectElement;
-		const code = select.value;
-
+	onLanguageSelected(event: MatSelectChange): void {
+		const code = event.value;
 		if(code) {
 			this.addLanguage(code);
-			select.value = '';
 		}
 	}
 
@@ -184,14 +188,16 @@ export class CreateProjectDialogComponent {
 			return;
 		}
 
+		const isDefault = this.selectedLanguages.length === 0;
+
 		this.selectedLanguages.push({
 			code: code,
 			name: this.getLanguageName(code),
-			isDefault: false
+			isDefault
 		});
 
 		this.languageForms.set(code, this.fb.group({
-			shortname: [''],
+			shortname: ['', Validators.required],
 			longname: [''],
 			description: ['']
 		}));
