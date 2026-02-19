@@ -98,6 +98,7 @@ public class WorkflowActionDAOServiceImpl implements WorkflowActionDAOService {
 			.set(WORKFLOW_ACTION.DOCUMENTABLE_OPTIONS, jsonMapperService.toJson(workflowAction.getDocumentableOptions()))
 			.set(WORKFLOW_ACTION.REQUIRE_SIGNATURE, workflowAction.isRequireSignature())
 			.set(WORKFLOW_ACTION.REQUIRED_SIGNATURE_TEXT, jsonMapperService.toJson(workflowAction.getRequireSignatureText()))
+			.set(WORKFLOW_ACTION.ICON, workflowAction.getIcon())
 			.execute();
 
 		return getWorkflowAction(projectId, workflowActionId);
@@ -121,6 +122,7 @@ public class WorkflowActionDAOServiceImpl implements WorkflowActionDAOService {
 			.set(WORKFLOW_ACTION.DOCUMENTABLE_OPTIONS, jsonMapperService.toJson(workflowAction.getDocumentableOptions()))
 			.set(WORKFLOW_ACTION.REQUIRE_SIGNATURE, workflowAction.isRequireSignature())
 			.set(WORKFLOW_ACTION.REQUIRED_SIGNATURE_TEXT, jsonMapperService.toJson(workflowAction.getRequireSignatureText()))
+			.set(WORKFLOW_ACTION.ICON, workflowAction.getIcon())
 			.where(WORKFLOW_ACTION.PROJECT_ID.eq(projectId))
 			.and(WORKFLOW_ACTION.WORKFLOW_ACTION_ID.eq(workflowActionId))
 			.execute();
@@ -158,6 +160,7 @@ public class WorkflowActionDAOServiceImpl implements WorkflowActionDAOService {
 		dto.setRequireSignature(record.getRequireSignature());
 		dto.setRequireSignatureText(jsonMapperService.fromJson(record.getRequiredSignatureText(), new TypeReference<TreeMap<String, String>>() {
 		}));
+		dto.setIcon(record.getIcon());
 
 		return dto;
 	}

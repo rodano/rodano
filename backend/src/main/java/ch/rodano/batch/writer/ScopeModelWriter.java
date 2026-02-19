@@ -82,6 +82,7 @@ public class ScopeModelWriter extends BaseWriter {
 					.set(SCOPE_MODEL.SCOPE_MODEL_ID, scopeModelId)
 					.set(SCOPE_MODEL.CODE, scopeModelCode)
 					.set(SCOPE_MODEL.VIRTUAL, scopeModel.isVirtual())
+					.set(SCOPE_MODEL.EXPECTED_NUMBER, scopeModel.getExpectedNumber())
 					.set(SCOPE_MODEL.MAX_NUMBER, scopeModel.getMaxNumber())
 					.set(SCOPE_MODEL.SCOPE_FORMAT, scopeModel.getScopeFormat())
 					.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, defaultProfileId)
@@ -92,6 +93,7 @@ public class ScopeModelWriter extends BaseWriter {
 					.set(SCOPE_MODEL.PLURAL_SHORTNAME, toJson(scopeModel.getPluralShortname()))
 					.onDuplicateKeyUpdate()
 					.set(SCOPE_MODEL.VIRTUAL, scopeModel.isVirtual())
+					.set(SCOPE_MODEL.EXPECTED_NUMBER, scopeModel.getExpectedNumber())
 					.set(SCOPE_MODEL.MAX_NUMBER, scopeModel.getMaxNumber())
 					.set(SCOPE_MODEL.SCOPE_FORMAT, scopeModel.getScopeFormat())
 					.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, defaultProfileId)
@@ -153,10 +155,12 @@ public class ScopeModelWriter extends BaseWriter {
 							.set(EVENT_GROUP.SHORTNAME, toJson(eventGroup.getShortname()))
 							.set(EVENT_GROUP.LONGNAME, toJson(eventGroup.getLongname()))
 							.set(EVENT_GROUP.DESCRIPTION, toJson(eventGroup.getDescription()))
+							.set(EVENT_GROUP.ICON, eventGroup.getIcon())
 							.onDuplicateKeyUpdate()
 							.set(EVENT_GROUP.SHORTNAME, toJson(eventGroup.getShortname()))
 							.set(EVENT_GROUP.LONGNAME, toJson(eventGroup.getLongname()))
 							.set(EVENT_GROUP.DESCRIPTION, toJson(eventGroup.getDescription()))
+							.set(EVENT_GROUP.ICON, eventGroup.getIcon())
 							.execute();
 					}
 				}

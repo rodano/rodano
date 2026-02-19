@@ -119,7 +119,7 @@ public class WorkflowDAO implements BaseProjectDAO<Workflow> {
 	private List<WorkflowState> loadWorkflowStates(final UUID workflowId) {
 		final var records = dslContext.selectFrom(WORKFLOW_STATE)
 			.where(WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId))
-			.orderBy(WORKFLOW_STATE.STATE_ORDER)
+			.orderBy(WORKFLOW_STATE.CODE)
 			.fetch();
 
 		return records.map(record -> {
@@ -163,7 +163,7 @@ public class WorkflowDAO implements BaseProjectDAO<Workflow> {
 	private SortedSet<Action> loadWorkflowActions(final UUID workflowId) {
 		final var records = dslContext.selectFrom(WORKFLOW_ACTION)
 			.where(WORKFLOW_ACTION.WORKFLOW_ID.eq(workflowId))
-			.orderBy(WORKFLOW_ACTION.ACTION_ORDER)
+			.orderBy(WORKFLOW_ACTION.CODE)
 			.fetch();
 
 		final SortedSet<Action> actions = new TreeSet<>();

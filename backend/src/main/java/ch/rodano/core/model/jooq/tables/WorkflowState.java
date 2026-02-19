@@ -90,11 +90,6 @@ public class WorkflowState extends TableImpl<WorkflowStateRecord> {
 	public final TableField<WorkflowStateRecord, String> CODE = createField(DSL.name("code"), SQLDataType.VARCHAR(128).nullable(false), this, "");
 
 	/**
-	 * The column <code>workflow_state.state_order</code>.
-	 */
-	public final TableField<WorkflowStateRecord, Integer> STATE_ORDER = createField(DSL.name("state_order"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
-	/**
 	 * The column <code>workflow_state.important</code>.
 	 */
 	public final TableField<WorkflowStateRecord, Boolean> IMPORTANT = createField(DSL.name("important"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");

@@ -27,6 +27,7 @@ import ch.rodano.api.config.FieldModelDTO;
 import ch.rodano.api.config.PossibleValueDTO;
 import ch.rodano.configuration.model.field.FieldModelType;
 import ch.rodano.configuration.model.rules.OperandType;
+import ch.rodano.core.model.jooq.enums.FieldModelDataType;
 import ch.rodano.core.model.jooq.tables.records.FieldModelRecord;
 import ch.rodano.core.model.jooq.tables.records.FieldPossibleValueRecord;
 
@@ -139,8 +140,8 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 			.set(FIELD_MODEL.PROJECT_ID, projectId)
 			.set(FIELD_MODEL.CODE, dto.getId())
 			.set(FIELD_MODEL.DATASET_MODEL_ID, dto.getDatasetModelId())
-			.set(FIELD_MODEL.TYPE, dto.getType().name())
-			.set(FIELD_MODEL.DATA_TYPE, dto.getDataType().name())
+			.set(FIELD_MODEL.TYPE, ch.rodano.core.model.jooq.enums.FieldModelType.valueOf(dto.getType().name()))
+			.set(FIELD_MODEL.DATA_TYPE, FieldModelDataType.valueOf(dto.getDataType().name()))
 			.set(FIELD_MODEL.SHORTNAME, jsonMapperService.toJson(dto.getShortname()))
 			.set(FIELD_MODEL.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
 			.set(FIELD_MODEL.DESCRIPTION, jsonMapperService.toJson(dto.getDescription()))
@@ -194,8 +195,8 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 		dslContext.update(FIELD_MODEL)
 			.set(FIELD_MODEL.CODE, dto.getId())
 			.set(FIELD_MODEL.DATASET_MODEL_ID, dto.getDatasetModelId())
-			.set(FIELD_MODEL.TYPE, dto.getType().name())
-			.set(FIELD_MODEL.DATA_TYPE, dto.getDataType().name())
+			.set(FIELD_MODEL.TYPE, ch.rodano.core.model.jooq.enums.FieldModelType.valueOf(dto.getType().name()))
+			.set(FIELD_MODEL.DATA_TYPE, FieldModelDataType.valueOf(dto.getDataType().name()))
 			.set(FIELD_MODEL.SHORTNAME, jsonMapperService.toJson(dto.getShortname()))
 			.set(FIELD_MODEL.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
 			.set(FIELD_MODEL.DESCRIPTION, jsonMapperService.toJson(dto.getDescription()))
@@ -340,8 +341,8 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 		final var dto = new FieldModelDTO();
 		dto.setFieldModelId(record.getFieldModelId());
 		dto.setId(record.getCode());
-		dto.setType(FieldModelType.valueOf(record.getType()));
-		dto.setDataType(OperandType.valueOf(record.getDataType()));
+		dto.setType(FieldModelType.valueOf(record.getType().name()));
+		dto.setDataType(OperandType.valueOf(record.getDataType().name()));
 		dto.setDatasetModelId(record.getDatasetModelId());
 		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
 		}));

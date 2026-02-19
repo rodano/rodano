@@ -193,6 +193,7 @@ create table if not exists scope_model (
     description json null,
     plural_shortname json null,
     virtual boolean not null default false,
+    expected_number int null,
     max_number int null,
     scope_format varchar(512) null,
 	default_parent_id uuid null,
@@ -392,6 +393,7 @@ create table if not exists event_group (
     shortname json null,
     longname json null,
     description json null,
+	icon varchar(64) null,
     constraint pk_event_group primary key (project_id, event_group_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
@@ -487,8 +489,9 @@ create table if not exists field_model (
     project_id uuid not null,
     dataset_model_id uuid not null,
     code varchar(128) not null,
-    type varchar(32) not null,
-    data_type varchar(32) not null,
+    type enum ('STRING', 'AUTO_COMPLETION', 'DATE', 'DATE_SELECT', 'NUMBER', 'SELECT',
+        'RADIO', 'CHECKBOX', 'CHECKBOX_GROUP', 'TEXTAREA', 'FILE') not null,
+    data_type enum ('STRING', 'DATE', 'NUMBER', 'BOOLEAN', 'BLOB') not null,
     shortname json null,
     longname json null,
     description json null,
@@ -772,6 +775,7 @@ create table if not exists workflow (
     code varchar(128) not null,
     aggregate_workflow_id uuid null,
     initial_state_id uuid null,
+    creation_action_id uuid null,
     order_by int null,
     shortname json null,
     longname json null,
@@ -790,7 +794,6 @@ create table if not exists workflow_state (
     project_id uuid not null,
     workflow_id uuid not null,
     code varchar(128) not null,
-    state_order int null,
     important boolean not null default false,
     color varchar(16) null,
     shortname json null,
@@ -817,7 +820,6 @@ create table if not exists workflow_action (
     project_id uuid not null,
     workflow_id uuid not null,
     code varchar(128) not null,
-    action_order int null,
     documentable boolean not null default false,
     require_signature boolean not null default false,
     shortname json null,
@@ -825,6 +827,7 @@ create table if not exists workflow_action (
     description json null,
     required_signature_text json null,
     documentable_options json null,
+	icon varchar(64) null,
     constraint pk_workflow_action primary key (project_id, workflow_action_id),
     constraint uq_workflow_action_code unique (project_id, workflow_id, code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;

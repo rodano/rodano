@@ -695,7 +695,7 @@
     </step>
 
     <!-- 21) ADD MISSING LINKS TO FIELD MODEL -->
-    <step id="fieldBackfill" next="projectBackfill">
+    <step id="fieldBackfill" next="workflowBackfill">
         <listeners>
             <listener ref="ch.rodano.batch.TraceListener"/>
         </listeners>
@@ -722,7 +722,35 @@
         </chunk>
     </step>
 
-    <!-- 22) ADD MISSING PROFILE ID TO PROJECT MODEL -->
+    <!-- 21) ADD MISSING LINKS TO WORKFLOW -->
+    <step id="workflowBackfill" next="projectBackfill">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="100" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/workflows"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.Workflow"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.WorkflowWriterBackfill">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <!-- 23) ADD MISSING PROFILE ID TO PROJECT MODEL -->
     <step id="projectBackfill">
         <listeners>
             <listener ref="ch.rodano.batch.TraceListener"/>

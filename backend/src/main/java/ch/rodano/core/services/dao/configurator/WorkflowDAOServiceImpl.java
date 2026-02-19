@@ -75,6 +75,7 @@ public class WorkflowDAOServiceImpl implements WorkflowDAOService {
 			.set(WORKFLOW.CODE, dto.getId())
 			.set(WORKFLOW.AGGREGATE_WORKFLOW_ID, dto.getAggregatedWorkflowId())
 			.set(WORKFLOW.INITIAL_STATE_ID, dto.getInitialStateId())
+			.set(WORKFLOW.CREATION_ACTION_ID, dto.getActionId())
 			.set(WORKFLOW.ORDER_BY, dto.getOrder())
 			.set(WORKFLOW.SHORTNAME, jsonMapperService.toJson(dto.getShortname()))
 			.set(WORKFLOW.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
@@ -99,6 +100,7 @@ public class WorkflowDAOServiceImpl implements WorkflowDAOService {
 			.set(WORKFLOW.CODE, dto.getId())
 			.set(WORKFLOW.AGGREGATE_WORKFLOW_ID, dto.getAggregatedWorkflowId())
 			.set(WORKFLOW.INITIAL_STATE_ID, dto.getInitialStateId())
+			.set(WORKFLOW.CREATION_ACTION_ID, dto.getActionId())
 			.set(WORKFLOW.ORDER_BY, dto.getOrder())
 			.set(WORKFLOW.SHORTNAME, jsonMapperService.toJson(dto.getShortname()))
 			.set(WORKFLOW.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
@@ -133,6 +135,7 @@ public class WorkflowDAOServiceImpl implements WorkflowDAOService {
 		dto.setId(record.getCode());
 		dto.setAggregatedWorkflowId(record.getAggregateWorkflowId());
 		dto.setInitialStateId(record.getInitialStateId());
+		dto.setActionId(record.getCreationActionId());
 		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
 		}));
 		dto.setLongname(jsonMapperService.fromJson(record.getLongname(), new TypeReference<TreeMap<String, String>>() {

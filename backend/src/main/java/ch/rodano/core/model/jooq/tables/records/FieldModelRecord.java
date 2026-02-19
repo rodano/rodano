@@ -4,6 +4,8 @@
 package ch.rodano.core.model.jooq.tables.records;
 
 
+import ch.rodano.core.model.jooq.enums.FieldModelDataType;
+import ch.rodano.core.model.jooq.enums.FieldModelType;
 import ch.rodano.core.model.jooq.tables.FieldModel;
 
 import java.math.BigDecimal;
@@ -80,29 +82,29 @@ public class FieldModelRecord extends UpdatableRecordImpl<FieldModelRecord> {
 	/**
 	 * Setter for <code>field_model.type</code>.
 	 */
-	public void setType(String value) {
+	public void setType(FieldModelType value) {
 		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.type</code>.
 	 */
-	public String getType() {
-		return (String) get(4);
+	public FieldModelType getType() {
+		return (FieldModelType) get(4);
 	}
 
 	/**
 	 * Setter for <code>field_model.data_type</code>.
 	 */
-	public void setDataType(String value) {
+	public void setDataType(FieldModelDataType value) {
 		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.data_type</code>.
 	 */
-	public String getDataType() {
-		return (String) get(5);
+	public FieldModelDataType getDataType() {
+		return (FieldModelDataType) get(5);
 	}
 
 	/**
@@ -618,7 +620,7 @@ public class FieldModelRecord extends UpdatableRecordImpl<FieldModelRecord> {
 	/**
 	 * Create a detached, initialised FieldModelRecord
 	 */
-	public FieldModelRecord(UUID fieldModelId, UUID projectId, UUID datasetModelId, String code, String type, String dataType, String shortname, String longname, String description, String matcherMessage, String advancedHelp, Boolean plugin, Boolean searchable, Boolean readOnly, Boolean exportable, Boolean allowDateInFuture, Integer exportOrder, Integer maxLength, Integer maxIntegerDigits, Integer maxDecimalDigits, BigDecimal minValue, BigDecimal maxValue, Integer minYear, String dictionary, String matcher, String inlineHelp, Boolean withYears, Boolean withMonths, Boolean withDays, Boolean withHours, Boolean withMinutes, Boolean withSeconds, Boolean yearsMandatory, Boolean monthsMandatory, Boolean daysMandatory, Boolean hoursMandatory, Boolean minutesMandatory, Boolean secondsMandatory, String valueFormula, String possibleValuesProvider, String possibleValuesProviderDesc) {
+	public FieldModelRecord(UUID fieldModelId, UUID projectId, UUID datasetModelId, String code, FieldModelType type, FieldModelDataType dataType, String shortname, String longname, String description, String matcherMessage, String advancedHelp, Boolean plugin, Boolean searchable, Boolean readOnly, Boolean exportable, Boolean allowDateInFuture, Integer exportOrder, Integer maxLength, Integer maxIntegerDigits, Integer maxDecimalDigits, BigDecimal minValue, BigDecimal maxValue, Integer minYear, String dictionary, String matcher, String inlineHelp, Boolean withYears, Boolean withMonths, Boolean withDays, Boolean withHours, Boolean withMinutes, Boolean withSeconds, Boolean yearsMandatory, Boolean monthsMandatory, Boolean daysMandatory, Boolean hoursMandatory, Boolean minutesMandatory, Boolean secondsMandatory, String valueFormula, String possibleValuesProvider, String possibleValuesProviderDesc) {
 		super(FieldModel.FIELD_MODEL);
 
 		setFieldModelId(fieldModelId);

@@ -7,6 +7,8 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.enums.FieldModelDataType;
+import ch.rodano.core.model.jooq.enums.FieldModelType;
 import ch.rodano.core.model.jooq.tables.Chart.ChartPath;
 import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
 import ch.rodano.core.model.jooq.tables.Field.FieldPath;
@@ -97,12 +99,12 @@ public class FieldModel extends TableImpl<FieldModelRecord> {
 	/**
 	 * The column <code>field_model.type</code>.
 	 */
-	public final TableField<FieldModelRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(32).nullable(false), this, "");
+	public final TableField<FieldModelRecord, FieldModelType> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(15).nullable(false).asEnumDataType(FieldModelType.class), this, "");
 
 	/**
 	 * The column <code>field_model.data_type</code>.
 	 */
-	public final TableField<FieldModelRecord, String> DATA_TYPE = createField(DSL.name("data_type"), SQLDataType.VARCHAR(32).nullable(false), this, "");
+	public final TableField<FieldModelRecord, FieldModelDataType> DATA_TYPE = createField(DSL.name("data_type"), SQLDataType.VARCHAR(7).nullable(false).asEnumDataType(FieldModelDataType.class), this, "");
 
 	/**
 	 * The column <code>field_model.shortname</code>.

@@ -21,6 +21,7 @@ public class ScopeModel {
 	private List<String> parentIds;
 
 	private boolean virtual;
+	private Integer expectedNumber;
 	private Integer maxNumber;
 	private String scopeFormat;
 
@@ -102,6 +103,14 @@ public class ScopeModel {
 
 	public void setVirtual(final boolean virtual) {
 		this.virtual = virtual;
+	}
+
+	public Integer getExpectedNumber() {
+		return expectedNumber;
+	}
+
+	public void setExpectedNumber(final Integer expectedNumber) {
+		this.expectedNumber = expectedNumber;
 	}
 
 	public Integer getMaxNumber() {
@@ -219,6 +228,7 @@ public class ScopeModel {
 			", defaultParentId='" + defaultParentId + '\'' +
 			", parentIds=" + parentIds +
 			", virtual=" + virtual +
+			", expectedNumber=" + expectedNumber +
 			", maxNumber=" + maxNumber +
 			", scopeFormat='" + scopeFormat + '\'' +
 			", eventGroups=" + eventGroups +

@@ -191,7 +191,7 @@ public class AggregateWorkflowDAOService {
 				DSL.inline(null, WORKFLOW_STATUS.USER_FK).as(WORKFLOW_STATUS.USER_FK),
 				DSL.inline(null, WORKFLOW_STATUS.ROBOT_FK).as(WORKFLOW_STATUS.ROBOT_FK),
 				DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
-				stateCases.as("state_id"),
+				stateCases.as(WORKFLOW_STATUS.WORKFLOW_STATE_ID),
 				workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
 				DSL.inline(null, WORKFLOW_STATUS.WORKFLOW_ACTION_ID).as(WORKFLOW_STATUS.WORKFLOW_ACTION_ID),
 				DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
@@ -205,7 +205,7 @@ public class AggregateWorkflowDAOService {
 			.leftJoin(FORM).on(WORKFLOW_STATUS.FORM_FK.eq(FORM.PK))
 			.where(DSL.and(conditions))
 			.groupBy(groupByFields)
-			.having(DSL.field("state_id").isNotNull());
+			.having(DSL.field("workflow_state_id").isNotNull());
 	}
 
 	public Select<Record17<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, UUID, String, String, UUID, UUID, String, UUID>> generateEventQuery(
@@ -262,7 +262,7 @@ public class AggregateWorkflowDAOService {
 				DSL.inline(null, WORKFLOW_STATUS.USER_FK).as(WORKFLOW_STATUS.USER_FK),
 				DSL.inline(null, WORKFLOW_STATUS.ROBOT_FK).as(WORKFLOW_STATUS.ROBOT_FK),
 				DSL.inline(null, WORKFLOW_STATUS.PROFILE_ID).as(WORKFLOW_STATUS.PROFILE_ID),
-				stateCases.as("state_id"),
+				stateCases.as(WORKFLOW_STATUS.WORKFLOW_STATE_ID),
 				workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
 				DSL.inline(null, WORKFLOW_STATUS.WORKFLOW_ACTION_ID).as(WORKFLOW_STATUS.WORKFLOW_ACTION_ID),
 				DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
@@ -275,7 +275,7 @@ public class AggregateWorkflowDAOService {
 			.leftJoin(FORM).on(WORKFLOW_STATUS.FORM_FK.eq(FORM.PK))
 			.where(DSL.and(conditions))
 			.groupBy(groupByFields)
-			.having(DSL.field("state_id").isNotNull());
+			.having(DSL.field("workflow_state_id").isNotNull());
 	}
 
 	//refrain from creating a similar method for forms

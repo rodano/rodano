@@ -77,114 +77,114 @@ public class WorkflowActionRecord extends UpdatableRecordImpl<WorkflowActionReco
 	}
 
 	/**
-	 * Setter for <code>workflow_action.action_order</code>.
-	 */
-	public void setActionOrder(Integer value) {
-		set(4, value);
-	}
-
-	/**
-	 * Getter for <code>workflow_action.action_order</code>.
-	 */
-	public Integer getActionOrder() {
-		return (Integer) get(4);
-	}
-
-	/**
 	 * Setter for <code>workflow_action.documentable</code>.
 	 */
 	public void setDocumentable(Boolean value) {
-		set(5, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.documentable</code>.
 	 */
 	public Boolean getDocumentable() {
-		return (Boolean) get(5);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>workflow_action.require_signature</code>.
 	 */
 	public void setRequireSignature(Boolean value) {
-		set(6, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.require_signature</code>.
 	 */
 	public Boolean getRequireSignature() {
-		return (Boolean) get(6);
+		return (Boolean) get(5);
 	}
 
 	/**
 	 * Setter for <code>workflow_action.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(7, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(7);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>workflow_action.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(8, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(8);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>workflow_action.description</code>.
 	 */
 	public void setDescription(String value) {
-		set(9, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.description</code>.
 	 */
 	public String getDescription() {
-		return (String) get(9);
+		return (String) get(8);
 	}
 
 	/**
 	 * Setter for <code>workflow_action.required_signature_text</code>.
 	 */
 	public void setRequiredSignatureText(String value) {
-		set(10, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.required_signature_text</code>.
 	 */
 	public String getRequiredSignatureText() {
-		return (String) get(10);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>workflow_action.documentable_options</code>.
 	 */
 	public void setDocumentableOptions(String value) {
-		set(11, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_action.documentable_options</code>.
 	 */
 	public String getDocumentableOptions() {
+		return (String) get(10);
+	}
+
+	/**
+	 * Setter for <code>workflow_action.icon</code>.
+	 */
+	public void setIcon(String value) {
+		set(11, value);
+	}
+
+	/**
+	 * Getter for <code>workflow_action.icon</code>.
+	 */
+	public String getIcon() {
 		return (String) get(11);
 	}
 
@@ -211,14 +211,13 @@ public class WorkflowActionRecord extends UpdatableRecordImpl<WorkflowActionReco
 	/**
 	 * Create a detached, initialised WorkflowActionRecord
 	 */
-	public WorkflowActionRecord(UUID workflowActionId, UUID projectId, UUID workflowId, String code, Integer actionOrder, Boolean documentable, Boolean requireSignature, String shortname, String longname, String description, String requiredSignatureText, String documentableOptions) {
+	public WorkflowActionRecord(UUID workflowActionId, UUID projectId, UUID workflowId, String code, Boolean documentable, Boolean requireSignature, String shortname, String longname, String description, String requiredSignatureText, String documentableOptions, String icon) {
 		super(WorkflowAction.WORKFLOW_ACTION);
 
 		setWorkflowActionId(workflowActionId);
 		setProjectId(projectId);
 		setWorkflowId(workflowId);
 		setCode(code);
-		setActionOrder(actionOrder);
 		setDocumentable(documentable);
 		setRequireSignature(requireSignature);
 		setShortname(shortname);
@@ -226,6 +225,7 @@ public class WorkflowActionRecord extends UpdatableRecordImpl<WorkflowActionReco
 		setDescription(description);
 		setRequiredSignatureText(requiredSignatureText);
 		setDocumentableOptions(documentableOptions);
+		setIcon(icon);
 		resetChangedOnNotNull();
 	}
 }

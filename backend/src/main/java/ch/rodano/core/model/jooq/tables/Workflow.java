@@ -103,6 +103,11 @@ public class Workflow extends TableImpl<WorkflowRecord> {
 	public final TableField<WorkflowRecord, UUID> INITIAL_STATE_ID = createField(DSL.name("initial_state_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
+	 * The column <code>workflow.creation_action_id</code>.
+	 */
+	public final TableField<WorkflowRecord, UUID> CREATION_ACTION_ID = createField(DSL.name("creation_action_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
+
+	/**
 	 * The column <code>workflow.order_by</code>.
 	 */
 	public final TableField<WorkflowRecord, Integer> ORDER_BY = createField(DSL.name("order_by"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");

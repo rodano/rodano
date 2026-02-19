@@ -83,11 +83,6 @@ public class WorkflowAction extends TableImpl<WorkflowActionRecord> {
 	public final TableField<WorkflowActionRecord, String> CODE = createField(DSL.name("code"), SQLDataType.VARCHAR(128).nullable(false), this, "");
 
 	/**
-	 * The column <code>workflow_action.action_order</code>.
-	 */
-	public final TableField<WorkflowActionRecord, Integer> ACTION_ORDER = createField(DSL.name("action_order"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
-	/**
 	 * The column <code>workflow_action.documentable</code>.
 	 */
 	public final TableField<WorkflowActionRecord, Boolean> DOCUMENTABLE = createField(DSL.name("documentable"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
@@ -121,6 +116,11 @@ public class WorkflowAction extends TableImpl<WorkflowActionRecord> {
 	 * The column <code>workflow_action.documentable_options</code>.
 	 */
 	public final TableField<WorkflowActionRecord, String> DOCUMENTABLE_OPTIONS = createField(DSL.name("documentable_options"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+
+	/**
+	 * The column <code>workflow_action.icon</code>.
+	 */
+	public final TableField<WorkflowActionRecord, String> ICON = createField(DSL.name("icon"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	private WorkflowAction(Name alias, Table<WorkflowActionRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

@@ -19,6 +19,8 @@ public class EventGroupDTO {
 	private SortedMap<String, String> longname;
 	private SortedMap<String, String> description;
 
+	private String icon;
+
 	private UUID scopeModelId;
 
 	/**
@@ -72,6 +74,14 @@ public class EventGroupDTO {
 
 	public void setDescription(final SortedMap<String, String> description) {
 		this.description = description;
+	}
+
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(final String icon) {
+		this.icon = icon;
 	}
 
 	public UUID getScopeModelId() {

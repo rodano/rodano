@@ -143,6 +143,7 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.set(SCOPE_MODEL.VIRTUAL, dto.isVirtual())
 			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, dto.getDefaultParentId())
 			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, dto.getDefaultProfileId())
+			.set(SCOPE_MODEL.EXPECTED_NUMBER, dto.getExpectedNumber())
 			.set(SCOPE_MODEL.MAX_NUMBER, dto.getMaxNumber())
 			.set(SCOPE_MODEL.SCOPE_FORMAT, dto.getScopeFormat())
 			.set(SCOPE_MODEL.LAYOUT, dto.getLayout())
@@ -170,6 +171,7 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.set(SCOPE_MODEL.VIRTUAL, dto.isVirtual())
 			.set(SCOPE_MODEL.DEFAULT_PARENT_ID, dto.getDefaultParentId())
 			.set(SCOPE_MODEL.DEFAULT_PROFILE_ID, dto.getDefaultProfileId())
+			.set(SCOPE_MODEL.EXPECTED_NUMBER, dto.getExpectedNumber())
 			.set(SCOPE_MODEL.MAX_NUMBER, dto.getMaxNumber())
 			.set(SCOPE_MODEL.SCOPE_FORMAT, dto.getScopeFormat())
 			.set(SCOPE_MODEL.LAYOUT, dto.getLayout())
@@ -305,6 +307,7 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		}));
 
 		dto.setVirtual(record.getVirtual());
+		dto.setExpectedNumber(record.getExpectedNumber());
 		dto.setMaxNumber(record.getMaxNumber());
 		dto.setScopeFormat(record.getScopeFormat());
 		dto.setDefaultParentId(record.getDefaultParentId());

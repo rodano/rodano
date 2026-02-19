@@ -22,35 +22,38 @@ alter table project
 	add column protocol_no                varchar(64)                           null,
 	add column version_number             varchar(32)                           null,
 	add column version_date               date                                  null,
-	add column status                     enum ('ACTIVE', 'CLOSED', 'ARCHIVED') null default null,
+	add column status                     enum ('ACTIVE', 'CLOSED', 'ARCHIVED') null     default null,
 	add column created                    datetime(3)                           not null default current_timestamp(3),
 	add column active_config_version_fk   bigint(20)                            null;
 
-insert into project (
-	project_id,
-	code,
-	shortname,
-	longname,
-	description,
-	smtp_tls,
-	password_strong,
-	password_unique,
-	epro_enabled,
-	status,
-	created
-) values (
-			 UNHEX(REPLACE('00000000-0000-0000-0000-000000000000', '-', '')),
-			 'SYSTEM',
-			 '{"en": "System Administration"}',
-			 '{"en": "System Administration Project"}',
-			 '{"en": "Internal system project for administrative operations"}',
-			 FALSE,
-			 FALSE,
-			 FALSE,
-			 FALSE,
-			 'ACTIVE',
-			 NOW()
-		 )
+insert into project (project_id,
+					 code,
+					 shortname,
+					 longname,
+					 description,
+					 smtp_tls,
+					 password_strong,
+					 password_unique,
+					 epro_enabled,
+					 status,
+					 created)
+values (UNHEX(REPLACE('00000000-0000-0000-0000-000000000000', '-', '')),
+		'SYSTEM',
+		'{
+          "en": "System Administration"
+        }',
+		'{
+          "en": "System Administration Project"
+        }',
+		'{
+          "en": "Internal system project for administrative operations"
+        }',
+		FALSE,
+		FALSE,
+		FALSE,
+		FALSE,
+		'ACTIVE',
+		NOW())
 on duplicate key update code = code;
 
 create table if not exists project_audit (
@@ -112,6 +115,7 @@ alter table scope_model
 	add column description        json         null,
 	add column plural_shortname   json         null,
 	add column virtual            boolean      not null default false,
+	add column expected_number    int          null,
 	add column max_number         int          null,
 	add column scope_format       varchar(512) null,
 	add column default_parent_id  uuid         null,
@@ -246,6 +250,7 @@ create table if not exists event_group (
 	shortname      json         null,
 	longname       json         null,
 	description    json         null,
+	icon           varchar(64)  null,
 	constraint pk_event_group primary key (project_id, event_group_id)
 ) engine = InnoDB
   default charset = utf8mb4
@@ -264,8 +269,11 @@ alter table dataset_model
 	add column expanded_label_pattern  varchar(512) null;
 
 alter table field_model
-	add column type                          varchar(32)    not null after code,
-	add column data_type                     varchar(32)    not null,
+	add column type                          enum ('STRING', 'AUTO_COMPLETION', 'DATE',
+		'DATE_SELECT', 'NUMBER', 'SELECT','RADIO',
+		'CHECKBOX', 'CHECKBOX_GROUP', 'TEXTAREA', 'FILE')   not null after code,
+	add column data_type                     enum ('STRING', 'DATE',
+		'NUMBER', 'BOOLEAN', 'BLOB')                        not null,
 	add column shortname                     json           null,
 	add column longname                      json           null,
 	add column description                   json           null,
@@ -470,6 +478,7 @@ create table if not exists form_cell_visibility_criteria_value (
 alter table workflow
 	add column aggregate_workflow_id uuid        null after code,
 	add column initial_state_id      uuid        null,
+	add column creation_action_id    uuid        null,
 	add column order_by              int         null,
 	add column shortname             json        null,
 	add column longname              json        null,
@@ -480,8 +489,7 @@ alter table workflow
 	add column icon                  varchar(64) null;
 
 alter table workflow_state
-	add column state_order             int         null after code,
-	add column important               boolean     not null default false,
+	add column important               boolean     not null default false after code,
 	add column color                   varchar(16) null,
 	add column shortname               json        null,
 	add column longname                json        null,
@@ -500,14 +508,14 @@ create table if not exists workflow_state_possible_action (
   collate = utf8mb4_unicode_ci;
 
 alter table workflow_action
-	add column action_order            int     null after code,
-	add column documentable            boolean not null default false,
-	add column require_signature       boolean not null default false,
-	add column shortname               json    null,
-	add column longname                json    null,
-	add column description             json    null,
-	add column required_signature_text json    null,
-	add column documentable_options    json    null;
+	add column documentable            boolean     not null default false after code,
+	add column require_signature       boolean     not null default false,
+	add column shortname               json        null,
+	add column longname                json        null,
+	add column description             json        null,
+	add column required_signature_text json        null,
+	add column documentable_options    json        null,
+	add column icon                    varchar(64) null;
 
 alter table validator
 	add column shortname        json    null after code,

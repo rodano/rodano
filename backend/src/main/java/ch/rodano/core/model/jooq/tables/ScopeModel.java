@@ -118,6 +118,11 @@ public class ScopeModel extends TableImpl<ScopeModelRecord> {
 	public final TableField<ScopeModelRecord, Boolean> VIRTUAL = createField(DSL.name("virtual"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
+	 * The column <code>scope_model.expected_number</code>.
+	 */
+	public final TableField<ScopeModelRecord, Integer> EXPECTED_NUMBER = createField(DSL.name("expected_number"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
+
+	/**
 	 * The column <code>scope_model.max_number</code>.
 	 */
 	public final TableField<ScopeModelRecord, Integer> MAX_NUMBER = createField(DSL.name("max_number"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");

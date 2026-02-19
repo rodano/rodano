@@ -76,6 +76,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 			.set(EVENT_GROUP.SHORTNAME, jsonMapperService.toJson(eventGroup.getShortname()))
 			.set(EVENT_GROUP.LONGNAME, jsonMapperService.toJson(eventGroup.getLongname()))
 			.set(EVENT_GROUP.DESCRIPTION, jsonMapperService.toJson(eventGroup.getDescription()))
+			.set(EVENT_GROUP.ICON, eventGroup.getIcon())
 			.execute();
 
 		return getEventGroup(projectId, eventGroupId);
@@ -94,6 +95,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 			.set(EVENT_GROUP.SHORTNAME, jsonMapperService.toJson(eventGroup.getShortname()))
 			.set(EVENT_GROUP.LONGNAME, jsonMapperService.toJson(eventGroup.getLongname()))
 			.set(EVENT_GROUP.DESCRIPTION, jsonMapperService.toJson(eventGroup.getDescription()))
+			.set(EVENT_GROUP.ICON, eventGroup.getIcon())
 			.where(EVENT_GROUP.PROJECT_ID.eq(projectId))
 			.and(EVENT_GROUP.EVENT_GROUP_ID.eq(eventGroupId))
 			.execute();
@@ -125,6 +127,7 @@ public class EventGroupDAOServiceImpl implements EventGroupDAOService {
 		}));
 		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
 		}));
+		dto.setIcon(record.getIcon());
 
 		return dto;
 	}

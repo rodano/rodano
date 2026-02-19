@@ -97,6 +97,11 @@ public class EventGroup extends TableImpl<EventGroupRecord> {
 	 */
 	public final TableField<EventGroupRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
+	/**
+	 * The column <code>event_group.icon</code>.
+	 */
+	public final TableField<EventGroupRecord, String> ICON = createField(DSL.name("icon"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
 	private EventGroup(Name alias, Table<EventGroupRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

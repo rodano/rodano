@@ -85,10 +85,10 @@ public class FieldModelDAO implements BaseProjectDAO<FieldModel> {
 		model.setFieldModelId(record.getFieldModelId());
 		model.setId(record.getCode());
 
-		final FieldModelType type = mappingHelper.parseEnum(FieldModelType.class, record.getType(), record.getCode());
+		final FieldModelType type = mappingHelper.parseEnum(FieldModelType.class, record.getType().name(), record.getCode());
 		model.setType(type != null ? type : FieldModelType.STRING);
 
-		model.setDataType(mappingHelper.parseEnum(OperandType.class, record.getDataType(), record.getCode()));
+		model.setDataType(mappingHelper.parseEnum(OperandType.class, record.getDataType().name(), record.getCode()));
 
 		model.setShortname(mappingHelper.parseJsonToMap(record.getShortname()));
 		model.setLongname(mappingHelper.parseJsonToMap(record.getLongname()));
@@ -132,7 +132,7 @@ public class FieldModelDAO implements BaseProjectDAO<FieldModel> {
 		model.setMinutesMandatory(record.getMinutesMandatory() != null ? record.getMinutesMandatory() : false);
 		model.setSecondsMandatory(record.getSecondsMandatory() != null ? record.getSecondsMandatory() : false);
 
-		if(record.getType() != null && isChoiceType(record.getType())) {
+		if(record.getType() != null && isChoiceType(record.getType().name())) {
 			model.setPossibleValues(possibleValueDAO.findByFieldModel(record.getFieldModelId()));
 		}
 

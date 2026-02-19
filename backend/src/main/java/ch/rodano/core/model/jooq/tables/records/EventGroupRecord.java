@@ -118,6 +118,20 @@ public class EventGroupRecord extends UpdatableRecordImpl<EventGroupRecord> {
 		return (String) get(6);
 	}
 
+	/**
+	 * Setter for <code>event_group.icon</code>.
+	 */
+	public void setIcon(String value) {
+		set(7, value);
+	}
+
+	/**
+	 * Getter for <code>event_group.icon</code>.
+	 */
+	public String getIcon() {
+		return (String) get(7);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -141,7 +155,7 @@ public class EventGroupRecord extends UpdatableRecordImpl<EventGroupRecord> {
 	/**
 	 * Create a detached, initialised EventGroupRecord
 	 */
-	public EventGroupRecord(UUID eventGroupId, UUID projectId, UUID scopeModelId, String code, String shortname, String longname, String description) {
+	public EventGroupRecord(UUID eventGroupId, UUID projectId, UUID scopeModelId, String code, String shortname, String longname, String description, String icon) {
 		super(EventGroup.EVENT_GROUP);
 
 		setEventGroupId(eventGroupId);
@@ -151,6 +165,7 @@ public class EventGroupRecord extends UpdatableRecordImpl<EventGroupRecord> {
 		setShortname(shortname);
 		setLongname(longname);
 		setDescription(description);
+		setIcon(icon);
 		resetChangedOnNotNull();
 	}
 }

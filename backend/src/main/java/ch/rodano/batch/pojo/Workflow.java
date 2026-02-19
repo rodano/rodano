@@ -16,6 +16,7 @@ public class Workflow {
 
 	private String aggregateWorkflowId;
 	private String initialStateId;
+	private String actionId;
 	private Integer orderBy;
 	private boolean mandatory;
 	private boolean unique;
@@ -80,6 +81,14 @@ public class Workflow {
 
 	public void setInitialStateId(final String initialStateId) {
 		this.initialStateId = initialStateId;
+	}
+
+	public String getActionId() {
+		return actionId;
+	}
+
+	public void setActionId(final String actionId) {
+		this.actionId = actionId;
 	}
 
 	public Integer getOrderBy() {
@@ -148,6 +157,7 @@ public class Workflow {
 			", message=" + message +
 			", aggregateWorkflowId='" + aggregateWorkflowId + '\'' +
 			", initialStateId='" + initialStateId + '\'' +
+			", actionId='" + actionId + '\'' +
 			", orderBy=" + orderBy +
 			", mandatory=" + mandatory +
 			", unique=" + unique +

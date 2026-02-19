@@ -6,6 +6,10 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import ch.rodano.core.model.jooq.enums.FieldModelDataType;
+import ch.rodano.core.model.jooq.enums.FieldModelType;
+
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FieldModel {
 
@@ -16,8 +20,8 @@ public class FieldModel {
 	private Map<String, String> matcherMessage;
 	private Map<String, String> advancedHelp;
 
-	private String type;
-	private String dataType;
+	private FieldModelType type;
+	private FieldModelDataType dataType;
 	private String valueFormula;
 	private boolean plugin;
 	private boolean searchable;
@@ -105,19 +109,19 @@ public class FieldModel {
 		this.advancedHelp = advancedHelp;
 	}
 
-	public String getType() {
+	public FieldModelType getType() {
 		return type;
 	}
 
-	public void setType(final String type) {
+	public void setType(final FieldModelType type) {
 		this.type = type;
 	}
 
-	public String getDataType() {
+	public FieldModelDataType getDataType() {
 		return dataType;
 	}
 
-	public void setDataType(final String dataType) {
+	public void setDataType(final FieldModelDataType dataType) {
 		this.dataType = dataType;
 	}
 

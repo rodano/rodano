@@ -35,6 +35,7 @@ public class ScopeModelDTO {
 	@NotNull
 	boolean virtual;
 
+	Integer expectedNumber;
 	Integer maxNumber;
 	String scopeFormat;
 	String layout;
@@ -150,6 +151,14 @@ public class ScopeModelDTO {
 
 	public void setVirtual(final boolean virtual) {
 		this.virtual = virtual;
+	}
+
+	public Integer getExpectedNumber() {
+		return expectedNumber;
+	}
+
+	public void setExpectedNumber(final Integer expectedNumber) {
+		this.expectedNumber = expectedNumber;
 	}
 
 	public Integer getMaxNumber() {

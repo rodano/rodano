@@ -91,115 +91,129 @@ public class WorkflowRecord extends UpdatableRecordImpl<WorkflowRecord> {
 	}
 
 	/**
+	 * Setter for <code>workflow.creation_action_id</code>.
+	 */
+	public void setCreationActionId(UUID value) {
+		set(5, value);
+	}
+
+	/**
+	 * Getter for <code>workflow.creation_action_id</code>.
+	 */
+	public UUID getCreationActionId() {
+		return (UUID) get(5);
+	}
+
+	/**
 	 * Setter for <code>workflow.order_by</code>.
 	 */
 	public void setOrderBy(Integer value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.order_by</code>.
 	 */
 	public Integer getOrderBy() {
-		return (Integer) get(5);
+		return (Integer) get(6);
 	}
 
 	/**
 	 * Setter for <code>workflow.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>workflow.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(7, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(7);
+		return (String) get(8);
 	}
 
 	/**
 	 * Setter for <code>workflow.description</code>.
 	 */
 	public void setDescription(String value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.description</code>.
 	 */
 	public String getDescription() {
-		return (String) get(8);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>workflow.message</code>.
 	 */
 	public void setMessage(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.message</code>.
 	 */
 	public String getMessage() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>workflow.mandatory</code>.
 	 */
 	public void setMandatory(Boolean value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.mandatory</code>.
 	 */
 	public Boolean getMandatory() {
-		return (Boolean) get(10);
+		return (Boolean) get(11);
 	}
 
 	/**
 	 * Setter for <code>workflow.is_unique</code>.
 	 */
 	public void setIsUnique(Boolean value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.is_unique</code>.
 	 */
 	public Boolean getIsUnique() {
-		return (Boolean) get(11);
+		return (Boolean) get(12);
 	}
 
 	/**
 	 * Setter for <code>workflow.icon</code>.
 	 */
 	public void setIcon(String value) {
-		set(12, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>workflow.icon</code>.
 	 */
 	public String getIcon() {
-		return (String) get(12);
+		return (String) get(13);
 	}
 
 	// -------------------------------------------------------------------------
@@ -225,7 +239,7 @@ public class WorkflowRecord extends UpdatableRecordImpl<WorkflowRecord> {
 	/**
 	 * Create a detached, initialised WorkflowRecord
 	 */
-	public WorkflowRecord(UUID workflowId, UUID projectId, String code, UUID aggregateWorkflowId, UUID initialStateId, Integer orderBy, String shortname, String longname, String description, String message, Boolean mandatory, Boolean isUnique, String icon) {
+	public WorkflowRecord(UUID workflowId, UUID projectId, String code, UUID aggregateWorkflowId, UUID initialStateId, UUID creationActionId, Integer orderBy, String shortname, String longname, String description, String message, Boolean mandatory, Boolean isUnique, String icon) {
 		super(Workflow.WORKFLOW);
 
 		setWorkflowId(workflowId);
@@ -233,6 +247,7 @@ public class WorkflowRecord extends UpdatableRecordImpl<WorkflowRecord> {
 		setCode(code);
 		setAggregateWorkflowId(aggregateWorkflowId);
 		setInitialStateId(initialStateId);
+		setCreationActionId(creationActionId);
 		setOrderBy(orderBy);
 		setShortname(shortname);
 		setLongname(longname);

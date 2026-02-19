@@ -12,6 +12,8 @@ public class EventGroup {
 	private Map<String, String> longname;
 	private Map<String, String> description;
 
+	private String icon;
+
 	public String getId() {
 		return id;
 	}
@@ -44,6 +46,14 @@ public class EventGroup {
 		this.description = description;
 	}
 
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(final String icon) {
+		this.icon = icon;
+	}
+
 	@Override
 	public String toString() {
 		return "EventGroup{" +
@@ -51,6 +61,7 @@ public class EventGroup {
 			", shortname=" + shortname +
 			", longname=" + longname +
 			", description=" + description +
+			", icon='" + icon + '\'' +
 			'}';
 	}
 }

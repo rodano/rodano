@@ -85,8 +85,8 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 	private Integer maxYear;
 
 	//number
-	private int maxIntegerDigits;
-	private int maxDecimalDigits;
+	private Integer maxIntegerDigits;
+	private Integer maxDecimalDigits;
 
 	//date
 	@NotNull
@@ -319,19 +319,19 @@ public class FieldModelDTO implements Comparable<FieldModelDTO> {
 		this.maxLength = maxLength;
 	}
 
-	public int getMaxIntegerDigits() {
+	public Integer getMaxIntegerDigits() {
 		return maxIntegerDigits;
 	}
 
-	public void setMaxIntegerDigits(final int maxIntegerDigits) {
+	public void setMaxIntegerDigits(final Integer maxIntegerDigits) {
 		this.maxIntegerDigits = maxIntegerDigits;
 	}
 
-	public int getMaxDecimalDigits() {
+	public Integer getMaxDecimalDigits() {
 		return maxDecimalDigits;
 	}
 
-	public void setMaxDecimalDigits(final int maxDecimalDigits) {
+	public void setMaxDecimalDigits(final Integer maxDecimalDigits) {
 		this.maxDecimalDigits = maxDecimalDigits;
 	}
 

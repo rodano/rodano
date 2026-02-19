@@ -15,9 +15,10 @@ public class WorkflowAction {
 	private Map<String, String> requiredSignatureText;
 	private List<Map<String, String>> documentableOptions;
 
-	private Integer actionOrder;
 	private boolean documentable;
 	private boolean requireSignature;
+
+	private String icon;
 
 	private List<Rule> rules;
 
@@ -61,14 +62,6 @@ public class WorkflowAction {
 		this.requiredSignatureText = requiredSignatureText;
 	}
 
-	public Integer getActionOrder() {
-		return actionOrder;
-	}
-
-	public void setActionOrder(final Integer actionOrder) {
-		this.actionOrder = actionOrder;
-	}
-
 	public boolean isDocumentable() {
 		return documentable;
 	}
@@ -93,6 +86,14 @@ public class WorkflowAction {
 		this.documentableOptions = documentableOptions;
 	}
 
+	public String getIcon() {
+		return icon;
+	}
+
+	public void setIcon(final String icon) {
+		this.icon = icon;
+	}
+
 	public List<Rule> getRules() {
 		return rules;
 	}
@@ -109,10 +110,10 @@ public class WorkflowAction {
 			", longname=" + longname +
 			", description=" + description +
 			", requiredSignatureText=" + requiredSignatureText +
-			", actionOrder=" + actionOrder +
+			", documentableOptions=" + documentableOptions +
 			", documentable=" + documentable +
 			", requireSignature=" + requireSignature +
-			", documentableOptions='" + documentableOptions + '\'' +
+			", icon='" + icon + '\'' +
 			", rules=" + rules +
 			'}';
 	}

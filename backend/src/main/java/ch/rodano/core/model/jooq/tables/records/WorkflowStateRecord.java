@@ -77,129 +77,115 @@ public class WorkflowStateRecord extends UpdatableRecordImpl<WorkflowStateRecord
 	}
 
 	/**
-	 * Setter for <code>workflow_state.state_order</code>.
-	 */
-	public void setStateOrder(Integer value) {
-		set(4, value);
-	}
-
-	/**
-	 * Getter for <code>workflow_state.state_order</code>.
-	 */
-	public Integer getStateOrder() {
-		return (Integer) get(4);
-	}
-
-	/**
 	 * Setter for <code>workflow_state.important</code>.
 	 */
 	public void setImportant(Boolean value) {
-		set(5, value);
+		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.important</code>.
 	 */
 	public Boolean getImportant() {
-		return (Boolean) get(5);
+		return (Boolean) get(4);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.color</code>.
 	 */
 	public void setColor(String value) {
-		set(6, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.color</code>.
 	 */
 	public String getColor() {
-		return (String) get(6);
+		return (String) get(5);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(7, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(7);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(8, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(8);
+		return (String) get(7);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.description</code>.
 	 */
 	public void setDescription(String value) {
-		set(9, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.description</code>.
 	 */
 	public String getDescription() {
-		return (String) get(9);
+		return (String) get(8);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.icon</code>.
 	 */
 	public void setIcon(String value) {
-		set(10, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.icon</code>.
 	 */
 	public String getIcon() {
-		return (String) get(10);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.aggregate_state_id</code>.
 	 */
 	public void setAggregateStateId(UUID value) {
-		set(11, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.aggregate_state_id</code>.
 	 */
 	public UUID getAggregateStateId() {
-		return (UUID) get(11);
+		return (UUID) get(10);
 	}
 
 	/**
 	 * Setter for <code>workflow_state.aggregate_state_matcher</code>.
 	 */
 	public void setAggregateStateMatcher(String value) {
-		set(12, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_state.aggregate_state_matcher</code>.
 	 */
 	public String getAggregateStateMatcher() {
-		return (String) get(12);
+		return (String) get(11);
 	}
 
 	// -------------------------------------------------------------------------
@@ -225,14 +211,13 @@ public class WorkflowStateRecord extends UpdatableRecordImpl<WorkflowStateRecord
 	/**
 	 * Create a detached, initialised WorkflowStateRecord
 	 */
-	public WorkflowStateRecord(UUID workflowStateId, UUID projectId, UUID workflowId, String code, Integer stateOrder, Boolean important, String color, String shortname, String longname, String description, String icon, UUID aggregateStateId, String aggregateStateMatcher) {
+	public WorkflowStateRecord(UUID workflowStateId, UUID projectId, UUID workflowId, String code, Boolean important, String color, String shortname, String longname, String description, String icon, UUID aggregateStateId, String aggregateStateMatcher) {
 		super(WorkflowState.WORKFLOW_STATE);
 
 		setWorkflowStateId(workflowStateId);
 		setProjectId(projectId);
 		setWorkflowId(workflowId);
 		setCode(code);
-		setStateOrder(stateOrder);
 		setImportant(important);
 		setColor(color);
 		setShortname(shortname);

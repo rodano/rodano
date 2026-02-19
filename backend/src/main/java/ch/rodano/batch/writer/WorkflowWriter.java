@@ -83,7 +83,6 @@ public class WorkflowWriter extends BaseWriter {
 							.set(WORKFLOW_ACTION.WORKFLOW_ID, workflowId)
 							.set(WORKFLOW_ACTION.WORKFLOW_ACTION_ID, actionId)
 							.set(WORKFLOW_ACTION.CODE, action.getId())
-							.set(WORKFLOW_ACTION.ACTION_ORDER, action.getActionOrder())
 							.set(WORKFLOW_ACTION.DOCUMENTABLE, action.isDocumentable())
 							.set(WORKFLOW_ACTION.REQUIRE_SIGNATURE, action.isRequireSignature())
 							.set(WORKFLOW_ACTION.DOCUMENTABLE_OPTIONS, toJson(action.getDocumentableOptions()))
@@ -91,8 +90,8 @@ public class WorkflowWriter extends BaseWriter {
 							.set(WORKFLOW_ACTION.LONGNAME, toJson(action.getLongname()))
 							.set(WORKFLOW_ACTION.DESCRIPTION, toJson(action.getDescription()))
 							.set(WORKFLOW_ACTION.REQUIRED_SIGNATURE_TEXT, toJson(action.getRequiredSignatureText()))
+							.set(WORKFLOW_ACTION.ICON, action.getIcon())
 							.onDuplicateKeyUpdate()
-							.set(WORKFLOW_ACTION.ACTION_ORDER, action.getActionOrder())
 							.set(WORKFLOW_ACTION.DOCUMENTABLE, action.isDocumentable())
 							.set(WORKFLOW_ACTION.REQUIRE_SIGNATURE, action.isRequireSignature())
 							.set(WORKFLOW_ACTION.DOCUMENTABLE_OPTIONS, toJson(action.getDocumentableOptions()))
@@ -100,6 +99,7 @@ public class WorkflowWriter extends BaseWriter {
 							.set(WORKFLOW_ACTION.LONGNAME, toJson(action.getLongname()))
 							.set(WORKFLOW_ACTION.DESCRIPTION, toJson(action.getDescription()))
 							.set(WORKFLOW_ACTION.REQUIRED_SIGNATURE_TEXT, toJson(action.getRequiredSignatureText()))
+							.set(WORKFLOW_ACTION.ICON, action.getIcon())
 							.execute();
 
 						final List<Rule> actionRules = action.getRules();
