@@ -5,23 +5,12 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.field.PartialDate;
 import ch.rodano.configuration.model.language.LanguageStatic;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
 public enum Operator {
 	EQUALS {
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s = %s", column, parseValue(fieldModel, value));
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -79,17 +68,6 @@ public enum Operator {
 
 	},
 	NOT_EQUALS {
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s != %s", column, parseValue(fieldModel, value));
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -151,17 +129,6 @@ public enum Operator {
 		}
 	},
 	CONTAINS {
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s LIKE '%%%s%%'", column, value);
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -218,16 +185,6 @@ public enum Operator {
 		}
 	},
 	NOT_CONTAINS {
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s NOT LIKE '%%%s%%'", column, value);
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -289,16 +246,6 @@ public enum Operator {
 		}
 	},
 	GREATER {
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s > %s", column, parseValue(fieldModel, value));
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -362,16 +309,6 @@ public enum Operator {
 	},
 	GREATER_EQUALS {
 		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s >= %s", column, parseValue(fieldModel, value));
-		}
-
-		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
 			shortname.put(LanguageStatic.en.getId(), "Greater or equals to");
@@ -433,16 +370,6 @@ public enum Operator {
 		}
 	},
 	LOWER {
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s < %s", column, parseValue(fieldModel, value));
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -506,16 +433,6 @@ public enum Operator {
 	},
 	LOWER_EQUALS {
 		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			return String.format("%s <= %s", column, parseValue(fieldModel, value));
-		}
-
-		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
 			shortname.put(LanguageStatic.en.getId(), "Lower or equals to");
@@ -578,16 +495,6 @@ public enum Operator {
 	},
 	NULL {
 		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			return String.format("%s IS NULL", column);
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
 			shortname.put(LanguageStatic.en.getId(), "Is null");
@@ -645,16 +552,6 @@ public enum Operator {
 	},
 	NOT_NULL {
 		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			return String.format("%s IS NOT NULL", column);
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
 			shortname.put(LanguageStatic.en.getId(), "Is not null");
@@ -710,16 +607,6 @@ public enum Operator {
 		}
 	},
 	BLANK {
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			return String.format("(%s IS NULL OR %s LIKE '')", fieldModel.getId());
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			throw new UnsupportedOperationException();
-		}
-
 		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
@@ -778,16 +665,6 @@ public enum Operator {
 	},
 	NOT_BLANK {
 		@Override
-		public String toSql(final FieldModel fieldModel, final String column) {
-			return String.format("(%s IS NOT NULL AND %s NOT LIKE '')", fieldModel.getId());
-		}
-
-		@Override
-		public String toSql(final FieldModel fieldModel, final String column, final String value) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public Map<String, String> getLabels() {
 			final Map<String, String> shortname = new TreeMap<>();
 			shortname.put(LanguageStatic.en.getId(), "Is not blank");
@@ -842,57 +719,6 @@ public enum Operator {
 			throw new UnsupportedOperationException();
 		}
 	};
-
-	public static String parseValue(final FieldModel fieldModel, final String value) {
-		switch(fieldModel.getDataType()) {
-			case DATE: {
-				final var formatter = new StringBuilder();
-				final StringBuilder format = new StringBuilder();
-				if(fieldModel.isWithDays()) {
-					format.append("%d");
-				}
-				if(fieldModel.isWithMonths()) {
-					if(!format.isEmpty()) {
-						format.append(".");
-					}
-					format.append("%m");
-				}
-				if(fieldModel.isWithYears()) {
-					if(!format.isEmpty()) {
-						format.append(".");
-					}
-					format.append("%Y");
-				}
-				if(fieldModel.isWithHours()) {
-					if(!format.isEmpty()) {
-						format.append(" ");
-					}
-					format.append("%H");
-				}
-				if(fieldModel.isWithMinutes()) {
-					if(!format.isEmpty()) {
-						format.append(":");
-					}
-					format.append("%i");
-				}
-				if(fieldModel.isWithSeconds()) {
-					if(!format.isEmpty()) {
-						format.append(":");
-					}
-					format.append("%s");
-				}
-				return String.format("STR_TO_DATE('%s', '%s')", value, formatter);
-			}
-			case STRING:
-				return String.format("'%s'", value);
-			default:
-				return value;
-		}
-	}
-
-	public abstract String toSql(FieldModel fieldModel, String column);
-
-	public abstract String toSql(FieldModel fieldModel, String column, String value);
 
 	//label
 	public abstract Map<String, String> getLabels();
