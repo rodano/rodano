@@ -1,0 +1,39 @@
+<h2 class="dialog-title">Edit Aggregation</h2>
+
+<div class="dialog-content">
+	<p class="hint">
+		If this workflow is an aggregation workflow, choose here which state must be aggregated and the function that will be used to perform the aggregation:
+		<br />
+		"All" means that this state will be selected if all workflow statuses of the descendants workflowables are in the aggregated state.
+		<br />
+		"One" means that this state will be selected if at least one of the workflow statuses of the descendants workflows is in the aggregated state.
+		<br />
+		"Default" is the default state where no other state matches. There can be only zero or one default state per aggregated workflow.
+	</p>
+
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-field">
+			<label>Aggregate State</label>
+			<mat-select formControlName="aggregateStateId" placeholder="Select the aggregate state">
+				<mat-option [value]="null">None</mat-option>
+				@for (state of data.aggregatedWorkflowStates; track state.id) {
+					<mat-option [value]="state.id">{{ state.name }} ({{ state.code }})</mat-option>
+				}
+			</mat-select>
+		</div>
+
+		<div class="form-field">
+			<label>Aggregate State Matcher</label>
+			<mat-select formControlName="aggregateStateMatcher" placeholder="Select the aggregate function">
+				@for (option of matcherOptions; track option.value) {
+					<mat-option [value]="option.value">{{ option.label }}</mat-option>
+				}
+			</mat-select>
+		</div>
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()">Save Changes</button>
+</div>

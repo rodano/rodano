@@ -16,7 +16,9 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
-import { ProjectLanguage } from '@core/model/project-language';
+import {ProjectLanguage} from '@core/model/project-language';
+import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
+import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -50,13 +52,16 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	selectedLanguage = '';
 	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
-	private workflowStateSelectionsMap = new Map<string, WorkflowStateSelection[]>();
+
+	workflowStateIdsModified = false;
 
 	constructor(
 		public scopeModelManager: ScopeModelManagerService,
 		private languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private datasetModelManager: DatasetModelManagerService,
+		private workflowManager: WorkflowManagerService,
+		private workflowStateManager: WorkflowStateManagerService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -66,6 +71,8 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
+
+		this.workflowStateManager.load(this.projectId).subscribe();
 	}
 
 	ngOnDestroy(): void {
@@ -76,7 +83,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		this.scopeModelDialogService.openBasicInfoDialog(
 			this.projectId,
 			this.scopeModel,
-			this.project?.languages || []
+			this.projectLanguages
 		).subscribe((result: any) => {
 			if(result) {
 				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
@@ -130,22 +137,22 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 
 	onEditResources(): void {
 		const currentDraft = this.scopeModelManager.getById(this.scopeModel.scopeModelId);
-		const workflowStateSelections = this.workflowStateSelectionsMap.get(this.scopeModel.scopeModelId) || [];
+		const draft = currentDraft || this.scopeModel;
+
+		const workflowStateSelections: WorkflowStateSelection[] = (draft.workflowStateIds || []).map(stateId => {
+			const state = this.workflowStateManager.getById(stateId);
+			return {workflowId: state?.workflowId || '', workflowStateId: stateId};
+		});
 
 		this.scopeModelDialogService.openResourcesDialog(
 			this.projectId,
-			currentDraft || this.scopeModel,
+			draft,
 			workflowStateSelections
 		).subscribe(result => {
 			if(result) {
 				const draft = this.scopeModelManager.getById(this.scopeModel.scopeModelId);
 				if(draft) {
 					Object.assign(draft, result);
-
-					if(result.workflowStateSelections !== undefined) {
-						this.workflowStateSelectionsMap.set(this.scopeModel.scopeModelId, result.workflowStateSelections);
-					}
-
 					this.scopeModelManager.update(draft);
 					this.scopeModelUpdated.emit(draft);
 					this.showStagedMessage();
@@ -230,30 +237,26 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	getWorkflowStateSelections(): WorkflowStateGroup[] {
-		const selections = this.workflowStateSelectionsMap.get(this.scopeModel.scopeModelId) || [];
-
 		const grouped = new Map<string, {id: string; name: string}[]>();
 
-		selections.forEach(selection => {
-			if(!grouped.has(selection.workflowId)) {
-				grouped.set(selection.workflowId, []);
+		(this.scopeModel.workflowStateIds || []).forEach(stateId => {
+			const state = this.workflowStateManager.getById(stateId);
+			if(!state) {
+				return;
 			}
-
-			grouped.get(selection.workflowId)!.push({
-				id: selection.workflowStateId,
-				name: selection.workflowStateId
-			});
+			if(!grouped.has(state.workflowId)) {
+				grouped.set(state.workflowId, []);
+			}
+			const name = `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`;
+			grouped.get(state.workflowId)!.push({id: stateId, name});
 		});
 
 		const result: WorkflowStateGroup[] = [];
-		grouped.forEach((states, workflowId) => {
-			result.push({
-				workflowId,
-				workflowName: workflowId,
-				states
-			});
-		});
-
+		grouped.forEach((states, workflowId) => result.push({
+			workflowId,
+			workflowName: this.getWorkflowLabel(workflowId),
+			states
+		}));
 		return result;
 	}
 
@@ -273,7 +276,12 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	getWorkflowLabel(workflowId: string): string {
-		//TODO: Implement when workflows are ready
-		return workflowId;
+		const workflow = this.workflowManager.getById(workflowId);
+		if(!workflow) {
+			return workflowId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
+		return `${name} (${workflow.id})`;
 	}
 }

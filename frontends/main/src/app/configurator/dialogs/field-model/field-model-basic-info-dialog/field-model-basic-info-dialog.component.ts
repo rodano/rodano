@@ -54,7 +54,6 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
-	saving = false;
 
 	typeOptions: TypeOption[] = [
 		{value: 'STRING', label: 'String'},
@@ -209,7 +208,9 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 			}
 		});
 
-		const result = {
+		const typesWithPossibleValues = ['AUTO_COMPLETION', 'SELECT', 'RADIO', 'CHECKBOX_GROUP'];
+
+		const result: any = {
 			id: code,
 			shortname,
 			longname,
@@ -218,6 +219,10 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 			dataType: formValue.dataType,
 			readOnly: formValue.readOnly
 		};
+
+		if(!typesWithPossibleValues.includes(formValue.type)) {
+			result.possibleValues = [];
+		}
 
 		this.dialogRef.close(result);
 	}

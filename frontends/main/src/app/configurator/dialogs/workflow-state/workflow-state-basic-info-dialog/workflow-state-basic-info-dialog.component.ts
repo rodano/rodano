@@ -12,7 +12,6 @@ import {MatSelectModule} from '@angular/material/select';
 import {ProjectLanguage} from '@core/model/project-language';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WorkflowState} from '@core/model/workflow-state';
-import {WorkflowStateManagerService} from '../../../services/manager/workflow-state-manager.service';
 
 export interface WorkflowStateBasicInfoDialogData {
 	projectId: string;
@@ -44,13 +43,11 @@ export class WorkflowStateBasicInfoDialogComponent implements OnInit {
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
-	saving = false;
 
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<WorkflowStateBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: WorkflowStateBasicInfoDialogData,
-		private workflowStateManager: WorkflowStateManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.workflowState;
@@ -79,9 +76,9 @@ export class WorkflowStateBasicInfoDialogComponent implements OnInit {
 				wfs?.id || '',
 				[Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]
 			],
-			workflowId: [wfs?.workflowId || null],
+			workflowStateId: [wfs?.workflowStateId || null],
 			important: [wfs?.important || false],
-			color: [wfs?.color || null],
+			color: [wfs?.color || null, Validators.required],
 			icon: [wfs?.icon || null]
 		});
 	}
@@ -129,11 +126,24 @@ export class WorkflowStateBasicInfoDialogComponent implements OnInit {
 		return allValid;
 	}
 
-	onIdInput(event: Event): void {
+	onCodeInput(event: Event): void {
 		const input = event.target as HTMLInputElement;
 		const uppercaseValue = input.value.toUpperCase();
 		input.value = uppercaseValue;
 		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
+	}
+
+	get iconPreview(): string {
+		return this.form.get('icon')?.value?.trim() || '';
+	}
+
+	onColorInput(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const value = input.value;
+
+		if(/^#[0-9A-F]{6}$/i.test(value)) {
+			this.form.patchValue({color: value});
+		}
 	}
 
 	onCancel(): void {
@@ -168,7 +178,7 @@ export class WorkflowStateBasicInfoDialogComponent implements OnInit {
 
 		const result = {
 			id: code,
-			workflowId: formValue.workflowId,
+			workflowStateId: formValue.workflowStateId,
 			important: formValue.important,
 			color: formValue.color,
 			icon: formValue.icon,

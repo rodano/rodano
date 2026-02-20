@@ -1,18 +1,18 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ getTranslatedName(workflow.shortname) }}</h2>
-		<span class="detail-code">{{ workflow.id }}</span>
+		<span class="detail-code parent">{{ workflow.id }}</span>
 	</div>
 	<div class="header-actions">
-		<button class="btn-view-secondary btn-view-event-models" (click)="onSwitchToWorkflowStates()"
+		<button class="btn-view first-child" (click)="onSwitchToWorkflowStates()"
 										matTooltip="View Workflow States">
-			<mat-icon>event</mat-icon>
+			<mat-icon>adjust</mat-icon>
 			<span>Workflow States</span>
 		</button>
 
-		<button class="btn-view-secondary btn-view-event-groups" (click)="onSwitchToWorkflowActions()"
+		<button class="btn-view second-child" (click)="onSwitchToWorkflowActions()"
 										matTooltip="View Workflow Actions">
-			<mat-icon>group</mat-icon>
+			<mat-icon>play_circle</mat-icon>
 			<span>Workflow Actions</span>
 		</button>
 		<button class="btn-close" (click)="onClose()">
@@ -33,6 +33,21 @@
 					}
 				</label>
 				<div class="setting-value">{{ workflow.id }}</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('order')">
+				<label>
+					Order
+					@if (isFieldModified('order')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!workflow.order">
+					@if (!workflow.order) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ workflow.order || 'Not configured' }}
+				</div>
 			</div>
 
 			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
@@ -65,7 +80,7 @@
 				</div>
 			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('description')">
+			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
 				<label>
 					Description
 					@if (isFieldModified('description')) {
@@ -83,6 +98,155 @@
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>
 			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Assignment</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('aggregatedWorkflowId')">
+				<label>
+					Aggregate Workflow
+					@if (isFieldModified('aggregatedWorkflowId')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!workflow.aggregatedWorkflowId">
+					@if (!workflow.aggregatedWorkflowId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">settings</mat-icon>
+							<span class="language-name">{{ getWorkflowLabel(workflow.aggregatedWorkflowId) }}</span>
+						</div>
+					}
+				</div>
+			</div>
+
+			@if (!workflow.aggregatedWorkflowId) {
+				<div class="setting-item" [class.modified]="isFieldModified('mandatory')">
+					<label>
+						Mandatory
+						@if (isFieldModified('mandatory')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (workflow.mandatory) {
+							<span class="status-badge third">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('initialStateId')">
+					<label>
+						Initial State
+						@if (isFieldModified('initialStateId')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!workflow.initialStateId">
+						@if (!workflow.initialStateId) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							<div class="chip">
+								<mat-icon class="resource-icon">adjust</mat-icon>
+								<span class="language-name">{{ getWorkflowStateLabel(workflow.initialStateId) }}</span>
+							</div>
+						}
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('unique')">
+					<label>
+						Unique
+						@if (isFieldModified('unique')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">
+						@if (workflow.unique) {
+							<span class="status-badge second">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</div>
+				</div>
+			}
+
+			@if (!workflow.mandatory) {
+				<div class="setting-item" [class.modified]="isFieldModified('creationActionId')">
+					<label>
+						Creation Action
+						@if (isFieldModified('creationActionId')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!workflow.actionId">
+						@if (!workflow.actionId) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							<div class="chip">
+								<mat-icon class="resource-icon">play_circle</mat-icon>
+								<span class="language-name">{{ getWorkflowActionLabel(workflow.actionId) }}</span>
+							</div>
+						}
+					</div>
+				</div>
+			}
+		</div>
+		<button class="btn-edit" (click)="onEditAssignment()">
+			<mat-icon>edit</mat-icon>
+			Edit Assignment
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Message & Icon</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('message')">
+				<label>
+					Message
+					@if (isFieldModified('message')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!getTranslatedValue(workflow.message)">
+					@if (!getTranslatedValue(workflow.message)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ getTranslatedValue(workflow.message) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('icon')">
+				<label>
+					Icon
+					@if (isFieldModified('icon')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!workflow.icon">
+					@if (workflow.icon) {
+						<div class="icon-preview">
+							<mat-icon>{{ workflow.icon }}</mat-icon>
+							<span>{{ workflow.icon }}</span>
+						</div>
+					} @else {
+						<mat-icon class="warning-icon">report</mat-icon>
+						Not configured
+					}
+				</div>
+			</div>
+		</div>
+		<button class="btn-edit" (click)="onEditMisc()">
+			<mat-icon>edit</mat-icon>
+			Edit Message & Icon
 		</button>
 	</div>
 

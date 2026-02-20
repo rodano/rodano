@@ -28,6 +28,8 @@ import static ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.SCOPE_MODE
 import static ch.rodano.core.model.jooq.tables.ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelParent.SCOPE_MODEL_PARENT;
 import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflow.SCOPE_MODEL_WORKFLOW;
+import static ch.rodano.core.model.jooq.tables.ScopeModelWorkflowStateSelector.SCOPE_MODEL_WORKFLOW_STATE_SELECTOR;
+import static ch.rodano.core.model.jooq.tables.WorkflowState.WORKFLOW_STATE;
 
 @Repository
 public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
@@ -69,7 +71,7 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		}
 
 		return scopeModelRecords.map(record -> mapToDTO(
-			record, Map.of(), Map.of(), Map.of(), Map.of(), Map.of()
+			record, Map.of(), Map.of(), Map.of(), Map.of(), Map.of(), Map.of()
 		));
 	}
 
@@ -93,9 +95,10 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var datasetMap = loadDatasetModelIds(projectId, scopeModelIds);
 		final var formMap = loadFormModelIds(projectId, scopeModelIds);
 		final var workflowMap = loadWorkflowIds(projectId, scopeModelIds);
+		final var workflowStateMap = loadWorkflowStateIds(projectId, scopeModelIds);
 
 		return scopeModelRecords.map(record -> mapToDTO(
-			record, parentMap, childMap, datasetMap, formMap, workflowMap
+			record, parentMap, childMap, datasetMap, formMap, workflowMap, workflowStateMap
 		));
 	}
 
@@ -119,8 +122,9 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final var datasetMap = loadDatasetModelIds(projectId, scopeModelIds);
 		final var formMap = loadFormModelIds(projectId, scopeModelIds);
 		final var workflowMap = loadWorkflowIds(projectId, scopeModelIds);
+		final var workflowStateMap = loadWorkflowStateIds(projectId, scopeModelIds);
 
-		return mapToDTO(record, parentMap, childMap, datasetMap, formMap, workflowMap);
+		return mapToDTO(record, parentMap, childMap, datasetMap, formMap, workflowMap, workflowStateMap);
 	}
 
 	@Override
@@ -230,6 +234,11 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.and(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID.eq(scopeModelId))
 			.execute();
 
+		dslContext.deleteFrom(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR)
+			.where(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.PROJECT_ID.eq(projectId))
+			.and(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.SCOPE_MODEL_ID.eq(scopeModelId))
+			.execute();
+
 		batchInsert(projectId, scopeModelId, dto);
 	}
 
@@ -283,6 +292,21 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 					.execute();
 			}
 		}
+
+		if(dto.getWorkflowStateIds() != null) {
+			for(final var workflowStateId : dto.getWorkflowStateIds()) {
+				final var workflowId = dslContext.select(WORKFLOW_STATE.WORKFLOW_ID)
+					.from(WORKFLOW_STATE)
+					.where(WORKFLOW_STATE.WORKFLOW_STATE_ID.eq(workflowStateId))
+					.fetchOneInto(UUID.class);
+				dslContext.insertInto(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR)
+					.set(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.PROJECT_ID, projectId)
+					.set(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.SCOPE_MODEL_ID, scopeModelId)
+					.set(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.WORKFLOW_ID, workflowId)
+					.set(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.WORKFLOW_STATE_ID, workflowStateId)
+					.execute();
+			}
+		}
 	}
 
 	private ScopeModelDTO mapToDTO(
@@ -291,7 +315,8 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		final Map<UUID, List<UUID>> childMap,
 		final Map<UUID, List<UUID>> datasetMap,
 		final Map<UUID, List<UUID>> formMap,
-		final Map<UUID, List<UUID>> workflowMap
+		final Map<UUID, List<UUID>> workflowMap,
+		final Map<UUID, List<UUID>> workflowStateMap
 	) {
 		final var dto = new ScopeModelDTO();
 
@@ -319,6 +344,7 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		dto.setDatasetModelIds(datasetMap.getOrDefault(scopeModelId, List.of()));
 		dto.setFormModelIds(formMap.getOrDefault(scopeModelId, List.of()));
 		dto.setWorkflowIds(workflowMap.getOrDefault(scopeModelId, List.of()));
+		dto.setWorkflowStateIds(workflowStateMap.getOrDefault(scopeModelId, List.of()));
 
 		return dto;
 	}
@@ -375,6 +401,16 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			SCOPE_MODEL_WORKFLOW.PROJECT_ID,
 			SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID,
 			SCOPE_MODEL_WORKFLOW.WORKFLOW_ID
+		);
+	}
+
+	private Map<UUID, List<UUID>> loadWorkflowStateIds(final UUID projectId, final List<UUID> scopeModelIds) {
+		return fetchGroupedIds(
+			projectId, scopeModelIds,
+			SCOPE_MODEL_WORKFLOW_STATE_SELECTOR,
+			SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.PROJECT_ID,
+			SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.SCOPE_MODEL_ID,
+			SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.WORKFLOW_STATE_ID
 		);
 	}
 

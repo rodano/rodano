@@ -1,10 +1,10 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {LanguageService} from '../../services/language.service';
-import {forkJoin} from 'rxjs';
+import {forkJoin, Subscription} from 'rxjs';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowState} from '@core/model/workflow-state';
 import {WorkflowAction} from '@core/model/workflow-action';
@@ -19,6 +19,9 @@ import {WorkflowStateDetailComponent} from '../workflow-state/workflow-state-det
 import {
 	WorkflowActionDetailComponent
 } from '../workflow-action/workflow-action-detail/workflow-action-detail.component';
+import {ProjectLanguage} from '@core/model/project-language';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {HttpErrorResponse} from '@angular/common/http';
 
 type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-detail' | 'action-list' | 'action-detail';
 
@@ -26,7 +29,7 @@ type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-deta
 	selector: 'app-workflow-list',
 	standalone: true,
 	templateUrl: './workflow-list.component.html',
-	styleUrls: ['./workflow-list.component.css'],
+	styleUrls: ['../../shared/list-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,
@@ -36,13 +39,14 @@ type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-deta
 		MatTooltipModule
 	]
 })
-export class WorkflowListComponent implements OnInit, OnChanges {
+export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string | null>();
 	@Output() workflowsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() workflowContextChanged = new EventEmitter<{
+		workflows: any[];
 		workflowStates: any[];
 		workflowActions: any[];
 		selectedWorkflowId: string | null;
@@ -50,24 +54,18 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 		selectedWorkflowActionId: string | null;
 	}>();
 
-	loading = true;
-	workflows: Workflow[] = [];
-	originalWorkflows: Workflow[] = [];
-	workflowStates: WorkflowState[] = [];
-	originalWorkflowStates: WorkflowState[] = [];
-	workflowActions: WorkflowAction[] = [];
-	originalWorkflowActions: WorkflowAction[] = [];
-
 	selectedWorkflow: Workflow | null = null;
 	selectedWorkflowStateId: string | null = null;
 	selectedWorkflowActionId: string | null = null;
-
-	modifiedWorkflowIds = new Set<string>();
-	modifiedWorkflowStateIds = new Set<string>();
-	modifiedWorkflowActionIds = new Set<string>();
-
 	viewMode: ViewMode = 'workflow-list';
-	viewLevel = 1;
+	loading = true;
+
+	projectLanguages: ProjectLanguage[] = [];
+	selectedLanguage = '';
+	private languageSubscription: Subscription;
+
+	private currentWorkflowStates: WorkflowState[] = [];
+	private currentWorkflowActions: WorkflowAction[] = [];
 
 	constructor(
 		public workflowManager: WorkflowManagerService,
@@ -76,17 +74,97 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 		private workflowDialogService: WorkflowDialogService,
 		private workflowStateDialogService: WorkflowStateDialogService,
 		private workflowActionDialogService: WorkflowActionDialogService,
-		private languageService: LanguageService
+		private languageService: LanguageService,
+		private snackBar: MatSnackBar
 	) {}
 
 	ngOnInit(): void {
 		this.loadWorkflows();
+
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
+		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
+			this.selectedLanguage = language;
+		});
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['selectedNode'] && this.selectedNode) {
-			this.handleNodeSelection(this.selectedNode);
+		if(changes['selectedNode'] && this.workflows.length > 0) {
+			const nodeId = this.selectedNode;
+			if(nodeId?.startsWith('workflow-')) {
+				const workflowId = nodeId?.replace('workflow-', '');
+				const workflow = this.workflows.find(wf => wf.workflowId === workflowId);
+				if(workflow) {
+					this.selectedWorkflow = workflow;
+					this.updateFilteredWorkflowStates();
+					this.updateFilteredWorkflowActions();
+				}
+			}
+			else if(nodeId === 'workflows') {
+				this.selectedWorkflow = null;
+				this.currentWorkflowStates = [];
+				this.currentWorkflowActions = [];
+			}
 		}
+	}
+
+	ngOnDestroy(): void {
+		this.languageSubscription.unsubscribe();
+	}
+
+	get viewLevel(): number {
+		if(!this.selectedWorkflow) {
+			return 0;
+		}
+
+		if(this.viewMode === 'workflow-detail' || this.viewMode === 'state-list' || this.viewMode === 'action-list') {
+			return 2;
+		}
+
+		if(this.viewMode === 'state-detail' || this.viewMode === 'action-detail') {
+			return 3;
+		}
+
+		return 0;
+	}
+
+	get workflows(): Workflow[] {
+		return this.workflowManager.getAll();
+	}
+
+	get workflowStates(): WorkflowState[] {
+		return this.currentWorkflowStates;
+	}
+
+	get workflowActions(): WorkflowAction[] {
+		return this.currentWorkflowActions;
+	}
+
+	get modifiedWorkflowIds(): Set<string> {
+		return this.workflowManager.getModifiedIds();
+	}
+
+	get originalWorkflows(): Workflow[] {
+		return this.workflowManager.getOriginals();
+	}
+
+	get modifiedWorkflowStates(): Set<string> {
+		return this.workflowStateManager.getModifiedIds();
+	}
+
+	get modifiedWorkflowActions(): Set<string> {
+		return this.workflowActionManager.getModifiedIds();
+	}
+
+	get originalWorkflowStates(): WorkflowState[] {
+		return this.workflowStateManager.getOriginals();
+	}
+
+	get originalWorkflowActions(): WorkflowAction[] {
+		return this.workflowActionManager.getOriginals();
+	}
+
+	get totalModificationCount(): number {
+		return this.workflowManager.getModificationCount() + this.workflowStateManager.getModificationCount() + this.workflowActionManager.getModificationCount();
 	}
 
 	loadWorkflows(): void {
@@ -94,87 +172,86 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 
 		forkJoin({
 			workflows: this.workflowManager.load(this.projectId),
-			workflowStates: this.workflowStateManager.load(this.projectId),
+			workflowStates: this.workflowStateManager.loadFull(this.projectId),
 			workflowActions: this.workflowActionManager.load(this.projectId)
 		}).subscribe({
-			next: ({workflows, workflowStates, workflowActions}) => {
-				this.workflows = workflows;
-				this.originalWorkflows = this.workflowManager.getOriginals();
-
-				this.originalWorkflowStates = this.workflowStateManager.getOriginals();
-				this.originalWorkflowActions = this.workflowActionManager.getOriginals();
-
-				this.modifiedWorkflowIds = this.workflowManager.getModifiedIds();
-				this.modifiedWorkflowStateIds = this.workflowStateManager.getModifiedIds();
-				this.modifiedWorkflowActionIds = this.workflowActionManager.getModifiedIds();
-
-				this.emitModificationCount();
+			next: ({workflows}) => {
+				if(this.selectedWorkflow) {
+					this.selectedWorkflow = workflows.find(
+						wf => wf.workflowId === this.selectedWorkflow!.workflowId
+					) || null;
+					this.updateFilteredWorkflowStates();
+					this.updateFilteredWorkflowActions();
+				}
 				this.loading = false;
+				this.emitContext();
 			},
 			error: error => {
 				console.error('Error loading workflows:', error);
+				this.snackBar.open('Failed to load workflows', 'Close', {duration: 3000});
 				this.loading = false;
 			}
 		});
 	}
 
-	private handleNodeSelection(nodeId: string): void {
-		if(nodeId === 'workflows') {
-			this.viewMode = 'workflow-list';
-			this.viewLevel = 1;
-			this.clearSelection();
-		}
-		else if(nodeId.startsWith('workflow-')) {
-			const workflowId = nodeId.replace('workflow-', '');
-			const workflow = this.workflows.find(wf => wf.workflowId === workflowId);
-			if(workflow) {
-				this.onSelectWorkflow(workflow);
-			}
-		}
-		else if(nodeId.startsWith('workflow-state-')) {
-			const workflowStateId = nodeId.replace('workflow-state-', '');
-			this.onSelectWorkflowState(workflowStateId);
-		}
-		else if(nodeId.startsWith('workflow-action-')) {
-			const workflowActionId = nodeId.replace('workflow-action-', '');
-			this.onSelectWorkflowAction(workflowActionId);
-		}
-	}
-
-	onSelectWorkflow(workflow: Workflow | null): void {
-		if(!workflow) {
-			this.viewMode = 'workflow-list';
-			this.viewLevel = 1;
-			this.selectedWorkflow = null;
-			this.selectedWorkflowStateId = null;
-			this.selectedWorkflowActionId = null;
-			this.workflowStates = [];
-			this.workflowActions = [];
-			this.emitContext();
+	private updateFilteredWorkflowStates(): void {
+		if(!this.selectedWorkflow) {
+			this.currentWorkflowStates = [];
 			return;
 		}
+		this.currentWorkflowStates = this.workflowStateManager.getAllForWorkflow(this.selectedWorkflow.workflowId);
+	}
 
-		if(this.selectedWorkflow?.workflowId === workflow.workflowId && this.viewMode === 'workflow-detail') {
-			this.viewMode = 'workflow-list';
-			this.viewLevel = 1;
-			this.selectedWorkflow = null;
-			this.selectedWorkflowStateId = null;
-			this.selectedWorkflowActionId = null;
-			this.workflowStates = [];
-			this.workflowActions = [];
+	private updateFilteredWorkflowActions(): void {
+		if(!this.selectedWorkflow) {
+			this.currentWorkflowActions = [];
+			return;
+		}
+		this.currentWorkflowActions = this.workflowActionManager.getAllForWorkflow(this.selectedWorkflow.workflowId);
+	}
+
+	onSelectWorkflow(workflow: Workflow): void {
+		if(this.selectedWorkflow?.workflowId === workflow.workflowId) {
+			this.clearSelection();
 		}
 		else {
-			this.selectedWorkflow = workflow;
-			this.viewMode = 'workflow-detail';
-			this.viewLevel = 2;
-			this.selectedWorkflowStateId = null;
-			this.selectedWorkflowActionId = null;
+			this.selectWorkflow(workflow);
+		}
+		this.emitContext();
+	}
 
-			this.workflowStates = this.workflowStateManager.getAllForWorkflow(workflow.workflowId);
-			this.workflowActions = this.workflowActionManager.getAllForWorkflow(workflow.workflowId);
+	clearSelection(): void {
+		this.selectedWorkflow = null;
+		this.selectedWorkflowStateId = null;
+		this.selectedWorkflowActionId = null;
+		this.currentWorkflowStates = [];
+		this.currentWorkflowActions = [];
+		this.viewMode = 'workflow-detail';
+		this.nodeSelected.emit('workflows');
+	}
+
+	backWorkflowDetail(): void {
+		this.viewMode = 'workflow-detail';
+		this.selectedWorkflowStateId = null;
+		this.selectedWorkflowActionId = null;
+		this.emitContext();
+	}
+
+	private selectWorkflow(workflow: Workflow): void {
+		const previousWorkflowId = this.selectedWorkflow?.workflowId;
+
+		this.selectedWorkflow = workflow;
+		this.selectedWorkflowStateId = null;
+		this.selectedWorkflowActionId = null;
+
+		if(previousWorkflowId !== workflow.workflowId) {
+			this.viewMode = 'workflow-detail';
 		}
 
+		this.updateFilteredWorkflowStates();
+		this.updateFilteredWorkflowActions();
 		this.emitContext();
+		this.nodeSelected.emit(`workflow-${workflow.workflowId}`);
 	}
 
 	isSelected(workflow: Workflow): boolean {
@@ -184,110 +261,54 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 	onCreateWorkflow(): void {
 		this.workflowDialogService.openCreateDialog(
 			this.projectId,
-			this.project?.languages || []
-		).subscribe(result => {
+			this.projectLanguages
+		).subscribe((result: Workflow | null) => {
 			if(result) {
-				const newWorkflow: Workflow = {
-					workflowId: `temp-${Date.now()}`,
-					...result
-				};
-
-				this.workflows.push(newWorkflow);
-				this.workflowManager.update(newWorkflow);
-				this.modifiedWorkflowIds = this.workflowManager.getModifiedIds();
-				this.emitModificationCount();
+				this.workflowManager.create(this.projectId, result).subscribe({
+					next: () => {
+						this.snackBar.open('Workflow created', 'Close', {duration: 2000});
+						this.loadWorkflows();
+						this.emitModificationChange();
+					},
+					error: error => {
+						console.error('Error creating workflow', error);
+						this.snackBar.open('Failed to create workflow', 'Close', {duration: 3000});
+					}
+				});
 			}
 		});
 	}
 
 	onWorkflowUpdated(updatedWorkflow: Workflow): void {
-		const index = this.workflows.findIndex(wf => wf.workflowId === updatedWorkflow.workflowId);
-		if(index !== -1) {
-			this.workflows[index] = updatedWorkflow;
-		}
-
-		this.selectedWorkflow = updatedWorkflow;
-		this.workflowManager.update(updatedWorkflow);
-		this.modifiedWorkflowIds = this.workflowManager.getModifiedIds();
-		this.emitModificationCount();
+		this.selectedWorkflow = this.workflowManager.getById(updatedWorkflow.workflowId) || null;
+		this.emitModificationChange();
 	}
 
 	onWorkflowDeleted(workflowId: string): void {
-		this.workflows = this.workflows.filter(wf => wf.workflowId !== workflowId);
-
-		const wasOriginal = this.originalWorkflows.some(wf => wf.workflowId === workflowId);
-		if(wasOriginal) {
-			this.modifiedWorkflowIds.add(`${workflowId}-deleted`);
+		const workflow = this.workflows.find(wf => wf.workflowId === workflowId);
+		if(!workflow) {
+			return;
 		}
-		else {
-			this.modifiedWorkflowIds.delete(workflowId);
-		}
-
-		this.selectedWorkflow = null;
-		this.viewMode = 'workflow-list';
-		this.viewLevel = 1;
-		this.emitModificationCount();
-		this.emitContext();
+		this.performDelete(workflow);
 	}
 
-	switchToWorkflowStateView(): void {
-		this.viewMode = 'state-list';
-		this.viewLevel = 2;
-		this.emitContext();
-	}
+	private performDelete(workflow: Workflow): void {
+		this.workflowManager.delete(this.projectId, workflow.workflowId).subscribe({
+			next: () => {
+				this.snackBar.open('Workflow deleted', 'Close', {duration: 2000});
 
-	switchToWorkflowActionView(): void {
-		this.viewMode = 'action-list';
-		this.viewLevel = 2;
-		this.emitContext();
-	}
+				if(this.selectedWorkflow?.workflowId === workflow.workflowId) {
+					this.clearSelection();
+				}
 
-	backWorkflowDetail(): void {
-		this.viewMode = 'workflow-detail';
-		this.viewLevel = 2;
-		this.selectedWorkflowStateId = null;
-		this.selectedWorkflowActionId = null;
-		this.emitContext();
-	}
-
-	onSelectWorkflowState(workflowStateId: string | null): void {
-		if(!workflowStateId) {
-			this.viewMode = 'state-list';
-			this.viewLevel = 2;
-			this.selectedWorkflowStateId = null;
-		}
-		else if(this.selectedWorkflowStateId === workflowStateId && this.viewMode === 'state-detail') {
-			this.viewMode = 'state-list';
-			this.viewLevel = 2;
-			this.selectedWorkflowStateId = null;
-		}
-		else {
-			this.selectedWorkflowStateId = workflowStateId;
-			this.viewMode = 'state-detail';
-			this.viewLevel = 3;
-		}
-
-		this.emitContext();
-	}
-
-	onSelectWorkflowAction(workflowActionId: string | null): void {
-		if(!workflowActionId) {
-			this.viewMode = 'action-list';
-			this.viewLevel = 2;
-			this.selectedWorkflowActionId = null;
-		}
-		else if(this.selectedWorkflowActionId === workflowActionId && this.viewMode === 'action-detail') {
-			this.viewMode = 'action-list';
-			this.viewLevel = 2;
-			this.selectedWorkflowActionId = null;
-		}
-		else {
-			this.selectedWorkflowActionId = workflowActionId;
-			this.viewMode = 'action-detail';
-			this.viewLevel = 3;
-		}
-
-		this.emitContext();
+				this.loadWorkflows();
+				this.emitModificationChange();
+			},
+			error: (error: HttpErrorResponse) => {
+				console.error('Error deleting workflow:', error);
+				this.snackBar.open('Failed to delete workflow', 'Close', {duration: 3000});
+			}
+		});
 	}
 
 	onCreateWorkflowState(): void {
@@ -298,51 +319,79 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 		this.workflowStateDialogService.openCreateDialog(
 			this.projectId,
 			this.selectedWorkflow.workflowId,
-			this.project?.languages || []
+			this.projectLanguages
 		).subscribe(result => {
 			if(result && this.selectedWorkflow) {
 				const newWorkflowState: WorkflowState = {
-					workflowStateId: `temp-${Date.now()}`,
+					workflowStateId: '',
 					workflowId: this.selectedWorkflow.workflowId,
-					...result
+					...result,
+					possibleActions: []
 				};
 
-				this.workflowStates.push(newWorkflowState);
-				this.workflowStateManager.update(newWorkflowState);
-				this.modifiedWorkflowStateIds = this.workflowStateManager.getModifiedIds();
-				this.emitModificationCount();
-				this.emitContext();
+				this.workflowStateManager.create(this.projectId, newWorkflowState).subscribe({
+					next: () => {
+						this.snackBar.open('Workflow state created', 'Close', {duration: 2000});
+						this.loadWorkflows();
+					},
+					error: error => {
+						console.error('Error creating workflow state:', error);
+						this.snackBar.open('Failed to create workflow state', 'Close', {duration: 3000});
+					}
+				});
 			}
 		});
 	}
 
 	onWorkflowStateUpdated(updatedWorkflowState: WorkflowState): void {
-		this.workflowStateManager.update(updatedWorkflowState);
-
-		if(this.selectedWorkflow) {
-			this.workflowStates = this.workflowStateManager.getAllForWorkflow(this.selectedWorkflow.workflowId);
+		if(!updatedWorkflowState) {
+			return;
 		}
-
-		this.modifiedWorkflowStateIds = this.workflowStateManager.getModifiedIds();
-		this.emitModificationCount();
-		this.emitContext();
+		this.workflowStateManager.update(updatedWorkflowState);
+		this.updateFilteredWorkflowStates();
+		this.emitModificationChange();
+		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
 	}
 
 	onWorkflowStateDeleted(workflowStateId: string): void {
-		this.workflowStates = this.workflowStates.filter(wfs => wfs.workflowStateId !== workflowStateId);
+		this.workflowStateManager.delete(this.projectId, workflowStateId).subscribe({
+			next: () => {
+				this.snackBar.open('Workflow state deleted', 'Close', {duration: 2000});
 
-		const wasOriginal = this.originalWorkflowStates.some(wfs => wfs.workflowStateId === workflowStateId);
-		if(wasOriginal) {
-			this.modifiedWorkflowStateIds.add(`${workflowStateId}-deleted`);
+				if(this.selectedWorkflowStateId === workflowStateId) {
+					this.selectedWorkflowStateId = null;
+					this.viewMode = 'state-list';
+				}
+
+				this.updateFilteredWorkflowStates();
+				this.emitModificationChange();
+				this.emitContext();
+			},
+			error: (error: HttpErrorResponse) => {
+				console.error('Error deleting workflow state:', error);
+				this.snackBar.open('Failed to delete workflow state', 'Close', {duration: 3000});
+			}
+		});
+	}
+
+	switchToWorkflowStateView(): void {
+		if(!this.selectedWorkflow) {
+			return;
+		}
+		this.viewMode = 'state-list';
+		this.emitContext();
+	}
+
+	onSelectWorkflowState(workflowStateId: string): void {
+		if(this.selectedWorkflowStateId === workflowStateId) {
+			this.selectedWorkflowStateId = null;
+			this.viewMode = 'state-list';
 		}
 		else {
-			this.modifiedWorkflowStateIds.delete(workflowStateId);
+			this.selectedWorkflowStateId = workflowStateId;
+			this.viewMode = 'state-detail';
+			this.nodeSelected.emit(`workflow-state-${workflowStateId}`);
 		}
-
-		this.selectedWorkflowStateId = null;
-		this.viewMode = 'state-list';
-		this.viewLevel = 2;
-		this.emitModificationCount();
 		this.emitContext();
 	}
 
@@ -354,81 +403,89 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 		this.workflowActionDialogService.openCreateDialog(
 			this.projectId,
 			this.selectedWorkflow.workflowId,
-			this.project?.languages || []
+			this.projectLanguages
 		).subscribe(result => {
 			if(result && this.selectedWorkflow) {
 				const newWorkflowAction: WorkflowAction = {
-					workflowActionId: `temp-${Date.now()}`,
+					workflowActionId: '',
 					workflowId: this.selectedWorkflow.workflowId,
 					...result
 				};
 
-				this.workflowActions.push(newWorkflowAction);
-				this.workflowActionManager.update(newWorkflowAction);
-				this.modifiedWorkflowActionIds = this.workflowActionManager.getModifiedIds();
-				this.emitModificationCount();
-				this.emitContext();
+				this.workflowActionManager.create(this.projectId, newWorkflowAction).subscribe({
+					next: () => {
+						this.snackBar.open('Workflow action created', 'Close', {duration: 2000});
+						this.loadWorkflows();
+					},
+					error: error => {
+						console.error('Error creating workflow action:', error);
+						this.snackBar.open('Failed to create workflow action', 'Close', {duration: 3000});
+					}
+				});
 			}
 		});
 	}
 
 	onWorkflowActionUpdated(updatedWorkflowAction: WorkflowAction): void {
-		this.workflowActionManager.update(updatedWorkflowAction);
-
-		if(this.selectedWorkflow) {
-			this.workflowActions = this.workflowActionManager.getAllForWorkflow(this.selectedWorkflow.workflowId);
+		if(!updatedWorkflowAction) {
+			return;
 		}
 
-		this.modifiedWorkflowActionIds = this.workflowActionManager.getModifiedIds();
-		this.emitModificationCount();
-		this.emitContext();
+		this.workflowActionManager.update(updatedWorkflowAction);
+		this.updateFilteredWorkflowActions();
+		this.emitModificationChange();
+		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
 	}
 
 	onWorkflowActionDeleted(workflowActionId: string): void {
-		this.workflowActions = this.workflowActions.filter(wfa => wfa.workflowActionId !== workflowActionId);
+		this.workflowActionManager.delete(this.projectId, workflowActionId).subscribe({
+			next: () => {
+				this.snackBar.open('Workflow action deleted', 'Close', {duration: 2000});
 
-		const wasOriginal = this.originalWorkflowActions.some(wfa => wfa.workflowActionId === workflowActionId);
-		if(wasOriginal) {
-			this.modifiedWorkflowActionIds.add(`${workflowActionId}-deleted`);
+				if(this.selectedWorkflowActionId === workflowActionId) {
+					this.selectedWorkflowActionId = null;
+					this.viewMode = 'action-list';
+				}
+
+				this.updateFilteredWorkflowActions();
+				this.emitModificationChange();
+				this.emitContext();
+			},
+			error: (error: HttpErrorResponse) => {
+				console.error('Error deleting workflow action:', error);
+				this.snackBar.open('Failed to delete workflow action', 'Close', {duration: 3000});
+			}
+		});
+	}
+
+	switchToWorkflowActionView(): void {
+		if(!this.selectedWorkflow) {
+			return;
+		}
+		this.viewMode = 'action-list';
+		this.emitContext();
+	}
+
+	onSelectWorkflowAction(workflowActionId: string): void {
+		if(this.selectedWorkflowActionId === workflowActionId) {
+			this.selectedWorkflowActionId = null;
+			this.viewMode = 'action-list';
 		}
 		else {
-			this.modifiedWorkflowActionIds.delete(workflowActionId);
+			this.selectedWorkflowActionId = workflowActionId;
+			this.viewMode = 'action-detail';
+			this.nodeSelected.emit(`workflow-action-${workflowActionId}`);
 		}
-
-		this.selectedWorkflowActionId = null;
-		this.viewMode = 'action-list';
-		this.viewLevel = 2;
-		this.emitModificationCount();
 		this.emitContext();
 	}
 
-	isWorkflowStateModified(workflowStateId: string): boolean {
-		return this.modifiedWorkflowStateIds.has(workflowStateId);
-	}
-
-	isWorkflowActionModified(workflowActionId: string): boolean {
-		return this.modifiedWorkflowActionIds.has(workflowActionId);
-	}
-
-	clearSelection(): void {
-		this.selectedWorkflow = null;
-		this.selectedWorkflowStateId = null;
-		this.selectedWorkflowActionId = null;
-		this.workflowStates = [];
-		this.workflowActions = [];
-		this.viewMode = 'workflow-list';
-		this.viewLevel = 1;
-		this.emitContext();
-	}
-
-	private emitModificationCount(): void {
-		const totalCount = this.modifiedWorkflowIds.size + this.modifiedWorkflowStateIds.size + this.modifiedWorkflowActionIds.size;
-
-		this.workflowsChanged.emit({modificationCount: totalCount});
+	private emitModificationChange(): void {
+		this.workflowsChanged.emit({modificationCount: this.totalModificationCount});
 	}
 
 	private emitContext(): void {
 		this.workflowContextChanged.emit({
+			workflows: [...this.workflows],
 			workflowStates: this.workflowStates,
 			workflowActions: this.workflowActions,
 			selectedWorkflowId: this.selectedWorkflow?.workflowId || null,
@@ -437,7 +494,53 @@ export class WorkflowListComponent implements OnInit, OnChanges {
 		});
 	}
 
+	getWorkflowLabel(workflowId: string): string {
+		const workflow = this.workflows.find(wf => wf.workflowId === workflowId);
+		if(!workflow) {
+			return workflowId;
+		}
+
+		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
+		return `${name} (${workflow.id})`;
+	}
+
+	getAggregatedStateLabel(workflowStateId: string): string {
+		if(!this.selectedWorkflow?.aggregatedWorkflowId) {
+			return workflowStateId;
+		}
+		const workflowState = this.workflowStateManager
+			.getAllForWorkflow(this.selectedWorkflow.aggregatedWorkflowId)
+			.find(s => s.workflowStateId === workflowStateId);
+		if(!workflowState) {
+			return workflowStateId;
+		}
+		const name = this.languageService.getDefaultTranslation(workflowState.shortname) || workflowState.id;
+		return `${name} (${workflowState.id})`;
+	}
+
+	getInitialStateLabel(workflowId: string, stateId: string): string {
+		const state = this.workflowStateManager.getAllForWorkflow(workflowId).find(s => s.workflowStateId === stateId);
+		return state
+			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
+			: stateId;
+	}
+
+	getCreationActionLabel(workflowId: string, actionId: string): string {
+		const action = this.workflowActionManager.getAllForWorkflow(workflowId).find(a => a.workflowActionId === actionId);
+		return action
+			? `${this.languageService.getDefaultTranslation(action.shortname) || action.id} (${action.id})`
+			: actionId;
+	}
+
 	getTranslatedName(translations: Record<string, string> | undefined): string {
 		return this.languageService.getDefaultTranslation(translations) || '';
+	}
+
+	isWorkflowStateModified(workflowStateId: string): boolean {
+		return this.workflowStateManager.isModified(workflowStateId);
+	}
+
+	isWorkflowActionModified(workflowActionId: string): boolean {
+		return this.workflowActionManager.isModified(workflowActionId);
 	}
 }

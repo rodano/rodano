@@ -15,6 +15,7 @@ import {PossibleValue} from '@core/model/possible-value';
 import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
 import {ValidatorManagerService} from '../../../services/manager/validator-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
+import {WorkflowManagerService} from '../../../services/manager/workflow-manager.service';
 
 @Component({
 	selector: 'app-field-model-detail',
@@ -45,14 +46,12 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 
-	allValidators: {id: string; code: string; name: string}[] = [];
-	allWorkflows: {id: string; code: string; name: string}[] = [];
-
 	constructor(
 		private languageService: LanguageService,
 		private fieldModelDialogService: FieldModelDialogService,
 		private fieldModelManager: FieldModelManagerService,
 		private validatorManager: ValidatorManagerService,
+		private workflowManager: WorkflowManagerService,
 		private dialog: MatDialog
 	) {}
 
@@ -61,28 +60,10 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
-
-		this.fieldModelManager.loadFull(this.projectId).subscribe({
-			next: () => {
-				this.loadFieldModel();
-			},
-			error: error => console.error('Error loading full field models:', error)
-		});
-
-		this.loadValidators();
-		this.loadWorkflows();
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['fieldModelId'] && this.fieldModelId) {
-			this.fieldModelManager.loadFull(this.projectId).subscribe({
-				next: () => {
-					this.loadFieldModel();
-				},
-				error: error => console.error('Error loading full field models:', error)
-			});
-		}
-		else if(changes['fieldModels']) {
+		if(changes['fieldModelId'] || changes['fieldModels']) {
 			this.loadFieldModel();
 		}
 	}
@@ -94,29 +75,11 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private loadFieldModel(): void {
-		const fieldModel = this.fieldModels.find(fm => fm.fieldModelId === this.fieldModelId);
-		this.draftFieldModel = fieldModel ? JSON.parse(JSON.stringify(fieldModel)) : null;
-
-		const original = this.originalFieldModels.find(fm => fm.fieldModelId === this.fieldModelId);
+		this.draftFieldModel = this.fieldModelManager.getById(this.fieldModelId)
+			? JSON.parse(JSON.stringify(this.fieldModelManager.getById(this.fieldModelId)))
+			: null;
+		const original = this.fieldModelManager.getOriginals().find(fm => fm.fieldModelId === this.fieldModelId);
 		this.originalFieldModel = original ? JSON.parse(JSON.stringify(original)) : null;
-	}
-
-	private loadValidators(): void {
-		this.validatorManager.load(this.projectId).subscribe({
-			next: validators => {
-				this.allValidators = validators.map(v => ({
-					id: v.validatorId,
-					code: v.id,
-					name: this.languageService.getDefaultTranslation(v.shortname) || v.id
-				}));
-			},
-			error: error => console.error('Error loading validators:', error)
-		});
-	}
-
-	private loadWorkflows(): void {
-		//TODO: Implement when workflows are ready
-		this.allWorkflows = [];
 	}
 
 	isFieldModified(field: keyof FieldModel): boolean {
@@ -165,20 +128,22 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		}
 	}
 
-	getValidatorName(validatorId: string): string {
-		const validator = this.allValidators.find(v => v.id === validatorId);
+	getValidatorLabel(validatorId: string): string {
+		const validator = this.validatorManager.getById(validatorId);
 		if(!validator) {
 			return validatorId;
 		}
-		return `${validator.name} (${validator.code})`;
+		const name = this.languageService.getDefaultTranslation(validator.shortname) || validator.id;
+		return `${name} (${validator.id})`;
 	}
 
-	getWorkflowName(workflowId: string): string {
-		const workflow = this.allWorkflows.find(wf => wf.id === workflowId);
+	getWorkflowLabel(workflowId: string): string {
+		const workflow = this.workflowManager.getById(workflowId);
 		if(!workflow) {
 			return workflowId;
 		}
-		return `${workflow.name} (${workflow.code})`;
+		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
+		return `${name} (${workflow.id})`;
 	}
 
 	getTypeLabel(type: string): string {
@@ -329,16 +294,9 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		this.fieldModelDialogService.openResourcesDialog(
-			this.draftFieldModel,
-			this.allValidators,
-			this.allWorkflows
-		).subscribe(result => {
+		this.fieldModelDialogService.openResourcesDialog(this.draftFieldModel).subscribe(result => {
 			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
+				this.draftFieldModel = {...this.draftFieldModel, ...result};
 				this.fieldModelUpdated.emit(this.draftFieldModel);
 			}
 		});

@@ -1,39 +1,5 @@
 @import "../../../shared/detail-shared.css";
 
-.possible-values-display {
-	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
-}
-
-.possible-value-card {
-	background-color: #f9fafb;
-	border: 1px solid #e5e7eb;
-	border-radius: 0.375rem;
-	padding: 0.75rem;
-	transition: all 0.2s;
-}
-
-.possible-value-card:hover {
-	background-color: #f3f4f6;
-	border-color: #d1d5db;
-}
-
-.pv-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 1rem;
-	flex-wrap: wrap;
-}
-
-.pv-name {
-	font-weight: 500;
-	color: #374151;
-	flex: 1;
-	min-width: 200px;
-}
-
 .pv-badges {
 	display: flex;
 	gap: 0.5rem;

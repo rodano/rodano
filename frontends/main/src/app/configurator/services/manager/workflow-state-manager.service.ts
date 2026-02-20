@@ -47,14 +47,11 @@ export class WorkflowStateManagerService {
 					if(existing) {
 						Object.assign(existing, fullModel);
 					}
-
-					const original = this.tracker.getOriginals().find(o =>
-						(o as any).eventModelId === fullModel.workflowStateId
-					);
-					if(original) {
-						Object.assign(original, fullModel);
+					else {
+						this.tracker.addEntity(fullModel);
 					}
 				});
+				this.loaded = true;
 				this.fullLoaded = true;
 				return this.tracker.getCurrent();
 			})
@@ -93,6 +90,10 @@ export class WorkflowStateManagerService {
 				this.tracker.removeEntity(workflowStateId);
 			})
 		);
+	}
+
+	isLoaded(): boolean {
+		return this.loaded;
 	}
 
 	getModifiedIds(): Set<string> {

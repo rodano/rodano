@@ -72,12 +72,7 @@ export class DatasetModelExportDialogComponent implements OnInit {
 			const formValue = this.form.getRawValue();
 			const result: any = {};
 
-			const normalize = (value: any) => {
-				if(value === '' || value === null || value === undefined) {
-					return null;
-				}
-				return value;
-			};
+			const normalize = (value: any) => value === '' || value === null || value === undefined ? null : value;
 
 			const normalizedExportable = normalize(formValue.exportable);
 			const normalizedOriginalExportable = normalize(this.data.datasetModel.exportable);
@@ -85,10 +80,15 @@ export class DatasetModelExportDialogComponent implements OnInit {
 				result.exportable = formValue.exportable;
 			}
 
-			const normalizedExportOrder = normalize(formValue.exportOrder);
-			const normalizedOriginalExportOrder = normalize(this.data.datasetModel.exportOrder);
-			if(normalizedExportOrder !== normalizedOriginalExportOrder) {
-				result.exportOrder = formValue.exportOrder;
+			if(!formValue.exportable) {
+				result.exportOrder = null;
+			}
+			else {
+				const normalizedExportOrder = normalize(formValue.exportOrder);
+				const normalizedOriginalExportOrder = normalize(this.data.datasetModel.exportOrder);
+				if(normalizedExportOrder !== normalizedOriginalExportOrder) {
+					result.exportOrder = formValue.exportOrder;
+				}
 			}
 
 			this.dialogRef.close(result);

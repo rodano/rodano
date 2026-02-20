@@ -132,41 +132,56 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getWorkflowConfiguration()?.workflowId">
-					@if (!getWorkflowConfiguration()?.workflowId) {
+				<div class="setting-value" [class.not-configured]="getWorkflowDisplayName() === 'Not set'">
+					@if (getWorkflowDisplayName() === 'Not set') {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">settings</mat-icon>
+							<span class="language-name">{{ getWorkflowDisplayName() }}</span>
+						</div>
 					}
-					{{ getWorkflowConfiguration()?.workflowId || 'Not configured' }}
 				</div>
 			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('invalidWorkflowStateIds')">
+			<div class="setting-item" [class.modified]="isFieldModified('invalidStateId')">
 				<label>
-					Invalid States
-					@if (isFieldModified('invalidWorkflowStateIds')) {
+					Invalid State
+					@if (isFieldModified('invalidStateId')) {
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getInvalidStatesDisplay()">
-					@if (!getInvalidStatesDisplay()) {
+				<div class="setting-value" [class.not-configured]="getInvalidStateDisplay() === 'Not set'">
+					@if (getInvalidStateDisplay() === 'Not set') {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">cancel</mat-icon>
+							<span class="language-name">{{ getInvalidStateDisplay() }}</span>
+						</div>
 					}
-					{{ getInvalidStatesDisplay() || 'Not configured' }}
 				</div>
 			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('validWorkflowStateIds')">
+			<div class="setting-item" [class.modified]="isFieldModified('validStateId')">
 				<label>
-					Valid States
-					@if (isFieldModified('validWorkflowStateIds')) {
+					Valid State
+					@if (isFieldModified('validStateId')) {
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getValidStatesDisplay()">
-					@if (!getValidStatesDisplay()) {
+				<div class="setting-value" [class.not-configured]="getValidStateDisplay() === 'Not set'">
+					@if (getValidStateDisplay() === 'Not set') {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">check_circle</mat-icon>
+							<span class="language-name">{{ getValidStateDisplay() }}</span>
+						</div>
 					}
-					{{ getValidStatesDisplay() || 'Not configured' }}
 				</div>
 			</div>
 		</div>

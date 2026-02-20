@@ -37,14 +37,12 @@ public class WorkflowActionDTO {
 	@NotNull
 	private boolean requireSignature;
 	@Schema(description = "The signature requirement text")
-	@NotNull
 	private SortedMap<String, String> requireSignatureText;
 
 	@Schema(description = "Can a message be attached to the action execution?")
 	@NotNull
 	private boolean documentable;
 	@Schema(description = "Action message options")
-	@NotNull
 	private List<Map<String, String>> documentableOptions;
 
 	@NotBlank

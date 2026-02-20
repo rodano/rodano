@@ -13,7 +13,7 @@
 			<p><span class="label">Message:</span>{{ data.workflow.triggerMessage }}</p>
 		}
 
-		@if (data.action.documentableOptions.length > 0) {
+		@if ((data.action.documentableOptions?.length ?? 0) > 0) {
 			<mat-radio-group>
 				@for (option of data.action.documentableOptions; track option) {
 					<mat-radio-button
@@ -30,7 +30,7 @@
 			</mat-radio-group>
 		}
 
-		@if (data.action.documentableOptions.length <= 0 || otherOption) {
+		@if ((data.action.documentableOptions?.length ?? 0) <= 0 || otherOption) {
 			<mat-form-field class="full-width">
 				<mat-label>Rationale</mat-label>
 				<textarea

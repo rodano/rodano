@@ -40,5 +40,6 @@ export interface ScopeModel {
     formModelIds: Array<string>;
     workflowIds: Array<string>;
     defaultProfileId: string;
+    workflowStateIds: Array<string>;
 }
 

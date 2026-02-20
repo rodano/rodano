@@ -1,0 +1,70 @@
+<h2 class="dialog-title">Assignment</h2>
+
+<div class="dialog-content">
+	<form [formGroup]="form" class="settings-form">
+
+		<div class="form-section">
+			<div class="form-field">
+				<label>Aggregate Workflow</label>
+				<mat-select formControlName="aggregatedWorkflowId" placeholder="None">
+					<mat-option [value]="null">None</mat-option>
+					@for (wf of data.availableWorkflows; track wf.workflowId) {
+						<mat-option [value]="wf.workflowId">{{ getWorkflowLabel(wf) }}</mat-option>
+					}
+				</mat-select>
+				<span class="hint">When set, mandatory, initial state, and unique are not applicable</span>
+			</div>
+		</div>
+
+		@if (!hasAggregateWorkflow) {
+			<div class="form-section">
+				<div class="form-field">
+					<mat-checkbox formControlName="mandatory">Mandatory</mat-checkbox>
+					<span class="hint">When mandatory, the creation action is not applicable</span>
+				</div>
+
+				<div class="form-field">
+					<label>Initial State</label>
+					<mat-select formControlName="initialStateId" placeholder="None">
+						<mat-option [value]="null">None</mat-option>
+						@for (state of availableStates; track state.id) {
+							<mat-option [value]="state.id">{{ state.name }} ({{ state.code }})</mat-option>
+						}
+					</mat-select>
+					@if (availableStates.length === 0) {
+						<span class="hint">Select an aggregate workflow first to load its states</span>
+					}
+				</div>
+			</div>
+		}
+
+		@if (!isMandatory) {
+			<div class="form-field">
+				<label>Creation Action</label>
+				<mat-select formControlName="actionId" placeholder="None">
+					<mat-option [value]="null">None</mat-option>
+					@for (action of availableActions; track action.id) {
+						<mat-option [value]="action.id">{{ action.name }} ({{ action.code }})</mat-option>
+					}
+				</mat-select>
+				@if (availableActions.length === 0) {
+					<span class="hint">Select an aggregate workflow first to load its actions</span>
+				}
+			</div>
+		}
+
+		@if (!hasAggregateWorkflow) {
+			<div class="form-field">
+				<mat-checkbox formControlName="unique">Unique</mat-checkbox>
+			</div>
+		}
+
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid">
+		Save Changes
+	</button>
+</div>

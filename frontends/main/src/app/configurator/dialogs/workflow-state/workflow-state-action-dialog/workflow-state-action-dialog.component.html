@@ -1,0 +1,52 @@
+<h2 class="dialog-title">Edit Possible Actions</h2>
+
+<div class="dialog-content">
+	<div class="form-section">
+		<h3>Possible Actions</h3>
+		<p class="hint">Select which workflow actions are possible from this state</p>
+
+		<div class="dual-list-container">
+			<div class="list-box">
+				<div class="box-label">Available</div>
+				<div class="list-items">
+					@if (availableWorkflowActions.length === 0) {
+						<div class="empty-placeholder">No available actions</div>
+					}
+					@for (action of availableWorkflowActions; track action.id) {
+						<div class="list-item" (click)="onAdd(action)">
+							<div class="item-text">
+								<span>{{ action.name }}</span>
+							</div>
+							<mat-icon class="action-icon">add_circle_outline</mat-icon>
+						</div>
+					}
+				</div>
+			</div>
+
+			<div class="list-box selected">
+				<div class="box-label">Selected</div>
+				<div class="list-items">
+					@if (selectedWorkflowActions.length === 0) {
+						<div class="empty-placeholder">No actions selected</div>
+					}
+					@for (action of selectedWorkflowActions; track action.id) {
+						<div class="list-item" (click)="onRemove(action)">
+							<div class="item-text">
+								<span>{{ action.name }}</span>
+							</div>
+							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

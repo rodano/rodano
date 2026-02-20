@@ -43,7 +43,7 @@ export class WorkflowTreeComponent implements OnChanges {
 			const node: TreeNode = {
 				id: `workflow-${wf.workflowId}`,
 				label: this.languageService.getDefaultTranslation(wf.shortname) || wf.id,
-				icon: 'settings',
+				icon: 'work',
 				type: 'workflow',
 				selected: this.selectedWorkflowId === wf.workflowId,
 				entityId: wf.workflowId

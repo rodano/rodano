@@ -1,0 +1,54 @@
+<h2 class="dialog-title">Edit Documentation</h2>
+
+<div class="dialog-content">
+	<p class="hint">
+		If the action is documentable, the user will be asked to provide a rationale to justify why he is doing the action. It is possible to configure a list of predefined rationales that will be presented to the user (but the user will always be able to provide a custom rationale).
+	</p>
+
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-field">
+			<mat-checkbox formControlName="documentable">Documentable</mat-checkbox>
+		</div>
+
+		@if (documentable) {
+			<div class="form-section">
+				<h3>Documentation Options</h3>
+				<p class="hint">Predefined rationale options presented to the user. The user can always provide a custom one.</p>
+
+				@for (option of options.controls; track $index; let i = $index) {
+					<div class="option-row">
+						<mat-tab-group class="option-tabs">
+							@for (lang of availableLanguages; track lang.languageCode) {
+								@if (lang.languageCode) {
+									<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+										<div class="tab-content" [formGroup]="$any(option)">
+											<div class="form-field">
+												<input
+													type="text"
+													[formControlName]="lang.languageCode"
+													placeholder="Rationale text">
+											</div>
+										</div>
+									</mat-tab>
+								}
+							}
+						</mat-tab-group>
+						<button type="button" class="btn-icon-danger" (click)="removeOption(i)">
+							<mat-icon>close</mat-icon>
+						</button>
+					</div>
+				}
+
+				<button type="button" class="btn-secondary" (click)="addOption()">
+					<mat-icon>add</mat-icon>
+					Add Documentation Option
+				</button>
+			</div>
+		}
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()">Save Changes</button>
+</div>

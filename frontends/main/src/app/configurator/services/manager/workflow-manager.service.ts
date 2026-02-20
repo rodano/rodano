@@ -15,7 +15,7 @@ export class WorkflowManagerService {
 	constructor(private workflowService: WorkflowService) {
 		this.tracker = new EntityModificationTracker<Workflow>(
 			wf => wf.workflowId,
-			['id', 'aggregatedWorkflowId', 'initialStateId', 'order', 'mandatory', 'unique', 'icon'],
+			['id', 'aggregatedWorkflowId', 'initialStateId', 'actionId', 'order', 'mandatory', 'unique', 'icon'],
 			['shortname', 'longname', 'description', 'message'],
 			[]
 		);

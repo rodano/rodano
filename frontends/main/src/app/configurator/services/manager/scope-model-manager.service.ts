@@ -17,7 +17,7 @@ export class ScopeModelManagerService {
 			sm => sm.scopeModelId,
 			['id', 'virtual', 'defaultParentId', 'defaultProfileId', 'scopeFormat', 'expectedNumber', 'maxNumber'],
 			['shortname', 'longname', 'description', 'pluralShortname'],
-			['parentIds', 'datasetModelIds', 'formModelIds', 'workflowIds']
+			['parentIds', 'datasetModelIds', 'formModelIds', 'workflowIds', 'workflowStateIds']
 		);
 	}
 

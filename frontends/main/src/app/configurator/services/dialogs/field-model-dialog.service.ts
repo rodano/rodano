@@ -24,13 +24,19 @@ import {
 import {
 	FieldModelResourcesDialogComponent
 } from '../../dialogs/field-model/field-model-resources-dialog/field-model-resources-dialog.component';
+import {LanguageService} from '../language.service';
+import {WorkflowManagerService} from '../manager/workflow-manager.service';
+import {ValidatorManagerService} from '../manager/validator-manager.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class FieldModelDialogService {
 	constructor(
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private languageService: LanguageService,
+		private validatorManager: ValidatorManagerService,
+		private workflowManager: WorkflowManagerService
 	) {}
 
 	openCreateDialog(
@@ -150,21 +156,22 @@ export class FieldModelDialogService {
 		return dialogRef.afterClosed();
 	}
 
-	openResourcesDialog(
-		fieldModel: FieldModel,
-		availableValidators: {id: string; name: string}[],
-		availableWorkflows: {id: string; name: string}[]
-	): Observable<any> {
+	openResourcesDialog(fieldModel: FieldModel): Observable<any> {
 		const dialogRef = this.dialog.open(FieldModelResourcesDialogComponent, {
 			width: '500px',
 			data: {
 				fieldModel,
-				availableValidators,
-				availableWorkflows
+				availableValidators: this.validatorManager.getAll().map(v => ({
+					id: v.validatorId,
+					name: `${this.languageService.getDefaultTranslation(v.shortname) || v.id} (${v.id})`
+				})),
+				availableWorkflows: this.workflowManager.getAll().map(wf => ({
+					id: wf.workflowId,
+					name: `${this.languageService.getDefaultTranslation(wf.shortname) || wf.id} (${wf.id})`
+				}))
 			},
 			disableClose: true
 		});
-
 		return dialogRef.afterClosed();
 	}
 }

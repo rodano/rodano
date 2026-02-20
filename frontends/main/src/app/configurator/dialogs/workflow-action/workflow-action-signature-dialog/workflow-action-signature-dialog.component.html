@@ -1,0 +1,43 @@
+<h2 class="dialog-title">Edit Signature</h2>
+
+<div class="dialog-content">
+	<p class="hint">
+		If the action requires a signature, the user will be prompted to enter their login and password to validate the
+		action.
+		You can configure an affidavit text that will be shown to the user.
+	</p>
+
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-field">
+			<mat-checkbox formControlName="requireSignature">Require Signature</mat-checkbox>
+		</div>
+
+		@if (requireSignature) {
+			<div class="form-section">
+				<h3>Signature Text</h3>
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="signatureTextForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<textarea
+											formControlName="text"
+											rows="5"
+											placeholder="Affidavit text shown to the user before signing">
+										</textarea>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+		}
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()">Save Changes</button>
+</div>

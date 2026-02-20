@@ -12,12 +12,15 @@ import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirma
 import {Workflow} from '@core/model/workflow';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowDialogService} from '../../services/dialogs/workflow-dialog.service';
+import {ProjectLanguage} from '@core/model/project-language';
+import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
+import {WorkflowActionManagerService} from '../../services/manager/workflow-action-manager.service';
 
 @Component({
 	selector: 'app-workflow-detail',
 	standalone: true,
 	templateUrl: './workflow-detail.component.html',
-	styleUrls: ['./workflow-detail.component.css'],
+	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,
@@ -37,10 +40,13 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 	@Output() switchToWorkflowActions = new EventEmitter<void>();
 
 	selectedLanguage = '';
+	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 
 	constructor(
 		public workflowManager: WorkflowManagerService,
+		public workflowStateManager: WorkflowStateManagerService,
+		private workflowActionManager: WorkflowActionManagerService,
 		private languageService: LanguageService,
 		private workflowDialogService: WorkflowDialogService,
 		private dialog: MatDialog,
@@ -48,6 +54,7 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
@@ -61,7 +68,35 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 		this.workflowDialogService.openBasicInfoDialog(
 			this.projectId,
 			this.workflow,
-			this.project?.languages || []
+			this.projectLanguages
+		).subscribe((result: any) => {
+			if(result) {
+				const updatedWorkflow: Workflow = {...this.workflow, ...result};
+				this.workflowManager.update(updatedWorkflow);
+				this.workflowUpdated.emit(updatedWorkflow);
+				this.showStagedMessage();
+			}
+		});
+	}
+
+	onEditAssignment(): void {
+		this.workflowDialogService.openAssignmentDialog(
+			this.workflow,
+			this.allWorkflows
+		).subscribe((result: any) => {
+			if(result) {
+				const updatedWorkflow: Workflow = {...this.workflow, ...result};
+				this.workflowManager.update(updatedWorkflow);
+				this.workflowUpdated.emit(updatedWorkflow);
+				this.showStagedMessage();
+			}
+		});
+	}
+
+	onEditMisc(): void {
+		this.workflowDialogService.openMiscDialog(
+			this.workflow,
+			this.projectLanguages
 		).subscribe((result: any) => {
 			if(result) {
 				const updatedWorkflow: Workflow = {...this.workflow, ...result};
@@ -131,6 +166,32 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 
 		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
 		return `${name} (${workflow.id})`;
+	}
+
+	getWorkflowStateLabel(workflowStateId: string | null | undefined): string {
+		if(!workflowStateId) {
+			return 'Not configured';
+		}
+		const workflowState = this.workflowStateManager.getAllForWorkflow(this.workflow.workflowId)
+			.find(wfs => wfs.workflowStateId === workflowStateId);
+		if(!workflowState) {
+			return workflowStateId;
+		}
+		const name = this.languageService.getDefaultTranslation(workflowState.shortname) || workflowState.id;
+		return `${name} (${workflowState.id})`;
+	}
+
+	getWorkflowActionLabel(workflowActionId: string | null | undefined): string {
+		if(!workflowActionId) {
+			return 'Not configured';
+		}
+		const workflowAction = this.workflowActionManager.getAllForWorkflow(this.workflow.workflowId)
+			.find(wfa => wfa.workflowActionId === workflowActionId);
+		if(!workflowAction) {
+			return workflowActionId;
+		}
+		const name = this.languageService.getDefaultTranslation(workflowAction.shortname) || workflowAction.id;
+		return `${name} (${workflowAction.id})`;
 	}
 
 	getLanguageName(code: string | undefined): string {

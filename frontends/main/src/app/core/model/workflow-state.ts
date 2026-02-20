@@ -17,13 +17,13 @@ export interface WorkflowState {
     workflowStateId: string;
     id: string;
     shortname: { [key: string]: string; };
-    longname: { [key: string]: string; };
-    description: { [key: string]: string; };
+    longname?: { [key: string]: string; };
+    description?: { [key: string]: string; };
     workflowId: string;
     /**
      * Is the state hidden?
      */
-    hidden: boolean;
+    hidden?: boolean;
     /**
      * Is the state important?
      */
@@ -31,12 +31,12 @@ export interface WorkflowState {
     /**
      * Should the state message be displayed?
      */
-    showMessage: boolean;
+    showMessage?: boolean;
     /**
      * Possible actions relating to the state
      */
     possibleActions: Array<WorkflowAction>;
-    icon: string;
+    icon?: string;
     color: string;
     aggregateStateId?: string;
     aggregateStateMatcher?: string;

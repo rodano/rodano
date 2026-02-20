@@ -63,15 +63,15 @@
 							<div class="card-details">
 								<div class="detail-item">
 									<mat-icon>settings</mat-icon>
-									<span>Workflow: {{ getWorkflowDisplayName(validator.validatorId) }}</span>
+									<span>Workflow: {{ validator.workflowId ? getWorkflowDisplayName(validator) : 'Not set' }}</span>
 								</div>
 								<div class="detail-item">
 									<mat-icon>cancel</mat-icon>
-									<span>Invalid: {{ getInvalidStatesDisplay(validator.validatorId) }}</span>
+									<span>Invalid: {{ getInvalidStateDisplay(validator) }}</span>
 								</div>
 								<div class="detail-item">
 									<mat-icon>check_circle</mat-icon>
-									<span>Valid: {{ getValidStatesDisplay(validator.validatorId) }}</span>
+									<span>Valid: {{ getValidStateDisplay(validator) }}</span>
 								</div>
 							</div>
 						</div>

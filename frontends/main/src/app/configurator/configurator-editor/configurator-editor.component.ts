@@ -22,11 +22,11 @@ import {ScopeModelManagerService} from '../services/manager/scope-model-manager.
 import {DatasetModelManagerService} from '../services/manager/dataset-model-manager.service';
 import {ValidatorManagerService} from '../services/manager/validator-manager.service';
 import {WorkflowManagerService} from '../services/manager/workflow-manager.service';
-import { EventModelManagerService } from '../services/manager/event-model-manager.service';
-import { EventGroupManagerService } from '../services/manager/event-group-manager.service';
-import { FieldModelManagerService } from '../services/manager/field-model-manager.service';
-import { WorkflowStateManagerService } from '../services/manager/workflow-state-manager.service';
-import { WorkflowActionManagerService } from '../services/manager/workflow-action-manager.service';
+import {EventModelManagerService} from '../services/manager/event-model-manager.service';
+import {EventGroupManagerService} from '../services/manager/event-group-manager.service';
+import {FieldModelManagerService} from '../services/manager/field-model-manager.service';
+import {WorkflowStateManagerService} from '../services/manager/workflow-state-manager.service';
+import {WorkflowActionManagerService} from '../services/manager/workflow-action-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -241,6 +241,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
+			this.workflows = [];
 			this.workflowStates = [];
 			this.workflowActions = [];
 
@@ -428,8 +429,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			workflowActions: component.workflowActions,
 			originalWorkflows: component.originalWorkflows,
 			modifiedWorkflowIds: component.modifiedWorkflowIds,
-			modifiedWorkflowStateIds: component.modifiedWorkflowStateIds,
-			modifiedWorkflowActionIds: component.modifiedWorkflowActionIds
+			modifiedWorkflowStateIds: component.modifiedWorkflowStates,
+			modifiedWorkflowActionIds: component.modifiedWorkflowActions
 		}).toPromise().then(() => {
 			component.loadWorkflows();
 			this.workflows = this.workflowManager.getAll();
@@ -507,8 +508,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 						workflowActions: workflowComponent.workflowActions,
 						originalWorkflows: workflowComponent.originalWorkflows,
 						modifiedWorkflowIds: workflowComponent.modifiedWorkflowIds,
-						modifiedWorkflowStateIds: workflowComponent.modifiedWorkflowStateIds,
-						modifiedWorkflowActionIds: workflowComponent.modifiedWorkflowActionIds
+						modifiedWorkflowStateIds: workflowComponent.modifiedWorkflowStates,
+						modifiedWorkflowActionIds: workflowComponent.modifiedWorkflowActions
 					});
 					workflowComponent.loadWorkflows();
 				}
@@ -622,6 +623,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onWorkflowContextChanged(context: any): void {
 		setTimeout(() => {
+			this.workflows = context.workflows;
 			this.workflowStates = context.workflowStates;
 			this.workflowActions = context.workflowActions;
 			this.selectedWorkflowId = context.selectedWorkflowId;

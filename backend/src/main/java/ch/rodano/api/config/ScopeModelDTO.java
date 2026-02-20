@@ -57,6 +57,9 @@ public class ScopeModelDTO {
 	@NotNull
 	UUID defaultProfileId;
 
+	@NotNull
+	List<UUID> workflowStateIds;
+
 	public UUID getScopeModelId() {
 		return scopeModelId;
 	}
@@ -231,5 +234,13 @@ public class ScopeModelDTO {
 
 	public void setChildScopeModelIds(final List<UUID> childScopeModelIds) {
 		this.childScopeModelIds = childScopeModelIds;
+	}
+
+	public List<UUID> getWorkflowStateIds() {
+		return workflowStateIds;
+	}
+
+	public void setWorkflowStateIds(final List<UUID> workflowStateIds) {
+		this.workflowStateIds = workflowStateIds;
 	}
 }

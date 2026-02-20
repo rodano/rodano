@@ -32,8 +32,8 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="draftEventModel.number === undefined || draftEventModel.number === null">
-						@if (draftEventModel.number === undefined || draftEventModel.number === null) {
+					<div class="setting-value" [class.not-configured]="!draftEventModel.number">
+						@if (!draftEventModel.number) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
 						{{ draftEventModel.number ?? 'Not configured' }}
@@ -44,15 +44,23 @@
 					<label>
 						Event Group
 						@if (isFieldModified('eventGroupId')) {
-							<mat-icon class="modified-icon">edit</mat-icon>
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value">
-						{{ getEventGroupName(draftEventModel.eventGroupId) }}
+					<div class="setting-value" [class.not-configured]="!draftEventModel.eventGroupId">
+						@if (!draftEventModel.eventGroupId) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							<div class="chip">
+								<mat-icon class="resource-icon">group</mat-icon>
+								<span class="language-name">{{ getEventGroupName(draftEventModel.eventGroupId) }}</span>
+							</div>
+						}
 					</div>
 				</div>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('shortname')">
+				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
 					<label>
 						Short Name
 						@if (isFieldModified('shortname')) {
@@ -136,8 +144,8 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="draftEventModel.maxOccurrence === undefined || draftEventModel.maxOccurrence === null">
-						@if (draftEventModel.maxOccurrence === undefined || draftEventModel.maxOccurrence === null) {
+					<div class="setting-value" [class.not-configured]="!draftEventModel.maxOccurrence">
+						@if (!draftEventModel.maxOccurrence) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
 						{{ draftEventModel.maxOccurrence ?? 'Unlimited' }}
@@ -193,7 +201,7 @@
 					</div>
 				</div>
 
-				<div class="setting-item" [class.modified]="isFieldModified('deadlineAggregationFunction')">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('deadlineAggregationFunction')">
 					<label>
 						Deadline Aggregation Function
 						@if (isFieldModified('deadlineAggregationFunction')) {
@@ -294,24 +302,22 @@
 					</div>
 				</div>
 
-				<div class="setting-item" [class.modified]="isFieldModified('icon')">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('icon')">
 					<label>
 						Icon
 						@if (isFieldModified('icon')) {
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value">
+					<div class="setting-value" [class.not-configured]="!draftEventModel.icon">
 						@if (draftEventModel.icon) {
 							<div class="icon-preview">
 								<mat-icon>{{ draftEventModel.icon }}</mat-icon>
 								<span>{{ draftEventModel.icon }}</span>
 							</div>
 						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No icon configured</span>
-							</div>
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
 						}
 					</div>
 				</div>
@@ -389,8 +395,8 @@
 							<div class="chip-container">
 								@for (workflowId of draftEventModel.workflowIds; track workflowId) {
 									<div class="chip">
-										<mat-icon class="resource-icon">account_tree</mat-icon>
-										<span class="language-name">{{ workflowId }}</span>
+										<mat-icon class="resource-icon">settings</mat-icon>
+										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 									</div>
 								}
 							</div>

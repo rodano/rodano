@@ -15,6 +15,7 @@ import {EventModelDialogService} from '../../../services/dialogs/event-model-dia
 import {DatasetModelManagerService} from '../../../services/manager/dataset-model-manager.service';
 import {EventModelManagerService} from '../../../services/manager/event-model-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
+import {WorkflowManagerService} from '../../../services/manager/workflow-manager.service';
 
 @Component({
 	selector: 'app-event-model-detail',
@@ -50,6 +51,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		private eventModelDialogService: EventModelDialogService,
 		private eventModelManager: EventModelManagerService,
 		private datasetModelManager: DatasetModelManagerService,
+		private workflowManager: WorkflowManagerService,
 		private dialog: MatDialog
 	) {}
 
@@ -57,13 +59,6 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
-		});
-
-		this.eventModelManager.loadFull(this.projectId).subscribe({
-			next: () => {
-				this.loadEventModel();
-			},
-			error: error => console.error('Error loading full event models:', error)
 		});
 	}
 
@@ -149,7 +144,7 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 
 	getEventGroupName(eventGroupId: string | undefined): string {
 		if(!eventGroupId) {
-			return 'None';
+			return 'Not set';
 		}
 		const eventGroup = this.eventGroups.find(eg => eg.eventGroupId === eventGroupId);
 		if(!eventGroup) {
@@ -304,7 +299,11 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	getWorkflowLabel(workflowId: string): string {
-		//TODO: Implement when workflows are ready
-		return workflowId;
+		const workflow = this.workflowManager.getById(workflowId);
+		if(!workflow) {
+			return workflowId;
+		}
+		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
+		return `${name} (${workflow.id})`;
 	}
 }

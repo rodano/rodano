@@ -22,7 +22,7 @@ import {WorkflowActionDialogService} from '../../../services/dialogs/workflow-ac
 		MatTooltipModule
 	],
 	templateUrl: './workflow-action-detail.component.html',
-	styleUrls: ['./workflow-action-detail.component.css']
+	styleUrls: ['../../../shared/detail-shared.css']
 })
 export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -33,7 +33,7 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 	@Input() project: ConfiguratorProject | null = null;
 
 	@Output() closed = new EventEmitter<void>();
-	@Output() workflowActionUpdated = new EventEmitter<WorkflowAction>();
+	@Output() workflowActionUpdated = new EventEmitter<any>();
 	@Output() workflowActionDeleted = new EventEmitter<string>();
 
 	draftWorkflowAction: WorkflowAction | null = null;
@@ -97,55 +97,14 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 		if(draft) {
 			this.draftWorkflowAction = draft;
 			this.originalWorkflowAction = original || null;
-			this.calculateModifiedFields();
 		}
 	}
 
-	private calculateModifiedFields(): void {
-		this.modifiedFields.clear();
-
-		if(!this.draftWorkflowAction || !this.originalWorkflowAction) {
-			return;
+	isFieldModified(field: keyof WorkflowAction): boolean {
+		if(!this.originalWorkflowAction || !this.draftWorkflowAction) {
+			return false;
 		}
-
-		const draft = this.draftWorkflowAction;
-		const original = this.originalWorkflowAction;
-
-		if(draft.id !== original.id) {
-			this.modifiedFields.add('id');
-		}
-
-		const translationFields: (keyof WorkflowAction)[] = ['shortname', 'longname', 'description'];
-
-		translationFields.forEach(field => {
-			const draftValue = draft[field] as Record<string, string> | undefined;
-			const originalValue = original[field] as Record<string, string> | undefined;
-
-			if(draftValue && originalValue) {
-				const allLanguages = new Set([
-					...Object.keys(draftValue),
-					...Object.keys(originalValue)
-				]);
-
-				allLanguages.forEach(lang => {
-					if(draftValue[lang] !== originalValue[lang]) {
-						this.modifiedFields.add(`${field as string}.${lang}`);
-					}
-				});
-			}
-			else if(draftValue !== originalValue) {
-				this.modifiedFields.add(field as string);
-			}
-		});
-	}
-
-	isFieldModified(fieldName: string): boolean {
-		if(this.modifiedFields.has(fieldName)) {
-			return true;
-		}
-
-		const languageFieldPattern = new RegExp(`^${fieldName}\\.`);
-		return Array.from(this.modifiedFields).some(field => languageFieldPattern.test(field));
+		return JSON.stringify(this.originalWorkflowAction[field]) !== JSON.stringify(this.draftWorkflowAction[field]);
 	}
 
 	onClose(): void {
@@ -177,6 +136,38 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 				};
 
 				this.workflowActionUpdated.emit(updatedWorkflowAction);
+			}
+		});
+	}
+
+	onEditDocumentation(): void {
+		if(!this.draftWorkflowAction) {
+			return;
+		}
+
+		this.workflowActionDialogService.openDocumentationDialog(
+			this.draftWorkflowAction,
+			this.project?.languages || []
+		).subscribe(result => {
+			if(result && this.draftWorkflowAction) {
+				this.draftWorkflowAction = {...this.draftWorkflowAction, ...result};
+				this.workflowActionUpdated.emit(this.draftWorkflowAction);
+			}
+		});
+	}
+
+	onEditSignature(): void {
+		if(!this.draftWorkflowAction) {
+			return;
+		}
+
+		this.workflowActionDialogService.openSignatureDialog(
+			this.draftWorkflowAction,
+			this.project?.languages || []
+		).subscribe(result => {
+			if(result && this.draftWorkflowAction) {
+				this.draftWorkflowAction = {...this.draftWorkflowAction, ...result};
+				this.workflowActionUpdated.emit(this.draftWorkflowAction);
 			}
 		});
 	}

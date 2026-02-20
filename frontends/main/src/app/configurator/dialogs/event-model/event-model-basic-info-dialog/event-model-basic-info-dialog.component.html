@@ -10,8 +10,8 @@
 					formControlName="id"
 					placeholder="EVENT_CODE"
 					required
-					(input)="onIdInput($event)">
-				<span class="hint">Unique identifier for this event model</span>
+					(input)="onCodeInput($event)">
+				<span class="hint">Uppercase letters, numbers, and underscores only</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
 					<span class="error-message">Code is required</span>
 				}
@@ -22,7 +22,7 @@
 				<input
 					type="number"
 					formControlName="number"
-					placeholder="1">
+					placeholder="Enter number">
 				<span class="hint">Optional numeric identifier</span>
 			</div>
 
@@ -109,7 +109,8 @@
 			Cancel
 		</button>
 		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
-			Save Changes
+			<mat-icon>save</mat-icon>
+			{{ isEditMode ? 'Save Changes' : 'Create Event Model' }}
 		</button>
 	</div>
 </div>

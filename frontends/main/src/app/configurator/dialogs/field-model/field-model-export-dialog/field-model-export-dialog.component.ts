@@ -52,6 +52,12 @@ export class FieldModelExportDialogComponent implements OnInit {
 			exportOrder: [fm.exportOrder, [Validators.min(0)]],
 			searchable: [fm.searchable || false]
 		});
+
+		this.form.get('exportable')?.valueChanges.subscribe((exportable: boolean) => {
+			if(!exportable) {
+				this.form.get('exportOrder')?.setValue(null, {emitEvent: false});
+			}
+		});
 	}
 
 	onCancel(): void {
@@ -68,7 +74,7 @@ export class FieldModelExportDialogComponent implements OnInit {
 
 		const result = {
 			exportable: formValue.exportable,
-			exportOrder: formValue.exportOrder,
+			exportOrder: formValue.exportable ? formValue.exportOrder : null,
 			searchable: formValue.searchable
 		};
 

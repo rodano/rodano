@@ -72,7 +72,7 @@
 									<mat-icon>folder</mat-icon>
 									<span>{{ datasetModel.family || 'No family' }}</span>
 								</div>
-								<div class="detail-item" [class.unset]="datasetModel.exportOrder === null || datasetModel.exportOrder === undefined">
+								<div class="detail-item" [class.unset]="!datasetModel.exportOrder">
 									<mat-icon>sort</mat-icon>
 									<span>Export Order: {{ datasetModel.exportOrder !== null && datasetModel.exportOrder !== undefined ? datasetModel.exportOrder : 'Not exportable' }}</span>
 								</div>
@@ -82,7 +82,7 @@
 								</div>
 								<div class="detail-item" [class.unset]="!datasetModel.fieldModels || datasetModel.fieldModels.length === 0">
 									<mat-icon>view_list</mat-icon>
-									<span>{{ datasetModel.fieldModels.length || 0 }} {{ (datasetModel.fieldModels.length || 0) === 1 ? 'Field' : 'Fields' }}</span>
+									<span>{{ getFieldModelCount(datasetModel.datasetModelId) }} {{ getFieldModelCount(datasetModel.datasetModelId) === 1 ? 'Field Model' : 'Field Models' }}</span>
 								</div>
 							</div>
 						</div>

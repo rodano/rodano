@@ -12,7 +12,7 @@
 export interface TimelineGraphDataPeriod { 
     label?: string;
     'default'?: boolean;
-    start_date_string?: string;
     stop_date_string?: string;
+    start_date_string?: string;
 }
 

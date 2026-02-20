@@ -36,6 +36,12 @@
 				<span class="hint">Browse icons at <a href="https://fonts.google.com/icons"
 																																										target="_blank">Material Icons</a></span>
 			</div>
+			@if (iconPreview) {
+				<div class="dialog-icon">
+					<span class="hint">Preview</span>
+					<mat-icon>{{ iconPreview }}</mat-icon>
+				</div>
+			}
 		</div>
 	</form>
 </div>

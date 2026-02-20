@@ -30,6 +30,22 @@
 				<div class="setting-value">{{ datasetModel.id }}</div>
 			</div>
 
+			<div class="setting-item" [class.modified]="isFieldModified('multiple')">
+				<label>
+					Multiple
+					@if (isFieldModified('multiple')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">
+					@if (datasetModel.multiple) {
+						<span class="status-badge first">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</div>
+			</div>
+
 			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
 				<label>
 					Short Name
@@ -72,22 +88,6 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
 					{{ getTranslatedValue(datasetModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
-
-			<div class="setting-item" [class.modified]="isFieldModified('multiple')">
-				<label>
-					Multiple
-					@if (isFieldModified('multiple')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (datasetModel.multiple) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
 				</div>
 			</div>
 		</div>

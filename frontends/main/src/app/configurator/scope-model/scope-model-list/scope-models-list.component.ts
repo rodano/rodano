@@ -172,7 +172,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 		forkJoin({
 			scopeModels: this.scopeModelManager.load(this.projectId),
-			eventModels: this.eventModelManager.load(this.projectId),
+			eventModels: this.eventModelManager.loadFull(this.projectId),
 			eventGroups: this.eventGroupManager.load(this.projectId)
 		}).subscribe({
 			next: ({scopeModels}) => {

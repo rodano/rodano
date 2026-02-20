@@ -63,6 +63,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 	@Output() workflowsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() workflowContextChanged = new EventEmitter<{
+		workflows: any[];
 		workflowStates: any[];
 		workflowActions: any[];
 		selectedWorkflowId: string | null;
@@ -204,6 +205,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	}
 
 	onWorkflowContextChanged(context: {
+		workflows: any[];
 		workflowStates: any[];
 		workflowActions: any[];
 		selectedWorkflowId: string | null;

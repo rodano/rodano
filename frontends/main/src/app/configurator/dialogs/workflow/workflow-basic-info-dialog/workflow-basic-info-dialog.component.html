@@ -9,8 +9,8 @@
 					type="text"
 					formControlName="id"
 					placeholder="WORKFLOW_CODE"
-					(input)="onCodeInput($event)"
-					style="text-transform: uppercase;">
+					required
+					(input)="onCodeInput($event)">
 				<span class="hint">Uppercase letters, numbers, and underscores only</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
 					<span class="error-message">Code is required</span>
@@ -101,14 +101,15 @@
 				}
 			</div>
 
-			<div class="form-field checkbox-field">
-				<mat-checkbox formControlName="mandatory">Mandatory Workflow</mat-checkbox>
-				<span class="hint">This workflow is mandatory</span>
-			</div>
-
-			<div class="form-field checkbox-field">
-				<mat-checkbox formControlName="unique">Unique Workflow</mat-checkbox>
-				<span class="hint">This workflow is unique</span>
+			<div class="form-section">
+				<div class="form-field">
+					<label>Order</label>
+					<input
+						type="number"
+						formControlName="order"
+						placeholder="Enter order number">
+					<span class="hint">Determines the order of this workflow (lower numbers appear first)</span>
+				</div>
 			</div>
 		</form>
 	</div>

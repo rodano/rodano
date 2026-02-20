@@ -3,11 +3,14 @@ import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {ProjectLanguage} from '@core/model/project-language';
 import {Observable} from 'rxjs';
 import {Validator} from '@core/model/validator';
+import {WorkflowManagerService} from '../manager/workflow-manager.service';
+import {WorkflowStateManagerService} from '../manager/workflow-state-manager.service';
+import {LanguageService} from '../language.service';
 import {
 	ValidatorBasicInfoDialogComponent, ValidatorBasicInfoDialogData
 } from '../../dialogs/validator/validator-basic-info-dialog/validator-basic-info-dialog.component';
 import {
-	ValidatorWorkflowConfiguration, ValidatorWorkflowDialogComponent
+	ValidatorWorkflowDialogComponent, ValidatorWorkflowDialogData
 } from '../../dialogs/validator/validator-workflow-dialog/validator-workflow-dialog.component';
 
 @Injectable({
@@ -15,69 +18,66 @@ import {
 })
 export class ValidatorDialogService {
 	constructor(
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private workflowManager: WorkflowManagerService,
+		private workflowStateManager: WorkflowStateManagerService,
+		private languageService: LanguageService
 	) {}
 
-	openCreateDialog(
-		projectId: string,
-		languages: ProjectLanguage[]
-	): Observable<any> {
+	openCreateDialog(projectId: string, languages: ProjectLanguage[]): Observable<any> {
 		const dialogRef: MatDialogRef<ValidatorBasicInfoDialogComponent> = this.dialog.open(
 			ValidatorBasicInfoDialogComponent,
 			{
 				width: '500px',
 				disableClose: true,
-				data: {
-					projectId,
-					validator: null,
-					languages
-				} as ValidatorBasicInfoDialogData
+				data: {projectId, validator: null, languages} as ValidatorBasicInfoDialogData
 			}
 		);
-
 		return dialogRef.afterClosed();
 	}
 
-	openBasicInfoDialog(
-		projectId: string,
-		validator: Validator,
-		languages: ProjectLanguage[]
-	): Observable<any> {
-		const clonedValidator = JSON.parse(JSON.stringify(validator));
-
+	openBasicInfoDialog(projectId: string, validator: Validator, languages: ProjectLanguage[]): Observable<any> {
 		const dialogRef: MatDialogRef<ValidatorBasicInfoDialogComponent> = this.dialog.open(
 			ValidatorBasicInfoDialogComponent,
 			{
 				width: '500px',
 				disableClose: true,
-				data: {
-					projectId,
-					validator: clonedValidator,
-					languages
-				} as ValidatorBasicInfoDialogData
+				data: {projectId, validator: JSON.parse(JSON.stringify(validator)), languages} as ValidatorBasicInfoDialogData
 			}
 		);
-
 		return dialogRef.afterClosed();
 	}
 
-	openWorkflowDialog(
-		validator: Validator,
-		currentConfiguration: ValidatorWorkflowConfiguration | null
-	): Observable<any> {
-		const dialogRef: MatDialogRef<ValidatorWorkflowDialogComponent> = this.dialog.open(
-			ValidatorWorkflowDialogComponent,
-			{
-				width: '500px',
-				disableClose: true,
-				data: {
-					validator,
-					availableWorkflows: [], //TODO: Pass actual workflows
-					currentConfiguration
-				}
-			}
-		);
+	openWorkflowDialog(validator: Validator, projectId: string): Observable<any> {
+		return new Observable(observer => {
+			const openDialog = () => {
+				const dialogRef = this.dialog.open(ValidatorWorkflowDialogComponent, {
+					width: '500px',
+					disableClose: true,
+					data: {
+						validator,
+						availableWorkflows: this.workflowManager.getAll().map(wf => ({
+							id: wf.workflowId,
+							name: `${this.languageService.getDefaultTranslation(wf.shortname) || wf.id} (${wf.id})`,
+							states: this.workflowStateManager.getAllForWorkflow(wf.workflowId).map(wfs => ({
+								id: wfs.workflowStateId,
+								name: `${this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id} (${wfs.id})`
+							}))
+						}))
+					} as ValidatorWorkflowDialogData
+				});
+				dialogRef.afterClosed().subscribe(result => {
+					observer.next(result);
+					observer.complete();
+				});
+			};
 
-		return dialogRef.afterClosed();
+			if(this.workflowStateManager.isLoaded()) {
+				openDialog();
+			}
+			else {
+				this.workflowStateManager.load(projectId).subscribe(() => openDialog());
+			}
+		});
 	}
 }

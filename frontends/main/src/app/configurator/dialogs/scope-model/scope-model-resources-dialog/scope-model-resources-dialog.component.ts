@@ -159,28 +159,49 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 	}
 
 	onWorkflowSelected(selector: WorkflowStateSelector, workflowId: string): void {
-		selector.selectedWorkflowId = workflowId;
-
 		const workflow = this.selectedWorkflows.find(wf => wf.id === workflowId);
-		if(workflow) {
-			selector.availableStates = [...workflow.states];
-			selector.selectedStates = [];
-		}
+		const index = this.workflowStateSelectors.indexOf(selector);
+
+		const alreadySelectedStateIds = this.workflowStateSelectors
+			.filter(s => s.id !== selector.id && s.selectedWorkflowId === workflowId)
+			.flatMap(s => s.selectedStates.map(st => st.id));
+
+		const availableStates = workflow
+			? workflow.states.filter(st => !alreadySelectedStateIds.includes(st.id))
+			: [];
+
+		this.workflowStateSelectors[index] = {
+			...selector,
+			selectedWorkflowId: workflowId,
+			availableStates,
+			selectedStates: []
+		};
+
+		this.workflowStateSelectors = [...this.workflowStateSelectors];
 	}
 
 	onAddState(selector: WorkflowStateSelector, state: {id: string; name: string}): void {
 		selector.availableStates = selector.availableStates.filter(s => s.id !== state.id);
 		selector.selectedStates = [...selector.selectedStates, state];
+
+		this.workflowStateSelectors = this.workflowStateSelectors.map(s => {
+			if(s.id !== selector.id && s.selectedWorkflowId === selector.selectedWorkflowId) {
+				return {...s, availableStates: s.availableStates.filter(st => st.id !== state.id)};
+			}
+			return s;
+		});
 	}
 
 	onRemoveState(selector: WorkflowStateSelector, state: {id: string; name: string}): void {
 		selector.selectedStates = selector.selectedStates.filter(s => s.id !== state.id);
 		selector.availableStates = [...selector.availableStates, state];
-	}
 
-	getWorkflowName(workflowId: string): string {
-		const workflow = this.selectedWorkflows.find(wf => wf.id === workflowId);
-		return workflow?.name || workflowId;
+		this.workflowStateSelectors = this.workflowStateSelectors.map(s => {
+			if(s.id !== selector.id && s.selectedWorkflowId === selector.selectedWorkflowId) {
+				return {...s, availableStates: [...s.availableStates, state]};
+			}
+			return s;
+		});
 	}
 
 	onSave(): void {
@@ -216,21 +237,7 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 			}
 		});
 
-		const originalSelections = this.data.workflowStateSelections || [];
-		const originalSelectionsStr = JSON.stringify(
-			originalSelections
-				.map(s => `${s.workflowId}:${s.workflowStateId}`)
-				.sort()
-		);
-		const currentSelectionsStr = JSON.stringify(
-			currentSelections
-				.map(s => `${s.workflowId}:${s.workflowStateId}`)
-				.sort()
-		);
-
-		if(originalSelectionsStr !== currentSelectionsStr) {
-			result.workflowStateSelections = currentSelections;
-		}
+		result.workflowStateIds = currentSelections.map(s => s.workflowStateId);
 
 		this.dialogRef.close(result);
 	}

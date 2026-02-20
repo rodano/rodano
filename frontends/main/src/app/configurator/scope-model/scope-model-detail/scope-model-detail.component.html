@@ -242,7 +242,7 @@
 	<div class="settings-section">
 		<h3>Default Settings</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('defaultProfileId')">
+			<div class="setting-item full-width" [class.modified]="isFieldModified('defaultProfileId')">
 				<label>
 					Default Profile
 					@if (isFieldModified('defaultProfileId')) {
@@ -360,8 +360,8 @@
 						<div class="chip-container">
 							@for (workflowId of scopeModel.workflowIds; track workflowId) {
 								<div class="chip">
-									<mat-icon class="resource-icon">account_tree</mat-icon>
-									<span class="language-name">{{ workflowId }}</span>
+									<mat-icon class="resource-icon">settings</mat-icon>
+									<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 								</div>
 							}
 						</div>
@@ -374,10 +374,10 @@
 				</div>
 			</div>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('workflowStateSelections')">
+			<div class="setting-item full-width" [class.modified]="workflowStateIdsModified">
 				<label>
-					Workflow State Selectors
-					@if (isFieldModified('workflowStateSelections')) {
+					Workflow State Selectors ({{ getWorkflowStateSelections().length }})
+					@if (workflowStateIdsModified) {
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
@@ -387,13 +387,13 @@
 							@for (workflowGroup of getWorkflowStateSelections(); track workflowGroup.workflowId) {
 								<div class="workflow-state-group">
 									<div class="workflow-header">
-										<mat-icon class="resource-icon">account_tree</mat-icon>
+										<mat-icon class="resource-icon">settings</mat-icon>
 										<span class="workflow-name">{{ workflowGroup.workflowName }}</span>
 									</div>
 									<div class="chip-container states-chips">
 										@for (state of workflowGroup.states; track state.id) {
 											<div class="chip state-chip">
-												<mat-icon class="state-icon">check_circle</mat-icon>
+												<mat-icon class="state-icon">adjust</mat-icon>
 												<span class="language-name">{{ state.name }}</span>
 											</div>
 										}

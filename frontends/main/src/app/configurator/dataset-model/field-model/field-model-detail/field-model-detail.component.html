@@ -61,7 +61,7 @@
 					</div>
 				</div>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('shortname')">
+				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
 					<label>
 						Short Name
 						@if (isFieldModified('shortname')) {
@@ -76,7 +76,7 @@
 					</div>
 				</div>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
+				<div class="setting-item" [class.modified]="isFieldModified('longname')">
 					<label>
 						Long Name
 						@if (isFieldModified('longname')) {
@@ -426,8 +426,8 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="draftFieldModel.exportOrder === null || draftFieldModel.exportOrder === undefined">
-						@if (draftFieldModel.exportOrder === null || draftFieldModel.exportOrder === undefined) {
+					<div class="setting-value" [class.not-configured]="!draftFieldModel.exportOrder">
+						@if (!draftFieldModel.exportOrder) {
 							<mat-icon class="warning-icon">report</mat-icon>
 							Not configured
 						} @else {
@@ -461,7 +461,7 @@
 		<div class="settings-section">
 			<h3>Help</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('inlineHelp')">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('inlineHelp')">
 					<label>
 						Inline Help
 						@if (isFieldModified('inlineHelp')) {
@@ -564,11 +564,11 @@
 							}
 						</label>
 						<div class="setting-value">
-							<div class="possible-values-display">
+							<div class="multilist-display">
 								@for (pv of getSortedPossibleValues(); track pv.id) {
-									<div class="possible-value-card">
-										<div class="pv-header">
-											<span class="pv-name">
+									<div class="multilist-card">
+										<div class="multilist-header">
+											<span class="multilist-name">
 												{{ getPossibleValueLabel(pv) }}
 											</span>
 											<div class="pv-badges">
@@ -614,8 +614,8 @@
 							<div class="chip-container">
 								@for (validatorId of draftFieldModel.validatorIds; track validatorId) {
 									<div class="chip">
-										<mat-icon class="resource-icon">verified</mat-icon>
-										<span class="language-name">{{ getValidatorName(validatorId) }}</span>
+										<mat-icon class="resource-icon">rule</mat-icon>
+										<span class="language-name">{{ getValidatorLabel(validatorId) }}</span>
 									</div>
 								}
 							</div>
@@ -640,8 +640,8 @@
 							<div class="chip-container">
 								@for (workflowId of draftFieldModel.workflowIds; track workflowId) {
 									<div class="chip">
-										<mat-icon class="resource-icon">account_tree</mat-icon>
-										<span class="language-name">{{ getWorkflowName(workflowId) }}</span>
+										<mat-icon class="resource-icon">settings</mat-icon>
+										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 									</div>
 								}
 							</div>

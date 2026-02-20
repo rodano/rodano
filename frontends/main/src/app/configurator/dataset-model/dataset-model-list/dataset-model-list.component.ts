@@ -151,7 +151,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 		forkJoin({
 			datasetModels: this.datasetModelManager.load(this.projectId),
-			fieldModels: this.fieldModelManager.load(this.projectId)
+			fieldModels: this.fieldModelManager.loadFull(this.projectId)
 		}).subscribe({
 			next: ({datasetModels}) => {
 				if(this.selectedDatasetModel) {
@@ -412,5 +412,9 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	isFieldModelModified(fieldModelId: string): boolean {
 		return this.fieldModelManager.isModified(fieldModelId);
+	}
+
+	getFieldModelCount(datasetModelId: string): number {
+		return this.fieldModelManager.getAllForDataset(datasetModelId).length;
 	}
 }

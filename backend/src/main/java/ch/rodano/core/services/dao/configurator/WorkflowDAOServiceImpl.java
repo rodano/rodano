@@ -133,6 +133,7 @@ public class WorkflowDAOServiceImpl implements WorkflowDAOService {
 		final var dto = new WorkflowDTO();
 		dto.setWorkflowId(record.getWorkflowId());
 		dto.setId(record.getCode());
+		dto.setOrder(record.getOrderBy());
 		dto.setAggregatedWorkflowId(record.getAggregateWorkflowId());
 		dto.setInitialStateId(record.getInitialStateId());
 		dto.setActionId(record.getCreationActionId());

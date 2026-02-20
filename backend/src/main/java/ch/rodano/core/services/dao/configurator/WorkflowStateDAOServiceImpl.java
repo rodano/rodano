@@ -246,7 +246,7 @@ public class WorkflowStateDAOServiceImpl implements WorkflowStateDAOService {
 
 	private WorkflowStateDTO mapToDTO(final WorkflowStateRecord record, final Map<UUID, List<WorkflowActionDTO>> actionMap) {
 		final var dto = new WorkflowStateDTO();
-		dto.setWorkflowId(record.getWorkflowId());
+		dto.setWorkflowStateId(record.getWorkflowStateId());
 		dto.setId(record.getCode());
 		dto.setWorkflowId(record.getWorkflowId());
 		dto.setShortname(jsonMapperService.fromJson(record.getShortname(), new TypeReference<TreeMap<String, String>>() {
@@ -256,7 +256,7 @@ public class WorkflowStateDAOServiceImpl implements WorkflowStateDAOService {
 		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
 		}));
 		dto.setImportant(record.getImportant());
-		dto.setColor(dto.getColor());
+		dto.setColor(record.getColor());
 		dto.setIcon(record.getIcon());
 		dto.setAggregateStateId(record.getAggregateStateId());
 		dto.setAggregateStateMatcher(record.getAggregateStateMatcher());

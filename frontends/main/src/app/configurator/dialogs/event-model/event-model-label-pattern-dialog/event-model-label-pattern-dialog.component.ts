@@ -82,6 +82,10 @@ export class EventModelLabelPatternDialogComponent implements OnInit {
 		labelPatternControl?.setValue(currentValue + pattern);
 	}
 
+	get iconPreview(): string {
+		return this.form.get('icon')?.value?.trim() || '';
+	}
+
 	onSave(): void {
 		if(this.form.valid) {
 			const formValue = this.form.value;

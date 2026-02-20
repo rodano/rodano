@@ -38,7 +38,7 @@ export class ValidatorTreeComponent implements OnChanges {
 		this.treeNodes = this.validators.map(v => ({
 			id: `validator-${v.validatorId}`,
 			label: this.languageService.getDefaultTranslation(v.shortname) || v.id,
-			icon: 'check_circle',
+			icon: 'verified',
 			type: 'validator',
 			selected: this.selectedValidatorId === v.validatorId,
 			entityId: v.validatorId

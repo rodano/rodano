@@ -10,13 +10,12 @@ import {Validator} from '@core/model/validator';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ValidatorManagerService} from '../../services/manager/validator-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
-import {Subscription} from 'rxjs';
+import {forkJoin, of, Subscription} from 'rxjs';
 import {MatTooltip} from '@angular/material/tooltip';
 import {ValidatorDialogService} from '../../services/dialogs/validator-dialog.service';
 import {ValidatorDetailComponent} from '../validator-detail/validator-detail.component';
-import {
-	ValidatorWorkflowConfiguration
-} from '../../dialogs/validator/validator-workflow-dialog/validator-workflow-dialog.component';
+import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
+import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 
 @Component({
 	selector: 'app-validators-list',
@@ -52,10 +51,10 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
 
-	private workflowConfigurationsMap = new Map<string, ValidatorWorkflowConfiguration | null>();
-
 	constructor(
 		public validatorManager: ValidatorManagerService,
+		private workflowManager: WorkflowManagerService,
+		private workflowStateManager: WorkflowStateManagerService,
 		private validatorDialogService: ValidatorDialogService,
 		private languageService: LanguageService,
 		private snackBar: MatSnackBar
@@ -114,8 +113,13 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	loadValidators(): void {
 		this.loading = true;
-		this.validatorManager.load(this.projectId).subscribe({
-			next: (validators: Validator[]) => {
+		forkJoin({
+			validators: this.validatorManager.load(this.projectId),
+			workflowStates: this.workflowStateManager.isLoaded()
+				? of(null)
+				: this.workflowStateManager.load(this.projectId)
+		}).subscribe({
+			next: ({validators}) => {
 				if(this.selectedValidator) {
 					this.selectedValidator = validators.find(
 						v => v.validatorId === this.selectedValidator!.validatorId
@@ -235,32 +239,33 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 		return this.validatorManager.isModified(validatorId);
 	}
 
-	getWorkflowConfiguration(validatorId: string): ValidatorWorkflowConfiguration | null {
-		return this.workflowConfigurationsMap.get(validatorId) || null;
-	}
-
-	getWorkflowDisplayName(validatorId: string): string {
-		const config = this.getWorkflowConfiguration(validatorId);
-		if(!config?.workflowId) {
+	getWorkflowDisplayName(validator: Validator): string {
+		if(!validator.workflowId) {
 			return 'Not set';
 		}
-		//TODO: Replace with actual workflow lookup when you have workflows available
-		return config.workflowId;
+		const workflow = this.workflowManager.getById(validator.workflowId);
+		return workflow
+			? `${this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id} (${workflow.id})`
+			: validator.workflowId;
 	}
 
-	getInvalidStatesDisplay(validatorId: string): string {
-		const config = this.getWorkflowConfiguration(validatorId);
-		if(!config?.invalidWorkflowStateIds || config.invalidWorkflowStateIds.length === 0) {
+	getInvalidStateDisplay(validator: Validator): string {
+		if(!validator.invalidStateId) {
 			return 'Not set';
 		}
-		return config.invalidWorkflowStateIds.join(', ');
+		const state = this.workflowStateManager.getById(validator.invalidStateId);
+		return state
+			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
+			: validator.invalidStateId;
 	}
 
-	getValidStatesDisplay(validatorId: string): string {
-		const config = this.getWorkflowConfiguration(validatorId);
-		if(!config?.validWorkflowStateIds || config.validWorkflowStateIds.length === 0) {
+	getValidStateDisplay(validator: Validator): string {
+		if(!validator.validStateId) {
 			return 'Not set';
 		}
-		return config.validWorkflowStateIds.join(', ');
+		const state = this.workflowStateManager.getById(validator.validStateId);
+		return state
+			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
+			: validator.validStateId;
 	}
 }

@@ -32,7 +32,7 @@ export interface WorkflowAction {
     /**
      * The signature requirement text
      */
-    requireSignatureText: { [key: string]: string; };
+    requireSignatureText?: { [key: string]: string; };
     /**
      * Can a message be attached to the action execution?
      */
@@ -40,7 +40,7 @@ export interface WorkflowAction {
     /**
      * Action message options
      */
-    documentableOptions: Array<{ [key: string]: string; }>;
+    documentableOptions?: Array<{ [key: string]: string; }>;
     icon: string;
 }
 

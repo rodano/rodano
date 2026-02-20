@@ -46,7 +46,6 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 	availableLanguages: ProjectLanguage[] = [];
 	eventGroups: {id: string; name: string; code: string}[];
 	isEditMode: boolean;
-	saving = false;
 
 	constructor(
 		private fb: FormBuilder,
@@ -134,7 +133,7 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 		return allValid;
 	}
 
-	onIdInput(event: Event): void {
+	onCodeInput(event: Event): void {
 		const input = event.target as HTMLInputElement;
 		const uppercaseValue = input.value.toUpperCase();
 		input.value = uppercaseValue;

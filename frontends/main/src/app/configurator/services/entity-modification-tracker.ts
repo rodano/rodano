@@ -68,8 +68,11 @@ export class EntityModificationTracker<T extends Record<string, any>> {
 	private trackChanges(id: string, original: T, updated: T): void {
 		const modifiedFields = new Set<string>();
 
+		const normalize = (value: any) =>
+			value === null || value === undefined ? undefined : value;
+
 		this.simpleFields.forEach(field => {
-			if(JSON.stringify(original[field]) !== JSON.stringify(updated[field])) {
+			if(normalize(original[field]) !== normalize(updated[field])) {
 				modifiedFields.add(field as string);
 			}
 		});
@@ -83,14 +86,13 @@ export class EntityModificationTracker<T extends Record<string, any>> {
 					...Object.keys(originalValue),
 					...Object.keys(updatedValue)
 				]);
-
 				allLanguages.forEach(lang => {
 					if(originalValue[lang] !== updatedValue[lang]) {
 						modifiedFields.add(`${field as string}.${lang}`);
 					}
 				});
 			}
-			else if(originalValue !== updatedValue) {
+			else if(normalize(originalValue) !== normalize(updatedValue)) {
 				modifiedFields.add(field as string);
 			}
 		});

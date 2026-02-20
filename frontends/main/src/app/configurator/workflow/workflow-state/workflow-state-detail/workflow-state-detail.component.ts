@@ -12,12 +12,14 @@ import {WorkflowState} from '@core/model/workflow-state';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowStateDialogService} from '../../../services/dialogs/workflow-state-dialog.service';
 import {WorkflowStateManagerService} from '../../../services/manager/workflow-state-manager.service';
+import {WorkflowActionManagerService} from '../../../services/manager/workflow-action-manager.service';
+import {ProjectLanguage} from '@core/model/project-language';
 
 @Component({
 	selector: 'app-workflow-state-detail',
 	standalone: true,
 	templateUrl: './workflow-state-detail.component.html',
-	styleUrls: ['./workflow-state-detail.component.css'],
+	styleUrls: ['../../../shared/detail-shared.css'],
 	imports: [
 		CommonModule,
 		MatIconModule,
@@ -38,38 +40,27 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	originalWorkflowState: WorkflowState | null = null;
 	draftWorkflowState: WorkflowState | null = null;
 	selectedLanguage = '';
+	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
 
 	constructor(
 		private languageService: LanguageService,
 		private workflowStateDialogService: WorkflowStateDialogService,
 		private workflowStateManager: WorkflowStateManagerService,
+		private workflowActionManager: WorkflowActionManagerService,
 		private dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
-
-		this.workflowStateManager.loadFull(this.projectId).subscribe({
-			next: () => {
-				this.loadWorkflowState();
-			},
-			error: error => console.error('Error loading full workflow states:', error)
-		});
+		this.loadWorkflowState();
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['workflowStateId'] && this.workflowStateId) {
-			this.workflowStateManager.loadFull(this.projectId).subscribe({
-				next: () => {
-					this.loadWorkflowState();
-				},
-				error: error => console.error('Error loading full workflow state:', error)
-			});
-		}
-		else if(changes['workflowStates']) {
+		if(changes['workflowStateId'] || changes['workflowStates']) {
 			this.loadWorkflowState();
 		}
 	}
@@ -81,10 +72,9 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	}
 
 	private loadWorkflowState(): void {
-		const workflowState = this.workflowStates.find(wfs => wfs.workflowStateId === this.workflowStateId);
+		const workflowState = this.workflowStateManager.getById(this.workflowStateId);
 		this.draftWorkflowState = workflowState ? JSON.parse(JSON.stringify(workflowState)) : null;
-
-		const original = this.originalWorkflowStates.find(wfs => wfs.workflowStateId === this.workflowStateId);
+		const original = this.workflowStateManager.getOriginals().find(wfs => wfs.workflowStateId === this.workflowStateId);
 		this.originalWorkflowState = original ? JSON.parse(JSON.stringify(original)) : null;
 	}
 
@@ -140,6 +130,31 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 		return `${shortname} (${workflowState.id})`;
 	}
 
+	get hasAggregation(): boolean {
+		return !!this.workflow?.aggregatedWorkflowId;
+	}
+
+	get aggregatedWorkflowStates(): {id: string; name: string; code: string}[] {
+		if(!this.workflow?.aggregatedWorkflowId) {
+			return [];
+		}
+		return this.workflowStateManager
+			.getAllForWorkflow(this.workflow.aggregatedWorkflowId)
+			.map(wfs => ({
+				id: wfs.workflowStateId,
+				name: this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id,
+				code: wfs.id
+			}));
+	}
+
+	getAggregatedStateLabel(workflowStateId: string | undefined): string {
+		if(!workflowStateId) {
+			return 'Not set';
+		}
+		const workflowState = this.aggregatedWorkflowStates.find(s => s.id === workflowStateId);
+		return workflowState ? `${workflowState.name} (${workflowState.code})` : workflowStateId;
+	}
+
 	onEditBasicInfo(): void {
 		if(!this.draftWorkflowState || !this.workflow) {
 			return;
@@ -149,13 +164,61 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 			this.draftWorkflowState,
 			this.projectId,
 			this.workflow.workflowId,
-			this.project?.languages || []
+			this.projectLanguages
 		).subscribe(result => {
 			if(result && this.draftWorkflowState) {
 				this.draftWorkflowState = {
 					...this.draftWorkflowState,
 					...result
 				};
+				this.workflowStateUpdated.emit(this.draftWorkflowState);
+			}
+		});
+	}
+
+	onEditAggregation(): void {
+		if(!this.draftWorkflowState) {
+			return;
+		}
+
+		this.workflowStateDialogService.openAggregationDialog(
+			this.draftWorkflowState,
+			this.aggregatedWorkflowStates
+		).subscribe(result => {
+			if(result && this.draftWorkflowState) {
+				this.draftWorkflowState = {...this.draftWorkflowState, ...result};
+				this.workflowStateUpdated.emit(this.draftWorkflowState);
+			}
+		});
+	}
+
+	get availableActionsForDialog(): {id: string; name: string; code: string}[] {
+		if(!this.workflow) {
+			return [];
+		}
+		return this.workflowActionManager
+			.getAllForWorkflow(this.workflow.workflowId)
+			.map(wfa => ({
+				id: wfa.workflowActionId,
+				name: this.languageService.getDefaultTranslation(wfa.shortname) || wfa.id,
+				code: wfa.id
+			}));
+	}
+
+	onEditPossibleActions(): void {
+		if(!this.draftWorkflowState) {
+			return;
+		}
+
+		this.workflowStateDialogService.openActionsDialog(
+			this.draftWorkflowState,
+			this.availableActionsForDialog
+		).subscribe(result => {
+			if(result && this.draftWorkflowState) {
+				const possibleActions = (result.possibleActionIds as string[])
+					.map(id => this.workflowActionManager.getById(id))
+					.filter(a => !!a);
+				this.draftWorkflowState = {...this.draftWorkflowState, possibleActions};
 				this.workflowStateUpdated.emit(this.draftWorkflowState);
 			}
 		});

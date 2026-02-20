@@ -17,28 +17,23 @@ public class WorkflowStateDTO {
 	String id;
 	@NotNull
 	Map<String, String> shortname;
-	@NotNull
 	Map<String, String> longname;
-	@NotNull
 	Map<String, String> description;
 
 	@NotNull
 	UUID workflowId;
 
 	@Schema(description = "Is the state hidden?")
-	@NotNull
 	boolean hidden;
 	@Schema(description = "Is the state important?")
 	@NotNull
 	boolean important;
 	@Schema(description = "Should the state message be displayed?")
-	@NotNull
 	boolean showMessage;
 	@Schema(description = "Possible actions relating to the state")
 	@NotNull
 	List<WorkflowActionDTO> possibleActions;
 
-	@NotBlank
 	String icon;
 	@NotBlank
 	String color;

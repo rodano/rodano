@@ -18,6 +18,10 @@
 				</label>
 				<div class="setting-value">{{ project?.code }}</div>
 			</div>
+			<div class="setting-item">
+				<label>Created</label>
+				<div class="setting-value">{{ project?.created | date:'medium' }}</div>
+			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
 				<label>
 					Short Name
@@ -46,7 +50,7 @@
 					{{ getTranslatedValue(project?.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('description')">
+			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
 				<label>
 					Description
 					@if (isFieldModified('description')) {
@@ -85,10 +89,6 @@
 					<span class="color-swatch" [style.background-color]="project?.color"></span>
 					{{ project?.color }}
 				</div>
-			</div>
-			<div class="setting-item">
-				<label>Created</label>
-				<div class="setting-value">{{ project?.created | date:'medium' }}</div>
 			</div>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
@@ -337,7 +337,7 @@
 			@if (project?.languages?.length) {
 				<div class="chip-container">
 					@for (lang of project?.languages; track lang.languageCode) {
-						<div class="chip" [class.default-chip]="lang.isDefault">
+						<div class="chip" [class.third]="lang.isDefault">
 							<span class="language-name">{{ getLanguageName(lang.languageCode) }}</span>
 							<span class="language-code">({{ lang.languageCode }})</span>
 							@if (lang.isDefault) {

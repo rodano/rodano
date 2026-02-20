@@ -204,7 +204,7 @@
 											<span>{{ eventModel.datasetModelIds.length || 0 }} {{ (eventModel.datasetModelIds.length || 0) === 1 ? 'Dataset' : 'Datasets' }}</span>
 										</div>
 										<div class="detail-item">
-											<mat-icon>account_tree</mat-icon>
+											<mat-icon>settings</mat-icon>
 											<span>{{ eventModel.workflowIds.length || 0 }} {{ (eventModel.workflowIds.length || 0) === 1 ? 'Workflow' : 'Workflows' }}</span>
 										</div>
 									</div>
@@ -239,7 +239,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card second-child-card event-group-card create-card" (click)="onCreateEventGroup()">
+						<div class="secondary-card second-child-card small-card create-card" (click)="onCreateEventGroup()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Event Group</h3>
@@ -248,7 +248,7 @@
 						</div>
 
 						@for (eventGroup of eventGroups; track eventGroup.eventGroupId) {
-							<div class="secondary-card second-child-card event-group-card"
+							<div class="secondary-card second-child-card small-card"
 												[class.selected]="selectedEventGroupId === eventGroup.eventGroupId"
 												[class.modified]="isEventGroupModified(eventGroup.eventGroupId)"
 												(click)="onSelectEventGroup(eventGroup.eventGroupId)">

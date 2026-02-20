@@ -629,6 +629,13 @@
 	transform: translateY(0);
 }
 
+/* ==================== Icon Preview ==================== */
+.dialog-icon {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+}
+
 /* ==================== Language Selector ==================== */
 .language-selector {
 	display: flex;

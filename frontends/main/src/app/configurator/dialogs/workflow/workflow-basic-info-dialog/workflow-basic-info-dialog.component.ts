@@ -17,6 +17,7 @@ interface DialogData {
 	projectId: string;
 	workflow: Workflow | null;
 	languages: ProjectLanguage[];
+	workflowActions: {id: string; name: string; code: string};
 }
 
 @Component({
@@ -39,8 +40,9 @@ interface DialogData {
 export class WorkflowBasicInfoDialogComponent implements OnInit {
 	form: FormGroup;
 	languageForms = new Map<string, FormGroup>();
-	isEditMode: boolean;
 	availableLanguages: ProjectLanguage[] = [];
+	workflowActions: {id: string; name: string; code: string};
+	isEditMode: boolean;
 
 	constructor(
 		private fb: FormBuilder,
@@ -50,61 +52,96 @@ export class WorkflowBasicInfoDialogComponent implements OnInit {
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.workflow;
-
-		this.form = this.fb.group({
-			id: ['', [Validators.required]],
-			mandatory: [false],
-			unique: [false]
-		});
+		this.workflowActions = data.workflowActions || [];
 	}
 
 	ngOnInit(): void {
-		this.availableLanguages = this.data.languages?.length
-			? this.data.languages
-			: [{languageCode: 'en', isDefault: true}];
+		this.loadProjectLanguages();
+		this.initializeForm();
+	}
+
+	loadProjectLanguages(): void {
+		this.availableLanguages = this.data.languages || [];
+
+		if(this.availableLanguages.length === 0) {
+			this.availableLanguages = [{languageCode: 'en', isDefault: true}];
+		}
 
 		this.initializeLanguageForms();
+	}
+
+	initializeForm(): void {
+		const wf = this.data.workflow;
+
+		this.form = this.fb.group({
+			id: [
+				wf?.id || '',
+				[Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]
+			],
+			order: [wf?.order || null]
+		});
 	}
 
 	initializeLanguageForms(): void {
 		this.availableLanguages.forEach((lang: ProjectLanguage) => {
 			if(lang.languageCode) {
+				const wf = this.data.workflow;
 				const langForm = this.fb.group({
-					shortname: ['', lang.isDefault ? Validators.required : []],
-					longname: [''],
-					description: [''],
-					message: ['']
+					shortname: [
+						wf?.shortname?.[lang.languageCode] || '',
+						lang.isDefault ? Validators.required : []
+					],
+					longname: [wf?.longname?.[lang.languageCode] || ''],
+					description: [wf?.description?.[lang.languageCode] || ''],
+					message: [wf?.message?.[lang.languageCode] || '']
 				});
 				this.languageForms.set(lang.languageCode, langForm);
 			}
 		});
+	}
 
-		if(this.data.workflow) {
-			this.populateForm();
+	getLanguageLabel(code: string, isDefault: boolean): string {
+		const name = this.getLanguageName(code);
+		return isDefault ? `${name} ☆` : name;
+	}
+
+	getLanguageName(code: string): string {
+		try {
+			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
+			return displayNames.of(code) || code.toUpperCase();
+		}
+		catch (error) {
+			console.error(error);
+			return code.toUpperCase();
 		}
 	}
 
-	populateForm(): void {
-		if(!this.data.workflow) {
-			return;
-		}
-
-		const workflow = this.data.workflow;
-
-		this.form.patchValue({
-			id: workflow.id,
-			mandatory: workflow.mandatory,
-			unique: workflow.unique
+	areLanguageFormsValid(): boolean {
+		let allValid = true;
+		this.languageForms.forEach((langForm: FormGroup) => {
+			if(langForm.invalid) {
+				allValid = false;
+			}
 		});
+		return allValid;
+	}
 
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			langForm.patchValue({
-				shortname: workflow.shortname[langCode] || '',
-				longname: workflow.longname?.[langCode] || '',
-				description: workflow.description?.[langCode] || '',
-				message: workflow.message[langCode] || ''
-			});
-		});
+	onCodeInput(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const uppercaseValue = input.value.toUpperCase();
+		input.value = uppercaseValue;
+		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
+	}
+
+	isCodeDuplicate(code: string): boolean {
+		const currentWorkflowId = this.data.workflow?.workflowId;
+		return this.workflowManager.getAll().some(wf =>
+			wf.id.toUpperCase() === code.toUpperCase() && wf.workflowId !== currentWorkflowId
+		);
+	}
+
+	onCancel(): void {
+		this.dialogRef.close(null);
 	}
 
 	onSave(): void {
@@ -116,7 +153,7 @@ export class WorkflowBasicInfoDialogComponent implements OnInit {
 		const formValue = this.form.getRawValue();
 		const code = formValue.id.toUpperCase();
 
-		if(!this.isEditMode && this.isCodeDuplicate(code)) {
+		if(this.isCodeDuplicate(code)) {
 			this.snackBar.open(`A workflow with code "${code}" already exists`, 'Close', {duration: 3000});
 			return;
 		}
@@ -149,57 +186,9 @@ export class WorkflowBasicInfoDialogComponent implements OnInit {
 			longname,
 			description,
 			message,
-			mandatory: formValue.mandatory,
-			unique: formValue.unique
+			order: formValue.order
 		};
 
 		this.dialogRef.close(result);
-	}
-
-	areLanguageFormsValid(): boolean {
-		let allValid = true;
-		this.languageForms.forEach((langForm: FormGroup) => {
-			if(langForm.invalid) {
-				allValid = false;
-			}
-		});
-		return allValid;
-	}
-
-	onCodeInput(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const uppercaseValue = input.value.toUpperCase();
-		input.value = uppercaseValue;
-		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
-	}
-
-	isCodeDuplicate(code: string): boolean {
-		const currentWorkflowId = this.data.workflow?.workflowId;
-		return this.workflowManager.getAll().some(wf =>
-			wf.id.toUpperCase() === code.toUpperCase() && wf.workflowId !== currentWorkflowId
-		);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
-	}
-
-	getLanguageLabel(code: string, isDefault: boolean): string {
-		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ☆` : name;
 	}
 }

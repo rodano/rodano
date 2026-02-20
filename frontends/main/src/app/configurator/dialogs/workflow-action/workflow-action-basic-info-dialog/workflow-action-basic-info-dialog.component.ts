@@ -12,7 +12,6 @@ import {MatSelectModule} from '@angular/material/select';
 import {ProjectLanguage} from '@core/model/project-language';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WorkflowAction} from '@core/model/workflow-action';
-import {WorkflowActionManagerService} from '../../../services/manager/workflow-action-manager.service';
 
 export interface WorkflowActionBasicInfoDialogData {
 	projectId: string;
@@ -44,13 +43,11 @@ export class WorkflowActionBasicInfoDialogComponent implements OnInit {
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
-	saving = false;
 
 	constructor(
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<WorkflowActionBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: WorkflowActionBasicInfoDialogData,
-		private workflowActionManager: WorkflowActionManagerService,
 		private snackBar: MatSnackBar
 	) {
 		this.isEditMode = !!data.workflowAction;
@@ -79,9 +76,8 @@ export class WorkflowActionBasicInfoDialogComponent implements OnInit {
 				wfa?.id || '',
 				[Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]
 			],
-			workflowId: [wfa?.workflowId || null],
-			documentable: [wfa?.documentable || null],
-			requireSignature: [wfa?.requireSignature || false]
+			workflowActionId: [wfa?.workflowActionId || null],
+			icon: [wfa?.icon || null]
 		});
 	}
 
@@ -95,8 +91,7 @@ export class WorkflowActionBasicInfoDialogComponent implements OnInit {
 						lang.isDefault ? Validators.required : []
 					],
 					longname: [wfa?.longname?.[lang.languageCode] || ''],
-					description: [wfa?.description?.[lang.languageCode] || ''],
-					requiredSignatureText: [wfa?.requireSignatureText?.[lang.languageCode] || '']
+					description: [wfa?.description?.[lang.languageCode] || '']
 				});
 				this.languageForms.set(lang.languageCode, langForm);
 			}
@@ -129,11 +124,15 @@ export class WorkflowActionBasicInfoDialogComponent implements OnInit {
 		return allValid;
 	}
 
-	onIdInput(event: Event): void {
+	onCodeInput(event: Event): void {
 		const input = event.target as HTMLInputElement;
 		const uppercaseValue = input.value.toUpperCase();
 		input.value = uppercaseValue;
 		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
+	}
+
+	get iconPreview(): string {
+		return this.form.get('icon')?.value?.trim() || '';
 	}
 
 	onCancel(): void {
@@ -152,7 +151,6 @@ export class WorkflowActionBasicInfoDialogComponent implements OnInit {
 		const shortname: Record<string, string> = {};
 		const longname: Record<string, string> = {};
 		const description: Record<string, string> = {};
-		const requiredSignatureText: Record<string, string> = {};
 
 		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
 			const langValue = langForm.value;
@@ -165,21 +163,15 @@ export class WorkflowActionBasicInfoDialogComponent implements OnInit {
 			if(langValue.description) {
 				description[langCode] = langValue.description;
 			}
-			if(langValue.requireSignatureText) {
-				requiredSignatureText[langCode] = langValue.description;
-			}
 		});
 
 		const result = {
 			id: code,
-			workflowActionId: formValue.workflowActionId,
-			workflowId: formValue.workflowId,
-			documentable: formValue.documentable,
-			requireSignature: formValue.requireSignature,
+			workflowId: this.data.workflowId,
+			icon: formValue.icon,
 			shortname,
 			longname,
-			description,
-			requiredSignatureText
+			description
 		};
 
 		this.dialogRef.close(result);

@@ -214,13 +214,13 @@ export class DraftSaveService {
 			else if(id.startsWith('temp-')) {
 				const workflow = workflows.find(wf => wf.workflowId === id);
 				if(workflow) {
-					saveObservables.push(this.workflowService.createWorkflow(projectId, workflow));
+					saveObservables.push(this.workflowService.createWorkflow(projectId, this.toPayload(workflow)));
 				}
 			}
 			else {
 				const workflow = workflows.find(wf => wf.workflowId === id);
 				if(workflow) {
-					saveObservables.push(this.workflowService.updateWorkflow(projectId, id, workflow));
+					saveObservables.push(this.workflowService.updateWorkflow(projectId, id, this.toPayload(workflow)));
 				}
 			}
 		});
@@ -228,6 +228,11 @@ export class DraftSaveService {
 		return saveObservables.length > 0
 			? forkJoin(saveObservables).pipe(map(() => undefined))
 			: of(undefined);
+	}
+
+	private toPayload(workflow: Workflow): any {
+		const {states, actions, ...payload} = workflow as any;
+		return payload;
 	}
 
 	saveWorkflowStates(

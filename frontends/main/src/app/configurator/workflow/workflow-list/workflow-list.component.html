@@ -46,24 +46,37 @@
 							</div>
 							<div class="card-header-badges">
 								@if (workflow.mandatory) {
-									<span class="status-badge virtual" matTooltip="Mandatory">
-										<mat-icon class="badge-full">visibility_off</mat-icon>
-										<mat-icon class="badge-short">visibility_off</mat-icon>
+									<span class="status-badge third" matTooltip="Mandatory">
+										<mat-icon class="badge-full">priority_high</mat-icon>
+										<mat-icon class="badge-short">priority_high</mat-icon>
 									</span>
 								}
 								@if (workflow.unique) {
-									<span class="status-badge virtual" matTooltip="Is Unique">
-										<mat-icon class="badge-full">visibility_off</mat-icon>
-										<mat-icon class="badge-short">visibility_off</mat-icon>
+									<span class="status-badge second" matTooltip="Unique">
+										<mat-icon class="badge-full">fingerprint</mat-icon>
+										<mat-icon class="badge-short">fingerprint</mat-icon>
 									</span>
 								}
 							</div>
 						</div>
 						<div class="card-body">
 							<div class="card-details">
-
-
-
+								<div class="detail-item" [class.unset]="!workflow.order">
+									<mat-icon>sort</mat-icon>
+									<span>Order: {{ workflow.order !== null && workflow.order !== undefined ? workflow.order : 'Not set' }}</span>
+								</div>
+								<div class="detail-item" [class.unset]="!workflow.aggregatedWorkflowId">
+									<mat-icon>settings</mat-icon>
+									<span>Aggregate Workflow: {{ workflow.aggregatedWorkflowId !== null && workflow.aggregatedWorkflowId !== undefined ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</span>
+								</div>
+								<div class="detail-item" [class.unset]="!workflow.initialStateId">
+									<mat-icon>adjust</mat-icon>
+									<span>Initial State: {{ workflow.initialStateId ? getInitialStateLabel(workflow.workflowId, workflow.initialStateId) : 'Not set' }}</span>
+								</div>
+								<div class="detail-item" [class.unset]="!workflow.actionId">
+									<mat-icon>play_circle</mat-icon>
+									<span>Creation Action: {{ workflow.actionId ? getCreationActionLabel(workflow.workflowId, workflow.actionId) : 'Not set' }}</span>
+								</div>
 							</div>
 						</div>
 
@@ -101,7 +114,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card event-card create-card" (click)="onCreateWorkflowState()">
+						<div class="secondary-card first-child-card create-card" (click)="onCreateWorkflowState()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Workflow State</h3>
@@ -110,7 +123,7 @@
 						</div>
 
 						@for (workflowState of workflowStates; track workflowState.workflowStateId) {
-							<div class="secondary-card event-card"
+							<div class="secondary-card first-child-card"
 												[class.selected]="selectedWorkflowStateId === workflowState.workflowStateId"
 												[class.modified]="isWorkflowStateModified(workflowState.workflowStateId)"
 												(click)="onSelectWorkflowState(workflowState.workflowStateId)">
@@ -128,7 +141,7 @@
 									</div>
 									<div class="card-header-badges">
 										@if (workflowState.important) {
-											<span class="status-badge mandatory" matTooltip="Important">
+											<span class="status-badge third" matTooltip="Important">
 												<mat-icon class="badge-full">priority_high</mat-icon>
 												<mat-icon class="badge-short">priority_high</mat-icon>
 											</span>
@@ -139,8 +152,16 @@
 								<div class="card-body">
 									<div class="card-details">
 										<div class="detail-item">
-											<mat-icon>account_tree</mat-icon>
+											<mat-icon>play_circle</mat-icon>
 											<span>{{ workflowState.possibleActions.length || 0 }} {{ (workflowState.possibleActions.length || 0) === 1 ? 'Possible Workflow Action' : 'Possible Workflow Actions' }}</span>
+										</div>
+										<div class="detail-item" [class.unset]="!workflowState.aggregateStateId">
+											<mat-icon>adjust</mat-icon>
+											<span>Aggregate State: {{ workflowState.aggregateStateId !== null && workflowState.aggregateStateId !== undefined ? getAggregatedStateLabel(workflowState.aggregateStateId) : 'Not set' }}</span>
+										</div>
+										<div class="detail-item" [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
+											<mat-icon>equal</mat-icon>
+											<span>Aggregate State Matcher: {{ workflowState.aggregateStateMatcher !== null && workflowState.aggregateStateMatcher !== undefined ? workflowState.aggregateStateMatcher : 'Not set' }}</span>
 										</div>
 									</div>
 								</div>
@@ -149,7 +170,7 @@
 
 						@if (workflowStates.length === 0) {
 							<div class="empty-state-small">
-								<mat-icon>event</mat-icon>
+								<mat-icon>adjust</mat-icon>
 								<p>No workflow states yet. Create your first workflow state to get started.</p>
 							</div>
 						}
@@ -174,7 +195,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card event-card event-group-card create-card" (click)="onCreateWorkflowAction()">
+						<div class="secondary-card second-child-card small-card create-card" (click)="onCreateWorkflowAction()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Workflow Action</h3>
@@ -183,7 +204,7 @@
 						</div>
 
 						@for (workflowAction of workflowActions; track workflowAction.workflowActionId) {
-							<div class="secondary-card event-card event-group-card"
+							<div class="secondary-card second-child-card small-card"
 												[class.selected]="selectedWorkflowActionId === workflowAction.workflowActionId"
 												[class.modified]="isWorkflowActionModified(workflowAction.workflowActionId)"
 												(click)="onSelectWorkflowAction(workflowAction.workflowActionId)">
@@ -199,13 +220,27 @@
 										<h3>{{ getTranslatedName(workflowAction.shortname) }}</h3>
 										<p class="card-code">{{ workflowAction.id }}</p>
 									</div>
+									<div class="card-header-badges">
+										@if (workflowAction.documentable) {
+											<span class="status-badge third" matTooltip="Documentable">
+												<mat-icon class="badge-full">article</mat-icon>
+												<mat-icon class="badge-short">article</mat-icon>
+											</span>
+										}
+										@if (workflowAction.requireSignature) {
+											<span class="status-badge fourth" matTooltip="Require Signature">
+												<mat-icon class="badge-full">stylus_note</mat-icon>
+												<mat-icon class="badge-short">stylus_note</mat-icon>
+											</span>
+										}
+									</div>
 								</div>
 							</div>
 						}
 
 						@if (workflowActions.length === 0) {
 							<div class="empty-state-small">
-								<mat-icon>group</mat-icon>
+								<mat-icon>play_circle</mat-icon>
 								<p>No workflow actions yet. Create your first workflow action to get started.</p>
 							</div>
 						}
@@ -221,7 +256,7 @@
 					[projectId]="projectId"
 					[project]="project"
 					[allWorkflows]="workflows"
-					(workflowUpdated)="onSelectWorkflow($event)"
+					(workflowUpdated)="onWorkflowUpdated($event)"
 					(workflowDeleted)="onWorkflowDeleted($event)"
 					(closed)="onSelectWorkflow(selectedWorkflow)"
 					(switchToWorkflowStates)="switchToWorkflowStateView()"

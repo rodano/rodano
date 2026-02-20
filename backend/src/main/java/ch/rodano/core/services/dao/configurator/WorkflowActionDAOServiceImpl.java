@@ -155,8 +155,8 @@ public class WorkflowActionDAOServiceImpl implements WorkflowActionDAOService {
 		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
 		}));
 		dto.setDocumentable(record.getDocumentable());
-		dto.setDocumentableOptions(List.of(jsonMapperService.fromJson(record.getDocumentableOptions(), new TypeReference<TreeMap<String, String>>() {
-		})));
+		dto.setDocumentableOptions(jsonMapperService.fromJson(record.getDocumentableOptions(), new TypeReference<>() {
+		}));
 		dto.setRequireSignature(record.getRequireSignature());
 		dto.setRequireSignatureText(jsonMapperService.fromJson(record.getRequiredSignatureText(), new TypeReference<TreeMap<String, String>>() {
 		}));

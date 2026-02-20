@@ -135,16 +135,14 @@
 
 			<div class="form-field">
 				<label>Workflow</label>
-				<select
+				<mat-select
 					[value]="selector.selectedWorkflowId"
-					(change)="onWorkflowSelected(selector, $any($event.target).value)"
-					class="workflow-select"
-				>
-					<option value="">Select a workflow</option>
+					(valueChange)="onWorkflowSelected(selector, $event)">
+					<mat-option value="">Select a workflow</mat-option>
 					@for (workflow of selectedWorkflows; track workflow.id) {
-						<option [value]="workflow.id">{{ workflow.name || workflow.id }}</option>
+						<mat-option [value]="workflow.id">{{ workflow.name || workflow.id }}</mat-option>
 					}
-				</select>
+				</mat-select>
 				<span class="hint">Choose one of the selected workflows above</span>
 			</div>
 

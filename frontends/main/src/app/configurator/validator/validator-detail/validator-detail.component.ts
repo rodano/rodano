@@ -12,21 +12,15 @@ import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirma
 import {Validator} from '@core/model/validator';
 import {ValidatorManagerService} from '../../services/manager/validator-manager.service';
 import {ValidatorDialogService} from '../../services/dialogs/validator-dialog.service';
-import {
-	ValidatorWorkflowConfiguration
-} from '../../dialogs/validator/validator-workflow-dialog/validator-workflow-dialog.component';
+import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
+import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 
 @Component({
 	selector: 'app-validator-detail',
 	standalone: true,
 	templateUrl: './validator-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule
-	]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule]
 })
 export class ValidatorDetailComponent implements OnInit, OnDestroy {
 	@Input() validator!: Validator;
@@ -40,10 +34,10 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
 
-	private workflowConfigurationsMap = new Map<string, ValidatorWorkflowConfiguration | null>();
-
 	constructor(
 		public validatorManager: ValidatorManagerService,
+		private workflowManager: WorkflowManagerService,
+		private workflowStateManager: WorkflowStateManagerService,
 		private languageService: LanguageService,
 		private validatorDialogService: ValidatorDialogService,
 		private dialog: MatDialog,
@@ -76,17 +70,8 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 	}
 
 	onEditWorkflow(): void {
-		const currentConfiguration = this.workflowConfigurationsMap.get(this.validator.validatorId) || null;
-
-		this.validatorDialogService.openWorkflowDialog(
-			this.validator,
-			currentConfiguration
-		).subscribe(result => {
+		this.validatorDialogService.openWorkflowDialog(this.validator, this.projectId).subscribe(result => {
 			if(result) {
-				if(result.workflowConfiguration !== undefined) {
-					this.workflowConfigurationsMap.set(this.validator.validatorId, result.workflowConfiguration);
-				}
-
 				const updatedValidator: Validator = {...this.validator, ...result};
 				this.validatorManager.update(updatedValidator);
 				this.validatorUpdated.emit(updatedValidator);
@@ -106,7 +91,6 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 				type: 'danger'
 			}
 		});
-
 		dialogRef.afterClosed().subscribe(confirmed => {
 			if(confirmed) {
 				this.validatorDeleted.emit(this.validator.validatorId);
@@ -134,8 +118,7 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 		if(!translations) {
 			return '';
 		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
+		return translations[languageCode || this.selectedLanguage] || '';
 	}
 
 	getLanguageName(code: string | undefined): string {
@@ -143,32 +126,41 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 			return 'Unknown';
 		}
 		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
+			return new Intl.DisplayNames(['en'], {type: 'language'}).of(code) || code.toUpperCase();
 		}
-		catch (e) {
-			console.error(e);
+		catch (error) {
+			console.error(error);
 			return code.toUpperCase();
 		}
 	}
 
-	getWorkflowConfiguration(): ValidatorWorkflowConfiguration | null {
-		return this.workflowConfigurationsMap.get(this.validator.validatorId) || null;
+	getWorkflowDisplayName(): string {
+		if(!this.validator.workflowId) {
+			return 'Not set';
+		}
+		const workflow = this.workflowManager.getById(this.validator.workflowId);
+		return workflow
+			? `${this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id} (${workflow.id})`
+			: this.validator.workflowId;
 	}
 
-	getInvalidStatesDisplay(): string {
-		const config = this.getWorkflowConfiguration();
-		if(!config?.invalidWorkflowStateIds || config.invalidWorkflowStateIds.length === 0) {
-			return '';
+	getInvalidStateDisplay(): string {
+		if(!this.validator.invalidStateId) {
+			return 'Not set';
 		}
-		return config.invalidWorkflowStateIds.join(', ');
+		const state = this.workflowStateManager.getById(this.validator.invalidStateId);
+		return state
+			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
+			: this.validator.invalidStateId;
 	}
 
-	getValidStatesDisplay(): string {
-		const config = this.getWorkflowConfiguration();
-		if(!config?.validWorkflowStateIds || config.validWorkflowStateIds.length === 0) {
-			return '';
+	getValidStateDisplay(): string {
+		if(!this.validator.validStateId) {
+			return 'Not set';
 		}
-		return config.validWorkflowStateIds.join(', ');
+		const state = this.workflowStateManager.getById(this.validator.validStateId);
+		return state
+			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
+			: this.validator.validStateId;
 	}
 }

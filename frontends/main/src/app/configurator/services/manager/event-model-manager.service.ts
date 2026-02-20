@@ -54,14 +54,11 @@ export class EventModelManagerService {
 					if(existing) {
 						Object.assign(existing, fullModel);
 					}
-
-					const original = this.tracker.getOriginals().find(o =>
-						(o as any).eventModelId === fullModel.eventModelId
-					);
-					if(original) {
-						Object.assign(original, fullModel);
+					else {
+						this.tracker.addEntity(fullModel);
 					}
 				});
+				this.loaded = true;
 				this.fullLoaded = true;
 				return this.tracker.getCurrent();
 			})
