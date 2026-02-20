@@ -46,6 +46,8 @@ public class RandomDataInitializer {
 
 	public static final String RATIONALE = "Add random data";
 
+	private final RandomUtils randomUtils;
+	private final RandomStringUtils randomStringUtils;
 	private final StudyService studyService;
 	private final ScopeService scopeService;
 	private final ScopeDAOService scopeDAOService;
@@ -76,19 +78,21 @@ public class RandomDataInitializer {
 		this.transactionCacheDAOService = transactionCacheDAOService;
 		this.scopeCreatorService = scopeCreatorService;
 		this.auditActionService = auditActionService;
+		randomUtils = RandomUtils.insecure();
+		randomStringUtils = RandomStringUtils.insecure();
 	}
 
 	private ZonedDateTime generateRandomDate(final Optional<ZonedDateTime> minDate, final Optional<ZonedDateTime> maxDate, final Optional<ZonedDateTime> average) {
 		if(average.isPresent()) {
-			return average.get().minusDays(RandomUtils.nextLong(0, 20) - 10);
+			return average.get().minusDays(randomUtils.randomLong(0, 20) - 10);
 		}
 		return ZonedDateTime.of(
-			RandomUtils.nextInt(minDate.map(ZonedDateTime::getYear).orElse(1920), maxDate.orElse(ZonedDateTime.now()).getYear()),
-			RandomUtils.nextInt(1, 13),
-			RandomUtils.nextInt(1, 28),
-			RandomUtils.nextInt(0, 24),
-			RandomUtils.nextInt(0, 60),
-			RandomUtils.nextInt(0, 60),
+			randomUtils.randomInt(minDate.map(ZonedDateTime::getYear).orElse(1920), maxDate.orElse(ZonedDateTime.now()).getYear()),
+			randomUtils.randomInt(1, 13),
+			randomUtils.randomInt(1, 28),
+			randomUtils.randomInt(0, 24),
+			randomUtils.randomInt(0, 60),
+			randomUtils.randomInt(0, 60),
 			0,
 			ZoneId.of("UTC")
 		);
@@ -114,7 +118,7 @@ public class RandomDataInitializer {
 					maxValue = Math.pow(10, Math.min(formatter.getMinimumIntegerDigits(), maxLength)) - 1;
 				}
 
-				final Double number = RandomUtils.nextDouble(minValue, maxValue);
+				final Double number = randomUtils.randomDouble(minValue, maxValue);
 				return formatter.format(number);
 			case STRING:
 				//TODO handle attribute having a matcher
@@ -124,7 +128,7 @@ public class RandomDataInitializer {
 						maxLength = fieldModel.getMaxLength();
 					}
 
-					return RandomStringUtils.random(RandomUtils.nextInt(5, maxLength), true, false);
+					return randomStringUtils.next(randomUtils.randomInt(5, maxLength), true, false);
 				}
 				return "";
 			case TEXTAREA:
@@ -132,7 +136,7 @@ public class RandomDataInitializer {
 				if(fieldModel.getMaxLength() != null) {
 					maxLength = fieldModel.getMaxLength();
 				}
-				return RandomStringUtils.random(RandomUtils.nextInt(10, maxLength), true, false);
+				return randomStringUtils.next(randomUtils.randomInt(10, maxLength), true, false);
 			case DATE:
 			case DATE_SELECT:
 				final var minDate = fieldModel.getMinYear() != null ? ZonedDateTime.of(fieldModel.getMinYear(), 1, 1, 0, 0, 0, 0, ZoneId.of("UTC")) : null;
@@ -145,9 +149,9 @@ public class RandomDataInitializer {
 				return fieldModel.getDateTimeFormatter().format(date);
 			case SELECT:
 			case RADIO:
-				return fieldModel.getPossibleValues().get(RandomUtils.nextInt(0, fieldModel.getPossibleValues().size())).getId();
+				return fieldModel.getPossibleValues().get(randomUtils.randomInt(0, fieldModel.getPossibleValues().size())).getId();
 			case CHECKBOX:
-				return Boolean.toString(RandomUtils.nextBoolean());
+				return Boolean.toString(randomUtils.randomBoolean());
 			default:
 				return "";
 		}
@@ -186,7 +190,7 @@ public class RandomDataInitializer {
 			.toList();
 
 		for(final var datasetModel : scopeModelMultipleDatasetModels) {
-			for(int i = 0; i < RandomUtils.nextInt(0, 4); i++) {
+			for(int i = 0; i < randomUtils.randomInt(0, 4); i++) {
 				final Dataset dataset = datasetService.create(scope, datasetModel, context, RATIONALE);
 				fillDataset(context, scope, Optional.empty(), dataset);
 			}
@@ -208,7 +212,7 @@ public class RandomDataInitializer {
 				.toList();
 
 			for(final var datasetModel : eventMultipleDatasetModels) {
-				for(int i = 0; i < RandomUtils.nextInt(0, 4); i++) {
+				for(int i = 0; i < randomUtils.randomInt(0, 4); i++) {
 					final Dataset dataset = datasetService.create(scope, event, datasetModel, context, RATIONALE);
 					fillDataset(context, scope, Optional.of(event), dataset);
 				}
@@ -233,7 +237,7 @@ public class RandomDataInitializer {
 			var scope = scopeDAOService.getScopeByCode(code);
 			if(scope == null) {
 				logger.info(String.format("Creating %s", code));
-				final var parentPk = availableParentPks.get(RandomUtils.nextInt(0, availableParentPks.size()));
+				final var parentPk = availableParentPks.get(randomUtils.randomInt(0, availableParentPks.size()));
 				final var parentScope = scopeDAOService.getScopeByPk(parentPk);
 				final var name = String.format("%s %s", namePrefix, numberFormatter.format(i + 1));
 				scope = scopeCreatorService.createScope(new ScopeBuilder(context, origin).createScope(scopeModel, parentScope, code, name));

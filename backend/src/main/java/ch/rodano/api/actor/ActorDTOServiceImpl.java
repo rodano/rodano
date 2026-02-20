@@ -240,7 +240,7 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 
 	private String generateKey() {
 		//255 is the max authorized by the Basic authentication protocol
-		return RandomStringUtils.randomAlphanumeric(32);
+		return RandomStringUtils.secure().nextAlphanumeric(32);
 	}
 
 }

@@ -3,7 +3,6 @@ package ch.rodano.core.helpers.builder;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import ch.rodano.configuration.model.language.LanguageStatic;
@@ -17,13 +16,6 @@ public class UserBuilder {
 
 	private UserBuilder(final User user) {
 		this.userAndRoles = new UserCreatorService.UserCreation(user, new ArrayList<>());
-	}
-
-	public static UserBuilder generateRandomUser() {
-		final var user = new User();
-		user.setName(RandomStringUtils.random(10));
-		user.setEmail(generateEmail());
-		return new UserBuilder(user);
 	}
 
 	public static UserBuilder createUser(final String name, final String email) {
@@ -57,9 +49,5 @@ public class UserBuilder {
 
 	public UserCreatorService.UserCreation getUserAndRoles() {
 		return userAndRoles;
-	}
-
-	private static String generateEmail() {
-		return RandomStringUtils.randomAlphanumeric(10) + "@" + RandomStringUtils.randomAlphanumeric(7) + ".com";
 	}
 }

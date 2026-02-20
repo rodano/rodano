@@ -47,7 +47,7 @@ public class HelloTask implements ScheduledTask {
 
 			//update something in the database to check that the environment works properly
 			final var user = userService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL);
-			user.setUserAgent(RandomStringUtils.randomAlphanumeric(8));
+			user.setUserAgent(RandomStringUtils.insecure().nextAlphanumeric(8));
 			userService.saveUser(user, context, "Updating user from a task");
 
 			return true;

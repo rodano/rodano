@@ -57,6 +57,7 @@ public class TestDataInitializer {
 
 	private static DateTimeFormatter DATE_FIELD_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
+	private final RandomUtils randomUtils;
 	private final AuditActionService auditActionService;
 	private final StudyService studyService;
 	private final RuleService ruleService;
@@ -118,12 +119,13 @@ public class TestDataInitializer {
 		this.scopeCreatorService = scopeCreatorService;
 		this.robotService = robotService;
 		this.robotDAOService = robotDAOService;
+		randomUtils = RandomUtils.insecure();
 	}
 
 	private Robot createAndSaveRobot(final String name, final Scope scope, final Profile profile, final DatabaseActionContext context) {
 		final var robot = new Robot();
 		robot.setName(name);
-		robot.setKey(RandomStringUtils.randomAlphanumeric(32));
+		robot.setKey(RandomStringUtils.insecure().nextAlphanumeric(32));
 
 		robotService.createRobot(
 			robot,
@@ -199,10 +201,10 @@ public class TestDataInitializer {
 
 		//add patients
 		final var patient = study.getScopeModel("PATIENT");
-		scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(RandomUtils.nextLong(0, 30))).createScope(patient, at01, "AT-01-01", "AT-01-01"));
-		final var fr0101 = scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(RandomUtils.nextLong(0, 30))).createScope(patient, fr01, "FR-01-01", "FR-01-01"));
-		scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(RandomUtils.nextLong(0, 30))).createScope(patient, fr01, "FR-01-02", "FR-01-02"));
-		final var fr0103 = scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(RandomUtils.nextLong(0, 30))).createScope(patient, fr01, "FR-01-03", "FR-01-03"));
+		scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(randomUtils.randomLong(0, 30))).createScope(patient, at01, "AT-01-01", "AT-01-01"));
+		final var fr0101 = scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(randomUtils.randomLong(0, 30))).createScope(patient, fr01, "FR-01-01", "FR-01-01"));
+		scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(randomUtils.randomLong(0, 30))).createScope(patient, fr01, "FR-01-02", "FR-01-02"));
+		final var fr0103 = scopeCreatorService.createScope(new ScopeBuilder(context, origin.plusDays(randomUtils.randomLong(0, 30))).createScope(patient, fr01, "FR-01-03", "FR-01-03"));
 
 		//add some data
 		final var baselineEvent = patient.getEventModel("BASELINE");
@@ -244,7 +246,7 @@ public class TestDataInitializer {
 		submitter = new FieldSubmitterHelper(context, fr0101, Optional.of(baseline), fieldService, validationService);
 		inputs.clear();
 		inputs.put("ELIGIBILITY_CRITERIA", "Y");
-		inputs.put("DATE_OF_ENROLLMENT", origin.plusDays(RandomUtils.nextInt(1, 30)).format(DATE_FIELD_FORMATTER));
+		inputs.put("DATE_OF_ENROLLMENT", origin.plusDays(randomUtils.randomInt(1, 30)).format(DATE_FIELD_FORMATTER));
 		submitter.updateFields(studyEntryDataset, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study entry workflow
@@ -256,7 +258,7 @@ public class TestDataInitializer {
 		ruleService.execute(state, studyEntry.getFormModel().getRules(), context);
 
 		//fr0103
-		var chronology = actionDate.plusDays(RandomUtils.nextInt(1, 30));
+		var chronology = actionDate.plusDays(randomUtils.randomInt(1, 30));
 		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
 
 		//demographics entry inputs
@@ -379,7 +381,7 @@ public class TestDataInitializer {
 		ruleService.execute(state, edss.getFormModel().getRules(), context);
 
 		final var visit6 = eventService.get(fr0103, visit6Event, 0);
-		chronology = chronology.plusMonths(6).plusDays(RandomUtils.nextInt(0, 5));
+		chronology = chronology.plusMonths(6).plusDays(randomUtils.randomInt(0, 5));
 		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
 
 		//study status inputs
@@ -473,7 +475,7 @@ public class TestDataInitializer {
 		scopeRelationService.transfer(fr0103, fr02, chronology.plusMonths(3), context);
 
 		final var visit12 = eventService.get(fr0103, visit12Event, 0);
-		chronology = chronology.plusMonths(6).plusDays(RandomUtils.nextInt(0, 5));
+		chronology = chronology.plusMonths(6).plusDays(randomUtils.randomInt(0, 5));
 		context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, chronology);
 
 		//study status inputs
