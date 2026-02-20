@@ -121,10 +121,10 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.leftJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE.PK.in(ancestorPks).or(
-						SCOPE_ANCESTOR.ANCESTOR_FK.in(ancestorPks)
-							.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
-							.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
-					)
+					SCOPE_ANCESTOR.ANCESTOR_FK.in(ancestorPks)
+						.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+						.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
+				)
 					.and(SCOPE.SCOPE_MODEL_ID.in(scopeModelIds))
 					.and(SCOPE.DELETED.isFalse())
 			)
@@ -465,6 +465,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			}
 		}
 
+		//TODO use the better code from StatisticsChartFactoryService
 		search.getFieldModelCriteria().ifPresent(criteria -> {
 			final var criteriaByDocument = criteria.stream()
 				.collect(Collectors.groupingBy(FieldModelCriterion::datasetModelId));
@@ -481,7 +482,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					final var operator = criterion.operator();
 					final var criterionValue = criterion.value();
 
-					final var operatedFieldName = String.format("%s.%s", datasetModel.getExportTableName(), fieldModel.getId());
+					final var operatedFieldName = String.format("%s.%s_raw", datasetModel.getExportTableName(), fieldModel.getId());
 					final var operatedField = field(operatedFieldName, String.class);
 					final var fieldCondition = JOOQTranslator.translate(operator, fieldModel, operatedField, criterionValue);
 
