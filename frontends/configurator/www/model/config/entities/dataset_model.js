@@ -21,8 +21,7 @@ export class DatasetModel extends DisplayableNode {
 			longname: {type: 'object'},
 			description: {type: 'object'},
 			multiple: {type: 'boolean'},
-			collapsedLabelPattern: {type: 'string'},
-			expandedLabelPattern: {type: 'string'},
+			meaningfulFieldModelIds: {type: 'array'},
 			family: {type: 'string'},
 			master: {type: 'boolean'},
 			exportable: {type: 'boolean'},
@@ -49,8 +48,7 @@ export class DatasetModel extends DisplayableNode {
 		this.longname = {};
 		this.description = {};
 		this.multiple = false;
-		this.collapsedLabelPattern = undefined;
-		this.expandedLabelPattern = undefined;
+		this.meaningfulFieldModelIds = [];
 		this.family = undefined;
 		this.master = false;
 		this.exportable = true;
@@ -229,8 +227,8 @@ export class DatasetModel extends DisplayableNode {
 		if(this.fieldModels.isEmpty()) {
 			report.addError(`Dataset model ${this.id} does not have any field models`);
 		}
-		if(this.multiple && !this.collapsedLabelPattern) {
-			report.addError(`Dataset model ${this.id} is multiple but does not have a collapsed label pattern`, this);
+		if(this.multiple && this.meaningfulFieldModelIds.isEmpty()) {
+			report.addError(`Dataset model ${this.id} is multiple but does not have any meaningful field model ids`, this);
 		}
 		//check uniqueness of columns (field model ids and their possible value ids for field models that can have multiple values)
 		const columns = [];

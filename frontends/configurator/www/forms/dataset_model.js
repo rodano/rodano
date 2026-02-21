@@ -9,18 +9,6 @@ import {FieldModel} from '../model/config/entities/field_model.js';
 
 const sort_margin = 5;
 
-function manage_multiple() {
-	if(/**@type {HTMLInputElement}*/ (document.getElementById('dataset_model_multiple')).checked) {
-		document.getElementById('dataset_model_labels').style.display = 'block';
-	}
-	else {
-		//reset and hide fields
-		/**@type {HTMLInputElement}*/ (document.getElementById('dataset_model_collapsed_label_pattern')).value = '';
-		/**@type {HTMLInputElement}*/ (document.getElementById('dataset_model_expanded_label_pattern')).value = '';
-		document.getElementById('dataset_model_labels').style.display = 'none';
-	}
-}
-
 function draw_field_model(field_model) {
 	const field_model_li = document.createFullElement('li', {'data-field-model-id': field_model.id});
 	field_model_li.appendChild(document.createFullElement('img', {src: 'images/arrows_up_down.png', alt: 'Sort field model', title: 'Sort field model'}));
@@ -42,21 +30,6 @@ export default {
 	form: 'edit_dataset_model_form',
 	init: function() {
 		document.getElementById('edit_dataset_model_form').addEventListener('submit', FormStaticActions.SubmitEditionForm);
-
-		function dragstart(event) {
-			this.style.opacity = 0.6;
-			event.dataTransfer.effectAllowed = 'copy';
-			event.dataTransfer.setData('text/plain', this.textContent);
-		}
-		function dragend() {
-			this.style.opacity = 1;
-		}
-		document.getElementById('dataset_model_labels_patterns').querySelectorAll('span').forEach(function(pattern) {
-			pattern.addEventListener('dragstart', dragstart);
-			pattern.addEventListener('dragend', dragend);
-		});
-
-		document.getElementById('dataset_model_multiple').addEventListener('change', manage_multiple);
 
 		document.getElementById('dataset_model_all_field_models_validator').addEventListener(
 			'click',
@@ -256,6 +229,7 @@ export default {
 
 		FormHelpers.FillSelect(document.getElementById('dataset_model_field_model_validators'), dataset_model.study.validators);
 		FormHelpers.FillSelect(document.getElementById('dataset_model_field_model_workflows'), dataset_model.study.workflows);
+		FormHelpers.FillPalette(document.getElementById('dataset_model_meaningful_field_model_ids'), dataset_model.fieldModels);
 		FormHelpers.FillLocalizedInput(document.getElementById('dataset_model_shortname'), dataset_model.study.languages);
 		FormHelpers.FillLocalizedInput(document.getElementById('dataset_model_longname'), dataset_model.study.languages);
 		FormHelpers.FillLocalizedInput(document.getElementById('dataset_model_description'), dataset_model.study.languages);
@@ -274,7 +248,6 @@ export default {
 		}
 
 		draw_field_models(dataset_model);
-		manage_multiple();
 		NodeTools.DrawUsage(dataset_model, document.getElementById('dataset_model_usage'));
 	}
 };

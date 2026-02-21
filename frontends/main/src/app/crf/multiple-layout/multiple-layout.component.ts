@@ -111,15 +111,9 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 
 	ngOnChanges() {
 		this.fieldModelsToDisplay = [];
-		this.layout.datasetModel?.collapsedLabelPattern?.split('${').forEach(element => {
-			if(element !== '') {
-				element = element.trim();
-				if(element.startsWith('fieldModelId:')) {
-					const fieldModelId = element.slice(13, -1);
-					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
-					this.fieldModelsToDisplay.push(fieldModel);
-				}
-			}
+		this.layout.datasetModel?.meaningfulFieldModelIds?.forEach(fieldModelId => {
+			const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
+			this.fieldModelsToDisplay.push(fieldModel);
 		});
 		this.columnsToDisplay = [...this.fieldModelsToDisplay.map(f => f.id), 'actions'];
 		this.multipleDatasets = this.datasets.filter(d => d.modelId === this.layout.datasetModel.id);

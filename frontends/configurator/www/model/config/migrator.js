@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 120;
+const CURRENT_VERSION = 121;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -160,6 +160,23 @@ const Migrations = {
 				chart.ranges.forEach(range => {
 					delete range.show;
 				});
+			});
+		}
+	},
+	migrate_120: {
+		description: 'Add meaningful field model ids to dataset models',
+		migration: function(config) {
+			config.datasetModels.forEach(dataset_model => {
+				if(dataset_model.collapsedLabelPattern) {
+					dataset_model.meaningfulFieldModelIds = dataset_model.collapsedLabelPattern
+						.split('${')
+						.map(e => e.trim())
+						.filter(e => e.startsWith('fieldModelId:'))
+						.map(e => e.slice(13, -1))
+						.filter(field_model_id => dataset_model.fieldModels.some(f => f.id === field_model_id));
+				}
+				delete dataset_model.collapsedLabelPattern;
+				delete dataset_model.expandedLabelPattern;
 			});
 		}
 	}

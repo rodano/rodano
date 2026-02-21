@@ -51,8 +51,7 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 	private SortedMap<String, String> longname;
 	private SortedMap<String, String> description;
 
-	private String collapsedLabelPattern;
-	private String expandedLabelPattern;
+	private List<String> meaningfulFieldModelIds;
 
 	private String family;
 	private boolean master;
@@ -82,8 +81,6 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 		shortname = datasetModel.getShortname();
 		longname = datasetModel.getLongname();
 		description = datasetModel.getDescription();
-		collapsedLabelPattern = datasetModel.getCollapsedLabelPattern();
-		expandedLabelPattern = datasetModel.getExpandedLabelPattern();
 		family = datasetModel.getFamily();
 		master = datasetModel.getMaster();
 		contribution = datasetModel.isContribution();
@@ -128,6 +125,14 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 	@JsonManagedReference
 	public final void setFieldModels(final List<FieldModel> fieldModels) {
 		this.fieldModels = fieldModels;
+	}
+
+	public List<String> getMeaningfulFieldModelIds() {
+		return meaningfulFieldModelIds;
+	}
+
+	public void setMeaningfulFieldModelIds(final List<String> meaningfulFieldModelIds) {
+		this.meaningfulFieldModelIds = meaningfulFieldModelIds;
 	}
 
 	public final String getFamily() {
@@ -197,22 +202,6 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 
 	public final void setShortname(final SortedMap<String, String> shortname) {
 		this.shortname = shortname;
-	}
-
-	public String getCollapsedLabelPattern() {
-		return collapsedLabelPattern;
-	}
-
-	public void setCollapsedLabelPattern(final String collapsedLabelPattern) {
-		this.collapsedLabelPattern = collapsedLabelPattern;
-	}
-
-	public String getExpandedLabelPattern() {
-		return expandedLabelPattern;
-	}
-
-	public void setExpandedLabelPattern(final String expandedLabelPattern) {
-		this.expandedLabelPattern = expandedLabelPattern;
 	}
 
 	public final List<Rule> getDeleteRules() {

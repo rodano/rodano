@@ -27,12 +27,8 @@ public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
 	@Schema(description = "Field models")
 	@NotNull
 	List<FieldModelDTO> fieldModels;
-	@Deprecated
-	@Schema(description = "The label pattern when the multiple document is expanded")
-	String expandedLabelPattern;
-	@Deprecated
-	@Schema(description = "The label pattern when the multiple document is collapsed")
-	String collapsedLabelPattern;
+	@Schema(description = "The meaningful field model ids for this dataset, used in multiple layouts")
+	List<String> meaningfulFieldModelIds;
 
 	@Schema(description = "Does the current user have write permission on this document")
 	@NotNull
@@ -86,20 +82,12 @@ public class DatasetModelDTO implements Comparable<DatasetModelDTO> {
 		this.shortname = shortname;
 	}
 
-	public String getExpandedLabelPattern() {
-		return expandedLabelPattern;
+	public List<String> getMeaningfulFieldModelIds() {
+		return meaningfulFieldModelIds;
 	}
 
-	public void setExpandedLabelPattern(final String expandedLabelPattern) {
-		this.expandedLabelPattern = expandedLabelPattern;
-	}
-
-	public String getCollapsedLabelPattern() {
-		return collapsedLabelPattern;
-	}
-
-	public void setCollapsedLabelPattern(final String collapsedLabelPattern) {
-		this.collapsedLabelPattern = collapsedLabelPattern;
+	public void setMeaningfulFieldModelIds(final List<String> meaningfulFieldModelIds) {
+		this.meaningfulFieldModelIds = meaningfulFieldModelIds;
 	}
 
 	public boolean isCanWrite() {

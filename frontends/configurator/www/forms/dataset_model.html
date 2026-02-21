@@ -30,25 +30,10 @@
 				<label for="dataset_model_multiple">Multiple</label>
 				<input id="dataset_model_multiple" type="checkbox" name="multiple" />
 			</p>
-			<fieldset id="dataset_model_labels">
-				<legend>Labels</legend>
-				<p id="dataset_model_labels_patterns">
-					For patterns, use
-					<span draggable="true">${shortname}</span>,
-					<span draggable="true">${longname}</span>,
-					<span draggable="true">${description}</span>,
-					<span draggable="true">${number}</span>,
-					<span draggable="true">${fieldModelId:FIELD_MODEL_ID}</span>.
-				</p>
-				<p>
-					<label for="dataset_model_collapsed_label_pattern" title="Label displayed when dataset is collapsed" class="long">Collapsed label pattern</label>
-					<input id="dataset_model_collapsed_label_pattern" type="text" name="collapsedLabelPattern" class="very_long" />
-				</p>
-				<p>
-					<label for="dataset_model_expanded_label_pattern" title="Label displayed when dataset is expanded" class="long">Expanded label pattern</label>
-					<input id="dataset_model_expanded_label_pattern" type="text" name="expandedLabelPattern" class="very_long" />
-				</p>
-			</fieldset>
+			<p>
+				<label for="dataset_model_meaningful_field_model_ids">Meaningful field models</label>
+				<app-palette id="dataset_model_meaningful_field_model_ids" name="meaningfulFieldModelIds"></app-palette>
+			</p>
 			<fieldset>
 				<legend>Family</legend>
 				<p>

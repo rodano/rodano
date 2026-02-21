@@ -81,8 +81,7 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 		dto.multiple = datasetModel.isMultiple();
 		dto.exportable = datasetModel.isExportable();
 		dto.scopeDocumentation = datasetModel.isScopeDocumentation();
-		dto.expandedLabelPattern = datasetModel.getExpandedLabelPattern();
-		dto.collapsedLabelPattern = datasetModel.getCollapsedLabelPattern();
+		dto.meaningfulFieldModelIds = datasetModel.getMeaningfulFieldModelIds();
 		dto.fieldModels = datasetModel.getFieldModels().stream()
 			.sorted()
 			.map(f -> new FieldModelDTO(f, languages))

@@ -380,8 +380,6 @@ const DATASET_MODEL_EQ5D = {
 	multiple: false,
 	exportable: true,
 	scopeDocumentation: false,
-	expandedLabelPattern: '',
-	collapsedLabelPattern: '',
 	canWrite: true
 } satisfies DatasetModel;
 

@@ -36,15 +36,9 @@ export interface DatasetModel {
      */
     fieldModels: Array<FieldModel>;
     /**
-     * The label pattern when the multiple document is expanded
-     * @deprecated
+     * The meaningful field model ids for this dataset, used in multiple layouts
      */
-    expandedLabelPattern?: string;
-    /**
-     * The label pattern when the multiple document is collapsed
-     * @deprecated
-     */
-    collapsedLabelPattern?: string;
+    meaningfulFieldModelIds?: Array<string>;
     /**
      * Does the current user have write permission on this document
      */
