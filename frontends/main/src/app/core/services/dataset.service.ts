@@ -50,7 +50,7 @@ export class DatasetService {
 		}
 		const params = new HttpParams()
 			.set('datasetModelId', datasetModelId);
-		return this.http.get<Dataset>(`${url}/datasets/candidate`, {params});
+		return this.http.get<Dataset>(`${url}/candidate-dataset`, {params});
 	}
 
 	saveForScope(scopePk: number, datasets: Dataset[]): Observable<Dataset[]> {

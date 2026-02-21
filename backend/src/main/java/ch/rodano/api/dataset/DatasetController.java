@@ -190,14 +190,15 @@ public class DatasetController extends AbstractSecuredController {
 	}
 
 	/**
-	 * This function programmatically crates its own isolated transaction and sets it to "rollback only"
+	 * This function programmatically creates its own isolated transaction and sets it to "rollback only"
 	 * in order to roll back the transaction.
 	 */
-	@Operation(summary = "Create a candidate dataset on a scope", description = "Provides a dataset skeleton from which an actual dataset can be created")
-	@GetMapping("datasets/candidate")
+	@Operation(summary = "Create a candidate dataset", description = "Provides a dataset skeleton from which an actual dataset can be created")
+	@GetMapping({ "candidate-dataset", "events/{eventPk}/candidate-dataset" })
 	@ResponseStatus(HttpStatus.OK)
-	public DatasetDTO createCandidateScopeDataset(
+	public DatasetDTO createCandidateDataset(
 		@PathVariable final Long scopePk,
+		@PathVariable final Optional<Long> eventPk,
 		@RequestParam final String datasetModelId
 	) {
 		final var transactionTemplate = new TransactionTemplate(transactionManager);
@@ -207,41 +208,7 @@ public class DatasetController extends AbstractSecuredController {
 			status.setRollbackOnly();
 
 			final var scope = scopeDAOService.getScopeByPk(scopePk);
-			utilsService.checkNotNull(Scope.class, scope, scopePk);
-
-			final var datasetModel = studyService.getStudy().getDatasetModel(datasetModelId);
-
-			//check rights
-			final var acl = rightsService.getACL(currentActor(), scope);
-			acl.checkRight(datasetModel, Rights.WRITE);
-
-			final var candidateDataset = datasetService.createCandidate(scope, Optional.empty(), datasetModel, acl.actor());
-			final var datasetDTO = datasetDTOService.createDTO(scope, Optional.empty(), candidateDataset, acl);
-			cleanPksFromDataset(datasetDTO);
-			return datasetDTO;
-		});
-	}
-
-	/**
-	 * This function programmatically crates its own isolated transaction and sets it to "rollback only"
-	 * in order to roll back the transaction.
-	 */
-	@Operation(summary = "Create a candidate dataset on a event", description = "Provides a dataset skeleton from which an actual dataset can be created")
-	@GetMapping("events/{eventPk}/datasets/candidate")
-	@ResponseStatus(HttpStatus.OK)
-	public DatasetDTO createCandidateEventDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@RequestParam final String datasetModelId
-	) {
-		final var transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-
-		return transactionTemplate.execute(status -> {
-			status.setRollbackOnly();
-
-			final var scope = scopeDAOService.getScopeByPk(scopePk);
-			final var event = eventDAOService.getEventByPk(eventPk);
+			final var event = eventPk.map(eventDAOService::getEventByPk);
 
 			utilsService.checkNotNull(Scope.class, scope, scopePk);
 			utilsService.checkNotNull(Event.class, event, eventPk);
@@ -253,9 +220,16 @@ public class DatasetController extends AbstractSecuredController {
 			final var acl = rightsService.getACL(currentActor(), scope);
 			acl.checkRight(datasetModel, Rights.WRITE);
 
-			final var candidateDataset = datasetService.createCandidate(scope, Optional.of(event), datasetModel, acl.actor());
-			final var datasetDTO = datasetDTOService.createDTO(scope, Optional.of(event), candidateDataset, acl);
-			cleanPksFromDataset(datasetDTO);
+			final var candidateDataset = datasetService.createCandidate(scope, event, datasetModel, acl.actor());
+			final var datasetDTO = datasetDTOService.createDTO(scope, event, candidateDataset, acl);
+
+			//remove pk for the candidate dataset and its fields
+			datasetDTO.setPk(null);
+			datasetDTO.getFields().forEach(f -> {
+				f.setPk(null);
+				f.setDatasetPk(null);
+			});
+
 			return datasetDTO;
 		});
 	}
@@ -420,14 +394,5 @@ public class DatasetController extends AbstractSecuredController {
 		return datasets.stream()
 			.map(d -> datasetDTOService.createDTO(scope, event, d, acl))
 			.collect(Collectors.toSet());
-	}
-
-	//remove pk for the candidate dataset and its fields
-	private void cleanPksFromDataset(final DatasetDTO datasetDTO) {
-		datasetDTO.setPk(null);
-		datasetDTO.fields.forEach(f -> {
-			f.setPk(null);
-			f.setDatasetPk(null);
-		});
 	}
 }
