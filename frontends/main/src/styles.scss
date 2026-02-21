@@ -69,10 +69,11 @@
 		--mat-checkbox-label-text-size: 1rem;
 
 		//custom variables
-		--light-highlight-color: #eee;
-		--light-border-color: #ccc;
+		--strong-highlight-color: #ccc;
+		--strong-border-color: #ccc;
 
-		--lighter-border-color: #ddd;
+		--light-highlight-color: #eee;
+		--light-border-color: #ddd;
 
 		--gap: 0.5rem;
 	}
@@ -321,7 +322,7 @@ nav.side-navigation {
 		display: flex;
 		align-items: center;
 		gap: 1rem;
-		border-bottom: 1px solid var(--light-border-color);
+		border-bottom: 1px solid var(--strong-border-color);
 		& a {
 			height: 26px;
 			color: inherit;
@@ -338,19 +339,19 @@ nav.side-navigation {
 
 	li {
 		&.starting-block {
-			border-top: 1px solid var(--light-border-color);
+			border-top: 1px solid var(--strong-border-color);
 		}
 		&.ending-block {
-			border-bottom: 1px solid var(--light-border-color);
+			border-bottom: 1px solid var(--strong-border-color);
 		}
 		&.ending-block-light {
-			border-bottom: 1px solid var(--lighter-border-color);
+			border-bottom: 1px solid var(--light-border-color);
 		}
 		& > span {
 			display: flex;
 			align-items: center;
 			&:has(a.active) {
-				background: var(--light-border-color);
+				background: var(--strong-highlight-color);
 			}
 		}
 		& .main-content {

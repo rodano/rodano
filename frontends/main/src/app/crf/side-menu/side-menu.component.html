@@ -46,7 +46,7 @@
 			<li>
 				<span>
 					<a
-						[routerLink]="['/crf', scope().pk, 'form', form.pk]"
+						[routerLink]="['/crf', scope().pk, 'forms', form.pk]"
 						routerLinkActive="active"
 						[routerLinkActiveOptions]="{exact: true}"
 						queryParamsHandling="preserve"
@@ -88,6 +88,7 @@
 						<a
 							[routerLink]="[]"
 							[queryParams]="generateToggleParameters(event.pk)"
+							queryParamsHandling="merge"
 							[matTooltip]="expandedEventPks().includes(event.pk) ? 'Collapse forms' : 'Expand forms'"
 							[class.disabled]="eventPk() === event.pk">
 							<mat-icon>
@@ -99,11 +100,11 @@
 							</mat-icon>
 						</a>
 						<a
-							[routerLink]="['/crf', scope().pk, 'event', event.pk]"
-							routerLinkActive="active"
-							[routerLinkActiveOptions]="{exact: true}"
-							queryParamsHandling="preserve"
+							[routerLink]="[]"
+							[queryParams]="generateToggleParameters(event.pk)"
+							queryParamsHandling="merge"
 							[class.removed]="event.removed"
+							[class.disabled]="eventPk() === event.pk"
 							class="main-content">
 							{{ event.longname }}
 							<span class="statuses">
@@ -132,11 +133,23 @@
 					<!-- Event forms -->
 					@if (expandedEventPks().includes(event.pk)) {
 						<ol class="submenu">
+							<li>
+								<span>
+									<a
+										[routerLink]="['/crf', scope().pk, 'events', event.pk, 'dashboard']"
+										routerLinkActive="active"
+										[routerLinkActiveOptions]="{exact: true}"
+										queryParamsHandling="preserve"
+										class="main-content">
+										Status
+									</a>
+								</span>
+							</li>
 							@for (form of eventsForms()[event.pk]; track form.pk) {
 								<li>
 									<span>
 										<a
-											[routerLink]="['/crf', scope().pk, 'event', event.pk, 'form', form.pk]"
+											[routerLink]="['/crf', scope().pk, 'events', event.pk, 'forms', form.pk]"
 											routerLinkActive="active"
 											[routerLinkActiveOptions]="{exact: true}"
 											queryParamsHandling="preserve"

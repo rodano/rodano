@@ -128,27 +128,27 @@ export class SideMenuComponent implements OnInit {
 				const expandedEventPksStr: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
 				const newExpandedEventPks = expandedEventPksStr.split(',').filter(p => !!p).map(p => parseInt(p));
 				this.expandedEventPks.set(newExpandedEventPks);
-				//if the event is selected, open it
 				//do not used the observed parameters, use the active route snapshot to access the child route parameters instead
 				const params = this.activatedRoute.firstChild?.snapshot.params || {};
 				const newEventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
 				this.eventPk.set(newEventPk);
-				if(newEventPk && !newExpandedEventPks.includes(newEventPk)) {
-					this.router.navigate([], {
-						queryParams: {
-							[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: [...newExpandedEventPks, newEventPk].join(',')
-						},
-						queryParamsHandling: 'merge'
-					});
+				//if the event is selected, add it to the expanded event pks
+				if(this.eventPk()) {
+					if(!this.expandedEventPks().includes(this.eventPk()!)) {
+						this.expandedEventPks.set([...this.expandedEventPks(), this.eventPk()!]);
+					}
+					//refrain from programmatically navigate to the URL as this will add an entry in the browser history
 				}
-				else {
-					newExpandedEventPks.forEach(eventPk => {
-						if(!this.eventsForms()[eventPk]) {
-							this.formService.searchOnEvent(scope.pk, eventPk).subscribe(forms => {
-								this.eventsForms.update(ef => ({...ef, [eventPk]: forms}));
-							});
-						}
-					});
+				//load forms for every expanded event
+				const formsRequests = Object.fromEntries(this.expandedEventPks()
+					.filter(eventPk => !this.eventsForms()[eventPk])
+					.map(eventPk => [eventPk, this.formService.searchOnEvent(scope.pk, eventPk)]));
+				if(Object.keys(formsRequests).length > 0) {
+					forkJoin(formsRequests)
+						.pipe(takeUntilDestroyed(this.destroyRef))
+						.subscribe(eventForms => {
+							Object.assign(this.eventsForms, eventForms);
+						});
 				}
 			}
 		});
@@ -241,9 +241,9 @@ export class SideMenuComponent implements OnInit {
 						this.router.navigate([
 							'/crf',
 							this.scope().pk,
-							'event',
+							'events',
 							event.pk,
-							'form',
+							'forms',
 							forms[0].pk
 						]);
 					},

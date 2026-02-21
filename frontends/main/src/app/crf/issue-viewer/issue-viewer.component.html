@@ -24,7 +24,7 @@
 			mat-cell
 			*matCellDef="let status">
 			@if (status.eventFk) {
-				<a [routerLink]="['/crf', status.scopeFk, 'event', status.eventFk]">{{ status.eventShortname }}</a>
+				<a [routerLink]="['/crf', status.scopeFk, 'events', status.eventFk, 'dashboard']">{{ status.eventShortname }}</a>
 			} @else {
 				NA
 			}

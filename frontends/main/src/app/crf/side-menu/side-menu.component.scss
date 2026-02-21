@@ -6,7 +6,7 @@
 li:has(ol.submenu) {
 	position: relative;
 
-	// extend vertical line down to connect with submenu
+	//extend vertical line down to connect with submenu
 	&::after {
 		content: '';
 		position: absolute;

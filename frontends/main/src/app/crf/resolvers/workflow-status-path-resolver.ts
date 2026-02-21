@@ -32,11 +32,11 @@ export class WorkflowStatusPathResolver implements Resolve<FormInfo> {
 				const command = ['/crf', form.scopePk];
 				const queryParams: Record<string, string> = {};
 				if(form.eventPk) {
-					command.push('event', form.eventPk);
+					command.push('events', form.eventPk);
 					queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] = form.eventPk.toString();
 				}
 				if(form.formPk) {
-					command.push('form', form.formPk);
+					command.push('forms', form.formPk);
 				}
 				this.router.navigate(command, {queryParams});
 			})
