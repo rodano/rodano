@@ -2,19 +2,31 @@
 	margin-bottom: 1rem;
 	width: 25%;
 }
-.mat-column-PARENT-SCOPE_CODE {
-	width: 8rem;
-}
+.mat-column-PARENT_SCOPE_CODE,
 .mat-column-SCOPE_CODE {
 	width: 8rem;
+	max-width: 8rem;
 }
 .mat-column-EVENT_LABEL,
 .mat-column-FORM_LABEL,
+.mat-column-FIELD_LABEL,
+.mat-column-WORKFLOW_LABEL,
+.mat-column-STATUS_LABEL {
+	width: 8rem;
+	max-width: 8rem;
+}
 .mat-column-FIELD_LABEL {
 	width: 12rem;
+	max-width: 12rem;
 }
 .mat-column-EVENT_DATE,
 .mat-column-FORM_DATE,
-.mat-column-FIELD_DATE {
+.mat-column-FIELD_DATE,
+.mat-column-STATUS_DATE {
 	width: 8rem;
+	max-width: 8rem;
+}
+.mat-mdc-cell {
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
