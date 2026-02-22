@@ -29,10 +29,11 @@
 					@for (proposal of filteredProposals$ | async; track proposal.id) {
 						<mat-option [value]="proposal">
 							<div class="proposal-option">
-								<span class="proposal-label">{{ proposal.label }}</span>
-								<br>
-								<span class="proposal-category">{{ proposal.category }}</span>
-								<span class="proposal-id">{{ proposal.id }}</span>
+								<div class="proposal-top">
+									<span class="proposal-label" [innerHTML]="highlightMatch(proposal.label, (form.get('valueFormula')?.value || ''))"></span>
+									<span class="proposal-category-badge" [ngClass]="getCategoryClass(proposal.category)">{{ proposal.category }}</span>
+								</div>
+								<span class="proposal-id" [innerHTML]="highlightMatch(proposal.id, (form.get('valueFormula')?.value || ''))"></span>
 							</div>
 						</mat-option>
 					}

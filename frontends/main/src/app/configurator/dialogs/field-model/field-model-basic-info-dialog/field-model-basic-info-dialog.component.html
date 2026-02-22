@@ -93,7 +93,8 @@
 			Cancel
 		</button>
 		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
-			Save Changes
+			<mat-icon>save</mat-icon>
+			{{ isEditMode ? 'Save Changes' : 'Create Field Model' }}
 		</button>
 	</div>
 </div>
