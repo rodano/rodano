@@ -27,6 +27,7 @@ import {EventGroupManagerService} from '../services/manager/event-group-manager.
 import {FieldModelManagerService} from '../services/manager/field-model-manager.service';
 import {WorkflowStateManagerService} from '../services/manager/workflow-state-manager.service';
 import {WorkflowActionManagerService} from '../services/manager/workflow-action-manager.service';
+import {ProfileManagerService} from '../services/manager/profile-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -60,6 +61,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	datasetModelModificationCount = 0;
 	validatorModificationCount = 0;
 	workflowModificationCount = 0;
+	profileModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -70,6 +72,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	workflows: any[] = [];
 	workflowStates: any[] = [];
 	workflowActions: any[] = [];
+	profiles: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -80,6 +83,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedWorkflowId: string | null = null;
 	selectedWorkflowStateId: string | null = null;
 	selectedWorkflowActionId: string | null = null;
+	selectedProfileId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -99,6 +103,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private workflowActionManager: WorkflowActionManagerService,
+		private profileManager: ProfileManagerService,
 		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
@@ -140,6 +145,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowManager.invalidate();
 		this.workflowStateManager.invalidate();
 		this.workflowActionManager.invalidate();
+		this.profileManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -183,6 +189,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: workflows => this.workflows = workflows,
 			error: error => console.error('Error loading workflows:', error)
 		});
+
+		this.profileManager.load(this.projectId).subscribe({
+			next: profiles => this.profiles = profiles,
+			error: error => console.error('Error loading profiles:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -190,6 +201,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.datasetModels = this.datasetModelManager.getAll();
 		this.validators = this.validatorManager.getAll();
 		this.workflows = this.workflowManager.getAll();
+		this.profiles = this.profileManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -228,7 +240,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -244,11 +256,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.workflows = [];
 			this.workflowStates = [];
 			this.workflowActions = [];
+			this.profiles = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
 			this.detailComponent?.validatorsListComponent?.clearSelection();
 			this.detailComponent?.workflowListComponent?.clearSelection();
+			this.detailComponent?.profileListComponent?.clearSelection();
 		}
 	}
 
@@ -268,30 +282,26 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowModificationCount = event.modificationCount;
 	}
 
+	onProfilesChanged(event: {modificationCount: number}): void {
+		this.profileModificationCount = event.modificationCount;
+	}
+
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
+	}
 
-		Object.keys(updates).forEach(key => {
-			const originalValue = this.project![key as keyof ConfiguratorProject];
-			const newValue = updates[key as keyof ConfiguratorProject];
-
-			if(newValue !== null && originalValue !== null && typeof newValue === 'object' && typeof originalValue === 'object') {
-				if(JSON.stringify(originalValue) !== JSON.stringify(newValue)) {
-					this.modifiedFields.add(key);
-				}
-				else {
-					this.modifiedFields.delete(key);
-				}
+	get projectModificationCount(): number {
+		if(!this.project || !this.workingProject) {
+			return 0;
+		}
+		return Object.keys(this.workingProject).filter(key => {
+			const original = this.project![key as keyof ConfiguratorProject];
+			const current = this.workingProject![key as keyof ConfiguratorProject];
+			if(typeof original === 'object' && original !== null) {
+				return JSON.stringify(original) !== JSON.stringify(current);
 			}
-			else {
-				if(originalValue !== newValue) {
-					this.modifiedFields.add(key);
-				}
-				else {
-					this.modifiedFields.delete(key);
-				}
-			}
-		});
+			return original !== current;
+		}).length;
 	}
 
 	onSaveDraft(): void {
@@ -324,6 +334,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveWorkflows());
 				}
 
+				if(this.profileModificationCount > 0) {
+					saveObservables.push(this.saveProfiles());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
@@ -331,6 +345,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 							this.datasetModelModificationCount = 0;
 							this.validatorModificationCount = 0;
 							this.workflowModificationCount = 0;
+							this.profileModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -437,6 +452,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveProfiles(): Promise<void> {
+		const component = this.detailComponent?.profileListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveProfiles(this.projectId, {
+			profileManager: component.profileManager,
+			profiles: component.profiles,
+			originalProfiles: component.originalProfiles,
+			modifiedProfileIds: component.modifiedProfileIds
+		}).toPromise().then(() => {
+			component.loadProfiles();
+			this.profiles = this.profileManager.getAll();
+		});
+	}
+
 	onDiscardChanges(): void {
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
@@ -514,10 +546,22 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					workflowComponent.loadWorkflows();
 				}
 
+				const profileComponent = this.detailComponent?.profileListComponent;
+				if(profileComponent) {
+					this.entitySaveOrchestratorService.resetProfilesToOriginals({
+						profileManager: profileComponent.profileManager,
+						profiles: profileComponent.profiles,
+						originalProfiles: profileComponent.originalProfiles,
+						modifiedProfileIds: profileComponent.modifiedProfileIds
+					});
+					profileComponent.loadProfiles();
+				}
+
 				this.scopeModelModificationCount = 0;
 				this.datasetModelModificationCount = 0;
 				this.validatorModificationCount = 0;
 				this.workflowModificationCount = 0;
+				this.profileModificationCount = 0;
 
 				this.refreshTreeData();
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
@@ -587,11 +631,21 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	get hasModifications(): boolean {
-		return this.modifiedFields.size > 0 || this.scopeModelModificationCount > 0 || this.datasetModelModificationCount > 0 || this.validatorModificationCount > 0 || this.workflowModificationCount > 0;
+		return this.projectModificationCount > 0
+		  || this.scopeModelModificationCount > 0
+		  || this.datasetModelModificationCount > 0
+		  || this.validatorModificationCount > 0
+		  || this.workflowModificationCount > 0
+		  || this.profileModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
-		return this.modifiedFields.size + this.scopeModelModificationCount + this.datasetModelModificationCount + this.validatorModificationCount + this.workflowModificationCount;
+		return this.projectModificationCount
+		  + this.scopeModelModificationCount
+		  + this.datasetModelModificationCount
+		  + this.validatorModificationCount
+		  + this.workflowModificationCount
+		  + this.profileModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -629,6 +683,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedWorkflowId = context.selectedWorkflowId;
 			this.selectedWorkflowStateId = context.selectedWorkflowStateId;
 			this.selectedWorkflowActionId = context.selectedWorkflowActionId;
+		});
+	}
+
+	onProfileContextChanged(context: any): void {
+		setTimeout(() => {
+			this.profiles = context.profiles;
+			this.selectedProfileId = context.selectedProfileId;
 		});
 	}
 }

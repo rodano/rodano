@@ -54,12 +54,13 @@
 		(categoryClicked)="onWorkflowsClicked()">
 	</app-workflow-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('profiles')">
-			<mat-icon class="node-icon">badge</mat-icon>
-			<span class="node-label">Profiles</span>
-		</div>
-	</div>
+	<app-profile-tree
+		[projectId]="projectId"
+		[profiles]="profiles"
+		[expanded]="expandedCategory === 'profiles'"
+		[selectedProfileId]="selectedProfileId"
+		(categoryClicked)="onProfilesClicked()">
+	</app-profile-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('features')">

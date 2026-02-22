@@ -7,6 +7,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {ProjectSettingsDialogService} from '../../services/dialogs/project-settings-dialog.service';
 import {LanguageService} from '../../services/language.service';
 import {Subscription} from 'rxjs';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 
 @Component({
 	selector: 'app-project-settings-detail',
@@ -19,7 +20,7 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
-	@Input() modifiedFields = new Set<string>();
+	@Input() workingProject: ConfiguratorProject | null = null;
 	@Output() fieldsUpdated = new EventEmitter<Partial<ConfiguratorProject>>();
 
 	selectedLanguage = '';
@@ -27,7 +28,8 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 
 	constructor(
 		private dialogService: ProjectSettingsDialogService,
-		private languageService: LanguageService
+		private languageService: LanguageService,
+		private profileManager: ProfileManagerService
 	) {}
 
 	ngOnInit(): void {
@@ -73,7 +75,15 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 	}
 
 	isFieldModified(fieldName: string): boolean {
-		return this.modifiedFields.has(fieldName);
+		if(!this.project || !this.workingProject) {
+			return false;
+		}
+		const original = this.project[fieldName as keyof ConfiguratorProject];
+		const current = this.workingProject[fieldName as keyof ConfiguratorProject];
+		if(typeof original === 'object' && original !== null) {
+			return JSON.stringify(original) !== JSON.stringify(current);
+		}
+		return original !== current;
 	}
 
 	onLanguageChange(event: Event): void {
@@ -205,5 +215,14 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 				});
 			}
 		});
+	}
+
+	getProfileLabel(profileId: string): string {
+		const profile = this.profileManager.getById(profileId);
+		if(!profile) {
+			return profileId;
+		}
+		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
+		return `${name} (${profile.id})`;
 	}
 }

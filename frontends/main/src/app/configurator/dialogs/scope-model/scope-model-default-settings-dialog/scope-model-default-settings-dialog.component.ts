@@ -9,6 +9,8 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSelectModule} from '@angular/material/select';
 import {Profile} from '@core/model/profile';
+import {ProfileManagerService} from '../../../services/manager/profile-manager.service';
+import {LanguageService} from '../../../services/language.service';
 
 interface DialogData {
 	projectId: string;
@@ -37,6 +39,8 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 
 	constructor(
 		private fb: FormBuilder,
+		private profileManager: ProfileManagerService,
+		private languageService: LanguageService,
 		private dialogRef: MatDialogRef<ScopeModelDefaultSettingsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
 		private snackBar: MatSnackBar
@@ -47,12 +51,8 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.loadAvailableProfiles();
+		this.availableProfiles = this.profileManager.getAll();
 		this.populateForm();
-	}
-
-	loadAvailableProfiles(): void {
-		//TODO: Replace with actual service call when backend endpoint is ready
 	}
 
 	populateForm(): void {
@@ -70,7 +70,7 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 		const formValue = this.form.getRawValue();
 
 		const result = {
-			defaultProfileId: formValue.defaultProfileId || ''
+			defaultProfileId: formValue.defaultProfileId || null
 		};
 
 		this.dialogRef.close(result);
@@ -78,5 +78,10 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 
 	onCancel(): void {
 		this.dialogRef.close(null);
+	}
+
+	getProfileLabel(profile: Profile): string {
+		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
+		return `${name} (${profile.id})`;
 	}
 }

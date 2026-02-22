@@ -42,11 +42,13 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!workflow.order">
-					@if (!workflow.order) {
+				<div class="setting-value" [class.not-configured]="workflow.order === null || workflow.order === undefined">
+					@if (workflow.order === null || workflow.order === undefined) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ workflow.order }}
 					}
-					{{ workflow.order || 'Not configured' }}
 				</div>
 			</div>
 

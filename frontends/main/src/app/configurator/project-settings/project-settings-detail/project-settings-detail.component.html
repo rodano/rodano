@@ -233,8 +233,13 @@
 				<div class="setting-value" [class.not-configured]="!project?.eproProfileId">
 					@if (!project?.eproProfileId) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">badge</mat-icon>
+							<span class="language-name">{{ getProfileLabel(project!.eproProfileId!) }}</span>
+						</div>
 					}
-					{{ project?.eproProfileId || 'Not configured' }}
 				</div>
 			</div>
 		</div>

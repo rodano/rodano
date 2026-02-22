@@ -5,6 +5,8 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {Profile} from '@core/model/profile';
 import {MatSelectModule} from '@angular/material/select';
+import {ProfileManagerService} from '../../../services/manager/profile-manager.service';
+import {LanguageService} from '../../../services/language.service';
 
 export interface EproSettingsDialogData {
 	eproEnabled: boolean;
@@ -30,6 +32,8 @@ export class ProjectSettingsEproDialogComponent {
 
 	constructor(
 		private fb: FormBuilder,
+		private profileManager: ProfileManagerService,
+		private languageService: LanguageService,
 		private dialogRef: MatDialogRef<ProjectSettingsEproDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EproSettingsDialogData
 	) {
@@ -47,5 +51,14 @@ export class ProjectSettingsEproDialogComponent {
 		if(this.form.valid) {
 			this.dialogRef.close(this.form.value);
 		}
+	}
+
+	getProfileLabel(profileId: string): string {
+		const profile = this.profileManager.getById(profileId);
+		if(!profile) {
+			return profileId;
+		}
+		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
+		return `${name} (${profile.id})`;
 	}
 }

@@ -46,7 +46,10 @@ public class CacheConfig {
 			"workflowStates",
 			"workflowState",
 			"workflowActions",
-			"workflowAction"
+			"workflowAction",
+
+			"profiles",
+			"profile"
 		);
 	}
 }

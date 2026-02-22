@@ -1,0 +1,93 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Profiles</h1>
+			<p class="detail-subtitle">Configure profiles for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<div class="empty-state">
+			<mat-icon>hourglass_empty</mat-icon>
+			<p>Loading profiles...</p>
+		</div>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card" (click)="onCreateProfile()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Profile</h3>
+						<p>Add a new profile</p>
+					</div>
+				</div>
+
+				@for (profile of profiles; track profile.profileId) {
+					<div class="primary-card"
+										[class.selected]="isSelected(profile)"
+										[class.modified]="modifiedProfileIds.has(profile.profileId)"
+										[style.border-top-color]="modifiedProfileIds.has(profile.profileId) ? '#f59e0b' : ''"
+										(click)="onSelectProfile(profile)">
+
+						@if (isSelected(profile)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ getTranslatedName(profile.shortname) }}</h3>
+								<p class="card-code">{{ profile.id }}</p>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item" [class.unset]="!profile.order">
+									<mat-icon>sort</mat-icon>
+									<span>Order: {{ profile.order !== null && profile.order !== undefined ? profile.order : 'Not set' }}</span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>settings</mat-icon>
+									<span>Workflow of Interest: {{ profile.workflowOfInterestId ? getWorkflowDisplayName(profile) : 'Not set' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (modifiedProfileIds.has(profile.profileId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (profiles.length === 0) {
+				<div class="empty-state">
+					<mat-icon>badge</mat-icon>
+					<h3>No profiles</h3>
+					<p>Create your first profile to start collecting data</p>
+				</div>
+			}
+		</div>
+
+		@if (selectedProfile && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-profile-detail
+					[profile]="selectedProfile"
+					[projectId]="projectId"
+					[project]="project"
+					[allProfiles]="profiles"
+					(profileUpdated)="onProfileUpdated($event)"
+					(profileDeleted)="onProfileDeleted($event)"
+					(closed)="onSelectProfile(selectedProfile)">
+				</app-profile-detail>
+			</div>
+		}
+	}
+</div>

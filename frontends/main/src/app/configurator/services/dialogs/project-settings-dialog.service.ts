@@ -28,13 +28,15 @@ import {
 import {
 	ProjectSettingsRuleTagsDialogComponent, RuleTagsDialogData
 } from '../../dialogs/project-settings/project-settings-rule-tags-dialog/project-settings-rule-tags-dialog.component';
+import {ProfileManagerService} from '../manager/profile-manager.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ProjectSettingsDialogService {
 	constructor(
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private profileManager: ProfileManagerService
 	) {}
 
 	openBasicInfoDialog(project: ConfiguratorProject): Observable<any> {
@@ -97,7 +99,7 @@ export class ProjectSettingsDialogService {
 			data: {
 				eproEnabled: project?.eproEnabled,
 				eproProfileId: project?.eproProfileId,
-				availableProfiles: [] //TODO: Fetch from service
+				availableProfiles: this.profileManager.getAll()
 			} as EproSettingsDialogData
 		});
 

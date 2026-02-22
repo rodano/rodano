@@ -99,6 +99,7 @@
 					[fieldModels]="fieldModels"
 					[validators]="validators"
 					[workflows]="workflows"
+					[profiles]="profiles"
 					[workflowStates]="workflowStates"
 					[workflowActions]="workflowActions"
 					[selectedScopeModelId]="selectedScopeModelId"
@@ -110,6 +111,7 @@
 					[selectedWorkflowId]="selectedWorkflowId"
 					[selectedWorkflowStateId]="selectedWorkflowStateId"
 					[selectedWorkflowActionId]="selectedWorkflowActionId"
+					[selectedProfileId]="selectedProfileId"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
 			</div>
@@ -117,17 +119,20 @@
 			<div class="editor-main">
 				<app-configurator-detail
 					[projectId]="projectId"
-					[project]="workingProject"
+					[project]="project"
+					[workingProject]="workingProject"
 					[selectedNode]="selectedNode"
 					(fieldsUpdated)="onFieldsUpdated($event)"
 					(scopeModelsChanged)="onScopeModelsChanged($event)"
 					(datasetModelsChanged)="onDatasetModelsChanged($event)"
 					(validatorsChanged)="onValidatorsChanged($event)"
 					(workflowsChanged)="onWorkflowsChanged($event)"
+					(profilesChanged)="onProfilesChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
-					(workflowContextChanged)="onWorkflowContextChanged($event)">
+					(workflowContextChanged)="onWorkflowContextChanged($event)"
+					(profileContextChanged)="onProfileContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

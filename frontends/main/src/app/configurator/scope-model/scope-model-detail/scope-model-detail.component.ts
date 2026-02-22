@@ -19,6 +19,7 @@ import {DatasetModelManagerService} from '../../services/manager/dataset-model-m
 import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -62,6 +63,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		private datasetModelManager: DatasetModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
+		private profileManager: ProfileManagerService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
 	) {}
@@ -265,7 +267,6 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		if(!datasetModel) {
 			return datasetModelId;
 		}
-
 		const name = this.languageService.getDefaultTranslation(datasetModel.shortname) || datasetModel.id;
 		return `${name} (${datasetModel.id})`;
 	}
@@ -280,8 +281,16 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		if(!workflow) {
 			return workflowId;
 		}
-
 		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
 		return `${name} (${workflow.id})`;
+	}
+
+	getProfileLabel(profileId: string): string {
+		const profile = this.profileManager.getById(profileId);
+		if(!profile) {
+			return profileId;
+		}
+		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
+		return `${name} (${profile.id})`;
 	}
 }

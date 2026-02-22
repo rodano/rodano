@@ -63,6 +63,7 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 	ngOnInit(): void {
 		this.loadValidators();
 
+		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});

@@ -18,6 +18,8 @@ import {WorkflowActionService} from './api/workflow-action.service';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowState} from '@core/model/workflow-state';
 import {WorkflowAction} from '@core/model/workflow-action';
+import {Profile} from '@core/model/profile';
+import {ProfileService} from './api/profile.service';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -30,7 +32,8 @@ export class DraftSaveService {
 		private validatorService: ValidatorService,
 		private workflowService: WorkflowService,
 		private workflowStateService: WorkflowStateService,
-		private workflowActionService: WorkflowActionService
+		private workflowActionService: WorkflowActionService,
+		private profileService: ProfileService
 	) {}
 
 	saveScopeModels(
@@ -265,6 +268,41 @@ export class DraftSaveService {
 			const workflowAction = workflowActions.find(wfa => wfa.workflowActionId === id);
 			if(workflowAction) {
 				saveObservables.push(this.workflowActionService.updateWorkflowAction(projectId, id, workflowAction));
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveProfiles(
+		projectId: string,
+		modifiedIds: Set<string>,
+		profiles: Profile[],
+		originalProfiles: Profile[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalProfiles.find(p => p.profileId === originalId);
+				if(original) {
+					saveObservables.push(this.profileService.deleteProfile(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const profile = profiles.find(p => p.profileId === id);
+				if(profile) {
+					saveObservables.push(this.profileService.createProfile(projectId, profile));
+				}
+			}
+			else {
+				const profile = profiles.find(p => p.profileId === id);
+				if(profile) {
+					saveObservables.push(this.profileService.updateProfile(projectId, id, profile));
+				}
 			}
 		});
 

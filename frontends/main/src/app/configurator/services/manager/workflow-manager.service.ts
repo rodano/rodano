@@ -59,6 +59,10 @@ export class WorkflowManagerService {
 		);
 	}
 
+	isLoaded(): boolean {
+		return this.loaded;
+	}
+
 	getModifiedIds(): Set<string> {
 		return this.tracker.getModifiedIds();
 	}

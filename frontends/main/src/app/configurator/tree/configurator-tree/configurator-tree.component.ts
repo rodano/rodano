@@ -6,6 +6,7 @@ import {DatasetModelsTreeComponent} from '../dataset-models-tree/dataset-models-
 import {ProjectSettingsTreeComponent} from '../project-settings-tree/project-settings-tree.component';
 import {ValidatorTreeComponent} from '../validator-tree/validator-tree.component';
 import {WorkflowTreeComponent} from '../workflow-tree/workflow-tree.component';
+import {ProfileTreeComponent} from '../profile-tree/profile-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -17,7 +18,8 @@ import {WorkflowTreeComponent} from '../workflow-tree/workflow-tree.component';
 		ScopeModelsTreeComponent,
 		DatasetModelsTreeComponent,
 		ValidatorTreeComponent,
-		WorkflowTreeComponent
+		WorkflowTreeComponent,
+		ProfileTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -34,6 +36,7 @@ export class ConfiguratorTreeComponent {
 	@Input() workflows: any[] = [];
 	@Input() workflowStates: any[] = [];
 	@Input() workflowActions: any[] = [];
+	@Input() profiles: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -43,10 +46,11 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedWorkflowId: string | null = null;
 	@Input() selectedWorkflowStateId: string | null = null;
 	@Input() selectedWorkflowActionId: string | null = null;
+	@Input() selectedProfileId: string | null = null;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | null = null;
 
 	onScopeModelsClicked(): void {
 		this.expandedCategory = this.expandedCategory === 'scope-models' ? null : 'scope-models';
@@ -66,6 +70,11 @@ export class ConfiguratorTreeComponent {
 	onWorkflowsClicked(): void {
 		this.expandedCategory = this.expandedCategory === 'workflows' ? null : 'workflows';
 		this.categoryClicked.emit('workflows');
+	}
+
+	onProfilesClicked(): void {
+		this.expandedCategory = this.expandedCategory === 'profiles' ? null : 'profiles';
+		this.categoryClicked.emit('profiles');
 	}
 
 	onCategoryClick(categoryId: string): void {

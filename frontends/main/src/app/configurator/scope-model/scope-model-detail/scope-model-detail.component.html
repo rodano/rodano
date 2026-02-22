@@ -118,11 +118,13 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!scopeModel.expectedNumber">
-					@if (!scopeModel.expectedNumber) {
+				<div class="setting-value" [class.not-configured]="scopeModel.expectedNumber === null || scopeModel.expectedNumber === undefined">
+					@if (scopeModel.expectedNumber === null || scopeModel.expectedNumber === undefined) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ scopeModel.expectedNumber }}
 					}
-					{{ scopeModel.expectedNumber || 'Not configured' }}
 				</div>
 			</div>
 
@@ -133,11 +135,13 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!scopeModel.maxNumber">
-					@if (!scopeModel.maxNumber) {
+				<div class="setting-value" [class.not-configured]="scopeModel.maxNumber === null || scopeModel.maxNumber === undefined">
+					@if (scopeModel.maxNumber === null || scopeModel.maxNumber === undefined) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ scopeModel.maxNumber }}
 					}
-					{{ scopeModel.maxNumber || 'Not configured' }}
 				</div>
 			</div>
 		</div>
@@ -175,8 +179,13 @@
 				<div class="setting-value" [class.not-configured]="!scopeModel.defaultParentId">
 					@if (!scopeModel.defaultParentId) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">account_tree</mat-icon>
+							<span class="language-name">{{ getScopeModelLabel(scopeModel.defaultParentId) }}</span>
+						</div>
 					}
-					{{ scopeModel.defaultParentId ? getScopeModelLabel(scopeModel.defaultParentId) : 'Not configured' }}
 				</div>
 			</div>
 
@@ -252,8 +261,13 @@
 				<div class="setting-value" [class.not-configured]="!scopeModel.defaultProfileId">
 					@if (!scopeModel.defaultProfileId) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip">
+							<mat-icon class="resource-icon">badge</mat-icon>
+							<span class="language-name">{{ getProfileLabel(scopeModel.defaultProfileId) }}</span>
+						</div>
 					}
-					{{ scopeModel.defaultProfileId || 'Not configured' }}
 				</div>
 			</div>
 		</div>

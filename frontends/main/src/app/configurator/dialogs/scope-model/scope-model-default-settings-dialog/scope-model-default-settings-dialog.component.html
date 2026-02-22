@@ -5,11 +5,11 @@
 		<form [formGroup]="form" class="settings-form">
 			<div class="form-field">
 				<label>Default Profile</label>
-				<mat-select formControlName="defaultProfileId" placeholder="Select default profile">
-					<mat-option [value]="''">None</mat-option>
-					@for (profile of availableProfiles; track profile.id) {
-						<mat-option [value]="profile.id">
-							{{ profile.shortname }} ({{ profile.id }})
+				<mat-select formControlName="defaultProfileId" placeholder="Select profile">
+					<mat-option [value]="null">None</mat-option>
+					@for (profile of availableProfiles; track profile.profileId) {
+						<mat-option [value]="profile.profileId">
+							{{ getProfileLabel(profile) }}
 						</mat-option>
 					}
 				</mat-select>

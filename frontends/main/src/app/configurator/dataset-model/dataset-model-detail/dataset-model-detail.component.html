@@ -163,11 +163,13 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!datasetModel.exportOrder">
-					@if (!datasetModel.exportOrder) {
+				<div class="setting-value" [class.not-configured]="datasetModel.exportOrder === null || datasetModel.exportOrder === undefined">
+					@if (datasetModel.exportOrder === null || datasetModel.exportOrder === undefined) {
 						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ datasetModel.exportOrder }}
 					}
-					{{ datasetModel.exportOrder || 'Not configured' }}
 				</div>
 			</div>
 		</div>

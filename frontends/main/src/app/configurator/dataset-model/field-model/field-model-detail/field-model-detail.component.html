@@ -125,11 +125,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxLength">
-								@if (!draftFieldModel.maxLength) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.maxLength === null || draftFieldModel.maxLength === undefined">
+								@if (draftFieldModel.maxLength === null || draftFieldModel.maxLength === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.maxLength }}
 								}
-								{{ draftFieldModel.maxLength || 'Not configured' }}
 							</div>
 						</div>
 					}
@@ -176,11 +178,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxIntegerDigits">
-								@if (!draftFieldModel.maxIntegerDigits) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.maxIntegerDigits === null || draftFieldModel.maxIntegerDigits === undefined">
+								@if (draftFieldModel.maxIntegerDigits === null || draftFieldModel.maxIntegerDigits === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.maxIntegerDigits }}
 								}
-								{{ draftFieldModel.maxIntegerDigits || 'Not configured' }}
 							</div>
 						</div>
 
@@ -191,11 +195,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxDecimalDigits">
-								@if (!draftFieldModel.maxDecimalDigits) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.maxDecimalDigits === null || draftFieldModel.maxDecimalDigits === undefined">
+								@if (draftFieldModel.maxDecimalDigits === null || draftFieldModel.maxDecimalDigits === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.maxDecimalDigits }}
 								}
-								{{ draftFieldModel.maxDecimalDigits || 'Not configured' }}
 							</div>
 						</div>
 
@@ -206,11 +212,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.minValue">
-								@if (!draftFieldModel.minValue) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.minValue === null || draftFieldModel.minValue === undefined">
+								@if (draftFieldModel.minValue === null || draftFieldModel.minValue === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.minValue }}
 								}
-								{{ draftFieldModel.minValue ?? 'Not configured' }}
 							</div>
 						</div>
 
@@ -221,11 +229,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxValue">
-								@if (!draftFieldModel.maxValue) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.maxValue === null || draftFieldModel.maxValue === undefined">
+								@if (draftFieldModel.maxValue === null || draftFieldModel.maxValue === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.maxValue }}
 								}
-								{{ draftFieldModel.maxValue ?? 'Not configured' }}
 							</div>
 						</div>
 					}
@@ -316,11 +326,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.minYear">
-								@if (!draftFieldModel.minYear) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.minYear === null || draftFieldModel.minYear === undefined">
+								@if (draftFieldModel.minYear === null || draftFieldModel.minYear === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.minYear }}
 								}
-								{{ draftFieldModel.minYear || 'Not configured' }}
 							</div>
 						</div>
 
@@ -331,11 +343,13 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!draftFieldModel.maxYear">
-								@if (!draftFieldModel.maxYear) {
+							<div class="setting-value" [class.not-configured]="draftFieldModel.maxYear === null || draftFieldModel.maxYear === undefined">
+								@if (draftFieldModel.maxYear === null || draftFieldModel.maxYear === undefined) {
 									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ draftFieldModel.maxYear }}
 								}
-								{{ draftFieldModel.maxYear || 'Not configured' }}
 							</div>
 						</div>
 
@@ -426,10 +440,10 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!draftFieldModel.exportOrder">
-						@if (!draftFieldModel.exportOrder) {
+					<div class="setting-value" [class.not-configured]="draftFieldModel.exportOrder === null || draftFieldModel.exportOrder === undefined">
+						@if (draftFieldModel.exportOrder === null || draftFieldModel.exportOrder === undefined) {
 							<mat-icon class="warning-icon">report</mat-icon>
-							Not configured
+							<span>Not configured</span>
 						} @else {
 							{{ draftFieldModel.exportOrder }}
 						}

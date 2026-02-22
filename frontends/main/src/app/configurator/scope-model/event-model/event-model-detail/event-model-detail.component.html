@@ -32,11 +32,13 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!draftEventModel.number">
-						@if (!draftEventModel.number) {
+					<div class="setting-value" [class.not-configured]="draftEventModel.number === null || draftEventModel.number === undefined">
+						@if (draftEventModel.number === null || draftEventModel.number === undefined) {
 							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftEventModel.number }}
 						}
-						{{ draftEventModel.number ?? 'Not configured' }}
 					</div>
 				</div>
 
@@ -144,11 +146,13 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!draftEventModel.maxOccurrence">
-						@if (!draftEventModel.maxOccurrence) {
+					<div class="setting-value" [class.not-configured]="draftEventModel.maxOccurrence === null || draftEventModel.maxOccurrence === undefined">
+						@if (draftEventModel.maxOccurrence === null || draftEventModel.maxOccurrence === undefined) {
 							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftEventModel.maxOccurrence }}
 						}
-						{{ draftEventModel.maxOccurrence ?? 'Unlimited' }}
 					</div>
 				</div>
 

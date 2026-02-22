@@ -17,6 +17,8 @@ export interface Profile {
     shortname: { [key: string]: string; };
     longname?: { [key: string]: string; };
     description?: { [key: string]: string; };
+    order?: number;
+    workflowOfInterestId?: string;
     features: Array<string>;
     profilesRight: { [key: string]: Set<Rights>; };
     privacyPolicies: Array<PrivacyPolicy>;

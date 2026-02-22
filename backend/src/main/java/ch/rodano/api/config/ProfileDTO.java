@@ -20,6 +20,9 @@ public record ProfileDTO(
 	SortedMap<String, String> longname,
 	SortedMap<String, String> description,
 
+	Integer order,
+	UUID workflowOfInterestId,
+
 	//rights
 	@NotNull Collection<String> features,
 	@NotNull Map<String, Set<Rights>> profilesRight,
@@ -34,6 +37,8 @@ public record ProfileDTO(
 			profile.getShortname(),
 			profile.getLongname(),
 			profile.getDescription(),
+			null,
+			null,
 			profile.getGrantedFeatureIds(),
 			profile.getGrantedProfileIdRights(),
 			profile.getPrivacyPolicies().stream().map(PrivacyPolicyDTO::new).toList()

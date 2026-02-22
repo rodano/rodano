@@ -7,6 +7,7 @@ import {ScopeModelsListComponent} from '../scope-model/scope-model-list/scope-mo
 import {DatasetModelListComponent} from '../dataset-model/dataset-model-list/dataset-model-list.component';
 import {ValidatorsListComponent} from '../validator/validators-list/validators-list.component';
 import {WorkflowListComponent} from '../workflow/workflow-list/workflow-list.component';
+import {ProfileListComponent} from '../profile/profile-list/profile-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -20,7 +21,8 @@ import {WorkflowListComponent} from '../workflow/workflow-list/workflow-list.com
 		ScopeModelsListComponent,
 		DatasetModelListComponent,
 		ValidatorsListComponent,
-		WorkflowListComponent
+		WorkflowListComponent,
+		ProfileListComponent
 	]
 })
 export class ConfiguratorDetailComponent implements OnChanges {
@@ -28,11 +30,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(DatasetModelListComponent) datasetModelsListComponent?: DatasetModelListComponent;
 	@ViewChild(ValidatorsListComponent) validatorsListComponent?: ValidatorsListComponent;
 	@ViewChild(WorkflowListComponent) workflowListComponent?: WorkflowListComponent;
+	@ViewChild(ProfileListComponent) profileListComponent?: ProfileListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
-	@Input() modifiedFields = new Set<string>();
+	@Input() workingProject: ConfiguratorProject | null = null;
 	@Output() fieldsUpdated = new EventEmitter<Partial<ConfiguratorProject>>();
 	@Output() nodeSelected = new EventEmitter<string | null>();
 	@Output() modificationCountChanged = new EventEmitter<number>();
@@ -71,12 +74,19 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedWorkflowActionId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'overview' | null = null;
+	@Output() profilesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() profileContextChanged = new EventEmitter<{
+		profiles: any[];
+		selectedProfileId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
 	validatorModificationCount = 0;
 	workflowModificationCount = 0;
+	profileModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -128,6 +138,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
+	onProfileSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onProfilesChanged(event: {modificationCount: number}): void {
+		this.profileModificationCount = event.modificationCount;
+		this.profilesChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -174,6 +195,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
+		if(this.selectedNode === 'profiles') {
+			this.selectedNodeType = 'profiles';
+			return;
+		}
+
 		this.selectedNodeType = 'overview';
 	}
 
@@ -213,5 +239,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedWorkflowActionId: string | null;
 	}): void {
 		this.workflowContextChanged.emit(context);
+	}
+
+	onProfileContextChanged(context: {
+		profiles: any[];
+		selectedProfileId: string | null;
+	}): void {
+		this.profileContextChanged.emit(context);
 	}
 }
