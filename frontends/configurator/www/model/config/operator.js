@@ -20,7 +20,7 @@ export const Operator = Object.freeze({
 		label: 'Contains',
 		has_value: true,
 		test: function(a, b) {
-			return a.includes(b);
+			return a !== undefined && a.includes(b);
 		}
 	},
 	NOT_CONTAINS: {
@@ -28,7 +28,7 @@ export const Operator = Object.freeze({
 		label: 'Contains not',
 		has_value: true,
 		test: function(a, b) {
-			return !a.includes(b);
+			return a === undefined || !a.includes(b);
 		}
 	},
 	GREATER: {
@@ -36,7 +36,7 @@ export const Operator = Object.freeze({
 		label: 'Greater than',
 		has_value: true,
 		test: function(a, b) {
-			return a > b;
+			return a !== undefined && a > b;
 		}
 	},
 	GREATER_EQUALS: {
@@ -44,7 +44,7 @@ export const Operator = Object.freeze({
 		label: 'Greater or equals to',
 		has_value: true,
 		test: function(a, b) {
-			return a >= b;
+			return a !== undefined && a >= b;
 		}
 	},
 	LOWER: {
@@ -52,7 +52,7 @@ export const Operator = Object.freeze({
 		label: 'Lower than',
 		has_value: true,
 		test: function(a, b) {
-			return a < b;
+			return a !== undefined && a < b;
 		}
 	},
 	LOWER_EQUALS: {
@@ -60,7 +60,7 @@ export const Operator = Object.freeze({
 		label: 'Lower or equals to',
 		has_value: true,
 		test: function(a, b) {
-			return a <= b;
+			return a !== undefined && a <= b;
 		}
 	},
 	NULL: {
