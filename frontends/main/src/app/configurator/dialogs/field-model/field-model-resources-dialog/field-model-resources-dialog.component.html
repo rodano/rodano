@@ -13,10 +13,10 @@
 						@if (availableValidators.length === 0) {
 							<div class="empty-placeholder">No available validators</div>
 						}
-						@for (validator of availableValidators; track validator.id) {
+						@for (validator of availableValidators; track validator.validatorId) {
 							<div class="list-item" (click)="onAddValidator(validator)">
 								<div class="item-text">
-									<span>{{ validator.name || validator.id }}</span>
+									<span>{{ languageService.getLabel(validator) }}</span>
 								</div>
 								<mat-icon class="action-icon">add_circle_outline</mat-icon>
 							</div>
@@ -30,10 +30,10 @@
 						@if (selectedValidators.length === 0) {
 							<div class="empty-placeholder">No validators selected</div>
 						}
-						@for (validator of selectedValidators; track validator.id) {
+						@for (validator of selectedValidators; track validator.validatorId) {
 							<div class="list-item" (click)="onRemoveValidator(validator)">
 								<div class="item-text">
-									<span>{{ validator.name || validator.id }}</span>
+									<span>{{ languageService.getLabel(validator) }}</span>
 								</div>
 								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 							</div>
@@ -54,10 +54,10 @@
 						@if (availableWorkflows.length === 0) {
 							<div class="empty-placeholder">No available workflows</div>
 						}
-						@for (workflow of availableWorkflows; track workflow.id) {
+						@for (workflow of availableWorkflows; track workflow.workflowId) {
 							<div class="list-item" (click)="onAddWorkflow(workflow)">
 								<div class="item-text">
-									<span>{{ workflow.name || workflow.id }}</span>
+									<span>{{ languageService.getLabel(workflow) }}</span>
 								</div>
 								<mat-icon class="action-icon">add_circle_outline</mat-icon>
 							</div>
@@ -71,10 +71,10 @@
 						@if (selectedWorkflows.length === 0) {
 							<div class="empty-placeholder">No workflows selected</div>
 						}
-						@for (workflow of selectedWorkflows; track workflow.id) {
+						@for (workflow of selectedWorkflows; track workflow.workflowId) {
 							<div class="list-item" (click)="onRemoveWorkflow(workflow)">
 								<div class="item-text">
-									<span>{{ workflow.name || workflow.id }}</span>
+									<span>{{ languageService.getLabel(workflow) }}</span>
 								</div>
 								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 							</div>

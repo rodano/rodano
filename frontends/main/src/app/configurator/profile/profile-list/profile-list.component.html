@@ -40,7 +40,7 @@
 
 						<div class="card-header">
 							<div class="card-info">
-								<h3>{{ getTranslatedName(profile.shortname) }}</h3>
+								<h3>{{ languageService.getTranslatedName(profile.shortname) }}</h3>
 								<p class="card-code">{{ profile.id }}</p>
 							</div>
 						</div>
@@ -53,7 +53,7 @@
 								</div>
 								<div class="detail-item">
 									<mat-icon>settings</mat-icon>
-									<span>Workflow of Interest: {{ profile.workflowOfInterestId ? getWorkflowDisplayName(profile) : 'Not set' }}</span>
+									<span>Workflow of Interest: {{ profile.workflowOfInterestId ? getWorkflowLabel(profile.workflowOfInterestId) : 'Not set' }}</span>
 								</div>
 							</div>
 						</div>

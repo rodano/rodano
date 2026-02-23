@@ -4,12 +4,16 @@ import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {LanguageService} from '../../../services/language.service';
+import {DatasetModel} from '@core/model/dataset-model';
+import {Workflow} from '@core/model/workflow';
+import {FormModel} from '@core/model/form-model';
 
 export interface EventModelResourcesDialogData {
 	eventModel: EventModel;
-	availableFormModels: {id: string; name: string}[];
-	availableDatasetModels: {id: string; name: string}[];
-	availableWorkflows: {id: string; name: string}[];
+	availableFormModels: FormModel[];
+	availableDatasetModels: DatasetModel[];
+	availableWorkflows: Workflow[];
 }
 
 @Component({
@@ -25,16 +29,17 @@ export interface EventModelResourcesDialogData {
 	styleUrls: ['../../dialog-shared.css']
 })
 export class EventModelResourcesDialogComponent implements OnInit {
-	availableFormModels: {id: string; name: string}[] = [];
-	selectedFormModels: {id: string; name: string}[] = [];
+	availableFormModels: FormModel[] = [];
+	selectedFormModels: FormModel[] = [];
 
-	availableDatasetModels: {id: string; name: string}[] = [];
-	selectedDatasetModels: {id: string; name: string}[] = [];
+	availableDatasetModels: DatasetModel[] = [];
+	selectedDatasetModels: DatasetModel[] = [];
 
-	availableWorkflows: {id: string; name: string}[] = [];
-	selectedWorkflows: {id: string; name: string}[] = [];
+	availableWorkflows: Workflow[] = [];
+	selectedWorkflows: Workflow[] = [];
 
 	constructor(
+		public languageService: LanguageService,
 		private dialogRef: MatDialogRef<EventModelResourcesDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelResourcesDialogData
 	) {}
@@ -47,49 +52,49 @@ export class EventModelResourcesDialogComponent implements OnInit {
 
 	private initializeFormModels(): void {
 		const selectedIds = this.data.eventModel.formModelIds || [];
-		this.selectedFormModels = this.data.availableFormModels.filter(fm => selectedIds.includes(fm.id));
-		this.availableFormModels = this.data.availableFormModels.filter(fm => !selectedIds.includes(fm.id));
+		this.selectedFormModels = this.data.availableFormModels.filter(fm => selectedIds.includes(fm.formModelId));
+		this.availableFormModels = this.data.availableFormModels.filter(fm => !selectedIds.includes(fm.formModelId));
 	}
 
 	private initializeDatasetModels(): void {
 		const selectedIds = this.data.eventModel.datasetModelIds || [];
-		this.selectedDatasetModels = this.data.availableDatasetModels.filter(dm => selectedIds.includes(dm.id));
-		this.availableDatasetModels = this.data.availableDatasetModels.filter(dm => !selectedIds.includes(dm.id));
+		this.selectedDatasetModels = this.data.availableDatasetModels.filter(dm => selectedIds.includes(dm.datasetModelId));
+		this.availableDatasetModels = this.data.availableDatasetModels.filter(dm => !selectedIds.includes(dm.datasetModelId));
 	}
 
 	private initializeWorkflows(): void {
 		const selectedIds = this.data.eventModel.workflowIds || [];
-		this.selectedWorkflows = this.data.availableWorkflows.filter(wf => selectedIds.includes(wf.id));
-		this.availableWorkflows = this.data.availableWorkflows.filter(wf => !selectedIds.includes(wf.id));
+		this.selectedWorkflows = this.data.availableWorkflows.filter(wf => selectedIds.includes(wf.workflowId));
+		this.availableWorkflows = this.data.availableWorkflows.filter(wf => !selectedIds.includes(wf.workflowId));
 	}
 
-	onAddFormModel(formModel: {id: string; name: string}): void {
-		this.availableFormModels = this.availableFormModels.filter(fm => fm.id !== formModel.id);
+	addFormModel(formModel: FormModel): void {
+		this.availableFormModels = this.availableFormModels.filter(fm => fm.formModelId !== formModel.formModelId);
 		this.selectedFormModels = [...this.selectedFormModels, formModel];
 	}
 
-	onRemoveFormModel(formModel: {id: string; name: string}): void {
-		this.selectedFormModels = this.selectedFormModels.filter(fm => fm.id !== formModel.id);
+	removeFormModel(formModel: FormModel): void {
+		this.selectedFormModels = this.selectedFormModels.filter(fm => fm.formModelId !== formModel.formModelId);
 		this.availableFormModels = [...this.availableFormModels, formModel];
 	}
 
-	onAddDatasetModel(datasetModel: {id: string; name: string}): void {
-		this.availableDatasetModels = this.availableDatasetModels.filter(dm => dm.id !== datasetModel.id);
+	addDatasetModel(datasetModel: DatasetModel): void {
+		this.availableDatasetModels = this.availableDatasetModels.filter(dm => dm.datasetModelId !== datasetModel.datasetModelId);
 		this.selectedDatasetModels = [...this.selectedDatasetModels, datasetModel];
 	}
 
-	onRemoveDatasetModel(datasetModel: {id: string; name: string}): void {
-		this.selectedDatasetModels = this.selectedDatasetModels.filter(dm => dm.id !== datasetModel.id);
+	removeDatasetModel(datasetModel: DatasetModel): void {
+		this.selectedDatasetModels = this.selectedDatasetModels.filter(dm => dm.datasetModelId !== datasetModel.datasetModelId);
 		this.availableDatasetModels = [...this.availableDatasetModels, datasetModel];
 	}
 
-	onAddWorkflow(workflow: {id: string; name: string}): void {
-		this.availableWorkflows = this.availableWorkflows.filter(wf => wf.id !== workflow.id);
+	addWorkflow(workflow: Workflow): void {
+		this.availableWorkflows = this.availableWorkflows.filter(wf => wf.workflowId !== workflow.workflowId);
 		this.selectedWorkflows = [...this.selectedWorkflows, workflow];
 	}
 
-	onRemoveWorkflow(workflow: {id: string; name: string}): void {
-		this.selectedWorkflows = this.selectedWorkflows.filter(wf => wf.id !== workflow.id);
+	removeWorkflow(workflow: Workflow): void {
+		this.selectedWorkflows = this.selectedWorkflows.filter(wf => wf.workflowId !== workflow.workflowId);
 		this.availableWorkflows = [...this.availableWorkflows, workflow];
 	}
 
@@ -97,19 +102,19 @@ export class EventModelResourcesDialogComponent implements OnInit {
 		const result: any = {};
 
 		const originalFormIds = this.data.eventModel.formModelIds || [];
-		const currentFormIds = this.selectedFormModels.map(fm => fm.id);
+		const currentFormIds = this.selectedFormModels.map(fm => fm.formModelId);
 		if(JSON.stringify(originalFormIds.sort()) !== JSON.stringify(currentFormIds.sort())) {
 			result.formModelIds = currentFormIds;
 		}
 
 		const originalDatasetIds = this.data.eventModel.datasetModelIds || [];
-		const currentDatasetIds = this.selectedDatasetModels.map(dm => dm.id);
+		const currentDatasetIds = this.selectedDatasetModels.map(dm => dm.datasetModelId);
 		if(JSON.stringify(originalDatasetIds.sort()) !== JSON.stringify(currentDatasetIds.sort())) {
 			result.datasetModelIds = currentDatasetIds;
 		}
 
 		const originalWorkflowIds = this.data.eventModel.workflowIds || [];
-		const currentWorkflowIds = this.selectedWorkflows.map(wf => wf.id);
+		const currentWorkflowIds = this.selectedWorkflows.map(wf => wf.workflowId);
 		if(JSON.stringify(originalWorkflowIds.sort()) !== JSON.stringify(currentWorkflowIds.sort())) {
 			result.workflowIds = currentWorkflowIds;
 		}

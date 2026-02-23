@@ -9,7 +9,7 @@
 					<mat-option [value]="null">None</mat-option>
 					@for (profile of availableProfiles; track profile.profileId) {
 						<mat-option [value]="profile.profileId">
-							{{ getProfileLabel(profile) }}
+							{{ languageService.getLabel(profile) }}
 						</mat-option>
 					}
 				</mat-select>

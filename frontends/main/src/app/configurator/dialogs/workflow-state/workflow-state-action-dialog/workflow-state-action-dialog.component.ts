@@ -6,10 +6,11 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {WorkflowAction} from '@core/model/workflow-action';
+import {LanguageService} from '../../../services/language.service';
 
 export interface WorkflowStateActionDialogData {
 	workflowState: WorkflowState;
-	availableWorkflowActions: {id: string; name: string; code: string}[];
+	availableWorkflowActions: WorkflowAction[];
 }
 
 @Component({
@@ -26,27 +27,28 @@ export interface WorkflowStateActionDialogData {
 	]
 })
 export class WorkflowStateActionDialogComponent implements OnInit {
-	availableWorkflowActions: {id: string; name: string; code: string}[] = [];
-	selectedWorkflowActions: {id: string; name: string; code: string}[] = [];
+	availableWorkflowActions: WorkflowAction[] = [];
+	selectedWorkflowActions: WorkflowAction[] = [];
 
 	constructor(
+		public languageService: LanguageService,
 		private dialogRef: MatDialogRef<WorkflowStateActionDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: WorkflowStateActionDialogData
 	) {}
 
 	ngOnInit(): void {
-		const selectedIds = (this.data.workflowState.possibleActions || []).map((wfa: WorkflowAction) => wfa.workflowActionId);
-		this.selectedWorkflowActions = this.data.availableWorkflowActions.filter(wfa => selectedIds.includes(wfa.id));
-		this.availableWorkflowActions = this.data.availableWorkflowActions.filter(wfa => !selectedIds.includes(wfa.id));
+		const selectedIds = (this.data.workflowState.possibleActions || []).map(wfa => wfa.workflowActionId);
+		this.selectedWorkflowActions = this.data.availableWorkflowActions.filter(wfa => selectedIds.includes(wfa.workflowActionId));
+		this.availableWorkflowActions = this.data.availableWorkflowActions.filter(wfa => !selectedIds.includes(wfa.workflowActionId));
 	}
 
-	onAdd(workflowAction: {id: string; name: string; code: string}): void {
-		this.availableWorkflowActions = this.availableWorkflowActions.filter(wfa => wfa.id !== workflowAction.id);
+	onAdd(workflowAction: WorkflowAction): void {
+		this.availableWorkflowActions = this.availableWorkflowActions.filter(wfa => wfa.workflowActionId !== workflowAction.workflowActionId);
 		this.selectedWorkflowActions = [...this.selectedWorkflowActions, workflowAction];
 	}
 
-	onRemove(workflowAction: {id: string; name: string; code: string}): void {
-		this.selectedWorkflowActions = this.selectedWorkflowActions.filter(wfa => wfa.id !== workflowAction.id);
+	onRemove(workflowAction: WorkflowAction): void {
+		this.selectedWorkflowActions = this.selectedWorkflowActions.filter(wfa => wfa.workflowActionId !== workflowAction.workflowActionId);
 		this.availableWorkflowActions = [...this.availableWorkflowActions, workflowAction];
 	}
 
@@ -54,14 +56,14 @@ export class WorkflowStateActionDialogComponent implements OnInit {
 		const originalIds = (this.data.workflowState.possibleActions || [])
 			.map((a: WorkflowAction) => a.workflowActionId)
 			.sort();
-		const currentIds = this.selectedWorkflowActions.map(wfa => wfa.id).sort();
+		const currentIds = this.selectedWorkflowActions.map(wfa => wfa.workflowActionId).sort();
 
 		if(JSON.stringify(originalIds) === JSON.stringify(currentIds)) {
 			this.dialogRef.close(null);
 			return;
 		}
 
-		this.dialogRef.close({possibleActionIds: this.selectedWorkflowActions.map(wfa => wfa.id)});
+		this.dialogRef.close({possibleActionIds: this.selectedWorkflowActions.map(wfa => wfa.workflowActionId)});
 	}
 
 	onCancel(): void {

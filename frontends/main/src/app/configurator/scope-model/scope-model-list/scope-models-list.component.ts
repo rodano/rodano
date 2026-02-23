@@ -71,10 +71,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		public scopeModelManager: ScopeModelManagerService,
 		public eventModelManager: EventModelManagerService,
 		public eventGroupManager: EventGroupManagerService,
+		public languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private eventModelDialogService: EventModelDialogService,
 		private eventGroupDialogService: EventGroupDialogService,
-		private languageService: LanguageService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -316,17 +316,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const formattedEventGroups = this.eventGroups.map(eg => ({
-			id: eg.eventGroupId,
-			name: this.languageService.getDefaultTranslation(eg.shortname) || eg.id,
-			code: eg.id
-		}));
-
 		this.eventModelDialogService.openCreateDialog(
 			this.projectId,
 			this.selectedScopeModel.scopeModelId,
-			this.projectLanguages,
-			formattedEventGroups
+			this.projectLanguages
 		).subscribe(result => {
 			if(result && this.selectedScopeModel) {
 				const newEventModel: EventModel = {
@@ -504,10 +497,6 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			selectedEventModelId: this.selectedEventModelId,
 			selectedEventGroupId: this.selectedEventGroupId
 		});
-	}
-
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.languageService.getDefaultTranslation(translations) || '';
 	}
 
 	isEventModelModified(eventModelId: string): boolean {

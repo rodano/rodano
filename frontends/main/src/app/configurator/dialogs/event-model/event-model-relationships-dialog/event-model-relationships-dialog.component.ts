@@ -31,7 +31,7 @@ export class EventModelRelationshipsDialogComponent implements OnInit {
 	selectedImpliedEventModels: EventModel[] = [];
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private dialogRef: MatDialogRef<EventModelRelationshipsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelRelationshipsDialogData
 	) {}
@@ -83,11 +83,6 @@ export class EventModelRelationshipsDialogComponent implements OnInit {
 	removeImpliedEventModel(eventModel: EventModel): void {
 		this.selectedImpliedEventModels = this.selectedImpliedEventModels.filter(em => em.eventModelId !== eventModel.eventModelId);
 		this.availableImpliedEventModels = [...this.availableImpliedEventModels, eventModel];
-	}
-
-	getEventModelName(eventModel: EventModel): string {
-		const name = this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id;
-		return `${name} (${eventModel.id})`;
 	}
 
 	onSave(): void {

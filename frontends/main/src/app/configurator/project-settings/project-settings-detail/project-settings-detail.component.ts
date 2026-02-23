@@ -27,8 +27,8 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 	private languageSubscription: Subscription;
 
 	constructor(
+		public languageService: LanguageService,
 		private dialogService: ProjectSettingsDialogService,
-		private languageService: LanguageService,
 		private profileManager: ProfileManagerService
 	) {}
 
@@ -48,32 +48,6 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 		this.languageSubscription.unsubscribe();
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
-	}
-
 	isFieldModified(fieldName: string): boolean {
 		if(!this.project || !this.workingProject) {
 			return false;
@@ -84,11 +58,6 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 			return JSON.stringify(original) !== JSON.stringify(current);
 		}
 		return original !== current;
-	}
-
-	onLanguageChange(event: Event): void {
-		const select = event.target as HTMLSelectElement;
-		this.selectedLanguage = select.value;
 	}
 
 	onEditBasicInfo(): void {
@@ -218,11 +187,6 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 	}
 
 	getProfileLabel(profileId: string): string {
-		const profile = this.profileManager.getById(profileId);
-		if(!profile) {
-			return profileId;
-		}
-		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
-		return `${name} (${profile.id})`;
+		return this.languageService.getLabelById(profileId, id => this.profileManager.getById(id));
 	}
 }

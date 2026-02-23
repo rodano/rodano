@@ -54,11 +54,6 @@ export class ProjectSettingsEproDialogComponent {
 	}
 
 	getProfileLabel(profileId: string): string {
-		const profile = this.profileManager.getById(profileId);
-		if(!profile) {
-			return profileId;
-		}
-		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
-		return `${name} (${profile.id})`;
+		return this.languageService.getLabelById(profileId, id => this.profileManager.getById(id));
 	}
 }

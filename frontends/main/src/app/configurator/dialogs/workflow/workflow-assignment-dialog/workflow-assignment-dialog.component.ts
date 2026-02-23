@@ -9,12 +9,14 @@ import {MatSelectModule} from '@angular/material/select';
 import {Subscription} from 'rxjs';
 import {LanguageService} from '../../../services/language.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {WorkflowState} from '@core/model/workflow-state';
+import {WorkflowAction} from '@core/model/workflow-action';
 
 export interface WorkflowAssignmentDialogData {
 	workflow: Workflow;
 	availableWorkflows: Workflow[];
-	currentWorkflowStates: {id: string; name: string; code: string}[];
-	currentWorkflowActions: {id: string; name: string; code: string}[];
+	currentWorkflowStates: WorkflowState[];
+	currentWorkflowActions: WorkflowAction[];
 }
 
 @Component({
@@ -33,16 +35,16 @@ export interface WorkflowAssignmentDialogData {
 })
 export class WorkflowAssignmentDialogComponent implements OnInit, OnDestroy {
 	form: FormGroup;
-	availableStates: {id: string; name: string; code: string}[] = [];
-	availableActions: {id: string; name: string; code: string}[] = [];
+	availableStates: WorkflowState[] = [];
+	availableActions: WorkflowAction[] = [];
 
 	private formSubscriptions = new Subscription();
 
 	constructor(
+		public languageService: LanguageService,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<WorkflowAssignmentDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: WorkflowAssignmentDialogData,
-		private languageService: LanguageService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -63,11 +65,6 @@ export class WorkflowAssignmentDialogComponent implements OnInit, OnDestroy {
 
 	get isMandatory(): boolean {
 		return !!this.form.get('mandatory')?.value;
-	}
-
-	getWorkflowLabel(workflow: Workflow): string {
-		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
-		return `${name} (${workflow.id})`;
 	}
 
 	private initializeForm(): void {

@@ -12,8 +12,10 @@ import {MatInputModule} from '@angular/material/input';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ProjectLanguage} from '@core/model/project-language';
 import {ScopeModelManagerService} from '../../../services/manager/scope-model-manager.service';
+import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
+import {LanguageService} from '../../../services/language.service';
 
-interface DialogData {
+interface ScopeModelBasicInfoDialogData {
 	projectId: string;
 	scopeModel: ScopeModel | null;
 	languages: ProjectLanguage[];
@@ -36,144 +38,50 @@ interface DialogData {
 		MatTabsModule
 	]
 })
-export class ScopeModelBasicInfoDialogComponent implements OnInit {
+export class ScopeModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
-	languageForms = new Map<string, FormGroup>();
 	isEditMode: boolean;
-	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
-		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<ScopeModelBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DialogData,
+		fb: FormBuilder,
+		languageService: LanguageService,
+		dialogRef: MatDialogRef<ScopeModelBasicInfoDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) public data: ScopeModelBasicInfoDialogData,
 		private scopeModelManager: ScopeModelManagerService,
 		private snackBar: MatSnackBar
 	) {
+		super(fb, languageService, dialogRef);
 		this.isEditMode = !!data.scopeModel;
-
-		this.form = this.fb.group({
-			id: ['', [Validators.required]],
-			virtual: [false],
-			expectedNumber: [null, [Validators.min(0)]],
-			maxNumber: [null, [Validators.min(0)]]
-		});
 	}
 
 	ngOnInit(): void {
-		this.availableLanguages = this.data.languages?.length
-			? this.data.languages
-			: [{languageCode: 'en', isDefault: true}];
-
-		this.initializeLanguageForms();
+		this.loadProjectLanguages(this.data.languages);
+		this.initializeForm();
 	}
 
 	initializeLanguageForms(): void {
-		this.availableLanguages.forEach((lang: ProjectLanguage) => {
-			if(lang.languageCode) {
-				const langForm = this.fb.group({
-					shortname: ['', lang.isDefault ? Validators.required : []],
-					longname: [''],
-					description: [''],
-					pluralShortname: ['', lang.isDefault ? Validators.required : []]
-				});
-				this.languageForms.set(lang.languageCode, langForm);
+		this.availableLanguages.forEach(lang => {
+			if(!lang.languageCode) {
+				return;
 			}
-		});
-
-		if(this.data.scopeModel) {
-			this.populateForm();
-		}
-	}
-
-	populateForm(): void {
-		if(!this.data.scopeModel) {
-			return;
-		}
-
-		const scopeModel = this.data.scopeModel;
-
-		this.form.patchValue({
-			id: scopeModel.id,
-			virtual: scopeModel.virtual,
-			expectedNumber: scopeModel.expectedNumber || null,
-			maxNumber: scopeModel.maxNumber || null
-		});
-
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			langForm.patchValue({
-				shortname: scopeModel.shortname[langCode] || '',
-				longname: scopeModel.longname?.[langCode] || '',
-				description: scopeModel.description?.[langCode] || '',
-				pluralShortname: scopeModel.pluralShortname[langCode] || ''
-			});
+			const sm = this.data.scopeModel;
+			this.languageForms.set(lang.languageCode, this.fb.group({
+				shortname: [sm?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
+				longname: [sm?.longname?.[lang.languageCode] || ''],
+				description: [sm?.description?.[lang.languageCode] || ''],
+				pluralShortname: [sm?.pluralShortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []]
+			}));
 		});
 	}
 
-	onSave(): void {
-		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
-			return;
-		}
-
-		const formValue = this.form.getRawValue();
-		const code = formValue.id.toUpperCase();
-
-		if(!this.isEditMode && this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A scope model with code "${code}" already exists`, 'Close', {duration: 3000});
-			return;
-		}
-
-		const shortname: Record<string, string> = {};
-		const longname: Record<string, string> = {};
-		const description: Record<string, string> = {};
-		const pluralShortname: Record<string, string> = {};
-
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			const langValue = langForm.value;
-
-			if(langValue.shortname) {
-				shortname[langCode] = langValue.shortname;
-			}
-			if(langValue.longname) {
-				longname[langCode] = langValue.longname;
-			}
-			if(langValue.description) {
-				description[langCode] = langValue.description;
-			}
-			if(langValue.pluralShortname) {
-				pluralShortname[langCode] = langValue.pluralShortname;
-			}
+	initializeForm(): void {
+		const sm = this.data.scopeModel;
+		this.form = this.fb.group({
+			id: [sm?.id || '', [Validators.required]],
+			virtual: [sm?.virtual ?? false],
+			expectedNumber: [sm?.expectedNumber ?? null, [Validators.min(0)]],
+			maxNumber: [sm?.maxNumber ?? null, [Validators.min(0)]]
 		});
-
-		const result = {
-			id: code,
-			shortname,
-			longname,
-			description,
-			pluralShortname,
-			virtual: formValue.virtual,
-			expectedNumber: formValue.expectedNumber,
-			maxNumber: formValue.maxNumber
-		};
-
-		this.dialogRef.close(result);
-	}
-
-	areLanguageFormsValid(): boolean {
-		let allValid = true;
-		this.languageForms.forEach((langForm: FormGroup) => {
-			if(langForm.invalid) {
-				allValid = false;
-			}
-		});
-		return allValid;
-	}
-
-	onCodeInput(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const uppercaseValue = input.value.toUpperCase();
-		input.value = uppercaseValue;
-		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
 	}
 
 	isCodeDuplicate(code: string): boolean {
@@ -183,26 +91,35 @@ export class ScopeModelBasicInfoDialogComponent implements OnInit {
 		);
 	}
 
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
+	onSave(): void {
+		if(this.form.invalid || !this.areLanguageFormsValid()) {
+			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			return;
+		}
 
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
+		const code = this.form.getRawValue().id.toUpperCase();
+		if(!this.isEditMode && this.isCodeDuplicate(code)) {
+			this.snackBar.open(`A scope model with code "${code}" already exists`, 'Close', {duration: 3000});
+			return;
 		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
-	}
 
-	getLanguageLabel(code: string, isDefault: boolean): string {
-		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ☆` : name;
+		const {shortname, longname, description} = this.collectTranslations();
+		const pluralShortname: Record<string, string> = {};
+
+		this.languageForms.forEach((langForm, langCode) => {
+			const v = langForm.value;
+			if(v.pluralShortname) {
+				pluralShortname[langCode] = v.pluralShortname;
+			}
+		});
+
+		this.dialogRef.close({
+			id: code,
+			shortname,
+			longname,
+			description,
+			pluralShortname,
+			...this.form.value
+		});
 	}
 }

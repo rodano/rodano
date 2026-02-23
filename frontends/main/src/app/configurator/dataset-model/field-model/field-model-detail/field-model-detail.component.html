@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ draftFieldModel ? getTranslatedValue(draftFieldModel.shortname) : '' }}</h2>
+		<h2>{{ languageService.getTranslatedValue(draftFieldModel?.shortname) }}</h2>
 		<span class="detail-code first-child">{{ draftFieldModel?.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -68,11 +68,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.shortname)">
-						@if (!getTranslatedValue(draftFieldModel.shortname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftFieldModel.shortname)">
+						@if (!languageService.getTranslatedValue(draftFieldModel.shortname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftFieldModel.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftFieldModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -83,11 +83,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.longname)">
-						@if (!getTranslatedValue(draftFieldModel.longname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftFieldModel.longname)">
+						@if (!languageService.getTranslatedValue(draftFieldModel.longname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftFieldModel.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftFieldModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -98,11 +98,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.description)">
-						@if (!getTranslatedValue(draftFieldModel.description)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftFieldModel.description)">
+						@if (!languageService.getTranslatedValue(draftFieldModel.description)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftFieldModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftFieldModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 			</div>
@@ -161,11 +161,11 @@
 									<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 								}
 							</label>
-							<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftFieldModel.matcherMessage)">
-								@if (!getTranslatedValue(draftFieldModel.matcherMessage)) {
+							<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftFieldModel.matcherMessage)">
+								@if (!languageService.getTranslatedValue(draftFieldModel.matcherMessage)) {
 									<mat-icon class="warning-icon">report</mat-icon>
 								}
-								{{ getTranslatedValue(draftFieldModel.matcherMessage) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+								{{ languageService.getTranslatedValue(draftFieldModel.matcherMessage) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 							</div>
 						</div>
 					}
@@ -583,7 +583,7 @@
 									<div class="multilist-card">
 										<div class="multilist-header">
 											<span class="multilist-name">
-												{{ getPossibleValueLabel(pv) }}
+												{{ languageService.getLabel(pv) }}
 											</span>
 											<div class="pv-badges">
 												@if (pv.specify) {

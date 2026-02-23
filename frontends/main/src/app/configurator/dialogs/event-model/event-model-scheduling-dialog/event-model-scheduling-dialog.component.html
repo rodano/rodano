@@ -52,7 +52,7 @@
 						@for (eventModel of availableEventModels; track eventModel.eventModelId) {
 							<div class="list-item" (click)="onAddEventModel(eventModel)">
 								<div class="item-text">
-									<span>{{ getEventModelLabel(eventModel) }}</span>
+									<span>{{ languageService.getLabel(eventModel) }}</span>
 								</div>
 								<mat-icon class="action-icon">add_circle_outline</mat-icon>
 							</div>
@@ -69,7 +69,7 @@
 						@for (eventModel of selectedEventModels; track eventModel.eventModelId) {
 							<div class="list-item" (click)="onRemoveEventModel(eventModel)">
 								<div class="item-text">
-									<span>{{ getEventModelLabel(eventModel) }}</span>
+									<span>{{ languageService.getLabel(eventModel) }}</span>
 								</div>
 								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 							</div>

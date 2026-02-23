@@ -13,6 +13,8 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {FieldModel} from '@core/model/field-model';
 import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
+import {LanguageService} from '../../../services/language.service';
+import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
 
 export interface FieldModelBasicInfoDialogData {
 	projectId: string;
@@ -49,10 +51,8 @@ interface DataTypeOption {
 		MatSelectModule
 	]
 })
-export class FieldModelBasicInfoDialogComponent implements OnInit {
+export class FieldModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
-	languageForms = new Map<string, FormGroup>();
-	availableLanguages: ProjectLanguage[] = [];
 	isEditMode: boolean;
 
 	typeOptions: TypeOption[] = [
@@ -78,92 +78,44 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 	];
 
 	constructor(
-		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<FieldModelBasicInfoDialogComponent>,
+		fb: FormBuilder,
+		languageService: LanguageService,
+		dialogRef: MatDialogRef<FieldModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: FieldModelBasicInfoDialogData,
 		private fieldModelManager: FieldModelManagerService,
 		private snackBar: MatSnackBar
 	) {
+		super(fb, languageService, dialogRef);
 		this.isEditMode = !!data.fieldModel;
 	}
 
 	ngOnInit(): void {
-		this.loadProjectLanguages();
+		this.loadProjectLanguages(this.data.languages);
 		this.initializeForm();
 	}
 
-	loadProjectLanguages(): void {
-		this.availableLanguages = this.data.languages || [];
-
-		if(this.availableLanguages.length === 0) {
-			this.availableLanguages = [{languageCode: 'en', isDefault: true}];
-		}
-
-		this.initializeLanguageForms();
+	initializeLanguageForms(): void {
+		this.availableLanguages.forEach(lang => {
+			if(!lang.languageCode) {
+				return;
+			}
+			const fm = this.data.fieldModel;
+			this.languageForms.set(lang.languageCode, this.fb.group({
+				shortname: [fm?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
+				longname: [fm?.longname?.[lang.languageCode] || ''],
+				description: [fm?.description?.[lang.languageCode] || '']
+			}));
+		});
 	}
 
 	initializeForm(): void {
 		const fm = this.data.fieldModel;
-
 		this.form = this.fb.group({
-			id: [
-				fm?.id || '',
-				[Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]
-			],
+			id: [fm?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
 			type: [fm?.type || null, Validators.required],
 			dataType: [fm?.dataType || null, Validators.required],
 			readOnly: [fm?.readOnly || false]
 		});
-	}
-
-	initializeLanguageForms(): void {
-		this.availableLanguages.forEach((lang: ProjectLanguage) => {
-			if(lang.languageCode) {
-				const fm = this.data.fieldModel;
-				const langForm = this.fb.group({
-					shortname: [
-						fm?.shortname?.[lang.languageCode] || '',
-						lang.isDefault ? Validators.required : []
-					],
-					longname: [fm?.longname?.[lang.languageCode] || ''],
-					description: [fm?.description?.[lang.languageCode] || '']
-				});
-				this.languageForms.set(lang.languageCode, langForm);
-			}
-		});
-	}
-
-	getLanguageLabel(code: string, isDefault: boolean): string {
-		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ☆` : name;
-	}
-
-	getLanguageName(code: string): string {
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
-	areLanguageFormsValid(): boolean {
-		let allValid = true;
-		this.languageForms.forEach((langForm: FormGroup) => {
-			if(langForm.invalid) {
-				allValid = false;
-			}
-		});
-		return allValid;
-	}
-
-	onIdInput(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const uppercaseValue = input.value.toUpperCase();
-		input.value = uppercaseValue;
-		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
 	}
 
 	isCodeDuplicate(code: string): boolean {
@@ -173,41 +125,19 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 		);
 	}
 
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
 			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
 			return;
 		}
 
-		const formValue = this.form.getRawValue();
-		const code = formValue.id.toUpperCase();
-
+		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
 			this.snackBar.open(`A field model with code "${code}" already exists`, 'Close', {duration: 3000});
 			return;
 		}
 
-		const shortname: Record<string, string> = {};
-		const longname: Record<string, string> = {};
-		const description: Record<string, string> = {};
-
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			const langValue = langForm.value;
-			if(langValue.shortname) {
-				shortname[langCode] = langValue.shortname;
-			}
-			if(langValue.longname) {
-				longname[langCode] = langValue.longname;
-			}
-			if(langValue.description) {
-				description[langCode] = langValue.description;
-			}
-		});
-
+		const {shortname, longname, description} = this.collectTranslations();
 		const typesWithPossibleValues = ['AUTO_COMPLETION', 'SELECT', 'RADIO', 'CHECKBOX_GROUP'];
 
 		const result: any = {
@@ -215,12 +145,10 @@ export class FieldModelBasicInfoDialogComponent implements OnInit {
 			shortname,
 			longname,
 			description,
-			type: formValue.type,
-			dataType: formValue.dataType,
-			readOnly: formValue.readOnly
+			...this.form.value
 		};
 
-		if(!typesWithPossibleValues.includes(formValue.type)) {
+		if(!typesWithPossibleValues.includes(this.form.value.type)) {
 			result.possibleValues = [];
 		}
 

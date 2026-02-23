@@ -1,7 +1,6 @@
 <h2 class="dialog-title">Edit Associated Resources</h2>
 
 <div class="dialog-content">
-	<!-- Form Models Section -->
 	<div class="form-section">
 		<h3>Form Models</h3>
 		<p class="hint">Select which forms should be associated with this event</p>
@@ -13,10 +12,10 @@
 					@if (availableFormModels.length === 0) {
 						<div class="empty-placeholder">No available form models</div>
 					}
-					@for (formModel of availableFormModels; track formModel.id) {
-						<div class="list-item" (click)="onAddFormModel(formModel)">
+					@for (formModel of availableFormModels; track formModel.formModelId) {
+						<div class="list-item" (click)="addFormModel(formModel)">
 							<div class="item-text">
-								<span>{{ formModel.name || formModel.id }}</span>
+								<span>{{ languageService.getLabel(formModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -30,10 +29,10 @@
 					@if (selectedFormModels.length === 0) {
 						<div class="empty-placeholder">No form models selected</div>
 					}
-					@for (formModel of selectedFormModels; track formModel.id) {
-						<div class="list-item" (click)="onRemoveFormModel(formModel)">
+					@for (formModel of selectedFormModels; track formModel.formModelId) {
+						<div class="list-item" (click)="removeFormModel(formModel)">
 							<div class="item-text">
-								<span>{{ formModel.name || formModel.id }}</span>
+								<span>{{ languageService.getLabel(formModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>
@@ -43,7 +42,6 @@
 		</div>
 	</div>
 
-	<!-- Dataset Models Section -->
 	<div class="form-section">
 		<h3>Dataset Models</h3>
 		<p class="hint">Select which datasets should be associated with this event</p>
@@ -55,10 +53,10 @@
 					@if (availableDatasetModels.length === 0) {
 						<div class="empty-placeholder">No available dataset models</div>
 					}
-					@for (datasetModel of availableDatasetModels; track datasetModel.id) {
-						<div class="list-item" (click)="onAddDatasetModel(datasetModel)">
+					@for (datasetModel of availableDatasetModels; track datasetModel.datasetModelId) {
+						<div class="list-item" (click)="addDatasetModel(datasetModel)">
 							<div class="item-text">
-								<span>{{ datasetModel.name || datasetModel.id }}</span>
+								<span>{{ languageService.getLabel(datasetModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -72,10 +70,10 @@
 					@if (selectedDatasetModels.length === 0) {
 						<div class="empty-placeholder">No dataset models selected</div>
 					}
-					@for (datasetModel of selectedDatasetModels; track datasetModel.id) {
-						<div class="list-item" (click)="onRemoveDatasetModel(datasetModel)">
+					@for (datasetModel of selectedDatasetModels; track datasetModel.datasetModelId) {
+						<div class="list-item" (click)="removeDatasetModel(datasetModel)">
 							<div class="item-text">
-								<span>{{ datasetModel.name || datasetModel.id }}</span>
+								<span>{{ languageService.getLabel(datasetModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>
@@ -97,10 +95,10 @@
 					@if (availableWorkflows.length === 0) {
 						<div class="empty-placeholder">No available workflows</div>
 					}
-					@for (workflow of availableWorkflows; track workflow.id) {
-						<div class="list-item" (click)="onAddWorkflow(workflow)">
+					@for (workflow of availableWorkflows; track workflow.workflowId) {
+						<div class="list-item" (click)="addWorkflow(workflow)">
 							<div class="item-text">
-								<span>{{ workflow.name || workflow.id }}</span>
+								<span>{{ languageService.getLabel(workflow) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -114,10 +112,10 @@
 					@if (selectedWorkflows.length === 0) {
 						<div class="empty-placeholder">No workflows selected</div>
 					}
-					@for (workflow of selectedWorkflows; track workflow.id) {
-						<div class="list-item" (click)="onRemoveWorkflow(workflow)">
+					@for (workflow of selectedWorkflows; track workflow.workflowId) {
+						<div class="list-item" (click)="removeWorkflow(workflow)">
 							<div class="item-text">
-								<span>{{ workflow.name || workflow.id }}</span>
+								<span>{{ languageService.getLabel(workflow) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>

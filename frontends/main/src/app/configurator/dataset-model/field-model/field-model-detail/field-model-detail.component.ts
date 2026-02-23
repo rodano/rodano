@@ -47,7 +47,7 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	private languageSubscription: Subscription;
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private fieldModelDialogService: FieldModelDialogService,
 		private fieldModelManager: FieldModelManagerService,
 		private validatorManager: ValidatorManagerService,
@@ -93,18 +93,6 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		this.closed.emit();
 	}
 
-	getTranslatedValue(translations: Record<string, string> | undefined): string {
-		if(!translations) {
-			return '';
-		}
-		return translations[this.selectedLanguage] || '';
-	}
-
-	getPossibleValueLabel(pv: PossibleValue): string {
-		const name = this.languageService.getDefaultTranslation(pv.shortname) || pv.id;
-		return `${name} (${pv.id})`;
-	}
-
 	getSortedPossibleValues(): PossibleValue[] {
 		if(!this.draftFieldModel?.possibleValues) {
 			return [];
@@ -114,36 +102,12 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		);
 	}
 
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
 	getValidatorLabel(validatorId: string): string {
-		const validator = this.validatorManager.getById(validatorId);
-		if(!validator) {
-			return validatorId;
-		}
-		const name = this.languageService.getDefaultTranslation(validator.shortname) || validator.id;
-		return `${name} (${validator.id})`;
+		return this.languageService.getLabelById(validatorId, id => this.validatorManager.getById(id));
 	}
 
 	getWorkflowLabel(workflowId: string): string {
-		const workflow = this.workflowManager.getById(workflowId);
-		if(!workflow) {
-			return workflowId;
-		}
-		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
-		return `${name} (${workflow.id})`;
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 
 	getTypeLabel(type: string): string {
@@ -307,7 +271,7 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const fieldModelName = this.getTranslatedValue(this.draftFieldModel.shortname) || this.draftFieldModel.id;
+		const fieldModelName = this.languageService.getTranslatedValue(this.draftFieldModel.shortname) || this.draftFieldModel.id;
 
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',

@@ -42,7 +42,7 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 
 	constructor(
 		public datasetModelManager: DatasetModelManagerService,
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private datasetModelDialogService: DatasetModelDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
@@ -118,7 +118,7 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Dataset Model',
-				message: `Are you sure you want to delete "${this.getTranslatedValue(this.datasetModel.shortname)}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.datasetModel.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -146,31 +146,5 @@ export class DatasetModelDetailComponent implements OnInit, OnDestroy {
 
 	isFieldModified(fieldName: string): boolean {
 		return this.datasetModelManager.isFieldModified(this.datasetModel.datasetModelId, fieldName);
-	}
-
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
 	}
 }

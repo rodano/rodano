@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ draftEventModel ? getTranslatedValue(draftEventModel.shortname) : '' }}</h2>
+		<h2>{{ languageService.getTranslatedName(draftEventModel?.shortname) }}</h2>
 		<span class="detail-code first-child">{{ draftEventModel?.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -56,7 +56,7 @@
 						} @else {
 							<div class="chip">
 								<mat-icon class="resource-icon">group</mat-icon>
-								<span class="language-name">{{ getEventGroupName(draftEventModel.eventGroupId) }}</span>
+								<span class="language-name">{{ getEventGroupLabel(draftEventModel.eventGroupId) }}</span>
 							</div>
 						}
 					</div>
@@ -69,11 +69,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventModel.shortname)">
-						@if (!getTranslatedValue(draftEventModel.shortname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventModel.shortname)">
+						@if (!languageService.getTranslatedValue(draftEventModel.shortname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftEventModel.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftEventModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -84,11 +84,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventModel.longname)">
-						@if (!getTranslatedValue(draftEventModel.longname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventModel.longname)">
+						@if (!languageService.getTranslatedValue(draftEventModel.longname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftEventModel.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftEventModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -99,11 +99,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventModel.description)">
-						@if (!getTranslatedValue(draftEventModel.description)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventModel.description)">
+						@if (!languageService.getTranslatedValue(draftEventModel.description)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftEventModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftEventModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -263,7 +263,7 @@
 								@for (refId of draftEventModel.deadlineReferenceEventModelIds; track refId) {
 									<div class="chip third">
 										<mat-icon class="resource-icon">schedule</mat-icon>
-										<span class="language-name">{{ getEventModelCode(refId) }}</span>
+										<span class="language-name">{{ getEventModelLabel(refId) }}</span>
 									</div>
 								}
 							</div>
@@ -435,7 +435,7 @@
 								@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
 									<div class="chip fourth">
 										<mat-icon class="resource-icon">block</mat-icon>
-										<span class="language-name">{{ getEventModelName(blockedId) }}</span>
+										<span class="language-name">{{ getEventModelLabel(blockedId) }}</span>
 									</div>
 								}
 							</div>
@@ -461,7 +461,7 @@
 								@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
 									<div class="chip fifth">
 										<mat-icon class="resource-icon">arrow_forward</mat-icon>
-										<span class="language-name">{{ getEventModelName(impliedId) }}</span>
+										<span class="language-name">{{ getEventModelLabel(impliedId) }}</span>
 									</div>
 								}
 							</div>

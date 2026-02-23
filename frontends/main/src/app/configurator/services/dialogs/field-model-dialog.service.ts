@@ -161,14 +161,8 @@ export class FieldModelDialogService {
 			width: '500px',
 			data: {
 				fieldModel,
-				availableValidators: this.validatorManager.getAll().map(v => ({
-					id: v.validatorId,
-					name: `${this.languageService.getDefaultTranslation(v.shortname) || v.id} (${v.id})`
-				})),
-				availableWorkflows: this.workflowManager.getAll().map(wf => ({
-					id: wf.workflowId,
-					name: `${this.languageService.getDefaultTranslation(wf.shortname) || wf.id} (${wf.id})`
-				}))
+				availableValidators: this.validatorManager.getAll(),
+				availableWorkflows: this.workflowManager.getAll()
 			},
 			disableClose: true
 		});

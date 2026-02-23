@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ draftEventGroup ? getTranslatedValue(draftEventGroup.shortname) : '' }}</h2>
+		<h2>{{ languageService.getTranslatedName(draftEventGroup?.shortname) }}</h2>
 		<span class="detail-code second-child">{{ draftEventGroup?.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -32,11 +32,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventGroup.shortname)">
-						@if (!getTranslatedValue(draftEventGroup.shortname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventGroup.shortname)">
+						@if (!languageService.getTranslatedValue(draftEventGroup.shortname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftEventGroup.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftEventGroup.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -47,11 +47,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventGroup.longname)">
-						@if (!getTranslatedValue(draftEventGroup.longname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventGroup.longname)">
+						@if (!languageService.getTranslatedValue(draftEventGroup.longname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftEventGroup.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftEventGroup.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -62,11 +62,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftEventGroup.description)">
-						@if (!getTranslatedValue(draftEventGroup.description)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventGroup.description)">
+						@if (!languageService.getTranslatedValue(draftEventGroup.description)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftEventGroup.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftEventGroup.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -87,14 +87,14 @@
 										<div class="translation-values">
 											<div class="translation-value">
 												<span class="value-label">Short:</span>
-												<span [class.empty-value]="!getTranslatedValue(draftEventGroup.shortname, lang.code)">
-													{{ getTranslatedValue(draftEventGroup.shortname, lang.code) || 'Not set' }}
+												<span [class.empty-value]="!languageService.getTranslatedValue(draftEventGroup.shortname, lang.code)">
+													{{ languageService.getTranslatedValue(draftEventGroup.shortname, lang.code) || 'Not set' }}
 												</span>
 											</div>
 											<div class="translation-value">
 												<span class="value-label">Long:</span>
-												<span [class.empty-value]="!getTranslatedValue(draftEventGroup.longname, lang.code)">
-													{{ getTranslatedValue(draftEventGroup.longname, lang.code) || 'Not set' }}
+												<span [class.empty-value]="!languageService.getTranslatedValue(draftEventGroup.longname, lang.code)">
+													{{ languageService.getTranslatedValue(draftEventGroup.longname, lang.code) || 'Not set' }}
 												</span>
 											</div>
 										</div>

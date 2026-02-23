@@ -14,7 +14,7 @@
 					} @else {
 						@for (eventModel of availableBlockedEventModels; track eventModel.eventModelId) {
 							<div class="list-item" (click)="addBlockedEventModel(eventModel)">
-								<span class="item-text">{{ getEventModelName(eventModel) }}</span>
+								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
 								<mat-icon class="action-icon">add_circle_outline</mat-icon>
 							</div>
 						}
@@ -30,7 +30,7 @@
 					} @else {
 						@for (eventModel of selectedBlockedEventModels; track eventModel.eventModelId) {
 							<div class="list-item" (click)="removeBlockedEventModel(eventModel)">
-								<span class="item-text">{{ getEventModelName(eventModel) }}</span>
+								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
 								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 							</div>
 						}
@@ -53,7 +53,7 @@
 					} @else {
 						@for (eventModel of availableImpliedEventModels; track eventModel.eventModelId) {
 							<div class="list-item" (click)="addImpliedEventModel(eventModel)">
-								<span class="item-text">{{ getEventModelName(eventModel) }}</span>
+								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
 								<mat-icon class="action-icon">add_circle_outline</mat-icon>
 							</div>
 						}
@@ -69,7 +69,7 @@
 					} @else {
 						@for (eventModel of selectedImpliedEventModels; track eventModel.eventModelId) {
 							<div class="list-item" (click)="removeImpliedEventModel(eventModel)">
-								<span class="item-text">{{ getEventModelName(eventModel) }}</span>
+								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
 								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 							</div>
 						}

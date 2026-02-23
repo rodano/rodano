@@ -64,10 +64,10 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	constructor(
 		public datasetModelManager: DatasetModelManagerService,
 		public fieldModelManager: FieldModelManagerService,
+		public languageService: LanguageService,
 		private configuratorService: ConfiguratorService,
 		private datasetModelDialogService: DatasetModelDialogService,
 		private fieldModelDialogService: FieldModelDialogService,
-		private languageService: LanguageService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -372,10 +372,6 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 			selectedDatasetModelId: this.selectedDatasetModel?.datasetModelId || null,
 			selectedFieldModelId: this.selectedFieldModelId
 		});
-	}
-
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.languageService.getDefaultTranslation(translations) || '';
 	}
 
 	hasLabelPatterns(datasetModel: DatasetModel): boolean {

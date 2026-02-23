@@ -19,7 +19,6 @@ import {
 	WorkflowStateSelection
 } from '../../dialogs/scope-model/scope-model-resources-dialog/scope-model-resources-dialog.component';
 import {DatasetModelManagerService} from '../manager/dataset-model-manager.service';
-import {LanguageService} from '../language.service';
 import {WorkflowManagerService} from '../manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../manager/workflow-state-manager.service';
 
@@ -32,7 +31,6 @@ export class ScopeModelDialogService {
 		private datasetModelManager: DatasetModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
-		private languageService: LanguageService
 	) {}
 
 	openCreateDialog(
@@ -114,23 +112,17 @@ export class ScopeModelDialogService {
 		scopeModel: ScopeModel,
 		workflowStateSelections: WorkflowStateSelection[]
 	): Observable<any> {
+		const availableWorkflows = this.workflowManager.getAll().map(wf => ({
+			...wf,
+			states: this.workflowStateManager.getAllForWorkflow(wf.workflowId)
+		}));
 		const dialogRef = this.dialog.open(ScopeModelResourcesDialogComponent, {
 			width: '500px',
 			data: {
 				scopeModel: JSON.parse(JSON.stringify(scopeModel)),
 				availableForms: [],
-				availableDatasets: this.datasetModelManager.getAll().map(dm => ({
-					id: dm.datasetModelId,
-					name: `${this.languageService.getDefaultTranslation(dm.shortname) || dm.id} (${dm.id})`
-				})),
-				availableWorkflows: this.workflowManager.getAll().map(wf => ({
-					id: wf.workflowId,
-					name: `${this.languageService.getDefaultTranslation(wf.shortname) || wf.id} (${wf.id})`,
-					states: this.workflowStateManager.getAllForWorkflow(wf.workflowId).map(wfs => ({
-						id: wfs.workflowStateId,
-						name: `${this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id} (${wfs.id})`
-					}))
-				})),
+				availableDatasets: this.datasetModelManager.getAll(),
+				availableWorkflows,
 				workflowStateSelections
 			}
 		});

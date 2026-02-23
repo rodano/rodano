@@ -41,4 +41,43 @@ export class LanguageService {
 		const defaultLang = this.getDefaultLanguageCode();
 		return translations[defaultLang] || '';
 	}
+
+	getLabel(entity: {id: string; shortname?: Record<string, string>}): string {
+		const name = this.getDefaultTranslation(entity.shortname) || entity.id;
+		return `${name} (${entity.id})`;
+	}
+
+	getLabelById<T extends {id: string; shortname?: Record<string, string>}>(
+		id: string,
+		getById: (id: string) => T | undefined | null
+	): string {
+		const entity = getById(id);
+		return entity ? this.getLabel(entity) : id;
+	}
+
+	getLanguageName(code: string | undefined): string {
+		if(!code) {
+			return 'Unknown';
+		}
+		try {
+			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
+			return displayNames.of(code) || code.toUpperCase();
+		}
+		catch (e) {
+			console.error(e);
+			return code.toUpperCase();
+		}
+	}
+
+	getTranslatedName(translations: Record<string, string> | undefined): string {
+		return this.getTranslatedValue(translations);
+	}
+
+	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
+		if(!translations) {
+			return '';
+		}
+		const lang = languageCode || this.currentLanguage;
+		return translations[lang] || '';
+	}
 }

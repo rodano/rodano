@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ getTranslatedName(validator.shortname) }}</h2>
+		<h2>{{ languageService.getTranslatedName(validator.shortname) }}</h2>
 		<span class="detail-code parent">{{ validator.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -31,11 +31,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.shortname)">
-					@if (!getTranslatedValue(validator.shortname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.shortname)">
+					@if (!languageService.getTranslatedValue(validator.shortname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(validator.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(validator.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -46,11 +46,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.longname)">
-					@if (!getTranslatedValue(validator.longname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.longname)">
+					@if (!languageService.getTranslatedValue(validator.longname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(validator.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(validator.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -61,11 +61,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.description)">
-					@if (!getTranslatedValue(validator.description)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.description)">
+					@if (!languageService.getTranslatedValue(validator.description)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(validator.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(validator.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -76,11 +76,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(validator.message)">
-					@if (!getTranslatedValue(validator.message)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.message)">
+					@if (!languageService.getTranslatedValue(validator.message)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(validator.message) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(validator.message) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -132,14 +132,14 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="getWorkflowDisplayName() === 'Not set'">
-					@if (getWorkflowDisplayName() === 'Not set') {
+				<div class="setting-value" [class.not-configured]="!validator.workflowId">
+					@if (!validator.workflowId) {
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
 						<div class="chip">
 							<mat-icon class="resource-icon">settings</mat-icon>
-							<span class="language-name">{{ getWorkflowDisplayName() }}</span>
+							<span class="language-name">{{ getWorkflowLabel(validator.workflowId) }}</span>
 						</div>
 					}
 				</div>
@@ -152,14 +152,14 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="getInvalidStateDisplay() === 'Not set'">
-					@if (getInvalidStateDisplay() === 'Not set') {
+				<div class="setting-value" [class.not-configured]="!validator.invalidStateId">
+					@if (!validator.invalidStateId) {
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
 						<div class="chip">
 							<mat-icon class="resource-icon">cancel</mat-icon>
-							<span class="language-name">{{ getInvalidStateDisplay() }}</span>
+							<span class="language-name">{{ getWorkflowStateLabel(validator.invalidStateId) }}</span>
 						</div>
 					}
 				</div>
@@ -172,14 +172,14 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="getValidStateDisplay() === 'Not set'">
-					@if (getValidStateDisplay() === 'Not set') {
+				<div class="setting-value" [class.not-configured]="!validator.validStateId">
+					@if (!validator.validStateId) {
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
 						<div class="chip">
 							<mat-icon class="resource-icon">check_circle</mat-icon>
-							<span class="language-name">{{ getValidStateDisplay() }}</span>
+							<span class="language-name">{{ getWorkflowStateLabel(validator.validStateId) }}</span>
 						</div>
 					}
 				</div>

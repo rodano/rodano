@@ -49,7 +49,7 @@ export class EventModelSchedulingDialogComponent implements OnInit {
 	selectedEventModels: EventModel[] = [];
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<EventModelSchedulingDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelSchedulingDialogData
@@ -97,11 +97,6 @@ export class EventModelSchedulingDialogComponent implements OnInit {
 	onRemoveEventModel(eventModel: EventModel): void {
 		this.selectedEventModels = this.selectedEventModels.filter(em => em.eventModelId !== eventModel.eventModelId);
 		this.availableEventModels = [...this.availableEventModels, eventModel];
-	}
-
-	getEventModelLabel(eventModel: EventModel): string {
-		const shortname = this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id;
-		return `${shortname} (${eventModel.id})`;
 	}
 
 	onSave(): void {

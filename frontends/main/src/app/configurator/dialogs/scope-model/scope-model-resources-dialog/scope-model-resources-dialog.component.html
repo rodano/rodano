@@ -12,10 +12,10 @@
 					@if (availableFormModels.length === 0) {
 						<div class="empty-placeholder">No available form models</div>
 					}
-					@for (formModel of availableFormModels; track formModel.id) {
+					@for (formModel of availableFormModels; track formModel.formModelId) {
 						<div class="list-item" (click)="onAddFormModel(formModel)">
 							<div class="item-text">
-								<span>{{ formModel.name || formModel.id }}</span>
+								<span>{{ languageService.getLabel(formModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -29,10 +29,10 @@
 					@if (selectedFormModels.length === 0) {
 						<div class="empty-placeholder">No form models selected</div>
 					}
-					@for (formModel of selectedFormModels; track formModel.id) {
+					@for (formModel of selectedFormModels; track formModel.formModelId) {
 						<div class="list-item" (click)="onRemoveFormModel(formModel)">
 							<div class="item-text">
-								<span>{{ formModel.name || formModel.id }}</span>
+								<span>{{ languageService.getLabel(formModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>
@@ -53,10 +53,10 @@
 					@if (availableDatasetModels.length === 0) {
 						<div class="empty-placeholder">No available dataset models</div>
 					}
-					@for (datasetModel of availableDatasetModels; track datasetModel.id) {
+					@for (datasetModel of availableDatasetModels; track datasetModel.datasetModelId) {
 						<div class="list-item" (click)="onAddDatasetModel(datasetModel)">
 							<div class="item-text">
-								<span>{{ datasetModel.name || datasetModel.id }}</span>
+								<span>{{ languageService.getLabel(datasetModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -70,10 +70,10 @@
 					@if (selectedDatasetModels.length === 0) {
 						<div class="empty-placeholder">No dataset models selected</div>
 					}
-					@for (datasetModel of selectedDatasetModels; track datasetModel.id) {
+					@for (datasetModel of selectedDatasetModels; track datasetModel.datasetModelId) {
 						<div class="list-item" (click)="onRemoveDatasetModel(datasetModel)">
 							<div class="item-text">
-								<span>{{ datasetModel.name || datasetModel.id }}</span>
+								<span>{{ languageService.getLabel(datasetModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>
@@ -94,10 +94,10 @@
 					@if (availableWorkflows.length === 0) {
 						<div class="empty-placeholder">No available workflows</div>
 					}
-					@for (workflow of availableWorkflows; track workflow.id) {
+					@for (workflow of availableWorkflows; track workflow.workflowId) {
 						<div class="list-item" (click)="onAddWorkflow(workflow)">
 							<div class="item-text">
-								<span>{{ workflow.name || workflow.id }}</span>
+								<span>{{ languageService.getLabel(workflow) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -111,10 +111,10 @@
 					@if (selectedWorkflows.length === 0) {
 						<div class="empty-placeholder">No workflows selected</div>
 					}
-					@for (workflow of selectedWorkflows; track workflow.id) {
+					@for (workflow of selectedWorkflows; track workflow.workflowId) {
 						<div class="list-item" (click)="onRemoveWorkflow(workflow)">
 							<div class="item-text">
-								<span>{{ workflow.name || workflow.id }}</span>
+								<span>{{ languageService.getLabel(workflow) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>
@@ -139,8 +139,8 @@
 					[value]="selector.selectedWorkflowId"
 					(valueChange)="onWorkflowSelected(selector, $event)">
 					<mat-option value="">Select a workflow</mat-option>
-					@for (workflow of selectedWorkflows; track workflow.id) {
-						<mat-option [value]="workflow.id">{{ workflow.name || workflow.id }}</mat-option>
+					@for (workflow of selectedWorkflows; track workflow.workflowId) {
+						<mat-option [value]="workflow.workflowId">{{ languageService.getLabel(workflow) }}</mat-option>
 					}
 				</mat-select>
 				<span class="hint">Choose one of the selected workflows above</span>
@@ -156,10 +156,10 @@
 								@if (selector.availableStates.length === 0) {
 									<div class="empty-placeholder">No available states</div>
 								}
-								@for (state of selector.availableStates; track state.id) {
+								@for (state of selector.availableStates; track state.workflowStateId) {
 									<div class="list-item" (click)="onAddState(selector, state)">
 										<div class="item-text">
-											<span>{{ state.name }}</span>
+											<span>{{ languageService.getLabel(state) }}</span>
 										</div>
 										<mat-icon class="action-icon">add_circle_outline</mat-icon>
 									</div>
@@ -173,10 +173,10 @@
 								@if (selector.selectedStates.length === 0) {
 									<div class="empty-placeholder">No states selected</div>
 								}
-								@for (state of selector.selectedStates; track state.id) {
+								@for (state of selector.selectedStates; track state.workflowStateId) {
 									<div class="list-item" (click)="onRemoveState(selector, state)">
 										<div class="item-text">
-											<span>{{ state.name }}</span>
+											<span>{{ languageService.getLabel(state) }}</span>
 										</div>
 										<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 									</div>

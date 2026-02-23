@@ -9,7 +9,7 @@
 					type="text"
 					formControlName="code"
 					placeholder="MY_PROJECT"
-					(input)="onCodeInput($event)"
+					(input)="onCodeInput($event, form)"
 					style="text-transform: uppercase;">
 				<span class="hint">Uppercase letters, numbers, and underscores only (e.g., TEST, STUDY_2024)</span>
 				@if (form.get('code')?.hasError('required') && form.get('code')?.touched) {

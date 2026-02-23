@@ -10,7 +10,7 @@
 					formControlName="id"
 					placeholder="EVENT_CODE"
 					required
-					(input)="onCodeInput($event)">
+					(input)="onCodeInput($event, form)">
 				<span class="hint">Uppercase letters, numbers, and underscores only</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
 					<span class="error-message">Code is required</span>
@@ -30,8 +30,8 @@
 				<label>Event Group</label>
 				<mat-select formControlName="eventGroupId" placeholder="Select event group">
 					<mat-option [value]="null">None</mat-option>
-					@for (group of eventGroups; track group.id) {
-						<mat-option [value]="group.id">{{ group.name }} ({{ group.code }})</mat-option>
+					@for (group of eventGroups; track group.eventGroupId) {
+						<mat-option [value]="group.eventGroupId">{{ languageService.getLabel(group) }}</mat-option>
 					}
 				</mat-select>
 				<span class="hint">Optional grouping for related events</span>

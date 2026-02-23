@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ draftWorkflowState ? getTranslatedValue(draftWorkflowState.shortname) : '' }}</h2>
+		<h2>{{ languageService.getTranslatedName(draftWorkflowState?.shortname) }}</h2>
 		<span class="detail-code first-child">{{ draftWorkflowState?.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -81,11 +81,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftWorkflowState.shortname)">
-						@if (!getTranslatedValue(draftWorkflowState.shortname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowState.shortname)">
+						@if (!languageService.getTranslatedValue(draftWorkflowState.shortname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftWorkflowState.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftWorkflowState.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -96,11 +96,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftWorkflowState.longname)">
-						@if (!getTranslatedValue(draftWorkflowState.longname)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowState.longname)">
+						@if (!languageService.getTranslatedValue(draftWorkflowState.longname)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftWorkflowState.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftWorkflowState.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -111,11 +111,11 @@
 							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 						}
 					</label>
-					<div class="setting-value" [class.not-configured]="!getTranslatedValue(draftWorkflowState.description)">
-						@if (!getTranslatedValue(draftWorkflowState.description)) {
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowState.description)">
+						@if (!languageService.getTranslatedValue(draftWorkflowState.description)) {
 							<mat-icon class="warning-icon">report</mat-icon>
 						}
-						{{ getTranslatedValue(draftWorkflowState.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+						{{ languageService.getTranslatedValue(draftWorkflowState.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 					</div>
 				</div>
 
@@ -147,7 +147,7 @@
 							} @else {
 								<div class="chip">
 									<mat-icon class="resource-icon">adjust</mat-icon>
-									<span class="language-name">{{ getAggregatedStateLabel(draftWorkflowState.aggregateStateId) }}</span>
+									<span class="language-name">{{ getWorkflowStateLabel(draftWorkflowState.aggregateStateId) }}</span>
 								</div>
 							}
 						</div>
@@ -192,7 +192,7 @@
 								@for (action of draftWorkflowState.possibleActions; track action.workflowActionId) {
 									<div class="chip">
 										<mat-icon class="resource-icon">play_circle</mat-icon>
-										<span class="tag">{{ action.id }}</span>
+										<span class="tag">{{ languageService.getLabel(action) }}</span>
 									</div>
 								}
 							</div>

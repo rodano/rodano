@@ -6,10 +6,13 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatIconModule} from '@angular/material/icon';
 import {Validator} from '@core/model/validator';
 import {FormsModule} from '@angular/forms';
+import {Workflow} from '@core/model/workflow';
+import {WorkflowState} from '@core/model/workflow-state';
+import {LanguageService} from '../../../services/language.service';
 
 export interface ValidatorWorkflowDialogData {
 	validator: Validator;
-	availableWorkflows: {id: string; name: string; states: {id: string; name: string}[]}[];
+	availableWorkflows: Workflow[];
 }
 
 @Component({
@@ -30,9 +33,10 @@ export class ValidatorWorkflowDialogComponent implements OnInit {
 	selectedWorkflowId: string | null = null;
 	selectedInvalidStateId: string | null = null;
 	selectedValidStateId: string | null = null;
-	availableStates: {id: string; name: string}[] = [];
+	availableStates: WorkflowState[] = [];
 
 	constructor(
+		public languageService: LanguageService,
 		private dialogRef: MatDialogRef<ValidatorWorkflowDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: ValidatorWorkflowDialogData
 	) {}
@@ -43,7 +47,7 @@ export class ValidatorWorkflowDialogComponent implements OnInit {
 		this.selectedValidStateId = this.data.validator.validStateId || null;
 
 		if(this.selectedWorkflowId) {
-			const workflow = this.data.availableWorkflows.find(wf => wf.id === this.selectedWorkflowId);
+			const workflow = this.data.availableWorkflows.find(wf => wf.workflowId === this.selectedWorkflowId);
 			this.availableStates = workflow ? workflow.states : [];
 		}
 	}
@@ -52,7 +56,7 @@ export class ValidatorWorkflowDialogComponent implements OnInit {
 		this.selectedWorkflowId = workflowId;
 		this.selectedInvalidStateId = null;
 		this.selectedValidStateId = null;
-		const workflow = this.data.availableWorkflows.find(wf => wf.id === workflowId);
+		const workflow = this.data.availableWorkflows.find(wf => wf.workflowId === workflowId);
 		this.availableStates = workflow ? [...workflow.states] : [];
 	}
 

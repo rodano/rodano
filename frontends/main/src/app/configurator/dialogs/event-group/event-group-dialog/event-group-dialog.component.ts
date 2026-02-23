@@ -8,6 +8,10 @@ import {MatIconModule} from '@angular/material/icon';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatTabsModule} from '@angular/material/tabs';
+import {LanguageService} from '../../../services/language.service';
+import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
+import {EventGroupManagerService} from '../../../services/manager/event-group-manager.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 export interface EventGroupDialogData {
 	projectId: string;
@@ -31,148 +35,72 @@ export interface EventGroupDialogData {
 	templateUrl: './event-group-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css']
 })
-export class EventGroupDialogComponent implements OnInit {
+export class EventGroupDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
-	languageForms = new Map<string, FormGroup>();
 	isEditMode = false;
 
-	availableLanguages: ProjectLanguage[] = [];
-
 	constructor(
-		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<EventGroupDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventGroupDialogData
+		fb: FormBuilder,
+		languageService: LanguageService,
+		dialogRef: MatDialogRef<EventGroupDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) public data: EventGroupDialogData,
+		private eventGroupManager: EventGroupManagerService,
+		private snackBar: MatSnackBar
 	) {
+		super(fb, languageService, dialogRef);
 		this.isEditMode = !!data.eventGroup;
-
-		this.form = this.fb.group({
-			id: ['', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]]
-		});
 	}
 
 	ngOnInit(): void {
-		this.loadProjectLanguages();
-	}
-
-	loadProjectLanguages(): void {
-		this.availableLanguages = this.data.languages || [];
-
-		if(this.availableLanguages.length === 0) {
-			this.availableLanguages = [{languageCode: 'en', isDefault: true}];
-		}
-
-		this.initializeLanguageForms();
+		this.loadProjectLanguages(this.data.languages);
+		this.initializeForm();
 	}
 
 	initializeLanguageForms(): void {
-		this.availableLanguages.forEach((lang: ProjectLanguage) => {
-			if(lang.languageCode) {
-				const langForm = this.fb.group({
-					shortname: ['', lang.isDefault ? Validators.required : []],
-					longname: [''],
-					description: ['']
-				});
-				this.languageForms.set(lang.languageCode, langForm);
+		this.availableLanguages.forEach(lang => {
+			if(!lang.languageCode) {
+				return;
 			}
-		});
-
-		if(this.data.eventGroup) {
-			this.populateForm();
-		}
-	}
-
-	populateForm(): void {
-		if(!this.data.eventGroup) {
-			return;
-		}
-
-		const eventGroup = this.data.eventGroup;
-
-		this.form.patchValue({
-			id: eventGroup.id
-		});
-
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			langForm.patchValue({
-				shortname: eventGroup.shortname?.[langCode] || '',
-				longname: eventGroup.longname?.[langCode] || '',
-				description: eventGroup.description?.[langCode] || ''
-			});
+			const eg = this.data.eventGroup;
+			this.languageForms.set(lang.languageCode, this.fb.group({
+				shortname: [eg?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
+				longname: [eg?.longname?.[lang.languageCode] || ''],
+				description: [eg?.description?.[lang.languageCode] || '']
+			}));
 		});
 	}
 
-	onIdInput(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const uppercaseValue = input.value.toUpperCase();
-		input.value = uppercaseValue;
-		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
+	initializeForm(): void {
+		const eg = this.data.eventGroup;
+		this.form = this.fb.group({
+			id: [eg?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]]
+		});
 	}
 
-	areLanguageFormsValid(): boolean {
-		let allValid = true;
-		this.languageForms.forEach((langForm: FormGroup) => {
-			if(langForm.invalid) {
-				allValid = false;
-			}
-		});
-		return allValid;
+	isCodeDuplicate(code: string): boolean {
+		const currentEventGroupId = this.data.eventGroup?.eventGroupId;
+		return this.eventGroupManager.getAll().some(eg =>
+			eg.id.toUpperCase() === code.toUpperCase() && eg.eventGroupId !== currentEventGroupId
+		);
 	}
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
+			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
 			return;
 		}
 
-		const formValue = this.form.getRawValue();
+		const code = this.form.getRawValue().id.toUpperCase();
+		if(this.isCodeDuplicate(code)) {
+			this.snackBar.open(`An event model with code "${code}" already exists`, 'Close', {duration: 3000});
+		}
 
-		const shortname: Record<string, string> = {};
-		const longname: Record<string, string> = {};
-		const description: Record<string, string> = {};
-
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			const langValue = langForm.value;
-
-			if(langValue.shortname) {
-				shortname[langCode] = langValue.shortname;
-			}
-			if(langValue.longname) {
-				longname[langCode] = langValue.longname;
-			}
-			if(langValue.description) {
-				description[langCode] = langValue.description;
-			}
-		});
-
-		const result = {
-			id: formValue.id,
+		const {shortname, longname, description} = this.collectTranslations();
+		this.dialogRef.close({
+			id: code,
 			shortname,
 			longname,
 			description
-		};
-
-		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
-	}
-
-	getLanguageLabel(code: string, isDefault: boolean): string {
-		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ★` : name;
+		});
 	}
 }

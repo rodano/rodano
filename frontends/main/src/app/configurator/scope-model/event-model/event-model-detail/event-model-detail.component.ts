@@ -16,6 +16,7 @@ import {DatasetModelManagerService} from '../../../services/manager/dataset-mode
 import {EventModelManagerService} from '../../../services/manager/event-model-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../../services/manager/workflow-manager.service';
+import {EventGroupManagerService} from '../../../services/manager/event-group-manager.service';
 
 @Component({
 	selector: 'app-event-model-detail',
@@ -47,9 +48,10 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	private languageSubscription: Subscription;
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private eventModelDialogService: EventModelDialogService,
 		private eventModelManager: EventModelManagerService,
+		private eventGroupManager: EventGroupManagerService,
 		private datasetModelManager: DatasetModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private dialog: MatDialog
@@ -101,77 +103,16 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		this.closed.emit();
 	}
 
-	getTranslatedValue(translations: Record<string, string> | undefined): string {
-		if(!translations) {
-			return '';
-		}
-		return translations[this.selectedLanguage] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
-	getEventModelName(eventModelId: string): string {
-		const em = this.eventModels.find(e => e.eventModelId === eventModelId);
-		if(!em) {
-			return eventModelId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(em.shortname) || em.id;
-		return `${name} (${em.id})`;
-	}
-
-	getEventModelCode(eventModelId: string): string {
-		const eventModel = this.eventModels.find(em => em.eventModelId === eventModelId);
-		if(!eventModel) {
-			return eventModelId;
-		}
-
-		const shortname = this.languageService.getDefaultTranslation(eventModel.shortname) || eventModel.id;
-		return `${shortname} (${eventModel.id})`;
-	}
-
-	getEventGroupName(eventGroupId: string | undefined): string {
-		if(!eventGroupId) {
-			return 'Not set';
-		}
-		const eventGroup = this.eventGroups.find(eg => eg.eventGroupId === eventGroupId);
-		if(!eventGroup) {
-			return eventGroupId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(eventGroup.shortname) || eventGroup.id;
-		return `${name} (${eventGroup.id})`;
-	}
-
 	onEditBasicInfo(): void {
 		if(!this.draftEventModel || !this.scopeModel) {
 			return;
 		}
 
-		const formattedEventGroups = this.eventGroups.map(eg => ({
-			id: eg.eventGroupId,
-			name: this.languageService.getDefaultTranslation(eg.shortname) || eg.id,
-			code: eg.id
-		}));
-
 		this.eventModelDialogService.openBasicInfoDialog(
 			this.draftEventModel,
 			this.projectId,
 			this.scopeModel.scopeModelId,
-			this.projectLanguages,
-			formattedEventGroups
+			this.projectLanguages
 		).subscribe(result => {
 			if(result && this.draftEventModel) {
 				this.draftEventModel = {
@@ -263,13 +204,11 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const eventModelName = this.getTranslatedValue(this.draftEventModel.shortname) || this.draftEventModel.id;
-
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
 			data: {
 				title: 'Delete Event Model',
-				message: `Are you sure you want to delete "${eventModelName}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.draftEventModel.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -283,14 +222,16 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	getDatasetModelLabel(datasetModelId: string): string {
-		const datasetModel = this.datasetModelManager.getById(datasetModelId);
-		if(!datasetModel) {
-			return datasetModelId;
-		}
+	getEventModelLabel(eventModelId: string): string {
+		return this.languageService.getLabelById(eventModelId, id => this.eventModelManager.getById(id));
+	}
 
-		const name = this.languageService.getDefaultTranslation(datasetModel.shortname) || datasetModel.id;
-		return `${name} (${datasetModel.id})`;
+	getEventGroupLabel(eventGroupId: string): string {
+		return this.languageService.getLabelById(eventGroupId, id => this.eventGroupManager.getById(id));
+	}
+
+	getDatasetModelLabel(datasetModelId: string): string {
+		return this.languageService.getLabelById(datasetModelId, id => this.datasetModelManager.getById(id));
 	}
 
 	getFormModelLabel(formModelId: string): string {
@@ -299,11 +240,6 @@ export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	getWorkflowLabel(workflowId: string): string {
-		const workflow = this.workflowManager.getById(workflowId);
-		if(!workflow) {
-			return workflowId;
-		}
-		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
-		return `${name} (${workflow.id})`;
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 }

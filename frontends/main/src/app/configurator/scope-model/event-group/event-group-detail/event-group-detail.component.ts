@@ -46,7 +46,7 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 	availableLanguages: {code: string; name: string; isDefault: boolean}[] = [];
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private eventGroupDialogService: EventGroupDialogService,
 		private dialog: MatDialog
 	) {
@@ -78,7 +78,7 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 		if(this.project?.languages) {
 			this.availableLanguages = this.project.languages.map(lang => ({
 				code: lang.languageCode || '',
-				name: this.getLanguageName(lang.languageCode),
+				name: this.languageService.getLanguageName(lang.languageCode),
 				isDefault: lang.isDefault || false
 			}));
 		}
@@ -186,13 +186,11 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 			return;
 		}
 
-		const eventGroupName = this.getTranslatedValue(this.draftEventGroup.shortname) || this.draftEventGroup.id;
-
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
 			data: {
 				title: 'Delete Event Group',
-				message: `Are you sure you want to delete "${eventGroupName}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.draftEventGroup.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -204,27 +202,5 @@ export class EventGroupDetailComponent implements OnInit, OnChanges, OnDestroy {
 				this.eventGroupDeleted.emit(this.draftEventGroup.eventGroupId);
 			}
 		});
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
 	}
 }

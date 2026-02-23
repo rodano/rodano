@@ -12,10 +12,10 @@
 					@if (availableWorkflowActions.length === 0) {
 						<div class="empty-placeholder">No available actions</div>
 					}
-					@for (action of availableWorkflowActions; track action.id) {
+					@for (action of availableWorkflowActions; track action.workflowActionId) {
 						<div class="list-item" (click)="onAdd(action)">
 							<div class="item-text">
-								<span>{{ action.name }}</span>
+								<span>{{ languageService.getLabel(action) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -29,10 +29,10 @@
 					@if (selectedWorkflowActions.length === 0) {
 						<div class="empty-placeholder">No actions selected</div>
 					}
-					@for (action of selectedWorkflowActions; track action.id) {
+					@for (action of selectedWorkflowActions; track action.workflowActionId) {
 						<div class="list-item" (click)="onRemove(action)">
 							<div class="item-text">
-								<span>{{ action.name }}</span>
+								<span>{{ languageService.getLabel(action) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>

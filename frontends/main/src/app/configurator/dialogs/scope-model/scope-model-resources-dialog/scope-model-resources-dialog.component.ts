@@ -5,12 +5,17 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
 import {MatIconModule} from '@angular/material/icon';
+import {WorkflowState} from '@core/model/workflow-state';
+import {FormModel} from '@core/model/form-model';
+import {DatasetModel} from '@core/model/dataset-model';
+import {Workflow} from '@core/model/workflow';
+import {LanguageService} from '../../../services/language.service';
 
 interface WorkflowStateSelector {
 	id: string;
 	selectedWorkflowId: string;
-	availableStates: {id: string; name: string}[];
-	selectedStates: {id: string; name: string}[];
+	availableStates: WorkflowState[];
+	selectedStates: WorkflowState[];
 }
 
 export interface WorkflowStateSelection {
@@ -20,9 +25,9 @@ export interface WorkflowStateSelection {
 
 export interface ScopeModelResourcesDialogData {
 	scopeModel: ScopeModel;
-	availableForms: {id: string; name: string}[];
-	availableDatasets: {id: string; name: string}[];
-	availableWorkflows: {id: string; name: string; states: {id: string; name: string}[]}[];
+	availableForms: FormModel[];
+	availableDatasets: DatasetModel[];
+	availableWorkflows: Workflow[];
 	workflowStateSelections: WorkflowStateSelection[];
 }
 
@@ -40,19 +45,20 @@ export interface ScopeModelResourcesDialogData {
 	styleUrls: ['../../dialog-shared.css']
 })
 export class ScopeModelResourcesDialogComponent implements OnInit {
-	availableFormModels: {id: string; name: string}[] = [];
-	selectedFormModels: {id: string; name: string}[] = [];
+	availableFormModels: FormModel[] = [];
+	selectedFormModels: FormModel[] = [];
 
-	availableDatasetModels: {id: string; name: string}[] = [];
-	selectedDatasetModels: {id: string; name: string}[] = [];
+	availableDatasetModels: DatasetModel[] = [];
+	selectedDatasetModels: DatasetModel[] = [];
 
-	availableWorkflows: {id: string; name: string; states: {id: string; name: string}[]}[] = [];
-	selectedWorkflows: {id: string; name: string; states: {id: string; name: string}[]}[] = [];
+	availableWorkflows: Workflow[] = [];
+	selectedWorkflows: Workflow[] = [];
 
 	workflowStateSelectors: WorkflowStateSelector[] = [];
 	private selectorIdCounter = 0;
 
 	constructor(
+		public languageService: LanguageService,
 		private dialogRef: MatDialogRef<ScopeModelResourcesDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: ScopeModelResourcesDialogData
 	) {}
@@ -66,20 +72,20 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 
 	private initializeFormModels(): void {
 		const selectedIds = this.data.scopeModel.formModelIds || [];
-		this.selectedFormModels = this.data.availableForms.filter(fm => selectedIds.includes(fm.id));
-		this.availableFormModels = this.data.availableForms.filter(fm => !selectedIds.includes(fm.id));
+		this.selectedFormModels = this.data.availableForms.filter(fm => selectedIds.includes(fm.formModelId));
+		this.availableFormModels = this.data.availableForms.filter(fm => !selectedIds.includes(fm.formModelId));
 	}
 
 	private initializeDatasetModels(): void {
 		const selectedIds = this.data.scopeModel.datasetModelIds || [];
-		this.selectedDatasetModels = this.data.availableDatasets.filter(dm => selectedIds.includes(dm.id));
-		this.availableDatasetModels = this.data.availableDatasets.filter(dm => !selectedIds.includes(dm.id));
+		this.selectedDatasetModels = this.data.availableDatasets.filter(dm => selectedIds.includes(dm.datasetModelId));
+		this.availableDatasetModels = this.data.availableDatasets.filter(dm => !selectedIds.includes(dm.datasetModelId));
 	}
 
 	private initializeWorkflows(): void {
 		const selectedIds = this.data.scopeModel.workflowIds || [];
-		this.selectedWorkflows = this.data.availableWorkflows.filter(wf => selectedIds.includes(wf.id));
-		this.availableWorkflows = this.data.availableWorkflows.filter(wf => !selectedIds.includes(wf.id));
+		this.selectedWorkflows = this.data.availableWorkflows.filter(wf => selectedIds.includes(wf.workflowId));
+		this.availableWorkflows = this.data.availableWorkflows.filter(wf => !selectedIds.includes(wf.workflowId));
 	}
 
 	private initializeWorkflowStateSelectors(): void {
@@ -93,15 +99,13 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 		});
 
 		selectionsByWorkflow.forEach((stateIds, workflowId) => {
-			const workflow = this.selectedWorkflows.find(wf => wf.id === workflowId);
+			const workflow = this.selectedWorkflows.find(wf => wf.workflowId === workflowId);
 			if(workflow) {
-				const selectorId = `selector_${this.selectorIdCounter++}`;
-
-				const selectedStates = workflow.states.filter(state => stateIds.includes(state.id));
-				const availableStates = workflow.states.filter(state => !stateIds.includes(state.id));
+				const selectedStates = workflow.states.filter(st => stateIds.includes(st.workflowStateId));
+				const availableStates = workflow.states.filter(st => !stateIds.includes(st.workflowStateId));
 
 				this.workflowStateSelectors.push({
-					id: selectorId,
+					id: `selector_${this.selectorIdCounter++}`,
 					selectedWorkflowId: workflowId,
 					availableStates,
 					selectedStates
@@ -110,48 +114,46 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 		});
 	}
 
-	onAddFormModel(formModel: {id: string; name: string}): void {
-		this.availableFormModels = this.availableFormModels.filter(fm => fm.id !== formModel.id);
+	onAddFormModel(formModel: FormModel): void {
+		this.availableFormModels = this.availableFormModels.filter(fm => fm.formModelId !== formModel.formModelId);
 		this.selectedFormModels = [...this.selectedFormModels, formModel];
 	}
 
-	onRemoveFormModel(formModel: {id: string; name: string}): void {
-		this.selectedFormModels = this.selectedFormModels.filter(fm => fm.id !== formModel.id);
+	onRemoveFormModel(formModel: FormModel): void {
+		this.selectedFormModels = this.selectedFormModels.filter(fm => fm.formModelId !== formModel.formModelId);
 		this.availableFormModels = [...this.availableFormModels, formModel];
 	}
 
-	onAddDatasetModel(datasetModel: {id: string; name: string}): void {
-		this.availableDatasetModels = this.availableDatasetModels.filter(dm => dm.id !== datasetModel.id);
+	onAddDatasetModel(datasetModel: DatasetModel): void {
+		this.availableDatasetModels = this.availableDatasetModels.filter(dm => dm.datasetModelId !== datasetModel.datasetModelId);
 		this.selectedDatasetModels = [...this.selectedDatasetModels, datasetModel];
 	}
 
-	onRemoveDatasetModel(datasetModel: {id: string; name: string}): void {
-		this.selectedDatasetModels = this.selectedDatasetModels.filter(dm => dm.id !== datasetModel.id);
+	onRemoveDatasetModel(datasetModel: DatasetModel): void {
+		this.selectedDatasetModels = this.selectedDatasetModels.filter(dm => dm.datasetModelId !== datasetModel.datasetModelId);
 		this.availableDatasetModels = [...this.availableDatasetModels, datasetModel];
 	}
 
-	onAddWorkflow(workflow: {id: string; name: string; states: {id: string; name: string}[]}): void {
-		this.availableWorkflows = this.availableWorkflows.filter(wf => wf.id !== workflow.id);
+	onAddWorkflow(workflow: Workflow): void {
+		this.availableWorkflows = this.availableWorkflows.filter(wf => wf.workflowId !== workflow.workflowId);
 		this.selectedWorkflows = [...this.selectedWorkflows, workflow];
 	}
 
-	onRemoveWorkflow(workflow: {id: string; name: string; states: {id: string; name: string}[]}): void {
-		this.selectedWorkflows = this.selectedWorkflows.filter(wf => wf.id !== workflow.id);
+	onRemoveWorkflow(workflow: Workflow): void {
+		this.selectedWorkflows = this.selectedWorkflows.filter(wf => wf.workflowId !== workflow.workflowId);
 		this.availableWorkflows = [...this.availableWorkflows, workflow];
-
 		this.workflowStateSelectors = this.workflowStateSelectors.filter(
-			selector => selector.selectedWorkflowId !== workflow.id
+			selector => selector.selectedWorkflowId !== workflow.workflowId
 		);
 	}
 
 	addWorkflowStateSelector(): void {
-		const selectorId = `selector_${this.selectorIdCounter++}`;
-		this.workflowStateSelectors.push({
-			id: selectorId,
+		this.workflowStateSelectors = [...this.workflowStateSelectors, {
+			id: `selector_${this.selectorIdCounter++}`,
 			selectedWorkflowId: '',
 			availableStates: [],
 			selectedStates: []
-		});
+		}];
 	}
 
 	removeWorkflowStateSelector(selector: WorkflowStateSelector): void {
@@ -159,15 +161,15 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 	}
 
 	onWorkflowSelected(selector: WorkflowStateSelector, workflowId: string): void {
-		const workflow = this.selectedWorkflows.find(wf => wf.id === workflowId);
+		const workflow = this.selectedWorkflows.find(wf => wf.workflowId === workflowId);
 		const index = this.workflowStateSelectors.indexOf(selector);
 
 		const alreadySelectedStateIds = this.workflowStateSelectors
 			.filter(s => s.id !== selector.id && s.selectedWorkflowId === workflowId)
-			.flatMap(s => s.selectedStates.map(st => st.id));
+			.flatMap(s => s.selectedStates.map(st => st.workflowStateId));
 
 		const availableStates = workflow
-			? workflow.states.filter(st => !alreadySelectedStateIds.includes(st.id))
+			? workflow.states.filter(st => !alreadySelectedStateIds.includes(st.workflowStateId))
 			: [];
 
 		this.workflowStateSelectors[index] = {
@@ -176,24 +178,23 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 			availableStates,
 			selectedStates: []
 		};
-
 		this.workflowStateSelectors = [...this.workflowStateSelectors];
 	}
 
-	onAddState(selector: WorkflowStateSelector, state: {id: string; name: string}): void {
-		selector.availableStates = selector.availableStates.filter(s => s.id !== state.id);
+	onAddState(selector: WorkflowStateSelector, state: WorkflowState): void {
+		selector.availableStates = selector.availableStates.filter(s => s.workflowStateId !== state.workflowStateId);
 		selector.selectedStates = [...selector.selectedStates, state];
 
 		this.workflowStateSelectors = this.workflowStateSelectors.map(s => {
 			if(s.id !== selector.id && s.selectedWorkflowId === selector.selectedWorkflowId) {
-				return {...s, availableStates: s.availableStates.filter(st => st.id !== state.id)};
+				return {...s, availableStates: s.availableStates.filter(st => st.workflowStateId !== state.workflowStateId)};
 			}
 			return s;
 		});
 	}
 
-	onRemoveState(selector: WorkflowStateSelector, state: {id: string; name: string}): void {
-		selector.selectedStates = selector.selectedStates.filter(s => s.id !== state.id);
+	onRemoveState(selector: WorkflowStateSelector, state: WorkflowState): void {
+		selector.selectedStates = selector.selectedStates.filter(s => s.workflowStateId !== state.workflowStateId);
 		selector.availableStates = [...selector.availableStates, state];
 
 		this.workflowStateSelectors = this.workflowStateSelectors.map(s => {
@@ -207,35 +208,30 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 	onSave(): void {
 		const result: any = {};
 
-		const originalFormIds = this.data.scopeModel.formModelIds || [];
-		const currentFormIds = this.selectedFormModels.map(fm => fm.id);
-		if(JSON.stringify(originalFormIds.sort()) !== JSON.stringify(currentFormIds.sort())) {
-			result.formModelIds = currentFormIds;
+		const originalFormIds = [...(this.data.scopeModel.formModelIds || [])].sort();
+		const currentFormIds = [...this.selectedFormModels.map(fm => fm.formModelId)].sort();
+		if(JSON.stringify(originalFormIds) !== JSON.stringify(currentFormIds)) {
+			result.formModelIds = this.selectedFormModels.map(fm => fm.formModelId);
 		}
 
-		const originalDatasetIds = this.data.scopeModel.datasetModelIds || [];
-		const currentDatasetIds = this.selectedDatasetModels.map(dm => dm.id);
-		if(JSON.stringify(originalDatasetIds.sort()) !== JSON.stringify(currentDatasetIds.sort())) {
-			result.datasetModelIds = currentDatasetIds;
+		const originalDatasetIds = [...(this.data.scopeModel.datasetModelIds || [])].sort();
+		const currentDatasetIds = [...this.selectedDatasetModels.map(dm => dm.datasetModelId)].sort();
+		if(JSON.stringify(originalDatasetIds) !== JSON.stringify(currentDatasetIds)) {
+			result.datasetModelIds = this.selectedDatasetModels.map(dm => dm.datasetModelId);
 		}
 
-		const originalWorkflowIds = this.data.scopeModel.workflowIds || [];
-		const currentWorkflowIds = this.selectedWorkflows.map(wf => wf.id);
-		if(JSON.stringify(originalWorkflowIds.sort()) !== JSON.stringify(currentWorkflowIds.sort())) {
-			result.workflowIds = currentWorkflowIds;
+		const originalWorkflowIds = [...(this.data.scopeModel.workflowIds || [])].sort();
+		const currentWorkflowIds = [...this.selectedWorkflows.map(wf => wf.workflowId)].sort();
+		if(JSON.stringify(originalWorkflowIds) !== JSON.stringify(currentWorkflowIds)) {
+			result.workflowIds = this.selectedWorkflows.map(wf => wf.workflowId);
 		}
 
-		const currentSelections: WorkflowStateSelection[] = [];
-		this.workflowStateSelectors.forEach(selector => {
-			if(selector.selectedWorkflowId) {
-				selector.selectedStates.forEach(state => {
-					currentSelections.push({
-						workflowId: selector.selectedWorkflowId,
-						workflowStateId: state.id
-					});
-				});
-			}
-		});
+		const currentSelections: WorkflowStateSelection[] = this.workflowStateSelectors
+			.filter(selector => selector.selectedWorkflowId)
+			.flatMap(selector => selector.selectedStates.map(state => ({
+				workflowId: selector.selectedWorkflowId,
+				workflowStateId: state.workflowStateId
+			})));
 
 		result.workflowStateIds = currentSelections.map(s => s.workflowStateId);
 

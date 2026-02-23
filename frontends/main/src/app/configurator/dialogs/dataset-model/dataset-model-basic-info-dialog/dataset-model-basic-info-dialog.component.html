@@ -9,7 +9,7 @@
 					type="text"
 					formControlName="id"
 					placeholder="DATASET_CODE"
-					(input)="onIdInput($event)"
+					(input)="onCodeInput($event, form)"
 					style="text-transform: uppercase;">
 				<span class="hint">Uppercase letters, numbers, and underscores only</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {

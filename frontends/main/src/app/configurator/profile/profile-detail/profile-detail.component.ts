@@ -37,8 +37,8 @@ export class ProfileDetailComponent implements OnInit, OnDestroy {
 
 	constructor(
 		public profileManager: ProfileManagerService,
+		public languageService: LanguageService,
 		private workflowManager: WorkflowManagerService,
-		private languageService: LanguageService,
 		private profileDialogService: ProfileDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
@@ -75,7 +75,7 @@ export class ProfileDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Profile',
-				message: `Are you sure you want to delete "${this.getTranslatedValue(this.profile.shortname)}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.profile.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -100,37 +100,7 @@ export class ProfileDetailComponent implements OnInit, OnDestroy {
 		return this.profileManager.isFieldModified(this.profile.profileId, fieldName);
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		return translations[languageCode || this.selectedLanguage] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			return new Intl.DisplayNames(['en'], {type: 'language'}).of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
-	getWorkflowDisplayName(): string {
-		if(!this.profile.workflowOfInterestId) {
-			return 'Not set';
-		}
-		const workflow = this.workflowManager.getById(this.profile.workflowOfInterestId);
-		return workflow
-			? `${this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id} (${workflow.id})`
-			: this.profile.workflowOfInterestId;
+	getWorkflowLabel(workflowId: string): string {
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 }

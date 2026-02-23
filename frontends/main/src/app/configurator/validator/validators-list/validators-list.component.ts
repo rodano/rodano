@@ -53,10 +53,10 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	constructor(
 		public validatorManager: ValidatorManagerService,
+		public languageService: LanguageService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private validatorDialogService: ValidatorDialogService,
-		private languageService: LanguageService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -232,41 +232,15 @@ export class ValidatorsListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.languageService.getDefaultTranslation(translations) || '';
-	}
-
 	isModified(validatorId: string): boolean {
 		return this.validatorManager.isModified(validatorId);
 	}
 
-	getWorkflowDisplayName(validator: Validator): string {
-		if(!validator.workflowId) {
-			return 'Not set';
-		}
-		const workflow = this.workflowManager.getById(validator.workflowId);
-		return workflow
-			? `${this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id} (${workflow.id})`
-			: validator.workflowId;
+	getWorkflowLabel(workflowId: string): string {
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 
-	getInvalidStateDisplay(validator: Validator): string {
-		if(!validator.invalidStateId) {
-			return 'Not set';
-		}
-		const state = this.workflowStateManager.getById(validator.invalidStateId);
-		return state
-			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
-			: validator.invalidStateId;
-	}
-
-	getValidStateDisplay(validator: Validator): string {
-		if(!validator.validStateId) {
-			return 'Not set';
-		}
-		const state = this.workflowStateManager.getById(validator.validStateId);
-		return state
-			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
-			: validator.validStateId;
+	getWorkflowStateLabel(workflowStateId: string): string {
+		return this.languageService.getLabelById(workflowStateId, id => this.workflowStateManager.getById(id));
 	}
 }

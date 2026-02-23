@@ -71,10 +71,10 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		public workflowManager: WorkflowManagerService,
 		public workflowStateManager: WorkflowStateManagerService,
 		public workflowActionManager: WorkflowActionManagerService,
+		public languageService: LanguageService,
 		private workflowDialogService: WorkflowDialogService,
 		private workflowStateDialogService: WorkflowStateDialogService,
 		private workflowActionDialogService: WorkflowActionDialogService,
-		private languageService: LanguageService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -494,53 +494,23 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	getWorkflowLabel(workflowId: string): string {
-		const workflow = this.workflows.find(wf => wf.workflowId === workflowId);
-		if(!workflow) {
-			return workflowId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
-		return `${name} (${workflow.id})`;
-	}
-
-	getAggregatedStateLabel(workflowStateId: string): string {
-		if(!this.selectedWorkflow?.aggregatedWorkflowId) {
-			return workflowStateId;
-		}
-		const workflowState = this.workflowStateManager
-			.getAllForWorkflow(this.selectedWorkflow.aggregatedWorkflowId)
-			.find(s => s.workflowStateId === workflowStateId);
-		if(!workflowState) {
-			return workflowStateId;
-		}
-		const name = this.languageService.getDefaultTranslation(workflowState.shortname) || workflowState.id;
-		return `${name} (${workflowState.id})`;
-	}
-
-	getInitialStateLabel(workflowId: string, stateId: string): string {
-		const state = this.workflowStateManager.getAllForWorkflow(workflowId).find(s => s.workflowStateId === stateId);
-		return state
-			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
-			: stateId;
-	}
-
-	getCreationActionLabel(workflowId: string, actionId: string): string {
-		const action = this.workflowActionManager.getAllForWorkflow(workflowId).find(a => a.workflowActionId === actionId);
-		return action
-			? `${this.languageService.getDefaultTranslation(action.shortname) || action.id} (${action.id})`
-			: actionId;
-	}
-
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.languageService.getDefaultTranslation(translations) || '';
-	}
-
 	isWorkflowStateModified(workflowStateId: string): boolean {
 		return this.workflowStateManager.isModified(workflowStateId);
 	}
 
 	isWorkflowActionModified(workflowActionId: string): boolean {
 		return this.workflowActionManager.isModified(workflowActionId);
+	}
+
+	getWorkflowLabel(workflowId: string): string {
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
+	}
+
+	getWorkflowStateLabel(workflowStateId: string): string {
+		return this.languageService.getLabelById(workflowStateId, id => this.workflowStateManager.getById(id));
+	}
+
+	getWorkflowActionLabel(workflowActionId: string): string {
+		return this.languageService.getLabelById(workflowActionId, id => this.workflowActionManager.getById(id));
 	}
 }

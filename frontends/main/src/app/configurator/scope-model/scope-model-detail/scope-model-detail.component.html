@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ getTranslatedName(scopeModel.shortname) }}</h2>
+		<h2>{{ languageService.getTranslatedName(scopeModel.shortname) }}</h2>
 		<span class="detail-code parent">{{ scopeModel.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -42,11 +42,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(scopeModel.shortname)">
-					@if (!getTranslatedValue(scopeModel.shortname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.shortname)">
+					@if (!languageService.getTranslatedValue(scopeModel.shortname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(scopeModel.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(scopeModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -57,11 +57,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(scopeModel.longname)">
-					@if (!getTranslatedValue(scopeModel.longname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.longname)">
+					@if (!languageService.getTranslatedValue(scopeModel.longname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(scopeModel.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(scopeModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -72,11 +72,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(scopeModel.pluralShortname)">
-					@if (!getTranslatedValue(scopeModel.pluralShortname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.pluralShortname)">
+					@if (!languageService.getTranslatedValue(scopeModel.pluralShortname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(scopeModel.pluralShortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(scopeModel.pluralShortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -87,11 +87,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(scopeModel.description)">
-					@if (!getTranslatedValue(scopeModel.description)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.description)">
+					@if (!languageService.getTranslatedValue(scopeModel.description)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(scopeModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(scopeModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 

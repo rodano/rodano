@@ -38,7 +38,6 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 
 	draftWorkflowAction: WorkflowAction | null = null;
 	originalWorkflowAction: WorkflowAction | null = null;
-	modifiedFields = new Set<string>();
 
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
@@ -46,7 +45,7 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 	availableLanguages: {code: string; name: string; isDefault: boolean}[] = [];
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private workflowActionDialogService: WorkflowActionDialogService,
 		private dialog: MatDialog
 	) {
@@ -78,7 +77,7 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 		if(this.project?.languages) {
 			this.availableLanguages = this.project.languages.map(lang => ({
 				code: lang.languageCode || '',
-				name: this.getLanguageName(lang.languageCode),
+				name: this.languageService.getLanguageName(lang.languageCode),
 				isDefault: lang.isDefault || false
 			}));
 		}
@@ -177,13 +176,11 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 			return;
 		}
 
-		const workflowActionName = this.getTranslatedValue(this.draftWorkflowAction.shortname) || this.draftWorkflowAction.id;
-
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
 			data: {
 				title: 'Delete Workflow Action',
-				message: `Are you sure you want to delete "${workflowActionName}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.draftWorkflowAction.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -195,27 +192,5 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 				this.workflowActionDeleted.emit(this.draftWorkflowAction.workflowActionId);
 			}
 		});
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
 	}
 }

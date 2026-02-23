@@ -36,9 +36,9 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 
 	constructor(
 		public validatorManager: ValidatorManagerService,
+		public languageService: LanguageService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
-		private languageService: LanguageService,
 		private validatorDialogService: ValidatorDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
@@ -85,7 +85,7 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Validator',
-				message: `Are you sure you want to delete "${this.getTranslatedValue(this.validator.shortname)}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.validator.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -110,57 +110,11 @@ export class ValidatorDetailComponent implements OnInit, OnDestroy {
 		return this.validatorManager.isFieldModified(this.validator.validatorId, fieldName);
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
+	getWorkflowLabel(workflowId: string): string {
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		return translations[languageCode || this.selectedLanguage] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			return new Intl.DisplayNames(['en'], {type: 'language'}).of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
-	getWorkflowDisplayName(): string {
-		if(!this.validator.workflowId) {
-			return 'Not set';
-		}
-		const workflow = this.workflowManager.getById(this.validator.workflowId);
-		return workflow
-			? `${this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id} (${workflow.id})`
-			: this.validator.workflowId;
-	}
-
-	getInvalidStateDisplay(): string {
-		if(!this.validator.invalidStateId) {
-			return 'Not set';
-		}
-		const state = this.workflowStateManager.getById(this.validator.invalidStateId);
-		return state
-			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
-			: this.validator.invalidStateId;
-	}
-
-	getValidStateDisplay(): string {
-		if(!this.validator.validStateId) {
-			return 'Not set';
-		}
-		const state = this.workflowStateManager.getById(this.validator.validStateId);
-		return state
-			? `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`
-			: this.validator.validStateId;
+	getWorkflowStateLabel(workflowStateId: string): string {
+		return this.languageService.getLabelById(workflowStateId, id => this.workflowStateManager.getById(id));
 	}
 }

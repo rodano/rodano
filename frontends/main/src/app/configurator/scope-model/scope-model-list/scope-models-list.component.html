@@ -42,7 +42,7 @@
 
 						<div class="card-header">
 							<div class="card-info">
-								<h3>{{ getTranslatedName(scopeModel.shortname) }}</h3>
+								<h3>{{ languageService.getTranslatedName(scopeModel.shortname) }}</h3>
 								<p class="card-code">{{ scopeModel.id }}</p>
 							</div>
 							<div class="card-header-badges">
@@ -127,7 +127,7 @@
 						</button>
 						<div>
 							<h2>Event Models</h2>
-							<p class="column-subtitle">{{ selectedScopeModel ? getTranslatedName(selectedScopeModel.shortname) : '' }}</p>
+							<p class="column-subtitle">{{ selectedScopeModel ? languageService.getTranslatedName(selectedScopeModel.shortname) : '' }}</p>
 						</div>
 					</div>
 				</div>
@@ -166,7 +166,7 @@
 
 								<div class="card-header">
 									<div class="card-info">
-										<h3>{{ getTranslatedName(eventModel.shortname) }}</h3>
+										<h3>{{ languageService.getTranslatedName(eventModel.shortname) }}</h3>
 										<p class="card-code">{{ eventModel.id }}</p>
 									</div>
 									<div class="card-header-badges">
@@ -232,7 +232,7 @@
 						</button>
 						<div>
 							<h2>Event Groups</h2>
-							<p class="column-subtitle">{{ selectedScopeModel ? getTranslatedName(selectedScopeModel.shortname) : '' }}</p>
+							<p class="column-subtitle">{{ selectedScopeModel ? languageService.getTranslatedName(selectedScopeModel.shortname) : '' }}</p>
 						</div>
 					</div>
 				</div>
@@ -261,7 +261,7 @@
 
 								<div class="card-header">
 									<div class="card-info">
-										<h3>{{ getTranslatedName(eventGroup.shortname) }}</h3>
+										<h3>{{ languageService.getTranslatedName(eventGroup.shortname) }}</h3>
 										<p class="card-code">{{ eventGroup.id }}</p>
 									</div>
 								</div>

@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ getTranslatedName(datasetModel.shortname) }}</h2>
+		<h2>{{ languageService.getTranslatedName(datasetModel.shortname) }}</h2>
 		<span class="detail-code parent">{{ datasetModel.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -53,11 +53,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(datasetModel.shortname)">
-					@if (!getTranslatedValue(datasetModel.shortname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(datasetModel.shortname)">
+					@if (!languageService.getTranslatedValue(datasetModel.shortname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(datasetModel.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(datasetModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -68,11 +68,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(datasetModel.longname)">
-					@if (!getTranslatedValue(datasetModel.longname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(datasetModel.longname)">
+					@if (!languageService.getTranslatedValue(datasetModel.longname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(datasetModel.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(datasetModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -83,11 +83,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(datasetModel.description)">
-					@if (!getTranslatedValue(datasetModel.description)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(datasetModel.description)">
+					@if (!languageService.getTranslatedValue(datasetModel.description)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(datasetModel.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(datasetModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 		</div>

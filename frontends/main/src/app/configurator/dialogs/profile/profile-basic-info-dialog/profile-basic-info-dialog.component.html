@@ -9,7 +9,7 @@
 					type="text"
 					formControlName="id"
 					placeholder="PROFILE_CODE"
-					(input)="onIdInput($event)"
+					(input)="onCodeInput($event, form)"
 					style="text-transform: uppercase;">
 				<span class="hint">Uppercase letters, numbers, and underscores only</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
@@ -34,9 +34,9 @@
 				<label>Workflow of Interest</label>
 				<mat-select formControlName="workflowOfInterestId" placeholder="Select workflow">
 					<mat-option [value]="null">None</mat-option>
-					@for (workflow of availableWorkflows; track workflow.workflowId) {
+					@for (workflow of data.availableWorkflows; track workflow.workflowId) {
 						<mat-option [value]="workflow.workflowId">
-							{{ getWorkflowLabel(workflow) }}
+							{{ languageService.getLabel(workflow) }}
 						</mat-option>
 					}
 				</mat-select>

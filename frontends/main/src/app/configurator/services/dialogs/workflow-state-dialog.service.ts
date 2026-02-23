@@ -11,13 +11,17 @@ import {
 import {
 	WorkflowStateActionDialogComponent
 } from '../../dialogs/workflow-state/workflow-state-action-dialog/workflow-state-action-dialog.component';
+import {WorkflowActionManagerService} from '../manager/workflow-action-manager.service';
+import {WorkflowStateManagerService} from '../manager/workflow-state-manager.service';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class WorkflowStateDialogService {
 	constructor(
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private workflowActionManager: WorkflowActionManagerService,
+		private workflowStateManager: WorkflowStateManagerService
 	) {}
 
 	openCreateDialog(
@@ -61,26 +65,41 @@ export class WorkflowStateDialogService {
 
 	openAggregationDialog(
 		workflowState: WorkflowState,
-		aggregatedWorkflowStates: {id: string; name: string; code: string}[]
+		aggregatedWorkflowId: string
 	): Observable<any> {
+		const aggregatedWorkflowStates = this.workflowStateManager.getAllForWorkflow(aggregatedWorkflowId);
 		const dialogRef = this.dialog.open(WorkflowStateAggregationDialogComponent, {
 			width: '500px',
-			data: {workflowState: JSON.parse(JSON.stringify(workflowState)), aggregatedWorkflowStates}
+			data: {
+				workflowState: JSON.parse(JSON.stringify(workflowState)),
+				aggregatedWorkflowStates
+			}
 		});
 		return dialogRef.afterClosed();
 	}
 
-	openActionsDialog(
-		workflowState: WorkflowState,
-		availableActions: {id: string; name: string; code: string}[]
-	): Observable<any> {
+	openActionsDialog(workflowState: WorkflowState, workflowId: string): Observable<any> {
+		const availableWorkflowActions = this.workflowActionManager.getAllForWorkflow(workflowId);
 		const dialogRef = this.dialog.open(WorkflowStateActionDialogComponent, {
 			width: '500px',
 			data: {
 				workflowState: JSON.parse(JSON.stringify(workflowState)),
-				availableWorkflowActions: availableActions
+				availableWorkflowActions
 			}
 		});
-		return dialogRef.afterClosed();
+		return new Observable(observer => {
+			dialogRef.afterClosed().subscribe(result => {
+				if(result) {
+					const possibleActions = (result.possibleActionIds as string[])
+						.map(id => this.workflowActionManager.getById(id))
+						.filter(a => !!a);
+					observer.next({possibleActions});
+				}
+				else {
+					observer.next(null);
+				}
+				observer.complete();
+			});
+		});
 	}
 }

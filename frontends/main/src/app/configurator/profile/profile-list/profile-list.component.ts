@@ -50,9 +50,9 @@ export class ProfileListComponent implements OnInit, OnChanges, OnDestroy {
 
 	constructor(
 		public profileManager: ProfileManagerService,
+		public languageService: LanguageService,
 		private workflowManager: WorkflowManagerService,
 		private profileDialogService: ProfileDialogService,
-		private languageService: LanguageService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -228,21 +228,11 @@ export class ProfileListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.languageService.getDefaultTranslation(translations) || '';
-	}
-
 	isModified(profileId: string): boolean {
 		return this.profileManager.isModified(profileId);
 	}
 
-	getWorkflowDisplayName(profile: Profile): string {
-		if(!profile.workflowOfInterestId) {
-			return 'Not set';
-		}
-		const workflow = this.workflowManager.getById(profile.workflowOfInterestId);
-		return workflow
-			? `${this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id} (${workflow.id})`
-			: profile.workflowOfInterestId;
+	getWorkflowLabel(workflowId: string): string {
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 }

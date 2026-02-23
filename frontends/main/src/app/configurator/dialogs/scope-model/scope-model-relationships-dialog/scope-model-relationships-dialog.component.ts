@@ -37,7 +37,7 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 	availableParents: ScopeModel[] = [];
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ScopeModelRelationshipsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
@@ -104,10 +104,5 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {
 		return this.languageService.getDefaultTranslation(translations) || '';
-	}
-
-	getScopeModelLabel(scopeModel: ScopeModel): string {
-		const shortname = this.languageService.getDefaultTranslation(scopeModel.shortname) || scopeModel.id;
-		return `${shortname} (${scopeModel.id})`;
 	}
 }

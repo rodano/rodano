@@ -41,7 +41,7 @@
 
 						<div class="card-header">
 							<div class="card-info">
-								<h3>{{ getTranslatedName(workflow.shortname) }}</h3>
+								<h3>{{ languageService.getTranslatedName(workflow.shortname) }}</h3>
 								<p class="card-code">{{ workflow.id }}</p>
 							</div>
 							<div class="card-header-badges">
@@ -67,15 +67,15 @@
 								</div>
 								<div class="detail-item" [class.unset]="!workflow.aggregatedWorkflowId">
 									<mat-icon>settings</mat-icon>
-									<span>Aggregate Workflow: {{ workflow.aggregatedWorkflowId !== null && workflow.aggregatedWorkflowId !== undefined ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</span>
+									<span>Aggregate Workflow: {{ workflow.aggregatedWorkflowId ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</span>
 								</div>
 								<div class="detail-item" [class.unset]="!workflow.initialStateId">
 									<mat-icon>adjust</mat-icon>
-									<span>Initial State: {{ workflow.initialStateId ? getInitialStateLabel(workflow.workflowId, workflow.initialStateId) : 'Not set' }}</span>
+									<span>Initial State: {{ workflow.initialStateId ? getWorkflowStateLabel(workflow.initialStateId) : 'Not set' }}</span>
 								</div>
 								<div class="detail-item" [class.unset]="!workflow.actionId">
 									<mat-icon>play_circle</mat-icon>
-									<span>Creation Action: {{ workflow.actionId ? getCreationActionLabel(workflow.workflowId, workflow.actionId) : 'Not set' }}</span>
+									<span>Creation Action: {{ workflow.actionId ? getWorkflowActionLabel(workflow.actionId) : 'Not set' }}</span>
 								</div>
 							</div>
 						</div>
@@ -107,7 +107,7 @@
 						</button>
 						<div>
 							<h2>Workflow States</h2>
-							<p class="column-subtitle">{{ selectedWorkflow ? getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
+							<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
 						</div>
 					</div>
 				</div>
@@ -136,7 +136,7 @@
 
 								<div class="card-header">
 									<div class="card-info">
-										<h3>{{ getTranslatedName(workflowState.shortname) }}</h3>
+										<h3>{{ languageService.getTranslatedName(workflowState.shortname) }}</h3>
 										<p class="card-code">{{ workflowState.id }}</p>
 									</div>
 									<div class="card-header-badges">
@@ -157,7 +157,7 @@
 										</div>
 										<div class="detail-item" [class.unset]="!workflowState.aggregateStateId">
 											<mat-icon>adjust</mat-icon>
-											<span>Aggregate State: {{ workflowState.aggregateStateId !== null && workflowState.aggregateStateId !== undefined ? getAggregatedStateLabel(workflowState.aggregateStateId) : 'Not set' }}</span>
+											<span>Aggregate State: {{ workflowState.aggregateStateId ? getWorkflowStateLabel(workflowState.aggregateStateId) : 'Not set' }}</span>
 										</div>
 										<div class="detail-item" [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
 											<mat-icon>equal</mat-icon>
@@ -188,7 +188,7 @@
 						</button>
 						<div>
 							<h2>Workflow Actions</h2>
-							<p class="column-subtitle">{{ selectedWorkflow ? getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
+							<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
 						</div>
 					</div>
 				</div>
@@ -217,7 +217,7 @@
 
 								<div class="card-header">
 									<div class="card-info">
-										<h3>{{ getTranslatedName(workflowAction.shortname) }}</h3>
+										<h3>{{ languageService.getTranslatedName(workflowAction.shortname) }}</h3>
 										<p class="card-code">{{ workflowAction.id }}</p>
 									</div>
 									<div class="card-header-badges">
@@ -270,8 +270,6 @@
 				<app-workflow-state-detail
 					[projectId]="projectId"
 					[workflowStateId]="selectedWorkflowStateId"
-					[workflowStates]="workflowStates"
-					[originalWorkflowStates]="originalWorkflowStates"
 					[workflow]="selectedWorkflow"
 					[project]="project"
 					(closed)="backWorkflowDetail()"

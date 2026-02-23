@@ -58,7 +58,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 
 	constructor(
 		public scopeModelManager: ScopeModelManagerService,
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private datasetModelManager: DatasetModelManagerService,
 		private workflowManager: WorkflowManagerService,
@@ -168,7 +168,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Scope Model',
-				message: `Are you sure you want to delete "${this.getTranslatedName(this.scopeModel.shortname)}"?`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedName(this.scopeModel.shortname)}"?`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -202,42 +202,6 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		return this.scopeModelManager.isFieldModified(this.scopeModel.scopeModelId, fieldName);
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
-	getScopeModelLabel(scopeModelId: string): string {
-		const scopeModel = this.allScopeModels.find(sm => sm.scopeModelId === scopeModelId);
-		if(!scopeModel) {
-			return scopeModelId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(scopeModel.shortname) || scopeModel.id;
-		return `${name} (${scopeModel.id})`;
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
-	}
-
 	getWorkflowStateSelections(): WorkflowStateGroup[] {
 		const grouped = new Map<string, {id: string; name: string}[]>();
 
@@ -262,13 +226,12 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 		return result;
 	}
 
+	getScopeModelLabel(scopeModelId: string): string {
+		return this.languageService.getLabelById(scopeModelId, id => this.scopeModelManager.getById(id));
+	}
+
 	getDatasetModelLabel(datasetModelId: string): string {
-		const datasetModel = this.datasetModelManager.getById(datasetModelId);
-		if(!datasetModel) {
-			return datasetModelId;
-		}
-		const name = this.languageService.getDefaultTranslation(datasetModel.shortname) || datasetModel.id;
-		return `${name} (${datasetModel.id})`;
+		return this.languageService.getLabelById(datasetModelId, id => this.datasetModelManager.getById(id));
 	}
 
 	getFormModelLabel(formModelId: string): string {
@@ -277,20 +240,10 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	getWorkflowLabel(workflowId: string): string {
-		const workflow = this.workflowManager.getById(workflowId);
-		if(!workflow) {
-			return workflowId;
-		}
-		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
-		return `${name} (${workflow.id})`;
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 
 	getProfileLabel(profileId: string): string {
-		const profile = this.profileManager.getById(profileId);
-		if(!profile) {
-			return profileId;
-		}
-		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
-		return `${name} (${profile.id})`;
+		return this.languageService.getLabelById(profileId, id => this.profileManager.getById(id));
 	}
 }

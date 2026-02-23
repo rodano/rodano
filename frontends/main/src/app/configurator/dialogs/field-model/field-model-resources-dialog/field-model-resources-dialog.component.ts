@@ -4,11 +4,14 @@ import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {Validator} from '@core/model/validator';
+import {Workflow} from '@core/model/workflow';
+import {LanguageService} from '../../../services/language.service';
 
 export interface FieldModelResourcesDialogData {
 	fieldModel: FieldModel;
-	availableValidators: {id: string; name: string}[];
-	availableWorkflows: {id: string; name: string}[];
+	availableValidators: Validator[];
+	availableWorkflows: Workflow[];
 }
 
 @Component({
@@ -24,13 +27,14 @@ export interface FieldModelResourcesDialogData {
 	styleUrls: ['../../dialog-shared.css']
 })
 export class FieldModelResourcesDialogComponent implements OnInit {
-	availableValidators: {id: string; name: string}[] = [];
-	selectedValidators: {id: string; name: string}[] = [];
+	availableValidators: Validator[] = [];
+	selectedValidators: Validator[] = [];
 
-	availableWorkflows: {id: string; name: string}[] = [];
-	selectedWorkflows: {id: string; name: string}[] = [];
+	availableWorkflows: Workflow[] = [];
+	selectedWorkflows: Workflow[] = [];
 
 	constructor(
+		public languageService: LanguageService,
 		private dialogRef: MatDialogRef<FieldModelResourcesDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: FieldModelResourcesDialogData
 	) {}
@@ -42,33 +46,33 @@ export class FieldModelResourcesDialogComponent implements OnInit {
 
 	private initializeValidators(): void {
 		const selectedIds = this.data.fieldModel.validatorIds || [];
-		this.selectedValidators = this.data.availableValidators.filter(v => selectedIds.includes(v.id));
-		this.availableValidators = this.data.availableValidators.filter(v => !selectedIds.includes(v.id));
+		this.selectedValidators = this.data.availableValidators.filter(v => selectedIds.includes(v.validatorId));
+		this.availableValidators = this.data.availableValidators.filter(v => !selectedIds.includes(v.validatorId));
 	}
 
 	private initializeWorkflows(): void {
 		const selectedIds = this.data.fieldModel.workflowIds || [];
-		this.selectedWorkflows = this.data.availableWorkflows.filter(wf => selectedIds.includes(wf.id));
-		this.availableWorkflows = this.data.availableWorkflows.filter(wf => !selectedIds.includes(wf.id));
+		this.selectedWorkflows = this.data.availableWorkflows.filter(wf => selectedIds.includes(wf.workflowId));
+		this.availableWorkflows = this.data.availableWorkflows.filter(wf => !selectedIds.includes(wf.workflowId));
 	}
 
-	onAddValidator(validator: {id: string; name: string}): void {
-		this.availableValidators = this.availableValidators.filter(v => v.id !== validator.id);
+	onAddValidator(validator: Validator): void {
+		this.availableValidators = this.availableValidators.filter(v => v.validatorId !== validator.validatorId);
 		this.selectedValidators = [...this.selectedValidators, validator];
 	}
 
-	onRemoveValidator(validator: {id: string; name: string}): void {
-		this.selectedValidators = this.selectedValidators.filter(v => v.id !== validator.id);
+	onRemoveValidator(validator: Validator): void {
+		this.selectedValidators = this.selectedValidators.filter(v => v.validatorId !== validator.validatorId);
 		this.availableValidators = [...this.availableValidators, validator];
 	}
 
-	onAddWorkflow(workflow: {id: string; name: string}): void {
-		this.availableWorkflows = this.availableWorkflows.filter(wf => wf.id !== workflow.id);
+	onAddWorkflow(workflow: Workflow): void {
+		this.availableWorkflows = this.availableWorkflows.filter(wf => wf.workflowId !== workflow.workflowId);
 		this.selectedWorkflows = [...this.selectedWorkflows, workflow];
 	}
 
-	onRemoveWorkflow(workflow: {id: string; name: string}): void {
-		this.selectedWorkflows = this.selectedWorkflows.filter(wf => wf.id !== workflow.id);
+	onRemoveWorkflow(workflow: Workflow): void {
+		this.selectedWorkflows = this.selectedWorkflows.filter(wf => wf.workflowId !== workflow.workflowId);
 		this.availableWorkflows = [...this.availableWorkflows, workflow];
 	}
 
@@ -76,13 +80,13 @@ export class FieldModelResourcesDialogComponent implements OnInit {
 		const result: any = {};
 
 		const originalValidatorIds = this.data.fieldModel.validatorIds || [];
-		const currentValidatorIds = this.selectedValidators.map(v => v.id);
+		const currentValidatorIds = this.selectedValidators.map(v => v.validatorId);
 		if(JSON.stringify(originalValidatorIds.sort()) !== JSON.stringify(currentValidatorIds.sort())) {
 			result.validatorIds = currentValidatorIds;
 		}
 
 		const originalWorkflowIds = this.data.fieldModel.workflowIds || [];
-		const currentWorkflowIds = this.selectedWorkflows.map(wf => wf.id);
+		const currentWorkflowIds = this.selectedWorkflows.map(wf => wf.workflowId);
 		if(JSON.stringify(originalWorkflowIds.sort()) !== JSON.stringify(currentWorkflowIds.sort())) {
 			result.workflowIds = currentWorkflowIds;
 		}

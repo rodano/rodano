@@ -19,8 +19,8 @@ import {
 	EventModelRelationshipsDialogComponent
 } from '../../dialogs/event-model/event-model-relationships-dialog/event-model-relationships-dialog.component';
 import {DatasetModelManagerService} from '../manager/dataset-model-manager.service';
-import {LanguageService} from '../language.service';
 import {WorkflowManagerService} from '../manager/workflow-manager.service';
+import {EventGroupManagerService} from '../manager/event-group-manager.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -29,15 +29,14 @@ export class EventModelDialogService {
 	constructor(
 		private dialog: MatDialog,
 		private datasetModelManager: DatasetModelManagerService,
-		private workflowManager: WorkflowManagerService,
-		private languageService: LanguageService
+		private eventGroupManager: EventGroupManagerService,
+		private workflowManager: WorkflowManagerService
 	) {}
 
 	openCreateDialog(
 		projectId: string,
 		scopeModelId: string,
-		languages: any[],
-		eventGroups: {id: string; name: string; code: string}[]
+		languages: any[]
 	): Observable<any> {
 		const dialogRef = this.dialog.open(EventModelBasicInfoDialogComponent, {
 			width: '500px',
@@ -47,7 +46,7 @@ export class EventModelDialogService {
 				scopeModelId,
 				eventModel: null,
 				languages,
-				eventGroups
+				eventGroups: this.eventGroupManager.getAll()
 			} as EventModelBasicInfoDialogData
 		});
 
@@ -58,8 +57,7 @@ export class EventModelDialogService {
 		eventModel: EventModel,
 		projectId: string,
 		scopeModelId: string,
-		languages: any[],
-		eventGroups: {id: string; name: string; code: string}[]
+		languages: any[]
 	): Observable<any> {
 		const dialogRef = this.dialog.open(EventModelBasicInfoDialogComponent, {
 			width: '500px',
@@ -69,7 +67,7 @@ export class EventModelDialogService {
 				scopeModelId,
 				eventModel,
 				languages,
-				eventGroups
+				eventGroups: this.eventGroupManager.getAll()
 			} as EventModelBasicInfoDialogData
 		});
 
@@ -125,14 +123,8 @@ export class EventModelDialogService {
 			data: {
 				eventModel: JSON.parse(JSON.stringify(eventModel)),
 				availableFormModels: [],
-				availableDatasetModels: this.datasetModelManager.getAll().map(dm => ({
-					id: dm.datasetModelId,
-					name: `${this.languageService.getDefaultTranslation(dm.shortname) || dm.id} (${dm.id})`
-				})),
-				availableWorkflows: this.workflowManager.getAll().map(wf => ({
-					id: wf.workflowId,
-					name: `${this.languageService.getDefaultTranslation(wf.shortname) || wf.id} (${wf.id})`
-				}))
+				availableDatasetModels: this.datasetModelManager.getAll(),
+				availableWorkflows: this.workflowManager.getAll()
 			}
 		});
 		return dialogRef.afterClosed();

@@ -60,29 +60,13 @@ export class WorkflowDialogService {
 	}
 
 	openAssignmentDialog(workflow: Workflow, availableWorkflows: Workflow[]): Observable<any> {
-		const currentWorkflowStates = this.workflowStateManager
-			.getAllForWorkflow(workflow.workflowId)
-			.map(wfs => ({
-				id: wfs.workflowStateId,
-				name: this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id,
-				code: wfs.id
-			}));
-
-		const currentWorkflowActions = this.workflowActionManager
-			.getAllForWorkflow(workflow.workflowId)
-			.map(wfa => ({
-				id: wfa.workflowActionId,
-				name: this.languageService.getDefaultTranslation(wfa.shortname) || wfa.id,
-				code: wfa.id
-			}));
-
 		const dialogRef = this.dialog.open(WorkflowAssignmentDialogComponent, {
 			width: '500px',
 			data: {
 				workflow: JSON.parse(JSON.stringify(workflow)),
 				availableWorkflows: availableWorkflows.filter(wf => wf.workflowId !== workflow.workflowId),
-				currentWorkflowStates,
-				currentWorkflowActions
+				currentWorkflowStates: this.workflowStateManager.getAllForWorkflow(workflow.workflowId),
+				currentWorkflowActions: this.workflowActionManager.getAllForWorkflow(workflow.workflowId)
 			}
 		});
 		return dialogRef.afterClosed();

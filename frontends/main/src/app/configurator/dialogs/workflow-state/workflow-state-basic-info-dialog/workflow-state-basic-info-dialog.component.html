@@ -10,7 +10,7 @@
 					formControlName="id"
 					placeholder="WORKFLOW_STATE_CODE"
 					required
-					(input)="onCodeInput($event)">
+					(input)="onCodeInput($event, form)">
 				<span class="hint">Uppercase letters, numbers, and underscores only</span>
 				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
 					<span class="error-message">Code is required</span>

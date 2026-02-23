@@ -12,7 +12,6 @@ import {WorkflowState} from '@core/model/workflow-state';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowStateDialogService} from '../../../services/dialogs/workflow-state-dialog.service';
 import {WorkflowStateManagerService} from '../../../services/manager/workflow-state-manager.service';
-import {WorkflowActionManagerService} from '../../../services/manager/workflow-action-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
 
 @Component({
@@ -29,8 +28,6 @@ import {ProjectLanguage} from '@core/model/project-language';
 export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
 	@Input() workflowStateId = '';
-	@Input() workflowStates: WorkflowState[] = [];
-	@Input() originalWorkflowStates: WorkflowState[] = [];
 	@Input() workflow: Workflow | null = null;
 	@Input() project: ConfiguratorProject | null = null;
 	@Output() closed = new EventEmitter<void>();
@@ -44,10 +41,9 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	private languageSubscription: Subscription;
 
 	constructor(
-		private languageService: LanguageService,
+		public languageService: LanguageService,
 		private workflowStateDialogService: WorkflowStateDialogService,
 		private workflowStateManager: WorkflowStateManagerService,
-		private workflowActionManager: WorkflowActionManagerService,
 		private dialog: MatDialog
 	) {}
 
@@ -60,7 +56,7 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['workflowStateId'] || changes['workflowStates']) {
+		if(changes['workflowStateId']) {
 			this.loadWorkflowState();
 		}
 	}
@@ -89,70 +85,8 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 		this.closed.emit();
 	}
 
-	getTranslatedValue(translations: Record<string, string> | undefined): string {
-		if(!translations) {
-			return '';
-		}
-		return translations[this.selectedLanguage] || '';
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
-	getWorkflowStateName(workflowStateId: string): string {
-		const wfs = this.workflowStates.find(wf => wf.workflowStateId === workflowStateId);
-		if(!wfs) {
-			return workflowStateId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id;
-		return `${name} (${wfs.id})`;
-	}
-
-	getWorkflowStateCode(workflowStateId: string): string {
-		const workflowState = this.workflowStates.find(wfs => wfs.workflowStateId === workflowStateId);
-		if(!workflowState) {
-			return workflowStateId;
-		}
-
-		const shortname = this.languageService.getDefaultTranslation(workflowState.shortname) || workflowState.id;
-		return `${shortname} (${workflowState.id})`;
-	}
-
 	get hasAggregation(): boolean {
 		return !!this.workflow?.aggregatedWorkflowId;
-	}
-
-	get aggregatedWorkflowStates(): {id: string; name: string; code: string}[] {
-		if(!this.workflow?.aggregatedWorkflowId) {
-			return [];
-		}
-		return this.workflowStateManager
-			.getAllForWorkflow(this.workflow.aggregatedWorkflowId)
-			.map(wfs => ({
-				id: wfs.workflowStateId,
-				name: this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id,
-				code: wfs.id
-			}));
-	}
-
-	getAggregatedStateLabel(workflowStateId: string | undefined): string {
-		if(!workflowStateId) {
-			return 'Not set';
-		}
-		const workflowState = this.aggregatedWorkflowStates.find(s => s.id === workflowStateId);
-		return workflowState ? `${workflowState.name} (${workflowState.code})` : workflowStateId;
 	}
 
 	onEditBasicInfo(): void {
@@ -177,13 +111,13 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	}
 
 	onEditAggregation(): void {
-		if(!this.draftWorkflowState) {
+		if(!this.draftWorkflowState || !this.workflow?.aggregatedWorkflowId) {
 			return;
 		}
 
 		this.workflowStateDialogService.openAggregationDialog(
 			this.draftWorkflowState,
-			this.aggregatedWorkflowStates
+			this.workflow.aggregatedWorkflowId
 		).subscribe(result => {
 			if(result && this.draftWorkflowState) {
 				this.draftWorkflowState = {...this.draftWorkflowState, ...result};
@@ -192,33 +126,17 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 		});
 	}
 
-	get availableActionsForDialog(): {id: string; name: string; code: string}[] {
-		if(!this.workflow) {
-			return [];
-		}
-		return this.workflowActionManager
-			.getAllForWorkflow(this.workflow.workflowId)
-			.map(wfa => ({
-				id: wfa.workflowActionId,
-				name: this.languageService.getDefaultTranslation(wfa.shortname) || wfa.id,
-				code: wfa.id
-			}));
-	}
-
 	onEditPossibleActions(): void {
-		if(!this.draftWorkflowState) {
+		if(!this.draftWorkflowState || !this.workflow) {
 			return;
 		}
 
 		this.workflowStateDialogService.openActionsDialog(
 			this.draftWorkflowState,
-			this.availableActionsForDialog
+			this.workflow.workflowId
 		).subscribe(result => {
 			if(result && this.draftWorkflowState) {
-				const possibleActions = (result.possibleActionIds as string[])
-					.map(id => this.workflowActionManager.getById(id))
-					.filter(a => !!a);
-				this.draftWorkflowState = {...this.draftWorkflowState, possibleActions};
+				this.draftWorkflowState = {...this.draftWorkflowState, ...result};
 				this.workflowStateUpdated.emit(this.draftWorkflowState);
 			}
 		});
@@ -229,13 +147,11 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 			return;
 		}
 
-		const workflowStateName = this.getTranslatedValue(this.draftWorkflowState.shortname) || this.draftWorkflowState.id;
-
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
 			data: {
 				title: 'Delete Workflow State',
-				message: `Are you sure you want to delete "${workflowStateName}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.draftWorkflowState.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -247,5 +163,9 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 				this.workflowStateDeleted.emit(this.draftWorkflowState.workflowStateId);
 			}
 		});
+	}
+
+	getWorkflowStateLabel(workflowStateId: string): string {
+		return this.languageService.getLabelById(workflowStateId, id => this.workflowStateManager.getById(id));
 	}
 }

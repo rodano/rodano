@@ -1,6 +1,6 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
-		<h2>{{ getTranslatedName(profile.shortname) }}</h2>
+		<h2>{{ languageService.getTranslatedName(profile.shortname) }}</h2>
 		<span class="detail-code parent">{{ profile.id }}</span>
 	</div>
 	<div class="header-actions">
@@ -48,11 +48,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(profile.shortname)">
-					@if (!getTranslatedValue(profile.shortname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(profile.shortname)">
+					@if (!languageService.getTranslatedValue(profile.shortname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(profile.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(profile.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -63,11 +63,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(profile.longname)">
-					@if (!getTranslatedValue(profile.longname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(profile.longname)">
+					@if (!languageService.getTranslatedValue(profile.longname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(profile.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(profile.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -78,11 +78,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(profile.description)">
-					@if (!getTranslatedValue(profile.description)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(profile.description)">
+					@if (!languageService.getTranslatedValue(profile.description)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(profile.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(profile.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 
@@ -93,14 +93,14 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="getWorkflowDisplayName() === 'Not set'">
-					@if (getWorkflowDisplayName() === 'Not set') {
+				<div class="setting-value" [class.not-configured]="!profile.workflowOfInterestId">
+					@if (!profile.workflowOfInterestId) {
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
 						<div class="chip">
 							<mat-icon class="resource-icon">settings</mat-icon>
-							<span class="language-name">{{ getWorkflowDisplayName() }}</span>
+							<span class="language-name">{{ getWorkflowLabel(profile.workflowOfInterestId) }}</span>
 						</div>
 					}
 				</div>

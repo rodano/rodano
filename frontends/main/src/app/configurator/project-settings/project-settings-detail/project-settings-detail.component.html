@@ -16,11 +16,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value">{{ project?.code }}</div>
+				<div class="setting-value">{{ workingProject?.code }}</div>
 			</div>
 			<div class="setting-item">
 				<label>Created</label>
-				<div class="setting-value">{{ project?.created | date:'medium' }}</div>
+				<div class="setting-value">{{ workingProject?.created | date:'medium' }}</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
 				<label>
@@ -29,11 +29,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(project?.shortname)">
-					@if (!getTranslatedValue(project?.shortname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(workingProject?.shortname)">
+					@if (!languageService.getTranslatedValue(workingProject?.shortname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(project?.shortname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(workingProject?.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('longname')">
@@ -43,11 +43,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(project?.longname)">
-					@if (!getTranslatedValue(project?.longname)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(workingProject?.longname)">
+					@if (!languageService.getTranslatedValue(workingProject?.longname)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(project?.longname) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(workingProject?.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
@@ -57,11 +57,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!getTranslatedValue(project?.description)">
-					@if (!getTranslatedValue(project?.description)) {
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(workingProject?.description)">
+					@if (!languageService.getTranslatedValue(workingProject?.description)) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ getTranslatedValue(project?.description) || 'Not configured for ' + getLanguageName(selectedLanguage) }}
+					{{ languageService.getTranslatedValue(workingProject?.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('url')">
@@ -71,11 +71,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.url">
-					@if (!project?.url) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.url">
+					@if (!workingProject?.url) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.url || 'Not configured' }}
+					{{ workingProject?.url || 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('color')">
@@ -86,8 +86,8 @@
 					}
 				</label>
 				<div class="setting-value color-preview">
-					<span class="color-swatch" [style.background-color]="project?.color"></span>
-					{{ project?.color }}
+					<span class="color-swatch" [style.background-color]="workingProject?.color"></span>
+					{{ workingProject?.color }}
 				</div>
 			</div>
 		</div>
@@ -109,12 +109,12 @@
 		<div class="settings-grid">
 			<div class="setting-item full-width">
 				<label>Introduction Text (HTML)</label>
-				<div class="setting-value text-content" [class.not-configured]="!project?.introductionText">
-					@if (!project?.introductionText) {
+				<div class="setting-value text-content" [class.not-configured]="!workingProject?.introductionText">
+					@if (!workingProject?.introductionText) {
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div [innerHTML]="project?.introductionText"></div>
+						<div [innerHTML]="workingProject?.introductionText"></div>
 					}
 				</div>
 			</div>
@@ -135,11 +135,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.email">
-					@if (!project?.email) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.email">
+					@if (!workingProject?.email) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.email || 'Not configured' }}
+					{{ workingProject?.email || 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('smtpTls')">
@@ -149,7 +149,7 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value">{{ project?.smtpTls ? 'Enabled' : 'Disabled' }}</div>
+				<div class="setting-value">{{ workingProject?.smtpTls ? 'Enabled' : 'Disabled' }}</div>
 			</div>
 		</div>
 		<button class="btn-edit" (click)="onEditEmailSettings()">
@@ -168,7 +168,7 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value">{{ project?.passwordStrong ? 'Enabled' : 'Disabled' }}</div>
+				<div class="setting-value">{{ workingProject?.passwordStrong ? 'Enabled' : 'Disabled' }}</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('passwordLength')">
 				<label>
@@ -177,11 +177,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.passwordLength">
-					@if (!project?.passwordLength) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.passwordLength">
+					@if (!workingProject?.passwordLength) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.passwordLength ? project?.passwordLength + ' characters' : 'Not configured' }}
+					{{ workingProject?.passwordLength ? workingProject?.passwordLength + ' characters' : 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('passwordValidityDuration')">
@@ -192,7 +192,7 @@
 					}
 				</label>
 				<div class="setting-value">
-					{{ project?.passwordValidityDuration ? project?.passwordValidityDuration + ' days' : 'Never expires' }}
+					{{ workingProject?.passwordValidityDuration ? workingProject?.passwordValidityDuration + ' days' : 'Never expires' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('passwordUnique')">
@@ -202,7 +202,7 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value">{{ project?.passwordUnique ? 'Enabled' : 'Disabled' }}</div>
+				<div class="setting-value">{{ workingProject?.passwordUnique ? 'Enabled' : 'Disabled' }}</div>
 			</div>
 		</div>
 		<button class="btn-edit" (click)="onEditPasswordPolicies()">
@@ -221,7 +221,7 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value">{{ project?.eproEnabled ? 'Enabled' : 'Disabled' }}</div>
+				<div class="setting-value">{{ workingProject?.eproEnabled ? 'Enabled' : 'Disabled' }}</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('eproProfileId')">
 				<label>
@@ -230,14 +230,14 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.eproProfileId">
-					@if (!project?.eproProfileId) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.eproProfileId">
+					@if (!workingProject?.eproProfileId) {
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
 						<div class="chip">
 							<mat-icon class="resource-icon">badge</mat-icon>
-							<span class="language-name">{{ getProfileLabel(project!.eproProfileId!) }}</span>
+							<span class="language-name">{{ getProfileLabel(workingProject!.eproProfileId!) }}</span>
 						</div>
 					}
 				</div>
@@ -259,11 +259,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.clientName">
-					@if (!project?.clientName) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.clientName">
+					@if (!workingProject?.clientName) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.clientName || 'Not configured' }}
+					{{ workingProject?.clientName || 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('clientEmail')">
@@ -273,11 +273,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.clientEmail">
-					@if (!project?.clientEmail) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.clientEmail">
+					@if (!workingProject?.clientEmail) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.clientEmail || 'Not configured' }}
+					{{ workingProject?.clientEmail || 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('protocolNo')">
@@ -287,11 +287,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.protocolNo">
-					@if (!project?.protocolNo) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.protocolNo">
+					@if (!workingProject?.protocolNo) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.protocolNo || 'Not configured' }}
+					{{ workingProject?.protocolNo || 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('versionNumber')">
@@ -301,11 +301,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.versionNumber">
-					@if (!project?.versionNumber) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.versionNumber">
+					@if (!workingProject?.versionNumber) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.versionNumber || 'Not configured' }}
+					{{ workingProject?.versionNumber || 'Not configured' }}
 				</div>
 			</div>
 			<div class="setting-item" [class.modified]="isFieldModified('versionDate')">
@@ -315,11 +315,11 @@
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
 				</label>
-				<div class="setting-value" [class.not-configured]="!project?.versionDate">
-					@if (!project?.versionDate) {
+				<div class="setting-value" [class.not-configured]="!workingProject?.versionDate">
+					@if (!workingProject?.versionDate) {
 						<mat-icon class="warning-icon">report</mat-icon>
 					}
-					{{ project?.versionDate ? (project?.versionDate | date:'mediumDate') : 'Not configured' }}
+					{{ workingProject?.versionDate ? (workingProject?.versionDate | date:'mediumDate') : 'Not configured' }}
 				</div>
 			</div>
 		</div>
@@ -339,11 +339,11 @@
 			</h3>
 		</div>
 		<div class="language-list">
-			@if (project?.languages?.length) {
+			@if (workingProject?.languages?.length) {
 				<div class="chip-container">
-					@for (lang of project?.languages; track lang.languageCode) {
+					@for (lang of workingProject?.languages; track lang.languageCode) {
 						<div class="chip" [class.third]="lang.isDefault">
-							<span class="language-name">{{ getLanguageName(lang.languageCode) }}</span>
+							<span class="language-name">{{ languageService.getLanguageName(lang.languageCode) }}</span>
 							<span class="language-code">({{ lang.languageCode }})</span>
 							@if (lang.isDefault) {
 								<mat-icon class="default-icon">star</mat-icon>
@@ -374,9 +374,9 @@
 			</h3>
 		</div>
 		<div class="tag-list">
-			@if (project?.ruleTags?.length) {
+			@if (workingProject?.ruleTags?.length) {
 				<div class="chip-container">
-					@for (tag of project?.ruleTags; track tag.tag) {
+					@for (tag of workingProject?.ruleTags; track tag.tag) {
 						<div class="chip">{{ tag.tag }}</div>
 					}
 				</div>

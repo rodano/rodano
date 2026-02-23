@@ -4,6 +4,9 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
 import {ProjectLanguage} from '@core/model/project-language';
+import {LanguageService} from '../../../services/language.service';
+import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 export interface BasicInfoDialogData {
 	code: string;
@@ -27,93 +30,43 @@ export interface BasicInfoDialogData {
 	templateUrl: './project-settings-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css']
 })
-export class ProjectSettingsBasicInfoDialogComponent implements OnInit {
+export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
-	languageForms = new Map<string, FormGroup>();
-	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
-		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<ProjectSettingsBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: BasicInfoDialogData
+		fb: FormBuilder,
+		languageService: LanguageService,
+		dialogRef: MatDialogRef<ProjectSettingsBasicInfoDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) public data: BasicInfoDialogData,
+		private snackBar: MatSnackBar
 	) {
-		this.form = this.fb.group({
-			code: [data.code, [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
-			url: [data.url, [Validators.pattern(/^https?:\/\/.+/)]],
-			color: [data.color || '#5bd4d4']
-		});
+		super(fb, languageService, dialogRef);
 	}
 
 	ngOnInit(): void {
-		this.availableLanguages = this.data.languages?.length > 0
-			? this.data.languages.filter(lang => lang && lang.languageCode)
-			: [{languageCode: 'en', isDefault: true}];
+		this.loadProjectLanguages(this.data.languages);
+		this.initializeForm();
+	}
 
+	protected initializeLanguageForms(): void {
 		this.availableLanguages.forEach(lang => {
 			if(!lang.languageCode) {
 				return;
 			}
-
-			const languageForm = this.fb.group({
-				shortname: [this.data.shortname?.[lang.languageCode] || ''],
+			this.languageForms.set(lang.languageCode, this.fb.group({
+				shortname: [this.data.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
 				longname: [this.data.longname?.[lang.languageCode] || ''],
 				description: [this.data.description?.[lang.languageCode] || '']
-			});
-			this.languageForms.set(lang.languageCode, languageForm);
+			}));
 		});
 	}
 
-	getLanguageLabel(languageCode: string, isDefault: boolean): string {
-		try {
-			const displayNames = new Intl.DisplayNames([navigator.language, 'en'], {type: 'language'});
-			const languageName = displayNames.of(languageCode) || languageCode.toUpperCase();
-
-			return isDefault ? `${languageName} (Default)` : languageName;
-		}
-		catch (error) {
-			console.error('Error getting language label', error);
-			return isDefault ? `${languageCode.toUpperCase()} (Default)` : languageCode.toUpperCase();
-		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
-	}
-
-	onSave(): void {
-		if(this.form.invalid) {
-			return;
-		}
-
-		const formValue = this.form.value;
-
-		const shortname: Record<string, string> = {};
-		const longname: Record<string, string> = {};
-		const description: Record<string, string> = {};
-
-		this.languageForms.forEach((langForm, languageCode) => {
-			const langValue = langForm.value;
-			if(langValue.shortname) {
-				shortname[languageCode] = langValue.shortname;
-			}
-			if(langValue.longname) {
-				longname[languageCode] = langValue.longname;
-			}
-			if(langValue.description) {
-				description[languageCode] = langValue.description;
-			}
+	initializeForm(): void {
+		this.form = this.fb.group({
+			code: [this.data.code, [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
+			url: [this.data.url, [Validators.pattern(/^https?:\/\/.+/)]],
+			color: [this.data.color || '#5bd4d4']
 		});
-
-		const result = {
-			code: formValue.code,
-			shortname,
-			longname,
-			description,
-			url: formValue.url,
-			color: formValue.color
-		};
-
-		this.dialogRef.close(result);
 	}
 
 	onColorInput(event: Event): void {
@@ -125,8 +78,19 @@ export class ProjectSettingsBasicInfoDialogComponent implements OnInit {
 		}
 	}
 
-	onCodeInput(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		input.value = input.value.toUpperCase();
+	onSave(): void {
+		if(this.form.invalid || !this.areLanguageFormsValid()) {
+			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			return;
+		}
+
+		const {shortname, longname, description} = this.collectTranslations();
+		this.dialogRef.close({
+			code: this.form.value.code,
+			shortname,
+			longname,
+			description,
+			...this.form.value
+		});
 	}
 }

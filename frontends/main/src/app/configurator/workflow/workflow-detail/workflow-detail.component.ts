@@ -46,8 +46,8 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 	constructor(
 		public workflowManager: WorkflowManagerService,
 		public workflowStateManager: WorkflowStateManagerService,
+		public languageService: LanguageService,
 		private workflowActionManager: WorkflowActionManagerService,
-		private languageService: LanguageService,
 		private workflowDialogService: WorkflowDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
@@ -112,7 +112,7 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Workflow',
-				message: `Are you sure you want to delete "${this.getTranslatedName(this.workflow.shortname)}"?`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedName(this.workflow.shortname)}"?`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -146,65 +146,15 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 		return this.workflowManager.isFieldModified(this.workflow.workflowId, fieldName);
 	}
 
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.getTranslatedValue(translations);
-	}
-
-	getTranslatedValue(translations: Record<string, string> | undefined, languageCode?: string): string {
-		if(!translations) {
-			return '';
-		}
-		const lang = languageCode || this.selectedLanguage;
-		return translations[lang] || '';
-	}
-
 	getWorkflowLabel(workflowId: string): string {
-		const workflow = this.allWorkflows.find(wf => wf.workflowId === workflowId);
-		if(!workflow) {
-			return workflowId;
-		}
-
-		const name = this.languageService.getDefaultTranslation(workflow.shortname) || workflow.id;
-		return `${name} (${workflow.id})`;
+		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
 	}
 
-	getWorkflowStateLabel(workflowStateId: string | null | undefined): string {
-		if(!workflowStateId) {
-			return 'Not configured';
-		}
-		const workflowState = this.workflowStateManager.getAllForWorkflow(this.workflow.workflowId)
-			.find(wfs => wfs.workflowStateId === workflowStateId);
-		if(!workflowState) {
-			return workflowStateId;
-		}
-		const name = this.languageService.getDefaultTranslation(workflowState.shortname) || workflowState.id;
-		return `${name} (${workflowState.id})`;
+	getWorkflowStateLabel(workflowStateId: string): string {
+		return this.languageService.getLabelById(workflowStateId, id => this.workflowStateManager.getById(id));
 	}
 
-	getWorkflowActionLabel(workflowActionId: string | null | undefined): string {
-		if(!workflowActionId) {
-			return 'Not configured';
-		}
-		const workflowAction = this.workflowActionManager.getAllForWorkflow(this.workflow.workflowId)
-			.find(wfa => wfa.workflowActionId === workflowActionId);
-		if(!workflowAction) {
-			return workflowActionId;
-		}
-		const name = this.languageService.getDefaultTranslation(workflowAction.shortname) || workflowAction.id;
-		return `${name} (${workflowAction.id})`;
-	}
-
-	getLanguageName(code: string | undefined): string {
-		if(!code) {
-			return 'Unknown';
-		}
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (e) {
-			console.error(e);
-			return code.toUpperCase();
-		}
+	getWorkflowActionLabel(workflowActionId: string): string {
+		return this.languageService.getLabelById(workflowActionId, id => this.workflowActionManager.getById(id));
 	}
 }

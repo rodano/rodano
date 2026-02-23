@@ -13,13 +13,16 @@ import {EventModel} from '@core/model/event-model';
 import {ProjectLanguage} from '@core/model/project-language';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {EventModelManagerService} from '../../../services/manager/event-model-manager.service';
+import {LanguageService} from '../../../services/language.service';
+import {EventGroup} from '@core/model/event-group';
+import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
 
 export interface EventModelBasicInfoDialogData {
 	projectId: string;
 	scopeModelId: string;
 	eventModel: EventModel | null;
 	languages: ProjectLanguage[];
-	eventGroups: {id: string; name: string; code: string}[];
+	eventGroups: EventGroup[];
 }
 
 @Component({
@@ -40,47 +43,47 @@ export interface EventModelBasicInfoDialogData {
 		MatSelectModule
 	]
 })
-export class EventModelBasicInfoDialogComponent implements OnInit {
+export class EventModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
-	languageForms = new Map<string, FormGroup>();
-	availableLanguages: ProjectLanguage[] = [];
-	eventGroups: {id: string; name: string; code: string}[];
+	eventGroups: EventGroup[] = [];
 	isEditMode: boolean;
 
 	constructor(
-		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<EventModelBasicInfoDialogComponent>,
+		fb: FormBuilder,
+		languageService: LanguageService,
+		dialogRef: MatDialogRef<EventModelBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: EventModelBasicInfoDialogData,
 		private eventModelManager: EventModelManagerService,
 		private snackBar: MatSnackBar
 	) {
+		super(fb, languageService, dialogRef);
 		this.isEditMode = !!data.eventModel;
 		this.eventGroups = data.eventGroups || [];
 	}
 
 	ngOnInit(): void {
-		this.loadProjectLanguages();
+		this.loadProjectLanguages(this.data.languages);
 		this.initializeForm();
 	}
 
-	loadProjectLanguages(): void {
-		this.availableLanguages = this.data.languages || [];
-
-		if(this.availableLanguages.length === 0) {
-			this.availableLanguages = [{languageCode: 'en', isDefault: true}];
-		}
-
-		this.initializeLanguageForms();
+	initializeLanguageForms(): void {
+		this.availableLanguages.forEach(lang => {
+			if(!lang.languageCode) {
+				return;
+			}
+			const em = this.data.eventModel;
+			this.languageForms.set(lang.languageCode, this.fb.group({
+				shortname: [em?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
+				longname: [em?.longname?.[lang.languageCode] || ''],
+				description: [em?.description?.[lang.languageCode] || '']
+			}));
+		});
 	}
 
 	initializeForm(): void {
 		const em = this.data.eventModel;
-
 		this.form = this.fb.group({
-			id: [
-				em?.id || '',
-				[Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]
-			],
+			id: [em?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
 			number: [em?.number || null],
 			eventGroupId: [em?.eventGroupId || null],
 			mandatory: [em?.mandatory || false],
@@ -90,65 +93,11 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 		});
 	}
 
-	initializeLanguageForms(): void {
-		this.availableLanguages.forEach((lang: ProjectLanguage) => {
-			if(lang.languageCode) {
-				const em = this.data.eventModel;
-				const langForm = this.fb.group({
-					shortname: [
-						em?.shortname?.[lang.languageCode] || '',
-						lang.isDefault ? Validators.required : []
-					],
-					longname: [em?.longname?.[lang.languageCode] || ''],
-					description: [em?.description?.[lang.languageCode] || '']
-				});
-				this.languageForms.set(lang.languageCode, langForm);
-			}
-		});
-	}
-
-	getLanguageLabel(code: string, isDefault: boolean): string {
-		const name = this.getLanguageName(code);
-		return isDefault ? `${name} ☆` : name;
-	}
-
-	getLanguageName(code: string): string {
-		try {
-			const displayNames = new Intl.DisplayNames(['en'], {type: 'language'});
-			return displayNames.of(code) || code.toUpperCase();
-		}
-		catch (error) {
-			console.error(error);
-			return code.toUpperCase();
-		}
-	}
-
-	areLanguageFormsValid(): boolean {
-		let allValid = true;
-		this.languageForms.forEach((langForm: FormGroup) => {
-			if(langForm.invalid) {
-				allValid = false;
-			}
-		});
-		return allValid;
-	}
-
-	onCodeInput(event: Event): void {
-		const input = event.target as HTMLInputElement;
-		const uppercaseValue = input.value.toUpperCase();
-		input.value = uppercaseValue;
-		this.form.patchValue({id: uppercaseValue}, {emitEvent: false});
-	}
-
 	isCodeDuplicate(code: string): boolean {
 		const currentEventModelId = this.data.eventModel?.eventModelId;
 		return this.eventModelManager.getAll().some(em =>
 			em.id.toUpperCase() === code.toUpperCase() && em.eventModelId !== currentEventModelId
 		);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 
 	onSave(): void {
@@ -157,44 +106,19 @@ export class EventModelBasicInfoDialogComponent implements OnInit {
 			return;
 		}
 
-		const formValue = this.form.getRawValue();
-		const code = formValue.id.toUpperCase();
-
+		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
 			this.snackBar.open(`An event model with code "${code}" already exists`, 'Close', {duration: 3000});
 			return;
 		}
 
-		const shortname: Record<string, string> = {};
-		const longname: Record<string, string> = {};
-		const description: Record<string, string> = {};
-
-		this.languageForms.forEach((langForm: FormGroup, langCode: string) => {
-			const langValue = langForm.value;
-			if(langValue.shortname) {
-				shortname[langCode] = langValue.shortname;
-			}
-			if(langValue.longname) {
-				longname[langCode] = langValue.longname;
-			}
-			if(langValue.description) {
-				description[langCode] = langValue.description;
-			}
-		});
-
-		const result = {
+		const {shortname, longname, description} = this.collectTranslations();
+		this.dialogRef.close({
 			id: code,
-			number: formValue.number,
-			eventGroupId: formValue.eventGroupId,
 			shortname,
 			longname,
 			description,
-			mandatory: formValue.mandatory,
-			inceptive: formValue.inceptive,
-			maxOccurrence: formValue.maxOccurrence,
-			preventAdd: formValue.preventAdd
-		};
-
-		this.dialogRef.close(result);
+			...this.form.value
+		});
 	}
 }

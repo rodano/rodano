@@ -5,7 +5,6 @@ import {Observable} from 'rxjs';
 import {Validator} from '@core/model/validator';
 import {WorkflowManagerService} from '../manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../manager/workflow-state-manager.service';
-import {LanguageService} from '../language.service';
 import {
 	ValidatorBasicInfoDialogComponent, ValidatorBasicInfoDialogData
 } from '../../dialogs/validator/validator-basic-info-dialog/validator-basic-info-dialog.component';
@@ -20,8 +19,7 @@ export class ValidatorDialogService {
 	constructor(
 		private dialog: MatDialog,
 		private workflowManager: WorkflowManagerService,
-		private workflowStateManager: WorkflowStateManagerService,
-		private languageService: LanguageService
+		private workflowStateManager: WorkflowStateManagerService
 	) {}
 
 	openCreateDialog(projectId: string, languages: ProjectLanguage[]): Observable<any> {
@@ -51,20 +49,15 @@ export class ValidatorDialogService {
 	openWorkflowDialog(validator: Validator, projectId: string): Observable<any> {
 		return new Observable(observer => {
 			const openDialog = () => {
+				const availableWorkflows = this.workflowManager.getAll().map(wf => ({
+					...wf,
+					states: this.workflowStateManager.getAllForWorkflow(wf.workflowId)
+				}));
+
 				const dialogRef = this.dialog.open(ValidatorWorkflowDialogComponent, {
 					width: '500px',
 					disableClose: true,
-					data: {
-						validator,
-						availableWorkflows: this.workflowManager.getAll().map(wf => ({
-							id: wf.workflowId,
-							name: `${this.languageService.getDefaultTranslation(wf.shortname) || wf.id} (${wf.id})`,
-							states: this.workflowStateManager.getAllForWorkflow(wf.workflowId).map(wfs => ({
-								id: wfs.workflowStateId,
-								name: `${this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id} (${wfs.id})`
-							}))
-						}))
-					} as ValidatorWorkflowDialogData
+					data: {validator, availableWorkflows} as ValidatorWorkflowDialogData
 				});
 				dialogRef.afterClosed().subscribe(result => {
 					observer.next(result);

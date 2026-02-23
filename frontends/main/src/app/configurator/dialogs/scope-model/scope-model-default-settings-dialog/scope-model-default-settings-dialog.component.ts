@@ -38,9 +38,9 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 	availableProfiles: Profile[] = [];
 
 	constructor(
+		public languageService: LanguageService,
 		private fb: FormBuilder,
 		private profileManager: ProfileManagerService,
-		private languageService: LanguageService,
 		private dialogRef: MatDialogRef<ScopeModelDefaultSettingsDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: DialogData,
 		private snackBar: MatSnackBar
@@ -78,10 +78,5 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 
 	onCancel(): void {
 		this.dialogRef.close(null);
-	}
-
-	getProfileLabel(profile: Profile): string {
-		const name = this.languageService.getDefaultTranslation(profile.shortname) || profile.id;
-		return `${name} (${profile.id})`;
 	}
 }

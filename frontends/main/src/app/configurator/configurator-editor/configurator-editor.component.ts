@@ -89,6 +89,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	canRollForward = false;
 
 	constructor(
+		public languageService: LanguageService,
 		private route: ActivatedRoute,
 		private router: Router,
 		private configuratorService: ConfiguratorService,
@@ -104,7 +105,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private workflowStateManager: WorkflowStateManagerService,
 		private workflowActionManager: WorkflowActionManagerService,
 		private profileManager: ProfileManagerService,
-		public languageService: LanguageService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -619,15 +619,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onBack(): void {
 		localStorage.removeItem('configProjectId');
 		this.router.navigate(['/configurator']);
-	}
-
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		if(!translations) {
-			return '';
-		}
-		const currentLanguage = this.languageService.currentLanguage;
-		const defaultLanguage = this.languageService.getDefaultLanguageCode();
-		return translations[currentLanguage] || translations[defaultLanguage] || Object.values(translations)[0] || '';
 	}
 
 	get hasModifications(): boolean {

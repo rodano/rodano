@@ -5,10 +5,11 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
+import {LanguageService} from '../../../services/language.service';
 
 export interface WorkflowStateAggregationDialogData {
 	workflowState: WorkflowState;
-	aggregatedWorkflowStates: {id: string; name: string; code: string}[];
+	aggregatedWorkflowStates: WorkflowState[];
 }
 
 @Component({
@@ -35,6 +36,7 @@ export class WorkflowStateAggregationDialogComponent implements OnInit {
 	];
 
 	constructor(
+		public languageService: LanguageService,
 		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<WorkflowStateAggregationDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: WorkflowStateAggregationDialogData
