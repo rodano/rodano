@@ -10,10 +10,10 @@
 <div class="content-container"
 					[class.level-2]="viewLevel === 2">
 	@if (loading) {
-		<div class="empty-state">
-			<mat-icon>hourglass_empty</mat-icon>
-			<p>Loading profiles...</p>
-		</div>
+		<app-empty-state
+			[icon]="'hourglass_empty'"
+			[message]="'Loading profiles...'"
+		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
@@ -68,11 +68,11 @@
 			</div>
 
 			@if (profiles.length === 0) {
-				<div class="empty-state">
-					<mat-icon>badge</mat-icon>
-					<h3>No profiles</h3>
-					<p>Create your first profile to start collecting data</p>
-				</div>
+				<app-empty-state
+					[icon]="'badge'"
+					[title]="'No Profiles'"
+					[message]="'Create your first profile to start collecting data'"
+				/>
 			}
 		</div>
 

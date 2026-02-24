@@ -11,10 +11,10 @@
 					[class.level-2]="viewLevel === 2"
 					[class.level-3]="viewLevel === 3">
 	@if (loading) {
-		<div class="empty-state">
-			<mat-icon>hourglass_empty</mat-icon>
-			<p>Loading dataset models...</p>
-		</div>
+		<app-empty-state
+			[icon]="'hourglass_empty'"
+			[message]="'Loading dataset models...'"
+		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
@@ -97,11 +97,11 @@
 			</div>
 
 			@if (datasetModels.length === 0) {
-			<div class="empty-state">
-				<mat-icon>dataset</mat-icon>
-				<h3>No Dataset Models</h3>
-				<p>Create your first dataset model to start collecting data</p>
-			</div>
+				<app-empty-state
+					[icon]="'dataset'"
+					[title]="'No Dataset Models'"
+					[message]="'Create your first dataset model to start collecting data'"
+				/>
 			}
 		</div>
 
@@ -202,10 +202,11 @@
 						}
 
 						@if (fieldModels.length === 0) {
-							<div class="empty-state-small">
-								<mat-icon>text_ad</mat-icon>
-								<p>No field models yet. Create your first field model to get started.</p>
-							</div>
+							<app-empty-state
+								[icon]="'text_ad'"
+								[message]="'No field models yet. Create your first field model to get started.'"
+								[size]="'small'"
+							/>
 						}
 					</div>
 				</div>

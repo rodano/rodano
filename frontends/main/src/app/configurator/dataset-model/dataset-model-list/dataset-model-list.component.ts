@@ -19,6 +19,7 @@ import {FieldModelManagerService} from '../../services/manager/field-model-manag
 import {FieldModel} from '@core/model/field-model';
 import {FieldModelDialogService} from '../../services/dialogs/field-model-dialog.service';
 import {FieldModelDetailComponent} from '../field-model/field-model-detail/field-model-detail.component';
+import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 
 type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 
@@ -34,7 +35,8 @@ type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 		MatTooltipModule,
 		DatasetModelDetailComponent,
 		FieldModelDetailComponent,
-		MatProgressSpinnerModule
+		MatProgressSpinnerModule,
+		EmptyStateComponent
 	]
 })
 export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {

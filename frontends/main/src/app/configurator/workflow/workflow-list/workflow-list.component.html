@@ -11,10 +11,10 @@
 					[class.level-2]="viewLevel === 2"
 					[class.level-3]="viewLevel === 3">
 	@if (loading) {
-		<div class="empty-state">
-			<mat-icon>hourglass_empty</mat-icon>
-			<p>Loading workflows...</p>
-		</div>
+		<app-empty-state
+			[icon]="'hourglass_empty'"
+			[message]="'Loading workflows...'"
+		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
@@ -90,11 +90,11 @@
 			</div>
 
 			@if (workflows.length === 0) {
-				<div class="empty-state">
-					<mat-icon>settings</mat-icon>
-					<h3>No Workflows</h3>
-					<p>Create your first workflow to start collecting data</p>
-				</div>
+				<app-empty-state
+					[icon]="'settings'"
+					[title]="'No Workflows'"
+					[message]="'Create your first workflow to start collecting data'"
+				/>
 			}
 		</div>
 
@@ -169,10 +169,11 @@
 						}
 
 						@if (workflowStates.length === 0) {
-							<div class="empty-state-small">
-								<mat-icon>adjust</mat-icon>
-								<p>No workflow states yet. Create your first workflow state to get started.</p>
-							</div>
+							<app-empty-state
+								[icon]="'adjust'"
+								[message]="'No workflow states yet. Create your first workflow state to get started.'"
+								[size]="'small'"
+							/>
 						}
 					</div>
 				</div>
@@ -239,10 +240,11 @@
 						}
 
 						@if (workflowActions.length === 0) {
-							<div class="empty-state-small">
-								<mat-icon>play_circle</mat-icon>
-								<p>No workflow actions yet. Create your first workflow action to get started.</p>
-							</div>
+							<app-empty-state
+								[icon]="'play_circle'"
+								[message]="'No workflow actions yet. Create your first workflow state to get started.'"
+								[size]="'small'"
+							/>
 						}
 					</div>
 				</div>

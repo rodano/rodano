@@ -1,0 +1,8 @@
+<div [class]="size === 'small' ? 'empty-state-small' : 'empty-state'">
+	<mat-icon>{{ icon }}</mat-icon>
+	@if (size !== 'small') {
+		<h3>{{ title }}</h3>
+	}
+	<p>{{ message }}</p>
+	<ng-content></ng-content>
+</div>

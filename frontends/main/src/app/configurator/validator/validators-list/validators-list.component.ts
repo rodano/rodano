@@ -16,6 +16,7 @@ import {ValidatorDialogService} from '../../services/dialogs/validator-dialog.se
 import {ValidatorDetailComponent} from '../validator-detail/validator-detail.component';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
+import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 
 @Component({
 	selector: 'app-validators-list',
@@ -27,7 +28,8 @@ import {WorkflowStateManagerService} from '../../services/manager/workflow-state
 		MatProgressSpinnerModule,
 		MatSnackBarModule,
 		MatTooltip,
-		ValidatorDetailComponent
+		ValidatorDetailComponent,
+		EmptyStateComponent
 	],
 	templateUrl: './validators-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']

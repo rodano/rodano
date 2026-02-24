@@ -10,10 +10,10 @@
 <div class="content-container"
 					[class.level-2]="viewLevel === 2">
 	@if (loading) {
-		<div class="empty-state">
-			<mat-icon>hourglass_empty</mat-icon>
-			<p>Loading validators...</p>
-		</div>
+		<app-empty-state
+			[icon]="'hourglass_empty'"
+			[message]="'Loading validators...'"
+		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
@@ -86,11 +86,11 @@
 			</div>
 
 			@if (validators.length === 0) {
-				<div class="empty-state">
-					<mat-icon>rule</mat-icon>
-					<h3>No Validators</h3>
-					<p>Create your first validator to start collecting data</p>
-				</div>
+				<app-empty-state
+					[icon]="'rule'"
+					[title]="'No Validators'"
+					[message]="'Create your first validator to start collecting data'"
+				/>
 			}
 		</div>
 

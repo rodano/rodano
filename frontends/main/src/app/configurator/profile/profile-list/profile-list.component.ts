@@ -14,6 +14,7 @@ import {Profile} from '@core/model/profile';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {ProfileDialogService} from '../../services/dialogs/profile-dialog.service';
 import {ProfileDetailComponent} from '../profile-detail/profile-detail.component';
+import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 
 @Component({
 	selector: 'app-profile-list',
@@ -24,7 +25,8 @@ import {ProfileDetailComponent} from '../profile-detail/profile-detail.component
 		MatButtonModule,
 		MatProgressSpinnerModule,
 		MatSnackBarModule,
-		ProfileDetailComponent
+		ProfileDetailComponent,
+		EmptyStateComponent
 	],
 	templateUrl: './profile-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']

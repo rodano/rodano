@@ -75,11 +75,11 @@
 					<h2>{{ selectedNode }}</h2>
 				</div>
 				<div class="tab-content">
-					<div class="empty-state">
-						<mat-icon>construction</mat-icon>
-						<h3>Coming Soon</h3>
-						<p>Configuration for {{ selectedNode }} will be available here</p>
-					</div>
+					<app-empty-state
+						[icon]="'construction'"
+						[title]="'Coming Soon'"
+						[message]="`Configuration for ${selectedNode} will be available here`"
+					/>
 				</div>
 			}
 		}

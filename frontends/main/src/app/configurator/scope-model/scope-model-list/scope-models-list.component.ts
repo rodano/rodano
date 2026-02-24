@@ -21,6 +21,7 @@ import {forkJoin, Subscription} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ProjectLanguage} from '@core/model/project-language';
 import {HttpErrorResponse} from '@angular/common/http';
+import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 
 type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
 
@@ -36,7 +37,8 @@ type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 
 		EventModelDetailComponent,
 		EventModelTimelineComponent,
 		EventGroupDetailComponent,
-		MatTooltipModule
+		MatTooltipModule,
+		EmptyStateComponent
 	]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {

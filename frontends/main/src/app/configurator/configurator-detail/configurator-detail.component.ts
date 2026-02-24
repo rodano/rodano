@@ -8,6 +8,7 @@ import {DatasetModelListComponent} from '../dataset-model/dataset-model-list/dat
 import {ValidatorsListComponent} from '../validator/validators-list/validators-list.component';
 import {WorkflowListComponent} from '../workflow/workflow-list/workflow-list.component';
 import {ProfileListComponent} from '../profile/profile-list/profile-list.component';
+import {EmptyStateComponent} from '../shared/empty-state/empty-state.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -22,7 +23,8 @@ import {ProfileListComponent} from '../profile/profile-list/profile-list.compone
 		DatasetModelListComponent,
 		ValidatorsListComponent,
 		WorkflowListComponent,
-		ProfileListComponent
+		ProfileListComponent,
+		EmptyStateComponent
 	]
 })
 export class ConfiguratorDetailComponent implements OnChanges {
