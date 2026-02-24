@@ -28,6 +28,7 @@ import {FieldModelManagerService} from '../services/manager/field-model-manager.
 import {WorkflowStateManagerService} from '../services/manager/workflow-state-manager.service';
 import {WorkflowActionManagerService} from '../services/manager/workflow-action-manager.service';
 import {ProfileManagerService} from '../services/manager/profile-manager.service';
+import {FeatureManagerService} from '../services/manager/feature-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -62,6 +63,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	validatorModificationCount = 0;
 	workflowModificationCount = 0;
 	profileModificationCount = 0;
+	featureModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -73,6 +75,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	workflowStates: any[] = [];
 	workflowActions: any[] = [];
 	profiles: any[] = [];
+	features: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -84,6 +87,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedWorkflowStateId: string | null = null;
 	selectedWorkflowActionId: string | null = null;
 	selectedProfileId: string | null = null;
+	selectedFeatureId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -105,6 +109,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private workflowStateManager: WorkflowStateManagerService,
 		private workflowActionManager: WorkflowActionManagerService,
 		private profileManager: ProfileManagerService,
+		private featureManager: FeatureManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -146,6 +151,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowStateManager.invalidate();
 		this.workflowActionManager.invalidate();
 		this.profileManager.invalidate();
+		this.featureManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -194,6 +200,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: profiles => this.profiles = profiles,
 			error: error => console.error('Error loading profiles:', error)
 		});
+
+		this.featureManager.load(this.projectId).subscribe({
+			next: features => this.features = features,
+			error: error => console.error('Error loading features:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -202,6 +213,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.validators = this.validatorManager.getAll();
 		this.workflows = this.workflowManager.getAll();
 		this.profiles = this.profileManager.getAll();
+		this.features = this.featureManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -250,6 +262,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedWorkflowId = null;
 			this.selectedWorkflowStateId = null;
 			this.selectedWorkflowActionId = null;
+			this.selectedProfileId = null;
+			this.selectedFeatureId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
@@ -257,12 +271,14 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.workflowStates = [];
 			this.workflowActions = [];
 			this.profiles = [];
+			this.features = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
 			this.detailComponent?.validatorsListComponent?.clearSelection();
 			this.detailComponent?.workflowListComponent?.clearSelection();
 			this.detailComponent?.profileListComponent?.clearSelection();
+			this.detailComponent?.featureListComponent?.clearSelection();
 		}
 	}
 
@@ -284,6 +300,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onProfilesChanged(event: {modificationCount: number}): void {
 		this.profileModificationCount = event.modificationCount;
+	}
+
+	onFeaturesChanged(event: {modificationCount: number}): void {
+		this.featureModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -338,6 +358,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveProfiles());
 				}
 
+				if(this.featureModificationCount > 0) {
+					saveObservables.push(this.saveFeatures());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
@@ -346,6 +370,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 							this.validatorModificationCount = 0;
 							this.workflowModificationCount = 0;
 							this.profileModificationCount = 0;
+							this.featureModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -469,6 +494,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveFeatures(): Promise<void> {
+		const component = this.detailComponent?.featureListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveFeatures(this.projectId, {
+			featureManager: component.featureManager,
+			features: component.features,
+			originalFeatures: component.originalFeatures,
+			modifiedFeatureIds: component.modifiedFeatureIds
+		}).toPromise().then(() => {
+			component.loadFeatures();
+			this.features = this.featureManager.getAll();
+		});
+	}
+
 	onDiscardChanges(): void {
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
@@ -557,11 +599,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					profileComponent.loadProfiles();
 				}
 
+				const featureComponent = this.detailComponent?.featureListComponent;
+				if(featureComponent) {
+					this.entitySaveOrchestratorService.resetFeaturesToOriginals({
+						featureManager: featureComponent.featureManager,
+						features: featureComponent.features,
+						originalFeatures: featureComponent.originalFeatures,
+						modifiedFeatureIds: featureComponent.modifiedFeatureIds
+					});
+					featureComponent.loadFeatures();
+				}
+
 				this.scopeModelModificationCount = 0;
 				this.datasetModelModificationCount = 0;
 				this.validatorModificationCount = 0;
 				this.workflowModificationCount = 0;
 				this.profileModificationCount = 0;
+				this.featureModificationCount = 0;
 
 				this.refreshTreeData();
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
@@ -627,7 +681,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.datasetModelModificationCount > 0
 		  || this.validatorModificationCount > 0
 		  || this.workflowModificationCount > 0
-		  || this.profileModificationCount > 0;
+		  || this.profileModificationCount > 0
+		  || this.featureModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
@@ -636,7 +691,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  + this.datasetModelModificationCount
 		  + this.validatorModificationCount
 		  + this.workflowModificationCount
-		  + this.profileModificationCount;
+		  + this.profileModificationCount
+		  + this.featureModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -681,6 +737,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.profiles = context.profiles;
 			this.selectedProfileId = context.selectedProfileId;
+		});
+	}
+
+	onFeatureContextChanged(context: any): void {
+		setTimeout(() => {
+			this.features = context.features;
+			this.selectedFeatureId = context.selectedFeatureId;
 		});
 	}
 }

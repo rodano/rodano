@@ -276,39 +276,46 @@
 }
 
 /* ==================== Small Cards ==================== */
+.primary-card.small-card,
 .secondary-card.small-card {
 	height: auto;
 	min-height: 80px;
 	padding-bottom: 1rem;
 }
 
+.primary-card.small-card .card-body,
 .secondary-card.small-card .card-body {
 	display: none !important;
 }
 
+.primary-card.small-card .card-header,
 .secondary-card.small-card .card-header {
 	border-bottom: none !important;
 	margin-bottom: 0 !important;
 	padding-bottom: 0 !important;
 }
 
+.content-container.level-3 .primary-card.small-card,
 .content-container.level-3 .secondary-card.small-card {
 	min-height: 0;
 	height: auto;
 	padding: 0.75rem;
 }
 
+.primary-card.small-card.create-card,
 .secondary-card.small-card.create-card {
 	height: 80px;
 	min-height: 80px;
 }
 
+.content-container.level-3 .primary-card.small-card.create-card,
 .content-container.level-3 .secondary-card.small-card.create-card {
 	height: auto;
 	min-height: 60px;
 	padding: 0.75rem;
 }
 
+.content-container.level-2 .primary-card.small-card.create-card .create-content p,
 .content-container.level-2 .secondary-card.small-card.create-card .create-content p {
 	display: none !important;
 }

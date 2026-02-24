@@ -1,4 +1,3 @@
-import {EventGroup} from '@core/model/event-group';
 import {ProjectLanguage} from '@core/model/project-language';
 import {Component, Inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
@@ -8,20 +7,21 @@ import {MatIconModule} from '@angular/material/icon';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatInputModule} from '@angular/material/input';
 import {MatTabsModule} from '@angular/material/tabs';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {FeatureManagerService} from '../../../services/manager/feature-manager.service';
 import {LanguageService} from '../../../services/language.service';
 import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
-import {EventGroupManagerService} from '../../../services/manager/event-group-manager.service';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {Feature} from '@core/model/feature';
+import {MatCheckbox} from '@angular/material/checkbox';
 
-export interface EventGroupDialogData {
+export interface FeatureDialogData {
 	projectId: string;
-	scopeModelId: string;
-	eventGroup: EventGroup | null;
+	feature: Feature | null;
 	languages: ProjectLanguage[];
 }
 
 @Component({
-	selector: 'app-event-group-create-dialog',
+	selector: 'app-feature-create-dialog',
 	standalone: true,
 	imports: [
 		CommonModule,
@@ -30,25 +30,26 @@ export interface EventGroupDialogData {
 		MatIconModule,
 		ReactiveFormsModule,
 		MatInputModule,
-		MatTabsModule
+		MatTabsModule,
+		MatCheckbox
 	],
-	templateUrl: './event-group-dialog.component.html',
+	templateUrl: './feature-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css']
 })
-export class EventGroupDialogComponent extends BaseInfoDialogComponent implements OnInit {
+export class FeatureDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
 	isEditMode = false;
 
 	constructor(
 		fb: FormBuilder,
 		languageService: LanguageService,
-		dialogRef: MatDialogRef<EventGroupDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventGroupDialogData,
-		private eventGroupManager: EventGroupManagerService,
+		dialogRef: MatDialogRef<FeatureDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) public data: FeatureDialogData,
+		private featureManager: FeatureManagerService,
 		private snackBar: MatSnackBar
 	) {
 		super(fb, languageService, dialogRef);
-		this.isEditMode = !!data.eventGroup;
+		this.isEditMode = !!data.feature;
 	}
 
 	ngOnInit(): void {
@@ -61,26 +62,27 @@ export class EventGroupDialogComponent extends BaseInfoDialogComponent implement
 			if(!lang.languageCode) {
 				return;
 			}
-			const eg = this.data.eventGroup;
+			const f = this.data.feature;
 			this.languageForms.set(lang.languageCode, this.fb.group({
-				shortname: [eg?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
-				longname: [eg?.longname?.[lang.languageCode] || ''],
-				description: [eg?.description?.[lang.languageCode] || '']
+				shortname: [f?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
+				longname: [f?.longname?.[lang.languageCode] || ''],
+				description: [f?.description?.[lang.languageCode] || '']
 			}));
 		});
 	}
 
 	initializeForm(): void {
-		const eg = this.data.eventGroup;
+		const f = this.data.feature;
 		this.form = this.fb.group({
-			id: [eg?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]]
+			id: [f?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
+			optional: [f?.optional ?? false]
 		});
 	}
 
 	isCodeDuplicate(code: string): boolean {
-		const currentEventGroupId = this.data.eventGroup?.eventGroupId;
-		return this.eventGroupManager.getAll().some(eg =>
-			eg.id.toUpperCase() === code.toUpperCase() && eg.eventGroupId !== currentEventGroupId
+		const currentFeatureId = this.data.feature?.featureId;
+		return this.featureManager.getAll().some(f =>
+			f.id.toUpperCase() === code.toUpperCase() && f.featureId !== currentFeatureId
 		);
 	}
 
@@ -92,7 +94,7 @@ export class EventGroupDialogComponent extends BaseInfoDialogComponent implement
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`An event group with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.snackBar.open(`An feature with code "${code}" already exists`, 'Close', {duration: 3000});
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();
@@ -100,7 +102,8 @@ export class EventGroupDialogComponent extends BaseInfoDialogComponent implement
 			id: code,
 			shortname,
 			longname,
-			description
+			description,
+			...this.form.value
 		});
 	}
 }

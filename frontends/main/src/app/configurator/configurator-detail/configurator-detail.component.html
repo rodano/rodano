@@ -70,6 +70,16 @@
 					(profileContextChanged)="onProfileContextChanged($event)">
 				</app-profile-list>
 			}
+			@case ('features') {
+				<app-feature-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onFeatureSelected($event)"
+					(featuresChanged)="onFeaturesChanged($event)"
+					(featureContextChanged)="onFeatureContextChanged($event)">
+				</app-feature-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

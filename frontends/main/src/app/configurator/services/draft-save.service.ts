@@ -20,6 +20,8 @@ import {WorkflowState} from '@core/model/workflow-state';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {Profile} from '@core/model/profile';
 import {ProfileService} from './api/profile.service';
+import {FeatureService} from './api/feature.service';
+import {Feature} from '@core/model/feature';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -33,7 +35,8 @@ export class DraftSaveService {
 		private workflowService: WorkflowService,
 		private workflowStateService: WorkflowStateService,
 		private workflowActionService: WorkflowActionService,
-		private profileService: ProfileService
+		private profileService: ProfileService,
+		private featureService: FeatureService
 	) {}
 
 	saveScopeModels(
@@ -302,6 +305,41 @@ export class DraftSaveService {
 				const profile = profiles.find(p => p.profileId === id);
 				if(profile) {
 					saveObservables.push(this.profileService.updateProfile(projectId, id, profile));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveFeatures(
+		projectId: string,
+		modifiedIds: Set<string>,
+		features: Feature[],
+		originalFeatures: Feature[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalFeatures.find(f => f.featureId === originalId);
+				if(original) {
+					saveObservables.push(this.featureService.deleteFeature(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const feature = features.find(f => f.featureId === id);
+				if(feature) {
+					saveObservables.push(this.featureService.createFeature(projectId, feature));
+				}
+			}
+			else {
+				const feature = features.find(f => f.featureId === id);
+				if(feature) {
+					saveObservables.push(this.featureService.updateFeature(projectId, id, feature));
 				}
 			}
 		});

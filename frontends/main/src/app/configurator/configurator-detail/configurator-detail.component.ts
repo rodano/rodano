@@ -9,6 +9,7 @@ import {ValidatorsListComponent} from '../validator/validators-list/validators-l
 import {WorkflowListComponent} from '../workflow/workflow-list/workflow-list.component';
 import {ProfileListComponent} from '../profile/profile-list/profile-list.component';
 import {EmptyStateComponent} from '../shared/empty-state/empty-state.component';
+import {FeatureListComponent} from '../feature/feature-list/feature-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -24,6 +25,7 @@ import {EmptyStateComponent} from '../shared/empty-state/empty-state.component';
 		ValidatorsListComponent,
 		WorkflowListComponent,
 		ProfileListComponent,
+		FeatureListComponent,
 		EmptyStateComponent
 	]
 })
@@ -33,6 +35,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(ValidatorsListComponent) validatorsListComponent?: ValidatorsListComponent;
 	@ViewChild(WorkflowListComponent) workflowListComponent?: WorkflowListComponent;
 	@ViewChild(ProfileListComponent) profileListComponent?: ProfileListComponent;
+	@ViewChild(FeatureListComponent) featureListComponent?: FeatureListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -82,13 +85,20 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedProfileId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'overview' | null = null;
+	@Output() featuresChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() featureContextChanged = new EventEmitter<{
+		features: any[];
+		selectedFeatureId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
 	validatorModificationCount = 0;
 	workflowModificationCount = 0;
 	profileModificationCount = 0;
+	featureModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -151,6 +161,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
+	onFeatureSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onFeaturesChanged(event: {modificationCount: number}): void {
+		this.featureModificationCount = event.modificationCount;
+		this.featuresChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -202,6 +223,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
+		if(this.selectedNode === 'features') {
+			this.selectedNodeType = 'features';
+			return;
+		}
+
 		this.selectedNodeType = 'overview';
 	}
 
@@ -248,5 +274,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedProfileId: string | null;
 	}): void {
 		this.profileContextChanged.emit(context);
+	}
+
+	onFeatureContextChanged(context: {
+		features: any[];
+		selectedFeatureId: string | null;
+	}): void {
+		this.featureContextChanged.emit(context);
 	}
 }

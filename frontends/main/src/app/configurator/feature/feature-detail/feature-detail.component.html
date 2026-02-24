@@ -1,0 +1,103 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(feature.shortname) }}</h2>
+		<span class="detail-code parent">{{ feature.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('id')">
+				<label>
+					Code
+					@if (isFieldModified('id')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">{{ feature.id }}</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('optional')">
+				<label>
+					Optional
+					@if (isFieldModified('optional')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">
+					@if (feature.optional) {
+						<span class="status-badge first">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
+				<label>
+					Short Name
+					@if (isFieldModified('shortname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(feature.shortname)">
+					@if (!languageService.getTranslatedValue(feature.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(feature.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('longname')">
+				<label>
+					Long Name
+					@if (isFieldModified('longname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(feature.longname)">
+					@if (!languageService.getTranslatedValue(feature.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(feature.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+				<label>
+					Description
+					@if (isFieldModified('description')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(feature.description)">
+					@if (!languageService.getTranslatedValue(feature.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(feature.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section danger-section">
+		<h3>Delete Feature</h3>
+		<p class="danger-text">Deleting this feature is permanent and cannot be undone.</p>
+		<button class="btn-delete" (click)="onDelete()">
+			<mat-icon>delete</mat-icon>
+			Delete
+		</button>
+	</div>
+</div>

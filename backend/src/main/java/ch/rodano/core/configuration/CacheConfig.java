@@ -49,7 +49,10 @@ public class CacheConfig {
 			"workflowAction",
 
 			"profiles",
-			"profile"
+			"profile",
+
+			"features",
+			"feature"
 		);
 	}
 }

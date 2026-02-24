@@ -7,6 +7,7 @@ import {DatasetModelContext} from './contexts/dataset-model-context';
 import {ValidatorContext} from './contexts/validator-context';
 import {WorkflowContext} from './contexts/workflow-context';
 import {ProfileContext} from './contexts/profile-context';
+import {FeatureContext} from './contexts/feature-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -132,6 +133,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveFeatures(projectId: string, context: FeatureContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveFeatures(
+				projectId,
+				context.modifiedFeatureIds,
+				context.features,
+				context.originalFeatures
+			)
+		]).pipe(
+			map(() => {
+				context.featureManager.syncOriginalsWithCurrent();
+
+				context.featureManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -170,5 +188,11 @@ export class EntitySaveOrchestratorService {
 		context.profileManager.resetToOriginals();
 
 		context.profileManager.invalidate();
+	}
+
+	resetFeaturesToOriginals(context: FeatureContext): void {
+		context.featureManager.resetToOriginals();
+
+		context.featureManager.invalidate();
 	}
 }

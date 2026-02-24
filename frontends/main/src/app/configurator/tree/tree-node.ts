@@ -5,6 +5,6 @@ export interface TreeNode {
 	children?: TreeNode[];
 	expanded?: boolean;
 	selected?: boolean;
-	type: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'field-model' | 'validator' | 'workflow' | 'workflow-state' | 'workflow-action' | 'profile';
+	type: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'field-model' | 'validator' | 'workflow' | 'workflow-state' | 'workflow-action' | 'profile' | 'feature';
 	entityId: string;
 }

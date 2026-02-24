@@ -27,6 +27,7 @@ public class ProfileServiceImpl implements ProfileService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ProfileDTO getProfile(final UUID projectId, final UUID profileId) {
 		final var profile = profileDAOService.getProfile(projectId, profileId);
 		if(profile == null) {

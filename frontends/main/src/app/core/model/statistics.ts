@@ -10,8 +10,8 @@
 
 
 export interface Statistics { 
-    mean?: number;
     sd?: number;
+    mean?: number;
     count?: number;
     min?: number;
     max?: number;

@@ -62,12 +62,13 @@
 		(categoryClicked)="onProfilesClicked()">
 	</app-profile-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('features')">
-			<mat-icon class="node-icon">star</mat-icon>
-			<span class="node-label">Features</span>
-		</div>
-	</div>
+	<app-feature-tree
+		[projectId]="projectId"
+		[features]="features"
+		[expanded]="expandedCategory === 'features'"
+		[selectedFeatureId]="selectedFeatureId"
+		(categoryClicked)="onFeaturesClicked()">
+	</app-feature-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('languages')">

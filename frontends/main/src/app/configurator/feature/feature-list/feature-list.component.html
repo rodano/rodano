@@ -1,0 +1,87 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Features</h1>
+			<p class="detail-subtitle">Configure features for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			[icon]="'hourglass_empty'"
+			[message]="'Loading features...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card small-card create-card" (click)="onCreateFeature()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Feature</h3>
+					</div>
+				</div>
+
+				@for (feature of features; track feature.featureId) {
+					<div class="primary-card small-card"
+										[class.selected]="isSelected(feature)"
+										[class.modified]="modifiedFeatureIds.has(feature.featureId)"
+										[style.border-top-color]="modifiedFeatureIds.has(feature.featureId) ? '#f59e0b' : ''"
+										(click)="onSelectFeature(feature)">
+
+						@if (isSelected(feature)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(feature.shortname) }}</h3>
+								<p class="card-code">{{ feature.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (feature.optional) {
+									<span class="status-badge first" matTooltip="Optional">
+										<mat-icon class="badge-full">indeterminate_check_box</mat-icon>
+										<mat-icon class="badge-short">indeterminate_check_box</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						@if (modifiedFeatureIds.has(feature.featureId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (features.length === 0) {
+				<app-empty-state
+					[icon]="'stars'"
+					[title]="'No Features'"
+					[message]="'Create your first feature to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedFeature && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-feature-detail
+					[feature]="selectedFeature"
+					[projectId]="projectId"
+					[project]="project"
+					[allFeatures]="features"
+					(featureUpdated)="onFeatureUpdated($event)"
+					(featureDeleted)="onFeatureDeleted($event)"
+					(closed)="onSelectFeature(selectedFeature)">
+				</app-feature-detail>
+			</div>
+		}
+	}
+</div>
