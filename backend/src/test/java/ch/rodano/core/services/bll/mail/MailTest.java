@@ -5,17 +5,16 @@ import java.util.Collections;
 import jakarta.mail.MessagingException;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.icegreen.greenmail.configuration.GreenMailConfiguration;
-import com.icegreen.greenmail.junit5.GreenMailExtension;
-import com.icegreen.greenmail.util.ServerSetupTest;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
 
 import ch.rodano.core.model.mail.Mail;
 import ch.rodano.core.model.mail.MailOrigin;
@@ -30,13 +29,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 public class MailTest extends StatelessDatabaseTest {
 
-	@RegisterExtension
-	static GreenMailExtension greenMail = new GreenMailExtension(ServerSetupTest.SMTP)
-		.withConfiguration(GreenMailConfiguration.aConfig())
-		.withPerMethodLifecycle(true);
+	@Autowired
+	private GreenMail greenMail;
 
 	@Autowired
 	private JavaMailSender sender;
+
+	@BeforeEach
+	public void resetGreenMail() throws FolderException {
+		greenMail.purgeEmailFromAllMailboxes();
+	}
 
 	@Autowired
 	private MailSenderTask mailSenderTask;
@@ -50,7 +52,7 @@ public class MailTest extends StatelessDatabaseTest {
 		final var mimeMail = mailService.createMimeMessage(createTestMail());
 		sender.send(mimeMail);
 
-		Assertions.assertTrue(greenMail.waitForIncomingEmail(10000, 1));
+		Assertions.assertTrue(greenMail.waitForIncomingEmail(1));
 
 		final var receivedMessage = greenMail.getReceivedMessages()[0];
 		assertEquals(1, receivedMessage.getAllRecipients().length);
