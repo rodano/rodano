@@ -41,7 +41,8 @@ export class ValidatorTreeComponent implements OnChanges {
 			icon: 'verified',
 			type: 'validator',
 			selected: this.selectedValidatorId === v.validatorId,
-			entityId: v.validatorId
+			entityId: v.validatorId,
+			themeClass: 'theme-validator'
 		}));
 	}
 }

@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(draftWorkflowState?.shortname) }}</h2>
-		<span class="detail-code first-child">{{ draftWorkflowState?.id }}</span>
+		<span class="detail-code theme-workflow-state">{{ draftWorkflowState?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -145,7 +145,7 @@
 								<mat-icon class="warning-icon">report</mat-icon>
 								<span>Not configured</span>
 							} @else {
-								<div class="chip">
+								<div class="chip theme-workflow-state">
 									<mat-icon class="resource-icon">adjust</mat-icon>
 									<span class="language-name">{{ getWorkflowStateLabel(draftWorkflowState.aggregateStateId) }}</span>
 								</div>
@@ -190,7 +190,7 @@
 						@if (draftWorkflowState.possibleActions.length > 0) {
 							<div class="chip-container">
 								@for (action of draftWorkflowState.possibleActions; track action.workflowActionId) {
-									<div class="chip">
+									<div class="chip theme-workflow-action">
 										<mat-icon class="resource-icon">play_circle</mat-icon>
 										<span class="tag">{{ languageService.getLabel(action) }}</span>
 									</div>
@@ -211,13 +211,11 @@
 			</button>
 		</div>
 
-		<div class="settings-section danger-section">
-			<h3>Delete Workflow State</h3>
-			<p class="danger-text">Deleting this workflow state is permanent and cannot be undone.</p>
-			<button class="btn-delete" (click)="onDelete()">
-				<mat-icon>delete</mat-icon>
-				Delete
-			</button>
-		</div>
+		<app-danger-zone
+			[title]="'Delete Workflow State'"
+			[message]="'Deleting this workflow state is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
 	</div>
 }

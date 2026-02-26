@@ -44,7 +44,8 @@ export class DatasetModelsTreeComponent implements OnChanges {
 				icon: 'table_chart',
 				type: 'dataset-model',
 				selected: this.selectedDatasetModelId === dm.datasetModelId,
-				entityId: dm.datasetModelId
+				entityId: dm.datasetModelId,
+				themeClass: 'theme-dataset-model'
 			};
 
 			if(this.selectedDatasetModelId === dm.datasetModelId && this.fieldModels.length > 0) {
@@ -56,7 +57,8 @@ export class DatasetModelsTreeComponent implements OnChanges {
 						icon: 'text_ad',
 						type: 'field-model',
 						selected: this.selectedFieldModelId === fm.fieldModelId,
-						entityId: fm.fieldModelId
+						entityId: fm.fieldModelId,
+						themeClass: 'theme-field-model'
 					}));
 
 				if(fieldNodes.length > 0) {

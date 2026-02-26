@@ -14,13 +14,14 @@ import {ValidatorManagerService} from '../../services/manager/validator-manager.
 import {ValidatorDialogService} from '../../services/dialogs/validator-dialog.service';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
+import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-validator-detail',
 	standalone: true,
 	templateUrl: './validator-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
 export class ValidatorDetailComponent implements OnInit, OnDestroy {
 	@Input() validator!: Validator;

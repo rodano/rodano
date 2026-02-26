@@ -12,13 +12,14 @@
 					[class.level-3]="viewLevel === 3">
 	@if (loading) {
 		<app-empty-state
+			style="width: 100%"
 			[icon]="'hourglass_empty'"
 			[message]="'Loading scope models...'"
 		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
-				<div class="primary-card create-card" (click)="onCreateScopeModel()">
+				<div class="primary-card create-card theme-scope-model" (click)="onCreateScopeModel()">
 					<div class="create-content">
 						<mat-icon>add_circle_outline</mat-icon>
 						<h3>Create Scope Model</h3>
@@ -27,11 +28,9 @@
 				</div>
 
 				@for (scopeModel of scopeModels; track scopeModel.scopeModelId) {
-					<div class="primary-card"
+					<div class="primary-card theme-scope-model"
 										[class.selected]="isSelected(scopeModel)"
 										[class.modified]="modifiedScopeModelIds.has(scopeModel.scopeModelId)"
-										[class.virtual-card]="scopeModel.virtual"
-										[style.border-top-color]="modifiedScopeModelIds.has(scopeModel.scopeModelId) ? '#f59e0b' : (scopeModel.virtual ? '#3b82f6' : '')"
 										(click)="onSelectScopeModel(scopeModel)">
 
 						@if (isSelected(scopeModel)) {
@@ -145,7 +144,7 @@
 					}
 
 					<div class="secondary-cards-grid">
-						<div class="secondary-card first-child-card create-card" (click)="onCreateEventModel()">
+						<div class="secondary-card first-child-card create-card theme-event-model" (click)="onCreateEventModel()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Event Model</h3>
@@ -154,7 +153,7 @@
 						</div>
 
 						@for (eventModel of eventModels; track eventModel.eventModelId) {
-							<div class="secondary-card first-child-card"
+							<div class="secondary-card first-child-card theme-event-model"
 												[class.selected]="selectedEventModelId === eventModel.eventModelId"
 												[class.modified]="isEventModelModified(eventModel.eventModelId)"
 												(click)="onSelectEventModel(eventModel.eventModelId)">
@@ -241,7 +240,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card second-child-card small-card create-card" (click)="onCreateEventGroup()">
+						<div class="secondary-card second-child-card small-card create-card theme-event-group" (click)="onCreateEventGroup()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Event Group</h3>
@@ -250,7 +249,7 @@
 						</div>
 
 						@for (eventGroup of eventGroups; track eventGroup.eventGroupId) {
-							<div class="secondary-card second-child-card small-card"
+							<div class="secondary-card second-child-card small-card theme-event-group"
 												[class.selected]="selectedEventGroupId === eventGroup.eventGroupId"
 												[class.modified]="isEventGroupModified(eventGroup.eventGroupId)"
 												(click)="onSelectEventGroup(eventGroup.eventGroupId)">

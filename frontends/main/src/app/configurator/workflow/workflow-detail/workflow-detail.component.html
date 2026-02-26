@@ -1,16 +1,16 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(workflow.shortname) }}</h2>
-		<span class="detail-code parent">{{ workflow.id }}</span>
+		<span class="detail-code theme-workflow">{{ workflow.id }}</span>
 	</div>
 	<div class="header-actions">
-		<button class="btn-view first-child" (click)="onSwitchToWorkflowStates()"
+		<button class="btn-view theme-workflow-state" (click)="onSwitchToWorkflowStates()"
 										matTooltip="View Workflow States">
 			<mat-icon>adjust</mat-icon>
 			<span>Workflow States</span>
 		</button>
 
-		<button class="btn-view second-child" (click)="onSwitchToWorkflowActions()"
+		<button class="btn-view theme-workflow-action" (click)="onSwitchToWorkflowActions()"
 										matTooltip="View Workflow Actions">
 			<mat-icon>play_circle</mat-icon>
 			<span>Workflow Actions</span>
@@ -118,7 +118,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-workflow">
 							<mat-icon class="resource-icon">settings</mat-icon>
 							<span class="language-name">{{ getWorkflowLabel(workflow.aggregatedWorkflowId) }}</span>
 						</div>
@@ -155,7 +155,7 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip">
+							<div class="chip theme-workflow-state">
 								<mat-icon class="resource-icon">adjust</mat-icon>
 								<span class="language-name">{{ getWorkflowStateLabel(workflow.initialStateId) }}</span>
 							</div>
@@ -193,7 +193,7 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip">
+							<div class="chip theme-workflow-action">
 								<mat-icon class="resource-icon">play_circle</mat-icon>
 								<span class="language-name">{{ getWorkflowActionLabel(workflow.actionId) }}</span>
 							</div>
@@ -252,12 +252,10 @@
 		</button>
 	</div>
 
-	<div class="settings-section danger-section">
-		<h3>Delete Workflow</h3>
-		<p class="danger-text">Deleting this workflow is permanent and cannot be undone.</p>
-		<button class="btn-delete" (click)="onDelete()">
-			<mat-icon>delete</mat-icon>
-			Delete
-		</button>
-	</div>
+	<app-danger-zone
+		[title]="'Delete Workflow'"
+		[message]="'Deleting this workflow is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
 </div>

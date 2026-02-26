@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedValue(draftFieldModel?.shortname) }}</h2>
-		<span class="detail-code first-child">{{ draftFieldModel?.id }}</span>
+		<span class="detail-code theme-field-model">{{ draftFieldModel?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -627,7 +627,7 @@
 						@if (draftFieldModel.validatorIds && draftFieldModel.validatorIds.length > 0) {
 							<div class="chip-container">
 								@for (validatorId of draftFieldModel.validatorIds; track validatorId) {
-									<div class="chip">
+									<div class="chip theme-validator">
 										<mat-icon class="resource-icon">rule</mat-icon>
 										<span class="language-name">{{ getValidatorLabel(validatorId) }}</span>
 									</div>
@@ -653,7 +653,7 @@
 						@if (draftFieldModel.workflowIds && draftFieldModel.workflowIds.length > 0) {
 							<div class="chip-container">
 								@for (workflowId of draftFieldModel.workflowIds; track workflowId) {
-									<div class="chip">
+									<div class="chip theme-workflow">
 										<mat-icon class="resource-icon">settings</mat-icon>
 										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 									</div>
@@ -674,13 +674,11 @@
 			</button>
 		</div>
 
-		<div class="settings-section danger-section">
-			<h3>Delete Field Model</h3>
-			<p class="danger-text">Deleting this field model is permanent and cannot be undone.</p>
-			<button class="btn-delete" (click)="onDelete()">
-				<mat-icon>delete</mat-icon>
-				Delete
-			</button>
-		</div>
+		<app-danger-zone
+			[title]="'Delete Field Model'"
+			[message]="'Deleting this field model is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
 	</div>
 }

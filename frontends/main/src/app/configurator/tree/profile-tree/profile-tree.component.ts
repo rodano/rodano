@@ -41,7 +41,8 @@ export class ProfileTreeComponent implements OnChanges {
 			icon: 'account_circle',
 			type: 'profile',
 			selected: this.selectedProfileId === p.profileId,
-			entityId: p.profileId
+			entityId: p.profileId,
+			themeClass: 'theme-profile'
 		}));
 	}
 }

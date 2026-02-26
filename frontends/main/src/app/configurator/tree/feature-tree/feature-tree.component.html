@@ -1,7 +1,6 @@
 <div class="tree-node">
 	<div
-		class="node-content clickable"
-		[class.selected]="expanded"
+		[ngClass]="['node-content', 'clickable', 'theme-feature', expanded ? 'selected' : '']"
 		(click)="onCategoryClick()">
 		<mat-icon class="node-icon">stars</mat-icon>
 		<span class="node-label">Features</span>
@@ -17,9 +16,7 @@
 </div>
 
 <ng-template #nodeTemplate let-node>
-	<div
-		class="node"
-		[class.selected]="node.selected">
+	<div [ngClass]="['node', node.themeClass, node.selected ? 'selected': '']">
 		<mat-icon class="node-icon">{{ node.icon }}</mat-icon>
 		<span class="node-label">{{ node.label }}</span>
 	</div>

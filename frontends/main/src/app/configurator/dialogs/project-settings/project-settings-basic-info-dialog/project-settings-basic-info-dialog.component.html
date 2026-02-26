@@ -7,15 +7,15 @@
 				<label>Project Code *</label>
 				<input
 					type="text"
-					formControlName="code"
+					formControlName="id"
 					placeholder="MY_PROJECT"
 					(input)="onCodeInput($event, form)"
 					style="text-transform: uppercase;">
 				<span class="hint">Uppercase letters, numbers, and underscores only (e.g., TEST, STUDY_2024)</span>
-				@if (form.get('code')?.hasError('required') && form.get('code')?.touched) {
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
 					<span class="error-message">Project code is required</span>
 				}
-				@if (form.get('code')?.hasError('pattern') && form.get('code')?.touched) {
+				@if (form.get('id')?.hasError('pattern') && form.get('id')?.touched) {
 					<span class="error-message">Only uppercase letters, numbers, and underscores allowed</span>
 				}
 			</div>

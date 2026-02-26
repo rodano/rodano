@@ -13,6 +13,7 @@ import {Workflow} from '@core/model/workflow';
 import {WorkflowStateDialogService} from '../../../services/dialogs/workflow-state-dialog.service';
 import {WorkflowStateManagerService} from '../../../services/manager/workflow-state-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
+import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-workflow-state-detail',
@@ -23,7 +24,9 @@ import {ProjectLanguage} from '@core/model/project-language';
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule]
+		MatTooltipModule,
+		DangerZoneComponent
+	]
 })
 export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

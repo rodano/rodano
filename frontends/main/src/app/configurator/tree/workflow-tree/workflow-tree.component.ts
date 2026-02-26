@@ -46,11 +46,12 @@ export class WorkflowTreeComponent implements OnChanges {
 				icon: 'work',
 				type: 'workflow',
 				selected: this.selectedWorkflowId === wf.workflowId,
-				entityId: wf.workflowId
+				entityId: wf.workflowId,
+				themeClass: 'theme-workflow'
 			};
 
-			if(this.selectedWorkflowId === wf.workflowId && this.workflowStates.length > 0) {
-				const fieldNodes: TreeNode[] = this.workflowStates
+			if(this.selectedWorkflowId === wf.workflowId) {
+				const stateNodes: TreeNode[] = this.workflowStates
 					.filter(wfs => wfs.workflowId === wf.workflowId)
 					.map(wfs => ({
 						id: `workflow-state-${wfs.workflowStateId}`,
@@ -58,17 +59,11 @@ export class WorkflowTreeComponent implements OnChanges {
 						icon: 'text_ad',
 						type: 'workflow-state',
 						selected: this.selectedWorkflowStateId === wfs.workflowStateId,
-						entityId: wfs.workflowStateId
+						entityId: wfs.workflowStateId,
+						themeClass: 'theme-workflow-state'
 					}));
 
-				if(fieldNodes.length > 0) {
-					node.children = fieldNodes;
-					node.expanded = true;
-				}
-			}
-
-			if(this.selectedWorkflowId === wf.workflowId && this.workflowActions.length > 0) {
-				const fieldNodes: TreeNode[] = this.workflowActions
+				const actionNodes: TreeNode[] = this.workflowActions
 					.filter(wfa => wfa.workflowId === wf.workflowId)
 					.map(wfa => ({
 						id: `workflow-action-${wfa.workflowActionId}`,
@@ -76,11 +71,13 @@ export class WorkflowTreeComponent implements OnChanges {
 						icon: 'text_ad',
 						type: 'workflow-action',
 						selected: this.selectedWorkflowActionId === wfa.workflowActionId,
-						entityId: wfa.workflowActionId
+						entityId: wfa.workflowActionId,
+						themeClass: 'theme-workflow-action'
 					}));
 
-				if(fieldNodes.length > 0) {
-					node.children = fieldNodes;
+				const children = [...stateNodes, ...actionNodes];
+				if(children.length > 0) {
+					node.children = children;
 					node.expanded = true;
 				}
 			}

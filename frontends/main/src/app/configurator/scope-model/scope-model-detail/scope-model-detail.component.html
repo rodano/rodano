@@ -1,16 +1,16 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(scopeModel.shortname) }}</h2>
-		<span class="detail-code parent">{{ scopeModel.id }}</span>
+		<span class="detail-code theme-scope-model">{{ scopeModel.id }}</span>
 	</div>
 	<div class="header-actions">
-		<button class="btn-view first-child" (click)="onSwitchToEventModels()"
+		<button class="btn-view theme-event-model" (click)="onSwitchToEventModels()"
 										matTooltip="View Event Models">
 			<mat-icon>event</mat-icon>
 			<span>Event Models</span>
 		</button>
 
-		<button class="btn-view second-child" (click)="onSwitchToEventGroups()"
+		<button class="btn-view theme-event-group" (click)="onSwitchToEventGroups()"
 										matTooltip="View Event Groups">
 			<mat-icon>group</mat-icon>
 			<span>Event Groups</span>
@@ -158,13 +158,13 @@
 				<label>Type</label>
 				<div class="setting-value">
 					@if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length === 0) {
-						Standalone
+						<span class="status-badge standalone">Standalone</span>
 					} @else if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length > 0) {
-						Root Level
+						<span class="status-badge root">Root Level</span>
 					} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length === 0) {
-						Leaf Level
+						<span class="status-badge leaf">Leaf Level</span>
 					} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length > 0) {
-						Intermediate Level
+						<span class="status-badge intermediate">Intermediate Level</span>
 					}
 				</div>
 			</div>
@@ -181,7 +181,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-scope-model">
 							<mat-icon class="resource-icon">account_tree</mat-icon>
 							<span class="language-name">{{ getScopeModelLabel(scopeModel.defaultParentId) }}</span>
 						</div>
@@ -200,9 +200,7 @@
 					@if (scopeModel.parentIds.length > 0) {
 						<div class="chip-container">
 							@for (parentId of scopeModel.parentIds; track parentId) {
-								<div class="chip"
-													[class.third]="parentId === scopeModel.defaultParentId"
-													[class.first]="parentId !== scopeModel.defaultParentId">
+								<div class="chip theme-scope-model">
 									@if (parentId === scopeModel.defaultParentId) {
 										<mat-icon class="resource-icon">star</mat-icon>
 									} @else {
@@ -227,7 +225,7 @@
 					@if (scopeModel.childScopeModelIds.length > 0) {
 						<div class="chip-container">
 							@for (childId of scopeModel.childScopeModelIds; track childId) {
-								<div class="chip second">
+								<div class="chip theme-scope-model">
 									<mat-icon class="resource-icon">arrow_downward</mat-icon>
 									<span class="language-name">{{ getScopeModelLabel(childId) }}</span>
 								</div>
@@ -263,7 +261,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-profile">
 							<mat-icon class="resource-icon">badge</mat-icon>
 							<span class="language-name">{{ getProfileLabel(scopeModel.defaultProfileId) }}</span>
 						</div>
@@ -321,7 +319,7 @@
 					@if (scopeModel.formModelIds.length > 0) {
 						<div class="chip-container">
 							@for (formId of scopeModel.formModelIds; track formId) {
-								<div class="chip">
+								<div class="chip theme-form-model">
 									<mat-icon class="resource-icon">description</mat-icon>
 									<span class="language-name">{{ formId }}</span>
 								</div>
@@ -347,7 +345,7 @@
 					@if (scopeModel.datasetModelIds.length > 0) {
 						<div class="chip-container">
 							@for (datasetId of scopeModel.datasetModelIds; track datasetId) {
-								<div class="chip">
+								<div class="chip theme-dataset-model">
 									<mat-icon class="resource-icon">dataset</mat-icon>
 									<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
 								</div>
@@ -373,7 +371,7 @@
 					@if (scopeModel.workflowIds.length > 0) {
 						<div class="chip-container">
 							@for (workflowId of scopeModel.workflowIds; track workflowId) {
-								<div class="chip">
+								<div class="chip theme-workflow">
 									<mat-icon class="resource-icon">settings</mat-icon>
 									<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 								</div>
@@ -390,7 +388,7 @@
 
 			<div class="setting-item full-width" [class.modified]="workflowStateIdsModified">
 				<label>
-					Workflow State Selectors ({{ getWorkflowStateSelections().length }})
+					Workflow State Selectors
 					@if (workflowStateIdsModified) {
 						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 					}
@@ -399,15 +397,15 @@
 					@if (getWorkflowStateSelections().length > 0) {
 						<div class="workflow-state-selections">
 							@for (workflowGroup of getWorkflowStateSelections(); track workflowGroup.workflowId) {
-								<div class="workflow-state-group">
-									<div class="workflow-header">
+								<div class="workflow-state-group theme-workflow">
+									<div class="workflow-header theme-workflow">
 										<mat-icon class="resource-icon">settings</mat-icon>
 										<span class="workflow-name">{{ workflowGroup.workflowName }}</span>
 									</div>
-									<div class="chip-container states-chips">
+									<div class="chip-container">
 										@for (state of workflowGroup.states; track state.id) {
-											<div class="chip state-chip">
-												<mat-icon class="state-icon">adjust</mat-icon>
+											<div class="chip theme-workflow-state">
+												<mat-icon class="resource-icon">adjust</mat-icon>
 												<span class="language-name">{{ state.name }}</span>
 											</div>
 										}
@@ -431,16 +429,10 @@
 		</button>
 	</div>
 
-	<div class="settings-section danger-section">
-		<h3>Delete Scope Model</h3>
-		<p class="danger-text">Deleting this scope model is permanent and cannot be undone.
-			@if (scopeModel.childScopeModelIds.length > 0) {
-				All child scope models will be promoted one level up.
-			}
-		</p>
-		<button class="btn-delete" (click)="onDelete()">
-			<mat-icon>delete</mat-icon>
-			Delete
-		</button>
-	</div>
+	<app-danger-zone
+		[title]="'Delete Scope Model'"
+		[message]="'Deleting this scope model is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
 </div>

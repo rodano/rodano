@@ -1,51 +1,5 @@
 @import '../../shared/list-shared.css';
 
-/* ==================== Scope Model Specific Styles ==================== */
-
-/* Virtual scope model styling */
-.primary-card.virtual-card {
-	border-top-color: #3b82f6;
-}
-
-.primary-card.virtual-card.selected {
-	border-top-color: #3b82f6;
-	box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-	background-color: #dbeafe;
-}
-
-.primary-card.virtual-card.selected::after {
-	border-color: transparent #3b82f6 transparent transparent;
-}
-
-.primary-card.modified.virtual-card.selected {
-	border-top-color: #f59e0b;
-}
-
-.primary-card.modified.virtual-card.selected::after {
-	border-color: transparent #f59e0b transparent transparent;
-}
-
-/* ==================== Card Status Badges ==================== */
-.status-badge.standalone {
-	background-color: #e5e7eb;
-	color: #374151;
-}
-
-.status-badge.intermediate {
-	background-color: #fef3c7;
-	color: #92400e;
-}
-
-.status-badge.root {
-	background-color: #dcfce7;
-	color: #15803d;
-}
-
-.status-badge.leaf {
-	background-color: #fee2e2;
-	color: #991b1b;
-}
-
 /* ==================== Event Model Timeline ==================== */
 .content-container.level-3 .timeline-wrapper {
 	display: none;

@@ -41,7 +41,8 @@ export class FeatureTreeComponent implements OnChanges {
 			icon: 'tune',
 			type: 'feature',
 			selected: this.selectedFeatureId === f.featureId,
-			entityId: f.featureId
+			entityId: f.featureId,
+			themeClass: 'theme-feature'
 		}));
 	}
 }

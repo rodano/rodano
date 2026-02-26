@@ -1,10 +1,10 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(datasetModel.shortname) }}</h2>
-		<span class="detail-code parent">{{ datasetModel.id }}</span>
+		<span class="detail-code theme-dataset-model">{{ datasetModel.id }}</span>
 	</div>
 	<div class="header-actions">
-		<button class="btn-view first-child" (click)="onSwitchToFieldModels()"
+		<button class="btn-view theme-field-model" (click)="onSwitchToFieldModels()"
 										matTooltip="View Field Models">
 			<mat-icon>text_ad</mat-icon>
 			<span>Field Models</span>
@@ -230,12 +230,10 @@
 		</button>
 	</div>
 
-	<div class="settings-section danger-section">
-		<h3>Delete Dataset Model</h3>
-		<p class="danger-text">Deleting this dataset model is permanent and cannot be undone.</p>
-		<button class="btn-delete" (click)="onDelete()">
-			<mat-icon>delete</mat-icon>
-			Delete
-		</button>
-	</div>
+	<app-danger-zone
+		[title]="'Delete Dataset Model'"
+		[message]="'Deleting this dataset model is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
 </div>

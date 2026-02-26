@@ -13,7 +13,7 @@
 	border-radius: 0.5rem;
 	padding: 1rem;
 	border: 1px solid #e5e7eb;
-	border-left: 3px solid #5bd4d4;
+	border-left: 3px solid var(--entity-color);
 }
 
 .workflow-header {
@@ -26,31 +26,6 @@
 }
 
 .workflow-header .resource-icon {
-	color: #5bd4d4;
+	color: var(--entity-color);
 	font-size: 1.25rem;
-}
-
-.workflow-name {
-	font-size: 0.875rem;
-}
-
-.states-chips {
-	margin-left: 1.75rem;
-}
-
-.state-chip {
-	background-color: #eff6ff;
-	border: 1px solid #bfdbfe;
-}
-
-.state-chip .state-icon {
-	color: #3b82f6;
-	font-size: 1rem;
-	width: 1rem;
-	height: 1rem;
-}
-
-.status-badge.inceptive {
-	background-color: #dbeafe;
-	color: #1e40af;
 }

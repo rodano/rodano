@@ -15,6 +15,7 @@ import {WorkflowDialogService} from '../../services/dialogs/workflow-dialog.serv
 import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {WorkflowActionManagerService} from '../../services/manager/workflow-action-manager.service';
+import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-workflow-detail',
@@ -25,7 +26,8 @@ import {WorkflowActionManagerService} from '../../services/manager/workflow-acti
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule
+		MatTooltipModule,
+		DangerZoneComponent
 	]
 })
 export class WorkflowDetailComponent implements OnInit, OnDestroy {

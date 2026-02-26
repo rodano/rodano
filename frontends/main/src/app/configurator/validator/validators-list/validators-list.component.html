@@ -11,13 +11,14 @@
 					[class.level-2]="viewLevel === 2">
 	@if (loading) {
 		<app-empty-state
+			style="width: 100%"
 			[icon]="'hourglass_empty'"
 			[message]="'Loading validators...'"
 		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
-				<div class="primary-card create-card" (click)="onCreateValidator()">
+				<div class="primary-card create-card theme-validator" (click)="onCreateValidator()">
 					<div class="create-content">
 						<mat-icon>add_circle_outline</mat-icon>
 						<h3>Create Validator</h3>
@@ -26,7 +27,7 @@
 				</div>
 
 				@for (validator of validators; track validator.validatorId) {
-					<div class="primary-card"
+					<div class="primary-card theme-validator"
 										[class.selected]="isSelected(validator)"
 										[class.modified]="modifiedValidatorIds.has(validator.validatorId)"
 										[style.border-top-color]="modifiedValidatorIds.has(validator.validatorId) ? '#f59e0b' : ''"

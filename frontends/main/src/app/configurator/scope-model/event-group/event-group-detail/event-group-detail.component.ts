@@ -11,6 +11,7 @@ import {LanguageService} from '../../../services/language.service';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {EventGroupDialogService} from '../../../services/dialogs/event-group-dialog.service';
+import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-event-group-detail',
@@ -19,7 +20,8 @@ import {EventGroupDialogService} from '../../../services/dialogs/event-group-dia
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule
+		MatTooltipModule,
+		DangerZoneComponent
 	],
 	templateUrl: './event-group-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css']

@@ -17,6 +17,7 @@ import {EventModelManagerService} from '../../../services/manager/event-model-ma
 import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../../services/manager/workflow-manager.service';
 import {EventGroupManagerService} from '../../../services/manager/event-group-manager.service';
+import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-event-model-detail',
@@ -27,7 +28,9 @@ import {EventGroupManagerService} from '../../../services/manager/event-group-ma
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule]
+		MatTooltipModule,
+		DangerZoneComponent
+	]
 })
 export class EventModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

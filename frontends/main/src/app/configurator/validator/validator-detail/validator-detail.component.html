@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(validator.shortname) }}</h2>
-		<span class="detail-code parent">{{ validator.id }}</span>
+		<span class="detail-code theme-validator">{{ validator.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -137,7 +137,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-workflow">
 							<mat-icon class="resource-icon">settings</mat-icon>
 							<span class="language-name">{{ getWorkflowLabel(validator.workflowId) }}</span>
 						</div>
@@ -157,7 +157,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-workflow-state">
 							<mat-icon class="resource-icon">cancel</mat-icon>
 							<span class="language-name">{{ getWorkflowStateLabel(validator.invalidStateId) }}</span>
 						</div>
@@ -177,7 +177,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-workflow-state">
 							<mat-icon class="resource-icon">check_circle</mat-icon>
 							<span class="language-name">{{ getWorkflowStateLabel(validator.validStateId) }}</span>
 						</div>
@@ -191,12 +191,10 @@
 		</button>
 	</div>
 
-	<div class="settings-section danger-section">
-		<h3>Delete Validator</h3>
-		<p class="danger-text">Deleting this validator is permanent and cannot be undone.</p>
-		<button class="btn-delete" (click)="onDelete()">
-			<mat-icon>delete</mat-icon>
-			Delete
-		</button>
-	</div>
+	<app-danger-zone
+		[title]="'Delete Validator'"
+		[message]="'Deleting this validator is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
 </div>

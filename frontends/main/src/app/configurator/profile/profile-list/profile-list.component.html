@@ -11,13 +11,14 @@
 					[class.level-2]="viewLevel === 2">
 	@if (loading) {
 		<app-empty-state
+			style="width: 100%"
 			[icon]="'hourglass_empty'"
 			[message]="'Loading profiles...'"
 		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
-				<div class="primary-card create-card" (click)="onCreateProfile()">
+				<div class="primary-card create-card theme-profile" (click)="onCreateProfile()">
 					<div class="create-content">
 						<mat-icon>add_circle_outline</mat-icon>
 						<h3>Create Profile</h3>
@@ -26,7 +27,7 @@
 				</div>
 
 				@for (profile of profiles; track profile.profileId) {
-					<div class="primary-card"
+					<div class="primary-card theme-profile"
 										[class.selected]="isSelected(profile)"
 										[class.modified]="modifiedProfileIds.has(profile.profileId)"
 										[style.border-top-color]="modifiedProfileIds.has(profile.profileId) ? '#f59e0b' : ''"

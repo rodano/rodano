@@ -13,13 +13,14 @@ import {ProjectLanguage} from '@core/model/project-language';
 import {Feature} from '@core/model/feature';
 import {FeatureManagerService} from '../../services/manager/feature-manager.service';
 import {FeatureDialogService} from '../../services/dialogs/feature-dialog.service';
+import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-feature-detail',
 	standalone: true,
 	templateUrl: './feature-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
 export class FeatureDetailComponent implements OnInit, OnDestroy {
 	@Input() feature!: Feature;

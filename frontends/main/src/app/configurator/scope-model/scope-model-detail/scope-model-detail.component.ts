@@ -20,6 +20,7 @@ import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -36,7 +37,8 @@ interface WorkflowStateGroup {
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule
+		MatTooltipModule,
+		DangerZoneComponent
 	]
 })
 export class ScopeModelDetailComponent implements OnInit, OnDestroy {

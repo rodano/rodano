@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(feature.shortname) }}</h2>
-		<span class="detail-code parent">{{ feature.id }}</span>
+		<span class="detail-code theme-feature">{{ feature.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -92,12 +92,10 @@
 		</button>
 	</div>
 
-	<div class="settings-section danger-section">
-		<h3>Delete Feature</h3>
-		<p class="danger-text">Deleting this feature is permanent and cannot be undone.</p>
-		<button class="btn-delete" (click)="onDelete()">
-			<mat-icon>delete</mat-icon>
-			Delete
-		</button>
-	</div>
+	<app-danger-zone
+		[title]="'Delete Feature'"
+		[message]="'Deleting this feature is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
 </div>

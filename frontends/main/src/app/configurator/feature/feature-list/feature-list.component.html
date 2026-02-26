@@ -11,13 +11,14 @@
 					[class.level-2]="viewLevel === 2">
 	@if (loading) {
 		<app-empty-state
+			style="width: 100%"
 			[icon]="'hourglass_empty'"
 			[message]="'Loading features...'"
 		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
-				<div class="primary-card small-card create-card" (click)="onCreateFeature()">
+				<div class="primary-card small-card create-card theme-feature" (click)="onCreateFeature()">
 					<div class="create-content">
 						<mat-icon>add_circle_outline</mat-icon>
 						<h3>Create Feature</h3>
@@ -25,7 +26,7 @@
 				</div>
 
 				@for (feature of features; track feature.featureId) {
-					<div class="primary-card small-card"
+					<div class="primary-card small-card theme-feature"
 										[class.selected]="isSelected(feature)"
 										[class.modified]="modifiedFeatureIds.has(feature.featureId)"
 										[style.border-top-color]="modifiedFeatureIds.has(feature.featureId) ? '#f59e0b' : ''"

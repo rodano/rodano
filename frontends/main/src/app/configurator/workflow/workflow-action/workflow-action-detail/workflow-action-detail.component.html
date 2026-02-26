@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(draftWorkflowAction?.shortname) }}</h2>
-		<span class="detail-code second-child">{{ draftWorkflowAction?.id }}</span>
+		<span class="detail-code theme-workflow-action">{{ draftWorkflowAction?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -190,13 +190,11 @@
 			</button>
 		</div>
 
-		<div class="settings-section danger-section">
-			<h3>Delete Workflow Action</h3>
-			<p class="danger-text">Deleting this workflow action is permanent and cannot be undone.</p>
-			<button class="btn-delete" (click)="onDelete()">
-				<mat-icon>delete</mat-icon>
-				Delete
-			</button>
-		</div>
+		<app-danger-zone
+			[title]="'Delete Workflow Action'"
+			[message]="'Deleting this workflow action is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
 	</div>
 }

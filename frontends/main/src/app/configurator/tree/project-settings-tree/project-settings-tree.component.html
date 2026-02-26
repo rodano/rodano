@@ -1,6 +1,6 @@
 <div class="tree-node">
 	<div
-		class="node-content clickable"
+		[ngClass]="['node-content', 'clickable', 'theme-main']"
 		[class.selected]="selected"
 		(click)="onCategoryClick()">
 		<mat-icon class="node-icon">menu_book</mat-icon>

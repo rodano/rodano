@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(draftEventModel?.shortname) }}</h2>
-		<span class="detail-code first-child">{{ draftEventModel?.id }}</span>
+		<span class="detail-code theme-event-model">{{ draftEventModel?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -54,7 +54,7 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip">
+							<div class="chip theme-event-group">
 								<mat-icon class="resource-icon">group</mat-icon>
 								<span class="language-name">{{ getEventGroupLabel(draftEventModel.eventGroupId) }}</span>
 							</div>
@@ -346,7 +346,7 @@
 						@if (draftEventModel.formModelIds && draftEventModel.formModelIds.length > 0) {
 							<div class="chip-container">
 								@for (formId of draftEventModel.formModelIds; track formId) {
-									<div class="chip">
+									<div class="chip theme-form-model">
 										<mat-icon class="resource-icon">description</mat-icon>
 										<span class="language-name">{{ formId }}</span>
 									</div>
@@ -372,7 +372,7 @@
 						@if (draftEventModel.datasetModelIds && draftEventModel.datasetModelIds.length > 0) {
 							<div class="chip-container">
 								@for (datasetId of draftEventModel.datasetModelIds; track datasetId) {
-									<div class="chip">
+									<div class="chip theme-dataset-model">
 										<mat-icon class="resource-icon">dataset</mat-icon>
 										<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
 									</div>
@@ -398,7 +398,7 @@
 						@if (draftEventModel.workflowIds && draftEventModel.workflowIds.length > 0) {
 							<div class="chip-container">
 								@for (workflowId of draftEventModel.workflowIds; track workflowId) {
-									<div class="chip">
+									<div class="chip theme-workflow">
 										<mat-icon class="resource-icon">settings</mat-icon>
 										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 									</div>
@@ -433,7 +433,7 @@
 						@if (draftEventModel.blockedEventModelIds && draftEventModel.blockedEventModelIds.length > 0) {
 							<div class="chip-container">
 								@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
-									<div class="chip fourth">
+									<div class="chip theme-event-model">
 										<mat-icon class="resource-icon">block</mat-icon>
 										<span class="language-name">{{ getEventModelLabel(blockedId) }}</span>
 									</div>
@@ -459,7 +459,7 @@
 						@if (draftEventModel.impliedEventModelIds && draftEventModel.impliedEventModelIds.length > 0) {
 							<div class="chip-container">
 								@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
-									<div class="chip fifth">
+									<div class="chip theme-event-model">
 										<mat-icon class="resource-icon">arrow_forward</mat-icon>
 										<span class="language-name">{{ getEventModelLabel(impliedId) }}</span>
 									</div>
@@ -480,13 +480,11 @@
 			</button>
 		</div>
 
-		<div class="settings-section danger-section">
-			<h3>Delete Event Model</h3>
-			<p class="danger-text">Deleting this event model is permanent and cannot be undone.</p>
-			<button class="btn-delete" (click)="onDelete()">
-				<mat-icon>delete</mat-icon>
-				Delete
-			</button>
-		</div>
+		<app-danger-zone
+			[title]="'Delete Event Model'"
+			[message]="'Deleting this event model is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
 	</div>
 }

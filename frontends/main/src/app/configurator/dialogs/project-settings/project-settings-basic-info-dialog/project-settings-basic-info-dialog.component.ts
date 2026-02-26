@@ -63,7 +63,7 @@ export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogCompo
 
 	initializeForm(): void {
 		this.form = this.fb.group({
-			code: [this.data.code, [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
+			id: [this.data.code, [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
 			url: [this.data.url, [Validators.pattern(/^https?:\/\/.+/)]],
 			color: [this.data.color || '#5bd4d4']
 		});
@@ -86,7 +86,7 @@ export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogCompo
 
 		const {shortname, longname, description} = this.collectTranslations();
 		this.dialogRef.close({
-			code: this.form.value.code,
+			code: this.form.getRawValue().id.toUpperCase(),
 			shortname,
 			longname,
 			description,

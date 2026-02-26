@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(draftEventGroup?.shortname) }}</h2>
-		<span class="detail-code second-child">{{ draftEventGroup?.id }}</span>
+		<span class="detail-code theme-event-group">{{ draftEventGroup?.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -111,13 +111,11 @@
 			</button>
 		</div>
 
-		<div class="settings-section danger-section">
-			<h3>Delete Event Group</h3>
-			<p class="danger-text">Deleting this event group is permanent and cannot be undone.</p>
-			<button class="btn-delete" (click)="onDelete()">
-				<mat-icon>delete</mat-icon>
-				Delete
-			</button>
-		</div>
+		<app-danger-zone
+			[title]="'Delete Event Group'"
+			[message]="'Deleting this event group is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
 	</div>
 }

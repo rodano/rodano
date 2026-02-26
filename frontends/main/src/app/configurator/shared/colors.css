@@ -1,0 +1,156 @@
+.theme-main {
+	--entity-color: #5bd4d4;
+	--entity-highlight: rgba(91, 212, 212, 0.12);
+}
+
+.theme-scope-model {
+	--entity-color: #1E3A8A;
+	--entity-highlight: rgba(30, 58, 138, 0.12);
+}
+
+.theme-event-model {
+	--entity-color: #166534;
+	--entity-highlight: rgba(22, 101, 52, 0.12);
+}
+
+.theme-event-group {
+	--entity-color: #6B21A8;
+	--entity-highlight: rgba(107, 33, 168, 0.12);
+}
+
+.theme-dataset-model {
+	--entity-color: #0E7490;
+	--entity-highlight: rgba(14, 116, 144, 0.12);
+}
+
+.theme-field-model {
+	--entity-color: #374151;
+	--entity-highlight: rgba(55, 65, 81, 0.12);
+}
+
+.theme-workflow {
+	--entity-color: #0F766E;
+	--entity-highlight: rgba(15, 118, 110, 0.12);
+}
+
+.theme-workflow-state {
+	--entity-color: #9D174D;
+	--entity-highlight: rgba(157, 23, 77, 0.12);
+}
+
+.theme-workflow-action {
+	--entity-color: #0369A1;
+	--entity-highlight: rgba(3, 105, 161, 0.12);
+}
+
+.theme-rule {
+	--entity-color: #6D28D9;
+	--entity-highlight: rgba(109, 40, 217, 0.12);
+}
+
+.theme-rule-def-property {
+	--entity-color: #5B21B6;
+	--entity-highlight: rgba(91, 33, 182, 0.12);
+}
+
+.theme-rule-def-action {
+	--entity-color: #7C3AED;
+	--entity-highlight: rgba(124, 58, 237, 0.12);
+}
+
+.theme-feature {
+	--entity-color: #CA8A04;
+	--entity-highlight: rgba(202, 138, 4, 0.12);
+}
+
+.theme-profile {
+	--entity-color: #7C2D12;
+	--entity-highlight: rgba(124, 45, 18, 0.12);
+}
+
+.theme-validator {
+	--entity-color: #4D7C0F;
+	--entity-highlight: rgba(77, 124, 15, 0.12);
+}
+
+.theme-form-model {
+	--entity-color: #0C4A6E;
+	--entity-highlight: rgba(12, 74, 110, 0.12);
+}
+
+.theme-menu {
+	--entity-color: #334155;
+	--entity-highlight: rgba(51, 65, 85, 0.12);
+}
+
+.theme-payment-plan {
+	--entity-color: #047857;
+	--entity-highlight: rgba(4, 120, 87, 0.12);
+}
+
+.theme-report {
+	--entity-color: #0F766E;
+	--entity-highlight: rgba(15, 118, 110, 0.12);
+}
+
+.theme-cron {
+	--entity-color: #475569;
+	--entity-highlight: rgba(71, 85, 105, 0.12);
+}
+
+.theme-workflow-summary {
+	--entity-color: #831843;
+	--entity-highlight: rgba(131, 24, 67, 0.12);
+}
+
+.status-badge.standalone {
+	background-color: #1e293b;
+	color: #ffffff;
+}
+
+.status-badge.root {
+	background-color: #064e3b;
+	color: #ffffff;
+}
+
+.status-badge.intermediate {
+	background-color: #fef08a;
+	color: #854d0e;
+}
+
+.status-badge.leaf {
+	background-color: #9f1239;
+	color: #ffffff;
+}
+
+.status-badge.first {
+	background-color: #dcfce7;
+	color: #166534;
+	border: 1px solid #166534;
+}
+
+.status-badge.second {
+	background-color: #fae8ff;
+	color: #86198f;
+	border: 1px solid #86198f;
+}
+
+.status-badge.third {
+	background-color: #ffedd5;
+	color: #9a3412;
+	border: 1px solid #9a3412;
+}
+
+.status-badge.fourth {
+	background-color: #f1f5f9;
+	color: #0f172a;
+	border: 1px solid #0f172a;
+}
+
+.theme-danger {
+	--entity-color: #dc2626;
+	--entity-color-dark: #b91c1c;
+	--entity-highlight: rgba(220, 38, 38, 0.12);
+	--entity-bg: #fef2f2;
+	--entity-border: #fecaca;
+}

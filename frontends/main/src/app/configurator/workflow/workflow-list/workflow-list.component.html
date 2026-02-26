@@ -12,13 +12,14 @@
 					[class.level-3]="viewLevel === 3">
 	@if (loading) {
 		<app-empty-state
+			style="width: 100%"
 			[icon]="'hourglass_empty'"
 			[message]="'Loading workflows...'"
 		/>
 	} @else {
 		<div class="cards-container">
 			<div class="primary-cards-grid">
-				<div class="primary-card create-card" (click)="onCreateWorkflow()">
+				<div class="primary-card create-card theme-workflow" (click)="onCreateWorkflow()">
 					<div class="create-content">
 						<mat-icon>add_circle_outline</mat-icon>
 						<h3>Create Workflow</h3>
@@ -27,7 +28,7 @@
 				</div>
 
 				@for (workflow of workflows; track workflow.workflowId) {
-					<div class="primary-card"
+					<div class="primary-card theme-workflow"
 										[class.selected]="isSelected(workflow)"
 										[class.modified]="modifiedWorkflowIds.has(workflow.workflowId)"
 										[style.border-top-color]="modifiedWorkflowIds.has(workflow.workflowId) ? '#f59e0b' : ''"
@@ -114,7 +115,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card first-child-card create-card" (click)="onCreateWorkflowState()">
+						<div class="secondary-card first-child-card create-card theme-workflow-state" (click)="onCreateWorkflowState()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Workflow State</h3>
@@ -123,7 +124,7 @@
 						</div>
 
 						@for (workflowState of workflowStates; track workflowState.workflowStateId) {
-							<div class="secondary-card first-child-card"
+							<div class="secondary-card first-child-card theme-workflow-state"
 												[class.selected]="selectedWorkflowStateId === workflowState.workflowStateId"
 												[class.modified]="isWorkflowStateModified(workflowState.workflowStateId)"
 												(click)="onSelectWorkflowState(workflowState.workflowStateId)">
@@ -196,7 +197,7 @@
 
 				<div class="secondary-column-content">
 					<div class="secondary-cards-grid">
-						<div class="secondary-card second-child-card small-card create-card" (click)="onCreateWorkflowAction()">
+						<div class="secondary-card second-child-card small-card create-card theme-workflow-action" (click)="onCreateWorkflowAction()">
 							<div class="create-content">
 								<mat-icon>add_circle_outline</mat-icon>
 								<h3>Create Workflow Action</h3>
@@ -205,7 +206,7 @@
 						</div>
 
 						@for (workflowAction of workflowActions; track workflowAction.workflowActionId) {
-							<div class="secondary-card second-child-card small-card"
+							<div class="secondary-card second-child-card small-card theme-workflow-action"
 												[class.selected]="selectedWorkflowActionId === workflowAction.workflowActionId"
 												[class.modified]="isWorkflowActionModified(workflowAction.workflowActionId)"
 												(click)="onSelectWorkflowAction(workflowAction.workflowActionId)">

@@ -1,7 +1,7 @@
 <div class="detail-panel-header">
 	<div class="detail-title">
 		<h2>{{ languageService.getTranslatedName(profile.shortname) }}</h2>
-		<span class="detail-code parent">{{ profile.id }}</span>
+		<span class="detail-code theme-profile">{{ profile.id }}</span>
 	</div>
 	<div class="header-actions">
 		<button class="btn-close" (click)="onClose()">
@@ -98,7 +98,7 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip">
+						<div class="chip theme-workflow">
 							<mat-icon class="resource-icon">settings</mat-icon>
 							<span class="language-name">{{ getWorkflowLabel(profile.workflowOfInterestId) }}</span>
 						</div>
@@ -113,12 +113,10 @@
 		</button>
 	</div>
 
-	<div class="settings-section danger-section">
-		<h3>Delete Profile</h3>
-		<p class="danger-text">Deleting this profile is permanent and cannot be undone.</p>
-		<button class="btn-delete" (click)="onDelete()">
-			<mat-icon>delete</mat-icon>
-			Delete
-		</button>
-	</div>
+	<app-danger-zone
+		[title]="'Delete Profile'"
+		[message]="'Deleting this profile is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
 </div>

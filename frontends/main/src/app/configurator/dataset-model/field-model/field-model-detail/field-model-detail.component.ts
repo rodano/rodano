@@ -16,6 +16,7 @@ import {FieldModelManagerService} from '../../../services/manager/field-model-ma
 import {ValidatorManagerService} from '../../../services/manager/validator-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../../services/manager/workflow-manager.service';
+import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-field-model-detail',
@@ -26,7 +27,8 @@ import {WorkflowManagerService} from '../../../services/manager/workflow-manager
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule
+		MatTooltipModule,
+		DangerZoneComponent
 	]
 })
 export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {

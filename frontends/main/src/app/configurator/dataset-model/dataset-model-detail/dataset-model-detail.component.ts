@@ -13,6 +13,7 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {DatasetModelDialogService} from '../../services/dialogs/dataset-model-dialog.service';
 import {ProjectLanguage} from '@core/model/project-language';
+import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-dataset-model-detail',
@@ -23,7 +24,8 @@ import {ProjectLanguage} from '@core/model/project-language';
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule
+		MatTooltipModule,
+		DangerZoneComponent
 	]
 })
 export class DatasetModelDetailComponent implements OnInit, OnDestroy {

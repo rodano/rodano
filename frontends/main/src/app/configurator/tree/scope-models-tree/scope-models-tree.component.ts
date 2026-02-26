@@ -59,7 +59,8 @@ export class ScopeModelsTreeComponent implements OnChanges {
 			expanded: true,
 			selected: this.selectedScopeModelId === scopeModel.scopeModelId,
 			type: 'scope-model',
-			entityId: scopeModel.scopeModelId
+			entityId: scopeModel.scopeModelId,
+			themeClass: 'theme-scope-model'
 		};
 
 		const childScopeNodes = children.map(child => this.buildNode(child, allModels));
@@ -76,7 +77,8 @@ export class ScopeModelsTreeComponent implements OnChanges {
 						icon: 'group',
 						type: 'event-group',
 						selected: this.selectedEventGroupId === eg.eventGroupId,
-						entityId: eg.eventGroupId
+						entityId: eg.eventGroupId,
+						themeClass: 'theme-event-group'
 					});
 				});
 
@@ -89,7 +91,8 @@ export class ScopeModelsTreeComponent implements OnChanges {
 						icon: 'event',
 						type: 'event-model',
 						selected: this.selectedEventModelId === em.eventModelId,
-						entityId: em.eventModelId
+						entityId: em.eventModelId,
+						themeClass: 'theme-event-model'
 					});
 				});
 

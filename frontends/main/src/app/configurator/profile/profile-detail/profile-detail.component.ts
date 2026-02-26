@@ -14,13 +14,14 @@ import {Profile} from '@core/model/profile';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {ProfileDialogService} from '../../services/dialogs/profile-dialog.service';
 import {ProjectLanguage} from '@core/model/project-language';
+import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-profile-detail',
 	standalone: true,
 	templateUrl: './profile-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
 export class ProfileDetailComponent implements OnInit, OnDestroy {
 	@Input() profile!: Profile;

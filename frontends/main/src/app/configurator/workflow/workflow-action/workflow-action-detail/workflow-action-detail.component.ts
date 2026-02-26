@@ -11,6 +11,7 @@ import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confi
 import {WorkflowAction} from '@core/model/workflow-action';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowActionDialogService} from '../../../services/dialogs/workflow-action-dialog.service';
+import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 
 @Component({
 	selector: 'app-workflow-action-detail',
@@ -19,7 +20,8 @@ import {WorkflowActionDialogService} from '../../../services/dialogs/workflow-ac
 		CommonModule,
 		MatIconModule,
 		MatButtonModule,
-		MatTooltipModule
+		MatTooltipModule,
+		DangerZoneComponent
 	],
 	templateUrl: './workflow-action-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css']
