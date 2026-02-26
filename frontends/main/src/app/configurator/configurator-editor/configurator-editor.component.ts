@@ -16,7 +16,8 @@ import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmatio
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
 import {SnapshotManagerService} from '../services/manager/snapshot-manager.service';
-import {forkJoin} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrator.service';
 import {ScopeModelManagerService} from '../services/manager/scope-model-manager.service';
 import {DatasetModelManagerService} from '../services/manager/dataset-model-manager.service';
@@ -91,6 +92,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	canRollback = false;
 	canRollForward = false;
+
+	canNavigate = () => this.confirmDiscardIfChanged();
 
 	constructor(
 		public languageService: LanguageService,
@@ -511,116 +514,135 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
-	onDiscardChanges(): void {
+	private confirmDiscardIfChanged(): Observable<boolean> {
+		if(!this.hasModifications) {
+			return of(true);
+		}
+
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
 			maxWidth: '90vw',
 			data: {
-				title: 'Discard Changes',
-				message: 'Are you sure you want to discard all unsaved changes? This action cannot be undone.',
+				title: 'Discard Changes?',
+				message: 'You have unsaved changes. Switching views will discard them. Continue?',
 				confirmText: 'Discard',
 				cancelText: 'Cancel',
 				type: 'danger'
 			}
 		});
 
-		dialogRef.afterClosed().subscribe(confirmed => {
+		return dialogRef.afterClosed().pipe(
+			map(confirmed => {
+				if(confirmed) {
+					this.performFullReset();
+					return true;
+				}
+				return false;
+			})
+		);
+	}
+
+	onDiscardChanges(): void {
+		this.confirmDiscardIfChanged().subscribe(confirmed => {
 			if(confirmed) {
-				this.workingProject = {...this.project!};
-				this.modifiedFields.clear();
-
-				const scopeComponent = this.detailComponent?.scopeModelsListComponent;
-				if(scopeComponent) {
-					this.entitySaveOrchestratorService.resetScopeModelsToOriginals({
-						scopeModelManager: scopeComponent.scopeModelManager,
-						eventModelManager: scopeComponent.eventModelManager,
-						eventGroupManager: scopeComponent.eventGroupManager,
-						scopeModels: scopeComponent.scopeModels,
-						eventModels: scopeComponent.eventModels,
-						eventGroups: scopeComponent.eventGroups,
-						originalScopeModels: scopeComponent.originalScopeModels,
-						modifiedScopeModelIds: scopeComponent.modifiedScopeModelIds,
-						modifiedEventModels: scopeComponent.modifiedEventModels,
-						modifiedEventGroups: scopeComponent.modifiedEventGroups
-					});
-					scopeComponent.loadScopeModels();
-				}
-
-				const datasetComponent = this.detailComponent?.datasetModelsListComponent;
-				if(datasetComponent) {
-					this.entitySaveOrchestratorService.resetDatasetModelsToOriginals({
-						datasetModelManager: datasetComponent.datasetModelManager,
-						fieldModelManager: datasetComponent.fieldModelManager,
-						datasetModels: datasetComponent.datasetModels,
-						fieldModels: datasetComponent.fieldModels,
-						originalDatasetModels: datasetComponent.originalDatasetModels,
-						modifiedDatasetModelIds: datasetComponent.modifiedDatasetModelIds,
-						modifiedFieldModels: datasetComponent.modifiedFieldModels
-					});
-					datasetComponent.loadDatasetModels();
-				}
-
-				const validatorComponent = this.detailComponent?.validatorsListComponent;
-				if(validatorComponent) {
-					this.entitySaveOrchestratorService.resetValidatorsToOriginals({
-						validatorManager: validatorComponent.validatorManager,
-						validators: validatorComponent.validators,
-						originalValidators: validatorComponent.originalValidators,
-						modifiedValidatorIds: validatorComponent.modifiedValidatorIds
-					});
-					validatorComponent.loadValidators();
-				}
-
-				const workflowComponent = this.detailComponent?.workflowListComponent;
-				if(workflowComponent) {
-					this.entitySaveOrchestratorService.resetWorkflowsToOriginals({
-						workflowManager: workflowComponent.workflowManager,
-						workflowStateManager: workflowComponent.workflowStateManager,
-						workflowActionManager: workflowComponent.workflowActionManager,
-						workflows: workflowComponent.workflows,
-						workflowStates: workflowComponent.workflowStates,
-						workflowActions: workflowComponent.workflowActions,
-						originalWorkflows: workflowComponent.originalWorkflows,
-						modifiedWorkflowIds: workflowComponent.modifiedWorkflowIds,
-						modifiedWorkflowStateIds: workflowComponent.modifiedWorkflowStates,
-						modifiedWorkflowActionIds: workflowComponent.modifiedWorkflowActions
-					});
-					workflowComponent.loadWorkflows();
-				}
-
-				const profileComponent = this.detailComponent?.profileListComponent;
-				if(profileComponent) {
-					this.entitySaveOrchestratorService.resetProfilesToOriginals({
-						profileManager: profileComponent.profileManager,
-						profiles: profileComponent.profiles,
-						originalProfiles: profileComponent.originalProfiles,
-						modifiedProfileIds: profileComponent.modifiedProfileIds
-					});
-					profileComponent.loadProfiles();
-				}
-
-				const featureComponent = this.detailComponent?.featureListComponent;
-				if(featureComponent) {
-					this.entitySaveOrchestratorService.resetFeaturesToOriginals({
-						featureManager: featureComponent.featureManager,
-						features: featureComponent.features,
-						originalFeatures: featureComponent.originalFeatures,
-						modifiedFeatureIds: featureComponent.modifiedFeatureIds
-					});
-					featureComponent.loadFeatures();
-				}
-
-				this.scopeModelModificationCount = 0;
-				this.datasetModelModificationCount = 0;
-				this.validatorModificationCount = 0;
-				this.workflowModificationCount = 0;
-				this.profileModificationCount = 0;
-				this.featureModificationCount = 0;
-
-				this.refreshTreeData();
 				this.snackBar.open('Changes discarded', 'Close', {duration: 2000});
 			}
 		});
+	}
+
+	private performFullReset(): void {
+		this.workingProject = {...this.project!};
+		this.modifiedFields.clear();
+
+		const scopeComponent = this.detailComponent?.scopeModelsListComponent;
+		if(scopeComponent) {
+			this.entitySaveOrchestratorService.resetScopeModelsToOriginals({
+				scopeModelManager: scopeComponent.scopeModelManager,
+				eventModelManager: scopeComponent.eventModelManager,
+				eventGroupManager: scopeComponent.eventGroupManager,
+				scopeModels: scopeComponent.scopeModels,
+				eventModels: scopeComponent.eventModels,
+				eventGroups: scopeComponent.eventGroups,
+				originalScopeModels: scopeComponent.originalScopeModels,
+				modifiedScopeModelIds: scopeComponent.modifiedScopeModelIds,
+				modifiedEventModels: scopeComponent.modifiedEventModels,
+				modifiedEventGroups: scopeComponent.modifiedEventGroups
+			});
+			scopeComponent.loadScopeModels();
+		}
+
+		const datasetComponent = this.detailComponent?.datasetModelsListComponent;
+		if(datasetComponent) {
+			this.entitySaveOrchestratorService.resetDatasetModelsToOriginals({
+				datasetModelManager: datasetComponent.datasetModelManager,
+				fieldModelManager: datasetComponent.fieldModelManager,
+				datasetModels: datasetComponent.datasetModels,
+				fieldModels: datasetComponent.fieldModels,
+				originalDatasetModels: datasetComponent.originalDatasetModels,
+				modifiedDatasetModelIds: datasetComponent.modifiedDatasetModelIds,
+				modifiedFieldModels: datasetComponent.modifiedFieldModels
+			});
+			datasetComponent.loadDatasetModels();
+		}
+
+		const validatorComponent = this.detailComponent?.validatorsListComponent;
+		if(validatorComponent) {
+			this.entitySaveOrchestratorService.resetValidatorsToOriginals({
+				validatorManager: validatorComponent.validatorManager,
+				validators: validatorComponent.validators,
+				originalValidators: validatorComponent.originalValidators,
+				modifiedValidatorIds: validatorComponent.modifiedValidatorIds
+			});
+			validatorComponent.loadValidators();
+		}
+
+		const workflowComponent = this.detailComponent?.workflowListComponent;
+		if(workflowComponent) {
+			this.entitySaveOrchestratorService.resetWorkflowsToOriginals({
+				workflowManager: workflowComponent.workflowManager,
+				workflowStateManager: workflowComponent.workflowStateManager,
+				workflowActionManager: workflowComponent.workflowActionManager,
+				workflows: workflowComponent.workflows,
+				workflowStates: workflowComponent.workflowStates,
+				workflowActions: workflowComponent.workflowActions,
+				originalWorkflows: workflowComponent.originalWorkflows,
+				modifiedWorkflowIds: workflowComponent.modifiedWorkflowIds,
+				modifiedWorkflowStateIds: workflowComponent.modifiedWorkflowStates,
+				modifiedWorkflowActionIds: workflowComponent.modifiedWorkflowActions
+			});
+			workflowComponent.loadWorkflows();
+		}
+
+		const profileComponent = this.detailComponent?.profileListComponent;
+		if(profileComponent) {
+			this.entitySaveOrchestratorService.resetProfilesToOriginals({
+				profileManager: profileComponent.profileManager,
+				profiles: profileComponent.profiles,
+				originalProfiles: profileComponent.originalProfiles,
+				modifiedProfileIds: profileComponent.modifiedProfileIds
+			});
+			profileComponent.loadProfiles();
+		}
+
+		const featureComponent = this.detailComponent?.featureListComponent;
+		if(featureComponent) {
+			this.entitySaveOrchestratorService.resetFeaturesToOriginals({
+				featureManager: featureComponent.featureManager,
+				features: featureComponent.features,
+				originalFeatures: featureComponent.originalFeatures,
+				modifiedFeatureIds: featureComponent.modifiedFeatureIds
+			});
+			featureComponent.loadFeatures();
+		}
+
+		this.scopeModelModificationCount = 0;
+		this.datasetModelModificationCount = 0;
+		this.validatorModificationCount = 0;
+		this.workflowModificationCount = 0;
+		this.profileModificationCount = 0;
+		this.featureModificationCount = 0;
+
+		this.refreshTreeData();
 	}
 
 	onCreateSnapshot(): void {
@@ -671,8 +693,12 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	onBack(): void {
-		localStorage.removeItem('configProjectId');
-		this.router.navigate(['/configurator']);
+		this.confirmDiscardIfChanged().subscribe(confirmed => {
+			if(confirmed) {
+				localStorage.removeItem('configProjectId');
+				this.router.navigate(['/configurator']);
+			}
+		});
 	}
 
 	get hasModifications(): boolean {

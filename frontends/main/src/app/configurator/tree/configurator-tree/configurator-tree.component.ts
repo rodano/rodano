@@ -8,6 +8,7 @@ import {ValidatorTreeComponent} from '../validator-tree/validator-tree.component
 import {WorkflowTreeComponent} from '../workflow-tree/workflow-tree.component';
 import {ProfileTreeComponent} from '../profile-tree/profile-tree.component';
 import {FeatureTreeComponent} from '../feature-tree/feature-tree.component';
+import {Observable, of} from 'rxjs';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -51,43 +52,67 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedWorkflowActionId: string | null = null;
 	@Input() selectedProfileId: string | null = null;
 	@Input() selectedFeatureId: string | null = null;
+	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
 	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | null = null;
 
+	private runGuarded(action: () => void): void {
+		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
+		guard$.subscribe(canNavigate => {
+			if(canNavigate) {
+				action();
+			}
+		});
+	}
+
 	onScopeModelsClicked(): void {
-		this.expandedCategory = this.expandedCategory === 'scope-models' ? null : 'scope-models';
-		this.categoryClicked.emit('scope-models');
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'scope-models' ? null : 'scope-models';
+			this.categoryClicked.emit('scope-models');
+		});
 	}
 
 	onDatasetModelsClicked(): void {
-		this.expandedCategory = this.expandedCategory === 'dataset-models' ? null : 'dataset-models';
-		this.categoryClicked.emit('dataset-models');
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'dataset-models' ? null : 'dataset-models';
+			this.categoryClicked.emit('dataset-models');
+		});
 	}
 
 	onValidatorsClicked(): void {
-		this.expandedCategory = this.expandedCategory === 'validators' ? null : 'validators';
-		this.categoryClicked.emit('validators');
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'validators' ? null : 'validators';
+			this.categoryClicked.emit('validators');
+		});
 	}
 
 	onWorkflowsClicked(): void {
-		this.expandedCategory = this.expandedCategory === 'workflows' ? null : 'workflows';
-		this.categoryClicked.emit('workflows');
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'workflows' ? null : 'workflows';
+			this.categoryClicked.emit('workflows');
+		});
 	}
 
 	onProfilesClicked(): void {
-		this.expandedCategory = this.expandedCategory === 'profiles' ? null : 'profiles';
-		this.categoryClicked.emit('profiles');
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'profiles' ? null : 'profiles';
+			this.categoryClicked.emit('profiles');
+		});
 	}
 
 	onFeaturesClicked(): void {
-		this.expandedCategory = this.expandedCategory === 'features' ? null : 'features';
-		this.categoryClicked.emit('features');
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'features' ? null : 'features';
+			this.categoryClicked.emit('features');
+		});
 	}
 
 	onCategoryClick(categoryId: string): void {
-		this.expandedCategory = null;
-		this.categoryClicked.emit(categoryId);
+		this.runGuarded(() => {
+			this.expandedCategory = null;
+			this.categoryClicked.emit(categoryId);
+		});
 	}
 }

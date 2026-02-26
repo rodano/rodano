@@ -17,11 +17,14 @@ import {ScopeModelDetailComponent} from '../scope-model-detail/scope-model-detai
 import {EventModelDialogService} from '../../services/dialogs/event-model-dialog.service';
 import {EventGroupDialogService} from '../../services/dialogs/event-group-dialog.service';
 import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
-import {forkJoin, Subscription} from 'rxjs';
+import {forkJoin, Observable, of, Subscription} from 'rxjs';
+import {map} from 'rxjs/operators';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ProjectLanguage} from '@core/model/project-language';
 import {HttpErrorResponse} from '@angular/common/http';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 
 type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
 
@@ -77,7 +80,8 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		private scopeModelDialogService: ScopeModelDialogService,
 		private eventModelDialogService: EventModelDialogService,
 		private eventGroupDialogService: EventGroupDialogService,
-		private snackBar: MatSnackBar
+		private snackBar: MatSnackBar,
+		private dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
@@ -212,17 +216,63 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.currentEventGroups = this.eventGroupManager.getAllForScope(this.selectedScopeModel.scopeModelId);
 	}
 
+	private confirmViewChange(): Observable<boolean> {
+		if(this.totalModificationCount === 0) {
+			return of(true);
+		}
+
+		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+			width: '450px',
+			data: {
+				title: 'Discard staged changes?',
+				message: 'You have unsaved changes in your models. Switching views will discard them.',
+				confirmText: 'Discard',
+				cancelText: 'Cancel',
+				type: 'danger'
+			}
+		});
+
+		return dialogRef.afterClosed().pipe(
+			map(confirmed => {
+				if(confirmed) {
+					this.resetManagers();
+					return true;
+				}
+				return false;
+			})
+		);
+	}
+
+	private resetManagers(): void {
+		this.loadScopeModels();
+		this.emitModificationChange();
+	}
+
 	onSelectScopeModel(scopeModel: ScopeModel): void {
-		if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-			this.clearSelection();
-		}
-		else {
-			this.selectScopeModel(scopeModel);
-		}
-		this.emitContext();
+		this.confirmViewChange().subscribe(confirmed => {
+			if(!confirmed) {
+				return;
+			}
+
+			if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
+				this.clearSelectionInternal();
+			}
+			else {
+				this.selectScopeModel(scopeModel);
+			}
+			this.emitContext();
+		});
 	}
 
 	clearSelection(): void {
+		this.confirmViewChange().subscribe(confirmed => {
+			if(confirmed) {
+				this.clearSelectionInternal();
+			}
+		});
+	}
+
+	private clearSelectionInternal(): void {
 		this.selectedScopeModel = null;
 		this.selectedEventModelId = null;
 		this.selectedEventGroupId = null;
@@ -233,10 +283,14 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	backToScopeDetail(): void {
-		this.viewMode = 'scope-detail';
-		this.selectedEventModelId = null;
-		this.selectedEventGroupId = null;
-		this.emitContext();
+		this.confirmViewChange().subscribe(confirmed => {
+			if(confirmed) {
+				this.viewMode = 'scope-detail';
+				this.selectedEventModelId = null;
+				this.selectedEventGroupId = null;
+				this.emitContext();
+			}
+		});
 	}
 
 	private selectScopeModel(scopeModel: ScopeModel): void {
@@ -300,7 +354,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 				this.snackBar.open('Scope model deleted', 'Close', {duration: 2000});
 
 				if(this.selectedScopeModel?.scopeModelId === scopeModel.scopeModelId) {
-					this.clearSelection();
+					this.clearSelectionInternal();
 				}
 
 				this.loadScopeModels();
@@ -385,21 +439,31 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		if(!this.selectedScopeModel) {
 			return;
 		}
-		this.viewMode = 'event-list';
-		this.emitContext();
+		this.confirmViewChange().subscribe(confirmed => {
+			if(confirmed) {
+				this.viewMode = 'event-list';
+				this.emitContext();
+			}
+		});
 	}
 
 	onSelectEventModel(eventModelId: string): void {
-		if(this.selectedEventModelId === eventModelId) {
-			this.selectedEventModelId = null;
-			this.viewMode = 'event-list';
-		}
-		else {
-			this.selectedEventModelId = eventModelId;
-			this.viewMode = 'event-detail';
-			this.nodeSelected.emit(`event-model-${eventModelId}`);
-		}
-		this.emitContext();
+		this.confirmViewChange().subscribe(confirmed => {
+			if(!confirmed) {
+				return;
+			}
+
+			if(this.selectedEventModelId === eventModelId) {
+				this.selectedEventModelId = null;
+				this.viewMode = 'event-list';
+			}
+			else {
+				this.selectedEventModelId = eventModelId;
+				this.viewMode = 'event-detail';
+				this.nodeSelected.emit(`event-model-${eventModelId}`);
+			}
+			this.emitContext();
+		});
 	}
 
 	onCreateEventGroup(): void {
@@ -469,21 +533,31 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		if(!this.selectedScopeModel) {
 			return;
 		}
-		this.viewMode = 'event-group-list';
-		this.emitContext();
+		this.confirmViewChange().subscribe(confirmed => {
+			if(confirmed) {
+				this.viewMode = 'event-group-list';
+				this.emitContext();
+			}
+		});
 	}
 
 	onSelectEventGroup(eventGroupId: string): void {
-		if(this.selectedEventGroupId === eventGroupId) {
-			this.selectedEventGroupId = null;
-			this.viewMode = 'event-group-list';
-		}
-		else {
-			this.selectedEventGroupId = eventGroupId;
-			this.viewMode = 'event-group-detail';
-			this.nodeSelected.emit(`event-group-${eventGroupId}`);
-		}
-		this.emitContext();
+		this.confirmViewChange().subscribe(confirmed => {
+			if(!confirmed) {
+				return;
+			}
+
+			if(this.selectedEventGroupId === eventGroupId) {
+				this.selectedEventGroupId = null;
+				this.viewMode = 'event-group-list';
+			}
+			else {
+				this.selectedEventGroupId = eventGroupId;
+				this.viewMode = 'event-group-detail';
+				this.nodeSelected.emit(`event-group-${eventGroupId}`);
+			}
+			this.emitContext();
+		});
 	}
 
 	private emitModificationChange(): void {
