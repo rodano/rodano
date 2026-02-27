@@ -1,9 +1,8 @@
 import {Component, Inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
-import {MatIconModule} from '@angular/material/icon';
-import {MatTabsModule} from '@angular/material/tabs';
+import {WysiwygEditorComponent} from '../../../shared/wysiwyg-editor/wysiwyg-editor.component';
 
 export interface IntroductionTextDialogData {
 	introductionText?: string;
@@ -18,36 +17,25 @@ export interface IntroductionTextDialogData {
 		CommonModule,
 		ReactiveFormsModule,
 		MatDialogModule,
-		MatIconModule,
-		MatTabsModule
+		WysiwygEditorComponent
 	]
 })
 export class ProjectSettingsIntroTextDialogComponent implements OnInit {
-	form: FormGroup;
+	introductionTextControl = new FormControl('');
 
 	constructor(
-		private fb: FormBuilder,
 		private dialogRef: MatDialogRef<ProjectSettingsIntroTextDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) public data: IntroductionTextDialogData
-	) {
-		this.form = this.fb.group({
-			introductionText: ['']
-		});
-	}
+	) {}
 
 	ngOnInit(): void {
-		this.form.patchValue({
-			introductionText: this.data.introductionText || ''
-		});
+		this.introductionTextControl.setValue(this.data.introductionText || '');
 	}
 
 	onSave(): void {
-		if(this.form.invalid) {
-			this.form.markAllAsTouched();
-			return;
-		}
-
-		this.dialogRef.close(this.form.value);
+		this.dialogRef.close({
+			introductionText: this.introductionTextControl.value || null
+		});
 	}
 
 	onCancel(): void {

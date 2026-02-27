@@ -1,7 +1,7 @@
 package ch.rodano.api.config;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.UUID;
 
@@ -33,7 +33,7 @@ public record PrivacyPolicyDTO(
 
 	@Schema(description = "Profiles affected by the privacy policy")
 	@NotEmpty
-	Set<String> profileIds
+	List<UUID> profileIds
 ) {
 	public PrivacyPolicyDTO(final PrivacyPolicy privacyPolicy) {
 		this(
@@ -43,7 +43,7 @@ public record PrivacyPolicyDTO(
 			privacyPolicy.getLongname(),
 			privacyPolicy.getDescription(),
 			privacyPolicy.getContent(),
-			privacyPolicy.getProfileIds()
+			privacyPolicy.getProfileUuids()
 		);
 	}
 }

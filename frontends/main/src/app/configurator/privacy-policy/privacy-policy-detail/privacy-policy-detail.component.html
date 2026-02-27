@@ -1,0 +1,134 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(privacyPolicy.shortname) }}</h2>
+		<span class="detail-code theme-privacy-policy">{{ privacyPolicy.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('id')">
+				<label>
+					Code
+					@if (isFieldModified('id')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">{{ privacyPolicy.id }}</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
+				<label>
+					Short Name
+					@if (isFieldModified('shortname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(privacyPolicy.shortname)">
+					@if (!languageService.getTranslatedValue(privacyPolicy.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(privacyPolicy.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('longname')">
+				<label>
+					Long Name
+					@if (isFieldModified('longname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(privacyPolicy.longname)">
+					@if (!languageService.getTranslatedValue(privacyPolicy.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(privacyPolicy.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+				<label>
+					Description
+					@if (isFieldModified('description')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(privacyPolicy.description)">
+					@if (!languageService.getTranslatedValue(privacyPolicy.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(privacyPolicy.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item full-width" [class.modified]="isFieldModified('content')">
+				<label>
+					Content
+					@if (isFieldModified('content')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(privacyPolicy.content)">
+					@if (!languageService.getTranslatedValue(privacyPolicy.content)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(privacyPolicy.content) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Associated Resources</h3>
+		<div class="settings-grid">
+			<div class="setting-item full-width" [class.modified]="isFieldModified('profileIds')">
+				<label>
+					Profiles
+					@if (isFieldModified('profileIds')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="relationship-box">
+					@if (privacyPolicy.profileIds.length > 0) {
+						<div class="chip-container">
+							@for (profileId of privacyPolicy.profileIds; track profileId) {
+								<div class="chip theme-profile">
+									<mat-icon class="resource-icon">badge</mat-icon>
+									<span class="language-name">{{ profileId }}</span>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-message-centered">
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>No profiles configured</span>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+		<button class="btn-edit" (click)="onEditResources()">
+			<mat-icon>edit</mat-icon>
+			Edit Resources
+		</button>
+	</div>
+
+	<app-danger-zone
+		[title]="'Delete Privacy Policy'"
+		[message]="'Deleting this privacy policy is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
+</div>

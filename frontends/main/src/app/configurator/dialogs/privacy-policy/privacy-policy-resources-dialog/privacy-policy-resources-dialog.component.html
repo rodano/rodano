@@ -1,0 +1,54 @@
+<h2 class="dialog-title">Edit Resources</h2>
+
+<div class="dialog-content">
+	<div class="form-section">
+		<h3>Profiles</h3>
+		<p class="hint">Select which profiles should be associated with this scope</p>
+
+		<div class="dual-list-container">
+			<div class="list-box">
+				<div class="box-label">Available</div>
+				<div class="list-items">
+					@if (availableProfiles.length === 0) {
+						<div class="empty-placeholder">No available profiles</div>
+					}
+					@for (profile of availableProfiles; track profile.profileId) {
+						<div class="list-item" (click)="onAddProfile(profile)">
+							<div class="item-text">
+								<span>{{ languageService.getLabel(profile) }}</span>
+							</div>
+							<mat-icon class="action-icon">add_circle_outline</mat-icon>
+						</div>
+					}
+				</div>
+			</div>
+
+			<div class="list-box selected">
+				<div class="box-label">Selected</div>
+				<div class="list-items">
+					@if (selectedProfiles.length === 0) {
+						<div class="empty-placeholder">No profiles selected</div>
+					}
+					@for (profile of selectedProfiles; track profile.profileId) {
+						<div class="list-item" (click)="onRemoveProfile(profile)">
+							<div class="item-text">
+								<span>{{ languageService.getLabel(profile) }}</span>
+							</div>
+							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+						</div>
+					}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">
+		Cancel
+	</button>
+	<button class="btn-primary" (click)="onSave()">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

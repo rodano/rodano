@@ -105,12 +105,13 @@
 		</div>
 	</div>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">privacy</mat-icon>
-			<span class="node-label">Privacy Policies</span>
-		</div>
-	</div>
+	<app-privacy-policy-tree
+		[projectId]="projectId"
+		[privacyPolicies]="privacyPolicies"
+		[expanded]="expandedCategory === 'privacy-policies'"
+		[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
+		(categoryClicked)="onPrivacyPolicyClicked()">
+	</app-privacy-policy-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('menus')">

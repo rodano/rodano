@@ -1,0 +1,18 @@
+.ql-toolbar {
+	border-top-left-radius: 0.375rem;
+	border-top-right-radius: 0.375rem;
+	border-color: #d1d5db;
+}
+
+.ql-container {
+	border-bottom-left-radius: 0.375rem;
+	border-bottom-right-radius: 0.375rem;
+	border-color: #d1d5db;
+	font-size: 0.9375rem;
+	min-height: 250px;
+}
+
+.ql-editor.ql-blank::before {
+	color: #5bd4d4;
+	font-style: normal;
+}

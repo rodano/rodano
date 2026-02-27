@@ -8,6 +8,7 @@ import {ValidatorContext} from './contexts/validator-context';
 import {WorkflowContext} from './contexts/workflow-context';
 import {ProfileContext} from './contexts/profile-context';
 import {FeatureContext} from './contexts/feature-context';
+import {PrivacyPolicyContext} from './contexts/privacy-policy-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -150,6 +151,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	savePrivacyPolicies(projectId: string, context: PrivacyPolicyContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.savePrivacyPolicies(
+				projectId,
+				context.modifiedPrivacyPolicyIds,
+				context.privacyPolicies,
+				context.originalPrivacyPolicies
+			)
+		]).pipe(
+			map(() => {
+				context.privacyPolicyManager.syncOriginalsWithCurrent();
+
+				context.privacyPolicyManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -194,5 +212,11 @@ export class EntitySaveOrchestratorService {
 		context.featureManager.resetToOriginals();
 
 		context.featureManager.invalidate();
+	}
+
+	resetPrivacyPoliciesToOriginals(context: PrivacyPolicyContext): void {
+		context.privacyPolicyManager.resetToOriginals();
+
+		context.privacyPolicyManager.invalidate();
 	}
 }

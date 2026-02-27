@@ -101,6 +101,7 @@
 					[workflows]="workflows"
 					[profiles]="profiles"
 					[features]="features"
+					[privacyPolicies]="privacyPolicies"
 					[workflowStates]="workflowStates"
 					[workflowActions]="workflowActions"
 					[selectedScopeModelId]="selectedScopeModelId"
@@ -114,6 +115,7 @@
 					[selectedWorkflowActionId]="selectedWorkflowActionId"
 					[selectedProfileId]="selectedProfileId"
 					[selectedFeatureId]="selectedFeatureId"
+					[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -132,12 +134,14 @@
 					(workflowsChanged)="onWorkflowsChanged($event)"
 					(profilesChanged)="onProfilesChanged($event)"
 					(featuresChanged)="onFeaturesChanged($event)"
+					(privacyPoliciesChanged)="onPrivacyPoliciesChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
 					(workflowContextChanged)="onWorkflowContextChanged($event)"
 					(profileContextChanged)="onProfileContextChanged($event)"
-					(featureContextChanged)="onFeatureContextChanged($event)">
+					(featureContextChanged)="onFeatureContextChanged($event)"
+					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

@@ -1,0 +1,23 @@
+<div class="tree-node">
+	<div
+		[ngClass]="['node-content', 'clickable', 'theme-privacy-policy', expanded ? 'selected' : '']"
+		(click)="onCategoryClick()">
+		<mat-icon class="node-icon">security</mat-icon>
+		<span class="node-label">Privacy Policies</span>
+	</div>
+
+	@if (expanded && treeNodes.length > 0) {
+		<div class="node-children">
+			@for (node of treeNodes; track node.id) {
+				<ng-container *ngTemplateOutlet="nodeTemplate; context: {$implicit: node}"></ng-container>
+			}
+		</div>
+	}
+</div>
+
+<ng-template #nodeTemplate let-node>
+	<div [ngClass]="['node', node.themeClass, node.selected ? 'selected': '']">
+		<mat-icon class="node-icon">{{ node.icon }}</mat-icon>
+		<span class="node-label">{{ node.label }}</span>
+	</div>
+</ng-template>

@@ -9,6 +9,7 @@ import {WorkflowTreeComponent} from '../workflow-tree/workflow-tree.component';
 import {ProfileTreeComponent} from '../profile-tree/profile-tree.component';
 import {FeatureTreeComponent} from '../feature-tree/feature-tree.component';
 import {Observable, of} from 'rxjs';
+import {PrivacyPolicyTreeComponent} from '../privacy-policy-tree/privacy-policy-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -22,7 +23,8 @@ import {Observable, of} from 'rxjs';
 		ValidatorTreeComponent,
 		WorkflowTreeComponent,
 		ProfileTreeComponent,
-		FeatureTreeComponent
+		FeatureTreeComponent,
+		PrivacyPolicyTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -41,6 +43,7 @@ export class ConfiguratorTreeComponent {
 	@Input() workflowActions: any[] = [];
 	@Input() profiles: any[] = [];
 	@Input() features: any[] = [];
+	@Input() privacyPolicies: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -52,11 +55,12 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedWorkflowActionId: string | null = null;
 	@Input() selectedProfileId: string | null = null;
 	@Input() selectedFeatureId: string | null = null;
+	@Input() selectedPrivacyPolicyId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -106,6 +110,13 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'features' ? null : 'features';
 			this.categoryClicked.emit('features');
+		});
+	}
+
+	onPrivacyPolicyClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'privacy-policies' ? null : 'privacy-policies';
+			this.categoryClicked.emit('privacy-policies');
 		});
 	}
 

@@ -80,6 +80,16 @@
 					(featureContextChanged)="onFeatureContextChanged($event)">
 				</app-feature-list>
 			}
+			@case ('privacy-policies') {
+				<app-privacy-policy-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onPrivacyPolicySelected($event)"
+					(privacyPoliciesChanged)="onPrivacyPoliciesChanged($event)"
+					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)">
+				</app-privacy-policy-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

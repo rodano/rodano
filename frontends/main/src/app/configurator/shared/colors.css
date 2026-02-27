@@ -88,6 +88,11 @@
 	--entity-highlight: rgba(4, 120, 87, 0.12);
 }
 
+.theme-privacy-policy {
+	--entity-color: #FF7F50;
+	--entity-highlight: rgba(255, 127, 80, 0.12);
+}
+
 .theme-report {
 	--entity-color: #0F766E;
 	--entity-highlight: rgba(15, 118, 110, 0.12);

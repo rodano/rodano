@@ -1,0 +1,90 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Privacy Policies</h1>
+			<p class="detail-subtitle">Configure privacy policies for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading privacy policies...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-privacy-policy" (click)="onCreatePrivacyPolicy()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Privacy Policy</h3>
+						<p>Add a new privacy policy</p>
+					</div>
+				</div>
+
+				@for (privacyPolicy of privacyPolicies; track privacyPolicy.policyId) {
+					<div class="primary-card theme-privacy-policy"
+										[class.selected]="isSelected(privacyPolicy)"
+										[class.modified]="modifiedPrivacyPolicyIds.has(privacyPolicy.policyId)"
+										[style.border-top-color]="modifiedPrivacyPolicyIds.has(privacyPolicy.policyId) ? '#f59e0b' : ''"
+										(click)="onSelectPrivacyPolicy(privacyPolicy)">
+
+						@if (isSelected(privacyPolicy)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(privacyPolicy.shortname) }}</h3>
+								<p class="card-code">{{ privacyPolicy.id }}</p>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>badge</mat-icon>
+									<span>{{ privacyPolicy.profileIds.length }} {{ privacyPolicy.profileIds.length === 1 ? 'Profile' : 'Profiles' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (modifiedPrivacyPolicyIds.has(privacyPolicy.policyId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (privacyPolicies.length === 0) {
+				<app-empty-state
+					[icon]="'security'"
+					[title]="'No Privacy Policies'"
+					[message]="'Create your first privacy policy to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedPrivacyPolicy && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-privacy-policy-detail
+					[privacyPolicy]="selectedPrivacyPolicy"
+					[projectId]="projectId"
+					[project]="project"
+					[allPrivacyPolicies]="privacyPolicies"
+					(privacyPolicyUpdated)="onPrivacyPolicyUpdated($event)"
+					(privacyPolicyDeleted)="onPrivacyPolicyDeleted($event)"
+					(closed)="onSelectPrivacyPolicy(selectedPrivacyPolicy)">
+				</app-privacy-policy-detail>
+			</div>
+		}
+	}
+</div>

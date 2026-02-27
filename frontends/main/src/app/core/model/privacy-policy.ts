@@ -31,6 +31,6 @@ export interface PrivacyPolicy {
     /**
      * Profiles affected by the privacy policy
      */
-    profileIds: Set<string>;
+    profileIds: Array<string>;
 }
 

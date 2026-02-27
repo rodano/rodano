@@ -5,47 +5,47 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import {Profile} from '@core/model/profile';
-import {ProfileManagerService} from '../../../services/manager/profile-manager.service';
 import {MatSelectModule} from '@angular/material/select';
-import {Workflow} from '@core/model/workflow';
 import {LanguageService} from '../../../services/language.service';
 import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
+import {PrivacyPolicy} from '@core/model/privacy-policy';
+import {PrivacyPolicyManagerService} from '../../../services/manager/privacy-policy-manager.service';
+import {WysiwygEditorComponent} from '../../../shared/wysiwyg-editor/wysiwyg-editor.component';
 
-export interface ProfileBasicInfoDialogData {
+export interface PrivacyPolicyBasicInfoDialogData {
 	projectId: string;
-	profile: Profile | null;
+	privacyPolicy: PrivacyPolicy | null;
 	languages: ProjectLanguage[];
-	availableWorkflows: Workflow[];
 }
 
 @Component({
-	selector: 'app-profile-basic-info-dialog',
+	selector: 'app-privacy-policy-basic-info-dialog',
 	standalone: true,
-	templateUrl: './profile-basic-info-dialog.component.html',
+	templateUrl: './privacy-policy-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
 	imports: [
 		CommonModule,
 		ReactiveFormsModule,
 		MatDialogModule,
 		MatTabsModule,
-		MatSelectModule
+		MatSelectModule,
+		WysiwygEditorComponent
 	]
 })
-export class ProfileBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
+export class PrivacyPolicyBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
 	isEditMode: boolean;
 
 	constructor(
 		fb: FormBuilder,
 		languageService: LanguageService,
-		dialogRef: MatDialogRef<ProfileBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ProfileBasicInfoDialogData,
-		private profileManager: ProfileManagerService,
+		dialogRef: MatDialogRef<PrivacyPolicyBasicInfoDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) public data: PrivacyPolicyBasicInfoDialogData,
+		private privacyPolicyManager: PrivacyPolicyManagerService,
 		private snackBar: MatSnackBar
 	) {
 		super(fb, languageService, dialogRef);
-		this.isEditMode = !!data.profile;
+		this.isEditMode = !!data.privacyPolicy;
 	}
 
 	ngOnInit(): void {
@@ -58,28 +58,27 @@ export class ProfileBasicInfoDialogComponent extends BaseInfoDialogComponent imp
 			if(!lang.languageCode) {
 				return;
 			}
-			const p = this.data.profile;
+			const pp = this.data.privacyPolicy;
 			this.languageForms.set(lang.languageCode, this.fb.group({
-				shortname: [p?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
-				longname: [p?.longname?.[lang.languageCode] || ''],
-				description: [p?.description?.[lang.languageCode] || '']
+				shortname: [pp?.shortname?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []],
+				longname: [pp?.longname?.[lang.languageCode] || ''],
+				description: [pp?.description?.[lang.languageCode] || ''],
+				content: [pp?.content?.[lang.languageCode] || '', lang.isDefault ? Validators.required : []]
 			}));
 		});
 	}
 
 	initializeForm(): void {
-		const p = this.data.profile;
+		const pp = this.data.privacyPolicy;
 		this.form = this.fb.group({
-			id: [p?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
-			workflowOfInterestId: [p?.workflowOfInterestId ?? null],
-			order: [p?.order ?? null]
+			id: [pp?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]]
 		});
 	}
 
 	isCodeDuplicate(code: string): boolean {
-		const currentProfileId = this.data.profile?.profileId;
-		return this.profileManager.getAll().some(p =>
-			p.id.toUpperCase() === code.toUpperCase() && p.profileId !== currentProfileId
+		const currentPrivacyPolicyId = this.data.privacyPolicy?.policyId;
+		return this.privacyPolicyManager.getAll().some(pp =>
+			pp.id.toUpperCase() === code.toUpperCase() && pp.policyId !== currentPrivacyPolicyId
 		);
 	}
 
@@ -91,17 +90,26 @@ export class ProfileBasicInfoDialogComponent extends BaseInfoDialogComponent imp
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A profile with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.snackBar.open(`A privacy policy with code "${code}" already exists`, 'Close', {duration: 3000});
 			return;
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();
+		const content: Record<string, string> = {};
+
+		this.languageForms.forEach((langForm, langCode) => {
+			const v = langForm.value;
+			if(v.content) {
+				content[langCode] = v.content;
+			}
+		});
+
 		this.dialogRef.close({
 			id: code,
 			shortname,
 			longname,
 			description,
-			...this.form.value
+			content
 		});
 	}
 }

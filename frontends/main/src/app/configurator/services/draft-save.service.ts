@@ -22,6 +22,8 @@ import {Profile} from '@core/model/profile';
 import {ProfileService} from './api/profile.service';
 import {FeatureService} from './api/feature.service';
 import {Feature} from '@core/model/feature';
+import {PrivacyPolicyService} from './api/privacy-policy.service';
+import {PrivacyPolicy} from '@core/model/privacy-policy';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -36,7 +38,8 @@ export class DraftSaveService {
 		private workflowStateService: WorkflowStateService,
 		private workflowActionService: WorkflowActionService,
 		private profileService: ProfileService,
-		private featureService: FeatureService
+		private featureService: FeatureService,
+		private privacyPolicyService: PrivacyPolicyService
 	) {}
 
 	saveScopeModels(
@@ -237,7 +240,7 @@ export class DraftSaveService {
 	}
 
 	private toPayload(workflow: Workflow): any {
-		const {states, actions, ...payload} = workflow as any;
+		const {...payload} = workflow as any;
 		return payload;
 	}
 
@@ -340,6 +343,41 @@ export class DraftSaveService {
 				const feature = features.find(f => f.featureId === id);
 				if(feature) {
 					saveObservables.push(this.featureService.updateFeature(projectId, id, feature));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	savePrivacyPolicies(
+		projectId: string,
+		modifiedIds: Set<string>,
+		privacyPolicies: PrivacyPolicy[],
+		originalPrivacyPolicies: PrivacyPolicy[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalPrivacyPolicies.find(pp => pp.policyId === originalId);
+				if(original) {
+					saveObservables.push(this.privacyPolicyService.deletePrivacyPolicy(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const privacyPolicy = privacyPolicies.find(pp => pp.policyId === id);
+				if(privacyPolicy) {
+					saveObservables.push(this.privacyPolicyService.createPrivacyPolicy(projectId, privacyPolicy));
+				}
+			}
+			else {
+				const privacyPolicy = privacyPolicies.find(pp => pp.policyId === id);
+				if(privacyPolicy) {
+					saveObservables.push(this.privacyPolicyService.updatePrivacyPolicy(projectId, id, privacyPolicy));
 				}
 			}
 		});

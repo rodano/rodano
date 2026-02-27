@@ -30,6 +30,7 @@ import {WorkflowStateManagerService} from '../services/manager/workflow-state-ma
 import {WorkflowActionManagerService} from '../services/manager/workflow-action-manager.service';
 import {ProfileManagerService} from '../services/manager/profile-manager.service';
 import {FeatureManagerService} from '../services/manager/feature-manager.service';
+import {PrivacyPolicyManagerService} from '../services/manager/privacy-policy-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -65,6 +66,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	workflowModificationCount = 0;
 	profileModificationCount = 0;
 	featureModificationCount = 0;
+	privacyPolicyModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -77,6 +79,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	workflowActions: any[] = [];
 	profiles: any[] = [];
 	features: any[] = [];
+	privacyPolicies: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -89,6 +92,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedWorkflowActionId: string | null = null;
 	selectedProfileId: string | null = null;
 	selectedFeatureId: string | null = null;
+	selectedPrivacyPolicyId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -113,6 +117,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private workflowActionManager: WorkflowActionManagerService,
 		private profileManager: ProfileManagerService,
 		private featureManager: FeatureManagerService,
+		private privacyPolicyManager: PrivacyPolicyManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -155,6 +160,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowActionManager.invalidate();
 		this.profileManager.invalidate();
 		this.featureManager.invalidate();
+		this.privacyPolicyManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -208,6 +214,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: features => this.features = features,
 			error: error => console.error('Error loading features:', error)
 		});
+
+		this.privacyPolicyManager.load(this.projectId).subscribe({
+			next: privacyPolicies => this.privacyPolicies = privacyPolicies,
+			error: error => console.error('Error loading privacy policies:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -217,6 +228,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflows = this.workflowManager.getAll();
 		this.profiles = this.profileManager.getAll();
 		this.features = this.featureManager.getAll();
+		this.privacyPolicies = this.privacyPolicyManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -267,6 +279,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedWorkflowActionId = null;
 			this.selectedProfileId = null;
 			this.selectedFeatureId = null;
+			this.selectedPrivacyPolicyId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
@@ -275,6 +288,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.workflowActions = [];
 			this.profiles = [];
 			this.features = [];
+			this.privacyPolicies = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -282,6 +296,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.workflowListComponent?.clearSelection();
 			this.detailComponent?.profileListComponent?.clearSelection();
 			this.detailComponent?.featureListComponent?.clearSelection();
+			this.detailComponent?.privacyPolicyListComponent?.clearSelection();
 		}
 	}
 
@@ -307,6 +322,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onFeaturesChanged(event: {modificationCount: number}): void {
 		this.featureModificationCount = event.modificationCount;
+	}
+
+	onPrivacyPoliciesChanged(event: {modificationCount: number}): void {
+		this.privacyPolicyModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -365,6 +384,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveFeatures());
 				}
 
+				if(this.privacyPolicyModificationCount > 0) {
+					saveObservables.push(this.savePrivacyPolicies());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
@@ -374,6 +397,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 							this.workflowModificationCount = 0;
 							this.profileModificationCount = 0;
 							this.featureModificationCount = 0;
+							this.privacyPolicyModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -514,6 +538,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private savePrivacyPolicies(): Promise<void> {
+		const component = this.detailComponent?.privacyPolicyListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.savePrivacyPolicies(this.projectId, {
+			privacyPolicyManager: component.privacyPolicyManager,
+			privacyPolicies: component.privacyPolicies,
+			originalPrivacyPolicies: component.originalPrivacyPolicies,
+			modifiedPrivacyPolicyIds: component.modifiedPrivacyPolicyIds
+		}).toPromise().then(() => {
+			component.loadPrivacyPolicies();
+			this.privacyPolicies = this.privacyPolicyManager.getAll();
+		});
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -635,12 +676,24 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			featureComponent.loadFeatures();
 		}
 
+		const privacyPolicyComponent = this.detailComponent?.privacyPolicyListComponent;
+		if(privacyPolicyComponent) {
+			this.entitySaveOrchestratorService.resetPrivacyPoliciesToOriginals({
+				privacyPolicyManager: privacyPolicyComponent.privacyPolicyManager,
+				privacyPolicies: privacyPolicyComponent.privacyPolicies,
+				originalPrivacyPolicies: privacyPolicyComponent.originalPrivacyPolicies,
+				modifiedPrivacyPolicyIds: privacyPolicyComponent.modifiedPrivacyPolicyIds
+			});
+			privacyPolicyComponent.loadPrivacyPolicies();
+		}
+
 		this.scopeModelModificationCount = 0;
 		this.datasetModelModificationCount = 0;
 		this.validatorModificationCount = 0;
 		this.workflowModificationCount = 0;
 		this.profileModificationCount = 0;
 		this.featureModificationCount = 0;
+		this.privacyPolicyModificationCount = 0;
 
 		this.refreshTreeData();
 	}
@@ -708,7 +761,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.validatorModificationCount > 0
 		  || this.workflowModificationCount > 0
 		  || this.profileModificationCount > 0
-		  || this.featureModificationCount > 0;
+		  || this.featureModificationCount > 0
+		  || this.privacyPolicyModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
@@ -718,7 +772,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  + this.validatorModificationCount
 		  + this.workflowModificationCount
 		  + this.profileModificationCount
-		  + this.featureModificationCount;
+		  + this.featureModificationCount
+		  + this.privacyPolicyModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -770,6 +825,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.features = context.features;
 			this.selectedFeatureId = context.selectedFeatureId;
+		});
+	}
+
+	onPrivacyPolicyContextChanged(context: any): void {
+		setTimeout(() => {
+			this.privacyPolicies = context.privacyPolicies;
+			this.selectedPrivacyPolicyId = context.selectedPrivacyPolicyId;
 		});
 	}
 }

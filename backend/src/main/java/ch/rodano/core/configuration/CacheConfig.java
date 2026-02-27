@@ -52,7 +52,10 @@ public class CacheConfig {
 			"profile",
 
 			"features",
-			"feature"
+			"feature",
+
+			"privacy-policies",
+			"privacy-policy"
 		);
 	}
 }

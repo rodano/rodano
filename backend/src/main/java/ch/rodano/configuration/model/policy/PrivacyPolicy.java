@@ -160,7 +160,10 @@ public class PrivacyPolicy implements Serializable, SuperDisplayable, Node, Comp
 
 	@JsonIgnore
 	public List<UUID> getProfileUuids() {
-		if(this.study == null || this.profileIds == null) {
+		if(this.study == null) {
+			throw new IllegalStateException("Cannot resolve profile UUIDs: study is not set on PrivacyPolicy " + id);
+		}
+		if(this.profileIds == null) {
 			return List.of();
 		}
 		return profileIds.stream()

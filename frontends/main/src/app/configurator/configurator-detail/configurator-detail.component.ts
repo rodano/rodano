@@ -10,6 +10,7 @@ import {WorkflowListComponent} from '../workflow/workflow-list/workflow-list.com
 import {ProfileListComponent} from '../profile/profile-list/profile-list.component';
 import {EmptyStateComponent} from '../shared/empty-state/empty-state.component';
 import {FeatureListComponent} from '../feature/feature-list/feature-list.component';
+import {PrivacyPolicyListComponent} from '../privacy-policy/privacy-policy-list/privacy-policy-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -26,6 +27,7 @@ import {FeatureListComponent} from '../feature/feature-list/feature-list.compone
 		WorkflowListComponent,
 		ProfileListComponent,
 		FeatureListComponent,
+		PrivacyPolicyListComponent,
 		EmptyStateComponent
 	]
 })
@@ -36,6 +38,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(WorkflowListComponent) workflowListComponent?: WorkflowListComponent;
 	@ViewChild(ProfileListComponent) profileListComponent?: ProfileListComponent;
 	@ViewChild(FeatureListComponent) featureListComponent?: FeatureListComponent;
+	@ViewChild(PrivacyPolicyListComponent) privacyPolicyListComponent?: PrivacyPolicyListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -91,7 +94,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFeatureId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'overview' | null = null;
+	@Output() privacyPoliciesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() privacyPolicyContextChanged = new EventEmitter<{
+		privacyPolicies: any[];
+		selectedPrivacyPolicyId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
@@ -99,6 +108,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	workflowModificationCount = 0;
 	profileModificationCount = 0;
 	featureModificationCount = 0;
+	privacyPolicyModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -172,6 +182,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
+	onPrivacyPolicySelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onPrivacyPoliciesChanged(event: {modificationCount: number}): void {
+		this.privacyPolicyModificationCount = event.modificationCount;
+		this.privacyPoliciesChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -228,6 +249,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 			return;
 		}
 
+		if(this.selectedNode === 'privacy-policies') {
+			this.selectedNodeType = 'privacy-policies';
+			return;
+		}
+
 		this.selectedNodeType = 'overview';
 	}
 
@@ -281,5 +307,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFeatureId: string | null;
 	}): void {
 		this.featureContextChanged.emit(context);
+	}
+
+	onPrivacyPolicyContextChanged(context: {
+		privacyPolicies: any[];
+		selectedPrivacyPolicyId: string | null;
+	}): void {
+		this.privacyPolicyContextChanged.emit(context);
 	}
 }
