@@ -81,19 +81,6 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	) {}
 
 	ngOnInit() {
-		//visibility criteria
-		/*this.visibilityService.layoutCriterionEvents$(this.layout.id).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(criterion => {
-			this.loggingService.info(`Multiple layout ${this.layout.id} receiving criterion`, criterion);
-			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteria.ActionEnum.SHOW.toLocaleLowerCase();
-			this.shown = criterion.reverse ? !show : show;
-
-			//mark the datasets
-			this.datasets.forEach(d => d.show = this.shown);
-			//this.crfService.mergeCurrentDatasets(this.datasets);
-		});*/
-
 		this.visibilityService.layoutVisibilityEvents$(this.layout.id).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
@@ -102,11 +89,6 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 			//mark the datasets
 			this.multipleDatasets.forEach(d => d.show = shown);
 		});
-
-		/*this.fieldUpdateService.datasetFieldUpdated$(this.layout.datasetModel.id).subscribe(() => {
-			console.log(this.multipleDatasets.flatMap(d => d.fields));
-			this.table.renderRows();
-		});*/
 	}
 
 	ngOnChanges() {

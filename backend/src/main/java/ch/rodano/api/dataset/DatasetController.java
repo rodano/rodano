@@ -133,6 +133,8 @@ public class DatasetController extends AbstractSecuredController {
 			.toList();
 	}
 
+	//TODO remove this endpoint, and let the frontend fetch the datasets based on dataset model ids
+	@Deprecated
 	@Operation(summary = "Get datasets for a from")
 	@GetMapping({ "forms/{formPk}/datasets", "events/{eventPk}/forms/{formPk}/datasets" })
 	@ResponseStatus(HttpStatus.OK)

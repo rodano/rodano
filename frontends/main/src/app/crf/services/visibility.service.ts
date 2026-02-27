@@ -17,30 +17,11 @@ export class VisibilityService {
 		private crfService: CRFService
 	) { }
 
-	//The subjects for the cell and layout visibility actions
-	//private criterionStream$ = new Subject<CRFVisibilityCriterion>();
-
 	//subject for the visibility of cells
 	private cellVisibilityStream$ = new Subject<CellVisibilityEvent>();
 
 	//subject for the visibility of layouts
 	private layoutVisibilityStream$ = new Subject<LayoutVisibilityEvent>();
-
-	//allows for subscribers to receive only the events that are of interest for them
-	/*public cellCriterionEvents$(cellId: string, layoutUid?: string): Observable<CRFVisibilityCriterion> {
-		return this.criterionStream$.pipe(
-			filter(c => c.targetCellIds.includes(cellId) && c.layoutUid === layoutUid)
-		);
-	}*/
-
-	//allows for subscribers to receive only the events that are of interest for them
-	/*public layoutCriterionEvents$(
-		layoutId: string
-	): Observable<CRFVisibilityCriterion> {
-		return this.criterionStream$.pipe(
-			filter(c => c.targetLayoutIds.includes(layoutId))
-		);
-	}*/
 
 	public triggerCriteria(cell: Cell, layoutUid: string, field: CRFField): void {
 		cell.visibilityCriteria.forEach(criterion => {

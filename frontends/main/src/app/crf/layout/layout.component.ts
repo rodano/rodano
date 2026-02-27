@@ -41,24 +41,6 @@ export class LayoutComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		/*this.visibilityService.layoutCriterionEvents$(this.layout.id).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(criterion => {
-			this.loggingService.info(`Layout ${this.layout.id} receiving criterion`, criterion);
-			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteria.ActionEnum.SHOW.toLocaleLowerCase();
-			this.shown = criterion.reverse ? !show : show;
-
-			//mark the fields
-			this.crfService.getLayoutFields(this.layout, this.datasets).forEach(f => f.shown = this.shown);
-
-			//cascade visibility criterion to the cells inside the layout
-			/*const cellIds = this.crfService.getLayoutCells(this.layout).map(c => c.id);
-			this.visibilityService.showHideCells(cellIds, undefined, this.shown);
-			if(this.shown) {
-				this.visibilityService.triggerAllCells();
-			}*/
-		//});
-
 		this.visibilityService.layoutVisibilityEvents$(this.layout.id).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {

@@ -211,13 +211,6 @@ export class CRFService {
 		}
 	}
 
-	getLayoutFields(layout: Layout, datasets: CRFDataset[]): CRFField[] {
-		const cells = this.getLayoutCells(layout);
-		return cells
-			.filter(c => this.getCellHasField(c))
-			.map(c => this.getCellField(c, datasets));
-	}
-
 	getCellHasField(cell: Cell) {
 		return cell.datasetModelId && cell.fieldModelId;
 	}
