@@ -1,7 +1,7 @@
+import {beforeEach, describe, it} from 'vitest';
 import {CellLoadingService} from './cell-loading.service';
-import {of, merge, interval} from 'rxjs';
+import {of, merge, interval, VirtualTimeScheduler} from 'rxjs';
 import {delay, take, map, filter} from 'rxjs/operators';
-import {getTestScheduler} from 'jasmine-marbles';
 import {TestBed} from '@angular/core/testing';
 import {CRFService} from './crf.service';
 
@@ -19,7 +19,7 @@ describe('CellLoadingService', () => {
 	});
 
 	it('#allCellsLoaded$ is correct within timeframe', () => {
-		const scheduler = getTestScheduler();
+		const scheduler = new VirtualTimeScheduler();
 
 		cellLoadingService.registerCellIds([
 			'a',
@@ -48,7 +48,7 @@ describe('CellLoadingService', () => {
 	});
 
 	it('#allCellsLoaded emits true multiple times', () => {
-		const scheduler = getTestScheduler();
+		const scheduler = new VirtualTimeScheduler();
 
 		cellLoadingService.registerCellIds([
 			'0',

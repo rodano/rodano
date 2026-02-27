@@ -136,14 +136,14 @@ jobs:
         run: npm run format:check
 
       - name: Execute unit tests
-        run: npm run test -- --no-watch --no-progress --karma-config=src/karma-ci.conf.cjs
+        run: npm run test:ci
 
       # store reports as artifacts
       - name: Store test report
         uses: actions/upload-artifact@v4
         with:
           name: frontend-main-test-report
-          path: frontends/main/test-report.html
+          path: frontends/main/test-output/results.xml
 
   frontend-configurator:
     name: Test configurator frontend

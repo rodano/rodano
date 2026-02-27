@@ -24,7 +24,7 @@ Run `npm build` to build the project. Run `npm run build:prod` for a production 
 
 ## Running unit tests
 
-Run `npm test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Run `npm test` to execute the unit tests via [Vitest](https://vitest.dev/).
 
 ## Generate API typescript model
 

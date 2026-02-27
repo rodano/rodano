@@ -3,7 +3,8 @@
 		"node_modules": true,
 		"package-lock.json": true,
 		".angular": true,
-		"www": true
+		"www": true,
+		"test-output": true
 	},
 	"css.format.maxPreserveNewLines": 2,
 	"css.format.newlineBetweenRules": false,

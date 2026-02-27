@@ -35,6 +35,7 @@
 						"browser": "src/main.ts"
 					},
 					"configurations": {
+						"development": {},
 						"production": {
 							"fileReplacements": [
 								{
@@ -79,18 +80,10 @@
 					}
 				},
 				"test": {
-					"builder": "@angular/build:karma",
+					"builder": "@angular/build:unit-test",
 					"options": {
-						"main": "src/test.ts",
 						"tsConfig": "tsconfig.spec.json",
-						"karmaConfig": "src/karma.conf.cjs",
-						"styles": [
-							"src/styles.scss"
-						],
-						"scripts": [],
-						"assets": [
-							"src/assets"
-						]
+						"runnerConfig": "vitest.config.ts"
 					}
 				},
 				"lint": {

@@ -1,35 +1,35 @@
+import {beforeEach, describe, it, expect, vi, type MockedObject} from 'vitest';
 import {CRFService} from './crf.service';
 import {DatasetService} from '@core/services/dataset.service';
 import {TestBed} from '@angular/core/testing';
 import {of} from 'rxjs';
 import {DATASET_VISIT_DOCUMENTATION, CRF_DATASET_VISIT_DOCUMENTATION, FORM} from 'src/test/stubs';
-import {FormService} from '@core/services/form.service';
 
 describe('CRFService', () => {
 	let service: CRFService;
-	let datasetServiceSpy: jasmine.SpyObj<DatasetService>;
+	let datasetServiceSpy: MockedObject<DatasetService>;
 
 	beforeEach(() => {
-		const spy = jasmine.createSpyObj('DatasetService', ['searchOnForm']);
-		const spy2 = jasmine.createSpyObj('DatasetService', ['searchOnEvent']);
+		const datasetServiceMock = {
+			searchOnForm: vi.fn().mockName('DatasetService.searchOnForm'),
+			searchOnEvent: vi.fn().mockName('DatasetService.searchOnEvent')
+		};
 
 		TestBed.configureTestingModule({
 			providers: [
-				{provide: DatasetService, useValue: spy},
-				{provide: FormService, useValue: spy2}
+				{provide: DatasetService, useValue: datasetServiceMock}
 			]
 		});
 
 		service = TestBed.inject(CRFService);
-		datasetServiceSpy = TestBed.inject(DatasetService) as jasmine.SpyObj<DatasetService>;
+		datasetServiceSpy = TestBed.inject(DatasetService) as MockedObject<DatasetService>;
 	});
 
 	it('#getCRFDatasets works', () => {
-		datasetServiceSpy.searchOnForm.and.returnValue(of([DATASET_VISIT_DOCUMENTATION]));
+		datasetServiceSpy.searchOnForm.mockReturnValue(of([DATASET_VISIT_DOCUMENTATION]));
 
 		service.getCRFDatasets(FORM).subscribe({
-			next: datasets => expect(datasets).toContain(CRF_DATASET_VISIT_DOCUMENTATION),
-			error: fail
+			next: datasets => expect(datasets).toContainEqual(CRF_DATASET_VISIT_DOCUMENTATION)
 		});
 	});
 });
