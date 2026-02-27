@@ -73,14 +73,12 @@
 				mat-cell
 				*matCellDef="let dataset"
 				[attr.colspan]="columnsToDisplay.length">
-				<div [@layoutExpand]="dataset.expanded ? 'expanded' : 'collapsed'">
-					<app-layout
-						[layout]="layout"
-						[datasets]="[dataset]"
-						[layoutUid]="layout.id + '_' + dataset.id"
-						[disabled]="dataset.removed || disabled">
-					</app-layout>
-				</div>
+				<app-layout
+					[layout]="layout"
+					[datasets]="[dataset]"
+					[layoutUid]="layout.id + '_' + dataset.id"
+					[disabled]="dataset.removed || disabled">
+				</app-layout>
 			</td>
 		</ng-container>
 
@@ -97,6 +95,7 @@
 		<tr
 			mat-row
 			*matRowDef="let dataset; columns: ['expandedDataset']"
+			[class.collapsed]="!dataset.expanded"
 			class="expanded-dataset"></tr>
 	</table>
 

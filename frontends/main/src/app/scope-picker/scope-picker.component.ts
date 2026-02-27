@@ -149,8 +149,8 @@ export class ScopePickerComponent implements MatFormFieldControl<number>, OnInit
 		this.select.setDescribedByIds(ids);
 	}
 
-	onContainerClick() {
-		this.select.onContainerClick();
+	onContainerClick(event: MouseEvent) {
+		this.select.onContainerClick(event);
 	}
 
 	writeValue(value: any) {

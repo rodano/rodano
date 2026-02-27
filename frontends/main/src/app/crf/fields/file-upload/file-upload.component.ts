@@ -2,7 +2,6 @@ import {Component, Input, DestroyRef} from '@angular/core';
 import {FileService} from '@core/services/file.service';
 import {tap, last, map} from 'rxjs/operators';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
-import {trigger, state, style, transition, animate} from '@angular/animations';
 import {NotificationService} from 'src/app/services/notification.service';
 import {FileModel} from '@core/model/file-model';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -17,7 +16,6 @@ import {CRFField} from '../../models/crf-field';
 	selector: 'app-file-upload',
 	templateUrl: './file-upload.component.html',
 	styleUrls: ['../field/field.component.css', './file-upload.component.css'],
-	animations: [trigger('fadeInOut', [state('in', style({opacity: 100})), transition('* => void', [animate(300, style({opacity: 0}))])])],
 	imports: [
 		MatButton,
 		MatIconButton,
@@ -33,7 +31,6 @@ export class FileUploadComponent {
 
 	uploadInProgress = false;
 	uploadProgress: number;
-	animState: string | undefined;
 
 	constructor(
 		private fileService: FileService,
@@ -58,7 +55,6 @@ export class FileUploadComponent {
 		}
 
 		this.uploadInProgress = true;
-		this.animState = 'in';
 
 		this.fileService.upload(this.field.scopePk, file, this.field.eventPk).pipe(
 			takeUntilDestroyed(this.destroyRef),
@@ -82,7 +78,6 @@ export class FileUploadComponent {
 			}
 		}).add(() => {
 			this.uploadInProgress = false;
-			this.animState = undefined;
 		});
 	}
 

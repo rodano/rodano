@@ -1,6 +1,5 @@
 import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {Layout} from '@core/model/layout';
-import {trigger, state, style, transition, animate} from '@angular/animations';
 import {MatSortModule, Sort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatIcon} from '@angular/material/icon';
@@ -32,13 +31,6 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	selector: 'app-multiple-layout',
 	templateUrl: './multiple-layout.component.html',
 	styleUrls: ['./multiple-layout.component.css'],
-	animations: [
-		trigger('layoutExpand', [
-			state('collapsed', style({height: '0', minHeight: '0', marginTop: '0', marginBottom: '0'})),
-			state('expanded', style({height: '*', marginTop: '1rem', marginBottom: '1rem'})),
-			transition('expanded <=> collapsed', animate('200ms cubic-bezier(0.4, 0.0, 0.2, 1)'))
-		])
-	],
 	imports: [
 		MatTableModule,
 		MatSortModule,

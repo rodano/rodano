@@ -31,12 +31,10 @@
 }
 
 @if (uploadInProgress) {
-	<div [@fadeInOut]="animState">
-		<mat-progress-bar
-			mode="determinate"
-			[value]="uploadProgress">
-		</mat-progress-bar>
-	</div>
+	<mat-progress-bar
+		mode="determinate"
+		[value]="uploadProgress">
+	</mat-progress-bar>
 }
 
 <input

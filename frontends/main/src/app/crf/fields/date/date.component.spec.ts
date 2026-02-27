@@ -3,7 +3,6 @@ import {DateComponent} from './date.component';
 import {CRF_FIELD_DATE_OF_WITHDRAWAL} from 'src/test/stubs';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS} from '@angular/material/core';
 import {CustomDateAdapter} from 'src/app/utils/custom-date-adapter';
-import {provideNoopAnimations} from '@angular/platform-browser/animations';
 
 describe('DateComponent', () => {
 	let component: DateComponent;
@@ -13,7 +12,6 @@ describe('DateComponent', () => {
 		TestBed.configureTestingModule({
 			imports: [DateComponent],
 			providers: [
-				provideNoopAnimations(),
 				{provide: DateAdapter, useClass: CustomDateAdapter}, {provide: MAT_DATE_FORMATS, useValue: MAT_NATIVE_DATE_FORMATS}
 			]
 		}).compileComponents();

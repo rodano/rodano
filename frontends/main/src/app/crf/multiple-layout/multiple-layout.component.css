@@ -7,8 +7,10 @@ tr {
 		cursor: pointer;
 	}
 	&.expanded-dataset {
-		height: 0;
-		& td {
+		&.collapsed {
+			display: none;
+		}
+		& > td {
 			border-left: 1rem solid var(--light-border-color);
 			border-bottom: 0;
 		}
