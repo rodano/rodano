@@ -111,7 +111,7 @@ export class FormComponent implements OnInit, OnChanges {
 	//the child components will not be destroyed and re-created
 	saveDatasets() {
 		this.saveLoading = true;
-		this.crfService.saveCRFDatasets(this.form, this.datasets)
+		this.crfService.saveCRFDatasets(this.form, this.layouts, this.datasets)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {

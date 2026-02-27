@@ -70,21 +70,28 @@ export class CRFService {
 	}
 
 	/**
-	 * Transform datasets into a submission and push it to the server
+	 * Transform datasets into a submission object and push it to the server
 	 * @param form A form
+	 * @param layouts The layout of the form, required to determine which fields are displayed and which are not
 	 * @param datasets A list of CRFDatasets
 	 */
-	saveCRFDatasets(form: Form, crfDatasets: CRFDataset[]): Observable<Dataset[]> {
+	saveCRFDatasets(form: Form, layouts: Layout[], crfDatasets: CRFDataset[]): Observable<Dataset[]> {
 		const updatedDatasets = [] as DatasetUpdate[];
 		const newDatasets = [] as DatasetCreation[];
 		const removedDatasets = {} as Record<number, string>;
 		const restoredDatasets = [] as DatasetRestoration[];
+		const formCells = this.getLayoutsCells(layouts).filter(c => this.getCellHasField(c));
 		crfDatasets
 			//remove read only data
 			.filter(d => d.canWrite)
 			.forEach(dataset => {
+				//remove fields that are not part of the form
+				dataset.fields = dataset.fields.filter(f =>
+					formCells.some(c => c.datasetModelId === dataset.modelId && c.fieldModelId === f.modelId)
+				);
+
 				//mark hidden datasets as removed
-				//do no try to do this in the multiple layout component
+				//do not try to do this in the multiple layout component
 				//dataset may be shown/hidden multiple times before being submitted and only the final state count
 				if(!dataset.show && dataset.pk) {
 					dataset.removed = true;
