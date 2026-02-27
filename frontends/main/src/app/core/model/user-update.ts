@@ -16,19 +16,11 @@ export interface UserUpdate {
     /**
      * Name
      */
-    name?: string;
-    /**
-     * Is the user externally managed
-     */
-    externallyManaged?: boolean;
+    name: string;
     /**
      * Language ID
      */
     languageId?: string;
-    /**
-     * Country ID
-     */
-    countryId?: string;
     /**
      * Phone number
      */

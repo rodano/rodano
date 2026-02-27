@@ -13,7 +13,13 @@
  * Role of the new user
  */
 export interface RoleCreation { 
+    /**
+     * Scope reference
+     */
     scopePk: number;
+    /**
+     * ID of the profile
+     */
     profileId: string;
 }
 

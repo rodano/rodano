@@ -33,7 +33,6 @@ export interface UserAuditTrail {
     shouldChangePassword?: boolean;
     userAgent?: string;
     languageId?: string;
-    countryId?: string;
     phone?: string;
     pk?: number;
     auditObjectFk?: number;

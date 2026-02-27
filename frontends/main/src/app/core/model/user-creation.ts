@@ -23,17 +23,9 @@ export interface UserCreation {
      */
     email: string;
     /**
-     * Is the user externally managed
-     */
-    externallyManaged: boolean;
-    /**
      * Phone number
      */
     phone?: string;
-    /**
-     * Country ID
-     */
-    countryId?: string;
     /**
      * Language ID
      */

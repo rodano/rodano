@@ -22,7 +22,6 @@ public class UserDTO extends ActorDTO {
 	@NotNull
 	boolean canWrite;
 
-	String countryId;
 	@NotBlank
 	String languageId;
 	String userAgent;
@@ -94,14 +93,6 @@ public class UserDTO extends ActorDTO {
 
 	public void setCanWrite(final boolean canBeEdited) {
 		this.canWrite = canBeEdited;
-	}
-
-	public String getCountryId() {
-		return countryId;
-	}
-
-	public void setCountryId(final String countryId) {
-		this.countryId = countryId;
 	}
 
 	public String getLanguageId() {

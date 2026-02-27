@@ -43,7 +43,6 @@ export interface User {
     newEmailExpirationDate?: Date;
     phone?: string;
     canWrite: boolean;
-    countryId?: string;
     languageId: string;
     userAgent?: string;
     loginDate?: Date;

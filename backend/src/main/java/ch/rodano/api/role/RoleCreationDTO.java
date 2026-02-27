@@ -1,10 +1,17 @@
 package ch.rodano.api.role;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 public class RoleCreationDTO {
-	@NotNull Long scopePk;
-	@NotNull String profileId;
+	@Schema(description = "Scope reference")
+	@NotNull
+	Long scopePk;
+	@Schema(description = "ID of the profile")
+	@NotBlank
+	String profileId;
 
 	public Long getScopePk() {
 		return scopePk;

@@ -34,7 +34,6 @@ public class UserRecord {
 
 	protected String userAgent;
 	protected String languageId;
-	protected String countryId;
 	protected String phone;
 
 	// TODO 2FA
@@ -227,14 +226,6 @@ public class UserRecord {
 
 	public void setLanguageId(final String languageId) {
 		this.languageId = languageId;
-	}
-
-	public String getCountryId() {
-		return countryId;
-	}
-
-	public void setCountryId(final String countryId) {
-		this.countryId = countryId;
 	}
 
 	public String getPhone() {

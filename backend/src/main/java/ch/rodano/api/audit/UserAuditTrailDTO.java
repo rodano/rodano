@@ -22,7 +22,6 @@ public final class UserAuditTrailDTO extends UserAuditTrail {
 		this.recoveryCode = userAuditTrail.getRecoveryCode();
 		this.shouldChangePassword = userAuditTrail.isShouldChangePassword();
 		this.languageId = userAuditTrail.getLanguageId();
-		this.countryId = userAuditTrail.getCountryId();
 		this.phone = userAuditTrail.getPhone();
 
 		// copy all the user audit trail properties

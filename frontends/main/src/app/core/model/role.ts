@@ -16,7 +16,13 @@ import { Profile } from './profile';
  * Roles
  */
 export interface Role { 
+    /**
+     * Scope reference
+     */
     scopePk: number;
+    /**
+     * ID of the profile
+     */
     profileId: string;
     pk: number;
     userPk?: number;

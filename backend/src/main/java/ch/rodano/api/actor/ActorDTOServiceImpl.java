@@ -182,7 +182,6 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 
 		dto.hasPassword = StringUtils.isNotEmpty(user.getPassword());
 		dto.passwordChangedDate = user.getPasswordChangedDate();
-		dto.countryId = user.getCountryId();
 
 		dto.languageId = StringUtils.defaultIfBlank(user.getLanguageId(), studyService.getStudy().getDefaultLanguageId());
 
@@ -210,8 +209,7 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 		generatedUser.setEmail(userCreationDTO.email());
 		generatedUser.setName(userCreationDTO.name());
 		generatedUser.setPhone(userCreationDTO.phone());
-		generatedUser.setExternallyManaged(userCreationDTO.externallyManaged());
-		generatedUser.setCountryId(userCreationDTO.countryId());
+		generatedUser.setExternallyManaged(false);
 		generatedUser.setLanguageId(userCreationDTO.languageId());
 
 		return generatedUser;
@@ -221,7 +219,6 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 	public void updateUser(final User user, final UserUpdateDTO userUpdateDTO) {
 		user.setName(userUpdateDTO.name());
 		user.setPhone(userUpdateDTO.phone());
-		user.setCountryId(userUpdateDTO.countryId());
 		user.setLanguageId(userUpdateDTO.languageId());
 	}
 
