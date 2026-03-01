@@ -98,17 +98,19 @@
 	</div>
 
 	<div class="settings-section">
-		<div class="section-header" [class.modified]="isFieldModified('introductionText')">
+		<div class="section-header">
 			<h3>
 				Introduction Text
-				@if (isFieldModified('introductionText')) {
-					<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-				}
 			</h3>
 		</div>
 		<div class="settings-grid">
-			<div class="setting-item full-width">
-				<label>Introduction Text (HTML)</label>
+			<div class="setting-item full-width" [class.modified]="isFieldModified('introductionText')">
+				<label>
+					Introduction Text (HTML)
+					@if (isFieldModified('introductionText')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
 				<div class="setting-value text-content" [class.not-configured]="!workingProject?.introductionText">
 					@if (!workingProject?.introductionText) {
 						<mat-icon class="warning-icon">report</mat-icon>
@@ -342,7 +344,7 @@
 			@if (workingProject?.languages?.length) {
 				<div class="chip-container">
 					@for (lang of workingProject?.languages; track lang.languageCode) {
-						<div class="chip" [class.third]="lang.isDefault">
+						<div class="chip" [class.third]="lang.isDefault" [class.default]="!lang.isDefault">
 							<span class="language-name">{{ languageService.getLanguageName(lang.languageCode) }}</span>
 							<span class="language-code">({{ lang.languageCode }})</span>
 							@if (lang.isDefault) {
@@ -377,7 +379,7 @@
 			@if (workingProject?.ruleTags?.length) {
 				<div class="chip-container">
 					@for (tag of workingProject?.ruleTags; track tag.tag) {
-						<div class="chip">{{ tag.tag }}</div>
+						<div class="chip default">{{ tag.tag }}</div>
 					}
 				</div>
 			} @else {

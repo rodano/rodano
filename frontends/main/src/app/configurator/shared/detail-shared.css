@@ -235,6 +235,12 @@
 	color: var(--entity-color);
 }
 
+.chip.default {
+	background-color: rgba(158, 154, 154, 0.12);
+	color: #9e9a9a;
+	border: 1px solid #858181;
+}
+
 .chip.first {
 	background-color: #e0f2f1;
 	color: #047857;
