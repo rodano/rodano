@@ -30,7 +30,7 @@ public class PrivacyPolicyController {
 	}
 
 	/**
-	 * Get all Privacy Policies for a project
+	 * Get all privacy policies for a project
 	 */
 	@GetMapping("/policies")
 	public ResponseEntity<List<PrivacyPolicyDTO>> getPrivacyPolicies(@PathVariable final UUID projectId) {
@@ -39,7 +39,7 @@ public class PrivacyPolicyController {
 	}
 
 	/**
-	 * Get a specific Privacy Policy
+	 * Get a specific privacy policy
 	 */
 	@GetMapping("/policies/{privacyPolicyId}")
 	public ResponseEntity<PrivacyPolicyDTO> getPrivacyPolicy(
@@ -51,7 +51,7 @@ public class PrivacyPolicyController {
 	}
 
 	/**
-	 * Create a new Privacy Policy
+	 * Create a new privacy policy
 	 */
 	@PostMapping("/policies")
 	@SkipProjectAccessCheck
@@ -64,7 +64,7 @@ public class PrivacyPolicyController {
 	}
 
 	/**
-	 * Update an existing Privacy Policy
+	 * Update an existing privacy policy
 	 */
 	@PutMapping("/policies/{privacyPolicyId}")
 	@SkipProjectAccessCheck
@@ -78,7 +78,7 @@ public class PrivacyPolicyController {
 	}
 
 	/**
-	 * Delete a Privacy Policy
+	 * Delete a privacy policy
 	 */
 	@DeleteMapping("/policies/{privacyPolicyId}")
 	@SkipProjectAccessCheck

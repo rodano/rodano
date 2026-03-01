@@ -68,15 +68,15 @@
 								</div>
 								<div class="detail-item" [class.unset]="!workflow.aggregatedWorkflowId">
 									<mat-icon>settings</mat-icon>
-									<span>Aggregate Workflow: {{ workflow.aggregatedWorkflowId ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</span>
+									<span>Aggregate Workflow: <b>{{ workflow.aggregatedWorkflowId ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</b></span>
 								</div>
 								<div class="detail-item" [class.unset]="!workflow.initialStateId">
 									<mat-icon>adjust</mat-icon>
-									<span>Initial State: {{ workflow.initialStateId ? getWorkflowStateLabel(workflow.initialStateId) : 'Not set' }}</span>
+									<span>Initial State: <b>{{ workflow.initialStateId ? getWorkflowStateLabel(workflow.initialStateId) : 'Not set' }}</b></span>
 								</div>
 								<div class="detail-item" [class.unset]="!workflow.actionId">
 									<mat-icon>play_circle</mat-icon>
-									<span>Creation Action: {{ workflow.actionId ? getWorkflowActionLabel(workflow.actionId) : 'Not set' }}</span>
+									<span>Creation Action: <b>{{ workflow.actionId ? getWorkflowActionLabel(workflow.actionId) : 'Not set' }}</b></span>
 								</div>
 							</div>
 						</div>
@@ -158,7 +158,7 @@
 										</div>
 										<div class="detail-item" [class.unset]="!workflowState.aggregateStateId">
 											<mat-icon>adjust</mat-icon>
-											<span>Aggregate State: {{ workflowState.aggregateStateId ? getWorkflowStateLabel(workflowState.aggregateStateId) : 'Not set' }}</span>
+											<span>Aggregate State: <b>{{ workflowState.aggregateStateId ? getWorkflowStateLabel(workflowState.aggregateStateId) : 'Not set' }}</b></span>
 										</div>
 										<div class="detail-item" [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
 											<mat-icon>equal</mat-icon>

@@ -10,6 +10,7 @@ import {ProfileContext} from './contexts/profile-context';
 import {FeatureContext} from './contexts/feature-context';
 import {PrivacyPolicyContext} from './contexts/privacy-policy-context';
 import {ResourceCategoryContext} from './contexts/resource-category-context';
+import {ReportContext} from './contexts/report-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -186,6 +187,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveReports(projectId: string, context: ReportContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveReports(
+				projectId,
+				context.modifiedReportIds,
+				context.reports,
+				context.originalReports
+			)
+		]).pipe(
+			map(() => {
+				context.reportManager.syncOriginalsWithCurrent();
+
+				context.reportManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -242,5 +260,11 @@ export class EntitySaveOrchestratorService {
 		context.resourceCategoryManager.resetToOriginals();
 
 		context.resourceCategoryManager.invalidate();
+	}
+
+	resetReportsToOriginals(context: ReportContext): void {
+		context.reportManager.resetToOriginals();
+
+		context.reportManager.invalidate();
 	}
 }

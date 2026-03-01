@@ -112,7 +112,8 @@ public class PrivacyPolicyDAOServiceImpl implements PrivacyPolicyDAOService {
 	})
 	public void deletePrivacyPolicy(final UUID projectId, final UUID privacyPolicyId) {
 		dslContext.deleteFrom(PRIVACY_POLICY_PROFILE)
-			.where(PRIVACY_POLICY_PROFILE.POLICY_ID.eq(privacyPolicyId))
+			.where(PRIVACY_POLICY_PROFILE.PROJECT_ID.eq(projectId))
+			.and(PRIVACY_POLICY_PROFILE.POLICY_ID.eq(privacyPolicyId))
 			.execute();
 
 		dslContext.deleteFrom(PRIVACY_POLICY)
@@ -130,7 +131,8 @@ public class PrivacyPolicyDAOServiceImpl implements PrivacyPolicyDAOService {
 
 	private void saveProfileIds(final UUID projectId, final UUID policyId, final List<UUID> profileIds) {
 		dslContext.deleteFrom(PRIVACY_POLICY_PROFILE)
-			.where(PRIVACY_POLICY_PROFILE.POLICY_ID.eq(policyId))
+			.where(PRIVACY_POLICY_PROFILE.PROJECT_ID.eq(projectId))
+			.and(PRIVACY_POLICY_PROFILE.POLICY_ID.eq(policyId))
 			.execute();
 
 		if(profileIds == null || profileIds.isEmpty()) {

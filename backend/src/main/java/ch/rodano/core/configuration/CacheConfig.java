@@ -58,7 +58,10 @@ public class CacheConfig {
 			"privacy-policy",
 
 			"resource-categories",
-			"resource-category"
+			"resource-category",
+
+			"reports",
+			"report"
 		);
 	}
 }

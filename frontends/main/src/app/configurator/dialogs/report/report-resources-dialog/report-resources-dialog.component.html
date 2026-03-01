@@ -2,20 +2,20 @@
 
 <div class="dialog-content">
 	<div class="form-section">
-		<h3>Profiles</h3>
-		<p class="hint">Select which profiles should be associated with this privacy policy</p>
+		<h3>Field Models</h3>
+		<p class="hint">Select which field models should be associated with this report</p>
 
 		<div class="dual-list-container">
 			<div class="list-box">
 				<div class="box-label">Available</div>
 				<div class="list-items">
-					@if (availableProfiles.length === 0) {
-						<div class="empty-placeholder">No available profiles</div>
+					@if (availableFieldModels.length === 0) {
+						<div class="empty-placeholder">No available fieldModels</div>
 					}
-					@for (profile of availableProfiles; track profile.profileId) {
-						<div class="list-item" (click)="onAddProfile(profile)">
+					@for (fieldModel of availableFieldModels; track fieldModel.fieldModelId) {
+						<div class="list-item" (click)="onAddFieldModel(fieldModel)">
 							<div class="item-text">
-								<span>{{ languageService.getLabel(profile) }}</span>
+								<span>{{ languageService.getLabel(fieldModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">add_circle_outline</mat-icon>
 						</div>
@@ -26,13 +26,13 @@
 			<div class="list-box selected">
 				<div class="box-label">Selected</div>
 				<div class="list-items">
-					@if (selectedProfiles.length === 0) {
-						<div class="empty-placeholder">No profiles selected</div>
+					@if (selectedFieldModels.length === 0) {
+						<div class="empty-placeholder">No field models selected</div>
 					}
-					@for (profile of selectedProfiles; track profile.profileId) {
-						<div class="list-item" (click)="onRemoveProfile(profile)">
+					@for (fieldModel of selectedFieldModels; track fieldModel.fieldModelId) {
+						<div class="list-item" (click)="onRemoveFieldModel(fieldModel)">
 							<div class="item-text">
-								<span>{{ languageService.getLabel(profile) }}</span>
+								<span>{{ languageService.getLabel(fieldModel) }}</span>
 							</div>
 							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
 						</div>

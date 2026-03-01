@@ -1,0 +1,98 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Reports</h1>
+			<p class="detail-subtitle">Configure reports for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading reports...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-report" (click)="onCreateReport()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Report</h3>
+						<p>Add a new report</p>
+					</div>
+				</div>
+
+				@for (report of reports; track report.reportId) {
+					<div class="primary-card theme-report"
+										[class.selected]="isSelected(report)"
+										[class.modified]="modifiedReportIds.has(report.reportId)"
+										[style.border-top-color]="modifiedReportIds.has(report.reportId) ? '#f59e0b' : ''"
+										(click)="onSelectReport(report)">
+
+						@if (isSelected(report)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(report.shortname) }}</h3>
+								<p class="card-code">{{ report.id }}</p>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>settings</mat-icon>
+									<span>Workflow: <b>{{ getWorkflowLabel(report.workflowId) }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>dataset</mat-icon>
+									<span>Dataset Model: <b>{{ getDatasetModelLabel(report.datasetModelId) }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>text_ad</mat-icon>
+									<span>{{ report.fieldModelIds.length }} {{ report.fieldModelIds.length === 1 ? 'Field Model' : 'Field Models' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (modifiedReportIds.has(report.reportId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (reports.length === 0) {
+				<app-empty-state
+					[icon]="'analytics'"
+					[title]="'No Reports'"
+					[message]="'Create your first report to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedReport && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-report-detail
+					[report]="selectedReport"
+					[projectId]="projectId"
+					[project]="project"
+					[allReports]="reports"
+					(reportUpdated)="onReportUpdated($event)"
+					(reportDeleted)="onReportDeleted($event)"
+					(closed)="onSelectReport(selectedReport)">
+				</app-report-detail>
+			</div>
+		}
+	}
+</div>

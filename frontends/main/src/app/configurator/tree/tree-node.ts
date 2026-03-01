@@ -5,7 +5,7 @@ export interface TreeNode {
 	children?: TreeNode[];
 	expanded?: boolean;
 	selected?: boolean;
-	type: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'field-model' | 'validator' | 'workflow' | 'workflow-state' | 'workflow-action' | 'profile' | 'feature' | 'privacy-policy' | 'resource-category';
+	type: 'scope-model' | 'event-model' | 'event-group' | 'dataset-model' | 'field-model' | 'validator' | 'workflow' | 'workflow-state' | 'workflow-action' | 'profile' | 'feature' | 'privacy-policy' | 'resource-category' | 'report';
 	entityId: string;
 	themeClass?: string;
 }

@@ -95,10 +95,20 @@
 					[projectId]="projectId"
 					[project]="project"
 					[selectedNode]="selectedNode"
-					(nodeSelected)="onrRsourceCategorySelected($event)"
+					(nodeSelected)="onResourceCategorySelected($event)"
 					(resourceCategoriesChanged)="onResourceCategoriesChanged($event)"
 					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)">
 				</app-resource-category-list>
+			}
+			@case ('reports') {
+				<app-report-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onResourceCategorySelected($event)"
+					(reportsChanged)="onReportsChanged($event)"
+					(reportContextChanged)="onReportContextChanged($event)">
+				</app-report-list>
 			}
 			@default {
 				<div class="detail-header">

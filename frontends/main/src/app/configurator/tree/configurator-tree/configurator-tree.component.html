@@ -114,12 +114,13 @@
 		(categoryClicked)="onPrivacyPolicyClicked()">
 	</app-privacy-policy-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">analytics</mat-icon>
-			<span class="node-label">Reports</span>
-		</div>
-	</div>
+	<app-report-tree
+		[projectId]="projectId"
+		[reports]="reports"
+		[expanded]="expandedCategory === 'reports'"
+		[selectedReportId]="selectedReportId"
+		(categoryClicked)="onReportClicked()">
+	</app-report-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('menus')">

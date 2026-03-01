@@ -14,6 +14,7 @@ import {PrivacyPolicyListComponent} from '../privacy-policy/privacy-policy-list/
 import {
 	ResourceCategoryListComponent
 } from '../resource-category/resource-category-list/resource-category-list.component';
+import {ReportListComponent} from '../report/report-list/report-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -32,6 +33,7 @@ import {
 		FeatureListComponent,
 		PrivacyPolicyListComponent,
 		ResourceCategoryListComponent,
+		ReportListComponent,
 		EmptyStateComponent
 	]
 })
@@ -44,6 +46,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(FeatureListComponent) featureListComponent?: FeatureListComponent;
 	@ViewChild(PrivacyPolicyListComponent) privacyPolicyListComponent?: PrivacyPolicyListComponent;
 	@ViewChild(ResourceCategoryListComponent) resourceCategoryListComponent?: ResourceCategoryListComponent;
+	@ViewChild(ReportListComponent) reportListComponent?: ReportListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -111,7 +114,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedResourceCategoryId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'overview' | null = null;
+	@Output() reportsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() reportContextChanged = new EventEmitter<{
+		reports: any[];
+		selectedReportId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
@@ -121,6 +130,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	featureModificationCount = 0;
 	privacyPolicyModificationCount = 0;
 	resourceCategoryModificationCount = 0;
+	reportModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -205,7 +215,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
-	onrRsourceCategorySelected(nodeId: string | null): void {
+	onResourceCategorySelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 		this.nodeSelected.emit(nodeId);
 	}
@@ -213,6 +223,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	onResourceCategoriesChanged(event: {modificationCount: number}): void {
 		this.resourceCategoryModificationCount = event.modificationCount;
 		this.resourceCategoriesChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
+	onReportSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onReportsChanged(event: {modificationCount: number}): void {
+		this.reportModificationCount = event.modificationCount;
+		this.reportsChanged.emit(event);
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
@@ -279,6 +300,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'resource-categories') {
 			this.selectedNodeType = 'resource-categories';
+			return;
+		}
+
+		if(this.selectedNode === 'reports') {
+			this.selectedNodeType = 'reports';
 			return;
 		}
 
@@ -349,5 +375,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedResourceCategoryId: string | null;
 	}): void {
 		this.resourceCategoryContextChanged.emit(context);
+	}
+
+	onReportContextChanged(context: {
+		reports: any[];
+		selectedReportId: string | null;
+	}): void {
+		this.reportContextChanged.emit(context);
 	}
 }

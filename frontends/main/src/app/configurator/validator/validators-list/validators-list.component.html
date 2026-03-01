@@ -64,15 +64,15 @@
 							<div class="card-details">
 								<div class="detail-item">
 									<mat-icon>settings</mat-icon>
-									<span>Workflow: {{ validator.workflowId ? getWorkflowLabel(validator.workflowId) : 'Not set' }}</span>
+									<span>Workflow: <b>{{ validator.workflowId ? getWorkflowLabel(validator.workflowId) : 'Not set' }}</b></span>
 								</div>
 								<div class="detail-item">
 									<mat-icon>cancel</mat-icon>
-									<span>Invalid: {{ validator.invalidStateId ? getWorkflowStateLabel(validator.invalidStateId) : 'Not set' }}</span>
+									<span>Invalid State: <b>{{ validator.invalidStateId ? getWorkflowStateLabel(validator.invalidStateId) : 'Not set' }}</b></span>
 								</div>
 								<div class="detail-item">
 									<mat-icon>check_circle</mat-icon>
-									<span>Valid: {{ validator.validStateId ? getWorkflowStateLabel(validator.validStateId) : 'Not set' }}</span>
+									<span>Valid State: <b>{{ validator.validStateId ? getWorkflowStateLabel(validator.validStateId) : 'Not set' }}</b></span>
 								</div>
 							</div>
 						</div>

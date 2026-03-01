@@ -32,6 +32,7 @@ import {ProfileManagerService} from '../services/manager/profile-manager.service
 import {FeatureManagerService} from '../services/manager/feature-manager.service';
 import {PrivacyPolicyManagerService} from '../services/manager/privacy-policy-manager.service';
 import {ResourceCategoryManagerService} from '../services/manager/resource-category-manager.service';
+import {ReportManagerService} from '../services/manager/report-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -69,6 +70,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	featureModificationCount = 0;
 	privacyPolicyModificationCount = 0;
 	resourceCategoryModificationCount = 0;
+	reportModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -83,6 +85,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	features: any[] = [];
 	privacyPolicies: any[] = [];
 	resourceCategories: any[] = [];
+	reports: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -97,6 +100,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedFeatureId: string | null = null;
 	selectedPrivacyPolicyId: string | null = null;
 	selectedResourceCategoryId: string | null = null;
+	selectedReportId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -123,6 +127,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private featureManager: FeatureManagerService,
 		private privacyPolicyManager: PrivacyPolicyManagerService,
 		private resourceCategoryManager: ResourceCategoryManagerService,
+		private reportManager: ReportManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -167,6 +172,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.featureManager.invalidate();
 		this.privacyPolicyManager.invalidate();
 		this.resourceCategoryManager.invalidate();
+		this.reportManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -230,6 +236,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: resourceCategories => this.resourceCategories = resourceCategories,
 			error: error => console.error('Error loading resource categories:', error)
 		});
+
+		this.reportManager.load(this.projectId).subscribe({
+			next: reports => this.reports = reports,
+			error: error => console.error('Error loading reports:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -241,6 +252,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.features = this.featureManager.getAll();
 		this.privacyPolicies = this.privacyPolicyManager.getAll();
 		this.resourceCategories = this.resourceCategoryManager.getAll();
+		this.reports = this.reportManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -302,6 +314,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.features = [];
 			this.privacyPolicies = [];
 			this.resourceCategories = [];
+			this.reports = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -311,6 +324,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.featureListComponent?.clearSelection();
 			this.detailComponent?.privacyPolicyListComponent?.clearSelection();
 			this.detailComponent?.resourceCategoryListComponent?.clearSelection();
+			this.detailComponent?.reportListComponent?.clearSelection();
 		}
 	}
 
@@ -344,6 +358,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onResourceCategoriesChanged(event: {modificationCount: number}): void {
 		this.resourceCategoryModificationCount = event.modificationCount;
+	}
+
+	onReportsChanged(event: {modificationCount: number}): void {
+		this.reportModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -410,6 +428,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveResourceCategories());
 				}
 
+				if(this.reportModificationCount > 0) {
+					saveObservables.push(this.saveReports());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
@@ -421,6 +443,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 							this.featureModificationCount = 0;
 							this.privacyPolicyModificationCount = 0;
 							this.resourceCategoryModificationCount = 0;
+							this.reportModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -595,6 +618,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveReports(): Promise<void> {
+		const component = this.detailComponent?.reportListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveReports(this.projectId, {
+			reportManager: component.reportManager,
+			reports: component.reports,
+			originalReports: component.originalReports,
+			modifiedReportIds: component.modifiedReportIds
+		}).toPromise().then(() => {
+			component.loadReports();
+			this.reports = this.reportManager.getAll();
+		});
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -738,6 +778,17 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			resourceCategoryComponent.loadResourceCategories();
 		}
 
+		const reportComponent = this.detailComponent?.reportListComponent;
+		if(reportComponent) {
+			this.entitySaveOrchestratorService.resetReportsToOriginals({
+				reportManager: reportComponent.reportManager,
+				reports: reportComponent.reports,
+				originalReports: reportComponent.originalReports,
+				modifiedReportIds: reportComponent.modifiedReportIds
+			});
+			reportComponent.loadReports();
+		}
+
 		this.scopeModelModificationCount = 0;
 		this.datasetModelModificationCount = 0;
 		this.validatorModificationCount = 0;
@@ -746,6 +797,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.featureModificationCount = 0;
 		this.privacyPolicyModificationCount = 0;
 		this.resourceCategoryModificationCount = 0;
+		this.reportModificationCount = 0;
 
 		this.refreshTreeData();
 	}
@@ -815,7 +867,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.profileModificationCount > 0
 		  || this.featureModificationCount > 0
 		  || this.privacyPolicyModificationCount > 0
-		  || this.resourceCategoryModificationCount > 0;
+		  || this.resourceCategoryModificationCount > 0
+		  || this.reportModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
@@ -827,7 +880,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  + this.profileModificationCount
 		  + this.featureModificationCount
 		  + this.privacyPolicyModificationCount
-		  + this.resourceCategoryModificationCount;
+		  + this.resourceCategoryModificationCount
+		  + this.reportModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -893,6 +947,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.resourceCategories = context.resourceCategories;
 			this.selectedResourceCategoryId = context.selectedResourceCategoryId;
+		});
+	}
+
+	onReportContextChanged(context: any): void {
+		setTimeout(() => {
+			this.reports = context.reports;
+			this.selectedReportId = context.selectedReportId;
 		});
 	}
 }

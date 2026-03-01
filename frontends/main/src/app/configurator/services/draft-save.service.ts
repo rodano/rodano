@@ -26,6 +26,8 @@ import {PrivacyPolicyService} from './api/privacy-policy.service';
 import {PrivacyPolicy} from '@core/model/privacy-policy';
 import {ResourceCategoryService} from './api/resource-category.service';
 import {ResourceCategory} from '@core/model/resource-category';
+import {ReportService} from './api/report.service';
+import { Report } from '@core/model/report';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -42,7 +44,8 @@ export class DraftSaveService {
 		private profileService: ProfileService,
 		private featureService: FeatureService,
 		private privacyPolicyService: PrivacyPolicyService,
-		private resourceCategoryService: ResourceCategoryService
+		private resourceCategoryService: ResourceCategoryService,
+		private reportService: ReportService
 	) {}
 
 	saveScopeModels(
@@ -416,6 +419,41 @@ export class DraftSaveService {
 				const resourceCategory = resourceCategories.find(rc => rc.categoryId === id);
 				if(resourceCategory) {
 					saveObservables.push(this.resourceCategoryService.updateResourceCategory(projectId, id, resourceCategory));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveReports(
+		projectId: string,
+		modifiedIds: Set<string>,
+		reports: Report[],
+		originalReports: Report[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalReports.find(r => r.reportId === originalId);
+				if(original) {
+					saveObservables.push(this.reportService.deleteReport(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const report = reports.find(r => r.reportId === id);
+				if(report) {
+					saveObservables.push(this.reportService.createReport(projectId, report));
+				}
+			}
+			else {
+				const report = reports.find(r => r.reportId === id);
+				if(report) {
+					saveObservables.push(this.reportService.updateReport(projectId, id, report));
 				}
 			}
 		});

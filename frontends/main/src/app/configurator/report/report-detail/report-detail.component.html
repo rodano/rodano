@@ -1,0 +1,151 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(report.shortname) }}</h2>
+		<span class="detail-code theme-report">{{ report.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (report) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<div class="setting-item" [class.modified]="isFieldModified('id')">
+					<label>
+						Code
+						@if (isFieldModified('id')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value">{{ report.id }}</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('workflowId')">
+					<label>
+						Workflow
+						@if (isFieldModified('workflowId')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!report.workflowId">
+						<div class="chip theme-workflow">
+							<mat-icon class="resource-icon">settings</mat-icon>
+							<span class="language-name">{{ getWorkflowLabel(report.workflowId) }}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('datasetModelId')">
+					<label>
+						Dataset Model
+						@if (isFieldModified('datasetModelId')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!report.datasetModelId">
+						<div class="chip theme-dataset-model">
+							<mat-icon class="resource-icon">dataset</mat-icon>
+							<span class="language-name">{{ getDatasetModelLabel(report.datasetModelId) }}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
+					<label>
+						Short Name
+						@if (isFieldModified('shortname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(report.shortname)">
+						@if (!languageService.getTranslatedValue(report.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(report.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
+					<label>
+						Long Name
+						@if (isFieldModified('longname')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(report.longname)">
+						@if (!languageService.getTranslatedValue(report.longname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(report.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+
+				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+					<label>
+						Description
+						@if (isFieldModified('description')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(report.description)">
+						@if (!languageService.getTranslatedValue(report.description)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(report.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Associated Resources</h3>
+			<div class="settings-grid">
+				<div class="setting-item full-width" [class.modified]="isFieldModified('fieldModelIds')">
+					<label>
+						Field Models
+						@if (isFieldModified('fieldModelIds')) {
+							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+						}
+					</label>
+					<div class="relationship-box">
+						@if (report.fieldModelIds && report.fieldModelIds.length > 0) {
+							<div class="chip-container">
+								@for (fieldId of report.fieldModelIds; track fieldId) {
+									<div class="chip theme-field-model">
+										<mat-icon class="resource-icon">text_ad</mat-icon>
+										<span class="language-name">{{ getFieldModelLabel(fieldId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No field models configured</span>
+							</div>
+						}
+					</div>
+				</div>
+			</div>
+			<button class="btn-edit" (click)="onEditResources()">
+				<mat-icon>edit</mat-icon>
+				Edit Resources
+			</button>
+		</div>
+
+		<app-danger-zone
+			[title]="'Delete Report'"
+			[message]="'Deleting this report is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
+	</div>
+}

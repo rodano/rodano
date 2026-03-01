@@ -105,6 +105,7 @@
 					[features]="features"
 					[privacyPolicies]="privacyPolicies"
 					[resourceCategories]="resourceCategories"
+					[reports]="reports"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -118,6 +119,7 @@
 					[selectedFeatureId]="selectedFeatureId"
 					[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
 					[selectedResourceCategoryId]="selectedResourceCategoryId"
+					[selectedReportId]="selectedReportId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -138,6 +140,7 @@
 					(featuresChanged)="onFeaturesChanged($event)"
 					(privacyPoliciesChanged)="onPrivacyPoliciesChanged($event)"
 					(resourceCategoriesChanged)="onResourceCategoriesChanged($event)"
+					(reportsChanged)="onReportsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -145,7 +148,8 @@
 					(profileContextChanged)="onProfileContextChanged($event)"
 					(featureContextChanged)="onFeatureContextChanged($event)"
 					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)"
-					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)">
+					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)"
+					(reportContextChanged)="onReportContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>
