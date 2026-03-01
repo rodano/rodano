@@ -24,6 +24,8 @@ import {FeatureService} from './api/feature.service';
 import {Feature} from '@core/model/feature';
 import {PrivacyPolicyService} from './api/privacy-policy.service';
 import {PrivacyPolicy} from '@core/model/privacy-policy';
+import {ResourceCategoryService} from './api/resource-category.service';
+import {ResourceCategory} from '@core/model/resource-category';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -39,7 +41,8 @@ export class DraftSaveService {
 		private workflowActionService: WorkflowActionService,
 		private profileService: ProfileService,
 		private featureService: FeatureService,
-		private privacyPolicyService: PrivacyPolicyService
+		private privacyPolicyService: PrivacyPolicyService,
+		private resourceCategoryService: ResourceCategoryService
 	) {}
 
 	saveScopeModels(
@@ -378,6 +381,41 @@ export class DraftSaveService {
 				const privacyPolicy = privacyPolicies.find(pp => pp.policyId === id);
 				if(privacyPolicy) {
 					saveObservables.push(this.privacyPolicyService.updatePrivacyPolicy(projectId, id, privacyPolicy));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveResourceCategories(
+		projectId: string,
+		modifiedIds: Set<string>,
+		resourceCategories: ResourceCategory[],
+		originalResourceCategories: ResourceCategory[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalResourceCategories.find(rc => rc.categoryId === originalId);
+				if(original) {
+					saveObservables.push(this.resourceCategoryService.deleteResourceCategory(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const resourceCategory = resourceCategories.find(rc => rc.categoryId === id);
+				if(resourceCategory) {
+					saveObservables.push(this.resourceCategoryService.createResourceCategory(projectId, resourceCategory));
+				}
+			}
+			else {
+				const resourceCategory = resourceCategories.find(rc => rc.categoryId === id);
+				if(resourceCategory) {
+					saveObservables.push(this.resourceCategoryService.updateResourceCategory(projectId, id, resourceCategory));
 				}
 			}
 		});

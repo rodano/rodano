@@ -98,12 +98,13 @@
 		</div>
 	</div>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">eco</mat-icon>
-			<span class="node-label">Resource Categories</span>
-		</div>
-	</div>
+	<app-resource-category-tree
+		[projectId]="projectId"
+		[resourceCategories]="resourceCategories"
+		[expanded]="expandedCategory === 'resource-categories'"
+		[selectedResourceCategoryId]="selectedResourceCategoryId"
+		(categoryClicked)="onResourceCategoryClicked()">
+	</app-resource-category-tree>
 
 	<app-privacy-policy-tree
 		[projectId]="projectId"

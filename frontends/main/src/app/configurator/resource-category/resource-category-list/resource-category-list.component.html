@@ -1,0 +1,80 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Resource Categories</h1>
+			<p class="detail-subtitle">Configure resource categories for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading resource categories...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card small-card create-card theme-resource-category" (click)="onCreateResourceCategory()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Resource Category</h3>
+					</div>
+				</div>
+
+				@for (resourceCategory of resourceCategories; track resourceCategory.categoryId) {
+					<div class="primary-card small-card theme-resource-category"
+										[class.selected]="isSelected(resourceCategory)"
+										[class.modified]="modifiedResourceCategoryIds.has(resourceCategory.categoryId)"
+										[style.border-top-color]="modifiedResourceCategoryIds.has(resourceCategory.categoryId) ? '#f59e0b' : ''"
+										(click)="onSelectResourceCategory(resourceCategory)">
+
+						@if (isSelected(resourceCategory)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(resourceCategory.shortname) }}</h3>
+								<p class="card-code">{{ resourceCategory.id }}</p>
+							</div>
+						</div>
+
+						@if (modifiedResourceCategoryIds.has(resourceCategory.categoryId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (resourceCategories.length === 0) {
+				<app-empty-state
+					[icon]="'eco'"
+					[title]="'No Resource Categories'"
+					[message]="'Create your first resource category to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedResourceCategory && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-resource-category-detail
+					[resourceCategory]="selectedResourceCategory"
+					[projectId]="projectId"
+					[project]="project"
+					[allResourceCategories]="resourceCategories"
+					(resourceCategoryUpdated)="onResourceCategoryUpdated($event)"
+					(resourceCategoryDeleted)="onResourceCategoryDeleted($event)"
+					(closed)="onSelectResourceCategory(selectedResourceCategory)">
+				</app-resource-category-detail>
+			</div>
+		}
+	}
+</div>

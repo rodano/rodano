@@ -1,0 +1,88 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">{{ isEditMode ? 'Edit Basic Information' : 'Create Resource Category' }}</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Code *</label>
+				<input
+					type="text"
+					formControlName="id"
+					placeholder="RESOURCE_CATEGORY_CODE"
+					required
+					(input)="onCodeInput($event, form)">
+				<span class="hint">Uppercase letters, numbers, and underscores only</span>
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+					<span class="error-message">Code is required</span>
+				}
+			</div>
+
+			<div class="form-section">
+				<h3>Icon</h3>
+				<p class="hint">Specify a Material Icon name to represent this workflow state</p>
+
+				<div class="form-field">
+					<label>Icon</label>
+					<input type="text" formControlName="icon" placeholder='e.g., "person", "medical_services"'>
+					<span class="hint">Browse icons at <a href="https://fonts.google.com/icons"
+																																											target="_blank">Material Icons</a></span>
+				</div>
+				@if (iconPreview) {
+					<div class="dialog-icon">
+						<span class="hint">Preview</span>
+						<mat-icon>{{ iconPreview }}</mat-icon>
+					</div>
+				}
+			</div>
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+										<input
+											type="text"
+											formControlName="shortname"
+											placeholder="Documents">
+										<span class="hint">Brief display name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Long Name</label>
+										<input
+											type="text"
+											formControlName="longname">
+										<span class="hint">Full descriptive name</span>
+									</div>
+
+									<div class="form-field">
+										<label>Description</label>
+										<textarea
+											formControlName="description"
+											placeholder="Detailed description of this resource category"
+											rows="3"></textarea>
+										<span class="hint">Optional description</span>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+			{{ isEditMode ? 'Save Changes' : 'Create Resource Category' }}
+		</button>
+	</div>
+</div>

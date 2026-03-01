@@ -94,7 +94,7 @@ export class FeatureDialogComponent extends BaseInfoDialogComponent implements O
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`An feature with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.snackBar.open(`A feature with code "${code}" already exists`, 'Close', {duration: 3000});
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();

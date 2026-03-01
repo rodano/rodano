@@ -31,6 +31,7 @@ import {WorkflowActionManagerService} from '../services/manager/workflow-action-
 import {ProfileManagerService} from '../services/manager/profile-manager.service';
 import {FeatureManagerService} from '../services/manager/feature-manager.service';
 import {PrivacyPolicyManagerService} from '../services/manager/privacy-policy-manager.service';
+import {ResourceCategoryManagerService} from '../services/manager/resource-category-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -67,6 +68,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	profileModificationCount = 0;
 	featureModificationCount = 0;
 	privacyPolicyModificationCount = 0;
+	resourceCategoryModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -80,6 +82,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	profiles: any[] = [];
 	features: any[] = [];
 	privacyPolicies: any[] = [];
+	resourceCategories: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -93,6 +96,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedProfileId: string | null = null;
 	selectedFeatureId: string | null = null;
 	selectedPrivacyPolicyId: string | null = null;
+	selectedResourceCategoryId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -118,6 +122,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private profileManager: ProfileManagerService,
 		private featureManager: FeatureManagerService,
 		private privacyPolicyManager: PrivacyPolicyManagerService,
+		private resourceCategoryManager: ResourceCategoryManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -161,6 +166,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.profileManager.invalidate();
 		this.featureManager.invalidate();
 		this.privacyPolicyManager.invalidate();
+		this.resourceCategoryManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -219,6 +225,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: privacyPolicies => this.privacyPolicies = privacyPolicies,
 			error: error => console.error('Error loading privacy policies:', error)
 		});
+
+		this.resourceCategoryManager.load(this.projectId).subscribe({
+			next: resourceCategories => this.resourceCategories = resourceCategories,
+			error: error => console.error('Error loading resource categories:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -229,6 +240,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.profiles = this.profileManager.getAll();
 		this.features = this.featureManager.getAll();
 		this.privacyPolicies = this.privacyPolicyManager.getAll();
+		this.resourceCategories = this.resourceCategoryManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -289,6 +301,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.profiles = [];
 			this.features = [];
 			this.privacyPolicies = [];
+			this.resourceCategories = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -297,6 +310,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.profileListComponent?.clearSelection();
 			this.detailComponent?.featureListComponent?.clearSelection();
 			this.detailComponent?.privacyPolicyListComponent?.clearSelection();
+			this.detailComponent?.resourceCategoryListComponent?.clearSelection();
 		}
 	}
 
@@ -326,6 +340,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onPrivacyPoliciesChanged(event: {modificationCount: number}): void {
 		this.privacyPolicyModificationCount = event.modificationCount;
+	}
+
+	onResourceCategoriesChanged(event: {modificationCount: number}): void {
+		this.resourceCategoryModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -388,6 +406,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.savePrivacyPolicies());
 				}
 
+				if(this.resourceCategoryModificationCount > 0) {
+					saveObservables.push(this.saveResourceCategories());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
@@ -398,6 +420,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 							this.profileModificationCount = 0;
 							this.featureModificationCount = 0;
 							this.privacyPolicyModificationCount = 0;
+							this.resourceCategoryModificationCount = 0;
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -555,6 +578,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveResourceCategories(): Promise<void> {
+		const component = this.detailComponent?.resourceCategoryListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveResourceCategories(this.projectId, {
+			resourceCategoryManager: component.resourceCategoryManager,
+			resourceCategories: component.resourceCategories,
+			originalResourceCategories: component.originalResourceCategories,
+			modifiedResourceCategoryIds: component.modifiedResourceCategoryIds
+		}).toPromise().then(() => {
+			component.loadResourceCategories();
+			this.resourceCategories = this.resourceCategoryManager.getAll();
+		});
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -687,6 +727,17 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			privacyPolicyComponent.loadPrivacyPolicies();
 		}
 
+		const resourceCategoryComponent = this.detailComponent?.resourceCategoryListComponent;
+		if(resourceCategoryComponent) {
+			this.entitySaveOrchestratorService.resetResourceCategoriesToOriginals({
+				resourceCategoryManager: resourceCategoryComponent.resourceCategoryManager,
+				resourceCategories: resourceCategoryComponent.resourceCategories,
+				originalResourceCategories: resourceCategoryComponent.originalResourceCategories,
+				modifiedResourceCategoryIds: resourceCategoryComponent.modifiedResourceCategoryIds
+			});
+			resourceCategoryComponent.loadResourceCategories();
+		}
+
 		this.scopeModelModificationCount = 0;
 		this.datasetModelModificationCount = 0;
 		this.validatorModificationCount = 0;
@@ -694,6 +745,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.profileModificationCount = 0;
 		this.featureModificationCount = 0;
 		this.privacyPolicyModificationCount = 0;
+		this.resourceCategoryModificationCount = 0;
 
 		this.refreshTreeData();
 	}
@@ -762,7 +814,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.workflowModificationCount > 0
 		  || this.profileModificationCount > 0
 		  || this.featureModificationCount > 0
-		  || this.privacyPolicyModificationCount > 0;
+		  || this.privacyPolicyModificationCount > 0
+		  || this.resourceCategoryModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
@@ -773,7 +826,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  + this.workflowModificationCount
 		  + this.profileModificationCount
 		  + this.featureModificationCount
-		  + this.privacyPolicyModificationCount;
+		  + this.privacyPolicyModificationCount
+		  + this.resourceCategoryModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -832,6 +886,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.privacyPolicies = context.privacyPolicies;
 			this.selectedPrivacyPolicyId = context.selectedPrivacyPolicyId;
+		});
+	}
+
+	onResourceCategoryContextChanged(context: any): void {
+		setTimeout(() => {
+			this.resourceCategories = context.resourceCategories;
+			this.selectedResourceCategoryId = context.selectedResourceCategoryId;
 		});
 	}
 }

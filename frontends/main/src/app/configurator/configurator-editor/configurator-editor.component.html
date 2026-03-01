@@ -99,11 +99,12 @@
 					[fieldModels]="fieldModels"
 					[validators]="validators"
 					[workflows]="workflows"
+					[workflowStates]="workflowStates"
+					[workflowActions]="workflowActions"
 					[profiles]="profiles"
 					[features]="features"
 					[privacyPolicies]="privacyPolicies"
-					[workflowStates]="workflowStates"
-					[workflowActions]="workflowActions"
+					[resourceCategories]="resourceCategories"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -116,6 +117,7 @@
 					[selectedProfileId]="selectedProfileId"
 					[selectedFeatureId]="selectedFeatureId"
 					[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
+					[selectedResourceCategoryId]="selectedResourceCategoryId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -135,13 +137,15 @@
 					(profilesChanged)="onProfilesChanged($event)"
 					(featuresChanged)="onFeaturesChanged($event)"
 					(privacyPoliciesChanged)="onPrivacyPoliciesChanged($event)"
+					(resourceCategoriesChanged)="onResourceCategoriesChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
 					(workflowContextChanged)="onWorkflowContextChanged($event)"
 					(profileContextChanged)="onProfileContextChanged($event)"
 					(featureContextChanged)="onFeatureContextChanged($event)"
-					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)">
+					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)"
+					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

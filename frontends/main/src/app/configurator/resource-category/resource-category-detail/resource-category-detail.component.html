@@ -1,0 +1,105 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(resourceCategory.shortname) }}</h2>
+		<span class="detail-code theme-resource-category">{{ resourceCategory.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+			<div class="setting-item" [class.modified]="isFieldModified('id')">
+				<label>
+					Code
+					@if (isFieldModified('id')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value">{{ resourceCategory.id }}</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('icon')">
+				<label>
+					Icon
+					@if (isFieldModified('icon')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!resourceCategory.icon">
+					@if (resourceCategory.icon) {
+						<div class="icon-preview">
+							<mat-icon>{{ resourceCategory.icon }}</mat-icon>
+							<span>{{ resourceCategory.icon }}</span>
+						</div>
+					} @else {
+						<mat-icon class="warning-icon">report</mat-icon>
+						Not configured
+					}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
+				<label>
+					Short Name
+					@if (isFieldModified('shortname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(resourceCategory.shortname)">
+					@if (!languageService.getTranslatedValue(resourceCategory.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(resourceCategory.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item" [class.modified]="isFieldModified('longname')">
+				<label>
+					Long Name
+					@if (isFieldModified('longname')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(resourceCategory.longname)">
+					@if (!languageService.getTranslatedValue(resourceCategory.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(resourceCategory.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
+				<label>
+					Description
+					@if (isFieldModified('description')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(resourceCategory.description)">
+					@if (!languageService.getTranslatedValue(resourceCategory.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(resourceCategory.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</div>
+			</div>
+
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<app-danger-zone
+		[title]="'Delete Resource Category'"
+		[message]="'Deleting this resource category is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
+</div>

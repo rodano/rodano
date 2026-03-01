@@ -9,6 +9,7 @@ import {WorkflowContext} from './contexts/workflow-context';
 import {ProfileContext} from './contexts/profile-context';
 import {FeatureContext} from './contexts/feature-context';
 import {PrivacyPolicyContext} from './contexts/privacy-policy-context';
+import {ResourceCategoryContext} from './contexts/resource-category-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -168,6 +169,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveResourceCategories(projectId: string, context: ResourceCategoryContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveResourceCategories(
+				projectId,
+				context.modifiedResourceCategoryIds,
+				context.resourceCategories,
+				context.originalResourceCategories
+			)
+		]).pipe(
+			map(() => {
+				context.resourceCategoryManager.syncOriginalsWithCurrent();
+
+				context.resourceCategoryManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -218,5 +236,11 @@ export class EntitySaveOrchestratorService {
 		context.privacyPolicyManager.resetToOriginals();
 
 		context.privacyPolicyManager.invalidate();
+	}
+
+	resetResourceCategoriesToOriginals(context: ResourceCategoryContext): void {
+		context.resourceCategoryManager.resetToOriginals();
+
+		context.resourceCategoryManager.invalidate();
 	}
 }
