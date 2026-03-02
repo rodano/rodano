@@ -155,10 +155,6 @@ public class Chart implements Node, Comparable<Chart> {
 		this.title = title;
 	}
 
-	public String getLocalizedTitle(final String... languages) {
-		return DisplayableUtils.getLocalizedMap(title, languages);
-	}
-
 	public Map<String, String> getLegendX() {
 		return legendX;
 	}
@@ -167,20 +163,12 @@ public class Chart implements Node, Comparable<Chart> {
 		this.legendX = legendX;
 	}
 
-	public String getLocalizedLegendX(final String... languages) {
-		return DisplayableUtils.getLocalizedMap(legendX, languages);
-	}
-
 	public Map<String, String> getLegendY() {
 		return legendY;
 	}
 
 	public void setLegendY(final Map<String, String> legendY) {
 		this.legendY = legendY;
-	}
-
-	public String getLocalizedLegendY(final String... languages) {
-		return DisplayableUtils.getLocalizedMap(legendY, languages);
 	}
 
 	public List<String> getColors() {

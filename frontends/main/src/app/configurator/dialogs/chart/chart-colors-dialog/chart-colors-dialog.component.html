@@ -1,0 +1,42 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Colors</h2>
+
+	<div class="dialog-content">
+		<div class="colors-grid">
+			@for (color of colors; track color.id) {
+				<div class="color-entry">
+					<button
+						type="button"
+						class="color-button"
+						[style.background-color]="color.value"
+						(click)="onColorPickerClick(picker)">
+					</button>
+					<input
+						#picker
+						type="color"
+						class="color-input-hidden"
+						[value]="color.value"
+						(input)="onColorPickerChange(color.id, $event)">
+					<input
+						type="text"
+						class="color-text-input"
+						[value]="color.value"
+						maxlength="7"
+						placeholder="#000000"
+						(input)="onColorTextInput(color.id, $event)">
+					<button class="btn-delete" type="button" (click)="removeColor(color.id)">
+						<mat-icon>close</mat-icon>
+					</button>
+				</div>
+			}
+			<div class="color-add-card" (click)="addColor()">
+				<mat-icon>add</mat-icon>
+			</div>
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

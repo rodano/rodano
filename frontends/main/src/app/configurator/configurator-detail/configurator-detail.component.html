@@ -110,6 +110,16 @@
 					(reportContextChanged)="onReportContextChanged($event)">
 				</app-report-list>
 			}
+			@case ('charts') {
+				<app-chart-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onChartSelected($event)"
+					(chartsChanged)="onChartsChanged($event)"
+					(chartContextChanged)="onChartContextChanged($event)">
+				</app-chart-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

@@ -1,0 +1,149 @@
+<div class="detail-header">
+	<div class="header-title-row">
+		<div>
+			<h1>Charts</h1>
+			<p class="detail-subtitle">Configure charts for data collection</p>
+		</div>
+	</div>
+</div>
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading charts...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-chart" (click)="onCreateChart()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Chart</h3>
+						<p>Add a new chart</p>
+					</div>
+				</div>
+
+				@for (chart of charts; track chart.chartId) {
+					<div class="primary-card theme-chart"
+										[class.selected]="isSelected(chart)"
+										[class.modified]="modifiedChartIds.has(chart.chartId)"
+										[style.border-top-color]="modifiedChartIds.has(chart.chartId) ? '#f59e0b' : ''"
+										(click)="onSelectChart(chart)">
+
+						@if (isSelected(chart)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(chart.shortname) }}</h3>
+								<p class="card-code">{{ chart.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (chart.overrideUserRights) {
+									<span class="status-badge third" matTooltip="Override User Rights">
+										<mat-icon class="badge-full">copyright</mat-icon>
+										<mat-icon class="badge-short">copyright</mat-icon>
+									</span>
+								}
+								@if (chart.withStatistics) {
+									<span class="status-badge first" matTooltip="With Statistics">
+										<mat-icon class="badge-full">add_chart</mat-icon>
+										<mat-icon class="badge-short">add_chart</mat-icon>
+									</span>
+								}
+								@if (chart.displayExpected) {
+									<span class="status-badge second" matTooltip="Display Expected">
+										<mat-icon class="badge-full">desktop_windows</mat-icon>
+										<mat-icon class="badge-short">desktop_windows</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<span>Type: <b>{{ chart.type }}</b></span>
+								</div>
+								@if (chart.type !== 'WORKFLOW_STATUS') {
+									<div class="detail-item">
+										<mat-icon>account_tree</mat-icon>
+										<span>Leaf Scope Model: <b>{{ chart.leafScopeModelId ? getScopeModelLabel(chart.leafScopeModelId) : 'Not set' }}</b></span>
+									</div>
+								}
+								@switch (chart.type) {
+									@case ('STATISTICS') {
+										<div class="detail-item">
+											<mat-icon>text_ad</mat-icon>
+											<span>Field Model: <b>{{ chart.fieldModelId ? getFieldModelLabel(chart.fieldModelId) : 'Not set' }}</b></span>
+										</div>
+									}
+									@case ('ENROLLMENT') {
+										<div class="detail-item">
+											<mat-icon>settings</mat-icon>
+											<span>Enrollment Workflow: <b>{{ chart.workflowId ? getWorkflowLabel(chart.workflowId) : 'Not set' }}</b></span>
+										</div>
+									}
+									@case ('WORKFLOW_STATUS') {
+										<div class="detail-item">
+											<mat-icon>settings</mat-icon>
+											<span>Workflow: <b>{{ chart.workflowId ? getWorkflowLabel(chart.workflowId) : 'Not set' }}</b></span>
+										</div>
+										<div class="detail-item">
+											<mat-icon>check_circle</mat-icon>
+											<span>{{ getIncludedStatesCount(chart) }} {{ getIncludedStatesCount(chart) === 1 ? 'Included State' : 'Included States' }}</span>
+										</div>
+										<div class="detail-item">
+											<mat-icon>cancel</mat-icon>
+											<span>{{ getExcludedStatesCount(chart) }} {{ getExcludedStatesCount(chart) === 1 ? 'Excluded State' : 'Excluded States' }}</span>
+										</div>
+									}
+									@case ('ENROLLMENT_BY_SCOPE') {
+										<div class="detail-item">
+											<mat-icon>account_tree</mat-icon>
+											<span>Scope Model: <b>{{ chart.scopeModelId ? getScopeModelLabel(chart.scopeModelId) : 'Not set' }}</b></span>
+										</div>
+									}
+								}
+							</div>
+						</div>
+
+						@if (modifiedChartIds.has(chart.chartId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (charts.length === 0) {
+				<app-empty-state
+					[icon]="'bar_chart'"
+					[title]="'No Charts'"
+					[message]="'Create your first chart to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedChart && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-chart-detail
+					[chart]="selectedChart"
+					[projectId]="projectId"
+					[project]="project"
+					[allCharts]="charts"
+					(chartUpdated)="onChartUpdated($event)"
+					(chartDeleted)="onChartDeleted($event)"
+					(closed)="onSelectChart(selectedChart)">
+				</app-chart-detail>
+			</div>
+		}
+	}
+</div>

@@ -137,6 +137,10 @@ export class FieldModelManagerService {
 		return this.tracker.isModified(id);
 	}
 
+	isFieldModified(formModelId: string, fieldName: string): boolean {
+		return this.tracker.isFieldModified(formModelId, fieldName);
+	}
+
 	getModificationCount(): number {
 		return this.tracker.getTotalModifiedFieldsCount();
 	}

@@ -61,7 +61,10 @@ public class CacheConfig {
 			"resource-category",
 
 			"reports",
-			"report"
+			"report",
+
+			"charts",
+			"chart"
 		);
 	}
 }

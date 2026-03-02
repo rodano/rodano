@@ -1,0 +1,92 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Chart Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				@if (availableLanguages.length === 1) {
+					<div class="language-fields">
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<div [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Title</label>
+										<input type="text" formControlName="title" placeholder="Chart Title">
+									</div>
+									<div class="form-field">
+										<label>Abscissa Legend (X-Axis)</label>
+										<input type="text" formControlName="legendX" placeholder="X-Axis">
+										<span class="hint">Optional label for the horizontal axis</span>
+									</div>
+									<div class="form-field">
+										<label>Ordinate Legend (Y-Axis)</label>
+										<input type="text" formControlName="legendY" placeholder="Y-Axis">
+										<span class="hint">Optional label for the vertical axis</span>
+									</div>
+								</div>
+							}
+						}
+					</div>
+				} @else {
+					<mat-tab-group>
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+										<div class="form-field">
+											<label>Title</label>
+											<input type="text" formControlName="title" placeholder="Chart Title">
+										</div>
+										<div class="form-field">
+											<label>Abscissa Legend (X-Axis)</label>
+											<input type="text" formControlName="legendX" placeholder="X-Axis">
+											<span class="hint">Optional label for the horizontal axis</span>
+										</div>
+										<div class="form-field">
+											<label>Ordinate Legend (Y-Axis)</label>
+											<input type="text" formControlName="legendY" placeholder="Y-Axis">
+											<span class="hint">Optional label for the vertical axis</span>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
+				}
+			</div>
+
+			<div class="form-section">
+				<h3>Options</h3>
+
+				<div class="form-field checkbox-field">
+					<mat-checkbox formControlName="overrideUserRights">Override User Rights</mat-checkbox>
+					<span class="hint">Allow all users to view this chart regardless of their rights</span>
+				</div>
+
+				@if (showLeafScopeModel) {
+					<div class="form-field">
+						<label>Leaf Scope Model</label>
+						<mat-select formControlName="leafScopeModelId">
+							<mat-option [value]="null">None</mat-option>
+							@for (sm of data.availableScopeModels; track sm.scopeModelId) {
+								<mat-option [value]="sm.scopeModelId">{{ languageService.getLabel(sm) }}</mat-option>
+							}
+						</mat-select>
+						<span class="hint">Optional leaf scope model for this chart</span>
+					</div>
+				}
+			</div>
+
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+			Save Changes
+		</button>
+	</div>
+</div>

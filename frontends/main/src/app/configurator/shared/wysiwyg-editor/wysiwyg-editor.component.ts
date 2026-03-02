@@ -60,7 +60,7 @@ export class WysiwygEditorComponent implements AfterViewInit, OnDestroy, Control
 
 		this.quill.on('text-change', () => {
 			const content = this.quill.getText().trim()
-				? this.quill.getSemanticHTML()
+				? this.quill.getSemanticHTML().replace(/&nbsp;/g, ' ')
 				: '';
 			this.onChange(content);
 			this.contentChange.emit(content);

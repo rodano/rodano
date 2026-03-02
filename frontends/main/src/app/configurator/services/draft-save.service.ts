@@ -27,7 +27,9 @@ import {PrivacyPolicy} from '@core/model/privacy-policy';
 import {ResourceCategoryService} from './api/resource-category.service';
 import {ResourceCategory} from '@core/model/resource-category';
 import {ReportService} from './api/report.service';
-import { Report } from '@core/model/report';
+import {Report} from '@core/model/report';
+import {ChartService} from './api/chart.service';
+import {ChartModel} from '@core/model/chart-model';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -45,7 +47,8 @@ export class DraftSaveService {
 		private featureService: FeatureService,
 		private privacyPolicyService: PrivacyPolicyService,
 		private resourceCategoryService: ResourceCategoryService,
-		private reportService: ReportService
+		private reportService: ReportService,
+		private chartService: ChartService
 	) {}
 
 	saveScopeModels(
@@ -454,6 +457,41 @@ export class DraftSaveService {
 				const report = reports.find(r => r.reportId === id);
 				if(report) {
 					saveObservables.push(this.reportService.updateReport(projectId, id, report));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveCharts(
+		projectId: string,
+		modifiedIds: Set<string>,
+		charts: ChartModel[],
+		originalCharts: ChartModel[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalCharts.find(c => c.chartId === originalId);
+				if(original) {
+					saveObservables.push(this.chartService.deleteChart(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const chart = charts.find(c => c.chartId === id);
+				if(chart) {
+					saveObservables.push(this.chartService.createChart(projectId, chart));
+				}
+			}
+			else {
+				const chart = charts.find(c => c.chartId === id);
+				if(chart) {
+					saveObservables.push(this.chartService.updateChart(projectId, id, chart));
 				}
 			}
 		});

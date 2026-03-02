@@ -85,10 +85,7 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	isFieldModified(field: keyof FieldModel): boolean {
-		if(!this.originalFieldModel || !this.draftFieldModel) {
-			return false;
-		}
-		return JSON.stringify(this.originalFieldModel[field]) !== JSON.stringify(this.draftFieldModel[field]);
+		return this.fieldModelManager.isFieldModified(this.fieldModelId, field as string);
 	}
 
 	onClose(): void {

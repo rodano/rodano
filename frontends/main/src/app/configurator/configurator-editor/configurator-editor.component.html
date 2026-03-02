@@ -106,6 +106,7 @@
 					[privacyPolicies]="privacyPolicies"
 					[resourceCategories]="resourceCategories"
 					[reports]="reports"
+					[charts]="charts"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -120,6 +121,7 @@
 					[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
 					[selectedResourceCategoryId]="selectedResourceCategoryId"
 					[selectedReportId]="selectedReportId"
+					[selectedChartId]="selectedChartId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -141,6 +143,7 @@
 					(privacyPoliciesChanged)="onPrivacyPoliciesChanged($event)"
 					(resourceCategoriesChanged)="onResourceCategoriesChanged($event)"
 					(reportsChanged)="onReportsChanged($event)"
+					(chartsChanged)="onChartsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -149,7 +152,8 @@
 					(featureContextChanged)="onFeatureContextChanged($event)"
 					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)"
 					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)"
-					(reportContextChanged)="onReportContextChanged($event)">
+					(reportContextChanged)="onReportContextChanged($event)"
+					(chartContextChanged)="onChartContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

@@ -12,6 +12,7 @@ import {Observable, of} from 'rxjs';
 import {PrivacyPolicyTreeComponent} from '../privacy-policy-tree/privacy-policy-tree.component';
 import {ResourceCategoryTreeComponent} from '../resource-category-tree/resource-category-tree.component';
 import {ReportTreeComponent} from '../report-tree/report-tree.component';
+import {ChartTreeComponent} from '../chart-tree/chart-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -28,7 +29,8 @@ import {ReportTreeComponent} from '../report-tree/report-tree.component';
 		FeatureTreeComponent,
 		PrivacyPolicyTreeComponent,
 		ResourceCategoryTreeComponent,
-		ReportTreeComponent
+		ReportTreeComponent,
+		ChartTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -50,6 +52,7 @@ export class ConfiguratorTreeComponent {
 	@Input() privacyPolicies: any[] = [];
 	@Input() resourceCategories: any[] = [];
 	@Input() reports: any[] = [];
+	@Input() charts: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -64,11 +67,12 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedPrivacyPolicyId: string | null = null;
 	@Input() selectedResourceCategoryId: string | null = null;
 	@Input() selectedReportId: string | null = null;
+	@Input() selectedChartId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -139,6 +143,13 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'reports' ? null : 'reports';
 			this.categoryClicked.emit('reports');
+		});
+	}
+
+	onChartClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'charts' ? null : 'charts';
+			this.categoryClicked.emit('charts');
 		});
 	}
 

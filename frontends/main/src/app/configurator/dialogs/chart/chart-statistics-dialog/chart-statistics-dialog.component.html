@@ -1,0 +1,120 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">Statistics Settings</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Field Model</label>
+				<mat-select formControlName="fieldModelId" placeholder="Select a field model">
+					<mat-option [value]="null">None</mat-option>
+					@for (fm of filteredFieldModels; track fm.fieldModelId) {
+						<mat-option [value]="fm.fieldModelId">
+							{{ languageService.getLabel(fm) }}
+						</mat-option>
+					}
+				</mat-select>
+				@if (!data.leafScopeModel) {
+					<span class="hint">Configure a leaf scope model in Settings to filter field models</span>
+				}
+			</div>
+
+			<div class="form-field checkbox-field">
+				<mat-checkbox formControlName="withStatistics">With Statistics</mat-checkbox>
+				<span class="hint">Show statistical summary (mean, median, etc.) alongside the chart</span>
+			</div>
+		</form>
+
+		<div class="ranges-section">
+			<div class="ranges-header">
+				<h3>Ranges</h3>
+				<button class="btn-add-range" type="button" (click)="addRange()">
+					<mat-icon>add</mat-icon>
+					Add Range
+				</button>
+			</div>
+
+			@if (data.languages.length > 1) {
+				<mat-tab-group (selectedIndexChange)="onLanguageChange($event)">
+					@for (lang of data.languages; track lang.languageCode) {
+						<mat-tab [label]="getLanguageLabel(lang)"></mat-tab>
+					}
+				</mat-tab-group>
+			}
+
+			@if (ranges.length === 0) {
+				<div class="empty-state">
+					<mat-icon>bar_chart</mat-icon>
+					<p>No ranges configured. Click "Add Range" to add one.</p>
+				</div>
+			} @else {
+				<div class="ranges-table-wrapper">
+					<table class="ranges-table">
+						<thead>
+						<tr>
+							<th>ID *</th>
+							<th>Label</th>
+							<th>Value</th>
+							<th>Min</th>
+							<th>Max</th>
+							<th>Other</th>
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>
+							@for (range of ranges; track range.chartRangeId; let i = $index) {
+								<tr>
+									<td>
+										<input type="text" class="range-input"
+																	[value]="range.id"
+																	(input)="updateRangeField(i, 'id', $any($event.target).value)"
+																	placeholder="RANGE_ID">
+									</td>
+									<td>
+										<input type="text" class="range-input"
+																	[value]="getRangeLabelForLanguage(range)"
+																	(input)="updateRangeLabelForLanguage(i, $any($event.target).value)"
+																	placeholder="Label">
+									</td>
+									<td>
+										<input type="text" class="range-input range-input-sm"
+																	[value]="range.value || ''"
+																	(input)="updateRangeField(i, 'value', $any($event.target).value)"
+																	placeholder="Value">
+									</td>
+									<td>
+										<input type="number" class="range-input range-input-sm"
+																	[value]="range.min ?? ''"
+																	(input)="updateRangeField(i, 'min', isNaN($any($event.target).valueAsNumber) ? undefined : $any($event.target).valueAsNumber)"
+																	placeholder="Min">
+									</td>
+									<td>
+										<input type="number" class="range-input range-input-sm"
+																	[value]="range.max ?? ''"
+																	(input)="updateRangeField(i, 'max', isNaN($any($event.target).valueAsNumber) ? undefined : $any($event.target).valueAsNumber)"
+																	placeholder="Max">
+									</td>
+									<td class="center">
+										<mat-checkbox
+											[checked]="range.other"
+											(change)="updateRangeField(i, 'other', $any($event).checked)">
+										</mat-checkbox>
+									</td>
+									<td class="center">
+										<button class="btn-delete" type="button" (click)="removeRange(i)">
+											<mat-icon>close</mat-icon>
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

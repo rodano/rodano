@@ -84,12 +84,13 @@
 		</div>
 	</div>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">bar_chart</mat-icon>
-			<span class="node-label">Charts</span>
-		</div>
-	</div>
+	<app-chart-tree
+		[projectId]="projectId"
+		[charts]="charts"
+		[expanded]="expandedCategory === 'charts'"
+		[selectedChartId]="selectedChartId"
+		(categoryClicked)="onChartClicked()">
+	</app-chart-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('menus')">

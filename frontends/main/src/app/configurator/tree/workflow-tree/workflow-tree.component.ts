@@ -56,7 +56,7 @@ export class WorkflowTreeComponent implements OnChanges {
 					.map(wfs => ({
 						id: `workflow-state-${wfs.workflowStateId}`,
 						label: this.languageService.getDefaultTranslation(wfs.shortname) || wfs.id,
-						icon: 'text_ad',
+						icon: 'adjust',
 						type: 'workflow-state',
 						selected: this.selectedWorkflowStateId === wfs.workflowStateId,
 						entityId: wfs.workflowStateId,
@@ -68,7 +68,7 @@ export class WorkflowTreeComponent implements OnChanges {
 					.map(wfa => ({
 						id: `workflow-action-${wfa.workflowActionId}`,
 						label: this.languageService.getDefaultTranslation(wfa.shortname) || wfa.id,
-						icon: 'text_ad',
+						icon: 'play_circle',
 						type: 'workflow-action',
 						selected: this.selectedWorkflowActionId === wfa.workflowActionId,
 						entityId: wfa.workflowActionId,

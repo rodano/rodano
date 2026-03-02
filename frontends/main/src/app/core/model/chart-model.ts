@@ -7,21 +7,32 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { ChartStateFilter } from './chart-state-filter';
 import { ChartType } from './chart-type';
+import { ChartRange } from './chart-range';
 
 
-/**
- * Chart model
- */
 export interface ChartModel { 
     chartId: string;
     id: string;
     type: ChartType;
-    title: string;
-    legendX?: string;
-    legendY?: string;
+    shortname: { [key: string]: string; };
+    longname?: { [key: string]: string; };
+    description?: { [key: string]: string; };
+    title: { [key: string]: string; };
+    legendX?: { [key: string]: string; };
+    legendY?: { [key: string]: string; };
+    workflowId?: string;
+    scopeModelId?: string;
+    leafScopeModelId?: string;
+    datasetModelId?: string;
+    fieldModelId?: string;
     colors: Array<string>;
-    withStatistics: boolean;
+    withStatistics?: boolean;
+    overrideUserRights?: boolean;
+    displayExpected?: boolean;
+    ranges: Array<ChartRange>;
+    stateFilters: Array<ChartStateFilter>;
 }
 export namespace ChartModel {
 }

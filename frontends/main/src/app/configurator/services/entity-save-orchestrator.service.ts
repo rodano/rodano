@@ -11,6 +11,7 @@ import {FeatureContext} from './contexts/feature-context';
 import {PrivacyPolicyContext} from './contexts/privacy-policy-context';
 import {ResourceCategoryContext} from './contexts/resource-category-context';
 import {ReportContext} from './contexts/report-context';
+import {ChartContext} from './contexts/chart-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -204,6 +205,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveCharts(projectId: string, context: ChartContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveCharts(
+				projectId,
+				context.modifiedChartIds,
+				context.charts,
+				context.originalCharts
+			)
+		]).pipe(
+			map(() => {
+				context.chartManager.syncOriginalsWithCurrent();
+
+				context.chartManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -266,5 +284,11 @@ export class EntitySaveOrchestratorService {
 		context.reportManager.resetToOriginals();
 
 		context.reportManager.invalidate();
+	}
+
+	resetChartsToOriginals(context: ChartContext): void {
+		context.chartManager.resetToOriginals();
+
+		context.chartManager.invalidate();
 	}
 }

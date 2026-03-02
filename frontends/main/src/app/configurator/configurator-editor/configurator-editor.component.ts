@@ -33,6 +33,7 @@ import {FeatureManagerService} from '../services/manager/feature-manager.service
 import {PrivacyPolicyManagerService} from '../services/manager/privacy-policy-manager.service';
 import {ResourceCategoryManagerService} from '../services/manager/resource-category-manager.service';
 import {ReportManagerService} from '../services/manager/report-manager.service';
+import {ChartManagerService} from '../services/manager/chart-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -71,6 +72,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	privacyPolicyModificationCount = 0;
 	resourceCategoryModificationCount = 0;
 	reportModificationCount = 0;
+	chartModificationCount = 0;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -86,6 +88,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	privacyPolicies: any[] = [];
 	resourceCategories: any[] = [];
 	reports: any[] = [];
+	charts: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -101,6 +104,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedPrivacyPolicyId: string | null = null;
 	selectedResourceCategoryId: string | null = null;
 	selectedReportId: string | null = null;
+	selectedChartId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -128,6 +132,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private privacyPolicyManager: PrivacyPolicyManagerService,
 		private resourceCategoryManager: ResourceCategoryManagerService,
 		private reportManager: ReportManagerService,
+		private chartManager: ChartManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -173,6 +178,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.privacyPolicyManager.invalidate();
 		this.resourceCategoryManager.invalidate();
 		this.reportManager.invalidate();
+		this.chartManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -241,6 +247,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: reports => this.reports = reports,
 			error: error => console.error('Error loading reports:', error)
 		});
+
+		this.chartManager.load(this.projectId).subscribe({
+			next: charts => this.charts = charts,
+			error: error => console.error('Error loading charts:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -253,6 +264,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.privacyPolicies = this.privacyPolicyManager.getAll();
 		this.resourceCategories = this.resourceCategoryManager.getAll();
 		this.reports = this.reportManager.getAll();
+		this.charts = this.chartManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -315,6 +327,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.privacyPolicies = [];
 			this.resourceCategories = [];
 			this.reports = [];
+			this.charts = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -325,6 +338,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.privacyPolicyListComponent?.clearSelection();
 			this.detailComponent?.resourceCategoryListComponent?.clearSelection();
 			this.detailComponent?.reportListComponent?.clearSelection();
+			this.detailComponent?.chartListComponent?.clearSelection();
 		}
 	}
 
@@ -362,6 +376,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	onReportsChanged(event: {modificationCount: number}): void {
 		this.reportModificationCount = event.modificationCount;
+	}
+
+	onChartsChanged(event: {modificationCount: number}): void {
+		this.chartModificationCount = event.modificationCount;
 	}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
@@ -432,18 +450,14 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 					saveObservables.push(this.saveReports());
 				}
 
+				if(this.chartModificationCount > 0) {
+					saveObservables.push(this.saveCharts());
+				}
+
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
-							this.scopeModelModificationCount = 0;
-							this.datasetModelModificationCount = 0;
-							this.validatorModificationCount = 0;
-							this.workflowModificationCount = 0;
-							this.profileModificationCount = 0;
-							this.featureModificationCount = 0;
-							this.privacyPolicyModificationCount = 0;
-							this.resourceCategoryModificationCount = 0;
-							this.reportModificationCount = 0;
+							this.resetAllModificationCounts();
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -635,6 +649,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
+	private saveCharts(): Promise<void> {
+		const component = this.detailComponent?.chartListComponent;
+		if(!component) {
+			return Promise.resolve();
+		}
+
+		return this.entitySaveOrchestratorService.saveCharts(this.projectId, {
+			chartManager: component.chartManager,
+			charts: component.charts,
+			originalCharts: component.originalCharts,
+			modifiedChartIds: component.modifiedChartIds
+		}).toPromise().then(() => {
+			component.loadCharts();
+			this.charts = this.chartManager.getAll();
+		});
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -675,120 +706,38 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workingProject = {...this.project!};
 		this.modifiedFields.clear();
 
-		const scopeComponent = this.detailComponent?.scopeModelsListComponent;
-		if(scopeComponent) {
-			this.entitySaveOrchestratorService.resetScopeModelsToOriginals({
-				scopeModelManager: scopeComponent.scopeModelManager,
-				eventModelManager: scopeComponent.eventModelManager,
-				eventGroupManager: scopeComponent.eventGroupManager,
-				scopeModels: scopeComponent.scopeModels,
-				eventModels: scopeComponent.eventModels,
-				eventGroups: scopeComponent.eventGroups,
-				originalScopeModels: scopeComponent.originalScopeModels,
-				modifiedScopeModelIds: scopeComponent.modifiedScopeModelIds,
-				modifiedEventModels: scopeComponent.modifiedEventModels,
-				modifiedEventGroups: scopeComponent.modifiedEventGroups
-			});
-			scopeComponent.loadScopeModels();
-		}
+		this.scopeModelManager.resetToOriginals();
+		this.eventModelManager.resetToOriginals();
+		this.eventGroupManager.resetToOriginals();
+		this.datasetModelManager.resetToOriginals();
+		this.fieldModelManager.resetToOriginals();
+		this.validatorManager.resetToOriginals();
+		this.workflowManager.resetToOriginals();
+		this.workflowStateManager.resetToOriginals();
+		this.workflowActionManager.resetToOriginals();
+		this.profileManager.resetToOriginals();
+		this.featureManager.resetToOriginals();
+		this.privacyPolicyManager.resetToOriginals();
+		this.resourceCategoryManager.resetToOriginals();
+		this.reportManager.resetToOriginals();
+		this.chartManager.resetToOriginals();
 
-		const datasetComponent = this.detailComponent?.datasetModelsListComponent;
-		if(datasetComponent) {
-			this.entitySaveOrchestratorService.resetDatasetModelsToOriginals({
-				datasetModelManager: datasetComponent.datasetModelManager,
-				fieldModelManager: datasetComponent.fieldModelManager,
-				datasetModels: datasetComponent.datasetModels,
-				fieldModels: datasetComponent.fieldModels,
-				originalDatasetModels: datasetComponent.originalDatasetModels,
-				modifiedDatasetModelIds: datasetComponent.modifiedDatasetModelIds,
-				modifiedFieldModels: datasetComponent.modifiedFieldModels
-			});
-			datasetComponent.loadDatasetModels();
-		}
+		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
+		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
+		this.detailComponent?.validatorsListComponent?.loadValidators();
+		this.detailComponent?.workflowListComponent?.loadWorkflows();
+		this.detailComponent?.profileListComponent?.loadProfiles();
+		this.detailComponent?.featureListComponent?.loadFeatures();
+		this.detailComponent?.privacyPolicyListComponent?.loadPrivacyPolicies();
+		this.detailComponent?.resourceCategoryListComponent?.loadResourceCategories();
+		this.detailComponent?.reportListComponent?.loadReports();
+		this.detailComponent?.chartListComponent?.loadCharts();
 
-		const validatorComponent = this.detailComponent?.validatorsListComponent;
-		if(validatorComponent) {
-			this.entitySaveOrchestratorService.resetValidatorsToOriginals({
-				validatorManager: validatorComponent.validatorManager,
-				validators: validatorComponent.validators,
-				originalValidators: validatorComponent.originalValidators,
-				modifiedValidatorIds: validatorComponent.modifiedValidatorIds
-			});
-			validatorComponent.loadValidators();
-		}
+		this.resetAllModificationCounts();
+		this.refreshTreeData();
+	}
 
-		const workflowComponent = this.detailComponent?.workflowListComponent;
-		if(workflowComponent) {
-			this.entitySaveOrchestratorService.resetWorkflowsToOriginals({
-				workflowManager: workflowComponent.workflowManager,
-				workflowStateManager: workflowComponent.workflowStateManager,
-				workflowActionManager: workflowComponent.workflowActionManager,
-				workflows: workflowComponent.workflows,
-				workflowStates: workflowComponent.workflowStates,
-				workflowActions: workflowComponent.workflowActions,
-				originalWorkflows: workflowComponent.originalWorkflows,
-				modifiedWorkflowIds: workflowComponent.modifiedWorkflowIds,
-				modifiedWorkflowStateIds: workflowComponent.modifiedWorkflowStates,
-				modifiedWorkflowActionIds: workflowComponent.modifiedWorkflowActions
-			});
-			workflowComponent.loadWorkflows();
-		}
-
-		const profileComponent = this.detailComponent?.profileListComponent;
-		if(profileComponent) {
-			this.entitySaveOrchestratorService.resetProfilesToOriginals({
-				profileManager: profileComponent.profileManager,
-				profiles: profileComponent.profiles,
-				originalProfiles: profileComponent.originalProfiles,
-				modifiedProfileIds: profileComponent.modifiedProfileIds
-			});
-			profileComponent.loadProfiles();
-		}
-
-		const featureComponent = this.detailComponent?.featureListComponent;
-		if(featureComponent) {
-			this.entitySaveOrchestratorService.resetFeaturesToOriginals({
-				featureManager: featureComponent.featureManager,
-				features: featureComponent.features,
-				originalFeatures: featureComponent.originalFeatures,
-				modifiedFeatureIds: featureComponent.modifiedFeatureIds
-			});
-			featureComponent.loadFeatures();
-		}
-
-		const privacyPolicyComponent = this.detailComponent?.privacyPolicyListComponent;
-		if(privacyPolicyComponent) {
-			this.entitySaveOrchestratorService.resetPrivacyPoliciesToOriginals({
-				privacyPolicyManager: privacyPolicyComponent.privacyPolicyManager,
-				privacyPolicies: privacyPolicyComponent.privacyPolicies,
-				originalPrivacyPolicies: privacyPolicyComponent.originalPrivacyPolicies,
-				modifiedPrivacyPolicyIds: privacyPolicyComponent.modifiedPrivacyPolicyIds
-			});
-			privacyPolicyComponent.loadPrivacyPolicies();
-		}
-
-		const resourceCategoryComponent = this.detailComponent?.resourceCategoryListComponent;
-		if(resourceCategoryComponent) {
-			this.entitySaveOrchestratorService.resetResourceCategoriesToOriginals({
-				resourceCategoryManager: resourceCategoryComponent.resourceCategoryManager,
-				resourceCategories: resourceCategoryComponent.resourceCategories,
-				originalResourceCategories: resourceCategoryComponent.originalResourceCategories,
-				modifiedResourceCategoryIds: resourceCategoryComponent.modifiedResourceCategoryIds
-			});
-			resourceCategoryComponent.loadResourceCategories();
-		}
-
-		const reportComponent = this.detailComponent?.reportListComponent;
-		if(reportComponent) {
-			this.entitySaveOrchestratorService.resetReportsToOriginals({
-				reportManager: reportComponent.reportManager,
-				reports: reportComponent.reports,
-				originalReports: reportComponent.originalReports,
-				modifiedReportIds: reportComponent.modifiedReportIds
-			});
-			reportComponent.loadReports();
-		}
-
+	resetAllModificationCounts(): void {
 		this.scopeModelModificationCount = 0;
 		this.datasetModelModificationCount = 0;
 		this.validatorModificationCount = 0;
@@ -798,8 +747,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.privacyPolicyModificationCount = 0;
 		this.resourceCategoryModificationCount = 0;
 		this.reportModificationCount = 0;
-
-		this.refreshTreeData();
+		this.chartModificationCount = 0;
 	}
 
 	onCreateSnapshot(): void {
@@ -868,7 +816,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.featureModificationCount > 0
 		  || this.privacyPolicyModificationCount > 0
 		  || this.resourceCategoryModificationCount > 0
-		  || this.reportModificationCount > 0;
+		  || this.reportModificationCount > 0
+		  || this.chartModificationCount > 0;
 	}
 
 	get totalModificationCount(): number {
@@ -881,7 +830,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  + this.featureModificationCount
 		  + this.privacyPolicyModificationCount
 		  + this.resourceCategoryModificationCount
-		  + this.reportModificationCount;
+		  + this.reportModificationCount
+		  + this.chartModificationCount;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -954,6 +904,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.reports = context.reports;
 			this.selectedReportId = context.selectedReportId;
+		});
+	}
+
+	onChartContextChanged(context: any): void {
+		setTimeout(() => {
+			this.charts = context.charts;
+			this.selectedChartId = context.selectedChartId;
 		});
 	}
 }

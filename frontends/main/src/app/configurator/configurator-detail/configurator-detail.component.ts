@@ -15,6 +15,7 @@ import {
 	ResourceCategoryListComponent
 } from '../resource-category/resource-category-list/resource-category-list.component';
 import {ReportListComponent} from '../report/report-list/report-list.component';
+import {ChartListComponent} from '../chart/chart-list/chart-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -34,6 +35,7 @@ import {ReportListComponent} from '../report/report-list/report-list.component';
 		PrivacyPolicyListComponent,
 		ResourceCategoryListComponent,
 		ReportListComponent,
+		ChartListComponent,
 		EmptyStateComponent
 	]
 })
@@ -47,6 +49,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(PrivacyPolicyListComponent) privacyPolicyListComponent?: PrivacyPolicyListComponent;
 	@ViewChild(ResourceCategoryListComponent) resourceCategoryListComponent?: ResourceCategoryListComponent;
 	@ViewChild(ReportListComponent) reportListComponent?: ReportListComponent;
+	@ViewChild(ChartListComponent) chartListComponent?: ChartListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -120,7 +123,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedReportId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'overview' | null = null;
+	@Output() chartsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() chartContextChanged = new EventEmitter<{
+		charts: any[];
+		selectedChartId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'overview' | null = null;
 
 	scopeModelModificationCount = 0;
 	datasetModelModificationCount = 0;
@@ -131,6 +140,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	privacyPolicyModificationCount = 0;
 	resourceCategoryModificationCount = 0;
 	reportModificationCount = 0;
+	chartModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -237,6 +247,17 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.modificationCountChanged.emit(event.modificationCount);
 	}
 
+	onChartSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onChartsChanged(event: {modificationCount: number}): void {
+		this.chartModificationCount = event.modificationCount;
+		this.chartsChanged.emit(event);
+		this.modificationCountChanged.emit(event.modificationCount);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -305,6 +326,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'reports') {
 			this.selectedNodeType = 'reports';
+			return;
+		}
+
+		if(this.selectedNode === 'charts') {
+			this.selectedNodeType = 'charts';
 			return;
 		}
 
@@ -382,5 +408,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedReportId: string | null;
 	}): void {
 		this.reportContextChanged.emit(context);
+	}
+
+	onChartContextChanged(context: {
+		charts: any[];
+		selectedChartId: string | null;
+	}): void {
+		this.chartContextChanged.emit(context);
 	}
 }
