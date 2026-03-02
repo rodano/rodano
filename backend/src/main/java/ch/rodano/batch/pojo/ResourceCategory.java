@@ -13,6 +13,7 @@ public class ResourceCategory {
 	private Map<String, String> description;
 
 	private String icon;
+	private String color;
 
 	public String getId() {
 		return id;
@@ -54,6 +55,14 @@ public class ResourceCategory {
 		this.icon = icon;
 	}
 
+	public String getColor() {
+		return color;
+	}
+
+	public void setColor(final String color) {
+		this.color = color;
+	}
+
 	@Override
 	public String toString() {
 		return "ResourceCategory{" +
@@ -62,6 +71,7 @@ public class ResourceCategory {
 			", longname=" + longname +
 			", description=" + description +
 			", icon='" + icon + '\'' +
+			", color='" + color + '\'' +
 			'}';
 	}
 }

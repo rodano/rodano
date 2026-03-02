@@ -35,6 +35,31 @@
 				}
 			</div>
 
+			<div class="form-field">
+				<label>Color</label>
+				<div class="color-picker-wrapper">
+					<button
+						type="button"
+						class="color-button"
+						[style.background-color]="form.get('color')?.value || '#e0e0e0'"
+						(click)="colorPicker.click()"
+						[title]="form.get('color')?.value ? 'Current color: ' + form.get('color')?.value : 'No color set'">
+					</button>
+					<input
+						#colorPicker
+						type="color"
+						formControlName="color"
+						class="color-input-hidden">
+					<input
+						type="text"
+						[value]="form.get('color')?.value"
+						(input)="onColorInput($event)"
+						placeholder="#e0e0e0"
+						maxlength="7"
+						class="color-text-input">
+				</div>
+			</div>
+
 			<div class="form-section">
 				<h3>Translations</h3>
 

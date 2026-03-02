@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.enums.ChartType;
 import ch.rodano.core.model.jooq.tables.ChartColor.ChartColorPath;
 import ch.rodano.core.model.jooq.tables.ChartRange.ChartRangePath;
 import ch.rodano.core.model.jooq.tables.ChartStateFilter.ChartStateFilterPath;
@@ -87,7 +88,7 @@ public class Chart extends TableImpl<ChartRecord> {
 	/**
 	 * The column <code>chart.type</code>.
 	 */
-	public final TableField<ChartRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(64).nullable(false), this, "");
+	public final TableField<ChartRecord, ChartType> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(19).nullable(false).asEnumDataType(ChartType.class), this, "");
 
 	/**
 	 * The column <code>chart.override_user_rights</code>.

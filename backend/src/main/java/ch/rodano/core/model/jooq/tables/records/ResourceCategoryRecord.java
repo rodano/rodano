@@ -77,45 +77,59 @@ public class ResourceCategoryRecord extends UpdatableRecordImpl<ResourceCategory
 	}
 
 	/**
+	 * Setter for <code>resource_category.color</code>.
+	 */
+	public void setColor(String value) {
+		set(4, value);
+	}
+
+	/**
+	 * Getter for <code>resource_category.color</code>.
+	 */
+	public String getColor() {
+		return (String) get(4);
+	}
+
+	/**
 	 * Setter for <code>resource_category.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(4, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>resource_category.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(4);
+		return (String) get(5);
 	}
 
 	/**
 	 * Setter for <code>resource_category.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>resource_category.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(5);
+		return (String) get(6);
 	}
 
 	/**
 	 * Setter for <code>resource_category.description</code>.
 	 */
 	public void setDescription(String value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>resource_category.description</code>.
 	 */
 	public String getDescription() {
-		return (String) get(6);
+		return (String) get(7);
 	}
 
 	// -------------------------------------------------------------------------
@@ -141,13 +155,14 @@ public class ResourceCategoryRecord extends UpdatableRecordImpl<ResourceCategory
 	/**
 	 * Create a detached, initialised ResourceCategoryRecord
 	 */
-	public ResourceCategoryRecord(UUID categoryId, UUID projectId, String code, String icon, String shortname, String longname, String description) {
+	public ResourceCategoryRecord(UUID categoryId, UUID projectId, String code, String icon, String color, String shortname, String longname, String description) {
 		super(ResourceCategory.RESOURCE_CATEGORY);
 
 		setCategoryId(categoryId);
 		setProjectId(projectId);
 		setCode(code);
 		setIcon(icon);
+		setColor(color);
 		setShortname(shortname);
 		setLongname(longname);
 		setDescription(description);

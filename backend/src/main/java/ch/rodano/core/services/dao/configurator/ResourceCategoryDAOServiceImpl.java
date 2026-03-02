@@ -74,6 +74,7 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 			.set(RESOURCE_CATEGORY.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
 			.set(RESOURCE_CATEGORY.DESCRIPTION, jsonMapperService.toJson(dto.getDescription()))
 			.set(RESOURCE_CATEGORY.ICON, dto.getIcon())
+			.set(RESOURCE_CATEGORY.COLOR, dto.getColor())
 			.execute();
 
 		return getResourceCategory(projectId, categoryId);
@@ -92,6 +93,7 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 			.set(RESOURCE_CATEGORY.LONGNAME, jsonMapperService.toJson(dto.getLongname()))
 			.set(RESOURCE_CATEGORY.DESCRIPTION, jsonMapperService.toJson(dto.getDescription()))
 			.set(RESOURCE_CATEGORY.ICON, dto.getIcon())
+			.set(RESOURCE_CATEGORY.COLOR, dto.getColor())
 			.where(RESOURCE_CATEGORY.PROJECT_ID.eq(projectId))
 			.and(RESOURCE_CATEGORY.CATEGORY_ID.eq(resourceCategoryId))
 			.execute();
@@ -124,6 +126,7 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 		dto.setDescription(jsonMapperService.fromJson(record.getDescription(), new TypeReference<TreeMap<String, String>>() {
 		}));
 		dto.setIcon(record.getIcon());
+		dto.setColor(record.getColor());
 
 		return dto;
 	}

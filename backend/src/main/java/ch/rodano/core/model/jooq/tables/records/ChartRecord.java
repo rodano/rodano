@@ -4,6 +4,7 @@
 package ch.rodano.core.model.jooq.tables.records;
 
 
+import ch.rodano.core.model.jooq.enums.ChartType;
 import ch.rodano.core.model.jooq.tables.Chart;
 
 import java.util.UUID;
@@ -65,15 +66,15 @@ public class ChartRecord extends UpdatableRecordImpl<ChartRecord> {
 	/**
 	 * Setter for <code>chart.type</code>.
 	 */
-	public void setType(String value) {
+	public void setType(ChartType value) {
 		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>chart.type</code>.
 	 */
-	public String getType() {
-		return (String) get(3);
+	public ChartType getType() {
+		return (ChartType) get(3);
 	}
 
 	/**
@@ -295,7 +296,7 @@ public class ChartRecord extends UpdatableRecordImpl<ChartRecord> {
 	/**
 	 * Create a detached, initialised ChartRecord
 	 */
-	public ChartRecord(UUID chartId, UUID projectId, String code, String type, Boolean overrideUserRights, Boolean withStatistics, Boolean displayExpected, String shortname, String longname, String description, String title, String legendX, String legendY, UUID workflowId, UUID scopeModelId, UUID leafScopeModelId, UUID datasetModelId, UUID fieldModelId) {
+	public ChartRecord(UUID chartId, UUID projectId, String code, ChartType type, Boolean overrideUserRights, Boolean withStatistics, Boolean displayExpected, String shortname, String longname, String description, String title, String legendX, String legendY, UUID workflowId, UUID scopeModelId, UUID leafScopeModelId, UUID datasetModelId, UUID fieldModelId) {
 		super(Chart.CHART);
 
 		setChartId(chartId);

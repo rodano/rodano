@@ -13,7 +13,7 @@ export class ResourceCategoryManagerService {
 	constructor(private resourceCategoryService: ResourceCategoryService) {
 		this.tracker = new EntityModificationTracker<ResourceCategory>(
 			resourceCategory => resourceCategory.categoryId,
-			['id', 'icon'],
+			['id', 'icon', 'color'],
 			['shortname', 'longname', 'description'],
 			[]
 		);

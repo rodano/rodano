@@ -82,6 +82,11 @@ public class ResourceCategory extends TableImpl<ResourceCategoryRecord> {
 	public final TableField<ResourceCategoryRecord, String> ICON = createField(DSL.name("icon"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
+	 * The column <code>resource_category.color</code>.
+	 */
+	public final TableField<ResourceCategoryRecord, String> COLOR = createField(DSL.name("color"), SQLDataType.VARCHAR(16).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
 	 * The column <code>resource_category.shortname</code>.
 	 */
 	public final TableField<ResourceCategoryRecord, String> SHORTNAME = createField(DSL.name("shortname"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");

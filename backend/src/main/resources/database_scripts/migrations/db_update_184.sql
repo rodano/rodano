@@ -561,6 +561,7 @@ create table payment_step_distribution (
 
 alter table resource_category
 	add column icon        varchar(128) null after code,
+	add column color       varchar(16)  null,
 	add column shortname   json         null,
 	add column longname    json         null,
 	add column description json         null;
@@ -680,24 +681,25 @@ create table workflow_summary_column_state (
   collate = utf8mb4_unicode_ci;
 
 create table chart (
-	chart_id             uuid         not null default uuid(),
-	project_id           uuid         not null,
-	code                 varchar(128) not null,
-	type                 varchar(64)  not null,
-	override_user_rights boolean      not null default false,
-	with_statistics      boolean      not null default false,
-	display_expected     boolean      not null default false,
-	shortname            json         null,
-	longname             json         null,
-	description          json         null,
-	title                json         null,
-	legend_x             json         null,
-	legend_y             json         null,
-	workflow_id          uuid         null,
-	scope_model_id       uuid         null,
-	leaf_scope_model_id  uuid         null,
-	dataset_model_id     uuid         null,
-	field_model_id       uuid         null,
+	chart_id             uuid            not null default uuid(),
+	project_id           uuid            not null,
+	code                 varchar(128)    not null,
+	type                 enum ('ENROLLMENT_BY_SCOPE', 'ENROLLMENT',
+		'STATISTICS', 'WORKFLOW_STATUS') not null,
+	override_user_rights boolean         not null default false,
+	with_statistics      boolean         not null default false,
+	display_expected     boolean         not null default false,
+	shortname            json            null,
+	longname             json            null,
+	description          json            null,
+	title                json            null,
+	legend_x             json            null,
+	legend_y             json            null,
+	workflow_id          uuid            null,
+	scope_model_id       uuid            null,
+	leaf_scope_model_id  uuid            null,
+	dataset_model_id     uuid            null,
+	field_model_id       uuid            null,
 	constraint pk_chart primary key (project_id, chart_id),
 	constraint uq_chart_code unique (project_id, code)
 ) engine = InnoDB

@@ -44,6 +44,19 @@
 				</div>
 			</div>
 
+			<div class="setting-item" [class.modified]="isFieldModified('color')">
+				<label>
+					Color
+					@if (isFieldModified('color')) {
+						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+					}
+				</label>
+				<div class="setting-value color-preview">
+					<span class="color-swatch" [style.background-color]="resourceCategory.color"></span>
+					{{ resourceCategory.color }}
+				</div>
+			</div>
+
 			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
 				<label>
 					Short Name
@@ -59,7 +72,7 @@
 				</div>
 			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
+			<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
 				<label>
 					Long Name
 					@if (isFieldModified('longname')) {

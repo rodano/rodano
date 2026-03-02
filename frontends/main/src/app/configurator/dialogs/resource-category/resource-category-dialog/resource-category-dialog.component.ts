@@ -80,7 +80,8 @@ export class ResourceCategoryDialogComponent extends BaseInfoDialogComponent imp
 		this.form = this.fb.group({
 			id: [rc?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
 			categoryId: [rc?.categoryId || null],
-			icon: [rc?.icon || null]
+			icon: [rc?.icon || null],
+			color: [rc?.color || null]
 		});
 	}
 
@@ -93,6 +94,15 @@ export class ResourceCategoryDialogComponent extends BaseInfoDialogComponent imp
 		return this.resourceCategoryManager.getAll().some(rc =>
 			rc.id.toUpperCase() === code.toUpperCase() && rc.categoryId !== currentResourceCategoryId
 		);
+	}
+
+	onColorInput(event: Event): void {
+		const input = event.target as HTMLInputElement;
+		const value = input.value;
+
+		if(/^#[0-9A-F]{6}$/i.test(value)) {
+			this.form.patchValue({color: value});
+		}
 	}
 
 	onSave(): void {

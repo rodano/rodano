@@ -77,7 +77,7 @@ public class ChartDAO implements BaseProjectDAO<Chart> {
 		model.setId(record.getCode());
 		model.setChartId(record.getChartId());
 
-		model.setType(mappingHelper.parseEnum(ChartType.class, record.getType(), "type"));
+		model.setType(mappingHelper.parseEnum(ChartType.class, record.getType().name(), "type"));
 		model.setOverrideUserRights(record.getOverrideUserRights() != null ? record.getOverrideUserRights() : false);
 		model.setWithStatistics(record.getWithStatistics() != null ? record.getWithStatistics() : false);
 		model.setDisplayExpected(record.getDisplayExpected() != null ? record.getDisplayExpected() : false);

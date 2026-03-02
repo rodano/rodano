@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import ch.rodano.core.model.jooq.enums.ChartType;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Chart {
 
@@ -16,7 +18,7 @@ public class Chart {
 	private Map<String, String> legendX;
 	private Map<String, String> legendY;
 
-	private String type;
+	private ChartType type;
 	private Boolean overrideUserRights;
 	private Boolean withStatistics;
 	private Boolean displayExpected;
@@ -89,11 +91,11 @@ public class Chart {
 		this.legendY = legendY;
 	}
 
-	public String getType() {
+	public ChartType getType() {
 		return type;
 	}
 
-	public void setType(final String type) {
+	public void setType(final ChartType type) {
 		this.type = type;
 	}
 
