@@ -95,12 +95,12 @@ export class ValidatorBasicInfoDialogComponent extends BaseInfoDialogComponent i
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();
-		const invalidMessage: Record<string, string> = {};
+		const message: Record<string, string> = {};
 
 		this.languageForms.forEach((langForm, langCode) => {
 			const v = langForm.value;
 			if(v.message) {
-				invalidMessage[langCode] = v.message;
+				message[langCode] = v.message;
 			}
 		});
 
@@ -109,7 +109,7 @@ export class ValidatorBasicInfoDialogComponent extends BaseInfoDialogComponent i
 			shortname,
 			longname,
 			description,
-			invalidMessage,
+			message,
 			...this.form.value
 		});
 	}
