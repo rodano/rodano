@@ -23,8 +23,7 @@
 				@for (datasetModel of datasetModels; track datasetModel.datasetModelId) {
 					<div class="primary-card theme-dataset-model"
 										[class.selected]="isSelected(datasetModel)"
-										[class.modified]="modifiedDatasetModelIds.has(datasetModel.datasetModelId)"
-										[style.border-top-color]="modifiedDatasetModelIds.has(datasetModel.datasetModelId) ? '#f59e0b' : ''"
+										[appModified]="modifiedDatasetModelIds.has(datasetModel.datasetModelId)"
 										(click)="onSelectDatasetModel(datasetModel)">
 
 						@if (isSelected(datasetModel)) {
@@ -126,7 +125,7 @@
 						@for (fieldModel of fieldModels; track fieldModel.fieldModelId) {
 							<div class="secondary-card first-child-card theme-field-model"
 												[class.selected]="selectedFieldModelId === fieldModel.fieldModelId"
-												[class.modified]="isFieldModelModified(fieldModel.fieldModelId)"
+												[appModified]="isFieldModelModified(fieldModel.fieldModelId)"
 												(click)="onSelectFieldModel(fieldModel.fieldModelId)">
 
 								@if (selectedFieldModelId === fieldModel.fieldModelId) {

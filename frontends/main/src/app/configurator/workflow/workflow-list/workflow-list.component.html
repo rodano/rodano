@@ -23,8 +23,7 @@
 				@for (workflow of workflows; track workflow.workflowId) {
 					<div class="primary-card theme-workflow"
 										[class.selected]="isSelected(workflow)"
-										[class.modified]="modifiedWorkflowIds.has(workflow.workflowId)"
-										[style.border-top-color]="modifiedWorkflowIds.has(workflow.workflowId) ? '#f59e0b' : ''"
+										[appModified]="modifiedWorkflowIds.has(workflow.workflowId)"
 										(click)="onSelectWorkflow(workflow)">
 
 						@if (isSelected(workflow)) {
@@ -119,7 +118,7 @@
 						@for (workflowState of workflowStates; track workflowState.workflowStateId) {
 							<div class="secondary-card first-child-card theme-workflow-state"
 												[class.selected]="selectedWorkflowStateId === workflowState.workflowStateId"
-												[class.modified]="isWorkflowStateModified(workflowState.workflowStateId)"
+												[appModified]="isWorkflowStateModified(workflowState.workflowStateId)"
 												(click)="onSelectWorkflowState(workflowState.workflowStateId)">
 
 								@if (selectedWorkflowStateId === workflowState.workflowStateId) {
@@ -201,7 +200,7 @@
 						@for (workflowAction of workflowActions; track workflowAction.workflowActionId) {
 							<div class="secondary-card second-child-card small-card theme-workflow-action"
 												[class.selected]="selectedWorkflowActionId === workflowAction.workflowActionId"
-												[class.modified]="isWorkflowActionModified(workflowAction.workflowActionId)"
+												[appModified]="isWorkflowActionModified(workflowAction.workflowActionId)"
 												(click)="onSelectWorkflowAction(workflowAction.workflowActionId)">
 
 								@if (selectedWorkflowActionId === workflowAction.workflowActionId) {

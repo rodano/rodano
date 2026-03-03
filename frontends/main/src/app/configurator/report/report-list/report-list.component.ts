@@ -17,12 +17,13 @@ import {WorkflowManagerService} from '../../services/manager/workflow-manager.se
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 @Component({
 	selector: 'app-report-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ReportDetailComponent, EmptyStateComponent, ListHeaderComponent],
+		MatSnackBarModule, ReportDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './report-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

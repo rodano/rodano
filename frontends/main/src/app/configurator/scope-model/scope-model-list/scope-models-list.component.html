@@ -23,7 +23,7 @@
 				@for (scopeModel of scopeModels; track scopeModel.scopeModelId) {
 					<div class="primary-card theme-scope-model"
 										[class.selected]="isSelected(scopeModel)"
-										[class.modified]="modifiedScopeModelIds.has(scopeModel.scopeModelId)"
+										[appModified]="modifiedScopeModelIds.has(scopeModel.scopeModelId)"
 										(click)="onSelectScopeModel(scopeModel)">
 
 						@if (isSelected(scopeModel)) {
@@ -148,7 +148,7 @@
 						@for (eventModel of eventModels; track eventModel.eventModelId) {
 							<div class="secondary-card first-child-card theme-event-model"
 												[class.selected]="selectedEventModelId === eventModel.eventModelId"
-												[class.modified]="isEventModelModified(eventModel.eventModelId)"
+												[appModified]="isEventModelModified(eventModel.eventModelId)"
 												(click)="onSelectEventModel(eventModel.eventModelId)">
 
 								@if (selectedEventModelId === eventModel.eventModelId) {
@@ -244,7 +244,7 @@
 						@for (eventGroup of eventGroups; track eventGroup.eventGroupId) {
 							<div class="secondary-card second-child-card small-card theme-event-group"
 												[class.selected]="selectedEventGroupId === eventGroup.eventGroupId"
-												[class.modified]="isEventGroupModified(eventGroup.eventGroupId)"
+												[appModified]="isEventGroupModified(eventGroup.eventGroupId)"
 												(click)="onSelectEventGroup(eventGroup.eventGroupId)">
 
 								@if (selectedEventGroupId === eventGroup.eventGroupId) {

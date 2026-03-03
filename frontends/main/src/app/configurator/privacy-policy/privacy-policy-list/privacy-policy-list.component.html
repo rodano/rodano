@@ -22,8 +22,7 @@
 				@for (privacyPolicy of privacyPolicies; track privacyPolicy.policyId) {
 					<div class="primary-card theme-privacy-policy"
 										[class.selected]="isSelected(privacyPolicy)"
-										[class.modified]="modifiedPrivacyPolicyIds.has(privacyPolicy.policyId)"
-										[style.border-top-color]="modifiedPrivacyPolicyIds.has(privacyPolicy.policyId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(privacyPolicy.policyId)"
 										(click)="onSelectPrivacyPolicy(privacyPolicy)">
 
 						@if (isSelected(privacyPolicy)) {
@@ -48,7 +47,7 @@
 							</div>
 						</div>
 
-						@if (modifiedPrivacyPolicyIds.has(privacyPolicy.policyId)) {
+						@if (isModified(privacyPolicy.policyId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

@@ -22,8 +22,7 @@
 				@for (profile of profiles; track profile.profileId) {
 					<div class="primary-card theme-profile"
 										[class.selected]="isSelected(profile)"
-										[class.modified]="modifiedProfileIds.has(profile.profileId)"
-										[style.border-top-color]="modifiedProfileIds.has(profile.profileId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(profile.profileId)"
 										(click)="onSelectProfile(profile)">
 
 						@if (isSelected(profile)) {
@@ -52,7 +51,7 @@
 							</div>
 						</div>
 
-						@if (modifiedProfileIds.has(profile.profileId)) {
+						@if (isModified(profile.profileId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

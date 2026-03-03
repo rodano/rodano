@@ -15,12 +15,13 @@ import {ResourceCategory} from '@core/model/resource-category';
 import {ResourceCategoryDetailComponent} from '../resource-category-detail/resource-category-detail.component';
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 @Component({
 	selector: 'app-resource-category-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ResourceCategoryDetailComponent, EmptyStateComponent, ListHeaderComponent],
+		MatSnackBarModule, ResourceCategoryDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './resource-category-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

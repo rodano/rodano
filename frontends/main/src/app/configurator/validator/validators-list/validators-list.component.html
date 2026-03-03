@@ -22,8 +22,7 @@
 				@for (validator of validators; track validator.validatorId) {
 					<div class="primary-card theme-validator"
 										[class.selected]="isSelected(validator)"
-										[class.modified]="modifiedValidatorIds.has(validator.validatorId)"
-										[style.border-top-color]="modifiedValidatorIds.has(validator.validatorId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(validator.validatorId)"
 										(click)="onSelectValidator(validator)">
 
 						@if (isSelected(validator)) {
@@ -70,7 +69,7 @@
 							</div>
 						</div>
 
-						@if (modifiedValidatorIds.has(validator.validatorId)) {
+						@if (isModified(validator.validatorId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

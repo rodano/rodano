@@ -20,6 +20,7 @@ import {FieldModelDialogService} from '../../services/dialogs/field-model-dialog
 import {FieldModelDetailComponent} from '../field-model/field-model-detail/field-model-detail.component';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 
@@ -29,7 +30,7 @@ type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 	templateUrl: './dataset-model-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DatasetModelDetailComponent,
-		FieldModelDetailComponent, MatProgressSpinnerModule, EmptyStateComponent, ListHeaderComponent]
+		FieldModelDetailComponent, MatProgressSpinnerModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective]
 })
 export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

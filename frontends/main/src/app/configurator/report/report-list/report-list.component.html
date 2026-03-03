@@ -22,8 +22,7 @@
 				@for (report of reports; track report.reportId) {
 					<div class="primary-card theme-report"
 										[class.selected]="isSelected(report)"
-										[class.modified]="modifiedReportIds.has(report.reportId)"
-										[style.border-top-color]="modifiedReportIds.has(report.reportId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(report.reportId)"
 										(click)="onSelectReport(report)">
 
 						@if (isSelected(report)) {
@@ -56,7 +55,7 @@
 							</div>
 						</div>
 
-						@if (modifiedReportIds.has(report.reportId)) {
+						@if (isModified(report.reportId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

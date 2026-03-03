@@ -21,8 +21,7 @@
 				@for (resourceCategory of resourceCategories; track resourceCategory.categoryId) {
 					<div class="primary-card small-card theme-resource-category"
 										[class.selected]="isSelected(resourceCategory)"
-										[class.modified]="modifiedResourceCategoryIds.has(resourceCategory.categoryId)"
-										[style.border-top-color]="modifiedResourceCategoryIds.has(resourceCategory.categoryId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(resourceCategory.categoryId)"
 										(click)="onSelectResourceCategory(resourceCategory)">
 
 						@if (isSelected(resourceCategory)) {
@@ -38,7 +37,7 @@
 							</div>
 						</div>
 
-						@if (modifiedResourceCategoryIds.has(resourceCategory.categoryId)) {
+						@if (isModified(resourceCategory.categoryId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

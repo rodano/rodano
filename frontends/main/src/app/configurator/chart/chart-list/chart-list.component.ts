@@ -20,12 +20,13 @@ import {WorkflowManagerService} from '../../services/manager/workflow-manager.se
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 @Component({
 	selector: 'app-chart-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ChartDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent],
+		MatSnackBarModule, ChartDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './chart-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

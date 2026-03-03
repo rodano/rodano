@@ -21,8 +21,7 @@
 				@for (feature of features; track feature.featureId) {
 					<div class="primary-card small-card theme-feature"
 										[class.selected]="isSelected(feature)"
-										[class.modified]="modifiedFeatureIds.has(feature.featureId)"
-										[style.border-top-color]="modifiedFeatureIds.has(feature.featureId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(feature.featureId)"
 										(click)="onSelectFeature(feature)">
 
 						@if (isSelected(feature)) {
@@ -46,7 +45,7 @@
 							</div>
 						</div>
 
-						@if (modifiedFeatureIds.has(feature.featureId)) {
+						@if (isModified(feature.featureId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

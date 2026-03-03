@@ -16,12 +16,13 @@ import {ProfileDetailComponent} from '../profile-detail/profile-detail.component
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 @Component({
 	selector: 'app-profile-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ProfileDetailComponent, EmptyStateComponent, ListHeaderComponent],
+		MatSnackBarModule, ProfileDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './profile-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

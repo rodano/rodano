@@ -22,8 +22,7 @@
 				@for (chart of charts; track chart.chartId) {
 					<div class="primary-card theme-chart"
 										[class.selected]="isSelected(chart)"
-										[class.modified]="modifiedChartIds.has(chart.chartId)"
-										[style.border-top-color]="modifiedChartIds.has(chart.chartId) ? '#f59e0b' : ''"
+										[appModified]="modifiedIds.has(chart.chartId)"
 										(click)="onSelectChart(chart)">
 
 						@if (isSelected(chart)) {
@@ -107,7 +106,7 @@
 							</div>
 						</div>
 
-						@if (modifiedChartIds.has(chart.chartId)) {
+						@if (isModified(chart.chartId)) {
 							<div class="card-modified-indicator">
 								<mat-icon>edit</mat-icon>
 							</div>

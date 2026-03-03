@@ -16,12 +16,13 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {FeatureDetailComponent} from '../feature-detail/feature-detail.component';
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 @Component({
 	selector: 'app-feature-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, FeatureDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent],
+		MatSnackBarModule, FeatureDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './feature-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

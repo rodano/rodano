@@ -15,12 +15,13 @@ import {PrivacyPolicyDialogService} from '../../services/dialogs/privacy-policy-
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
+import {ModifiedDirective} from '../../shared/modified.directive';
 
 @Component({
 	selector: 'app-privacy-policy-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, PrivacyPolicyDetailComponent, EmptyStateComponent, ListHeaderComponent],
+		MatSnackBarModule, PrivacyPolicyDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './privacy-policy-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })
