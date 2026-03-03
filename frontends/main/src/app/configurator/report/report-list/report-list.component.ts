@@ -16,12 +16,13 @@ import {ReportDetailComponent} from '../report-detail/report-detail.component';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {BaseListComponent} from '../../shared/base-list.component';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-report-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ReportDetailComponent, EmptyStateComponent],
+		MatSnackBarModule, ReportDetailComponent, EmptyStateComponent, ListHeaderComponent],
 	templateUrl: './report-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

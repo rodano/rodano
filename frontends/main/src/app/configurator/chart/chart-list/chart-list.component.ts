@@ -19,13 +19,13 @@ import {FieldModelManagerService} from '../../services/manager/field-model-manag
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {BaseListComponent} from '../../shared/base-list.component';
-import { Validator } from '@core/model/validator';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-chart-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ChartDetailComponent, EmptyStateComponent, MatTooltip],
+		MatSnackBarModule, ChartDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent],
 	templateUrl: './chart-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

@@ -15,12 +15,13 @@ import {LanguageService} from '../../services/language.service';
 import {ProfileDetailComponent} from '../profile-detail/profile-detail.component';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {BaseListComponent} from '../../shared/base-list.component';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-profile-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ProfileDetailComponent, EmptyStateComponent],
+		MatSnackBarModule, ProfileDetailComponent, EmptyStateComponent, ListHeaderComponent],
 	templateUrl: './profile-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

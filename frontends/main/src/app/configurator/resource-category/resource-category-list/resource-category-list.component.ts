@@ -14,12 +14,13 @@ import {ResourceCategoryDialogService} from '../../services/dialogs/resource-cat
 import {ResourceCategory} from '@core/model/resource-category';
 import {ResourceCategoryDetailComponent} from '../resource-category-detail/resource-category-detail.component';
 import {BaseListComponent} from '../../shared/base-list.component';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-resource-category-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ResourceCategoryDetailComponent, EmptyStateComponent],
+		MatSnackBarModule, ResourceCategoryDetailComponent, EmptyStateComponent, ListHeaderComponent],
 	templateUrl: './resource-category-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

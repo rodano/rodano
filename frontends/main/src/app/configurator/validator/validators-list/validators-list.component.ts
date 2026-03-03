@@ -17,12 +17,13 @@ import {LanguageService} from '../../services/language.service';
 import {ValidatorDetailComponent} from '../validator-detail/validator-detail.component';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {BaseListComponent} from '../../shared/base-list.component';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-validators-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, MatTooltip, ValidatorDetailComponent, EmptyStateComponent],
+		MatSnackBarModule, MatTooltip, ValidatorDetailComponent, EmptyStateComponent, ListHeaderComponent],
 	templateUrl: './validators-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

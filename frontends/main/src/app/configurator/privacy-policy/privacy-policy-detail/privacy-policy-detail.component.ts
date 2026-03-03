@@ -14,6 +14,7 @@ import {PrivacyPolicy} from '@core/model/privacy-policy';
 import {PrivacyPolicyManagerService} from '../../services/manager/privacy-policy-manager.service';
 import {PrivacyPolicyDialogService} from '../../services/dialogs/privacy-policy-dialog.service';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 
 @Component({
 	selector: 'app-privacy-policy-detail',
@@ -38,6 +39,7 @@ export class PrivacyPolicyDetailComponent implements OnInit, OnDestroy {
 	constructor(
 		public privacyPolicyManager: PrivacyPolicyManagerService,
 		public languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private privacyPolicyDialogService: PrivacyPolicyDialogService,
 		private dialog: MatDialog,
 		private snackBar: MatSnackBar
@@ -117,5 +119,9 @@ export class PrivacyPolicyDetailComponent implements OnInit, OnDestroy {
 
 	isFieldModified(fieldName: string): boolean {
 		return this.privacyPolicyManager.isFieldModified(this.privacyPolicy.policyId, fieldName);
+	}
+
+	getProfileLabel(profileId: string): string {
+		return this.languageService.getLabelById(profileId, id => this.profileManager.getById(id));
 	}
 }

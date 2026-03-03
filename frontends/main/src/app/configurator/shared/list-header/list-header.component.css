@@ -1,0 +1,22 @@
+.detail-header {
+	padding: 1.5rem;
+	border-bottom: 2px solid #e5e7eb;
+}
+
+.detail-header h1 {
+	margin: 0;
+}
+
+.detail-subtitle {
+	margin: 0.5rem 0 0 0;
+	font-size: 0.875rem;
+	color: #6b7280;
+	font-weight: normal;
+}
+
+.header-title-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+}

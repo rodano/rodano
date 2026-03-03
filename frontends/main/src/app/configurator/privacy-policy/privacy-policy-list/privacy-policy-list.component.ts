@@ -14,13 +14,13 @@ import {PrivacyPolicyDetailComponent} from '../privacy-policy-detail/privacy-pol
 import {PrivacyPolicyDialogService} from '../../services/dialogs/privacy-policy-dialog.service';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {BaseListComponent} from '../../shared/base-list.component';
-import { Validator } from '@core/model/validator';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-privacy-policy-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, PrivacyPolicyDetailComponent, EmptyStateComponent],
+		MatSnackBarModule, PrivacyPolicyDetailComponent, EmptyStateComponent, ListHeaderComponent],
 	templateUrl: './privacy-policy-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

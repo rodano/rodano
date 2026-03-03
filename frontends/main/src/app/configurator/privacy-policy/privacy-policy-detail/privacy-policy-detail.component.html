@@ -106,7 +106,7 @@
 							@for (profileId of privacyPolicy.profileIds; track profileId) {
 								<div class="chip theme-profile">
 									<mat-icon class="resource-icon">badge</mat-icon>
-									<span class="language-name">{{ profileId }}</span>
+									<span class="language-name">{{ getProfileLabel(profileId) }}</span>
 								</div>
 							}
 						</div>

@@ -23,6 +23,7 @@ import {ProjectLanguage} from '@core/model/project-language';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-detail' | 'action-list' | 'action-detail';
 
@@ -32,7 +33,7 @@ type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-deta
 	templateUrl: './workflow-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
 	imports: [CommonModule, MatIconModule, WorkflowDetailComponent, WorkflowStateDetailComponent,
-		WorkflowActionDetailComponent, MatTooltipModule, EmptyStateComponent]
+		WorkflowActionDetailComponent, MatTooltipModule, EmptyStateComponent, ListHeaderComponent]
 })
 export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

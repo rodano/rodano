@@ -15,13 +15,13 @@ import {FeatureDialogService} from '../../services/dialogs/feature-dialog.servic
 import {MatTooltip} from '@angular/material/tooltip';
 import {FeatureDetailComponent} from '../feature-detail/feature-detail.component';
 import {BaseListComponent} from '../../shared/base-list.component';
-import { Validator } from '@core/model/validator';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 @Component({
 	selector: 'app-feature-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, FeatureDetailComponent, EmptyStateComponent, MatTooltip],
+		MatSnackBarModule, FeatureDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent],
 	templateUrl: './feature-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })

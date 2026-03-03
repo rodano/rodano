@@ -25,6 +25,7 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
+import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 
 type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
 
@@ -34,7 +35,7 @@ type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 
 	templateUrl: './scope-models-list.component.html',
 	styleUrls: ['./scope-models-list.component.css'],
 	imports: [CommonModule, MatIconModule, ScopeModelDetailComponent, EventModelDetailComponent,
-		EventModelTimelineComponent, EventGroupDetailComponent, MatTooltipModule, EmptyStateComponent]
+		EventModelTimelineComponent, EventGroupDetailComponent, MatTooltipModule, EmptyStateComponent, ListHeaderComponent]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
