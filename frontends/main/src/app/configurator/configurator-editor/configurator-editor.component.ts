@@ -16,7 +16,7 @@ import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmatio
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
 import {SnapshotManagerService} from '../services/manager/snapshot-manager.service';
-import {forkJoin, Observable, of} from 'rxjs';
+import {forkJoin, Observable, of, lastValueFrom} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrator.service';
 import {ScopeModelManagerService} from '../services/manager/scope-model-manager.service';
@@ -452,13 +452,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 	}
 
-	private saveScopeModelsAndEvents(): Promise<void> {
+	private async saveScopeModelsAndEvents(): Promise<void> {
 		const component = this.detailComponent?.scopeModelsListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveScopeModels(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveScopeModels(this.projectId, {
 			scopeModelManager: component.scopeModelManager,
 			eventModelManager: component.eventModelManager,
 			eventGroupManager: component.eventGroupManager,
@@ -469,19 +469,18 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			modifiedScopeModelIds: component.modifiedScopeModelIds,
 			modifiedEventModels: component.modifiedEventModels,
 			modifiedEventGroups: component.modifiedEventGroups
-		}).toPromise().then(() => {
-			component.loadScopeModels();
-			this.scopeModels = this.scopeModelManager.getAll();
-		});
+		}));
+		component.loadScopeModels();
+		this.scopeModels = this.scopeModelManager.getAll();
 	}
 
-	private saveDatasetModelsAndFields(): Promise<void> {
+	private async saveDatasetModelsAndFields(): Promise<void> {
 		const component = this.detailComponent?.datasetModelsListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveDatasetModels(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveDatasetModels(this.projectId, {
 			datasetModelManager: component.datasetModelManager,
 			fieldModelManager: component.fieldModelManager,
 			datasetModels: component.datasetModels,
@@ -489,36 +488,34 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			originalDatasetModels: component.originalDatasetModels,
 			modifiedDatasetModelIds: component.modifiedDatasetModelIds,
 			modifiedFieldModels: component.modifiedFieldModels
-		}).toPromise().then(() => {
-			component.loadDatasetModels();
-			this.datasetModels = this.datasetModelManager.getAll();
-		});
+		}));
+		component.loadDatasetModels();
+		this.datasetModels = this.datasetModelManager.getAll();
 	}
 
-	private saveValidators(): Promise<void> {
+	private async saveValidators(): Promise<void> {
 		const component = this.detailComponent?.validatorsListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveValidators(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveValidators(this.projectId, {
 			validatorManager: component.validatorManager,
 			validators: component.validators,
 			originalValidators: component.originalValidators,
 			modifiedValidatorIds: component.modifiedValidatorIds
-		}).toPromise().then(() => {
-			component.loadValidators();
-			this.validators = this.validatorManager.getAll();
-		});
+		}));
+		component.loadValidators();
+		this.validators = this.validatorManager.getAll();
 	}
 
-	private saveWorkflows(): Promise<void> {
+	private async saveWorkflows(): Promise<void> {
 		const component = this.detailComponent?.workflowListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveWorkflows(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveWorkflows(this.projectId, {
 			workflowManager: component.workflowManager,
 			workflowStateManager: component.workflowStateManager,
 			workflowActionManager: component.workflowActionManager,
@@ -529,112 +526,105 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			modifiedWorkflowIds: component.modifiedWorkflowIds,
 			modifiedWorkflowStateIds: component.modifiedWorkflowStates,
 			modifiedWorkflowActionIds: component.modifiedWorkflowActions
-		}).toPromise().then(() => {
-			component.loadWorkflows();
-			this.workflows = this.workflowManager.getAll();
-		});
+		}));
+		component.loadWorkflows();
+		this.workflows = this.workflowManager.getAll();
 	}
 
-	private saveProfiles(): Promise<void> {
+	private async saveProfiles(): Promise<void> {
 		const component = this.detailComponent?.profileListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveProfiles(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveProfiles(this.projectId, {
 			profileManager: component.profileManager,
 			profiles: component.profiles,
 			originalProfiles: component.originalProfiles,
 			modifiedProfileIds: component.modifiedProfileIds
-		}).toPromise().then(() => {
-			component.loadProfiles();
-			this.profiles = this.profileManager.getAll();
-		});
+		}));
+		component.loadProfiles();
+		this.profiles = this.profileManager.getAll();
 	}
 
-	private saveFeatures(): Promise<void> {
+	private async saveFeatures(): Promise<void> {
 		const component = this.detailComponent?.featureListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveFeatures(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveFeatures(this.projectId, {
 			featureManager: component.featureManager,
 			features: component.features,
 			originalFeatures: component.originalFeatures,
 			modifiedFeatureIds: component.modifiedFeatureIds
-		}).toPromise().then(() => {
-			component.loadFeatures();
-			this.features = this.featureManager.getAll();
-		});
+		}));
+		component.loadFeatures();
+		this.features = this.featureManager.getAll();
 	}
 
-	private savePrivacyPolicies(): Promise<void> {
+	private async savePrivacyPolicies(): Promise<void> {
 		const component = this.detailComponent?.privacyPolicyListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.savePrivacyPolicies(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.savePrivacyPolicies(this.projectId, {
 			privacyPolicyManager: component.privacyPolicyManager,
 			privacyPolicies: component.privacyPolicies,
 			originalPrivacyPolicies: component.originalPrivacyPolicies,
 			modifiedPrivacyPolicyIds: component.modifiedPrivacyPolicyIds
-		}).toPromise().then(() => {
-			component.loadPrivacyPolicies();
-			this.privacyPolicies = this.privacyPolicyManager.getAll();
-		});
+		}));
+		component.loadPrivacyPolicies();
+		this.privacyPolicies = this.privacyPolicyManager.getAll();
 	}
 
-	private saveResourceCategories(): Promise<void> {
+	private async saveResourceCategories(): Promise<void> {
 		const component = this.detailComponent?.resourceCategoryListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveResourceCategories(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveResourceCategories(this.projectId, {
 			resourceCategoryManager: component.resourceCategoryManager,
 			resourceCategories: component.resourceCategories,
 			originalResourceCategories: component.originalResourceCategories,
 			modifiedResourceCategoryIds: component.modifiedResourceCategoryIds
-		}).toPromise().then(() => {
-			component.loadResourceCategories();
-			this.resourceCategories = this.resourceCategoryManager.getAll();
-		});
+		}));
+		component.loadResourceCategories();
+		this.resourceCategories = this.resourceCategoryManager.getAll();
 	}
 
-	private saveReports(): Promise<void> {
+	private async saveReports(): Promise<void> {
 		const component = this.detailComponent?.reportListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveReports(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveReports(this.projectId, {
 			reportManager: component.reportManager,
 			reports: component.reports,
 			originalReports: component.originalReports,
 			modifiedReportIds: component.modifiedReportIds
-		}).toPromise().then(() => {
-			component.loadReports();
-			this.reports = this.reportManager.getAll();
-		});
+		}));
+		component.loadReports();
+		this.reports = this.reportManager.getAll();
 	}
 
-	private saveCharts(): Promise<void> {
+	private async saveCharts(): Promise<void> {
 		const component = this.detailComponent?.chartListComponent;
 		if(!component) {
-			return Promise.resolve();
+			return;
 		}
 
-		return this.entitySaveOrchestratorService.saveCharts(this.projectId, {
+		await lastValueFrom(this.entitySaveOrchestratorService.saveCharts(this.projectId, {
 			chartManager: component.chartManager,
 			charts: component.charts,
 			originalCharts: component.originalCharts,
 			modifiedChartIds: component.modifiedChartIds
-		}).toPromise().then(() => {
-			component.loadCharts();
-			this.charts = this.chartManager.getAll();
-		});
+		}));
+		component.loadCharts();
+		this.charts = this.chartManager.getAll();
 	}
 
 	private confirmDiscardIfChanged(): Observable<boolean> {
