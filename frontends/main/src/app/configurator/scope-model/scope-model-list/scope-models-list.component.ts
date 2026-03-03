@@ -33,16 +33,8 @@ type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 
 	standalone: true,
 	templateUrl: './scope-models-list.component.html',
 	styleUrls: ['./scope-models-list.component.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		ScopeModelDetailComponent,
-		EventModelDetailComponent,
-		EventModelTimelineComponent,
-		EventGroupDetailComponent,
-		MatTooltipModule,
-		EmptyStateComponent
-	]
+	imports: [CommonModule, MatIconModule, ScopeModelDetailComponent, EventModelDetailComponent,
+		EventModelTimelineComponent, EventGroupDetailComponent, MatTooltipModule, EmptyStateComponent]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -85,20 +77,20 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	) {}
 
 	ngOnInit(): void {
-		this.loadScopeModels();
-
 		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
+		this.loadScopeModels();
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode'] && this.scopeModels.length > 0) {
 			const nodeId = this.selectedNode;
 			if(nodeId?.startsWith('scope-model-')) {
-				const scopeModelId = nodeId?.replace('scope-model-', '');
-				const scopeModel = this.scopeModels.find(sm => sm.scopeModelId === scopeModelId);
+				const scopeModel = this.scopeModels.find(
+					sm => sm.scopeModelId === nodeId?.replace('scope-model-', '')
+				);
 				if(scopeModel) {
 					this.selectedScopeModel = scopeModel;
 					this.updateFilteredEventModels();
@@ -133,41 +125,17 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		return 0;
 	}
 
-	get scopeModels(): ScopeModel[] {
-		return this.scopeModelManager.getAll();
-	}
+	get scopeModels(): ScopeModel[] {return this.scopeModelManager.getAll();}
+	get eventModels(): EventModel[] {return this.currentEventModels;}
+	get eventGroups(): EventGroup[] {return this.currentEventGroups;}
 
-	get eventModels(): EventModel[] {
-		return this.currentEventModels;
-	}
+	get modifiedScopeModelIds(): Set<string> {return this.scopeModelManager.getModifiedIds();}
+	get modifiedEventModels(): Set<string> {return this.eventModelManager.getModifiedIds();}
+	get modifiedEventGroups(): Set<string> {return this.eventGroupManager.getModifiedIds();}
 
-	get eventGroups(): EventGroup[] {
-		return this.currentEventGroups;
-	}
-
-	get modifiedScopeModelIds(): Set<string> {
-		return this.scopeModelManager.getModifiedIds();
-	}
-
-	get originalScopeModels(): ScopeModel[] {
-		return this.scopeModelManager.getOriginals();
-	}
-
-	get modifiedEventModels(): Set<string> {
-		return this.eventModelManager.getModifiedIds();
-	}
-
-	get modifiedEventGroups(): Set<string> {
-		return this.eventGroupManager.getModifiedIds();
-	}
-
-	get originalEventModels(): EventModel[] {
-		return this.eventModelManager.getOriginals();
-	}
-
-	get originalEventGroups(): EventGroup[] {
-		return this.eventGroupManager.getOriginals();
-	}
+	get originalScopeModels(): ScopeModel[] {return this.scopeModelManager.getOriginals();}
+	get originalEventModels(): EventModel[] {return this.eventModelManager.getOriginals();}
+	get originalEventGroups(): EventGroup[] {return this.eventGroupManager.getOriginals();}
 
 	get totalModificationCount(): number {
 		return this.scopeModelManager.getModificationCount() + this.eventModelManager.getModificationCount() + this.eventGroupManager.getModificationCount();

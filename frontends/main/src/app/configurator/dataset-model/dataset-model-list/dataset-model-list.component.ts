@@ -14,12 +14,11 @@ import {DatasetModelDialogService} from '../../services/dialogs/dataset-model-di
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {ProjectLanguage} from '@core/model/project-language';
 import {HttpErrorResponse} from '@angular/common/http';
-import {ConfiguratorService} from '../../services/api/configurator.service';
 import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
 import {FieldModel} from '@core/model/field-model';
 import {FieldModelDialogService} from '../../services/dialogs/field-model-dialog.service';
 import {FieldModelDetailComponent} from '../field-model/field-model-detail/field-model-detail.component';
-import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 
 type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 
@@ -28,16 +27,8 @@ type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 	standalone: true,
 	templateUrl: './dataset-model-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule,
-		DatasetModelDetailComponent,
-		FieldModelDetailComponent,
-		MatProgressSpinnerModule,
-		EmptyStateComponent
-	]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DatasetModelDetailComponent,
+		FieldModelDetailComponent, MatProgressSpinnerModule, EmptyStateComponent]
 })
 export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -67,27 +58,25 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		public datasetModelManager: DatasetModelManagerService,
 		public fieldModelManager: FieldModelManagerService,
 		public languageService: LanguageService,
-		private configuratorService: ConfiguratorService,
 		private datasetModelDialogService: DatasetModelDialogService,
 		private fieldModelDialogService: FieldModelDialogService,
 		private snackBar: MatSnackBar
 	) {}
 
 	ngOnInit(): void {
-		this.loadDatasetModels();
-
 		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
 		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
 			this.selectedLanguage = language;
 		});
+		this.loadDatasetModels();
 	}
 
 	ngOnChanges(changes: any): void {
 		if(changes['selectedNode'] && this.datasetModels.length > 0) {
 			const nodeId = this.selectedNode;
 			if(nodeId?.startsWith('dataset-model-')) {
-				const datasetModelId = nodeId.replace('dataset-model-', '');
-				const datasetModel = this.datasetModels.find(dm => dm.datasetModelId === datasetModelId);
+				const datasetModel = this.datasetModels.find(
+					dm => dm.datasetModelId === nodeId?.replace('dataset-model-', ''));
 				if(datasetModel) {
 					this.selectedDatasetModel = datasetModel;
 					this.updateFilteredFieldModels();
@@ -120,29 +109,14 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		return 0;
 	}
 
-	get datasetModels(): DatasetModel[] {
-		return this.datasetModelManager.getAll();
-	}
+	get datasetModels(): DatasetModel[] {return this.datasetModelManager.getAll();}
+	get fieldModels(): FieldModel[] {return this.currentFieldModels;}
 
-	get fieldModels(): FieldModel[] {
-		return this.currentFieldModels;
-	}
+	get modifiedDatasetModelIds(): Set<string> {return this.datasetModelManager.getModifiedIds();}
+	get modifiedFieldModels(): Set<string> {return this.fieldModelManager.getModifiedIds();}
 
-	get modifiedDatasetModelIds(): Set<string> {
-		return this.datasetModelManager.getModifiedIds();
-	}
-
-	get originalDatasetModels(): DatasetModel[] {
-		return this.datasetModelManager.getOriginals();
-	}
-
-	get modifiedFieldModels(): Set<string> {
-		return this.fieldModelManager.getModifiedIds();
-	}
-
-	get originalFieldModels(): FieldModel[] {
-		return this.fieldModelManager.getOriginals();
-	}
+	get originalDatasetModels(): DatasetModel[] {return this.datasetModelManager.getOriginals();}
+	get originalFieldModels(): FieldModel[] {return this.fieldModelManager.getOriginals();}
 
 	get totalModificationCount(): number {
 		return this.datasetModelManager.getModificationCount() + this.fieldModelManager.getModificationCount();

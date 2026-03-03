@@ -1,113 +1,38 @@
 import {Injectable} from '@angular/core';
-import {EntityModificationTracker} from '../entity-modification-tracker';
+import {Observable} from 'rxjs';
 import {ScopeModel} from '@core/model/scope-model';
 import {ScopeModelService} from '../api/scope-model.service';
-import {Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {BaseManagerService} from './base-manager.service';
 
-@Injectable({
-	providedIn: 'root'
-})
-export class ScopeModelManagerService {
-	private tracker: EntityModificationTracker<ScopeModel>;
-	private loaded = false;
-
+@Injectable({providedIn: 'root'})
+export class ScopeModelManagerService extends BaseManagerService<ScopeModel> {
 	constructor(private scopeModelService: ScopeModelService) {
-		this.tracker = new EntityModificationTracker<ScopeModel>(
-			sm => sm.scopeModelId,
-			['id', 'virtual', 'defaultParentId', 'defaultProfileId', 'scopeFormat', 'expectedNumber', 'maxNumber'],
-			['shortname', 'longname', 'description', 'pluralShortname'],
-			['parentIds', 'datasetModelIds', 'formModelIds', 'workflowIds', 'workflowStateIds']
-		);
+		super();
+		this.initTracker();
 	}
 
-	load(projectId: string): Observable<ScopeModel[]> {
-		if(this.loaded) {
-			return of(this.tracker.getCurrent());
-		}
-		return this.scopeModelService.getScopeModels(projectId).pipe(
-			map(models => {
-				this.tracker.initialize(models);
-				this.loaded = true;
-				return models;
-			})
-		);
+	protected getIdFn() {return (sm: ScopeModel) => sm.scopeModelId;}
+	protected getSimpleFields(): (keyof ScopeModel)[] {
+		return ['id', 'virtual', 'defaultParentId', 'defaultProfileId', 'scopeFormat', 'expectedNumber', 'maxNumber'];
 	}
 
-	invalidate(): void {
-		this.loaded = false;
+	protected getTranslationFields(): (keyof ScopeModel)[] {
+		return ['shortname', 'longname', 'description', 'pluralShortname'];
 	}
 
-	create(projectId: string, scopeModel: ScopeModel): Observable<ScopeModel> {
-		return this.scopeModelService.createScopeModel(projectId, scopeModel).pipe(
-			map(created => {
-				this.tracker.addEntity(created);
-				return created;
-			})
-		);
+	protected getArrayFields(): (keyof ScopeModel)[] {
+		return ['parentIds', 'datasetModelIds', 'formModelIds', 'workflowIds', 'workflowStateIds'];
 	}
 
-	update(scopeModel: ScopeModel): void {
-		this.tracker.updateEntity(scopeModel);
+	protected fetchAll(projectId: string): Observable<ScopeModel[]> {
+		return this.scopeModelService.getScopeModels(projectId);
 	}
 
-	delete(projectId: string, scopeModelId: string): Observable<void> {
-		return this.scopeModelService.deleteScopeModel(projectId, scopeModelId).pipe(
-			map(() => {
-				this.tracker.removeEntity(scopeModelId);
-			})
-		);
+	protected createEntity(projectId: string, entity: ScopeModel): Observable<ScopeModel> {
+		return this.scopeModelService.createScopeModel(projectId, entity);
 	}
 
-	getModifiedIds(): Set<string> {
-		return this.tracker.getModifiedIds();
-	}
-
-	getModifiedFieldsMap(): Map<string, Set<string>> {
-		return this.tracker.getModifiedFieldsMap();
-	}
-
-	getOriginals(): ScopeModel[] {
-		return this.tracker.getOriginals();
-	}
-
-	clearModifications(): void {
-		this.tracker.clearModifications();
-	}
-
-	resetToOriginals(): void {
-		this.tracker.resetToOriginals();
-	}
-
-	setAll(scopeModels: ScopeModel[]): void {
-		this.tracker.initialize(scopeModels);
-	}
-
-	getAll(): ScopeModel[] {
-		return this.tracker.getCurrent();
-	}
-
-	getById(id: string): ScopeModel | undefined {
-		return this.tracker.getEntity(id);
-	}
-
-	isModified(id: string): boolean {
-		return this.tracker.isModified(id);
-	}
-
-	isFieldModified(id: string, field: string): boolean {
-		return this.tracker.isFieldModified(id, field);
-	}
-
-	getModificationCount(): number {
-		return this.tracker.getTotalModifiedFieldsCount();
-	}
-
-	updateOnServer(projectId: string, scopeModelId: string, scopeModel: ScopeModel): Observable<ScopeModel> {
-		return this.scopeModelService.updateScopeModel(projectId, scopeModelId, scopeModel);
-	}
-
-	syncOriginalsWithCurrent(): void {
-		this.tracker.syncOriginalsWithCurrent();
+	protected deleteEntity(projectId: string, id: string): Observable<void> {
+		return this.scopeModelService.deleteScopeModel(projectId, id);
 	}
 }

@@ -5,8 +5,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import {ConfiguratorProject} from '@core/model/configurator-project';
-import {ProjectLanguage} from '@core/model/project-language';
-import {forkJoin, of, Subscription} from 'rxjs';
+import {forkJoin, of} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
@@ -19,227 +18,117 @@ import {ScopeModelManagerService} from '../../services/manager/scope-model-manag
 import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
+import {BaseListComponent} from '../../shared/base-list.component';
+import { Validator } from '@core/model/validator';
 
 @Component({
 	selector: 'app-chart-list',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatProgressSpinnerModule,
-		MatSnackBarModule,
-		ChartDetailComponent,
-		EmptyStateComponent,
-		MatTooltip
-	],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
+		MatSnackBarModule, ChartDetailComponent, EmptyStateComponent, MatTooltip],
 	templateUrl: './chart-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })
-export class ChartListComponent implements OnInit, OnChanges, OnDestroy {
-	@Input() projectId = '';
-	@Input() project: ConfiguratorProject | null = null;
-	@Input() selectedNode: string | null = null;
-	@Output() nodeSelected = new EventEmitter<string | null>();
+export class ChartListComponent
+	extends BaseListComponent<ChartModel>
+	implements OnInit, OnChanges, OnDestroy {
+	@Input() override projectId = '';
+	@Input() override project: ConfiguratorProject | null = null;
+	@Input() override selectedNode: string | null = null;
 	@Output() chartsChanged = new EventEmitter<{modificationCount: number}>();
 	@Output() chartContextChanged = new EventEmitter<{
 		charts: any[];
 		selectedChartId: string | null;
 	}>();
 
-	selectedChart: ChartModel | null = null;
-	viewMode = 'detail';
-	loading = false;
-
-	projectLanguages: ProjectLanguage[] = [];
-	selectedLanguage = '';
-	private languageSubscription: Subscription;
-
 	constructor(
 		public chartManager: ChartManagerService,
-		public languageService: LanguageService,
+		public override languageService: LanguageService,
 		private fieldModelManager: FieldModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private scopeModelManager: ScopeModelManagerService,
 		private chartDialogService: ChartDialogService,
-		private snackBar: MatSnackBar
-	) {}
-
-	ngOnInit(): void {
-		this.loadCharts();
-
-		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
+		snackBar: MatSnackBar
+	) {
+		super(chartManager, languageService, snackBar);
 	}
 
-	ngOnChanges(changes: any): void {
-		if(changes['selectedNode'] && this.charts.length > 0) {
-			const nodeId = this.selectedNode;
-			if(nodeId?.startsWith('chart-')) {
-				const chartId = nodeId.replace('chart-', '');
-				const chart = this.charts.find(c => c.chartId === chartId);
-				if(chart) {
-					this.selectedChart = chart;
-				}
-			}
-			else if(nodeId === 'charts') {
-				this.selectedChart = null;
-			}
-		}
-	}
+	getEntityId(c: ChartModel): string {return c.chartId;}
+	getNodePrefix(): string {return 'chart';}
+	getListNodeName(): string {return 'charts';}
 
-	ngOnDestroy(): void {
-		this.languageSubscription.unsubscribe();
-	}
+	get charts(): ChartModel[] {return this.chartManager.getAll();}
+	get selectedChart(): ChartModel | null {return this.selected as ChartModel | null;}
+	get modifiedChartIds(): Set<string> {return this.chartManager.getModifiedIds();}
+	get originalCharts(): ChartModel[] {return this.chartManager.getOriginals();}
 
-	get viewLevel(): number {
-		if(!this.selectedChart) {
-			return 0;
-		}
-		return 2;
-	}
-
-	get charts(): ChartModel[] {
-		return this.chartManager.getAll();
-	}
-
-	get modifiedChartIds(): Set<string> {
-		return this.chartManager.getModifiedIds();
-	}
-
-	get originalCharts(): ChartModel[] {
-		return this.chartManager.getOriginals();
-	}
-
-	get totalModificationCount(): number {
-		return this.chartManager.getModificationCount();
-	}
-
-	loadCharts(): void {
+	loadCharts(): void {this.load();}
+	load(): void {
 		this.loading = true;
 		forkJoin({
 			charts: this.chartManager.loadFull(this.projectId),
-			fieldModels: this.fieldModelManager.isLoaded() ? of(null) : this.fieldModelManager.load(this.projectId),
-			workflowStates: this.workflowStateManager.isLoaded() ? of(null) : this.workflowStateManager.load(this.projectId)
+			fieldModels: this.fieldModelManager.isLoaded()
+				? of(null)
+				: this.fieldModelManager.load(this.projectId),
+			workflowStates: this.workflowStateManager.isLoaded()
+				? of(null)
+				: this.workflowStateManager.load(this.projectId)
 		}).subscribe({
-			next: ({charts}) => {
-				if(this.selectedChart) {
-					this.selectedChart = charts.find(
-						c => c.chartId === this.selectedChart!.chartId
-					) || null;
+			next: ({charts}) => this.afterLoad(charts),
+			error: (e: HttpErrorResponse) => this.handleLoadError(e, 'charts')
+		});
+	}
+
+	emitChangedEvent(count: number): void {
+		this.chartsChanged.emit({modificationCount: count});
+	}
+
+	emitContextEvent(): void {
+		this.chartContextChanged.emit({
+			charts: [...this.charts],
+			selectedChartId: this.selected?.chartId || null
+		});
+	}
+
+	onCreate(): void {
+		this.chartDialogService.openCreateDialog(this.projectId, this.projectLanguages)
+			.subscribe((result: ChartModel | null) => {
+				if(result) {
+					this.chartManager.create(this.projectId, result).subscribe({
+						next: () => this.afterCreate('Chart'),
+						error: e => {
+							console.error(e);
+							this.snackBar.open('Failed to create chart', 'Close', {duration: 3000});
+						}
+					});
 				}
-				this.loading = false;
-				this.emitContext();
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error loading charts:', error);
-				this.snackBar.open('Failed to load charts', 'Close', {duration: 3000});
-				this.loading = false;
-			}
-		});
+			});
 	}
 
-	onSelectChart(chart: ChartModel): void {
-		if(this.selectedChart?.chartId === chart.chartId) {
-			this.clearSelection();
-		}
-		else {
-			this.selectChart(chart);
-		}
-		this.emitContext();
-	}
-
-	clearSelection(): void {
-		this.selectedChart = null;
-		this.viewMode = 'detail';
-		this.nodeSelected.emit('charts');
-	}
-
-	private selectChart(chart: ChartModel): void {
-		const previousChartId = this.selectedChart?.chartId;
-		this.selectedChart = chart;
-
-		if(previousChartId !== chart.chartId) {
-			this.viewMode = 'detail';
-		}
-		this.emitContext();
-		this.nodeSelected.emit(`chart-${chart.chartId}`);
-	}
-
-	isSelected(chart: ChartModel): boolean {
-		return this.selectedChart?.chartId === chart.chartId;
-	}
-
-	onCreateChart(): void {
-		this.chartDialogService.openCreateDialog(
-			this.projectId,
-			this.projectLanguages
-		).subscribe((result: ChartModel | null) => {
-			if(result) {
-				this.chartManager.create(this.projectId, result).subscribe({
-					next: () => {
-						this.snackBar.open('Chart created', 'Close', {duration: 2000});
-						this.loadCharts();
-						this.emitModificationChange();
-					},
-					error: error => {
-						console.error('Error creating chart', error);
-						this.snackBar.open('Failed to create chart', 'Close', {duration: 3000});
-					}
-				});
-			}
-		});
-	}
-
-	onChartUpdated(updatedChart: ChartModel): void {
-		this.selectedChart = this.chartManager.getById(updatedChart.chartId) || null;
+	onUpdated(updated: ChartModel): void {
+		this.selected = this.chartManager.getById(updated.chartId) || null;
 		this.emitModificationChange();
 	}
 
-	onChartDeleted(chartId: string): void {
+	onDeleted(chartId: string): void {
 		const chart = this.charts.find(c => c.chartId === chartId);
 		if(!chart) {
 			return;
 		}
-		this.performDelete(chart);
-	}
-
-	private performDelete(chart: ChartModel): void {
-		this.chartManager.delete(this.projectId, chart.chartId).subscribe({
-			next: () => {
-				this.snackBar.open('Chart deleted', 'Close', {duration: 2000});
-
-				if(this.selectedChart?.chartId === chart.chartId) {
-					this.clearSelection();
-				}
-
-				this.loadCharts();
-				this.emitModificationChange();
-			},
-			error: (error: HttpErrorResponse) => {
-				console.error('Error deleting chart', error);
+		this.chartManager.delete(this.projectId, chartId).subscribe({
+			next: () => this.afterDelete(chart, 'Chart'),
+			error: (e: HttpErrorResponse) => {
+				console.error(e);
 				this.snackBar.open('Failed to delete chart', 'Close', {duration: 3000});
 			}
 		});
 	}
 
-	private emitModificationChange(): void {
-		this.chartsChanged.emit({modificationCount: this.totalModificationCount});
-	}
-
-	private emitContext(): void {
-		this.chartContextChanged.emit({
-			charts: [...this.charts],
-			selectedChartId: this.selectedChart?.chartId || null
-		});
-	}
-
-	isModified(chartId: string): boolean {
-		return this.chartManager.isModified(chartId);
-	}
+	onSelectChart(c: ChartModel): void {this.onSelect(c);}
+	onCreateChart(): void {this.onCreate();}
+	onChartUpdated(c: ChartModel): void {this.onUpdated(c);}
+	onChartDeleted(id: string): void {this.onDeleted(id);}
 
 	getWorkflowLabel(workflowId: string): string {
 		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));

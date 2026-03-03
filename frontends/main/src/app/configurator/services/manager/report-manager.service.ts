@@ -1,107 +1,38 @@
 import {Injectable} from '@angular/core';
-import {EntityModificationTracker} from '../entity-modification-tracker';
-import {Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import {ReportService} from '../api/report.service';
 import {Report} from '@core/model/report';
+import {BaseManagerService} from './base-manager.service';
 
 @Injectable({providedIn: 'root'})
-export class ReportManagerService {
-	private tracker: EntityModificationTracker<Report>;
-	private loaded = false;
-
+export class ReportManagerService extends BaseManagerService<Report> {
 	constructor(private reportService: ReportService) {
-		this.tracker = new EntityModificationTracker<Report>(
-			report => report.reportId,
-			['id', 'workflowId', 'datasetModelId'],
-			['shortname', 'longname', 'description'],
-			['fieldModelIds']
-		);
+		super();
+		this.initTracker();
 	}
 
-	load(projectId: string): Observable<Report[]> {
-		if(this.loaded) {
-			return of(this.tracker.getCurrent());
-		}
-		return this.reportService.getReports(projectId).pipe(
-			map(reports => {
-				this.tracker.initialize(reports);
-				this.loaded = true;
-				return reports;
-			})
-		);
+	protected getIdFn() {return (r: Report) => r.reportId;}
+	protected getSimpleFields(): (keyof Report)[] {
+		return ['id', 'workflowId', 'datasetModelId'];
 	}
 
-	invalidate(): void {
-		this.loaded = false;
+	protected getTranslationFields(): (keyof Report)[] {
+		return ['shortname', 'longname', 'description'];
 	}
 
-	create(projectId: string, report: Report): Observable<Report> {
-		return this.reportService.createReport(projectId, report).pipe(
-			map(created => {
-				this.tracker.addEntity(created);
-				return created;
-			})
-		);
+	protected getArrayFields(): (keyof Report)[] {
+		return ['fieldModelIds'];
 	}
 
-	update(report: Report): void {
-		this.tracker.updateEntity(report);
+	protected fetchAll(projectId: string): Observable<Report[]> {
+		return this.reportService.getReports(projectId);
 	}
 
-	delete(projectId: string, reportId: string): Observable<void> {
-		return this.reportService.deleteReport(projectId, reportId).pipe(
-			map(() => {
-				this.tracker.removeEntity(reportId);
-			})
-		);
+	protected createEntity(projectId: string, entity: Report): Observable<Report> {
+		return this.reportService.createReport(projectId, entity);
 	}
 
-	getModifiedIds(): Set<string> {
-		return this.tracker.getModifiedIds();
-	}
-
-	getModifiedFieldsMap(): Map<string, Set<string>> {
-		return this.tracker.getModifiedFieldsMap();
-	}
-
-	getOriginals(): Report[] {
-		return this.tracker.getOriginals();
-	}
-
-	clearModifications(): void {
-		this.tracker.clearModifications();
-	}
-
-	resetToOriginals(): void {
-		this.tracker.resetToOriginals();
-	}
-
-	getAll(): Report[] {
-		return this.tracker.getCurrent();
-	}
-
-	getById(id: string): Report | undefined {
-		return this.tracker.getEntity(id);
-	}
-
-	isModified(reportId: string): boolean {
-		return this.tracker.isModified(reportId);
-	}
-
-	isFieldModified(reportId: string, fieldName: string): boolean {
-		return this.tracker.isFieldModified(reportId, fieldName);
-	}
-
-	getModificationCount(): number {
-		return this.tracker.getTotalModifiedFieldsCount();
-	}
-
-	updateOnServer(projectId: string, reportId: string, report: Report): Observable<Report> {
-		return this.reportService.updateReport(projectId, reportId, report);
-	}
-
-	syncOriginalsWithCurrent(): void {
-		this.tracker.syncOriginalsWithCurrent();
+	protected deleteEntity(projectId: string, id: string): Observable<void> {
+		return this.reportService.deleteReport(projectId, id);
 	}
 }

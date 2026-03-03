@@ -31,15 +31,8 @@ type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-deta
 	standalone: true,
 	templateUrl: './workflow-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		WorkflowDetailComponent,
-		WorkflowStateDetailComponent,
-		WorkflowActionDetailComponent,
-		MatTooltipModule,
-		EmptyStateComponent
-	]
+	imports: [CommonModule, MatIconModule, WorkflowDetailComponent, WorkflowStateDetailComponent,
+		WorkflowActionDetailComponent, MatTooltipModule, EmptyStateComponent]
 })
 export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -93,8 +86,8 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		if(changes['selectedNode'] && this.workflows.length > 0) {
 			const nodeId = this.selectedNode;
 			if(nodeId?.startsWith('workflow-')) {
-				const workflowId = nodeId?.replace('workflow-', '');
-				const workflow = this.workflows.find(wf => wf.workflowId === workflowId);
+				const workflow = this.workflows.find(
+					wf => wf.workflowId === nodeId?.replace('workflow-', ''));
 				if(workflow) {
 					this.selectedWorkflow = workflow;
 					this.updateFilteredWorkflowStates();
@@ -129,41 +122,17 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		return 0;
 	}
 
-	get workflows(): Workflow[] {
-		return this.workflowManager.getAll();
-	}
+	get workflows(): Workflow[] {return this.workflowManager.getAll();}
+	get workflowStates(): WorkflowState[] {return this.currentWorkflowStates;}
+	get workflowActions(): WorkflowAction[] {return this.currentWorkflowActions;}
 
-	get workflowStates(): WorkflowState[] {
-		return this.currentWorkflowStates;
-	}
+	get modifiedWorkflowIds(): Set<string> {return this.workflowManager.getModifiedIds();}
+	get modifiedWorkflowStates(): Set<string> {return this.workflowStateManager.getModifiedIds();}
+	get modifiedWorkflowActions(): Set<string> {return this.workflowActionManager.getModifiedIds();}
 
-	get workflowActions(): WorkflowAction[] {
-		return this.currentWorkflowActions;
-	}
-
-	get modifiedWorkflowIds(): Set<string> {
-		return this.workflowManager.getModifiedIds();
-	}
-
-	get originalWorkflows(): Workflow[] {
-		return this.workflowManager.getOriginals();
-	}
-
-	get modifiedWorkflowStates(): Set<string> {
-		return this.workflowStateManager.getModifiedIds();
-	}
-
-	get modifiedWorkflowActions(): Set<string> {
-		return this.workflowActionManager.getModifiedIds();
-	}
-
-	get originalWorkflowStates(): WorkflowState[] {
-		return this.workflowStateManager.getOriginals();
-	}
-
-	get originalWorkflowActions(): WorkflowAction[] {
-		return this.workflowActionManager.getOriginals();
-	}
+	get originalWorkflows(): Workflow[] {return this.workflowManager.getOriginals();}
+	get originalWorkflowStates(): WorkflowState[] {return this.workflowStateManager.getOriginals();}
+	get originalWorkflowActions(): WorkflowAction[] {return this.workflowActionManager.getOriginals();}
 
 	get totalModificationCount(): number {
 		return this.workflowManager.getModificationCount() + this.workflowStateManager.getModificationCount() + this.workflowActionManager.getModificationCount();

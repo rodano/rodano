@@ -1,107 +1,38 @@
 import {Injectable} from '@angular/core';
-import {EntityModificationTracker} from '../entity-modification-tracker';
-import {Observable, of} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Observable} from 'rxjs';
 import {PrivacyPolicy} from '@core/model/privacy-policy';
 import {PrivacyPolicyService} from '../api/privacy-policy.service';
+import {BaseManagerService} from './base-manager.service';
 
 @Injectable({providedIn: 'root'})
-export class PrivacyPolicyManagerService {
-	private tracker: EntityModificationTracker<PrivacyPolicy>;
-	private loaded = false;
-
+export class PrivacyPolicyManagerService extends BaseManagerService<PrivacyPolicy> {
 	constructor(private privacyPolicyService: PrivacyPolicyService) {
-		this.tracker = new EntityModificationTracker<PrivacyPolicy>(
-			privacyPolicy => privacyPolicy.policyId,
-			['id'],
-			['shortname', 'longname', 'description', 'content'],
-			['profileIds']
-		);
+		super();
+		this.initTracker();
 	}
 
-	load(projectId: string): Observable<PrivacyPolicy[]> {
-		if(this.loaded) {
-			return of(this.tracker.getCurrent());
-		}
-		return this.privacyPolicyService.getPrivacyPolicies(projectId).pipe(
-			map(privacyPolicies => {
-				this.tracker.initialize(privacyPolicies);
-				this.loaded = true;
-				return privacyPolicies;
-			})
-		);
+	protected getIdFn() {return (pp: PrivacyPolicy) => pp.policyId;}
+	protected getSimpleFields(): (keyof PrivacyPolicy)[] {
+		return ['id'];
 	}
 
-	invalidate(): void {
-		this.loaded = false;
+	protected getTranslationFields(): (keyof PrivacyPolicy)[] {
+		return ['shortname', 'longname', 'description', 'content'];
 	}
 
-	create(projectId: string, privacyPolicy: PrivacyPolicy): Observable<PrivacyPolicy> {
-		return this.privacyPolicyService.createPrivacyPolicy(projectId, privacyPolicy).pipe(
-			map(created => {
-				this.tracker.addEntity(created);
-				return created;
-			})
-		);
+	protected getArrayFields(): (keyof PrivacyPolicy)[] {
+		return ['profileIds'];
 	}
 
-	update(privacyPolicy: PrivacyPolicy): void {
-		this.tracker.updateEntity(privacyPolicy);
+	protected fetchAll(projectId: string): Observable<PrivacyPolicy[]> {
+		return this.privacyPolicyService.getPrivacyPolicies(projectId);
 	}
 
-	delete(projectId: string, privacyPolicyId: string): Observable<void> {
-		return this.privacyPolicyService.deletePrivacyPolicy(projectId, privacyPolicyId).pipe(
-			map(() => {
-				this.tracker.removeEntity(privacyPolicyId);
-			})
-		);
+	protected createEntity(projectId: string, entity: PrivacyPolicy): Observable<PrivacyPolicy> {
+		return this.privacyPolicyService.createPrivacyPolicy(projectId, entity);
 	}
 
-	getModifiedIds(): Set<string> {
-		return this.tracker.getModifiedIds();
-	}
-
-	getModifiedFieldsMap(): Map<string, Set<string>> {
-		return this.tracker.getModifiedFieldsMap();
-	}
-
-	getOriginals(): PrivacyPolicy[] {
-		return this.tracker.getOriginals();
-	}
-
-	clearModifications(): void {
-		this.tracker.clearModifications();
-	}
-
-	resetToOriginals(): void {
-		this.tracker.resetToOriginals();
-	}
-
-	getAll(): PrivacyPolicy[] {
-		return this.tracker.getCurrent();
-	}
-
-	getById(id: string): PrivacyPolicy | undefined {
-		return this.tracker.getEntity(id);
-	}
-
-	isModified(privacyPolicyId: string): boolean {
-		return this.tracker.isModified(privacyPolicyId);
-	}
-
-	isFieldModified(privacyPolicyId: string, fieldName: string): boolean {
-		return this.tracker.isFieldModified(privacyPolicyId, fieldName);
-	}
-
-	getModificationCount(): number {
-		return this.tracker.getTotalModifiedFieldsCount();
-	}
-
-	updateOnServer(projectId: string, privacyPolicyId: string, privacyPolicy: PrivacyPolicy): Observable<PrivacyPolicy> {
-		return this.privacyPolicyService.updatePrivacyPolicy(projectId, privacyPolicyId, privacyPolicy);
-	}
-
-	syncOriginalsWithCurrent(): void {
-		this.tracker.syncOriginalsWithCurrent();
+	protected deleteEntity(projectId: string, id: string): Observable<void> {
+		return this.privacyPolicyService.deletePrivacyPolicy(projectId, id);
 	}
 }
