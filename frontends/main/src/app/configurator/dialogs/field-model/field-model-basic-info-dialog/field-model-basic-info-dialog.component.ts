@@ -141,11 +141,11 @@ export class FieldModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 		const typesWithPossibleValues = ['AUTO_COMPLETION', 'SELECT', 'RADIO', 'CHECKBOX_GROUP'];
 
 		const result: any = {
+			...this.form.value,
 			id: code,
 			shortname,
 			longname,
-			description,
-			...this.form.value
+			description
 		};
 
 		if(!typesWithPossibleValues.includes(this.form.value.type)) {

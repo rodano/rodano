@@ -33,7 +33,7 @@ export class ReportListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() reportsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() reportsChanged = new EventEmitter<boolean>();
 	@Output() reportContextChanged = new EventEmitter<{
 		reports: any[];
 		selectedReportId: string | null;
@@ -70,8 +70,8 @@ export class ReportListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.reportsChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.reportsChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -97,6 +97,7 @@ export class ReportListComponent
 	}
 
 	onUpdated(updated: Report): void {
+		this.reportManager.update(updated);
 		this.selected = this.reportManager.getById(updated.reportId) || null;
 		this.emitModificationChange();
 	}

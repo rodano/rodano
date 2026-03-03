@@ -265,6 +265,8 @@
 				<app-workflow-state-detail
 					[projectId]="projectId"
 					[workflowStateId]="selectedWorkflowStateId"
+					[workflowStates]="workflowStates"
+					[originalWorkflowStates]="originalWorkflowStates"
 					[workflow]="selectedWorkflow"
 					[project]="project"
 					(closed)="backWorkflowDetail()"

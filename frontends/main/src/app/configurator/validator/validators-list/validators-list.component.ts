@@ -34,7 +34,7 @@ export class ValidatorsListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() validatorsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() validatorsChanged = new EventEmitter<boolean>();
 	@Output() validatorContextChanged = new EventEmitter<{
 		validators: any[];
 		selectedValidatorId: string | null;
@@ -74,8 +74,8 @@ export class ValidatorsListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.validatorsChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.validatorsChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -101,6 +101,7 @@ export class ValidatorsListComponent
 	}
 
 	onUpdated(updated: Validator): void {
+		this.validatorManager.update(updated);
 		this.selected = this.validatorManager.getById(updated.validatorId) || null;
 		this.emitModificationChange();
 	}

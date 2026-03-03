@@ -57,9 +57,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@Input() workingProject: ConfiguratorProject | null = null;
 	@Output() fieldsUpdated = new EventEmitter<Partial<ConfiguratorProject>>();
 	@Output() nodeSelected = new EventEmitter<string | null>();
-	@Output() modificationCountChanged = new EventEmitter<number>();
 
-	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() scopeModelsChanged = new EventEmitter<boolean>();
 	@Output() scopeModelContextChanged = new EventEmitter<{
 		scopeModels: any[];
 		eventModels: any[];
@@ -69,7 +68,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedEventGroupId: string | null;
 	}>();
 
-	@Output() datasetModelsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() datasetModelsChanged = new EventEmitter<boolean>();
 	@Output() datasetModelContextChanged = new EventEmitter<{
 		datasetModels: any[];
 		fieldModels: any[];
@@ -77,13 +76,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFieldModelId: string | null;
 	}>();
 
-	@Output() validatorsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() validatorsChanged = new EventEmitter<boolean>();
 	@Output() validatorContextChanged = new EventEmitter<{
 		validators: any[];
 		selectedValidatorId: string | null;
 	}>();
 
-	@Output() workflowsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() workflowsChanged = new EventEmitter<boolean>();
 	@Output() workflowContextChanged = new EventEmitter<{
 		workflows: any[];
 		workflowStates: any[];
@@ -93,54 +92,43 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedWorkflowActionId: string | null;
 	}>();
 
-	@Output() profilesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() profilesChanged = new EventEmitter<boolean>();
 	@Output() profileContextChanged = new EventEmitter<{
 		profiles: any[];
 		selectedProfileId: string | null;
 	}>();
 
-	@Output() featuresChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() featuresChanged = new EventEmitter<boolean>();
 	@Output() featureContextChanged = new EventEmitter<{
 		features: any[];
 		selectedFeatureId: string | null;
 	}>();
 
-	@Output() privacyPoliciesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() privacyPoliciesChanged = new EventEmitter<boolean>();
 	@Output() privacyPolicyContextChanged = new EventEmitter<{
 		privacyPolicies: any[];
 		selectedPrivacyPolicyId: string | null;
 	}>();
 
-	@Output() resourceCategoriesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() resourceCategoriesChanged = new EventEmitter<boolean>();
 	@Output() resourceCategoryContextChanged = new EventEmitter<{
 		resourceCategories: any[];
 		selectedResourceCategoryId: string | null;
 	}>();
 
-	@Output() reportsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() reportsChanged = new EventEmitter<boolean>();
 	@Output() reportContextChanged = new EventEmitter<{
 		reports: any[];
 		selectedReportId: string | null;
 	}>();
 
-	@Output() chartsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() chartsChanged = new EventEmitter<boolean>();
 	@Output() chartContextChanged = new EventEmitter<{
 		charts: any[];
 		selectedChartId: string | null;
 	}>();
 
 	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'overview' | null = null;
-
-	scopeModelModificationCount = 0;
-	datasetModelModificationCount = 0;
-	validatorModificationCount = 0;
-	workflowModificationCount = 0;
-	profileModificationCount = 0;
-	featureModificationCount = 0;
-	privacyPolicyModificationCount = 0;
-	resourceCategoryModificationCount = 0;
-	reportModificationCount = 0;
-	chartModificationCount = 0;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -153,10 +141,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onScopeModelsChanged(event: {modificationCount: number}): void {
-		this.scopeModelModificationCount = event.modificationCount;
-		this.scopeModelsChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onScopeModelsChanged(value: boolean): void {
+		this.scopeModelsChanged.emit(value);
 	}
 
 	onDatasetModelSelected(nodeId: string | null): void {
@@ -164,10 +150,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onDatasetModelsChanged(event: {modificationCount: number}): void {
-		this.datasetModelModificationCount = event.modificationCount;
-		this.datasetModelsChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onDatasetModelsChanged(value: boolean): void {
+		this.datasetModelsChanged.emit(value);
 	}
 
 	onValidatorSelected(nodeId: string | null): void {
@@ -175,10 +159,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onValidatorsChanged(event: {modificationCount: number}): void {
-		this.validatorModificationCount = event.modificationCount;
-		this.validatorsChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onValidatorsChanged(value: boolean): void {
+		this.validatorsChanged.emit(value);
 	}
 
 	onWorkflowSelected(nodeId: string | null): void {
@@ -186,10 +168,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onWorkflowsChanged(event: {modificationCount: number}): void {
-		this.workflowModificationCount = event.modificationCount;
-		this.workflowsChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onWorkflowsChanged(value: boolean): void {
+		this.workflowsChanged.emit(value);
 	}
 
 	onProfileSelected(nodeId: string | null): void {
@@ -197,10 +177,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onProfilesChanged(event: {modificationCount: number}): void {
-		this.profileModificationCount = event.modificationCount;
-		this.profilesChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onProfilesChanged(value: boolean): void {
+		this.profilesChanged.emit(value);
 	}
 
 	onFeatureSelected(nodeId: string | null): void {
@@ -208,10 +186,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onFeaturesChanged(event: {modificationCount: number}): void {
-		this.featureModificationCount = event.modificationCount;
-		this.featuresChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onFeaturesChanged(value: boolean): void {
+		this.featuresChanged.emit(value);
 	}
 
 	onPrivacyPolicySelected(nodeId: string | null): void {
@@ -219,10 +195,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onPrivacyPoliciesChanged(event: {modificationCount: number}): void {
-		this.privacyPolicyModificationCount = event.modificationCount;
-		this.privacyPoliciesChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onPrivacyPoliciesChanged(value: boolean): void {
+		this.privacyPoliciesChanged.emit(value);
 	}
 
 	onResourceCategorySelected(nodeId: string | null): void {
@@ -230,10 +204,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onResourceCategoriesChanged(event: {modificationCount: number}): void {
-		this.resourceCategoryModificationCount = event.modificationCount;
-		this.resourceCategoriesChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onResourceCategoriesChanged(value: boolean): void {
+		this.resourceCategoriesChanged.emit(value);
 	}
 
 	onReportSelected(nodeId: string | null): void {
@@ -241,10 +213,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onReportsChanged(event: {modificationCount: number}): void {
-		this.reportModificationCount = event.modificationCount;
-		this.reportsChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onReportsChanged(value: boolean): void {
+		this.reportsChanged.emit(value);
 	}
 
 	onChartSelected(nodeId: string | null): void {
@@ -252,10 +222,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.nodeSelected.emit(nodeId);
 	}
 
-	onChartsChanged(event: {modificationCount: number}): void {
-		this.chartModificationCount = event.modificationCount;
-		this.chartsChanged.emit(event);
-		this.modificationCountChanged.emit(event.modificationCount);
+	onChartsChanged(value: boolean): void {
+		this.chartsChanged.emit(value);
 	}
 
 	private determineNodeType(): void {

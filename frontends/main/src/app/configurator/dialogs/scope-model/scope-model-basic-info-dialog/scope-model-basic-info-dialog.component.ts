@@ -114,12 +114,12 @@ export class ScopeModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 		});
 
 		this.dialogRef.close({
+			...this.form.value,
 			id: code,
 			shortname,
 			longname,
 			description,
-			pluralShortname,
-			...this.form.value
+			pluralShortname
 		});
 	}
 }

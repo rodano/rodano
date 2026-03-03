@@ -105,12 +105,12 @@ export class ValidatorBasicInfoDialogComponent extends BaseInfoDialogComponent i
 		});
 
 		this.dialogRef.close({
+			...this.form.value,
 			id: code,
 			shortname,
 			longname,
 			description,
-			message,
-			...this.form.value
+			message
 		});
 	}
 }

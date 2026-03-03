@@ -30,15 +30,19 @@ import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.compo
 })
 export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
-	@Input() workflowStateId = '';
+	@Input() workflowStateId: string | null = null;
+	@Input() workflowStates: WorkflowState[] = [];
+	@Input() originalWorkflowStates: WorkflowState[] = [];
 	@Input() workflow: Workflow | null = null;
 	@Input() project: ConfiguratorProject | null = null;
+
 	@Output() closed = new EventEmitter<void>();
 	@Output() workflowStateUpdated = new EventEmitter<any>();
 	@Output() workflowStateDeleted = new EventEmitter<string>();
 
-	originalWorkflowState: WorkflowState | null = null;
 	draftWorkflowState: WorkflowState | null = null;
+	originalWorkflowState: WorkflowState | null = null;
+
 	selectedLanguage = '';
 	projectLanguages: ProjectLanguage[] = [];
 	private languageSubscription: Subscription;
@@ -59,7 +63,7 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	}
 
 	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['workflowStateId']) {
+		if(changes['workflowStateId'] || changes['workflowStates']) {
 			this.loadWorkflowState();
 		}
 	}
@@ -71,10 +75,19 @@ export class WorkflowStateDetailComponent implements OnInit, OnChanges, OnDestro
 	}
 
 	private loadWorkflowState(): void {
-		const workflowState = this.workflowStateManager.getById(this.workflowStateId);
-		this.draftWorkflowState = workflowState ? JSON.parse(JSON.stringify(workflowState)) : null;
-		const original = this.workflowStateManager.getOriginals().find(wfs => wfs.workflowStateId === this.workflowStateId);
-		this.originalWorkflowState = original ? JSON.parse(JSON.stringify(original)) : null;
+		if(!this.workflowStateId) {
+			this.draftWorkflowState = null;
+			this.originalWorkflowState = null;
+			return;
+		}
+
+		const draft = this.workflowStates.find(wfs => wfs.workflowStateId === this.workflowStateId);
+		const original = this.originalWorkflowStates.find(wfs => wfs.workflowStateId === this.workflowStateId);
+
+		if(draft) {
+			this.draftWorkflowState = draft;
+			this.originalWorkflowState = original || null;
+		}
 	}
 
 	isFieldModified(field: keyof WorkflowState): boolean {

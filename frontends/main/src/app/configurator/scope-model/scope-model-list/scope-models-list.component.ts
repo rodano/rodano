@@ -44,7 +44,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string | null>();
-	@Output() scopeModelsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() scopeModelsChanged = new EventEmitter<boolean>();
 	@Output() scopeModelContextChanged = new EventEmitter<{
 		scopeModels: any[];
 		eventModels: any[];
@@ -532,7 +532,7 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private emitModificationChange(): void {
-		this.scopeModelsChanged.emit({modificationCount: this.totalModificationCount});
+		this.scopeModelsChanged.emit(this.totalModificationCount > 0);
 	}
 
 	private emitContext(): void {

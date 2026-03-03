@@ -31,7 +31,7 @@ export abstract class BaseListComponent<T extends Record<string, any>> implement
 	abstract getNodePrefix(): string;
 	abstract getListNodeName(): string;
 	abstract load(): void;
-	abstract emitChangedEvent(count: number): void;
+	abstract emitChangedEvent(hasModifications: boolean): void;
 	abstract emitContextEvent(): void;
 	abstract onCreate(): void;
 	abstract onUpdated(entity: T): void;
@@ -130,5 +130,5 @@ export abstract class BaseListComponent<T extends Record<string, any>> implement
 		this.emitModificationChange();
 	}
 
-	emitModificationChange(): void {this.emitChangedEvent(this.totalModificationCount);}
+	emitModificationChange(): void {this.emitChangedEvent(this.totalModificationCount > 0);}
 }

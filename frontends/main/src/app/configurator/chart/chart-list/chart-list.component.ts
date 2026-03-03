@@ -36,7 +36,7 @@ export class ChartListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() chartsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() chartsChanged = new EventEmitter<boolean>();
 	@Output() chartContextChanged = new EventEmitter<{
 		charts: any[];
 		selectedChartId: string | null;
@@ -81,8 +81,8 @@ export class ChartListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.chartsChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.chartsChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -108,6 +108,7 @@ export class ChartListComponent
 	}
 
 	onUpdated(updated: ChartModel): void {
+		this.chartManager.update(updated);
 		this.selected = this.chartManager.getById(updated.chartId) || null;
 		this.emitModificationChange();
 	}

@@ -31,7 +31,7 @@ export class ResourceCategoryListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() resourceCategoriesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() resourceCategoriesChanged = new EventEmitter<boolean>();
 	@Output() resourceCategoryContextChanged = new EventEmitter<{
 		resourceCategories: any[];
 		selectedResourceCategoryId: string | null;
@@ -66,8 +66,8 @@ export class ResourceCategoryListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.resourceCategoriesChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.resourceCategoriesChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -93,6 +93,7 @@ export class ResourceCategoryListComponent
 	}
 
 	onUpdated(updated: ResourceCategory): void {
+		this.resourceCategoryManager.update(updated);
 		this.selected = this.resourceCategoryManager.getById(updated.categoryId) || null;
 		this.emitModificationChange();
 	}

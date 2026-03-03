@@ -32,7 +32,7 @@ export class FeatureListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() featuresChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() featuresChanged = new EventEmitter<boolean>();
 	@Output() featureContextChanged = new EventEmitter<{
 		features: any[];
 		selectedFeatureId: string | null;
@@ -67,8 +67,8 @@ export class FeatureListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.featuresChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.featuresChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -94,6 +94,7 @@ export class FeatureListComponent
 	}
 
 	onUpdated(updated: Feature): void {
+		this.featureManager.update(updated);
 		this.selected = this.featureManager.getById(updated.featureId) || null;
 		this.emitModificationChange();
 	}

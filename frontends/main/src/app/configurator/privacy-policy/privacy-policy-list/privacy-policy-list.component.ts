@@ -31,7 +31,7 @@ export class PrivacyPolicyListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() privacyPoliciesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() privacyPoliciesChanged = new EventEmitter<boolean>();
 	@Output() privacyPolicyContextChanged = new EventEmitter<{
 		privacyPolicies: any[];
 		selectedPrivacyPolicyId: string | null;
@@ -66,8 +66,8 @@ export class PrivacyPolicyListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.privacyPoliciesChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.privacyPoliciesChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -93,6 +93,7 @@ export class PrivacyPolicyListComponent
 	}
 
 	onUpdated(updated: PrivacyPolicy): void {
+		this.privacyPolicyManager.update(updated);
 		this.selected = this.privacyPolicyManager.getById(updated.policyId) || null;
 		this.emitModificationChange();
 	}

@@ -32,7 +32,7 @@ export class ProfileListComponent
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
-	@Output() profilesChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() profilesChanged = new EventEmitter<boolean>();
 	@Output() profileContextChanged = new EventEmitter<{
 		profiles: any[];
 		selectedProfileId: string | null;
@@ -71,8 +71,8 @@ export class ProfileListComponent
 		});
 	}
 
-	emitChangedEvent(count: number): void {
-		this.profilesChanged.emit({modificationCount: count});
+	emitChangedEvent(hasModifications: boolean): void {
+		this.profilesChanged.emit(hasModifications);
 	}
 
 	emitContextEvent(): void {
@@ -98,6 +98,7 @@ export class ProfileListComponent
 	}
 
 	onUpdated(updated: Profile): void {
+		this.profileManager.update(updated);
 		this.selected = this.profileManager.getById(updated.profileId) || null;
 		this.emitModificationChange();
 	}

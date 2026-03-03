@@ -37,7 +37,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string>();
-	@Output() datasetModelChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() datasetModelChanged = new EventEmitter<boolean>();
 	@Output() datasetModelContextChanged = new EventEmitter<{
 		datasetModels: any[];
 		fieldModels: any[];
@@ -340,7 +340,7 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private emitModificationChange(): void {
-		this.datasetModelChanged.emit({modificationCount: this.totalModificationCount});
+		this.datasetModelChanged.emit(this.totalModificationCount > 0);
 	}
 
 	private emitContext(): void {

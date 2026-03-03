@@ -95,10 +95,10 @@ export class WorkflowActionBasicInfoDialogComponent extends BaseInfoDialogCompon
 
 		const {shortname, longname, description} = this.collectTranslations();
 		this.dialogRef.close({
+			...this.form.value,
 			shortname,
 			longname,
-			description,
-			...this.form.value
+			description
 		});
 	}
 }

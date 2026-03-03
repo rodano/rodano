@@ -78,7 +78,7 @@ export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent impl
 		this.form = this.fb.group({
 			id: [r?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
 			workflowId: [r?.workflowId || '', Validators.required],
-			datasetModelId: [r?.id || '', Validators.required]
+			datasetModelId: [r?.datasetModelId || '', Validators.required]
 		});
 	}
 
@@ -103,11 +103,11 @@ export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent impl
 
 		const {shortname, longname, description} = this.collectTranslations();
 		this.dialogRef.close({
+			...this.form.value,
 			id: code,
 			shortname,
 			longname,
-			description,
-			...this.form.value
+			description
 		});
 	}
 }

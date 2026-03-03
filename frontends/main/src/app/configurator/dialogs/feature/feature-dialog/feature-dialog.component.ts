@@ -99,11 +99,11 @@ export class FeatureDialogComponent extends BaseInfoDialogComponent implements O
 
 		const {shortname, longname, description} = this.collectTranslations();
 		this.dialogRef.close({
+			...this.form.value,
 			id: code,
 			shortname,
 			longname,
-			description,
-			...this.form.value
+			description
 		});
 	}
 }

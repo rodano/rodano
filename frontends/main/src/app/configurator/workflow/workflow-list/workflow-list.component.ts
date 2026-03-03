@@ -41,7 +41,7 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
 	@Output() nodeSelected = new EventEmitter<string | null>();
-	@Output() workflowsChanged = new EventEmitter<{modificationCount: number}>();
+	@Output() workflowsChanged = new EventEmitter<boolean>();
 	@Output() workflowContextChanged = new EventEmitter<{
 		workflows: any[];
 		workflowStates: any[];
@@ -153,9 +153,9 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 					this.selectedWorkflow = workflows.find(
 						wf => wf.workflowId === this.selectedWorkflow!.workflowId
 					) || null;
-					this.updateFilteredWorkflowStates();
-					this.updateFilteredWorkflowActions();
 				}
+				this.updateFilteredWorkflowStates();
+				this.updateFilteredWorkflowActions();
 				this.loading = false;
 				this.emitContext();
 			},
@@ -453,7 +453,7 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private emitModificationChange(): void {
-		this.workflowsChanged.emit({modificationCount: this.totalModificationCount});
+		this.workflowsChanged.emit(this.totalModificationCount > 0);
 	}
 
 	private emitContext(): void {

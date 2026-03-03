@@ -13,7 +13,7 @@ export class ResourceCategoryManagerService extends BaseManagerService<ResourceC
 
 	protected getIdFn() {return (rc: ResourceCategory) => rc.categoryId;}
 	protected getSimpleFields(): (keyof ResourceCategory)[] {
-		return [];
+		return ['id', 'icon', 'color'];
 	}
 
 	protected getTranslationFields(): (keyof ResourceCategory)[] {

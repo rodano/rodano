@@ -63,16 +63,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	saving = false;
 	selectedNode: string | null = null;
 	modifiedFields = new Set<string>();
-	scopeModelModificationCount = 0;
-	datasetModelModificationCount = 0;
-	validatorModificationCount = 0;
-	workflowModificationCount = 0;
-	profileModificationCount = 0;
-	featureModificationCount = 0;
-	privacyPolicyModificationCount = 0;
-	resourceCategoryModificationCount = 0;
-	reportModificationCount = 0;
-	chartModificationCount = 0;
+	scopeModelModified = false;
+	datasetModelModified = false;
+	validatorModified = false;
+	workflowModified = false;
+	profileModified = false;
+	featureModified = false;
+	privacyPolicyModified = false;
+	resourceCategoryModified = false;
+	reportModified = false;
+	chartModified = false;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -342,45 +342,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		}
 	}
 
-	onScopeModelsChanged(event: {modificationCount: number}): void {
-		this.scopeModelModificationCount = event.modificationCount;
-	}
-
-	onDatasetModelsChanged(event: {modificationCount: number}): void {
-		this.datasetModelModificationCount = event.modificationCount;
-	}
-
-	onValidatorsChanged(event: {modificationCount: number}): void {
-		this.validatorModificationCount = event.modificationCount;
-	}
-
-	onWorkflowsChanged(event: {modificationCount: number}): void {
-		this.workflowModificationCount = event.modificationCount;
-	}
-
-	onProfilesChanged(event: {modificationCount: number}): void {
-		this.profileModificationCount = event.modificationCount;
-	}
-
-	onFeaturesChanged(event: {modificationCount: number}): void {
-		this.featureModificationCount = event.modificationCount;
-	}
-
-	onPrivacyPoliciesChanged(event: {modificationCount: number}): void {
-		this.privacyPolicyModificationCount = event.modificationCount;
-	}
-
-	onResourceCategoriesChanged(event: {modificationCount: number}): void {
-		this.resourceCategoryModificationCount = event.modificationCount;
-	}
-
-	onReportsChanged(event: {modificationCount: number}): void {
-		this.reportModificationCount = event.modificationCount;
-	}
-
-	onChartsChanged(event: {modificationCount: number}): void {
-		this.chartModificationCount = event.modificationCount;
-	}
+	onScopeModelsChanged(value: boolean): void {this.scopeModelModified = value;}
+	onDatasetModelsChanged(value: boolean): void {this.datasetModelModified = value;}
+	onValidatorsChanged(value: boolean): void {this.validatorModified = value;}
+	onWorkflowsChanged(value: boolean): void {this.workflowModified = value;}
+	onProfilesChanged(value: boolean): void {this.profileModified = value;}
+	onFeaturesChanged(value: boolean): void {this.featureModified = value;}
+	onPrivacyPoliciesChanged(value: boolean): void {this.privacyPolicyModified = value;}
+	onResourceCategoriesChanged(value: boolean): void {this.resourceCategoryModified = value;}
+	onReportsChanged(value: boolean): void {this.reportModified = value;}
+	onChartsChanged(value: boolean): void {this.chartModified = value;}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
@@ -414,50 +385,50 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				const saveObservables: any[] = [];
 
-				if(this.scopeModelModificationCount > 0) {
+				if(this.scopeModelModified) {
 					saveObservables.push(this.saveScopeModelsAndEvents());
 				}
 
-				if(this.datasetModelModificationCount > 0) {
+				if(this.datasetModelModified) {
 					saveObservables.push(this.saveDatasetModelsAndFields());
 				}
 
-				if(this.validatorModificationCount > 0) {
+				if(this.validatorModified) {
 					saveObservables.push(this.saveValidators());
 				}
 
-				if(this.workflowModificationCount > 0) {
+				if(this.workflowModified) {
 					saveObservables.push(this.saveWorkflows());
 				}
 
-				if(this.profileModificationCount > 0) {
+				if(this.profileModified) {
 					saveObservables.push(this.saveProfiles());
 				}
 
-				if(this.featureModificationCount > 0) {
+				if(this.featureModified) {
 					saveObservables.push(this.saveFeatures());
 				}
 
-				if(this.privacyPolicyModificationCount > 0) {
+				if(this.privacyPolicyModified) {
 					saveObservables.push(this.savePrivacyPolicies());
 				}
 
-				if(this.resourceCategoryModificationCount > 0) {
+				if(this.resourceCategoryModified) {
 					saveObservables.push(this.saveResourceCategories());
 				}
 
-				if(this.reportModificationCount > 0) {
+				if(this.reportModified) {
 					saveObservables.push(this.saveReports());
 				}
 
-				if(this.chartModificationCount > 0) {
+				if(this.chartModified) {
 					saveObservables.push(this.saveCharts());
 				}
 
 				if(saveObservables.length > 0) {
 					forkJoin(saveObservables).subscribe({
 						next: () => {
-							this.resetAllModificationCounts();
+							this.resetAllModifications();
 							this.saving = false;
 							this.snackBar.open('Draft saved', 'Close', {duration: 2000});
 						},
@@ -733,21 +704,21 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.reportListComponent?.loadReports();
 		this.detailComponent?.chartListComponent?.loadCharts();
 
-		this.resetAllModificationCounts();
+		this.resetAllModifications();
 		this.refreshTreeData();
 	}
 
-	resetAllModificationCounts(): void {
-		this.scopeModelModificationCount = 0;
-		this.datasetModelModificationCount = 0;
-		this.validatorModificationCount = 0;
-		this.workflowModificationCount = 0;
-		this.profileModificationCount = 0;
-		this.featureModificationCount = 0;
-		this.privacyPolicyModificationCount = 0;
-		this.resourceCategoryModificationCount = 0;
-		this.reportModificationCount = 0;
-		this.chartModificationCount = 0;
+	resetAllModifications(): void {
+		this.scopeModelModified = false;
+		this.datasetModelModified = false;
+		this.validatorModified = false;
+		this.workflowModified = false;
+		this.profileModified = false;
+		this.featureModified = false;
+		this.privacyPolicyModified = false;
+		this.resourceCategoryModified = false;
+		this.reportModified = false;
+		this.chartModified = false;
 	}
 
 	onCreateSnapshot(): void {
@@ -808,30 +779,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 	get hasModifications(): boolean {
 		return this.projectModificationCount > 0
-		  || this.scopeModelModificationCount > 0
-		  || this.datasetModelModificationCount > 0
-		  || this.validatorModificationCount > 0
-		  || this.workflowModificationCount > 0
-		  || this.profileModificationCount > 0
-		  || this.featureModificationCount > 0
-		  || this.privacyPolicyModificationCount > 0
-		  || this.resourceCategoryModificationCount > 0
-		  || this.reportModificationCount > 0
-		  || this.chartModificationCount > 0;
-	}
-
-	get totalModificationCount(): number {
-		return this.projectModificationCount
-		  + this.scopeModelModificationCount
-		  + this.datasetModelModificationCount
-		  + this.validatorModificationCount
-		  + this.workflowModificationCount
-		  + this.profileModificationCount
-		  + this.featureModificationCount
-		  + this.privacyPolicyModificationCount
-		  + this.resourceCategoryModificationCount
-		  + this.reportModificationCount
-		  + this.chartModificationCount;
+		  || this.scopeModelModified
+		  || this.datasetModelModified
+		  || this.validatorModified
+		  || this.workflowModified
+		  || this.profileModified
+		  || this.featureModified
+		  || this.privacyPolicyModified
+		  || this.resourceCategoryModified
+		  || this.reportModified
+		  || this.chartModified;
 	}
 
 	onScopeModelContextChanged(context: any): void {

@@ -86,11 +86,11 @@ export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogCompo
 
 		const {shortname, longname, description} = this.collectTranslations();
 		this.dialogRef.close({
+			...this.form.value,
 			code: this.form.getRawValue().id.toUpperCase(),
 			shortname,
 			longname,
-			description,
-			...this.form.value
+			description
 		});
 	}
 }
