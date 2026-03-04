@@ -1,104 +1,184 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {ConfiguratorProject} from '@core/model/configurator-project';
 import {MatDialog} from '@angular/material/dialog';
-import {Subscription} from 'rxjs';
-import {LanguageService} from '../../../services/language.service';
-import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {FieldModel} from '@core/model/field-model';
 import {DatasetModel} from '@core/model/dataset-model';
-import {FieldModelDialogService} from '../../../services/dialogs/field-model-dialog.service';
 import {PossibleValue} from '@core/model/possible-value';
+import {FieldModelDialogService} from '../../../services/dialogs/field-model-dialog.service';
 import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
 import {ValidatorManagerService} from '../../../services/manager/validator-manager.service';
-import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../../services/manager/workflow-manager.service';
+import {LanguageService} from '../../../services/language.service';
+import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
+import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 
 @Component({
 	selector: 'app-field-model-detail',
 	standalone: true,
 	templateUrl: './field-model-detail.component.html',
 	styleUrls: ['./field-model-detail.component.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule,
-		DangerZoneComponent
-	]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
-export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
-	@Input() projectId = '';
+export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldModel> {
 	@Input() fieldModelId = '';
 	@Input() fieldModels: FieldModel[] = [];
 	@Input() originalFieldModels: FieldModel[] = [];
 	@Input() datasetModel: DatasetModel | null = null;
-	@Input() project: ConfiguratorProject | null = null;
-	@Output() closed = new EventEmitter<void>();
-	@Output() fieldModelUpdated = new EventEmitter<any>();
-	@Output() fieldModelDeleted = new EventEmitter<string>();
 
-	originalFieldModel: FieldModel | null = null;
-	draftFieldModel: FieldModel | null = null;
-	selectedLanguage = '';
-	projectLanguages: ProjectLanguage[] = [];
-	private languageSubscription: Subscription;
+	@Output() fieldModelUpdated = this.entityUpdated;
+	@Output() fieldModelDeleted = this.entityDeleted;
 
 	constructor(
-		public languageService: LanguageService,
+		languageService: LanguageService,
 		private fieldModelDialogService: FieldModelDialogService,
 		private fieldModelManager: FieldModelManagerService,
 		private validatorManager: ValidatorManagerService,
 		private workflowManager: WorkflowManagerService,
-		private dialog: MatDialog
-	) {}
-
-	ngOnInit(): void {
-		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
+		private dialog: MatDialog,
+		snackBar: MatSnackBar
+	) {
+		super(languageService, snackBar);
 	}
 
-	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['fieldModelId'] || changes['fieldModels']) {
-			this.loadFieldModel();
-		}
+	protected entityIdInputName(): string {return 'fieldModelId';}
+	protected entitiesInputName(): string {return 'fieldModels';}
+	protected getEntityId(): string {return this.fieldModelId;}
+	protected getEntities(): FieldModel[] {return this.fieldModels;}
+	protected getOriginals(): FieldModel[] {return this.originalFieldModels;}
+	protected findInArray(arr: FieldModel[], id: string): FieldModel | undefined {
+		return arr.find(fm => fm.fieldModelId === id);
 	}
 
-	ngOnDestroy(): void {
-		if(this.languageSubscription) {
-			this.languageSubscription.unsubscribe();
-		}
-	}
-
-	private loadFieldModel(): void {
-		this.draftFieldModel = this.fieldModelManager.getById(this.fieldModelId)
-			? JSON.parse(JSON.stringify(this.fieldModelManager.getById(this.fieldModelId)))
-			: null;
+	protected override syncDraft(): void {
+		const entity = this.fieldModelManager.getById(this.fieldModelId);
+		this.draftEntity = entity ? JSON.parse(JSON.stringify(entity)) : null;
 		const original = this.fieldModelManager.getOriginals().find(fm => fm.fieldModelId === this.fieldModelId);
-		this.originalFieldModel = original ? JSON.parse(JSON.stringify(original)) : null;
+		this.originalEntity = original ? JSON.parse(JSON.stringify(original)) : null;
 	}
 
-	isFieldModified(field: keyof FieldModel): boolean {
+	override isFieldModified(field: keyof FieldModel): boolean {
 		return this.fieldModelManager.isFieldModified(this.fieldModelId, field as string);
 	}
 
-	onClose(): void {
-		this.closed.emit();
+	get draftFieldModel(): FieldModel | null {return this.draftEntity;}
+
+	onEditBasicInfo(): void {
+		if(!this.draftEntity || !this.datasetModel) {
+			return;
+		}
+		this.fieldModelDialogService.openBasicInfoDialog(
+			this.draftEntity, this.projectId,
+			this.datasetModel.datasetModelId, this.projectLanguages
+		).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onEditValidation(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		this.fieldModelDialogService.openValidationDialog(
+			this.draftEntity, this.projectId, this.project?.languages || []
+		).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onEditCalculatedValue(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		this.fieldModelDialogService.openCalculatedValueDialog(
+			this.draftEntity, this.projectId
+		).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onEditExport(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		this.fieldModelDialogService.openExportDialog(this.draftEntity).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onEditHelp(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		this.fieldModelDialogService.openHelpDialog(
+			this.draftEntity, this.project?.languages || []
+		).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onEditPossibleValues(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		this.fieldModelDialogService.openPossibleValuesDialog(
+			this.draftEntity, this.projectId, this.project?.languages || []
+		).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onEditResources(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		this.fieldModelDialogService.openResourcesDialog(this.draftEntity).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
+			}
+		});
+	}
+
+	onDelete(): void {
+		if(!this.draftEntity) {
+			return;
+		}
+		const name = this.languageService.getTranslatedValue(this.draftEntity.shortname) || this.draftEntity.id;
+		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+			width: '500px',
+			data: {
+				title: 'Delete Field Model',
+				message: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
+				confirmText: 'Delete',
+				cancelText: 'Cancel',
+				type: 'danger'
+			}
+		});
+		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+			if(confirmed && this.draftEntity) {
+				this.entityDeleted.emit(this.draftEntity.fieldModelId);
+			}
+		});
 	}
 
 	getSortedPossibleValues(): PossibleValue[] {
-		if(!this.draftFieldModel?.possibleValues) {
-			return [];
-		}
-		return [...this.draftFieldModel.possibleValues].sort((a, b) =>
-			(a.sortOrder ?? 0) - (b.sortOrder ?? 0)
-		);
+		return [...(this.draftEntity?.possibleValues || [])].sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 	}
 
 	getValidatorLabel(validatorId: string): string {
@@ -111,223 +191,40 @@ export class FieldModelDetailComponent implements OnInit, OnChanges, OnDestroy {
 
 	getTypeLabel(type: string): string {
 		const typeMap: Record<string, string> = {
-			STRING: 'String',
-			AUTO_COMPLETION: 'Autocompleted String',
-			DATE: 'Date',
-			DATE_SELECT: 'Date with Selection',
-			NUMBER: 'Number',
-			SELECT: 'Combobox',
-			RADIO: 'Radio',
-			CHECKBOX: 'Checkbox',
-			CHECKBOX_GROUP: 'Checkbox Group',
-			TEXTAREA: 'Text Area',
-			FILE: 'File'
+			STRING: 'String', AUTO_COMPLETION: 'Autocompleted String', DATE: 'Date',
+			DATE_SELECT: 'Date with Selection', NUMBER: 'Number', SELECT: 'Combobox',
+			RADIO: 'Radio', CHECKBOX: 'Checkbox', CHECKBOX_GROUP: 'Checkbox Group',
+			TEXTAREA: 'Text Area', FILE: 'File'
 		};
 		return typeMap[type] || type;
 	}
 
 	getDataTypeLabel(dataType: string): string {
 		const dataTypeMap: Record<string, string> = {
-			STRING: 'String',
-			DATE: 'Date',
-			NUMBER: 'Number',
-			BOOLEAN: 'Boolean',
-			BLOB: 'Blob'
+			STRING: 'String', DATE: 'Date', NUMBER: 'Number', BOOLEAN: 'Boolean', BLOB: 'Blob'
 		};
 		return dataTypeMap[dataType] || dataType;
 	}
 
-	onEditBasicInfo(): void {
-		if(!this.draftFieldModel || !this.datasetModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openBasicInfoDialog(
-			this.draftFieldModel,
-			this.projectId,
-			this.datasetModel.datasetModelId,
-			this.projectLanguages
-		).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onEditValidation(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openValidationDialog(
-			this.draftFieldModel,
-			this.projectId,
-			this.project?.languages || []
-		).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onEditCalculatedValue(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openCalculatedValueDialog(
-			this.draftFieldModel,
-			this.projectId
-		).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onEditExport(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openExportDialog(this.draftFieldModel).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onEditHelp(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openHelpDialog(
-			this.draftFieldModel,
-			this.project?.languages || []
-		).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onEditPossibleValues(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openPossibleValuesDialog(
-			this.draftFieldModel,
-			this.projectId,
-			this.project?.languages || []
-		).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {
-					...this.draftFieldModel,
-					...result
-				};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onEditResources(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		this.fieldModelDialogService.openResourcesDialog(this.draftFieldModel).subscribe(result => {
-			if(result && this.draftFieldModel) {
-				this.draftFieldModel = {...this.draftFieldModel, ...result};
-				this.fieldModelUpdated.emit(this.draftFieldModel);
-			}
-		});
-	}
-
-	onDelete(): void {
-		if(!this.draftFieldModel) {
-			return;
-		}
-
-		const fieldModelName = this.languageService.getTranslatedValue(this.draftFieldModel.shortname) || this.draftFieldModel.id;
-
-		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-			width: '500px',
-			data: {
-				title: 'Delete Field Model',
-				message: `Are you sure you want to delete "${fieldModelName}"? This action cannot be undone.`,
-				confirmText: 'Delete',
-				cancelText: 'Cancel',
-				type: 'danger'
-			}
-		});
-
-		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-			if(confirmed && this.draftFieldModel) {
-				this.fieldModelDeleted.emit(this.draftFieldModel.fieldModelId);
-			}
-		});
-	}
-
 	hasValidationSettings(): boolean {
-		if(!this.draftFieldModel?.type) {
+		const type = this.draftEntity?.type;
+		if(!type) {
 			return false;
 		}
-		const type = this.draftFieldModel.type;
-		return type !== 'AUTO_COMPLETION'
-		  && type !== 'SELECT'
-		  && type !== 'RADIO'
-		  && type !== 'CHECKBOX'
-		  && type !== 'CHECKBOX_GROUP';
+		return !['AUTO_COMPLETION', 'SELECT', 'RADIO', 'CHECKBOX', 'CHECKBOX_GROUP'].includes(type);
 	}
 
 	getAdvancedHelpText(): string {
-		return this.languageService.getDefaultTranslation(this.draftFieldModel?.advancedHelp) || '';
+		return this.languageService.getDefaultTranslation(this.draftEntity?.advancedHelp) || '';
 	}
 
 	hasAdvancedHelp(): boolean {
-		return !!(this.draftFieldModel?.advancedHelp && Object.keys(this.draftFieldModel.advancedHelp).length > 0);
+		return !!(this.draftEntity?.advancedHelp && Object.keys(this.draftEntity.advancedHelp).length > 0);
 	}
 
-	showStringValidation(): boolean {
-		return this.draftFieldModel?.type === 'STRING';
-	}
-
-	showTextAreaValidation(): boolean {
-		const type = this.draftFieldModel?.type;
-		return type === 'TEXTAREA' || type === 'FILE';
-	}
-
-	showDateValidation(): boolean {
-		return this.draftFieldModel?.type === 'DATE';
-	}
-
-	showDateSelectValidation(): boolean {
-		return this.draftFieldModel?.type === 'DATE_SELECT';
-	}
-
-	showNumberValidation(): boolean {
-		return this.draftFieldModel?.type === 'NUMBER';
-	}
+	showStringValidation(): boolean {return this.draftEntity?.type === 'STRING';}
+	showTextAreaValidation(): boolean {return this.draftEntity?.type === 'TEXTAREA' || this.draftEntity?.type === 'FILE';}
+	showDateValidation(): boolean {return this.draftEntity?.type === 'DATE';}
+	showDateSelectValidation(): boolean {return this.draftEntity?.type === 'DATE_SELECT';}
+	showNumberValidation(): boolean {return this.draftEntity?.type === 'NUMBER';}
 }

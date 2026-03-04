@@ -1,10 +1,8 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {ConfiguratorProject} from '@core/model/configurator-project';
-import {Subscription} from 'rxjs';
 import {LanguageService} from '../../../services/language.service';
 import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
@@ -12,131 +10,57 @@ import {WorkflowAction} from '@core/model/workflow-action';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowActionDialogService} from '../../../services/dialogs/workflow-action-dialog.service';
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
+import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
 	selector: 'app-workflow-action-detail',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule,
-		DangerZoneComponent
-	],
 	templateUrl: './workflow-action-detail.component.html',
-	styleUrls: ['../../../shared/detail-shared.css']
+	styleUrls: ['../../../shared/detail-shared.css'],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
-export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestroy {
-	@Input() projectId = '';
-	@Input() workflowActionId: string | null = null;
+export class WorkflowActionDetailComponent extends BaseDraftDetailComponent<WorkflowAction> {
+	@Input() workflowActionId = '';
 	@Input() workflowActions: WorkflowAction[] = [];
 	@Input() originalWorkflowActions: WorkflowAction[] = [];
 	@Input() workflow: Workflow | null = null;
-	@Input() project: ConfiguratorProject | null = null;
 
-	@Output() closed = new EventEmitter<void>();
-	@Output() workflowActionUpdated = new EventEmitter<any>();
-	@Output() workflowActionDeleted = new EventEmitter<string>();
-
-	draftWorkflowAction: WorkflowAction | null = null;
-	originalWorkflowAction: WorkflowAction | null = null;
-
-	selectedLanguage = '';
-	private languageSubscription: Subscription;
-
-	availableLanguages: {code: string; name: string; isDefault: boolean}[] = [];
+	@Output() workflowActionUpdated = this.entityUpdated;
+	@Output() workflowActionDeleted = this.entityDeleted;
 
 	constructor(
-		public languageService: LanguageService,
+		languageService: LanguageService,
 		private workflowActionDialogService: WorkflowActionDialogService,
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		snackBar: MatSnackBar
 	) {
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
+		super(languageService, snackBar);
 	}
 
-	ngOnInit(): void {
-		this.loadLanguages();
-		this.loadWorkflowAction();
-	}
+	get draftWorkflowAction(): WorkflowAction | null {return this.draftEntity;}
 
-	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['workflowActionId'] || changes['workflowActions']) {
-			this.loadWorkflowAction();
-		}
-
-		if(changes['project']) {
-			this.loadLanguages();
-		}
-	}
-
-	ngOnDestroy(): void {
-		this.languageSubscription?.unsubscribe();
-	}
-
-	private loadLanguages(): void {
-		if(this.project?.languages) {
-			this.availableLanguages = this.project.languages.map(lang => ({
-				code: lang.languageCode || '',
-				name: this.languageService.getLanguageName(lang.languageCode),
-				isDefault: lang.isDefault || false
-			}));
-		}
-	}
-
-	private loadWorkflowAction(): void {
-		if(!this.workflowActionId) {
-			this.draftWorkflowAction = null;
-			this.originalWorkflowAction = null;
-			return;
-		}
-
-		const draft = this.workflowActions.find(wfa => wfa.workflowActionId === this.workflowActionId);
-		const original = this.originalWorkflowActions.find(wfa => wfa.workflowActionId === this.workflowActionId);
-
-		if(draft) {
-			this.draftWorkflowAction = draft;
-			this.originalWorkflowAction = original || null;
-		}
-	}
-
-	isFieldModified(field: keyof WorkflowAction): boolean {
-		if(!this.originalWorkflowAction || !this.draftWorkflowAction) {
-			return false;
-		}
-		return JSON.stringify(this.originalWorkflowAction[field]) !== JSON.stringify(this.draftWorkflowAction[field]);
-	}
-
-	onClose(): void {
-		this.closed.emit();
+	protected entityIdInputName(): string {return 'workflowActionId';}
+	protected entitiesInputName(): string {return 'workflowActions';}
+	protected getEntityId(): string {return this.workflowActionId;}
+	protected getEntities(): WorkflowAction[] {return this.workflowActions;}
+	protected getOriginals(): WorkflowAction[] {return this.originalWorkflowActions;}
+	protected findInArray(arr: WorkflowAction[], id: string): WorkflowAction | undefined {
+		return arr.find(wa => wa.workflowActionId === id);
 	}
 
 	onEditBasicInfo(): void {
-		if(!this.draftWorkflowAction) {
+		if(!this.draftWorkflowAction || !this.workflow) {
 			return;
 		}
-
-		const workflowId = this.draftWorkflowAction.workflowId || this.workflow?.workflowId;
-
-		if(!workflowId) {
-			console.error('No workflow ID available');
-			return;
-		}
-
 		this.workflowActionDialogService.openEditDialog(
 			this.projectId,
-			workflowId,
-			this.draftWorkflowAction,
-			this.project?.languages || []
-		).subscribe((result: any) => {
-			if(result && this.draftWorkflowAction) {
-				const updatedWorkflowAction: WorkflowAction = {
-					...this.draftWorkflowAction,
-					...result
-				};
-
-				this.workflowActionUpdated.emit(updatedWorkflowAction);
+			this.workflow.workflowId,
+			this.draftEntity!,
+			this.projectLanguages
+		).subscribe(result => {
+			if(result) {
+				this.applyUpdate(result);
 			}
 		});
 	}
@@ -145,14 +69,11 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 		if(!this.draftWorkflowAction) {
 			return;
 		}
-
 		this.workflowActionDialogService.openDocumentationDialog(
-			this.draftWorkflowAction,
-			this.project?.languages || []
+			this.draftEntity!, this.projectLanguages
 		).subscribe(result => {
-			if(result && this.draftWorkflowAction) {
-				this.draftWorkflowAction = {...this.draftWorkflowAction, ...result};
-				this.workflowActionUpdated.emit(this.draftWorkflowAction);
+			if(result) {
+				this.applyUpdate(result);
 			}
 		});
 	}
@@ -161,14 +82,11 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 		if(!this.draftWorkflowAction) {
 			return;
 		}
-
 		this.workflowActionDialogService.openSignatureDialog(
-			this.draftWorkflowAction,
-			this.project?.languages || []
+			this.draftEntity!, this.projectLanguages
 		).subscribe(result => {
-			if(result && this.draftWorkflowAction) {
-				this.draftWorkflowAction = {...this.draftWorkflowAction, ...result};
-				this.workflowActionUpdated.emit(this.draftWorkflowAction);
+			if(result) {
+				this.applyUpdate(result);
 			}
 		});
 	}
@@ -177,21 +95,19 @@ export class WorkflowActionDetailComponent implements OnInit, OnChanges, OnDestr
 		if(!this.draftWorkflowAction) {
 			return;
 		}
-
 		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
 			width: '500px',
 			data: {
 				title: 'Delete Workflow Action',
-				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.draftWorkflowAction.shortname)}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.draftEntity!.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
 			}
 		});
-
 		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
-			if(confirmed && this.draftWorkflowAction) {
-				this.workflowActionDeleted.emit(this.draftWorkflowAction.workflowActionId);
+			if(confirmed && this.draftEntity) {
+				this.entityDeleted.emit(this.draftEntity.workflowActionId);
 			}
 		});
 	}

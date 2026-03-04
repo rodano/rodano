@@ -1,19 +1,17 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {ConfiguratorProject} from '@core/model/configurator-project';
-import {Subscription} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
-import {ProjectLanguage} from '@core/model/project-language';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {ResourceCategoryManagerService} from '../../services/manager/resource-category-manager.service';
 import {ResourceCategory} from '@core/model/resource-category';
 import {ResourceCategoryDialogService} from '../../services/dialogs/resource-category-dialog.service';
+import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 
 @Component({
 	selector: 'app-resource-category-detail',
@@ -22,49 +20,37 @@ import {ResourceCategoryDialogService} from '../../services/dialogs/resource-cat
 	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
-export class ResourceCategoryDetailComponent implements OnInit, OnDestroy {
-	@Input() resourceCategory!: ResourceCategory;
-	@Input() projectId = '';
-	@Input() project: ConfiguratorProject | null = null;
-	@Input() allResourceCategories: ResourceCategory[] = [];
-	@Output() resourceCategoryUpdated = new EventEmitter<ResourceCategory>();
-	@Output() resourceCategoryDeleted = new EventEmitter<string>();
-	@Output() closed = new EventEmitter<void>();
+export class ResourceCategoryDetailComponent extends BaseManagerDetailComponent<ResourceCategory, ResourceCategoryManagerService> {
+	@Input() override entity!: ResourceCategory;
+	@Input() override allEntities: ResourceCategory[] = [];
+	@Output() resourceCategoryUpdated = this.entityUpdated;
+	@Output() resourceCategoryDeleted = this.entityDeleted;
 
-	selectedLanguage = '';
-	projectLanguages: ProjectLanguage[];
-	private languageSubscription: Subscription;
+	@Input() set resourceCategory(v: ResourceCategory) {this.entity = v;}
+	get resourceCategory(): ResourceCategory {return this.entity;}
+
+	@Input() set allResourceCategories(v: ResourceCategory[]) {this.allEntities = v;}
 
 	constructor(
-		public resourceCategoryManager: ResourceCategoryManagerService,
-		public languageService: LanguageService,
+		resourceCategoryManager: ResourceCategoryManagerService,
+		languageService: LanguageService,
 		private resourceCategoryDialogService: ResourceCategoryDialogService,
 		private dialog: MatDialog,
-		private snackBar: MatSnackBar
-	) {}
-
-	ngOnInit(): void {
-		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
+		snackBar: MatSnackBar
+	) {
+		super(resourceCategoryManager, languageService, snackBar);
 	}
 
-	ngOnDestroy(): void {
-		this.languageSubscription.unsubscribe();
-	}
+	protected getEntityId(): string {return this.entity.categoryId;}
 
 	onEditBasicInfo(): void {
 		this.resourceCategoryDialogService.openBasicInfoDialog(
 			this.projectId,
-			this.resourceCategory,
+			this.entity,
 			this.projectLanguages
-		).subscribe((result: any) => {
+		).subscribe(result => {
 			if(result) {
-				const updatedResourceCategory: ResourceCategory = {...this.resourceCategory, ...result};
-				this.resourceCategoryManager.update(updatedResourceCategory);
-				this.resourceCategoryUpdated.emit(updatedResourceCategory);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
@@ -74,7 +60,7 @@ export class ResourceCategoryDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Resource Category',
-				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.resourceCategory.shortname)}"? This action cannot be undone.`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedValue(this.entity.shortname)}"? This action cannot be undone.`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
@@ -82,20 +68,8 @@ export class ResourceCategoryDetailComponent implements OnInit, OnDestroy {
 		});
 		dialogRef.afterClosed().subscribe(confirmed => {
 			if(confirmed) {
-				this.resourceCategoryDeleted.emit(this.resourceCategory.categoryId);
+				this.entityDeleted.emit(this.entity.categoryId);
 			}
 		});
-	}
-
-	onClose(): void {
-		this.closed.emit();
-	}
-
-	private showStagedMessage(): void {
-		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
-	}
-
-	isFieldModified(fieldName: string): boolean {
-		return this.resourceCategoryManager.isFieldModified(this.resourceCategory.categoryId, fieldName);
 	}
 }

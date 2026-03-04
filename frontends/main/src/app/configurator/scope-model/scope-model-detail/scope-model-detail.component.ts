@@ -1,26 +1,24 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatDialog} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import {ScopeModel} from '@core/model/scope-model';
-import {ConfiguratorProject} from '@core/model/configurator-project';
-import {Subscription} from 'rxjs';
 import {
 	WorkflowStateSelection
 } from '../../dialogs/scope-model/scope-model-resources-dialog/scope-model-resources-dialog.component';
 import {ScopeModelManagerService} from '../../services/manager/scope-model-manager.service';
-import {LanguageService} from '../../services/language.service';
-import {MatDialog} from '@angular/material/dialog';
-import {MatSnackBar} from '@angular/material/snack-bar';
-import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {ScopeModelDialogService} from '../../services/dialogs/scope-model-dialog.service';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
-import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {LanguageService} from '../../services/language.service';
+import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
+import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -33,134 +31,91 @@ interface WorkflowStateGroup {
 	standalone: true,
 	templateUrl: './scope-model-detail.component.html',
 	styleUrls: ['./scope-model-detail.component.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule,
-		DangerZoneComponent
-	]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
-export class ScopeModelDetailComponent implements OnInit, OnDestroy {
-	@Input() scopeModel!: ScopeModel;
-	@Input() projectId = '';
-	@Input() project: ConfiguratorProject | null = null;
-	@Input() allScopeModels: ScopeModel[] = [];
-	@Output() scopeModelUpdated = new EventEmitter<ScopeModel>();
-	@Output() scopeModelDeleted = new EventEmitter<string>();
-	@Output() closed = new EventEmitter<void>();
+export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeModel, ScopeModelManagerService> {
+	@Input() override entity!: ScopeModel;
+	@Input() override allEntities: ScopeModel[] = [];
+
+	@Input() set scopeModel(v: ScopeModel) {this.entity = v;}
+	get scopeModel(): ScopeModel {return this.entity;}
+
+	@Input() set allScopeModels(v: ScopeModel[]) {this.allEntities = v;}
+
+	@Output() scopeModelUpdated = this.entityUpdated;
+	@Output() scopeModelDeleted = this.entityDeleted;
 	@Output() switchToEventModels = new EventEmitter<void>();
 	@Output() switchToEventGroups = new EventEmitter<void>();
 
-	selectedLanguage = '';
-	projectLanguages: ProjectLanguage[] = [];
-	private languageSubscription: Subscription;
-
-	workflowStateIdsModified = false;
-
 	constructor(
-		public scopeModelManager: ScopeModelManagerService,
-		public languageService: LanguageService,
+		scopeModelManager: ScopeModelManagerService,
+		languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private datasetModelManager: DatasetModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private profileManager: ProfileManagerService,
 		private dialog: MatDialog,
-		private snackBar: MatSnackBar
-	) {}
-
-	ngOnInit(): void {
-		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
-
-		this.workflowStateManager.load(this.projectId).subscribe();
+		snackBar: MatSnackBar
+	) {
+		super(scopeModelManager, languageService, snackBar);
 	}
 
-	ngOnDestroy(): void {
-		this.languageSubscription.unsubscribe();
+	protected getEntityId(): string {return this.entity.scopeModelId;}
+
+	protected override onInit(): void {
+		this.workflowStateManager.load(this.projectId).subscribe();
 	}
 
 	onEditBasicInfo(): void {
 		this.scopeModelDialogService.openBasicInfoDialog(
-			this.projectId,
-			this.scopeModel,
-			this.projectLanguages
-		).subscribe((result: any) => {
+			this.projectId, this.entity, this.projectLanguages
+		).subscribe(result => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.scopeModelUpdated.emit(updatedScopeModel);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
 
 	onEditRelationships(): void {
 		this.scopeModelDialogService.openRelationshipsDialog(
-			this.projectId,
-			this.scopeModel
-		).subscribe((result: any) => {
+			this.projectId, this.entity
+		).subscribe(result => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.scopeModelUpdated.emit(updatedScopeModel);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
 
 	onEditDefaultSettings(): void {
 		this.scopeModelDialogService.openDefaultSettingsDialog(
-			this.projectId,
-			this.scopeModel
-		).subscribe((result: any) => {
+			this.projectId, this.entity
+		).subscribe(result => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.scopeModelUpdated.emit(updatedScopeModel);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
 
 	onEditPattern(): void {
-		this.scopeModelDialogService.openPatternDialog(
-			this.scopeModel
-		).subscribe((result: any) => {
+		this.scopeModelDialogService.openPatternDialog(this.entity).subscribe(result => {
 			if(result) {
-				const updatedScopeModel: ScopeModel = {...this.scopeModel, ...result};
-				this.scopeModelManager.update(updatedScopeModel);
-				this.scopeModelUpdated.emit(updatedScopeModel);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
 
 	onEditResources(): void {
-		const currentDraft = this.scopeModelManager.getById(this.scopeModel.scopeModelId);
-		const draft = currentDraft || this.scopeModel;
-
-		const workflowStateSelections: WorkflowStateSelection[] = (draft.workflowStateIds || []).map(stateId => {
+		const workflowStateSelections: WorkflowStateSelection[] = (this.entity.workflowStateIds || []).map(stateId => {
 			const state = this.workflowStateManager.getById(stateId);
 			return {workflowId: state?.workflowId || '', workflowStateId: stateId};
 		});
 
 		this.scopeModelDialogService.openResourcesDialog(
-			this.projectId,
-			draft,
-			workflowStateSelections
+			this.projectId, this.entity, workflowStateSelections
 		).subscribe(result => {
 			if(result) {
-				const draft = this.scopeModelManager.getById(this.scopeModel.scopeModelId);
-				if(draft) {
-					Object.assign(draft, result);
-					this.scopeModelManager.update(draft);
-					this.scopeModelUpdated.emit(draft);
-					this.showStagedMessage();
-				}
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
@@ -170,44 +125,29 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Scope Model',
-				message: `Are you sure you want to delete "${this.languageService.getTranslatedName(this.scopeModel.shortname)}"?`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedName(this.entity.shortname)}"?`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
 			}
 		});
-
 		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
 			if(confirmed) {
-				this.scopeModelDeleted.emit(this.scopeModel.scopeModelId);
+				this.entityDeleted.emit(this.entity.scopeModelId);
 			}
 		});
 	}
 
-	onClose(): void {
-		this.closed.emit();
-	}
+	onSwitchToEventModels(): void {this.switchToEventModels.emit();}
+	onSwitchToEventGroups(): void {this.switchToEventGroups.emit();}
 
-	onSwitchToEventModels(): void {
-		this.switchToEventModels.emit();
-	}
-
-	onSwitchToEventGroups(): void {
-		this.switchToEventGroups.emit();
-	}
-
-	private showStagedMessage(): void {
-		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
-	}
-
-	isFieldModified(fieldName: string): boolean {
-		return this.scopeModelManager.isFieldModified(this.scopeModel.scopeModelId, fieldName);
+	get workflowStateIdsModified(): boolean {
+		return this.isFieldModified('workflowStateIds');
 	}
 
 	getWorkflowStateSelections(): WorkflowStateGroup[] {
 		const grouped = new Map<string, {id: string; name: string}[]>();
-
-		(this.scopeModel.workflowStateIds || []).forEach(stateId => {
+		(this.entity.workflowStateIds || []).forEach(stateId => {
 			const state = this.workflowStateManager.getById(stateId);
 			if(!state) {
 				return;
@@ -218,18 +158,13 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 			const name = `${this.languageService.getDefaultTranslation(state.shortname) || state.id} (${state.id})`;
 			grouped.get(state.workflowId)!.push({id: stateId, name});
 		});
-
 		const result: WorkflowStateGroup[] = [];
-		grouped.forEach((states, workflowId) => result.push({
-			workflowId,
-			workflowName: this.getWorkflowLabel(workflowId),
-			states
-		}));
+		grouped.forEach((states, workflowId) => result.push({workflowId, workflowName: this.getWorkflowLabel(workflowId), states}));
 		return result;
 	}
 
 	getScopeModelLabel(scopeModelId: string): string {
-		return this.languageService.getLabelById(scopeModelId, id => this.scopeModelManager.getById(id));
+		return this.languageService.getLabelById(scopeModelId, id => this.manager.getById(id));
 	}
 
 	getDatasetModelLabel(datasetModelId: string): string {
@@ -237,8 +172,7 @@ export class ScopeModelDetailComponent implements OnInit, OnDestroy {
 	}
 
 	getFormModelLabel(formModelId: string): string {
-		//TODO: Implement when form models are ready
-		return formModelId;
+		return formModelId; //TODO: Implement when form models are ready
 	}
 
 	getWorkflowLabel(workflowId: string): string {

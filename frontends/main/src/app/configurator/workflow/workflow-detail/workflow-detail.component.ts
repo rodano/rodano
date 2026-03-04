@@ -1,10 +1,8 @@
-import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
 import {MatTooltipModule} from '@angular/material/tooltip';
-import {ConfiguratorProject} from '@core/model/configurator-project';
-import {Subscription} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {MatDialog} from '@angular/material/dialog';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -12,99 +10,73 @@ import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirma
 import {Workflow} from '@core/model/workflow';
 import {WorkflowManagerService} from '../../services/manager/workflow-manager.service';
 import {WorkflowDialogService} from '../../services/dialogs/workflow-dialog.service';
-import {ProjectLanguage} from '@core/model/project-language';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {WorkflowActionManagerService} from '../../services/manager/workflow-action-manager.service';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
+import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 
 @Component({
 	selector: 'app-workflow-detail',
 	standalone: true,
 	templateUrl: './workflow-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule,
-		DangerZoneComponent
-	]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
 })
-export class WorkflowDetailComponent implements OnInit, OnDestroy {
-	@Input() workflow!: Workflow;
-	@Input() projectId = '';
-	@Input() project: ConfiguratorProject | null = null;
-	@Input() allWorkflows: Workflow[] = [];
-	@Output() workflowUpdated = new EventEmitter<Workflow>();
-	@Output() workflowDeleted = new EventEmitter<string>();
-	@Output() closed = new EventEmitter<void>();
+export class WorkflowDetailComponent extends BaseManagerDetailComponent<Workflow, WorkflowManagerService> {
+	@Input() override entity!: Workflow;
+	@Input() override allEntities: Workflow[] = [];
+
+	@Input() set workflow(v: Workflow) {this.entity = v;}
+	get workflow(): Workflow {return this.entity;}
+
+	@Input() set allWorkflows(v: Workflow[]) {this.allEntities = v;}
+
+	@Output() workflowUpdated = this.entityUpdated;
+	@Output() workflowDeleted = this.entityDeleted;
+
 	@Output() switchToWorkflowStates = new EventEmitter<void>();
 	@Output() switchToWorkflowActions = new EventEmitter<void>();
 
-	selectedLanguage = '';
-	projectLanguages: ProjectLanguage[] = [];
-	private languageSubscription: Subscription;
-
 	constructor(
-		public workflowManager: WorkflowManagerService,
+		workflowManager: WorkflowManagerService,
 		public workflowStateManager: WorkflowStateManagerService,
-		public languageService: LanguageService,
-		private workflowActionManager: WorkflowActionManagerService,
+		public workflowActionManager: WorkflowActionManagerService,
+		languageService: LanguageService,
 		private workflowDialogService: WorkflowDialogService,
 		private dialog: MatDialog,
-		private snackBar: MatSnackBar
-	) {}
-
-	ngOnInit(): void {
-		this.projectLanguages = this.project?.languages?.length ? this.project.languages : this.languageService.projectLanguages;
-		this.languageSubscription = this.languageService.selectedLanguage$.subscribe(language => {
-			this.selectedLanguage = language;
-		});
+		snackBar: MatSnackBar
+	) {
+		super(workflowManager, languageService, snackBar);
 	}
 
-	ngOnDestroy(): void {
-		this.languageSubscription.unsubscribe();
-	}
+	protected getEntityId(): string {return this.entity.workflowId;}
 
 	onEditBasicInfo(): void {
 		this.workflowDialogService.openBasicInfoDialog(
-			this.projectId,
-			this.workflow,
-			this.projectLanguages
-		).subscribe((result: any) => {
+			this.projectId, this.entity, this.projectLanguages
+		).subscribe(result => {
 			if(result) {
-				const updatedWorkflow: Workflow = {...this.workflow, ...result};
-				this.workflowManager.update(updatedWorkflow);
-				this.workflowUpdated.emit(updatedWorkflow);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
 
 	onEditAssignment(): void {
 		this.workflowDialogService.openAssignmentDialog(
-			this.workflow,
-			this.allWorkflows
-		).subscribe((result: any) => {
+			this.entity, this.allEntities
+		).subscribe(result => {
 			if(result) {
-				const updatedWorkflow: Workflow = {...this.workflow, ...result};
-				this.workflowManager.update(updatedWorkflow);
-				this.workflowUpdated.emit(updatedWorkflow);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
 
 	onEditMisc(): void {
 		this.workflowDialogService.openMiscDialog(
-			this.workflow,
-			this.projectLanguages
-		).subscribe((result: any) => {
+			this.entity, this.projectLanguages
+		).subscribe(result => {
 			if(result) {
-				const updatedWorkflow: Workflow = {...this.workflow, ...result};
-				this.workflowManager.update(updatedWorkflow);
-				this.workflowUpdated.emit(updatedWorkflow);
-				this.showStagedMessage();
+				this.applyUpdate({...this.entity, ...result});
 			}
 		});
 	}
@@ -114,42 +86,24 @@ export class WorkflowDetailComponent implements OnInit, OnDestroy {
 			width: '500px',
 			data: {
 				title: 'Delete Workflow',
-				message: `Are you sure you want to delete "${this.languageService.getTranslatedName(this.workflow.shortname)}"?`,
+				message: `Are you sure you want to delete "${this.languageService.getTranslatedName(this.entity.shortname)}"?`,
 				confirmText: 'Delete',
 				cancelText: 'Cancel',
 				type: 'danger'
 			}
 		});
-
 		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
 			if(confirmed) {
-				this.workflowDeleted.emit(this.workflow.workflowId);
+				this.entityDeleted.emit(this.entity.workflowId);
 			}
 		});
 	}
 
-	onClose(): void {
-		this.closed.emit();
-	}
-
-	onSwitchToWorkflowStates(): void {
-		this.switchToWorkflowStates.emit();
-	}
-
-	onSwitchToWorkflowActions(): void {
-		this.switchToWorkflowActions.emit();
-	}
-
-	private showStagedMessage(): void {
-		this.snackBar.open('Changes staged (not saved yet)', 'Close', {duration: 2000});
-	}
-
-	isFieldModified(fieldName: string): boolean {
-		return this.workflowManager.isFieldModified(this.workflow.workflowId, fieldName);
-	}
+	onSwitchToWorkflowStates(): void {this.switchToWorkflowStates.emit();}
+	onSwitchToWorkflowActions(): void {this.switchToWorkflowActions.emit();}
 
 	getWorkflowLabel(workflowId: string): string {
-		return this.languageService.getLabelById(workflowId, id => this.workflowManager.getById(id));
+		return this.languageService.getLabelById(workflowId, id => this.manager.getById(id));
 	}
 
 	getWorkflowStateLabel(workflowStateId: string): string {
