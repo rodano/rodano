@@ -16,13 +16,14 @@ import {LanguageService} from '../../../services/language.service';
 import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confirmation-dialog.component';
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
+import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-field-model-detail',
 	standalone: true,
 	templateUrl: './field-model-detail.component.html',
 	styleUrls: ['./field-model-detail.component.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldModel> {
 	@Input() fieldModelId = '';
@@ -214,17 +215,27 @@ export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldMod
 		return !['AUTO_COMPLETION', 'SELECT', 'RADIO', 'CHECKBOX', 'CHECKBOX_GROUP'].includes(type);
 	}
 
-	getAdvancedHelpText(): string {
-		return this.languageService.getDefaultTranslation(this.draftEntity?.advancedHelp) || '';
-	}
-
-	hasAdvancedHelp(): boolean {
-		return !!(this.draftEntity?.advancedHelp && Object.keys(this.draftEntity.advancedHelp).length > 0);
-	}
-
 	showStringValidation(): boolean {return this.draftEntity?.type === 'STRING';}
 	showTextAreaValidation(): boolean {return this.draftEntity?.type === 'TEXTAREA' || this.draftEntity?.type === 'FILE';}
 	showDateValidation(): boolean {return this.draftEntity?.type === 'DATE';}
 	showDateSelectValidation(): boolean {return this.draftEntity?.type === 'DATE_SELECT';}
 	showNumberValidation(): boolean {return this.draftEntity?.type === 'NUMBER';}
+
+	get dateConfigModified(): boolean {
+		return this.isFieldModified('withYears')
+		  || this.isFieldModified('withMonths')
+		  || this.isFieldModified('withDays')
+		  || this.isFieldModified('withHours')
+		  || this.isFieldModified('withMinutes')
+		  || this.isFieldModified('withSeconds');
+	}
+
+	get mandatoryFieldsModified(): boolean {
+		return this.isFieldModified('yearsMandatory')
+		  || this.isFieldModified('monthsMandatory')
+		  || this.isFieldModified('daysMandatory')
+		  || this.isFieldModified('hoursMandatory')
+		  || this.isFieldModified('minutesMandatory')
+		  || this.isFieldModified('secondsMandatory');
+	}
 }

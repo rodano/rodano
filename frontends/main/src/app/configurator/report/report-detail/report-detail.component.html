@@ -15,90 +15,55 @@
 		<div class="settings-section">
 			<h3>Basic Information</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('id')">
-					<label>
-						Code
-						@if (isFieldModified('id')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">{{ report.id }}</div>
-				</div>
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')">
+					{{ report.id }}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('workflowId')">
-					<label>
-						Workflow
-						@if (isFieldModified('workflowId')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!report.workflowId">
-						<div class="chip theme-workflow">
-							<mat-icon class="resource-icon">settings</mat-icon>
-							<span class="language-name">{{ getWorkflowLabel(report.workflowId) }}</span>
-						</div>
+				<app-setting-item label="Workflow"
+																						[modified]="isFieldModified('workflowId')">
+					<div class="chip theme-workflow">
+						<mat-icon class="resource-icon">settings</mat-icon>
+						<span class="language-name">{{ getWorkflowLabel(report.workflowId) }}</span>
 					</div>
-				</div>
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('datasetModelId')">
-					<label>
-						Dataset Model
-						@if (isFieldModified('datasetModelId')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!report.datasetModelId">
-						<div class="chip theme-dataset-model">
-							<mat-icon class="resource-icon">dataset</mat-icon>
-							<span class="language-name">{{ getDatasetModelLabel(report.datasetModelId) }}</span>
-						</div>
+				<app-setting-item label="Dataset Model"
+																						[modified]="isFieldModified('datasetModelId')">
+					<div class="chip theme-dataset-model">
+						<mat-icon class="resource-icon">dataset</mat-icon>
+						<span class="language-name">{{ getDatasetModelLabel(report.datasetModelId) }}</span>
 					</div>
-				</div>
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-					<label>
-						Short Name
-						@if (isFieldModified('shortname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(report.shortname)">
-						@if (!languageService.getTranslatedValue(report.shortname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(report.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Short Name"
+																						[modified]="isFieldModified('shortname')"
+																						[notConfigured]="!languageService.getTranslatedValue(report.shortname)">
+					@if (!languageService.getTranslatedValue(report.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(report.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
-					<label>
-						Long Name
-						@if (isFieldModified('longname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(report.longname)">
-						@if (!languageService.getTranslatedValue(report.longname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(report.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Long Name"
+																						[modified]="isFieldModified('longname')"
+																						[notConfigured]="!languageService.getTranslatedValue(report.longname)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(report.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(report.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-					<label>
-						Description
-						@if (isFieldModified('description')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(report.description)">
-						@if (!languageService.getTranslatedValue(report.description)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(report.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Description"
+																						[modified]="isFieldModified('description')"
+																						[notConfigured]="!languageService.getTranslatedValue(report.description)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(report.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(report.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 			</div>
 			<button class="btn-edit" (click)="onEditBasicInfo()">
 				<mat-icon>edit</mat-icon>
@@ -109,13 +74,10 @@
 		<div class="settings-section">
 			<h3>Associated Resources</h3>
 			<div class="settings-grid">
-				<div class="setting-item full-width" [class.modified]="isFieldModified('fieldModelIds')">
-					<label>
-						Field Models
-						@if (isFieldModified('fieldModelIds')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
+				<app-setting-item label="Field Models"
+																						[modified]="isFieldModified('fieldModelIds')"
+																						[fullWidth]="true"
+																						[plain]="true">
 					<div class="relationship-box">
 						@if (report.fieldModelIds && report.fieldModelIds.length > 0) {
 							<div class="chip-container">
@@ -133,7 +95,7 @@
 							</div>
 						}
 					</div>
-				</div>
+				</app-setting-item>
 			</div>
 			<button class="btn-edit" (click)="onEditResources()">
 				<mat-icon>edit</mat-icon>

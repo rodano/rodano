@@ -14,77 +14,48 @@
 	<div class="settings-section">
 		<h3>Basic Information</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('id')">
-				<label>
-					Code
-					@if (isFieldModified('id')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ feature.id }}</div>
-			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('optional')">
-				<label>
-					Optional
-					@if (isFieldModified('optional')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (feature.optional) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ feature.id }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-				<label>
-					Short Name
-					@if (isFieldModified('shortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(feature.shortname)">
-					@if (!languageService.getTranslatedValue(feature.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(feature.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Optional"
+																					[modified]="isFieldModified('optional')">
+				@if (feature.optional) {
+					<span class="status-badge first">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
-				<label>
-					Long Name
-					@if (isFieldModified('longname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(feature.longname)">
-					@if (!languageService.getTranslatedValue(feature.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(feature.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Short Name"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(feature.shortname)">
+				@if (!languageService.getTranslatedValue(feature.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(feature.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-				<label>
-					Description
-					@if (isFieldModified('description')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(feature.description)">
-					@if (!languageService.getTranslatedValue(feature.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(feature.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Long Name"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(feature.longname)">
+				@if (!languageService.getTranslatedValue(feature.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(feature.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
+			<app-setting-item label="Description"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(feature.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(feature.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(feature.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>

@@ -14,13 +14,14 @@ import {WorkflowManagerService} from '../../services/manager/workflow-manager.se
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-validator-detail',
 	standalone: true,
 	templateUrl: './validator-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class ValidatorDetailComponent extends BaseManagerDetailComponent<Validator, ValidatorManagerService> {
 	@Input() override entity!: Validator;

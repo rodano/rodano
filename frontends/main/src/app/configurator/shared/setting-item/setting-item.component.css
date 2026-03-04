@@ -1,0 +1,51 @@
+.setting-item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+}
+
+.setting-item.full-width {
+	grid-column: 1 / -1;
+}
+
+.setting-item label {
+	font-size: 0.875rem;
+	font-weight: 600;
+	color: #374151;
+}
+
+.setting-value {
+	font-size: 0.875rem;
+	color: #111827;
+	padding: 0.5rem;
+	background-color: #f9fafb;
+	border-radius: 0.375rem;
+	border: 1px solid #e5e7eb;
+	min-height: 1.75rem;
+	align-content: center;
+}
+
+.not-configured {
+	color: #dc2626 !important;
+	background-color: #fef2f2 !important;
+	border-color: #fecaca !important;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.setting-item.modified {
+	position: relative;
+	border-right: 0.25rem solid #f59e0b;
+	background-color: #fffbeb;
+	border-radius: 0.25rem;
+}
+
+.modified-icon {
+	font-size: 1rem !important;
+	width: 1rem !important;
+	height: 1rem !important;
+	color: #f59e0b !important;
+	margin-left: 0.25rem;
+	vertical-align: middle;
+}

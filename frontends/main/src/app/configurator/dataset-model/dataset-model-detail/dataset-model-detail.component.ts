@@ -12,13 +12,14 @@ import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirma
 import {DatasetModelDialogService} from '../../services/dialogs/dataset-model-dialog.service';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-dataset-model-detail',
 	standalone: true,
 	templateUrl: './dataset-model-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class DatasetModelDetailComponent extends BaseManagerDetailComponent<DatasetModel, DatasetModelManagerService> {
 	@Input() override entity!: DatasetModel;

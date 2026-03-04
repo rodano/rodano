@@ -9,87 +9,59 @@
 			<h3>Basic Information</h3>
 		</div>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('code')">
-				<label>
-					Project Code
-					@if (isFieldModified('code')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ workingProject?.code }}</div>
-			</div>
-			<div class="setting-item">
-				<label>Created</label>
-				<div class="setting-value">{{ workingProject?.created | date:'medium' }}</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-				<label>
-					Short Name
-					@if (isFieldModified('shortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(workingProject?.shortname)">
-					@if (!languageService.getTranslatedValue(workingProject?.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(workingProject?.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
-				<label>
-					Long Name
-					@if (isFieldModified('longname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(workingProject?.longname)">
-					@if (!languageService.getTranslatedValue(workingProject?.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(workingProject?.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
-			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-				<label>
-					Description
-					@if (isFieldModified('description')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(workingProject?.description)">
-					@if (!languageService.getTranslatedValue(workingProject?.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(workingProject?.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('url')">
-				<label>
-					URL
-					@if (isFieldModified('url')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.url">
-					@if (!workingProject?.url) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.url || 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('color')">
-				<label>
-					Color
-					@if (isFieldModified('color')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value color-preview">
+			<app-setting-item label="Project Code"
+																					[modified]="isFieldModified('code')">
+				{{ workingProject?.code }}
+			</app-setting-item>
+
+			<app-setting-item label="Created">
+				{{ workingProject?.created | date:'medium' }}
+			</app-setting-item>
+
+			<app-setting-item label="Short Name"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(workingProject?.shortname)">
+				@if (!languageService.getTranslatedValue(workingProject?.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workingProject?.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Long Name"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(workingProject?.longname)">
+				@if (!languageService.getTranslatedValue(workingProject?.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workingProject?.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Description"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(workingProject?.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(workingProject?.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workingProject?.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="URL"
+																					[modified]="isFieldModified('url')"
+																					[notConfigured]="!workingProject?.url">
+				@if (!workingProject?.url) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.url || 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="Color"
+																					[modified]="isFieldModified('color')">
+				<div class="color-preview">
 					<span class="color-swatch" [style.background-color]="workingProject?.color"></span>
 					{{ workingProject?.color }}
 				</div>
-			</div>
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>
@@ -104,22 +76,17 @@
 			</h3>
 		</div>
 		<div class="settings-grid">
-			<div class="setting-item full-width" [class.modified]="isFieldModified('introductionText')">
-				<label>
-					Introduction Text (HTML)
-					@if (isFieldModified('introductionText')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value text-content" [class.not-configured]="!workingProject?.introductionText">
-					@if (!workingProject?.introductionText) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div [innerHTML]="workingProject?.introductionText"></div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Introduction Text (HTML)"
+																					[modified]="isFieldModified('introductionText')"
+																					[notConfigured]="!workingProject?.introductionText"
+																					[fullWidth]="true">
+				@if (!workingProject?.introductionText) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div [innerHTML]="workingProject?.introductionText"></div>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditIntroductionText()">
 			<mat-icon>edit</mat-icon>
@@ -130,29 +97,23 @@
 	<div class="settings-section">
 		<h3>Email Settings</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('email')">
-				<label>
-					Project Email
-					@if (isFieldModified('email')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.email">
-					@if (!workingProject?.email) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.email || 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('smtpTls')">
-				<label>
-					SMTP TLS
-					@if (isFieldModified('smtpTls')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ workingProject?.smtpTls ? 'Enabled' : 'Disabled' }}</div>
-			</div>
+			<app-setting-item label="Project Email"
+																					[modified]="isFieldModified('email')"
+																					[notConfigured]="!workingProject?.email">
+				@if (!workingProject?.email) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.email || 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="SMTP TLS"
+																					[modified]="isFieldModified('smtpTls')">
+				@if (workingProject?.smtpTls) {
+					<span class="status-badge default">Enabled</span>
+				} @else {
+					<span class="status-badge">Disabled</span>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditEmailSettings()">
 			<mat-icon>edit</mat-icon>
@@ -163,49 +124,37 @@
 	<div class="settings-section">
 		<h3>Password Policies</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('passwordStrong')">
-				<label>
-					Strong Password Required
-					@if (isFieldModified('passwordStrong')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ workingProject?.passwordStrong ? 'Enabled' : 'Disabled' }}</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('passwordLength')">
-				<label>
-					Minimum Length
-					@if (isFieldModified('passwordLength')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.passwordLength">
-					@if (!workingProject?.passwordLength) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.passwordLength ? workingProject?.passwordLength + ' characters' : 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('passwordValidityDuration')">
-				<label>
-					Validity Duration
-					@if (isFieldModified('passwordValidityDuration')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					{{ workingProject?.passwordValidityDuration ? workingProject?.passwordValidityDuration + ' days' : 'Never expires' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('passwordUnique')">
-				<label>
-					Uniqueness Check
-					@if (isFieldModified('passwordUnique')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ workingProject?.passwordUnique ? 'Enabled' : 'Disabled' }}</div>
-			</div>
+			<app-setting-item label="Strong Password Required"
+																					[modified]="isFieldModified('passwordStrong')">
+				@if (workingProject?.passwordStrong) {
+					<span class="status-badge default">Enabled</span>
+				} @else {
+					<span class="status-badge">Disabled</span>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Minimum Length"
+																					[modified]="isFieldModified('passwordLength')"
+																					[notConfigured]="!workingProject?.passwordLength">
+				@if (!workingProject?.passwordLength) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.passwordLength ? workingProject?.passwordLength + ' characters' : 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="Validity Duration"
+																					[modified]="isFieldModified('passwordValidityDuration')">
+				{{ workingProject?.passwordValidityDuration ? workingProject?.passwordValidityDuration + ' days' : 'Never expires' }}
+			</app-setting-item>
+
+			<app-setting-item label="Uniqueness Check"
+																					[modified]="isFieldModified('passwordUnique')">
+				@if (workingProject?.passwordUnique) {
+					<span class="status-badge default">Enabled</span>
+				} @else {
+					<span class="status-badge">Disabled</span>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditPasswordPolicies()">
 			<mat-icon>edit</mat-icon>
@@ -216,34 +165,28 @@
 	<div class="settings-section">
 		<h3>ePRO Settings</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('eproEnabled')">
-				<label>
-					ePRO Enabled
-					@if (isFieldModified('eproEnabled')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ workingProject?.eproEnabled ? 'Enabled' : 'Disabled' }}</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('eproProfileId')">
-				<label>
-					ePRO Profile
-					@if (isFieldModified('eproProfileId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.eproProfileId">
-					@if (!workingProject?.eproProfileId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip">
-							<mat-icon class="resource-icon">badge</mat-icon>
-							<span class="language-name">{{ getProfileLabel(workingProject!.eproProfileId!) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="ePRO Enabled"
+																					[modified]="isFieldModified('eproEnabled')">
+				@if (workingProject?.eproEnabled) {
+					<span class="status-badge default">Enabled</span>
+				} @else {
+					<span class="status-badge">Disabled</span>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="ePRO Profile"
+																					[modified]="isFieldModified('eproProfileId')"
+																					[notConfigured]="!workingProject?.eproProfileId">
+				@if (!workingProject?.eproProfileId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-profile">
+						<mat-icon class="resource-icon">badge</mat-icon>
+						<span class="language-name">{{ getProfileLabel(workingProject!.eproProfileId!) }}</span>
+					</div>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditEproSettings()">
 			<mat-icon>edit</mat-icon>
@@ -254,76 +197,50 @@
 	<div class="settings-section">
 		<h3>Client Information</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('clientName')">
-				<label>
-					Client Name
-					@if (isFieldModified('clientName')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.clientName">
-					@if (!workingProject?.clientName) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.clientName || 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('clientEmail')">
-				<label>
-					Client Email
-					@if (isFieldModified('clientEmail')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.clientEmail">
-					@if (!workingProject?.clientEmail) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.clientEmail || 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('protocolNo')">
-				<label>
-					Protocol Number
-					@if (isFieldModified('protocolNo')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.protocolNo">
-					@if (!workingProject?.protocolNo) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.protocolNo || 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('versionNumber')">
-				<label>
-					Version Number
-					@if (isFieldModified('versionNumber')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.versionNumber">
-					@if (!workingProject?.versionNumber) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.versionNumber || 'Not configured' }}
-				</div>
-			</div>
-			<div class="setting-item" [class.modified]="isFieldModified('versionDate')">
-				<label>
-					Version Date
-					@if (isFieldModified('versionDate')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!workingProject?.versionDate">
-					@if (!workingProject?.versionDate) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ workingProject?.versionDate ? (workingProject?.versionDate | date:'mediumDate') : 'Not configured' }}
-				</div>
-			</div>
+			<app-setting-item label="Client Name"
+																					[modified]="isFieldModified('clientName')"
+																					[notConfigured]="!workingProject?.clientName">
+				@if (!workingProject?.clientName) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.clientName || 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="Client Email"
+																					[modified]="isFieldModified('clientEmail')"
+																					[notConfigured]="!workingProject?.clientEmail">
+				@if (!workingProject?.clientEmail) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.clientEmail || 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="Protocol Number"
+																					[modified]="isFieldModified('protocolNo')"
+																					[notConfigured]="!workingProject?.protocolNo">
+				@if (!workingProject?.protocolNo) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.protocolNo || 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="Version Number"
+																					[modified]="isFieldModified('versionNumber')"
+																					[notConfigured]="!workingProject?.versionNumber">
+				@if (!workingProject?.versionNumber) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.versionNumber || 'Not configured' }}
+			</app-setting-item>
+
+			<app-setting-item label="Version Date"
+																					[modified]="isFieldModified('versionDate')"
+																					[notConfigured]="!workingProject?.versionDate">
+				@if (!workingProject?.versionDate) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ workingProject?.versionDate ? (workingProject?.versionDate | date:'mediumDate') : 'Not configured' }}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditClientInfo()">
 			<mat-icon>edit</mat-icon>

@@ -15,80 +15,53 @@
 		<div class="settings-section">
 			<h3>Basic Information</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('id')">
-					<label>
-						Code
-						@if (isFieldModified('id')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">{{ draftWorkflowAction.id }}</div>
-				</div>
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')">
+					{{ draftWorkflowAction.id }}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('icon')">
-					<label>
-						Icon
-						@if (isFieldModified('icon')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!draftWorkflowAction.icon">
-						@if (draftWorkflowAction.icon) {
-							<div class="icon-preview">
-								<mat-icon>{{ draftWorkflowAction.icon }}</mat-icon>
-								<span>{{ draftWorkflowAction.icon }}</span>
-							</div>
-						} @else {
-							<mat-icon class="warning-icon">report</mat-icon>
-							Not configured
-						}
-					</div>
-				</div>
+				<app-setting-item label="Icon"
+																						[modified]="isFieldModified('icon')"
+																						[notConfigured]="!draftWorkflowAction.icon">
+					@if (draftWorkflowAction.icon) {
+						<div class="icon-preview">
+							<mat-icon>{{ draftWorkflowAction.icon }}</mat-icon>
+							<span>{{ draftWorkflowAction.icon }}</span>
+						</div>
+					} @else {
+						<mat-icon class="warning-icon">report</mat-icon>
+						Not configured
+					}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-					<label>
-						Short Name
-						@if (isFieldModified('shortname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowAction.shortname)">
-						@if (!languageService.getTranslatedValue(draftWorkflowAction.shortname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftWorkflowAction.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Short Name"
+																						[modified]="isFieldModified('shortname')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.shortname)">
+					@if (!languageService.getTranslatedValue(draftWorkflowAction.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftWorkflowAction.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('longname')">
-					<label>
-						Long Name
-						@if (isFieldModified('longname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowAction.longname)">
-						@if (!languageService.getTranslatedValue(draftWorkflowAction.longname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftWorkflowAction.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Long Name"
+																						[modified]="isFieldModified('longname')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.longname)">
+					@if (!languageService.getTranslatedValue(draftWorkflowAction.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftWorkflowAction.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-					<label>
-						Description
-						@if (isFieldModified('description')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowAction.description)">
-						@if (!languageService.getTranslatedValue(draftWorkflowAction.description)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftWorkflowAction.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Description"
+																						[modified]="isFieldModified('description')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.description)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(draftWorkflowAction.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftWorkflowAction.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
+
 			</div>
 			<button class="btn-edit" (click)="onEditBasicInfo()">
 				<mat-icon>edit</mat-icon>
@@ -99,47 +72,34 @@
 		<div class="settings-section">
 			<h3>Documentation</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('documentable')">
-					<label>
-						Documentable
-						@if (isFieldModified('documentable')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">
-						@if (draftWorkflowAction.documentable) {
-							<span class="status-badge third">Yes</span>
-						} @else {
-							<span class="status-badge">No</span>
-						}
-					</div>
-				</div>
+				<app-setting-item label="Documentable"
+																						[modified]="isFieldModified('documentable')">
+					@if (draftWorkflowAction.documentable) {
+						<span class="status-badge third">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
 
 				@if (draftWorkflowAction.documentable && draftWorkflowAction.documentableOptions?.length) {
-					<div class="setting-item full-width" [class.modified]="isFieldModified('documentableOptions')">
-						<label>
-							Documentation Options ({{ draftWorkflowAction.documentableOptions?.length }})
-							@if (isFieldModified('documentableOptions')) {
-								<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-							}
-						</label>
-						<div class="setting-value">
-							<div class="multilist-display">
-								@for (option of draftWorkflowAction.documentableOptions; track $index) {
-									<div class="multilist-card">
-										<div class="multilist-header">
-            <span class="multilist-name" [class.not-configured]="!languageService.getTranslatedValue(option)">
+					<app-setting-item label="Documentation Options"
+																							[modified]="isFieldModified('documentableOptions')"
+																							[fullWidth]="true">
+						<div class="multilist-display">
+							@for (option of draftWorkflowAction.documentableOptions; track $index) {
+								<div class="multilist-card" [class.not-configured]="!languageService.getTranslatedValue(option)">
+									<div class="multilist-header">
+            <span class="multilist-name">
                 @if (!languageService.getTranslatedValue(option)) {
 																	<mat-icon class="warning-icon">report</mat-icon>
 																}
 													{{ languageService.getTranslatedValue(option) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
             </span>
-										</div>
 									</div>
-								}
-							</div>
+								</div>
+							}
 						</div>
-					</div>
+					</app-setting-item>
 				}
 			</div>
 			<button class="btn-edit" (click)="onEditDocumentation()">
@@ -151,37 +111,25 @@
 		<div class="settings-section">
 			<h3>Signature</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('requireSignature')">
-					<label>
-						Require Signature
-						@if (isFieldModified('requireSignature')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">
-						@if (draftWorkflowAction.requireSignature) {
-							<span class="status-badge fourth">Yes</span>
-						} @else {
-							<span class="status-badge">No</span>
-						}
-					</div>
-				</div>
+				<app-setting-item label="Require Signature"
+																						[modified]="isFieldModified('requireSignature')">
+					@if (draftWorkflowAction.requireSignature) {
+						<span class="status-badge fourth">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
 
 				@if (draftWorkflowAction.requireSignature) {
-					<div class="setting-item full-width" [class.modified]="isFieldModified('requireSignatureText')">
-						<label>
-							Signature Text
-							@if (isFieldModified('requireSignatureText')) {
-								<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-							}
-						</label>
-						<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText)">
-							@if (!languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText)) {
-								<mat-icon class="warning-icon">report</mat-icon>
-							}
-							{{ languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-						</div>
-					</div>
+					<app-setting-item label="Signature Text"
+																							[modified]="isFieldModified('requireSignatureText')"
+																							[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText)"
+																							[fullWidth]="true">
+						@if (!languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
 				}
 			</div>
 			<button class="btn-edit" (click)="onEditSignature()">

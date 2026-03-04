@@ -14,13 +14,14 @@ import {WorkflowStateManagerService} from '../../services/manager/workflow-state
 import {WorkflowActionManagerService} from '../../services/manager/workflow-action-manager.service';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-workflow-detail',
 	standalone: true,
 	templateUrl: './workflow-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class WorkflowDetailComponent extends BaseManagerDetailComponent<Workflow, WorkflowManagerService> {
 	@Input() override entity!: Workflow;

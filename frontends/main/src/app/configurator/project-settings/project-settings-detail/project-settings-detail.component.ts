@@ -8,13 +8,14 @@ import {ProjectSettingsDialogService} from '../../services/dialogs/project-setti
 import {LanguageService} from '../../services/language.service';
 import {Subscription} from 'rxjs';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-project-settings-detail',
 	standalone: true,
 	templateUrl: './project-settings-detail.component.html',
 	styleUrls: ['./project-settings-detail.component.css'],
-	imports: [CommonModule, MatTabsModule, MatIconModule, MatTooltip]
+	imports: [CommonModule, MatTabsModule, MatIconModule, MatTooltip, SettingItemComponent]
 })
 export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';

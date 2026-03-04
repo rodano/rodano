@@ -13,13 +13,14 @@ import {WorkflowStateManagerService} from '../../../services/manager/workflow-st
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { SettingItemComponent } from '../../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-workflow-state-detail',
 	standalone: true,
 	templateUrl: './workflow-state-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class WorkflowStateDetailComponent extends BaseDraftDetailComponent<WorkflowState> {
 	@Input() workflowStateId: string | null = null;

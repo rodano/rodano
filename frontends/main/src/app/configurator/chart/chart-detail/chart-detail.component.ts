@@ -18,13 +18,14 @@ import {LanguageService} from '../../services/language.service';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-chart-detail',
 	standalone: true,
 	templateUrl: './chart-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class ChartDetailComponent
 	extends BaseManagerDetailComponent<ChartModel, ChartManagerService> {

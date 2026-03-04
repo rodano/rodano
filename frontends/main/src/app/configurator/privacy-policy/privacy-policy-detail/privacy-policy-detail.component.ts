@@ -13,13 +13,14 @@ import {PrivacyPolicyDialogService} from '../../services/dialogs/privacy-policy-
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-privacy-policy-detail',
 	standalone: true,
 	templateUrl: './privacy-policy-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class PrivacyPolicyDetailComponent extends BaseManagerDetailComponent<PrivacyPolicy, PrivacyPolicyManagerService> {
 	@Input() override entity!: PrivacyPolicy;

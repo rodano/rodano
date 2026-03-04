@@ -15,64 +15,44 @@
 		<div class="settings-section">
 			<h3>Basic Information</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('id')">
-					<label>
-						Code
-						@if (isFieldModified('id')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">{{ draftEventGroup.id }}</div>
-				</div>
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')">
+					{{ draftEventGroup.id }}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-					<label>
-						Short Name
-						@if (isFieldModified('shortname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventGroup.shortname)">
-						@if (!languageService.getTranslatedValue(draftEventGroup.shortname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftEventGroup.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Short Name"
+																						[modified]="isFieldModified('shortname')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftEventGroup.shortname)">
+					@if (!languageService.getTranslatedValue(draftEventGroup.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftEventGroup.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
-					<label>
-						Long Name
-						@if (isFieldModified('longname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventGroup.longname)">
-						@if (!languageService.getTranslatedValue(draftEventGroup.longname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftEventGroup.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Long Name"
+																						[modified]="isFieldModified('longname')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftEventGroup.longname)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(draftEventGroup.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftEventGroup.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-					<label>
-						Description
-						@if (isFieldModified('description')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftEventGroup.description)">
-						@if (!languageService.getTranslatedValue(draftEventGroup.description)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftEventGroup.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Description"
+																						[modified]="isFieldModified('description')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftEventGroup.description)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(draftEventGroup.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftEventGroup.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
 				@if (availableLanguages.length > 1) {
-					<div class="setting-item full-width">
-						<label>All Translations</label>
+					<app-setting-item label="All Translations"
+																							[fullWidth]="true"
+																							[plain]="true">
 						<div class="relationship-box">
 							<div class="translations-list">
 								@for (lang of availableLanguages; track lang.code) {
@@ -102,7 +82,7 @@
 								}
 							</div>
 						</div>
-					</div>
+					</app-setting-item>
 				}
 			</div>
 			<button class="btn-edit" (click)="onEditBasicInfo()">

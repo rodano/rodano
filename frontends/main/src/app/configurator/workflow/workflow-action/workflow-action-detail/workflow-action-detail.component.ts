@@ -12,13 +12,14 @@ import {WorkflowActionDialogService} from '../../../services/dialogs/workflow-ac
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-workflow-action-detail',
 	standalone: true,
 	templateUrl: './workflow-action-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class WorkflowActionDetailComponent extends BaseDraftDetailComponent<WorkflowAction> {
 	@Input() workflowActionId = '';

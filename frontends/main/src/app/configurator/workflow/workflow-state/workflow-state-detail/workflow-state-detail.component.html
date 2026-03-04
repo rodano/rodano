@@ -15,110 +15,71 @@
 		<div class="settings-section">
 			<h3>Basic Information</h3>
 			<div class="settings-grid">
-				<div class="setting-item" [class.modified]="isFieldModified('id')">
-					<label>
-						Code
-						@if (isFieldModified('id')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">{{ draftWorkflowState.id }}</div>
-				</div>
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')"
+																						[notConfigured]="!draftWorkflowState.id">
+					{{ draftWorkflowState.id }}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('color')">
-					<label>
-						Color
-						@if (isFieldModified('color')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value color-preview">
+				<app-setting-item label="Color"
+																						[modified]="isFieldModified('color')"
+																						[notConfigured]="!draftWorkflowState.color">
+					<div class="color-preview">
 						<span class="color-swatch" [style.background-color]="draftWorkflowState.color"></span>
 						{{ draftWorkflowState.color }}
 					</div>
-				</div>
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('important')">
-					<label>
-						Important
-						@if (isFieldModified('important')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value">
-						@if (draftWorkflowState.important) {
-							<span class="status-badge third">Yes</span>
-						} @else {
-							<span class="status-badge">No</span>
-						}
-					</div>
-				</div>
+				<app-setting-item label="Important"
+																						[modified]="isFieldModified('important')">
+					@if (draftWorkflowState.important) {
+						<span class="status-badge third">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
 
-				<div class="setting-item" [class.modified]="isFieldModified('icon')">
-					<label>
-						Icon
-						@if (isFieldModified('icon')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!draftWorkflowState.icon">
-						@if (draftWorkflowState.icon) {
-							<div class="icon-preview">
-								<mat-icon>{{ draftWorkflowState.icon }}</mat-icon>
-								<span>{{ draftWorkflowState.icon }}</span>
-							</div>
-						} @else {
-							<mat-icon class="warning-icon">report</mat-icon>
-							Not configured
-						}
-					</div>
-				</div>
+				<app-setting-item label="Icon"
+																						[modified]="isFieldModified('icon')"
+																						[notConfigured]="!draftWorkflowState.icon">
+					@if (draftWorkflowState.icon) {
+						<div class="icon-preview">
+							<mat-icon>{{ draftWorkflowState.icon }}</mat-icon>
+							<span>{{ draftWorkflowState.icon }}</span>
+						</div>
+					} @else {
+						<mat-icon class="warning-icon">report</mat-icon>
+						Not configured
+					}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('shortname')">
-					<label>
-						Short Name
-						@if (isFieldModified('shortname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowState.shortname)">
-						@if (!languageService.getTranslatedValue(draftWorkflowState.shortname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftWorkflowState.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Short Name"
+																						[modified]="isFieldModified('shortname')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowState.shortname)">
+					@if (!languageService.getTranslatedValue(draftWorkflowState.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftWorkflowState.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('longname')">
-					<label>
-						Long Name
-						@if (isFieldModified('longname')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowState.longname)">
-						@if (!languageService.getTranslatedValue(draftWorkflowState.longname)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftWorkflowState.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
+				<app-setting-item label="Long Name"
+																						[modified]="isFieldModified('longname')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowState.longname)">
+					@if (!languageService.getTranslatedValue(draftWorkflowState.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftWorkflowState.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 
-				<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-					<label>
-						Description
-						@if (isFieldModified('description')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
-					<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(draftWorkflowState.description)">
-						@if (!languageService.getTranslatedValue(draftWorkflowState.description)) {
-							<mat-icon class="warning-icon">report</mat-icon>
-						}
-						{{ languageService.getTranslatedValue(draftWorkflowState.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-					</div>
-				</div>
-
+				<app-setting-item label="Description"
+																						[modified]="isFieldModified('description')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowState.description)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(draftWorkflowState.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftWorkflowState.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
 			</div>
 			<button class="btn-edit" (click)="onEditBasicInfo()">
 				<mat-icon>edit</mat-icon>
@@ -133,41 +94,29 @@
 					Configure how this state participates in workflow aggregation.
 				</p>
 				<div class="settings-grid">
-					<div class="setting-item" [class.modified]="isFieldModified('aggregateStateId')">
-						<label>
-							Aggregate State
-							@if (isFieldModified('aggregateStateId')) {
-								<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-							}
-						</label>
-						<div class="setting-value" [class.not-configured]="!draftWorkflowState.aggregateStateId">
-							@if (!draftWorkflowState.aggregateStateId) {
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>Not configured</span>
-							} @else {
-								<div class="chip theme-workflow-state">
-									<mat-icon class="resource-icon">adjust</mat-icon>
-									<span class="language-name">{{ getWorkflowStateLabel(draftWorkflowState.aggregateStateId) }}</span>
-								</div>
-							}
-						</div>
-					</div>
+					<app-setting-item label="Aggregate State"
+																							[modified]="isFieldModified('aggregateStateId')"
+																							[notConfigured]="!draftWorkflowState.aggregateStateId">
+						@if (!draftWorkflowState.aggregateStateId) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							<div class="chip theme-workflow-state">
+								<mat-icon class="resource-icon">adjust</mat-icon>
+								<span class="language-name">{{ getWorkflowStateLabel(draftWorkflowState.aggregateStateId) }}</span>
+							</div>
+						}
+					</app-setting-item>
 
-					<div class="setting-item" [class.modified]="isFieldModified('aggregateStateMatcher')">
-						<label>
-							Aggregate State Matcher
-							@if (isFieldModified('aggregateStateMatcher')) {
-								<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-							}
-						</label>
-						<div class="setting-value" [class.not-configured]="!draftWorkflowState.aggregateStateMatcher">
-							@if (!draftWorkflowState.aggregateStateMatcher) {
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>Not configured</span>
-							}
-							{{ draftWorkflowState.aggregateStateMatcher }}
-						</div>
-					</div>
+					<app-setting-item label="Aggregate State Matcher"
+																							[modified]="isFieldModified('aggregateStateMatcher')"
+																							[notConfigured]="!draftWorkflowState.aggregateStateMatcher">
+						@if (!draftWorkflowState.aggregateStateMatcher) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						}
+						{{ draftWorkflowState.aggregateStateMatcher }}
+					</app-setting-item>
 				</div>
 				<button class="btn-edit" (click)="onEditAggregation()">
 					<mat-icon>edit</mat-icon>
@@ -179,13 +128,10 @@
 		<div class="settings-section">
 			<h3>Possible Actions</h3>
 			<div class="settings-grid">
-				<div class="setting-item full-width" [class.modified]="isFieldModified('possibleActions')">
-					<label>
-						Actions
-						@if (isFieldModified('possibleActions')) {
-							<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-						}
-					</label>
+				<app-setting-item label="Actions"
+																						[modified]="isFieldModified('possibleActions')"
+																						[fullWidth]="true"
+																						[plain]="true">
 					<div class="relationship-box">
 						@if (draftWorkflowState.possibleActions.length > 0) {
 							<div class="chip-container">
@@ -203,7 +149,7 @@
 							</div>
 						}
 					</div>
-				</div>
+				</app-setting-item>
 			</div>
 			<button class="btn-edit" (click)="onEditPossibleActions()">
 				<mat-icon>edit</mat-icon>

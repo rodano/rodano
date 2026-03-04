@@ -20,76 +20,48 @@
 	<div class="settings-section">
 		<h3>Basic Information</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('id')">
-				<label>
-					Code
-					@if (isFieldModified('id')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ datasetModel.id }}</div>
-			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('multiple')">
-				<label>
-					Multiple
-					@if (isFieldModified('multiple')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (datasetModel.multiple) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ datasetModel.id }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-				<label>
-					Short Name
-					@if (isFieldModified('shortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(datasetModel.shortname)">
-					@if (!languageService.getTranslatedValue(datasetModel.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(datasetModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Multiple"
+																					[modified]="isFieldModified('multiple')">
+				@if (datasetModel.multiple) {
+					<span class="status-badge first">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
-				<label>
-					Long Name
-					@if (isFieldModified('longname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(datasetModel.longname)">
-					@if (!languageService.getTranslatedValue(datasetModel.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(datasetModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Short Name"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(datasetModel.shortname)">
+				@if (!languageService.getTranslatedValue(datasetModel.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(datasetModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-				<label>
-					Description
-					@if (isFieldModified('description')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(datasetModel.description)">
-					@if (!languageService.getTranslatedValue(datasetModel.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(datasetModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Long Name"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(datasetModel.longname)">
+				@if (!languageService.getTranslatedValue(datasetModel.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(datasetModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Description"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(datasetModel.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(datasetModel.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(datasetModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>
@@ -100,36 +72,23 @@
 	<div class="settings-section">
 		<h3>Family Settings</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('family')">
-				<label>
-					Family
-					@if (isFieldModified('family')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!datasetModel.family">
-					@if (!datasetModel.family) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ datasetModel.family || 'Not configured' }}
-				</div>
-			</div>
+			<app-setting-item label="Family"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!datasetModel.family">
+				@if (!datasetModel.family) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ datasetModel.family || 'Not configured' }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('master')">
-				<label>
-					Master
-					@if (isFieldModified('master')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (datasetModel.master) {
-						<span class="status-badge second">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Master"
+																					[modified]="isFieldModified('master')">
+				@if (datasetModel.master) {
+					<span class="status-badge second">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditFamily()">
 			<mat-icon>edit</mat-icon>
@@ -140,38 +99,25 @@
 	<div class="settings-section">
 		<h3>Export Settings</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('exportable')">
-				<label>
-					Exportable
-					@if (isFieldModified('exportable')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (datasetModel.exportable) {
-						<span class="status-badge third">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Exportable"
+																					[modified]="isFieldModified('exportable')">
+				@if (datasetModel.exportable) {
+					<span class="status-badge third">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('exportOrder')">
-				<label>
-					Export Order
-					@if (isFieldModified('exportOrder')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="datasetModel.exportOrder === null || datasetModel.exportOrder === undefined">
-					@if (datasetModel.exportOrder === null || datasetModel.exportOrder === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ datasetModel.exportOrder }}
-					}
-				</div>
-			</div>
+			<app-setting-item label="Export Order"
+																					[modified]="isFieldModified('exportOrder')"
+																					[notConfigured]="datasetModel.exportOrder === null || datasetModel.exportOrder === undefined">
+				@if (datasetModel.exportOrder === null || datasetModel.exportOrder === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ datasetModel.exportOrder }}
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditExport()">
 			<mat-icon>edit</mat-icon>
@@ -182,13 +128,10 @@
 	<div class="settings-section">
 		<h3>Label Patterns</h3>
 		<div class="settings-grid">
-			<div class="setting-item full-width" [class.modified]="isFieldModified('collapsedLabelPattern')">
-				<label>
-					Collapsed Label Pattern
-					@if (isFieldModified('collapsedLabelPattern')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Collapsed Label Pattern"
+																					[modified]="isFieldModified('collapsedLabelPattern')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (datasetModel.collapsedLabelPattern) {
 						<div class="code-format-display">
@@ -201,15 +144,12 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('expandedLabelPattern')">
-				<label>
-					Expanded Label Pattern
-					@if (isFieldModified('expandedLabelPattern')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Expanded Label Pattern"
+																					[modified]="isFieldModified('expandedLabelPattern')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (datasetModel.expandedLabelPattern) {
 						<div class="code-format-display">
@@ -222,7 +162,7 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditLabelPatterns()">
 			<mat-icon>edit</mat-icon>

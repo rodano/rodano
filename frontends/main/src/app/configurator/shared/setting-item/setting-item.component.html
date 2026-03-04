@@ -1,0 +1,13 @@
+<div class="setting-item"
+					[class.modified]="modified"
+					[class.full-width]="fullWidth">
+	<label>
+		{{ label }}
+		@if (modified) {
+			<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+		}
+	</label>
+	<div [class.setting-value]="!plain" [class.not-configured]="notConfigured">
+		<ng-content />
+	</div>
+</div>

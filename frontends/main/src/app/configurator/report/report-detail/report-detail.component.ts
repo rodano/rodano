@@ -15,13 +15,14 @@ import {WorkflowManagerService} from '../../services/manager/workflow-manager.se
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-report-detail',
 	standalone: true,
 	templateUrl: './report-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class ReportDetailComponent extends BaseManagerDetailComponent<Report, ReportManagerService> {
 	@Input() override entity!: Report;

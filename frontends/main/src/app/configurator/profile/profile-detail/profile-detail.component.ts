@@ -13,13 +13,14 @@ import {ProfileManagerService} from '../../services/manager/profile-manager.serv
 import {ProfileDialogService} from '../../services/dialogs/profile-dialog.service';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-profile-detail',
 	standalone: true,
 	templateUrl: './profile-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class ProfileDetailComponent extends BaseManagerDetailComponent<Profile, ProfileManagerService> {
 	@Input() override entity!: Profile;

@@ -12,13 +12,14 @@ import {ResourceCategoryManagerService} from '../../services/manager/resource-ca
 import {ResourceCategory} from '@core/model/resource-category';
 import {ResourceCategoryDialogService} from '../../services/dialogs/resource-category-dialog.service';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 @Component({
 	selector: 'app-resource-category-detail',
 	standalone: true,
 	templateUrl: './resource-category-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class ResourceCategoryDetailComponent extends BaseManagerDetailComponent<ResourceCategory, ResourceCategoryManagerService> {
 	@Input() override entity!: ResourceCategory;

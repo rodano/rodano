@@ -19,6 +19,7 @@ import {LanguageService} from '../../services/language.service';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
+import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -31,7 +32,7 @@ interface WorkflowStateGroup {
 	standalone: true,
 	templateUrl: './scope-model-detail.component.html',
 	styleUrls: ['./scope-model-detail.component.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
 })
 export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeModel, ScopeModelManagerService> {
 	@Input() override entity!: ScopeModel;

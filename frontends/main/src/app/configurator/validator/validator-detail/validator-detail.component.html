@@ -14,107 +14,67 @@
 	<div class="settings-section">
 		<h3>Basic Information</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('id')">
-				<label>
-					Code
-					@if (isFieldModified('id')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ validator.id }}</div>
-			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-				<label>
-					Short Name
-					@if (isFieldModified('shortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.shortname)">
-					@if (!languageService.getTranslatedValue(validator.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(validator.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ validator.id }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
-				<label>
-					Long Name
-					@if (isFieldModified('longname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.longname)">
-					@if (!languageService.getTranslatedValue(validator.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(validator.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Short Name"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(validator.shortname)">
+				@if (!languageService.getTranslatedValue(validator.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(validator.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-				<label>
-					Description
-					@if (isFieldModified('description')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.description)">
-					@if (!languageService.getTranslatedValue(validator.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(validator.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Long Name"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(validator.longname)">
+				@if (!languageService.getTranslatedValue(validator.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(validator.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('message')">
-				<label>
-					Invalid Message
-					@if (isFieldModified('message')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(validator.message)">
-					@if (!languageService.getTranslatedValue(validator.message)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(validator.message) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Description"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(validator.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(validator.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(validator.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('required')">
-				<label>
-					Required
-					@if (isFieldModified('required')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (validator.required) {
-						<span class="status-badge second">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Invalid Message"
+																					[modified]="isFieldModified('message')"
+																					[notConfigured]="!languageService.getTranslatedValue(validator.message)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(validator.message)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(validator.message) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('script')">
-				<label>
-					Script
-					@if (isFieldModified('script')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (validator.script) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Required"
+																					[modified]="isFieldModified('required')">
+				@if (validator.required) {
+					<span class="status-badge second">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Script"
+																					[modified]="isFieldModified('script')">
+				@if (validator.script) {
+					<span class="status-badge first">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>
@@ -125,65 +85,47 @@
 	<div class="settings-section">
 		<h3>Workflow Configuration</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('workflowId')">
-				<label>
-					Workflow
-					@if (isFieldModified('workflowId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!validator.workflowId">
-					@if (!validator.workflowId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-workflow">
-							<mat-icon class="resource-icon">settings</mat-icon>
-							<span class="language-name">{{ getWorkflowLabel(validator.workflowId) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Workflow"
+																					[modified]="isFieldModified('workflowId')"
+																					[notConfigured]="!validator.workflowId">
+				@if (!validator.workflowId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-workflow">
+						<mat-icon class="resource-icon">settings</mat-icon>
+						<span class="language-name">{{ getWorkflowLabel(validator.workflowId) }}</span>
+					</div>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('invalidStateId')">
-				<label>
-					Invalid State
-					@if (isFieldModified('invalidStateId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!validator.invalidStateId">
-					@if (!validator.invalidStateId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-workflow-state">
-							<mat-icon class="resource-icon">cancel</mat-icon>
-							<span class="language-name">{{ getWorkflowStateLabel(validator.invalidStateId) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Invalid State"
+																					[modified]="isFieldModified('invalidStateId')"
+																					[notConfigured]="!validator.invalidStateId">
+				@if (!validator.invalidStateId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-workflow-state">
+						<mat-icon class="resource-icon">cancel</mat-icon>
+						<span class="language-name">{{ getWorkflowStateLabel(validator.invalidStateId) }}</span>
+					</div>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('validStateId')">
-				<label>
-					Valid State
-					@if (isFieldModified('validStateId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!validator.validStateId">
-					@if (!validator.validStateId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-workflow-state">
-							<mat-icon class="resource-icon">check_circle</mat-icon>
-							<span class="language-name">{{ getWorkflowStateLabel(validator.validStateId) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Valid State"
+																					[modified]="isFieldModified('validStateId')"
+																					[notConfigured]="!validator.validStateId">
+				@if (!validator.validStateId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-workflow-state">
+						<mat-icon class="resource-icon">check_circle</mat-icon>
+						<span class="language-name">{{ getWorkflowStateLabel(validator.validStateId) }}</span>
+					</div>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditWorkflow()">
 			<mat-icon>edit</mat-icon>

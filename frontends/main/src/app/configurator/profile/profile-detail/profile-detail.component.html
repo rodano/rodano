@@ -14,98 +14,64 @@
 	<div class="settings-section">
 		<h3>Basic Information</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('id')">
-				<label>
-					Code
-					@if (isFieldModified('id')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ profile.id }}</div>
-			</div>
 
-			<div class="setting-item" [class.modified]="isFieldModified('order')">
-				<label>
-					Order
-					@if (isFieldModified('order')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="profile.order === null || profile.order === undefined">
-					@if (profile.order === null || profile.order === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ profile.order }}
-					}
-				</div>
-			</div>
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ profile.id }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-				<label>
-					Short Name
-					@if (isFieldModified('shortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(profile.shortname)">
-					@if (!languageService.getTranslatedValue(profile.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(profile.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Order"
+																					[modified]="isFieldModified('order')"
+																					[notConfigured]="profile.order === null || profile.order === undefined">
+				@if (profile.order === null || profile.order === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ profile.order }}
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
-				<label>
-					Long Name
-					@if (isFieldModified('longname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(profile.longname)">
-					@if (!languageService.getTranslatedValue(profile.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(profile.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Short Name"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(profile.shortname)">
+				@if (!languageService.getTranslatedValue(profile.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(profile.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('description')">
-				<label>
-					Description
-					@if (isFieldModified('description')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(profile.description)">
-					@if (!languageService.getTranslatedValue(profile.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(profile.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Long Name"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(profile.longname)">
+				@if (!languageService.getTranslatedValue(profile.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(profile.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('workflowOfInterestId')">
-				<label>
-					Workflow of Interest
-					@if (isFieldModified('workflowOfInterestId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!profile.workflowOfInterestId">
-					@if (!profile.workflowOfInterestId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-workflow">
-							<mat-icon class="resource-icon">settings</mat-icon>
-							<span class="language-name">{{ getWorkflowLabel(profile.workflowOfInterestId) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Description"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(profile.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(profile.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(profile.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
+			<app-setting-item label="Workflow of Interest"
+																					[modified]="isFieldModified('workflowOfInterestId')"
+																					[notConfigured]="!profile.workflowOfInterestId">
+				@if (!profile.workflowOfInterestId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-workflow">
+						<mat-icon class="resource-icon">settings</mat-icon>
+						<span class="language-name">{{ getWorkflowLabel(profile.workflowOfInterestId) }}</span>
+					</div>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>

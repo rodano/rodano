@@ -25,125 +25,77 @@
 	<div class="settings-section">
 		<h3>Basic Information</h3>
 		<div class="settings-grid">
-			<div class="setting-item" [class.modified]="isFieldModified('id')">
-				<label>
-					Code
-					@if (isFieldModified('id')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">{{ scopeModel.id }}</div>
-			</div>
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ scopeModel.id }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('shortname')">
-				<label>
-					Short Name
-					@if (isFieldModified('shortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.shortname)">
-					@if (!languageService.getTranslatedValue(scopeModel.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(scopeModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Short Name"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.shortname)">
+				@if (!languageService.getTranslatedValue(scopeModel.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(scopeModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('longname')">
-				<label>
-					Long Name
-					@if (isFieldModified('longname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.longname)">
-					@if (!languageService.getTranslatedValue(scopeModel.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(scopeModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Long Name"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.longname)">
+				@if (!languageService.getTranslatedValue(scopeModel.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(scopeModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('pluralShortname')">
-				<label>
-					Plural Name
-					@if (isFieldModified('pluralShortname')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.pluralShortname)">
-					@if (!languageService.getTranslatedValue(scopeModel.pluralShortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(scopeModel.pluralShortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Plural Name"
+																					[modified]="isFieldModified('pluralShortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.pluralShortname)">
+				@if (!languageService.getTranslatedValue(scopeModel.pluralShortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(scopeModel.pluralShortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('description')">
-				<label>
-					Description
-					@if (isFieldModified('description')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!languageService.getTranslatedValue(scopeModel.description)">
-					@if (!languageService.getTranslatedValue(scopeModel.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(scopeModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</div>
-			</div>
+			<app-setting-item label="Description"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.description)">
+				@if (!languageService.getTranslatedValue(scopeModel.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(scopeModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('virtual')">
-				<label>
-					Virtual
-					@if (isFieldModified('virtual')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value">
-					@if (scopeModel.virtual) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Virtual"
+																					[modified]="isFieldModified('virtual')">
+				@if (scopeModel.virtual) {
+					<span class="status-badge first">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('expectedNumber')">
-				<label>
-					Expected Number
-					@if (isFieldModified('expectedNumber')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="scopeModel.expectedNumber === null || scopeModel.expectedNumber === undefined">
-					@if (scopeModel.expectedNumber === null || scopeModel.expectedNumber === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ scopeModel.expectedNumber }}
-					}
-				</div>
-			</div>
+			<app-setting-item label="Expected Number"
+																					[modified]="isFieldModified('expectedNumber')"
+																					[notConfigured]="scopeModel.expectedNumber === null || scopeModel.expectedNumber === undefined">
+				@if (scopeModel.expectedNumber === null || scopeModel.expectedNumber === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ scopeModel.expectedNumber }}
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('maxNumber')">
-				<label>
-					Maximum Number
-					@if (isFieldModified('maxNumber')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="scopeModel.maxNumber === null || scopeModel.maxNumber === undefined">
-					@if (scopeModel.maxNumber === null || scopeModel.maxNumber === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ scopeModel.maxNumber }}
-					}
-				</div>
-			</div>
+			<app-setting-item label="Maximum Number"
+																					[modified]="isFieldModified('maxNumber')"
+																					[notConfigured]="scopeModel.maxNumber === null || scopeModel.maxNumber === undefined">
+				@if (scopeModel.maxNumber === null || scopeModel.maxNumber === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ scopeModel.maxNumber }}
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditBasicInfo()">
 			<mat-icon>edit</mat-icon>
@@ -154,48 +106,36 @@
 	<div class="settings-section">
 		<h3>Hierarchy & Relationships</h3>
 		<div class="settings-grid">
-			<div class="setting-item">
-				<label>Type</label>
-				<div class="setting-value">
-					@if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length === 0) {
-						<span class="status-badge standalone">Standalone</span>
-					} @else if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length > 0) {
-						<span class="status-badge root">Root Level</span>
-					} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length === 0) {
-						<span class="status-badge leaf">Leaf Level</span>
-					} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length > 0) {
-						<span class="status-badge intermediate">Intermediate Level</span>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Type">
+				@if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length === 0) {
+					<span class="status-badge standalone">Standalone</span>
+				} @else if (scopeModel.parentIds.length === 0 && scopeModel.childScopeModelIds.length > 0) {
+					<span class="status-badge root">Root Level</span>
+				} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length === 0) {
+					<span class="status-badge leaf">Leaf Level</span>
+				} @else if (scopeModel.parentIds.length > 0 && scopeModel.childScopeModelIds.length > 0) {
+					<span class="status-badge intermediate">Intermediate Level</span>
+				}
+			</app-setting-item>
 
-			<div class="setting-item" [class.modified]="isFieldModified('defaultParentId')">
-				<label>
-					Default Parent
-					@if (isFieldModified('defaultParentId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!scopeModel.defaultParentId">
-					@if (!scopeModel.defaultParentId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-scope-model">
-							<mat-icon class="resource-icon">account_tree</mat-icon>
-							<span class="language-name">{{ getScopeModelLabel(scopeModel.defaultParentId) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Default Parent"
+																					[modified]="isFieldModified('defaultParentId')"
+																					[notConfigured]="!scopeModel.defaultParentId">
+				@if (!scopeModel.defaultParentId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-scope-model">
+						<mat-icon class="resource-icon">account_tree</mat-icon>
+						<span class="language-name">{{ getScopeModelLabel(scopeModel.defaultParentId) }}</span>
+					</div>
+				}
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('parentIds')">
-				<label>
-					Parent Scope Models
-					@if (isFieldModified('parentIds')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Parent Scope Models"
+																					[modified]="isFieldModified('parentIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (scopeModel.parentIds.length > 0) {
 						<div class="chip-container">
@@ -217,10 +157,11 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 
-			<div class="setting-item full-width">
-				<label>Child Scope Models</label>
+			<app-setting-item label="Child Scope Models"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (scopeModel.childScopeModelIds.length > 0) {
 						<div class="chip-container">
@@ -238,7 +179,7 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditRelationships()">
 			<mat-icon>edit</mat-icon>
@@ -249,25 +190,20 @@
 	<div class="settings-section">
 		<h3>Default Settings</h3>
 		<div class="settings-grid">
-			<div class="setting-item full-width" [class.modified]="isFieldModified('defaultProfileId')">
-				<label>
-					Default Profile
-					@if (isFieldModified('defaultProfileId')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
-				<div class="setting-value" [class.not-configured]="!scopeModel.defaultProfileId">
-					@if (!scopeModel.defaultProfileId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-profile">
-							<mat-icon class="resource-icon">badge</mat-icon>
-							<span class="language-name">{{ getProfileLabel(scopeModel.defaultProfileId) }}</span>
-						</div>
-					}
-				</div>
-			</div>
+			<app-setting-item label="Default Profile"
+																					[modified]="isFieldModified('defaultProfileId')"
+																					[notConfigured]="!scopeModel.defaultProfileId"
+																					[fullWidth]="true">
+				@if (!scopeModel.defaultProfileId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-profile">
+						<mat-icon class="resource-icon">badge</mat-icon>
+						<span class="language-name">{{ getProfileLabel(scopeModel.defaultProfileId) }}</span>
+					</div>
+				}
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditDefaultSettings()">
 			<mat-icon>edit</mat-icon>
@@ -278,13 +214,10 @@
 	<div class="settings-section">
 		<h3>Code Format Pattern</h3>
 		<div class="settings-grid">
-			<div class="setting-item full-width" [class.modified]="isFieldModified('scopeFormat')">
-				<label>
-					Code Format
-					@if (isFieldModified('scopeFormat')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Code Format Pattern"
+																					[modified]="isFieldModified('scopeFormat')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (scopeModel.scopeFormat) {
 						<div class="code-format-display">
@@ -297,7 +230,7 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditPattern()">
 			<mat-icon>edit</mat-icon>
@@ -308,13 +241,10 @@
 	<div class="settings-section">
 		<h3>Associated Resources</h3>
 		<div class="settings-grid">
-			<div class="setting-item full-width" [class.modified]="isFieldModified('formModelIds')">
-				<label>
-					Form Models
-					@if (isFieldModified('formModelIds')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Form Models"
+																					[modified]="isFieldModified('formModelIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (scopeModel.formModelIds.length > 0) {
 						<div class="chip-container">
@@ -332,15 +262,12 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('datasetModelIds')">
-				<label>
-					Dataset Models
-					@if (isFieldModified('datasetModelIds')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Dataset Models"
+																					[modified]="isFieldModified('datasetModelIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (scopeModel.datasetModelIds.length > 0) {
 						<div class="chip-container">
@@ -358,15 +285,12 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="isFieldModified('workflowIds')">
-				<label>
-					Workflows
-					@if (isFieldModified('workflowIds')) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Workflows"
+																					[modified]="isFieldModified('workflowIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (scopeModel.workflowIds.length > 0) {
 						<div class="chip-container">
@@ -384,15 +308,12 @@
 						</div>
 					}
 				</div>
-			</div>
+			</app-setting-item>
 
-			<div class="setting-item full-width" [class.modified]="workflowStateIdsModified">
-				<label>
-					Workflow State Selectors
-					@if (workflowStateIdsModified) {
-						<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
-					}
-				</label>
+			<app-setting-item label="Workflow State Selectors"
+																					[modified]="workflowStateIdsModified"
+																					[fullWidth]="true"
+																					[plain]="true">
 				<div class="relationship-box">
 					@if (getWorkflowStateSelections().length > 0) {
 						<div class="workflow-state-selections">
@@ -420,8 +341,7 @@
 						</div>
 					}
 				</div>
-			</div>
-
+			</app-setting-item>
 		</div>
 		<button class="btn-edit" (click)="onEditResources()">
 			<mat-icon>edit</mat-icon>
