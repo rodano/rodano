@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../services/language.service';
 import {TreeNode} from '../tree-node';
+import {BaseTreeComponent} from '../base-tree.component';
 
 @Component({
 	selector: 'app-workflow-tree',
@@ -11,30 +12,23 @@ import {TreeNode} from '../tree-node';
 	templateUrl: './workflow-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class WorkflowTreeComponent implements OnChanges {
-	@Input() projectId = '';
+export class WorkflowTreeComponent extends BaseTreeComponent {
 	@Input() workflows: any[] = [];
-	@Input() expanded = false;
 	@Input() workflowStates: any[] = [];
 	@Input() workflowActions: any[] = [];
 	@Input() selectedWorkflowId: string | null = null;
 	@Input() selectedWorkflowStateId: string | null = null;
 	@Input() selectedWorkflowActionId: string | null = null;
-	@Output() categoryClicked = new EventEmitter<void>();
 
-	treeNodes: TreeNode[] = [];
-
-	constructor(private languageService: LanguageService) {}
-
-	ngOnChanges(): void {
-		this.buildTree();
+	constructor(languageService: LanguageService) {
+		super(languageService);
 	}
 
-	onCategoryClick(): void {
-		this.categoryClicked.emit();
-	}
+	getCategoryIcon(): string {return 'settings';}
+	getCategoryLabel(): string {return 'Workflows';}
+	getCategoryTheme(): string {return 'theme-workflow';}
 
-	private buildTree(): void {
+	protected buildTree(): void {
 		if(!this.workflows.length) {
 			return;
 		}

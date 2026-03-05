@@ -1,40 +1,29 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {TreeNode} from '../tree-node';
 import {LanguageService} from '../../services/language.service';
+import {BaseTreeComponent} from '../base-tree.component';
 
 @Component({
 	selector: 'app-resource-category-tree',
 	standalone: true,
 	imports: [CommonModule, MatIconModule],
-	templateUrl: './resource-category-tree.component.html',
+	templateUrl: '../simple-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class ResourceCategoryTreeComponent implements OnChanges {
-	@Input() projectId = '';
+export class ResourceCategoryTreeComponent extends BaseTreeComponent {
 	@Input() resourceCategories: any[] = [];
-	@Input() expanded = false;
 	@Input() selectedResourceCategoryId: string | null = null;
-	@Output() categoryClicked = new EventEmitter<void>();
 
-	treeNodes: TreeNode[] = [];
-
-	constructor(private languageService: LanguageService) {}
-
-	ngOnChanges(): void {
-		this.buildTree();
+	constructor(languageService: LanguageService) {
+		super(languageService);
 	}
 
-	onCategoryClick(): void {
-		this.categoryClicked.emit();
-	}
+	getCategoryIcon(): string {return 'eco';}
+	getCategoryLabel(): string {return 'Resource Categories';}
+	getCategoryTheme(): string {return 'theme-resource-category';}
 
-	private buildTree(): void {
-		if(!this.resourceCategories.length) {
-			return;
-		}
-
+	protected buildTree(): void {
 		this.treeNodes = this.resourceCategories.map(rc => ({
 			id: `resource-category-${rc.categoryId}`,
 			label: this.languageService.getDefaultTranslation(rc.shortname) || rc.id,

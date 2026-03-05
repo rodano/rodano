@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../services/language.service';
 import {TreeNode} from '../tree-node';
+import {BaseTreeComponent} from '../base-tree.component';
 
 @Component({
 	selector: 'app-scope-models-tree',
@@ -11,30 +12,23 @@ import {TreeNode} from '../tree-node';
 	templateUrl: './scope-models-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class ScopeModelsTreeComponent implements OnChanges {
-	@Input() projectId = '';
-	@Input() expanded = false;
+export class ScopeModelsTreeComponent extends BaseTreeComponent {
 	@Input() scopeModels: any[] = [];
 	@Input() eventModels: any[] = [];
 	@Input() eventGroups: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
-	@Output() categoryClicked = new EventEmitter<void>();
 
-	treeNodes: TreeNode[] = [];
-
-	constructor(private languageService: LanguageService) {}
-
-	ngOnChanges(): void {
-		this.buildTree();
+	constructor(languageService: LanguageService) {
+		super(languageService);
 	}
 
-	onCategoryClick(): void {
-		this.categoryClicked.emit();
-	}
+	getCategoryIcon(): string {return 'account_tree';}
+	getCategoryLabel(): string {return 'Scope Models';}
+	getCategoryTheme(): string {return 'theme-scope-model';}
 
-	private buildTree(): void {
+	protected buildTree(): void {
 		if(!this.scopeModels.length) {
 			return;
 		}

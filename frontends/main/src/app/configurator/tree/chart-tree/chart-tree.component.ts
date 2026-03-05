@@ -1,40 +1,29 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {TreeNode} from '../tree-node';
 import {LanguageService} from '../../services/language.service';
+import {BaseTreeComponent} from '../base-tree.component';
 
 @Component({
 	selector: 'app-chart-tree',
 	standalone: true,
 	imports: [CommonModule, MatIconModule],
-	templateUrl: './chart-tree.component.html',
+	templateUrl: '../simple-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class ChartTreeComponent implements OnChanges {
-	@Input() projectId = '';
+export class ChartTreeComponent extends BaseTreeComponent {
 	@Input() charts: any[] = [];
-	@Input() expanded = false;
 	@Input() selectedChartId: string | null = null;
-	@Output() categoryClicked = new EventEmitter<void>();
 
-	treeNodes: TreeNode[] = [];
-
-	constructor(private languageService: LanguageService) {}
-
-	ngOnChanges(): void {
-		this.buildTree();
+	constructor(languageService: LanguageService) {
+		super(languageService);
 	}
 
-	onCategoryClick(): void {
-		this.categoryClicked.emit();
-	}
+	getCategoryIcon(): string {return 'bar_chart';}
+	getCategoryLabel(): string {return 'Charts';}
+	getCategoryTheme(): string {return 'theme-chart';}
 
-	private buildTree(): void {
-		if(!this.charts.length) {
-			return;
-		}
-
+	protected buildTree(): void {
 		this.treeNodes = this.charts.map(c => ({
 			id: `chart-${c.chartId}`,
 			label: this.languageService.getDefaultTranslation(c.shortname) || c.id,

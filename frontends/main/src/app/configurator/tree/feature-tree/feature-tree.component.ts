@@ -1,40 +1,29 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
-import {TreeNode} from '../tree-node';
 import {LanguageService} from '../../services/language.service';
+import {BaseTreeComponent} from '../base-tree.component';
 
 @Component({
 	selector: 'app-feature-tree',
 	standalone: true,
 	imports: [CommonModule, MatIconModule],
-	templateUrl: './feature-tree.component.html',
+	templateUrl: '../simple-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class FeatureTreeComponent implements OnChanges {
-	@Input() projectId = '';
+export class FeatureTreeComponent extends BaseTreeComponent {
 	@Input() features: any[] = [];
-	@Input() expanded = false;
 	@Input() selectedFeatureId: string | null = null;
-	@Output() categoryClicked = new EventEmitter<void>();
 
-	treeNodes: TreeNode[] = [];
-
-	constructor(private languageService: LanguageService) {}
-
-	ngOnChanges(): void {
-		this.buildTree();
+	constructor(languageService: LanguageService) {
+		super(languageService);
 	}
 
-	onCategoryClick(): void {
-		this.categoryClicked.emit();
-	}
+	getCategoryIcon(): string {return 'stars';}
+	getCategoryLabel(): string {return 'Features';}
+	getCategoryTheme(): string {return 'theme-feature';}
 
-	private buildTree(): void {
-		if(!this.features.length) {
-			return;
-		}
-
+	protected buildTree(): void {
 		this.treeNodes = this.features.map(f => ({
 			id: `feature-${f.featureId}`,
 			label: this.languageService.getDefaultTranslation(f.shortname) || f.id,

@@ -1,8 +1,9 @@
-import {Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../services/language.service';
 import {TreeNode} from '../tree-node';
+import {BaseTreeComponent} from '../base-tree.component';
 
 @Component({
 	selector: 'app-dataset-models-tree',
@@ -11,28 +12,21 @@ import {TreeNode} from '../tree-node';
 	templateUrl: './dataset-models-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class DatasetModelsTreeComponent implements OnChanges {
-	@Input() projectId = '';
+export class DatasetModelsTreeComponent extends BaseTreeComponent {
 	@Input() datasetModels: any[] = [];
-	@Input() expanded = false;
 	@Input() fieldModels: any[] = [];
 	@Input() selectedDatasetModelId: string | null = null;
 	@Input() selectedFieldModelId: string | null = null;
-	@Output() categoryClicked = new EventEmitter<void>();
 
-	treeNodes: TreeNode[] = [];
-
-	constructor(private languageService: LanguageService) {}
-
-	ngOnChanges(): void {
-		this.buildTree();
+	constructor(languageService: LanguageService) {
+		super(languageService);
 	}
 
-	onCategoryClick(): void {
-		this.categoryClicked.emit();
-	}
+	getCategoryIcon(): string {return 'table_chart';}
+	getCategoryLabel(): string {return 'Dataset Models';}
+	getCategoryTheme(): string {return 'theme-dataset-model';}
 
-	private buildTree(): void {
+	protected buildTree(): void {
 		if(!this.datasetModels.length) {
 			return;
 		}
