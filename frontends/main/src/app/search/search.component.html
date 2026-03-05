@@ -163,7 +163,11 @@
 				mat-row
 				[class.clickable]="true"
 				[class.removed]="result.scope.removed"
+				tabindex="0"
+				role="link"
 				(click)="navigateToScope(result.scope.pk)"
+				(keydown.enter)="navigateToScope(result.scope.pk)"
+				(keydown.space)="navigateToScope(result.scope.pk); $event.preventDefault()"
 				*matRowDef="let result; columns: columnsToDisplay"></tr>
 		</form>
 	</table>
