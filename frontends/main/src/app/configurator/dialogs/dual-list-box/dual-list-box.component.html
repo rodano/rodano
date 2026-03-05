@@ -1,0 +1,44 @@
+<div class="form-section">
+	@if (title) {
+		<h3>{{ title }}</h3>
+	}
+	@if (hint) {
+		<p class="hint">{{ hint }}</p>
+	}
+
+	<div class="dual-list-container">
+		<div class="list-box">
+			<div class="box-label">Available</div>
+			<div class="list-items">
+				@if (available.length === 0) {
+					<div class="empty-placeholder">{{ availablePlaceholder }}</div>
+				}
+				@for (item of available; track trackFn ? trackFn(item) : $index) {
+					<div class="list-item" (click)="add.emit(item)">
+						<div class="item-text">
+							<span>{{ labelFn(item) }}</span>
+						</div>
+						<mat-icon class="action-icon">add_circle_outline</mat-icon>
+					</div>
+				}
+			</div>
+		</div>
+
+		<div class="list-box selected">
+			<div class="box-label">Selected</div>
+			<div class="list-items">
+				@if (selected.length === 0) {
+					<div class="empty-placeholder">{{ selectedPlaceholder }}</div>
+				}
+				@for (item of selected; track trackFn ? trackFn(item) : $index) {
+					<div class="list-item" (click)="remove.emit(item)">
+						<div class="item-text">
+							<span>{{ labelFn(item) }}</span>
+						</div>
+						<mat-icon class="action-icon">remove_circle_outline</mat-icon>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+</div>

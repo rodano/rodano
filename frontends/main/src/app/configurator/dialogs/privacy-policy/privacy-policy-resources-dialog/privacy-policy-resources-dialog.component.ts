@@ -8,6 +8,7 @@ import {LanguageService} from '../../../services/language.service';
 import {PrivacyPolicy} from '@core/model/privacy-policy';
 import {Profile} from '@core/model/profile';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface PrivacyPolicyResourcesDialogData {
 	privacyPolicy: PrivacyPolicy;
@@ -19,7 +20,7 @@ export interface PrivacyPolicyResourcesDialogData {
 	standalone: true,
 	templateUrl: './privacy-policy-resources-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule, DualListBoxComponent]
 })
 export class PrivacyPolicyResourcesDialogComponent extends BaseDialogComponent<PrivacyPolicyResourcesDialogData> implements OnInit {
 	availableProfiles: Profile[] = [];

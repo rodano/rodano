@@ -9,6 +9,7 @@ import {LanguageService} from '../../../services/language.service';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface ChartWorkflowStatusDialogData {
 	chart: ChartModel;
@@ -21,7 +22,7 @@ export interface ChartWorkflowStatusDialogData {
 	standalone: true,
 	templateUrl: './chart-workflow-status-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatIconModule, MatSelectModule]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatIconModule, MatSelectModule, DualListBoxComponent]
 })
 export class ChartWorkflowStatusDialogComponent extends BaseDialogComponent<ChartWorkflowStatusDialogData> implements OnInit {
 	form: FormGroup;

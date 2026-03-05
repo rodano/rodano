@@ -6,6 +6,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../../services/language.service';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface EventModelRelationshipsDialogData {
 	eventModel: EventModel;
@@ -17,7 +18,7 @@ export interface EventModelRelationshipsDialogData {
 	standalone: true,
 	templateUrl: './event-model-relationships-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, DualListBoxComponent]
 })
 export class EventModelRelationshipsDialogComponent extends BaseDialogComponent<EventModelRelationshipsDialogData> implements OnInit {
 	availableBlockedEventModels: EventModel[] = [];

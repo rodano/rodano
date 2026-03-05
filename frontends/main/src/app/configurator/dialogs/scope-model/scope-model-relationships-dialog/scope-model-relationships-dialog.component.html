@@ -4,52 +4,23 @@
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
 
-			<div class="form-field">
-				<label>Parent Scope Models</label>
-				<div class="dual-list-container">
-					<div class="list-box">
-						<span class="box-label">Available Models</span>
-						<div class="list-items">
-							@for (parent of availableParents; track parent.scopeModelId) {
-								@if (!isParentSelected(parent.scopeModelId)) {
-									<div class="list-item" (click)="toggleParent(parent.scopeModelId)">
-										<span class="item-text">
-											{{ languageService.getLabel(parent) }}
-										</span>
-										<mat-icon class="action-icon">add_circle_outline</mat-icon>
-									</div>
-								}
-							}
-						</div>
-					</div>
-
-					<div class="list-box selected">
-						<span class="box-label">Selected Parents</span>
-						<div class="list-items">
-							@if (form.get('parentIds')?.value?.length === 0) {
-								<div class="empty-placeholder">Root Level (None)</div>
-							}
-							@for (parent of availableParents; track parent.scopeModelId) {
-								@if (isParentSelected(parent.scopeModelId)) {
-									<div class="list-item" (click)="toggleParent(parent.scopeModelId)">
-										<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-										<span class="item-text">
-											{{ languageService.getLabel(parent) }}
-										</span>
-									</div>
-								}
-							}
-						</div>
-					</div>
-				</div>
-				<span class="hint">Click a model to move it between lists.</span>
-			</div>
+			<app-dual-list-box
+				title="Parent Scope Models"
+				hint="Click a model to move it between lists."
+				[available]="availableParents"
+				[selected]="selectedParents"
+				[labelFn]="languageService.getLabel.bind(languageService)"
+				availablePlaceholder="No available models"
+				selectedPlaceholder="Root Level (None)"
+				(add)="onAddParent($event)"
+				(remove)="onRemoveParent($event)">
+			</app-dual-list-box>
 
 			<div class="form-field">
 				<label>Default Parent</label>
 				<mat-select formControlName="defaultParentId" placeholder="Select default parent">
 					<mat-option [value]="''">None</mat-option>
-					@for (parent of getSelectedParents(); track parent.scopeModelId) {
+					@for (parent of selectedParents; track parent.scopeModelId) {
 						<mat-option [value]="parent.scopeModelId">
 							{{ languageService.getLabel(parent) }}
 						</mat-option>

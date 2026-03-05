@@ -8,6 +8,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {LanguageService} from '../../../services/language.service';
 import {MatSelectModule} from '@angular/material/select';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface EventModelSchedulingDialogData {
 	eventModel: EventModel;
@@ -19,7 +20,7 @@ export interface EventModelSchedulingDialogData {
 	standalone: true,
 	templateUrl: './event-model-scheduling-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule, MatSelectModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule, MatSelectModule, DualListBoxComponent]
 })
 export class EventModelSchedulingDialogComponent extends BaseDialogComponent<EventModelSchedulingDialogData> implements OnInit {
 	form: FormGroup;

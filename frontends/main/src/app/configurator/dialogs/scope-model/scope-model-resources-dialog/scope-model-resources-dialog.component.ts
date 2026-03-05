@@ -11,6 +11,7 @@ import {DatasetModel} from '@core/model/dataset-model';
 import {Workflow} from '@core/model/workflow';
 import {LanguageService} from '../../../services/language.service';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 interface WorkflowStateSelector {
 	id: string;
@@ -37,7 +38,7 @@ export interface ScopeModelResourcesDialogData {
 	standalone: true,
 	templateUrl: './scope-model-resources-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule, DualListBoxComponent]
 })
 export class ScopeModelResourcesDialogComponent extends BaseDialogComponent<ScopeModelResourcesDialogData> implements OnInit {
 	availableFormModels: FormModel[] = [];

@@ -1,83 +1,29 @@
 <h2 class="dialog-title">Edit Event Relationships</h2>
 
 <div class="dialog-content">
-	<div class="form-section">
-		<h3>Blocked Event Models</h3>
-		<p class="hint">Event models that cannot be created when this event exists</p>
+	<app-dual-list-box
+		title="Blocked Event Models"
+		hint="Event models that cannot be created when this event exists"
+		[available]="availableBlockedEventModels"
+		[selected]="selectedBlockedEventModels"
+		[labelFn]="languageService.getLabel.bind(languageService)"
+		availablePlaceholder="No available event models"
+		selectedPlaceholder="No event models selected"
+		(add)="addBlockedEventModel($event)"
+		(remove)="removeBlockedEventModel($event)">
+	</app-dual-list-box>
 
-		<div class="dual-list-container">
-			<div class="list-box">
-				<div class="box-label">Available Event Models</div>
-				<div class="list-items">
-					@if (availableBlockedEventModels.length === 0) {
-						<div class="empty-placeholder">No available event models</div>
-					} @else {
-						@for (eventModel of availableBlockedEventModels; track eventModel.eventModelId) {
-							<div class="list-item" (click)="addBlockedEventModel(eventModel)">
-								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
-								<mat-icon class="action-icon">add_circle_outline</mat-icon>
-							</div>
-						}
-					}
-				</div>
-			</div>
-
-			<div class="list-box selected">
-				<div class="box-label">Selected Event Models</div>
-				<div class="list-items">
-					@if (selectedBlockedEventModels.length === 0) {
-						<div class="empty-placeholder">No blocked event models</div>
-					} @else {
-						@for (eventModel of selectedBlockedEventModels; track eventModel.eventModelId) {
-							<div class="list-item" (click)="removeBlockedEventModel(eventModel)">
-								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
-								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-							</div>
-						}
-					}
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="form-section">
-		<h3>Implied Event Models</h3>
-		<p class="hint">Event models that must be created when this event is created</p>
-
-		<div class="dual-list-container">
-			<div class="list-box">
-				<div class="box-label">Available Event Models</div>
-				<div class="list-items">
-					@if (availableImpliedEventModels.length === 0) {
-						<div class="empty-placeholder">No available event models</div>
-					} @else {
-						@for (eventModel of availableImpliedEventModels; track eventModel.eventModelId) {
-							<div class="list-item" (click)="addImpliedEventModel(eventModel)">
-								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
-								<mat-icon class="action-icon">add_circle_outline</mat-icon>
-							</div>
-						}
-					}
-				</div>
-			</div>
-
-			<div class="list-box selected">
-				<div class="box-label">Selected Event Models</div>
-				<div class="list-items">
-					@if (selectedImpliedEventModels.length === 0) {
-						<div class="empty-placeholder">No implied event models</div>
-					} @else {
-						@for (eventModel of selectedImpliedEventModels; track eventModel.eventModelId) {
-							<div class="list-item" (click)="removeImpliedEventModel(eventModel)">
-								<span class="item-text">{{ languageService.getLabel(eventModel) }}</span>
-								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-							</div>
-						}
-					}
-				</div>
-			</div>
-		</div>
-	</div>
+	<app-dual-list-box
+		title="Implied Event Models"
+		hint="Event models that must be created when this event is created"
+		[available]="availableImpliedEventModels"
+		[selected]="selectedImpliedEventModels"
+		[labelFn]="languageService.getLabel.bind(languageService)"
+		availablePlaceholder="No available event models"
+		selectedPlaceholder="No event models selected"
+		(add)="addImpliedEventModel($event)"
+		(remove)="removeImpliedEventModel($event)">
+	</app-dual-list-box>
 </div>
 
 <div class="dialog-actions">

@@ -17,81 +17,29 @@
 		</form>
 
 		@if (form.value.workflowId) {
-			<div class="form-section">
-				<h3>Included States</h3>
-				<div class="dual-list-container">
-					<div class="list-box">
-						<div class="box-label">Available</div>
-						<div class="list-items">
-							@if (includedAvailable.length === 0) {
-								<div class="empty-placeholder">No available states</div>
-							}
-							@for (state of includedAvailable; track state.workflowStateId) {
-								<div class="list-item" (click)="addIncluded(state)">
-									<div class="item-text">
-										<span>{{ languageService.getLabel(state) }}</span>
-									</div>
-									<mat-icon class="action-icon">add_circle_outline</mat-icon>
-								</div>
-							}
-						</div>
-					</div>
-					<div class="list-box selected">
-						<div class="box-label">Selected</div>
-						<div class="list-items">
-							@if (includedSelected.length === 0) {
-								<div class="empty-placeholder">None selected</div>
-							}
-							@for (state of includedSelected; track state.workflowStateId) {
-								<div class="list-item" (click)="removeIncluded(state)">
-									<div class="item-text">
-										<span>{{ languageService.getLabel(state) }}</span>
-									</div>
-									<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-								</div>
-							}
-						</div>
-					</div>
-				</div>
-			</div>
+			<app-dual-list-box
+				title="Included States"
+				hint="Select which workflow states are included in this chart"
+				[available]="includedAvailable"
+				[selected]="includedSelected"
+				[labelFn]="languageService.getLabel.bind(languageService)"
+				availablePlaceholder="No available workflow states"
+				selectedPlaceholder="No workflow states selected"
+				(add)="addIncluded($event)"
+				(remove)="removeIncluded($event)">
+			</app-dual-list-box>
 
-			<div class="form-section">
-				<h3>Excluded States</h3>
-				<div class="dual-list-container">
-					<div class="list-box">
-						<div class="box-label">Available</div>
-						<div class="list-items">
-							@if (excludedAvailable.length === 0) {
-								<div class="empty-placeholder">No available states</div>
-							}
-							@for (state of excludedAvailable; track state.workflowStateId) {
-								<div class="list-item" (click)="addExcluded(state)">
-									<div class="item-text">
-										<span>{{ languageService.getLabel(state) }}</span>
-									</div>
-									<mat-icon class="action-icon">add_circle_outline</mat-icon>
-								</div>
-							}
-						</div>
-					</div>
-					<div class="list-box selected">
-						<div class="box-label">Selected</div>
-						<div class="list-items">
-							@if (excludedSelected.length === 0) {
-								<div class="empty-placeholder">None selected</div>
-							}
-							@for (state of excludedSelected; track state.workflowStateId) {
-								<div class="list-item" (click)="removeExcluded(state)">
-									<div class="item-text">
-										<span>{{ languageService.getLabel(state) }}</span>
-									</div>
-									<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-								</div>
-							}
-						</div>
-					</div>
-				</div>
-			</div>
+			<app-dual-list-box
+				title="Excluded States"
+				hint="Select which workflow states are excluded from this chart"
+				[available]="excludedAvailable"
+				[selected]="excludedSelected"
+				[labelFn]="languageService.getLabel.bind(languageService)"
+				availablePlaceholder="No available workflow states"
+				selectedPlaceholder="No workflow states selected"
+				(add)="addExcluded($event)"
+				(remove)="removeExcluded($event)">
+			</app-dual-list-box>
 		}
 	</div>
 

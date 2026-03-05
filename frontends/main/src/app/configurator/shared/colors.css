@@ -138,6 +138,12 @@
 	color: #ffffff;
 }
 
+.status-badge.default {
+	background-color: rgba(91, 212, 212, 0.12);
+	color: #5bd4d4;
+	border: 1px solid #5bd4d4;
+}
+
 .status-badge.first {
 	background-color: #dcfce7;
 	color: #166534;

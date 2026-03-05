@@ -1,129 +1,41 @@
 <h2 class="dialog-title">Edit Associated Resources</h2>
 
 <div class="dialog-content">
-	<div class="form-section">
-		<h3>Form Models</h3>
-		<p class="hint">Select which forms should be associated with this event</p>
+	<app-dual-list-box
+		title="Form Models"
+		hint="Select which forms should be associated with this event"
+		[available]="availableFormModels"
+		[selected]="selectedFormModels"
+		[labelFn]="languageService.getLabel.bind(languageService)"
+		availablePlaceholder="No available form models"
+		selectedPlaceholder="No form models selected"
+		(add)="addFormModel($event)"
+		(remove)="removeFormModel($event)">
+	</app-dual-list-box>
 
-		<div class="dual-list-container">
-			<div class="list-box">
-				<div class="box-label">Available</div>
-				<div class="list-items">
-					@if (availableFormModels.length === 0) {
-						<div class="empty-placeholder">No available form models</div>
-					}
-					@for (formModel of availableFormModels; track formModel.formModelId) {
-						<div class="list-item" (click)="addFormModel(formModel)">
-							<div class="item-text">
-								<span>{{ languageService.getLabel(formModel) }}</span>
-							</div>
-							<mat-icon class="action-icon">add_circle_outline</mat-icon>
-						</div>
-					}
-				</div>
-			</div>
+	<app-dual-list-box
+		title="Dataset Models"
+		hint="Select which datasets should be associated with this event"
+		[available]="availableDatasetModels"
+		[selected]="selectedDatasetModels"
+		[labelFn]="languageService.getLabel.bind(languageService)"
+		availablePlaceholder="No available dataset models"
+		selectedPlaceholder="No dataset models selected"
+		(add)="addDatasetModel($event)"
+		(remove)="removeDatasetModel($event)">
+	</app-dual-list-box>
 
-			<div class="list-box selected">
-				<div class="box-label">Selected</div>
-				<div class="list-items">
-					@if (selectedFormModels.length === 0) {
-						<div class="empty-placeholder">No form models selected</div>
-					}
-					@for (formModel of selectedFormModels; track formModel.formModelId) {
-						<div class="list-item" (click)="removeFormModel(formModel)">
-							<div class="item-text">
-								<span>{{ languageService.getLabel(formModel) }}</span>
-							</div>
-							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-						</div>
-					}
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="form-section">
-		<h3>Dataset Models</h3>
-		<p class="hint">Select which datasets should be associated with this event</p>
-
-		<div class="dual-list-container">
-			<div class="list-box">
-				<div class="box-label">Available</div>
-				<div class="list-items">
-					@if (availableDatasetModels.length === 0) {
-						<div class="empty-placeholder">No available dataset models</div>
-					}
-					@for (datasetModel of availableDatasetModels; track datasetModel.datasetModelId) {
-						<div class="list-item" (click)="addDatasetModel(datasetModel)">
-							<div class="item-text">
-								<span>{{ languageService.getLabel(datasetModel) }}</span>
-							</div>
-							<mat-icon class="action-icon">add_circle_outline</mat-icon>
-						</div>
-					}
-				</div>
-			</div>
-
-			<div class="list-box selected">
-				<div class="box-label">Selected</div>
-				<div class="list-items">
-					@if (selectedDatasetModels.length === 0) {
-						<div class="empty-placeholder">No dataset models selected</div>
-					}
-					@for (datasetModel of selectedDatasetModels; track datasetModel.datasetModelId) {
-						<div class="list-item" (click)="removeDatasetModel(datasetModel)">
-							<div class="item-text">
-								<span>{{ languageService.getLabel(datasetModel) }}</span>
-							</div>
-							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-						</div>
-					}
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!-- Workflows Section -->
-	<div class="form-section">
-		<h3>Workflows</h3>
-		<p class="hint">Select which workflows should be associated with this event</p>
-
-		<div class="dual-list-container">
-			<div class="list-box">
-				<div class="box-label">Available</div>
-				<div class="list-items">
-					@if (availableWorkflows.length === 0) {
-						<div class="empty-placeholder">No available workflows</div>
-					}
-					@for (workflow of availableWorkflows; track workflow.workflowId) {
-						<div class="list-item" (click)="addWorkflow(workflow)">
-							<div class="item-text">
-								<span>{{ languageService.getLabel(workflow) }}</span>
-							</div>
-							<mat-icon class="action-icon">add_circle_outline</mat-icon>
-						</div>
-					}
-				</div>
-			</div>
-
-			<div class="list-box selected">
-				<div class="box-label">Selected</div>
-				<div class="list-items">
-					@if (selectedWorkflows.length === 0) {
-						<div class="empty-placeholder">No workflows selected</div>
-					}
-					@for (workflow of selectedWorkflows; track workflow.workflowId) {
-						<div class="list-item" (click)="removeWorkflow(workflow)">
-							<div class="item-text">
-								<span>{{ languageService.getLabel(workflow) }}</span>
-							</div>
-							<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-						</div>
-					}
-				</div>
-			</div>
-		</div>
-	</div>
+	<app-dual-list-box
+		title="Workflows"
+		hint="Select which workflows should be associated with this event"
+		[available]="availableWorkflows"
+		[selected]="selectedWorkflows"
+		[labelFn]="languageService.getLabel.bind(languageService)"
+		availablePlaceholder="No available workflows"
+		selectedPlaceholder="No workflows selected"
+		(add)="addWorkflow($event)"
+		(remove)="removeWorkflow($event)">
+	</app-dual-list-box>
 </div>
 
 <div class="dialog-actions">

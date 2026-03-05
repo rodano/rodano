@@ -8,6 +8,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {LanguageService} from '../../../services/language.service';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface WorkflowStateActionDialogData {
 	workflowState: WorkflowState;
@@ -19,7 +20,7 @@ export interface WorkflowStateActionDialogData {
 	standalone: true,
 	templateUrl: './workflow-state-action-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule, DualListBoxComponent]
 })
 export class WorkflowStateActionDialogComponent extends BaseDialogComponent<WorkflowStateActionDialogData> implements OnInit {
 	availableWorkflowActions: WorkflowAction[] = [];

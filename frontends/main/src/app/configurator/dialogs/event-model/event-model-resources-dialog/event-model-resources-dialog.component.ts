@@ -9,6 +9,7 @@ import {DatasetModel} from '@core/model/dataset-model';
 import {Workflow} from '@core/model/workflow';
 import {FormModel} from '@core/model/form-model';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface EventModelResourcesDialogData {
 	eventModel: EventModel;
@@ -22,7 +23,7 @@ export interface EventModelResourcesDialogData {
 	standalone: true,
 	templateUrl: './event-model-resources-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, DualListBoxComponent]
 })
 export class EventModelResourcesDialogComponent extends BaseDialogComponent<EventModelResourcesDialogData> implements OnInit {
 	availableFormModels: FormModel[] = [];

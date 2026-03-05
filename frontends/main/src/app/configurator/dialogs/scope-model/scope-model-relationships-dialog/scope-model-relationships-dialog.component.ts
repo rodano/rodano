@@ -11,6 +11,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../../services/language.service';
 import {ScopeModelManagerService} from '../../../services/manager/scope-model-manager.service';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 interface DialogData {
 	projectId: string;
@@ -23,11 +24,12 @@ interface DialogData {
 	templateUrl: './scope-model-relationships-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
-		MatSelectModule, MatIconModule]
+		MatSelectModule, MatIconModule, DualListBoxComponent]
 })
 export class ScopeModelRelationshipsDialogComponent extends BaseDialogComponent<DialogData> implements OnInit {
 	form: FormGroup;
 	availableParents: ScopeModel[] = [];
+	selectedParents: ScopeModel[] = [];
 
 	constructor(
 		public languageService: LanguageService,
@@ -40,51 +42,36 @@ export class ScopeModelRelationshipsDialogComponent extends BaseDialogComponent<
 	}
 
 	ngOnInit(): void {
-		this.availableParents = this.scopeModelManager.getAll().filter(
+		const all = this.scopeModelManager.getAll().filter(
 			sm => sm.scopeModelId !== this.data.scopeModel.scopeModelId
 		);
+		const selectedIds = this.data.scopeModel.parentIds || [];
+		this.selectedParents = all.filter(sm => selectedIds.includes(sm.scopeModelId));
+		this.availableParents = all.filter(sm => !selectedIds.includes(sm.scopeModelId));
+
 		this.form = this.fb.group({
 			parentIds: [this.data.scopeModel.parentIds || []],
 			defaultParentId: [this.data.scopeModel.defaultParentId || '']
 		});
 	}
 
-	toggleParent(parentId: string): void {
-		const currentIds: string[] = [...this.form.get('parentIds')?.value];
-		const index = currentIds.indexOf(parentId);
-
-		if(index > -1) {
-			currentIds.splice(index, 1);
-			if(this.form.get('defaultParentId')?.value === parentId) {
-				this.form.patchValue({defaultParentId: ''});
-			}
-		}
-		else {
-			currentIds.push(parentId);
-		}
-
-		this.form.patchValue({parentIds: currentIds});
+	onAddParent(parent: ScopeModel): void {
+		this.availableParents = this.availableParents.filter(p => p.scopeModelId !== parent.scopeModelId);
+		this.selectedParents = [...this.selectedParents, parent];
 	}
 
-	isParentSelected(parentId: string): boolean {
-		return (this.form.get('parentIds')?.value || []).includes(parentId);
-	}
-
-	getSelectedParents(): ScopeModel[] {
-		const selectedIds = this.form.get('parentIds')?.value || [];
-		return this.availableParents.filter(p => selectedIds.includes(p.scopeModelId));
+	onRemoveParent(parent: ScopeModel): void {
+		this.selectedParents = this.selectedParents.filter(p => p.scopeModelId !== parent.scopeModelId);
+		this.availableParents = [...this.availableParents, parent];
+		if(this.form.get('defaultParentId')?.value === parent.scopeModelId) {
+			this.form.patchValue({defaultParentId: ''});
+		}
 	}
 
 	onSave(): void {
-		const formValue = this.form.getRawValue();
-		const result = {
-			parentIds: formValue.parentIds || [],
-			defaultParentId: formValue.defaultParentId || ''
-		};
-		this.dialogRef.close(result);
-	}
-
-	getTranslatedName(translations: Record<string, string> | undefined): string {
-		return this.languageService.getDefaultTranslation(translations) || '';
+		this.dialogRef.close({
+			parentIds: this.selectedParents.map(p => p.scopeModelId),
+			defaultParentId: this.form.getRawValue().defaultParentId || ''
+		});
 	}
 }

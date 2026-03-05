@@ -8,6 +8,7 @@ import {LanguageService} from '../../../services/language.service';
 import {Report} from '@core/model/report';
 import {FieldModel} from '@core/model/field-model';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface ReportResourcesDialogData {
 	report: Report;
@@ -19,7 +20,7 @@ export interface ReportResourcesDialogData {
 	standalone: true,
 	templateUrl: './report-resources-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule, DualListBoxComponent]
 })
 export class ReportResourcesDialogComponent extends BaseDialogComponent<ReportResourcesDialogData> implements OnInit {
 	availableFieldModels: FieldModel[] = [];

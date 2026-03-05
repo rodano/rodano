@@ -8,6 +8,7 @@ import {Validator} from '@core/model/validator';
 import {Workflow} from '@core/model/workflow';
 import {LanguageService} from '../../../services/language.service';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface FieldModelResourcesDialogData {
 	fieldModel: FieldModel;
@@ -20,7 +21,7 @@ export interface FieldModelResourcesDialogData {
 	standalone: true,
 	templateUrl: './field-model-resources-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, DualListBoxComponent]
 })
 export class FieldModelResourcesDialogComponent extends BaseDialogComponent<FieldModelResourcesDialogData> implements OnInit {
 	availableValidators: Validator[] = [];

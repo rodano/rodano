@@ -38,46 +38,17 @@
 			</div>
 		</div>
 
-		<div class="form-section">
-			<h3>Reference Events</h3>
-			<p class="hint">Select which events this deadline is calculated from</p>
-
-			<div class="dual-list-container">
-				<div class="list-box">
-					<div class="box-label">Available</div>
-					<div class="list-items">
-						@if (availableEventModels.length === 0) {
-							<div class="empty-placeholder">No available event models</div>
-						}
-						@for (eventModel of availableEventModels; track eventModel.eventModelId) {
-							<div class="list-item" (click)="onAddEventModel(eventModel)">
-								<div class="item-text">
-									<span>{{ languageService.getLabel(eventModel) }}</span>
-								</div>
-								<mat-icon class="action-icon">add_circle_outline</mat-icon>
-							</div>
-						}
-					</div>
-				</div>
-
-				<div class="list-box selected">
-					<div class="box-label">Selected</div>
-					<div class="list-items">
-						@if (selectedEventModels.length === 0) {
-							<div class="empty-placeholder">No reference events selected</div>
-						}
-						@for (eventModel of selectedEventModels; track eventModel.eventModelId) {
-							<div class="list-item" (click)="onRemoveEventModel(eventModel)">
-								<div class="item-text">
-									<span>{{ languageService.getLabel(eventModel) }}</span>
-								</div>
-								<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-							</div>
-						}
-					</div>
-				</div>
-			</div>
-		</div>
+		<app-dual-list-box
+			title="Reference Events"
+			hint="Select which events this deadline is calculated from"
+			[available]="availableEventModels"
+			[selected]="selectedEventModels"
+			[labelFn]="languageService.getLabel.bind(languageService)"
+			availablePlaceholder="No available event models"
+			selectedPlaceholder="No event models selected"
+			(add)="onAddEventModel($event)"
+			(remove)="onRemoveEventModel($event)">
+		</app-dual-list-box>
 
 		<div class="form-section">
 			<h3>Interval</h3>
