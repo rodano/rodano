@@ -4,6 +4,24 @@
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
 
+			<div class="form-field">
+				<mat-checkbox formControlName="overrideUserRights">Override User Rights</mat-checkbox>
+				<span class="hint">Allow all users to view this chart regardless of their rights</span>
+			</div>
+
+			@if (showLeafScopeModel) {
+				<div class="form-field">
+					<label>Leaf Scope Model</label>
+					<mat-select formControlName="leafScopeModelId">
+						<mat-option [value]="null">None</mat-option>
+						@for (sm of data.availableScopeModels; track sm.scopeModelId) {
+							<mat-option [value]="sm.scopeModelId">{{ languageService.getLabel(sm) }}</mat-option>
+						}
+					</mat-select>
+					<span class="hint">Optional leaf scope model for this chart</span>
+				</div>
+			}
+
 			<div class="form-section">
 				<h3>Translations</h3>
 
@@ -57,29 +75,6 @@
 					</mat-tab-group>
 				}
 			</div>
-
-			<div class="form-section">
-				<h3>Options</h3>
-
-				<div class="form-field checkbox-field">
-					<mat-checkbox formControlName="overrideUserRights">Override User Rights</mat-checkbox>
-					<span class="hint">Allow all users to view this chart regardless of their rights</span>
-				</div>
-
-				@if (showLeafScopeModel) {
-					<div class="form-field">
-						<label>Leaf Scope Model</label>
-						<mat-select formControlName="leafScopeModelId">
-							<mat-option [value]="null">None</mat-option>
-							@for (sm of data.availableScopeModels; track sm.scopeModelId) {
-								<mat-option [value]="sm.scopeModelId">{{ languageService.getLabel(sm) }}</mat-option>
-							}
-						</mat-select>
-						<span class="hint">Optional leaf scope model for this chart</span>
-					</div>
-				}
-			</div>
-
 		</form>
 	</div>
 

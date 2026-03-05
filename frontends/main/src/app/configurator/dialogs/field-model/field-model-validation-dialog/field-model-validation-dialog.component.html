@@ -10,54 +10,46 @@
 		} @else {
 			<form [formGroup]="form" class="settings-form">
 				@if (showStringValidation()) {
+					<div class="form-field">
+						<label>Max. Length</label>
+						<input type="number" formControlName="maxLength" placeholder="255">
+						<span class="hint">Maximum number of characters</span>
+					</div>
+
+					<div class="form-field">
+						<label>Matcher (Regex)</label>
+						<input type="text" formControlName="matcher" placeholder="^[A-Z0-9]+$">
+						<span class="hint">Regular expression for validation</span>
+					</div>
+
 					<div class="form-section">
-						<h3>Validation</h3>
-
-						<div class="form-field">
-							<label>Max. Length</label>
-							<input type="number" formControlName="maxLength" placeholder="255">
-							<span class="hint">Maximum number of characters</span>
-						</div>
-
-						<div class="form-field">
-							<label>Matcher (Regex)</label>
-							<input type="text" formControlName="matcher" placeholder="^[A-Z0-9]+$">
-							<span class="hint">Regular expression for validation</span>
-						</div>
-
-						<div class="form-section">
-							<h4>Matcher Message</h4>
-							<mat-tab-group>
-								@for (lang of availableLanguages; track lang.languageCode) {
-									@if (lang.languageCode) {
-										<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-											<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-												<div class="form-field">
-													<label>Error Message</label>
-													<textarea
-														formControlName="matcherMessage"
-														placeholder="Please enter a valid value"
-														rows="2"></textarea>
-													<span class="hint">Message shown when validation fails</span>
-												</div>
+						<h3>Matcher Message</h3>
+						<mat-tab-group>
+							@for (lang of availableLanguages; track lang.languageCode) {
+								@if (lang.languageCode) {
+									<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+										<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+											<div class="form-field">
+												<label>Error Message</label>
+												<textarea
+													formControlName="matcherMessage"
+													placeholder="Please enter a valid value"
+													rows="2"></textarea>
+												<span class="hint">Message shown when validation fails</span>
 											</div>
-										</mat-tab>
-									}
+										</div>
+									</mat-tab>
 								}
-							</mat-tab-group>
-						</div>
+							}
+						</mat-tab-group>
 					</div>
 				}
 
 				@if (showTextAreaValidation()) {
-					<div class="form-section">
-						<h3>Validation</h3>
-
-						<div class="form-field">
-							<label>Max. Length</label>
-							<input type="number" formControlName="maxLength" placeholder="1000">
-							<span class="hint">For a file, max. length is the maximum length for the name of the file</span>
-						</div>
+					<div class="form-field">
+						<label>Max. Length</label>
+						<input type="number" formControlName="maxLength" placeholder="1000">
+						<span class="hint">For a file, max. length is the maximum length for the name of the file</span>
 					</div>
 				}
 
@@ -75,23 +67,17 @@
 						</div>
 					</div>
 
-					<div class="form-section">
-						<h3>Validation</h3>
-
-						<div class="form-row">
-							<div class="form-field">
-								<label>Min. Year</label>
-								<input type="number" formControlName="minYear" placeholder="1900">
-							</div>
-
-							<div class="form-field">
-								<label>Max. Year</label>
-								<input type="number" formControlName="maxYear" placeholder="2100">
-							</div>
-						</div>
-
-						<mat-checkbox formControlName="allowDateInFuture">Allow date in future</mat-checkbox>
+					<div class="form-field">
+						<label>Min. Year</label>
+						<input type="number" formControlName="minYear" placeholder="1900">
 					</div>
+
+					<div class="form-field">
+						<label>Max. Year</label>
+						<input type="number" formControlName="maxYear" placeholder="2100">
+					</div>
+
+					<mat-checkbox formControlName="allowDateInFuture">Allow date in future</mat-checkbox>
 				}
 
 				@if (showDateSelectValidation()) {
@@ -121,87 +107,69 @@
 						</div>
 					</div>
 
-					<div class="form-section">
-						<h3>Validation</h3>
-
-						<div class="form-row">
-							<div class="form-field">
-								<label>Min. Year</label>
-								<input type="number" formControlName="minYear" placeholder="1900">
-							</div>
-
-							<div class="form-field">
-								<label>Max. Year</label>
-								<input type="number" formControlName="maxYear" placeholder="2100">
-							</div>
-						</div>
-
-						<mat-checkbox formControlName="allowDateInFuture">Allow date in future</mat-checkbox>
+					<div class="form-field">
+						<label>Min. Year</label>
+						<input type="number" formControlName="minYear" placeholder="1900">
 					</div>
+
+					<div class="form-field">
+						<label>Max. Year</label>
+						<input type="number" formControlName="maxYear" placeholder="2100">
+					</div>
+
+					<mat-checkbox formControlName="allowDateInFuture">Allow date in future</mat-checkbox>
 				}
 
 				@if (showNumberValidation()) {
-					<div class="form-section">
-						<h3>Number Configuration</h3>
+					<div class="form-field">
+						<label>Max. Number of Integer Digits</label>
+						<input type="number" formControlName="maxIntegerDigits" placeholder="10">
+					</div>
 
-						<div class="form-row">
-							<div class="form-field">
-								<label>Max. Number of Integer Digits</label>
-								<input type="number" formControlName="maxIntegerDigits" placeholder="10">
-							</div>
+					<div class="form-field">
+						<label>Max. Number of Decimal Digits</label>
+						<input type="number" formControlName="maxDecimalDigits" placeholder="2">
+					</div>
 
-							<div class="form-field">
-								<label>Max. Number of Decimal Digits</label>
-								<input type="number" formControlName="maxDecimalDigits" placeholder="2">
-							</div>
-						</div>
+					<div class="form-field">
+						<label>Min. Value</label>
+						<input type="number" formControlName="minValue" placeholder="0">
+					</div>
+
+					<div class="form-field">
+						<label>Max. Value</label>
+						<input type="number" formControlName="maxValue" placeholder="999999">
+					</div>
+
+					<div class="form-field">
+						<label>Matcher (Regex)</label>
+						<input type="text" formControlName="matcher" placeholder="^[0-9]+$">
+						<span class="hint">Regular expression for validation</span>
+						@if (form.get('matcher')?.hasError('invalidRegex') && form.get('matcher')?.touched) {
+							<span class="error-message">Invalid regular expression syntax</span>
+						}
 					</div>
 
 					<div class="form-section">
-						<h3>Validation</h3>
-
-						<div class="form-row">
-							<div class="form-field">
-								<label>Min. Value</label>
-								<input type="number" formControlName="minValue" placeholder="0">
-							</div>
-
-							<div class="form-field">
-								<label>Max. Value</label>
-								<input type="number" formControlName="maxValue" placeholder="999999">
-							</div>
-						</div>
-
-						<div class="form-field">
-							<label>Matcher (Regex)</label>
-							<input type="text" formControlName="matcher" placeholder="^[0-9]+$">
-							<span class="hint">Regular expression for validation</span>
-							@if (form.get('matcher')?.hasError('invalidRegex') && form.get('matcher')?.touched) {
-								<span class="error-message">Invalid regular expression syntax</span>
-							}
-						</div>
-
-						<div class="form-section">
-							<h4>Matcher Message</h4>
-							<mat-tab-group>
-								@for (lang of availableLanguages; track lang.languageCode) {
-									@if (lang.languageCode) {
-										<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-											<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-												<div class="form-field">
-													<label>Error Message</label>
-													<textarea
-														formControlName="matcherMessage"
-														placeholder="Please enter a valid number"
-														rows="2"></textarea>
-													<span class="hint">Message shown when validation fails</span>
-												</div>
+						<h3>Matcher Message</h3>
+						<mat-tab-group>
+							@for (lang of availableLanguages; track lang.languageCode) {
+								@if (lang.languageCode) {
+									<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+										<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+											<div class="form-field">
+												<label>Error Message</label>
+												<textarea
+													formControlName="matcherMessage"
+													placeholder="Please enter a valid number"
+													rows="2"></textarea>
+												<span class="hint">Message shown when validation fails</span>
 											</div>
-										</mat-tab>
-									}
+										</div>
+									</mat-tab>
 								}
-							</mat-tab-group>
-						</div>
+							}
+						</mat-tab-group>
 					</div>
 				}
 			</form>

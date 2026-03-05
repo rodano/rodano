@@ -8,6 +8,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {ProfileManagerService} from '../../../services/manager/profile-manager.service';
 import {LanguageService} from '../../../services/language.service';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 export interface EproSettingsDialogData {
 	eproEnabled: boolean;
@@ -20,7 +21,7 @@ export interface EproSettingsDialogData {
 	standalone: true,
 	templateUrl: './project-settings-epro-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSlideToggleModule, MatSelectModule]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSlideToggleModule, MatSelectModule, MatCheckbox]
 })
 export class ProjectSettingsEproDialogComponent extends BaseDialogComponent<EproSettingsDialogData> {
 	form: FormGroup;

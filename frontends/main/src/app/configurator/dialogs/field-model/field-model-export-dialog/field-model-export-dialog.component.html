@@ -3,24 +3,20 @@
 
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
-			<div class="form-section">
-				<h3>Export and Use</h3>
+			<div class="form-field">
+				<mat-checkbox formControlName="exportable">Exportable</mat-checkbox>
+				<span class="hint">Include this field in data exports</span>
+			</div>
 
-				<div class="form-field">
-					<mat-checkbox formControlName="exportable">Exportable</mat-checkbox>
-					<span class="hint">Include this field in data exports</span>
-				</div>
+			<div class="form-field">
+				<label>Export Order</label>
+				<input type="number" formControlName="exportOrder" placeholder="10" min="0">
+				<span class="hint">Order in which this field appears in exports (lower numbers first)</span>
+			</div>
 
-				<div class="form-field">
-					<label>Export Order</label>
-					<input type="number" formControlName="exportOrder" placeholder="10" min="0">
-					<span class="hint">Order in which this field appears in exports (lower numbers first)</span>
-				</div>
-
-				<div class="form-field">
-					<mat-checkbox formControlName="searchable">Searchable</mat-checkbox>
-					<span class="hint">Can this field be searched</span>
-				</div>
+			<div class="form-field">
+				<mat-checkbox formControlName="searchable">Searchable</mat-checkbox>
+				<span class="hint">Can this field be searched</span>
 			</div>
 		</form>
 	</div>

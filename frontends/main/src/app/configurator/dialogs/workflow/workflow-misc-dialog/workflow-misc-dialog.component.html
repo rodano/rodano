@@ -4,6 +4,17 @@
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
 
+			<div class="form-field">
+				<label>Icon</label>
+				<div class="icon-input-row">
+					<input type="text" formControlName="icon" placeholder='e.g., "person", "medical_services"'>
+					@if (iconPreview) {
+						<mat-icon class="icon-preview">{{ iconPreview }}</mat-icon>
+					}
+				</div>
+				<span class="hint">Browse icons at <a href="https://fonts.google.com/icons" target="_blank">Material Icons</a></span>
+			</div>
+
 			<div class="form-section">
 				<h3>Message</h3>
 				@if (availableLanguages.length === 1) {
@@ -38,26 +49,6 @@
 					</mat-tab-group>
 				}
 			</div>
-
-			<div class="form-section">
-				<h3>Icon</h3>
-				<div class="form-field">
-					<label>Icon name</label>
-					<input
-						type="text"
-						formControlName="icon"
-						placeholder="e.g. domain, person, folder">
-					<span class="hint">Browse icons at <a href="https://fonts.google.com/icons"
-																																											target="_blank">Material Icons</a></span>
-				</div>
-				@if (iconPreview) {
-					<div class="dialog-icon">
-						<span class="hint">Preview</span>
-						<mat-icon>{{ iconPreview }}</mat-icon>
-					</div>
-				}
-			</div>
-
 		</form>
 	</div>
 

@@ -2,8 +2,8 @@
 
 <div class="dialog-content">
 	<form [formGroup]="form" class="settings-form">
-		<div class="form-section">
-			<h3>Available Patterns</h3>
+		<div class="form-field">
+			<label>Available Patterns</label>
 			<p class="hint">Click on a pattern to insert it into the label pattern field</p>
 
 			<div class="pattern-chips">
@@ -15,7 +15,7 @@
 			</div>
 		</div>
 
-		<div class="form-section">
+		<div class="form-field">
 			<h3>Label Pattern</h3>
 			<p class="hint">Define how event instances should be labeled. Use the patterns above or type your own text.</p>
 
@@ -26,22 +26,15 @@
 			</div>
 		</div>
 
-		<div class="form-section">
-			<h3>Icon</h3>
-			<p class="hint">Specify a Material Icon name to represent this event</p>
-
-			<div class="form-field">
-				<label>Icon</label>
-				<input type="text" formControlName="icon" placeholder='e.g., "event", "medical_services"'>
-				<span class="hint">Browse icons at <a href="https://fonts.google.com/icons"
-																																										target="_blank">Material Icons</a></span>
+		<div class="form-field">
+			<label>Icon</label>
+			<div class="icon-input-row">
+				<input type="text" formControlName="icon" placeholder='e.g., "person", "medical_services"'>
+				@if (iconPreview) {
+					<mat-icon class="icon-preview">{{ iconPreview }}</mat-icon>
+				}
 			</div>
-			@if (iconPreview) {
-				<div class="dialog-icon">
-					<span class="hint">Preview</span>
-					<mat-icon>{{ iconPreview }}</mat-icon>
-				</div>
-			}
+			<span class="hint">Browse icons at <a href="https://fonts.google.com/icons" target="_blank">Material Icons</a></span>
 		</div>
 	</form>
 </div>

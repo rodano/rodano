@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 export interface PasswordPoliciesDialogData {
 	passwordStrong: boolean;
@@ -17,7 +18,7 @@ export interface PasswordPoliciesDialogData {
 	standalone: true,
 	templateUrl: './project-settings-password-policies-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSlideToggleModule]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSlideToggleModule, MatCheckbox]
 })
 export class ProjectSettingsPasswordPoliciesDialogComponent extends BaseDialogComponent<PasswordPoliciesDialogData> {
 	form: FormGroup;

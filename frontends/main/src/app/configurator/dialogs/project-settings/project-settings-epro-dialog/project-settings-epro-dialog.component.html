@@ -3,13 +3,9 @@
 
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
+
 			<div class="form-field">
-				<label>ePRO Enabled</label>
-				<div class="toggle-wrapper">
-					<mat-slide-toggle formControlName="eproEnabled" color="primary">
-						{{ form.get('eproEnabled')?.value ? 'Enabled' : 'Disabled' }}
-					</mat-slide-toggle>
-				</div>
+				<mat-checkbox formControlName="eproEnabled">ePRO Enabled</mat-checkbox>
 				<span class="hint">Enable electronic Patient Reported Outcomes (ePRO) functionality for this project</span>
 			</div>
 

@@ -123,11 +123,6 @@ export class FieldModelPossibleValuesDialogComponent extends BaseDialogComponent
 			const array = this.possibleValuesArray;
 			const controls = array.controls.slice();
 
-			const currentSort = controls[index].get('sortOrder')?.value;
-			const previousSort = controls[index - 1].get('sortOrder')?.value;
-			controls[index].get('sortOrder')?.setValue(previousSort);
-			controls[index - 1].get('sortOrder')?.setValue(currentSort);
-
 			[controls[index - 1], controls[index]] = [controls[index], controls[index - 1]];
 
 			array.clear();
@@ -139,11 +134,6 @@ export class FieldModelPossibleValuesDialogComponent extends BaseDialogComponent
 		if(index < this.possibleValuesArray.length - 1) {
 			const array = this.possibleValuesArray;
 			const controls = array.controls.slice();
-
-			const currentSort = controls[index].get('sortOrder')?.value;
-			const nextSort = controls[index + 1].get('sortOrder')?.value;
-			controls[index].get('sortOrder')?.setValue(nextSort);
-			controls[index + 1].get('sortOrder')?.setValue(currentSort);
 
 			[controls[index], controls[index + 1]] = [controls[index + 1], controls[index]];
 
@@ -190,7 +180,7 @@ export class FieldModelPossibleValuesDialogComponent extends BaseDialogComponent
 
 		const formValue = this.form.getRawValue();
 
-		const possibleValues: PossibleValue[] = formValue.possibleValues.map((pv: any) => {
+		const possibleValues: PossibleValue[] = formValue.possibleValues.map((pv: any, index: number) => {
 			const shortname: Record<string, string> = {};
 			this.availableLanguages.forEach(lang => {
 				if(lang.languageCode) {
@@ -206,11 +196,12 @@ export class FieldModelPossibleValuesDialogComponent extends BaseDialogComponent
 				shortname,
 				exportLabel: pv.exportLabel,
 				specify: pv.specify,
-				sortOrder: pv.sortOrder
+				sortOrder: index
 			} as PossibleValue;
 		});
 
 		const result = {
+			...this.data.fieldModel,
 			dictionary: formValue.dictionary,
 			possibleValuesProvider: formValue.possibleValuesProvider,
 			possibleValuesProviderDescription: formValue.possibleValuesProviderDescription,

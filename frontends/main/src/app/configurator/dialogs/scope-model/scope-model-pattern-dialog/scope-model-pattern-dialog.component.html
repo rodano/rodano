@@ -2,8 +2,8 @@
 
 <div class="dialog-content">
 	<form [formGroup]="form" class="settings-form">
-		<div class="form-section">
-			<h3>Available Patterns</h3>
+		<div class="form-field">
+			<label>Available Patterns</label>
 			<p class="hint">Click on a pattern to insert it into the code format field</p>
 
 			<div class="pattern-chips">
@@ -15,15 +15,13 @@
 			</div>
 		</div>
 
-		<div class="form-section">
+
+		<div class="form-field">
 			<h3>Code Format</h3>
 			<p class="hint">Define how scope instances should be coded. Use the patterns above or type your own text.</p>
-
-			<div class="form-field">
-				<label>Code Format</label>
-				<input type="text" formControlName="scopeFormat" placeholder='e.g., "${parent}-${siblingsNumber:2}"'>
-				<span class="hint">Combine text with patterns to create dynamic scope codes</span>
-			</div>
+			<label>Code Format</label>
+			<input type="text" formControlName="scopeFormat" placeholder='e.g., "${parent}-${siblingsNumber:2}"'>
+			<span class="hint">Combine text with patterns to create dynamic scope codes</span>
 		</div>
 	</form>
 </div>

@@ -3,36 +3,32 @@
 
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
-			<div class="form-section">
-				<h3>Possible Values Configuration</h3>
+			<div class="form-field">
+				<label>Dictionary</label>
+				<input type="text" formControlName="dictionary" placeholder="names.txt">
+				<span class="hint">Dictionary file for autocomplete (used for AUTO_COMPLETION field type)</span>
+			</div>
 
-				<div class="form-field">
-					<label>Dictionary</label>
-					<input type="text" formControlName="dictionary" placeholder="names.txt">
-					<span class="hint">Dictionary file for autocomplete (used for AUTO_COMPLETION field type)</span>
-				</div>
+			<div class="form-field">
+				<label>Provider</label>
+				<input type="text" formControlName="possibleValuesProvider" placeholder="ProviderClassName">
+				<span class="hint">Java class name that provides dynamic possible values</span>
+			</div>
 
-				<div class="form-field">
-					<label>Provider</label>
-					<input type="text" formControlName="possibleValuesProvider" placeholder="ProviderClassName">
-					<span class="hint">Java class name that provides dynamic possible values</span>
-				</div>
-
-				<div class="form-field">
-					<label>Provider Description</label>
-					<textarea
-						formControlName="possibleValuesProviderDescription"
-						placeholder="Description of the provider"
-						rows="3"></textarea>
-					<span class="hint">Description of how the provider generates possible values</span>
-				</div>
+			<div class="form-field">
+				<label>Provider Description</label>
+				<textarea
+					formControlName="possibleValuesProviderDescription"
+					placeholder="Description of the provider"
+					rows="3"></textarea>
+				<span class="hint">Description of how the provider generates possible values</span>
 			</div>
 
 			@if (showPossibleValuesSection) {
-				<div class="form-section">
+				<div class="form-field">
 					<div class="section-header">
 						<h3>Possible Values</h3>
-						<button type="button" class="btn-add" (click)="addPossibleValue()">
+						<button type="button" class="btn-add-item" (click)="addPossibleValue()">
 							<mat-icon>add</mat-icon>
 							Add Possible Value
 						</button>
@@ -53,7 +49,7 @@
 											<mat-icon>delete</mat-icon>
 										</button>
 									</div>
-									<span class="pv-number">Value {{ pvGroup.get('sortOrder')?.value + 1 }}</span>
+									<span class="pv-number">Value {{ i + 1 }}</span>
 								</div>
 
 								<div class="pv-content">
@@ -104,7 +100,8 @@
 						}
 
 						@if (possibleValuesArray.length === 0) {
-							<div class="empty-state-small">
+							<div class="empty-state">
+								<mat-icon>list</mat-icon>
 								<p>No possible values defined. Click "Add Possible Value" to create one.</p>
 							</div>
 						}

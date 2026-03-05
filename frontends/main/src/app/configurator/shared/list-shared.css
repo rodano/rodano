@@ -270,9 +270,10 @@
 	display: none !important;
 }
 
-.content-container.level-2 .primary-card .card-selection-icon {
-	top: 2px;
-	right: 5px;
+.content-container.level-2 .primary-card .card-selection-icon,
+.content-container.level-2 .secondary-card .card-selection-icon {
+	top: 1px;
+	right: 3px;
 }
 
 .content-container.level-2 .primary-card .card-header {
@@ -336,6 +337,11 @@
 	border-width: 0 20px 20px 0;
 }
 
+.content-container.level-3 .first-child-card.selected::after,
+.content-container.level-3 .second-child-card.selected::after {
+	border-width: 0 30px 30px 0;
+}
+
 .content-container.level-3 .primary-card.create-card {
 	height: auto;
 	min-height: 60px;
@@ -366,8 +372,8 @@
 }
 
 .content-container.level-3 .secondary-card .card-selection-icon {
-	top: 2px;
-	right: 5px;
+	top: 1px;
+	right: 3px;
 }
 
 .content-container.level-3 .secondary-card .card-header {

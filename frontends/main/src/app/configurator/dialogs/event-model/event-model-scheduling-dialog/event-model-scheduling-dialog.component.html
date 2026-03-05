@@ -2,40 +2,38 @@
 
 <div class="dialog-content">
 	<form [formGroup]="form" class="settings-form">
-		<div class="form-section">
+
+		<div class="form-field">
 			<h3>Deadline</h3>
 			<p class="hint">Configure when this event should occur relative to reference events</p>
+			<label>Deadline Value</label>
+			<input type="number" formControlName="deadline" min="0" placeholder="Enter deadline value">
+			<span class="hint">Number of time units after reference event(s)</span>
+			@if (form.get('deadline')?.hasError('min')) {
+				<span class="error-message">Must be 0 or greater</span>
+			}
+		</div>
 
-			<div class="form-field">
-				<label>Deadline Value</label>
-				<input type="number" formControlName="deadline" min="0" placeholder="Enter deadline value">
-				<span class="hint">Number of time units after reference event(s)</span>
-				@if (form.get('deadline')?.hasError('min')) {
-					<span class="error-message">Must be 0 or greater</span>
+		<div class="form-field">
+			<label>Deadline Unit</label>
+			<mat-select formControlName="deadlineUnit" placeholder="Select deadline unit">
+				<mat-option value="">None</mat-option>
+				@for (unit of timeUnits; track unit.value) {
+					<mat-option [value]="unit.value">{{ unit.label }}</mat-option>
 				}
-			</div>
+			</mat-select>
+			<span class="hint">Time unit for deadline</span>
+		</div>
 
-			<div class="form-field">
-				<label>Deadline Unit</label>
-				<mat-select formControlName="deadlineUnit" placeholder="Select deadline unit">
-					<mat-option value="">None</mat-option>
-					@for (unit of timeUnits; track unit.value) {
-						<mat-option [value]="unit.value">{{ unit.label }}</mat-option>
-					}
-				</mat-select>
-				<span class="hint">Time unit for deadline</span>
-			</div>
-
-			<div class="form-field">
-				<label>Aggregation Function</label>
-				<mat-select formControlName="deadlineAggregationFunction" placeholder="Select aggregation function">
-					<mat-option value="">None</mat-option>
-					@for (func of aggregationFunctions; track func.value) {
-						<mat-option [value]="func.value">{{ func.label }}</mat-option>
-					}
-				</mat-select>
-				<span class="hint">How to calculate deadline when multiple reference events exist</span>
-			</div>
+		<div class="form-field">
+			<label>Aggregation Function</label>
+			<mat-select formControlName="deadlineAggregationFunction" placeholder="Select aggregation function">
+				<mat-option value="">None</mat-option>
+				@for (func of aggregationFunctions; track func.value) {
+					<mat-option [value]="func.value">{{ func.label }}</mat-option>
+				}
+			</mat-select>
+			<span class="hint">How to calculate deadline when multiple reference events exist</span>
 		</div>
 
 		<app-dual-list-box
@@ -50,29 +48,26 @@
 			(remove)="onRemoveEventModel($event)">
 		</app-dual-list-box>
 
-		<div class="form-section">
+		<div class="form-field">
 			<h3>Interval</h3>
 			<p class="hint">Configure how often this event can repeat</p>
+			<label>Interval Value</label>
+			<input type="number" formControlName="interval" min="0" placeholder="Enter interval value">
+			<span class="hint">Number of time units between occurrences</span>
+			@if (form.get('interval')?.hasError('min')) {
+				<span class="error-message">Must be 0 or greater</span>
+			}
+		</div>
 
-			<div class="form-field">
-				<label>Interval Value</label>
-				<input type="number" formControlName="interval" min="0" placeholder="Enter interval value">
-				<span class="hint">Number of time units between occurrences</span>
-				@if (form.get('interval')?.hasError('min')) {
-					<span class="error-message">Must be 0 or greater</span>
+		<div class="form-field">
+			<label>Interval Unit</label>
+			<mat-select formControlName="intervalUnit" placeholder="Select interval unit">
+				<mat-option value="">None</mat-option>
+				@for (unit of timeUnits; track unit.value) {
+					<mat-option [value]="unit.value">{{ unit.label }}</mat-option>
 				}
-			</div>
-
-			<div class="form-field">
-				<label>Interval Unit</label>
-				<mat-select formControlName="intervalUnit" placeholder="Select interval unit">
-					<mat-option value="">None</mat-option>
-					@for (unit of timeUnits; track unit.value) {
-						<mat-option [value]="unit.value">{{ unit.label }}</mat-option>
-					}
-				</mat-select>
-				<span class="hint">Time unit for interval</span>
-			</div>
+			</mat-select>
+			<span class="hint">Time unit for interval</span>
 		</div>
 	</form>
 </div>

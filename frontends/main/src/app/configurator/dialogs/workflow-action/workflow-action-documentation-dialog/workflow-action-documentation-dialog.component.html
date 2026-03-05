@@ -11,38 +11,47 @@
 		</div>
 
 		@if (documentable) {
-			<div class="form-section">
-				<h3>Documentation Options</h3>
+			<div class="form-field">
+				<div class="section-header">
+					<h3>Documentation Options</h3>
+					<button type="button" class="btn-add-item" (click)="addOption()">
+						<mat-icon>add</mat-icon>
+						Add Option
+					</button>
+				</div>
+
 				<p class="hint">Predefined rationale options presented to the user. The user can always provide a custom one.</p>
 
-				@for (option of options.controls; track $index; let i = $index) {
-					<div class="option-row">
-						<mat-tab-group class="option-tabs">
-							@for (lang of availableLanguages; track lang.languageCode) {
-								@if (lang.languageCode) {
-									<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-										<div class="tab-content" [formGroup]="$any(option)">
-											<div class="form-field">
-												<input
-													type="text"
-													[formControlName]="lang.languageCode"
-													placeholder="Rationale text">
-											</div>
-										</div>
-									</mat-tab>
-								}
-							}
-						</mat-tab-group>
-						<button type="button" class="btn-delete" (click)="removeOption(i)">
-							<mat-icon>delete</mat-icon>
-						</button>
+				@if (options.controls.length === 0) {
+					<div class="empty-state">
+						<mat-icon>description</mat-icon>
+						<p>No options configured. Click "Add Option" to add one.</p>
 					</div>
+				} @else {
+					<mat-tab-group class="global-lang-tabs">
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content">
+										@for (option of options.controls; track $index; let i = $index) {
+											<div class="option-row" [formGroup]="$any(option)">
+												<div class="form-field">
+													<input
+														type="text"
+														[formControlName]="lang.languageCode"
+														placeholder="Rationale text">
+												</div>
+												<button type="button" class="btn-delete" (click)="removeOption(i)">
+													<mat-icon>delete</mat-icon>
+												</button>
+											</div>
+										}
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
 				}
-
-				<button type="button" class="btn-secondary" (click)="addOption()">
-					<mat-icon>add</mat-icon>
-					Add Documentation Option
-				</button>
 			</div>
 		}
 	</form>

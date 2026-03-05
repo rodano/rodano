@@ -381,37 +381,40 @@
 					}
 				</app-setting-item>
 
-				@if (draftFieldModel.possibleValues && draftFieldModel.possibleValues.length > 0) {
-					<app-setting-item label="Defined Possible Values"
-																							[modified]="isFieldModified('possibleValues')"
-																							[fullWidth]="true">
-						<div class="multilist-display">
-							@for (pv of getSortedPossibleValues(); track pv.id) {
-								<div class="multilist-card">
-									<div class="multilist-header">
-											<span class="multilist-name">
-												{{ languageService.getLabel(pv) }}
+				<app-setting-item label="Defined Possible Values"
+																						[modified]="isFieldModified('possibleValues')"
+																						[fullWidth]="true">
+					<div class="multilist-display">
+						@for (pv of getSortedPossibleValues(); track pv.id) {
+							<div class="multilist-card">
+								<div class="multilist-header">
+									<span class="multilist-name">
+										{{ languageService.getLabel(pv) }}
+									</span>
+									<div class="pv-badges">
+										@if (pv.specify) {
+											<span class="badge badge-info" title="User can specify additional information">
+												<mat-icon>edit_note</mat-icon>
+												Specify
 											</span>
-										<div class="pv-badges">
-											@if (pv.specify) {
-												<span class="badge badge-info" title="User can specify additional information">
-														<mat-icon>edit_note</mat-icon>
-														Specify
-													</span>
-											}
-											@if (pv.exportLabel) {
-												<span class="badge badge-secondary" [title]="'Export label: ' + pv.exportLabel">
-														<mat-icon>file_download</mat-icon>
-													{{ pv.exportLabel }}
-													</span>
-											}
-										</div>
+										}
+										@if (pv.exportLabel) {
+											<span class="badge badge-secondary" [title]="'Export label: ' + pv.exportLabel">
+												<mat-icon>file_download</mat-icon>
+												{{ pv.exportLabel }}
+											</span>
+										}
 									</div>
 								</div>
-							}
-						</div>
-					</app-setting-item>
-				}
+							</div>
+						} @empty {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No possible values defined</span>
+							</div>
+						}
+					</div>
+				</app-setting-item>
 			</div>
 			<button class="btn-edit" (click)="onEditPossibleValues()">
 				<mat-icon>edit</mat-icon>

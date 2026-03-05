@@ -430,7 +430,8 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 				.set(FIELD_POSSIBLE_VALUE.CODE, val.getId())
 				.set(FIELD_POSSIBLE_VALUE.SHORTNAME, jsonMapperService.toJson(val.getShortname()))
 				.set(FIELD_POSSIBLE_VALUE.SPECIFY, val.isSpecify())
-				.set(FIELD_POSSIBLE_VALUE.EXPORT_LABEL, val.getExportLabel()));
+				.set(FIELD_POSSIBLE_VALUE.EXPORT_LABEL, val.getExportLabel())
+				.set(FIELD_POSSIBLE_VALUE.SORT_ORDER, val.getSortOrder()));
 		}
 		dslContext.batch(queries).execute();
 	}

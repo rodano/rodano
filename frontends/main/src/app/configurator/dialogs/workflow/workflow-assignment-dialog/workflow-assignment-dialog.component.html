@@ -3,38 +3,34 @@
 <div class="dialog-content">
 	<form [formGroup]="form" class="settings-form">
 
-		<div class="form-section">
-			<div class="form-field">
-				<label>Aggregate Workflow</label>
-				<mat-select formControlName="aggregatedWorkflowId" placeholder="None">
-					<mat-option [value]="null">None</mat-option>
-					@for (workflow of data.availableWorkflows; track workflow.workflowId) {
-						<mat-option [value]="workflow.workflowId">{{ languageService.getLabel(workflow) }}</mat-option>
-					}
-				</mat-select>
-				<span class="hint">When set, mandatory, initial state, and unique are not applicable</span>
-			</div>
+		<div class="form-field">
+			<label>Aggregate Workflow</label>
+			<mat-select formControlName="aggregatedWorkflowId" placeholder="None">
+				<mat-option [value]="null">None</mat-option>
+				@for (workflow of data.availableWorkflows; track workflow.workflowId) {
+					<mat-option [value]="workflow.workflowId">{{ languageService.getLabel(workflow) }}</mat-option>
+				}
+			</mat-select>
+			<span class="hint">When set, mandatory, initial state, and unique are not applicable</span>
 		</div>
 
 		@if (!hasAggregateWorkflow) {
-			<div class="form-section">
-				<div class="form-field">
-					<mat-checkbox formControlName="mandatory">Mandatory</mat-checkbox>
-					<span class="hint">When mandatory, the creation action is not applicable</span>
-				</div>
+			<div class="form-field">
+				<mat-checkbox formControlName="mandatory">Mandatory</mat-checkbox>
+				<span class="hint">When mandatory, the creation action is not applicable</span>
+			</div>
 
-				<div class="form-field">
-					<label>Initial State</label>
-					<mat-select formControlName="initialStateId" placeholder="None">
-						<mat-option [value]="null">None</mat-option>
-						@for (state of availableStates; track state.workflowStateId) {
-							<mat-option [value]="state.workflowStateId">{{ languageService.getLabel(state) }}</mat-option>
-						}
-					</mat-select>
-					@if (availableStates.length === 0) {
-						<span class="hint">Select an aggregate workflow first to load its states</span>
+			<div class="form-field">
+				<label>Initial State</label>
+				<mat-select formControlName="initialStateId" placeholder="None">
+					<mat-option [value]="null">None</mat-option>
+					@for (state of availableStates; track state.workflowStateId) {
+						<mat-option [value]="state.workflowStateId">{{ languageService.getLabel(state) }}</mat-option>
 					}
-				</div>
+				</mat-select>
+				@if (availableStates.length === 0) {
+					<span class="hint">Select an aggregate workflow first to load its states</span>
+				}
 			</div>
 		}
 

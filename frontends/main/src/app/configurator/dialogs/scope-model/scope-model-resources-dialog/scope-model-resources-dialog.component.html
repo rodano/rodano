@@ -37,75 +37,59 @@
 		(remove)="onRemoveWorkflow($event)">
 	</app-dual-list-box>
 
-	@for (selector of workflowStateSelectors; track selector.id) {
-		<div class="form-section workflow-state-selector">
-			<div class="selector-header">
-				<h3>Workflow State Selector</h3>
-				<button type="button" class="btn-delete" (click)="removeWorkflowStateSelector(selector)">
-					<mat-icon>delete</mat-icon>
-				</button>
+	<div class="selectors-section">
+		<div class="section-header">
+			<h3>Workflow State Selectors</h3>
+			<button type="button" class="btn-add-item" (click)="addWorkflowStateSelector()">
+				<mat-icon>add</mat-icon>
+				Add Selector
+			</button>
+		</div>
+
+		@if (workflowStateSelectors.length === 0) {
+			<div class="empty-state">
+				<mat-icon>account_tree</mat-icon>
+				<p>No selectors configured. Click "Add Selector" to add one.</p>
 			</div>
-
-			<div class="form-field">
-				<label>Workflow</label>
-				<mat-select
-					[value]="selector.selectedWorkflowId"
-					(valueChange)="onWorkflowSelected(selector, $event)">
-					<mat-option value="">Select a workflow</mat-option>
-					@for (workflow of selectedWorkflows; track workflow.workflowId) {
-						<mat-option [value]="workflow.workflowId">{{ languageService.getLabel(workflow) }}</mat-option>
-					}
-				</mat-select>
-				<span class="hint">Choose one of the selected workflows above</span>
-			</div>
-
-			@if (selector.selectedWorkflowId) {
-				<div class="form-field">
-					<label>States</label>
-					<div class="dual-list-container">
-						<div class="list-box">
-							<div class="box-label">Available</div>
-							<div class="list-items">
-								@if (selector.availableStates.length === 0) {
-									<div class="empty-placeholder">No available states</div>
-								}
-								@for (state of selector.availableStates; track state.workflowStateId) {
-									<div class="list-item" (click)="onAddState(selector, state)">
-										<div class="item-text">
-											<span>{{ languageService.getLabel(state) }}</span>
-										</div>
-										<mat-icon class="action-icon">add_circle_outline</mat-icon>
-									</div>
-								}
-							</div>
-						</div>
-
-						<div class="list-box selected">
-							<div class="box-label">Selected</div>
-							<div class="list-items">
-								@if (selector.selectedStates.length === 0) {
-									<div class="empty-placeholder">No states selected</div>
-								}
-								@for (state of selector.selectedStates; track state.workflowStateId) {
-									<div class="list-item" (click)="onRemoveState(selector, state)">
-										<div class="item-text">
-											<span>{{ languageService.getLabel(state) }}</span>
-										</div>
-										<mat-icon class="action-icon">remove_circle_outline</mat-icon>
-									</div>
-								}
-							</div>
-						</div>
+		} @else {
+			@for (selector of workflowStateSelectors; track selector.id) {
+				<div class="form-section workflow-state-selector">
+					<div class="selector-header">
+						<h3>Workflow State Selector</h3>
+						<button type="button" class="btn-delete" (click)="removeWorkflowStateSelector(selector)">
+							<mat-icon>delete</mat-icon>
+						</button>
 					</div>
+
+					<div class="form-field">
+						<label>Workflow</label>
+						<mat-select
+							[value]="selector.selectedWorkflowId"
+							(valueChange)="onWorkflowSelected(selector, $event)">
+							<mat-option value="">Select a workflow</mat-option>
+							@for (workflow of selectedWorkflows; track workflow.workflowId) {
+								<mat-option [value]="workflow.workflowId">{{ languageService.getLabel(workflow) }}</mat-option>
+							}
+						</mat-select>
+						<span class="hint">Choose one of the selected workflows above</span>
+					</div>
+
+					@if (selector.selectedWorkflowId) {
+						<app-dual-list-box
+							title="States"
+							[available]="selector.availableStates"
+							[selected]="selector.selectedStates"
+							[labelFn]="languageService.getLabel.bind(languageService)"
+							availablePlaceholder="No available states"
+							selectedPlaceholder="No states selected"
+							(add)="onAddState(selector, $event)"
+							(remove)="onRemoveState(selector, $event)">
+						</app-dual-list-box>
+					}
 				</div>
 			}
-		</div>
-	}
-
-	<button type="button" class="btn-add-selector" (click)="addWorkflowStateSelector()">
-		<mat-icon>add</mat-icon>
-		Add Workflow State Selector
-	</button>
+		}
+	</div>
 </div>
 
 <div class="dialog-actions">
