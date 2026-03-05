@@ -444,7 +444,7 @@ export class SearchComponent implements OnInit {
 		const search = new ScopeSearch();
 		search.fullText = this.searchForm.controls.scopeCode.value;
 
-		search.scopeModelId = this.scopeModelId;
+		search.scopeModelId = this.selectedScopeModel.id;
 		search.workflowStates = {};
 		search.fieldModelCriteria = '';
 		search.includeDeleted = this.showRemovedScopesControl.value ?? false;
