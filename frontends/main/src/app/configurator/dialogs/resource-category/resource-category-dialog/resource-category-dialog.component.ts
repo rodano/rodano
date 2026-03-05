@@ -27,18 +27,8 @@ export interface ResourceCategoryDialogData {
 	standalone: true,
 	templateUrl: './resource-category-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule, MatIconModule,
+		MatCheckboxModule, MatTabsModule, MatSelectModule]
 })
 export class ResourceCategoryDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -48,11 +38,11 @@ export class ResourceCategoryDialogComponent extends BaseInfoDialogComponent imp
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ResourceCategoryDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ResourceCategoryDialogData,
+		@Inject(MAT_DIALOG_DATA) data: ResourceCategoryDialogData,
 		private resourceCategoryManager: ResourceCategoryManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.resourceCategory;
 	}
 
@@ -107,13 +97,13 @@ export class ResourceCategoryDialogComponent extends BaseInfoDialogComponent imp
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A resource category with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A resource category with code "${code}" already exists`);
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();

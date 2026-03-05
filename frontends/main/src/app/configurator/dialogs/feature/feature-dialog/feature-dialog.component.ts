@@ -23,18 +23,10 @@ export interface FeatureDialogData {
 @Component({
 	selector: 'app-feature-create-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		ReactiveFormsModule,
-		MatInputModule,
-		MatTabsModule,
-		MatCheckbox
-	],
 	templateUrl: './feature-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule, MatInputModule,
+		MatTabsModule, MatCheckbox]
 })
 export class FeatureDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -44,11 +36,11 @@ export class FeatureDialogComponent extends BaseInfoDialogComponent implements O
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<FeatureDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FeatureDialogData,
+		@Inject(MAT_DIALOG_DATA) data: FeatureDialogData,
 		private featureManager: FeatureManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.feature;
 	}
 
@@ -88,13 +80,13 @@ export class FeatureDialogComponent extends BaseInfoDialogComponent implements O
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A feature with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A feature with code "${code}" already exists`);
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();

@@ -9,6 +9,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatTabsModule} from '@angular/material/tabs';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {ProjectLanguage} from '@core/model/project-language';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface WorkflowActionDocumentationDialogData {
 	workflowAction: WorkflowAction;
@@ -18,28 +19,22 @@ export interface WorkflowActionDocumentationDialogData {
 @Component({
 	selector: 'app-workflow-action-documentation-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatSelectModule,
-		MatTabsModule
-	],
 	templateUrl: './workflow-action-documentation-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatIconModule, MatCheckboxModule,
+		MatSelectModule, MatTabsModule]
 })
-export class WorkflowActionDocumentationDialogComponent implements OnInit {
+export class WorkflowActionDocumentationDialogComponent extends BaseDialogComponent<WorkflowActionDocumentationDialogData> implements OnInit {
 	form: FormGroup;
 	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<WorkflowActionDocumentationDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowActionDocumentationDialogData
-	) {}
+		dialogRef: MatDialogRef<WorkflowActionDocumentationDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: WorkflowActionDocumentationDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.availableLanguages = this.data.languages?.length
@@ -123,9 +118,5 @@ export class WorkflowActionDocumentationDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(Object.keys(result).length > 0 ? result : null);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

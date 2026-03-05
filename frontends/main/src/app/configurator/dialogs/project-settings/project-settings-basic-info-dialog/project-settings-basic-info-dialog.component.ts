@@ -21,14 +21,9 @@ export interface BasicInfoDialogData {
 @Component({
 	selector: 'app-edit-basic-info-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule
-	],
 	templateUrl: './project-settings-basic-info-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule]
 })
 export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -37,10 +32,10 @@ export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogCompo
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ProjectSettingsBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: BasicInfoDialogData,
-		private snackBar: MatSnackBar
+		@Inject(MAT_DIALOG_DATA) data: BasicInfoDialogData,
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 	}
 
 	ngOnInit(): void {
@@ -80,7 +75,7 @@ export class ProjectSettingsBasicInfoDialogComponent extends BaseInfoDialogCompo
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 

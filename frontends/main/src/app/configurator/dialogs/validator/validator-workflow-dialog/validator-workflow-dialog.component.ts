@@ -9,6 +9,7 @@ import {FormsModule} from '@angular/forms';
 import {Workflow} from '@core/model/workflow';
 import {WorkflowState} from '@core/model/workflow-state';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ValidatorWorkflowDialogData {
 	validator: Validator;
@@ -18,18 +19,11 @@ export interface ValidatorWorkflowDialogData {
 @Component({
 	selector: 'app-validator-workflow-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		MatSelectModule,
-		FormsModule
-	],
 	templateUrl: './validator-workflow-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule, FormsModule]
 })
-export class ValidatorWorkflowDialogComponent implements OnInit {
+export class ValidatorWorkflowDialogComponent extends BaseDialogComponent<ValidatorWorkflowDialogData> implements OnInit {
 	selectedWorkflowId: string | null = null;
 	selectedInvalidStateId: string | null = null;
 	selectedValidStateId: string | null = null;
@@ -37,9 +31,11 @@ export class ValidatorWorkflowDialogComponent implements OnInit {
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ValidatorWorkflowDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ValidatorWorkflowDialogData
-	) {}
+		dialogRef: MatDialogRef<ValidatorWorkflowDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ValidatorWorkflowDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.selectedWorkflowId = this.data.validator.workflowId || null;
@@ -66,9 +62,5 @@ export class ValidatorWorkflowDialogComponent implements OnInit {
 			invalidStateId: this.selectedInvalidStateId || undefined,
 			validStateId: this.selectedValidStateId || undefined
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

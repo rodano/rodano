@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface EventModelRelationshipsDialogData {
 	eventModel: EventModel;
@@ -14,16 +15,11 @@ export interface EventModelRelationshipsDialogData {
 @Component({
 	selector: 'app-event-model-relationships-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule
-	],
 	templateUrl: './event-model-relationships-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]
 })
-export class EventModelRelationshipsDialogComponent implements OnInit {
+export class EventModelRelationshipsDialogComponent extends BaseDialogComponent<EventModelRelationshipsDialogData> implements OnInit {
 	availableBlockedEventModels: EventModel[] = [];
 	selectedBlockedEventModels: EventModel[] = [];
 
@@ -32,9 +28,11 @@ export class EventModelRelationshipsDialogComponent implements OnInit {
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<EventModelRelationshipsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventModelRelationshipsDialogData
-	) {}
+		dialogRef: MatDialogRef<EventModelRelationshipsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: EventModelRelationshipsDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.initializeBlockedEventModels();
@@ -103,9 +101,5 @@ export class EventModelRelationshipsDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

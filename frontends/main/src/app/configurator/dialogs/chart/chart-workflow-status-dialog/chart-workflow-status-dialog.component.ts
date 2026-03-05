@@ -8,6 +8,7 @@ import {WorkflowState} from '@core/model/workflow-state';
 import {LanguageService} from '../../../services/language.service';
 import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ChartWorkflowStatusDialogData {
 	chart: ChartModel;
@@ -22,7 +23,7 @@ export interface ChartWorkflowStatusDialogData {
 	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatIconModule, MatSelectModule]
 })
-export class ChartWorkflowStatusDialogComponent implements OnInit {
+export class ChartWorkflowStatusDialogComponent extends BaseDialogComponent<ChartWorkflowStatusDialogData> implements OnInit {
 	form: FormGroup;
 
 	includedSelected: WorkflowState[] = [];
@@ -31,9 +32,11 @@ export class ChartWorkflowStatusDialogComponent implements OnInit {
 	constructor(
 		private fb: FormBuilder,
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ChartWorkflowStatusDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartWorkflowStatusDialogData
-	) {}
+		dialogRef: MatDialogRef<ChartWorkflowStatusDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ChartWorkflowStatusDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.form = this.fb.group({
@@ -45,7 +48,6 @@ export class ChartWorkflowStatusDialogComponent implements OnInit {
 			this.excludedSelected = [];
 		});
 
-		//restore existing state filters
 		const stateFilters = this.data.chart?.stateFilters || [];
 		stateFilters.forEach(sf => {
 			const state = this.data.availableWorkflowStates.find(s => s.workflowStateId === sf.workflowStateId);
@@ -115,9 +117,5 @@ export class ChartWorkflowStatusDialogComponent implements OnInit {
 			workflowId: this.form.value.workflowId,
 			stateFilters
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 }

@@ -7,6 +7,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatTabsModule} from '@angular/material/tabs';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {ProjectLanguage} from '@core/model/project-language';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface WorkflowActionSignatureDialogData {
 	workflowAction: WorkflowAction;
@@ -16,20 +17,22 @@ export interface WorkflowActionSignatureDialogData {
 @Component({
 	selector: 'app-workflow-action-signature-dialog',
 	standalone: true,
-	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatCheckboxModule, MatTabsModule],
 	templateUrl: './workflow-action-signature-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatCheckboxModule, MatTabsModule]
 })
-export class WorkflowActionSignatureDialogComponent implements OnInit {
+export class WorkflowActionSignatureDialogComponent extends BaseDialogComponent<WorkflowActionSignatureDialogData> implements OnInit {
 	form: FormGroup;
 	signatureTextForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<WorkflowActionSignatureDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowActionSignatureDialogData
-	) {}
+		dialogRef: MatDialogRef<WorkflowActionSignatureDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: WorkflowActionSignatureDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.availableLanguages = this.data.languages?.length
@@ -89,9 +92,5 @@ export class WorkflowActionSignatureDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(Object.keys(result).length > 0 ? result : null);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

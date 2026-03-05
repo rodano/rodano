@@ -2,6 +2,7 @@ import {Component, Inject} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ClientInfoDialogData {
 	clientName: string | null;
@@ -14,22 +15,19 @@ export interface ClientInfoDialogData {
 @Component({
 	selector: 'app-edit-client-info-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule
-	],
 	templateUrl: './project-settings-client-info-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule]
 })
-export class ProjectSettingsClientInfoDialogComponent {
+export class ProjectSettingsClientInfoDialogComponent extends BaseDialogComponent<ClientInfoDialogData> {
 	form: FormGroup;
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<ProjectSettingsClientInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ClientInfoDialogData
+		dialogRef: MatDialogRef<ProjectSettingsClientInfoDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ClientInfoDialogData
 	) {
+		super(dialogRef, data);
 		this.form = this.fb.group({
 			clientName: [data.clientName],
 			clientEmail: [data.clientEmail, [Validators.email]],
@@ -37,10 +35,6 @@ export class ProjectSettingsClientInfoDialogComponent {
 			versionNumber: [data.versionNumber],
 			versionDate: [data.versionDate]
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 
 	onSave(): void {

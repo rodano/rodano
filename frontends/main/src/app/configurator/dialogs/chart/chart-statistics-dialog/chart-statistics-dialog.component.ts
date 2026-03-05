@@ -14,6 +14,7 @@ import {DatasetModel} from '@core/model/dataset-model';
 import {ScopeModel} from '@core/model/scope-model';
 import {MatTabsModule} from '@angular/material/tabs';
 import {ProjectLanguage} from '@core/model/project-language';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ChartStatisticsDialogData {
 	chart: ChartModel;
@@ -28,17 +29,10 @@ export interface ChartStatisticsDialogData {
 	standalone: true,
 	templateUrl: './chart-statistics-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css', './chart-statistics-dialog.component.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatCheckboxModule,
-		MatIconModule,
-		MatSelectModule,
-		MatTabsModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatCheckboxModule, MatIconModule, MatSelectModule,
+		MatTabsModule]
 })
-export class ChartStatisticsDialogComponent implements OnInit {
+export class ChartStatisticsDialogComponent extends BaseDialogComponent<ChartStatisticsDialogData> implements OnInit {
 	form: FormGroup;
 	ranges: ChartRange[] = [];
 	selectedLanguage: string;
@@ -46,10 +40,12 @@ export class ChartStatisticsDialogComponent implements OnInit {
 	constructor(
 		private fb: FormBuilder,
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ChartStatisticsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartStatisticsDialogData,
-		private snackBar: MatSnackBar
-	) {}
+		dialogRef: MatDialogRef<ChartStatisticsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ChartStatisticsDialogData,
+		snackBar: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	ngOnInit(): void {
 		this.selectedLanguage = this.languageService.currentLanguage
@@ -140,7 +136,7 @@ export class ChartStatisticsDialogComponent implements OnInit {
 	onSave(): void {
 		const emptyIds = this.ranges.some(r => !r.id?.trim());
 		if(emptyIds) {
-			this.snackBar.open('All ranges must have an ID', 'Close', {duration: 3000});
+			this.showError('All ranges must have an ID');
 			return;
 		}
 
@@ -150,10 +146,6 @@ export class ChartStatisticsDialogComponent implements OnInit {
 			withStatistics: this.form.value.withStatistics,
 			ranges: this.ranges.map((r, i) => ({...r, sortOrder: i}))
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 
 	protected readonly isNaN = isNaN;

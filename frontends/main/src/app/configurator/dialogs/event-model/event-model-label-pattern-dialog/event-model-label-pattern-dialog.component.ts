@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface EventModelLabelPatternDialogData {
 	eventModel: EventModel;
@@ -18,17 +19,11 @@ interface PatternOption {
 @Component({
 	selector: 'app-event-model-label-pattern-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		ReactiveFormsModule
-	],
 	templateUrl: './event-model-label-pattern-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule]
 })
-export class EventModelLabelPatternDialogComponent implements OnInit {
+export class EventModelLabelPatternDialogComponent extends BaseDialogComponent<EventModelLabelPatternDialogData> implements OnInit {
 	form: FormGroup;
 
 	patternOptions: PatternOption[] = [
@@ -58,20 +53,17 @@ export class EventModelLabelPatternDialogComponent implements OnInit {
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<EventModelLabelPatternDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventModelLabelPatternDialogData
+		dialogRef: MatDialogRef<EventModelLabelPatternDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: EventModelLabelPatternDialogData
 	) {
-		this.form = this.fb.group({
-			labelPattern: [''],
-			icon: ['']
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		if(this.data.eventModel) {
-			this.form.patchValue({
-				labelPattern: this.data.eventModel.labelPattern || '',
-				icon: this.data.eventModel.icon || ''
+			this.form = this.fb.group({
+				labelPattern: [this.data.eventModel.labelPattern || ''],
+				icon: [this.data.eventModel.icon || '']
 			});
 		}
 	}
@@ -112,9 +104,5 @@ export class EventModelLabelPatternDialogComponent implements OnInit {
 
 			this.dialogRef.close(result);
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

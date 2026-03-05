@@ -38,18 +38,8 @@ interface DataTypeOption {
 	standalone: true,
 	templateUrl: './field-model-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule, MatTabsModule, MatSelectModule]
 })
 export class FieldModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -81,11 +71,11 @@ export class FieldModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<FieldModelBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelBasicInfoDialogData,
 		private fieldModelManager: FieldModelManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.fieldModel;
 	}
 
@@ -127,13 +117,13 @@ export class FieldModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A field model with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A field model with code "${code}" already exists`);
 			return;
 		}
 

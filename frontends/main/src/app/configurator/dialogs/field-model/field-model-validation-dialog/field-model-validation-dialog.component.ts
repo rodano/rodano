@@ -12,6 +12,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface FieldModelValidationDialogData {
 	fieldModel: FieldModel;
@@ -23,20 +24,10 @@ export interface FieldModelValidationDialogData {
 	standalone: true,
 	templateUrl: './field-model-validation-dialog.component.html',
 	styleUrls: ['./field-model-validation-dialog.component.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule, MatTabsModule, MatSelectModule]
 })
-export class FieldModelValidationDialogComponent implements OnInit {
+export class FieldModelValidationDialogComponent extends BaseDialogComponent<FieldModelValidationDialogData> implements OnInit {
 	form: FormGroup;
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
@@ -44,10 +35,11 @@ export class FieldModelValidationDialogComponent implements OnInit {
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<FieldModelValidationDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelValidationDialogData,
-		private snackBar: MatSnackBar
+		dialogRef: MatDialogRef<FieldModelValidationDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelValidationDialogData,
+		snackBar: MatSnackBar
 	) {
+		super(dialogRef, data, snackBar);
 		this.fieldType = data.fieldModel.type || 'STRING';
 	}
 
@@ -151,13 +143,9 @@ export class FieldModelValidationDialogComponent implements OnInit {
 		}
 	}
 
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
 	onSave(): void {
 		if(this.form.invalid) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
@@ -169,7 +157,7 @@ export class FieldModelValidationDialogComponent implements OnInit {
 			}
 			catch (error) {
 				const errorMessage = error instanceof Error ? error.message : 'Invalid regex syntax';
-				this.snackBar.open(`Invalid regular expression: ${errorMessage}`, 'Close', {duration: 5000});
+				this.showError(`Invalid regular expression: ${errorMessage}`);
 				return;
 			}
 		}

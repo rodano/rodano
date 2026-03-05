@@ -7,6 +7,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../../services/language.service';
 import {Report} from '@core/model/report';
 import {FieldModel} from '@core/model/field-model';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ReportResourcesDialogData {
 	report: Report;
@@ -16,25 +17,21 @@ export interface ReportResourcesDialogData {
 @Component({
 	selector: 'app-report-resources-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		MatSelectModule
-	],
 	templateUrl: './report-resources-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
 })
-export class ReportResourcesDialogComponent implements OnInit {
+export class ReportResourcesDialogComponent extends BaseDialogComponent<ReportResourcesDialogData> implements OnInit {
 	availableFieldModels: FieldModel[] = [];
 	selectedFieldModels: FieldModel[] = [];
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ReportResourcesDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ReportResourcesDialogData
-	) {}
+		dialogRef: MatDialogRef<ReportResourcesDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ReportResourcesDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.initializeFieldModels();
@@ -66,9 +63,5 @@ export class ReportResourcesDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

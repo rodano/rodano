@@ -23,17 +23,10 @@ export interface EventGroupDialogData {
 @Component({
 	selector: 'app-event-group-create-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		ReactiveFormsModule,
-		MatInputModule,
-		MatTabsModule
-	],
 	templateUrl: './event-group-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule, MatInputModule,
+		MatTabsModule]
 })
 export class EventGroupDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -43,11 +36,11 @@ export class EventGroupDialogComponent extends BaseInfoDialogComponent implement
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<EventGroupDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventGroupDialogData,
+		@Inject(MAT_DIALOG_DATA) data: EventGroupDialogData,
 		private eventGroupManager: EventGroupManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.eventGroup;
 	}
 
@@ -86,13 +79,13 @@ export class EventGroupDialogComponent extends BaseInfoDialogComponent implement
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`An event group with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`An event group with code "${code}" already exists`);
 		}
 
 		const {shortname, longname, description} = this.collectTranslations();

@@ -9,6 +9,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface FieldModelExportDialogData {
 	fieldModel: FieldModel;
@@ -19,26 +20,20 @@ export interface FieldModelExportDialogData {
 	standalone: true,
 	templateUrl: './field-model-export-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule]
 })
-export class FieldModelExportDialogComponent implements OnInit {
+export class FieldModelExportDialogComponent extends BaseDialogComponent<FieldModelExportDialogData> implements OnInit {
 	form: FormGroup;
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<FieldModelExportDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelExportDialogData,
-		private snackBar: MatSnackBar
-	) {}
+		dialogRef: MatDialogRef<FieldModelExportDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelExportDialogData,
+		snackBar: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	ngOnInit(): void {
 		this.initializeForm();
@@ -60,13 +55,9 @@ export class FieldModelExportDialogComponent implements OnInit {
 		});
 	}
 
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
 	onSave(): void {
 		if(this.form.invalid) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 

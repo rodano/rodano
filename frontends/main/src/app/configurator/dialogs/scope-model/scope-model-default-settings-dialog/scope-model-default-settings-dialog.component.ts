@@ -11,6 +11,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {Profile} from '@core/model/profile';
 import {ProfileManagerService} from '../../../services/manager/profile-manager.service';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 interface DialogData {
 	projectId: string;
@@ -22,17 +23,10 @@ interface DialogData {
 	standalone: true,
 	templateUrl: './scope-model-default-settings-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatSelectModule]
 })
-export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
+export class ScopeModelDefaultSettingsDialogComponent extends BaseDialogComponent<DialogData> implements OnInit {
 	form: FormGroup;
 	saving = false;
 	availableProfiles: Profile[] = [];
@@ -41,42 +35,23 @@ export class ScopeModelDefaultSettingsDialogComponent implements OnInit {
 		public languageService: LanguageService,
 		private fb: FormBuilder,
 		private profileManager: ProfileManagerService,
-		private dialogRef: MatDialogRef<ScopeModelDefaultSettingsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DialogData,
-		private snackBar: MatSnackBar
+		dialogRef: MatDialogRef<ScopeModelDefaultSettingsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: DialogData,
+		snackBar: MatSnackBar
 	) {
-		this.form = this.fb.group({
-			defaultProfileId: ['']
-		});
+		super(dialogRef, data, snackBar);
 	}
 
 	ngOnInit(): void {
 		this.availableProfiles = this.profileManager.getAll();
-		this.populateForm();
-	}
-
-	populateForm(): void {
-		this.form.patchValue({
-			defaultProfileId: this.data.scopeModel.defaultProfileId || ''
+		this.form = this.fb.group({
+			defaultProfileId: [this.data.scopeModel.defaultProfileId || '']
 		});
 	}
 
 	onSave(): void {
-		if(this.form.invalid) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
-			return;
-		}
-
-		const formValue = this.form.getRawValue();
-
-		const result = {
-			defaultProfileId: formValue.defaultProfileId || null
-		};
-
-		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
+		this.dialogRef.close({
+			efaultProfileId: this.form.getRawValue().defaultProfileId || null
+		});
 	}
 }

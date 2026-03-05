@@ -10,6 +10,7 @@ import {MatSelectModule} from '@angular/material/select';
 import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../../services/language.service';
 import {ScopeModelManagerService} from '../../../services/manager/scope-model-manager.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 interface DialogData {
 	projectId: string;
@@ -21,45 +22,30 @@ interface DialogData {
 	standalone: true,
 	templateUrl: './scope-model-relationships-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatSelectModule,
-		MatIconModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatSelectModule, MatIconModule]
 })
-export class ScopeModelRelationshipsDialogComponent implements OnInit {
+export class ScopeModelRelationshipsDialogComponent extends BaseDialogComponent<DialogData> implements OnInit {
 	form: FormGroup;
 	availableParents: ScopeModel[] = [];
 
 	constructor(
 		public languageService: LanguageService,
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<ScopeModelRelationshipsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DialogData,
+		dialogRef: MatDialogRef<ScopeModelRelationshipsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: DialogData,
 		private scopeModelManager: ScopeModelManagerService
 	) {
-		this.form = this.fb.group({
-			parentIds: [[]],
-			defaultParentId: ['']
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		this.availableParents = this.scopeModelManager.getAll().filter(
 			sm => sm.scopeModelId !== this.data.scopeModel.scopeModelId
 		);
-		this.populateForm();
-	}
-
-	populateForm(): void {
-		this.form.patchValue({
-			parentIds: this.data.scopeModel.parentIds || [],
-			defaultParentId: this.data.scopeModel.defaultParentId || ''
+		this.form = this.fb.group({
+			parentIds: [this.data.scopeModel.parentIds || []],
+			defaultParentId: [this.data.scopeModel.defaultParentId || '']
 		});
 	}
 
@@ -96,10 +82,6 @@ export class ScopeModelRelationshipsDialogComponent implements OnInit {
 			defaultParentId: formValue.defaultParentId || ''
 		};
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 
 	getTranslatedName(translations: Record<string, string> | undefined): string {

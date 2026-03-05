@@ -7,6 +7,7 @@ import {ChartModel} from '@core/model/chart-model';
 import {ScopeModel} from '@core/model/scope-model';
 import {LanguageService} from '../../../services/language.service';
 import {MatSelectModule} from '@angular/material/select';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ChartEnrollmentByScopeDialogData {
 	chart: ChartModel;
@@ -20,16 +21,18 @@ export interface ChartEnrollmentByScopeDialogData {
 	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSelectModule]
 })
-export class ChartEnrollmentByScopeDialogComponent implements OnInit {
+export class ChartEnrollmentByScopeDialogComponent extends BaseDialogComponent<ChartEnrollmentByScopeDialogData> implements OnInit {
 	form: FormGroup;
 
 	constructor(
 		private fb: FormBuilder,
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ChartEnrollmentByScopeDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartEnrollmentByScopeDialogData,
-		private snackBar: MatSnackBar
-	) {}
+		dialogRef: MatDialogRef<ChartEnrollmentByScopeDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ChartEnrollmentByScopeDialogData,
+		snackBar: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	ngOnInit(): void {
 		this.form = this.fb.group({
@@ -41,9 +44,5 @@ export class ChartEnrollmentByScopeDialogComponent implements OnInit {
 		this.dialogRef.close({
 			scopeModelId: this.form.value.scopeModelId
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 }

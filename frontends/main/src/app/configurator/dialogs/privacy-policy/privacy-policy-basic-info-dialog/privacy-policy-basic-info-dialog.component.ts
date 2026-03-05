@@ -23,14 +23,7 @@ export interface PrivacyPolicyBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './privacy-policy-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule,
-		MatSelectModule,
-		WysiwygEditorComponent
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule, MatSelectModule, WysiwygEditorComponent]
 })
 export class PrivacyPolicyBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -40,11 +33,11 @@ export class PrivacyPolicyBasicInfoDialogComponent extends BaseInfoDialogCompone
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<PrivacyPolicyBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: PrivacyPolicyBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: PrivacyPolicyBasicInfoDialogData,
 		private privacyPolicyManager: PrivacyPolicyManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.privacyPolicy;
 	}
 
@@ -84,13 +77,13 @@ export class PrivacyPolicyBasicInfoDialogComponent extends BaseInfoDialogCompone
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A privacy policy with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A privacy policy with code "${code}" already exists`);
 			return;
 		}
 

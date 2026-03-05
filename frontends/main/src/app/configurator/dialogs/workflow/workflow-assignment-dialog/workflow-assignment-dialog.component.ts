@@ -11,6 +11,7 @@ import {LanguageService} from '../../../services/language.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {WorkflowState} from '@core/model/workflow-state';
 import {WorkflowAction} from '@core/model/workflow-action';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface WorkflowAssignmentDialogData {
 	workflow: Workflow;
@@ -24,16 +25,9 @@ export interface WorkflowAssignmentDialogData {
 	standalone: true,
 	templateUrl: './workflow-assignment-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatCheckboxModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatCheckboxModule, MatSelectModule]
 })
-export class WorkflowAssignmentDialogComponent implements OnInit, OnDestroy {
+export class WorkflowAssignmentDialogComponent extends BaseDialogComponent<WorkflowAssignmentDialogData> implements OnInit, OnDestroy {
 	form: FormGroup;
 	availableStates: WorkflowState[] = [];
 	availableActions: WorkflowAction[] = [];
@@ -43,10 +37,12 @@ export class WorkflowAssignmentDialogComponent implements OnInit, OnDestroy {
 	constructor(
 		public languageService: LanguageService,
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<WorkflowAssignmentDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowAssignmentDialogData,
-		private snackBar: MatSnackBar
-	) {}
+		dialogRef: MatDialogRef<WorkflowAssignmentDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: WorkflowAssignmentDialogData,
+		snackBar: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	ngOnInit(): void {
 		this.initializeForm();
@@ -100,13 +96,9 @@ export class WorkflowAssignmentDialogComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
 	onSave(): void {
 		if(this.form.invalid) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 

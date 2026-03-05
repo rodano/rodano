@@ -3,6 +3,7 @@ import {CommonModule} from '@angular/common';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {ChartModel} from '@core/model/chart-model';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ChartColorsDialogData {
 	chart: ChartModel;
@@ -20,13 +21,15 @@ interface ColorEntry {
 	styleUrls: ['../../dialog-shared.css', './chart-colors-dialog.component.css'],
 	imports: [CommonModule, MatDialogModule, MatIconModule]
 })
-export class ChartColorsDialogComponent implements OnInit {
+export class ChartColorsDialogComponent extends BaseDialogComponent<ChartColorsDialogData> implements OnInit {
 	colors: ColorEntry[] = [];
 
 	constructor(
-		private dialogRef: MatDialogRef<ChartColorsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartColorsDialogData
-	) {}
+		dialogRef: MatDialogRef<ChartColorsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ChartColorsDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.colors = this.data.chart.colors
@@ -64,9 +67,5 @@ export class ChartColorsDialogComponent implements OnInit {
 
 	onSave(): void {
 		this.dialogRef.close(this.colors.map(c => c.value));
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 }

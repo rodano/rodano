@@ -22,13 +22,7 @@ export interface DatasetModelBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './dataset-model-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule,
-		MatCheckboxModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule, MatCheckboxModule]
 })
 export class DatasetModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -38,11 +32,11 @@ export class DatasetModelBasicInfoDialogComponent extends BaseInfoDialogComponen
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<DatasetModelBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DatasetModelBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: DatasetModelBasicInfoDialogData,
 		private datasetModelManager: DatasetModelManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.datasetModel;
 	}
 
@@ -82,13 +76,13 @@ export class DatasetModelBasicInfoDialogComponent extends BaseInfoDialogComponen
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A dataset model with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A dataset model with code "${code}" already exists`);
 			return;
 		}
 

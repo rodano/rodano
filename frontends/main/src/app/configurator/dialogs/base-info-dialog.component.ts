@@ -1,19 +1,25 @@
-import {Directive} from '@angular/core';
+import {Directive, Inject} from '@angular/core';
 import {FormBuilder, FormGroup} from '@angular/forms';
 import {ProjectLanguage} from '@core/model/project-language';
 import {LanguageService} from '../services/language.service';
-import {MatDialogRef} from '@angular/material/dialog';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {BaseDialogComponent} from './base-dialog.component';
 
 @Directive()
-export abstract class BaseInfoDialogComponent {
+export abstract class BaseInfoDialogComponent extends BaseDialogComponent {
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 
-	constructor(
+	protected constructor(
 		protected fb: FormBuilder,
 		protected languageService: LanguageService,
-		protected dialogRef: MatDialogRef<any>
-	) {}
+		dialogRef: MatDialogRef<any>,
+		@Inject(MAT_DIALOG_DATA) data: any,
+		snackBar?: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	protected loadProjectLanguages(languages: ProjectLanguage[]): void {
 		this.availableLanguages = languages?.length
@@ -63,9 +69,5 @@ export abstract class BaseInfoDialogComponent {
 		const uppercased = input.value.toUpperCase();
 		input.value = uppercased;
 		form.patchValue({[controlName]: uppercased}, {emitEvent: false});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

@@ -6,6 +6,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import ISO6391 from 'iso-639-1';
 import {MatSelectChange, MatSelectModule} from '@angular/material/select';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface LanguagesDialogData {
 	languages: ProjectLanguage[];
@@ -16,21 +17,17 @@ export interface LanguagesDialogData {
 	standalone: true,
 	templateUrl: './project-settings-languages-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatIconModule,
-		MatTooltipModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, MatDialogModule, MatIconModule, MatTooltipModule, MatSelectModule]
 })
-export class ProjectSettingsLanguagesDialogComponent implements OnInit {
+export class ProjectSettingsLanguagesDialogComponent extends BaseDialogComponent<LanguagesDialogData> implements OnInit {
 	selectedLanguages: {code: string; name: string; isDefault: boolean}[] = [];
 
 	constructor(
-		private dialogRef: MatDialogRef<ProjectSettingsLanguagesDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: LanguagesDialogData
-	) {}
+		dialogRef: MatDialogRef<ProjectSettingsLanguagesDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: LanguagesDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		if(this.data.languages && this.data.languages.length > 0) {
@@ -140,9 +137,5 @@ export class ProjectSettingsLanguagesDialogComponent implements OnInit {
 		}));
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 }

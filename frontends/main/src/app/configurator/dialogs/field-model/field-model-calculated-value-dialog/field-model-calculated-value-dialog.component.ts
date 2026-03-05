@@ -11,6 +11,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {Observable, of} from 'rxjs';
 import {map, startWith} from 'rxjs/operators';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface FieldModelCalculatedValueDialogData {
 	fieldModel: FieldModel;
@@ -29,19 +30,10 @@ interface FormulaProposal {
 	standalone: true,
 	templateUrl: './field-model-calculated-value-dialog.component.html',
 	styleUrls: ['./field-model-calculated-value-dialog.component.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatAutocompleteModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule, MatAutocompleteModule]
 })
-export class FieldModelCalculatedValueDialogComponent implements OnInit {
+export class FieldModelCalculatedValueDialogComponent extends BaseDialogComponent<FieldModelCalculatedValueDialogData> implements OnInit {
 	form: FormGroup;
 	filteredProposals$: Observable<FormulaProposal[]> = of([]);
 
@@ -126,9 +118,11 @@ export class FieldModelCalculatedValueDialogComponent implements OnInit {
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<FieldModelCalculatedValueDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelCalculatedValueDialogData
-	) {}
+		dialogRef: MatDialogRef<FieldModelCalculatedValueDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelCalculatedValueDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.form = this.fb.group({
@@ -205,10 +199,6 @@ export class FieldModelCalculatedValueDialogComponent implements OnInit {
 
 	getCategoryClass(category: string): string {
 		return `badge-${category.toLowerCase().replace(/\s+/g, '-')}`;
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 
 	onSave(): void {

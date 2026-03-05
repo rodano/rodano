@@ -8,6 +8,7 @@ import {LanguageService} from '../../../services/language.service';
 import {DatasetModel} from '@core/model/dataset-model';
 import {Workflow} from '@core/model/workflow';
 import {FormModel} from '@core/model/form-model';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface EventModelResourcesDialogData {
 	eventModel: EventModel;
@@ -19,16 +20,11 @@ export interface EventModelResourcesDialogData {
 @Component({
 	selector: 'app-event-model-resources-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule
-	],
 	templateUrl: './event-model-resources-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]
 })
-export class EventModelResourcesDialogComponent implements OnInit {
+export class EventModelResourcesDialogComponent extends BaseDialogComponent<EventModelResourcesDialogData> implements OnInit {
 	availableFormModels: FormModel[] = [];
 	selectedFormModels: FormModel[] = [];
 
@@ -40,9 +36,11 @@ export class EventModelResourcesDialogComponent implements OnInit {
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<EventModelResourcesDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventModelResourcesDialogData
-	) {}
+		dialogRef: MatDialogRef<EventModelResourcesDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: EventModelResourcesDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.initializeFormModels();
@@ -120,9 +118,5 @@ export class EventModelResourcesDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

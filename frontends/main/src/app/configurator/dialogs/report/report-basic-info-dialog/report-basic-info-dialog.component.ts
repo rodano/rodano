@@ -10,8 +10,8 @@ import {Report} from '@core/model/report';
 import {ReportManagerService} from '../../../services/manager/report-manager.service';
 import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
 import {LanguageService} from '../../../services/language.service';
-import { Workflow } from '@core/model/workflow';
-import { DatasetModel } from '@core/model/dataset-model';
+import {Workflow} from '@core/model/workflow';
+import {DatasetModel} from '@core/model/dataset-model';
 
 export interface ReportBasicInfoDialogData {
 	projectId: string;
@@ -26,13 +26,7 @@ export interface ReportBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './report-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule, MatSelectModule]
 })
 export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -44,11 +38,11 @@ export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent impl
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ReportBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ReportBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: ReportBasicInfoDialogData,
 		private reportManager: ReportManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.report;
 		this.workflows = data.workflows || [];
 		this.datasetModels = data.datasetModels || [];
@@ -91,13 +85,13 @@ export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent impl
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A report with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A report with code "${code}" already exists`);
 			return;
 		}
 

@@ -30,18 +30,8 @@ export interface EventModelBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './event-model-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule, MatTabsModule, MatSelectModule]
 })
 export class EventModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -52,11 +42,11 @@ export class EventModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<EventModelBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventModelBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: EventModelBasicInfoDialogData,
 		private eventModelManager: EventModelManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.eventModel;
 		this.eventGroups = data.eventGroups || [];
 	}
@@ -102,13 +92,13 @@ export class EventModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`An event model with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`An event model with code "${code}" already exists`);
 			return;
 		}
 

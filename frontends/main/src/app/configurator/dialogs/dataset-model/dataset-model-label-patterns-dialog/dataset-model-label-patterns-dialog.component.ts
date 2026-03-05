@@ -5,6 +5,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface DatasetModelLabelPatternsDialogData {
 	datasetModel: DatasetModel;
@@ -18,17 +19,11 @@ interface PatternOption {
 @Component({
 	selector: 'app-dataset-model-label-patterns-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule
-	],
 	templateUrl: './dataset-model-label-patterns-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatIconModule]
 })
-export class DatasetModelLabelPatternsDialogComponent implements OnInit, AfterViewInit {
+export class DatasetModelLabelPatternsDialogComponent extends BaseDialogComponent<DatasetModelLabelPatternsDialogData> implements OnInit, AfterViewInit {
 	@ViewChild('collapsedInput') collapsedInput!: ElementRef<HTMLInputElement>;
 	@ViewChild('expandedInput') expandedInput!: ElementRef<HTMLInputElement>;
 
@@ -45,20 +40,17 @@ export class DatasetModelLabelPatternsDialogComponent implements OnInit, AfterVi
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<DatasetModelLabelPatternsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DatasetModelLabelPatternsDialogData
+		dialogRef: MatDialogRef<DatasetModelLabelPatternsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: DatasetModelLabelPatternsDialogData
 	) {
-		this.form = this.fb.group({
-			collapsedLabelPattern: [''],
-			expandedLabelPattern: ['']
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		if(this.data.datasetModel) {
-			this.form.patchValue({
-				collapsedLabelPattern: this.data.datasetModel.collapsedLabelPattern || '',
-				expandedLabelPattern: this.data.datasetModel.expandedLabelPattern || ''
+			this.form = this.fb.group({
+				collapsedLabelPattern: [this.data.datasetModel.collapsedLabelPattern || ''],
+				expandedLabelPattern: [this.data.datasetModel.expandedLabelPattern || '']
 			});
 		}
 	}
@@ -102,10 +94,6 @@ export class DatasetModelLabelPatternsDialogComponent implements OnInit, AfterVi
 				element.setSelectionRange(newPosition, newPosition);
 			}, 0);
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 
 	onSave(): void {

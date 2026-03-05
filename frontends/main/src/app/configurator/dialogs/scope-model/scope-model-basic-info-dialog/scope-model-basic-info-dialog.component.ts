@@ -26,17 +26,8 @@ interface ScopeModelBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './scope-model-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatCheckboxModule,
-		MatSelectModule,
-		MatTabsModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatCheckboxModule, MatSelectModule, MatTabsModule]
 })
 export class ScopeModelBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -46,11 +37,11 @@ export class ScopeModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ScopeModelBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ScopeModelBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: ScopeModelBasicInfoDialogData,
 		private scopeModelManager: ScopeModelManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.scopeModel;
 	}
 
@@ -93,13 +84,13 @@ export class ScopeModelBasicInfoDialogComponent extends BaseInfoDialogComponent 
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(!this.isEditMode && this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A scope model with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A scope model with code "${code}" already exists`);
 			return;
 		}
 

@@ -24,13 +24,7 @@ export interface ProfileBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './profile-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule, MatSelectModule]
 })
 export class ProfileBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -40,11 +34,11 @@ export class ProfileBasicInfoDialogComponent extends BaseInfoDialogComponent imp
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ProfileBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ProfileBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: ProfileBasicInfoDialogData,
 		private profileManager: ProfileManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.profile;
 	}
 
@@ -85,13 +79,13 @@ export class ProfileBasicInfoDialogComponent extends BaseInfoDialogComponent imp
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A profile with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A profile with code "${code}" already exists`);
 			return;
 		}
 

@@ -4,6 +4,7 @@ import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatCheckbox} from '@angular/material/checkbox';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface DatasetModelExportDialogData {
 	datasetModel: DatasetModel;
@@ -12,36 +13,28 @@ export interface DatasetModelExportDialogData {
 @Component({
 	selector: 'app-dataset-model-export-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatCheckbox
-	],
 	templateUrl: './dataset-model-export-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatCheckbox]
 })
-export class DatasetModelExportDialogComponent implements OnInit {
+export class DatasetModelExportDialogComponent extends BaseDialogComponent<DatasetModelExportDialogData> implements OnInit {
 	form: FormGroup;
 
 	constructor(
 		private fb: FormBuilder,
-		public dialogRef: MatDialogRef<DatasetModelExportDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DatasetModelExportDialogData
+		dialogRef: MatDialogRef<DatasetModelExportDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: DatasetModelExportDialogData
 	) {
-		this.form = this.fb.group({
-			exportable: [false],
-			exportOrder: [{value: null, disabled: true}]
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		if(this.data.datasetModel) {
 			const isExportable = this.data.datasetModel.exportable ?? false;
 
-			this.form.patchValue({
-				exportable: isExportable,
-				exportOrder: this.data.datasetModel.exportOrder
+			this.form = this.fb.group({
+				exportable: [isExportable],
+				exportOrder: [this.data.datasetModel.exportOrder]
 			});
 
 			if(isExportable) {
@@ -61,10 +54,6 @@ export class DatasetModelExportDialogComponent implements OnInit {
 				this.form.get('exportOrder')?.setValue(null);
 			}
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 
 	onSave(): void {

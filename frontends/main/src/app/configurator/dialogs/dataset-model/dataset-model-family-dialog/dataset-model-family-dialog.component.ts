@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {DatasetModel} from '@core/model/dataset-model';
 import {MatCheckbox} from '@angular/material/checkbox';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface DatasetModelFamilyDialogData {
 	datasetModel: DatasetModel;
@@ -12,40 +13,28 @@ export interface DatasetModelFamilyDialogData {
 @Component({
 	selector: 'app-dataset-model-family-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatCheckbox
-	],
 	templateUrl: './dataset-model-family-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatCheckbox]
 })
-export class DatasetModelFamilyDialogComponent implements OnInit {
+export class DatasetModelFamilyDialogComponent extends BaseDialogComponent<DatasetModelFamilyDialogData> implements OnInit {
 	form: FormGroup;
 
 	constructor(
 		private fb: FormBuilder,
-		public dialogRef: MatDialogRef<DatasetModelFamilyDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: DatasetModelFamilyDialogData
+		dialogRef: MatDialogRef<DatasetModelFamilyDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: DatasetModelFamilyDialogData
 	) {
-		this.form = this.fb.group({
-			family: [''],
-			master: [false]
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		if(this.data.datasetModel) {
-			this.form.patchValue({
-				family: this.data.datasetModel.family || '',
-				master: this.data.datasetModel.master ?? false
+			this.form = this.fb.group({
+				family: [this.data.datasetModel.family || ''],
+				master: [this.data.datasetModel.master ?? false]
 			});
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 
 	onSave(): void {

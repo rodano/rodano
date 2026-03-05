@@ -12,6 +12,7 @@ import {MatCheckboxModule} from '@angular/material/checkbox';
 import {MatTabsModule} from '@angular/material/tabs';
 import {ProjectLanguage} from '@core/model/project-language';
 import {PossibleValue} from '@core/model/possible-value';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface FieldModelPossibleValuesDialogData {
 	fieldModel: FieldModel;
@@ -23,29 +24,22 @@ export interface FieldModelPossibleValuesDialogData {
 	standalone: true,
 	templateUrl: './field-model-possible-values-dialog.component.html',
 	styleUrls: ['./field-model-possible-values-dialog.component.css', '../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatTabsModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule, MatTabsModule]
 })
-export class FieldModelPossibleValuesDialogComponent implements OnInit {
+export class FieldModelPossibleValuesDialogComponent extends BaseDialogComponent<FieldModelPossibleValuesDialogData> implements OnInit {
 	form: FormGroup;
 	availableLanguages: ProjectLanguage[] = [];
 	showPossibleValuesSection = false;
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<FieldModelPossibleValuesDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelPossibleValuesDialogData,
-		private snackBar: MatSnackBar
-	) {}
+		dialogRef: MatDialogRef<FieldModelPossibleValuesDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelPossibleValuesDialogData,
+		snackBar: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	ngOnInit(): void {
 		this.loadProjectLanguages();
@@ -188,13 +182,9 @@ export class FieldModelPossibleValuesDialogComponent implements OnInit {
 		}
 	}
 
-	onCancel(): void {
-		this.dialogRef.close(null);
-	}
-
 	onSave(): void {
 		if(this.form.invalid) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 

@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {FormsModule} from '@angular/forms';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface RuleTagsDialogData {
 	ruleTags: ProjectRuleTag[];
@@ -15,22 +16,18 @@ export interface RuleTagsDialogData {
 	standalone: true,
 	templateUrl: './project-settings-rule-tags-dialog.component.html',
 	styleUrls: ['./project-settings-rule-tags-dialog.component.css'],
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatIconModule,
-		MatTooltipModule,
-		FormsModule
-	]
+	imports: [CommonModule, MatDialogModule, MatIconModule, MatTooltipModule, FormsModule]
 })
-export class ProjectSettingsRuleTagsDialogComponent implements OnInit {
+export class ProjectSettingsRuleTagsDialogComponent extends BaseDialogComponent<RuleTagsDialogData> implements OnInit {
 	selectedTags: string[] = [];
 	newTagInput = '';
 
 	constructor(
-		private dialogRef: MatDialogRef<ProjectSettingsRuleTagsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: RuleTagsDialogData
-	) {}
+		dialogRef: MatDialogRef<ProjectSettingsRuleTagsDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: RuleTagsDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		if(this.data.ruleTags && this.data.ruleTags.length > 0) {
@@ -82,9 +79,5 @@ export class ProjectSettingsRuleTagsDialogComponent implements OnInit {
 		}));
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 }

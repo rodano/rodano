@@ -1,7 +1,7 @@
 import {ProjectLanguage} from '@core/model/project-language';
 import {Component, Inject, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatCheckboxModule} from '@angular/material/checkbox';
@@ -23,14 +23,7 @@ export interface ChartSettingsDialogData {
 	standalone: true,
 	templateUrl: './chart-settings-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule,
-		MatCheckboxModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule, MatCheckboxModule, MatSelectModule]
 })
 export class ChartSettingsDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -39,10 +32,10 @@ export class ChartSettingsDialogComponent extends BaseInfoDialogComponent implem
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ChartSettingsDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartSettingsDialogData,
-		private snackBar: MatSnackBar
+		@Inject(MAT_DIALOG_DATA) data: ChartSettingsDialogData,
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 	}
 
 	ngOnInit(): void {
@@ -78,7 +71,7 @@ export class ChartSettingsDialogComponent extends BaseInfoDialogComponent implem
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 

@@ -7,6 +7,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {LanguageService} from '../../../services/language.service';
 import {MatSelectModule} from '@angular/material/select';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface EventModelSchedulingDialogData {
 	eventModel: EventModel;
@@ -16,18 +17,11 @@ export interface EventModelSchedulingDialogData {
 @Component({
 	selector: 'app-event-model-scheduling-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		ReactiveFormsModule,
-		MatSelectModule
-	],
 	templateUrl: './event-model-scheduling-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule, MatSelectModule]
 })
-export class EventModelSchedulingDialogComponent implements OnInit {
+export class EventModelSchedulingDialogComponent extends BaseDialogComponent<EventModelSchedulingDialogData> implements OnInit {
 	form: FormGroup;
 
 	timeUnits = [
@@ -51,26 +45,20 @@ export class EventModelSchedulingDialogComponent implements OnInit {
 	constructor(
 		public languageService: LanguageService,
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<EventModelSchedulingDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: EventModelSchedulingDialogData
+		dialogRef: MatDialogRef<EventModelSchedulingDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: EventModelSchedulingDialogData
 	) {
-		this.form = this.fb.group({
-			deadline: [null, [Validators.min(0)]],
-			deadlineUnit: [''],
-			deadlineAggregationFunction: [''],
-			interval: [null, [Validators.min(0)]],
-			intervalUnit: ['']
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		if(this.data.eventModel) {
-			this.form.patchValue({
-				deadline: this.data.eventModel.deadline,
-				deadlineUnit: this.data.eventModel.deadlineUnit || '',
-				deadlineAggregationFunction: this.data.eventModel.deadlineAggregationFunction || '',
-				interval: this.data.eventModel.interval,
-				intervalUnit: this.data.eventModel.intervalUnit || ''
+			this.form = this.fb.group({
+				deadline: [this.data.eventModel.deadline, [Validators.min(0)]],
+				deadlineUnit: [this.data.eventModel.deadlineUnit || ''],
+				deadlineAggregationFunction: [this.data.eventModel.deadlineAggregationFunction || ''],
+				interval: [this.data.eventModel.interval, [Validators.min(0)]],
+				intervalUnit: [this.data.eventModel.intervalUnit || '']
 			});
 
 			const selectedIds = this.data.eventModel.deadlineReferenceEventModelIds || [];
@@ -150,9 +138,5 @@ export class EventModelSchedulingDialogComponent implements OnInit {
 
 			this.dialogRef.close(result);
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

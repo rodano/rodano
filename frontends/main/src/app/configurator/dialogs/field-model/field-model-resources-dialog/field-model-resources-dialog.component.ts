@@ -7,6 +7,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {Validator} from '@core/model/validator';
 import {Workflow} from '@core/model/workflow';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface FieldModelResourcesDialogData {
 	fieldModel: FieldModel;
@@ -17,16 +18,11 @@ export interface FieldModelResourcesDialogData {
 @Component({
 	selector: 'app-field-model-resources-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule
-	],
 	templateUrl: './field-model-resources-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule]
 })
-export class FieldModelResourcesDialogComponent implements OnInit {
+export class FieldModelResourcesDialogComponent extends BaseDialogComponent<FieldModelResourcesDialogData> implements OnInit {
 	availableValidators: Validator[] = [];
 	selectedValidators: Validator[] = [];
 
@@ -35,9 +31,11 @@ export class FieldModelResourcesDialogComponent implements OnInit {
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<FieldModelResourcesDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelResourcesDialogData
-	) {}
+		dialogRef: MatDialogRef<FieldModelResourcesDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelResourcesDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.initializeValidators();
@@ -92,9 +90,5 @@ export class FieldModelResourcesDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

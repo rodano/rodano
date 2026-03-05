@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {FormBuilder, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ScopeModelPatternDialogData {
 	scopeModel: ScopeModel;
@@ -18,17 +19,11 @@ interface PatternOption {
 @Component({
 	selector: 'app-scope-model-pattern-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		ReactiveFormsModule
-	],
 	templateUrl: './scope-model-pattern-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, ReactiveFormsModule]
 })
-export class ScopeModelPatternDialogComponent implements OnInit {
+export class ScopeModelPatternDialogComponent extends BaseDialogComponent<ScopeModelPatternDialogData> implements OnInit {
 	form: FormGroup;
 
 	patternOptions: PatternOption[] = [
@@ -41,18 +36,16 @@ export class ScopeModelPatternDialogComponent implements OnInit {
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<ScopeModelPatternDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ScopeModelPatternDialogData
+		dialogRef: MatDialogRef<ScopeModelPatternDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ScopeModelPatternDialogData
 	) {
-		this.form = this.fb.group({
-			scopeFormat: ['']
-		});
+		super(dialogRef, data);
 	}
 
 	ngOnInit(): void {
 		if(this.data.scopeModel) {
-			this.form.patchValue({
-				scopeFormat: this.data.scopeModel.scopeFormat || ''
+			this.form = this.fb.group({
+				scopeFormat: [this.data.scopeModel.scopeFormat || '']
 			});
 		}
 	}
@@ -83,9 +76,5 @@ export class ScopeModelPatternDialogComponent implements OnInit {
 
 			this.dialogRef.close(result);
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

@@ -7,6 +7,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {MatSelectModule} from '@angular/material/select';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface WorkflowStateActionDialogData {
 	workflowState: WorkflowState;
@@ -18,23 +19,19 @@ export interface WorkflowStateActionDialogData {
 	standalone: true,
 	templateUrl: './workflow-state-action-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
 })
-export class WorkflowStateActionDialogComponent implements OnInit {
+export class WorkflowStateActionDialogComponent extends BaseDialogComponent<WorkflowStateActionDialogData> implements OnInit {
 	availableWorkflowActions: WorkflowAction[] = [];
 	selectedWorkflowActions: WorkflowAction[] = [];
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<WorkflowStateActionDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowStateActionDialogData
-	) {}
+		dialogRef: MatDialogRef<WorkflowStateActionDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: WorkflowStateActionDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		const selectedIds = (this.data.workflowState.possibleActions || []).map(wfa => wfa.workflowActionId);
@@ -64,9 +61,5 @@ export class WorkflowStateActionDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close({possibleActionIds: this.selectedWorkflowActions.map(wfa => wfa.workflowActionId)});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

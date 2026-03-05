@@ -7,6 +7,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTabsModule} from '@angular/material/tabs';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface WorkflowMiscDialogData {
 	workflow: Workflow;
@@ -18,25 +19,20 @@ export interface WorkflowMiscDialogData {
 	standalone: true,
 	templateUrl: './workflow-misc-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		MatTabsModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatIconModule, MatTabsModule]
 })
-export class WorkflowMiscDialogComponent implements OnInit {
+export class WorkflowMiscDialogComponent extends BaseDialogComponent<WorkflowMiscDialogData> implements OnInit {
 	form: FormGroup;
 	languageForms = new Map<string, FormGroup>();
 	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<WorkflowMiscDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowMiscDialogData
-	) {}
+		dialogRef: MatDialogRef<WorkflowMiscDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: WorkflowMiscDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.availableLanguages = this.data.languages?.length
@@ -82,10 +78,6 @@ export class WorkflowMiscDialogComponent implements OnInit {
 			console.error(error);
 			return code.toUpperCase();
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 
 	onSave(): void {

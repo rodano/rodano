@@ -27,18 +27,8 @@ export interface WorkflowStateBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './workflow-state-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatCheckboxModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatCheckboxModule, MatTabsModule, MatSelectModule]
 })
 export class WorkflowStateBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -48,10 +38,10 @@ export class WorkflowStateBasicInfoDialogComponent extends BaseInfoDialogCompone
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<WorkflowStateBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowStateBasicInfoDialogData,
-		private snackBar: MatSnackBar
+		@Inject(MAT_DIALOG_DATA) data: WorkflowStateBasicInfoDialogData,
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.workflowState;
 	}
 
@@ -100,7 +90,7 @@ export class WorkflowStateBasicInfoDialogComponent extends BaseInfoDialogCompone
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 

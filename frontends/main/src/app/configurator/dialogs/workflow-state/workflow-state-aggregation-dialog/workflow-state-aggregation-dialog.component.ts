@@ -6,6 +6,7 @@ import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/
 import {MatButtonModule} from '@angular/material/button';
 import {MatSelectModule} from '@angular/material/select';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface WorkflowStateAggregationDialogData {
 	workflowState: WorkflowState;
@@ -15,17 +16,11 @@ export interface WorkflowStateAggregationDialogData {
 @Component({
 	selector: 'app-workflow-state-aggregation-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatSelectModule
-	],
 	templateUrl: './workflow-state-aggregation-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatSelectModule]
 })
-export class WorkflowStateAggregationDialogComponent implements OnInit {
+export class WorkflowStateAggregationDialogComponent extends BaseDialogComponent<WorkflowStateAggregationDialogData> implements OnInit {
 	form: FormGroup;
 
 	matcherOptions = [
@@ -38,9 +33,11 @@ export class WorkflowStateAggregationDialogComponent implements OnInit {
 	constructor(
 		public languageService: LanguageService,
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<WorkflowStateAggregationDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: WorkflowStateAggregationDialogData
-	) {}
+		dialogRef: MatDialogRef<WorkflowStateAggregationDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: WorkflowStateAggregationDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.form = this.fb.group({
@@ -63,9 +60,5 @@ export class WorkflowStateAggregationDialogComponent implements OnInit {
 		}
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

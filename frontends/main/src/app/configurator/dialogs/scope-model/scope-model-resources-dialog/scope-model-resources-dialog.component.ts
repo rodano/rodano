@@ -10,6 +10,7 @@ import {FormModel} from '@core/model/form-model';
 import {DatasetModel} from '@core/model/dataset-model';
 import {Workflow} from '@core/model/workflow';
 import {LanguageService} from '../../../services/language.service';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 interface WorkflowStateSelector {
 	id: string;
@@ -34,17 +35,11 @@ export interface ScopeModelResourcesDialogData {
 @Component({
 	selector: 'app-scope-model-resources-dialog',
 	standalone: true,
-	imports: [
-		CommonModule,
-		MatDialogModule,
-		MatButtonModule,
-		MatIconModule,
-		MatSelectModule
-	],
 	templateUrl: './scope-model-resources-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css']
+	styleUrls: ['../../dialog-shared.css'],
+	imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatSelectModule]
 })
-export class ScopeModelResourcesDialogComponent implements OnInit {
+export class ScopeModelResourcesDialogComponent extends BaseDialogComponent<ScopeModelResourcesDialogData> implements OnInit {
 	availableFormModels: FormModel[] = [];
 	selectedFormModels: FormModel[] = [];
 
@@ -59,9 +54,11 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 
 	constructor(
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ScopeModelResourcesDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ScopeModelResourcesDialogData
-	) {}
+		dialogRef: MatDialogRef<ScopeModelResourcesDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ScopeModelResourcesDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.initializeFormModels();
@@ -236,9 +233,5 @@ export class ScopeModelResourcesDialogComponent implements OnInit {
 		result.workflowStateIds = currentSelections.map(s => s.workflowStateId);
 
 		this.dialogRef.close(result);
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 }

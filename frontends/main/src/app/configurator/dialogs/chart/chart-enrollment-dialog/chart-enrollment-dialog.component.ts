@@ -7,6 +7,7 @@ import {ChartModel} from '@core/model/chart-model';
 import {Workflow} from '@core/model/workflow';
 import {LanguageService} from '../../../services/language.service';
 import {MatSelectModule} from '@angular/material/select';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface ChartEnrollmentDialogData {
 	chart: ChartModel;
@@ -20,15 +21,17 @@ export interface ChartEnrollmentDialogData {
 	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatCheckboxModule, MatSelectModule]
 })
-export class ChartEnrollmentDialogComponent implements OnInit {
+export class ChartEnrollmentDialogComponent extends BaseDialogComponent<ChartEnrollmentDialogData> implements OnInit {
 	form: FormGroup;
 
 	constructor(
 		private fb: FormBuilder,
 		public languageService: LanguageService,
-		private dialogRef: MatDialogRef<ChartEnrollmentDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartEnrollmentDialogData
-	) {}
+		dialogRef: MatDialogRef<ChartEnrollmentDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: ChartEnrollmentDialogData
+	) {
+		super(dialogRef, data);
+	}
 
 	ngOnInit(): void {
 		this.form = this.fb.group({
@@ -42,9 +45,5 @@ export class ChartEnrollmentDialogComponent implements OnInit {
 			displayExpected: this.form.value.displayExpected,
 			workflowId: this.form.value.workflowId
 		});
-	}
-
-	onCancel(): void {
-		this.dialogRef.close();
 	}
 }

@@ -22,13 +22,7 @@ export interface ChartBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './chart-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatTabsModule,
-		MatSelectModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatTabsModule, MatSelectModule]
 })
 export class ChartBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
@@ -38,11 +32,11 @@ export class ChartBasicInfoDialogComponent extends BaseInfoDialogComponent imple
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<ChartBasicInfoDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: ChartBasicInfoDialogData,
+		@Inject(MAT_DIALOG_DATA) data: ChartBasicInfoDialogData,
 		private chartManager: ChartManagerService,
-		private snackBar: MatSnackBar
+		snackBar: MatSnackBar
 	) {
-		super(fb, languageService, dialogRef);
+		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.chart;
 	}
 
@@ -89,13 +83,13 @@ export class ChartBasicInfoDialogComponent extends BaseInfoDialogComponent imple
 
 	onSave(): void {
 		if(this.form.invalid || !this.areLanguageFormsValid()) {
-			this.snackBar.open('Please fill in all required fields', 'Close', {duration: 3000});
+			this.showError();
 			return;
 		}
 
 		const code = this.form.getRawValue().id.toUpperCase();
 		if(this.isCodeDuplicate(code)) {
-			this.snackBar.open(`A chart with code "${code}" already exists`, 'Close', {duration: 3000});
+			this.showError(`A chart with code "${code}" already exists`);
 			return;
 		}
 

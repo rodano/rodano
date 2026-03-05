@@ -10,6 +10,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import {BaseDialogComponent} from '../../base-dialog.component';
 
 export interface FieldModelHelpDialogData {
 	fieldModel: FieldModel;
@@ -21,27 +22,21 @@ export interface FieldModelHelpDialogData {
 	standalone: true,
 	templateUrl: './field-model-help-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [
-		CommonModule,
-		ReactiveFormsModule,
-		MatDialogModule,
-		MatFormFieldModule,
-		MatInputModule,
-		MatButtonModule,
-		MatIconModule,
-		MatTabsModule
-	]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatFormFieldModule, MatInputModule, MatButtonModule,
+		MatIconModule, MatTabsModule]
 })
-export class FieldModelHelpDialogComponent implements OnInit {
+export class FieldModelHelpDialogComponent extends BaseDialogComponent<FieldModelHelpDialogData> implements OnInit {
 	form: FormGroup;
 	availableLanguages: ProjectLanguage[] = [];
 
 	constructor(
 		private fb: FormBuilder,
-		private dialogRef: MatDialogRef<FieldModelHelpDialogComponent>,
-		@Inject(MAT_DIALOG_DATA) public data: FieldModelHelpDialogData,
-		private snackBar: MatSnackBar
-	) {}
+		dialogRef: MatDialogRef<FieldModelHelpDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) data: FieldModelHelpDialogData,
+		snackBar: MatSnackBar
+	) {
+		super(dialogRef, data, snackBar);
+	}
 
 	ngOnInit(): void {
 		this.loadProjectLanguages();
@@ -87,10 +82,6 @@ export class FieldModelHelpDialogComponent implements OnInit {
 			console.error(error);
 			return code.toUpperCase();
 		}
-	}
-
-	onCancel(): void {
-		this.dialogRef.close(null);
 	}
 
 	onSave(): void {
