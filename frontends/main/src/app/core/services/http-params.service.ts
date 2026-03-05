@@ -76,6 +76,9 @@ export class HttpParamsService {
 				case 'orderAscending':
 					search.orderAscending = JSON.parse(value);
 					break;
+				case 'includeDeleted':
+					search.includeDeleted = JSON.parse(value);
+					break;
 				case 'fieldModelCriteria':
 					search.fieldModelCriteria = decodeURIComponent(value);
 					break;

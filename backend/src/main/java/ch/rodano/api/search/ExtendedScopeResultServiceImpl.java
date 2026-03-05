@@ -10,7 +10,9 @@ import java.util.Optional;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +36,6 @@ import static ch.rodano.core.model.jooq.Tables.SCOPE;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
 import static ch.rodano.core.model.jooq.Tables.SCOPE_RELATION;
 import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATUS;
-import static org.jooq.impl.DSL.field;
 
 @Service
 @Transactional(readOnly = true)
@@ -117,7 +118,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			final var datasetModel = fieldModel.getDatasetModel();
 			final var selectAlias = sqlFieldValueColumnAlias(datasetModel.getId(), fieldModel.getId());
 			final var fieldAlias = datasetModel.getId().toLowerCase() + "_" + fieldModel.getId().toLowerCase();
-			selectFields.add(DSL.field(fieldAlias + ".value").as(selectAlias));
+			selectFields.add(DSL.field(DSL.name(fieldAlias, "value")).as(selectAlias));
 		}
 
 		// handle rights with scope ancestor table
@@ -128,7 +129,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 
 		// add ancestor columns to the select list so they are available in the result
 		selectFields.add(default_parent_scope.PK.as("default_parent_sc_pk"));
-		selectFields.add(default_parent_scope.ID.as("default_parent_sc_id"));
+		selectFields.add(default_parent_scope.SCOPE_MODEL_ID.as("default_parent_sc_model_id"));
 		selectFields.add(default_parent_scope.CODE.as("ancestor_code"));
 		selectFields.add(default_parent_scope.SHORTNAME.as("default_parent_sc_shortname"));
 		selectFields.add(default_parent_scope.LONGNAME.as("default_parent_sc_longname"));
@@ -178,47 +179,27 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			}
 		});
 
-		// one join per workflow filter is required
-		search.getWorkflowStates().get().forEach((key, value) -> {
-			final var workflowJoin = WORKFLOW_STATUS.as(sqlWorkflowsStateColumnAlias(key));
-			// perform a left join to include scopes without workflow status rows
-			query.leftJoin(workflowJoin).on(
-				SCOPE.PK.eq(workflowJoin.SCOPE_FK)
-					.and(workflowJoin.WORKFLOW_ID.eq(key))
-					.and(workflowJoin.DELETED.isFalse()));
-		});
 
-		final var workflowJoins = new ArrayList<org.jooq.Table<?>>();
-		if (!search.getWorkflowStates().get().isEmpty()) {
-			for (final var entry : search.getWorkflowStates().get().entrySet()) {
-				final var workflowJoin = WORKFLOW_STATUS.as(sqlWorkflowsStateColumnAlias(entry.getKey() + ".state_id"));
-				// perform an inner join to only include scopes that have matching workflow
-				// status rows
-				workflowJoins.add(workflowJoin);
+		final var workflowStatesByWorkflow = search.getWorkflowStates().orElse(Collections.emptyMap());
+		workflowsOnScopeModel.forEach(workflow -> {
+			final var workflowId = workflow.getId();
+			final var workflowJoin = WORKFLOW_STATUS.as(sqlWorkflowsStateColumnAlias(workflowId));
+			final var filteredStates = workflowStatesByWorkflow.get(workflowId);
 
+			if (filteredStates != null && !filteredStates.isEmpty()) {
 				query.innerJoin(workflowJoin).on(
 					SCOPE.PK.eq(workflowJoin.SCOPE_FK)
-						.and(workflowJoin.WORKFLOW_ID.eq(entry.getKey()))
+						.and(workflowJoin.WORKFLOW_ID.eq(workflowId))
 						.and(workflowJoin.DELETED.isFalse())
-						.and(workflowJoin.STATE_ID.in(entry.getValue())));
+						.and(workflowJoin.STATE_ID.in(filteredStates)));
 			}
-		}
-
-		// retrieve all workflow statuses for the workflows on the scope model
-
-		workflowsOnScopeModel.forEach(workflow -> {
-
-			final var workflowJoin =
-				WORKFLOW_STATUS.as(sqlWorkflowsStateColumnAlias(workflow.getId()));
-			if (workflowJoins.contains(
-				WORKFLOW_STATUS.as(sqlWorkflowsStateColumnAlias(workflow.getId() + ".state_id")))) {
-				return; // already joined above
+			else {
+				// Keep workflows without explicit state filters available for projection/sorting.
+				query.leftJoin(workflowJoin).on(
+					SCOPE.PK.eq(workflowJoin.SCOPE_FK)
+						.and(workflowJoin.WORKFLOW_ID.eq(workflowId))
+						.and(workflowJoin.DELETED.isFalse()));
 			}
-			// perform a left join to include scopes without workflow status rows
-			query.leftJoin(workflowJoin).on(
-				SCOPE.PK.eq(workflowJoin.SCOPE_FK)
-					.and(workflowJoin.WORKFLOW_ID.eq(workflow.getId()))
-					.and(workflowJoin.DELETED.isFalse()));
 		});
 
 
@@ -253,8 +234,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 
 				if (!fieldCriteria.isEmpty()) {
 					// Field has criteria: join with the condition(s) combined with OR
-					final var operatedFieldName = String.format("%s.value", fieldAlias);
-					final var operatedField = field(operatedFieldName, String.class);
+					final var operatedField = DSL.field(DSL.name(fieldAlias, "value"), String.class);
 					
 					// Build OR condition from all criteria for this field
 					Condition combinedCondition = null;
@@ -287,9 +267,11 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 				final List<Condition> scopeConditions = new ArrayList<>();
 				for (final var entry : ancestorPks.entrySet()) {
 					scopeConditions.add(
-						SCOPE.PK.in(entry.getValue())
-							.or(SCOPE_ANCESTOR.ANCESTOR_FK.in(entry.getValue()))
-							.and(SCOPE.SCOPE_MODEL_ID.eq(entry.getKey())));
+						DSL.or(
+							SCOPE.PK.in(entry.getValue()),
+							sa.ANCESTOR_FK.in(entry.getValue())
+						).and(SCOPE.SCOPE_MODEL_ID.eq(entry.getKey()))
+					);
 				}
 				conditions.add(DSL.or(scopeConditions));
 			}
@@ -301,7 +283,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			conditions.add(
 				SCOPE.DELETED.isFalse()
 					// scope ancestor table is null for the root scope
-					.and(SCOPE_ANCESTOR.ANCESTOR_FK.isNull().or(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())));
+					.and(sa.ANCESTOR_FK.isNull().or(sa.ANCESTOR_DELETED.isFalse())));
 		}
 
 		search.getPks().ifPresent(pks -> {
@@ -337,43 +319,60 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 
 		// Apply sorting - use extendedSortBy if provided, otherwise use default sortBy
 		if (search.getExtendedSortBy() != null && !search.getExtendedSortBy().isEmpty()) {
-			// Dynamic field sorting
-			var sortTarget = search.getExtendedSortBy();
-			final var workflowIds = workflowsOnScopeModel.stream().map(Workflow::getId).toList();
-			final var fieldIds = searchableFieldsOnScopeModel.stream().map(f -> f.getId().toLowerCase()).toList();
-			// Normalize workflow sort keys to the exposed select alias using sqlWorkflowsStateColumnAlias
-			if (!sortTarget.contains(".")) { //Workflos state sort
-				if (workflowIds.contains(sortTarget)) {
-					sortTarget = sqlWorkflowsStateColumnAlias(sortTarget) + ".state_id";
-				}
-				else if (sortTarget.startsWith("ws_")) {
-					sortTarget = sortTarget + ".state_id";
+			Field<?> sortField = null;
+			final var sortTarget = search.getExtendedSortBy();
+
+			// Workflow state sorting (allow-listed by configured workflow IDs)
+			if (!sortTarget.contains(".")) {
+				final var normalizedWorkflowId = sortTarget.startsWith("ws_") ? sortTarget.substring(3) : sortTarget;
+				final var isAllowedWorkflow = workflowsOnScopeModel.stream()
+					.map(Workflow::getId)
+					.anyMatch(normalizedWorkflowId::equals);
+
+				if (isAllowedWorkflow) {
+					sortField = DSL.field(DSL.name(sqlWorkflowsStateColumnAlias(normalizedWorkflowId), "state_id"), String.class);
 				}
 			}
-			else { // Field sort
+			else {
+				// Searchable field sorting: expected format datasetModelId.fieldModelId
 				final var parts = sortTarget.split("\\.");
-				if (parts.length == 2 && fieldIds.contains(parts[1])) {
-					final var sortColumn = DSL.field(String.format("%s_%s.value", parts[0], parts[1]));
-					// get configuration to check field type
-					final var fieldmodel = studyService.getStudy().getDatasetModel(parts[0]).getFieldModel(parts[1]);
-					if (FieldModelType.NUMBER.equals(fieldmodel.getType())) {
-						// cast to double for numeric sorting
-						sortTarget = "CAST(" + DSL.field(sortColumn) + " AS DOUBLE)";
-					}
-					else if (FieldModelType.DATE.equals(fieldmodel.getType())) {
-						// cast to date for date sorting
-						sortTarget = "STR_TO_DATE(" + sortColumn + ", '" + JOOQTranslator.SQL_FIELD_DATE_FORMAT.getValue() + "')";
+				if (parts.length == 2) {
+					final var datasetModelId = parts[0];
+					final var fieldModelId = parts[1];
 
-					}
-					else {
-						sortTarget = sortColumn.getName();
+					final var matchedFieldModel = searchableFieldsOnScopeModel.stream()
+						.filter(f -> f.getDatasetModel().getId().equalsIgnoreCase(datasetModelId)
+							&& f.getId().equalsIgnoreCase(fieldModelId))
+						.findFirst();
+
+					if (matchedFieldModel.isPresent()) {
+						final var fieldModel = matchedFieldModel.get();
+						final var datasetAlias = fieldModel.getDatasetModel().getId().toLowerCase() + "_" + fieldModel.getId().toLowerCase();
+						final var valueField = DSL.field(DSL.name(datasetAlias, "value"), String.class);
+
+						if (FieldModelType.NUMBER.equals(fieldModel.getType())) {
+							sortField = valueField.cast(Double.class);
+						}
+						else if (FieldModelType.DATE.equals(fieldModel.getType())) {
+							sortField = DSL.function(
+								"STR_TO_DATE",
+								SQLDataType.LOCALDATE,
+								valueField,
+								DSL.inline(JOOQTranslator.SQL_FIELD_DATE_FORMAT.getValue()));
+						}
+						else {
+							sortField = valueField;
+						}
 					}
 				}
 			}
 
-			final var sortField = DSL.field(sortTarget);
-
-			query.orderBy(search.getOrder() == org.jooq.SortOrder.ASC ? sortField.asc() : sortField.desc());
+			if (sortField != null) {
+				query.orderBy(search.getOrder() == org.jooq.SortOrder.ASC ? sortField.asc() : sortField.desc());
+			}
+			else {
+				query.orderBy(search.getSortBy().getField().sort(search.getOrder()));
+			}
 		}
 		else {
 			// Standard field sorting
@@ -393,7 +392,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			final ExtendedScopeSearchResultDTO dto = new ExtendedScopeSearchResultDTO();
 			final ScopeDTO scopeDTO = new ScopeDTO();
 			scopeDTO.setCode(record.get("code").toString());
-			scopeDTO.setPk(Long.parseLong(record.get("pk").toString()));
+			scopeDTO.setPk(record.get("pk", Long.class));
 			scopeDTO.setId(record.get("id").toString());
 			scopeDTO.setShortname(record.get("shortname").toString());
 			scopeDTO.setLongname(record.get("longname") != null ? record.get("longname").toString() : null);
@@ -402,7 +401,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			scopeDTO.setRemoved(((Boolean)record.get("deleted")) != null ? (Boolean) record.get("deleted") : false);
 			final ScopeTinyDTO parentDTO = new ScopeTinyDTO(
 				record.get("default_parent_sc_pk", Long.class),
-				record.get("default_parent_sc_id", String.class),
+				record.get("default_parent_sc_model_id", String.class),
 				record.get("default_parent_sc_code", String.class),
 				record.get("default_parent_sc_shortname", String.class),
 				record.get("default_parent_sc_longname", String.class)

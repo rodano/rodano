@@ -37,7 +37,7 @@ import {Operator} from '@core/model/operator';
 import {DateUTCPipe} from '../pipes/date-utc.pipe';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
-import {LowerCasePipe} from '@angular/common';
+import {Location, LowerCasePipe} from '@angular/common';
 import {FormService} from '@core/services/form.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
@@ -142,6 +142,7 @@ export class SearchComponent implements OnInit {
 		private readonly notificationService: NotificationService,
 		private readonly router: Router,
 		private readonly route: ActivatedRoute,
+		private readonly location: Location,
 		private readonly dialog: MatDialog,
 		private readonly destroyRef: DestroyRef,
 		private readonly formService: FormService,
@@ -178,9 +179,22 @@ export class SearchComponent implements OnInit {
 			switchMap(results => {
 				const scopeModels = results.scopeModels;
 
-				//Find the leaf scope model by ID from URL
-				if(!this.selectedScopeModel.id && this.scopeModelId) {
-					this.selectedScopeModel = scopeModels.find(sm => sm.id === this.scopeModelId) ?? ({} as ScopeModel);
+				const resolvedScopeModel = this.resolveScopeModel(scopeModels);
+				if(!resolvedScopeModel) {
+					throw new Error('No scope models available');
+				}
+
+				this.selectedScopeModel = resolvedScopeModel;
+				this.scopeModelId = resolvedScopeModel.id;
+
+				const queryScopeModelId = this.route.snapshot.queryParams['scopeModelId'];
+				if(queryScopeModelId !== this.scopeModelId) {
+					const queryParams = {
+						...this.route.snapshot.queryParams,
+						scopeModelId: this.scopeModelId
+					};
+					const query = this.httpParamsService.toHttpParams(queryParams).toString();
+					this.location.replaceState(`/search?${query}`);
 				}
 
 				this.selectedScopeModelParentModel = scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel.defaultParentId) ?? ({} as ScopeModel);
@@ -220,6 +234,14 @@ export class SearchComponent implements OnInit {
 		).subscribe(({parentsWithWriteAccess}) => {
 			this.writeAccessOnParent = parentsWithWriteAccess.length > 0;
 		});
+	}
+
+	private resolveScopeModel(scopeModels: ScopeModel[]): ScopeModel | undefined {
+		if(scopeModels.length === 0) {
+			return undefined;
+		}
+
+		return scopeModels.find(sm => sm.id === this.scopeModelId) ?? scopeModels.find(sm => sm.id === this.selectedScopeModel.id) ?? scopeModels.find(sm => sm.leaf) ?? scopeModels[0];
 	}
 
 	private buildMapsAndColumns(): void {
@@ -444,10 +466,10 @@ export class SearchComponent implements OnInit {
 		const search = new ScopeSearch();
 		search.fullText = this.searchForm.controls.scopeCode.value;
 
-		search.scopeModelId = this.scopeModelId;
+		search.scopeModelId = this.selectedScopeModel.id;
 		search.workflowStates = {};
 		search.fieldModelCriteria = '';
-		search.includeDeleted = this.showRemovedScopesControl.value ?? false;
+		search.includeDeleted = this.showRemovedScopesControl.value === true ? true : undefined;
 
 		//Process workflow states
 		this.searchableWorkflows.forEach(workflow => {
@@ -569,9 +591,9 @@ export class SearchComponent implements OnInit {
 		return isDateType && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory;
 	}
 
-	getFieldModel(datasetModelId: string, fieldId: string): FieldModel {
+	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
 		const key = `${datasetModelId.toUpperCase()}.${fieldId.toUpperCase()}`;
-		return this.fieldModelCache.get(key) ?? {} as FieldModel;
+		return this.fieldModelCache.get(key);
 	}
 
 	getWorkflow(workflowId: string): Workflow | undefined {
@@ -605,7 +627,7 @@ export class SearchComponent implements OnInit {
 	}
 
 	//return the searchable field from the form control ID
-	getSearchableFieldFromFormControlId(formControlId: string): FieldModel {
+	getSearchableFieldFromFormControlId(formControlId: string): FieldModel | undefined {
 		const [datasetModelId, fieldModelId] = formControlId.split('.');
 
 		return this.getFieldModel(datasetModelId, fieldModelId);
@@ -613,7 +635,7 @@ export class SearchComponent implements OnInit {
 
 	resetSearchCriteria(): void {
 		//Reset all form controls without emitting to avoid multiple searches
-		this.searchForm.reset({emitEvent: false});
+		this.searchForm.reset({}, {emitEvent: false});
 		this.parentScopeControl.setValue([], {emitEvent: false});
 		this.fieldModelCriteria = [];
 		this.paginator.pageIndex = 0;

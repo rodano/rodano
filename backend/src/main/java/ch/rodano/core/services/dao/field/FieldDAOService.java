@@ -10,7 +10,6 @@ import java.util.function.Function;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.FieldAuditTrail;
-import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Timeframe;
 import ch.rodano.core.model.field.Field;
 
@@ -59,5 +58,5 @@ public interface FieldDAOService {
 	Map<Long, NavigableSet<FieldAuditTrail>> getAuditTrailsForProperty(Collection<Field> fields, Optional<Timeframe> timeframe, Function<FieldAuditTrail, Object> property);
 
 
-	Map<Long, List<Dataset>> getSearchableFieldsOnScope(ScopeModel scopeModel);
+	Map<Long, List<Field>> getSearchableFieldsOnScope(ScopeModel scopeModel);
 }

@@ -125,20 +125,19 @@
 							*matCellDef="let result"
 							class="value-cell">
 							@if (workflowStatusModelMap.has(column)) {
-								@for (workflowStatus of result.workflowStatuses; track Object.keys(workflowStatus)) {
-									@for (key of Object.keys(workflowStatus); track key) {
-										@if (key === column) {
-											{{ getStatusModel(column, workflowStatus[key]) | localizeMap }}
-										}
+								@for (workflowStatus of result.workflowStatuses; track $index) {
+									@let stateId = workflowStatus[column];
+									@if (stateId) {
+										{{ getStatusModel(column, stateId) | localizeMap }}
 									}
 								}
 							}
 
 							@if (fieldModelMap.has(column)) {
 								@let fieldModel = getSearchableFieldFromFormControlId(column);
-								@if (result.fieldValues) {
+								@if (fieldModel && result.fieldValues) {
 									@for (datasetModelId of Object.keys(result.fieldValues); track datasetModelId) {
-										@if (datasetModelId === getSearchableFieldFromFormControlId(column).datasetModelId) {
+										@if (datasetModelId === fieldModel.datasetModelId) {
 											@let value = result.fieldValues[datasetModelId][fieldModel.id];
 											@if (getIsPossibleValue(datasetModelId, fieldModel.id)) {
 												{{ getValueShortname(datasetModelId, fieldModel.id, value) | localizeMap }}

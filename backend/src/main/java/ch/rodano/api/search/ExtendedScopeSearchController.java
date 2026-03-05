@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jooq.DSLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +35,6 @@ import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
 import ch.rodano.core.utils.RightsService;
 
 
@@ -47,10 +45,8 @@ import ch.rodano.core.utils.RightsService;
 public class ExtendedScopeSearchController extends AbstractSecuredController {
 	private static final Logger LOG = LoggerFactory.getLogger(ExtendedScopeSearchController.class);
 
-	final DSLContext create;
 	final Integer defaultPageSize;
 	final ExtendedScopeResultService extendedScopeResultService;
-	final WorkflowStatusDAOService workflowStatusDAOService;
 	private final ObjectMapper mapper;
 	private final ScopeService scopeService;
 
@@ -63,16 +59,12 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 					     final ScopeService scopeService,
 					     final ExtendedScopeResultService extendedScopeResultService,
 					     final ObjectMapper mapper,
-					     final WorkflowStatusDAOService workflowStatusDAOService,
-					     @Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize,
-					     final DSLContext create
+					     @Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
-		this.create = create;
 		this.defaultPageSize = defaultPageSize;
 		this.extendedScopeResultService = extendedScopeResultService;
 		this.mapper = mapper;
-		this.workflowStatusDAOService = workflowStatusDAOService;
 		this.scopeService = scopeService;
 	}
 
@@ -108,10 +100,10 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor());
 		final var currentRoles = currentActiveRoles();
 
-		// Determine whether removed scopes should be included. Only allow including removed scopes
-		// when the actor actually has the MANAGE_DELETED_DATA right.
+		// when the actor actually has the MANAGE_DELETED_DATA right. By default, do not include
+		// removed scopes unless explicitly requested via the includeDeleted parameter.
 		final var canManageDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
-		final boolean includeDeletedFinal = includeDeleted.map(val -> canManageDeleted && val).orElse(canManageDeleted);
+		final boolean includeDeletedFinal = includeDeleted.map(val -> canManageDeleted && val).orElse(false);
 
 		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
 		final Optional<Map<String, List<String>>> workflowStatesMap = workflowStates.map(s -> readFromURI(s, stateType));

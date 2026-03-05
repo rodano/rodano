@@ -17,7 +17,6 @@ import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.FieldAuditTrail;
-import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.jooq.Tables;
 import ch.rodano.core.model.jooq.tables.records.FieldAuditRecord;
@@ -146,32 +145,35 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	@Override
 
 	@Override
-	public Map<Long, List<Dataset>> getSearchableFieldsOnScope(final ScopeModel scopeModel) {
+	public Map<Long, List<Field>> getSearchableFieldsOnScope(final ScopeModel scopeModel) {
 		final var dsOnScope = studyService.getStudy().getScopeModel(scopeModel.getId()).getDatasetModels().stream().toList();
 
-		// Map of dataset model IDs and searchable field model IDs
-		final Map<String, String> searchableFields = dsOnScope.stream()
+		// Keep all searchable field IDs for each dataset model ID.
+		final Map<String, List<String>> searchableFieldsByDataset = dsOnScope.stream()
 			.flatMap(dm -> dm.getFieldModels().stream()
 				.filter(FieldModel::isSearchable)
 				.map(fm -> Map.entry(dm.getId(), fm.getId())))
-			.collect(java.util.stream.Collectors.toMap(
+			.collect(Collectors.groupingBy(
 				Map.Entry::getKey,
-				Map.Entry::getValue,
-				(a, b) -> a
+				Collectors.mapping(Map.Entry::getValue, Collectors.toList())
 			));
+
+		if(searchableFieldsByDataset.isEmpty()) {
+			return Map.of();
+		}
+
+		final var pairedConditions = searchableFieldsByDataset.entrySet().stream()
+			.map(entry -> DATASET.DATASET_MODEL_ID.eq(entry.getKey()).and(FIELD.FIELD_MODEL_ID.in(entry.getValue())))
+			.toList();
 
 		final SelectConditionStep<Record> query = create.select().from(FIELD)
 			.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
-			.where(DATASET.DATASET_MODEL_ID.in(searchableFields.keySet()))
-			.and(FIELD.FIELD_MODEL_ID.in(searchableFields.values()));
+			.where(DSL.or(pairedConditions));
 
-		// Fetch the fields and map to Field entities
-		final var result = create.fetch(query);
-
-		return result.stream()
+		return create.fetch(query).stream()
 			.collect(Collectors.groupingBy(
 				r -> r.get(DATASET.SCOPE_FK),
-				Collectors.mapping(r -> r.into(Dataset.class), Collectors.toList())
+				Collectors.mapping(r -> r.into(FIELD).into(Field.class), Collectors.toList())
 			));
 	}
 
