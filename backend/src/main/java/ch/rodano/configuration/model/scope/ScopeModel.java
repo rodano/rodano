@@ -26,6 +26,7 @@ import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.event.EventGroup;
 import ch.rodano.configuration.model.event.EventModel;
+import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.form.FormModel;
 import ch.rodano.configuration.model.payment.PayableModel;
 import ch.rodano.configuration.model.profile.Profile;
@@ -346,6 +347,26 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
+	public List<Workflow> getAggregatedWorkflowsOnScopeModel() {
+		return this.getWorkflows().stream().filter(Workflow::isAggregator).toList();
+	}
+
+	@JsonIgnore
+	public List<Workflow> getWorkflowsOnScopeModel() {
+		return this.getWorkflows().stream().filter(workflow -> !workflow.isAggregator()).toList();
+	}
+
+	@JsonIgnore
+	public List<Workflow> getSearchableWorkflowsOnScopeModel() {
+		return this.getWorkflows().stream().filter(workflow -> !workflow.isAggregator()).filter(Workflow::isSearchable).toList();
+	}
+
+	@JsonIgnore
+	public List<FieldModel> getSearchableFieldsOnScopeModel() {
+		return this.getDatasetModels().stream().flatMap(d -> d.getFieldModels().stream()).filter(FieldModel::isSearchable).toList();
+	}
+
+	@JsonIgnore
 	public List<ScopeModel> getChildrenScopeModel() {
 		return getStudy().getScopeModels().stream()
 			.filter(s -> s.getParentIds().contains(getId()))
@@ -374,7 +395,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		if(getParentIds().contains(model.getId())) {
 			models.add(model);
 		}
-		else {
+		else{
 			for(final var parent : getScopeModelParents()) {
 				for(final var branch : parent.getBranch(model)) {
 					if(!models.contains(branch)) {

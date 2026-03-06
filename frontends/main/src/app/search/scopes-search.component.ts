@@ -43,11 +43,13 @@ import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
 import {ExtendedScopeSearchResult} from '@core/model/extended-scope-search-result';
 import {MatCheckbox} from '@angular/material/checkbox';
+import {AutofocusDirective} from '../directives/autofocus.directive';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-search',
-	templateUrl: './search.component.html',
-	styleUrls: ['./search.component.css'],
+	templateUrl: './scopes-search.component.html',
+	styleUrls: ['./scopes-search.component.css'],
 	imports: [
 		ReactiveFormsModule,
 		MatExpansionModule,
@@ -70,7 +72,8 @@ import {MatCheckbox} from '@angular/material/checkbox';
 		MatDatepickerModule,
 		DateUTCPipe,
 		LowerCasePipe,
-		MatCheckbox
+		MatCheckbox,
+		AutofocusDirective
 	]
 })
 export class SearchComponent implements OnInit {
@@ -81,10 +84,7 @@ export class SearchComponent implements OnInit {
 		}
 	];
 
-	columnsToDisplay: string[] = [
-		'parentScopeCode',
-		'scopeCode'
-	];
+	readonly columnsToDisplay = signal<string[]>([]);
 
 	Object = Object;
 	FieldModelType = FieldModelType;
@@ -92,18 +92,19 @@ export class SearchComponent implements OnInit {
 	@Input() scopeModel: ScopeModel;
 
 	scopeModelId: string;
-	selectedScopeModel: ScopeModel = {} as ScopeModel;
-	selectedScopeModelParentModel: ScopeModel = {} as ScopeModel;
-	writeAccessOnParent = false;
-	hasManageDeletedDataFeature = false;
+	readonly selectedScopeModel = signal<ScopeModel>({} as ScopeModel);
+	readonly selectedScopeModelParentModel = signal<ScopeModel>({} as ScopeModel);
+	readonly writeAccessOnParent = signal(false);
+	readonly hasManageDeletedDataFeature = signal(false);
+
+	readonly parentScopes = signal<ScopeMini[]>([]);
 
 	searchableWorkflows: Workflow[];
-	parentScopes: ScopeMini[];
 	searchableFields: FieldModel[];
 
 	fieldModelCriteria: FieldModelCriterion[] = [];
 
-	extendedScopeSearchResult: ExtendedScopeSearchResult[] = [];
+	extendedScopeSearchResult = signal<ExtendedScopeSearchResult[]>([]);
 
 	searchForm = new FormGroup<Record<string, FormControl<any>>>({
 		scopeCode: new FormControl()
@@ -112,20 +113,20 @@ export class SearchComponent implements OnInit {
 	parentScopeControl = new FormControl();
 	showRemovedScopesControl = new FormControl(false);
 
-	resultsLength: number;
+	resultsLength = signal(0);
 
 	//Map to hold the workflowStatus model shortname
-	workflowStatusModelMap = new Map<string, Record<string, string>>();
+	readonly workflowStatusModelMap = signal<Map<string, Record<string, string>>>(new Map());
 
-	statusModelMap = new Map<string, Record<string, string>>();
+	readonly statusModelMap = signal<Map<string, Record<string, string>>>(new Map());
 
 	//Map to hold the fieldModel
-	fieldModelMap = new Map<string, Record<string, string>>();
+	readonly fieldModelMap = signal<Map<string, Record<string, string>>>(new Map());
 
 	//Map to hold the aggregated workflow ID for a workflow aggregator
-	aggregatedWorkflowMap = new Map<string, string>();
+	readonly aggregatedWorkflowMap = signal<Map<string, string>>(new Map());
 
-	loading = false;
+	loading = signal(false);
 
 	//Caches
 	private readonly fieldModelCache = new Map<string, FieldModel>();
@@ -155,7 +156,7 @@ export class SearchComponent implements OnInit {
 
 		if(this.scopeModel) {
 			//If scopeModel is provided as input, use it and update URL
-			this.selectedScopeModel = this.scopeModel;
+			this.selectedScopeModel.set(this.scopeModel);
 			this.scopeModelId = this.scopeModel.id;
 		}
 
@@ -184,7 +185,7 @@ export class SearchComponent implements OnInit {
 					throw new Error('No scope models available');
 				}
 
-				this.selectedScopeModel = resolvedScopeModel;
+				this.selectedScopeModel.set(resolvedScopeModel);
 				this.scopeModelId = resolvedScopeModel.id;
 
 				const queryScopeModelId = this.route.snapshot.queryParams['scopeModelId'];
@@ -197,19 +198,19 @@ export class SearchComponent implements OnInit {
 					this.location.replaceState(`/search?${query}`);
 				}
 
-				this.selectedScopeModelParentModel = scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel.defaultParentId) ?? ({} as ScopeModel);
-				this.hasManageDeletedDataFeature = results.me.roles?.some(r => r.profile.features.some(f => f === 'MANAGE_DELETED_DATA')) ?? false;
+				this.selectedScopeModelParentModel.set(scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel().defaultParentId) ?? ({} as ScopeModel));
+				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.some(f => f === 'MANAGE_DELETED_DATA')) ?? false);
 
 				//Load dependent data after we have the scope model
 				return forkJoin({
-					searchableWorkflows: this.configurationService.getSearchableWorkflowsOnScope(this.selectedScopeModel),
+					searchableWorkflows: this.configurationService.getSearchableWorkflowsOnScope(this.selectedScopeModel()),
 					parentScopes: this.meService.getScopes(undefined, true, false),
-					searchableFields: this.configurationService.getSearchableFieldModelsOnScope(this.selectedScopeModel)
+					searchableFields: this.configurationService.getScopeModelFieldModels(this.selectedScopeModel().id, true)
 				});
 			}),
 			switchMap(results => {
 				this.searchableWorkflows = results.searchableWorkflows;
-				this.parentScopes = results.parentScopes.filter(scope => scope.modelId === this.selectedScopeModel.defaultParentId);
+				this.parentScopes.set(results.parentScopes.filter(scope => scope.modelId === this.selectedScopeModel().defaultParentId));
 
 				this.searchableFields = results.searchableFields;
 
@@ -225,14 +226,14 @@ export class SearchComponent implements OnInit {
 				this.loadData();
 
 				//Return the parentsWithWriteAccess observable
-				return this.scopeRelationService.getParents(this.selectedScopeModel.id, Rights.WRITE).pipe(
+				return this.scopeRelationService.getParents(this.selectedScopeModel().id, Rights.WRITE).pipe(
 					map(parentsWithWriteAccess => ({
 						parentsWithWriteAccess
 					}))
 				);
 			})
 		).subscribe(({parentsWithWriteAccess}) => {
-			this.writeAccessOnParent = parentsWithWriteAccess.length > 0;
+			this.writeAccessOnParent.set(parentsWithWriteAccess.length > 0);
 		});
 	}
 
@@ -241,29 +242,39 @@ export class SearchComponent implements OnInit {
 			return undefined;
 		}
 
-		return scopeModels.find(sm => sm.id === this.scopeModelId) ?? scopeModels.find(sm => sm.id === this.selectedScopeModel.id) ?? scopeModels.find(sm => sm.leaf) ?? scopeModels[0];
+		return scopeModels.find(sm => sm.id === this.scopeModelId) ?? scopeModels.find(sm => sm.id === this.selectedScopeModel().id) ?? scopeModels.find(sm => sm.leaf) ?? scopeModels[0];
 	}
 
 	private buildMapsAndColumns(): void {
+		const newColumns = ['parentScopeCode', 'scopeCode'];
+		const newWorkflowStatusMap = new Map<string, Record<string, string>>();
+		const newStatusModelMap = new Map<string, Record<string, string>>();
+		const newAggregatedWorkflowMap = new Map<string, string>();
+		const newFieldModelMap = new Map<string, Record<string, string>>();
 		//Build all maps in one pass
 		this.searchableFields.forEach(fieldModel => {
 			const controlName = this.getSFFormControlName(fieldModel);
-			this.columnsToDisplay.push(controlName);
-			this.fieldModelMap.set(controlName, fieldModel.shortname);
+			newColumns.push(controlName);
+			newFieldModelMap.set(controlName, fieldModel.shortname);
 		});
 
 		this.searchableWorkflows.forEach(workflow => {
-			this.columnsToDisplay.push(workflow.id);
-			this.workflowStatusModelMap.set(workflow.id, workflow.shortname);
+			newColumns.push(workflow.id);
+			newWorkflowStatusMap.set(workflow.id, workflow.shortname);
 
 			workflow.states.forEach(state => {
-				this.statusModelMap.set(`${workflow.id}_${state.id}`, state.shortname);
+				newStatusModelMap.set(`${workflow.id}_${state.id}`, state.shortname);
 			});
 
 			if(workflow.aggregator && workflow.aggregatedWorkflowId) {
-				this.aggregatedWorkflowMap.set(workflow.id, workflow.aggregatedWorkflowId);
+				newAggregatedWorkflowMap.set(workflow.id, workflow.aggregatedWorkflowId);
 			}
 		});
+		this.columnsToDisplay.set(newColumns);
+		this.fieldModelMap.set(newFieldModelMap);
+		this.workflowStatusModelMap.set(newWorkflowStatusMap);
+		this.statusModelMap.set(newStatusModelMap);
+		this.aggregatedWorkflowMap.set(newAggregatedWorkflowMap);
 	}
 
 	private setupFormListeners(): void {
@@ -320,9 +331,9 @@ export class SearchComponent implements OnInit {
 	private loadData(): void {
 		this.route.queryParams.pipe(
 			tap(() => {
-				this.loading = true;
-				this.extendedScopeSearchResult = [];
-				this.resultsLength = 0;
+				this.loading.set(true);
+				this.extendedScopeSearchResult.set([]);
+				this.resultsLength.set(0);
 			}),
 			switchMap(params => {
 				let scopeSearchObj: ScopeSearch;
@@ -335,15 +346,15 @@ export class SearchComponent implements OnInit {
 					scopeSearchObj = this.httpParamsService.toScopeSearch(params);
 				}
 
-				scopeSearchObj.scopeModelId = this.selectedScopeModel.id;
+				scopeSearchObj.scopeModelId = this.selectedScopeModel().id;
 
 				this.syncFormAndUrl(scopeSearchObj);
 				return this.scopeService.extendedSearch(scopeSearchObj);
 			}),
-			tap(() => this.loading = false)
+			tap(() => this.loading.set(false))
 		).subscribe(scopeResults => {
-			this.extendedScopeSearchResult = scopeResults.objects;
-			this.resultsLength = scopeResults.paging.total;
+			this.extendedScopeSearchResult.set(scopeResults.objects);
+			this.resultsLength.set(scopeResults.paging.total);
 		});
 	}
 
@@ -358,7 +369,7 @@ export class SearchComponent implements OnInit {
 
 	createPatient() {
 		const scopeSearch = new ScopeSearch();
-		scopeSearch.scopeModelId = this.selectedScopeModel.parentIds[0];
+		scopeSearch.scopeModelId = this.selectedScopeModel().parentIds[0];
 
 		//1. search for all the scopes with the parent scope model
 		//2. if there is more than one scope available, open the scope selection dialog, otherwise pick the only one that is available
@@ -374,7 +385,7 @@ export class SearchComponent implements OnInit {
 
 				return iif(
 					() => parentScopes.length > 1,
-					defer(() => this.openScopeSelectDialog(parentScopes, this.selectedScopeModel)),
+					defer(() => this.openScopeSelectDialog(parentScopes, this.selectedScopeModel())),
 					of(parentScopes[0])
 				);
 			}),
@@ -382,7 +393,7 @@ export class SearchComponent implements OnInit {
 				if(!parentScope) {
 					return EMPTY;
 				}
-				return this.scopeService.getCandidate(parentScope.pk, this.selectedScopeModel.id);
+				return this.scopeService.getCandidate(parentScope.pk, this.selectedScopeModel().id);
 			}),
 			switchMap(candidateScope => this.scopeService.create(candidateScope)),
 			switchMap(newScope =>
@@ -466,7 +477,7 @@ export class SearchComponent implements OnInit {
 		const search = new ScopeSearch();
 		search.fullText = this.searchForm.controls.scopeCode.value;
 
-		search.scopeModelId = this.selectedScopeModel.id;
+		search.scopeModelId = this.selectedScopeModel().id;
 		search.workflowStates = {};
 		search.fieldModelCriteria = '';
 		search.includeDeleted = this.showRemovedScopesControl.value === true ? true : undefined;
@@ -480,7 +491,7 @@ export class SearchComponent implements OnInit {
 				return;
 			}
 
-			const workflowId = this.aggregatedWorkflowMap.get(workflow.id) ?? workflow.id;
+			const workflowId = this.aggregatedWorkflowMap().get(workflow.id) ?? workflow.id;
 			search.workflowStates[workflowId] = value;
 		});
 
@@ -546,7 +557,7 @@ export class SearchComponent implements OnInit {
 	}
 
 	getStatusModel(workflowId: string, stateId: string) {
-		return this.statusModelMap.get(`${workflowId}_${stateId}`);
+		return this.statusModelMap().get(`${workflowId}_${stateId}`);
 	}
 
 	getValueShortname(datasetModelId: string, fieldId: string, field: any): Record<string, string> | undefined {

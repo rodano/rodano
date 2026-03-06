@@ -187,24 +187,6 @@ public class ConfigurationController extends AbstractSecuredController {
 			.toList();
 	}
 
-	@Operation(summary = "Get searchable field models on the scope model")
-	@GetMapping("searchable-field-models/{scopeModelId}")
-	@ResponseStatus(HttpStatus.OK)
-	public List<FieldModelDTO> getSearchableFieldModelsOnScopeModel(
-		@PathVariable final String scopeModelId
-	) {
-		final var acl = rightsService.getACL(currentActor());
-		final var languages = actorService.getLanguages(acl.actor());
-
-		return studyService.getStudy().getSearchableFieldModels().stream()
-			.filter(f -> acl.hasRight(f.getDatasetModel(), Rights.READ))
-			.filter(f -> f.getDatasetModel().getScopeModels().stream().anyMatch(sm -> sm.getId().equals(scopeModelId)))
-			.map(f -> new FieldModelDTO(f, languages))
-			.toList();
-	}
-
-
-
 	@Operation(summary = "Get the study workflow models")
 	@GetMapping("workflows")
 	public List<WorkflowDTO> getWorkflows() {
@@ -217,7 +199,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	}
 
 	@Operation(summary = "Get the study workflow models on the scope model")
-	@GetMapping("workflows/{scopeModelId}")
+	@GetMapping("/scope-model/{scopeModelId}/workflows")
 	public List<WorkflowDTO> getWorkflowsOnScopeModel(
 		@PathVariable final String scopeModelId,
 		@RequestParam(name = "isAggregator", required = false) final Boolean isAggregator
@@ -227,7 +209,7 @@ public class ConfigurationController extends AbstractSecuredController {
 		return studyService.getStudy().getScopeModel(scopeModelId).getWorkflows().stream()
 			.filter(w -> acl.hasRight(w))
 			.filter(w -> {
-				if (isAggregator == null) {
+				if(isAggregator == null) {
 					return !w.isAggregator(); // preserve previous default behavior
 				}
 				return w.isAggregator() == isAggregator;
@@ -268,14 +250,18 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/field-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<FieldModelDTO> getFieldModels(
-		@PathVariable final String scopeModelId
+		@PathVariable final String scopeModelId,
+		@RequestParam(name = "searchable", required = false) final Boolean searchable
 	) {
 		final var acl = rightsService.getACL(currentActor());
 		final var languages = actorService.getLanguages(acl.actor());
+		final var searchableOnly = Boolean.TRUE.equals(searchable);
+		final var searchableFieldModels = studyService.getStudy().getSearchableFieldModels();
 
 		return studyService.getStudy().getScopeModel(scopeModelId).getDatasetModels().stream()
 			.filter(p -> acl.hasRight(p, Rights.READ))
 			.flatMap(d -> d.getFieldModels().stream())
+			.filter(f -> !searchableOnly || searchableFieldModels.contains(f))
 			.map(f -> new FieldModelDTO(f, languages))
 			.toList();
 	}

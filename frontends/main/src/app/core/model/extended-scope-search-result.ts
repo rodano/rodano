@@ -7,15 +7,63 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Scope } from './scope';
+import { EnrollmentTarget } from './enrollment-target';
+import { EnrollmentModel } from './enrollment-model';
+import { ScopeModel } from './scope-model';
+import { ScopeTiny } from './scope-tiny';
+import { Workflow } from './workflow';
+import { SubscriptionRestriction } from './subscription-restriction';
+import { WorkflowStatus } from './workflow-status';
 
 
 /**
  * Objects of the page
  */
 export interface ExtendedScopeSearchResult { 
-    scope?: Scope;
-    workflowStatuses?: Array<{ [key: string]: string; }>;
+    /**
+     * Scope pk
+     */
+    pk: number;
+    id: string;
+    code: string;
+    shortname: string;
+    longname?: string;
+    /**
+     * Scope model ID
+     */
+    modelId: string;
+    virtual: boolean;
+    startDate: Date;
+    stopDate?: Date;
+    model: ScopeModel;
+    root: boolean;
+    creationTime: Date;
+    lastUpdateTime: Date;
+    removed: boolean;
+    locked: boolean;
+    /**
+     * Can the user update the scope?
+     */
+    canWrite: boolean;
+    /**
+     * Can the user remove the scope?
+     */
+    canBeRemoved: boolean;
+    description?: { [key: string]: string; };
+    expectedNumber?: number;
+    maxNumber?: number;
+    enrollmentModel?: EnrollmentModel;
+    enrollmentTargets: Array<EnrollmentTarget>;
+    leaves: number;
+    mainUserPk?: number;
+    mainUserName?: string;
+    subscriptionRestrictions: Array<SubscriptionRestriction>;
+    defaultProfileId?: string;
+    workflowStatuses?: Array<WorkflowStatus>;
+    possibleWorkflows: Array<Workflow>;
+    parentScope?: ScopeTiny;
+    searchableFields?: { [key: string]: { [key: string]: string; }; };
     fieldValues?: { [key: string]: { [key: string]: string; }; };
+    label?: string;
 }
 

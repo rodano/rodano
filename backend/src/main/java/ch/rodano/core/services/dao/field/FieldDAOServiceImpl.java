@@ -1,20 +1,15 @@
 package ch.rodano.core.services.dao.field;
 
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.SelectConditionStep;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
-import ch.rodano.configuration.model.field.FieldModel;
-import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.FieldAuditTrail;
 import ch.rodano.core.model.field.Field;
@@ -143,39 +138,4 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	}
 
 	@Override
-
-	@Override
-	public Map<Long, List<Field>> getSearchableFieldsOnScope(final ScopeModel scopeModel) {
-		final var dsOnScope = studyService.getStudy().getScopeModel(scopeModel.getId()).getDatasetModels().stream().toList();
-
-		// Keep all searchable field IDs for each dataset model ID.
-		final Map<String, List<String>> searchableFieldsByDataset = dsOnScope.stream()
-			.flatMap(dm -> dm.getFieldModels().stream()
-				.filter(FieldModel::isSearchable)
-				.map(fm -> Map.entry(dm.getId(), fm.getId())))
-			.collect(Collectors.groupingBy(
-				Map.Entry::getKey,
-				Collectors.mapping(Map.Entry::getValue, Collectors.toList())
-			));
-
-		if(searchableFieldsByDataset.isEmpty()) {
-			return Map.of();
-		}
-
-		final var pairedConditions = searchableFieldsByDataset.entrySet().stream()
-			.map(entry -> DATASET.DATASET_MODEL_ID.eq(entry.getKey()).and(FIELD.FIELD_MODEL_ID.in(entry.getValue())))
-			.toList();
-
-		final SelectConditionStep<Record> query = create.select().from(FIELD)
-			.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
-			.where(DSL.or(pairedConditions));
-
-		return create.fetch(query).stream()
-			.collect(Collectors.groupingBy(
-				r -> r.get(DATASET.SCOPE_FK),
-				Collectors.mapping(r -> r.into(FIELD).into(Field.class), Collectors.toList())
-			));
-	}
-
-
 }

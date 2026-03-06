@@ -1,4 +1,4 @@
-package ch.rodano.api.search;
+package ch.rodano.api.scope.search;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +40,7 @@ import ch.rodano.core.utils.RightsService;
 
 @Tag(name = "Search")
 @RestController
-@RequestMapping(value = "/extended-search")
+@RequestMapping(value = "/scopes/extended-search")
 @Transactional(readOnly = true)
 public class ExtendedScopeSearchController extends AbstractSecuredController {
 	private static final Logger LOG = LoggerFactory.getLogger(ExtendedScopeSearchController.class);
@@ -52,14 +52,13 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 
 
 	public ExtendedScopeSearchController(final RequestContextService requestContextService,
-					     final StudyService studyService,
-					     final ActorService actorService,
-					     final RoleService roleService,
-					     final RightsService rightsService,
-					     final ScopeService scopeService,
-					     final ExtendedScopeResultService extendedScopeResultService,
-					     final ObjectMapper mapper,
-					     @Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize
+		final StudyService studyService, final ActorService actorService,
+		final RoleService roleService,
+		final RightsService rightsService,
+		final ScopeService scopeService,
+		final ExtendedScopeResultService extendedScopeResultService,
+		final ObjectMapper mapper,
+		@Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.defaultPageSize = defaultPageSize;
@@ -73,7 +72,7 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		try {
 			return mapper.readValue(string, type);
 		}
-		catch (final JsonProcessingException e) {
+		catch(final JsonProcessingException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
@@ -110,31 +109,29 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		final var criteriaType = TypeFactory.defaultInstance().constructCollectionType(List.class, FieldModelCriterion.class);
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
-		LOG.info(scopeModelId.isEmpty() ? "Searching scopes with provided criteria" : "Searching scopes of model {} with provided criteria", scopeModelId.orElse(""));
-
 		final var search = new ScopeSearch()
-			.setCode(code.filter(StringUtils::isNotBlank))
-			.setIds(ids)
-			.setPks(pks)
-			.setParentPks(parentPks)
-			.setAncestorPks(ancestorPks)
-			.setScopeModelId(scopeModelId)
-			.setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, scopeModelId))
-			.setWorkflowStates(workflowStatesMap)
-			.setFieldModelCriteria(fieldModelCriterionList)
-			.setLeaf(leaf)
-			.setFullText(fullText.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(includeDeletedFinal)
-			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
-			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex)
-			.setScopeModelId(scopeModelId.isEmpty()? Optional.ofNullable(studyService.getStudy().getLeafScopeModel().getId()) : scopeModelId);
+					   .setCode(code.filter(StringUtils::isNotBlank))
+					   .setIds(ids)
+					   .setPks(pks)
+					   .setParentPks(parentPks)
+					   .setAncestorPks(ancestorPks)
+					   .setScopeModelId(scopeModelId)
+					   .setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, scopeModelId))
+					   .setWorkflowStates(workflowStatesMap)
+					   .setFieldModelCriteria(fieldModelCriterionList)
+					   .setLeaf(leaf)
+					   .setFullText(fullText.filter(StringUtils::isNotBlank))
+					   .setIncludeDeleted(includeDeletedFinal)
+					   .setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
+					   .setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex)
+					   .setScopeModelId(scopeModelId.isEmpty() ? Optional.ofNullable(studyService.getStudy().getLeafScopeModel().getId()) : scopeModelId);
 
 		//set sort if provided
 		sortBy.ifPresent(sort -> {
-			if (Arrays.stream(ScopeSortBy.class.getEnumConstants()).anyMatch(e -> e.name().equals(sort))) {
+			if(Arrays.stream(ScopeSortBy.class.getEnumConstants()).anyMatch(e -> e.name().equals(sort))) {
 				search.setSortBy(ScopeSortBy.valueOf(sort));
 			}
-			else {
+			else{
 				search.setExtendedSortBy(sort);
 			}
 		});

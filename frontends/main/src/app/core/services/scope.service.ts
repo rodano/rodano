@@ -11,7 +11,7 @@ import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
-import { PagedResultExtendedScopeSearchResult } from '@core/model/paged-result-extended-scope-search-result';
+import {PagedResultExtendedScopeSearchResult} from '@core/model/paged-result-extended-scope-search-result';
 
 @Service()
 export class ScopeService {
@@ -32,8 +32,7 @@ export class ScopeService {
 	}
 
 	extendedSearch(search: ScopeSearch): Observable<PagedResultExtendedScopeSearchResult> {
-		//return this.http.post<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/extended-search`, {search});
-		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/extended-search`, {params: this.httpParamsService.toHttpParams(search)});
+		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/scopes/extended-search`, {params: this.httpParamsService.toHttpParams(search)});
 	}
 
 	getExportUrl(search: ScopeSearch): string {

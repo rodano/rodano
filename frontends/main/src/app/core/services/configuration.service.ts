@@ -91,7 +91,7 @@ export class ConfigurationService {
 	}
 
 	getWorkflowsOnScope(scopeModel: ScopeModel): Observable<Workflow[]> {
-		return this.http.get<Workflow[]>(`${this.serviceUrl}/workflows/${scopeModel.id}`);
+		return this.http.get<Workflow[]>(`${this.serviceUrl}/scope-model/${scopeModel.id}/workflows`);
 	}
 
 	getSearchableWorkflowsOnScope(scopeModel: ScopeModel): Observable<Workflow[]> {
@@ -131,16 +131,12 @@ export class ConfigurationService {
 		return this.http.get<FormModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/form-models`);
 	}
 
-	getSearchableFieldModelsOnScope(scopeModel: ScopeModel): Observable<FieldModel[]> {
-		return this.http.get<FieldModel[]>(`${this.serviceUrl}/searchable-field-models/${scopeModel.id}`);
-	}
-
 	getScopeModelDatasetModels(scopeModelId: string): Observable<DatasetModel[]> {
 		return this.http.get<DatasetModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/dataset-models`);
 	}
 
-	getScopeModelFieldModels(scopeModelId: string): Observable<FieldModel[]> {
-		return this.http.get<FieldModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/field-models`);
+	getScopeModelFieldModels(scopeModelId: string, searchable = false): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/field-models?searchable=${searchable}`);
 	}
 
 	getAutocompleteOptions(datasetModelId: string, fieldModelId: string, value: string): Observable<string[]> {

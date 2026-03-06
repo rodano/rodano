@@ -237,9 +237,7 @@ export class Workflow extends DisplayableNode {
 		if(!this.isUsed()) {
 			report.addInfo(`Workflow ${this.id} is unused`, this, this['delete'], 'Delete workflow');
 		}
-		if (typeof this.searchable !== 'boolean') {
-			report.addError(`Workflow ${this.id} has an invalid 'searchable' property. It must be a boolean.`);
-		}
+		
 		return report;
 	}
 

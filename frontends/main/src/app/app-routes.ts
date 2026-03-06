@@ -38,7 +38,7 @@ export default [
 	{
 		path: 'search',
 		canActivate: [AuthGuard],
-		loadChildren: () => import('./search/search-routes')
+		loadChildren: () => import('./search/scopes-search')
 	},
 	{
 		path: CRF_PATH,

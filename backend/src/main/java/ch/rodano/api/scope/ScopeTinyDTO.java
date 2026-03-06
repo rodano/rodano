@@ -27,16 +27,4 @@ public record ScopeTinyDTO(
 			scope.getLongname()
 		);
 	}
-
-	public ScopeTinyDTO(@NotNull final Long pk, @NotBlank final
-	                    String modelId, @NotBlank final
-	                    String code, @NotBlank final
-	                    String shortname, @NotBlank final
-	                    String longname) {
-		this.pk = pk;
-		this.modelId = modelId;
-		this.code = code;
-		this.shortname = shortname;
-		this.longname = longname;
-	}
 }

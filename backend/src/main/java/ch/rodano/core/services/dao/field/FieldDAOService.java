@@ -2,12 +2,10 @@ package ch.rodano.core.services.dao.field;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.function.Function;
 
-import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.audit.models.FieldAuditTrail;
 import ch.rodano.core.model.event.Timeframe;
@@ -57,6 +55,4 @@ public interface FieldDAOService {
 
 	Map<Long, NavigableSet<FieldAuditTrail>> getAuditTrailsForProperty(Collection<Field> fields, Optional<Timeframe> timeframe, Function<FieldAuditTrail, Object> property);
 
-
-	Map<Long, List<Field>> getSearchableFieldsOnScope(ScopeModel scopeModel);
 }

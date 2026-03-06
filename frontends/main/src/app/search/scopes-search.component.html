@@ -3,17 +3,17 @@
 <div class="table-container">
 	<table
 		mat-table
-		[dataSource]="extendedScopeSearchResult"
+		[dataSource]="extendedScopeSearchResult()"
 		matSort>
 		<tr
 			*matNoDataRow
 			class="no-data-row">
-			<td [attr.colspan]="columnsToDisplay.length">
-				{{ loading ? 'Loading data...' : 'No data found' }}
+			<td [attr.colspan]="columnsToDisplay().length">
+				{{ loading() ? 'Loading data...' : 'No data found' }}
 			</td>
 		</tr>
 		<form [formGroup]="searchForm">
-			@for (column of columnsToDisplay; track column) {
+			@for (column of columnsToDisplay(); track column) {
 				@if (column === 'parentScopeCode') {
 					<ng-container
 						matColumnDef="parentScopeCode"
@@ -22,11 +22,11 @@
 							mat-header-cell
 							*matHeaderCellDef>
 							<mat-form-field>
-								<mat-label>{{ selectedScopeModelParentModel.shortname | localizeMap }}</mat-label>
+								<mat-label>{{ selectedScopeModelParentModel().shortname | localizeMap }}</mat-label>
 								<mat-select
 									[formControl]="parentScopeControl"
 									multiple>
-									@for (parentScope of parentScopes; track parentScope.pk) {
+									@for (parentScope of parentScopes(); track parentScope.pk) {
 										<mat-option [value]="parentScope.pk">
 											{{ parentScope.shortname }}
 										</mat-option>
@@ -38,7 +38,7 @@
 							mat-cell
 							*matCellDef="let result"
 							class="value-cell">
-							{{ result.scope.parentScope.code }}
+							{{ result.parentScope.code }}
 						</td>
 					</ng-container>
 				} @else if (column === 'scopeCode') {
@@ -54,14 +54,15 @@
 									matInput
 									type="text"
 									formControlName="scopeCode"
-									[placeholder]="selectedScopeModel.shortname | localizeMap" />
+									appAutofocus
+									[placeholder]="selectedScopeModel().shortname | localizeMap" />
 							</mat-form-field>
 						</th>
 						<td
 							mat-cell
 							*matCellDef="let result"
 							class="value-cell">
-							{{ result.scope.shortname }}
+							{{ result.shortname }}
 						</td>
 					</ng-container>
 				} @else {
@@ -70,7 +71,7 @@
 							mat-header-cell
 							*matHeaderCellDef
 							mat-sort-header>
-							@if (fieldModelMap.has(column)) {
+							@if (fieldModelMap().has(column)) {
 								@let fieldModel = getSearchableFieldFromFormControlId(column);
 								@if (fieldModel?.type === FieldModelType.DATE || fieldModel?.type === FieldModelType.DATE_SELECT) {
 									<mat-form-field (click)="$event.stopPropagation()">
@@ -105,9 +106,9 @@
 											[formControlName]="fieldModel ? getSFFormControlName(fieldModel) : null" />
 									</mat-form-field>
 								}
-							} @else if (workflowStatusModelMap.has(column)) {
+							} @else if (workflowStatusModelMap().has(column)) {
 								<mat-form-field (click)="$event.stopPropagation()">
-									<mat-label>{{ workflowStatusModelMap.get(column) | localizeMap }}</mat-label>
+									<mat-label>{{ workflowStatusModelMap().get(column) | localizeMap }}</mat-label>
 									<mat-select
 										[formControlName]="getWorkflow(column) ? getWSFormControlName(getWorkflow(column)!) : null"
 										multiple>
@@ -124,16 +125,16 @@
 							mat-cell
 							*matCellDef="let result"
 							class="value-cell">
-							@if (workflowStatusModelMap.has(column)) {
+							@if (workflowStatusModelMap().has(column)) {
 								@for (workflowStatus of result.workflowStatuses; track $index) {
-									@let stateId = workflowStatus[column];
-									@if (stateId) {
-										{{ getStatusModel(column, stateId) | localizeMap }}
+									@let statusId = workflowStatus.statusId;
+									@if (statusId) {
+										{{ getStatusModel(column, statusId) | localizeMap }}
 									}
 								}
 							}
 
-							@if (fieldModelMap.has(column)) {
+							@if (fieldModelMap().has(column)) {
 								@let fieldModel = getSearchableFieldFromFormControlId(column);
 								@if (fieldModel && result.fieldValues) {
 									@for (datasetModelId of Object.keys(result.fieldValues); track datasetModelId) {
@@ -157,13 +158,13 @@
 			}
 			<tr
 				mat-header-row
-				*matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+				*matHeaderRowDef="columnsToDisplay(); sticky: true"></tr>
 			<tr
 				mat-row
 				[class.clickable]="true"
-				[class.removed]="result.scope.removed"
-				(click)="navigateToScope(result.scope.pk)"
-				*matRowDef="let result; columns: columnsToDisplay"></tr>
+				[class.removed]="result.removed"
+				(click)="navigateToScope(result.pk)"
+				*matRowDef="let result; columns: columnsToDisplay()"></tr>
 		</form>
 	</table>
 	<mat-divider></mat-divider>
@@ -176,16 +177,16 @@
 				[disabled]="!writeAccessOnParent"
 				type="button">
 				<mat-icon>add</mat-icon>
-				New {{ selectedScopeModel.shortname | localizeMap | lowercase }}
+				New {{ selectedScopeModel().shortname | localizeMap | lowercase }}
 			</button>
 
 			<span class="toolbar-spacer"></span>
 
-			@if (hasManageDeletedDataFeature) {
+			@if (hasManageDeletedDataFeature()) {
 				<mat-checkbox
 					class="filter-options"
 					[formControl]="showRemovedScopesControl">
-					Show removed {{ selectedScopeModel.pluralShortname | localizeMap | lowercase }}
+					Show removed {{ selectedScopeModel().pluralShortname | localizeMap | lowercase }}
 				</mat-checkbox>
 			}
 			<button

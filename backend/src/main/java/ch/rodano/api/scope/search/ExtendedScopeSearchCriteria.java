@@ -1,4 +1,4 @@
-package ch.rodano.api.search;
+package ch.rodano.api.scope.search;
 
 import java.util.List;
 import java.util.Map;
