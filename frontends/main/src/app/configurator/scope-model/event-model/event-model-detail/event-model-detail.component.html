@@ -46,6 +46,7 @@
 				</app-setting-item>
 
 				<app-setting-item label="Short Name"
+																						[translated]="true"
 																						[modified]="isFieldModified('shortname')"
 																						[notConfigured]="!languageService.getTranslatedValue(draftEventModel.shortname)">
 					@if (!languageService.getTranslatedValue(draftEventModel.shortname)) {
@@ -55,6 +56,7 @@
 				</app-setting-item>
 
 				<app-setting-item label="Long Name"
+																						[translated]="true"
 																						[modified]="isFieldModified('longname')"
 																						[notConfigured]="!languageService.getTranslatedValue(draftEventModel.longname)"
 																						[fullWidth]="true">
@@ -65,6 +67,7 @@
 				</app-setting-item>
 
 				<app-setting-item label="Description"
+																						[translated]="true"
 																						[modified]="isFieldModified('description')"
 																						[notConfigured]="!languageService.getTranslatedValue(draftEventModel.description)"
 																						[fullWidth]="true">

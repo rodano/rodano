@@ -31,6 +31,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Short Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('shortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.shortname)">
 				@if (!languageService.getTranslatedValue(scopeModel.shortname)) {
@@ -40,6 +41,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Long Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('longname')"
 																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.longname)">
 				@if (!languageService.getTranslatedValue(scopeModel.longname)) {
@@ -49,6 +51,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Plural Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('pluralShortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.pluralShortname)">
 				@if (!languageService.getTranslatedValue(scopeModel.pluralShortname)) {
@@ -58,6 +61,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Description"
+																					[translated]="true"
 																					[modified]="isFieldModified('description')"
 																					[notConfigured]="!languageService.getTranslatedValue(scopeModel.description)">
 				@if (!languageService.getTranslatedValue(scopeModel.description)) {

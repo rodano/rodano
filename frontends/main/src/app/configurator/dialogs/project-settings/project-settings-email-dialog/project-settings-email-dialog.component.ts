@@ -4,6 +4,7 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {BaseDialogComponent} from '../../base-dialog.component';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 export interface EmailSettingsDialogData {
 	email: string | null;
@@ -15,7 +16,7 @@ export interface EmailSettingsDialogData {
 	standalone: true,
 	templateUrl: './project-settings-email-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSlideToggleModule]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatSlideToggleModule, MatCheckbox]
 })
 export class ProjectSettingsEmailDialogComponent extends BaseDialogComponent<EmailSettingsDialogData> {
 	form: FormGroup;

@@ -31,6 +31,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Short Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('shortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.shortname)">
 				@if (!languageService.getTranslatedValue(chart.shortname)) {
@@ -40,6 +41,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Long Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('longname')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.longname)">
 				@if (!languageService.getTranslatedValue(chart.longname)) {
@@ -49,6 +51,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Description"
+																					[translated]="true"
 																					[modified]="isFieldModified('description')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.description)"
 																					[fullWidth]="true">
@@ -68,6 +71,7 @@
 		<h3>Settings</h3>
 		<div class="settings-grid">
 			<app-setting-item label="Title"
+																					[translated]="true"
 																					[modified]="isFieldModified('title')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.title)">
 				@if (!languageService.getTranslatedValue(chart.title)) {
@@ -77,6 +81,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Abscissa Legend (X-Axis)"
+																					[translated]="true"
 																					[modified]="isFieldModified('legendX')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.legendX)">
 				@if (!languageService.getTranslatedValue(chart.legendX)) {
@@ -86,6 +91,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Ordinate Legend (Y-Axis)"
+																					[translated]="true"
 																					[modified]="isFieldModified('legendY')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.legendY)">
 				@if (!languageService.getTranslatedValue(chart.legendY)) {
@@ -198,6 +204,7 @@
 						</app-setting-item>
 
 						<app-setting-item label="Ranges"
+																								[translated]="true"
 																								[modified]="isFieldModified('ranges')"
 																								[fullWidth]="true"
 																								[plain]="true">

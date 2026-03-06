@@ -41,6 +41,15 @@
 	border-radius: 0.25rem;
 }
 
+.translated-icon {
+	font-size: 1rem !important;
+	width: 1rem !important;
+	height: 1rem !important;
+	color: #9ca3af !important;
+	margin-left: 0.25rem;
+	vertical-align: middle;
+}
+
 .modified-icon {
 	font-size: 1rem !important;
 	width: 1rem !important;

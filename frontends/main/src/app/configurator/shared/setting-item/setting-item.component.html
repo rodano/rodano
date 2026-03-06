@@ -3,6 +3,9 @@
 					[class.full-width]="fullWidth">
 	<label>
 		{{ label }}
+		@if (translated) {
+			<mat-icon class="translated-icon" matTooltip="Translatable field">language</mat-icon>
+		}
 		@if (modified) {
 			<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 		}

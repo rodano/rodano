@@ -16,12 +16,7 @@
 			</div>
 
 			<div class="form-field">
-				<label>SMTP TLS</label>
-				<div class="toggle-wrapper">
-					<mat-slide-toggle formControlName="smtpTls">
-						{{ form.get('smtpTls')?.value ? 'Enabled' : 'Disabled' }}
-					</mat-slide-toggle>
-				</div>
+				<mat-checkbox formControlName="smtpTls">SMTP TLS</mat-checkbox>
 				<span class="hint">Enable TLS encryption for SMTP connections</span>
 			</div>
 		</form>

@@ -36,6 +36,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Short Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('shortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(datasetModel.shortname)">
 				@if (!languageService.getTranslatedValue(datasetModel.shortname)) {
@@ -45,6 +46,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Long Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('longname')"
 																					[notConfigured]="!languageService.getTranslatedValue(datasetModel.longname)">
 				@if (!languageService.getTranslatedValue(datasetModel.longname)) {
@@ -54,6 +56,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Description"
+																					[translated]="true"
 																					[modified]="isFieldModified('description')"
 																					[notConfigured]="!languageService.getTranslatedValue(datasetModel.description)"
 																					[fullWidth]="true">

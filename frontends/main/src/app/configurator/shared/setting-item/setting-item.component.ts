@@ -16,6 +16,7 @@ export class SettingItemComponent {
 	@Input() notConfigured = false;
 	@Input() fullWidth = false;
 	@Input() plain = false;
+	@Input() translated = false;
 
 	@HostBinding('style.grid-column') get gridColumn() {
 		return this.fullWidth ? '1 / -1' : null;

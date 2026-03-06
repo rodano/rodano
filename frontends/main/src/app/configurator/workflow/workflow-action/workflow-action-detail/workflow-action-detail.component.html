@@ -35,6 +35,7 @@
 				</app-setting-item>
 
 				<app-setting-item label="Short Name"
+																						[translated]="true"
 																						[modified]="isFieldModified('shortname')"
 																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.shortname)">
 					@if (!languageService.getTranslatedValue(draftWorkflowAction.shortname)) {
@@ -44,6 +45,7 @@
 				</app-setting-item>
 
 				<app-setting-item label="Long Name"
+																						[translated]="true"
 																						[modified]="isFieldModified('longname')"
 																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.longname)">
 					@if (!languageService.getTranslatedValue(draftWorkflowAction.longname)) {
@@ -53,6 +55,7 @@
 				</app-setting-item>
 
 				<app-setting-item label="Description"
+																						[translated]="true"
 																						[modified]="isFieldModified('description')"
 																						[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.description)"
 																						[fullWidth]="true">
@@ -83,6 +86,7 @@
 
 				@if (draftWorkflowAction.documentable && draftWorkflowAction.documentableOptions?.length) {
 					<app-setting-item label="Documentation Options"
+																							[translated]="true"
 																							[modified]="isFieldModified('documentableOptions')"
 																							[fullWidth]="true">
 						<div class="multilist-display">
@@ -122,6 +126,7 @@
 
 				@if (draftWorkflowAction.requireSignature) {
 					<app-setting-item label="Signature Text"
+																							[translated]="true"
 																							[modified]="isFieldModified('requireSignatureText')"
 																							[notConfigured]="!languageService.getTranslatedValue(draftWorkflowAction.requireSignatureText)"
 																							[fullWidth]="true">

@@ -21,6 +21,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Short Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('shortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(validator.shortname)">
 				@if (!languageService.getTranslatedValue(validator.shortname)) {
@@ -30,6 +31,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Long Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('longname')"
 																					[notConfigured]="!languageService.getTranslatedValue(validator.longname)">
 				@if (!languageService.getTranslatedValue(validator.longname)) {
@@ -39,6 +41,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Description"
+																					[translated]="true"
 																					[modified]="isFieldModified('description')"
 																					[notConfigured]="!languageService.getTranslatedValue(validator.description)"
 																					[fullWidth]="true">
@@ -49,6 +52,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Invalid Message"
+																					[translated]="true"
 																					[modified]="isFieldModified('message')"
 																					[notConfigured]="!languageService.getTranslatedValue(validator.message)"
 																					[fullWidth]="true">

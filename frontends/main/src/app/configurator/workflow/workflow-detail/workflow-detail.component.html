@@ -42,6 +42,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Short Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('shortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(workflow.shortname)">
 				@if (!languageService.getTranslatedValue(workflow.shortname)) {
@@ -51,6 +52,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Long Name"
+																					[translated]="true"
 																					[modified]="isFieldModified('longname')"
 																					[notConfigured]="!languageService.getTranslatedValue(workflow.longname)">
 				@if (!languageService.getTranslatedValue(workflow.longname)) {
@@ -60,6 +62,7 @@
 			</app-setting-item>
 
 			<app-setting-item label="Description"
+																					[translated]="true"
 																					[modified]="isFieldModified('description')"
 																					[notConfigured]="!languageService.getTranslatedValue(workflow.description)"
 																					[fullWidth]="true">
@@ -152,6 +155,7 @@
 		<h3>Message & Icon</h3>
 		<div class="settings-grid">
 			<app-setting-item label="Message"
+																					[translated]="true"
 																					[modified]="isFieldModified('message')"
 																					[notConfigured]="!languageService.getTranslatedValue(workflow.message)">
 				@if (!languageService.getTranslatedValue(workflow.message)) {
