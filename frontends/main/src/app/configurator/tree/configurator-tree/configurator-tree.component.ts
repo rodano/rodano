@@ -13,6 +13,7 @@ import {PrivacyPolicyTreeComponent} from '../privacy-policy-tree/privacy-policy-
 import {ResourceCategoryTreeComponent} from '../resource-category-tree/resource-category-tree.component';
 import {ReportTreeComponent} from '../report-tree/report-tree.component';
 import {ChartTreeComponent} from '../chart-tree/chart-tree.component';
+import {FormModelTreeComponent} from '../form-model-tree/form-model-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -30,7 +31,8 @@ import {ChartTreeComponent} from '../chart-tree/chart-tree.component';
 		PrivacyPolicyTreeComponent,
 		ResourceCategoryTreeComponent,
 		ReportTreeComponent,
-		ChartTreeComponent
+		ChartTreeComponent,
+		FormModelTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -53,6 +55,8 @@ export class ConfiguratorTreeComponent {
 	@Input() resourceCategories: any[] = [];
 	@Input() reports: any[] = [];
 	@Input() charts: any[] = [];
+	@Input() formModels: any[] = [];
+	@Input() layouts: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -68,11 +72,13 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedResourceCategoryId: string | null = null;
 	@Input() selectedReportId: string | null = null;
 	@Input() selectedChartId: string | null = null;
+	@Input() selectedFormModelId: string | null = null;
+	@Input() selectedLayoutId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -150,6 +156,13 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'charts' ? null : 'charts';
 			this.categoryClicked.emit('charts');
+		});
+	}
+
+	onFormModelClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'form-models' ? null : 'form-models';
+			this.categoryClicked.emit('form-models');
 		});
 	}
 

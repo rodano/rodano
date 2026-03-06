@@ -4,6 +4,8 @@
 package ch.rodano.core.model.jooq.tables.records;
 
 
+import ch.rodano.core.model.jooq.enums.FormCellVisibilityCriteriaAction;
+import ch.rodano.core.model.jooq.enums.FormCellVisibilityCriteriaOperator;
 import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteria;
 
 import java.util.UUID;
@@ -81,29 +83,29 @@ public class FormCellVisibilityCriteriaRecord extends UpdatableRecordImpl<FormCe
 	/**
 	 * Setter for <code>form_cell_visibility_criteria.operator</code>.
 	 */
-	public void setOperator(String value) {
+	public void setOperator(FormCellVisibilityCriteriaOperator value) {
 		set(4, value);
 	}
 
 	/**
 	 * Getter for <code>form_cell_visibility_criteria.operator</code>.
 	 */
-	public String getOperator() {
-		return (String) get(4);
+	public FormCellVisibilityCriteriaOperator getOperator() {
+		return (FormCellVisibilityCriteriaOperator) get(4);
 	}
 
 	/**
 	 * Setter for <code>form_cell_visibility_criteria.action</code>.
 	 */
-	public void setAction(String value) {
+	public void setAction(FormCellVisibilityCriteriaAction value) {
 		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>form_cell_visibility_criteria.action</code>.
 	 */
-	public String getAction() {
-		return (String) get(5);
+	public FormCellVisibilityCriteriaAction getAction() {
+		return (FormCellVisibilityCriteriaAction) get(5);
 	}
 
 	// -------------------------------------------------------------------------
@@ -129,7 +131,7 @@ public class FormCellVisibilityCriteriaRecord extends UpdatableRecordImpl<FormCe
 	/**
 	 * Create a detached, initialised FormCellVisibilityCriteriaRecord
 	 */
-	public FormCellVisibilityCriteriaRecord(UUID formCellVisibleCriteriaId, UUID projectId, UUID formLayoutCellId, Integer lineOrder, String operator, String action) {
+	public FormCellVisibilityCriteriaRecord(UUID formCellVisibleCriteriaId, UUID projectId, UUID formLayoutCellId, Integer lineOrder, FormCellVisibilityCriteriaOperator operator, FormCellVisibilityCriteriaAction action) {
 		super(FormCellVisibilityCriteria.FORM_CELL_VISIBILITY_CRITERIA);
 
 		setFormCellVisibleCriteriaId(formCellVisibleCriteriaId);

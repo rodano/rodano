@@ -1,0 +1,54 @@
+@import "../../dialog-shared.css";
+@import "../../../shared/detail-shared.css";
+
+.theme-field-model {
+	--entity-color: #0369a1;
+	--entity-highlight: rgba(3, 105, 161, 0.1);
+}
+
+.preview-section {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.preview-label {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	color: #6b7280;
+	margin: 0;
+}
+
+.preview-label mat-icon {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.code-textarea {
+	width: 100%;
+	min-height: 70px;
+	padding: 8px 10px;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	font-family: 'Courier New', monospace;
+	font-size: 12px;
+	color: #111827;
+	resize: vertical;
+	box-sizing: border-box;
+	transition: border-color 0.12s;
+}
+
+.code-textarea:focus {
+	outline: none;
+	border-color: var(--entity-color, #0C4A6E);
+}
+
+.disabled-input {
+	background: #f9fafb;
+	color: #6b7280;
+	cursor: default;
+}

@@ -3,7 +3,6 @@ import {Observable, of} from 'rxjs';
 import {FieldModel} from '@core/model/field-model';
 import {FieldModelService} from '../api/field-model.service';
 import {BaseManagerService} from './base-manager.service';
-import {EventModel} from '@core/model/event-model';
 import {map} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})

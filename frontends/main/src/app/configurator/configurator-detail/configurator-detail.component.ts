@@ -16,6 +16,8 @@ import {
 } from '../resource-category/resource-category-list/resource-category-list.component';
 import {ReportListComponent} from '../report/report-list/report-list.component';
 import {ChartListComponent} from '../chart/chart-list/chart-list.component';
+import {FormModelListComponent} from '../form-model/form-model-list/form-model-list.component';
+import {Observable, of} from 'rxjs';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -36,6 +38,7 @@ import {ChartListComponent} from '../chart/chart-list/chart-list.component';
 		ResourceCategoryListComponent,
 		ReportListComponent,
 		ChartListComponent,
+		FormModelListComponent,
 		EmptyStateComponent
 	]
 })
@@ -50,6 +53,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(ResourceCategoryListComponent) resourceCategoryListComponent?: ResourceCategoryListComponent;
 	@ViewChild(ReportListComponent) reportListComponent?: ReportListComponent;
 	@ViewChild(ChartListComponent) chartListComponent?: ChartListComponent;
+	@ViewChild(FormModelListComponent) formModelListComponent?: FormModelListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -128,7 +132,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedChartId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'overview' | null = null;
+	@Output() formModelsChanged = new EventEmitter<boolean>();
+	@Output() formModelContextChanged = new EventEmitter<{
+		formModels: any[];
+		selectedFormModelId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -226,6 +236,23 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.chartsChanged.emit(value);
 	}
 
+	onFormModelSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onFormModelsChanged(value: boolean): void {
+		this.formModelsChanged.emit(value);
+	}
+
+	saveLayouts(): Observable<void> {
+		return this.formModelListComponent?.saveLayouts() ?? of(void 0);
+	}
+
+	discardLayouts(): void {
+		this.formModelListComponent?.discardLayouts();
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -299,6 +326,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'charts') {
 			this.selectedNodeType = 'charts';
+			return;
+		}
+
+		if(this.selectedNode === 'form-models') {
+			this.selectedNodeType = 'form-models';
 			return;
 		}
 
@@ -383,5 +415,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedChartId: string | null;
 	}): void {
 		this.chartContextChanged.emit(context);
+	}
+
+	onFormModelContextChanged(context: {
+		formModels: any[];
+		selectedFormModelId: string | null;
+	}): void {
+		this.formModelContextChanged.emit(context);
 	}
 }

@@ -360,17 +360,17 @@ create table if not exists form_model_workflow (
   collate = utf8mb4_unicode_ci;
 
 create table if not exists form_layout (
-	form_layout_id              uuid          not null default uuid(),
-	project_id                  uuid          not null,
-	form_model_id               uuid          not null,
-	dataset_model_id            uuid          null,
-	default_sort_field_model_id uuid          null,
-	code                        varchar(128)  not null,
-	type                        varchar(16)   not null,
-	description                 json          null,
-	text_before                 json          null,
-	text_after                  json          null,
-	css_code                    varchar(2048) null,
+	form_layout_id              uuid                        not null default uuid(),
+	project_id                  uuid                        not null,
+	form_model_id               uuid                        not null,
+	dataset_model_id            uuid                        null,
+	default_sort_field_model_id uuid                        null,
+	code                        varchar(128)                not null,
+	type                        enum ('SINGLE', 'MULTIPLE') not null,
+	description                 json                        null,
+	text_before                 json                        null,
+	text_after                  json                        null,
+	css_code                    varchar(2048)               null,
 	constraint pk_form_layout primary key (project_id, form_model_id, form_layout_id),
 	constraint uq_form_layout_code unique (project_id, form_model_id, code)
 ) engine = InnoDB
@@ -427,12 +427,13 @@ create table if not exists form_layout_cell (
   collate = utf8mb4_unicode_ci;
 
 create table if not exists form_cell_visibility_criteria (
-	form_cell_visible_criteria_id uuid        not null default uuid(),
-	project_id                    uuid        not null,
-	form_layout_cell_id           uuid        not null,
-	line_order                    int         not null,
-	operator                      varchar(32) null,
-	action                        varchar(16) not null,
+	form_cell_visible_criteria_id uuid                                                       not null default uuid(),
+	project_id                    uuid                                                       not null,
+	form_layout_cell_id           uuid                                                       not null,
+	line_order                    int                                                        not null,
+	operator                      enum ('EQUALS', 'NOT_EQUALS', 'CONTAINS', 'NOT_CONTAINS', 'GREATER',
+		'GREATER_EQUALS', 'LOWER', 'LOWER_EQUALS', 'NULL', 'NOT_NULL', 'BLANK', 'NOT_BLANK') null,
+	action                        enum ('SHOW', 'HIDE')                                      not null,
 	constraint pk_form_cell_visibility_criteria primary key (project_id, form_layout_cell_id, form_cell_visible_criteria_id)
 ) engine = InnoDB
   default charset = utf8mb4
@@ -464,13 +465,14 @@ create table if not exists form_cell_visibility_criteria_target_layout (
   collate = utf8mb4_unicode_ci;
 
 create table if not exists form_cell_visibility_criteria_value (
-	project_id                    uuid not null,
-	form_layout_cell_id           uuid not null,
-	form_cell_visible_criteria_id uuid not null,
-	line_order                    int  not null,
-	possible_value_id             UUID not null,
+	project_id                    uuid         not null,
+	form_layout_cell_id           uuid         not null,
+	form_cell_visible_criteria_id uuid         not null,
+	line_order                    int          not null,
+	possible_value_id             UUID         null,
+	value                         varchar(255) null,
 	constraint pk_form_cell_visibility_criteria_value primary key (project_id, form_layout_cell_id,
-																   form_cell_visible_criteria_id, possible_value_id)
+																   form_cell_visible_criteria_id, line_order)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
@@ -894,8 +896,8 @@ create table if not exists report (
 	report_id        uuid         not null default uuid(),
 	project_id       uuid         not null,
 	code             varchar(128) not null,
-	dataset_model_id uuid         not null,
 	workflow_id      uuid         not null,
+	dataset_model_id uuid         null,
 	shortname        json         null,
 	longname         json         null,
 	description      json         null,

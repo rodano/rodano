@@ -1,0 +1,267 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Cell Properties</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			@if (!isTextCell(cell)) {
+				<div class="form-field">
+					<label>Field</label>
+					<mat-select formControlName="fieldModelId" placeholder="Select field model">
+						@for (group of datasetGroups; track group.datasetModelId) {
+							<mat-optgroup [label]="group.label">
+								@for (fm of group.fields; track fm.fieldModelId) {
+									<mat-option [value]="fm.fieldModelId">
+										{{ languageService.getLabel(fm) }}
+									</mat-option>
+								}
+							</mat-optgroup>
+						}
+					</mat-select>
+				</div>
+			}
+
+			@if (!isTextCell(cell)) {
+				<div class="form-field checkbox-field">
+					<mat-checkbox formControlName="displayLabel">Display Label</mat-checkbox>
+					<span class="hint">Check if the label should be displayed</span>
+				</div>
+				<div class="form-field checkbox-field">
+					<mat-checkbox formControlName="displayPossibleValueLabels">Display Possible Value Label</mat-checkbox>
+					<span class="hint">Check if the possible values label should be displayed</span>
+				</div>
+
+				<div class="form-field">
+					<label>Possible Values Columns Number</label>
+					<input type="number" formControlName="possibleValuesColumnNumber" min="1" max="10"/>
+				</div>
+				<div class="form-field">
+					<label>Possible Values Columns Width</label>
+					<input type="number" formControlName="possibleValuesColumnWidth" min="1"/>
+				</div>
+
+				<div class="form-section">
+					<h3>
+						Label / Input Width
+					</h3>
+					<span class="hint">(effective column: {{ data.effectiveCellWidth }}px)</span>
+					<div class="form-field">
+						<label>Split</label>
+						<div class="size-buttons">
+							<button type="button" class="size-btn"
+															[class.active]="getActiveLabelPercent() === null"
+															(click)="setLabelPercent(null)">Auto
+							</button>
+							<button type="button" class="size-btn"
+															[class.active]="getActiveLabelPercent() === 0.25"
+															(click)="setLabelPercent(0.25)"
+															[matTooltip]="'Label ' + (data.effectiveCellWidth * 0.25 | number:'1.0-0') + 'px / Input ' + (data.effectiveCellWidth * 0.75 | number:'1.0-0') + 'px'">
+								25% / 75%
+							</button>
+							<button type="button" class="size-btn"
+															[class.active]="getActiveLabelPercent() === 0.50"
+															(click)="setLabelPercent(0.50)"
+															[matTooltip]="'Label ' + (data.effectiveCellWidth * 0.5 | number:'1.0-0') + 'px / Input ' + (data.effectiveCellWidth * 0.5 | number:'1.0-0') + 'px'">
+								50% / 50%
+							</button>
+							<button type="button" class="size-btn"
+															[class.active]="getActiveLabelPercent() === 0.75"
+															(click)="setLabelPercent(0.75)"
+															[matTooltip]="'Label ' + (data.effectiveCellWidth * 0.75 | number:'1.0-0') + 'px / Input ' + (data.effectiveCellWidth * 0.25 | number:'1.0-0') + 'px'">
+								75% / 25%
+							</button>
+						</div>
+					</div>
+					@if (getActiveLabelPercent() !== null) {
+						<div class="form-field">
+							<span class="hint">
+								Label: {{ (data.effectiveCellWidth * (getActiveLabelPercent() ?? 0)) | number:'1.0-0' }}px —
+								Input: {{ getComputedInputWidth() }}px
+							</span>
+						</div>
+					}
+					<div class="form-field">
+						<label>Label CSS</label>
+						<textarea class="html-textarea" formControlName="cssCodeForLabel" placeholder="width: 200px;"></textarea>
+					</div>
+					<div class="form-field">
+						<label>Input CSS</label>
+						<textarea class="html-textarea" formControlName="cssCodeForInput" placeholder="width: 200px;"></textarea>
+					</div>
+				</div>
+			}
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content">
+									<div class="form-field">
+										<label>{{ isTextCell(cell) ? 'Content' : 'Text Before' }}</label>
+										<textarea
+											[class.html-textarea]="isTextCell(cell)"
+											[placeholder]="isTextCell(cell) ? '<h3>Section title</h3>' : 'Text before the field...'"
+											[value]="getText(cellTextBefore, lang.languageCode)"
+											(input)="onTextBeforeChange($event, lang.languageCode)">
+										</textarea>
+									</div>
+									@if (!isTextCell(cell)) {
+										<div class="form-field">
+											<label>Text After</label>
+											<textarea
+												placeholder="Text after the field..."
+												[value]="getText(cellTextAfter, lang.languageCode)"
+												(input)="onTextAfterChange($event, lang.languageCode)">
+											</textarea>
+										</div>
+									}
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+
+			@if (!isTextCell(cell) && canHaveVisibilityCriteria(cell)) {
+				<div class="section-header">
+					<h3>Visibility Criteria</h3>
+					<button type="button" class="btn-add-item" (click)="addCriterion()">
+						<mat-icon>add</mat-icon>
+						Add Criterion
+					</button>
+				</div>
+
+				@if (cell.visibilityCriteria.length === 0) {
+					<div class="empty-state">
+						<mat-icon>visibility</mat-icon>
+						<p>No criteria — cell is always visible.</p>
+					</div>
+				}
+
+				<div class="criteria-list">
+					@for (criterion of cell.visibilityCriteria; track $index; let idx = $index) {
+						@if (getFieldModelById(cell.fieldModelId); as fm) {
+							<div class="criteria-item">
+
+								<div class="criteria-header">
+									<span class="criteria-number">Criterion {{ idx + 1 }}</span>
+									<div class="criteria-controls">
+										<button type="button" class="btn-delete" (click)="removeCriterion(idx)">
+											<mat-icon>delete</mat-icon>
+										</button>
+									</div>
+								</div>
+
+								<div class="criteria-content">
+
+									@if (fieldUsesValueDropdown(fm)) {
+										<div class="form-field">
+											<label>Value</label>
+											<mat-select
+												[ngModel]="getCriterionValue(criterion)"
+												[ngModelOptions]="{standalone: true}"
+												(ngModelChange)="setCriterionValue(criterion, $event)">
+												<mat-option [value]="null">— any —</mat-option>
+												@for (pv of fm.possibleValues; track pv.possibleValueId) {
+													<mat-option [value]="pv.possibleValueId">
+														{{ languageService.getLabel(pv) }}
+													</mat-option>
+												}
+											</mat-select>
+										</div>
+									} @else if (fieldUsesCheckboxBoolean(fm)) {
+										<div class="form-field">
+											<label>Value</label>
+											<mat-select
+												[ngModel]="getCriterionValue(criterion)"
+												[ngModelOptions]="{standalone: true}"
+												(ngModelChange)="setCriterionValue(criterion, $event)">
+												<mat-option [value]="null">— any —</mat-option>
+												<mat-option value="true">True</mat-option>
+												<mat-option value="false">False</mat-option>
+											</mat-select>
+										</div>
+									} @else if (fieldUsesOperator(fm)) {
+										<div class="form-row">
+											<div class="form-field">
+												<label>Operator</label>
+												<mat-select
+													[ngModel]="criterion.operator"
+													[ngModelOptions]="{standalone: true}"
+													(ngModelChange)="setCriterionOperator(criterion, $event)">
+													@for (op of getOperatorsForField(); track op.value) {
+														<mat-option [value]="op.value">{{ op.label }}</mat-option>
+													}
+												</mat-select>
+											</div>
+											@if (operatorNeedsValue(criterion.operator)) {
+												<div class="form-field">
+													<label>Value</label>
+													<input
+														[ngModel]="getCriterionValue(criterion)"
+														[ngModelOptions]="{standalone: true}"
+														(ngModelChange)="setCriterionValue(criterion, $event)"
+														placeholder="Enter value"/>
+												</div>
+											}
+										</div>
+									}
+
+									<div class="form-row">
+										<div class="form-field">
+											<label>Action</label>
+											<mat-select
+												[ngModel]="criterion.action"
+												[ngModelOptions]="{standalone: true}"
+												(ngModelChange)="criterion.action = $event">
+												<mat-option value="SHOW">Show</mat-option>
+												<mat-option value="HIDE">Hide</mat-option>
+											</mat-select>
+										</div>
+
+										<div class="form-field">
+											<label>Target Layout</label>
+											<mat-select
+												[ngModel]="getCriterionTargetLayoutId(criterion)"
+												[ngModelOptions]="{standalone: true}"
+												(ngModelChange)="setCriterionTargetLayout(criterion, $event)">
+												<mat-option value="">— any —</mat-option>
+												@for (layout of data.allLayouts; track layout.formLayoutId) {
+													<mat-option [value]="layout.formLayoutId">{{ layout.id }}</mat-option>
+												}
+											</mat-select>
+										</div>
+
+										<div class="form-field">
+											<label>Target Cell</label>
+											<mat-select
+												[ngModel]="getCriterionTargetCellId(criterion)"
+												[ngModelOptions]="{standalone: true}"
+												(ngModelChange)="setCriterionTargetCell(criterion, $event)">
+												<mat-option value="">— any —</mat-option>
+												@for (c of getCellsForTargetLayout(criterion); track c.formLayoutCellId) {
+													<mat-option [value]="c.formLayoutCellId">{{ c.id }}</mat-option>
+												}
+											</mat-select>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						}
+					}
+				</div>
+			}
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">
+			<mat-icon>save</mat-icon>
+			Save
+		</button>
+	</div>
+</div>

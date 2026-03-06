@@ -1,0 +1,187 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">
+		@if (isEditMode) { Edit Layout Settings }
+		@else if (generateFromDataset) { Generate Layout from Dataset }
+		@else { Create Empty Layout }
+	</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+
+			@if (!isEditMode) {
+				<div class="form-field">
+					<label>Layout Code *</label>
+					<input matInput formControlName="id"
+												placeholder="e.g. BASELINE_LAYOUT"
+												(input)="onCodeInput($event)" />
+					<span class="hint">Uppercase letters, digits and underscores only</span>
+					@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+						<span class="error-message">Code is required</span>
+					}
+					@if (form.get('id')?.hasError('pattern') && form.get('id')?.touched) {
+						<span class="error-message">Must start with a letter or underscore; uppercase only</span>
+					}
+				</div>
+			} @else {
+				<div class="form-field">
+					<label>Layout Code</label>
+					<input matInput formControlName="id" class="disabled-input" readonly />
+				</div>
+			}
+
+			<div class="form-field">
+				<label>Type</label>
+				<mat-select formControlName="type">
+					@for (t of layoutTypes; track t) {
+						<mat-option [value]="t">{{ t }}</mat-option>
+					}
+				</mat-select>
+				@if (form.get('type')?.value === 'SINGLE') {
+					<span class="hint">One record per event or scope</span>
+				} @else {
+					<span class="hint">Multiple records per event or scope</span>
+				}
+			</div>
+
+			@if (!isEditMode) {
+				<div class="form-field">
+					<label>Columns</label>
+					<mat-select formControlName="columnCount">
+						@for (n of [1,2,3,4,5,6]; track n) {
+							<mat-option [value]="n">{{ n }}</mat-option>
+						}
+					</mat-select>
+				</div>
+			}
+
+			<div class="form-field">
+				<label>
+					CSS Code
+				</label>
+				<textarea class="code-textarea" formControlName="cssCode"
+														placeholder="e.g. max-width: 1200px;">
+				</textarea>
+				<span class="hint">Applied to the layout container</span>
+			</div>
+
+			<div class="form-field">
+				<label>Dataset Model {{ generateFromDataset ? '*' : '' }}</label>
+				<mat-select formControlName="datasetModelId" placeholder="Select dataset model">
+					@if (!generateFromDataset) {
+						<mat-option value="">None</mat-option>
+					}
+					@for (ds of datasetModels; track ds.datasetModelId) {
+						<mat-option [value]="ds.datasetModelId">
+							{{ languageService.getLabel(ds) }}
+						</mat-option>
+					}
+				</mat-select>
+				@if (form.get('datasetModelId')?.hasError('required') && form.get('datasetModelId')?.touched) {
+					<span class="error-message">Dataset model is required</span>
+				}
+			</div>
+
+			@if (form.get('datasetModelId')?.value) {
+				<div class="form-field">
+					<label>Default Sort Field</label>
+					<mat-select formControlName="defaultSortFieldModelId">
+						<mat-option value="">None</mat-option>
+						@for (fm of fieldsForSelectedDataset; track fm.fieldModelId) {
+							<mat-option [value]="fm.fieldModelId">
+								{{ languageService.getLabel(fm) }}
+							</mat-option>
+						}
+					</mat-select>
+					<span class="hint">Field used to sort multiple records</span>
+				</div>
+			}
+
+			@if (generateFromDataset) {
+				@if (previewFields.length > 0) {
+					<div class="preview-section">
+						<p class="preview-label">
+							<mat-icon>preview</mat-icon>
+							{{ previewFields.length }} field{{ previewFields.length === 1 ? '' : 's' }} will be generated
+						</p>
+						<div class="relationship-box">
+							<div class="chip-container">
+								@for (fm of previewFields; track fm.fieldModelId) {
+									<div class="chip theme-field-model">
+										<mat-icon class="resource-icon">text_ad</mat-icon>
+										<span>{{ languageService.getLabel(fm) }}</span>
+									</div>
+								}
+							</div>
+						</div>
+					</div>
+				}
+
+				@if (previewFields.length === 0) {
+					<p class="empty-state">
+						<mat-icon>info_outline</mat-icon>
+						No field models found for this dataset. An empty layout will be created.
+					</p>
+				}
+			}
+
+			<div class="form-section">
+				<h3>Translations</h3>
+				<mat-tab-group>
+					@for (lang of projectLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content">
+									<div class="form-field">
+										<label>Description</label>
+										<input
+											[value]="getText(description, lang.languageCode)"
+											(input)="onTranslationChange($event, description, lang.languageCode!)"
+											placeholder="Layout description..." />
+									</div>
+									<div class="form-field">
+										<label>
+											Text Before
+										</label>
+										<textarea class="code-textarea"
+																				[value]="getText(textBefore, lang.languageCode)"
+																				(input)="onTranslationChange($event, textBefore, lang.languageCode!)"
+																				placeholder="<p>Introductory text...</p>">
+										</textarea>
+										<span class="hint">HTML rendered above the layout</span>
+									</div>
+									<div class="form-field">
+										<label>
+											Text After
+										</label>
+										<textarea class="code-textarea"
+																				[value]="getText(textAfter, lang.languageCode)"
+																				(input)="onTranslationChange($event, textAfter, lang.languageCode!)"
+																				placeholder="<p>Footer text...</p>">
+										</textarea>
+										<span class="hint">HTML rendered below the layout</span>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSubmit()" [disabled]="form.invalid">
+			@if (isEditMode) {
+				Save Changes
+			} @else if (generateFromDataset) {
+				<mat-icon>auto_awesome</mat-icon>
+				Generate Layout
+			} @else {
+				<mat-icon>add</mat-icon>
+				Create Layout
+			}
+		</button>
+	</div>
+</div>

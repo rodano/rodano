@@ -9,12 +9,14 @@
  */
 
 
-/**
- * Form model
- */
 export interface FormModel { 
     formModelId: string;
     id: string;
     shortname: { [key: string]: string; };
+    longname?: { [key: string]: string; };
+    description?: { [key: string]: string; };
+    printButtonLabel?: { [key: string]: string; };
+    optional?: boolean;
+    workflowIds?: Array<string>;
 }
 

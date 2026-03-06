@@ -120,6 +120,16 @@
 					(chartContextChanged)="onChartContextChanged($event)">
 				</app-chart-list>
 			}
+			@case ('form-models') {
+				<app-form-model-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onFormModelSelected($event)"
+					(formModelsChanged)="onFormModelsChanged($event)"
+					(formModelContextChanged)="onFormModelContextChanged($event)">
+				</app-form-model-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

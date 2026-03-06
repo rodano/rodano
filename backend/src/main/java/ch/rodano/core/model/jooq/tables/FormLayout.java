@@ -7,6 +7,7 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.enums.FormLayoutType;
 import ch.rodano.core.model.jooq.tables.DatasetModel.DatasetModelPath;
 import ch.rodano.core.model.jooq.tables.FieldModel.FieldModelPath;
 import ch.rodano.core.model.jooq.tables.FormLayoutColumn.FormLayoutColumnPath;
@@ -98,7 +99,7 @@ public class FormLayout extends TableImpl<FormLayoutRecord> {
 	/**
 	 * The column <code>form_layout.type</code>.
 	 */
-	public final TableField<FormLayoutRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(16).nullable(false), this, "");
+	public final TableField<FormLayoutRecord, FormLayoutType> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(8).nullable(false).asEnumDataType(FormLayoutType.class), this, "");
 
 	/**
 	 * The column <code>form_layout.description</code>.

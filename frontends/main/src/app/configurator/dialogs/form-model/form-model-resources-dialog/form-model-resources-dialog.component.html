@@ -1,0 +1,25 @@
+<h2 class="dialog-title">Edit Resources</h2>
+
+<div class="dialog-content">
+	<app-dual-list-box
+		title="Workflows"
+		hint="Select which workflows should be associated with this form"
+		[available]="availableWorkflows"
+		[selected]="selectedWorkflows"
+		[labelFn]="languageService.getLabel.bind(languageService)"
+		availablePlaceholder="No available workflows"
+		selectedPlaceholder="No workflows selected"
+		(add)="onAddWorkflow($event)"
+		(remove)="onRemoveWorkflow($event)">
+	</app-dual-list-box>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">
+		Cancel
+	</button>
+	<button class="btn-primary" (click)="onSave()">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

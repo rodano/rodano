@@ -12,6 +12,7 @@ import {PrivacyPolicyContext} from './contexts/privacy-policy-context';
 import {ResourceCategoryContext} from './contexts/resource-category-context';
 import {ReportContext} from './contexts/report-context';
 import {ChartContext} from './contexts/chart-context';
+import {FormModelContext} from './contexts/form-model-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -222,6 +223,22 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveFormModels(projectId: string, context: FormModelContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveFormModels(
+				projectId,
+				context.modifiedFormModelIds,
+				context.formModels,
+				context.originalFormModels
+			)
+		]).pipe(
+			map(() => {
+				context.formModelManager.syncOriginalsWithCurrent();
+				context.formModelManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -290,5 +307,10 @@ export class EntitySaveOrchestratorService {
 		context.chartManager.resetToOriginals();
 
 		context.chartManager.invalidate();
+	}
+
+	resetFormModelsToOriginals(context: FormModelContext): void {
+		context.formModelManager.resetToOriginals();
+		context.formModelManager.invalidate();
 	}
 }

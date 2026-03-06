@@ -84,7 +84,12 @@ public class FormCellVisibilityCriteriaValue extends TableImpl<FormCellVisibilit
 	 * The column
 	 * <code>form_cell_visibility_criteria_value.possible_value_id</code>.
 	 */
-	public final TableField<FormCellVisibilityCriteriaValueRecord, UUID> POSSIBLE_VALUE_ID = createField(DSL.name("possible_value_id"), SQLDataType.UUID.nullable(false), this, "");
+	public final TableField<FormCellVisibilityCriteriaValueRecord, UUID> POSSIBLE_VALUE_ID = createField(DSL.name("possible_value_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
+
+	/**
+	 * The column <code>form_cell_visibility_criteria_value.value</code>.
+	 */
+	public final TableField<FormCellVisibilityCriteriaValueRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	private FormCellVisibilityCriteriaValue(Name alias, Table<FormCellVisibilityCriteriaValueRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

@@ -5,6 +5,8 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import ch.rodano.core.model.jooq.enums.FormLayoutType;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FormModelLayout {
 
@@ -13,7 +15,7 @@ public class FormModelLayout {
 	private Map<String, String> textBefore;
 	private Map<String, String> textAfter;
 
-	private String type;
+	private FormLayoutType type;
 	private String cssCode;
 
 	private String datasetModelId;
@@ -56,11 +58,11 @@ public class FormModelLayout {
 		this.textAfter = textAfter;
 	}
 
-	public String getType() {
+	public FormLayoutType getType() {
 		return type;
 	}
 
-	public void setType(final String type) {
+	public void setType(final FormLayoutType type) {
 		this.type = type;
 	}
 

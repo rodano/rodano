@@ -6,6 +6,8 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
+import ch.rodano.core.model.jooq.enums.FormCellVisibilityCriteriaAction;
+import ch.rodano.core.model.jooq.enums.FormCellVisibilityCriteriaOperator;
 import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaTargetCell.FormCellVisibilityCriteriaTargetCellPath;
 import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaTargetLayout.FormCellVisibilityCriteriaTargetLayoutPath;
 import ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaValue.FormCellVisibilityCriteriaValuePath;
@@ -84,12 +86,12 @@ public class FormCellVisibilityCriteria extends TableImpl<FormCellVisibilityCrit
 	/**
 	 * The column <code>form_cell_visibility_criteria.operator</code>.
 	 */
-	public final TableField<FormCellVisibilityCriteriaRecord, String> OPERATOR = createField(DSL.name("operator"), SQLDataType.VARCHAR(32).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<FormCellVisibilityCriteriaRecord, FormCellVisibilityCriteriaOperator> OPERATOR = createField(DSL.name("operator"), SQLDataType.VARCHAR(14).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)).asEnumDataType(FormCellVisibilityCriteriaOperator.class), this, "");
 
 	/**
 	 * The column <code>form_cell_visibility_criteria.action</code>.
 	 */
-	public final TableField<FormCellVisibilityCriteriaRecord, String> ACTION = createField(DSL.name("action"), SQLDataType.VARCHAR(16).nullable(false), this, "");
+	public final TableField<FormCellVisibilityCriteriaRecord, FormCellVisibilityCriteriaAction> ACTION = createField(DSL.name("action"), SQLDataType.VARCHAR(4).nullable(false).asEnumDataType(FormCellVisibilityCriteriaAction.class), this, "");
 
 	private FormCellVisibilityCriteria(Name alias, Table<FormCellVisibilityCriteriaRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

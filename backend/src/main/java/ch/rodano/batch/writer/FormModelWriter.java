@@ -249,6 +249,7 @@ public class FormModelWriter extends BaseWriter {
 															.set(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_LAYOUT_CELL_ID, cellId)
 															.set(FORM_CELL_VISIBILITY_CRITERIA_VALUE.LINE_ORDER, lineOrder)
 															.set(FORM_CELL_VISIBILITY_CRITERIA_VALUE.POSSIBLE_VALUE_ID, possibleValueId)
+															.set(FORM_CELL_VISIBILITY_CRITERIA_VALUE.VALUE, possibleValueId == null ? value : null)
 															.onDuplicateKeyIgnore()
 															.execute();
 													}

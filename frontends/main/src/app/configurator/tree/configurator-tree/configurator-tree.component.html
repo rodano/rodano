@@ -35,12 +35,15 @@
 		(categoryClicked)="onValidatorsClicked()">
 	</app-validator-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('form-models')">
-			<mat-icon class="node-icon">description</mat-icon>
-			<span class="node-label">Form Models</span>
-		</div>
-	</div>
+	<app-form-model-tree
+		[projectId]="projectId"
+		[formModels]="formModels"
+		[expanded]="expandedCategory === 'form-models'"
+		[layouts]="layouts"
+		[selectedFormModelId]="selectedFormModelId"
+		[selectedLayoutId]="selectedLayoutId"
+		(categoryClicked)="onFormModelClicked()">
+	</app-form-model-tree>
 
 	<app-workflow-tree
 		[projectId]="projectId"

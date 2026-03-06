@@ -30,6 +30,8 @@ import {ReportService} from './api/report.service';
 import {Report} from '@core/model/report';
 import {ChartService} from './api/chart.service';
 import {ChartModel} from '@core/model/chart-model';
+import {FormModel} from '@core/model/form-model';
+import {FormModelService} from './api/form-model.service';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -48,7 +50,8 @@ export class DraftSaveService {
 		private privacyPolicyService: PrivacyPolicyService,
 		private resourceCategoryService: ResourceCategoryService,
 		private reportService: ReportService,
-		private chartService: ChartService
+		private chartService: ChartService,
+		private formModelService: FormModelService
 	) {}
 
 	saveScopeModels(
@@ -492,6 +495,41 @@ export class DraftSaveService {
 				const chart = charts.find(c => c.chartId === id);
 				if(chart) {
 					saveObservables.push(this.chartService.updateChart(projectId, id, chart));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveFormModels(
+		projectId: string,
+		modifiedIds: Set<string>,
+		formModels: FormModel[],
+		originalFormModels: FormModel[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalFormModels.find(fm => fm.formModelId === originalId);
+				if(original) {
+					saveObservables.push(this.formModelService.deleteFormModel(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const formModel = formModels.find(fm => fm.formModelId === id);
+				if(formModel) {
+					saveObservables.push(this.formModelService.createFormModel(projectId, formModel));
+				}
+			}
+			else {
+				const formModel = formModels.find(fm => fm.formModelId === id);
+				if(formModel) {
+					saveObservables.push(this.formModelService.updateFormModel(projectId, id, formModel));
 				}
 			}
 		});

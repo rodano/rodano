@@ -46,8 +46,10 @@ public class VisibilityCriteriaDAO {
 
 		model.setVisibilityCriteriaId(record.getFormCellVisibleCriteriaId());
 
-		model.setOperator(mappingHelper.parseEnum(Operator.class, record.getOperator(), "operator"));
-		model.setAction(mappingHelper.parseEnum(VisibilityCriterionAction.class, record.getAction(), "action"));
+		model.setOperator(record.getOperator() != null
+			? mappingHelper.parseEnum(Operator.class, record.getOperator().name(), "operator")
+			: null);
+		model.setAction(mappingHelper.parseEnum(VisibilityCriterionAction.class, record.getAction().name(), "action"));
 
 		model.setValues(loadValues(record.getFormCellVisibleCriteriaId()));
 		model.setTargetLayoutIds(loadTargetLayoutIds(record.getFormCellVisibleCriteriaId()));
@@ -57,14 +59,15 @@ public class VisibilityCriteriaDAO {
 	}
 
 	private List<String> loadValues(final UUID criteriaId) {
-		return dslContext.select(FIELD_POSSIBLE_VALUE.CODE)
+		return dslContext
+			.select(FIELD_POSSIBLE_VALUE.CODE, FORM_CELL_VISIBILITY_CRITERIA_VALUE.VALUE)
 			.from(FORM_CELL_VISIBILITY_CRITERIA_VALUE)
-			.join(FIELD_POSSIBLE_VALUE)
+			.leftJoin(FIELD_POSSIBLE_VALUE)
 			.on(FIELD_POSSIBLE_VALUE.POSSIBLE_VALUE_ID.eq(
 				FORM_CELL_VISIBILITY_CRITERIA_VALUE.POSSIBLE_VALUE_ID))
 			.where(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_CELL_VISIBLE_CRITERIA_ID.eq(criteriaId))
 			.orderBy(FORM_CELL_VISIBILITY_CRITERIA_VALUE.LINE_ORDER)
-			.fetch(FIELD_POSSIBLE_VALUE.CODE);
+			.fetch(row -> row.value1() != null ? row.value1() : row.value2());
 	}
 
 	private List<String> loadTargetLayoutIds(final UUID criteriaId) {

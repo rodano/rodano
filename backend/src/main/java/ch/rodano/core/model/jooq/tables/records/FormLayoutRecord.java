@@ -4,6 +4,7 @@
 package ch.rodano.core.model.jooq.tables.records;
 
 
+import ch.rodano.core.model.jooq.enums.FormLayoutType;
 import ch.rodano.core.model.jooq.tables.FormLayout;
 
 import java.util.UUID;
@@ -107,15 +108,15 @@ public class FormLayoutRecord extends UpdatableRecordImpl<FormLayoutRecord> {
 	/**
 	 * Setter for <code>form_layout.type</code>.
 	 */
-	public void setType(String value) {
+	public void setType(FormLayoutType value) {
 		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>form_layout.type</code>.
 	 */
-	public String getType() {
-		return (String) get(6);
+	public FormLayoutType getType() {
+		return (FormLayoutType) get(6);
 	}
 
 	/**
@@ -197,7 +198,7 @@ public class FormLayoutRecord extends UpdatableRecordImpl<FormLayoutRecord> {
 	/**
 	 * Create a detached, initialised FormLayoutRecord
 	 */
-	public FormLayoutRecord(UUID formLayoutId, UUID projectId, UUID formModelId, UUID datasetModelId, UUID defaultSortFieldModelId, String code, String type, String description, String textBefore, String textAfter, String cssCode) {
+	public FormLayoutRecord(UUID formLayoutId, UUID projectId, UUID formModelId, UUID datasetModelId, UUID defaultSortFieldModelId, String code, FormLayoutType type, String description, String textBefore, String textAfter, String cssCode) {
 		super(FormLayout.FORM_LAYOUT);
 
 		setFormLayoutId(formLayoutId);

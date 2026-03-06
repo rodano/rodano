@@ -29,7 +29,7 @@ POST http://localhost:8080/administration/projects/initialize
 Content-Type: application/json
 
 {
-  "projectCode": "TEST_FARIS",
+  "projectCode": "TEST",
   "adminName": "Test User",
   "adminEmail": "test@rodano.ch",
   "adminPassword": "Password1!",

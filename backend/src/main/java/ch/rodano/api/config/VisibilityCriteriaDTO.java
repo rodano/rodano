@@ -23,6 +23,9 @@ public class VisibilityCriteriaDTO {
 	@NotNull
 	private List<String> targetCellIds;
 
+	public VisibilityCriteriaDTO() {
+	}
+
 	public VisibilityCriteriaDTO(final VisibilityCriteria visibilityCriteria) {
 		this.formCellVisibilityCriteriaId = visibilityCriteria.getVisibilityCriteriaId();
 		this.operator = visibilityCriteria.getOperator();

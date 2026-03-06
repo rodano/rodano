@@ -107,6 +107,8 @@
 					[resourceCategories]="resourceCategories"
 					[reports]="reports"
 					[charts]="charts"
+					[formModels]="formModels"
+					[layouts]="formLayouts"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -122,6 +124,8 @@
 					[selectedResourceCategoryId]="selectedResourceCategoryId"
 					[selectedReportId]="selectedReportId"
 					[selectedChartId]="selectedChartId"
+					[selectedFormModelId]="selectedFormModelId"
+					[selectedLayoutId]="selectedLayoutId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -144,6 +148,7 @@
 					(resourceCategoriesChanged)="onResourceCategoriesChanged($event)"
 					(reportsChanged)="onReportsChanged($event)"
 					(chartsChanged)="onChartsChanged($event)"
+					(formModelsChanged)="onFormModelsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -153,7 +158,8 @@
 					(privacyPolicyContextChanged)="onPrivacyPolicyContextChanged($event)"
 					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)"
 					(reportContextChanged)="onReportContextChanged($event)"
-					(chartContextChanged)="onChartContextChanged($event)">
+					(chartContextChanged)="onChartContextChanged($event)"
+					(formModelContextChanged)="onFormModelContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

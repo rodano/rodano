@@ -4,29 +4,32 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import ch.rodano.core.model.jooq.enums.FormCellVisibilityCriteriaAction;
+import ch.rodano.core.model.jooq.enums.FormCellVisibilityCriteriaOperator;
+
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class FormCellVisibilityCriteria {
 
-	private String operator;
-	private String action;
+	private FormCellVisibilityCriteriaOperator operator;
+	private FormCellVisibilityCriteriaAction action;
 
 	private List<String> values;
 	private List<String> targetCellIds;
 	private List<String> targetLayoutIds;
 
-	public String getOperator() {
+	public FormCellVisibilityCriteriaOperator getOperator() {
 		return operator;
 	}
 
-	public void setOperator(final String operator) {
+	public void setOperator(final FormCellVisibilityCriteriaOperator operator) {
 		this.operator = operator;
 	}
 
-	public String getAction() {
+	public FormCellVisibilityCriteriaAction getAction() {
 		return action;
 	}
 
-	public void setAction(final String action) {
+	public void setAction(final FormCellVisibilityCriteriaAction action) {
 		this.action = action;
 	}
 

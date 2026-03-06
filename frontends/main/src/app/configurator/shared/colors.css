@@ -74,6 +74,11 @@
 }
 
 .theme-form-model {
+	--entity-color: #986b5b;
+	--entity-highlight: rgba(152, 107, 91, 0.12);
+}
+
+.theme-form-layout {
 	--entity-color: #0C4A6E;
 	--entity-highlight: rgba(12, 74, 110, 0.12);
 }

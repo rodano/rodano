@@ -96,12 +96,26 @@ public class FormCellVisibilityCriteriaValueRecord extends UpdatableRecordImpl<F
 		return (UUID) get(4);
 	}
 
+	/**
+	 * Setter for <code>form_cell_visibility_criteria_value.value</code>.
+	 */
+	public void setValue(String value) {
+		set(5, value);
+	}
+
+	/**
+	 * Getter for <code>form_cell_visibility_criteria_value.value</code>.
+	 */
+	public String getValue() {
+		return (String) get(5);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
 
 	@Override
-	public Record4<UUID, UUID, UUID, UUID> key() {
+	public Record4<UUID, UUID, UUID, Integer> key() {
 		return (Record4) super.key();
 	}
 
@@ -119,7 +133,7 @@ public class FormCellVisibilityCriteriaValueRecord extends UpdatableRecordImpl<F
 	/**
 	 * Create a detached, initialised FormCellVisibilityCriteriaValueRecord
 	 */
-	public FormCellVisibilityCriteriaValueRecord(UUID projectId, UUID formLayoutCellId, UUID formCellVisibleCriteriaId, Integer lineOrder, UUID possibleValueId) {
+	public FormCellVisibilityCriteriaValueRecord(UUID projectId, UUID formLayoutCellId, UUID formCellVisibleCriteriaId, Integer lineOrder, UUID possibleValueId, String value) {
 		super(FormCellVisibilityCriteriaValue.FORM_CELL_VISIBILITY_CRITERIA_VALUE);
 
 		setProjectId(projectId);
@@ -127,6 +141,7 @@ public class FormCellVisibilityCriteriaValueRecord extends UpdatableRecordImpl<F
 		setFormCellVisibleCriteriaId(formCellVisibleCriteriaId);
 		setLineOrder(lineOrder);
 		setPossibleValueId(possibleValueId);
+		setValue(value);
 		resetChangedOnNotNull();
 	}
 }

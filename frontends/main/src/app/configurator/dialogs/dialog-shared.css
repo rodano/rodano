@@ -60,6 +60,15 @@
 	color: #374151;
 }
 
+.form-row {
+	display: flex;
+	gap: 16px;
+}
+
+.form-row .form-field {
+	flex: 1;
+}
+
 .form-field {
 	display: flex;
 	flex-direction: column;

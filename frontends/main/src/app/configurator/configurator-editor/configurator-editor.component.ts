@@ -34,6 +34,7 @@ import {PrivacyPolicyManagerService} from '../services/manager/privacy-policy-ma
 import {ResourceCategoryManagerService} from '../services/manager/resource-category-manager.service';
 import {ReportManagerService} from '../services/manager/report-manager.service';
 import {ChartManagerService} from '../services/manager/chart-manager.service';
+import {FormModelManagerService} from '../services/manager/form-model-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -73,6 +74,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	resourceCategoryModified = false;
 	reportModified = false;
 	chartModified = false;
+	formModelModified = false;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -89,6 +91,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	resourceCategories: any[] = [];
 	reports: any[] = [];
 	charts: any[] = [];
+	formModels: any[] = [];
+	formLayouts: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -105,6 +109,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedResourceCategoryId: string | null = null;
 	selectedReportId: string | null = null;
 	selectedChartId: string | null = null;
+	selectedFormModelId: string | null = null;
+	selectedLayoutId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -133,6 +139,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private resourceCategoryManager: ResourceCategoryManagerService,
 		private reportManager: ReportManagerService,
 		private chartManager: ChartManagerService,
+		private formModelManager: FormModelManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -179,6 +186,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.resourceCategoryManager.invalidate();
 		this.reportManager.invalidate();
 		this.chartManager.invalidate();
+		this.formModelManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -252,6 +260,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: charts => this.charts = charts,
 			error: error => console.error('Error loading charts:', error)
 		});
+
+		this.formModelManager.load(this.projectId).subscribe({
+			next: formModels => this.formModels = formModels,
+			error: error => console.error('Error loading form models:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -265,6 +278,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.resourceCategories = this.resourceCategoryManager.getAll();
 		this.reports = this.reportManager.getAll();
 		this.charts = this.chartManager.getAll();
+		this.formModels = this.formModelManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -303,7 +317,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -328,6 +342,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.resourceCategories = [];
 			this.reports = [];
 			this.charts = [];
+			this.formModels = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -339,6 +354,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.resourceCategoryListComponent?.clearSelection();
 			this.detailComponent?.reportListComponent?.clearSelection();
 			this.detailComponent?.chartListComponent?.clearSelection();
+			this.detailComponent?.formModelListComponent?.clearSelection();
 		}
 	}
 
@@ -352,6 +368,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onResourceCategoriesChanged(value: boolean): void {this.resourceCategoryModified = value;}
 	onReportsChanged(value: boolean): void {this.reportModified = value;}
 	onChartsChanged(value: boolean): void {this.chartModified = value;}
+	onFormModelsChanged(value: boolean): void {this.formModelModified = value;}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
@@ -423,6 +440,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(this.chartModified) {
 					saveObservables.push(this.saveCharts());
+				}
+
+				if(this.formModelModified) {
+					saveObservables.push(this.saveFormModels());
+					saveObservables.push(this.detailComponent?.saveLayouts() ?? of(void 0));
 				}
 
 				if(saveObservables.length > 0) {
@@ -627,6 +649,22 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.charts = this.chartManager.getAll();
 	}
 
+	private async saveFormModels(): Promise<void> {
+		const component = this.detailComponent?.formModelListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveFormModels(this.projectId, {
+			formModelManager: component.formModelManager,
+			formModels: component.formModels,
+			originalFormModels: component.originalFormModels,
+			modifiedFormModelIds: component.modifiedFormModelIds
+		}));
+		component.loadFormModels();
+		this.formModels = this.formModelManager.getAll();
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -682,6 +720,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.resourceCategoryManager.resetToOriginals();
 		this.reportManager.resetToOriginals();
 		this.chartManager.resetToOriginals();
+		this.formModelManager.resetToOriginals();
 
 		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
 		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
@@ -693,6 +732,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.resourceCategoryListComponent?.loadResourceCategories();
 		this.detailComponent?.reportListComponent?.loadReports();
 		this.detailComponent?.chartListComponent?.loadCharts();
+		this.detailComponent?.formModelListComponent?.loadFormModels();
+		this.detailComponent?.discardLayouts();
 
 		this.resetAllModifications();
 		this.refreshTreeData();
@@ -709,6 +750,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.resourceCategoryModified = false;
 		this.reportModified = false;
 		this.chartModified = false;
+		this.formModelModified = false;
 	}
 
 	onCreateSnapshot(): void {
@@ -778,7 +820,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.privacyPolicyModified
 		  || this.resourceCategoryModified
 		  || this.reportModified
-		  || this.chartModified;
+		  || this.chartModified
+		  || this.formModelModified;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -858,6 +901,15 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.charts = context.charts;
 			this.selectedChartId = context.selectedChartId;
+		});
+	}
+
+	onFormModelContextChanged(context: any): void {
+		setTimeout(() => {
+			this.formModels = context.formModels;
+			this.formLayouts = context.layouts ?? [];
+			this.selectedFormModelId = context.selectedFormModelId;
+			this.selectedLayoutId = context.selectedLayoutId;
 		});
 	}
 }

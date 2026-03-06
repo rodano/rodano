@@ -57,7 +57,7 @@ public class LayoutDAO {
 		model.setTextBefore(mappingHelper.parseJsonToMap(record.getTextBefore()));
 		model.setTextAfter(mappingHelper.parseJsonToMap(record.getTextAfter()));
 
-		model.setType(mappingHelper.parseEnum(LayoutType.class, record.getType(), "type"));
+		model.setType(mappingHelper.parseEnum(LayoutType.class, record.getType().name(), "type"));
 
 		if(record.getDatasetModelId() != null) {
 			model.setDatasetModelId(getDatasetModelCode(record.getDatasetModelId()));

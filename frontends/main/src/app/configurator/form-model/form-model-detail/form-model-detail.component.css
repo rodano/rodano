@@ -1,0 +1,46 @@
+@import "../../shared/detail-shared.css";
+
+.section-description {
+	font-size: 13px;
+	color: #666;
+	margin: 0 0 12px 0;
+	line-height: 1.5;
+}
+
+.btn-navigate {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	padding: 12px 16px;
+	background: #f8f9fa;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	cursor: pointer;
+	font-size: 14px;
+	font-weight: 500;
+	color: #212121;
+	transition: background 0.15s, border-color 0.15s;
+	text-align: left;
+}
+
+.btn-navigate:hover {
+	background: #fce4ec;
+	border-color: #e91e63;
+	color: #880e4f;
+}
+
+.btn-navigate mat-icon:first-child {
+	color: #e91e63;
+	font-size: 20px;
+	width: 20px;
+	height: 20px;
+}
+
+.btn-navigate .arrow-icon {
+	margin-left: auto;
+	font-size: 18px;
+	width: 18px;
+	height: 18px;
+	color: #999;
+}

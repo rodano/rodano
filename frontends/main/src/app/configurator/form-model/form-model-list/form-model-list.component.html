@@ -1,0 +1,170 @@
+<app-list-header title="Form Models" subtitle="Configure forms and their layouts" />
+
+@if (viewMode === 'layout-detail' && selectedLayout && selectedFormModel) {
+	<div class="layout-fullscreen">
+		<div class="layout-breadcrumb">
+			<button class="breadcrumb-btn" (click)="clearSelection()">
+				<mat-icon>description</mat-icon>
+				<span>Form Models</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<button class="breadcrumb-btn" (click)="onSelectFormModel(selectedFormModel)">
+				<span>{{ languageService.getTranslatedName(selectedFormModel.shortname) }}</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<button class="breadcrumb-btn" (click)="switchToLayoutView()">
+				<span>Layouts</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">{{ selectedLayout.id }}</span>
+		</div>
+
+		<div class="layout-workspace">
+			<div class="layout-sidebar">
+				<app-form-layout-list
+					[projectId]="projectId"
+					[project]="project"
+					[formModelId]="selectedFormModel.formModelId"
+					[selectedLayoutId]="selectedLayout.formLayoutId || null"
+					[compact]="true"
+					[modifiedLayoutIds]="modifiedLayoutIds"
+					(layoutSelected)="onSelectLayout($event)"
+					(layoutCreated)="onLayoutCreated($event)"
+					(layoutDeleted)="onLayoutDeleted($event)">
+				</app-form-layout-list>
+			</div>
+
+			<div class="layout-editor-area">
+				<app-form-layout-editor
+					[projectId]="projectId"
+					[project]="project"
+					[formModelId]="selectedFormModel.formModelId"
+					[layout]="selectedLayout"
+					[allLayouts]="layouts"
+					(closed)="switchToLayoutView()"
+					(layoutChanged)="onLayoutChanged($event)">
+				</app-form-layout-editor>
+			</div>
+		</div>
+	</div>
+} @else {
+	<div class="content-container"
+						[class.level-2]="viewLevel === 2"
+						[class.level-3]="viewLevel === 3">
+		@if (loading) {
+			<app-empty-state
+				style="width: 100%"
+				[icon]="'hourglass_empty'"
+				[message]="'Loading form models...'"
+			/>
+		} @else {
+			<div class="cards-container">
+				<div class="primary-cards-grid">
+					<div class="primary-card create-card theme-form-model" (click)="onCreateFormModel()">
+						<div class="create-content">
+							<mat-icon>add_circle_outline</mat-icon>
+							<h3>Create Form Model</h3>
+							<p>Define a new form</p>
+						</div>
+					</div>
+
+					@for (formModel of formModels; track formModel.formModelId) {
+						<div class="primary-card theme-form-model"
+											[class.selected]="isSelected(formModel)"
+											[appModified]="modifiedFormModelIds.has(formModel.formModelId)"
+											(click)="onSelectFormModel(formModel)">
+
+							@if (isSelected(formModel)) {
+								<div class="card-selection-icon">
+									<mat-icon>check</mat-icon>
+								</div>
+							}
+
+							<div class="card-header">
+								<div class="card-info">
+									<h3>{{ languageService.getTranslatedName(formModel.shortname) }}</h3>
+									<p class="card-code">{{ formModel.id }}</p>
+								</div>
+								<div class="card-header-badges">
+									@if (formModel.optional) {
+										<span class="status-badge first" matTooltip="Optional">
+                                            <mat-icon class="badge-full">toggle_off</mat-icon>
+                                            <mat-icon class="badge-short">toggle_off</mat-icon>
+                                        </span>
+									}
+								</div>
+							</div>
+
+							<div class="card-body">
+								<div class="card-details">
+									<div class="detail-item">
+										<mat-icon>settings</mat-icon>
+										<span>{{ formModel.workflowIds?.length || 0 }} {{ (formModel.workflowIds?.length || 0) === 1 ? 'Workflow' : 'Workflows' }}</span>
+									</div>
+								</div>
+							</div>
+
+							@if (modifiedFormModelIds.has(formModel.formModelId)) {
+								<div class="card-modified-indicator">
+									<mat-icon>edit</mat-icon>
+								</div>
+							}
+						</div>
+					}
+				</div>
+
+				@if (formModels.length === 0) {
+					<app-empty-state
+						[icon]="'description'"
+						[title]="'No Form Models'"
+						[message]="'Create your first form model to start building forms'"
+						[size]="'normal'"
+					/>
+				}
+			</div>
+
+			@if (viewMode === 'layout-list') {
+				<div class="secondary-column">
+					<div class="secondary-column-header">
+						<div class="header-with-back">
+							<button class="btn-back" (click)="backToFormDetail()">
+								<mat-icon>arrow_back</mat-icon>
+							</button>
+							<div>
+								<h2>Layouts</h2>
+								<p class="column-subtitle">{{ selectedFormModel ? languageService.getTranslatedName(selectedFormModel.shortname) : '' }}</p>
+							</div>
+						</div>
+					</div>
+					<div class="secondary-column-content">
+						<app-form-layout-list
+							[projectId]="projectId"
+							[project]="project"
+							[formModelId]="selectedFormModel!.formModelId"
+							[selectedLayoutId]="selectedLayout?.formLayoutId || null"
+							[modifiedLayoutIds]="modifiedLayoutIds"
+							(layoutSelected)="onSelectLayout($event)"
+							(layoutCreated)="onLayoutCreated($event)"
+							(layoutDeleted)="onLayoutDeleted($event)">
+						</app-form-layout-list>
+					</div>
+				</div>
+			}
+
+			@if (selectedFormModel && viewMode === 'form-detail') {
+				<div class="detail-panel">
+					<app-form-model-detail
+						[formModel]="selectedFormModel"
+						[projectId]="projectId"
+						[project]="project"
+						[allFormModels]="formModels"
+						(formModelUpdated)="onFormModelUpdated($event)"
+						(formModelDeleted)="onFormModelDeleted($event)"
+						(closed)="onSelectFormModel(selectedFormModel)"
+						(switchToLayouts)="switchToLayoutView()">
+					</app-form-model-detail>
+				</div>
+			}
+		}
+	</div>
+}

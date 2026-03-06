@@ -64,7 +64,12 @@ public class CacheConfig {
 			"report",
 
 			"charts",
-			"chart"
+			"chart",
+
+			"formModels",
+			"formModel",
+			"layouts",
+			"layout"
 		);
 	}
 }
