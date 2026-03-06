@@ -11,6 +11,7 @@ import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
+import { PagedResultExtendedScopeSearchResult } from '@core/model/paged-result-extended-scope-search-result';
 
 @Service()
 export class ScopeService {
