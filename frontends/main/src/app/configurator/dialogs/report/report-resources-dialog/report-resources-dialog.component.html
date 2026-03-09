@@ -1,17 +1,51 @@
 <h2 class="dialog-title">Edit Resources</h2>
 
 <div class="dialog-content">
-	<app-dual-list-box
-		title="Field Models"
-		hint="Select which field models should be associated with this report"
-		[available]="availableFieldModels"
-		[selected]="selectedFieldModels"
-		[labelFn]="languageService.getLabel.bind(languageService)"
-		availablePlaceholder="No available field models"
-		selectedPlaceholder="No field models selected"
-		(add)="onAddFieldModel($event)"
-		(remove)="onRemoveFieldModel($event)">
-	</app-dual-list-box>
+	<div class="form-field">
+		<label>Workflow</label>
+		<mat-select
+			[value]="selectedWorkflowId"
+			(selectionChange)="onWorkflowChange($event.value)"
+			placeholder="Select a workflow">
+			<mat-option [value]="null">None</mat-option>
+			@for (w of data.workflows; track w.workflowId) {
+				<mat-option [value]="w.workflowId">
+					{{ languageService.getLabel(w) }}
+				</mat-option>
+			}
+		</mat-select>
+		<span></span>
+	</div>
+
+	<div class="form-field">
+		<label>Dataset Model</label>
+		<mat-select
+			[value]="selectedDatasetModelId"
+			(selectionChange)="onDatasetModelChange($event.value)"
+			placeholder="Select a dataset model">
+			<mat-option [value]="null">None</mat-option>
+			@for (dm of data.datasetModels; track dm.datasetModelId) {
+				<mat-option [value]="dm.datasetModelId">
+					{{ languageService.getLabel(dm) }}
+				</mat-option>
+			}
+		</mat-select>
+		<span class="hint">Selecting a dataset model filters the available field models below</span>
+	</div>
+
+	<div class="form-field">
+		<app-dual-list-box
+			title="Field Models"
+			hint="Select which field models should be associated with this report"
+			[available]="filteredAvailableFieldModels"
+			[selected]="selectedFieldModels"
+			[labelFn]="languageService.getLabel.bind(languageService)"
+			availablePlaceholder="No available field models"
+			selectedPlaceholder="No field models selected"
+			(add)="onAddFieldModel($event)"
+			(remove)="onRemoveFieldModel($event)">
+		</app-dual-list-box>
+	</div>
 </div>
 
 <div class="dialog-actions">

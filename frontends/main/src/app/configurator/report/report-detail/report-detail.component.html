@@ -20,22 +20,6 @@
 					{{ report.id }}
 				</app-setting-item>
 
-				<app-setting-item label="Workflow"
-																						[modified]="isFieldModified('workflowId')">
-					<div class="chip theme-workflow">
-						<mat-icon class="resource-icon">settings</mat-icon>
-						<span class="language-name">{{ getWorkflowLabel(report.workflowId) }}</span>
-					</div>
-				</app-setting-item>
-
-				<app-setting-item label="Dataset Model"
-																						[modified]="isFieldModified('datasetModelId')">
-					<div class="chip theme-dataset-model">
-						<mat-icon class="resource-icon">dataset</mat-icon>
-						<span class="language-name">{{ getDatasetModelLabel(report.datasetModelId) }}</span>
-					</div>
-				</app-setting-item>
-
 				<app-setting-item label="Short Name"
 																						[translated]="true"
 																						[modified]="isFieldModified('shortname')"
@@ -77,6 +61,34 @@
 		<div class="settings-section">
 			<h3>Associated Resources</h3>
 			<div class="settings-grid">
+				<app-setting-item label="Workflow"
+																						[modified]="isFieldModified('workflowId')"
+																						[notConfigured]="!report.workflowId">
+					@if (!report.workflowId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-workflow">
+							<mat-icon class="resource-icon">settings</mat-icon>
+							<span class="language-name">{{ getWorkflowLabel(report.workflowId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Dataset Model"
+																						[modified]="isFieldModified('datasetModelId')"
+																						[notConfigured]="!report.datasetModelId">
+					@if (!report.datasetModelId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-dataset-model">
+							<mat-icon class="resource-icon">dataset</mat-icon>
+							<span class="language-name">{{ getDatasetModelLabel(report.datasetModelId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
 				<app-setting-item label="Field Models"
 																						[modified]="isFieldModified('fieldModelIds')"
 																						[fullWidth]="true"

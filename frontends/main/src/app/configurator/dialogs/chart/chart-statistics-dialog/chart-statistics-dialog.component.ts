@@ -37,6 +37,8 @@ export class ChartStatisticsDialogComponent extends BaseDialogComponent<ChartSta
 	ranges: ChartRange[] = [];
 	selectedLanguage: string;
 
+	filterDatasetModelId: string | null = null;
+
 	constructor(
 		private fb: FormBuilder,
 		public languageService: LanguageService,
@@ -80,6 +82,32 @@ export class ChartStatisticsDialogComponent extends BaseDialogComponent<ChartSta
 		return fieldModel?.datasetModelId ?? null;
 	}
 
+	onDatasetFilterChange(datasetModelId: string | null): void {
+		this.filterDatasetModelId = datasetModelId;
+		const currentFieldModelId = this.form.value.fieldModelId;
+		if(currentFieldModelId) {
+			const stillValid = this.filteredFieldModels.some(fm => fm.fieldModelId === currentFieldModelId);
+			if(!stillValid) {
+				this.form.patchValue({fieldModelId: null, datasetModelId: null});
+			}
+		}
+	}
+
+	get filteredFieldModels(): FieldModel[] {
+		let models = this.data.availableFieldModels;
+
+		if(this.data.leafScopeModel?.datasetModelIds?.length) {
+			const allowedDatasetIds = new Set(this.data.leafScopeModel.datasetModelIds);
+			models = models.filter(fm => allowedDatasetIds.has(fm.datasetModelId));
+		}
+
+		if(this.filterDatasetModelId) {
+			models = models.filter(fm => fm.datasetModelId === this.filterDatasetModelId);
+		}
+
+		return models;
+	}
+
 	addRange(): void {
 		this.ranges = [...this.ranges, {
 			chartRangeId: crypto.randomUUID(),
@@ -120,17 +148,6 @@ export class ChartStatisticsDialogComponent extends BaseDialogComponent<ChartSta
 	getLanguageLabel(lang: ProjectLanguage): string {
 		const name = this.languageService.getLanguageName(lang.languageCode);
 		return lang.isDefault ? `${name} *` : name;
-	}
-
-	get filteredFieldModels(): FieldModel[] {
-		if(!this.data.leafScopeModel?.datasetModelIds?.length) {
-			return this.data.availableFieldModels;
-		}
-
-		const allowedDatasetIds = new Set(this.data.leafScopeModel.datasetModelIds);
-		return this.data.availableFieldModels.filter(fm =>
-			allowedDatasetIds.has(fm.datasetModelId)
-		);
 	}
 
 	onSave(): void {

@@ -10,15 +10,11 @@ import {Report} from '@core/model/report';
 import {ReportManagerService} from '../../../services/manager/report-manager.service';
 import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
 import {LanguageService} from '../../../services/language.service';
-import {Workflow} from '@core/model/workflow';
-import {DatasetModel} from '@core/model/dataset-model';
 
 export interface ReportBasicInfoDialogData {
 	projectId: string;
 	report: Report | null;
 	languages: ProjectLanguage[];
-	workflows: Workflow[];
-	datasetModels: DatasetModel[];
 }
 
 @Component({
@@ -30,8 +26,6 @@ export interface ReportBasicInfoDialogData {
 })
 export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
-	workflows: Workflow[] = [];
-	datasetModels: DatasetModel[] = [];
 	isEditMode: boolean;
 
 	constructor(
@@ -44,8 +38,6 @@ export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent impl
 	) {
 		super(fb, languageService, dialogRef, data, snackBar);
 		this.isEditMode = !!data.report;
-		this.workflows = data.workflows || [];
-		this.datasetModels = data.datasetModels || [];
 	}
 
 	ngOnInit(): void {
@@ -70,9 +62,7 @@ export class ReportBasicInfoDialogComponent extends BaseInfoDialogComponent impl
 	initializeForm(): void {
 		const r = this.data.report;
 		this.form = this.fb.group({
-			id: [r?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]],
-			workflowId: [r?.workflowId || '', Validators.required],
-			datasetModelId: [r?.datasetModelId || '', Validators.required]
+			id: [r?.id || '', [Validators.required, Validators.pattern(/^[A-Z_][A-Z0-9_]*$/)]]
 		});
 	}
 

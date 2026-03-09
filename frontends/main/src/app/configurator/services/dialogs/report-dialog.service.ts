@@ -34,9 +34,7 @@ export class ReportDialogService {
 				data: {
 					projectId,
 					report: null,
-					languages,
-					workflows: this.workflowManager.getAll(),
-					datasetModels: this.datasetModelManager.getAll()
+					languages
 				} as ReportBasicInfoDialogData
 			}
 		);
@@ -52,9 +50,7 @@ export class ReportDialogService {
 				data: {
 					projectId,
 					report: JSON.parse(JSON.stringify(report)),
-					languages,
-					workflows: this.workflowManager.getAll(),
-					datasetModels: this.datasetModelManager.getAll()
+					languages
 				} as ReportBasicInfoDialogData
 			}
 		);
@@ -69,7 +65,9 @@ export class ReportDialogService {
 			width: '500px',
 			data: {
 				report: JSON.parse(JSON.stringify(report)),
-				availableFieldModels: this.fieldModelManager.getAll()
+				datasetModels: this.datasetModelManager.getAll(),
+				availableFieldModels: this.fieldModelManager.getAll(),
+				workflows: this.workflowManager.getAll()
 			}
 		});
 		return dialogRef.afterClosed();

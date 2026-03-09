@@ -4,6 +4,21 @@
 	<div class="dialog-content">
 		<form [formGroup]="form" class="settings-form">
 			<div class="form-field">
+				<label>Dataset Model</label>
+				<mat-select
+					[value]="filterDatasetModelId"
+					(selectionChange)="onDatasetFilterChange($event.value)"
+					placeholder="Filter by dataset model">
+					<mat-option [value]="null">All datasets</mat-option>
+					@for (dm of data.availableDatasetModels; track dm.datasetModelId) {
+						<mat-option [value]="dm.datasetModelId">
+							{{ languageService.getLabel(dm) }}
+						</mat-option>
+					}
+				</mat-select>
+			</div>
+
+			<div class="form-field">
 				<label>Field Model</label>
 				<mat-select formControlName="fieldModelId" placeholder="Select a field model">
 					<mat-option [value]="null">None</mat-option>

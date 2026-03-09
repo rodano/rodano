@@ -194,18 +194,18 @@ public class ChartDAOServiceImpl implements ChartDAOService {
 	})
 	public void deleteChart(final UUID projectId, final UUID chartId) {
 		dslContext.deleteFrom(CHART_COLOR)
-			.where(CHART.PROJECT_ID.eq(projectId))
-			.and(CHART.CHART_ID.eq(chartId))
+			.where(CHART_COLOR.PROJECT_ID.eq(projectId))
+			.and(CHART_COLOR.CHART_ID.eq(chartId))
 			.execute();
 
 		dslContext.deleteFrom(CHART_RANGE)
-			.where(CHART.PROJECT_ID.eq(projectId))
-			.and(CHART.CHART_ID.eq(chartId))
+			.where(CHART_RANGE.PROJECT_ID.eq(projectId))
+			.and(CHART_RANGE.CHART_ID.eq(chartId))
 			.execute();
 
 		dslContext.deleteFrom(CHART_STATE_FILTER)
-			.where(CHART.PROJECT_ID.eq(projectId))
-			.and(CHART.CHART_ID.eq(chartId))
+			.where(CHART_STATE_FILTER.PROJECT_ID.eq(projectId))
+			.and(CHART_STATE_FILTER.CHART_ID.eq(chartId))
 			.execute();
 
 		dslContext.deleteFrom(CHART)

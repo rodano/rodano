@@ -1514,7 +1514,7 @@ create table if not exists report (
     report_id uuid not null default uuid(),
     project_id uuid not null,
     code varchar(128) not null,
-    workflow_id uuid not null,
+    workflow_id uuid null,
     dataset_model_id uuid null,
     shortname json null,
     longname json null,
