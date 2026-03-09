@@ -371,6 +371,7 @@ create table if not exists form_layout (
 	text_before                 json                        null,
 	text_after                  json                        null,
 	css_code                    varchar(2048)               null,
+	sort_order                  int                         not null default 0,
 	constraint pk_form_layout primary key (project_id, form_model_id, form_layout_id),
 	constraint uq_form_layout_code unique (project_id, form_model_id, code)
 ) engine = InnoDB

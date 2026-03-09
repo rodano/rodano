@@ -35,6 +35,7 @@ import {ResourceCategoryManagerService} from '../services/manager/resource-categ
 import {ReportManagerService} from '../services/manager/report-manager.service';
 import {ChartManagerService} from '../services/manager/chart-manager.service';
 import {FormModelManagerService} from '../services/manager/form-model-manager.service';
+import {FormLayoutManagerService} from '../services/manager/form-layout-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -140,6 +141,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private reportManager: ReportManagerService,
 		private chartManager: ChartManagerService,
 		private formModelManager: FormModelManagerService,
+		private formLayoutManager: FormLayoutManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -187,6 +189,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.reportManager.invalidate();
 		this.chartManager.invalidate();
 		this.formModelManager.invalidate();
+		this.formLayoutManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -444,7 +447,6 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(this.formModelModified) {
 					saveObservables.push(this.saveFormModels());
-					saveObservables.push(this.detailComponent?.saveLayouts() ?? of(void 0));
 				}
 
 				if(saveObservables.length > 0) {
@@ -657,9 +659,14 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 		await lastValueFrom(this.entitySaveOrchestratorService.saveFormModels(this.projectId, {
 			formModelManager: component.formModelManager,
+			formLayoutManager: component.formLayoutManager,
 			formModels: component.formModels,
 			originalFormModels: component.originalFormModels,
-			modifiedFormModelIds: component.modifiedFormModelIds
+			modifiedFormModelIds: component.modifiedFormModelIds,
+			layouts: component.formLayoutManager.getAll(),
+			originalLayouts: component.formLayoutManager.getOriginals(),
+			modifiedLayoutIds: component.formLayoutManager.getModifiedIds(),
+			formModelId: component.formLayoutManager.getCurrentFormModelId() ?? ''
 		}));
 		component.loadFormModels();
 		this.formModels = this.formModelManager.getAll();
@@ -721,6 +728,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.reportManager.resetToOriginals();
 		this.chartManager.resetToOriginals();
 		this.formModelManager.resetToOriginals();
+		this.formLayoutManager.resetToOriginals();
 
 		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
 		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
@@ -733,7 +741,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.reportListComponent?.loadReports();
 		this.detailComponent?.chartListComponent?.loadCharts();
 		this.detailComponent?.formModelListComponent?.loadFormModels();
-		this.detailComponent?.discardLayouts();
+		this.detailComponent?.formModelListComponent?.discardLayouts();
 
 		this.resetAllModifications();
 		this.refreshTreeData();

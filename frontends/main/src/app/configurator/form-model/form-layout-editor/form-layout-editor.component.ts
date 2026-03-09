@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
@@ -16,12 +16,12 @@ import {FieldModel} from '@core/model/field-model';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {ProjectLanguage} from '@core/model/project-language';
 import {MatDialog} from '@angular/material/dialog';
-import {
-	FormLayoutCellDialogComponent
-} from '../../dialogs/form-model/form-layout-cell-dialog/form-layout-cell-dialog.component';
-import {
-	FormLayoutCreateDialogComponent
-} from '../../dialogs/form-model/form-layout-create-dialog/form-layout-create-dialog.component';
+import {FormLayoutCellDialogComponent} from '../../dialogs/form-model/form-layout-cell-dialog/form-layout-cell-dialog.component';
+import {FormLayoutCreateDialogComponent} from '../../dialogs/form-model/form-layout-create-dialog/form-layout-create-dialog.component';
+import {FormLayoutService} from '../../services/api/form-layout.service';
+import {FormLayoutManagerService} from '../../services/manager/form-layout-manager.service';
+import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
+import {switchMap, of, Observable} from 'rxjs';
 
 @Component({
 	selector: 'app-form-layout-editor',
@@ -34,64 +34,203 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() formModelId = '';
-	@Input() layout!: Layout;
-	@Input() allLayouts: Layout[] = [];
-	@Output() closed = new EventEmitter<void>();
-	@Output() layoutChanged = new EventEmitter<Layout>();
 
-	workingLayout: Layout | null = null;
+	@Output() closed = new EventEmitter<void>();
+	@Output() layoutCreated = new EventEmitter<Layout>();
+	@Output() layoutDeleted = new EventEmitter<string>();
+	@Output() unsavedChanges = new EventEmitter<boolean>();
+
+	workingLayouts: Layout[] = [];
 	selectedCell: Cell | null = null;
+	activeLayoutId: string | null = null;
 	selectedLineIndex: number | null = null;
-	hasChanges = false;
 	paletteFilter = '';
+	paletteCollapsed = false;
 	collapsedDatasets = new Set<string>();
+	hoveredSlotId: string | null = null;
+	splitEditMode = false;
 
 	readonly columnPresets = [
-		{label: 'S', px: 150},
-		{label: 'M', px: 250},
-		{label: 'L', px: 400},
-		{label: 'XL', px: 600}
+		{label: 'S', px: 250},
+		{label: 'M', px: 500},
+		{label: 'L', px: 750},
+		{label: 'XL', px: 1000}
 	];
 
 	readonly TEXT_BLOCK_SENTINEL = '__TEXT_BLOCK__';
 
-	hoveredSlotId: string | null = null;
-
 	private resizing = false;
 	private resizeMoved = false;
 	private resizeCell: Cell | null = null;
+	private resizeLayout: Layout | null = null;
 	private resizeLineIndex: number | null = null;
 	private resizeStartX = 0;
 	private resizeStartColspan = 1;
 	private resizeDirection: 'left' | 'right' = 'right';
 
+	private splitResizing = false;
+	private splitResizeCell: Cell | null = null;
+	private splitResizeLayout: Layout | null = null;
+	private splitResizeLineIndex: number | null = null;
+	private splitResizeStartX = 0;
+	private splitResizeStartLabelPx = 0;
+	private splitResizeCellWidth = 0;
+	private splitResizeScale = 1;
+
+	snapIndicatorX: number | null = null;
+	private gridCellsScreenLeft = 0;
+	private readonly SNAP_THRESHOLD = 8;
+	currentDragAbsoluteX: number | null = null;
+	currentDragPercent: number | null = null;
+
 	constructor(
 		public languageService: LanguageService,
 		private datasetModelManager: DatasetModelManagerService,
 		private fieldModelManager: FieldModelManagerService,
+		private formLayoutService: FormLayoutService,
+		public formLayoutManager: FormLayoutManagerService,
 		private snackBar: MatSnackBar,
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private cdr: ChangeDetectorRef
 	) {}
 
 	ngOnInit(): void {
-		this.initWorkingLayout();
-	}
-
-	ngOnChanges(changes: SimpleChanges): void {
-		if(changes['layout'] && this.layout) {
-			this.initWorkingLayout();
+		if(this.projectId) {
+			this.fieldModelManager.loadFull(this.projectId).subscribe();
+		}
+		if(this.formModelId) {
+			this.formLayoutManager.load(this.projectId, this.formModelId).subscribe(() => {
+				this.initWorkingLayouts();
+			});
 		}
 	}
 
-	private initWorkingLayout(): void {
-		this.workingLayout = JSON.parse(JSON.stringify(this.layout));
+	ngOnChanges(changes: SimpleChanges): void {
+		if(changes['projectId'] && this.projectId) {
+			this.fieldModelManager.loadFull(this.projectId).subscribe();
+		}
+		if(changes['formModelId'] && this.formModelId && !changes['formModelId'].firstChange) {
+			this.formLayoutManager.load(this.projectId, this.formModelId).subscribe(() => {
+				this.initWorkingLayouts();
+			});
+		}
+	}
+
+	private initWorkingLayouts(): void {
+		this.workingLayouts = this.formLayoutManager.getAll().map(l => JSON.parse(JSON.stringify(l)));
 		this.selectedCell = null;
 		this.selectedLineIndex = null;
-		this.hasChanges = false;
+		this.activeLayoutId = this.workingLayouts[0]?.formLayoutId ?? null;
 		this.paletteFilter = '';
-		if(this.workingLayout) {
-			for(const line of this.workingLayout.lines) {
-				this.normalizeLineCells(line);
+		for(const wl of this.workingLayouts) {
+			for(const line of wl.lines) {
+				this.normalizeLineCells(line, wl.columns.length);
+			}
+		}
+	}
+
+	discardChanges(): void {
+		this.formLayoutManager.resetToOriginals();
+		this.initWorkingLayouts();
+		this.unsavedChanges.emit(false);
+	}
+
+	isLayoutModified(layoutId: string): boolean {
+		return this.formLayoutManager.isModified(layoutId);
+	}
+
+	get globalMaxColumnWidth(): number {
+		if(this.workingLayouts.length === 0) {
+			return 250;
+		}
+		return Math.max(...this.workingLayouts.map(l => this.getTotalColumnWidth(l)));
+	}
+
+	getGridTemplateColumns(layout: Layout): string {
+		return layout.columns
+			.map((_, i) => `${this.getRenderedColumnWidth(layout, i)}fr`)
+			.join(' ');
+	}
+
+	getColumnCount(layout: Layout): number {
+		return layout.columns.length || 1;
+	}
+
+	getTotalColumnWidth(layout: Layout): number {
+		return layout.columns.reduce((sum, col) => sum + (this.parseWidthPx(col.cssCode) ?? 250), 0);
+	}
+
+	getActiveColumnPreset(layout: Layout, colIndex: number): number | null {
+		return this.parseWidthPx(layout.columns[colIndex]?.cssCode);
+	}
+
+	isColumnPresetDisabled(layout: Layout, colIndex: number, presetPx: number): boolean {
+		const otherColsWidth = layout.columns
+			.reduce((sum, col, i) => i === colIndex ? sum : sum + (this.parseWidthPx(col.cssCode) ?? 250), 0);
+		return otherColsWidth + presetPx > 1250;
+	}
+
+	isLastColumnOccupied(layout: Layout): boolean {
+		const colCount = this.getColumnCount(layout);
+		for(const line of layout.lines) {
+			let col = 0;
+			for(const cell of line.cells) {
+				const span = cell.colspan ?? 1;
+				if(!this.isSpacerCell(cell) && col + span >= colCount) {
+					return true;
+				}
+				col += span;
+			}
+		}
+		return false;
+	}
+
+	addColumn(layout: Layout): void {
+		if(this.getColumnCount(layout) >= 6) {
+			return;
+		}
+		if(this.getTotalColumnWidth(layout) + 250 > 1250) {
+			this.snackBar.open('Total column width would exceed 1250px', 'Close', {duration: 3000});
+			return;
+		}
+		layout.columns = [...layout.columns, {}];
+		this.normalizeAllLines(layout);
+		this.recalculateCellLabelWidths(layout);
+		this.markChanged(layout);
+	}
+
+	removeLastColumn(layout: Layout): void {
+		if(this.getColumnCount(layout) <= 1) {
+			return;
+		}
+		layout.columns = layout.columns.slice(0, -1);
+		this.normalizeAllLines(layout);
+		this.recalculateCellLabelWidths(layout);
+		this.markChanged(layout);
+	}
+
+	setColumnWidth(layout: Layout, colIndex: number, px: number | null): void {
+		layout.columns[colIndex].cssCode = px !== null ? `width: ${px}px` : undefined;
+		this.recalculateCellLabelWidths(layout);
+		this.markChanged(layout);
+	}
+
+	private recalculateCellLabelWidths(layout: Layout): void {
+		for(let lineIndex = 0; lineIndex < layout.lines.length; lineIndex++) {
+			for(const cell of layout.lines[lineIndex].cells) {
+				if(!cell.cssCodeForLabel || !cell.cssCodeForInput) {
+					continue;
+				}
+				const labelPx = this.parseWidthPx(cell.cssCodeForLabel);
+				const inputPx = this.parseWidthPx(cell.cssCodeForInput);
+				if(labelPx === null || inputPx === null || labelPx + inputPx === 0) {
+					continue;
+				}
+				const ratio = labelPx / (labelPx + inputPx);
+				const newWidth = this.getNetCellWidth(layout, cell, lineIndex);
+				const newLabelPx = Math.round(newWidth * ratio);
+				cell.cssCodeForLabel = `width: ${newLabelPx}px`;
+				cell.cssCodeForInput = `width: ${newWidth - newLabelPx}px`;
 			}
 		}
 	}
@@ -136,11 +275,50 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		if(this.collapsedDatasets.has(datasetModelId)) {
 			this.collapsedDatasets.delete(datasetModelId);
 		}
-		else {this.collapsedDatasets.add(datasetModelId);}
+		else {
+			this.collapsedDatasets.add(datasetModelId);
+		}
 	}
 
 	isDatasetCollapsed(datasetModelId: string): boolean {
 		return this.collapsedDatasets.has(datasetModelId);
+	}
+
+	get allSlotDropListIds(): string[] {
+		const ids: string[] = [];
+		for(const wl of this.workingLayouts) {
+			wl.lines.forEach((_, li) => {
+				wl.lines[li].cells.forEach((_, ci) => {
+					ids.push(this.getSlotDropListId(wl.formLayoutId, li, ci));
+				});
+			});
+		}
+		return ids;
+	}
+
+	getSlotDropListId(layoutId: string, lineIndex: number, slotIndex: number): string {
+		return `slot-${layoutId}-${lineIndex}-${slotIndex}`;
+	}
+
+	getLinesDropListId(layoutId: string): string {
+		return `lines-${layoutId}`;
+	}
+
+	getSlotConnectedLists(): string[] {
+		return ['field-palette', ...this.allSlotDropListIds];
+	}
+
+	isTextCell(cell: Cell): boolean {
+		return !cell.fieldModelId;
+	}
+
+	isSpacerCell(cell: Cell): boolean {
+		return cell.fieldModelId === '__SPACER__';
+	}
+
+	getTextCellPreview(cell: Cell): string {
+		const raw = this.languageService.getTranslatedName(cell.textBefore as any) || '';
+		return raw.replace(/<[^>]*>/g, '').trim() || 'Text block';
 	}
 
 	getFieldModelById(fieldModelId: string): FieldModel | undefined {
@@ -168,148 +346,13 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		}
 	}
 
-	get columnCount(): number {
-		return this.workingLayout?.columns.length ?? 1;
-	}
-
-	getActiveColumnPreset(colIndex: number): number | null {
-		return this.parseWidthPx(this.workingLayout?.columns[colIndex]?.cssCode);
-	}
-
-	isColumnPresetDisabled(colIndex: number, presetPx: number): boolean {
-		const otherColsWidth = this.workingLayout!.columns
-			.reduce((sum, col, i) => i === colIndex ? sum : sum + (this.parseWidthPx(col.cssCode) ?? 250), 0);
-		return otherColsWidth + presetPx > 1250;
-	}
-
-	isLastColumnOccupied(): boolean {
-		if(!this.workingLayout) {
-			return false;
-		}
-		for(const line of this.workingLayout.lines) {
-			let col = 0;
-			for(const cell of line.cells) {
-				const span = cell.colspan ?? 1;
-				if(!this.isSpacerCell(cell) && col + span >= this.columnCount) {
-					return true;
-				}
-				col += span;
-			}
-		}
-		return false;
-	}
-
-	getTotalColumnWidth(): number {
-		return this.workingLayout?.columns
-			.reduce((sum, col) => sum + (this.parseWidthPx(col.cssCode) ?? 0), 0) ?? 0;
-	}
-
-	addColumn(): void {
-		if(!this.workingLayout || this.columnCount >= 6) {
-			return;
-		}
-		if(this.getTotalColumnWidth() + 250 > 1250) {
-			this.snackBar.open('Total column width would exceed 1250px', 'Close', {duration: 3000});
-			return;
-		}
-		this.workingLayout.columns = [...this.workingLayout.columns, {}];
-		this.normalizeAllLines();
-		this.markChanged();
-	}
-
-	removeLastColumn(): void {
-		if(!this.workingLayout || this.columnCount <= 1) {
-			return;
-		}
-		this.workingLayout.columns = this.workingLayout.columns.slice(0, -1);
-		this.normalizeAllLines();
-		this.markChanged();
-	}
-
-	setColumnWidth(colIndex: number, px: number | null): void {
-		if(!this.workingLayout) {
-			return;
-		}
-		this.workingLayout.columns[colIndex].cssCode = px !== null ? `width: ${px}px` : undefined;
-		this.markChanged();
-	}
-
-	getColumnWidth(colIndex: number): number {
-		const col = this.workingLayout?.columns[colIndex];
-		return this.parseWidthPx(col?.cssCode) ?? 250;
-	}
-
-	get allSlotDropListIds(): string[] {
-		if(!this.workingLayout) {
-			return [];
-		}
-		const ids: string[] = [];
-		this.workingLayout.lines.forEach((line, li) => {
-			line.cells.forEach((_, ci) => {
-				ids.push(this.getSlotDropListId(li, ci));
-			});
-		});
-		return ids;
-	}
-
-	getSlotDropListId(lineIndex: number, slotIndex: number): string {
-		return `slot-${this.workingLayout!.formLayoutId}-${lineIndex}-${slotIndex}`;
-	}
-
-	getSlotConnectedLists(): string[] {
-		return ['field-palette', ...this.allSlotDropListIds];
-	}
-
-	isTextCell(cell: Cell): boolean {
-		return !cell.fieldModelId;
-	}
-
-	isSpacerCell(cell: Cell): boolean {
-		return cell.fieldModelId === '__SPACER__';
-	}
-
-	getTextCellPreview(cell: Cell): string {
-		const raw = this.languageService.getTranslatedName(cell.textBefore as any) || '';
-		return raw.replace(/<[^>]*>/g, '').trim() || 'Text block';
-	}
-
-	private rebalanceLine(line: LayoutLine): void {
-		while(line.cells.length > 0) {
-			const total = line.cells.reduce((s, c) => s + (c.colspan ?? 1), 0);
-			const last = line.cells[line.cells.length - 1];
-			if(total > this.columnCount && this.isSpacerCell(last)) {
-				line.cells.pop();
-			}
-			else {
-				break;
-			}
-		}
-
-		let total = line.cells.reduce((s, c) => s + (c.colspan ?? 1), 0);
-		if(total > this.columnCount) {
-			for(let i = line.cells.length - 1; i >= 0 && total > this.columnCount; i--) {
-				if(this.isSpacerCell(line.cells[i])) {
-					const span = line.cells[i].colspan ?? 1;
-					line.cells.splice(i, 1);
-					total -= span;
-				}
-			}
-		}
-
-		this.normalizeLineCells(line);
-		line.cells = [...line.cells];
-	}
-
-	getCellGridColumn(cell: Cell, lineIndex: number): string {
-		const start = this.getCellStartColumn(cell, lineIndex) + 1;
+	getCellGridColumn(layout: Layout, cell: Cell, lineIndex: number): string {
+		const start = this.getCellStartColumn(layout, cell, lineIndex) + 1;
 		return `${start} / span ${cell.colspan ?? 1}`;
 	}
 
-	private getCellStartColumn(cell: Cell, lineIndex: number): number {
-		if(!this.workingLayout) {
-			return 0;
-		}
-		const line = this.workingLayout.lines[lineIndex];
+	private getCellStartColumn(layout: Layout, cell: Cell, lineIndex: number): number {
+		const line = layout.lines[lineIndex];
 		let col = 0;
 		for(const c of line.cells) {
 			if(c === cell) {
@@ -320,80 +363,99 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		return 0;
 	}
 
-	private normalizeLineCells(line: LayoutLine): void {
+	private normalizeLineCells(line: LayoutLine, colCount: number): void {
 		const usedSpans = line.cells.reduce((sum, c) => sum + (c.colspan ?? 1), 0);
-		const missing = this.columnCount - usedSpans;
+		const missing = colCount - usedSpans;
 		for(let i = 0; i < missing; i++) {
 			line.cells.push(this.buildSpacerCell());
 		}
 	}
 
-	private normalizeAllLines(): void {
-		if(!this.workingLayout) {
-			return;
-		}
-		for(const line of this.workingLayout.lines) {
+	private normalizeAllLines(layout: Layout): void {
+		const colCount = this.getColumnCount(layout);
+		for(const line of layout.lines) {
 			while(line.cells.length > 0) {
 				const last = line.cells[line.cells.length - 1];
 				const total = line.cells.reduce((s, c) => s + (c.colspan ?? 1), 0);
-				if(this.isSpacerCell(last) && total > this.columnCount) {
+				if(this.isSpacerCell(last) && total > colCount) {
 					line.cells.pop();
 				}
-				else {break;}
+				else {
+					break;
+				}
 			}
-			this.normalizeLineCells(line);
+			this.normalizeLineCells(line, colCount);
 		}
 	}
 
-	isLineFull(lineIndex: number): boolean {
-		if(!this.workingLayout) {
-			return false;
+	private rebalanceLine(layout: Layout, line: LayoutLine): void {
+		const colCount = this.getColumnCount(layout);
+		while(line.cells.length > 0) {
+			const total = line.cells.reduce((s, c) => s + (c.colspan ?? 1), 0);
+			const last = line.cells[line.cells.length - 1];
+			if(total > colCount && this.isSpacerCell(last)) {
+				line.cells.pop();
+			}
+			else {
+				break;
+			}
 		}
-		return this.workingLayout.lines[lineIndex].cells.every(c => !this.isSpacerCell(c));
+
+		let total = line.cells.reduce((s, c) => s + (c.colspan ?? 1), 0);
+		if(total > colCount) {
+			for(let i = line.cells.length - 1; i >= 0 && total > colCount; i--) {
+				if(this.isSpacerCell(line.cells[i])) {
+					const span = line.cells[i].colspan ?? 1;
+					line.cells.splice(i, 1);
+					total -= span;
+				}
+			}
+		}
+
+		this.normalizeLineCells(line, colCount);
+		line.cells = [...line.cells];
 	}
 
-	addLine(): void {
-		if(!this.workingLayout) {
-			return;
-		}
-		const spacers: Cell[] = Array.from({length: this.columnCount}, () => this.buildSpacerCell());
+	isLineFull(layout: Layout, lineIndex: number): boolean {
+		return layout.lines[lineIndex].cells.every(c => !this.isSpacerCell(c));
+	}
+
+	addLine(layout: Layout): void {
+		const colCount = this.getColumnCount(layout);
+		const spacers: Cell[] = Array.from({length: colCount}, () => this.buildSpacerCell());
 		const newLine: LayoutLine = {formLayoutLineId: '', cells: spacers};
-		this.workingLayout.lines = [...this.workingLayout.lines, newLine];
-		this.markChanged();
+		layout.lines = [...layout.lines, newLine];
+		this.activeLayoutId = layout.formLayoutId;
+		this.selectedLineIndex = layout.lines.length - 1;
+		this.markChanged(layout);
 	}
 
-	deleteLine(lineIndex: number): void {
-		if(!this.workingLayout) {
-			return;
-		}
-		if(this.selectedLineIndex === lineIndex) {
+	deleteLine(layout: Layout, lineIndex: number): void {
+		if(this.activeLayoutId === layout.formLayoutId && this.selectedLineIndex === lineIndex) {
 			this.selectedCell = null;
 			this.selectedLineIndex = null;
 		}
-		this.workingLayout.lines = this.workingLayout.lines.filter((_, i) => i !== lineIndex);
-		this.markChanged();
+		layout.lines = layout.lines.filter((_, i) => i !== lineIndex);
+		this.markChanged(layout);
 	}
 
-	deleteCell(lineIndex: number, cellIndex: number, event: Event): void {
+	deleteCell(layout: Layout, lineIndex: number, cellIndex: number, event: Event): void {
 		event.stopPropagation();
-		if(!this.workingLayout) {
-			return;
-		}
-		const line = this.workingLayout.lines[lineIndex];
+		const line = layout.lines[lineIndex];
 		if(this.selectedCell === line.cells[cellIndex]) {
 			this.selectedCell = null;
 			this.selectedLineIndex = null;
 		}
 		line.cells[cellIndex] = this.buildSpacerCell();
 		line.cells = [...line.cells];
-		this.markChanged();
+		this.markChanged(layout);
 	}
 
-	private buildCell(fieldModel: FieldModel): Cell {
-		const baseCode = `${this.workingLayout!.id}_${fieldModel.id}`.toUpperCase();
+	private buildCell(layout: Layout, fieldModel: FieldModel): Cell {
+		const baseCode = `${layout.id}_${fieldModel.id}`.toUpperCase();
 		return {
 			formLayoutCellId: '',
-			id: this.generateUniqueCellCode(baseCode),
+			id: this.generateUniqueCellCode(layout, baseCode),
 			datasetModelId: fieldModel.datasetModelId,
 			fieldModelId: fieldModel.fieldModelId,
 			visibilityCriteria: [],
@@ -404,10 +466,10 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		};
 	}
 
-	private buildTextCell(): Cell {
+	private buildTextCell(layout: Layout): Cell {
 		return {
 			formLayoutCellId: '',
-			id: this.generateUniqueCellCode(`${this.workingLayout!.id}_TEXT`.toUpperCase()),
+			id: this.generateUniqueCellCode(layout, `${layout.id}_TEXT`.toUpperCase()),
 			datasetModelId: '',
 			fieldModelId: '',
 			visibilityCriteria: [],
@@ -425,7 +487,7 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 	private buildSpacerCell(): Cell {
 		return {
 			formLayoutCellId: '',
-			id: this.generateUniqueCellCode(`${this.workingLayout!.id}_SPACER`.toUpperCase()),
+			id: crypto.randomUUID(),
 			datasetModelId: '',
 			fieldModelId: '__SPACER__',
 			visibilityCriteria: [],
@@ -436,9 +498,9 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		};
 	}
 
-	private generateUniqueCellCode(baseCode: string): string {
+	private generateUniqueCellCode(layout: Layout, baseCode: string): string {
 		const existing = new Set<string>();
-		for(const line of this.workingLayout!.lines) {
+		for(const line of layout.lines) {
 			for(const cell of line.cells) {
 				if(cell.id) {
 					existing.add(cell.id);
@@ -455,27 +517,44 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		return `${baseCode}_${i}`;
 	}
 
-	onDropLine(event: CdkDragDrop<LayoutLine[]>): void {
-		if(!this.workingLayout) {
-			return;
-		}
-		moveItemInArray(this.workingLayout.lines, event.previousIndex, event.currentIndex);
-		this.markChanged();
+	onDropLine(layout: Layout, event: CdkDragDrop<LayoutLine[]>): void {
+		moveItemInArray(layout.lines, event.previousIndex, event.currentIndex);
+		this.markChanged(layout);
 	}
 
-	onDropOnSlot(event: CdkDragDrop<any>, lineIndex: number, slotIndex: number): void {
-		this.hoveredSlotId = null;
-
-		if(!this.workingLayout) {
+	onDropLayout(event: CdkDragDrop<Layout[]>): void {
+		if(event.previousIndex === event.currentIndex) {
 			return;
 		}
-		const line = this.workingLayout.lines[lineIndex];
+		moveItemInArray(this.workingLayouts, event.previousIndex, event.currentIndex);
+		this.workingLayouts.forEach((l, i) => l.sortOrder = i);
+		const saves = this.workingLayouts.map(l =>
+			this.formLayoutService.updateLayout(this.projectId, this.formModelId, l.formLayoutId, l)
+		);
+		saves.reduce<Observable<Layout | null>>(
+			(chain, save) => chain.pipe(switchMap(() => save)),
+			of(null)
+		).subscribe({
+			next: () => this.snackBar.open('Layout order saved', 'Close', {duration: 2000}),
+			error: () => this.snackBar.open('Failed to save layout order', 'Close', {duration: 3000})
+		});
+	}
+
+	onDropOnSlot(layout: Layout, event: CdkDragDrop<any>, lineIndex: number, slotIndex: number): void {
+		this.hoveredSlotId = null;
+		const line = layout.lines[lineIndex];
 		const data = event.item.data;
 		const isExistingCell = data && 'formLayoutCellId' in data;
 
 		if(isExistingCell) {
 			const draggedCell = data as Cell;
-			const sourceLine = this.workingLayout.lines.find(l => l.cells.includes(draggedCell));
+			let sourceLine: LayoutLine | undefined;
+			for(const wl of this.workingLayouts) {
+				sourceLine = wl.lines.find(l => l.cells.includes(draggedCell));
+				if(sourceLine) {
+					break;
+				}
+			}
 			if(!sourceLine) {
 				return;
 			}
@@ -485,7 +564,6 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 
 			sourceLine.cells[sourceIndex] = targetCell;
 			targetCell.colspan = 1;
-
 			line.cells[slotIndex] = draggedCell;
 			draggedCell.colspan = 1;
 
@@ -493,146 +571,131 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 			for(let s = 0; s < extraSpacers; s++) {
 				sourceLine.cells.splice(sourceIndex + 1, 0, this.buildSpacerCell());
 			}
-
 			sourceLine.cells = [...sourceLine.cells];
 			line.cells = [...line.cells];
 		}
 		else if(data?.fieldModelId === this.TEXT_BLOCK_SENTINEL) {
-			const newCell = this.buildTextCell();
+			const newCell = this.buildTextCell(layout);
 			const targetCell = line.cells[slotIndex];
 			newCell.colspan = targetCell.colspan ?? 1;
 			line.cells[slotIndex] = newCell;
 			line.cells = [...line.cells];
 		}
 		else {
-			line.cells[slotIndex] = this.buildCell(data as FieldModel);
+			line.cells[slotIndex] = this.buildCell(layout, data as FieldModel);
 			line.cells = [...line.cells];
 		}
-		this.rebalanceLine(this.workingLayout!.lines[lineIndex]);
-		this.markChanged();
+		this.rebalanceLine(layout, layout.lines[lineIndex]);
+		this.markChanged(layout);
+	}
+
+	private getActiveLayout(): Layout | null {
+		return this.workingLayouts.find(l => l.formLayoutId === this.activeLayoutId) ?? this.workingLayouts[0] ?? null;
+	}
+
+	setActiveLayout(layoutId: string): void {
+		if(this.activeLayoutId !== layoutId) {
+			this.activeLayoutId = layoutId;
+			this.selectedCell = null;
+			this.selectedLineIndex = null;
+		}
+	}
+
+	togglePalette(): void {
+		this.paletteCollapsed = !this.paletteCollapsed;
 	}
 
 	onClickFieldInPalette(fieldModel: FieldModel): void {
-		if(!this.workingLayout) {
+		const layout = this.getActiveLayout();
+		if(!layout) {
 			return;
 		}
-		let targetIndex = this.selectedLineIndex ?? this.workingLayout.lines.length - 1;
+		let targetIndex = this.selectedLineIndex ?? layout.lines.length - 1;
 		if(targetIndex < 0) {
-			this.addLine();
+			this.addLine(layout);
 			targetIndex = 0;
 		}
-		if(this.isLineFull(targetIndex)) {
+		if(this.isLineFull(layout, targetIndex)) {
 			this.snackBar.open('Line is full — add a new line or increase column count', 'Close', {duration: 3000});
 			return;
 		}
-		const line = this.workingLayout.lines[targetIndex];
+		const line = layout.lines[targetIndex];
 		const spacerIndex = line.cells.findIndex(c => this.isSpacerCell(c));
 		if(spacerIndex === -1) {
 			return;
 		}
-		const newCell = this.buildCell(fieldModel);
+		const newCell = this.buildCell(layout, fieldModel);
 		line.cells[spacerIndex] = newCell;
 		line.cells = [...line.cells];
 		this.selectedCell = newCell;
 		this.selectedLineIndex = targetIndex;
-		this.markChanged();
+		this.markChanged(layout);
 	}
 
 	onClickTextBlockInPalette(): void {
-		if(!this.workingLayout) {
+		const layout = this.getActiveLayout();
+		if(!layout) {
 			return;
 		}
-		let targetIndex = this.selectedLineIndex ?? this.workingLayout.lines.length - 1;
+		let targetIndex = this.selectedLineIndex ?? layout.lines.length - 1;
 		if(targetIndex < 0) {
-			this.addLine();
+			this.addLine(layout);
 			targetIndex = 0;
 		}
-		if(this.isLineFull(targetIndex)) {
+		if(this.isLineFull(layout, targetIndex)) {
 			this.snackBar.open('Line is full — add a new line or increase column count', 'Close', {duration: 3000});
 			return;
 		}
-		const line = this.workingLayout.lines[targetIndex];
+		const line = layout.lines[targetIndex];
 		const spacerIndex = line.cells.findIndex(c => this.isSpacerCell(c));
 		if(spacerIndex === -1) {
 			return;
 		}
-		const newCell = this.buildTextCell();
+		const newCell = this.buildTextCell(layout);
 		newCell.colspan = line.cells[spacerIndex].colspan ?? 1;
 		line.cells[spacerIndex] = newCell;
 		line.cells = [...line.cells];
 		this.selectedCell = newCell;
 		this.selectedLineIndex = targetIndex;
-		this.markChanged();
+		this.markChanged(layout);
 	}
 
-	onCellClick(cell: Cell, lineIndex: number): void {
+	onCellClick(layout: Layout, cell: Cell, lineIndex: number): void {
 		if(this.resizeMoved) {
 			this.resizeMoved = false;
 			return;
 		}
-		if(!this.isSpacerCell(cell)) {
-			this.selectCell(cell, lineIndex);
-		}
-	}
-
-	isResizingCell(cell: Cell): boolean {
-		return this.resizing && this.resizeCell === cell;
-	}
-
-	onResizeStart(event: MouseEvent, cell: Cell, lineIndex: number, direction: 'left' | 'right'): void {
-		event.stopPropagation();
-		event.preventDefault();
-		this.resizing = true;
-		this.resizeMoved = false;
-		this.resizeCell = cell;
-		this.resizeLineIndex = lineIndex;
-		this.resizeStartX = event.clientX;
-		this.resizeStartColspan = cell.colspan ?? 1;
-		this.resizeDirection = direction;
-	}
-
-	@HostListener('document:mousemove', ['$event'])
-	onResizeMove(event: MouseEvent): void {
-		if(!this.resizing || !this.resizeCell || this.resizeLineIndex === null) {
+		if(this.isSplitEditActive()) {
 			return;
 		}
-
-		const colWidth = this.getEffectiveCellWidth(this.resizeCell, this.resizeLineIndex) / (this.resizeCell.colspan ?? 1);
-		const deltaX = event.clientX - this.resizeStartX;
-		const sign = this.resizeDirection === 'right' ? 1 : -1;
-		const deltaCols = Math.round((deltaX * sign) / colWidth);
-		const newColspan = Math.min(Math.max(1, this.resizeStartColspan + deltaCols), this.columnCount);
-
-		if(newColspan !== this.resizeCell.colspan) {
-			this.resizeMoved = true;
-			this.resizeCell.colspan = newColspan;
-			const line = this.workingLayout!.lines[this.resizeLineIndex];
-			this.rebalanceLine(line);
-			this.markChanged();
+		if(!this.isSpacerCell(cell)) {
+			this.activeLayoutId = layout.formLayoutId;
+			this.selectCell(layout, cell, lineIndex);
 		}
 	}
 
-	@HostListener('document:mouseup')
-	onResizeEnd(): void {
-		this.resizing = false;
-		this.resizeCell = null;
-		this.resizeLineIndex = null;
-	}
-
-	selectCell(cell: Cell, lineIndex: number): void {
+	selectCell(layout: Layout, cell: Cell, lineIndex: number): void {
 		this.selectedCell = cell;
 		this.selectedLineIndex = lineIndex;
-		this.openCellDialog(cell, lineIndex);
+		this.openCellDialog(layout, cell, lineIndex);
 	}
 
-	private openCellDialog(cell: Cell, lineIndex: number): void {
+	isCellSelected(cell: Cell): boolean {
+		return this.selectedCell === cell;
+	}
+
+	isLineSelected(layout: Layout, lineIndex: number): boolean {
+		return this.activeLayoutId === layout.formLayoutId && this.selectedLineIndex === lineIndex;
+	}
+
+	private openCellDialog(layout: Layout, cell: Cell, lineIndex: number): void {
 		const ref = this.dialog.open(FormLayoutCellDialogComponent, {
 			data: {
 				cell,
-				columnCount: this.columnCount,
-				allLayouts: this.allLayouts,
+				columnCount: this.getColumnCount(layout),
+				allLayouts: this.workingLayouts,
 				projectLanguages: this.projectLanguages,
-				effectiveCellWidth: this.getEffectiveCellWidth(cell, lineIndex)
+				effectiveCellWidth: this.getNetCellWidth(layout, cell, lineIndex)
 			},
 			panelClass: 'rodano-dialog'
 		});
@@ -645,59 +708,199 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 			const prevColspan = cell.colspan ?? 1;
 			Object.assign(cell, result);
 			if((result.colspan ?? 1) !== prevColspan) {
-				const line = this.workingLayout!.lines[lineIndex];
-				this.rebalanceLine(line);
+				this.rebalanceLine(layout, layout.lines[lineIndex]);
+				this.recalculateCellLabelWidths(layout);
 			}
-			this.markChanged();
+			this.markChanged(layout);
 		});
 	}
 
-	isCellSelected(cell: Cell): boolean {
-		return this.selectedCell === cell;
+	isResizingCell(cell: Cell): boolean {
+		return this.resizing && this.resizeCell === cell;
 	}
 
-	isLineSelected(lineIndex: number): boolean {
-		return this.selectedLineIndex === lineIndex;
+	onResizeStart(event: MouseEvent, layout: Layout, cell: Cell, lineIndex: number, direction: 'left' | 'right'): void {
+		event.stopPropagation();
+		event.preventDefault();
+		this.resizing = true;
+		this.resizeMoved = false;
+		this.resizeCell = cell;
+		this.resizeLayout = layout;
+		this.resizeLineIndex = lineIndex;
+		this.resizeStartX = event.clientX;
+		this.resizeStartColspan = cell.colspan ?? 1;
+		this.resizeDirection = direction;
 	}
 
-	parseWidthPx(cssCode: string | null | undefined): number | null {
-		const match = cssCode?.match(/width:\s*(\d+)px/);
-		return match ? parseInt(match[1]) : null;
+	@HostListener('document:mousemove', ['$event'])
+	onResizeMove(event: MouseEvent): void {
+		if(this.resizing && this.resizeCell && this.resizeLayout && this.resizeLineIndex !== null) {
+			const colWidth = this.getEffectiveCellWidth(this.resizeLayout, this.resizeCell, this.resizeLineIndex) / (this.resizeCell.colspan ?? 1);
+			const deltaX = event.clientX - this.resizeStartX;
+			const sign = this.resizeDirection === 'right' ? 1 : -1;
+			const deltaCols = Math.round((deltaX * sign) / colWidth);
+			const colCount = this.getColumnCount(this.resizeLayout);
+			const newColspan = Math.min(Math.max(1, this.resizeStartColspan + deltaCols), colCount);
+
+			if(newColspan !== this.resizeCell.colspan) {
+				this.resizeMoved = true;
+				this.resizeCell.colspan = newColspan;
+				const line = this.resizeLayout.lines[this.resizeLineIndex];
+				this.rebalanceLine(this.resizeLayout, line);
+				this.markChanged(this.resizeLayout);
+			}
+		}
+
+		if(this.splitResizing && this.splitResizeCell && this.splitResizeLayout && this.splitResizeLineIndex !== null) {
+			const delta = (event.clientX - this.splitResizeStartX) * this.splitResizeScale;
+			const rawPx = this.splitResizeStartLabelPx + delta;
+			const clampedPx = Math.min(Math.max(40, rawPx), this.splitResizeCellWidth - 40);
+			const steppedPx = Math.round(clampedPx / 5) * 5;
+			const snapped = this.snapLabelPx(this.splitResizeLayout, this.splitResizeCell, this.splitResizeLineIndex, steppedPx);
+			const labelPx = Math.round(snapped.px);
+			this.splitResizeCell.cssCodeForLabel = `width: ${labelPx}px`;
+			this.splitResizeCell.cssCodeForInput = `width: ${this.splitResizeCellWidth - labelPx}px`;
+			this.currentDragAbsoluteX = snapped.absoluteX;
+			this.currentDragPercent = this.getRulerPercent(this.splitResizeLayout, snapped.absoluteX);
+			this.cdr.detectChanges();
+		}
 	}
 
-	getEffectiveCellWidth(cell: Cell, lineIndex?: number): number {
+	@HostListener('document:mouseup')
+	onResizeEnd(): void {
+		this.resizing = false;
+		this.resizeCell = null;
+		this.resizeLayout = null;
+		this.resizeLineIndex = null;
+
+		if(this.splitResizing && this.splitResizeLayout && this.splitResizeCell) {
+			this.markChanged(this.splitResizeLayout);
+		}
+		this.splitResizing = false;
+		this.splitResizeCell = null;
+		this.splitResizeLayout = null;
+		this.splitResizeLineIndex = null;
+		this.snapIndicatorX = null;
+		this.currentDragAbsoluteX = null;
+		this.currentDragPercent = null;
+	}
+
+	getMaxLayoutWidth(): number {
+		return Math.max(...this.workingLayouts.map(l => this.getTotalColumnWidth(l)), 250);
+	}
+
+	getRenderedColumnWidth(layout: Layout, colIndex: number): number {
+		const explicit = this.parseWidthPx(layout.columns[colIndex]?.cssCode);
+		if(explicit !== null) {
+			return explicit;
+		}
+		const maxWidth = this.getMaxLayoutWidth();
+		const fixedWidth = layout.columns.reduce((sum, col) => {
+			const w = this.parseWidthPx(col.cssCode);
+			return sum + (w ?? 0);
+		}, 0);
+		const autoCount = layout.columns.filter(col => this.parseWidthPx(col.cssCode) === null).length;
+		return autoCount > 0 ? Math.floor((maxWidth - fixedWidth) / autoCount) : 250;
+	}
+
+	getEffectiveCellWidth(layout: Layout, cell: Cell, lineIndex?: number): number {
+		const GAP = 6;
 		const idx = lineIndex ?? this.selectedLineIndex;
-		if(!this.workingLayout || idx === null) {
+		if(idx === null) {
 			return 250;
 		}
-		const startCol = this.getCellStartColumn(cell, idx);
+		const startCol = this.getCellStartColumn(layout, cell, idx);
 		const colspan = cell.colspan ?? 1;
 		let total = 0;
-		for(let i = startCol; i < startCol + colspan && i < this.workingLayout.columns.length; i++) {
-			total += this.getColumnWidth(i);
+		for(let i = startCol; i < startCol + colspan && i < layout.columns.length; i++) {
+			total += this.getRenderedColumnWidth(layout, i);
+			if(i < startCol + colspan - 1) {
+				total += GAP;
+			}
 		}
 		return total || 250;
 	}
 
-	openSettings(): void {
-		if(!this.workingLayout) {
-			return;
-		}
+	openSettings(layout: Layout): void {
 		const ref = this.dialog.open(FormLayoutCreateDialogComponent, {
 			data: {
 				projectId: this.projectId,
 				formModelId: this.formModelId,
 				generateFromDataset: false,
-				layout: this.workingLayout
+				layout
 			},
 			panelClass: 'rodano-dialog'
 		});
 		ref.afterClosed().subscribe(result => {
-			if(!result || !this.workingLayout) {
+			if(!result) {
 				return;
 			}
-			Object.assign(this.workingLayout, result);
-			this.markChanged();
+			Object.assign(layout, result);
+			this.markChanged(layout);
+		});
+	}
+
+	onCreateLayout(generateFromDataset: boolean): void {
+		const ref = this.dialog.open(FormLayoutCreateDialogComponent, {
+			width: '560px',
+			data: {
+				projectId: this.projectId,
+				formModelId: this.formModelId,
+				project: this.project,
+				generateFromDataset
+			}
+		});
+		ref.afterClosed().subscribe((result: Layout | null) => {
+			if(!result) {
+				return;
+			}
+			result.sortOrder = this.workingLayouts.length;
+			this.formLayoutService.createLayout(this.projectId, this.formModelId, result).subscribe({
+				next: created => {
+					this.formLayoutManager.addLayout(created);
+					const wl: Layout = JSON.parse(JSON.stringify(created));
+					for(const line of wl.lines) {
+						this.normalizeLineCells(line, wl.columns.length);
+					}
+					this.workingLayouts = [...this.workingLayouts, wl];
+					this.activeLayoutId = wl.formLayoutId;
+					this.snackBar.open('Layout created', 'Close', {duration: 2000});
+					this.layoutCreated.emit(created);
+				},
+				error: () => {
+					this.snackBar.open('Failed to create layout', 'Close', {duration: 3000});
+				}
+			});
+		});
+	}
+
+	onDeleteLayout(layout: Layout): void {
+		const ref = this.dialog.open(ConfirmationDialogComponent, {
+			width: '450px',
+			data: {
+				title: 'Delete Layout',
+				message: `Are you sure you want to delete layout "${layout.id}"?`,
+				confirmText: 'Delete',
+				cancelText: 'Cancel',
+				type: 'danger'
+			}
+		});
+		ref.afterClosed().subscribe((confirmed: boolean) => {
+			if(!confirmed) {
+				return;
+			}
+			this.formLayoutService.deleteLayout(this.projectId, this.formModelId, layout.formLayoutId).subscribe({
+				next: () => {
+					this.formLayoutManager.removeLayout(layout.formLayoutId);
+					this.workingLayouts = this.workingLayouts.filter(l => l.formLayoutId !== layout.formLayoutId);
+					if(this.activeLayoutId === layout.formLayoutId) {
+						this.activeLayoutId = this.workingLayouts[0]?.formLayoutId ?? null;
+					}
+					this.snackBar.open('Layout deleted', 'Close', {duration: 2000});
+					this.layoutDeleted.emit(layout.formLayoutId);
+				},
+				error: () => this.snackBar.open('Failed to delete layout', 'Close', {duration: 3000})
+			});
 		});
 	}
 
@@ -713,19 +916,6 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		this.closed.emit();
 	}
 
-	protected markChanged(): void {
-		this.hasChanges = true;
-		if(this.workingLayout) {
-			const cleaned = JSON.parse(JSON.stringify(this.workingLayout));
-			for(const line of cleaned.lines) {
-				while(line.cells.length > 0 && line.cells[line.cells.length - 1].fieldModelId === '__SPACER__') {
-					line.cells.pop();
-				}
-			}
-			this.layoutChanged.emit(cleaned);
-		}
-	}
-
 	onSlotEntered(slotId: string): void {
 		this.hoveredSlotId = slotId;
 	}
@@ -734,5 +924,158 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 		if(this.hoveredSlotId === slotId) {
 			this.hoveredSlotId = null;
 		}
+	}
+
+	parseWidthPx(cssCode: string | null | undefined): number | null {
+		const match = cssCode?.match(/width:\s*(\d+)px/);
+		return match ? parseInt(match[1]) : null;
+	}
+
+	protected markChanged(layout: Layout): void {
+		const cleaned = JSON.parse(JSON.stringify(layout));
+		for(const line of cleaned.lines) {
+			while(line.cells.length > 0 && line.cells[line.cells.length - 1].fieldModelId === '__SPACER__') {
+				line.cells.pop();
+			}
+		}
+		this.formLayoutManager.update(cleaned);
+		this.unsavedChanges.emit(this.formLayoutManager.getModificationCount() > 0);
+	}
+
+	toggleSplitEditMode(event?: Event): void {
+		event?.stopPropagation();
+		this.splitEditMode = !this.splitEditMode;
+	}
+
+	isSplitEditActive(): boolean {
+		return this.splitEditMode;
+	}
+
+	onSplitResizeStart(event: MouseEvent, layout: Layout, cell: Cell, lineIndex: number): void {
+		event.stopPropagation();
+		event.preventDefault();
+		this.splitResizing = true;
+		this.splitResizeCell = cell;
+		this.splitResizeLayout = layout;
+		this.splitResizeLineIndex = lineIndex;
+		this.splitResizeStartX = event.clientX;
+
+		const GAP = 6;
+		const colspan = cell.colspan ?? 1;
+		this.splitResizeCellWidth = this.getEffectiveCellWidth(layout, cell, lineIndex) - (colspan - 1) * GAP;
+
+		const nominalGridWidth = layout.columns.reduce((sum, _, i) =>
+			sum + this.getRenderedColumnWidth(layout, i), 0) + (layout.columns.length - 1) * GAP;
+
+		const lineCells = (event.target as HTMLElement).closest('.grid-line')
+			?.querySelector('.line-cells') as HTMLElement | null;
+		this.gridCellsScreenLeft = lineCells ? lineCells.getBoundingClientRect().left : 0;
+
+		const PADDING = 20;
+		const domContentWidth = lineCells ? lineCells.getBoundingClientRect().width - PADDING : nominalGridWidth;
+		this.splitResizeScale = domContentWidth > 0 ? nominalGridWidth / domContentWidth : 1;
+
+		this.splitResizeStartLabelPx = this.parseWidthPx(cell.cssCodeForLabel) ?? Math.round(Math.round(this.splitResizeCellWidth * 0.5 / 5) * 5);
+	}
+
+	isSplitResizingCell(cell: Cell): boolean {
+		return this.splitResizing && this.splitResizeCell === cell;
+	}
+
+	getSplitLabelWidth(layout: Layout, cell: Cell, lineIndex: number): string {
+		const labelPx = this.parseWidthPx(cell.cssCodeForLabel);
+		if(labelPx !== null) {
+			const nominalWidth = this.getNetCellWidth(layout, cell, lineIndex);
+			return `${(labelPx / nominalWidth * 100).toFixed(2)}%`;
+		}
+		return '50%';
+	}
+
+	getSplitInputWidth(layout: Layout, cell: Cell, lineIndex: number): string {
+		const inputPx = this.parseWidthPx(cell.cssCodeForInput);
+		if(inputPx !== null) {
+			const nominalWidth = this.getNetCellWidth(layout, cell, lineIndex);
+			return `${(inputPx / nominalWidth * 100).toFixed(2)}%`;
+		}
+		return '50%';
+	}
+
+	getMiniRulerTicks(layout: Layout, cell: Cell, lineIndex: number): {pct: number; major: boolean; label: string | null}[] {
+		const width = this.getNetCellWidth(layout, cell, lineIndex);
+		const ticks: {pct: number; major: boolean; label: string | null}[] = [];
+		for(let x = 0; x <= width; x += 50) {
+			const major = x % 100 === 0;
+			ticks.push({pct: x / width * 100, major, label: major ? `${x}` : null});
+		}
+		return ticks;
+	}
+
+	getSplitLabelPct(layout: Layout, cell: Cell, lineIndex: number): number {
+		const width = this.getNetCellWidth(layout, cell, lineIndex);
+		const labelPx = this.parseWidthPx(cell.cssCodeForLabel) ?? Math.round(width * 0.5);
+		return labelPx / width * 100;
+	}
+
+	getLabelPxValue(cell: Cell): number {
+		return this.parseWidthPx(cell.cssCodeForLabel) ?? 0;
+	}
+
+	getCellStartAbsoluteX(layout: Layout, cell: Cell, lineIndex: number): number {
+		const startCol = this.getCellStartColumn(layout, cell, lineIndex);
+		let x = 0;
+		for(let i = 0; i < startCol; i++) {
+			x += this.getRenderedColumnWidth(layout, i);
+		}
+		return x;
+	}
+
+	getNetCellWidth(layout: Layout, cell: Cell, lineIndex: number): number {
+		const GAP = 6;
+		const colspan = cell.colspan ?? 1;
+		return this.getEffectiveCellWidth(layout, cell, lineIndex) - (colspan - 1) * GAP;
+	}
+
+	getAllSnapCandidates(excludeCell: Cell): number[] {
+		const candidates = new Set<number>();
+		for(const wl of this.workingLayouts) {
+			for(let li = 0; li < wl.lines.length; li++) {
+				for(const cell of wl.lines[li].cells) {
+					if(cell === excludeCell) {
+						continue;
+					}
+					if(this.isSpacerCell(cell) || this.isTextCell(cell)) {
+						continue;
+					}
+					const cellStartX = this.getCellStartAbsoluteX(wl, cell, li);
+					const cellWidth = this.getEffectiveCellWidth(wl, cell, li);
+					const labelPx = this.parseWidthPx(cell.cssCodeForLabel) ?? Math.round(cellWidth * 0.5);
+					candidates.add(cellStartX + labelPx);
+				}
+			}
+		}
+		return Array.from(candidates);
+	}
+
+	snapLabelPx(layout: Layout, cell: Cell, lineIndex: number, labelPx: number): {px: number; snapped: boolean; absoluteX: number} {
+		const cellStartX = this.getCellStartAbsoluteX(layout, cell, lineIndex);
+		const absoluteX = cellStartX + labelPx;
+		const candidates = this.getAllSnapCandidates(cell);
+		let bestDist = this.SNAP_THRESHOLD;
+		let bestAbsolute = absoluteX;
+		for(const candidate of candidates) {
+			const dist = Math.abs(candidate - absoluteX);
+			if(dist < bestDist) {
+				bestDist = dist;
+				bestAbsolute = candidate;
+			}
+		}
+		const snapped = bestAbsolute !== absoluteX;
+		return {px: bestAbsolute - cellStartX, snapped, absoluteX: bestAbsolute};
+	}
+
+	getRulerPercent(layout: Layout, nominalPx: number): number {
+		const total = layout.columns.reduce((sum, _, i) =>
+			sum + this.getRenderedColumnWidth(layout, i), 0);
+		return total > 0 ? (nominalPx / total * 100) : 0;
 	}
 }

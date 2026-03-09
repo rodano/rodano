@@ -73,18 +73,38 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 			],
 			type: [layout?.type ?? LayoutType.SINGLE, Validators.required],
 			contribution: [layout?.contribution ?? false],
+			layoutDatasetModelId: [
+				layout?.datasetModel?.datasetModelId ?? '',
+				layout?.type === LayoutType.MULTIPLE ? Validators.required : []
+			],
+			generateDatasetModelId: [
+				'',
+				data.generateFromDataset ? Validators.required : []
+			],
 			defaultSortFieldModelId: [layout?.defaultSortFieldModelId ?? ''],
 			cssCode: [layout?.cssCode ?? ''],
-			datasetModelId: ['', data.generateFromDataset ? Validators.required : []],
 			columnCount: [
-				{value: layout?.columns.length ?? 1, disabled: this.isEditMode},
+				{value: layout?.columns?.length ?? 1, disabled: this.isEditMode},
 				[Validators.required, Validators.min(1), Validators.max(6)]
 			]
 		});
 	}
 
 	ngOnInit(): void {
-		this.form.get('datasetModelId')?.valueChanges.subscribe(() => {
+		this.form.get('type')?.valueChanges.subscribe(type => {
+			const ctrl = this.form.get('layoutDatasetModelId')!;
+			if(type === LayoutType.MULTIPLE) {
+				ctrl.setValidators(Validators.required);
+			}
+			else {
+				ctrl.clearValidators();
+				ctrl.setValue('');
+			}
+			ctrl.updateValueAndValidity();
+			this.form.get('defaultSortFieldModelId')?.setValue('');
+		});
+
+		this.form.get('layoutDatasetModelId')?.valueChanges.subscribe(() => {
 			this.form.get('defaultSortFieldModelId')?.setValue('');
 		});
 	}
@@ -94,7 +114,7 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 	}
 
 	get previewFields(): FieldModel[] {
-		const dsId = this.form.get('datasetModelId')?.value;
+		const dsId = this.form.get('generateDatasetModelId')?.value;
 		if(!dsId) {
 			return [];
 		}
@@ -110,7 +130,7 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 	}
 
 	get fieldsForSelectedDataset(): FieldModel[] {
-		const dsId = this.form.get('datasetModelId')?.value;
+		const dsId = this.form.get('layoutDatasetModelId')?.value;
 		if(!dsId) {
 			return [];
 		}
@@ -143,6 +163,7 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 
 	onSubmit(): void {
 		if(this.form.invalid) {
+			this.form.markAllAsTouched();
 			return;
 		}
 
@@ -156,7 +177,10 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 				cssCode: v.cssCode || undefined,
 				description: this.description,
 				textBefore: this.textBefore,
-				textAfter: this.textAfter
+				textAfter: this.textAfter,
+				datasetModel: v.layoutDatasetModelId
+					? this.datasetModelManager.getById(v.layoutDatasetModelId)
+					: undefined
 			};
 			this.dialogRef.close(result);
 			return;
@@ -165,14 +189,16 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 		const columns: ColumnHeader[] = Array.from({length: v.columnCount}, () => ({}));
 		const lines: LayoutLine[] = [];
 
-		if(this.generateFromDataset) {
-			const fields = this.previewFields;
+		if(this.generateFromDataset && v.generateDatasetModelId) {
+			const fields = this.fieldModelManager.getAll()
+				.filter(fm => fm.datasetModelId === v.generateDatasetModelId);
+
 			for(let i = 0; i < fields.length; i += v.columnCount) {
 				const chunk = fields.slice(i, i + v.columnCount);
 				const cells: Cell[] = chunk.map(fm => ({
 					formLayoutCellId: '',
 					id: fm.id,
-					datasetModelId: v.datasetModelId,
+					datasetModelId: v.generateDatasetModelId,
 					fieldModelId: fm.fieldModelId,
 					visibilityCriteria: [],
 					displayLabel: true,
@@ -193,8 +219,8 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 			description: this.description,
 			textBefore: this.textBefore,
 			textAfter: this.textAfter,
-			datasetModel: v.datasetModelId
-				? this.datasetModelManager.getById(v.datasetModelId)
+			datasetModel: v.layoutDatasetModelId
+				? this.datasetModelManager.getById(v.layoutDatasetModelId)
 				: undefined,
 			columns,
 			lines,

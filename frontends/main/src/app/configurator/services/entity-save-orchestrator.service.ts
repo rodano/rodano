@@ -230,11 +230,25 @@ export class EntitySaveOrchestratorService {
 				context.modifiedFormModelIds,
 				context.formModels,
 				context.originalFormModels
+			),
+			this.draftSaveService.saveLayouts(
+				projectId,
+				context.formModelId,
+				context.modifiedLayoutIds,
+				context.layouts
 			)
 		]).pipe(
-			map(() => {
+			map(([, savedLayouts]) => {
 				context.formModelManager.syncOriginalsWithCurrent();
 				context.formModelManager.invalidate();
+
+				if(savedLayouts.length > 0) {
+					context.formLayoutManager.reinitializeFromServer(savedLayouts);
+				}
+				else {
+					context.formLayoutManager.syncOriginalsWithCurrent();
+				}
+				context.formLayoutManager.invalidate();
 			})
 		);
 	}
@@ -312,5 +326,7 @@ export class EntitySaveOrchestratorService {
 	resetFormModelsToOriginals(context: FormModelContext): void {
 		context.formModelManager.resetToOriginals();
 		context.formModelManager.invalidate();
+		context.formLayoutManager.resetToOriginals();
+		context.formLayoutManager.invalidate();
 	}
 }

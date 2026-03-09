@@ -17,7 +17,6 @@ import {
 import {ReportListComponent} from '../report/report-list/report-list.component';
 import {ChartListComponent} from '../chart/chart-list/chart-list.component';
 import {FormModelListComponent} from '../form-model/form-model-list/form-model-list.component';
-import {Observable, of} from 'rxjs';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -243,14 +242,6 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 	onFormModelsChanged(value: boolean): void {
 		this.formModelsChanged.emit(value);
-	}
-
-	saveLayouts(): Observable<void> {
-		return this.formModelListComponent?.saveLayouts() ?? of(void 0);
-	}
-
-	discardLayouts(): void {
-		this.formModelListComponent?.discardLayouts();
 	}
 
 	private determineNodeType(): void {

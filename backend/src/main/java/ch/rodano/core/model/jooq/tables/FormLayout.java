@@ -121,6 +121,11 @@ public class FormLayout extends TableImpl<FormLayoutRecord> {
 	 */
 	public final TableField<FormLayoutRecord, String> CSS_CODE = createField(DSL.name("css_code"), SQLDataType.VARCHAR(2048).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
+	/**
+	 * The column <code>form_layout.sort_order</code>.
+	 */
+	public final TableField<FormLayoutRecord, Integer> SORT_ORDER = createField(DSL.name("sort_order"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "");
+
 	private FormLayout(Name alias, Table<FormLayoutRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

@@ -80,12 +80,12 @@ public class Report extends TableImpl<ReportRecord> {
 	/**
 	 * The column <code>report.dataset_model_id</code>.
 	 */
-	public final TableField<ReportRecord, UUID> DATASET_MODEL_ID = createField(DSL.name("dataset_model_id"), SQLDataType.UUID.nullable(false), this, "");
+	public final TableField<ReportRecord, UUID> DATASET_MODEL_ID = createField(DSL.name("dataset_model_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>report.workflow_id</code>.
 	 */
-	public final TableField<ReportRecord, UUID> WORKFLOW_ID = createField(DSL.name("workflow_id"), SQLDataType.UUID.nullable(false), this, "");
+	public final TableField<ReportRecord, UUID> WORKFLOW_ID = createField(DSL.name("workflow_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
 	 * The column <code>report.shortname</code>.

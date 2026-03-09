@@ -32,6 +32,8 @@ import {ChartService} from './api/chart.service';
 import {ChartModel} from '@core/model/chart-model';
 import {FormModel} from '@core/model/form-model';
 import {FormModelService} from './api/form-model.service';
+import {FormLayoutService} from './api/form-layout.service';
+import {Layout} from '@core/model/layout';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -51,7 +53,8 @@ export class DraftSaveService {
 		private resourceCategoryService: ResourceCategoryService,
 		private reportService: ReportService,
 		private chartService: ChartService,
-		private formModelService: FormModelService
+		private formModelService: FormModelService,
+		private formLayoutService: FormLayoutService
 	) {}
 
 	saveScopeModels(
@@ -537,5 +540,25 @@ export class DraftSaveService {
 		return saveObservables.length > 0
 			? forkJoin(saveObservables).pipe(map(() => undefined))
 			: of(undefined);
+	}
+
+	saveLayouts(
+		projectId: string,
+		formModelId: string,
+		modifiedIds: Set<string>,
+		layouts: Layout[]
+	): Observable<Layout[]> {
+		const saveObservables: Observable<Layout>[] = [];
+
+		modifiedIds.forEach(id => {
+			const layout = layouts.find(l => l.formLayoutId === id);
+			if(layout) {
+				saveObservables.push(this.formLayoutService.updateLayout(projectId, formModelId, id, layout));
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables)
+			: of([]);
 	}
 }

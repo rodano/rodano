@@ -20,6 +20,7 @@ import {LanguageService} from '../../../services/language.service';
 import {FieldModelManagerService} from '../../../services/manager/field-model-manager.service';
 import {DatasetModelManagerService} from '../../../services/manager/dataset-model-manager.service';
 import {MatTabsModule} from '@angular/material/tabs';
+import {DualListBoxComponent} from '../../dual-list-box/dual-list-box.component';
 
 export interface FormLayoutCellDialogData {
 	cell: Cell;
@@ -29,8 +30,6 @@ export interface FormLayoutCellDialogData {
 	effectiveCellWidth: number;
 }
 
-type CellSize = 'narrow' | 'medium' | 'wide';
-
 @Component({
 	selector: 'app-form-layout-cell-dialog',
 	standalone: true,
@@ -38,7 +37,7 @@ type CellSize = 'narrow' | 'medium' | 'wide';
 	styleUrls: ['./form-layout-cell-dialog.component.css'],
 	imports: [
 		CommonModule, ReactiveFormsModule, FormsModule, MatDialogModule, MatIconModule, MatButtonModule, MatCheckboxModule,
-		MatSelectModule, MatTooltipModule, MatTabsModule]
+		MatSelectModule, MatTooltipModule, MatTabsModule, DualListBoxComponent]
 })
 export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 	cell: Cell;
@@ -48,7 +47,6 @@ export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 	cellTextBefore: Record<string, string> = {};
 	cellTextAfter: Record<string, string> = {};
 
-	private labelPercent: number | null = null;
 	private formSub: Subscription | null = null;
 
 	constructor(
@@ -88,23 +86,8 @@ export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 				displayPossibleValueLabels: [this.cell.displayPossibleValueLabels ?? false],
 				hasPrintButton: [this.cell.hasPrintButton ?? false],
 				possibleValuesColumnNumber: [this.cell.possibleValuesColumnNumber ?? null],
-				possibleValuesColumnWidth: [this.cell.possibleValuesColumnWidth ?? null],
-				cssCodeForLabel: [this.cell.cssCodeForLabel || ''],
-				cssCodeForInput: [this.cell.cssCodeForInput || '']
+				possibleValuesColumnWidth: [this.cell.possibleValuesColumnWidth ?? null]
 			});
-
-			if(this.cell.cssCodeForLabel) {
-				const labelPx = this.parseWidthPx(this.cell.cssCodeForLabel);
-				if(labelPx && this.data.effectiveCellWidth > 0) {
-					const ratio = labelPx / this.data.effectiveCellWidth;
-					const nearest = [0.25, 0.50, 0.75].reduce((a, b) =>
-						Math.abs(b - ratio) < Math.abs(a - ratio) ? b : a
-					);
-					if(Math.abs(nearest - ratio) < 0.05) {
-						this.labelPercent = nearest;
-					}
-				}
-			}
 		}
 
 		this.formSub = this.form.valueChanges.subscribe(v => {
@@ -116,6 +99,14 @@ export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 			}
 			Object.assign(this.cell, v);
 		});
+	}
+
+	get hasMultipleLayouts(): boolean {
+		return this.data.allLayouts.length > 1;
+	}
+
+	get hasMultipleCells(): boolean {
+		return this.getCellsInSameLayout().length > 0;
 	}
 
 	get datasetGroups(): {datasetModelId: string; label: string; fields: FieldModel[]}[] {
@@ -142,44 +133,91 @@ export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 		return groups.sort((a, b) => a.label.localeCompare(b.label));
 	}
 
+	getCellsInSameLayout(): Cell[] {
+		const currentLayout = this.data.allLayouts.find(l =>
+			l.lines.some(line => line.cells.some(c => c.formLayoutCellId === this.data.cell.formLayoutCellId))
+		);
+		if(!currentLayout) {
+			return [];
+		}
+		return currentLayout.lines
+			.flatMap(l => l.cells)
+			.filter(c =>
+				c.formLayoutCellId !== this.data.cell.formLayoutCellId
+				&& c.fieldModelId
+				&& c.fieldModelId !== '__SPACER__'
+				&& c.fieldModelId !== ''
+			);
+	}
+
+	getLayoutLabel(layout: Layout): string {
+		return layout.id;
+	}
+
+	getCellLabel(cell: Cell): string {
+		if(cell.id) {
+			return cell.id;
+		}
+		const fm = this.fieldModelManager.getById(cell.fieldModelId ?? '');
+		return fm ? this.languageService.getLabel(fm) : cell.formLayoutCellId;
+	}
+
+	private getCurrentLayoutId(): string | null {
+		return this.data.allLayouts.find(l =>
+			l.lines.some(line => line.cells.some(c => c.formLayoutCellId === this.data.cell.formLayoutCellId))
+		)?.formLayoutId ?? null;
+	}
+
+	getAvailableTargetLayouts(criterion: VisibilityCriteria): Layout[] {
+		const currentLayoutId = this.getCurrentLayoutId();
+		return this.data.allLayouts.filter(l =>
+			l.formLayoutId !== currentLayoutId
+			&& !criterion.targetLayoutIds.includes(l.formLayoutId)
+		);
+	}
+
+	getSelectedTargetLayouts(criterion: VisibilityCriteria): Layout[] {
+		const currentLayoutId = this.getCurrentLayoutId();
+		return this.data.allLayouts.filter(l =>
+			l.formLayoutId !== currentLayoutId
+			&& criterion.targetLayoutIds.includes(l.formLayoutId)
+		);
+	}
+
+	onAddTargetLayout(criterion: VisibilityCriteria, layout: Layout): void {
+		criterion.targetLayoutIds = [...criterion.targetLayoutIds, layout.formLayoutId];
+	}
+
+	onRemoveTargetLayout(criterion: VisibilityCriteria, layout: Layout): void {
+		criterion.targetLayoutIds = criterion.targetLayoutIds.filter(id => id !== layout.formLayoutId);
+	}
+
+	getAvailableTargetCells(criterion: VisibilityCriteria): Cell[] {
+		return this.getCellsInSameLayout().filter(c =>
+			!criterion.targetCellIds.includes(c.formLayoutCellId)
+		);
+	}
+
+	getSelectedTargetCells(criterion: VisibilityCriteria): Cell[] {
+		return this.getCellsInSameLayout().filter(c =>
+			criterion.targetCellIds.includes(c.formLayoutCellId)
+		);
+	}
+
+	onAddTargetCell(criterion: VisibilityCriteria, cell: Cell): void {
+		criterion.targetCellIds = [...criterion.targetCellIds, cell.formLayoutCellId];
+	}
+
+	onRemoveTargetCell(criterion: VisibilityCriteria, cell: Cell): void {
+		criterion.targetCellIds = criterion.targetCellIds.filter(id => id !== cell.formLayoutCellId);
+	}
+
 	isTextCell(cell: Cell): boolean {
 		return !cell.fieldModelId || cell.fieldModelId === '';
 	}
 
 	getFieldModelById(fieldModelId: string): FieldModel | undefined {
 		return this.fieldModelManager.getById(fieldModelId);
-	}
-
-	parseWidthPx(cssCode: string | null | undefined): number | null {
-		const match = cssCode?.match(/width:\s*(\d+)px/);
-		return match ? parseInt(match[1]) : null;
-	}
-
-	getActiveLabelPercent(): number | null {
-		return this.labelPercent;
-	}
-
-	getComputedInputWidth(): number {
-		const labelPx = this.parseWidthPx(this.cell.cssCodeForLabel);
-		return this.data.effectiveCellWidth - (labelPx ?? 0);
-	}
-
-	setLabelPercent(percent: number | null): void {
-		this.labelPercent = percent;
-		if(percent === null) {
-			this.cell.cssCodeForLabel = undefined;
-			this.cell.cssCodeForInput = undefined;
-		}
-		else {
-			const labelPx = Math.round(this.data.effectiveCellWidth * percent);
-			const inputPx = this.data.effectiveCellWidth - labelPx;
-			this.cell.cssCodeForLabel = `width: ${labelPx}px`;
-			this.cell.cssCodeForInput = `width: ${inputPx}px`;
-		}
-		this.form.patchValue({
-			cssCodeForLabel: this.cell.cssCodeForLabel ?? '',
-			cssCodeForInput: this.cell.cssCodeForInput ?? ''
-		}, {emitEvent: false});
 	}
 
 	getText(map: Record<string, string>, langCode: string): string {
@@ -247,7 +285,7 @@ export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 			operator: fm && this.fieldUsesOperator(fm) ? Operator.EQUALS : null as any,
 			values: [],
 			action: VisibilityCriterionAction.SHOW,
-			targetLayoutIds: [this.data.allLayouts[0]?.formLayoutId ?? ''],
+			targetLayoutIds: [],
 			targetCellIds: []
 		};
 		this.cell.visibilityCriteria = [...(this.cell.visibilityCriteria ?? []), criterion];
@@ -270,33 +308,6 @@ export class FormLayoutCellDialogComponent implements OnInit, OnDestroy {
 		if(!this.operatorNeedsValue(operator)) {
 			criterion.values = [];
 		}
-	}
-
-	getCriterionTargetLayoutId(criterion: VisibilityCriteria): string {
-		return criterion.targetLayoutIds[0] ?? '';
-	}
-
-	setCriterionTargetLayout(criterion: VisibilityCriteria, layoutId: string): void {
-		criterion.targetLayoutIds = layoutId ? [layoutId] : [];
-		criterion.targetCellIds = [];
-	}
-
-	getCriterionTargetCellId(criterion: VisibilityCriteria): string {
-		return criterion.targetCellIds[0] ?? '';
-	}
-
-	setCriterionTargetCell(criterion: VisibilityCriteria, cellId: string): void {
-		criterion.targetCellIds = cellId ? [cellId] : [];
-	}
-
-	getCellsForTargetLayout(criterion: VisibilityCriteria): Cell[] {
-		const layoutId = this.getCriterionTargetLayoutId(criterion);
-		const layout = this.data.allLayouts.find(l => l.formLayoutId === layoutId);
-		if(!layout) {
-			return [];
-		}
-		return layout.lines.flatMap(l => l.cells)
-			.filter(c => c.fieldModelId && c.fieldModelId !== '__SPACER__' && c.fieldModelId !== '');
 	}
 
 	getLanguageLabel(code: string, isDefault: boolean): string {

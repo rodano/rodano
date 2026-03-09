@@ -29,6 +29,7 @@ export interface Layout {
     textBefore?: { [key: string]: string; };
     textAfter?: { [key: string]: string; };
     cssCode?: string;
+    sortOrder?: number;
 }
 export namespace Layout {
 }

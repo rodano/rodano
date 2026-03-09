@@ -175,6 +175,20 @@ public class FormLayoutRecord extends UpdatableRecordImpl<FormLayoutRecord> {
 		return (String) get(10);
 	}
 
+	/**
+	 * Setter for <code>form_layout.sort_order</code>.
+	 */
+	public void setSortOrder(Integer value) {
+		set(11, value);
+	}
+
+	/**
+	 * Getter for <code>form_layout.sort_order</code>.
+	 */
+	public Integer getSortOrder() {
+		return (Integer) get(11);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -198,7 +212,7 @@ public class FormLayoutRecord extends UpdatableRecordImpl<FormLayoutRecord> {
 	/**
 	 * Create a detached, initialised FormLayoutRecord
 	 */
-	public FormLayoutRecord(UUID formLayoutId, UUID projectId, UUID formModelId, UUID datasetModelId, UUID defaultSortFieldModelId, String code, FormLayoutType type, String description, String textBefore, String textAfter, String cssCode) {
+	public FormLayoutRecord(UUID formLayoutId, UUID projectId, UUID formModelId, UUID datasetModelId, UUID defaultSortFieldModelId, String code, FormLayoutType type, String description, String textBefore, String textAfter, String cssCode, Integer sortOrder) {
 		super(FormLayout.FORM_LAYOUT);
 
 		setFormLayoutId(formLayoutId);
@@ -212,6 +226,7 @@ public class FormLayoutRecord extends UpdatableRecordImpl<FormLayoutRecord> {
 		setTextBefore(textBefore);
 		setTextAfter(textAfter);
 		setCssCode(cssCode);
+		setSortOrder(sortOrder);
 		resetChangedOnNotNull();
 	}
 }

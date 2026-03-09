@@ -58,6 +58,19 @@
 	padding: 4px 8px;
 }
 
+.breadcrumb-actions {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.breadcrumb-btn-active {
+	background: var(--entity-color, #0C4A6E);
+	color: #fff;
+	border-radius: 6px;
+}
+
 .layout-workspace {
 	display: flex;
 	flex: 1;

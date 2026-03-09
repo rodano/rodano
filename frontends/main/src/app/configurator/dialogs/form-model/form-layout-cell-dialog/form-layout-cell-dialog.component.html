@@ -18,9 +18,7 @@
 						}
 					</mat-select>
 				</div>
-			}
 
-			@if (!isTextCell(cell)) {
 				<div class="form-field checkbox-field">
 					<mat-checkbox formControlName="displayLabel">Display Label</mat-checkbox>
 					<span class="hint">Check if the label should be displayed</span>
@@ -38,61 +36,10 @@
 					<label>Possible Values Columns Width</label>
 					<input type="number" formControlName="possibleValuesColumnWidth" min="1"/>
 				</div>
-
-				<div class="form-section">
-					<h3>
-						Label / Input Width
-					</h3>
-					<span class="hint">(effective column: {{ data.effectiveCellWidth }}px)</span>
-					<div class="form-field">
-						<label>Split</label>
-						<div class="size-buttons">
-							<button type="button" class="size-btn"
-															[class.active]="getActiveLabelPercent() === null"
-															(click)="setLabelPercent(null)">Auto
-							</button>
-							<button type="button" class="size-btn"
-															[class.active]="getActiveLabelPercent() === 0.25"
-															(click)="setLabelPercent(0.25)"
-															[matTooltip]="'Label ' + (data.effectiveCellWidth * 0.25 | number:'1.0-0') + 'px / Input ' + (data.effectiveCellWidth * 0.75 | number:'1.0-0') + 'px'">
-								25% / 75%
-							</button>
-							<button type="button" class="size-btn"
-															[class.active]="getActiveLabelPercent() === 0.50"
-															(click)="setLabelPercent(0.50)"
-															[matTooltip]="'Label ' + (data.effectiveCellWidth * 0.5 | number:'1.0-0') + 'px / Input ' + (data.effectiveCellWidth * 0.5 | number:'1.0-0') + 'px'">
-								50% / 50%
-							</button>
-							<button type="button" class="size-btn"
-															[class.active]="getActiveLabelPercent() === 0.75"
-															(click)="setLabelPercent(0.75)"
-															[matTooltip]="'Label ' + (data.effectiveCellWidth * 0.75 | number:'1.0-0') + 'px / Input ' + (data.effectiveCellWidth * 0.25 | number:'1.0-0') + 'px'">
-								75% / 25%
-							</button>
-						</div>
-					</div>
-					@if (getActiveLabelPercent() !== null) {
-						<div class="form-field">
-							<span class="hint">
-								Label: {{ (data.effectiveCellWidth * (getActiveLabelPercent() ?? 0)) | number:'1.0-0' }}px —
-								Input: {{ getComputedInputWidth() }}px
-							</span>
-						</div>
-					}
-					<div class="form-field">
-						<label>Label CSS</label>
-						<textarea class="html-textarea" formControlName="cssCodeForLabel" placeholder="width: 200px;"></textarea>
-					</div>
-					<div class="form-field">
-						<label>Input CSS</label>
-						<textarea class="html-textarea" formControlName="cssCodeForInput" placeholder="width: 200px;"></textarea>
-					</div>
-				</div>
 			}
 
 			<div class="form-section">
 				<h3>Translations</h3>
-
 				<mat-tab-group>
 					@for (lang of availableLanguages; track lang.languageCode) {
 						@if (lang.languageCode) {
@@ -209,44 +156,44 @@
 										</div>
 									}
 
-									<div class="form-row">
-										<div class="form-field">
-											<label>Action</label>
-											<mat-select
-												[ngModel]="criterion.action"
-												[ngModelOptions]="{standalone: true}"
-												(ngModelChange)="criterion.action = $event">
-												<mat-option value="SHOW">Show</mat-option>
-												<mat-option value="HIDE">Hide</mat-option>
-											</mat-select>
-										</div>
-
-										<div class="form-field">
-											<label>Target Layout</label>
-											<mat-select
-												[ngModel]="getCriterionTargetLayoutId(criterion)"
-												[ngModelOptions]="{standalone: true}"
-												(ngModelChange)="setCriterionTargetLayout(criterion, $event)">
-												<mat-option value="">— any —</mat-option>
-												@for (layout of data.allLayouts; track layout.formLayoutId) {
-													<mat-option [value]="layout.formLayoutId">{{ layout.id }}</mat-option>
-												}
-											</mat-select>
-										</div>
-
-										<div class="form-field">
-											<label>Target Cell</label>
-											<mat-select
-												[ngModel]="getCriterionTargetCellId(criterion)"
-												[ngModelOptions]="{standalone: true}"
-												(ngModelChange)="setCriterionTargetCell(criterion, $event)">
-												<mat-option value="">— any —</mat-option>
-												@for (c of getCellsForTargetLayout(criterion); track c.formLayoutCellId) {
-													<mat-option [value]="c.formLayoutCellId">{{ c.id }}</mat-option>
-												}
-											</mat-select>
-										</div>
+									<div class="form-field">
+										<label>Action</label>
+										<mat-select
+											[ngModel]="criterion.action"
+											[ngModelOptions]="{standalone: true}"
+											(ngModelChange)="criterion.action = $event">
+											<mat-option value="SHOW">Show</mat-option>
+											<mat-option value="HIDE">Hide</mat-option>
+										</mat-select>
 									</div>
+
+									@if (hasMultipleLayouts) {
+										<app-dual-list-box
+											title="Target Layouts"
+											hint="Leave empty to apply to all layouts"
+											[available]="getAvailableTargetLayouts(criterion)"
+											[selected]="getSelectedTargetLayouts(criterion)"
+											[labelFn]="getLayoutLabel.bind(this)"
+											availablePlaceholder="No available layouts"
+											selectedPlaceholder="No layouts selected"
+											(add)="onAddTargetLayout(criterion, $event)"
+											(remove)="onRemoveTargetLayout(criterion, $event)">
+										</app-dual-list-box>
+									}
+
+									@if (hasMultipleCells) {
+										<app-dual-list-box
+											title="Target Cells"
+											hint="Leave empty to apply to all cells"
+											[available]="getAvailableTargetCells(criterion)"
+											[selected]="getSelectedTargetCells(criterion)"
+											[labelFn]="getCellLabel.bind(this)"
+											availablePlaceholder="No available cells"
+											selectedPlaceholder="No cells selected"
+											(add)="onAddTargetCell(criterion, $event)"
+											(remove)="onRemoveTargetCell(criterion, $event)">
+										</app-dual-list-box>
+									}
 
 								</div>
 							</div>

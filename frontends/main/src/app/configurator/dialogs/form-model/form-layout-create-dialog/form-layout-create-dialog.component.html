@@ -55,48 +55,61 @@
 			}
 
 			<div class="form-field">
-				<label>
-					CSS Code
-				</label>
+				<label>CSS Code</label>
 				<textarea class="code-textarea" formControlName="cssCode"
 														placeholder="e.g. max-width: 1200px;">
 				</textarea>
 				<span class="hint">Applied to the layout container</span>
 			</div>
 
-			<div class="form-field">
-				<label>Dataset Model {{ generateFromDataset ? '*' : '' }}</label>
-				<mat-select formControlName="datasetModelId" placeholder="Select dataset model">
-					@if (!generateFromDataset) {
-						<mat-option value="">None</mat-option>
-					}
-					@for (ds of datasetModels; track ds.datasetModelId) {
-						<mat-option [value]="ds.datasetModelId">
-							{{ languageService.getLabel(ds) }}
-						</mat-option>
-					}
-				</mat-select>
-				@if (form.get('datasetModelId')?.hasError('required') && form.get('datasetModelId')?.touched) {
-					<span class="error-message">Dataset model is required</span>
-				}
-			</div>
-
-			@if (form.get('datasetModelId')?.value) {
+			@if (form.get('type')?.value === 'MULTIPLE') {
 				<div class="form-field">
-					<label>Default Sort Field</label>
-					<mat-select formControlName="defaultSortFieldModelId">
-						<mat-option value="">None</mat-option>
-						@for (fm of fieldsForSelectedDataset; track fm.fieldModelId) {
-							<mat-option [value]="fm.fieldModelId">
-								{{ languageService.getLabel(fm) }}
+					<label>Dataset Model *</label>
+					<mat-select formControlName="layoutDatasetModelId" placeholder="Select dataset model">
+						@for (ds of datasetModels; track ds.datasetModelId) {
+							<mat-option [value]="ds.datasetModelId">
+								{{ languageService.getLabel(ds) }}
 							</mat-option>
 						}
 					</mat-select>
-					<span class="hint">Field used to sort multiple records</span>
+					<span class="hint">Dataset this layout is bound to</span>
+					@if (form.get('layoutDatasetModelId')?.hasError('required') && form.get('layoutDatasetModelId')?.touched) {
+						<span class="error-message">Dataset model is required</span>
+					}
 				</div>
+
+				@if (form.get('layoutDatasetModelId')?.value) {
+					<div class="form-field">
+						<label>Default Sort Field</label>
+						<mat-select formControlName="defaultSortFieldModelId">
+							<mat-option value="">None</mat-option>
+							@for (fm of fieldsForSelectedDataset; track fm.fieldModelId) {
+								<mat-option [value]="fm.fieldModelId">
+									{{ languageService.getLabel(fm) }}
+								</mat-option>
+							}
+						</mat-select>
+						<span class="hint">Field used to sort multiple records</span>
+					</div>
+				}
 			}
 
 			@if (generateFromDataset) {
+				<div class="form-field">
+					<label>Generate from Dataset *</label>
+					<mat-select formControlName="generateDatasetModelId" placeholder="Select dataset model">
+						@for (ds of datasetModels; track ds.datasetModelId) {
+							<mat-option [value]="ds.datasetModelId">
+								{{ languageService.getLabel(ds) }}
+							</mat-option>
+						}
+					</mat-select>
+					<span class="hint">Fields from this dataset will be added to the layout</span>
+					@if (form.get('generateDatasetModelId')?.hasError('required') && form.get('generateDatasetModelId')?.touched) {
+						<span class="error-message">Dataset model is required</span>
+					}
+				</div>
+
 				@if (previewFields.length > 0) {
 					<div class="preview-section">
 						<p class="preview-label">
@@ -116,7 +129,7 @@
 					</div>
 				}
 
-				@if (previewFields.length === 0) {
+				@if (form.get('generateDatasetModelId')?.value && previewFields.length === 0) {
 					<p class="empty-state">
 						<mat-icon>info_outline</mat-icon>
 						No field models found for this dataset. An empty layout will be created.
@@ -139,9 +152,7 @@
 											placeholder="Layout description..." />
 									</div>
 									<div class="form-field">
-										<label>
-											Text Before
-										</label>
+										<label>Text Before</label>
 										<textarea class="code-textarea"
 																				[value]="getText(textBefore, lang.languageCode)"
 																				(input)="onTranslationChange($event, textBefore, lang.languageCode!)"
@@ -150,9 +161,7 @@
 										<span class="hint">HTML rendered above the layout</span>
 									</div>
 									<div class="form-field">
-										<label>
-											Text After
-										</label>
+										<label>Text After</label>
 										<textarea class="code-textarea"
 																				[value]="getText(textAfter, lang.languageCode)"
 																				(input)="onTranslationChange($event, textAfter, lang.languageCode!)"

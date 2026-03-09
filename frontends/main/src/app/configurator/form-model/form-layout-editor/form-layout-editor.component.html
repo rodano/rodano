@@ -1,53 +1,20 @@
-<div class="editor-header">
-	<div class="editor-header-left">
-		<h2 class="editor-title">{{ workingLayout?.id }}</h2>
-		<span class="detail-code theme-form-layout">{{ workingLayout?.type }}</span>
-		<button class="btn-icon-sm" (click)="openSettings()" matTooltip="Layout settings">
-			<mat-icon>settings</mat-icon>
-		</button>
-	</div>
-	@if (hasChanges) {
-		<span class="unsaved-indicator">
-				<mat-icon>edit</mat-icon>
-				Unsaved
-			</span>
-	}
-	<div class="editor-header-right">
-			<span class="column-label" [class.width-warning]="getTotalColumnWidth() > 1250">
-				<mat-icon>straighten</mat-icon>
-				{{ getTotalColumnWidth() }}px / 1250px
-			</span>
-		<div class="column-controls">
-			<span class="column-label">
-				<mat-icon>view_column</mat-icon>
-				{{ columnCount }} {{ columnCount === 1 ? 'Column' : 'Columns' }}
-			</span>
-			<button class="btn-icon-sm"
-											(click)="removeLastColumn()"
-											[disabled]="columnCount <= 1 || isLastColumnOccupied()"
-											matTooltip="Remove column">
-				<mat-icon>remove</mat-icon>
-			</button>
-			<button class="btn-icon-sm"
-											(click)="addColumn()"
-											[disabled]="columnCount >= 6"
-											matTooltip="Add column">
-				<mat-icon>add</mat-icon>
-			</button>
-		</div>
-	</div>
-</div>
+<div class="editor-body">
 
-@if (workingLayout) {
-	<div class="editor-body">
-
-		<div class="field-palette">
-			<div class="palette-header">
+	<div class="field-palette" [class.collapsed]="paletteCollapsed">
+		<div class="palette-header">
+			@if (!paletteCollapsed) {
 				<mat-icon>text_ad</mat-icon>
 				<span>Fields</span>
 				<span class="palette-count">{{ totalFieldCount }}</span>
-			</div>
+			}
+			<button class="btn-icon-sm palette-toggle-btn"
+											(click)="togglePalette()"
+											[matTooltip]="paletteCollapsed ? 'Show fields' : 'Hide fields'">
+				<mat-icon>{{ paletteCollapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+			</button>
+		</div>
 
+		@if (!paletteCollapsed) {
 			<div class="palette-search">
 				<mat-icon>search</mat-icon>
 				<input class="palette-search-input"
@@ -110,11 +77,11 @@
 														cdkDrag
 														[cdkDragData]="fm"
 														(click)="onClickFieldInPalette(fm)"
-														matTooltip="Click to add to next line">
+														[matTooltip]="languageService.getLabel(fm)">
 										<div class="palette-item-body">
-        <span class="palette-item-name">
-            {{ languageService.getTranslatedName(fm.shortname) || fm.id }}
-        </span>
+											<span class="palette-item-name">
+												{{ languageService.getTranslatedName(fm.shortname) || fm.id }}
+											</span>
 											<span class="palette-item-code">{{ fm.id }}</span>
 										</div>
 										<span [class]="'field-type-badge ' + getFieldTypeBadge(fm).css"
@@ -133,140 +100,272 @@
 					}
 				</div>
 			}
-		</div>
+		}
+	</div>
 
-		<div class="grid-area">
+	<div class="layouts-stack"
+						cdkDropList
+						[cdkDropListData]="workingLayouts"
+						(cdkDropListDropped)="onDropLayout($event)">
 
-			@if (workingLayout.lines.length > 0) {
-				<div class="grid-header-row">
-					<div class="gutter-placeholder"></div>
-					@for (col of workingLayout.columns; track $index; let colIdx = $index) {
-						<div class="grid-col-header">
-							<span class="col-header-label">Col {{ colIdx + 1 }}</span>
-							<span class="col-header-width">
-								{{ getActiveColumnPreset(colIdx) ? (getActiveColumnPreset(colIdx) + 'px') : 'Auto' }}
+		@for (wl of workingLayouts; track wl.formLayoutId) {
+			<div class="layout-section"
+								[class.layout-active]="activeLayoutId === wl.formLayoutId"
+								[class.modified]="isLayoutModified(wl.formLayoutId)"
+								cdkDrag
+								[cdkDragData]="wl"
+								(click)="setActiveLayout(wl.formLayoutId)">
+
+				<div *cdkDragPlaceholder class="layout-drag-placeholder"></div>
+
+				<div class="layout-section-header">
+					<div class="layout-drag-handle" cdkDragHandle matTooltip="Drag to reorder">
+						<mat-icon>drag_indicator</mat-icon>
+					</div>
+					<div class="layout-header-left">
+						<h2 class="layout-title">{{ wl.id }}</h2>
+						<span class="detail-code theme-form-layout">{{ wl.type }}</span>
+						<button class="btn-icon-sm"
+														(click)="openSettings(wl); $event.stopPropagation()"
+														matTooltip="Layout settings">
+							<mat-icon>settings</mat-icon>
+						</button>
+						<button class="btn-icon-sm btn-icon-danger"
+														(click)="onDeleteLayout(wl); $event.stopPropagation()"
+														matTooltip="Delete layout">
+							<mat-icon>delete_outline</mat-icon>
+						</button>
+					</div>
+
+					<div class="layout-header-right">
+						<span class="column-label" [class.width-warning]="globalMaxColumnWidth > 1250">
+							<mat-icon>straighten</mat-icon>
+							{{ globalMaxColumnWidth }}px / 1250px
+						</span>
+						<div class="column-controls">
+							<span class="column-label">
+								<mat-icon>view_column</mat-icon>
+								{{ getColumnCount(wl) }} {{ getColumnCount(wl) === 1 ? 'Column' : 'Columns' }}
 							</span>
-							<div class="col-preset-buttons">
-								<button class="col-preset-btn"
-																[class.active]="getActiveColumnPreset(colIdx) === null"
-																(click)="setColumnWidth(colIdx, null)"
-																matTooltip="Auto width">
-									Auto
-								</button>
-								@for (preset of columnPresets; track preset.px) {
-									<button class="col-preset-btn"
-																	[class.active]="getActiveColumnPreset(colIdx) === preset.px"
-																	[disabled]="isColumnPresetDisabled(colIdx, preset.px)"
-																	(click)="setColumnWidth(colIdx, preset.px)"
-																	[matTooltip]="isColumnPresetDisabled(colIdx, preset.px) ? 'Would exceed 1250px total' : (preset.px + 'px')">
-										{{ preset.label }}
-									</button>
-								}
-							</div>
+							<button class="btn-icon-sm"
+															(click)="removeLastColumn(wl); $event.stopPropagation()"
+															[disabled]="getColumnCount(wl) <= 1 || isLastColumnOccupied(wl)"
+															matTooltip="Remove column">
+								<mat-icon>remove</mat-icon>
+							</button>
+							<button class="btn-icon-sm"
+															(click)="addColumn(wl); $event.stopPropagation()"
+															[disabled]="getTotalColumnWidth(wl) >= 1250"
+															matTooltip="Add column">
+								<mat-icon>add</mat-icon>
+							</button>
 						</div>
-					}
-					<div class="actions-placeholder"></div>
+					</div>
 				</div>
-			}
 
-			<div class="lines-container"
-								cdkDropList
-								[cdkDropListData]="workingLayout.lines"
-								(cdkDropListDropped)="onDropLine($event)">
-
-				@for (line of workingLayout.lines; track line.formLayoutLineId || $index; let i = $index) {
-					<div class="grid-line"
-										[class.line-active]="isLineSelected(i)"
-										cdkDrag
-										[cdkDragData]="line">
-
-						<div class="line-gutter" cdkDragHandle>
-							<mat-icon>drag_indicator</mat-icon>
-							<span class="line-number">{{ i + 1 }}</span>
-						</div>
-
-						<div class="line-cells" [style.--col-count]="columnCount">
-
-							@for (cell of line.cells; track cell.formLayoutCellId || $index; let ci = $index) {
-								<div class="grid-cell-wrapper"
-													cdkDropList
-													[id]="getSlotDropListId(i, ci)"
-													[cdkDropListData]="cell"
-													[cdkDropListConnectedTo]="getSlotConnectedLists()"
-													[style.grid-column]="getCellGridColumn(cell, i)"
-													(cdkDropListEntered)="onSlotEntered(getSlotDropListId(i, ci))"
-													(cdkDropListExited)="onSlotExited(getSlotDropListId(i, ci))"
-													[class.slot-hovered]="hoveredSlotId === getSlotDropListId(i, ci)"
-													(cdkDropListDropped)="onDropOnSlot($event, i, ci)">
-
-									<div class="grid-cell"
-														cdkDrag
-														[cdkDragData]="cell"
-														[cdkDragDisabled]="isSpacerCell(cell)"
-														[class.selected]="isCellSelected(cell)"
-														[class.text-cell]="isTextCell(cell)"
-														[class.spacer-cell]="isSpacerCell(cell)"
-														[class.resizing]="isResizingCell(cell)"
-														(click)="onCellClick(cell, i)">
-
-										@if (isTextCell(cell)) {
-											<mat-icon class="text-cell-icon">title</mat-icon>
-											<span class="cell-name text-cell-preview"
-																	[innerHTML]="getTextCellPreview(cell)"></span>
-										} @else if (isSpacerCell(cell)) {
-											<mat-icon class="spacer-cell-icon">crop_free</mat-icon>
-										} @else {
-											@if (getFieldModelById(cell.fieldModelId); as fm) {
-												<span [class]="'field-type-badge ' + getFieldTypeBadge(fm).css"
-																		[matTooltip]="getFieldTypeBadge(fm).tooltip">
-                <mat-icon>{{ getFieldTypeBadge(fm).icon }}</mat-icon>
-            </span>
-											}
-											<span class="cell-name">{{ getFieldLabel(cell.fieldModelId) }}</span>
-										}
-
-										@if (!isSpacerCell(cell)) {
-											<button class="cell-delete-btn"
-																			(click)="deleteCell(i, ci, $event)"
-																			matTooltip="Remove cell">
-												<mat-icon>close</mat-icon>
+				<div class="grid-area">
+					@if (wl.lines.length > 0) {
+						<div class="grid-header-row"
+											[style.grid-template-columns]="'56px ' + getGridTemplateColumns(wl) + ' 36px'">
+							<div class="gutter-placeholder"></div>
+							@for (col of wl.columns; track $index; let colIdx = $index) {
+								<div class="grid-col-header">
+									<span class="col-header-label">Col {{ colIdx + 1 }}</span>
+									<span class="col-header-width">
+										{{ getActiveColumnPreset(wl, colIdx) ? (getActiveColumnPreset(wl, colIdx) + 'px') : 'Auto' }}
+									</span>
+									<div class="col-preset-buttons">
+										<button class="col-preset-btn"
+																		[class.active]="getActiveColumnPreset(wl, colIdx) === null"
+																		(click)="setColumnWidth(wl, colIdx, null); $event.stopPropagation()"
+																		matTooltip="Auto width">
+											Auto
+										</button>
+										@for (preset of columnPresets; track preset.px) {
+											<button class="col-preset-btn"
+																			[class.active]="getActiveColumnPreset(wl, colIdx) === preset.px"
+																			[disabled]="isColumnPresetDisabled(wl, colIdx, preset.px)"
+																			(click)="setColumnWidth(wl, colIdx, preset.px); $event.stopPropagation()"
+																			[matTooltip]="isColumnPresetDisabled(wl, colIdx, preset.px) ? 'Would exceed 1250px total' : (preset.px + 'px')">
+												{{ preset.label }}
 											</button>
-										}
-
-										@if (!isSpacerCell(cell)) {
-											<div class="resize-handle resize-handle-right"
-																(mousedown)="onResizeStart($event, cell, i, 'right')"
-																(click)="$event.stopPropagation()">
-												<mat-icon>drag_handle</mat-icon>
-											</div>
 										}
 									</div>
 								</div>
 							}
+							<div class="actions-placeholder"></div>
 						</div>
+					}
 
-						<div class="line-actions">
-							<button class="btn-line-delete"
-															(click)="deleteLine(i)"
-															matTooltip="Delete line">
-								<mat-icon>delete_outline</mat-icon>
-							</button>
-						</div>
+					<div class="lines-container"
+										[id]="getLinesDropListId(wl.formLayoutId)"
+										cdkDropList
+										[cdkDropListData]="wl.lines"
+										(cdkDropListDropped)="onDropLine(wl, $event)">
+
+						@for (line of wl.lines; track line.formLayoutLineId || $index; let i = $index) {
+							<div class="grid-line"
+												[class.line-active]="isLineSelected(wl, i)"
+												cdkDrag
+												[cdkDragData]="line">
+
+								<div class="line-gutter" cdkDragHandle>
+									<mat-icon>drag_indicator</mat-icon>
+									<span class="line-number">{{ i + 1 }}</span>
+								</div>
+
+								<div class="line-cells" [style.grid-template-columns]="getGridTemplateColumns(wl)">
+
+									@for (cell of line.cells; track cell.formLayoutCellId || $index; let ci = $index) {
+										<div class="grid-cell-wrapper"
+															cdkDropList
+															[id]="getSlotDropListId(wl.formLayoutId, i, ci)"
+															[cdkDropListData]="cell"
+															[cdkDropListConnectedTo]="getSlotConnectedLists()"
+															[style.grid-column]="getCellGridColumn(wl, cell, i)"
+															(cdkDropListEntered)="onSlotEntered(getSlotDropListId(wl.formLayoutId, i, ci))"
+															(cdkDropListExited)="onSlotExited(getSlotDropListId(wl.formLayoutId, i, ci))"
+															[class.slot-hovered]="hoveredSlotId === getSlotDropListId(wl.formLayoutId, i, ci)"
+															(cdkDropListDropped)="onDropOnSlot(wl, $event, i, ci)">
+
+											<div class="grid-cell"
+																cdkDrag
+																[cdkDragData]="cell"
+																[cdkDragDisabled]="isSpacerCell(cell)"
+																[class.selected]="isCellSelected(cell)"
+																[class.text-cell]="isTextCell(cell)"
+																[class.spacer-cell]="isSpacerCell(cell)"
+																[class.resizing]="isResizingCell(cell)"
+																(click)="onCellClick(wl, cell, i)">
+
+												@if (isTextCell(cell)) {
+													<mat-icon class="text-cell-icon">title</mat-icon>
+													<span class="cell-name text-cell-preview"
+																			[innerHTML]="getTextCellPreview(cell)"></span>
+												} @else if (isSpacerCell(cell)) {
+													<mat-icon class="spacer-cell-icon">crop_free</mat-icon>
+												} @else {
+													@if (!isSplitEditActive()) {
+														@if (getFieldModelById(cell.fieldModelId); as fm) {
+															<span [class]="'field-type-badge ' + getFieldTypeBadge(fm).css"
+																					[matTooltip]="getFieldTypeBadge(fm).tooltip">
+															<mat-icon>{{ getFieldTypeBadge(fm).icon }}</mat-icon>
+														</span>
+														}
+													}
+
+													@if (isSplitEditActive()) {
+														<div class="split-cell-wrapper"
+																			[class.is-resizing]="isSplitResizingCell(cell)"
+																			(click)="$event.stopPropagation()">
+
+															<!-- Per-cell mini ruler -->
+															<div class="cell-mini-ruler">
+																@for (tick of getMiniRulerTicks(wl, cell, i); track tick.pct) {
+																	<div class="cell-ruler-tick"
+																						[class.cell-ruler-tick-major]="tick.major"
+																						[style.left.%]="tick.pct">
+																		@if (tick.label) {
+																			<span class="cell-ruler-label">{{ tick.label }}</span>
+																		}
+																	</div>
+																}
+																<div class="cell-ruler-divider"
+																					[style.left.%]="getSplitLabelPct(wl, cell, i)">
+																	@if (isSplitResizingCell(cell)) {
+																		<span class="cell-ruler-divider-label">{{ getLabelPxValue(cell) }}px</span>
+																	}
+																</div>
+															</div>
+
+															<div class="split-edit-cell">
+																<div class="split-label-area"
+																					[style.width]="getSplitLabelWidth(wl, cell, i)">
+																	<span class="split-area-label">Label</span>
+																</div>
+																<div class="split-divider"
+																					[style.left]="getSplitLabelWidth(wl, cell, i)"
+																					(mousedown)="onSplitResizeStart($event, wl, cell, i)">
+																	<div class="split-divider-line"></div>
+																</div>
+																<div class="split-input-area"
+																					[style.width]="getSplitInputWidth(wl, cell, i)">
+																	<span class="split-area-label">Input</span>
+																</div>
+															</div>
+														</div>
+													} @else {
+														<span class="cell-name">{{ getFieldLabel(cell.fieldModelId) }}</span>
+													}
+												}
+
+												@if (!isSpacerCell(cell) && !isSplitEditActive()) {
+													<button class="cell-delete-btn"
+																					(click)="deleteCell(wl, i, ci, $event)"
+																					matTooltip="Remove cell">
+														<mat-icon>close</mat-icon>
+													</button>
+												}
+
+												@if (!isSpacerCell(cell)) {
+													<div class="resize-handle resize-handle-right"
+																		(mousedown)="onResizeStart($event, wl, cell, i, 'right')"
+																		(click)="$event.stopPropagation()">
+														<mat-icon>drag_handle</mat-icon>
+													</div>
+												}
+											</div>
+										</div>
+									}
+								</div>
+
+								<div class="line-actions">
+									<button class="btn-line-delete"
+																	(click)="deleteLine(wl, i); $event.stopPropagation()"
+																	matTooltip="Delete line">
+										<mat-icon>delete_outline</mat-icon>
+									</button>
+								</div>
+							</div>
+						}
 					</div>
-				}
-			</div>
 
-			<button class="btn-add-line" (click)="addLine()">
-				<mat-icon>add</mat-icon>
-				Add Line
-			</button>
+					<div class="layout-footer">
+						<button class="btn-add-line"
+														type="button"
+														(click)="addLine(wl); $event.stopPropagation()">
+							<mat-icon>add</mat-icon>
+							Add Line
+						</button>
 
-			@if (workingLayout.lines.length === 0) {
-				<div class="empty-grid-hint">
-					<mat-icon>view_quilt</mat-icon>
-					<p>No lines yet. Click "Add Line" or drag a field from the palette on the left.</p>
+						@if (wl.lines.length === 0) {
+							<div class="empty-grid-hint">
+								<mat-icon>view_quilt</mat-icon>
+								<p>No lines yet. Click "Add Line" or drag a field from the palette on the left.</p>
+							</div>
+						}
+					</div>
 				</div>
-			}
+			</div>
+		}
+
+		@if (workingLayouts.length === 0) {
+			<div class="no-layouts-hint">
+				<mat-icon>view_quilt</mat-icon>
+				<p>No layouts yet. Create one below.</p>
+			</div>
+		}
+
+		<div class="create-layout-bar">
+			<button class="btn-add-line" type="button" (click)="onCreateLayout(false)">
+				<mat-icon>add</mat-icon>
+				Empty Layout
+			</button>
+			<button class="btn-add-line" type="button" (click)="onCreateLayout(true)">
+				<mat-icon>auto_awesome</mat-icon>
+				Generate from Dataset
+			</button>
 		</div>
+
 	</div>
-}
+</div>

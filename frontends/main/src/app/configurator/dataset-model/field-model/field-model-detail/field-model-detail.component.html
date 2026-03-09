@@ -220,17 +220,6 @@
 							}
 						</app-setting-item>
 
-						<app-setting-item label="Maximum Year"
-																								[modified]="isFieldModified('maxYear')"
-																								[notConfigured]="draftFieldModel.maxYear === null || draftFieldModel.maxYear === undefined">
-							@if (draftFieldModel.maxYear === null || draftFieldModel.maxYear === undefined) {
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>Not configured</span>
-							} @else {
-								{{ draftFieldModel.maxYear }}
-							}
-						</app-setting-item>
-
 						<app-setting-item label="Allow Date in Future"
 																								[modified]="isFieldModified('allowDateInFuture')">
 							@if (draftFieldModel.allowDateInFuture) {

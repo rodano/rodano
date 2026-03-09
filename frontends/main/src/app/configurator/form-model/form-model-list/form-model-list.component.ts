@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -6,32 +6,33 @@ import {FormModel} from '@core/model/form-model';
 import {ConfiguratorProject} from '@core/model/configurator-project';
 import {LanguageService} from '../../services/language.service';
 import {FormModelManagerService} from '../../services/manager/form-model-manager.service';
+import {FormLayoutManagerService} from '../../services/manager/form-layout-manager.service';
 import {FormModelDialogService} from '../../services/dialogs/form-model-dialog.service';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
-import {forkJoin, Observable, of, Subscription} from 'rxjs';
-import {map} from 'rxjs/operators';
+import {Subscription} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
 import {FormModelDetailComponent} from '../form-model-detail/form-model-detail.component';
-import {FormLayoutListComponent} from '../form-layout-list/form-layout-list.component';
 import {FormLayoutEditorComponent} from '../form-layout-editor/form-layout-editor.component';
 import {Layout} from '@core/model/layout';
-import {FormLayoutService} from '../../services/api/form-layout.service';
+import {FormLayoutPreviewComponent} from '../form-layout-preview/form-layout-preview.component';
 
-type ViewMode = 'form-list' | 'form-detail' | 'layout-list' | 'layout-detail';
+type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview';
 
 @Component({
 	selector: 'app-form-model-list',
 	standalone: true,
 	templateUrl: './form-model-list.component.html',
 	styleUrls: ['./form-model-list.component.css'],
-	imports: [CommonModule, MatIconModule, MatTooltipModule, FormModelDetailComponent, FormLayoutListComponent,
-		FormLayoutEditorComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective]
+	imports: [CommonModule, MatIconModule, MatTooltipModule, FormModelDetailComponent, FormLayoutEditorComponent,
+		EmptyStateComponent, ListHeaderComponent, ModifiedDirective, FormLayoutPreviewComponent]
 })
 export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
+	@ViewChild(FormLayoutEditorComponent) formLayoutEditor?: FormLayoutEditorComponent;
+
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
@@ -45,13 +46,8 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	}>();
 
 	selectedFormModel: FormModel | null = null;
-	selectedLayout: Layout | null = null;
-	layouts: Layout[] = [];
 	viewMode: ViewMode = 'form-list';
 	loading = false;
-
-	modifiedLayoutIds = new Set<string>();
-	pendingLayouts = new Map<string, {layout: Layout; formModelId: string}>();
 
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
@@ -59,9 +55,9 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	constructor(
 		public formModelManager: FormModelManagerService,
+		public formLayoutManager: FormLayoutManagerService,
 		public languageService: LanguageService,
 		private formModelDialogService: FormModelDialogService,
-		private formLayoutService: FormLayoutService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -83,6 +79,9 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 				if(formModel) {
 					this.selectedFormModel = formModel;
 					this.viewMode = 'form-detail';
+					this.formLayoutManager.load(this.projectId, formModel.formModelId).subscribe(() => {
+						this.emitContext();
+					});
 				}
 			}
 			else if(nodeId === 'form-models') {
@@ -100,10 +99,10 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		if(!this.selectedFormModel) {
 			return 0;
 		}
-		if(this.viewMode === 'layout-detail') {
+		if(this.viewMode === 'layout-editor' || this.viewMode === 'layout-preview') {
 			return 3;
 		}
-		if(this.viewMode === 'form-detail' || this.viewMode === 'layout-list') {
+		if(this.viewMode === 'form-detail') {
 			return 2;
 		}
 		return 0;
@@ -114,7 +113,7 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	get originalFormModels(): FormModel[] {return this.formModelManager.getOriginals();}
 
 	get totalModificationCount(): number {
-		return this.formModelManager.getModificationCount();
+		return this.formModelManager.getModificationCount() + this.formLayoutManager.getModificationCount();
 	}
 
 	loadFormModels(): void {
@@ -126,8 +125,6 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 						fm => fm.formModelId === this.selectedFormModel!.formModelId
 					) || null;
 				}
-				this.pendingLayouts.clear();
-				this.modifiedLayoutIds = new Set();
 				this.loading = false;
 				this.emitContext();
 			},
@@ -139,46 +136,16 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		});
 	}
 
-	onLayoutChanged(layout: Layout): void {
-		if(layout.formLayoutId && this.selectedFormModel) {
-			this.modifiedLayoutIds = new Set([...this.modifiedLayoutIds, layout.formLayoutId]);
-			this.pendingLayouts.set(layout.formLayoutId, {
-				layout: JSON.parse(JSON.stringify(layout)),
-				formModelId: this.selectedFormModel.formModelId
-			});
-			const idx = this.layouts.findIndex(l => l.formLayoutId === layout.formLayoutId);
-			if(idx !== -1) {
-				this.layouts[idx] = layout;
-			}
-		}
-		this.emitModificationChange();
-	}
-
-	saveLayouts(): Observable<void> {
-		if(this.pendingLayouts.size === 0) {
-			return of(void 0);
-		}
-		const saves = Array.from(this.pendingLayouts.entries()).map(([layoutId, {layout, formModelId}]) =>
-			this.formLayoutService.updateLayout(this.projectId, formModelId, layoutId, layout)
-		);
-		return forkJoin(saves).pipe(
-			map(() => {
-				this.pendingLayouts.clear();
-				this.modifiedLayoutIds = new Set();
-				this.emitModificationChange();
-			})
-		);
-	}
-
 	discardLayouts(): void {
-		this.pendingLayouts.clear();
-		this.modifiedLayoutIds = new Set();
+		this.formLayoutEditor?.discardChanges();
+	}
+
+	get isSplitEditActive(): boolean {
+		return this.formLayoutEditor?.isSplitEditActive() ?? false;
+	}
+
+	onLayoutUnsavedChanges(_hasChanges: boolean): void {
 		this.emitModificationChange();
-		if(this.viewMode === 'layout-detail') {
-			this.viewMode = 'layout-list';
-			this.selectedLayout = null;
-			this.emitContext();
-		}
 	}
 
 	onSelectFormModel(formModel: FormModel): void {
@@ -197,7 +164,6 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	private clearSelectionInternal(): void {
 		this.selectedFormModel = null;
-		this.selectedLayout = null;
 		this.viewMode = 'form-list';
 		this.nodeSelected.emit('form-models');
 	}
@@ -205,18 +171,10 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	private selectFormModel(formModel: FormModel): void {
 		const previous = this.selectedFormModel?.formModelId;
 		this.selectedFormModel = formModel;
-		this.selectedLayout = null;
 		if(previous !== formModel.formModelId) {
 			this.viewMode = 'form-detail';
-			this.formLayoutService.getLayouts(this.projectId, formModel.formModelId).subscribe({
-				next: layouts => {
-					this.layouts = layouts;
-					this.emitContext();
-				},
-				error: () => {
-					this.layouts = [];
-					this.emitContext();
-				}
+			this.formLayoutManager.load(this.projectId, formModel.formModelId).subscribe(() => {
+				this.emitContext();
 			});
 		}
 		else {
@@ -233,45 +191,29 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		if(!this.selectedFormModel) {
 			return;
 		}
-		this.viewMode = 'layout-list';
-		this.selectedLayout = null;
+		this.viewMode = 'layout-editor';
+		this.emitContext();
+	}
+
+	switchToPreview(): void {
+		if(!this.selectedFormModel) {
+			return;
+		}
+		this.viewMode = 'layout-preview';
 		this.emitContext();
 	}
 
 	backToFormDetail(): void {
 		this.viewMode = 'form-detail';
-		this.selectedLayout = null;
 		this.emitContext();
 	}
 
-	onSelectLayout(layout: Layout): void {
-		if(this.selectedLayout?.formLayoutId === layout.formLayoutId) {
-			this.selectedLayout = null;
-			this.viewMode = 'layout-list';
-		}
-		else {
-			this.selectedLayout = layout;
-			this.viewMode = 'layout-detail';
-		}
+	onLayoutCreated(_layout: Layout): void {
 		this.emitContext();
 	}
 
-	onLayoutCreated(layout: Layout): void {
-		this.layouts = [...this.layouts, layout];
-		this.selectedLayout = layout;
-		this.viewMode = 'layout-detail';
+	onLayoutDeleted(_layoutId: string): void {
 		this.emitContext();
-	}
-
-	onLayoutDeleted(layoutId: string): void {
-		this.layouts = this.layouts.filter(l => l.formLayoutId !== layoutId);
-		this.modifiedLayoutIds = new Set([...this.modifiedLayoutIds].filter(id => id !== layoutId));
-		this.pendingLayouts.delete(layoutId);
-		if(this.selectedLayout?.formLayoutId === layoutId) {
-			this.selectedLayout = null;
-			this.viewMode = 'layout-list';
-			this.emitContext();
-		}
 	}
 
 	onCreateFormModel(): void {
@@ -323,17 +265,15 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	}
 
 	private emitModificationChange(): void {
-		this.formModelsChanged.emit(
-			this.totalModificationCount > 0 || this.modifiedLayoutIds.size > 0
-		);
+		this.formModelsChanged.emit(this.totalModificationCount > 0);
 	}
 
 	private emitContext(): void {
 		this.formModelContextChanged.emit({
 			formModels: [...this.formModels],
-			layouts: [...this.layouts],
+			layouts: [...this.formLayoutManager.getAll()],
 			selectedFormModelId: this.selectedFormModel?.formModelId || null,
-			selectedLayoutId: this.selectedLayout?.formLayoutId || null
+			selectedLayoutId: null
 		});
 	}
 }

@@ -42,19 +42,19 @@ export class FormModelTreeComponent extends BaseTreeComponent {
 				themeClass: 'theme-form-model'
 			};
 
-			if(this.selectedFormModelId === fm.formModelId && this.layouts.length > 0) {
-				const layoutNodes: TreeNode[] = this.layouts.map(layout => ({
-					id: `layout-${layout.formLayoutId}`,
-					label: layout.id,
-					icon: 'view_quilt',
-					type: 'layout',
-					selected: this.selectedLayoutId === layout.formLayoutId,
-					entityId: layout.formLayoutId,
-					themeClass: 'theme-form-layout'
-				}));
+			if(this.selectedFormModelId === fm.formModelId) {
+				const formLayouts = this.layouts.filter(l => l.formModelId === fm.formModelId);
 
-				if(layoutNodes.length > 0) {
-					node.children = layoutNodes;
+				if(formLayouts.length > 0) {
+					node.children = formLayouts.map(layout => ({
+						id: `layout-${layout.formLayoutId}`,
+						label: layout.id,
+						icon: 'view_quilt',
+						type: 'layout',
+						selected: this.selectedLayoutId === layout.formLayoutId,
+						entityId: layout.formLayoutId,
+						themeClass: 'theme-form-layout'
+					}));
 					node.expanded = true;
 				}
 			}

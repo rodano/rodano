@@ -96,6 +96,25 @@
 	line-height: 1.25rem;
 }
 
+.detail-container > app-form-model-list,
+.detail-container > app-scope-models-list,
+.detail-container > app-dataset-model-list,
+.detail-container > app-workflow-list,
+.detail-container > app-validators-list,
+.detail-container > app-profile-list,
+.detail-container > app-feature-list,
+.detail-container > app-privacy-policy-list,
+.detail-container > app-resource-category-list,
+.detail-container > app-report-list,
+.detail-container > app-chart-list,
+.detail-container > app-project-settings-detail {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
 @media (max-width: 768px) {
 	.welcome-state {
 		padding: 2rem 1rem;

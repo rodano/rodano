@@ -100,6 +100,7 @@ public class FormModelWriter extends BaseWriter {
 				final List<PendingTarget> pendingTargets = new java.util.ArrayList<>();
 
 				if(formModel.getLayouts() != null && !formModel.getLayouts().isEmpty()) {
+					int layoutOrder = 0;
 					for(FormModelLayout layout : formModel.getLayouts()) {
 						final String layoutCode = layout.getId();
 						final UUID layoutId = deterministic(projectId, "FORM_LAYOUT", formModel.getId() + "|" + layoutCode);
@@ -119,6 +120,7 @@ public class FormModelWriter extends BaseWriter {
 							.set(FORM_LAYOUT.DESCRIPTION, toJson(layout.getDescription()))
 							.set(FORM_LAYOUT.TEXT_BEFORE, toJson(layout.getTextBefore()))
 							.set(FORM_LAYOUT.TEXT_AFTER, toJson(layout.getTextAfter()))
+							.set(FORM_LAYOUT.SORT_ORDER, layoutOrder)
 							.onDuplicateKeyUpdate()
 							.set(FORM_LAYOUT.TYPE, layout.getType())
 							.set(FORM_LAYOUT.CSS_CODE, layout.getCssCode())
@@ -127,7 +129,10 @@ public class FormModelWriter extends BaseWriter {
 							.set(FORM_LAYOUT.DESCRIPTION, toJson(layout.getDescription()))
 							.set(FORM_LAYOUT.TEXT_BEFORE, toJson(layout.getTextBefore()))
 							.set(FORM_LAYOUT.TEXT_AFTER, toJson(layout.getTextAfter()))
+							.set(FORM_LAYOUT.SORT_ORDER, layoutOrder)
 							.execute();
+
+						layoutOrder++;
 
 						if(layout.getConstraint() != null) {
 							insertConstraintForOwner(tx, projectId, "FORM_LAYOUT", layoutId, layout.getConstraint(), RuleConstraintConstraintType.DEFAULT);

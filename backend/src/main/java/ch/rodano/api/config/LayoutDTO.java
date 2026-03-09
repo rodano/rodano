@@ -44,6 +44,8 @@ public class LayoutDTO {
 
 	String cssCode;
 
+	int sortOrder;
+
 	public UUID getFormLayoutId() {
 		return formLayoutId;
 	}
@@ -162,5 +164,13 @@ public class LayoutDTO {
 
 	public void setCssCode(final String cssCode) {
 		this.cssCode = cssCode;
+	}
+
+	public int getSortOrder() {
+		return sortOrder;
+	}
+
+	public void setSortOrder(final int sortOrder) {
+		this.sortOrder = sortOrder;
 	}
 }

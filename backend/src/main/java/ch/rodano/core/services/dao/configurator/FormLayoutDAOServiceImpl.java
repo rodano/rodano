@@ -61,7 +61,7 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 			.selectFrom(FORM_LAYOUT)
 			.where(FORM_LAYOUT.PROJECT_ID.eq(projectId))
 			.and(FORM_LAYOUT.FORM_MODEL_ID.eq(formModelId))
-			.orderBy(FORM_LAYOUT.CODE)
+			.orderBy(FORM_LAYOUT.SORT_ORDER.asc())
 			.fetch();
 
 		if(records.isEmpty()) {
@@ -109,6 +109,7 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 			.set(FORM_LAYOUT.TEXT_BEFORE, jsonMapperService.toJson(dto.getTextBefore()))
 			.set(FORM_LAYOUT.TEXT_AFTER, jsonMapperService.toJson(dto.getTextAfter()))
 			.set(FORM_LAYOUT.CSS_CODE, dto.getCssCode())
+			.set(FORM_LAYOUT.SORT_ORDER, dto.getSortOrder())
 			.execute();
 
 		replaceLayoutContent(projectId, formModelId, formLayoutId, dto);
@@ -132,6 +133,7 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 			.set(FORM_LAYOUT.TEXT_BEFORE, jsonMapperService.toJson(dto.getTextBefore()))
 			.set(FORM_LAYOUT.TEXT_AFTER, jsonMapperService.toJson(dto.getTextAfter()))
 			.set(FORM_LAYOUT.CSS_CODE, dto.getCssCode())
+			.set(FORM_LAYOUT.SORT_ORDER, dto.getSortOrder())
 			.where(FORM_LAYOUT.PROJECT_ID.eq(projectId))
 			.and(FORM_LAYOUT.FORM_LAYOUT_ID.eq(formLayoutId))
 			.execute();
@@ -148,7 +150,7 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 		@CacheEvict(value = "layout", key = "#projectId.toString() + ':' + #formModelId.toString() + ':' + #formLayoutId.toString()")
 	})
 	public void deleteLayout(final UUID projectId, final UUID formModelId, final UUID formLayoutId) {
-		deleteLayoutContent(projectId, formLayoutId);
+		deleteLayoutContent(projectId, formModelId, formLayoutId);
 
 		dslContext.deleteFrom(FORM_LAYOUT)
 			.where(FORM_LAYOUT.PROJECT_ID.eq(projectId))
@@ -157,7 +159,7 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 	}
 
 	private void replaceLayoutContent(final UUID projectId, final UUID formModelId, final UUID formLayoutId, final LayoutDTO dto) {
-		deleteLayoutContent(projectId, formLayoutId);
+		deleteLayoutContent(projectId, formModelId, formLayoutId);
 
 		if(dto.getColumns() != null) {
 			for(int i = 0; i < dto.getColumns().size(); i++) {
@@ -286,59 +288,118 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 		}
 	}
 
-	private void deleteLayoutContent(final UUID projectId, final UUID formLayoutId) {
-		final var lineIdSubquery = dslContext
+	private void deleteLayoutContent(final UUID projectId, final UUID formModelId, final UUID formLayoutId) {
+		final var colOrders = dslContext
+			.select(FORM_LAYOUT_COLUMN.COL_ORDER)
+			.from(FORM_LAYOUT_COLUMN)
+			.where(FORM_LAYOUT_COLUMN.PROJECT_ID.eq(projectId))
+			.and(FORM_LAYOUT_COLUMN.FORM_MODEL_ID.eq(formModelId))
+			.and(FORM_LAYOUT_COLUMN.FORM_LAYOUT_ID.eq(formLayoutId))
+			.fetchInto(Integer.class);
+
+		final var lineIds = dslContext
 			.select(FORM_LAYOUT_LINE.FORM_LAYOUT_LINE_ID)
 			.from(FORM_LAYOUT_LINE)
 			.where(FORM_LAYOUT_LINE.PROJECT_ID.eq(projectId))
-			.and(FORM_LAYOUT_LINE.FORM_LAYOUT_ID.eq(formLayoutId));
-
-		final var cellIdSubquery = dslContext
-			.select(FORM_LAYOUT_CELL.FORM_LAYOUT_CELL_ID)
-			.from(FORM_LAYOUT_CELL)
-			.where(FORM_LAYOUT_CELL.PROJECT_ID.eq(projectId))
-			.and(FORM_LAYOUT_CELL.FORM_LAYOUT_LINE_ID.in(lineIdSubquery));
-
-		final var criteriaIdSubquery = dslContext
-			.select(FORM_CELL_VISIBILITY_CRITERIA.FORM_CELL_VISIBLE_CRITERIA_ID)
-			.from(FORM_CELL_VISIBILITY_CRITERIA)
-			.where(FORM_CELL_VISIBILITY_CRITERIA.PROJECT_ID.eq(projectId))
-			.and(FORM_CELL_VISIBILITY_CRITERIA.FORM_LAYOUT_CELL_ID.in(cellIdSubquery));
-
-		dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA_VALUE)
-			.where(FORM_CELL_VISIBILITY_CRITERIA_VALUE.PROJECT_ID.eq(projectId))
-			.and(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_CELL_VISIBLE_CRITERIA_ID.in(criteriaIdSubquery))
-			.execute();
-
-		dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT)
-			.where(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.PROJECT_ID.eq(projectId))
-			.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.FORM_CELL_VISIBLE_CRITERIA_ID.in(criteriaIdSubquery))
-			.execute();
-
-		dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL)
-			.where(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.PROJECT_ID.eq(projectId))
-			.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.FORM_CELL_VISIBLE_CRITERIA_ID.in(criteriaIdSubquery))
-			.execute();
-
-		dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA)
-			.where(FORM_CELL_VISIBILITY_CRITERIA.PROJECT_ID.eq(projectId))
-			.and(FORM_CELL_VISIBILITY_CRITERIA.FORM_LAYOUT_CELL_ID.in(cellIdSubquery))
-			.execute();
-
-		dslContext.deleteFrom(FORM_LAYOUT_CELL)
-			.where(FORM_LAYOUT_CELL.PROJECT_ID.eq(projectId))
-			.and(FORM_LAYOUT_CELL.FORM_LAYOUT_LINE_ID.in(lineIdSubquery))
-			.execute();
-
-		dslContext.deleteFrom(FORM_LAYOUT_COLUMN)
-			.where(FORM_LAYOUT_COLUMN.PROJECT_ID.eq(projectId))
-			.and(FORM_LAYOUT_COLUMN.FORM_LAYOUT_ID.eq(formLayoutId))
-			.execute();
-
-		dslContext.deleteFrom(FORM_LAYOUT_LINE)
-			.where(FORM_LAYOUT_LINE.PROJECT_ID.eq(projectId))
+			.and(FORM_LAYOUT_LINE.FORM_MODEL_ID.eq(formModelId))
 			.and(FORM_LAYOUT_LINE.FORM_LAYOUT_ID.eq(formLayoutId))
-			.execute();
+			.fetchInto(UUID.class);
+
+		final var cellIds = lineIds.isEmpty() ? List.<UUID> of() :
+			dslContext
+				.select(FORM_LAYOUT_CELL.FORM_LAYOUT_CELL_ID)
+				.from(FORM_LAYOUT_CELL)
+				.where(FORM_LAYOUT_CELL.PROJECT_ID.eq(projectId))
+				.and(FORM_LAYOUT_CELL.FORM_MODEL_ID.eq(formModelId))
+				.and(FORM_LAYOUT_CELL.FORM_LAYOUT_ID.eq(formLayoutId))
+				.and(FORM_LAYOUT_CELL.FORM_LAYOUT_LINE_ID.in(lineIds))
+				.fetchInto(UUID.class);
+
+		final var criteriaIds = cellIds.isEmpty() ? List.<UUID> of() :
+			dslContext
+				.select(FORM_CELL_VISIBILITY_CRITERIA.FORM_CELL_VISIBLE_CRITERIA_ID)
+				.from(FORM_CELL_VISIBILITY_CRITERIA)
+				.where(FORM_CELL_VISIBILITY_CRITERIA.PROJECT_ID.eq(projectId))
+				.and(FORM_CELL_VISIBILITY_CRITERIA.FORM_LAYOUT_CELL_ID.in(cellIds))
+				.fetchInto(UUID.class);
+
+		if(!criteriaIds.isEmpty()) {
+			final var valueRecords = dslContext
+				.selectFrom(FORM_CELL_VISIBILITY_CRITERIA_VALUE)
+				.where(FORM_CELL_VISIBILITY_CRITERIA_VALUE.PROJECT_ID.eq(projectId))
+				.and(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_CELL_VISIBLE_CRITERIA_ID.in(criteriaIds))
+				.fetch();
+
+			for(final var row : valueRecords) {
+				dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA_VALUE)
+					.where(FORM_CELL_VISIBILITY_CRITERIA_VALUE.PROJECT_ID.eq(row.getProjectId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_CELL_VISIBLE_CRITERIA_ID.eq(row.getFormCellVisibleCriteriaId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_LAYOUT_CELL_ID.eq(row.getFormLayoutCellId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_VALUE.LINE_ORDER.eq(row.getLineOrder()))
+					.execute();
+			}
+
+			final var targetLayoutRecords = dslContext
+				.selectFrom(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT)
+				.where(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.PROJECT_ID.eq(projectId))
+				.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.FORM_CELL_VISIBLE_CRITERIA_ID.in(criteriaIds))
+				.fetch();
+
+			for(final var row : targetLayoutRecords) {
+				dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT)
+					.where(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.PROJECT_ID.eq(row.getProjectId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.FORM_CELL_VISIBLE_CRITERIA_ID.eq(row.getFormCellVisibleCriteriaId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.FORM_LAYOUT_CELL_ID.eq(row.getFormLayoutCellId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.LINE_ORDER.eq(row.getLineOrder()))
+					.execute();
+			}
+
+			final var targetCellRecords = dslContext
+				.selectFrom(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL)
+				.where(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.PROJECT_ID.eq(projectId))
+				.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.FORM_CELL_VISIBLE_CRITERIA_ID.in(criteriaIds))
+				.fetch();
+
+			for(final var row : targetCellRecords) {
+				dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL)
+					.where(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.PROJECT_ID.eq(row.getProjectId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.FORM_CELL_VISIBLE_CRITERIA_ID.eq(row.getFormCellVisibleCriteriaId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.FORM_LAYOUT_CELL_ID.eq(row.getFormLayoutCellId()))
+					.and(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.LINE_ORDER.eq(row.getLineOrder()))
+					.execute();
+			}
+		}
+
+		if(!cellIds.isEmpty()) {
+			dslContext.deleteFrom(FORM_CELL_VISIBILITY_CRITERIA)
+				.where(FORM_CELL_VISIBILITY_CRITERIA.PROJECT_ID.eq(projectId))
+				.and(FORM_CELL_VISIBILITY_CRITERIA.FORM_LAYOUT_CELL_ID.in(cellIds))
+				.execute();
+
+			dslContext.deleteFrom(FORM_LAYOUT_CELL)
+				.where(FORM_LAYOUT_CELL.PROJECT_ID.eq(projectId))
+				.and(FORM_LAYOUT_CELL.FORM_MODEL_ID.eq(formModelId))
+				.and(FORM_LAYOUT_CELL.FORM_LAYOUT_ID.in(formLayoutId))
+				.and(FORM_LAYOUT_CELL.FORM_LAYOUT_CELL_ID.in(cellIds))
+				.execute();
+		}
+
+		if(!colOrders.isEmpty()) {
+			dslContext.deleteFrom(FORM_LAYOUT_COLUMN)
+				.where(FORM_LAYOUT_COLUMN.PROJECT_ID.eq(projectId))
+				.and(FORM_LAYOUT_COLUMN.FORM_MODEL_ID.eq(formModelId))
+				.and(FORM_LAYOUT_COLUMN.FORM_LAYOUT_ID.eq(formLayoutId))
+				.and(FORM_LAYOUT_COLUMN.COL_ORDER.in(colOrders))
+				.execute();
+		}
+
+		if(!lineIds.isEmpty()) {
+			dslContext.deleteFrom(FORM_LAYOUT_LINE)
+				.where(FORM_LAYOUT_LINE.PROJECT_ID.eq(projectId))
+				.and(FORM_LAYOUT_LINE.FORM_MODEL_ID.eq(formModelId))
+				.and(FORM_LAYOUT_LINE.FORM_LAYOUT_ID.eq(formLayoutId))
+				.execute();
+		}
 	}
 
 	private List<LayoutDTO> mapToDTOs(final UUID projectId, final List<FormLayoutRecord> records) {
@@ -555,6 +616,7 @@ public class FormLayoutDAOServiceImpl implements FormLayoutDAOService {
 		dto.setTextAfter(jsonMapperService.fromJson(record.getTextAfter(), new TypeReference<TreeMap<String, String>>() {
 		}));
 		dto.setCssCode(record.getCssCode());
+		dto.setSortOrder(record.getSortOrder());
 		dto.setColumns(columns);
 		dto.setLines(lines);
 		return dto;

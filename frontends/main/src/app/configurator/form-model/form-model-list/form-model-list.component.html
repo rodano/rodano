@@ -1,6 +1,6 @@
 <app-list-header title="Form Models" subtitle="Configure forms and their layouts" />
 
-@if (viewMode === 'layout-detail' && selectedLayout && selectedFormModel) {
+@if (viewMode === 'layout-editor' && selectedFormModel) {
 	<div class="layout-fullscreen">
 		<div class="layout-breadcrumb">
 			<button class="breadcrumb-btn" (click)="clearSelection()">
@@ -8,44 +8,44 @@
 				<span>Form Models</span>
 			</button>
 			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
-			<button class="breadcrumb-btn" (click)="onSelectFormModel(selectedFormModel)">
+			<button class="breadcrumb-btn" (click)="backToFormDetail()">
 				<span>{{ languageService.getTranslatedName(selectedFormModel.shortname) }}</span>
 			</button>
 			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
-			<button class="breadcrumb-btn" (click)="switchToLayoutView()">
-				<span>Layouts</span>
-			</button>
-			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
-			<span class="breadcrumb-current">{{ selectedLayout.id }}</span>
-		</div>
+			<span class="breadcrumb-current">Layouts</span>
 
-		<div class="layout-workspace">
-			<div class="layout-sidebar">
-				<app-form-layout-list
-					[projectId]="projectId"
-					[project]="project"
-					[formModelId]="selectedFormModel.formModelId"
-					[selectedLayoutId]="selectedLayout.formLayoutId || null"
-					[compact]="true"
-					[modifiedLayoutIds]="modifiedLayoutIds"
-					(layoutSelected)="onSelectLayout($event)"
-					(layoutCreated)="onLayoutCreated($event)"
-					(layoutDeleted)="onLayoutDeleted($event)">
-				</app-form-layout-list>
-			</div>
-
-			<div class="layout-editor-area">
-				<app-form-layout-editor
-					[projectId]="projectId"
-					[project]="project"
-					[formModelId]="selectedFormModel.formModelId"
-					[layout]="selectedLayout"
-					[allLayouts]="layouts"
-					(closed)="switchToLayoutView()"
-					(layoutChanged)="onLayoutChanged($event)">
-				</app-form-layout-editor>
+			<div class="breadcrumb-actions">
+				<button class="breadcrumb-btn"
+												[class.breadcrumb-btn-active]="isSplitEditActive"
+												(click)="formLayoutEditor?.toggleSplitEditMode()"
+												matTooltip="Edit label/input widths">
+					<mat-icon>vertical_split</mat-icon>
+					<span>Split Edit</span>
+				</button>
+				<button class="breadcrumb-btn" (click)="switchToPreview()">
+					<mat-icon>visibility</mat-icon>
+					<span>Preview</span>
+				</button>
 			</div>
 		</div>
+
+		<app-form-layout-editor
+			[projectId]="projectId"
+			[project]="project"
+			[formModelId]="selectedFormModel.formModelId"
+			(closed)="backToFormDetail()"
+			(unsavedChanges)="onLayoutUnsavedChanges($event)"
+			(layoutCreated)="onLayoutCreated($event)"
+			(layoutDeleted)="onLayoutDeleted($event)">
+		</app-form-layout-editor>
+	</div>
+} @else if (viewMode === 'layout-preview' && selectedFormModel) {
+	<div class="layout-fullscreen">
+		<app-form-layout-preview
+			[projectId]="projectId"
+			[formModelId]="selectedFormModel.formModelId"
+			(closed)="switchToLayoutView()">
+		</app-form-layout-preview>
 	</div>
 } @else {
 	<div class="content-container"
@@ -88,9 +88,9 @@
 								<div class="card-header-badges">
 									@if (formModel.optional) {
 										<span class="status-badge first" matTooltip="Optional">
-                                            <mat-icon class="badge-full">toggle_off</mat-icon>
-                                            <mat-icon class="badge-short">toggle_off</mat-icon>
-                                        </span>
+											<mat-icon class="badge-full">toggle_off</mat-icon>
+											<mat-icon class="badge-short">toggle_off</mat-icon>
+										</span>
 									}
 								</div>
 							</div>
@@ -122,34 +122,6 @@
 					/>
 				}
 			</div>
-
-			@if (viewMode === 'layout-list') {
-				<div class="secondary-column">
-					<div class="secondary-column-header">
-						<div class="header-with-back">
-							<button class="btn-back" (click)="backToFormDetail()">
-								<mat-icon>arrow_back</mat-icon>
-							</button>
-							<div>
-								<h2>Layouts</h2>
-								<p class="column-subtitle">{{ selectedFormModel ? languageService.getTranslatedName(selectedFormModel.shortname) : '' }}</p>
-							</div>
-						</div>
-					</div>
-					<div class="secondary-column-content">
-						<app-form-layout-list
-							[projectId]="projectId"
-							[project]="project"
-							[formModelId]="selectedFormModel!.formModelId"
-							[selectedLayoutId]="selectedLayout?.formLayoutId || null"
-							[modifiedLayoutIds]="modifiedLayoutIds"
-							(layoutSelected)="onSelectLayout($event)"
-							(layoutCreated)="onLayoutCreated($event)"
-							(layoutDeleted)="onLayoutDeleted($event)">
-						</app-form-layout-list>
-					</div>
-				</div>
-			}
 
 			@if (selectedFormModel && viewMode === 'form-detail') {
 				<div class="detail-panel">
