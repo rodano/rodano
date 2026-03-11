@@ -3,8 +3,8 @@ package ch.rodano.api.configuration.handler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
-
-import jakarta.validation.ConstraintViolationException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import ch.rodano.api.controller.form.exception.DatasetSubmissionException;
-import ch.rodano.api.exception.ErrorDetails;
 import ch.rodano.api.exception.ManagedException;
-import ch.rodano.api.exception.ValidationErrorResponse;
-import ch.rodano.api.exception.Violation;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.actor.Actor;
@@ -67,7 +64,7 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		this.sendExceptionEmail = sendExceptionEmail;
 		this.exceptionEmailRecipient = exceptionEmailRecipient;
 
-		//a context must be provided to send an e-mail even it will not be used because e-mails are not audited
+		//a context must be provided to send an e-mail even if it will not be used because e-mails are not audited
 		this.context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, INTERNAL_ERROR_MESSAGE);
 	}
 
@@ -100,19 +97,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		if(e instanceof IllegalArgumentException) {
 			logger.info(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(new ErrorDetails(HttpStatus.BAD_REQUEST, e.getMessage(), path), HttpStatus.BAD_REQUEST);
-		}
-
-		if(e instanceof final ConstraintViolationException exc) {
-			logger.info(e.getLocalizedMessage(), e);
-			final var violations = exc.getConstraintViolations().stream()
-				.map(constraintViolation -> {
-					// Remove the function name from the property path, it is confusing for the clients of the API
-					final var propertyPath = constraintViolation.getPropertyPath().toString().split("\\.", 2)[1];
-					return new Violation(propertyPath, constraintViolation.getMessage());
-				})
-				.toList();
-
-			return new ResponseEntity<>(new ValidationErrorResponse(violations), HttpStatus.BAD_REQUEST);
 		}
 
 		//starting from here, we are managing "unexpected" exceptions
@@ -174,11 +158,15 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		final HttpStatusCode status,
 		final WebRequest request
 	) {
-		final var violations = ex.getBindingResult().getFieldErrors().stream()
-			.map(fieldError -> new Violation(fieldError.getObjectName() + "." + fieldError.getField(), fieldError.getDefaultMessage()))
-			.toList();
+		final var message = Stream.concat(
+			ex.getBindingResult().getFieldErrors().stream()
+				.map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage()),
+			ex.getBindingResult().getGlobalErrors().stream()
+				.map(globalError -> globalError.getObjectName() + ": " + globalError.getDefaultMessage())
+		).collect(Collectors.joining(", "));
 
-		return new ResponseEntity<>(new ValidationErrorResponse(violations), HttpStatus.BAD_REQUEST);
+		final var path = request.getDescription(false);
+		return new ResponseEntity<>(new ErrorDetails(HttpStatus.BAD_REQUEST, message, path), HttpStatus.BAD_REQUEST);
 	}
 
 	//returns true if the exception is worth sending an e-mail

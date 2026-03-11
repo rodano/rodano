@@ -1,4 +1,4 @@
-package ch.rodano.api.exception;
+package ch.rodano.api.configuration.handler;
 
 import java.time.ZonedDateTime;
 

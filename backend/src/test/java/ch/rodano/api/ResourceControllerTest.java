@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
 
+import ch.rodano.api.configuration.handler.ErrorDetails;
 import ch.rodano.api.dto.paging.PagedResult;
-import ch.rodano.api.exception.ErrorDetails;
 import ch.rodano.api.resource.ResourceDTO;
 import ch.rodano.api.resource.ResourceSubmissionDTO;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
