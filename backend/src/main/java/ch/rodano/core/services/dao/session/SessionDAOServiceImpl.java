@@ -30,10 +30,9 @@ public class SessionDAOServiceImpl implements SessionDAOService {
 	}
 
 	@Override
-	public Session updateSession(final Session session) {
+	public void updateSession(final Session session) {
 		final var record = create.newRecord(USER_SESSION, session);
 		record.update();
-		return session;
 	}
 
 	@Override

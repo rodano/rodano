@@ -19,9 +19,8 @@ public interface SessionDAOService {
 	 * Update a session
 	 *
 	 * @param session The session to update
-	 * @return The saved session
 	 */
-	Session updateSession(Session session);
+	void updateSession(Session session);
 
 	/**
 	 * Delete a session

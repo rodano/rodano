@@ -23,7 +23,7 @@ public interface SessionService {
 	 * @param session The session to update
 	 * @return The updated session
 	 */
-	Session refreshSession(Session session);
+	void refreshSession(Session session);
 
 	/**
 	 * Delete a session by its token

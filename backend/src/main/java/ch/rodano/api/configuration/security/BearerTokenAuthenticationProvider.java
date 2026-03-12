@@ -72,6 +72,7 @@ public class BearerTokenAuthenticationProvider implements AuthenticationProvider
 			}
 
 			// Get the user and their roles
+			//TODO fetch user and roles in a single request
 			final var user = userDAOService.getUserByPk(session.getUserFk());
 			final var roles = roleService.getActiveRoles(user);
 

@@ -35,9 +35,9 @@ public class SessionServiceImpl implements SessionService {
 	}
 
 	@Override
-	public Session refreshSession(final Session session) {
+	public void refreshSession(final Session session) {
 		session.setLastAccessTime(ZonedDateTime.now());
-		return sessionDAOService.updateSession(session);
+		sessionDAOService.updateSession(session);
 	}
 
 	@Override
