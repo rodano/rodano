@@ -18468,7 +18468,7 @@
 					"description": {},
 					"rules": [
 						{
-							"description": "Unveryf all fields",
+							"description": "Unverify all fields",
 							"constraint": {
 								"conditions": {
 									"SCOPE": {
