@@ -14,6 +14,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.session.SessionService;
@@ -55,6 +56,7 @@ public class BearerTokenAuthenticationProvider implements AuthenticationProvider
 	 * @throws AuthenticationException if authentication fails.
 	 */
 	@Override
+	@Transactional
 	public Authentication authenticate(final Authentication authentication) {
 		// Get the token
 		final var token = authentication.getCredentials().toString();
