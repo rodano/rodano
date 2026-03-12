@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -46,7 +47,7 @@ public class StatisticsChartFactoryService {
 	private Optional<ChartRange> findRange(final Chart chart, final String key) {
 		//try to find exact match
 		for(final ChartRange range : chart.getValueRanges()) {
-			if(StringUtils.equals(range.getValue(), key)) {
+			if(Strings.CS.equals(range.getValue(), key)) {
 				return Optional.of(range);
 			}
 		}

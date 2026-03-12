@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -41,7 +42,7 @@ public class BearerTokenAuthenticationFilter extends OncePerRequestFilter {
 		final var authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
 		// Check that it has the 'Bearer' prefix
-		if(StringUtils.startsWith(authorizationHeader, AUTHORIZATION_BEARER_PREFIX)) {
+		if(Strings.CS.startsWith(authorizationHeader, AUTHORIZATION_BEARER_PREFIX)) {
 			// Extract the token from the HTTP Authorization header
 			final var token = StringUtils.substringAfter(authorizationHeader, AUTHORIZATION_BEARER_PREFIX).trim();
 

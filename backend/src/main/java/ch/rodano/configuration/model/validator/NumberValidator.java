@@ -1,6 +1,7 @@
 package ch.rodano.configuration.model.validator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import ch.rodano.configuration.model.field.FieldModel;
 
@@ -55,12 +56,12 @@ public class NumberValidator implements ValueFormatValidator {
 
 			if(fieldModel.isDecimal()) {
 				// Add a single leading zero for values starting with dot
-				if(StringUtils.startsWith(sanitizedValue, ".")) {
+				if(Strings.CS.startsWith(sanitizedValue, ".")) {
 					return "0" + sanitizedValue;
 				}
 
 				// Strip ending dot
-				if(StringUtils.endsWith(sanitizedValue, ".")) {
+				if(Strings.CS.endsWith(sanitizedValue, ".")) {
 					return StringUtils.substringBeforeLast(sanitizedValue, ".");
 				}
 			}
@@ -102,7 +103,7 @@ public class NumberValidator implements ValueFormatValidator {
 		}
 		else {
 			// Number is configured as an integer
-			if(StringUtils.contains(value, ".")) {
+			if(Strings.CS.contains(value, ".")) {
 				return InvalidInteger.wrongType();
 			}
 

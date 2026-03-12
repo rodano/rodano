@@ -3,7 +3,7 @@ package ch.rodano.core.configuration.openapi;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springdoc.core.utils.SpringDocUtils;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +43,7 @@ public class OpenAPIConfig {
 			@Override
 			protected String decorateModelName(final AnnotatedType type, final String originalName) {
 				//remove the DTO suffix
-				final var name = StringUtils.removeEnd(originalName, "DTO");
+				final var name = Strings.CS.removeEnd(originalName, "DTO");
 				//change reserved schema names
 				if(name != null && SCHEMA_RESERVED_NAMES.contains(name)) {
 					return name + "Model";

@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
@@ -260,10 +261,10 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 				.or(SCOPE.CODE.like(searchValue));
 			//add search on workflowable models
 			//@formatter:off
-			final Predicate<WorkflowableModel> containsSearch = w -> StringUtils.containsIgnoreCase(w.getId(), search)
-				|| StringUtils.containsIgnoreCase(w.getLocalizedShortname(languages), search)
-				|| StringUtils.containsIgnoreCase(w.getLocalizedLongname(languages), search)
-				|| StringUtils.containsIgnoreCase(w.getLocalizedDescription(languages), search);
+			final Predicate<WorkflowableModel> containsSearch = w -> Strings.CI.contains(w.getId(), search)
+				|| Strings.CI.contains(w.getLocalizedShortname(languages), search)
+				|| Strings.CI.contains(w.getLocalizedLongname(languages), search)
+				|| Strings.CI.contains(w.getLocalizedDescription(languages), search);
 			//@formatter:on
 			final var workflowables = new ArrayList<WorkflowableModel>();
 			for(final Workflow workflow : workflows) {
