@@ -3,17 +3,14 @@
 		<ol>
 			@for (section of layout().sections; track section.id) {
 				<li>
-					<span>
-						<a
-							[routerLink]="['./', {sectionId: section.id}]"
-							[class.active]="section.id === selectedSection()?.id"
-							class="main-content">
-							{{ section.labels | localizeMap }}
-							@if (sectionBadges().hasOwnProperty(section.id)) {
-								<span class="badge">{{ sectionBadges()[section.id] }}</span>
-							}
-						</a>
-					</span>
+					<a
+						[routerLink]="['./', {sectionId: section.id}]"
+						[class.active]="section.id === selectedSection()?.id">
+						{{ section.labels | localizeMap }}
+						@if (sectionBadges().hasOwnProperty(section.id)) {
+							<span class="badge">{{ sectionBadges()[section.id] }}</span>
+						}
+					</a>
 				</li>
 			}
 		</ol>

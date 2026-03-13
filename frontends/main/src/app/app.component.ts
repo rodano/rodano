@@ -36,6 +36,8 @@ export class AppComponent implements OnInit {
 					document.body.style.setProperty('--mat-sys-secondary-container', 'color(from var(--mat-sys-primary) display-p3 calc(r - 0.1) calc(g - 0.1) calc(b - 0.1))');
 					document.body.style.setProperty('--mat-sys-on-secondary-container', 'white');
 
+					document.body.style.setProperty('--themed-highlight-color', 'color-mix(in srgb, var(--mat-sys-primary) 15%, white)');
+
 					this.study.set(study);
 					this.displayContent.set(true);
 				},

@@ -67,6 +67,8 @@
 		--mat-form-field-container-height: 36px;
 		--mat-form-field-container-vertical-padding: 6px;
 		--mat-checkbox-label-text-size: 1rem;
+		//do not override any color of material here
+		//this should be done programmatically in the app.component.ts file based on the color of the study
 
 		//custom variables
 		--strong-highlight-color: #ccc;
@@ -338,6 +340,9 @@ nav.side-navigation {
 	}
 
 	li {
+		&:has(> a.active) {
+			background: var(--strong-highlight-color);
+		}
 		&.starting-block {
 			border-top: 1px solid var(--strong-border-color);
 		}
@@ -347,16 +352,11 @@ nav.side-navigation {
 		&.ending-block-light {
 			border-bottom: 1px solid var(--light-border-color);
 		}
-		& > span {
-			display: flex;
-			align-items: center;
-			&:has(a.active) {
-				background: var(--strong-highlight-color);
-			}
-		}
-		& .main-content {
+		& > * {
+			width: 100%;
+			box-sizing: border-box;
+			display: inline-block;
 			padding: 0.4rem;
-			flex-grow: 1;
 		}
 		& a {
 			text-decoration: none;

@@ -206,15 +206,20 @@ export class SideMenuComponent implements OnInit {
 		this.settingsService.set(SideMenuComponent.EVENT_ORDERS_SETTING_KEY_PREFIX, this.eventOrdersByEventGroupId);
 	}
 
-	generateToggleParameters(eventPk: number): Record<string, string> {
+	generateToggleParameters(eventPk: number): Record<string, string | null> {
 		//do not update expanded event pks here, it's used for the creation of a link to a new state
-		const eventPks = this.expandedEventPks().includes(eventPk)
+		//allow to open only one event at a time for now
+		return this.expandedEventPks().includes(eventPk)
+			? {[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: null}
+			: {[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: eventPk.toString()};
+		//allowing multiple open events is disabled for now
+		/*const eventPks = this.expandedEventPks().includes(eventPk)
 			? this.expandedEventPks().filter(pk => pk !== eventPk)
 			: [...this.expandedEventPks(), eventPk];
 		if(eventPks.length === 0) {
 			return {};
 		}
-		return {[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: eventPks.join(',')};
+		return {[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: eventPks.join(',')};*/
 	}
 
 	createEvent() {
