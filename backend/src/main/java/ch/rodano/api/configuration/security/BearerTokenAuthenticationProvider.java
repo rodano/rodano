@@ -1,6 +1,5 @@
 package ch.rodano.api.configuration.security;
 
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,16 +60,10 @@ public class BearerTokenAuthenticationProvider implements AuthenticationProvider
 		// Get the token
 		final var token = authentication.getCredentials().toString();
 
-		// Get the session associated with the token
-		final var session = sessionService.getSessionByToken(token);
+		// Get the session associated with the token, refreshing its last access time
+		final var session = sessionService.getAndUpdateSession(token);
 
 		if(session != null) {
-			// Update the user's last access date in the database if required
-			// Update session only once every 5 seconds to improve performance
-			if(session.getLastAccessTime().plusSeconds(5).isBefore(ZonedDateTime.now())) {
-				sessionService.refreshSession(session);
-			}
-
 			// Get the user and their roles
 			//TODO fetch user and roles in a single request
 			final var user = userDAOService.getUserByPk(session.getUserFk());

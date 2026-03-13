@@ -26,7 +26,7 @@ public class SessionServiceImpl implements SessionService {
 		final var session = new Session();
 		session.setUserFk(user.getPk());
 		session.setCreationTime(now);
-		session.setLastAccessTime(ZonedDateTime.now());
+		session.setLastAccessTime(now);
 
 		final var token = generateSessionToken();
 		session.setToken(token);
@@ -35,9 +35,8 @@ public class SessionServiceImpl implements SessionService {
 	}
 
 	@Override
-	public void refreshSession(final Session session) {
-		session.setLastAccessTime(ZonedDateTime.now());
-		sessionDAOService.updateSession(session);
+	public Session getAndUpdateSession(final String token) {
+		return sessionDAOService.getAndUpdateSession(token);
 	}
 
 	@Override

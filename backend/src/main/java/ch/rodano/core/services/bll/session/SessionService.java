@@ -18,17 +18,17 @@ public interface SessionService {
 	Session createSession(User user);
 
 	/**
-	 * Update a session
+	 * Check if a session matches the given token and update its last access time
 	 *
-	 * @param session The session to update
-	 * @return The updated session
+	 * @param token The token
+	 * @return The session with the given token
 	 */
-	void refreshSession(Session session);
+	Session getAndUpdateSession(String token);
 
 	/**
-	 * Delete a session by its token
+	 * Delete a session
 	 *
-	 * @param session The session token to delete
+	 * @param session The session to delete
 	 */
 	void deleteSession(Session session);
 

@@ -30,9 +30,12 @@ public class SessionDAOServiceImpl implements SessionDAOService {
 	}
 
 	@Override
-	public void updateSession(final Session session) {
-		final var record = create.newRecord(USER_SESSION, session);
-		record.update();
+	public Session getAndUpdateSession(final String token) {
+		return create.update(USER_SESSION)
+			.set(USER_SESSION.LAST_ACCESS_TIME, ZonedDateTime.now())
+			.where(USER_SESSION.TOKEN.eq(token))
+			.returningResult(USER_SESSION.fields())
+			.fetchOneInto(Session.class);
 	}
 
 	@Override

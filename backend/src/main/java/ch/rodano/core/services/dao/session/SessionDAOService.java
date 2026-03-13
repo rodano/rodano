@@ -16,11 +16,12 @@ public interface SessionDAOService {
 	Session insertSession(Session session);
 
 	/**
-	 * Update a session
+	 * Check if a session matches the given token and update its last access time
 	 *
-	 * @param session The session to update
+	 * @param token The token
+	 * @return The session with the given token
 	 */
-	void updateSession(Session session);
+	Session getAndUpdateSession(String token);
 
 	/**
 	 * Delete a session
