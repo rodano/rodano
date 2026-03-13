@@ -18,7 +18,7 @@
 				formControlName="profileId"
 				name="profileId">
 				<mat-option></mat-option>
-				@for (profile of profiles; track profile.id) {
+				@for (profile of profiles(); track profile.id) {
 					<mat-option [value]="profile.id">{{ profile.shortname | localizeMap }}</mat-option>
 				}
 			</mat-select>
@@ -28,7 +28,7 @@
 			<mat-label>Scope</mat-label>
 			<app-scope-picker
 				formControlName="scopePk"
-				[scopes]="scopes"
+				[scopes]="scopes()"
 				required></app-scope-picker>
 		</mat-form-field>
 
@@ -46,7 +46,7 @@
 			</mat-select>
 		</mat-form-field>
 
-		@if (showExternallyManaged) {
+		@if (showExternallyManaged()) {
 			<mat-form-field>
 				<mat-label>Externally managed</mat-label>
 				<mat-select
@@ -74,12 +74,12 @@
 	<button
 		mat-flat-button
 		[routerLink]="['/users', 'new']"
-		[disabled]="!me?.rights?.canCreateUser">
+		[disabled]="!me()?.rights?.canCreateUser">
 		<mat-icon>add</mat-icon>
 		New user
 	</button>
 </div>
 
 <app-user-list
-	[predicate]="predicate"
-	[showExternallyManaged]="showExternallyManaged"></app-user-list>
+	[predicate]="predicate()"
+	[showExternallyManaged]="showExternallyManaged()"></app-user-list>

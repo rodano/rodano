@@ -1,4 +1,4 @@
-import {Component, Inject, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, input} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {EPROInvitation} from '@core/model/epro-invitation';
 import {MatButton} from '@angular/material/button';
@@ -7,12 +7,13 @@ import {Profile} from '@core/model/profile';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-epro-invitation',
 	templateUrl: './epro-invitation.component.html',
 	imports: [MatDialogModule, MatButton, QRCodeComponent, LocalizeMapPipe]
 })
 export class EproInvitationComponent {
-	@Input() eproProfile: Profile;
+	readonly eproProfile = input.required<Profile>();
 
 	public qrCodeUrl: string;
 

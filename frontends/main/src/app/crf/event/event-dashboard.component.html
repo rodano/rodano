@@ -1,38 +1,38 @@
 <div class="content">
 	<h1>
-		{{ event.shortname }}
-		@if (event.locked) {
+		{{ event().shortname }}
+		@if (event().locked) {
 			<mat-icon>lock</mat-icon>
 		}
-		<app-audit-trail-button [event]="event" />
+		<app-audit-trail-button [event]="event()" />
 	</h1>
 
 	<p>
-		@if (event.expected) {
-			Expected date: {{ event.expectedDate | dateUTC }} (in {{ dateDifferenceInDays }} days)
+		@if (event().expected) {
+			Expected date: {{ event().expectedDate | dateUTC }} (in {{ dateDifferenceInDays() }} days)
 		} @else {
-			Effective date: {{ event.date | dateUTC }}
-			@if (event.endDate) {
-				to {{ event.endDate | dateUTC }}
+			Effective date: {{ event().date | dateUTC }}
+			@if (event().endDate) {
+				to {{ event().endDate! | dateUTC }}
 			}
 		}
 	</p>
 
 	<div class="workflow-statuses">
 		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
-		@for (status of event.workflowStatuses; track status.pk || status.workflowId) {
+		@for (status of event().workflowStatuses; track status.pk || status.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.EVENT"
 				[workflowStatus]="status"
-				[workflowable]="event"
+				[workflowable]="event()"
 				(actionResponse)="onWorkflowExecution($event)">
 			</app-workflow-status>
 		}
 		<!-- Display workflows that can be created -->
-		@for (workflow of event.possibleWorkflows; track workflow.id) {
+		@for (workflow of event().possibleWorkflows; track workflow.id) {
 			<app-workflow-status
 				[entity]="workflowableEntity.EVENT"
-				[workflowable]="event"
+				[workflowable]="event()"
 				[workflow]="workflow"
 				(actionResponse)="onWorkflowExecution($event)">
 			</app-workflow-status>
@@ -40,7 +40,7 @@
 	</div>
 
 	<p class="actions">
-		@if (event.removed) {
+		@if (event().removed) {
 			<button
 				mat-flat-button
 				(click)="restore()"
@@ -48,7 +48,7 @@
 				Restore
 			</button>
 		} @else {
-			@if (event.locked) {
+			@if (event().locked) {
 				<button
 					mat-flat-button
 					(click)="unlock()"
@@ -72,5 +72,7 @@
 		}
 	</p>
 
-	<app-issue-viewer [eventPks]="[event.pk]"></app-issue-viewer>
+	<app-issue-viewer
+		[scopePks]="[scope().pk]"
+		[eventPks]="[event().pk]"></app-issue-viewer>
 </div>

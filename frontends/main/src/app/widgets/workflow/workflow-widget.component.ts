@@ -1,4 +1,4 @@
-import {Component, ViewChild, Input, Output, EventEmitter, OnInit, DestroyRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ViewChild, computed, input, output, OnInit, DestroyRef, signal} from '@angular/core';
 import {WidgetService} from '@core/services/widget.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {merge} from 'rxjs';
@@ -6,7 +6,6 @@ import {MatTable, MatTableModule} from '@angular/material/table';
 import {MatSort} from '@angular/material/sort';
 import {switchMap, startWith, debounceTime} from 'rxjs/operators';
 import {PagedResultWorkflowStatusInfo} from '@core/model/paged-result-workflow-status-info';
-import {WorkflowWidget} from '@core/model/workflow-widget';
 import {WorkflowStatusInfo} from '@core/model/workflow-status-info';
 import {Scope} from '@core/model/scope';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -18,12 +17,13 @@ import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {RouterLink} from '@angular/router';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toSignal, toObservable} from '@angular/core/rxjs-interop';
 import {WorkflowWidgetSearch} from '@core/utilities/search/workflow-widget-search';
 import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-widget',
 	templateUrl: './workflow-widget.component.html',
 	styleUrls: ['./workflow-widget.component.css'],
@@ -46,18 +46,25 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	]
 })
 export class WorkflowWidgetComponent implements OnInit {
-	@Input() id: string;
-	@Input() scopes?: Scope[];
-	@Output() workflowsLoaded = new EventEmitter<number>();
+	readonly id = input.required<string>();
+	readonly scopes = input<Scope[]>();
+	readonly workflowsLoaded = output<number>();
+	private workflowsEmitted = false;
 
-	widget: WorkflowWidget;
-	columnsToDisplay: string[] = [];
-	workflowStatuses: PagedResultWorkflowStatusInfo = EMPTY_PAGED_RESULT;
-	loading = false;
+	readonly widget = toSignal(
+		toObservable(this.id).pipe(
+			switchMap(id => this.widgetService.getWorkflowWidget(id))
+		)
+	);
+
+	readonly columnsToDisplay = computed(() => this.widget()?.columns.map(c => c.type) ?? []);
+	readonly workflowStatuses = signal<PagedResultWorkflowStatusInfo>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
 
 	filter = new FormControl('', {nonNullable: true});
 
-	exportUrl: string;
+	private readonly scopePks = computed(() => this.scopes()?.map(s => s.pk));
+	readonly exportUrl = computed(() => this.widgetService.getWorkflowWidgetExportUrl(this.id(), this.scopePks()));
 
 	columnToApiPropertyMap: Record<string, string> = {
 		WORKFLOW_LABEL: 'workflow',
@@ -87,14 +94,6 @@ export class WorkflowWidgetComponent implements OnInit {
 		this.sort.active = WorkflowWidgetSearch.DEFAULT_SORT_BY;
 		this.sort.direction = PaginatedSearch.getSortDirection(WorkflowWidgetSearch.DEFAULT_SORT_ASCENDING);
 
-		this.widgetService.getWorkflowWidget(this.id).subscribe(widget => {
-			this.widget = widget;
-			this.columnsToDisplay = this.widget.columns.map(c => c.type);
-		});
-
-		const scopePks = this.scopes?.map(s => s.pk);
-		this.exportUrl = this.widgetService.getWorkflowWidgetExportUrl(this.id, scopePks);
-
 		merge(
 			this.sort.sortChange,
 			this.paginator.page,
@@ -103,26 +102,27 @@ export class WorkflowWidgetComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new WorkflowWidgetSearch();
 				search.fullText = this.filter.value;
-				search.scopePks = scopePks;
+				search.scopePks = this.scopePks();
 				search.sortBy = this.sort.active;
 				search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 				search.pageIndex = this.paginator.pageIndex;
-				return this.widgetService.getWorkflowWidgetData(this.id, search);
+				return this.widgetService.getWorkflowWidgetData(this.id(), search);
 			})
 		).subscribe(result => {
-			this.workflowStatuses = result;
-			//We emit the number of workflows found and complete the stream as soon
-			//as at least one workflow is found
-			this.workflowsLoaded.emit(this.workflowStatuses.paging.total);
-			this.workflowsLoaded.complete();
-			this.loading = false;
+			this.workflowStatuses.set(result);
+			//emit result only the first time, not when state changes
+			if(!this.workflowsEmitted) {
+				this.workflowsLoaded.emit(result.paging.total);
+				this.workflowsEmitted = true;
+			}
+			this.loading.set(false);
 		});
 	}
 
 	getColumnHeader(columnType: string) {
-		return this.widget.columns.find(c => c.type === columnType)?.shortname || {};
+		return this.widget()?.columns.find(c => c.type === columnType)?.shortname || {};
 	}
 }

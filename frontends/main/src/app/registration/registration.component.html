@@ -1,11 +1,11 @@
 <h1>Registration</h1>
 <!-- First step displayed while loading -->
-@if (step === RegistrationStep.LOADING) {
+@if (step() === RegistrationStep.LOADING) {
 	<p>Please wait while your registration is being processed.</p>
 }
 
 <!-- Step displayed if there is an error with the code -->
-@else if (step === RegistrationStep.ERROR) {
+@else if (step() === RegistrationStep.ERROR) {
 	<p>
 		There was an issue in the registration process.<br />
 		Please try again or contact support.
@@ -13,10 +13,10 @@
 }
 
 <!-- Privacy policies -->
-@else if (step === RegistrationStep.POLICIES) {
+@else if (step() === RegistrationStep.POLICIES) {
 	<div>
 		<h2>Review privacy policies</h2>
-		@for (policy of policies.values(); track policy.id) {
+		@for (policy of policies(); track policy.id) {
 			<p [innerHtml]="policy.content | localizeMap"></p>
 		}
 		<div>
@@ -35,7 +35,7 @@
 }
 
 <!-- User password form -->
-@else if (step === RegistrationStep.PASSWORD) {
+@else if (step() === RegistrationStep.PASSWORD) {
 	<form
 		name="passwordForm"
 		[formGroup]="passwordForm"
@@ -73,8 +73,8 @@
 		<p>
 			<button
 				mat-flat-button
-				[class.loading]="loading"
-				[disabled]="loading || passwordForm.invalid">
+				[class.loading]="loading()"
+				[disabled]="loading() || passwordForm.invalid">
 				Save password
 			</button>
 		</p>
@@ -82,12 +82,12 @@
 }
 
 <!-- Last step: Confirmation -->
-@else if (step === RegistrationStep.CONFIRMATION) {
+@else if (step() === RegistrationStep.CONFIRMATION) {
 	<div>
 		<p>
 			You can now log in with the following credentials:
 			<br />
-			Your email: <strong>{{ email }}</strong>
+			Your email: <strong>{{ email() }}</strong>
 			<br />
 			Your password: the password you just entered
 		</p>

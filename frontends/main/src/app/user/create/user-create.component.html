@@ -3,7 +3,7 @@
 	[formGroup]="userCreationForm"
 	(ngSubmit)="save()"
 	class="centered">
-	<p class="error">{{ errorText }}</p>
+	<p class="error">{{ error() }}</p>
 
 	<p>
 		<mat-form-field>
@@ -44,7 +44,7 @@
 			<mat-select
 				formControlName="languageId"
 				required>
-				@for (language of languages; track language.id) {
+				@for (language of languages(); track language.id) {
 					<mat-option [value]="language.id">
 						{{ language.shortname | localizeMap }}
 					</mat-option>
@@ -59,7 +59,7 @@
 			<mat-select
 				formControlName="profileId"
 				required>
-				@for (profile of profiles | sort: 'id'; track profile.id) {
+				@for (profile of profiles() | sort: 'id'; track profile.id) {
 					<mat-option [value]="profile.id">
 						{{ profile.shortname | localizeMap }}
 					</mat-option>
@@ -70,7 +70,7 @@
 			<mat-label>Scope</mat-label>
 			<app-scope-picker
 				formControlName="scopePk"
-				[scopes]="scopes"
+				[scopes]="scopes()"
 				required></app-scope-picker>
 		</mat-form-field>
 	</p>

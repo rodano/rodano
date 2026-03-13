@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, input, signal} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 import {TimelineGraphData} from '@core/model/timeline-graph-data';
@@ -9,6 +9,7 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 import {LoggingService} from '@core/services/logging.service';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-timeline',
 	templateUrl: './timeline.component.html',
 	styleUrls: ['./timeline.component.css'],
@@ -19,8 +20,8 @@ import {LoggingService} from '@core/services/logging.service';
 	]
 })
 export class TimelineComponent implements OnInit {
-	@Input() scope: Scope;
-	graphs: TimelineGraphData[] = [];
+	readonly scope = input.required<Scope>();
+	readonly graphs = signal<TimelineGraphData[]>([]);
 
 	constructor(
 		private scopeService: ScopeService,
@@ -28,11 +29,11 @@ export class TimelineComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		this.scopeService.getGraphs(this.scope.pk).subscribe(graphs => {
-			this.graphs = graphs;
+		this.scopeService.getGraphs(this.scope().pk).subscribe(graphs => {
+			this.graphs.set(graphs);
 
 			setTimeout(() => {
-				this.graphs.forEach(graph => {
+				this.graphs().forEach(graph => {
 					const container = document.getElementById(graph.id) as HTMLDivElement;
 					try {
 						new Timeline(container, graph, 'en-US').draw();

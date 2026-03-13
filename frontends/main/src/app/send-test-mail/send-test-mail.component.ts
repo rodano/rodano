@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
 import {Validators, ReactiveFormsModule, FormGroup, FormControl} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
@@ -18,10 +18,11 @@ import {MailStatus} from '@core/model/mail-status';
 		MatFormField,
 		MatInput,
 		MatButton
-	]
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SendTestMailComponent implements OnInit {
-	error?: string = undefined;
+	readonly error = signal<string | undefined>(undefined);
 	mailForm = new FormGroup({
 		recipient: new FormControl('', [Validators.required]),
 		subject: new FormControl('Test email', [Validators.required]),
@@ -39,12 +40,12 @@ export class SendTestMailComponent implements OnInit {
 	}
 
 	sendMail() {
-		this.error = undefined;
+		this.error.set(undefined);
 		const mail = this.mailForm.value as MailCreation;
 		this.mailService.send(mail).subscribe({
 			next: mail => {
 				if(mail.status === MailStatus.FAILED) {
-					this.error = `Unable to send email: ${mail.error}`;
+					this.error.set(`Unable to send email: ${mail.error}`);
 				}
 				else {
 					this.notificationService.showSuccess('Email sent');

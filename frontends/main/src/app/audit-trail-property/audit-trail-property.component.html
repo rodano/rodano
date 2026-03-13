@@ -1,9 +1,9 @@
-<h1 mat-dialog-title>Audit trail for {{ entityName }} {{ property }}</h1>
+<h1 mat-dialog-title>Audit trail for {{ entityName() }} {{ property() }}</h1>
 
 <mat-dialog-content>
 	<table
 		mat-table
-		[dataSource]="trails">
+		[dataSource]="trails()">
 		<ng-container matColumnDef="value">
 			<th
 				mat-header-cell

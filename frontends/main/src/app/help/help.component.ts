@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {Study} from '@core/model/study';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -8,6 +8,7 @@ import {SupportComponent} from './support/support.component';
 import {AuthGuard} from '../guards/authentication.guard';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './help.component.html',
 	styleUrls: ['./help.component.css'],
 	imports: [

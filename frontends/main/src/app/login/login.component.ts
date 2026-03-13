@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router, ActivatedRoute} from '@angular/router';
 import {finalize} from 'rxjs/operators';
@@ -16,6 +16,7 @@ import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-login',
 	templateUrl: './login.component.html',
 	styleUrls: ['./login.component.css'],
@@ -30,10 +31,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 	]
 })
 export class LoginComponent implements OnInit {
-	study?: PublicStudy;
-	loading = false;
+	readonly study = signal<PublicStudy | undefined>(undefined);
+	readonly loading = signal(false);
 
-	display: LoginDisplay = LoginDisplay.LOGIN; //Initialize to show login
+	readonly display = signal<LoginDisplay>(LoginDisplay.LOGIN); //Initialize to show login
 	loginDisplay = LoginDisplay;
 	returnUrl: string;
 
@@ -55,7 +56,7 @@ export class LoginComponent implements OnInit {
 		})
 	});
 
-	error: string;
+	readonly error = signal<string | undefined>(undefined);
 
 	constructor(
 		private configurationService: ConfigurationService,
@@ -68,47 +69,47 @@ export class LoginComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		this.configurationService.getPublicStudy().subscribe(study => this.study = study);
+		this.configurationService.getPublicStudy().subscribe(study => this.study.set(study));
 		this.returnUrl = this.activatedRoute.snapshot.queryParams['returnUrl'] || '';
 	}
 
 	login() {
-		this.loading = true;
+		this.loading.set(true);
 		const credentials = this.loginForm.value as Credentials;
 
 		this.authStateService.login(credentials).pipe(
 			takeUntilDestroyed(this.destroyRef),
-			finalize(() => this.loading = false)
+			finalize(() => this.loading.set(false))
 		).subscribe(
 			{
 				next: () => {
 					this.router.navigate([this.returnUrl]);
 				},
 				error: (response: any) => {
-					this.error = response.error.message;
+					this.error.set(response.error.message);
 				}
 			}
 		);
 	}
 
 	sendPassword() {
-		this.loading = true;
+		this.loading.set(true);
 		const email: string = this.recoveryForm.value.email ?? '';
 
 		this.authService.recoverPassword(email).pipe(
 			takeUntilDestroyed(this.destroyRef),
-			finalize(() => this.loading = false)
+			finalize(() => this.loading.set(false))
 		).subscribe(() => {
-			this.display = LoginDisplay.LOGIN;
+			this.display.set(LoginDisplay.LOGIN);
 			this.router.navigate(['/login']);
 			this.notificationService.showSuccess('Recovery instructions sent to the email provided');
 		});
 	}
 
 	toggleDisplay() {
-		if(this.display === LoginDisplay.LOGIN) {
-			this.display = LoginDisplay.RECOVER;
+		if(this.display() === LoginDisplay.LOGIN) {
+			this.display.set(LoginDisplay.RECOVER);
 		}
-		else {(this.display = LoginDisplay.LOGIN);}
+		else {(this.display.set(LoginDisplay.LOGIN));}
 	}
 }

@@ -1,6 +1,6 @@
 <table
 	mat-table
-	[dataSource]="scopeRelations">
+	[dataSource]="scopeRelations()">
 	<ng-container matColumnDef="scope">
 		<th
 			mat-header-cell
@@ -60,7 +60,7 @@
 		<td
 			mat-cell
 			*matCellDef="let scopeRelation">
-			@if (scopeRelations.length > 1 && isCurrent(scopeRelation) && !scopeRelation.default) {
+			@if (scopeRelations().length > 1 && isCurrent(scopeRelation) && !scopeRelation.default) {
 				<button
 					mat-stroked-button
 					(click)="endRelation(scopeRelation.pk)">
@@ -78,7 +78,7 @@
 </table>
 
 <div class="forms">
-	@if (parentScopes.length > 0) {
+	@if (parentScopes().length > 0) {
 		<form
 			[formGroup]="addParentForm"
 			(ngSubmit)="addParent()">
@@ -91,7 +91,7 @@
 						<mat-form-field class="scope-picker">
 							<mat-label>Parent</mat-label>
 							<app-scope-picker
-								[scopes]="parentScopes"
+								[scopes]="parentScopes()"
 								formControlName="parentPk"
 								[required]="true">
 							</app-scope-picker>
@@ -121,7 +121,7 @@
 			</mat-card>
 		</form>
 	}
-	@if (transferParentScopes.length > 0) {
+	@if (transferParentScopes().length > 0) {
 		<form
 			[formGroup]="transferForm"
 			(ngSubmit)="transfer()">
@@ -135,7 +135,7 @@
 						<mat-select
 							formControlName="parentPk"
 							required>
-							@for (parentScope of transferParentScopes | sort: 'code'; track parentScope.pk) {
+							@for (parentScope of transferParentScopes() | sort: 'code'; track parentScope.pk) {
 								<mat-option [value]="parentScope.pk">{{ parentScope | scopeCodeShortname }}</mat-option>
 							}
 						</mat-select>

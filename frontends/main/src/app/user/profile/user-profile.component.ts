@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
@@ -13,8 +13,10 @@ import {Language} from '@core/model/language';
 import {MatOption} from '@angular/material/core';
 import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
 import {MatSelect} from '@angular/material/select';
+import {USER_TOKEN} from '../home/user.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-profile.component.html',
 	styleUrls: ['./user-profile.component.css'],
 	imports: [
@@ -29,11 +31,11 @@ import {MatSelect} from '@angular/material/select';
 		LocalizeMapPipe
 	]
 })
-export class UserProfileComponent implements OnInit, OnChanges {
-	@Input() me: User;
-	@Input() user: User;
+export class UserProfileComponent implements OnInit {
+	readonly user = inject(USER_TOKEN);
+	readonly me = input.required<User>();
 
-	languages: Language[];
+	readonly languages = signal<Language[]>([]);
 
 	userUpdateForm = new FormGroup({
 		name: new FormControl('', [Validators.required]),
@@ -46,24 +48,22 @@ export class UserProfileComponent implements OnInit, OnChanges {
 		private userService: UserService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
-	) {}
+	) {
+		effect(() => this.updateForm());
+	}
 
 	ngOnInit() {
 		this.configurationService.getLanguages().subscribe(languages => {
-			this.languages = languages;
+			this.languages.set(languages);
 		});
 	}
 
-	ngOnChanges() {
-		this.updateForm();
-	}
-
 	get canSave() {
-		return !this.user.externallyManaged && !this.user.removed && this.user.canWrite;
+		return !this.user().externallyManaged && !this.user().removed && this.user().canWrite;
 	}
 
 	updateForm() {
-		this.userUpdateForm.reset(this.user);
+		this.userUpdateForm.reset(this.user());
 		if(!this.canSave) {
 			this.userUpdateForm.disable();
 		}
@@ -75,10 +75,10 @@ export class UserProfileComponent implements OnInit, OnChanges {
 	save() {
 		const userUpdate = Object.assign({}, this.userUpdateForm.value) as User;
 
-		this.userService.save(this.user.pk, userUpdate).pipe(
+		this.userService.save(this.user().pk, userUpdate).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(user => {
-			Object.assign(this.user, user);
+			this.user.set(user);
 			this.notificationService.showSuccess('Modifications saved');
 		});
 	}

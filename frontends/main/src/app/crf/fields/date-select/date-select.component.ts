@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, DestroyRef, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, computed, effect, input} from '@angular/core';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
@@ -9,6 +9,7 @@ import {FieldUpdateService} from '../../services/field-update.service';
 import {CRFField} from '../../models/crf-field';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-date-select',
 	templateUrl: './date-select.component.html',
 	styleUrls: ['../field/field.component.css', './date-select.component.css'],
@@ -19,13 +20,54 @@ import {CRFField} from '../../models/crf-field';
 		MatOption
 	]
 })
-export class DateSelectComponent implements OnInit, OnChanges {
-	@Input() field: CRFField;
-	@Input() disabled: boolean;
+export class DateSelectComponent implements OnInit {
+	readonly field = input.required<CRFField>();
+	readonly disabled = input<boolean>(false);
 
-	days: {label: string; value: string}[];
-	months: {label: string; value: string}[];
-	years: {label: string; value: string}[];
+	readonly days = computed<{label: string; value: string}[]>(() => {
+		const field = this.field();
+		if(!field.model.withDays) {
+			return [];
+		}
+		const result: {label: string; value: string}[] = [];
+		if(!field.model.daysMandatory) {
+			result.push({label: 'Unknown', value: 'Unknown'});
+		}
+		for(let i = 1; i <= 31; i++) {
+			const day = i.toString().padStart(2, '0');
+			result.push({label: day, value: day});
+		}
+		return result;
+	});
+
+	readonly months = computed<{label: string; value: string}[]>(() => {
+		const field = this.field();
+		if(!field.model.withMonths) {
+			return [];
+		}
+		const result: {label: string; value: string}[] = [];
+		if(!field.model.monthsMandatory) {
+			result.push({label: 'Unknown', value: 'Unknown'});
+		}
+		for(let i = 1; i <= 12; i++) {
+			const month = i.toString().padStart(2, '0');
+			result.push({label: month, value: month});
+		}
+		return result;
+	});
+
+	readonly years = computed<{label: string; value: string}[]>(() => {
+		const field = this.field();
+		const result: {label: string; value: string}[] = [];
+		if(!field.model.yearsMandatory) {
+			result.push({label: 'Unknown', value: 'Unknown'});
+		}
+		const currentYear = new Date().getUTCFullYear();
+		for(let i = field.model.maxYear || currentYear; i >= (field.model.minYear || 1900); i--) {
+			result.push({label: i.toString(), value: i.toString()});
+		}
+		return result;
+	});
 
 	day = new FormControl('');
 	month = new FormControl('');
@@ -34,89 +76,48 @@ export class DateSelectComponent implements OnInit, OnChanges {
 	constructor(
 		private fieldUpdateService: FieldUpdateService,
 		private destroyRef: DestroyRef
-	) { }
+	) {
+		effect(() => {
+			if(this.disabled()) {
+				this.day.disable({emitEvent: false});
+				this.month.disable({emitEvent: false});
+				this.year.disable({emitEvent: false});
+			}
+			else {
+				this.day.enable({emitEvent: false});
+				this.month.enable({emitEvent: false});
+				this.year.enable({emitEvent: false});
+			}
+		});
+
+		effect(() => {
+			const field = this.field();
+			const dateParts = field.value?.split('.') ?? ['', '', ''];
+			this.year.reset(dateParts[dateParts.length - 1], {emitEvent: false});
+			if(field.model.withMonths) {
+				this.month.reset(dateParts[dateParts.length - 2], {emitEvent: false});
+				if(field.model.withDays) {
+					this.day.reset(dateParts[dateParts.length - 3], {emitEvent: false});
+				}
+			}
+		});
+	}
 
 	ngOnInit(): void {
-		const observables = [];
-		//fill days
-		if(this.field.model.withDays) {
-			this.days = [];
-			if(!this.field.model.daysMandatory) {
-				this.days.push({label: 'Unknown', value: 'Unknown'});
-			}
-			for(let i = 1; i <= 31; i++) {
-				const day = i.toString().padStart(2, '0');
-				//pay attention to the value that is a string
-				this.days.push({label: day, value: day});
-			}
-			observables.push(this.day.valueChanges);
-		}
-
-		//fill months
-		if(this.field.model.withMonths) {
-			this.months = [];
-			if(!this.field.model.monthsMandatory) {
-				this.months.push({label: 'Unknown', value: 'Unknown'});
-			}
-			for(let i = 1; i <= 12; i++) {
-				const month = i.toString().padStart(2, '0');
-				//pay attention to the value that is a string
-				this.months.push({label: month, value: month});
-			}
-			observables.push(this.month.valueChanges);
-		}
-
-		//fill years
-		this.years = [];
-		if(!this.field.model.yearsMandatory) {
-			this.years.push({label: 'Unknown', value: 'Unknown'});
-		}
-		const currentYear = new Date().getUTCFullYear();
-		for(let i = this.field.model.maxYear || currentYear; i >= (this.field.model.minYear || 1900); i--) {
-			const year = i.toString();
-			//pay attention to the value that is a string
-			this.years.push({label: year, value: year});
-		}
-
-		//set value
-		const dateParts = this.field.value?.split('.') ?? ['', '', ''];
-		this.year.reset(dateParts[dateParts.length - 1]);
-		if(this.field.model.withMonths) {
-			this.month.reset(dateParts[dateParts.length - 2]);
-			if(this.field.model.withDays) {
-				this.day.reset(dateParts[dateParts.length - 3]);
-			}
-		}
-		observables.push(this.year.valueChanges);
-
-		merge(...observables).pipe(
+		merge(this.day.valueChanges, this.month.valueChanges, this.year.valueChanges).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
-			//would be nicer to use the emitted values
-			//but it makes it difficult to deal with initial values
+			const field = this.field();
 			const parts = [];
-			if(this.field.model.withDays) {
+			if(field.model.withDays) {
 				parts.push(this.day.value);
 			}
-			if(this.field.model.withMonths) {
+			if(field.model.withMonths) {
 				parts.push(this.month.value);
 			}
 			parts.push(this.year.value);
 			const fieldValue = parts.join('.');
-			this.fieldUpdateService.updateField(this.field, fieldValue, fieldValue);
+			this.fieldUpdateService.updateField(field, fieldValue, fieldValue);
 		});
-	}
-
-	ngOnChanges() {
-		if(this.disabled) {
-			this.day.disable();
-			this.month.disable();
-			this.year.disable();
-		}
-		else {
-			this.day.enable();
-			this.month.enable();
-			this.year.enable();
-		}
 	}
 }

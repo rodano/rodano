@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, Inject, OnInit, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
 import {filter, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 import {Resource} from '@core/model/resource';
@@ -22,6 +22,7 @@ import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component'
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-modify-resource-dialog',
 	templateUrl: './modify-resource-dialog.component.html',
 	styleUrls: ['./modify-resource-dialog.component.css'],
@@ -46,11 +47,11 @@ export class ModifyResourceDialogComponent implements OnInit {
 		publicResource: new FormControl(false, {nonNullable: true})
 	});
 
-	newResource: boolean;
-	scopes: ScopeMini[] = [];
-	category?: ResourceCategory;
+	readonly newResource = signal(false);
+	readonly scopes = signal<ScopeMini[]>([]);
+	readonly category = signal<ResourceCategory | undefined>(undefined);
 	rootScope?: ScopeMini;
-	fileToUpload: File | null;
+	readonly fileToUpload = signal<File | null>(null);
 
 	constructor(
 		private dialogRef: MatDialogRef<ModifyResourceDialogComponent, Resource>,
@@ -61,7 +62,7 @@ export class ModifyResourceDialogComponent implements OnInit {
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
 	) {
-		this.newResource = (resource as Resource).pk === undefined;
+		this.newResource.set((resource as Resource).pk === undefined);
 	}
 
 	ngOnInit(): void {
@@ -72,9 +73,9 @@ export class ModifyResourceDialogComponent implements OnInit {
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({scopes, categories}) => {
-			this.category = categories.find(c => c.id === this.resource.categoryId) as ResourceCategory;
-			this.scopes = scopes;
-			this.rootScope = this.scopes[0];
+			this.category.set(categories.find(c => c.id === this.resource.categoryId) as ResourceCategory);
+			this.scopes.set(scopes);
+			this.rootScope = scopes[0];
 		});
 		(this.resourceForm.controls['publicResource'] as FormControl).valueChanges.subscribe(value => {
 			const scopeControl = this.resourceForm.get('scopePk') as FormControl;
@@ -94,14 +95,14 @@ export class ModifyResourceDialogComponent implements OnInit {
 
 	handleFileInput(files: FileList) {
 		//Handle file error message when files is more than 1
-		this.fileToUpload = files.item(0);
+		this.fileToUpload.set(files.item(0));
 	}
 
 	uploadFile(resourcePk: number): Observable<Resource> {
-		if(!this.fileToUpload) {
+		if(!this.fileToUpload()) {
 			throw new Error('There is no file to upload');
 		}
-		return this.resourceService.uploadFile(resourcePk, this.fileToUpload).pipe(
+		return this.resourceService.uploadFile(resourcePk, this.fileToUpload()!).pipe(
 			//HTTP event will emit multiple times but we are only interested when it is a final response
 			filter((event): event is HttpResponse<Resource> => event instanceof HttpResponse),
 			map((response: HttpResponse<Resource>) => response.body as Resource)
@@ -110,13 +111,13 @@ export class ModifyResourceDialogComponent implements OnInit {
 
 	save(): void {
 		this.resource = Object.assign(this.resource, this.resourceForm.getRawValue()) as ResourceSubmission;
-		const resource$ = this.newResource
+		const resource$ = this.newResource()
 			? this.resourceService.create(this.resource as ResourceSubmission)
 			: this.resourceService.save(this.resource as Resource);
 
 		resource$.pipe(
 			switchMap(resource => {
-				return this.fileToUpload ? this.uploadFile(resource.pk) : of(resource);
+				return this.fileToUpload() ? this.uploadFile(resource.pk) : of(resource);
 			})
 		).subscribe({
 			next: resource => this.dialogRef.close(resource),

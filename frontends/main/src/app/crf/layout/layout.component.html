@@ -1,23 +1,23 @@
-@if (shown) {
-	@if (!isEmptyObject(layout.textBefore)) {
+@if (shown()) {
+	@if (!isEmptyObject(layout().textBefore)) {
 		<div
 			class="block"
-			[innerHTML]="layout.textBefore | localizeMap | safeHtml"></div>
+			[innerHTML]="layout().textBefore | localizeMap | safeHtml"></div>
 	}
 
 	<table>
 		<colgroup>
-			@for (column of layout.columns; track $index) {
+			@for (column of layout().columns; track $index) {
 				<col [style]="column.cssCode" />
 			}
 		</colgroup>
-		@for (line of layout.lines; track $index) {
+		@for (line of layout().lines; track $index) {
 			<tr>
 				@for (cell of line.cells; track cell.id) {
 					<td [colSpan]="cell.colspan">
 						<app-cell
 							[cell]="cell"
-							[layoutUid]="layoutUid"
+							[layoutUid]="layoutUid()"
 							[field]="getField(cell)"
 							[disabled]="getDisabled(cell)">
 						</app-cell>
@@ -27,9 +27,9 @@
 		}
 	</table>
 
-	@if (!isEmptyObject(layout.textAfter)) {
+	@if (!isEmptyObject(layout().textAfter)) {
 		<div
 			class="block"
-			[innerHTML]="layout.textAfter | localizeMap | safeHtml"></div>
+			[innerHTML]="layout().textAfter | localizeMap | safeHtml"></div>
 	}
 }

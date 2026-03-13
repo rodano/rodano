@@ -1,4 +1,4 @@
-import {ErrorHandler, importProvidersFrom, provideZoneChangeDetection} from '@angular/core';
+import {ErrorHandler, importProvidersFrom, provideZonelessChangeDetection} from '@angular/core';
 import {AppComponent} from './app/app.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {APP_ROUTES} from './app/app-routes';
@@ -32,7 +32,7 @@ bootstrapApplication(AppComponent, {
 		//TODO a CustomDateAdapter may not be needed anymore at native adapters can be configured to use UTC
 		//see here https://material.angular.io/components/datepicker/overview#customizing-the-parse-and-display-formats
 		{provide: DateAdapter, useClass: CustomDateAdapter},
-		provideZoneChangeDetection(),
+		provideZonelessChangeDetection(),
 		provideHttpClient(withInterceptors([authInterceptor])),
 		provideRouter(APP_ROUTES, withComponentInputBinding(), withRouterConfig({paramsInheritanceStrategy: 'always'})),
 		provideCharts(withDefaultRegisterables())

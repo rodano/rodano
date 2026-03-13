@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, effect, input, model, signal} from '@angular/core';
 import {Cell} from '@core/model/cell';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
@@ -38,8 +38,10 @@ import {WorkflowStatusImportantPipe} from 'src/app/pipes/workflow-status-importa
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusNotImportantPipe} from 'src/app/pipes/workflow-status-not-important';
 import {FeatureStatic} from '@core/model/feature-static';
+import {Field} from '@core/model/field';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-field',
 	templateUrl: './field.component.html',
 	styleUrls: ['./field.component.css'],
@@ -66,18 +68,18 @@ import {FeatureStatic} from '@core/model/feature-static';
 		LocalizeFieldModelPipe
 	]
 })
-export class FieldComponent implements OnInit, OnChanges {
-	@Input() field: CRFField;
-	@Input() cell: Cell;
-	@Input() disabled: boolean;
+export class FieldComponent implements OnInit {
+	readonly field = model.required<CRFField>();
+	readonly cell = input.required<Cell>();
+	readonly disabled = input(false);
 
 	fieldModelType = FieldModelType;
 	workflowableEntity = WorkflowableEntity;
 
 	control = new FormControl('');
 
-	debug = undefined as string | undefined;
-	displayAuditTrail = false;
+	readonly debug = signal<string | undefined>(undefined);
+	readonly displayAuditTrail = signal(false);
 
 	constructor(
 		private crfService: CRFService,
@@ -88,6 +90,23 @@ export class FieldComponent implements OnInit, OnChanges {
 		private dialog: MatDialog,
 		private destroyRef: DestroyRef
 	) {
+		effect(() => {
+			const field = this.field();
+			const value = this.crfService.typeFieldValue(field.model, field.value);
+			this.control.reset(value);
+			//add the max length validator on top of the max length attribute in HTML
+			//the HTML attribute will enforce the max length in the UI
+			//the validator will enforce the max length in the form control
+			if(field.model.maxLength) {
+				this.control.addValidators(Validators.maxLength(field.model.maxLength));
+			}
+			if(this.getDisabled()) {
+				this.control.disable();
+			}
+			else {
+				this.control.enable();
+			}
+		});
 	}
 
 	ngOnInit() {
@@ -95,85 +114,64 @@ export class FieldComponent implements OnInit, OnChanges {
 		this.control.valueChanges.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(value => {
-			const fieldValue = this.crfService.buildFieldValue(this.field.model, value);
-			const fieldValueLabel = this.crfService.buildFieldValueLabel(this.field.model, value);
-			this.fieldUpdateService.updateField(this.field, fieldValue, fieldValueLabel);
+			const fieldValue = this.crfService.buildFieldValue(this.field().model, value);
+			const fieldValueLabel = this.crfService.buildFieldValueLabel(this.field().model, value);
+			this.fieldUpdateService.updateField(this.field(), fieldValue, fieldValueLabel);
 		});
 
 		this.authStateService.listenConnectedUser().pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(user => {
-			this.displayAuditTrail = user?.roles.some(r => r.profile.features.includes(FeatureStatic.VIEW_AUDIT_TRAIL)) ?? false;
+			this.displayAuditTrail.set(user?.roles.some(r => r.profile.features.includes(FeatureStatic.VIEW_AUDIT_TRAIL)) ?? false);
 		});
 
 		this.administrationService.isInDebug().subscribe(debug => {
 			if(debug) {
-				const fieldId = `${this.field.datasetModelId}/${this.field.modelId}`;
+				const fieldId = `${this.field().datasetModelId}/${this.field().modelId}`;
 				const fieldContainers = [];
-				fieldContainers.push(`scope=${this.field.scopePk}`);
-				if(this.field.eventPk) {
-					fieldContainers.push(`event=${this.field.eventPk}`);
+				fieldContainers.push(`scope=${this.field().scopePk}`);
+				if(this.field().eventPk) {
+					fieldContainers.push(`event=${this.field().eventPk}`);
 				}
-				fieldContainers.push(`dataset=${this.field.datasetPk}`);
-				fieldContainers.push(`field=${this.field.pk}`);
-				this.debug = `${fieldId} (${fieldContainers.join(', ')})`;
+				fieldContainers.push(`dataset=${this.field().datasetPk}`);
+				fieldContainers.push(`field=${this.field().pk}`);
+				this.debug.set(`${fieldId} (${fieldContainers.join(', ')})`);
 			}
 			else {
-				this.debug = undefined;
+				this.debug.set(undefined);
 			}
 		});
 	}
 
-	ngOnChanges() {
-		const value = this.crfService.typeFieldValue(this.field.model, this.field.value);
-		this.control.reset(value);
-		//add the max length validator on top of the max length attribute in HTML
-		//the HTML attribute will enforce the max length in the UI
-		//the validator will enforce the max length in the form control
-		if(this.field.model.maxLength) {
-			this.control.addValidators(Validators.maxLength(this.field.model.maxLength));
-		}
-		if(this.getDisabled()) {
-			this.control.disable();
-		}
-		else {
-			this.control.enable();
-		}
-	}
+	//remember that pending multiple dataset instances don't have pk wile the form has not been saved
+	readonly id = computed(() => `dataset-${this.field().datasetId}-field-${this.field().modelId}`);
 
-	get id(): string {
-		//remember that pending multiple dataset instances don't have pk wile the form has not been saved
-		return `dataset-${this.field.datasetId}-field-${this.field.modelId}`;
-	}
-
-	get style(): Record<string, string> {
-		const importantStatuses = this.field.workflowStatuses.filter(s => s.state.important);
+	readonly style = computed(() => {
+		const importantStatuses = this.field().workflowStatuses.filter(s => s.state.important);
 		if(importantStatuses.length === 0) {
-			return {};
+			return {} as Record<string, string>;
 		}
 		const color = importantStatuses[0].state.color;
 		return {
 			backgroundColor: `${color + 15}`,
 			border: `1px solid ${color}`
 		};
-	}
+	});
 
-	get hasActions(): boolean {
-		return this.field.possibleWorkflows.length > 0 || this.field.workflowStatuses.filter(s => !s.state.important).some(s => s.state.possibleActions.length > 0);
-	}
+	readonly hasActions = computed(() =>
+		this.field().possibleWorkflows.length > 0 || this.field().workflowStatuses.filter(s => !s.state.important).some(s => s.state.possibleActions.length > 0)
+	);
 
-	get creationActions(): WorkflowAction[] {
-		return this.field.possibleWorkflows.map(workflow => {
+	readonly creationActions = computed<WorkflowAction[]>(() =>
+		this.field().possibleWorkflows.map(workflow => {
 			return workflow.actions.find(a => a.id === workflow.actionId) as WorkflowAction;
-		});
-	}
+		})
+	);
+
+	readonly getDisabled = computed(() => this.field().model.dynamic || this.field().model.readOnly || this.disabled());
 
 	get indeterminate(): boolean {
 		return typeof this.control.value !== 'boolean';
-	}
-
-	getDisabled(): boolean {
-		return this.field.model.dynamic || this.field.model.readOnly || this.disabled;
 	}
 
 	isEmptyObject(object: any): boolean {
@@ -181,19 +179,19 @@ export class FieldComponent implements OnInit, OnChanges {
 	}
 
 	initializeWorkflow(action: WorkflowAction) {
-		this.workflowActionService.createOnField(this.field, action).subscribe(newField => {
-			Object.assign(this.field, newField);
+		this.workflowActionService.createOnField(this.field(), action).subscribe(newField => {
+			this.field.update(f => ({...newField, shown: f.shown, error: f.error}));
 		});
 	}
 
 	updateWorkflow(status: WorkflowStatus, action: WorkflowAction) {
-		this.workflowActionService.executeActionOnField(this.field, status, action).subscribe(newField => {
-			Object.assign(this.field, newField);
+		this.workflowActionService.executeActionOnField(this.field(), status, action).subscribe(newField => {
+			this.field.update(f => ({...newField, shown: f.shown, error: f.error}));
 		});
 	}
 
 	onActionResponse(newField: Workflowable) {
-		Object.assign(this.field, newField);
+		this.field.update(f => ({...newField as Field, shown: f.shown, error: f.error}));
 	}
 
 	openHelp(fieldModel: FieldModel) {
@@ -204,7 +202,7 @@ export class FieldComponent implements OnInit, OnChanges {
 
 	openAuditTrail() {
 		return this.dialog
-			.open(AuditTrailFieldComponent, {data: this.field})
+			.open(AuditTrailFieldComponent, {data: this.field()})
 			.afterClosed();
 	}
 }

@@ -12,7 +12,7 @@
 				required />
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="code" />
 	</p>
 
@@ -25,7 +25,7 @@
 				required />
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="shortname" />
 	</p>
 
@@ -34,11 +34,10 @@
 			<mat-label>Longname</mat-label>
 			<input
 				matInput
-				formControlName="longname"
-				required />
+				formControlName="longname" />
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="longname" />
 	</p>
 
@@ -50,7 +49,7 @@
 				formControlName="maxNumber" />
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="maxNumber" />
 
 		<mat-form-field>
@@ -60,7 +59,7 @@
 				formControlName="expectedNumber" />
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="expectedNumber" />
 	</p>
 
@@ -77,7 +76,7 @@
 			<mat-datepicker #startDatePicker></mat-datepicker>
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="startDate" />
 
 		<mat-form-field>
@@ -92,12 +91,12 @@
 			<mat-datepicker #stopDatePicker></mat-datepicker>
 		</mat-form-field>
 		<app-audit-trail-button
-			[scope]="scope"
+			[scope]="scope()"
 			property="stopDate" />
 	</p>
 
 	<p class="actions">
-		@if (scope.removed) {
+		@if (scope().removed) {
 			<button
 				mat-flat-button
 				(click)="restore()"
@@ -105,7 +104,7 @@
 				Restore
 			</button>
 		} @else {
-			@if (scope.locked) {
+			@if (scope().locked) {
 				<button
 					mat-flat-button
 					(click)="unlock()"
@@ -139,19 +138,19 @@
 
 	<div class="workflow-statuses">
 		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
-		@for (status of scope.workflowStatuses; track status.pk || status.workflowId) {
+		@for (status of scope().workflowStatuses; track status.pk || status.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.SCOPE"
 				[workflowStatus]="status"
-				[workflowable]="scope"
+				[workflowable]="scope()"
 				(actionResponse)="onWorkflowExecution($event)">
 			</app-workflow-status>
 		}
 		<!-- Display workflows that can be created -->
-		@for (workflow of scope.possibleWorkflows; track workflow.id) {
+		@for (workflow of scope().possibleWorkflows; track workflow.id) {
 			<app-workflow-status
 				[entity]="workflowableEntity.SCOPE"
-				[workflowable]="scope"
+				[workflowable]="scope()"
 				[workflow]="workflow"
 				(actionResponse)="onWorkflowExecution($event)">
 			</app-workflow-status>

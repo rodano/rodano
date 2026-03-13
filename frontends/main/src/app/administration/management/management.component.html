@@ -2,7 +2,7 @@
 <p>
 	<a
 		mat-flat-button
-		[href]="editConfigurationLink">
+		[href]="editConfigurationLink()">
 		Edit configuration
 	</a>
 	&nbsp;
@@ -18,14 +18,14 @@
 	<button
 		mat-flat-button
 		(click)="toggleMaintenance(true)"
-		[disabled]="inMaintenance">
+		[disabled]="inMaintenance()">
 		Turn on maintenance mode
 	</button>
 	&nbsp;
 	<button
 		mat-flat-button
 		(click)="toggleMaintenance(false)"
-		[disabled]="!inMaintenance">
+		[disabled]="!inMaintenance()">
 		Turn off maintenance mode
 	</button>
 </p>
@@ -35,14 +35,14 @@
 	<button
 		mat-flat-button
 		(click)="toggleDebug(true)"
-		[disabled]="inDebug">
+		[disabled]="inDebug()">
 		Turn on debug mode
 	</button>
 	&nbsp;
 	<button
 		mat-flat-button
 		(click)="toggleDebug(false)"
-		[disabled]="!inDebug">
+		[disabled]="!inDebug()">
 		Turn off debug mode
 	</button>
 </p>

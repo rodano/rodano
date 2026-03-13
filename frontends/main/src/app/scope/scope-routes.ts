@@ -1,7 +1,7 @@
 import {Route} from '@angular/router';
 import {ScopeListComponent} from './scope-list/scope-list.component';
 import {AuthGuard} from '../guards/authentication.guard';
-import {ScopeComponent} from './home/scope.component';
+import {ScopeComponent, SCOPE_TOKEN} from './home/scope.component';
 import {ScopeSettingsComponent} from './settings/scope-settings.component';
 import {ScopeParentsComponent} from './parents/scope-parents.component';
 import {ScopeResolver} from '../resolvers/scope-resolver';
@@ -11,6 +11,8 @@ import {ScopeUsersComponent} from './users/scope-users.component';
 import {FormResolver} from '../resolvers/form-resolver';
 import {FormComponent} from '../crf/form/form.component';
 import {ScopeEnrollmentComponent} from './enrollment/scope-enrollment.component';
+import {signal} from '@angular/core';
+import {Scope} from '@core/model/scope';
 
 export default [
 	{
@@ -25,6 +27,9 @@ export default [
 		path: ':scopeModelId/new',
 		component: ScopeComponent,
 		canActivate: [AuthGuard],
+		providers: [
+			{provide: SCOPE_TOKEN, useFactory: () => signal<Scope>(null as unknown as Scope)}
+		],
 		resolve: {
 			scopeModel: ScopeModelResolver
 		},
@@ -39,6 +44,9 @@ export default [
 		path: ':scopeModelId/:scopePk',
 		component: ScopeComponent,
 		canActivate: [AuthGuard],
+		providers: [
+			{provide: SCOPE_TOKEN, useFactory: () => signal<Scope>(null as unknown as Scope)}
+		],
 		resolve: {
 			scopeModel: ScopeModelResolver,
 			scope: ScopeResolver

@@ -1,9 +1,9 @@
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
-	[dataSource]="sessions">
+	[dataSource]="sessions()">
 	<ng-container matColumnDef="name">
 		<th
 			mat-header-cell

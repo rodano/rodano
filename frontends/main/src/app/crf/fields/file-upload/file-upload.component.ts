@@ -1,4 +1,4 @@
-import {Component, Input, DestroyRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input, DestroyRef, signal} from '@angular/core';
 import {FileService} from '@core/services/file.service';
 import {tap, last, map} from 'rxjs/operators';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
@@ -13,6 +13,7 @@ import {FieldUpdateService} from '../../services/field-update.service';
 import {CRFField} from '../../models/crf-field';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-file-upload',
 	templateUrl: './file-upload.component.html',
 	styleUrls: ['../field/field.component.css', './file-upload.component.css'],
@@ -25,12 +26,12 @@ import {CRFField} from '../../models/crf-field';
 	]
 })
 export class FileUploadComponent {
-	@Input() field: CRFField;
-	@Input() id: string;
-	@Input() disabled: boolean;
+	readonly field = input.required<CRFField>();
+	readonly id = input.required<string>();
+	readonly disabled = input.required<boolean>();
 
-	uploadInProgress = false;
-	uploadProgress: number;
+	readonly uploadInProgress = signal(false);
+	readonly uploadProgress = signal(0);
 
 	constructor(
 		private fileService: FileService,
@@ -49,18 +50,18 @@ export class FileUploadComponent {
 			return;
 		}
 
-		if(this.field.model.maxLength && file.name.length > this.field.model.maxLength) {
-			this.notificationService.showError(`File name must be shorter than ${this.field.model.maxLength} characters`);
+		if(this.field().model.maxLength && file.name.length > this.field().model.maxLength!) {
+			this.notificationService.showError(`File name must be shorter than ${this.field().model.maxLength} characters`);
 			return;
 		}
 
-		this.uploadInProgress = true;
+		this.uploadInProgress.set(true);
 
-		this.fileService.upload(this.field.scopePk, file, this.field.eventPk).pipe(
+		this.fileService.upload(this.field().scopePk, file, this.field().eventPk).pipe(
 			takeUntilDestroyed(this.destroyRef),
 			tap(event => {
 				if(event.type === HttpEventType.UploadProgress && event.total) {
-					this.uploadProgress = Math.round((event.loaded * 100) / event.total);
+					this.uploadProgress.set(Math.round((event.loaded * 100) / event.total));
 				}
 			}),
 			last(),
@@ -68,21 +69,21 @@ export class FileUploadComponent {
 		).subscribe({
 			next: response => {
 				const value = response.body?.uniqueName ?? '';
-				this.fieldUpdateService.updateField(this.field, value, value);
-				this.field.filePk = response.body?.pk;
-				this.field.fileName = response.body?.name;
+				this.fieldUpdateService.updateField(this.field(), value, value);
+				this.field().filePk = response.body?.pk;
+				this.field().fileName = response.body?.name;
 				this.notificationService.showSuccess('File uploaded');
 			},
 			error: () => {
 				this.notificationService.showError('Error occurred while uploading the file');
 			}
 		}).add(() => {
-			this.uploadInProgress = false;
+			this.uploadInProgress.set(false);
 		});
 	}
 
 	onClick() {
-		const nativeInput = document.getElementById(this.id) as HTMLInputElement;
+		const nativeInput = document.getElementById(this.id()) as HTMLInputElement;
 		nativeInput.value = '';
 
 		nativeInput.onchange = () => {
@@ -103,11 +104,11 @@ export class FileUploadComponent {
 	}
 
 	removeFile() {
-		this.field.value = undefined;
+		this.field().value = undefined;
 	}
 
 	getFileUrl(): string {
-		return this.fileService.getUrl(this.field.filePk as number);
+		return this.fileService.getUrl(this.field().filePk as number);
 	}
 
 	dragOverHandler(ev: DragEvent) {

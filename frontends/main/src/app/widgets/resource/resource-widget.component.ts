@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, input, signal} from '@angular/core';
 import {Resource} from '@core/model/resource';
 import {ResourceService} from '@core/services/resource.service';
 import {Expandable} from '@core/utilities/expandable';
@@ -9,6 +9,7 @@ import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {MatIcon} from '@angular/material/icon';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-resource-widget',
 	templateUrl: './resource-widget.component.html',
 	styleUrls: ['./resource-widget.component.css'],
@@ -21,9 +22,9 @@ import {MatIcon} from '@angular/material/icon';
 	]
 })
 export class ResourceWidgetComponent implements OnInit {
-	@Input({required: true}) category: string;
+	readonly category = input.required<string>();
 
-	resources: (Resource & Expandable)[];
+	readonly resources = signal<(Resource & Expandable)[]>([]);
 
 	constructor(
 		private resourceService: ResourceService
@@ -31,14 +32,14 @@ export class ResourceWidgetComponent implements OnInit {
 
 	ngOnInit(): void {
 		const search = new ResourceSearch();
-		search.categoryId = this.category;
+		search.categoryId = this.category();
 		search.sortBy = 'creationTime';
 		search.orderAscending = false;
 
 		this.resourceService.search(search).subscribe(resources => {
-			this.resources = resources.objects.map(resource => {
+			this.resources.set(resources.objects.map(resource => {
 				return {...resource, expanded: false};
-			});
+			}));
 		});
 	}
 

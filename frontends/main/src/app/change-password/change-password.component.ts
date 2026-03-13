@@ -1,5 +1,5 @@
 import {HttpErrorResponse} from '@angular/common/http';
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, input, signal} from '@angular/core';
 import {FormGroup, FormControl, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
@@ -17,6 +17,7 @@ import {ChangePassword} from '@core/model/change-password';
 import {User} from '@core/model/user';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-change-password',
 	templateUrl: './change-password.component.html',
 	styleUrls: ['./change-password.component.css'],
@@ -29,12 +30,12 @@ import {User} from '@core/model/user';
 		MatButton
 	]
 })
-export class ChangePasswordComponent implements OnInit {
-	loading = false;
+export class ChangePasswordComponent {
+	readonly loading = signal(false);
 
-	@Input() me?: User; //me will be available when the user is logged in
-	@Input() recoveryCode?: string; //recoveryCode will be available when the user clicks on the link in password recovery email
-	@Input() changeRequestContext: ChangePasswordContext;
+	readonly me = input<User>(); //me will be available when the user is logged in
+	readonly recoveryCode = input<string>(); //recoveryCode will be available when the user clicks on the link in password recovery email
+	readonly changeRequestContext = input.required<ChangePasswordContext>();
 
 	ChangePasswordContext = ChangePasswordContext;
 
@@ -53,40 +54,49 @@ export class ChangePasswordComponent implements OnInit {
 		})
 	}, {validators: CustomValidators.matchingPasswords});
 
-	errorText: string;
+	readonly error = signal<string | undefined>(undefined);
 
 	constructor(
 		private authService: AuthService,
 		private router: Router,
 		private notificationService: NotificationService
-	) {}
+	) {
+		effect(() => {
+			const email = this.me()?.email;
+			if(email) {
+				this.changePasswordForm.get('email')?.setValue(email);
+			}
+		});
 
-	ngOnInit(): void {
-		if(this.me) {
-			this.changePasswordForm.get('email')?.setValue(this.me.email);
-		}
-		if(!this.recoveryCode) {
-			this.changePasswordForm.get('currentPassword')?.setValidators(Validators.required);
-		}
+		effect(() => {
+			const currentPasswordControl = this.changePasswordForm.get('currentPassword');
+			if(this.recoveryCode()) {
+				currentPasswordControl?.clearValidators();
+			}
+			else {
+				currentPasswordControl?.setValidators(Validators.required);
+			}
+			currentPasswordControl?.updateValueAndValidity();
+		});
 	}
 
 	updatePassword(): void {
-		this.loading = true;
+		this.loading.set(true);
 
-		if(this.recoveryCode && this.changeRequestContext === ChangePasswordContext.PASSWORD_RESET) {
+		if(this.recoveryCode() && this.changeRequestContext() === ChangePasswordContext.PASSWORD_RESET) {
 			const newPassword = this.changePasswordForm.controls.password.value;
 			const resetPassword = {} as ResetPassword;
 			resetPassword.newPassword = newPassword;
-			resetPassword.resetCode = this.recoveryCode;
+			resetPassword.resetCode = this.recoveryCode()!;
 			this.authService.resetPassword(resetPassword).pipe(
-				finalize(() => this.loading = false)
+				finalize(() => this.loading.set(false))
 			).subscribe({
 				next: () => {
 					this.notificationService.showSuccess('Password reset');
 					this.router.navigate(['/login']);
 				},
 				error: (response: any) => {
-					this.errorText = getPasswordErrorMessage(response as HttpErrorResponse, this.recoveryCode !== undefined);
+					this.error.set(getPasswordErrorMessage(response as HttpErrorResponse, this.recoveryCode() !== undefined));
 				}
 			});
 		}
@@ -97,21 +107,21 @@ export class ChangePasswordComponent implements OnInit {
 
 			this.authService.changePassword(changePassword).pipe(
 				finalize(() => {
-					this.loading = false;
+					this.loading.set(false);
 				})
 			).subscribe({
 				next: () => {
-					if(this.changeRequestContext === ChangePasswordContext.USER_REQUEST) {
-						this.errorText = '';
+					if(this.changeRequestContext() === ChangePasswordContext.USER_REQUEST) {
+						this.error.set('');
 						this.changePasswordForm.reset();
 					}
-					else if(this.changeRequestContext === ChangePasswordContext.SYSTEM_REQUEST) {
+					else if(this.changeRequestContext() === ChangePasswordContext.SYSTEM_REQUEST) {
 						this.router.navigate(['/dashboard']);
 					}
 					this.notificationService.showSuccess('Password changed');
 				},
 				error: (response: any) => {
-					this.errorText = getPasswordErrorMessage(response as HttpErrorResponse, this.recoveryCode !== undefined);
+					this.error.set(getPasswordErrorMessage(response as HttpErrorResponse, this.recoveryCode() !== undefined));
 				}
 			});
 		}

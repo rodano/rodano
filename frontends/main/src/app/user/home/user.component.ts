@@ -1,5 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
-import {RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
+import {ChangeDetectionStrategy, Component, InjectionToken, OnInit, WritableSignal, inject, model, signal} from '@angular/core';
+import {ActivatedRoute, RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
 import {User} from '@core/model/user';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatIcon} from '@angular/material/icon';
@@ -8,9 +8,11 @@ import {MatBadge} from '@angular/material/badge';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {MatTooltip} from '@angular/material/tooltip';
 import {AuthStateService} from 'src/app/services/auth-state.service';
-import {MeService} from '@core/services/me.service';
+
+export const USER_TOKEN = new InjectionToken<WritableSignal<User>>('user');
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user.component.html',
 	styleUrls: ['./user.component.css'],
 	imports: [
@@ -27,23 +29,21 @@ import {MeService} from '@core/services/me.service';
 	]
 })
 export class UserComponent implements OnInit {
-	@Input() me: User;
-	//user will be undefined when this component is displayed to create a new user
-	@Input() user?: User;
-	pendingRolesNumber = 0;
+	//user a static signal instead of an input because the user must be shared with the child components
+	readonly user = inject(USER_TOKEN);
+	readonly me = model.required<User>();
+
+	readonly pendingRolesNumber = signal(0);
 
 	constructor(
-		private meService: MeService,
-		private authStateService: AuthStateService) {}
+		private authStateService: AuthStateService,
+		private route: ActivatedRoute) {}
 
 	ngOnInit() {
-		this.meService.get().subscribe(u => this.me = u);
+		const user = this.route.snapshot.data['user'];
+		this.user.set(user);
 		this.authStateService.listenConnectedUser().subscribe(user => {
-			this.pendingRolesNumber = AuthStateService.getUserPendingRolesNumber(user);
+			this.pendingRolesNumber.set(AuthStateService.getUserPendingRolesNumber(user));
 		});
-	}
-
-	getState(outlet: RouterOutlet) {
-		return outlet.activatedRouteData.state;
 	}
 }

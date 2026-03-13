@@ -1,4 +1,4 @@
-import {Component, Input, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, input, model} from '@angular/core';
 import {Event} from '@core/model/event';
 import {Scope} from '@core/model/scope';
 import {EventService} from '@core/services/event.service';
@@ -18,6 +18,7 @@ import {of, switchMap} from 'rxjs';
 import {CRFChangeService} from '../services/crf-change.service';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-event-dashboard',
 	templateUrl: './event-dashboard.component.html',
 	styleUrls: ['./event-dashboard.component.css'],
@@ -31,13 +32,16 @@ import {CRFChangeService} from '../services/crf-change.service';
 		AuditTrailButtonComponent
 	]
 })
-export class EventDashboardComponent implements OnChanges {
+export class EventDashboardComponent {
 	workflowableEntity = WorkflowableEntity;
 
-	@Input() scope: Scope;
-	@Input() event: Event;
+	readonly scope = input.required<Scope>();
+	readonly event = model.required<Event>();
 
-	dateDifferenceInDays: number;
+	readonly dateDifferenceInDays = computed(() => {
+		const date = this.event().date ?? this.event().expectedDate;
+		return differenceInDays(date, new Date());
+	});
 
 	constructor(
 		private eventService: EventService,
@@ -46,11 +50,6 @@ export class EventDashboardComponent implements OnChanges {
 		private dialog: MatDialog
 	) {}
 
-	ngOnChanges() {
-		const date = this.event.date ?? this.event.expectedDate;
-		this.dateDifferenceInDays = differenceInDays(date, new Date());
-	}
-
 	remove() {
 		return this.dialog
 			.open(DeleteRestoreComponent, {data: true})
@@ -58,7 +57,7 @@ export class EventDashboardComponent implements OnChanges {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.eventService.remove(this.event.scopePk, this.event.pk, rationale);
+						return this.eventService.remove(this.event().scopePk, this.event().pk, rationale);
 					}
 					return of(undefined);
 				})
@@ -66,7 +65,7 @@ export class EventDashboardComponent implements OnChanges {
 			.subscribe({
 				next: event => {
 					if(event) {
-						this.event = event;
+						this.event.set(event);
 						//used by the side menu to refresh the entities
 						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 						this.notificationService.showSuccess('Event removed');
@@ -85,7 +84,7 @@ export class EventDashboardComponent implements OnChanges {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.eventService.restore(this.event.scopePk, this.event.pk, rationale);
+						return this.eventService.restore(this.event().scopePk, this.event().pk, rationale);
 					}
 					return of(undefined);
 				})
@@ -93,7 +92,7 @@ export class EventDashboardComponent implements OnChanges {
 			.subscribe({
 				next: event => {
 					if(event) {
-						this.event = event;
+						this.event.set(event);
 						//used by the side menu to refresh the entities
 						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 						this.notificationService.showSuccess('Event restored');
@@ -106,9 +105,9 @@ export class EventDashboardComponent implements OnChanges {
 	}
 
 	lock() {
-		this.eventService.lock(this.event.scopePk, this.event.pk).subscribe({
+		this.eventService.lock(this.event().scopePk, this.event().pk).subscribe({
 			next: event => {
-				this.event = event;
+				this.event.set(event);
 				//used by the side menu to refresh the entities
 				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 				this.notificationService.showSuccess('Event locked');
@@ -120,9 +119,9 @@ export class EventDashboardComponent implements OnChanges {
 	}
 
 	unlock() {
-		this.eventService.unlock(this.event.scopePk, this.event.pk).subscribe({
+		this.eventService.unlock(this.event().scopePk, this.event().pk).subscribe({
 			next: event => {
-				this.event = event;
+				this.event.set(event);
 				//used by the side menu to refresh the entities
 				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 				this.notificationService.showSuccess('Event unlocked');
@@ -134,6 +133,6 @@ export class EventDashboardComponent implements OnChanges {
 	}
 
 	onWorkflowExecution(newEvent: Workflowable) {
-		this.event = newEvent as Event;
+		this.event.set(newEvent as Event);
 	}
 }

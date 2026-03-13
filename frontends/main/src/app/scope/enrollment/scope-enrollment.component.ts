@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, signal} from '@angular/core';
 import {Validators, FormControl, FormGroup, ReactiveFormsModule, FormArray} from '@angular/forms';
 import {forkJoin, of} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, catchError} from 'rxjs/operators';
@@ -32,8 +32,10 @@ import {NotificationService} from 'src/app/services/notification.service';
 import {LowerCasePipe} from '@angular/common';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
 import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
+import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-enrollment',
 	templateUrl: './scope-enrollment.component.html',
 	styleUrls: ['./scope-enrollment.component.css'],
@@ -57,11 +59,11 @@ import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
 		CapitalizeFirstPipe
 	]
 })
-export class ScopeEnrollmentComponent implements OnInit, OnChanges {
-	@Input() scopeModel: ScopeModel;
-	@Input() scope: Scope;
+export class ScopeEnrollmentComponent {
+	readonly scope = inject(SCOPE_TOKEN);
+	readonly scopeModel = input.required<ScopeModel>();
 
-	childScopeModel: ScopeModel;
+	readonly childScopeModel = signal<ScopeModel | undefined>(undefined);
 
 	//customization form
 	criteria = new FormArray([] as FormArray[]);
@@ -72,13 +74,13 @@ export class ScopeEnrollmentComponent implements OnInit, OnChanges {
 		criteria: this.criteria
 	}) as FormGroup;
 
-	scopeModels: ScopeModel[] = [];
-	rootScopes: ScopeMini[] = [];
-	fieldModels: FieldModel[];
+	readonly scopeModels = signal<ScopeModel[]>([]);
+	readonly rootScopes = signal<ScopeMini[]>([]);
+	readonly fieldModels = signal<FieldModel[]>([]);
 	enrollmentTypes: EnrollmentType[] = [EnrollmentType.AUTOMATIC, EnrollmentType.MANUAL];
-	enrollableCount: number | undefined = undefined;
+	readonly enrollableCount = signal<number | undefined>(undefined);
 
-	childScopes: Scope[] = [];
+	readonly childScopes = signal<Scope[]>([]);
 	columnsToDisplay: string[] = ['code', 'shortname', 'startDate', 'stopDate'];
 
 	constructor(
@@ -87,16 +89,33 @@ export class ScopeEnrollmentComponent implements OnInit, OnChanges {
 		private meService: MeService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
-	) { }
+	) {
+		effect(() => {
+			this.loadChildScopes();
+			const childScopeModelId = this.scopeModel().childScopeModelIds[0];
+			forkJoin({
+				scopeModels: this.configurationService.getScopeModelsSorted(),
+				fieldModels: this.configurationService.getScopeModelFieldModels(childScopeModelId),
+				childScopeModel: this.configurationService.getScopeModel(childScopeModelId),
+				rootScopes: this.meService.getScopes(undefined, true, false)
+			}).pipe(
+				takeUntilDestroyed(this.destroyRef)
+			).subscribe(({scopeModels, fieldModels, childScopeModel, rootScopes}) => {
+				this.scopeModels.set(scopeModels);
+				this.fieldModels.set(fieldModels);
+				this.childScopeModel.set(childScopeModel);
+				this.rootScopes.set(rootScopes);
+				this.reset();
+			});
+		});
 
-	ngOnInit() {
 		this.criteria.valueChanges.pipe(
 			debounceTime(500),
 			distinctUntilChanged((a, b) => JSON.stringify(a) === JSON.stringify(b)),
 			takeUntilDestroyed(this.destroyRef),
 			startWith(this.criteria.value),
 			switchMap(() => {
-				if(!this.fieldModels) {
+				if(!this.fieldModels().length) {
 					return of(undefined);
 				}
 				if(!this.enrollmentForm.valid) {
@@ -104,37 +123,17 @@ export class ScopeEnrollmentComponent implements OnInit, OnChanges {
 				}
 
 				const criteria = this.generateCriteria();
-				return this.scopeService.countEnrollable(this.scope.pk, criteria).pipe(
+				return this.scopeService.countEnrollable(this.scope().pk, criteria).pipe(
 					catchError(() => of(undefined))
 				);
 			})
 		).subscribe(count => {
-			this.enrollableCount = count;
-		});
-	}
-
-	ngOnChanges() {
-		this.loadChildScopes();
-		//virtual scope model must have exactly one child scope model, which is the one to use for enrollment configuration
-		const childScopeModelId = this.scopeModel.childScopeModelIds[0];
-		forkJoin({
-			scopeModels: this.configurationService.getScopeModelsSorted(),
-			fieldModels: this.configurationService.getScopeModelFieldModels(childScopeModelId),
-			childScopeModel: this.configurationService.getScopeModel(childScopeModelId),
-			rootScopes: this.meService.getScopes(undefined, true, false)
-		}).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({scopeModels, fieldModels, childScopeModel, rootScopes}) => {
-			this.scopeModels = scopeModels;
-			this.fieldModels = fieldModels;
-			this.childScopeModel = childScopeModel;
-			this.rootScopes = rootScopes;
-			this.reset();
+			this.enrollableCount.set(count);
 		});
 	}
 
 	getScopes(modelId: string): ScopeMini[] {
-		return this.rootScopes?.filter(s => s.modelId === modelId) ?? [];
+		return this.rootScopes().filter(s => s.modelId === modelId) ?? [];
 	}
 
 	getControl(i: number, j: number): FormControl {
@@ -145,7 +144,7 @@ export class ScopeEnrollmentComponent implements OnInit, OnChanges {
 	getFieldModel(index: number): FieldModel {
 		const criterion = this.criteria.controls[index] as FormArray;
 		const fieldModelId = criterion.controls[0].value;
-		return this.fieldModels?.find(f => f.id === fieldModelId) as FieldModel;
+		return this.fieldModels().find(f => f.id === fieldModelId) as FieldModel;
 	}
 
 	getOperators(index: number): Operator[] {
@@ -201,10 +200,10 @@ export class ScopeEnrollmentComponent implements OnInit, OnChanges {
 
 	reset() {
 		this.enrollmentForm.reset();
-		const type = this.scope.enrollmentModel?.type ?? null;
-		const system = this.scope.enrollmentModel?.system ?? false;
-		const rootScopeIds = this.scope.enrollmentModel?.scopesContainerIds ?? [];
-		const criteria = this.scope.enrollmentModel?.criteria ?? [];
+		const type = this.scope().enrollmentModel?.type ?? null;
+		const system = this.scope().enrollmentModel?.system ?? false;
+		const rootScopeIds = this.scope().enrollmentModel?.scopesContainerIds ?? [];
+		const criteria = this.scope().enrollmentModel?.criteria ?? [];
 		this.enrollmentForm.get('type')?.setValue(type);
 		this.enrollmentForm.get('system')?.setValue(system);
 		this.enrollmentForm.get('rootScopeIds')?.setValue(rootScopeIds);
@@ -226,40 +225,40 @@ export class ScopeEnrollmentComponent implements OnInit, OnChanges {
 		} as EnrollmentModel;
 
 		const updatedScope = {
-			...this.scope,
+			...this.scope(),
 			enrollmentModel
 		} as Scope;
 
-		this.scopeService.save(this.scope.pk, updatedScope).subscribe(scope => {
-			Object.assign(this.scope, scope);
+		this.scopeService.save(this.scope().pk, updatedScope).subscribe(scope => {
+			this.scope.set(scope);
 			this.notificationService.showSuccess('Enrollment model saved');
 		});
 	}
 
 	enroll() {
-		this.scopeService.enroll(this.scope.pk).subscribe(() => {
+		this.scopeService.enroll(this.scope().pk).subscribe(() => {
 			this.notificationService.showSuccess('All scopes enrolled successfully');
 			this.loadChildScopes();
 		});
 	}
 
 	unenroll() {
-		this.scopeService.unenroll(this.scope.pk).subscribe(() => {
+		this.scopeService.unenroll(this.scope().pk).subscribe(() => {
 			this.notificationService.showSuccess('All scopes unenrolled successfully');
 			this.loadChildScopes();
 		});
 	}
 
 	loadChildScopes() {
-		if(!this.scope?.pk) {
+		if(!this.scope()?.pk) {
 			return;
 		}
 		const search = new ScopeSearch();
-		search.parentPks = [this.scope.pk];
+		search.parentPks = [this.scope().pk];
 		this.scopeService.search(search).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(result => {
-			this.childScopes = result.objects;
+			this.childScopes.set(result.objects);
 		});
 	}
 }

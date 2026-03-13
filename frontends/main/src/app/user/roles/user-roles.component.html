@@ -1,9 +1,9 @@
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
-	[dataSource]="roles">
+	[dataSource]="user().roles">
 	<ng-container matColumnDef="profile">
 		<th
 			mat-header-cell
@@ -13,7 +13,7 @@
 		<td
 			mat-cell
 			*matCellDef="let role">
-			{{ role.profileId | lookupById: profiles | getField: 'shortname' | localizeMap }}
+			{{ role.profileId | lookupById: profiles() | getField: 'shortname' | localizeMap }}
 		</td>
 	</ng-container>
 	<ng-container matColumnDef="scope">
@@ -118,7 +118,7 @@
 					<mat-select
 						formControlName="profile"
 						required>
-						@for (profile of profiles | sort: 'id'; track profile.id) {
+						@for (profile of profiles() | sort: 'id'; track profile.id) {
 							<mat-option [value]="profile.id">
 								{{ profile.shortname | localizeMap }}
 							</mat-option>
@@ -132,7 +132,7 @@
 					<mat-label>Scope</mat-label>
 					<app-scope-picker
 						formControlName="scopePk"
-						[scopes]="scopes"
+						[scopes]="scopes()"
 						required></app-scope-picker>
 				</mat-form-field>
 			</div>

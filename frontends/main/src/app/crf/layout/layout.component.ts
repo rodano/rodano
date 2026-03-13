@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, DestroyRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, input, signal} from '@angular/core';
 import {Layout} from '@core/model/layout';
 import {VisibilityService} from '../services/visibility.service';
 import {CellComponent} from '../cell/cell.component';
@@ -14,6 +14,7 @@ import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
 import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-layout',
 	templateUrl: './layout.component.html',
 	styleUrls: ['./layout.component.css'],
@@ -24,14 +25,14 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	]
 })
 export class LayoutComponent implements OnInit {
-	@Input() layout: Layout;
-	@Input() datasets: CRFDataset[];
+	readonly layout = input.required<Layout>();
+	readonly datasets = input.required<CRFDataset[]>();
 	//layoutUid is the global identifier of the layout
 	//it is required for visibility criteria
-	@Input() layoutUid: string;
-	@Input() disabled: boolean;
+	readonly layoutUid = input.required<string>();
+	readonly disabled = input<boolean>(false);
 
-	shown = true;
+	readonly shown = signal(true);
 
 	constructor(
 		private visibilityService: VisibilityService,
@@ -41,22 +42,22 @@ export class LayoutComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		this.visibilityService.layoutVisibilityEvents$(this.layout.id).pipe(
+		this.visibilityService.layoutVisibilityEvents$(this.layout().id).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
 			//deal only with single layout here
 			//if the layout is multiple, its visibility state will be managed by the parent component
-			if(this.layout.type === LayoutType.SINGLE) {
-				this.loggingService.info(`Layout ${this.layout.id} receiving visibility event containing ${shown}`);
-				this.shown = shown;
-				const cells = this.crfService.getLayoutCells(this.layout);
+			if(this.layout().type === LayoutType.SINGLE) {
+				this.loggingService.info(`Layout ${this.layout().id} receiving visibility event containing ${shown}`);
+				this.shown.set(shown);
+				const cells = this.crfService.getLayoutCells(this.layout());
 				//reset state of the cells inside the layout
-				this.visibilityService.triggerCellsVisibilityEvent(cells, this.layoutUid, shown);
+				this.visibilityService.triggerCellsVisibilityEvent(cells, this.layoutUid(), shown);
 				//if the layout and its cells become visible, cell visibility criteria must be re-triggered
 				if(shown) {
 					cells
 						.filter(c => this.crfService.getCellHasField(c))
-						.forEach(c => this.visibilityService.triggerCriteria(c, this.layoutUid, this.getField(c) as CRFField));
+						.forEach(c => this.visibilityService.triggerCriteria(c, this.layoutUid(), this.getField(c) as CRFField));
 				}
 			}
 		});
@@ -66,17 +67,17 @@ export class LayoutComponent implements OnInit {
 		if(!this.crfService.getCellHasField(cell)) {
 			return undefined;
 		}
-		return this.crfService.getCellField(cell, this.datasets);
+		return this.crfService.getCellField(cell, this.datasets());
 	}
 
 	getDisabled(cell: Cell): boolean {
 		if(!this.crfService.getCellHasField(cell)) {
 			return false;
 		}
-		if(this.disabled) {
+		if(this.disabled()) {
 			return true;
 		}
-		const dataset = this.crfService.getCellDataset(cell, this.datasets);
+		const dataset = this.crfService.getCellDataset(cell, this.datasets());
 		//dataset may not be found if the user does not have the right to all datasets used in the form
 		if(!dataset) {
 			throw new Error(`Missing rights to access dataset ${cell.datasetModelId} (due to a misconfiguration`);

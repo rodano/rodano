@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
@@ -16,8 +16,10 @@ import {ChangePasswordContext} from 'src/app/change-password/change-password-con
 import {UserPasswordDialogResult} from '../dialogs/user-password-dialog-result';
 import {DeleteRestoreComponent} from 'src/app/crf/dialogs/delete-restore/delete-restore.component';
 import {of} from 'rxjs';
+import {USER_TOKEN} from '../home/user.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-security.component.html',
 	styleUrls: ['./user-security.component.css'],
 	imports: [
@@ -30,9 +32,9 @@ import {of} from 'rxjs';
 		ChangePasswordComponent
 	]
 })
-export class UserSecurityComponent implements OnChanges {
-	@Input() user: User;
-	@Input() me: User;
+export class UserSecurityComponent {
+	readonly user = inject(USER_TOKEN);
+	readonly me = input.required<User>();
 
 	emailForm = new FormGroup({
 		email: new FormControl('', {
@@ -43,52 +45,50 @@ export class UserSecurityComponent implements OnChanges {
 
 	ChangePasswordContext = ChangePasswordContext;
 
-	passwordErrorMessage: string;
-
 	constructor(
 		private userService: UserService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog,
 		private destroyRef: DestroyRef
-	) {}
-
-	ngOnChanges() {
-		this.emailForm.controls.email.setValue(this.user.pendingEmail || this.user.email);
+	) {
+		effect(() => {
+			this.emailForm.controls.email.setValue(this.user().pendingEmail || this.user().email);
+		});
 	}
 
 	convertToLocal() {
-		this.userService.convertToLocal(this.user.pk).pipe(
+		this.userService.convertToLocal(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(user => {
-			this.user.externallyManaged = user.externallyManaged;
+			this.user.set(user);
 			this.notificationService.showSuccess('User converted to a local user');
 		});
 	}
 
 	convertToExternal() {
-		this.userService.convertToExternal(this.user.pk).pipe(
+		this.userService.convertToExternal(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(user => {
-			this.user.externallyManaged = user.externallyManaged;
+			this.user.set(user);
 			this.notificationService.showSuccess('User converted to an external user');
 		});
 	}
 
 	changeEmail() {
 		return this.dialog
-			.open<UserPasswordDialogComponent, any, UserPasswordDialogResult>(UserPasswordDialogComponent, {data: {user: this.me, actionLabel: 'Change email'}})
+			.open<UserPasswordDialogComponent, any, UserPasswordDialogResult>(UserPasswordDialogComponent, {data: {user: this.me(), actionLabel: 'Change email'}})
 			.afterClosed()
 			.pipe(
 				//if the user canceled the dialog, we don't want to continue
 				takeWhile(userPassword => !!userPassword),
 				switchMap(userPassword => {
 					const email = this.emailForm.controls.email.value;
-					return this.userService.changeEmail(this.user.pk, userPassword.password, email);
+					return this.userService.changeEmail(this.user().pk, userPassword.password, email);
 				}),
 				takeUntilDestroyed(this.destroyRef)
 			).subscribe({
 				next: user => {
-					this.user = user;
+					this.user.set(user);
 					this.notificationService.showSuccess('Email change requested');
 				},
 				error: response => this.notificationService.showError(response.error.message)
@@ -105,7 +105,7 @@ export class UserSecurityComponent implements OnChanges {
 	}
 
 	resendEmailVerificationEmail() {
-		this.userService.resendEmailVerificationEmail(this.user.pk).pipe(
+		this.userService.resendEmailVerificationEmail(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
 			this.notificationService.showSuccess('Email verification email resent');
@@ -119,15 +119,15 @@ export class UserSecurityComponent implements OnChanges {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.userService.remove(this.user.pk, rationale).pipe(switchMap(() => of(true)));
+						return this.userService.remove(this.user().pk, rationale);
 					}
-					return of(false);
+					return of(undefined);
 				})
 			)
 			.subscribe({
-				next: approved => {
-					if(approved) {
-						this.user.removed = true;
+				next: user => {
+					if(user) {
+						this.user.set(user);
 						this.notificationService.showSuccess('User removed');
 					}
 				},
@@ -144,15 +144,15 @@ export class UserSecurityComponent implements OnChanges {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.userService.restore(this.user.pk, rationale).pipe(switchMap(() => of(true)));
+						return this.userService.restore(this.user().pk, rationale);
 					}
-					return of(false);
+					return of(undefined);
 				})
 			)
 			.subscribe({
-				next: approved => {
-					if(approved) {
-						this.user.removed = false;
+				next: user => {
+					if(user) {
+						this.user.set(user);
 						this.notificationService.showSuccess('User restored');
 					}
 				},
@@ -163,7 +163,7 @@ export class UserSecurityComponent implements OnChanges {
 	}
 
 	resendAccountActivationEmail() {
-		this.userService.resendAccountActivationEmail(this.user.pk).pipe(
+		this.userService.resendAccountActivationEmail(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
 			this.notificationService.showSuccess('Activation email resent');
@@ -171,10 +171,10 @@ export class UserSecurityComponent implements OnChanges {
 	}
 
 	unblock() {
-		this.userService.unblock(this.user.pk).pipe(
+		this.userService.unblock(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(user => {
-			this.user.blocked = user.blocked;
+			this.user.set(user);
 			this.notificationService.showSuccess('User unblocked');
 		});
 	}

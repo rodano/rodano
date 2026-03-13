@@ -1,126 +1,126 @@
 <div
 	class="block"
-	[class.error]="field.error"
-	[style]="style">
-	@if (debug) {
+	[class.error]="field().error()"
+	[style]="style()">
+	@if (debug()) {
 		<p class="debug">
-			{{ debug }}
+			{{ debug() }}
 		</p>
 	}
 
 	<div class="field">
 		<!-- The field label for non checkbox -->
-		@if (cell.displayLabel && field.model.type !== fieldModelType.CHECKBOX) {
+		@if (cell().displayLabel && field().model.type !== fieldModelType.CHECKBOX) {
 			<label
-				[for]="id"
-				[style]="cell.cssCodeForLabel">
-				{{ field.model | localizeFieldModel }}
+				[for]="id()"
+				[style]="cell().cssCodeForLabel">
+				{{ field().model | localizeFieldModel }}
 			</label>
 		}
 
-		@if (field.model.type === fieldModelType.STRING) {
-			<mat-form-field [style]="cell.cssCodeForInput">
+		@if (field().model.type === fieldModelType.STRING) {
+			<mat-form-field [style]="cell().cssCodeForInput">
 				<input
 					matInput
 					type="text"
-					[id]="id"
+					[id]="id()"
 					[formControl]="control"
-					[attr.maxlength]="field.model.maxLength || ''" />
+					[attr.maxlength]="field().model.maxLength || ''" />
 			</mat-form-field>
-		} @else if (field.model.type === fieldModelType.NUMBER) {
+		} @else if (field().model.type === fieldModelType.NUMBER) {
 			<mat-form-field
-				[style]="cell.cssCodeForInput"
-				[style.width]="cell.cssCodeForInput ? '' : '7rem'">
+				[style]="cell().cssCodeForInput"
+				[style.width]="cell().cssCodeForInput ? '' : '7rem'">
 				<input
 					matInput
 					type="number"
-					[id]="id"
+					[id]="id()"
 					[formControl]="control"
-					[attr.maxlength]="field.model.maxLength || ''" />
+					[attr.maxlength]="field().model.maxLength || ''" />
 			</mat-form-field>
-		} @else if (field.model.type === fieldModelType.TEXTAREA) {
-			<mat-form-field [style]="cell.cssCodeForInput">
+		} @else if (field().model.type === fieldModelType.TEXTAREA) {
+			<mat-form-field [style]="cell().cssCodeForInput">
 				<textarea
 					matInput
-					[id]="id"
+					[id]="id()"
 					[formControl]="control"
 					cdkTextAreaAutoSize
 					cdkAutosizeMinRows="2"
 					cdkAutoSizeMaxRows="4"
-					[attr.maxlength]="field.model.maxLength || ''">
+					[attr.maxlength]="field().model.maxLength || ''">
 				</textarea>
 			</mat-form-field>
-		} @else if (field.model.type === fieldModelType.SELECT) {
-			<mat-form-field [style]="cell.cssCodeForInput">
+		} @else if (field().model.type === fieldModelType.SELECT) {
+			<mat-form-field [style]="cell().cssCodeForInput">
 				<mat-select
-					[id]="id"
+					[id]="id()"
 					[formControl]="control"
 					panelWidth="">
 					<mat-option></mat-option>
-					@for (possibleValue of field.possibleValues; track possibleValue.id) {
+					@for (possibleValue of field().possibleValues; track possibleValue.id) {
 						<mat-option [value]="possibleValue.id">
 							{{ possibleValue.shortname | localizeMap }}
 						</mat-option>
 					}
 				</mat-select>
 			</mat-form-field>
-		} @else if (field.model.type === fieldModelType.CHECKBOX) {
+		} @else if (field().model.type === fieldModelType.CHECKBOX) {
 			<mat-checkbox
-				[id]="id"
+				[id]="id()"
 				[indeterminate]="indeterminate"
 				[formControl]="control">
-				{{ field.model | localizeFieldModel }}
+				{{ field().model | localizeFieldModel }}
 			</mat-checkbox>
-		} @else if (field.model.type === fieldModelType.RADIO) {
+		} @else if (field().model.type === fieldModelType.RADIO) {
 			<mat-radio-group
 				[formControl]="control"
-				[class.horizontal]="!cell.possibleValuesColumnNumber || cell.possibleValuesColumnNumber > 1">
-				@for (possibleValue of field.model.possibleValues; track possibleValue.id) {
+				[class.horizontal]="!cell().possibleValuesColumnNumber || cell().possibleValuesColumnNumber! > 1">
+				@for (possibleValue of field().model.possibleValues; track possibleValue.id) {
 					<mat-radio-button
 						[value]="possibleValue.id"
-						[disabled]="field.model.dynamic || field.model.readOnly || disabled">
+						[disabled]="field().model.dynamic || field().model.readOnly || disabled()">
 						{{ possibleValue.shortname | localizeMap }}
 					</mat-radio-button>
 				}
 			</mat-radio-group>
-		} @else if (field.model.type === fieldModelType.DATE) {
+		} @else if (field().model.type === fieldModelType.DATE) {
 			<app-date
-				[field]="field"
+				[field]="field()"
 				[disabled]="getDisabled()"></app-date>
-		} @else if (field.model.type === fieldModelType.DATE_SELECT) {
+		} @else if (field().model.type === fieldModelType.DATE_SELECT) {
 			<app-date-select
-				[field]="field"
+				[field]="field()"
 				[disabled]="getDisabled()"></app-date-select>
-		} @else if (field.model.type === fieldModelType.CHECKBOX_GROUP) {
+		} @else if (field().model.type === fieldModelType.CHECKBOX_GROUP) {
 			<app-checkbox-group
-				[field]="field"
+				[field]="field()"
 				[disabled]="getDisabled()"></app-checkbox-group>
-		} @else if (field.model.type === fieldModelType.AUTO_COMPLETION) {
+		} @else if (field().model.type === fieldModelType.AUTO_COMPLETION) {
 			<app-auto-complete
-				[field]="field"
-				[id]="id"
+				[field]="field()"
+				[id]="id()"
 				[disabled]="getDisabled()"></app-auto-complete>
-		} @else if (field.model.type === fieldModelType.FILE) {
+		} @else if (field().model.type === fieldModelType.FILE) {
 			<app-file-upload
-				[field]="field"
-				[id]="id"
+				[field]="field()"
+				[id]="id()"
 				[disabled]="getDisabled()"></app-file-upload>
 		}
 
-		@if (field.model.inlineHelp) {
+		@if (field().model.inlineHelp) {
 			<span
 				class="inline-help"
-				[innerHTML]="field.model.inlineHelp"></span>
+				[innerHTML]="field().model.inlineHelp"></span>
 		}
-		@if (!isEmptyObject(field.model.advancedHelp)) {
+		@if (!isEmptyObject(field().model.advancedHelp)) {
 			<button
 				mat-icon-button
 				type="button"
-				(click)="openHelp(field.model)">
+				(click)="openHelp(field().model)">
 				<mat-icon>info</mat-icon>
 			</button>
 		}
-		@if (displayAuditTrail) {
+		@if (displayAuditTrail()) {
 			<button
 				mat-icon-button
 				type="button"
@@ -130,10 +130,10 @@
 		}
 
 		<!-- Workflow creation actions menu -->
-		@if (hasActions) {
+		@if (hasActions()) {
 			<mat-menu #appMenu="matMenu">
 				<!-- Add creation actions used to create new workflow statuses -->
-				@for (action of creationActions; track action.id) {
+				@for (action of creationActions(); track action.id) {
 					<button
 						mat-menu-item
 						type="button"
@@ -143,7 +143,7 @@
 					</button>
 				}
 				<!-- Add actions to manipulate non important statuses (important statuses have their dedicated block below the field) -->
-				@for (status of field.workflowStatuses | notImportantStatus; track status.pk || status.workflowId) {
+				@for (status of field().workflowStatuses | notImportantStatus; track status.pk || status.workflowId) {
 					@for (action of status.state.possibleActions; track $index) {
 						<button
 							mat-menu-item
@@ -165,14 +165,14 @@
 	</div>
 
 	<!-- Workflow statuses actions -->
-	@if ((field.workflowStatuses | importantStatus).length > 0) {
+	@if ((field().workflowStatuses | importantStatus).length > 0) {
 		<p class="statuses">
 			<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
-			@for (status of field.workflowStatuses | importantStatus; track status.pk || status.workflowId) {
+			@for (status of field().workflowStatuses | importantStatus; track status.pk || status.workflowId) {
 				<app-workflow-status
 					[entity]="workflowableEntity.FIELD"
 					[workflowStatus]="status"
-					[workflowable]="field"
+					[workflowable]="field()"
 					rough="true"
 					(actionResponse)="onActionResponse($event)">
 				</app-workflow-status>
@@ -181,7 +181,7 @@
 	}
 
 	<!-- Errors -->
-	@if (field.error) {
-		<p>{{ field.error }}</p>
+	@if (field().error()) {
+		<p>{{ field().error() }}</p>
 	}
 </div>

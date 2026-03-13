@@ -1,4 +1,4 @@
-<h1 mat-dialog-title>{{ newResource ? 'Publish a ' : 'Modify' }} {{ category?.shortname | localizeMap }}</h1>
+<h1 mat-dialog-title>{{ newResource() ? 'Publish a ' : 'Modify' }} {{ category()?.shortname | localizeMap }}</h1>
 
 <form
 	name="resource"
@@ -30,7 +30,7 @@
 				<mat-label>Scope</mat-label>
 				<app-scope-picker
 					formControlName="scopePk"
-					[scopes]="scopes"></app-scope-picker>
+					[scopes]="scopes()"></app-scope-picker>
 			</mat-form-field>
 		</p>
 
@@ -50,7 +50,7 @@
 				accept=".csv,.pdf,.xlsx"
 				(change)="handleFileInput($any($event.target).files)" />
 
-			{{ fileToUpload?.name || $any(resource).filename }}
+			{{ fileToUpload()?.name || $any(resource).filename }}
 		</p>
 	</mat-dialog-content>
 
@@ -63,7 +63,7 @@
 		<button
 			mat-flat-button
 			[disabled]="resourceForm.invalid">
-			{{ newResource ? 'Create' : 'Update' }}
+			{{ newResource() ? 'Create' : 'Update' }}
 		</button>
 	</mat-dialog-actions>
 </form>

@@ -8,8 +8,8 @@
 			<mat-icon>arrow_back</mat-icon>
 		</button>
 
-		@if (robot) {
-			{{ robot.name }}
+		@if (robot()) {
+			{{ robot()!.name }}
 		} @else {
 			New robot
 		}
@@ -20,7 +20,7 @@
 	[formGroup]="robotForm"
 	(ngSubmit)="save()"
 	class="centered">
-	<p class="error">{{ errorText }}</p>
+	<p class="error">{{ error() }}</p>
 
 	<p>
 		<mat-form-field>
@@ -30,9 +30,9 @@
 				formControlName="name"
 				required />
 		</mat-form-field>
-		@if (robot) {
+		@if (robot()) {
 			<app-audit-trail-button
-				[robot]="robot"
+				[robot]="robot()!"
 				property="name" />
 		}
 	</p>
@@ -48,14 +48,14 @@
 		</mat-form-field>
 	</p>
 
-	@if (!robot) {
+	@if (!robot()) {
 		<p formGroupName="roleForm">
 			<mat-form-field>
 				<mat-label>Profile</mat-label>
 				<mat-select
 					formControlName="profileId"
 					required>
-					@for (profile of profiles | sort: 'id'; track profile.id) {
+					@for (profile of profiles() | sort: 'id'; track profile.id) {
 						<mat-option [value]="profile.id">
 							{{ profile.shortname | localizeMap }}
 						</mat-option>

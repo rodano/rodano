@@ -2,9 +2,9 @@
 
 <mat-dialog-content>
 	<mat-form-field class="scope-picker">
-		<mat-label>Select a {{ parentScopes[0].model.shortname | localizeMap | lowercase }}</mat-label>
+		<mat-label>Select a {{ parentScopes()[0].model.shortname | localizeMap | lowercase }}</mat-label>
 		<mat-select [(value)]="selectedScope">
-			@for (parentScope of parentScopes; track parentScope.pk) {
+			@for (parentScope of parentScopes(); track parentScope.pk) {
 				<mat-option [value]="parentScope">
 					{{ parentScope | scopeCodeShortname }}
 				</mat-option>

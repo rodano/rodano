@@ -1,5 +1,5 @@
 <mat-select>
-	@for (scopeModel of scopeModels; track scopeModel.id) {
+	@for (scopeModel of scopeModels(); track scopeModel.id) {
 		@if (getScopes(scopeModel.id).length > 0) {
 			<mat-optgroup [label]="scopeModel.shortname | localizeMap">
 				@for (scope of getScopes(scopeModel.id); track scope.pk) {

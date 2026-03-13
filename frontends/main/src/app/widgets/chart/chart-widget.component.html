@@ -1,12 +1,12 @@
-@if (chart) {
-	<h2>{{ chart.model.title }}</h2>
+@if (chart()) {
+	<h2>{{ chart()!.model.title }}</h2>
 	<canvas
 		baseChart
-		[data]="data"
-		[options]="options"
-		[type]="graphType">
+		[data]="data()"
+		[options]="options()"
+		[type]="graphType()">
 	</canvas>
-	@if (chart.model.withStatistics) {
+	@if (chart()!.model.withStatistics) {
 		<table>
 			<thead>
 				<th>Scope</th>
@@ -17,7 +17,7 @@
 				<th>SD</th>
 			</thead>
 			<tbody>
-				@for (dataset of chart.datasets; track $index) {
+				@for (dataset of chart()!.datasets; track $index) {
 					<tr>
 						<td>{{ dataset.label }}</td>
 						<td>{{ dataset.statistics?.count }}</td>

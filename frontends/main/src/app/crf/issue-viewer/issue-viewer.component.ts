@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatSort, MatSortModule} from '@angular/material/sort';
@@ -19,6 +19,7 @@ import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-issue-viewer',
 	templateUrl: './issue-viewer.component.html',
 	styleUrls: ['./issue-viewer.component.css'],
@@ -33,11 +34,11 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		DateUTCPipe
 	]
 })
-export class IssueViewerComponent implements OnInit, OnChanges {
-	@Input() scopePks: number[];
-	@Input() eventPks?: number[];
+export class IssueViewerComponent implements OnInit {
+	readonly scopePks = input.required<number[]>();
+	readonly eventPks = input<number[]>();
 
-	loading = false;
+	readonly loading = signal(false);
 	columnsToDisplay = [
 		'eventShortname',
 		'eventDate',
@@ -49,7 +50,7 @@ export class IssueViewerComponent implements OnInit, OnChanges {
 
 	refreshSearch$ = new Subject<void>();
 
-	workflowStatuses: PagedResultWorkflowStatus = EMPTY_PAGED_RESULT;
+	readonly workflowStatuses = signal<PagedResultWorkflowStatus>(EMPTY_PAGED_RESULT);
 
 	@ViewChild(MatTable, {static: true}) table: MatTable<WorkflowStatus>;
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -59,7 +60,13 @@ export class IssueViewerComponent implements OnInit, OnChanges {
 		private configurationService: ConfigurationService,
 		private workflowStatusService: WorkflowStatusService,
 		private destroyRef: DestroyRef
-	) {}
+	) {
+		effect(() => {
+			this.scopePks();
+			this.eventPks();
+			this.refreshSearch$.next();
+		});
+	}
 
 	ngOnInit() {
 		this.sort.active = WorkflowStatusSearch.DEFAULT_SORT_BY;
@@ -91,24 +98,20 @@ export class IssueViewerComponent implements OnInit, OnChanges {
 				);
 			}),
 			switchMap(({workflowIds, stateIds}) => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new WorkflowStatusSearch();
 				search.workflowIds = workflowIds;
 				search.stateIds = stateIds;
-				search.scopePks = this.scopePks;
-				search.eventPks = this.eventPks;
+				search.scopePks = this.scopePks();
+				search.eventPks = this.eventPks();
 				search.pageIndex = this.paginator.pageIndex;
 				search.sortBy = this.sort.active;
 				search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 				return this.workflowStatusService.search(search);
 			})
 		).subscribe(statuses => {
-			this.workflowStatuses = statuses;
-			this.loading = false;
+			this.workflowStatuses.set(statuses);
+			this.loading.set(false);
 		});
-	}
-
-	ngOnChanges() {
-		this.refreshSearch$.next();
 	}
 }

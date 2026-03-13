@@ -1,8 +1,8 @@
-import {Component, DestroyRef, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, model, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
-import {BehaviorSubject, combineLatest, forkJoin, of, switchMap} from 'rxjs';
+import {combineLatest, forkJoin, of, switchMap} from 'rxjs';
 import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -14,7 +14,7 @@ import {MatButton, MatIconButton} from '@angular/material/button';
 import {ScopeService} from '@core/services/scope.service';
 import {SelectEventComponent} from '../dialogs/add-event/select-event.component';
 import {CRFChangeService} from '../services/crf-change.service';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {EventGroup} from '@core/model/event-group';
 import {NotificationService} from 'src/app/services/notification.service';
 import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
@@ -22,6 +22,7 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {SettingsService} from '@core/services/settings.service';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-side-menu',
 	templateUrl: './side-menu.component.html',
 	styleUrls: ['./side-menu.component.scss'],
@@ -54,31 +55,18 @@ export class SideMenuComponent implements OnInit {
 		}
 	} satisfies EventGroup;
 
-	private scopeSubject$ = new BehaviorSubject<Scope | null>(null);
-	public scope$ = this.scopeSubject$.asObservable();
-	private _scope: Scope;
+	readonly scope = model.required<Scope>();
+	readonly scope$ = toObservable(this.scope);
 
-	@Input()
-	set scope(value: Scope) {
-		this._scope = value;
-		if(value) {
-			this.scopeSubject$.next(value);
-		}
-	}
-
-	get scope(): Scope {
-		return this._scope;
-	}
-
-	eventGroups: EventGroup[] = [];
-	scopeForms: Form[];
+	readonly eventGroups = signal<EventGroup[]>([]);
+	readonly scopeForms = signal<Form[]>([]);
 	events: Event[];
-	eventsForms: Record<number, Form[]> = {};
+	readonly eventsForms = signal<Record<number, Form[]>>({});
 
 	eventOrdersByEventGroupId: Record<string, boolean> = {};
 
-	expandedEventPks: number[] = [];
-	eventPk: number | undefined = undefined;
+	readonly expandedEventPks = signal<number[]>([]);
+	readonly eventPk = signal<number | undefined>(undefined);
 
 	constructor(
 		private activatedRoute: ActivatedRoute,
@@ -105,14 +93,14 @@ export class SideMenuComponent implements OnInit {
 					return of(typedWorkflowable.workflowable as Scope);
 				}
 				//if not, refetch it to get the latest status
-				return this.scopeService.get(this.scope.pk);
+				return this.scopeService.get(this.scope().pk);
 			}),
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(scope => {
 			//clean-up event forms cache
-			this.eventsForms = {};
+			this.eventsForms.set({});
 			//setting the scope will trigger a menu refresh through the scope observable
-			this.scope = scope;
+			this.scope.set(scope);
 		});
 
 		combineLatest([
@@ -131,31 +119,33 @@ export class SideMenuComponent implements OnInit {
 			}),
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(([scope, forms, events, queryParams]) => {
-			this.scopeForms = forms;
+			this.scopeForms.set(forms);
 			this.events = events;
 			if(scope !== null) {
 				this.loadSortSettings();
 				this.updateEventGroups();
 				//retrieve and manage expanded event pks
-				const expandedEventPks: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
-				this.expandedEventPks = expandedEventPks.split(',').filter(p => !!p).map(p => parseInt(p));
+				const expandedEventPksStr: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
+				const newExpandedEventPks = expandedEventPksStr.split(',').filter(p => !!p).map(p => parseInt(p));
+				this.expandedEventPks.set(newExpandedEventPks);
 				//if the event is selected, open it
 				//do not used the observed parameters, use the active route snapshot to access the child route parameters instead
 				const params = this.activatedRoute.firstChild?.snapshot.params || {};
-				this.eventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
-				if(this.eventPk && !this.expandedEventPks.includes(this.eventPk)) {
+				const newEventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
+				this.eventPk.set(newEventPk);
+				if(newEventPk && !newExpandedEventPks.includes(newEventPk)) {
 					this.router.navigate([], {
 						queryParams: {
-							[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: [...this.expandedEventPks, this.eventPk].join(',')
+							[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: [...newExpandedEventPks, newEventPk].join(',')
 						},
 						queryParamsHandling: 'merge'
 					});
 				}
 				else {
-					this.expandedEventPks.forEach(eventPk => {
-						if(!this.eventsForms[eventPk]) {
+					newExpandedEventPks.forEach(eventPk => {
+						if(!this.eventsForms()[eventPk]) {
 							this.formService.searchOnEvent(scope.pk, eventPk).subscribe(forms => {
-								this.eventsForms[eventPk] = forms;
+								this.eventsForms.update(ef => ({...ef, [eventPk]: forms}));
 							});
 						}
 					});
@@ -166,14 +156,15 @@ export class SideMenuComponent implements OnInit {
 
 	updateEventGroups() {
 		//build list of event groups, adding a placeholder event group if there are events without event group in the configuration
-		if(this.scope.model.eventGroups.length === 0) {
-			this.eventGroups = [SideMenuComponent.ALL_EVENT_GROUP];
+		if(this.scope().model.eventGroups.length === 0) {
+			this.eventGroups.set([SideMenuComponent.ALL_EVENT_GROUP]);
 		}
 		else {
-			this.eventGroups = [...this.scope.model.eventGroups];
+			const eventGroups = [...this.scope().model.eventGroups];
 			if(this.events.some(e => !e.model.eventGroupId)) {
-				this.eventGroups.push(SideMenuComponent.OTHER_EVENT_GROUP);
+				eventGroups.push(SideMenuComponent.OTHER_EVENT_GROUP);
 			}
+			this.eventGroups.set(eventGroups);
 		}
 	}
 
@@ -217,9 +208,9 @@ export class SideMenuComponent implements OnInit {
 
 	generateToggleParameters(eventPk: number): Record<string, string> {
 		//do not update expanded event pks here, it's used for the creation of a link to a new state
-		const eventPks = this.expandedEventPks.includes(eventPk)
-			? this.expandedEventPks.filter(pk => pk !== eventPk)
-			: [...this.expandedEventPks, eventPk];
+		const eventPks = this.expandedEventPks().includes(eventPk)
+			? this.expandedEventPks().filter(pk => pk !== eventPk)
+			: [...this.expandedEventPks(), eventPk];
 		if(eventPks.length === 0) {
 			return {};
 		}
@@ -227,7 +218,7 @@ export class SideMenuComponent implements OnInit {
 	}
 
 	createEvent() {
-		this.scopeService.getAvailableEventModels(this.scope.pk).pipe(
+		this.scopeService.getAvailableEventModels(this.scope().pk).pipe(
 			switchMap(events => {
 				return this.dialog
 					.open(SelectEventComponent, {data: events})
@@ -235,7 +226,7 @@ export class SideMenuComponent implements OnInit {
 			})
 		).subscribe(eventModelId => {
 			if(eventModelId) {
-				this.eventService.create(this.scope.pk, eventModelId).pipe(
+				this.eventService.create(this.scope().pk, eventModelId).pipe(
 					switchMap(event => {
 						return forkJoin({
 							event: of(event),
@@ -246,10 +237,10 @@ export class SideMenuComponent implements OnInit {
 					next: ({event, forms}) => {
 						this.events.push(event);
 						this.updateEventGroups();
-						this.eventsForms[event.pk] = forms;
+						this.eventsForms.update(ef => ({...ef, [event.pk]: forms}));
 						this.router.navigate([
 							'/crf',
-							this.scope.pk,
+							this.scope().pk,
 							'event',
 							event.pk,
 							'form',

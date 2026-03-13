@@ -3,34 +3,34 @@
 		<button
 			mat-icon-button
 			inline="true"
-			[routerLink]="['/scopes', scopeModel.id]"
+			[routerLink]="['/scopes', scopeModel().id]"
 			matTooltip="Go back">
 			<mat-icon>arrow_back</mat-icon>
 		</button>
 
-		@if (scope) {
-			{{ scope.code }}
+		@if (scope()) {
+			{{ scope().code }}
 
-			@if (scope.locked) {
+			@if (scope().locked) {
 				<mat-icon
 					matTooltip="Locked"
 					aria-hidden="false">
 					lock
 				</mat-icon>
 			}
-			<app-audit-trail-button [scope]="scope" />
+			<app-audit-trail-button [scope]="scope()" />
 		} @else {
-			New {{ scopeModel.shortname | localizeMap | lowercase }}
+			New {{ scopeModel().shortname | localizeMap | lowercase }}
 		}
 	</h1>
 
-	@if (scope) {
+	@if (scope()) {
 		<nav
 			mat-tab-nav-bar
 			[tabPanel]="tabPanel">
 			<a
 				mat-tab-link
-				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'settings']"
+				[routerLink]="['/scopes', scopeModel().id, scope().pk, 'settings']"
 				routerLinkActive
 				#settingsRLA="routerLinkActive"
 				[active]="settingsRLA.isActive">
@@ -38,26 +38,26 @@
 			</a>
 			<a
 				mat-tab-link
-				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'parents']"
+				[routerLink]="['/scopes', scopeModel().id, scope().pk, 'parents']"
 				routerLinkActive
 				#parentsRLA="routerLinkActive"
 				[active]="parentsRLA.isActive">
 				Parents
 			</a>
-			@if (scope.model.virtual) {
+			@if (scope().model.virtual) {
 				<a
 					mat-tab-link
-					[routerLink]="['/scopes', scopeModel.id, scope.pk, 'enrollment']"
+					[routerLink]="['/scopes', scopeModel().id, scope().pk, 'enrollment']"
 					routerLinkActive
 					#enrollmentRLA="routerLinkActive"
 					[active]="enrollmentRLA.isActive">
 					Enrollment
 				</a>
 			}
-			@for (form of forms; track form.pk) {
+			@for (form of forms(); track form.pk) {
 				<a
 					mat-tab-link
-					[routerLink]="['/scopes', scopeModel.id, scope.pk, 'form', form.pk]"
+					[routerLink]="['/scopes', scopeModel().id, scope().pk, 'form', form.pk]"
 					routerLinkActive
 					#formRLA="routerLinkActive"
 					[active]="formRLA.isActive">
@@ -66,7 +66,7 @@
 			}
 			<a
 				mat-tab-link
-				[routerLink]="['/scopes', scopeModel.id, scope.pk, 'users']"
+				[routerLink]="['/scopes', scopeModel().id, scope().pk, 'users']"
 				routerLinkActive
 				#usersRLA="routerLinkActive"
 				[active]="usersRLA.isActive">

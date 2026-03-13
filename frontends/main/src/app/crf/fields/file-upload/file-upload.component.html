@@ -1,4 +1,4 @@
-@if (!field.value) {
+@if (!field().value) {
 	<div
 		class="drop-zone"
 		(drop)="dropHandler($event)"
@@ -13,12 +13,12 @@
 	</div>
 }
 
-@if (field.value && field.filePk) {
+@if (field().value && field().filePk) {
 	<span class="box">
 		<a
 			[href]="getFileUrl()"
 			[appDownload]="getFileUrl()">
-			{{ field.fileName }}
+			{{ field().fileName }}
 		</a>
 		<button
 			mat-icon-button
@@ -30,15 +30,15 @@
 	</span>
 }
 
-@if (uploadInProgress) {
+@if (uploadInProgress()) {
 	<mat-progress-bar
 		mode="determinate"
-		[value]="uploadProgress">
+		[value]="uploadProgress()">
 	</mat-progress-bar>
 }
 
 <input
 	type="file"
-	[id]="id"
+	[id]="id()"
 	name="fileUpload"
 	style="display: none" />

@@ -1,4 +1,4 @@
-import {Component, Inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, signal} from '@angular/core';
 import {MatTableModule} from '@angular/material/table';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {DateTimeUTCPipe} from '../pipes/date-time-utc.pipe';
@@ -7,6 +7,7 @@ import {EntityAuditTrail} from '@core/model/entity-audit-trail';
 import {MatIcon} from '@angular/material/icon';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-audit-trail-entity',
 	templateUrl: './audit-trail-entity.component.html',
 	styleUrls: ['./audit-trail-entity.component.css'],
@@ -20,17 +21,17 @@ import {MatIcon} from '@angular/material/icon';
 	]
 })
 export class AuditTrailEntityComponent {
-	entityName: string;
-	trails: EntityAuditTrail[] = [];
-	selectedTrail: EntityAuditTrail;
+	readonly entityName = signal('');
+	readonly trails = signal<EntityAuditTrail[]>([]);
+	readonly selectedTrail = signal<EntityAuditTrail | null>(null);
 
 	columnsToDisplay = ['expand', 'by', 'date', 'context'];
 
 	constructor(
 		@Inject(MAT_DIALOG_DATA) data: {entityName: string; trails: EntityAuditTrail[]}
 	) {
-		this.entityName = data.entityName;
-		this.trails = data.trails;
+		this.entityName.set(data.entityName);
+		this.trails.set(data.trails);
 	}
 
 	getModification(trail: EntityAuditTrail) {

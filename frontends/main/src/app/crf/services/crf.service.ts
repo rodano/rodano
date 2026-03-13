@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, signal} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Dataset} from '@core/model/dataset';
 import {map} from 'rxjs/operators';
@@ -41,7 +41,7 @@ export class CRFService {
 	createCRFDataset(dataset: Dataset): CRFDataset {
 		return {
 			...dataset,
-			fields: dataset.fields.map(f => ({...f, shown: true, error: undefined})),
+			fields: dataset.fields.map(f => ({...f, shown: true, error: signal<string | undefined>(undefined)})),
 			show: true,
 			expanded: false,
 			rationale: undefined

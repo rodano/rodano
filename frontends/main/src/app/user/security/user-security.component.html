@@ -5,9 +5,9 @@
 		<mat-card appearance="outlined">
 			<mat-card-header>
 				<mat-card-title>Email</mat-card-title>
-				@if (!user.pendingEmail) {
+				@if (!user().pendingEmail) {
 					<mat-card-subtitle>
-						@if (me.pk === user.pk) {
+						@if (me().pk === user().pk) {
 							<span>
 								If you change your email, you will have 7 days to verify your new email address through an email that is sent
 								automatically.
@@ -23,14 +23,14 @@
 				}
 			</mat-card-header>
 			<mat-card-content>
-				@if (user.pendingEmail && getDifferenceInDays(user.newEmailExpirationDate) > 0) {
+				@if (user().pendingEmail && getDifferenceInDays(user().newEmailExpirationDate) > 0) {
 					<p>
-						@if (me.pk === user.pk) {
-							You have {{ getDifferenceInDays(user.newEmailExpirationDate) }} days to verify your new email address:
+						@if (me().pk === user().pk) {
+							You have {{ getDifferenceInDays(user().newEmailExpirationDate) }} days to verify your new email address:
 						} @else {
-							The user has {{ getDifferenceInDays(user.newEmailExpirationDate) }} days to verify their new email address:
+							The user has {{ getDifferenceInDays(user().newEmailExpirationDate) }} days to verify their new email address:
 						}
-						<strong>{{ user.pendingEmail }}</strong>
+						<strong>{{ user().pendingEmail }}</strong>
 					</p>
 					<p>
 						<button
@@ -64,16 +64,16 @@
 	</form>
 
 	<!-- Only display this form if the user modify themselves -->
-	@if (me.pk === user.pk) {
+	@if (me().pk === user().pk) {
 		<app-change-password
 			[changeRequestContext]="ChangePasswordContext.USER_REQUEST"
-			[me]="me">
+			[me]="me()">
 		</app-change-password>
 	}
 
-	@if (user.canWrite) {
+	@if (user().canWrite) {
 		<p class="actions">
-			@if (user.removed) {
+			@if (user().removed) {
 				<button
 					mat-flat-button
 					type="button"
@@ -88,7 +88,7 @@
 					Remove
 				</button>
 
-				@if (!user.activated) {
+				@if (!user().activated) {
 					<button
 						mat-flat-button
 						type="button"
@@ -97,7 +97,7 @@
 					</button>
 				}
 
-				@if (user.blocked) {
+				@if (user().blocked) {
 					<button
 						mat-flat-button
 						type="button"
@@ -106,8 +106,8 @@
 					</button>
 				}
 
-				@if (me.admin) {
-					@if (user.externallyManaged) {
+				@if (me().admin) {
+					@if (user().externallyManaged) {
 						<button
 							mat-flat-button
 							type="button"

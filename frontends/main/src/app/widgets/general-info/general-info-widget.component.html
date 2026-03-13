@@ -1,10 +1,10 @@
 <h2>General information</h2>
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
-	[dataSource]="info">
+	[dataSource]="info()">
 	<ng-container matColumnDef="title">
 		<th
 			mat-header-cell

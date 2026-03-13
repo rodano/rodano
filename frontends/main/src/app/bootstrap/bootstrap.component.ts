@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
@@ -8,6 +8,7 @@ import {Bootstrap} from '@core/model/bootstrap';
 import {DatabaseService} from '@core/services/database.service';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-bootstrap',
 	templateUrl: './bootstrap.component.html',
 	styleUrls: ['./bootstrap.component.css'],
@@ -21,8 +22,8 @@ import {DatabaseService} from '@core/services/database.service';
 	]
 })
 export class BootstrapComponent {
-	loading = false;
-	error?: string;
+	readonly loading = signal(false);
+	readonly error = signal<string | undefined>(undefined);
 
 	bootstrapForm = new FormGroup({
 		rootScopeName: new FormControl('', {
@@ -49,14 +50,14 @@ export class BootstrapComponent {
 	) { }
 
 	bootstrap() {
-		this.loading = true;
-		this.error = undefined;
+		this.loading.set(true);
+		this.error.set(undefined);
 		const bootstrap = this.bootstrapForm.value as Bootstrap;
 
 		this.databaseService.bootstrap(bootstrap).subscribe({
 			next: () => this.router.navigate(['/login']),
-			error: response => this.error = response.error.message,
-			complete: () => this.loading = false
-		}).add(() => this.loading = false);
+			error: response => this.error.set(response.error.message),
+			complete: () => this.loading.set(false)
+		}).add(() => this.loading.set(false));
 	}
 }

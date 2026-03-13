@@ -1,3 +1,4 @@
+import {WritableSignal} from '@angular/core';
 import {Field} from '@core/model/field';
 
 export interface CRFField extends Field {
@@ -6,5 +7,5 @@ export interface CRFField extends Field {
 	shown: boolean;
 
 	//Error on the field
-	error: string | undefined;
+	error: WritableSignal<string | undefined>;
 }

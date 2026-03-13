@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {PossibleValue} from '@core/model/possible-value';
 import {operatorByType} from '@core/enums/operator-by-type';
@@ -19,11 +19,11 @@ import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
 import {ChartWidgetComponent} from 'src/app/widgets/chart/chart-widget.component';
 import {CMSLayout} from '@core/model/cms-layout';
-import {CMSWidget} from '@core/model/cms-widget';
 import {ScopeModel} from '@core/model/scope-model';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-benchmark',
 	templateUrl: './benchmark.component.html',
 	styleUrls: ['./benchmark.component.css'],
@@ -42,9 +42,9 @@ import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 		ChartWidgetComponent
 	]
 })
-export class BenchmarkComponent implements OnInit, OnChanges {
-	@Input() layout: CMSLayout;
-	widgets: CMSWidget[] = [];
+export class BenchmarkComponent implements OnInit {
+	readonly layout = input.required<CMSLayout>();
+	readonly widgets = computed(() => this.layout().sections[0].widgets);
 
 	//customization form
 	criteria = new FormArray([] as FormArray[]);
@@ -53,19 +53,19 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 		criteria: this.criteria
 	}) as FormGroup;
 
-	scopeModels: ScopeModel[] = [];
-	rootScopes: ScopeMini[] = [];
-	fieldModels: FieldModel[];
+	readonly scopeModels = signal<ScopeModel[]>([]);
+	readonly rootScopes = signal<ScopeMini[]>([]);
+	readonly fieldModels = signal<FieldModel[]>([]);
 
 	//parameters sent to widgets
-	chartScopes: ScopeMini[] = [];
-	chartCriteria: FieldModelCriterion[] = [];
+	readonly chartScopes = signal<ScopeMini[]>([]);
+	readonly chartCriteria = signal<FieldModelCriterion[]>([]);
 
 	constructor(
 		private configurationService: ConfigurationService,
 		private meService: MeService,
 		private destroyRef: DestroyRef
-	) { }
+	) {}
 
 	ngOnInit() {
 		forkJoin({
@@ -75,19 +75,15 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({scopeModels, fieldModels, rootScopes}) => {
-			this.scopeModels = scopeModels;
-			this.fieldModels = fieldModels;
-			this.rootScopes = rootScopes;
+			this.scopeModels.set(scopeModels);
+			this.fieldModels.set(fieldModels);
+			this.rootScopes.set(rootScopes);
 			this.reset();
 		});
 	}
 
-	ngOnChanges() {
-		this.widgets = this.layout.sections[0].widgets;
-	}
-
 	getScopes(modelId: string): ScopeMini[] {
-		return this.rootScopes?.filter(s => s.modelId === modelId) ?? [];
+		return this.rootScopes().filter(s => s.modelId === modelId) ?? [];
 	}
 
 	getControl(i: number, j: number): FormControl {
@@ -98,7 +94,7 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 	getFieldModel(index: number): FieldModel {
 		const criterion = this.criteria.controls[index] as FormArray;
 		const fieldModelId = criterion.controls[0].value;
-		return this.fieldModels.find(f => f.id === fieldModelId) as FieldModel;
+		return this.fieldModels().find(f => f.id === fieldModelId) as FieldModel;
 	}
 
 	getOperators(index: number): Operator[] {
@@ -132,9 +128,9 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 
 	update() {
 		const scopes = (this.customizeForm.get('rootScopePks')?.value ?? []) as number[];
-		this.chartScopes = scopes.map(p => this.rootScopes.find(s => s.pk === p) as ScopeMini);
+		this.chartScopes.set(scopes.map(p => this.rootScopes().find(s => s.pk === p) as ScopeMini));
 
-		this.chartCriteria = this.criteria.controls.map((criterion: FormArray, index: number) => {
+		this.chartCriteria.set(this.criteria.controls.map((criterion: FormArray, index: number) => {
 			const fieldModel = this.getFieldModel(index);
 			return {
 				datasetModelId: fieldModel.datasetModelId,
@@ -142,12 +138,13 @@ export class BenchmarkComponent implements OnInit, OnChanges {
 				operator: criterion.controls[1].value,
 				value: criterion.controls[2].value
 			} as FieldModelCriterion;
-		});
+		}));
 	}
 
 	reset() {
 		this.customizeForm.reset();
-		this.customizeForm.get('rootScopePks')?.setValue([this.rootScopes[0].pk]);
+		this.customizeForm.get('rootScopePks')?.setValue([this.rootScopes()[0].pk]);
 		this.criteria.clear();
+		this.update();
 	}
 }

@@ -1,16 +1,16 @@
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
-	[dataSource]="users.objects"
+	[dataSource]="users().objects"
 	matSort
 	matSortDisableClear>
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
-			<td [attr.colspan]="columnsToDisplay.length">No data</td>
+			<td [attr.colspan]="columnsToDisplay().length">No data</td>
 		</tr>
 	}
 
@@ -72,7 +72,7 @@
 							{{ getRoleStatusDisplay(role.status).icon }}
 						</mat-icon>
 						<span>
-							{{ role.profileId | lookupById: profiles | getField: 'shortname' | localizeMap }} on
+							{{ role.profileId | lookupById: profiles() | getField: 'shortname' | localizeMap }} on
 							<strong>{{ role.scope.code }} ({{ role.scope.shortname }})</strong>
 						</span>
 					</li>
@@ -96,11 +96,11 @@
 
 	<tr
 		mat-header-row
-		*matHeaderRowDef="columnsToDisplay"></tr>
+		*matHeaderRowDef="columnsToDisplay()"></tr>
 	<tr
 		mat-row
 		[class.removed]="user.removed"
-		*matRowDef="let user; columns: columnsToDisplay"></tr>
+		*matRowDef="let user; columns: columnsToDisplay()"></tr>
 </table>
 
 <mat-divider></mat-divider>
@@ -108,13 +108,13 @@
 	<mat-toolbar-row>
 		<button
 			mat-stroked-button
-			[appDownload]="exportUrl">
+			[appDownload]="exportUrl()">
 			Export
 		</button>
 		<span class="toolbar-spacer"></span>
 		<mat-paginator
-			[pageSize]="users.paging.pageSize"
-			[length]="users.paging.total">
+			[pageSize]="users().paging.pageSize"
+			[length]="users().paging.total">
 		</mat-paginator>
 	</mat-toolbar-row>
 </mat-toolbar>

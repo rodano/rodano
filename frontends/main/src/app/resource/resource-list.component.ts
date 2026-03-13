@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Subject, merge} from 'rxjs';
 import {startWith, switchMap} from 'rxjs/operators';
@@ -32,6 +32,7 @@ import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-resource-list',
 	templateUrl: './resource-list.component.html',
 	styleUrls: ['./resource-list.component.css'],
@@ -57,7 +58,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	]
 })
 export class ResourceListComponent implements OnInit {
-	categories: ResourceCategory[];
+	readonly categories = signal<ResourceCategory[]>([]);
 
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
@@ -66,8 +67,8 @@ export class ResourceListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 
-	resources: PagedResultResource = EMPTY_PAGED_RESULT;
-	loading = false;
+	readonly resources = signal<PagedResultResource>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
 	columnsToDisplay = [
 		'title',
 		'category',
@@ -93,7 +94,7 @@ export class ResourceListComponent implements OnInit {
 
 		this.configurationService.getResourceCategories().pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(c => this.categories = c);
+		).subscribe(c => this.categories.set(c));
 
 		merge(
 			this.refreshSearch$.asObservable(),
@@ -103,7 +104,7 @@ export class ResourceListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new ResourceSearch();
 				Object.assign(search, this.searchForm.value);
 				search.removed = true;
@@ -113,8 +114,8 @@ export class ResourceListComponent implements OnInit {
 				return this.resourceService.search(search);
 			})
 		).subscribe(resources => {
-			this.resources = resources;
-			this.loading = false;
+			this.resources.set(resources);
+			this.loading.set(false);
 		});
 	}
 

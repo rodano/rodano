@@ -27,7 +27,7 @@
 		<mat-form-field>
 			<mat-label>In</mat-label>
 			<mat-select formControlName="parentScopePk">
-				@for (parentScope of parentScopes; track parentScope.pk) {
+				@for (parentScope of parentScopes(); track parentScope.pk) {
 					<mat-option [value]="parentScope.pk">{{ parentScope | scopeCodeShortname }}</mat-option>
 				}
 			</mat-select>

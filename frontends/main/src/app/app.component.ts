@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {HeaderComponent} from './header/header.component';
 import {Environment} from '@core/model/environment';
@@ -9,15 +9,16 @@ import {ConfigurationService} from '@core/services/configuration.service';
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css'],
-	imports: [HeaderComponent, RouterOutlet]
+	imports: [HeaderComponent, RouterOutlet],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
 	constructor(private configurationService: ConfigurationService) {}
 
 	environment = Environment;
 
-	study?: PublicStudy;
-	displayContent = false;
+	readonly study = signal<PublicStudy | undefined>(undefined);
+	readonly displayContent = signal(false);
 
 	ngOnInit() {
 		//set the CSS color variables to the body
@@ -35,11 +36,11 @@ export class AppComponent implements OnInit {
 					document.body.style.setProperty('--mat-sys-secondary-container', 'color(from var(--mat-sys-primary) display-p3 calc(r - 0.1) calc(g - 0.1) calc(b - 0.1))');
 					document.body.style.setProperty('--mat-sys-on-secondary-container', 'white');
 
-					this.study = study;
-					this.displayContent = true;
+					this.study.set(study);
+					this.displayContent.set(true);
 				},
 				error: () => {
-					this.displayContent = true;
+					this.displayContent.set(true);
 				}
 			});
 	}

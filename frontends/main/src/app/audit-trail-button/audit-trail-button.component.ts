@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {Scope} from '@core/model/scope';
 import {User} from '@core/model/user';
 import {MatIcon} from '@angular/material/icon';
@@ -24,6 +24,7 @@ import {FeatureStatic} from '@core/model/feature-static';
 import {WorkflowStatus} from '@core/model/workflow-status';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-audit-trail-button',
 	templateUrl: './audit-trail-button.component.html',
 	styleUrls: ['./audit-trail-button.component.css'],
@@ -35,17 +36,17 @@ import {WorkflowStatus} from '@core/model/workflow-status';
 	]
 })
 export class AuditTrailButtonComponent implements OnInit {
-	hasRight = false;
-	@Input() scope: Scope;
-	@Input() event: Event;
-	@Input() dataset: Dataset;
-	@Input() form: Form;
-	@Input() field: Field;
-	@Input() workflowStatus: WorkflowStatus;
-	@Input() user: User;
-	@Input() robot: Robot;
-	@Input() role: Role;
-	@Input() property: string;
+	readonly hasRight = signal(false);
+	readonly scope = input<Scope>();
+	readonly event = input<Event>();
+	readonly dataset = input<Dataset>();
+	readonly form = input<Form>();
+	readonly field = input<Field>();
+	readonly workflowStatus = input<WorkflowStatus>();
+	readonly user = input<User>();
+	readonly robot = input<Robot>();
+	readonly role = input<Role>();
+	readonly property = input<string>();
 
 	constructor(
 		private authStateService: AuthStateService,
@@ -59,77 +60,77 @@ export class AuditTrailButtonComponent implements OnInit {
 		this.authStateService.listenConnectedUser().pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(user => {
-			this.hasRight = user?.roles.some(r => r.profile.features.includes(FeatureStatic.VIEW_AUDIT_TRAIL)) ?? false;
+			this.hasRight.set(user?.roles.some(r => r.profile.features.includes(FeatureStatic.VIEW_AUDIT_TRAIL)) ?? false);
 		});
 	}
 
 	private getEntityName(): string {
-		if(this.scope) {
-			return this.scope.shortname;
+		if(this.scope()) {
+			return this.scope()!.shortname;
 		}
-		if(this.event) {
-			return this.event.shortname;
+		if(this.event()) {
+			return this.event()!.shortname;
 		}
-		if(this.dataset) {
-			return this.localizeMapPipe.transform(this.dataset.model.shortname);
+		if(this.dataset()) {
+			return this.localizeMapPipe.transform(this.dataset()!.model.shortname);
 		}
-		if(this.form) {
-			return this.localizeMapPipe.transform(this.form.model.shortname);
+		if(this.form()) {
+			return this.localizeMapPipe.transform(this.form()!.model.shortname);
 		}
-		if(this.workflowStatus) {
-			return this.localizeMapPipe.transform(this.workflowStatus.workflow.shortname);
+		if(this.workflowStatus()) {
+			return this.localizeMapPipe.transform(this.workflowStatus()!.workflow.shortname);
 		}
-		if(this.user) {
-			return this.user.name;
+		if(this.user()) {
+			return this.user()!.name;
 		}
-		if(this.robot) {
-			return this.robot.name;
+		if(this.robot()) {
+			return this.robot()!.name;
 		}
-		if(this.role) {
+		if(this.role()) {
 			return 'Role';
 		}
 		return 'Entity';
 	}
 
 	private getEntityTrails(): Observable<EntityAuditTrail[]> {
-		if(this.scope) {
-			return this.auditTrailService.getForScope(this.scope.pk);
+		if(this.scope()) {
+			return this.auditTrailService.getForScope(this.scope()!.pk);
 		}
-		if(this.event) {
-			return this.auditTrailService.getForEvent(this.event.scopePk, this.event.pk);
+		if(this.event()) {
+			return this.auditTrailService.getForEvent(this.event()!.scopePk, this.event()!.pk);
 		}
-		if(this.dataset) {
-			return this.auditTrailService.getForDataset(this.dataset.scopePk, this.dataset.eventPk, this.dataset.pk);
+		if(this.dataset()) {
+			return this.auditTrailService.getForDataset(this.dataset()!.scopePk, this.dataset()!.eventPk, this.dataset()!.pk);
 		}
-		if(this.form) {
-			return this.auditTrailService.getForForm(this.form.scopePk, this.form.eventPk, this.form.pk);
+		if(this.form()) {
+			return this.auditTrailService.getForForm(this.form()!.scopePk, this.form()!.eventPk, this.form()!.pk);
 		}
-		if(this.workflowStatus) {
-			return this.auditTrailService.getForWorkflowStatus(this.workflowStatus.pk);
+		if(this.workflowStatus()) {
+			return this.auditTrailService.getForWorkflowStatus(this.workflowStatus()!.pk);
 		}
-		return this.auditTrailService.getForUser(this.user.pk);
+		return this.auditTrailService.getForUser(this.user()!.pk);
 	}
 
 	private getPropertyTrails(): Observable<PropertyAuditTrail[]> {
-		if(this.scope) {
-			return this.auditTrailService.getForScopeProperty(this.scope.pk, this.property);
+		if(this.scope()) {
+			return this.auditTrailService.getForScopeProperty(this.scope()!.pk, this.property()!);
 		}
-		if(this.user) {
-			return this.auditTrailService.getForUserProperty(this.user.pk, this.property);
+		if(this.user()) {
+			return this.auditTrailService.getForUserProperty(this.user()!.pk, this.property()!);
 		}
-		if(this.robot) {
-			return this.auditTrailService.getForRobotProperty(this.robot.pk, this.property);
+		if(this.robot()) {
+			return this.auditTrailService.getForRobotProperty(this.robot()!.pk, this.property()!);
 		}
-		return this.auditTrailService.getForRoleProperty(this.role, this.property);
+		return this.auditTrailService.getForRoleProperty(this.role()!, this.property()!);
 	}
 
 	openModal() {
 		//open the right modal based on the provided parameters
-		if(this.property) {
+		if(this.property()) {
 			return this.getPropertyTrails().subscribe(trails => {
 				const data = {
 					entityName: this.getEntityName(),
-					property: this.property,
+					property: this.property()!,
 					trails
 				};
 				return this.dialog

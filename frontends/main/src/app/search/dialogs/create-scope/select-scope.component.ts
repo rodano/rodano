@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {Scope} from '@core/model/scope';
 import {MatButton} from '@angular/material/button';
@@ -9,6 +9,7 @@ import {LowerCasePipe} from '@angular/common';
 import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-select-scope',
 	templateUrl: './select-scope.component.html',
 	imports: [
@@ -23,15 +24,13 @@ import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 		ScopeCodeShortnamePipe
 	]
 })
-export class SelectScopeComponent implements OnInit {
-	parentScopes: Scope[] = [];
+export class SelectScopeComponent {
+	readonly parentScopes = signal<Scope[]>([]);
 	selectedScope: Scope;
 
 	constructor(
 		@Inject(MAT_DIALOG_DATA) public data: {parentScopes: Scope[]; childScopeModel: ScopeModel}
-	) { }
-
-	ngOnInit() {
-		this.parentScopes = this.data.parentScopes;
+	) {
+		this.parentScopes.set(this.data.parentScopes);
 	}
 }

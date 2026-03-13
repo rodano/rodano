@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
 import {Session} from '@core/model/session';
 import {SessionService} from '@core/services/session.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -15,7 +15,8 @@ import {MatTableModule} from '@angular/material/table';
 		MatButton,
 		MatProgressBar,
 		DateTimeUTCPipe
-	]
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ConnectedUsersComponent implements OnInit {
 	columnsToDisplay: string[] = [
@@ -26,8 +27,8 @@ export class ConnectedUsersComponent implements OnInit {
 		'actions'
 	];
 
-	sessions: Session[];
-	loading = false;
+	readonly sessions = signal<Session[]>([]);
+	readonly loading = signal(false);
 
 	constructor(
 		private sessionService: SessionService,
@@ -35,10 +36,10 @@ export class ConnectedUsersComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		this.loading = true;
+		this.loading.set(true);
 		this.sessionService.get().subscribe(sessions => {
-			this.sessions = sessions;
-			this.loading = false;
+			this.sessions.set(sessions);
+			this.loading.set(false);
 		});
 	}
 
@@ -48,7 +49,7 @@ export class ConnectedUsersComponent implements OnInit {
 
 	logout(sessionPk: number) {
 		this.sessionService.delete(sessionPk).subscribe(() => {
-			this.sessions = this.sessions.filter(session => session.pk !== sessionPk);
+			this.sessions.set(this.sessions().filter(s => s.pk !== sessionPk));
 		});
 	}
 }

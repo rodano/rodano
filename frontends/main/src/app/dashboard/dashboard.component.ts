@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {CMSLayout} from '@core/model/cms-layout';
 import {CMSSection} from '@core/model/cms-section';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -7,6 +7,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './dashboard.component.html',
 	styleUrls: ['./dashboard.component.scss'],
 	imports: [
@@ -16,10 +17,10 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 	]
 })
 export class DashboardComponent implements OnInit {
-	@Input() layout: CMSLayout;
+	readonly layout = input.required<CMSLayout>();
 
-	selectedSection: CMSSection;
-	sectionBadges: Record<string, number> = {};
+	readonly selectedSection = signal<CMSSection | undefined>(undefined);
+	readonly sectionBadges = signal<Record<string, number>>({});
 
 	constructor(
 		private activatedRoute: ActivatedRoute,
@@ -30,14 +31,16 @@ export class DashboardComponent implements OnInit {
 		this.activatedRoute.params.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(params => {
-			this.selectedSection = this.layout.sections.find(s => s.id === params['sectionId']) ?? this.layout.sections[0];
+			this.selectedSection.set(this.layout().sections.find(s => s.id === params['sectionId']) ?? this.layout().sections[0]);
 		});
 	}
 
 	updateBadges(sectionId: string, event: number) {
-		if(!this.sectionBadges[sectionId]) {
-			this.sectionBadges[sectionId] = 0;
-			this.sectionBadges[sectionId] += event;
+		const badges = this.sectionBadges();
+		if(!badges[sectionId]) {
+			badges[sectionId] = 0;
 		}
+		badges[sectionId] += event;
+		this.sectionBadges.set(badges);
 	}
 }

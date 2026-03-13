@@ -5,10 +5,10 @@
 <mat-dialog-content>
 	<mat-progress-bar
 		mode="indeterminate"
-		[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+		[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 	<table
 		mat-table
-		[dataSource]="events">
+		[dataSource]="events()">
 		<ng-container matColumnDef="event">
 			<th
 				mat-header-cell
@@ -81,7 +81,7 @@
 			mat-row
 			*matRowDef="let event; columns: columnsToDisplay"
 			(mouseover)="highlightRelatedEvents(event)"
-			[class.highlighted]="event.entityPk === selectedEntityPk"></tr>
+			[class.highlighted]="event.entityPk === selectedEntityPk()"></tr>
 	</table>
 </mat-dialog-content>
 

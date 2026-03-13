@@ -1,4 +1,4 @@
-import {Component, OnInit, DestroyRef, Input} from '@angular/core';
+import {Component, OnInit, DestroyRef, ChangeDetectionStrategy, input, signal, computed} from '@angular/core';
 import {Router, RouterLinkActive, RouterLink} from '@angular/router';
 import {Menu} from '@core/model/menu';
 import {switchMap} from 'rxjs/operators';
@@ -34,19 +34,20 @@ import {NotificationService} from '../services/notification.service';
 		MatMenuModule,
 		LocalizeMapPipe,
 		MatBadge
-	]
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HeaderComponent implements OnInit {
 	environment = Environment;
 	adminProfileId = 'ADMIN';
 
-	@Input() study: PublicStudy;
+	readonly study = input.required<PublicStudy>();
 
-	logo?: string;
-	user?: User;
-	menus?: Menu[];
-	profiles: Profile[] = [];
-	pendingRolesNumber = 0;
+	readonly logo = computed<string | undefined>(() => this.study().logo ? btoa(this.study().logo!) : undefined);
+	readonly user = signal<User | undefined>(undefined);
+	readonly menus = signal<Menu[]>([]);
+	readonly profiles = signal<Profile[]>([]);
+	readonly pendingRolesNumber = signal<number>(0);
 
 	constructor(
 		private authStateService: AuthStateService,
@@ -57,10 +58,6 @@ export class HeaderComponent implements OnInit {
 		private router: Router) {}
 
 	ngOnInit() {
-		if(this.study.logo) {
-			this.logo = btoa(this.study.logo);
-		}
-
 		this.authStateService.listenConnectedUser().pipe(
 			takeUntilDestroyed(this.destroyRef),
 			switchMap(user => {
@@ -71,11 +68,11 @@ export class HeaderComponent implements OnInit {
 				});
 			})
 		).subscribe(({user, menus, profiles}) => {
-			this.menus = menus;
-			this.user = user;
+			this.menus.set(menus);
+			this.user.set(user);
 			//remove admin profile from the list of profiles because it is hard-coded in the menu
-			this.profiles = profiles.filter(profile => profile.id !== this.adminProfileId);
-			this.pendingRolesNumber = AuthStateService.getUserPendingRolesNumber(user);
+			this.profiles.set(profiles.filter(profile => profile.id !== this.adminProfileId));
+			this.pendingRolesNumber.set(AuthStateService.getUserPendingRolesNumber(user));
 		});
 	}
 

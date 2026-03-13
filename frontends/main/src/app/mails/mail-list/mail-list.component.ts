@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {startWith, switchMap} from 'rxjs/operators';
@@ -36,6 +36,7 @@ import {MailStatus} from '@core/model/mail-status';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-mail-list',
 	templateUrl: './mail-list.component.html',
 	styleUrls: ['./mail-list.component.css'],
@@ -68,7 +69,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 export class MailListComponent implements OnInit {
 	mailOrigin = MailOrigin;
 	mailStatus = MailStatus;
-	exportUrl: string;
+	readonly exportUrl = signal('');
 
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
@@ -83,8 +84,8 @@ export class MailListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 
-	mails: PagedResultMail = EMPTY_PAGED_RESULT;
-	loading = false;
+	readonly mails = signal<PagedResultMail>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
 	columnsToDisplay: string[] = [
 		'selected',
 		'status',
@@ -96,7 +97,7 @@ export class MailListComponent implements OnInit {
 		'actions'
 	];
 
-	selectedMails: Mail[] = [];
+	readonly selectedMails = signal<Mail[]>([]);
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -120,18 +121,18 @@ export class MailListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new MailSearch();
 				Object.assign(search, this.searchForm.value);
 				search.sortBy = this.sort.active;
 				search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 				search.pageIndex = this.paginator.pageIndex;
-				this.exportUrl = this.mailsService.getExportUrl(search);
+				this.exportUrl.set(this.mailsService.getExportUrl(search));
 				return this.mailsService.search(search);
 			})
 		).subscribe(mails => {
-			this.mails = mails;
-			this.loading = false;
+			this.mails.set(mails);
+			this.loading.set(false);
 		});
 	}
 
@@ -156,15 +157,15 @@ export class MailListComponent implements OnInit {
 
 	onSelect(isSelected: boolean, mail: Mail) {
 		if(isSelected) {
-			this.selectedMails.push(mail);
+			this.selectedMails.update(mails => [...mails, mail]);
 		}
 		else {
-			this.selectedMails = this.selectedMails.filter(selectedMail => selectedMail !== mail);
+			this.selectedMails.update(mails => mails.filter(selectedMail => selectedMail !== mail));
 		}
 	}
 
 	resendMails() {
-		this.mailsService.resendMails(this.selectedMails).subscribe({
+		this.mailsService.resendMails(this.selectedMails()).subscribe({
 			next: () => {
 				this.notificationService.showSuccess('Selected emails resent');
 			},

@@ -1,9 +1,9 @@
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
-	[dataSource]="scheduledTasks">
+	[dataSource]="scheduledTasks()">
 	<ng-container matColumnDef="target">
 		<th
 			mat-header-cell

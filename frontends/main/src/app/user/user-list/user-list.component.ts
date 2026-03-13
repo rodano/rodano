@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, Input, DestroyRef, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, ViewChild, DestroyRef, computed, input, signal, effect} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
@@ -17,7 +17,7 @@ import {RouterLink} from '@angular/router';
 import {MatButton} from '@angular/material/button';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
-import {merge, startWith, Subject, switchMap} from 'rxjs';
+import {merge, Subject, switchMap} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {RoleStatus, getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
@@ -26,6 +26,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 import {YesNoPipe} from 'src/app/pipes/yes-no.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-list.component.html',
 	styleUrls: ['./user-list.component.css'],
 	selector: 'app-user-list',
@@ -49,27 +50,28 @@ import {YesNoPipe} from 'src/app/pipes/yes-no.pipe';
 		YesNoPipe
 	]
 })
-export class UserListComponent implements OnInit, OnChanges {
-	@Input() predicate: UserSearch = new UserSearch();
-	@Input() showExternallyManaged: boolean;
+export class UserListComponent implements OnInit {
+	readonly predicate = input<UserSearch>(new UserSearch());
+	readonly showExternallyManaged = input<boolean>();
 
 	refreshSearch$ = new Subject<void>();
 
-	profiles: Profile[];
+	readonly profiles = signal<Profile[]>([]);
 	roleStatus = RoleStatus;
 
 	getRoleStatusDisplay = getRoleStatusDisplay;
 
-	users: PagedResultUser = EMPTY_PAGED_RESULT;
-	loading = false;
-	columnsToDisplay: string[] = [
-		'name',
-		'email',
-		'phone',
-		'roles'
-	];
+	readonly users = signal<PagedResultUser>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
+	readonly columnsToDisplay = computed<string[]>(() => {
+		const columns = ['name', 'email', 'phone', 'roles'];
+		if(this.showExternallyManaged()) {
+			columns.push('externallyManaged');
+		}
+		return columns;
+	});
 
-	exportUrl: string;
+	readonly exportUrl = signal('');
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -78,14 +80,20 @@ export class UserListComponent implements OnInit, OnChanges {
 		private configurationService: ConfigurationService,
 		private userService: UserService,
 		private destroyRef: DestroyRef
-	) {}
+	) {
+		effect(() => {
+			//do not use Paginator:firstPage() as it will trigger a search
+			this.paginator.pageIndex = 0;
+			this.refreshSearch$.next();
+		});
+	}
 
 	ngOnInit() {
 		this.sort.active = UserSearch.DEFAULT_SORT_BY;
 		this.sort.direction = PaginatedSearch.getSortDirection(UserSearch.DEFAULT_SORT_ASCENDING);
 		this.configurationService.getProfiles().pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(p => this.profiles = p);
+		).subscribe(p => this.profiles.set(p));
 
 		merge(
 			this.refreshSearch$.asObservable(),
@@ -93,27 +101,17 @@ export class UserListComponent implements OnInit, OnChanges {
 			this.sort.sortChange
 		).pipe(
 			takeUntilDestroyed(this.destroyRef),
-			startWith({}),
 			switchMap(() => {
-				this.loading = true;
-				this.predicate.sortBy = this.sort.active;
-				this.predicate.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
-				this.predicate.pageIndex = this.paginator.pageIndex;
-				this.exportUrl = this.userService.getExportUrl(this.predicate);
-				return this.userService.search(this.predicate);
+				this.loading.set(true);
+				this.predicate().sortBy = this.sort.active;
+				this.predicate().orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
+				this.predicate().pageIndex = this.paginator.pageIndex;
+				this.exportUrl.set(this.userService.getExportUrl(this.predicate()));
+				return this.userService.search(this.predicate());
 			})
 		).subscribe(users => {
-			this.users = users;
-			this.loading = false;
+			this.users.set(users);
+			this.loading.set(false);
 		});
-	}
-
-	ngOnChanges() {
-		if(this.showExternallyManaged && !this.columnsToDisplay.includes('externallyManaged')) {
-			this.columnsToDisplay.push('externallyManaged');
-		}
-		//do not use Paginator:firstPage() as it will trigger a search
-		this.paginator.pageIndex = 0;
-		this.refreshSearch$.next();
 	}
 }

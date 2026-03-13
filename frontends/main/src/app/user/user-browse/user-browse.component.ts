@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, OnInit, signal} from '@angular/core';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {UserSearch} from '@core/utilities/search/user-search';
@@ -22,6 +22,7 @@ import {getRoleStatusDisplay} from '../role-status-display';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-browse.component.html',
 	styleUrls: ['./user-browse.component.css'],
 	imports: [
@@ -40,13 +41,13 @@ import {FeatureStatic} from '@core/model/feature-static';
 	]
 })
 export class UserBrowseComponent implements OnInit {
-	predicate = new UserSearch();
-	profiles: Profile[];
-	scopes: ScopeMini[];
-	me?: User;
+	readonly predicate = signal<UserSearch>(new UserSearch());
+	readonly profiles = signal<Profile[]>([]);
+	readonly scopes = signal<ScopeMini[]>([]);
+	readonly me = signal<User | undefined>(undefined);
 	roleStatus = RoleStatus;
 	showDeleted = false;
-	showExternallyManaged = false;
+	readonly showExternallyManaged = computed(() => this.me()?.roles?.some(role => role.profileId === FeatureStatic.ADMIN) || false);
 
 	roleStatusArray = Object.values(RoleStatus);
 	getRoleStatusDisplay = getRoleStatusDisplay;
@@ -71,25 +72,25 @@ export class UserBrowseComponent implements OnInit {
 			scopes: this.meService.getScopes(undefined, true, false),
 			me: this.meService.get()
 		}).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({profiles, scopes, me}) => {
-			this.profiles = profiles;
-			this.scopes = scopes;
-			this.me = me;
-			this.showExternallyManaged = this.me?.roles?.some(role => role.profileId === FeatureStatic.ADMIN) || false;
+			this.profiles.set(profiles);
+			this.scopes.set(scopes);
+			this.me.set(me);
 		});
 	}
 
 	search() {
 		const {fullText, scopePk, profileId, status, externallyManaged} = this.searchForm.value;
 
-		this.predicate = new UserSearch();
-		this.predicate.fullText = fullText || undefined;
-		this.predicate.scopePks = scopePk ? [Number(scopePk)] : [];
-		this.predicate.profileIds = profileId ? [profileId] : [];
-		this.predicate.states = status ? [status as RoleStatus] : [];
-		this.predicate.externallyManaged = externallyManaged === '' ? undefined : Boolean(externallyManaged);
+		const predicate = new UserSearch();
+		predicate.fullText = fullText || undefined;
+		predicate.scopePks = scopePk ? [Number(scopePk)] : [];
+		predicate.profileIds = profileId ? [profileId] : [];
+		predicate.states = status ? [status as RoleStatus] : [];
+		predicate.externallyManaged = externallyManaged === '' ? undefined : Boolean(externallyManaged);
+		this.predicate.set(predicate);
 	}
 
 	reset() {
-		this.predicate = new UserSearch();
+		this.predicate.set(new UserSearch());
 	}
 }

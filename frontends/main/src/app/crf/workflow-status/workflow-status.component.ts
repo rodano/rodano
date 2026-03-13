@@ -1,4 +1,4 @@
-import {booleanAttribute, Component, EventEmitter, Input, OnChanges, Output} from '@angular/core';
+import {ChangeDetectionStrategy, booleanAttribute, Component, computed, input, output} from '@angular/core';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowActionService} from '../services/workflow-action.service';
@@ -17,6 +17,7 @@ import {Workflow} from '@core/model/workflow';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-status',
 	templateUrl: './workflow-status.component.html',
 	styleUrls: ['./workflow-status.component.css'],
@@ -28,98 +29,92 @@ import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-
 		AuditTrailButtonComponent
 	]
 })
-export class WorkflowStatusComponent implements OnChanges {
+export class WorkflowStatusComponent {
 	workflowableEntity = WorkflowableEntity;
 
-	@Input({required: true}) entity: WorkflowableEntity;
-	@Input({required: true}) workflowable: Workflowable;
+	readonly entity = input.required<WorkflowableEntity>();
+	readonly workflowable = input.required<Workflowable>();
 
 	//workflow status is provided only when the status already exists
-	@Input() workflowStatus?: WorkflowStatus;
-	@Input() workflow?: Workflow;
+	readonly workflowStatus = input<WorkflowStatus>();
+	readonly workflow = input<Workflow>();
 
-	@Input({transform: booleanAttribute}) rough = false;
+	readonly rough = input(false, {transform: booleanAttribute});
 
-	@Output() actionResponse = new EventEmitter<Workflowable>();
+	readonly actionResponse = output<Workflowable>();
+
+	readonly effectiveWorkflow = computed(() => this.workflowStatus()?.workflow ?? this.workflow());
 
 	constructor(
 		private workflowActionService: WorkflowActionService,
 		private crfChangeService: CRFChangeService
 	) { }
 
-	ngOnChanges() {
-		if(this.workflowStatus) {
-			this.workflow = this.workflowStatus.workflow;
-		}
-	}
-
 	executeWorkflowAction(action: WorkflowAction) {
 		let request;
-		if(this.workflowStatus) {
+		if(this.workflowStatus()) {
 			request = this.workflowActionService.executeActionOnWorkflowable(
-				this.entity,
-				this.workflowable,
-				this.workflowStatus as WorkflowStatus,
+				this.entity(),
+				this.workflowable(),
+				this.workflowStatus() as WorkflowStatus,
 				action
 			);
 		}
 		else {
 			request = this.workflowActionService.createOnWorkflowable(
-				this.entity,
-				this.workflowable,
+				this.entity(),
+				this.workflowable(),
 				action
 			);
 		}
 		request.subscribe({
 			next: updatedWorkflowable => {
-				this.crfChangeService.emitUpdatedWorkflowable(this.entity, updatedWorkflowable);
+				this.crfChangeService.emitUpdatedWorkflowable(this.entity(), updatedWorkflowable);
 				this.actionResponse.emit(updatedWorkflowable);
 			}
 			//error management is done in the service
 		});
 	}
 
-	get icon(): string {
-		return this.workflowStatus?.state.icon ?? this.workflow?.icon ?? 'manufacturing';
-	}
+	readonly icon = computed(() => this.workflowStatus()?.state.icon ?? this.effectiveWorkflow()?.icon ?? 'manufacturing');
 
-	get style(): Record<string, string> {
-		if(this.rough) {
-			return {};
+	readonly style = computed(() => {
+		if(this.rough()) {
+			return {} as Record<string, string>;
 		}
-		const color = this.workflowStatus?.state.color ?? '#000';
+		const color = this.workflowStatus()?.state.color ?? '#000';
 		return {
 			backgroundColor: `${color + 15}`,
 			border: `1px solid ${color}`
 		};
-	}
+	});
 
-	get actions(): WorkflowAction[] {
-		if(this.workflowStatus) {
-			return this.workflowStatus.state.possibleActions;
+	readonly actions = computed<WorkflowAction[]>(() => {
+		if(this.workflowStatus()) {
+			return this.workflowStatus()!.state.possibleActions;
 		}
-		return [this.workflow?.actions.find(a => a.id === this.workflow?.actionId) as WorkflowAction];
-	}
+		return [this.effectiveWorkflow()?.actions.find(a => a.id === this.effectiveWorkflow()?.actionId) as WorkflowAction];
+	});
 
-	get displayActions(): boolean {
-		switch(this.entity) {
+	readonly displayActions = computed<boolean>(() => {
+		switch(this.entity()) {
 			case WorkflowableEntity.SCOPE: {
-				const scope = this.workflowable as Scope;
+				const scope = this.workflowable() as Scope;
 				return !scope.removed && !scope.locked;
 			}
 			case WorkflowableEntity.EVENT: {
-				const event = this.workflowable as Event;
+				const event = this.workflowable() as Event;
 				return !event.removed && !event.inRemoved && !event.locked && !event.inLocked;
 			}
 			case WorkflowableEntity.FORM: {
-				const form = this.workflowable as Form;
+				const form = this.workflowable() as Form;
 				return !form.removed && !form.inLocked;
 			}
 			case WorkflowableEntity.FIELD: {
-				const field = this.workflowable as Field;
+				const field = this.workflowable() as Field;
 				return !field.inRemoved && !field.inLocked;
 			}
 			default: return false;
 		}
-	}
+	});
 }

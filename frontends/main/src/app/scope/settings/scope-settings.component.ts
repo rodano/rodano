@@ -1,6 +1,5 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
-import {ScopeModel} from '@core/model/scope-model';
 import {Scope} from '@core/model/scope';
 import {ScopeService} from '@core/services/scope.service';
 import {NotificationService} from 'src/app/services/notification.service';
@@ -14,8 +13,10 @@ import {of, switchMap} from 'rxjs';
 import {WorkflowStatusComponent} from 'src/app/crf/workflow-status/workflow-status.component';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {Workflowable} from '@core/utilities/workflowable';
+import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope-settings.component.html',
 	styleUrls: ['./scope-settings.component.css'],
 	imports: [
@@ -29,11 +30,9 @@ import {Workflowable} from '@core/utilities/workflowable';
 		WorkflowStatusComponent
 	]
 })
-export class ScopeSettingsComponent implements OnInit {
+export class ScopeSettingsComponent {
 	workflowableEntity = WorkflowableEntity;
-
-	@Input() scopeModel: ScopeModel;
-	@Input() scope: Scope;
+	readonly scope = inject(SCOPE_TOKEN);
 
 	scopeUpdateForm = this.formBuilder.group({
 		code: ['', [Validators.required]],
@@ -50,27 +49,22 @@ export class ScopeSettingsComponent implements OnInit {
 		private scopeService: ScopeService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog
-	) { }
-
-	ngOnInit() {
-		this.updateForm();
-	}
-
-	updateForm() {
-		this.scopeUpdateForm.reset(this.scope);
-		if(this.scope.removed) {
-			this.scopeUpdateForm.disable();
-		}
-		else {
-			this.scopeUpdateForm.enable();
-		}
+	) {
+		effect(() => {
+			this.scopeUpdateForm.reset(this.scope());
+			if(this.scope().removed) {
+				this.scopeUpdateForm.disable();
+			}
+			else {
+				this.scopeUpdateForm.enable();
+			}
+		});
 	}
 
 	save() {
-		const updatedScope = {...this.scope, ...this.scopeUpdateForm.value} as Scope;
-		this.scopeService.save(this.scope.pk, updatedScope).subscribe(scope => {
-			Object.assign(this.scope, scope);
-			this.scopeUpdateForm.reset(this.scope);
+		const updatedScope = {...this.scope(), ...this.scopeUpdateForm.value} as Scope;
+		this.scopeService.save(this.scope().pk, updatedScope).subscribe(scope => {
+			this.scope.set(scope);
 			this.notificationService.showSuccess('Modifications saved');
 		});
 	}
@@ -82,7 +76,7 @@ export class ScopeSettingsComponent implements OnInit {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.scopeService.remove(this.scope.pk, rationale);
+						return this.scopeService.remove(this.scope().pk, rationale);
 					}
 					return of(undefined);
 				})
@@ -90,8 +84,7 @@ export class ScopeSettingsComponent implements OnInit {
 			.subscribe({
 				next: scope => {
 					if(scope) {
-						this.scope.removed = scope.removed;
-						this.updateForm();
+						this.scope.set(scope);
 						this.notificationService.showSuccess('Scope removed');
 					}
 				},
@@ -108,7 +101,7 @@ export class ScopeSettingsComponent implements OnInit {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.scopeService.restore(this.scope.pk, rationale);
+						return this.scopeService.restore(this.scope().pk, rationale);
 					}
 					return of(undefined);
 				})
@@ -116,8 +109,7 @@ export class ScopeSettingsComponent implements OnInit {
 			.subscribe({
 				next: scope => {
 					if(scope) {
-						this.scope.removed = scope.removed;
-						this.updateForm();
+						this.scope.set(scope);
 						this.notificationService.showSuccess('Scope restored');
 					}
 				},
@@ -128,20 +120,20 @@ export class ScopeSettingsComponent implements OnInit {
 	}
 
 	lock() {
-		this.scopeService.lock(this.scope.pk).subscribe(scope => {
-			this.scope.locked = scope.locked;
+		this.scopeService.lock(this.scope().pk).subscribe(scope => {
+			this.scope.set(scope);
 			this.notificationService.showSuccess('Scope locked');
 		});
 	}
 
 	unlock() {
-		this.scopeService.unlock(this.scope.pk).subscribe(scope => {
-			this.scope.locked = scope.locked;
+		this.scopeService.unlock(this.scope().pk).subscribe(scope => {
+			this.scope.set(scope);
 			this.notificationService.showSuccess('Scope unlocked');
 		});
 	}
 
 	onWorkflowExecution(newScope: Workflowable) {
-		this.scope = newScope as Scope;
+		this.scope.set(newScope as Scope);
 	}
 }

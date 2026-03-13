@@ -1,5 +1,5 @@
 import {HttpClient, HttpResponse} from '@angular/common/http';
-import {Directive, Input, HostListener, ElementRef, OnChanges, DestroyRef} from '@angular/core';
+import {Directive, HostListener, ElementRef, DestroyRef, effect, input} from '@angular/core';
 import {NotificationService} from '../services/notification.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {finalize} from 'rxjs';
@@ -7,19 +7,18 @@ import {finalize} from 'rxjs';
 @Directive({
 	selector: '[appDownload]'
 })
-export class DownloadDirective implements OnChanges {
-	@Input('appDownload') url: string | undefined;
+export class DownloadDirective {
+	readonly url = input<string | undefined>(undefined, {alias: 'appDownload'});
 
 	constructor(
 		private http: HttpClient,
 		private elementRef: ElementRef<HTMLButtonElement>,
 		private destroyRef: DestroyRef,
 		private notificationService: NotificationService
-	) {}
-
-	ngOnChanges() {
-		//this must happen in the next tick, to let Angular material handle the disable mapping
-		setTimeout(() => this.toggleDisabled(!this.url), 0);
+	) {
+		effect(() => {
+			this.toggleDisabled(!this.url());
+		});
 	}
 
 	toggleDisabled(disabled: boolean) {
@@ -35,7 +34,7 @@ export class DownloadDirective implements OnChanges {
 	onClick(event: Event) {
 		//nothing to do if no url is set
 		//this should not happen as the button should be disabled
-		if(!this.url) {
+		if(!this.url()) {
 			return;
 		}
 
@@ -47,7 +46,7 @@ export class DownloadDirective implements OnChanges {
 		this.toggleDisabled(true);
 		button.classList.add('loading');
 
-		this.http.get(this.url, {observe: 'response', responseType: 'blob'}).pipe(
+		this.http.get(this.url()!, {observe: 'response', responseType: 'blob'}).pipe(
 			takeUntilDestroyed(this.destroyRef),
 			finalize(() => {
 				this.toggleDisabled(false);

@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
 import {Layout} from '@core/model/layout';
 import {MatSortModule, Sort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -28,6 +28,7 @@ import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
 import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-multiple-layout',
 	templateUrl: './multiple-layout.component.html',
 	styleUrls: ['./multiple-layout.component.css'],
@@ -44,22 +45,22 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 		AuditTrailButtonComponent
 	]
 })
-export class MultipleLayoutComponent implements OnInit, OnChanges {
-	@Input() layout: Layout;
+export class MultipleLayoutComponent implements OnInit {
+	readonly layout = input.required<Layout>();
 	//this component must have a reference to the reference list of datasets to be able to push new datasets in it
 	//if a filtered list is provided, new datasets will not be visible by the parent component
-	@Input() datasets: CRFDataset[];
-	@Input() disabled: boolean;
+	readonly datasets = input.required<CRFDataset[]>();
+	readonly disabled = input<boolean>(false);
 
 	multipleDatasets: CRFDataset[] = [];
 
 	@ViewChild(MatTable) table: MatTable<any>;
-	fieldModelsToDisplay: FieldModel[] = [];
-	columnsToDisplay: string[] = [];
+	readonly fieldModelsToDisplay = signal<FieldModel[]>([]);
+	readonly columnsToDisplay = signal<string[]>([]);
 	//handle datasource manually to be able to refresh it properly
-	dataSource = new MatTableDataSource<CRFDataset>([]);
+	readonly dataSource = signal(new MatTableDataSource<CRFDataset>([]));
 
-	shown = true;
+	readonly shown = signal(true);
 
 	constructor(
 		private crfService: CRFService,
@@ -70,31 +71,34 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		private loggingService: LoggingService,
 		private dialog: MatDialog,
 		private destroyRef: DestroyRef
-	) {}
-
-	ngOnInit() {
-		this.visibilityService.layoutVisibilityEvents$(this.layout.id).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(shown => {
-			this.loggingService.info(`Multiple layout ${this.layout.id} receiving visibility event containing ${shown}`);
-			this.shown = shown;
-			//mark the datasets
-			this.multipleDatasets.forEach(d => d.show = shown);
+	) {
+		effect(() => {
+			const layout = this.layout();
+			const datasets = this.datasets();
+			const fieldModelsToDisplay: FieldModel[] = [];
+			layout.datasetModel?.meaningfulFieldModelIds?.forEach(fieldModelId => {
+				const fieldModel = layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
+				fieldModelsToDisplay.push(fieldModel);
+			});
+			this.fieldModelsToDisplay.set(fieldModelsToDisplay);
+			this.columnsToDisplay.set([...fieldModelsToDisplay.map(f => f.id), 'actions']);
+			this.multipleDatasets = datasets.filter(d => d.modelId === layout.datasetModel.id);
+			if(fieldModelsToDisplay.length > 0) {
+				this.sortDatasets(fieldModelsToDisplay[0], true);
+			}
+			this.dataSource.set(new MatTableDataSource<CRFDataset>(this.multipleDatasets));
 		});
 	}
 
-	ngOnChanges() {
-		this.fieldModelsToDisplay = [];
-		this.layout.datasetModel?.meaningfulFieldModelIds?.forEach(fieldModelId => {
-			const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
-			this.fieldModelsToDisplay.push(fieldModel);
+	ngOnInit() {
+		this.visibilityService.layoutVisibilityEvents$(this.layout().id).pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(shown => {
+			this.loggingService.info(`Multiple layout ${this.layout().id} receiving visibility event containing ${shown}`);
+			this.shown.set(shown);
+			//mark the datasets
+			this.multipleDatasets.forEach(d => d.show = shown);
 		});
-		this.columnsToDisplay = [...this.fieldModelsToDisplay.map(f => f.id), 'actions'];
-		this.multipleDatasets = this.datasets.filter(d => d.modelId === this.layout.datasetModel.id);
-		if(this.fieldModelsToDisplay.length > 0) {
-			this.sortDatasets(this.fieldModelsToDisplay[0], true);
-		}
-		this.dataSource = new MatTableDataSource<CRFDataset>(this.multipleDatasets);
 	}
 
 	trackBy(_: number, dataset: CRFDataset) {
@@ -102,7 +106,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	}
 
 	hasError(dataset: CRFDataset): boolean {
-		return dataset.fields.some(f => f.error || f.workflowStatuses.some(s => s.state.important));
+		return dataset.fields.some(f => f.error() || f.workflowStatuses.some(s => s.state.important));
 	}
 
 	getFieldValue(dataset: CRFDataset, fieldModelId: string): string {
@@ -111,29 +115,29 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	}
 
 	addDataset() {
-		this.crfService.getCandidateCRFDataset(this.layout.scopePk, this.layout.eventPk, this.layout.datasetModel.id).subscribe(newDataset => {
+		const layout = this.layout();
+		this.crfService.getCandidateCRFDataset(layout.scopePk, layout.eventPk, layout.datasetModel.id).subscribe(newDataset => {
 			newDataset.expanded = true;
-			this.datasets.push(newDataset);
+			this.datasets().push(newDataset);
 			this.multipleDatasets.push(newDataset);
-			this.dataSource._updateChangeSubscription();
+			this.dataSource()._updateChangeSubscription();
 			//this.crfService.addDataset(newDataset);
-			this.cellLoadingService.registerLayoutCells(this.layout);
+			this.cellLoadingService.registerLayoutCells(layout);
 		});
 	}
 
 	removeDataset(dataset: CRFDataset) {
 		//if the dataset does not have a pk yet, that means that it has not been uploaded yet
-		//we can thus delete it permanently.
+		//we can thus delete it permanently
 		if(!dataset.pk) {
-			this.datasets.splice(this.datasets.indexOf(dataset), 1);
-			//this.crfService.removeUncommitedDataset(dataset.id);
+			const datasets = this.datasets();
+			datasets.splice(datasets.indexOf(dataset), 1);
 		}
 		else {
 			this.openRationaleDialog(true).subscribe((rationale?: string) => {
 				if(rationale) {
 					dataset.rationale = rationale;
 					dataset.removed = true;
-					//this.crfService.mergeCurrentDatasets([dataset]);
 					this.notificationService.showSuccess('Dataset marked for deletion');
 				}
 			});
@@ -145,7 +149,6 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 			if(rationale) {
 				dataset.rationale = rationale;
 				dataset.removed = false;
-				//this.crfService.mergeCurrentDatasets([dataset]);
 				this.notificationService.showSuccess('Dataset marked for restoration');
 			}
 		});
@@ -177,7 +180,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		if(!sort.active && sort.direction === '') {
 			return;
 		}
-		const sortField = this.layout.datasetModel.fieldModels.find(f => f.id === sort.active) as FieldModel;
+		const sortField = this.layout().datasetModel.fieldModels.find(f => f.id === sort.active) as FieldModel;
 		this.sortDatasets(sortField, sort.direction === 'asc');
 
 		//re-render the rows after the sorting is done

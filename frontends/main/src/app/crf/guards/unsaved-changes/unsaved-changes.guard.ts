@@ -14,7 +14,7 @@ export class UnsavedChangesGuard implements CanDeactivate<FormComponent> {
 	canDeactivate(
 		component: FormComponent
 	): Observable<boolean> {
-		if(!component.dirty) {
+		if(!component.dirty()) {
 			return of(true);
 		}
 		return this.dialog

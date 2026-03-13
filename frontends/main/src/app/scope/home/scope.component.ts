@@ -1,5 +1,5 @@
-import {Component, Input, OnChanges} from '@angular/core';
-import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {ChangeDetectionStrategy, Component, InjectionToken, OnInit, WritableSignal, inject, input, signal} from '@angular/core';
+import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {Scope} from '@core/model/scope';
 import {ScopeModel} from '@core/model/scope-model';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -12,7 +12,10 @@ import {Form} from '@core/model/form';
 import {MatTooltip} from '@angular/material/tooltip';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 
+export const SCOPE_TOKEN = new InjectionToken<WritableSignal<Scope>>('scope');
+
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope.component.html',
 	styleUrls: ['./scope.component.css'],
 	imports: [
@@ -28,21 +31,24 @@ import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-
 		AuditTrailButtonComponent
 	]
 })
-export class ScopeComponent implements OnChanges {
-	@Input() scopeModel: ScopeModel;
-	//scope will be undefined when this component is displayed to create a new scope
-	@Input() scope?: Scope;
+export class ScopeComponent implements OnInit {
+	//scope is a shared signal so child components can update it and the parent template reacts
+	readonly scope = inject(SCOPE_TOKEN);
+	readonly scopeModel = input.required<ScopeModel>();
 
-	forms: Form[] = [];
+	readonly forms = signal<Form[]>([]);
 
 	constructor(
-		private formService: FormService
+		private formService: FormService,
+		private route: ActivatedRoute
 	) {}
 
-	ngOnChanges() {
-		if(this.scope) {
-			this.formService.searchOnScope(this.scope.pk).subscribe(forms => {
-				this.forms = forms;
+	ngOnInit() {
+		const scope: Scope | undefined = this.route.snapshot.data['scope'];
+		if(scope) {
+			this.scope.set(scope);
+			this.formService.searchOnScope(scope.pk).subscribe(forms => {
+				this.forms.set(forms);
 			});
 		}
 	}

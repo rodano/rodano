@@ -8,14 +8,14 @@
 
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table
-	[dataSource]="scopeOverdue.objects"
+	[dataSource]="scopeOverdue().objects"
 	matSort
 	matSortDisableClear>
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
@@ -28,7 +28,7 @@
 			mat-header-cell
 			*matHeaderCellDef
 			mat-sort-header>
-			{{ parentScopeName }}
+			{{ parentScopeName() }}
 		</th>
 		<td
 			mat-cell
@@ -42,7 +42,7 @@
 			mat-header-cell
 			*matHeaderCellDef
 			mat-sort-header>
-			{{ scopeName }}
+			{{ scopeName() }}
 		</th>
 		<td
 			mat-cell
@@ -56,7 +56,7 @@
 			mat-header-cell
 			*matHeaderCellDef
 			mat-sort-header>
-			{{ specificColumnName }}
+			{{ specificColumnName() }}
 		</th>
 		<td
 			mat-cell
@@ -91,13 +91,13 @@
 	<mat-toolbar-row>
 		<button
 			mat-stroked-button
-			[appDownload]="exportUrl">
+			[appDownload]="exportUrl()">
 			Export
 		</button>
 		<span class="toolbar-spacer"></span>
 		<mat-paginator
-			[pageSize]="scopeOverdue.paging.pageSize"
-			[length]="scopeOverdue.paging.total">
+			[pageSize]="scopeOverdue().paging.pageSize"
+			[length]="scopeOverdue().paging.total">
 		</mat-paginator>
 	</mat-toolbar-row>
 </mat-toolbar>

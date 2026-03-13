@@ -1,5 +1,5 @@
 <ul [formGroup]="formGroup">
-	@for (possibleValue of field.model.possibleValues; track possibleValue.id) {
+	@for (possibleValue of field().model.possibleValues; track possibleValue.id) {
 		<li>
 			<mat-checkbox [formControlName]="possibleValue.id">
 				{{ possibleValue.shortname | localizeMap }}

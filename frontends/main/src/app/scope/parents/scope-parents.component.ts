@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, signal} from '@angular/core';
 import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {forkJoin} from 'rxjs';
 import {ScopeModel} from '@core/model/scope-model';
@@ -22,8 +22,10 @@ import {Rights} from '@core/model/rights';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
+import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-parents',
 	templateUrl: './scope-parents.component.html',
 	styleUrls: ['./scope-parents.component.css'],
@@ -49,11 +51,11 @@ import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 		ScopePickerComponent
 	]
 })
-export class ScopeParentsComponent implements OnInit {
-	@Input() scopeModel: ScopeModel;
-	@Input() scope: Scope;
+export class ScopeParentsComponent {
+	readonly scope = inject(SCOPE_TOKEN);
+	readonly scopeModel = input.required<ScopeModel>();
 
-	scopeRelations: ScopeRelation[] = [];
+	readonly scopeRelations = signal<ScopeRelation[]>([]);
 
 	displayedColumns = [
 		'scope',
@@ -78,45 +80,45 @@ export class ScopeParentsComponent implements OnInit {
 		})
 	});
 
-	allParentScopes: Scope[] = [];
-	parentScopes: Scope[] = [];
-	transferParentScopes: Scope[] = [];
+	private readonly allParentScopes = signal<Scope[]>([]);
+	readonly parentScopes = computed(() => {
+		const currentParentScopePks = this.scopeRelations()
+			.filter(rel => this.isCurrent(rel))
+			.map(rel => rel.parent.pk);
+		return this.allParentScopes().filter(s => !currentParentScopePks.includes(s.pk));
+	});
+
+	readonly transferParentScopes = computed(() =>
+		this.parentScopes().filter(s => s.modelId === this.scopeModel().defaultParentId)
+	);
 
 	constructor(
 		private scopeRelationsService: ScopeRelationsService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
-	) { }
-
-	ngOnInit(): void {
-		forkJoin({
-			allParentScopes: this.scopeRelationsService.getParents(this.scopeModel.id, Rights.WRITE, false),
-			scopeRelations: this.scopeRelationsService.getParentRelations(this.scope.pk)
-		}).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({allParentScopes, scopeRelations}) => {
-			this.scopeRelations = scopeRelations;
-			this.allParentScopes = allParentScopes;
-			this.updateParentScopes();
+	) {
+		effect(() => {
+			forkJoin({
+				allParentScopes: this.scopeRelationsService.getParents(this.scopeModel().id, Rights.WRITE, false),
+				scopeRelations: this.scopeRelationsService.getParentRelations(this.scope().pk)
+			}).pipe(
+				takeUntilDestroyed(this.destroyRef)
+			).subscribe(({allParentScopes, scopeRelations}) => {
+				this.scopeRelations.set(scopeRelations);
+				this.allParentScopes.set(allParentScopes);
+			});
 		});
 	}
 
 	addParent() {
 		const scopeRelationCreation = this.addParentForm.value as ScopeRelationCreation;
 
-		this.scopeRelationsService.createScopeRelation(this.scope.pk, scopeRelationCreation).pipe(
+		this.scopeRelationsService.createScopeRelation(this.scope().pk, scopeRelationCreation).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe({
 			next: parentRelations => {
-				//Update the parent scopes
-				this.scopeRelations = parentRelations;
-
-				//Remove the actual parents from the potential parent list
-				this.updateParentScopes();
-
+				this.scopeRelations.set(parentRelations);
 				this.notificationService.showSuccess('Parent added');
-
-				//Reset the form
 				this.addParentForm.reset();
 			},
 			error: response => {
@@ -129,21 +131,13 @@ export class ScopeParentsComponent implements OnInit {
 		const parentPk = this.transferForm.value.parentPk;
 		const scopeRelationCreation = {parentPk, startDate: new Date()} as ScopeRelationCreation;
 
-		this.scopeRelationsService.transfer(this.scope.pk, scopeRelationCreation).pipe(
+		this.scopeRelationsService.transfer(this.scope().pk, scopeRelationCreation).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe({
 			next: parentRelations => {
-				//Update the parent scopes
-				this.scopeRelations = parentRelations;
-
-				//Remove the actual parents from the potential parent list
-				this.updateParentScopes();
-
-				//Notify the user
+				this.scopeRelations.set(parentRelations);
 				const newParentRelation = parentRelations.find(s => s.parent.pk === parentPk);
 				this.notificationService.showSuccess(`Transferred to ${newParentRelation?.parent.shortname}`);
-
-				//Reset the form
 				this.transferForm.reset();
 			},
 			error: response => {
@@ -153,35 +147,18 @@ export class ScopeParentsComponent implements OnInit {
 	}
 
 	endRelation(relationPk: number) {
-		this.scopeRelationsService.endRelation(this.scope.pk, relationPk, new Date()).pipe(
+		this.scopeRelationsService.endRelation(this.scope().pk, relationPk, new Date()).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe({
 			next: parentRelations => {
-				//Update the parent scopes
-				this.scopeRelations = parentRelations;
-
-				//Remove the actual parents from the potential parent list
-				this.updateParentScopes();
-
-				//Notify the user
+				this.scopeRelations.set(parentRelations);
 				this.notificationService.showSuccess('Relation ended');
-
-				//Reset the form
 				this.addParentForm.reset();
 			},
 			error: response => {
 				this.notificationService.showError(response.error.message);
 			}
 		});
-	}
-
-	updateParentScopes() {
-		const currentParentScopePks = this.scopeRelations
-			.filter(rel => this.isCurrent(rel))
-			.map(rel => rel.parent.pk);
-		this.parentScopes = this.allParentScopes.filter(s => !currentParentScopePks.includes(s.pk));
-		const defaultParentScopeModelId = this.scopeModel.defaultParentId;
-		this.transferParentScopes = this.parentScopes.filter(s => s.modelId === defaultParentScopeModelId);
 	}
 
 	isCurrent(scopeRelation: ScopeRelation): boolean {

@@ -1,14 +1,15 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ConfigurationService} from '@core/services/configuration.service';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-welcome-text',
 	templateUrl: './welcome-text.component.html',
 	styleUrl: './welcome-text.component.css'
 })
 export class WelcomeTextComponent implements OnInit {
-	welcomeTextHtml: SafeHtml;
+	readonly welcomeTextHtml = signal<SafeHtml>('');
 
 	constructor(
 		private configurationService: ConfigurationService,
@@ -18,7 +19,7 @@ export class WelcomeTextComponent implements OnInit {
 	ngOnInit(): void {
 		this.configurationService.getStudy().subscribe(
 			response => {
-				this.welcomeTextHtml = this.domSanitizer.bypassSecurityTrustHtml(response.welcomeText || '');
+				this.welcomeTextHtml.set(this.domSanitizer.bypassSecurityTrustHtml(response.welcomeText || ''));
 			}
 		);
 	}

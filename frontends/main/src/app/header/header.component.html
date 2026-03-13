@@ -1,19 +1,19 @@
 <mat-toolbar>
 	<h1>
 		<a [routerLink]="['/']">
-			@if (logo) {
+			@if (logo()) {
 				<img
-					[src]="'data:image/svg+xml;base64,' + logo"
-					[alt]="study.shortname | localizeMap" />
+					[src]="'data:image/svg+xml;base64,' + logo()"
+					[alt]="study().shortname | localizeMap" />
 			} @else {
-				{{ study.shortname | localizeMap }}
+				{{ study().shortname | localizeMap }}
 			}
 		</a>
 	</h1>
 
 	<div class="menus">
 		<!-- TODO the action.context should be simplified, this should be a single parameter instead of a nonsensical array-->
-		@for (menu of menus; track menu.id) {
+		@for (menu of menus(); track menu.id) {
 			@if (menu.submenus.length === 0) {
 				<a
 					mat-button
@@ -46,23 +46,23 @@
 	</div>
 
 	<div class="user">
-		@if (user) {
+		@if (user()) {
 			<a
-				[routerLink]="['/users', user.pk]"
+				[routerLink]="['/users', user()?.pk]"
 				mat-stroked-button
 				class="link-active"
-				[matBadge]="pendingRolesNumber"
+				[matBadge]="pendingRolesNumber()"
 				matBadgeSize="small"
 				matBadgeDescription="Role to enable"
 				matBadgeOverlap="true"
 				matBadgePosition="below after"
-				[matBadgeHidden]="pendingRolesNumber === 0"
-				[matTooltip]="pendingRolesNumber > 0 ? 'Pending roles: ' + pendingRolesNumber : 'Your account'">
-				{{ user.name }}
+				[matBadgeHidden]="pendingRolesNumber() === 0"
+				[matTooltip]="pendingRolesNumber() > 0 ? 'Pending roles: ' + pendingRolesNumber() : 'Your account'">
+				{{ user()?.name }}
 			</a>
 
 			<!-- Profile selector for super users -->
-			@if (study.environment === environment.DEV) {
+			@if (study().environment === environment.DEV) {
 				<mat-menu #appMenu="matMenu">
 					<!-- Hard code admin profile for superusers to be able to restore their admin profile -->
 					<button
@@ -71,7 +71,7 @@
 						(click)="switchProfile(adminProfileId)">
 						<span>Administrator</span>
 					</button>
-					@for (profile of profiles; track profile.id) {
+					@for (profile of profiles(); track profile.id) {
 						<button
 							mat-menu-item
 							type="button"

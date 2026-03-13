@@ -18,19 +18,19 @@
 				@for (option of data.action.documentableOptions; track option) {
 					<mat-radio-button
 						[value]="option | localizeMap"
-						(change)="rationale.setValue($event.value); otherOption = false">
+						(change)="rationale.setValue($event.value); otherOption.set(false)">
 						{{ option | localizeMap }}
 					</mat-radio-button>
 				}
 				<mat-radio-button
 					[value]="undefined"
-					(change)="rationale.setValue(''); otherOption = true">
+					(change)="rationale.setValue(''); otherOption.set(true)">
 					Other
 				</mat-radio-button>
 			</mat-radio-group>
 		}
 
-		@if (data.action.documentableOptions.length <= 0 || otherOption) {
+		@if (data.action.documentableOptions.length <= 0 || otherOption()) {
 			<mat-form-field class="full-width">
 				<mat-label>Rationale</mat-label>
 				<textarea

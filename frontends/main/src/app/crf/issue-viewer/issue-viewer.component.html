@@ -1,12 +1,12 @@
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
-	[dataSource]="workflowStatuses.objects"
+	[dataSource]="workflowStatuses().objects"
 	matSort
 	matSortDisableClear>
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
@@ -115,6 +115,6 @@
 </table>
 
 <mat-paginator
-	[pageSize]="workflowStatuses.paging.pageSize"
-	[length]="workflowStatuses.paging.total">
+	[pageSize]="workflowStatuses().paging.pageSize"
+	[length]="workflowStatuses().paging.total">
 </mat-paginator>

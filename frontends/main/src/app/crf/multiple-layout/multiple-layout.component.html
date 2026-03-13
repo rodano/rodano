@@ -1,26 +1,26 @@
-@if (shown) {
-	@if (!isEmptyObject(layout.textBefore)) {
+@if (shown()) {
+	@if (!isEmptyObject(layout().textBefore)) {
 		<div
 			class="block"
-			[innerHTML]="layout.textBefore | localizeMap | safeHtml"></div>
+			[innerHTML]="layout().textBefore | localizeMap | safeHtml"></div>
 	}
 
 	<table
 		mat-table
-		[dataSource]="dataSource"
+		[dataSource]="dataSource()"
 		[trackBy]="trackBy"
 		multiTemplateDataRows
 		matSort
 		(matSortChange)="sortChange($event)">
-		@if (dataSource.data.length === 0) {
+		@if (dataSource().data.length === 0) {
 			<tr
 				*matNoDataRow
 				class="no-data-row">
-				<td [attr.colspan]="columnsToDisplay.length">No data</td>
+				<td [attr.colspan]="columnsToDisplay().length">No data</td>
 			</tr>
 		}
 
-		@for (fieldModel of fieldModelsToDisplay; track fieldModel.id) {
+		@for (fieldModel of fieldModelsToDisplay(); track fieldModel.id) {
 			<ng-container [matColumnDef]="fieldModel.id">
 				<th
 					mat-header-cell
@@ -45,7 +45,7 @@
 			<td
 				mat-cell
 				*matCellDef="let dataset">
-				@if (!disabled && dataset.canWrite) {
+				@if (!disabled() && dataset.canWrite) {
 					@if (dataset.removed) {
 						<button
 							mat-icon-button
@@ -72,22 +72,22 @@
 			<td
 				mat-cell
 				*matCellDef="let dataset"
-				[attr.colspan]="columnsToDisplay.length">
+				[attr.colspan]="columnsToDisplay().length">
 				<app-layout
-					[layout]="layout"
+					[layout]="layout()"
 					[datasets]="[dataset]"
-					[layoutUid]="layout.id + '_' + dataset.id"
-					[disabled]="dataset.removed || disabled">
+					[layoutUid]="layout().id + '_' + dataset.id"
+					[disabled]="dataset.removed || disabled()">
 				</app-layout>
 			</td>
 		</ng-container>
 
 		<tr
 			mat-header-row
-			*matHeaderRowDef="columnsToDisplay; sticky: true"></tr>
+			*matHeaderRowDef="columnsToDisplay(); sticky: true"></tr>
 		<tr
 			mat-row
-			*matRowDef="let dataset; columns: columnsToDisplay"
+			*matRowDef="let dataset; columns: columnsToDisplay()"
 			class="dataset"
 			[class.error]="hasError(dataset)"
 			[class.removed]="dataset.removed"
@@ -99,20 +99,20 @@
 			class="expanded-dataset"></tr>
 	</table>
 
-	@if (!disabled && layout.datasetModel.canWrite) {
+	@if (!disabled() && layout().datasetModel.canWrite) {
 		<div class="footer">
 			<button
 				(click)="addDataset()"
 				mat-flat-button
 				type="button">
-				Add {{ layout.datasetModel.shortname | localizeMap }}
+				Add {{ layout().datasetModel.shortname | localizeMap }}
 			</button>
 		</div>
 	}
 
-	@if (!isEmptyObject(layout.textAfter)) {
+	@if (!isEmptyObject(layout().textAfter)) {
 		<div
 			class="block"
-			[innerHTML]="layout.textAfter | localizeMap | safeHtml"></div>
+			[innerHTML]="layout().textAfter | localizeMap | safeHtml"></div>
 	}
 }

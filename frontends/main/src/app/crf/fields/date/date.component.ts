@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, DestroyRef, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, effect, input} from '@angular/core';
 import {ReactiveFormsModule, FormControl, Validators} from '@angular/forms';
 import {MatDatepicker, MatDatepickerModule} from '@angular/material/datepicker';
 import {parse, format} from 'date-fns';
@@ -13,6 +13,7 @@ import {FieldService} from '@core/services/field.service';
 import {merge} from 'rxjs';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-date',
 	templateUrl: './date.component.html',
 	styleUrls: ['../field/field.component.css', './date.component.css'],
@@ -25,9 +26,9 @@ import {merge} from 'rxjs';
 		DateFormatYearDirective
 	]
 })
-export class DateComponent implements OnInit, OnChanges {
-	@Input() field: CRFField;
-	@Input() disabled: boolean;
+export class DateComponent implements OnInit {
+	readonly field = input.required<CRFField>();
+	readonly disabled = input<boolean>(false);
 
 	dateControl = new FormControl<Date>(new Date());
 	timeControl = new FormControl<string>('');
@@ -36,111 +37,113 @@ export class DateComponent implements OnInit, OnChanges {
 		private destroyRef: DestroyRef,
 		private fieldService: FieldService,
 		private fieldUpdateService: FieldUpdateService
-	) { }
+	) {
+		effect(() => {
+			if(this.field().model.readOnly || this.disabled()) {
+				this.dateControl.disable({emitEvent: false});
+			}
+			else {
+				this.dateControl.enable({emitEvent: false});
+			}
+		});
+
+		effect(() => {
+			const field = this.field();
+			this.timeControl.setValidators([this.getValidator()]);
+			if(field.value) {
+				const parts = field.value.split(' ');
+				if(this.isDate()) {
+					const datePart = parts.shift();
+					const dateFormat = this.fieldService.generateDateFormat(field.model);
+					const dateValue = parse(datePart as string, dateFormat, new Date());
+					this.dateControl.reset(dateValue, {emitEvent: false});
+				}
+				if(this.isTime()) {
+					const timePart = parts.shift();
+					this.timeControl.reset(timePart, {emitEvent: false});
+				}
+			}
+			else {
+				this.dateControl.reset(undefined, {emitEvent: false});
+				this.timeControl.reset(undefined, {emitEvent: false});
+			}
+		});
+	}
 
 	ngOnInit(): void {
-		const observables = [];
-		if(this.isDate()) {
-			observables.push(this.dateControl.valueChanges);
-		}
-		if(this.isTime()) {
-			observables.push(this.timeControl.valueChanges);
-		}
-		merge(...observables).pipe(
+		merge(this.dateControl.valueChanges, this.timeControl.valueChanges).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(value => {
 			if(this.dateControl.valid && this.timeControl.valid) {
+				const field = this.field();
 				const parts = [];
 				if(this.isDate()) {
-					const fieldFormat = this.fieldService.generateDateFormat(this.field.model);
+					const fieldFormat = this.fieldService.generateDateFormat(field.model);
 					parts.push(value ? format(this.dateControl.value as Date, fieldFormat) : '');
 				}
 				if(this.isTime()) {
 					parts.push(this.timeControl.value);
 				}
 				const fieldValue = parts.join(' ');
-				this.fieldUpdateService.updateField(this.field, fieldValue, fieldValue);
+				this.fieldUpdateService.updateField(field, fieldValue, fieldValue);
 			}
 		});
 	}
 
-	ngOnChanges() {
-		//adjust time validator
-		this.timeControl.setValidators([this.getValidator()]);
-		if(this.field.value) {
-			const parts = this.field.value.split(' ');
-			if(this.isDate()) {
-				const datePart = parts.shift();
-				const dateFormat = this.fieldService.generateDateFormat(this.field.model);
-				const dateValue = parse(datePart as string, dateFormat, new Date());
-				this.dateControl.reset(dateValue);
-			}
-			if(this.isTime()) {
-				const timePart = parts.shift();
-				this.timeControl.reset(timePart);
-			}
-		}
-		else {
-			this.dateControl.reset(undefined);
-			this.timeControl.reset(undefined);
-		}
-
-		if(this.field.model.readOnly || this.disabled) {
-			this.dateControl.disable();
-		}
-	}
-
 	getValidator() {
+		const field = this.field();
 		let regexp = '[01]\\d|2[0-3]';
-		if(this.field.model.withMinutes) {
+		if(field.model.withMinutes) {
 			regexp += ':[0-5]\\d';
 		}
-		if(this.field.model.withSeconds) {
+		if(field.model.withSeconds) {
 			regexp += ':[0-5]\\d';
 		}
 		return Validators.pattern(new RegExp(`^${regexp}$`));
 	}
 
 	getPlaceholder() {
+		const field = this.field();
 		let placeholder = 'HH';
-		if(this.field.model.withMinutes) {
+		if(field.model.withMinutes) {
 			placeholder += ':MM';
 		}
-		if(this.field.model.withSeconds) {
+		if(field.model.withSeconds) {
 			placeholder += ':SS';
 		}
 		return placeholder;
 	}
 
 	getTimeSize() {
+		const field = this.field();
 		let size = 2;
-		if(this.field.model.withMinutes) {
+		if(field.model.withMinutes) {
 			size += 3;
 		}
-		if(this.field.model.withSeconds) {
+		if(field.model.withSeconds) {
 			size += 3;
 		}
 		return size;
 	}
 
 	isDate() {
-		return this.fieldService.isDate(this.field.model);
+		return this.fieldService.isDate(this.field().model);
 	}
 
 	isTime() {
-		return this.fieldService.isTime(this.field.model);
+		return this.fieldService.isTime(this.field().model);
 	}
 
 	yearHandler(newValue: Date, picker: MatDatepicker<Date>) {
 		this.dateControl.setValue(newValue);
-		if(!this.field.model.withMonths) {
+		if(!this.field().model.withMonths) {
 			picker.close();
 		}
 	}
 
 	monthHandler(newValue: Date, picker: MatDatepicker<Date>) {
 		this.dateControl.setValue(newValue);
-		if(!this.field.model.withDays) {
+		if(!this.field().model.withDays) {
 			picker.close();
 		}
 	}

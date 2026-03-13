@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Inject, OnInit, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
@@ -15,6 +15,7 @@ export interface WorkflowRationaleData {
 }
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-audit-trail-field',
 	templateUrl: 'audit-trail-field.component.html',
 	styleUrls: ['./audit-trail-field.component.css'],
@@ -28,9 +29,9 @@ export interface WorkflowRationaleData {
 	]
 })
 export class AuditTrailFieldComponent implements OnInit {
-	events: FieldEventAuditTrail[];
-	selectedEntityPk: number | undefined;
-	loading = false;
+	readonly events = signal<FieldEventAuditTrail[]>([]);
+	readonly selectedEntityPk = signal<number | undefined>(undefined);
+	readonly loading = signal(false);
 	columnsToDisplay = ['event', 'value', 'by', 'date', 'context'];
 
 	constructor(
@@ -40,19 +41,19 @@ export class AuditTrailFieldComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		this.loading = true;
+		this.loading.set(true);
 		this.auditTrailService.getForField(this.field).subscribe(events => {
-			this.events = events;
-			this.loading = false;
+			this.events.set(events);
+			this.loading.set(false);
 		});
 	}
 
 	highlightRelatedEvents(event: FieldEventAuditTrail) {
 		if(event.entityType === FieldEventEntityType.WORKFLOW_STATUS) {
-			this.selectedEntityPk = event.entityPk;
+			this.selectedEntityPk.set(event.entityPk);
 		}
 		else {
-			this.selectedEntityPk = undefined;
+			this.selectedEntityPk.set(undefined);
 		}
 	}
 }

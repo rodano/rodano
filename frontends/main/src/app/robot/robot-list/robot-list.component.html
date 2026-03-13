@@ -18,7 +18,7 @@
 				formControlName="profileId"
 				name="profileId">
 				<mat-option></mat-option>
-				@for (profile of profiles; track profile.id) {
+				@for (profile of profiles(); track profile.id) {
 					<mat-option [value]="profile.id">
 						{{ profile.shortname | localizeMap }}
 					</mat-option>
@@ -49,14 +49,14 @@
 
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table
-	[dataSource]="robots.objects"
+	[dataSource]="robots().objects"
 	matSort
 	matSortDisableClear>
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
@@ -90,7 +90,7 @@
 		<td
 			mat-cell
 			*matCellDef="let robot">
-			{{ robot.roles[0].profileId | lookupById: profiles | getField: 'shortname' | localizeMap }}
+			{{ robot.roles[0].profileId | lookupById: profiles() | getField: 'shortname' | localizeMap }}
 		</td>
 	</ng-container>
 
@@ -147,8 +147,8 @@
 	<mat-toolbar-row>
 		<span class="toolbar-spacer"></span>
 		<mat-paginator
-			[pageSize]="robots.paging.pageSize"
-			[length]="robots.paging.total">
+			[pageSize]="robots().paging.pageSize"
+			[length]="robots().paging.total">
 		</mat-paginator>
 	</mat-toolbar-row>
 </mat-toolbar>

@@ -6,7 +6,7 @@
 </ul>
 <p>
 	<!-- prettier-ignore -->
-	Contact <a [href]="'mailto:' + study?.clientEmail">{{ study?.clientEmail }}</a
+	Contact <a [href]="'mailto:' + study()?.clientEmail">{{ study()?.clientEmail }}</a
 	>.
 </p>
 
@@ -17,7 +17,7 @@
 </ul>
 <p>
 	<!-- prettier-ignore -->
-	Contact <a [href]="'mailto:' + study?.email">{{ study?.email }}</a
+	Contact <a [href]="'mailto:' + study()?.email">{{ study()?.email }}</a
 	>.
 </p>
 

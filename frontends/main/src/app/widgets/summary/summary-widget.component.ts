@@ -1,4 +1,4 @@
-import {Component, ViewChild, Input, OnInit, DestroyRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ViewChild, OnInit, DestroyRef, input, signal} from '@angular/core';
 import {WidgetService} from '@core/services/widget.service';
 import {forkJoin, Observable, of, Subject} from 'rxjs';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -29,6 +29,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './summary-widget.component.html',
 	styleUrls: ['./summary-widget.component.css'],
 	imports: [
@@ -53,9 +54,9 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 	]
 })
 export abstract class SummaryWidgetComponent implements OnInit {
-	@Input() scopes?: Scope[];
+	readonly scopes = input<Scope[]>();
 
-	loading = true;
+	readonly loading = signal(true);
 
 	//scope selector
 	control: FormControl;
@@ -64,14 +65,14 @@ export abstract class SummaryWidgetComponent implements OnInit {
 	leafScopeModel: ScopeModel;
 
 	//table
-	ancestors: (ScopeTiny | Scope)[];
-	columns: SummaryColumn[];
+	readonly ancestors = signal<(ScopeTiny | Scope)[]>([]);
+	readonly columns = signal<SummaryColumn[]>([]);
 	@ViewChild(MatTable, {static: true}) table: MatTable<SummaryRow>;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
-	dataSource = new MatTableDataSource<SummaryRow>([]);
-	columnsToDisplay: string[] = [];
+	readonly dataSource = signal<MatTableDataSource<SummaryRow>>(new MatTableDataSource<SummaryRow>([]));
+	readonly columnsToDisplay = signal<string[]>([]);
 
-	buttons: ExportButton[] = [];
+	readonly buttons = signal<ExportButton[]>([]);
 
 	rootScopePkChanged: Subject<number> = new Subject<number>();
 
@@ -100,24 +101,24 @@ export abstract class SummaryWidgetComponent implements OnInit {
 				takeUntilDestroyed(this.destroyRef),
 				startWith(this.getInitialScopePk()),
 				switchMap(scopePk => {
-					this.loading = true;
+					this.loading.set(true);
 					return this.getData(scopePk);
 				}),
 				switchMap(data => {
 					const rootScopePk = data.rows[0].scope.pk;
-					this.buttons = this.getButtons(rootScopePk);
+					this.buttons.set(this.getButtons(rootScopePk));
 					return forkJoin({
 						data: of(data),
 						ancestors: this.scopeRelationService.getAncestors(rootScopePk)
 					});
 				})
 			).subscribe(({data, ancestors}) => {
-				this.columns = data.columns;
-				this.columnsToDisplay = ['scope', ...data.columns.map(c => c.id)];
-				this.dataSource = new MatTableDataSource<SummaryRow>(data.rows);
-				this.dataSource.paginator = this.paginator;
-				this.ancestors = [...ancestors, this.getRootScope()];
-				this.loading = false;
+				this.columns.set(data.columns);
+				this.columnsToDisplay.set(['scope', ...data.columns.map(c => c.id)]);
+				this.dataSource.set(new MatTableDataSource<SummaryRow>(data.rows));
+				this.dataSource().paginator = this.paginator;
+				this.ancestors.set([...ancestors, this.getRootScope()]);
+				this.loading.set(false);
 			});
 		});
 	}
@@ -127,16 +128,16 @@ export abstract class SummaryWidgetComponent implements OnInit {
 	abstract getButtons(scopePk: number | undefined): ExportButton[];
 
 	getInitialScopePk(): number | undefined {
-		return this.scopes?.[0].pk;
+		return this.scopes()?.[0].pk;
 	}
 
 	getRootScope(): ScopeTiny {
-		return this.dataSource.data[0].scope;
+		return this.dataSource().data[0].scope;
 	}
 
 	getParent(): ScopeTiny | Scope {
-		const depth = this.ancestors.length;
-		return this.ancestors[depth - 2];
+		const depth = this.ancestors().length;
+		return this.ancestors()[depth - 2];
 	}
 
 	selectScope(scope: ScopeTiny | Scope) {

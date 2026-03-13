@@ -12,14 +12,14 @@
 				name="fullText" />
 		</mat-form-field>
 
-		@if (parentScopes.length > 0) {
+		@if (parentScopes().length > 0) {
 			<mat-form-field class="scope-picker">
 				<mat-label>Parent</mat-label>
 				<mat-select
 					formControlName="parentPk"
 					name="parentPk">
 					<mat-option></mat-option>
-					@for (parentScope of parentScopes; track parentScope.pk) {
+					@for (parentScope of parentScopes(); track parentScope.pk) {
 						<mat-option [value]="[parentScope.pk]">
 							{{ parentScope | scopeCodeShortname }}
 						</mat-option>
@@ -44,12 +44,12 @@
 
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table
-	[dataSource]="scopes.objects">
-	@if (!loading) {
+	[dataSource]="scopes().objects">
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
@@ -139,8 +139,8 @@
 	<mat-toolbar-row>
 		<span class="toolbar-spacer"></span>
 		<mat-paginator
-			[pageSize]="scopes.paging.pageSize"
-			[length]="scopes.paging.total">
+			[pageSize]="scopes().paging.pageSize"
+			[length]="scopes().paging.total">
 		</mat-paginator>
 	</mat-toolbar-row>
 </mat-toolbar>

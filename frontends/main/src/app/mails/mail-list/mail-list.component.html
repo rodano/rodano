@@ -118,14 +118,14 @@
 
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table
-	[dataSource]="mails.objects"
+	[dataSource]="mails().objects"
 	matSort
 	matSortDisableClear>
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
@@ -258,19 +258,19 @@
 	<mat-toolbar-row>
 		<button
 			mat-stroked-button
-			[disabled]="selectedMails.length === 0"
+			[disabled]="selectedMails().length === 0"
 			(click)="resendMails()">
 			Resend
 		</button>
 		<button
 			mat-stroked-button
-			[appDownload]="exportUrl">
+			[appDownload]="exportUrl()">
 			Export
 		</button>
 		<span class="toolbar-spacer"></span>
 		<mat-paginator
-			[pageSize]="mails.paging.pageSize"
-			[length]="mails.paging.total">
+			[pageSize]="mails().paging.pageSize"
+			[length]="mails().paging.total">
 		</mat-paginator>
 	</mat-toolbar-row>
 </mat-toolbar>

@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {MatDialogModule} from '@angular/material/dialog';
 import {MatButton} from '@angular/material/button';
 
@@ -8,6 +8,7 @@ export interface WorkflowRationaleData {
 }
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-unsaved-changes',
 	templateUrl: 'unsaved-changes.component.html',
 	imports: [

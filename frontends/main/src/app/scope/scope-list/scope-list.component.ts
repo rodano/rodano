@@ -1,4 +1,4 @@
-import {Component, ViewChild, Input, OnChanges, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, ViewChild, DestroyRef, OnInit, effect, input, signal} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {RouterLink} from '@angular/router';
@@ -31,6 +31,7 @@ import {Rights} from '@core/model/rights';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-list',
 	templateUrl: './scope-list.component.html',
 	styleUrls: ['./scope-list.component.css'],
@@ -60,16 +61,16 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		ScopeCodeShortnamePipe
 	]
 })
-export class ScopeListComponent implements OnInit, OnChanges {
-	@Input({required: true}) scopeModel: ScopeModel;
+export class ScopeListComponent implements OnInit {
+	readonly scopeModel = input.required<ScopeModel>();
 
-	leafScopeModel?: ScopeModel;
-	defaultProfile: Profile | undefined;
-	exportUrl: string;
+	readonly leafScopeModel = signal<ScopeModel | undefined>(undefined);
+	readonly defaultProfile = signal<Profile | undefined>(undefined);
+	readonly exportUrl = signal('');
 
-	writeAccessOnParent = false;
+	readonly writeAccessOnParent = signal(false);
 
-	parentScopes: Scope[] = [];
+	readonly parentScopes = signal<Scope[]>([]);
 
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
@@ -78,9 +79,9 @@ export class ScopeListComponent implements OnInit, OnChanges {
 
 	refreshSearch$ = new Subject<void>();
 
-	scopes: PagedResultScope = EMPTY_PAGED_RESULT;
-	loading = false;
-	columnsToDisplay: string[] = [];
+	readonly scopes = signal<PagedResultScope>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
+	readonly columnsToDisplay = signal<string[]>([]);
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -90,33 +91,33 @@ export class ScopeListComponent implements OnInit, OnChanges {
 		private scopeService: ScopeService,
 		private scopeRelationService: ScopeRelationsService,
 		private destroyRef: DestroyRef
-	) { }
+	) {
+		effect(() => {
+			const scopeModel = this.scopeModel();
+			forkJoin({
+				leafScopeModel: this.configurationService.getLeafScopeModel(),
+				defaultProfile: scopeModel.defaultProfileId ? this.configurationService.getProfile(scopeModel.defaultProfileId) : of(undefined),
+				parentScopes: this.scopeRelationService.getParents(scopeModel.id, Rights.READ),
+				parentsWithWriteAccess: this.scopeRelationService.getParents(scopeModel.id, Rights.WRITE)
+			}).pipe(
+				takeUntilDestroyed(this.destroyRef)
+			).subscribe(({leafScopeModel, defaultProfile, parentScopes, parentsWithWriteAccess}) => {
+				this.leafScopeModel.set(leafScopeModel);
+				this.defaultProfile.set(defaultProfile);
+				this.parentScopes.set(parentScopes);
+				this.writeAccessOnParent.set(parentsWithWriteAccess.length > 0);
+			});
 
-	ngOnChanges() {
-		forkJoin({
-			leafScopeModel: this.configurationService.getLeafScopeModel(),
-			defaultProfile: this.scopeModel.defaultProfileId ? this.configurationService.getProfile(this.scopeModel.defaultProfileId) : of(undefined),
-			parentScopes: this.scopeRelationService.getParents(this.scopeModel.id, Rights.READ),
-			parentsWithWriteAccess: this.scopeRelationService.getParents(this.scopeModel.id, Rights.WRITE)
+			this.columnsToDisplay.set(['code', 'shortname']);
+			if(scopeModel.defaultProfileId) {
+				this.columnsToDisplay.update(cols => [...cols, 'userOfInterest']);
+			}
+			if(!scopeModel.leaf) {
+				this.columnsToDisplay.update(cols => [...cols, 'leavesCount']);
+			}
 
-		}).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({leafScopeModel, defaultProfile, parentScopes, parentsWithWriteAccess}) => {
-			this.leafScopeModel = leafScopeModel;
-			this.defaultProfile = defaultProfile;
-			this.parentScopes = parentScopes;
-			this.writeAccessOnParent = parentsWithWriteAccess.length > 0;
+			this.reset();
 		});
-
-		this.columnsToDisplay = ['code', 'shortname'];
-		if(this.scopeModel.defaultProfileId) {
-			this.columnsToDisplay.push('userOfInterest');
-		}
-		if(!this.scopeModel.leaf) {
-			this.columnsToDisplay.push('leavesCount');
-		}
-
-		this.reset();
 	}
 
 	ngOnInit() {
@@ -131,9 +132,9 @@ export class ScopeListComponent implements OnInit, OnChanges {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new ScopeSearch();
-				search.scopeModelId = this.scopeModel.id;
+				search.scopeModelId = this.scopeModel().id;
 				search.fullText = this.searchForm.get('fullText')?.value;
 				const parentPk = this.searchForm.get('parentPk')?.value;
 				if(parentPk) {
@@ -142,12 +143,12 @@ export class ScopeListComponent implements OnInit, OnChanges {
 				search.sortBy = this.sort.active;
 				search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 				search.pageIndex = this.paginator.pageIndex;
-				this.exportUrl = this.scopeService.getExportUrl(search);
+				this.exportUrl.set(this.scopeService.getExportUrl(search));
 				return this.scopeService.search(search);
 			})
 		).subscribe(scopes => {
-			this.scopes = scopes;
-			this.loading = false;
+			this.scopes.set(scopes);
+			this.loading.set(false);
 		});
 	}
 

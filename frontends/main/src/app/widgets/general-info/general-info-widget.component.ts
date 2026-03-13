@@ -1,9 +1,10 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
 import {WidgetService} from '@core/services/widget.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatTableModule} from '@angular/material/table';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-general-info-widget',
 	templateUrl: './general-info-widget.component.html',
 	styleUrls: ['./general-info-widget.component.css'],
@@ -13,21 +14,20 @@ import {MatTableModule} from '@angular/material/table';
 	]
 })
 export class GeneralInfoWidgetComponent implements OnInit {
-	info: {title: string; value: string}[] = [];
-	loading = false;
+	readonly info = signal<{title: string; value: string}[]>([]);
+	readonly loading = signal(false);
 
 	columnsToDisplay: string[] = ['title', 'value'];
-	dataSource = this.info;
 
 	constructor(
 		private widgetService: WidgetService
 	) {}
 
 	ngOnInit(): void {
-		this.loading = true;
+		this.loading.set(true);
 		this.widgetService.getGeneralInfo().subscribe(info => {
-			this.info = info;
-			this.loading = false;
+			this.info.set(info);
+			this.loading.set(false);
 		});
 	}
 }

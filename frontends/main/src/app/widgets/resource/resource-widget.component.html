@@ -1,5 +1,5 @@
 <ul>
-	@for (resource of resources; track resource.pk) {
+	@for (resource of resources(); track resource.pk) {
 		<li
 			[class.expanded]="resource.expanded"
 			[class.no-description]="!resource.description">

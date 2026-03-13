@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {Health} from '@core/model/health';
 import {Info} from '@core/model/info';
@@ -12,11 +12,12 @@ import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 	imports: [
 		DateTimeUTCPipe,
 		HumanReadableFileSizePipe
-	]
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DetailsComponent implements OnInit {
-	info?: Info;
-	health?: Health;
+	readonly info = signal<Info | undefined>(undefined);
+	readonly health = signal<Health | undefined>(undefined);
 
 	constructor(
 		private actuatorService: ActuatorService
@@ -27,8 +28,8 @@ export class DetailsComponent implements OnInit {
 			info: this.actuatorService.getInfo(),
 			health: this.actuatorService.getHealth()
 		}).subscribe(result => {
-			this.info = result.info;
-			this.health = result.health;
+			this.info.set(result.info);
+			this.health.set(result.health);
 		});
 	}
 

@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {UserService} from '@core/services/user.service';
@@ -22,6 +22,7 @@ import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-create.component.html',
 	styleUrls: ['./user-create.component.css'],
 	imports: [
@@ -49,10 +50,10 @@ export class UserCreateComponent implements OnInit {
 		})
 	});
 
-	languages: Language[];
-	profiles: Profile[];
-	scopes: ScopeMini[];
-	errorText: string;
+	readonly languages = signal<Language[]>([]);
+	readonly profiles = signal<Profile[]>([]);
+	readonly scopes = signal<ScopeMini[]>([]);
+	readonly error = signal<string | undefined>(undefined);
 
 	constructor(
 		private router: Router,
@@ -71,9 +72,9 @@ export class UserCreateComponent implements OnInit {
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({languages, profiles, scopes}) => {
-			this.languages = languages;
-			this.profiles = profiles;
-			this.scopes = scopes;
+			this.languages.set(languages);
+			this.profiles.set(profiles);
+			this.scopes.set(scopes);
 			this.userCreationForm.reset();
 		});
 	}
@@ -89,7 +90,7 @@ export class UserCreateComponent implements OnInit {
 				this.router.navigate(['/users', user.pk]);
 			},
 			error: (response: any) => {
-				this.errorText = response.error.message;
+				this.error.set(response.error.message);
 			}
 		});
 	}

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, model} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 import {NotificationService} from 'src/app/services/notification.service';
@@ -15,6 +15,7 @@ import {of, switchMap} from 'rxjs';
 import {CRFChangeService} from '../services/crf-change.service';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-dashboard',
 	templateUrl: './scope-dashboard.component.html',
 	styleUrls: ['./scope-dashboard.component.css'],
@@ -28,7 +29,7 @@ import {CRFChangeService} from '../services/crf-change.service';
 export class ScopeDashboardComponent {
 	workflowableEntity = WorkflowableEntity;
 
-	@Input() scope: Scope;
+	readonly scope = model.required<Scope>();
 	graphs: TimelineGraphData[] = [];
 
 	constructor(
@@ -45,7 +46,7 @@ export class ScopeDashboardComponent {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.scopeService.remove(this.scope.pk, rationale);
+						return this.scopeService.remove(this.scope().pk, rationale);
 					}
 					return of(undefined);
 				})
@@ -53,10 +54,10 @@ export class ScopeDashboardComponent {
 			.subscribe({
 				next: scope => {
 					if(scope) {
-						this.scope = scope;
+						this.scope.set(scope);
 						//used by the side menu to refresh the entities
 						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
-						this.notificationService.showSuccess(`${this.scope.model.shortname['en']} removed`);
+						this.notificationService.showSuccess(`${this.scope().model.shortname['en']} removed`);
 					}
 				},
 				error: response => {
@@ -72,7 +73,7 @@ export class ScopeDashboardComponent {
 			.pipe(
 				switchMap((rationale?: string) => {
 					if(rationale) {
-						return this.scopeService.restore(this.scope.pk, rationale);
+						return this.scopeService.restore(this.scope().pk, rationale);
 					}
 					return of(undefined);
 				})
@@ -80,10 +81,10 @@ export class ScopeDashboardComponent {
 			.subscribe({
 				next: scope => {
 					if(scope) {
-						this.scope = scope;
+						this.scope.set(scope);
 						//used by the side menu to refresh the entities
 						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
-						this.notificationService.showSuccess(`${this.scope.model.shortname['en']} restored`);
+						this.notificationService.showSuccess(`${this.scope().model.shortname['en']} restored`);
 					}
 				},
 				error: response => {
@@ -93,12 +94,12 @@ export class ScopeDashboardComponent {
 	}
 
 	lock() {
-		this.scopeService.lock(this.scope.pk).subscribe({
+		this.scopeService.lock(this.scope().pk).subscribe({
 			next: scope => {
-				this.scope = scope;
+				this.scope.set(scope);
 				//used by the side menu to refresh the entities
 				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
-				this.notificationService.showSuccess(`${this.scope.model.shortname['en']} locked`);
+				this.notificationService.showSuccess(`${this.scope().model.shortname['en']} locked`);
 			},
 			error: response => {
 				this.notificationService.showError(response.error.message);
@@ -107,12 +108,12 @@ export class ScopeDashboardComponent {
 	}
 
 	unlock() {
-		this.scopeService.unlock(this.scope.pk).subscribe({
+		this.scopeService.unlock(this.scope().pk).subscribe({
 			next: scope => {
-				this.scope = scope;
+				this.scope.set(scope);
 				//used by the side menu to refresh the entities
 				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
-				this.notificationService.showSuccess(`${this.scope.model.shortname['en']} unlocked`);
+				this.notificationService.showSuccess(`${this.scope().model.shortname['en']} unlocked`);
 			},
 			error: response => {
 				this.notificationService.showError(response.error.message);
@@ -121,6 +122,6 @@ export class ScopeDashboardComponent {
 	}
 
 	onWorkflowExecution(newScope: Workflowable) {
-		this.scope = newScope as Scope;
+		this.scope.set(newScope as Scope);
 	}
 }

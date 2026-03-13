@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {ExtractService} from '@core/services/extract.service';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -23,6 +23,7 @@ import {MeService} from '@core/services/me.service';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './extract.component.html',
 	styleUrls: ['./extract.component.css'],
 	imports: [
@@ -43,11 +44,11 @@ import {FeatureStatic} from '@core/model/feature-static';
 	]
 })
 export class ExtractComponent implements OnInit {
-	selectedScopeModel: ScopeModel;
+	readonly selectedScopeModel = signal<ScopeModel | undefined>(undefined);
 
-	rootScopes: ScopeMini[] = [];
-	scopeModels: ScopeModel[];
-	datasetModels: DatasetModel[];
+	readonly rootScopes = signal<ScopeMini[]>([]);
+	readonly scopeModels = signal<ScopeModel[]>([]);
+	readonly datasetModels = signal<DatasetModel[]>([]);
 
 	extractForm = new FormGroup({
 		rootScopePk: new FormControl(0, {nonNullable: true, validators: [Validators.required]}),
@@ -71,7 +72,7 @@ export class ExtractComponent implements OnInit {
 		this.activatedRoute.params.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(params => {
-			if(this.scopeModels) {
+			if(this.scopeModels().length > 0) {
 				this.selectScopeModel(params['scopeModelId']);
 			}
 		});
@@ -83,16 +84,16 @@ export class ExtractComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({rootScopes, scopeModels}) => {
 			scopeModels.reverse();
-			this.rootScopes = rootScopes;
-			this.scopeModels = scopeModels;
-			this.extractForm.get('rootScopePk')?.setValue(this.rootScopes[0].pk);
+			this.rootScopes.set(rootScopes);
+			this.scopeModels.set(scopeModels);
+			this.extractForm.get('rootScopePk')?.setValue(this.rootScopes()[0].pk);
 			this.selectScopeModel(this.activatedRoute.snapshot.params['scopeModelId']);
 		});
 	}
 
 	selectScopeModel(scopeModelId: string) {
-		this.selectedScopeModel = this.scopeModels.find(s => s.id === scopeModelId) ?? this.scopeModels[0];
-		this.extractService.getDatasetModels(this.selectedScopeModel.id).subscribe(d => this.datasetModels = d);
+		this.selectedScopeModel.set(this.scopeModels().find(s => s.id === scopeModelId) ?? this.scopeModels()[0]);
+		this.extractService.getDatasetModels(this.selectedScopeModel()!.id).subscribe(d => this.datasetModels.set(d));
 	}
 
 	getExportUrl(): string {
@@ -110,11 +111,11 @@ export class ExtractComponent implements OnInit {
 
 	getScopeTransfersReportUrl(): string {
 		const rootScopePk = this.extractForm.get('rootScopePk')?.value;
-		return this.reportService.getScopeTransfersUrl(this.selectedScopeModel.id, rootScopePk);
+		return this.reportService.getScopeTransfersUrl(this.selectedScopeModel()!.id, rootScopePk);
 	}
 
 	getEventsReportUrl(): string {
 		const rootScopePk = this.extractForm.get('rootScopePk')?.value;
-		return this.reportService.getEventsUrl(this.selectedScopeModel.id, rootScopePk);
+		return this.reportService.getEventsUrl(this.selectedScopeModel()!.id, rootScopePk);
 	}
 }

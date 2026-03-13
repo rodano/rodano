@@ -1,16 +1,16 @@
 <aside>
 	<nav class="side-navigation">
 		<ol>
-			@for (section of layout.sections; track section.id) {
+			@for (section of layout().sections; track section.id) {
 				<li>
 					<span>
 						<a
 							[routerLink]="['./', {sectionId: section.id}]"
-							[class.active]="section.id === selectedSection.id"
+							[class.active]="section.id === selectedSection()?.id"
 							class="main-content">
 							{{ section.labels | localizeMap }}
-							@if (sectionBadges.hasOwnProperty(section.id)) {
-								<span class="badge">{{ sectionBadges[section.id] }}</span>
+							@if (sectionBadges().hasOwnProperty(section.id)) {
+								<span class="badge">{{ sectionBadges()[section.id] }}</span>
 							}
 						</a>
 					</span>
@@ -20,8 +20,8 @@
 	</nav>
 </aside>
 <main class="content">
-	@for (section of layout.sections; track section.id) {
-		<div [hidden]="section.id !== selectedSection.id">
+	@for (section of layout().sections; track section.id) {
+		<div [hidden]="section.id !== selectedSection()?.id">
 			<h1>{{ section.labels | localizeMap }}</h1>
 			<div class="cms-layout">
 				@for (widget of section.widgets; track $index) {

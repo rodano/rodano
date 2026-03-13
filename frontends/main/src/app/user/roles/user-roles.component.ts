@@ -1,6 +1,5 @@
-import {Component, DestroyRef, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import {User} from '@core/model/user';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {switchMap} from 'rxjs/operators';
@@ -28,8 +27,10 @@ import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
 import {getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
+import {USER_TOKEN} from '../home/user.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-roles.component.html',
 	styleUrls: ['./user-roles.component.css'],
 	imports: [
@@ -54,10 +55,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 	]
 })
 export class UserRolesComponent implements OnInit {
-	@Input() user: User;
-	me: User;
-	roles: Role[] = [];
-	loading = false;
+	readonly user = inject(USER_TOKEN);
+	readonly loading = signal(false);
 
 	displayedColumns: string[] = [
 		'profile',
@@ -67,8 +66,8 @@ export class UserRolesComponent implements OnInit {
 		'actions'
 	];
 
-	profiles: Profile[];
-	scopes: ScopeMini[];
+	readonly profiles = signal<Profile[]>([]);
+	readonly scopes = signal<ScopeMini[]>([]);
 
 	getRoleStatusDisplay = getRoleStatusDisplay;
 
@@ -92,18 +91,14 @@ export class UserRolesComponent implements OnInit {
 		private meService: MeService) {}
 
 	ngOnInit() {
-		this.loading = true;
+		this.loading.set(true);
 		forkJoin({
 			profiles: this.configurationService.getProfiles(),
-			scopes: this.meService.getScopes(undefined, true, false),
-			me: this.meService.get()
-		}).subscribe(({profiles, scopes, me}) => {
-			this.profiles = profiles;
-			this.scopes = scopes;
-			this.me = me;
-			//initialize the table only when all data is available
-			this.roles = this.user.roles;
-			this.loading = false;
+			scopes: this.meService.getScopes(undefined, true, false)
+		}).subscribe(({profiles, scopes}) => {
+			this.profiles.set(profiles);
+			this.scopes.set(scopes);
+			this.loading.set(false);
 		});
 	}
 
@@ -111,48 +106,46 @@ export class UserRolesComponent implements OnInit {
 		const profileId = this.roleForm.controls.profile.value;
 		const scopePk = this.roleForm.controls.scopePk.value;
 
-		this.loading = true;
-		this.roleService.create(this.user.pk, profileId, scopePk).pipe(
-			switchMap(() => this.roleService.getRoles(this.user.pk)),
+		this.loading.set(true);
+		this.roleService.create(this.user().pk, profileId, scopePk).pipe(
+			switchMap(() => this.roleService.getRoles(this.user().pk)),
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(roles => {
 			this.roleForm.reset();
-			this.roles = roles;
+			this.user().roles = roles;
 			this.notificationService.showSuccess('New role created');
-			this.loading = false;
+			this.loading.set(false);
 		});
 	}
 
 	inviteToRole(rolePk: number) {
-		this.performRoleAction(this.roleService.inviteToRole(this.user.pk, rolePk));
+		this.performRoleAction(this.roleService.inviteToRole(this.user().pk, rolePk));
 	}
 
 	enableRole(rolePk: number) {
-		this.performRoleAction(this.roleService.enableRole(this.user.pk, rolePk));
+		this.performRoleAction(this.roleService.enableRole(this.user().pk, rolePk));
 	}
 
 	disableRole(rolePk: number) {
-		this.performRoleAction(this.roleService.disableRole(this.user.pk, rolePk));
+		this.performRoleAction(this.roleService.disableRole(this.user().pk, rolePk));
 	}
 
 	private performRoleAction(role$: Observable<Role>) {
-		this.loading = true;
+		this.loading.set(true);
 		role$.pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe({
 			next: updatedRole => {
-				const roleIndex = this.roles.findIndex(role => role.pk === updatedRole.pk);
-				this.roles[roleIndex] = updatedRole;
-				//refresh the mat-table datasource
-				this.roles = [...this.roles];
-				this.user.roles = this.roles;
-				this.authStateService.updateUser(this.user);
+				const roleIndex = this.user().roles.findIndex(r => r.pk === updatedRole.pk);
+				this.user().roles[roleIndex] = updatedRole;
+				this.user().roles = [...this.user().roles];
+				this.authStateService.updateUser(this.user());
 				this.notificationService.showSuccess('Role updated');
-				this.loading = false;
+				this.loading.set(false);
 			},
 			error: result => {
 				this.notificationService.showError(`Unable to update role: ${result.error.message}`);
-				this.loading = false;
+				this.loading.set(false);
 			}
 		});
 	}

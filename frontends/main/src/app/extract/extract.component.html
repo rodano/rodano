@@ -3,11 +3,11 @@
 	<nav
 		mat-tab-nav-bar
 		[tabPanel]="tabPanel">
-		@for (scopeModel of scopeModels; track scopeModel.id) {
+		@for (scopeModel of scopeModels(); track scopeModel.id) {
 			<a
 				mat-tab-link
 				[routerLink]="['./', {scopeModelId: scopeModel.id}]"
-				[active]="scopeModel.id === selectedScopeModel.id">
+				[active]="scopeModel.id === selectedScopeModel()?.id">
 				{{ scopeModel.shortname | localizeMap }}
 			</a>
 		}
@@ -15,14 +15,14 @@
 </div>
 
 <mat-tab-nav-panel #tabPanel>
-	@if (selectedScopeModel) {
+	@if (selectedScopeModel()) {
 		<form [formGroup]="extractForm">
 			<p>
 				<mat-form-field>
 					<mat-label>Scope to extract</mat-label>
 					<app-scope-picker
 						formControlName="rootScopePk"
-						[scopes]="rootScopes"
+						[scopes]="rootScopes()"
 						required></app-scope-picker>
 				</mat-form-field>
 			</p>
@@ -51,7 +51,7 @@
 			<mat-selection-list
 				#datasetModelList
 				formControlName="datasetModelIds">
-				@for (datasetModel of datasetModels; track datasetModel.id) {
+				@for (datasetModel of datasetModels(); track datasetModel.id) {
 					<mat-list-option [value]="datasetModel.id">
 						{{ datasetModel.shortname | localizeMap }}
 					</mat-list-option>

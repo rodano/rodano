@@ -5,9 +5,9 @@
 			mat-icon-button>
 			<mat-icon>arrow_back</mat-icon>
 		</a>
-		<span [class.removed]="scope.removed">
-			{{ scope.shortname }}
-			@if (scope.locked) {
+		<span [class.removed]="scope().removed">
+			{{ scope().shortname }}
+			@if (scope().locked) {
 				<mat-icon matTooltip="Locked">lock</mat-icon>
 			}
 		</span>
@@ -17,7 +17,7 @@
 		<li class="ending-block">
 			<span>
 				<a
-					[routerLink]="['/crf', scope.pk]"
+					[routerLink]="['/crf', scope().pk]"
 					routerLinkActive="active"
 					[routerLinkActiveOptions]="{exact: true}"
 					queryParamsHandling="preserve"
@@ -31,7 +31,7 @@
 		<li class="ending-block">
 			<span>
 				<a
-					[routerLink]="['/crf', scope.pk, 'dashboard']"
+					[routerLink]="['/crf', scope().pk, 'dashboard']"
 					routerLinkActive="active"
 					[routerLinkActiveOptions]="{exact: true}"
 					queryParamsHandling="preserve"
@@ -42,11 +42,11 @@
 		</li>
 
 		<!-- Scope forms -->
-		@for (form of scopeForms; track form.pk) {
+		@for (form of scopeForms(); track form.pk) {
 			<li>
 				<span>
 					<a
-						[routerLink]="['/crf', scope.pk, 'form', form.pk]"
+						[routerLink]="['/crf', scope().pk, 'form', form.pk]"
 						routerLinkActive="active"
 						[routerLinkActiveOptions]="{exact: true}"
 						queryParamsHandling="preserve"
@@ -68,7 +68,7 @@
 			</li>
 		}
 		<!-- Events -->
-		@for (eventGroup of eventGroups; track eventGroup.id) {
+		@for (eventGroup of eventGroups(); track eventGroup.id) {
 			<li class="starting-block">
 				<span>
 					<span class="main-content">
@@ -88,10 +88,10 @@
 						<a
 							[routerLink]="[]"
 							[queryParams]="generateToggleParameters(event.pk)"
-							[matTooltip]="expandedEventPks.includes(event.pk) ? 'Collapse forms' : 'Expand forms'"
-							[class.disabled]="eventPk === event.pk">
+							[matTooltip]="expandedEventPks().includes(event.pk) ? 'Collapse forms' : 'Expand forms'"
+							[class.disabled]="eventPk() === event.pk">
 							<mat-icon>
-								@if (expandedEventPks.includes(event.pk)) {
+								@if (expandedEventPks().includes(event.pk)) {
 									arrow_drop_down
 								} @else {
 									arrow_right
@@ -99,7 +99,7 @@
 							</mat-icon>
 						</a>
 						<a
-							[routerLink]="['/crf', scope.pk, 'event', event.pk]"
+							[routerLink]="['/crf', scope().pk, 'event', event.pk]"
 							routerLinkActive="active"
 							[routerLinkActiveOptions]="{exact: true}"
 							queryParamsHandling="preserve"
@@ -130,13 +130,13 @@
 					</span>
 
 					<!-- Event forms -->
-					@if (expandedEventPks.includes(event.pk)) {
+					@if (expandedEventPks().includes(event.pk)) {
 						<ol class="submenu">
-							@for (form of eventsForms[event.pk]; track form.pk) {
+							@for (form of eventsForms()[event.pk]; track form.pk) {
 								<li>
 									<span>
 										<a
-											[routerLink]="['/crf', scope.pk, 'event', event.pk, 'form', form.pk]"
+											[routerLink]="['/crf', scope().pk, 'event', event.pk, 'form', form.pk]"
 											routerLinkActive="active"
 											[routerLinkActiveOptions]="{exact: true}"
 											queryParamsHandling="preserve"
@@ -164,7 +164,7 @@
 		}
 	</ol>
 	<footer>
-		@if (scope.canWrite && !scope.removed && !scope.locked) {
+		@if (scope().canWrite && !scope().removed && !scope().locked) {
 			<button
 				id="add-event"
 				mat-flat-button

@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {ScopeModel} from '@core/model/scope-model';
@@ -17,6 +17,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Rights} from '@core/model/rights';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope-create.component.html',
 	styleUrls: ['./scope-create.component.css'],
 	imports: [
@@ -31,7 +32,7 @@ import {Rights} from '@core/model/rights';
 	]
 })
 export class ScopeCreateComponent implements OnInit {
-	@Input() scopeModel: ScopeModel;
+	readonly scopeModel = input.required<ScopeModel>();
 
 	scopeCreationForm = this.formBuilder.nonNullable.group({
 		code: ['', [Validators.required]],
@@ -39,7 +40,7 @@ export class ScopeCreateComponent implements OnInit {
 		parentScopePk: [1, [Validators.required]]
 	});
 
-	parentScopes: Scope[];
+	readonly parentScopes = signal<Scope[]>([]);
 
 	constructor(
 		private router: Router,
@@ -51,18 +52,18 @@ export class ScopeCreateComponent implements OnInit {
 	) { }
 
 	ngOnInit() {
-		this.scopeRelationsService.getParents(this.scopeModel.id, Rights.READ).subscribe(s => this.parentScopes = s);
+		this.scopeRelationsService.getParents(this.scopeModel().id, Rights.READ).subscribe(s => this.parentScopes.set(s));
 	}
 
 	save() {
 		const scopeCandidate = Object.assign({}, this.scopeCreationForm.value) as ScopeCandidate;
-		scopeCandidate.modelId = this.scopeModel.id;
+		scopeCandidate.modelId = this.scopeModel().id;
 		//Set the scope start date to now
 		scopeCandidate.startDate = new Date();
 		this.scopeService.create(scopeCandidate).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(s => {
-			this.notificationService.showSuccess(`${this.scopeModel.shortname['en']} created`);
+			this.notificationService.showSuccess(`${this.scopeModel().shortname['en']} created`);
 			this.router.navigate([
 				'/scopes',
 				s.modelId,

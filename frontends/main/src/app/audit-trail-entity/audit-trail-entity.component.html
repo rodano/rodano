@@ -1,9 +1,9 @@
-<h1 mat-dialog-title>Audit trail for {{ entityName }}</h1>
+<h1 mat-dialog-title>Audit trail for {{ entityName() }}</h1>
 
 <mat-dialog-content>
 	<table
 		mat-table
-		[dataSource]="trails"
+		[dataSource]="trails()"
 		multiTemplateDataRows>
 		<ng-container matColumnDef="expand">
 			<th
@@ -16,8 +16,8 @@
 				*matCellDef="let trail">
 				<button
 					mat-icon-button
-					(click)="selectedTrail = selectedTrail === trail ? null : trail; $event.stopPropagation()">
-					@if (selectedTrail === trail) {
+					(click)="selectedTrail.set(selectedTrail() === trail ? null : trail); $event.stopPropagation()">
+					@if (selectedTrail() === trail) {
 						<mat-icon>keyboard_arrow_up</mat-icon>
 					} @else {
 						<mat-icon>keyboard_arrow_down</mat-icon>
@@ -70,7 +70,7 @@
 				mat-cell
 				*matCellDef="let trail"
 				[attr.colspan]="columnsToDisplay.length">
-				<div [class.expanded]="trail === selectedTrail">
+				<div [class.expanded]="trail === selectedTrail()">
 					<table>
 						<thead>
 							<tr>

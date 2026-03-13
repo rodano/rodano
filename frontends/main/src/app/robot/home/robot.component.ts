@@ -1,4 +1,4 @@
-import {Component, OnInit, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit, model, signal} from '@angular/core';
 import {RouterLink, Router} from '@angular/router';
 import {Robot} from '@core/model/robot';
 import {Validators, ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
@@ -25,6 +25,7 @@ import {ScopeFinderComponent} from 'src/app/scope-finder/scope-finder.component'
 import {RoleCreation} from '@core/model/role-creation';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './robot.component.html',
 	styleUrls: ['./robot.component.css'],
 	imports: [
@@ -48,7 +49,7 @@ import {RoleCreation} from '@core/model/role-creation';
 	]
 })
 export class RobotComponent implements OnInit {
-	@Input() robot?: Robot;
+	readonly robot = model<Robot>();
 	roleForm = new FormGroup({
 		profileId: new FormControl('', [Validators.required]),
 		scopePk: new FormControl<number | null>(null, [Validators.required])
@@ -60,10 +61,10 @@ export class RobotComponent implements OnInit {
 		roleForm: this.roleForm
 	});
 
-	profiles: Profile[];
+	readonly profiles = signal<Profile[]>([]);
 
 	scopeResult$: Observable<PagedResultScope>;
-	errorText: string;
+	readonly error = signal<string | undefined>(undefined);
 
 	constructor(
 		private router: Router,
@@ -73,10 +74,10 @@ export class RobotComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		this.configurationService.getProfiles().subscribe(p => this.profiles = p);
-		if(this.robot) {
+		this.configurationService.getProfiles().subscribe(p => this.profiles.set(p));
+		if(this.robot()) {
 			this.robotForm.removeControl('roleForm');
-			this.robotForm.reset(this.robot);
+			this.robotForm.reset(this.robot());
 		}
 		else {
 			this.robotForm.addControl('roleForm', this.roleForm);
@@ -85,14 +86,14 @@ export class RobotComponent implements OnInit {
 	}
 
 	save() {
-		if(this.robot) {
+		if(this.robot()) {
 			const robotUpdate = this.robotForm.value as RobotUpdate;
-			this.robotService.save(this.robot.pk, robotUpdate).subscribe({
+			this.robotService.save(this.robot()!.pk, robotUpdate).subscribe({
 				next: robot => {
-					Object.assign(this.robot as Robot, robot);
+					this.robot.set(robot);
 					this.notificationService.showSuccess('Robot saved');
 				},
-				error: e => this.errorText = e.error.message
+				error: e => this.error.set(e.error.message)
 			});
 		}
 		else {
@@ -103,11 +104,11 @@ export class RobotComponent implements OnInit {
 			} as RobotCreation;
 
 			this.robotService.create(robotCreation).subscribe({
-				next: r => {
+				next: robot => {
 					this.notificationService.showSuccess('Robot created');
-					this.router.navigate(['/robots', r.pk]);
+					this.router.navigate(['/robots', robot.pk]);
 				},
-				error: e => this.errorText = e.error.message
+				error: e => this.error.set(e.error.message)
 			});
 		}
 	}

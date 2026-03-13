@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {ScopeModel} from '@core/model/scope-model';
@@ -21,6 +21,7 @@ import {CRFDocumentationGenerationStatus} from '@core/model/crf-documentation-ge
 import {ScopeFinderComponent} from '../scope-finder/scope-finder.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './documentation.component.html',
 	styleUrls: ['./documentation.component.css'],
 	imports: [
@@ -41,11 +42,11 @@ import {ScopeFinderComponent} from '../scope-finder/scope-finder.component';
 export class DocumentationComponent implements OnInit {
 	crfDocumentationGenerationStatus: CRFDocumentationGenerationStatus;
 
-	scopeModels: ScopeModel[] = [];
-	rootScopes: ScopeMini[] = [];
+	readonly scopeModels = signal<ScopeModel[]>([]);
+	readonly rootScopes = signal<ScopeMini[]>([]);
 	scopes: Scope[] = [];
 
-	generationStatus: CRFDocumentationGenerationStatus;
+	readonly generationStatus = signal<CRFDocumentationGenerationStatus | undefined>(undefined);
 
 	blankCrfForm = new FormGroup({
 		scopeModelId: new FormControl('', {nonNullable: true, validators: [Validators.required]}),
@@ -77,23 +78,23 @@ export class DocumentationComponent implements OnInit {
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({rootScopes, scopeModels}) => {
-			this.rootScopes = rootScopes;
-			this.archiveMultipleCrfForm.get('rootScopePk')?.setValue(this.rootScopes[0].pk);
-			this.scopeModels = scopeModels;
-			const leafScopeModel = this.scopeModels[this.scopeModels.length - 1];
+			this.rootScopes.set(rootScopes);
+			this.archiveMultipleCrfForm.get('rootScopePk')?.setValue(this.rootScopes()[0].pk);
+			this.scopeModels.set(scopeModels);
+			const leafScopeModel = this.scopeModels()[this.scopeModels().length - 1];
 			this.blankCrfForm.get('scopeModelId')?.setValue(leafScopeModel.id);
 			this.archiveMultipleCrfForm.get('scopeModelId')?.setValue(leafScopeModel.id);
 		});
 
 		this.documentationService.getArchiveCrfStatus().pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(s => this.generationStatus = s);
+		).subscribe(s => this.generationStatus.set(s));
 
 		interval(1000).pipe(
 			takeUntilDestroyed(this.destroyRef),
-			skipWhile(() => this.generationStatus !== CRFDocumentationGenerationStatus.IN_PROGRESS),
+			skipWhile(() => this.generationStatus() !== CRFDocumentationGenerationStatus.IN_PROGRESS),
 			switchMap(() => this.documentationService.getArchiveCrfStatus())
-		).subscribe(s => this.generationStatus = s);
+		).subscribe(s => this.generationStatus.set(s));
 	}
 
 	getScopes(modelId: string): Scope[] {
@@ -105,7 +106,7 @@ export class DocumentationComponent implements OnInit {
 	}
 
 	get blankCrfUrl(): string {
-		const scopeModelId = this.blankCrfForm.get('scopeModelId')?.value ?? this.scopeModels[0].id;
+		const scopeModelId = this.blankCrfForm.get('scopeModelId')?.value ?? this.scopeModels()[0].id;
 		const annotated = this.blankCrfForm.get('annotated')?.value ?? false;
 		return this.documentationService.getBlankCrfUrl(scopeModelId, annotated);
 	}
@@ -122,12 +123,12 @@ export class DocumentationComponent implements OnInit {
 
 	generateArchive() {
 		const rootScopePk = this.archiveMultipleCrfForm.get('rootScopePk')?.value as number;
-		const scopeModelId = this.archiveMultipleCrfForm.get('scopeModelId')?.value ?? this.scopeModels[0].id;
+		const scopeModelId = this.archiveMultipleCrfForm.get('scopeModelId')?.value ?? this.scopeModels()[0].id;
 		const withAuditTrails = this.archiveMultipleCrfForm.get('withAuditTrails')?.value ?? false;
 
 		this.documentationService.archiveCrfRequest([rootScopePk], scopeModelId, withAuditTrails)
 			.pipe(
 				takeUntilDestroyed(this.destroyRef)
-			).subscribe(() => this.generationStatus = CRFDocumentationGenerationStatus.IN_PROGRESS);
+			).subscribe(() => this.generationStatus.set(CRFDocumentationGenerationStatus.IN_PROGRESS));
 	}
 }

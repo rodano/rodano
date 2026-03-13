@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {EproService} from '@core/services/epro.service';
 import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
@@ -31,6 +31,7 @@ import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
 import {Profile} from '@core/model/profile';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './epro-list.component.html',
 	styleUrls: ['./epro-list.component.css'],
 	imports: [
@@ -51,17 +52,17 @@ import {Profile} from '@core/model/profile';
 	]
 })
 export class EproListComponent implements OnInit {
-	parentScopes: Scope[] = [];
+	readonly parentScopes = signal<Scope[]>([]);
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
 		parentPk: new FormControl(0)
 	});
 
 	refreshSearch$ = new Subject<void>();
-	scopes: PagedResultScope = EMPTY_PAGED_RESULT;
-	loading = false;
+	readonly scopes = signal<PagedResultScope>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
 
-	robots: EproRobot[];
+	readonly robots = signal<EproRobot[]>([]);
 	columnsToDisplay: string[] = [
 		'code',
 		'name',
@@ -96,7 +97,7 @@ export class EproListComponent implements OnInit {
 			}),
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(result => {
-			this.parentScopes = result.parentScopes;
+			this.parentScopes.set(result.parentScopes);
 			this.eproProfile = result.eproProfile;
 		});
 
@@ -107,7 +108,7 @@ export class EproListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new ScopeSearch();
 				search.leaf = true;
 				search.fullText = this.searchForm.get('fullText')?.value;
@@ -122,9 +123,9 @@ export class EproListComponent implements OnInit {
 				});
 			})
 		).subscribe(({robots, scopes}) => {
-			this.robots = robots;
-			this.scopes = scopes;
-			this.loading = false;
+			this.robots.set(robots);
+			this.scopes.set(scopes);
+			this.loading.set(false);
 		});
 	}
 
@@ -142,7 +143,7 @@ export class EproListComponent implements OnInit {
 	}
 
 	hasBeenInvited(scope: Scope): boolean {
-		return this.robots.some(robot => robot.scopePk === scope.pk);
+		return this.robots().some(robot => robot.scopePk === scope.pk);
 	}
 
 	invite(scope: Scope) {

@@ -12,7 +12,7 @@
 				required />
 		</mat-form-field>
 		<app-audit-trail-button
-			[user]="user"
+			[user]="user()"
 			property="name" />
 	</p>
 
@@ -25,7 +25,7 @@
 				formControlName="phone" />
 		</mat-form-field>
 		<app-audit-trail-button
-			[user]="user"
+			[user]="user()"
 			property="phone" />
 	</p>
 
@@ -35,7 +35,7 @@
 			<mat-select
 				formControlName="languageId"
 				required>
-				@for (language of languages; track language.id) {
+				@for (language of languages(); track language.id) {
 					<mat-option [value]="language.id">
 						{{ language.shortname | localizeMap }}
 					</mat-option>
@@ -43,7 +43,7 @@
 			</mat-select>
 		</mat-form-field>
 		<app-audit-trail-button
-			[user]="user"
+			[user]="user()"
 			property="languageId" />
 	</p>
 
@@ -52,7 +52,7 @@
 			<button
 				mat-flat-button
 				type="submit"
-				[disabled]="user.externallyManaged || userUpdateForm.invalid">
+				[disabled]="user().externallyManaged || userUpdateForm.invalid">
 				Save
 			</button>
 		</p>

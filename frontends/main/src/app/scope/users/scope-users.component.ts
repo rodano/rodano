@@ -1,18 +1,23 @@
-import {Component, Input, OnChanges} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, signal} from '@angular/core';
 import {UserSearch} from '@core/utilities/search/user-search';
-import {Scope} from '@core/model/scope';
 import {UserListComponent} from 'src/app/user/user-list/user-list.component';
+import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope-users.component.html',
 	imports: [UserListComponent]
 })
-export class ScopeUsersComponent implements OnChanges {
-	@Input() scope: Scope;
+export class ScopeUsersComponent {
+	readonly scope = inject(SCOPE_TOKEN);
 
-	predicate = new UserSearch();
+	readonly predicate = signal<UserSearch>(new UserSearch());
 
-	ngOnChanges() {
-		this.predicate.scopePks = [this.scope.pk];
+	constructor() {
+		effect(() => {
+			const predicate = new UserSearch();
+			predicate.scopePks = [this.scope().pk];
+			this.predicate.set(predicate);
+		});
 	}
 }

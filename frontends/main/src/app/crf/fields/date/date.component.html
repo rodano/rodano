@@ -1,4 +1,4 @@
-@if (field.model.withYears && field.model.withMonths && field.model.withDays) {
+@if (field().model.withYears && field().model.withMonths && field().model.withDays) {
 	<mat-form-field class="year-month-day">
 		<input
 			matInput
@@ -15,7 +15,7 @@
 			(monthSelected)="monthHandler($event, picker)">
 		</mat-datepicker>
 	</mat-form-field>
-} @else if (field.model.withYears && field.model.withMonths) {
+} @else if (field().model.withYears && field().model.withMonths) {
 	<mat-form-field
 		appDateFormatMonthYear
 		class="year-month">
@@ -34,7 +34,7 @@
 			(monthSelected)="monthHandler($event, picker)">
 		</mat-datepicker>
 	</mat-form-field>
-} @else if (field.model.withYears) {
+} @else if (field().model.withYears) {
 	<mat-form-field
 		appDateFormatYear
 		class="year">

@@ -1,4 +1,4 @@
-import {Component, Input, DestroyRef, OnInit, AfterViewInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, AfterViewInit, input, signal} from '@angular/core';
 import {Cell} from '@core/model/cell';
 import {VisibilityService} from '../services/visibility.service';
 import {CellLoadingService} from '../services/cell-loading.service';
@@ -13,6 +13,7 @@ import {merge} from 'rxjs';
 import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-cell',
 	templateUrl: './cell.component.html',
 	styleUrls: ['./cell.component.scss'],
@@ -23,15 +24,15 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	]
 })
 export class CellComponent implements OnInit, AfterViewInit {
-	@Input() cell: Cell;
+	readonly cell = input.required<Cell>();
 	//layoutUid is the global identifier of the parent layout
 	//it is required for cells that are in a multiple layout and do not contain a field
 	//they must be identified properly to manage visibility criteria
-	@Input() layoutUid: string;
-	@Input() field?: CRFField;
-	@Input() disabled: boolean;
+	readonly layoutUid = input.required<string>();
+	readonly field = input<CRFField>();
+	readonly disabled = input<boolean>(false);
 
-	shown = true;
+	readonly shown = signal(true);
 
 	constructor(
 		private visibilityService: VisibilityService,
@@ -66,14 +67,14 @@ export class CellComponent implements OnInit, AfterViewInit {
 			}*/
 		//});
 
-		this.visibilityService.cellVisibilityEvents$(this.cell.id, this.layoutUid).pipe(
+		this.visibilityService.cellVisibilityEvents$(this.cell().id, this.layoutUid()).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
-			this.loggingService.info(`Cell ${this.cell.id} receiving visibility event containing ${shown}`);
-			this.shown = shown;
+			this.loggingService.info(`Cell ${this.cell().id} receiving visibility event containing ${shown}`);
+			this.shown.set(shown);
 			//mark the field
-			if(this.field) {
-				this.field.shown = this.shown;
+			if(this.field()) {
+				this.field()!.shown = this.shown();
 			}
 			//if the cell becomes visible, its visibility criteria must be re-triggered
 			if(shown) {
@@ -81,17 +82,17 @@ export class CellComponent implements OnInit, AfterViewInit {
 			}
 			//if the cell is hidden its targets must be hidden as well
 			else {
-				this.cell.visibilityCriteria.forEach(criterion => {
-					criterion.targetCellIds.forEach(c => this.visibilityService.triggerCellVisibilityEvent(c, this.layoutUid, false));
+				this.cell().visibilityCriteria.forEach(criterion => {
+					criterion.targetCellIds.forEach(c => this.visibilityService.triggerCellVisibilityEvent(c, this.layoutUid(), false));
 					criterion.targetLayoutIds.forEach(l => this.visibilityService.triggerLayoutVisibilityEvent(l, false));
 				});
 			}
 		});
 
-		if(this.field) {
+		if(this.field()) {
 			//visibility criteria are triggered when all the cells are loaded or when the field is updated
 			merge(
-				this.fieldUpdateService.cellFieldUpdated$(this.field),
+				this.fieldUpdateService.cellFieldUpdated$(this.field()!),
 				this.cellLoadingService.allCellsLoaded$
 			).pipe(
 				takeUntilDestroyed(this.destroyRef)
@@ -102,9 +103,8 @@ export class CellComponent implements OnInit, AfterViewInit {
 	}
 
 	//consider cell to be loaded when this hook is triggered by Angular
-	//do not run this in an ngOnChanges, because in that case the cell is already loaded and ready to receive visibility events
 	ngAfterViewInit() {
-		this.cellLoadingService.cellLoadingComplete(this.cell.id);
+		this.cellLoadingService.cellLoadingComplete(this.cell().id);
 	}
 
 	isEmptyObject(object: any): boolean {
@@ -113,8 +113,8 @@ export class CellComponent implements OnInit, AfterViewInit {
 
 	triggerCriteria() {
 		//only cell containing fields may trigger visibility criteria
-		if(this.field) {
-			this.visibilityService.triggerCriteria(this.cell, this.layoutUid, this.field);
+		if(this.field()) {
+			this.visibilityService.triggerCriteria(this.cell(), this.layoutUid(), this.field()!);
 		}
 	}
 }

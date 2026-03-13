@@ -16,7 +16,7 @@
 		<mat-form-field class="scope-picker">
 			<mat-label>Scope model</mat-label>
 			<mat-select formControlName="scopeModelId">
-				@for (scopeModel of scopeModels; track scopeModel.id) {
+				@for (scopeModel of scopeModels(); track scopeModel.id) {
 					<mat-option [value]="scopeModel.id">
 						{{ scopeModel.shortname | localizeMap }}
 					</mat-option>
@@ -66,14 +66,14 @@
 			<mat-label>Root scope</mat-label>
 			<app-scope-picker
 				formControlName="rootScopePk"
-				[scopes]="rootScopes"
+				[scopes]="rootScopes()"
 				required></app-scope-picker>
 		</mat-form-field>
 
 		<mat-form-field class="scope-picker">
 			<mat-label>Scope model</mat-label>
 			<mat-select formControlName="scopeModelId">
-				@for (scopeModel of scopeModels; track scopeModel.id) {
+				@for (scopeModel of scopeModels(); track scopeModel.id) {
 					<mat-option [value]="scopeModel.id">
 						{{ scopeModel.shortname | localizeMap }}
 					</mat-option>
@@ -86,11 +86,11 @@
 		<button
 			mat-flat-button
 			type="submit"
-			[class.loading]="generationStatus === 'IN_PROGRESS'"
-			[disabled]="archiveMultipleCrfForm.invalid || generationStatus === 'IN_PROGRESS'">
+			[class.loading]="generationStatus() === 'IN_PROGRESS'"
+			[disabled]="archiveMultipleCrfForm.invalid || generationStatus() === 'IN_PROGRESS'">
 			Request archive CRF
 		</button>
-		@if (generationStatus === 'COMPLETED') {
+		@if (generationStatus() === 'COMPLETED') {
 			<button
 				mat-flat-button
 				[appDownload]="archiveMultipleCrfUrl"

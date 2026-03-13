@@ -1,4 +1,4 @@
-import {Component, HostBinding, Input, OnInit, Optional, Self, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, HostBinding, Input, OnInit, Optional, Self, ViewChild, input, signal} from '@angular/core';
 import {ControlValueAccessor, NgControl, ReactiveFormsModule} from '@angular/forms';
 import {MatOptgroup, MatOption, MatSelect} from '@angular/material/select';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -10,6 +10,7 @@ import {ScopeModel} from '@core/model/scope-model';
 import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-picker',
 	templateUrl: './scope-picker.component.html',
 	styleUrls: ['./scope-picker.component.css'],
@@ -28,14 +29,14 @@ import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 export class ScopePickerComponent implements MatFormFieldControl<number>, OnInit, ControlValueAccessor {
 	static nextId = 0;
 
-	@Input() scopes: ScopeMini[] = [];
+	readonly scopes = input<ScopeMini[]>([]);
 
 	@ViewChild(MatSelect, {static: true}) select: MatSelect;
 
 	@HostBinding() id = `scope-picker-${ScopePickerComponent.nextId++}`;
 	controlType = 'scope-picker';
 
-	scopeModels: ScopeModel[] = [];
+	readonly scopeModels = signal<ScopeModel[]>([]);
 
 	constructor(
 		private configurationService: ConfigurationService,
@@ -131,7 +132,7 @@ export class ScopePickerComponent implements MatFormFieldControl<number>, OnInit
 	}
 
 	ngOnInit() {
-		this.configurationService.getScopeModelsSorted().subscribe(s => this.scopeModels = s);
+		this.configurationService.getScopeModelsSorted().subscribe(s => this.scopeModels.set(s));
 
 		//because the underlying control is injected with {static: true}, it is available in this hook method
 		//no need to wait for afterViewInit
@@ -142,7 +143,7 @@ export class ScopePickerComponent implements MatFormFieldControl<number>, OnInit
 	}
 
 	getScopes(modelId: string): ScopeMini[] {
-		return this.scopes?.filter(c => c.modelId === modelId) ?? [];
+		return this.scopes().filter(c => c.modelId === modelId) ?? [];
 	}
 
 	setDescribedByIds(ids: string[]) {

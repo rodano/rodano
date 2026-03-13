@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, DestroyRef} from '@angular/core';
+import {Component, OnInit, ViewChild, DestroyRef, signal, ChangeDetectionStrategy} from '@angular/core';
 import {Robot} from '@core/model/robot';
 import {RobotService} from '@core/services/robot.service';
 import {startWith, switchMap} from 'rxjs/operators';
@@ -53,10 +53,11 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		LocalizeMapPipe,
 		LookupByIdPipe,
 		GetFieldPipe
-	]
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RobotListComponent implements OnInit {
-	profiles: Profile[];
+	readonly profiles = signal<Profile[]>([]);
 	searchForm = new FormGroup({
 		name: new FormControl('', {nonNullable: true}),
 		profileId: new FormControl('')
@@ -64,8 +65,8 @@ export class RobotListComponent implements OnInit {
 
 	refreshSearch$ = new Subject<void>();
 
-	robots: PagedResultRobot = EMPTY_PAGED_RESULT;
-	loading = false;
+	readonly robots = signal<PagedResultRobot>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
 	columnsToDisplay: string[] = [
 		'name',
 		'profileId',
@@ -89,7 +90,7 @@ export class RobotListComponent implements OnInit {
 
 		this.configurationService.getProfiles().pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(p => this.profiles = p);
+		).subscribe(p => this.profiles.set(p));
 
 		merge(
 			this.refreshSearch$.asObservable(),
@@ -99,7 +100,7 @@ export class RobotListComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new RobotSearch();
 				Object.assign(search, this.searchForm.value);
 				search.sortBy = this.sort.active;
@@ -108,8 +109,8 @@ export class RobotListComponent implements OnInit {
 				return this.robotService.search(search);
 			})
 		).subscribe(robots => {
-			this.robots = robots;
-			this.loading = false;
+			this.robots.set(robots);
+			this.loading.set(false);
 		});
 	}
 
@@ -129,6 +130,7 @@ export class RobotListComponent implements OnInit {
 	remove(robot: Robot) {
 		this.robotService.remove(robot.pk).subscribe(() => {
 			robot.removed = true;
+			this.robots.update(r => ({...r}));
 			this.notificationService.showSuccess('Robot removed');
 		});
 	}
@@ -136,6 +138,7 @@ export class RobotListComponent implements OnInit {
 	restore(robot: Robot) {
 		this.robotService.restore(robot.pk).subscribe(() => {
 			robot.removed = false;
+			this.robots.update(r => ({...r}));
 			this.notificationService.showSuccess('Robot restored');
 		});
 	}

@@ -1,4 +1,4 @@
-import {Component, DestroyRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, input, OnInit, output, ViewChild, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
@@ -22,6 +22,7 @@ import {DownloadDirective} from 'src/app/directives/download.component';
 import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-overdue-widget',
 	imports: [
 		ReactiveFormsModule,
@@ -43,21 +44,21 @@ import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
 	styleUrl: './overdue.component.css'
 })
 export class OverdueComponent implements OnInit {
-	@Input() scopes?: Scope[];
-	@Input() id: string;
-	@Input() specificColumnName: string;
+	readonly scopes = input<Scope[]>();
+	readonly id = input.required<string>();
+	readonly specificColumnName = input.required<string>();
 
-	@Output() scopesLoaded = new EventEmitter<number>();
+	readonly scopesLoaded = output<number>();
+	private scopesEmitted = false;
 
-	scopeOverdue: PagedResultOverdue = EMPTY_PAGED_RESULT;
-	overdueType: string;
-	loading = false;
+	readonly scopeOverdue = signal<PagedResultOverdue>(EMPTY_PAGED_RESULT);
+	readonly loading = signal(false);
 
-	scopeName: string;
-	parentScopeName: string;
+	readonly scopeName = signal('');
+	readonly parentScopeName = signal('');
 
-	scopePks: number[];
-	exportUrl: string;
+	private readonly scopePks = computed(() => this.scopes()?.map(s => s.pk));
+	readonly exportUrl = computed(() => this.widgetService.getScopeOverdueExportUrl(this.id(), this.scopePks()));
 
 	@ViewChild(MatTable, {static: true}) table: MatTable<Overdue>;
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
@@ -82,14 +83,9 @@ export class OverdueComponent implements OnInit {
 		this.sort.direction = PaginatedSearch.getSortDirection(OverdueWidgetSearch.DEFAULT_SORT_ASCENDING);
 
 		this.configService.getStudy().subscribe(config => {
-			this.scopeName = config.scopeModels.filter(s => s.leaf)[0].shortname['en'];
-			this.parentScopeName = config.scopeModels
-				.filter(s => s.id === config.scopeModels
-					.filter(s => s.leaf)[0].defaultParentId)[0].shortname['en'];
+			this.scopeName.set(config.scopeModels.filter(s => s.leaf)[0].shortname['en']);
+			this.parentScopeName.set(config.scopeModels.filter(s => s.id === config.scopeModels.filter(s => s.leaf)[0].defaultParentId)[0].shortname['en']);
 		});
-
-		const scopePks = this.scopes?.map(s => s.pk);
-		this.exportUrl = this.widgetService.getScopeOverdueExportUrl(this.id, scopePks);
 
 		merge(
 			this.sort.sortChange,
@@ -99,19 +95,22 @@ export class OverdueComponent implements OnInit {
 			takeUntilDestroyed(this.destroyRef),
 			startWith({}),
 			switchMap(() => {
-				this.loading = true;
+				this.loading.set(true);
 				const search = new OverdueWidgetSearch();
 				search.fullText = this.filter.value;
-				search.scopePks = scopePks;
+				search.scopePks = this.scopePks();
 				search.sortBy = this.sort.active;
 				search.orderAscending = PaginatedSearch.getOrderAscending(this.sort.direction);
 				search.pageIndex = this.paginator.pageIndex;
-				return this.widgetService.getScopeOverdue(this.id, search);
+				return this.widgetService.getScopeOverdue(this.id(), search);
 			})).subscribe(result => {
-			this.scopeOverdue = result;
-			this.scopesLoaded.emit(this.scopeOverdue.paging.total);
-			this.scopesLoaded.complete();
-			this.loading = false;
+			this.scopeOverdue.set(result);
+			//emit result only the first time, not when state changes
+			if(!this.scopesEmitted) {
+				this.scopesLoaded.emit(result.paging.total);
+				this.scopesEmitted = true;
+			}
+			this.loading.set(false);
 		});
 	}
 }

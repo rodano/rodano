@@ -8,18 +8,18 @@
 
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table
-	[dataSource]="workflowStatuses.objects"
+	[dataSource]="workflowStatuses().objects"
 	matSort
 	matSortDisableClear>
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
-			<td [attr.colspan]="columnsToDisplay.length">No data</td>
+			<td [attr.colspan]="columnsToDisplay().length">No data</td>
 		</tr>
 	}
 
@@ -207,23 +207,23 @@
 
 	<tr
 		mat-header-row
-		*matHeaderRowDef="columnsToDisplay"></tr>
+		*matHeaderRowDef="columnsToDisplay()"></tr>
 	<tr
 		mat-row
-		*matRowDef="let workflowStatusInfo; columns: columnsToDisplay"></tr>
+		*matRowDef="let workflowStatusInfo; columns: columnsToDisplay()"></tr>
 </table>
 
 <mat-toolbar>
 	<mat-toolbar-row>
 		<button
 			mat-stroked-button
-			[appDownload]="exportUrl">
+			[appDownload]="exportUrl()">
 			Export
 		</button>
 		<span class="toolbar-spacer"></span>
 		<mat-paginator
-			[pageSize]="workflowStatuses.paging.pageSize"
-			[length]="workflowStatuses.paging.total">
+			[pageSize]="workflowStatuses().paging.pageSize"
+			[length]="workflowStatuses().paging.total">
 		</mat-paginator>
 	</mat-toolbar-row>
 </mat-toolbar>

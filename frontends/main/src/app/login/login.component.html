@@ -1,10 +1,10 @@
-<div [innerHtml]="study?.introductionText"></div>
+<div [innerHtml]="study()?.introductionText"></div>
 
 <div id="authentication">
 	<div class="nice-box">
-		@if (display === loginDisplay.LOGIN) {
+		@if (display() === loginDisplay.LOGIN) {
 			<h2>Investigator and Monitor access</h2>
-			<p class="error">{{ error }}</p>
+			<p class="error">{{ error() }}</p>
 			<form
 				name="loginForm"
 				[formGroup]="loginForm"
@@ -46,8 +46,8 @@
 					<button
 						mat-flat-button
 						type="submit"
-						[class.loading]="loading"
-						[disabled]="loading || loginForm.invalid">
+						[class.loading]="loading()"
+						[disabled]="loading() || loginForm.invalid">
 						Login
 					</button>
 				</p>
@@ -61,7 +61,7 @@
 					</button>
 				</p>
 			</form>
-		} @else if (display === loginDisplay.RECOVER) {
+		} @else if (display() === loginDisplay.RECOVER) {
 			<h2>Password recovery</h2>
 			<p>
 				Enter your email address that you use to log in.<br />
@@ -92,8 +92,8 @@
 					<button
 						mat-flat-button
 						type="submit"
-						[class.loading]="loading"
-						[disabled]="loading || recoveryForm.invalid">
+						[class.loading]="loading()"
+						[disabled]="loading() || recoveryForm.invalid">
 						Send password
 					</button>
 				</p>
@@ -108,17 +108,17 @@
 		}
 	</div>
 
-	@if (study?.eproEnabled) {
+	@if (study()?.eproEnabled) {
 		<div class="nice-box">
-			<h2>{{ study?.eproProfile?.shortname | localizeMap }} access</h2>
+			<h2>{{ study()?.eproProfile?.shortname | localizeMap }} access</h2>
 			<p>
-				{{ study?.eproProfile?.shortname | localizeMap }} enrolled in this study can participate using dedicated access.
+				{{ study()?.eproProfile?.shortname | localizeMap }} enrolled in this study can participate using dedicated access.
 			</p>
 			<p>
 				<a
 					mat-flat-button
 					href="/eproapp">
-					{{ study?.eproProfile?.shortname | localizeMap }} access
+					{{ study()?.eproProfile?.shortname | localizeMap }} access
 				</a>
 			</p>
 		</div>

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input} from '@angular/core';
 import {Observable} from 'rxjs';
 import {MatTableModule} from '@angular/material/table';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -19,6 +19,7 @@ import {SummaryWidgetComponent} from '../summary/summary-widget.component';
 import {MatDivider} from '@angular/material/divider';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-summary-widget',
 	templateUrl: '../summary/summary-widget.component.html',
 	styleUrls: ['../summary/summary-widget.component.css'],
@@ -43,16 +44,16 @@ import {MatDivider} from '@angular/material/divider';
 	]
 })
 export class WorkflowSummaryWidgetComponent extends SummaryWidgetComponent {
-	@Input() id: string;
+	readonly id = input.required<string>();
 
 	getData(scopePk: number): Observable<Summary> {
-		return this.widgetService.getWorkflowSummary(this.id, scopePk);
+		return this.widgetService.getWorkflowSummary(this.id(), scopePk);
 	}
 
 	getButtons(scopePk: number): ExportButton[] {
 		return [
-			{label: 'Export', url: this.widgetService.getWorkflowSummaryExportUrl(this.id, scopePk)},
-			{label: 'Export historical detail', url: this.widgetService.getWorkflowSummaryExportHistoricalUrl(this.id, scopePk)}
+			{label: 'Export', url: this.widgetService.getWorkflowSummaryExportUrl(this.id(), scopePk)},
+			{label: 'Export historical detail', url: this.widgetService.getWorkflowSummaryExportHistoricalUrl(this.id(), scopePk)}
 		];
 	}
 }

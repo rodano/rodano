@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, input, output} from '@angular/core';
 import {CMSWidget} from '@core/model/cms-widget';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
 import {Scope} from '@core/model/scope';
@@ -12,6 +12,7 @@ import {OverdueComponent} from '../overdue/overdue.component';
 import {WelcomeTextComponent} from '../welcome-text/welcome-text.component';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-generic-widget',
 	templateUrl: './generic-widget.component.html',
 	styleUrls: ['./generic-widget.component.css'],
@@ -27,11 +28,11 @@ import {WelcomeTextComponent} from '../welcome-text/welcome-text.component';
 	]
 })
 export class GenericWidgetComponent {
-	@Input() widget: CMSWidget;
-	@Input() scopes?: Scope[];
-	@Input() criteria?: FieldModelCriterion[];
+	readonly widget = input.required<CMSWidget>();
+	readonly scopes = input<Scope[]>();
+	readonly criteria = input<FieldModelCriterion[]>();
 
-	@Output() notifyParent = new EventEmitter<number>();
+	readonly notifyParent = output<number>();
 
 	passEventToParent(event: number) {
 		this.notifyParent.emit(event);

@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {forkJoin} from 'rxjs';
 import {Study} from '@core/model/study';
@@ -23,13 +23,14 @@ import {DemoUserScheme} from '@core/model/demo-user-scheme';
 		MatFormField,
 		MatLabel,
 		MatInput
-	]
+	],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ManagementComponent implements OnInit {
-	study: Study;
-	editConfigurationLink: string;
-	inMaintenance: boolean;
-	inDebug: boolean;
+	readonly study = signal<Study | undefined>(undefined);
+	readonly editConfigurationLink = signal('');
+	readonly inMaintenance = signal(false);
+	readonly inDebug = signal(false);
 	demoUserSchemeForm = new FormGroup({
 		baseEmail: new FormControl('info@rodano.ch', {nonNullable: true, validators: [Validators.required, Validators.email]}),
 		password: new FormControl('Password1!', {nonNullable: true, validators: [Validators.required]})
@@ -56,12 +57,12 @@ export class ManagementComponent implements OnInit {
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({study, inMaintenance, inDebug}) => {
-			this.study = study;
-			this.inMaintenance = inMaintenance;
-			this.inDebug = inDebug;
+			this.study.set(study);
+			this.inMaintenance.set(inMaintenance);
+			this.inDebug.set(inDebug);
 		});
 
-		this.editConfigurationLink = `/config/?api_url=/api&bearer_token=${this.authStateService.getToken()}`;
+		this.editConfigurationLink.set(`/config/?api_url=/api&bearer_token=${this.authStateService.getToken()}`);
 	}
 
 	reloadConfiguration() {
@@ -69,11 +70,11 @@ export class ManagementComponent implements OnInit {
 	}
 
 	toggleMaintenance(state: boolean) {
-		this.administrationService.setMaintenance(state).subscribe(() => this.inMaintenance = state);
+		this.administrationService.setMaintenance(state).subscribe(() => this.inMaintenance.set(state));
 	}
 
 	toggleDebug(state: boolean) {
-		this.administrationService.setDebug(state).subscribe(() => this.inDebug = state);
+		this.administrationService.setDebug(state).subscribe(() => this.inDebug.set(state));
 	}
 
 	createDemoUsers() {

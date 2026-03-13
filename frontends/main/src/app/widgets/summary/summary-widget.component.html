@@ -1,10 +1,10 @@
-@if (scopes && scopes.length > 1) {
+@if (scopes() && scopes.length > 1) {
 	<mat-form-field>
 		<mat-label>Scope selector</mat-label>
 		<mat-select
 			[formControl]="control"
 			name="rootScope">
-			@for (scope of scopes; track scope.pk) {
+			@for (scope of scopes(); track scope.pk) {
 				<mat-option [value]="scope.pk">{{ scope | scopeCodeShortname }}</mat-option>
 			}
 		</mat-select>
@@ -12,7 +12,7 @@
 }
 
 <app-scope-breadcrumb
-	[scopes]="ancestors"
+	[scopes]="ancestors()"
 	disableDeepest="true"
 	(scopeChange)="this.selectScope($event)"
 	style="margin-bottom: 1rem">
@@ -20,17 +20,17 @@
 
 <mat-progress-bar
 	mode="indeterminate"
-	[style.visibility]="loading ? 'visible' : 'hidden'"></mat-progress-bar>
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 
 <table
 	mat-table
-	[dataSource]="dataSource">
+	[dataSource]="dataSource()">
 	<!-- do not display this message is the page is still loading-->
-	@if (!loading) {
+	@if (!loading()) {
 		<tr
 			*matNoDataRow
 			class="no-data-row">
-			<td [attr.colspan]="columnsToDisplay.length">No data</td>
+			<td [attr.colspan]="columnsToDisplay().length">No data</td>
 		</tr>
 	}
 
@@ -71,7 +71,7 @@
 		</td>
 	</ng-container>
 
-	@for (column of columns; track column.id) {
+	@for (column of columns(); track column.id) {
 		<ng-container [matColumnDef]="column.id">
 			<th
 				mat-header-cell
@@ -91,16 +91,16 @@
 
 	<tr
 		mat-header-row
-		*matHeaderRowDef="columnsToDisplay"></tr>
+		*matHeaderRowDef="columnsToDisplay()"></tr>
 	<tr
 		mat-row
-		*matRowDef="let row; columns: columnsToDisplay"></tr>
+		*matRowDef="let row; columns: columnsToDisplay()"></tr>
 </table>
 
 <mat-divider></mat-divider>
 <mat-toolbar>
 	<mat-toolbar-row>
-		@for (button of buttons; track button.url; let index = $index) {
+		@for (button of buttons(); track button.url; let index = $index) {
 			<button
 				mat-stroked-button
 				[appDownload]="button.url"

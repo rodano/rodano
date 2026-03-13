@@ -1,4 +1,5 @@
-import {Component, Input, OnChanges, DestroyRef, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, effect, input, model, signal, untracked} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {forkJoin} from 'rxjs';
 import {Form} from '@core/model/form';
 import {Layout} from '@core/model/layout';
@@ -24,12 +25,15 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
 import {CRFChangeService} from '../services/crf-change.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import {Workflowable} from '@core/utilities/workflowable';
 
 @Component({
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-form',
 	templateUrl: './form.component.html',
 	styleUrls: ['./form.component.scss'],
 	imports: [
+		FormsModule,
 		MatButton,
 		MatProgressBar,
 		LocalizeMapPipe,
@@ -39,22 +43,22 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 		AuditTrailButtonComponent
 	]
 })
-export class FormComponent implements OnInit, OnChanges {
-	@Input() scope: Scope;
+export class FormComponent implements OnInit {
+	readonly scope = input.required<Scope>();
 	//event may be null form scope attached directly to the scope
-	@Input() event?: Event;
-	@Input() form: Form;
+	readonly event = input<Event>();
+	readonly form = model.required<Form>();
 
 	layoutType = LayoutType;
 	workflowableEntity = WorkflowableEntity;
 
-	layouts: Layout[];
-	datasets: CRFDataset[];
+	readonly layouts = signal<Layout[]>([]);
+	readonly datasets = signal<CRFDataset[]>([]);
 
 	//distinguish between loading the form (all the cells are being initialized) vs saving the form
-	formLoading = false;
-	saveLoading = false;
-	dirty = false;
+	readonly formLoading = signal(false);
+	readonly saveLoading = signal(false);
+	readonly dirty = signal(false);
 
 	constructor(
 		private crfService: CRFService,
@@ -64,88 +68,82 @@ export class FormComponent implements OnInit, OnChanges {
 		private fieldUpdateService: FieldUpdateService,
 		private crfChangeService: CRFChangeService,
 		private destroyRef: DestroyRef
-	) {}
+	) {
+		effect(() => {
+			this.scope();
+			this.event();
+			this.form();
+			untracked(() => this.reloadContent());
+		});
+	}
 
 	ngOnInit() {
 		this.fieldUpdateService.fieldUpdated$
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
-				filter(() => !this.formLoading && !this.saveLoading)
+				filter(() => !this.formLoading() && !this.saveLoading())
 			).subscribe(() => {
-				this.dirty = true;
+				this.dirty.set(true);
 			});
 		this.cellLoadingService.allCellsLoaded$
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => {
-				this.formLoading = false;
+				this.formLoading.set(false);
 			});
 	}
 
-	ngOnChanges() {
-		this.reloadContent();
-	}
-
 	reloadContent() {
-		this.formLoading = true;
+		this.formLoading.set(true);
 		//reset the layouts and datasets parameters to force Angular to re-create the child components
 		//otherwise, child components may be re-used (for example if the same form is displayed but for different events)
 		//in that case, the child components (layouts and cells) will "stay the same" and Angular will not re-create them
 		//however, the new cells will be registered in the cell loading service, but the cells will never emit the "finished loading" event
 		//so the form will never be finish loading
-		this.layouts = [];
-		this.datasets = [];
+		this.layouts.set([]);
+		this.datasets.set([]);
 		forkJoin({
-			layouts: this.formService.getLayouts(this.scope.pk, this.event?.pk, this.form.pk),
-			datasets: this.crfService.getCRFDatasets(this.form)
+			layouts: this.formService.getLayouts(this.scope().pk, this.event()?.pk, this.form().pk),
+			datasets: this.crfService.getCRFDatasets(this.form())
 		})
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(({layouts, datasets}) => {
-				this.layouts = layouts;
-				this.datasets = datasets;
-				this.cellLoadingService.registerFormCells(this.layouts, this.datasets);
-				this.dirty = false;
+				this.layouts.set(layouts);
+				this.datasets.set(datasets);
+				this.cellLoadingService.registerFormCells(this.layouts(), this.datasets());
+				this.dirty.set(false);
 			});
 	}
 
 	//when saving datasets, the form is not reloaded from the perspective of Angular
 	//the child components will not be destroyed and re-created
 	saveDatasets() {
-		this.saveLoading = true;
-		this.crfService.saveCRFDatasets(this.form, this.layouts, this.datasets)
+		this.saveLoading.set(true);
+		this.crfService.saveCRFDatasets(this.form(), this.layouts(), this.datasets())
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
 				finalize(() => {
-					//refreshing the datasets or adding errors (in the next or error functions below) will trigger the refresh of the child components
-					//this will be done in another tick by Angular
-					//we need to take into account these operations before considering the save as finished
-					//remember that the "saveLoading" boolean is used to prevent the dirty state to be updated
-					//these refreshing operations may update fields (for example a plugin, or any empty field, for which the value will be set from an empty string to null)
-					//this will trigger a "field update" event and set the dirty state to true
-					//this is not the expected behavior as the dirty state must only be set to true due to operations made by the user
-					//so we need to shift setting the saveLoading state to false by a tick
-					setTimeout(() => this.saveLoading = false, 0);
+					this.saveLoading.set(false);
 				}),
 				switchMap(() => {
 					//refresh form, especially to update the workflow statuses
-					return this.formService.get(this.scope.pk, this.event?.pk, this.form.pk);
+					return this.formService.get(this.scope().pk, this.event()?.pk, this.form().pk);
 				})
 			).subscribe({
 				next: newForm => {
-					this.form = newForm;
-					//reload the form content because its layout may have been updated
+					this.form.set(newForm);
+					//resetting the form (hence reloading the form content) is required because its layouts may have been updated
 					//also remember that only write-access datasets are submitted and returned by the "save" API
 					//the other read-only need to be refreshed in case they have been updated
-					this.reloadContent();
 					//used by the side menu to refresh the entities
-					this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.FORM, this.form);
+					this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.FORM, this.form());
 					this.notificationService.showSuccess('Form saved');
 				},
 				error: (response: any) => {
 					const result = response.error as BlockingErrors;
 					result.errors.forEach(error => {
-						const dataset = this.datasets.find(d => d.id === error.datasetId) as CRFDataset;
+						const dataset = this.datasets().find(d => d.id === error.datasetId) as CRFDataset;
 						const field = dataset.fields.find(f => f.modelId === error.fieldModelId) as CRFField;
-						field.error = error.message;
+						field.error.set(error.message);
 					});
 
 					if(result.message) {
@@ -158,7 +156,7 @@ export class FormComponent implements OnInit, OnChanges {
 			});
 	}
 
-	onActionResponse(newForm: Form) {
-		(this.form as Form).workflowStatuses = (newForm as Form).workflowStatuses;
+	onActionResponse(newForm: Workflowable) {
+		this.form.set(newForm as Form);
 	}
 }
