@@ -1,0 +1,166 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Appearance</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Unit</label>
+				<input type="text" formControlName="unit" placeholder="e.g. kg, cm">
+				<span class="hint">Optional unit displayed alongside values</span>
+			</div>
+
+			<div class="form-field">
+				<label>Color</label>
+				<div class="color-picker-wrapper">
+					<button
+						type="button"
+						class="color-button"
+						[style.background-color]="form.get('color')?.value"
+						(click)="colorPicker.click()"
+						[title]="'Current color: ' + form.get('color')?.value">
+					</button>
+					<input
+						#colorPicker
+						type="color"
+						formControlName="color"
+						class="color-input-hidden">
+					<input
+						type="text"
+						[value]="form.get('color')?.value"
+						(input)="onColorInput($event, 'color')"
+						placeholder="#000000"
+						maxlength="7"
+						class="color-text-input">
+				</div>
+			</div>
+
+			<div class="form-field">
+				<label>Stroke color</label>
+				<div class="color-picker-wrapper">
+					<button
+						type="button"
+						class="color-button"
+						[style.background-color]="form.get('strokeColor')?.value"
+						(click)="strokeColorPicker.click()"
+						[title]="'Current color: ' + form.get('strokeColor')?.value">
+					</button>
+					<input
+						#strokeColorPicker
+						type="color"
+						formControlName="strokeColor"
+						class="color-input-hidden">
+					<input
+						type="text"
+						[value]="form.get('strokeColor')?.value"
+						(input)="onColorInput($event, 'strokeColor')"
+						placeholder="#000000"
+						maxlength="7"
+						class="color-text-input">
+				</div>
+			</div>
+
+			<div class="form-field">
+				<label>Opacity</label>
+				<input type="number" formControlName="opacity" min="0" max="1" step="0.1">
+			</div>
+
+			<div class="form-field">
+				<label>Mark</label>
+				<mat-select formControlName="mark" placeholder="None">
+					<mat-option [value]="null">None</mat-option>
+					@for (option of markOptions; track option.value) {
+						<mat-option [value]="option.value">{{ option.label }}</mat-option>
+					}
+				</mat-select>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="dashed">Dashed</mat-checkbox>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="hiddenLegend">Hidden legend</mat-checkbox>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="hidden">Hidden</mat-checkbox>
+			</div>
+
+			<div class="pattern-info">
+				<p>For the tooltip, the first line will be used as the title. The following lines are for the content. <br>
+				Tooltip text will be used as a template literal with the following context: "section" and "entry". For example, you
+					can use</p>
+				<div class="pattern-chips">
+					@for (option of mainPatternOptions; track option.pattern) {
+						<button type="button" class="pattern-chip" (click)="insertPattern(option.pattern)"
+														[title]="option.description">{{ option.pattern }}
+						</button>
+					}
+				</div>
+				<p>You can also display your meta-data</p>
+				<div class="pattern-chips">
+					@for (option of metadataPatternOptions; track option.pattern) {
+						<button type="button" class="pattern-chip" (click)="insertPattern(option.pattern)"
+														[title]="option.description">{{ option.pattern }}
+						</button>
+					}
+				</div>
+				<p>You can also include Javascript code that will be interpreted</p>
+				<div class="pattern-chips">
+					@for (option of jsPatternOptions; track option.pattern) {
+						<button type="button" class="pattern-chip" (click)="insertPattern(option.pattern)"
+														[title]="option.description">{{ option.pattern }}
+						</button>
+					}
+				</div>
+			</div>
+
+			<div class="form-section">
+				<h3>Translations</h3>
+
+				@if (availableLanguages.length === 1) {
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<div [formGroup]="tooltipForms.get(lang.languageCode)!">
+									<div class="form-field">
+									<label>Tooltip</label>
+										<textarea
+											#tooltipInput
+											formControlName="tooltip"
+											rows="6"
+											[placeholder]="'EDSS\nDate: ${entry.date.toDisplay()}\nValue: ${entry.value}'">
+										</textarea>
+								</div>
+							</div>
+						}
+					}
+				} @else {
+					<mat-tab-group>
+						@for (lang of availableLanguages; track lang.languageCode) {
+							@if (lang.languageCode) {
+								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+									<div class="tab-content" [formGroup]="tooltipForms.get(lang.languageCode)!">
+										<div class="form-field">
+											<label>Tooltip</label>
+											<textarea
+												#tooltipInput
+												formControlName="tooltip"
+												rows="6"
+												[placeholder]="'EDSS\nDate: ${entry.date.toDisplay()}\nValue: ${entry.value}'">
+											</textarea>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						}
+					</mat-tab-group>
+				}
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

@@ -1539,7 +1539,9 @@ create table if not exists timeline_graph (
     code varchar(128) not null,
     scope_model_id uuid null,
     study_start_event_model_id uuid null,
+    study_end_event_model_id uuid null,
     study_period_is_default boolean not null default false,
+    width int null,
     height int null,
     legend_width int null,
     scroller_height int null,
@@ -1558,7 +1560,7 @@ create table if not exists timeline_graph_section (
     project_id uuid not null,
     timeline_graph_id uuid not null,
     code varchar(128) not null,
-    type enum ('ACTION','PERIOD','DATE','LINE') not null,
+    type enum ('ACTION', 'PERIOD', 'DATE', 'LINE', 'DOT', 'BAR') not null,
     dataset_model_id uuid null,
     date_field_id uuid null,
     end_date_field_id uuid null,
@@ -1567,11 +1569,12 @@ create table if not exists timeline_graph_section (
     hide_expected_event boolean not null default false,
     hide_done_event boolean not null default false,
     use_scope_paths boolean not null default false,
+	unit varchar(64) null,
     color varchar(16) null,
     stroke_color varchar(16) null,
     opacity decimal(6, 3) null,
     dashed boolean not null default false,
-    mark enum ('CIRCLE','SQUARE','DIAMOND') null,
+    mark enum ('CIRCLE', 'SQUARE', 'CROSS', 'TRIANGLE', 'DIAMOND') null,
     position_start int null,
     position_stop int null,
     scale_min decimal(18, 6) null,
@@ -1579,7 +1582,7 @@ create table if not exists timeline_graph_section (
     scale_decimal int null,
     scale_mark_interval decimal(18, 6) null,
     scale_label_interval decimal(18, 6) null,
-    scale_position enum ('LEFT','RIGHT') null,
+    scale_position enum ('LEFT', 'RIGHT') null,
     hidden_legend boolean not null default false,
     hidden boolean not null default false,
     label json null,
@@ -1594,7 +1597,6 @@ create table if not exists timeline_graph_section_meta_field (
     timeline_graph_id uuid not null,
     graph_section_id uuid not null,
     field_model_id uuid not null,
-    sort_order int null,
     constraint pk_timeline_graph_section_meta_field primary key (project_id, timeline_graph_id, graph_section_id, field_model_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
@@ -1604,7 +1606,6 @@ create table if not exists timeline_graph_section_event (
     timeline_graph_id uuid not null,
     graph_section_id uuid not null,
     event_model_id uuid not null,
-    sort_order int null,
     constraint pk_timeline_graph_section_event primary key (project_id, timeline_graph_id, graph_section_id, event_model_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 

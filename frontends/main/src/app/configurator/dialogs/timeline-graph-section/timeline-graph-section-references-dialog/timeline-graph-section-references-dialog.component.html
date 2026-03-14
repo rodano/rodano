@@ -1,0 +1,193 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">References &amp; Entries</h2>
+
+	<div class="dialog-content">
+		<div class="ranges-section">
+			<div class="ranges-header">
+				<h3>References</h3>
+				<button class="btn-add-range" type="button" (click)="addReference()">
+					<mat-icon>add</mat-icon>
+					Add Reference
+				</button>
+			</div>
+
+			@if (references.length === 0) {
+				<div class="empty-state">
+					<mat-icon>stacked_line_chart</mat-icon>
+					<p>No references configured. Click "Add Reference" to add one.</p>
+				</div>
+			} @else {
+				@for (ref of references; track ref.graphReferenceId; let ri = $index) {
+					<div class="form-section">
+						<div class="section-header">
+							<h3>Reference {{ ri + 1 }}</h3>
+							<button class="btn-delete" type="button" (click)="removeReference(ri)">
+								<mat-icon>delete</mat-icon>
+							</button>
+						</div>
+
+						@if (availableLanguages.length === 1) {
+							@for (lang of availableLanguages; track lang.languageCode) {
+								<div class="form-field">
+									<label>Label</label>
+									<input
+										type="text"
+										[value]="ref.label[lang.languageCode!] || ''"
+										(input)="updateReferenceTranslation(ri, 'label', lang.languageCode!, $any($event.target).value)"
+										placeholder="Reference label">
+								</div>
+								<div class="form-field">
+									<label>Tooltip</label>
+									<textarea
+										rows="3"
+										[value]="ref.tooltip?.[lang.languageCode!] || ''"
+										(input)="updateReferenceTranslation(ri, 'tooltip', lang.languageCode!, $any($event.target).value)"
+										[placeholder]="'20% percentile\n${entry.label}'">
+									</textarea>
+								</div>
+							}
+						} @else {
+							<mat-tab-group>
+								@for (lang of availableLanguages; track lang.languageCode) {
+									<mat-tab [label]="getLanguageLabel(lang)">
+										<div class="tab-content">
+											<div class="form-field">
+												<label>Label</label>
+												<input
+													type="text"
+													[value]="ref.label[lang.languageCode!] || ''"
+													(input)="updateReferenceTranslation(ri, 'label', lang.languageCode!, $any($event.target).value)"
+													placeholder="Reference label">
+											</div>
+											<div class="form-field">
+												<label>Tooltip</label>
+												<textarea
+													rows="3"
+													[value]="ref.tooltip?.[lang.languageCode!] || ''"
+													(input)="updateReferenceTranslation(ri, 'tooltip', lang.languageCode!, $any($event.target).value)"
+													[placeholder]="'20% percentile\n${entry.label}'">
+												</textarea>
+											</div>
+										</div>
+									</mat-tab>
+								}
+							</mat-tab-group>
+						}
+
+						<div class="form-field">
+							<label>Reference section</label>
+							<mat-select
+								[value]="ref.referenceSectionId || ''"
+								(selectionChange)="updateReferenceField(ri, 'referenceSectionId', $event.value || undefined)">
+								<mat-option value="">None</mat-option>
+								@for (section of data.allSections; track section.graphSectionId) {
+									<mat-option [value]="section.graphSectionId">
+										{{ languageService.getTranslatedName(section.label) || section.id }}
+									</mat-option>
+								}
+							</mat-select>
+						</div>
+
+						<div class="form-field">
+							<label>Color</label>
+							<div class="color-picker-wrapper">
+								<input
+									type="color"
+									class="color-button"
+									[value]="ref.color || '#000000'"
+									(input)="updateReferenceField(ri, 'color', $any($event.target).value)"
+									[title]="'Current color: ' + (ref.color || '#000000')">
+								<input
+									type="text"
+									class="color-text-input"
+									[value]="ref.color || ''"
+									(input)="onColorInput($event, ri)"
+									placeholder="#000000"
+									maxlength="7">
+							</div>
+						</div>
+
+						<div class="form-field">
+							<mat-checkbox
+								[checked]="ref.dashed"
+								(change)="updateReferenceField(ri, 'dashed', $any($event).checked)">
+								Dashed
+							</mat-checkbox>
+						</div>
+
+						<div class="form-section">
+							<div class="section-header">
+								<h3>Entries</h3>
+								<button class="btn-add-item" type="button" (click)="addEntry(ri)">
+									<mat-icon>add</mat-icon>
+									Add Entry
+								</button>
+							</div>
+							<span class="hint">Time points are set relatively to the reference section. You can use "y" for years, "m" for months and "d" for days, for example 1y6m10d.</span>
+
+							@if (!ref.entries || ref.entries.length === 0) {
+								<div class="empty-state">
+									<mat-icon>table_rows</mat-icon>
+									<p>No entries yet. Click "Add Entry" to add one.</p>
+								</div>
+							} @else {
+								<div class="ranges-table-wrapper">
+									<table class="ranges-table">
+										<thead>
+										<tr>
+											<th>Time point</th>
+											<th>Value</th>
+											<th>Label</th>
+											<th></th>
+										</tr>
+										</thead>
+										<tbody>
+											@for (entry of ref.entries; track entry.sortOrder; let ei = $index) {
+												<tr>
+													<td>
+														<input
+															type="text"
+															class="range-input"
+															[value]="entry.timepoint"
+															(input)="updateEntryField(ri, ei, 'timepoint', $any($event.target).value)"
+															placeholder="1y6m">
+													</td>
+													<td>
+														<input
+															type="text"
+															class="range-input range-input-sm"
+															[defaultValue]="entry.value ?? ''"
+															(input)="updateEntryField(ri, ei, 'value', parseDecimal($any($event.target).value))"
+															placeholder="0.0">
+													</td>
+													<td>
+														<input
+															type="text"
+															class="range-input"
+															[value]="entry.label || ''"
+															(input)="updateEntryField(ri, ei, 'label', $any($event.target).value)"
+															placeholder="Label">
+													</td>
+													<td class="center">
+														<button class="btn-delete" type="button" (click)="removeEntry(ri, ei)">
+															<mat-icon>delete</mat-icon>
+														</button>
+													</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								</div>
+							}
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

@@ -34,6 +34,10 @@ import {FormModel} from '@core/model/form-model';
 import {FormModelService} from './api/form-model.service';
 import {FormLayoutService} from './api/form-layout.service';
 import {Layout} from '@core/model/layout';
+import {TimelineGraphService} from './api/timeline-graph.service';
+import {TimelineGraphSectionService} from './api/timeline-graph-section.service';
+import {TimelineGraph} from '@core/model/timeline-graph';
+import {TimelineGraphSection} from '@core/model/timeline-graph-section';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -54,7 +58,9 @@ export class DraftSaveService {
 		private reportService: ReportService,
 		private chartService: ChartService,
 		private formModelService: FormModelService,
-		private formLayoutService: FormLayoutService
+		private formLayoutService: FormLayoutService,
+		private timelineGraphService: TimelineGraphService,
+		private timelineGraphSectionService: TimelineGraphSectionService
 	) {}
 
 	saveScopeModels(
@@ -560,5 +566,59 @@ export class DraftSaveService {
 		return saveObservables.length > 0
 			? forkJoin(saveObservables)
 			: of([]);
+	}
+
+	saveTimelineGraphs(
+		projectId: string,
+		modifiedIds: Set<string>,
+		timelineGraphs: TimelineGraph[],
+		originalTimelineGraphs: TimelineGraph[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalTimelineGraphs.find(tg => tg.timelineGraphId === originalId);
+				if(original) {
+					saveObservables.push(this.timelineGraphService.deleteTimelineGraph(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const timelineGraph = timelineGraphs.find(tg => tg.timelineGraphId === id);
+				if(timelineGraph) {
+					saveObservables.push(this.timelineGraphService.createTimelineGraph(projectId, timelineGraph));
+				}
+			}
+			else {
+				const timelineGraph = timelineGraphs.find(tg => tg.timelineGraphId === id);
+				if(timelineGraph) {
+					saveObservables.push(this.timelineGraphService.updateTimelineGraph(projectId, id, timelineGraph));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveSections(
+		projectId: string,
+		modifiedIds: Set<string>,
+		sections: TimelineGraphSection[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			const section = sections.find(tgs => tgs.graphSectionId === id);
+			if(section) {
+				saveObservables.push(this.timelineGraphSectionService.updateSection(projectId, section.timelineGraphId, id, section));
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
 	}
 }

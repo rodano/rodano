@@ -17,6 +17,7 @@ public class TimelineGraphSection {
 	private Map<String, String> tooltip;
 
 	private TimelineGraphSectionType type;
+	private String unit;
 	private String color;
 	private String strokeColor;
 	private BigDecimal opacity;
@@ -71,6 +72,14 @@ public class TimelineGraphSection {
 
 	public void setType(final TimelineGraphSectionType type) {
 		this.type = type;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(final String unit) {
+		this.unit = unit;
 	}
 
 	public String getColor() {
@@ -239,11 +248,12 @@ public class TimelineGraphSection {
 			"id='" + id + '\'' +
 			", label=" + label +
 			", tooltip=" + tooltip +
-			", type='" + type + '\'' +
+			", type=" + type +
+			", unit='" + unit + '\'' +
 			", color='" + color + '\'' +
 			", strokeColor='" + strokeColor + '\'' +
 			", opacity=" + opacity +
-			", mark='" + mark + '\'' +
+			", mark=" + mark +
 			", useScopePaths=" + useScopePaths +
 			", hideExpectedEvent=" + hideExpectedEvent +
 			", hideDoneEvent=" + hideDoneEvent +

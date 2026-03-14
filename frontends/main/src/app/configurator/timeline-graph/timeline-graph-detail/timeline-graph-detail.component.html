@@ -1,0 +1,204 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(timelineGraph.shortname) }}</h2>
+		<span class="detail-code theme-timeline-graph">{{ timelineGraph.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-view theme-timeline-graph-section" (click)="onSwitchToSections()"
+										matTooltip="View Timelien Graph Sections">
+			<mat-icon>bid_landscape</mat-icon>
+			<span>Timeline Graph Sections</span>
+		</button>
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ timelineGraph.id }}
+			</app-setting-item>
+
+			<app-setting-item label="Scope Model"
+																					[modified]="isFieldModified('scopeModelId')"
+																					[notConfigured]="!timelineGraph.scopeModelId">
+				@if (!timelineGraph.scopeModelId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-scope-model">
+						<mat-icon class="resource-icon">account_tree</mat-icon>
+						<span class="language-name">{{ getScopeModelLabel(timelineGraph.scopeModelId) }}</span>
+					</div>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Short Name"
+																					[translated]="true"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(timelineGraph.shortname)">
+				@if (!languageService.getTranslatedValue(timelineGraph.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(timelineGraph.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Long Name"
+																					[translated]="true"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(timelineGraph.longname)">
+				@if (!languageService.getTranslatedValue(timelineGraph.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(timelineGraph.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Description"
+																					[translated]="true"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(timelineGraph.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(timelineGraph.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(timelineGraph.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Footnote"
+																					[translated]="true"
+																					[modified]="isFieldModified('footnote')"
+																					[notConfigured]="!languageService.getTranslatedValue(timelineGraph.footnote)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(timelineGraph.footnote)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(timelineGraph.footnote) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Study Period</h3>
+		<div class="settings-grid">
+			<app-setting-item label="Beginning Event Model"
+																					[modified]="isFieldModified('studyStartEventModelId')"
+																					[notConfigured]="!timelineGraph.studyStartEventModelId">
+				@if (!timelineGraph.studyStartEventModelId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-event-model">
+						<mat-icon class="resource-icon">event</mat-icon>
+						<span class="language-name">{{ getEventModelLabel(timelineGraph.studyStartEventModelId) }}</span>
+					</div>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="End Event Model"
+																					[modified]="isFieldModified('studyEndEventModelId')"
+																					[notConfigured]="!timelineGraph.studyEndEventModelId">
+				@if (!timelineGraph.studyEndEventModelId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-event-model">
+						<mat-icon class="resource-icon">event</mat-icon>
+						<span class="language-name">{{ getEventModelLabel(timelineGraph.studyEndEventModelId) }}</span>
+					</div>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Default Period"
+																					[modified]="isFieldModified('studyPeriodIsDefault')">
+				@if (timelineGraph.studyPeriodIsDefault) {
+					<span class="status-badge third">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditPeriod()">
+			<mat-icon>edit</mat-icon>
+			Edit Period
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Design</h3>
+		<div class="settings-grid">
+
+			<app-setting-item label="Width"
+																					[modified]="isFieldModified('width')"
+																					[notConfigured]="timelineGraph.width === null || timelineGraph.width === undefined">
+				@if (timelineGraph.width === null || timelineGraph.width === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ timelineGraph.width }}
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Height"
+																					[modified]="isFieldModified('height')"
+																					[notConfigured]="timelineGraph.height === null || timelineGraph.height === undefined">
+				@if (timelineGraph.height === null || timelineGraph.height === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ timelineGraph.height }}
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Legend Width"
+																					[modified]="isFieldModified('legendWidth')"
+																					[notConfigured]="timelineGraph.legendWidth === null || timelineGraph.legendWidth === undefined">
+				@if (timelineGraph.legendWidth === null || timelineGraph.legendWidth === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ timelineGraph.legendWidth }}
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Scroller Height"
+																					[modified]="isFieldModified('scrollerHeight')"
+																					[notConfigured]="timelineGraph.scrollerHeight === null || timelineGraph.scrollerHeight === undefined">
+				@if (timelineGraph.scrollerHeight === null || timelineGraph.scrollerHeight === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ timelineGraph.scrollerHeight }}
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Show Scroller"
+																					[modified]="isFieldModified('showScroller')">
+				@if (timelineGraph.showScroller) {
+					<span class="status-badge second">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditDesign()">
+			<mat-icon>edit</mat-icon>
+			Edit Design
+		</button>
+	</div>
+
+	<app-danger-zone
+		[title]="'Delete Timeline Graph'"
+		[message]="'Deleting this timeline graph is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
+</div>

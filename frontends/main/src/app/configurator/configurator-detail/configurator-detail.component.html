@@ -130,6 +130,16 @@
 					(formModelContextChanged)="onFormModelContextChanged($event)">
 				</app-form-model-list>
 			}
+			@case ('timeline-graphs') {
+				<app-timeline-graph-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onTimelineGraphSelected($event)"
+					(timelineGraphChanged)="onTimelineGraphsChanged($event)"
+					(timelineGraphContextChanged)="onTimelineGraphContextChanged($event)">
+				</app-timeline-graph-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

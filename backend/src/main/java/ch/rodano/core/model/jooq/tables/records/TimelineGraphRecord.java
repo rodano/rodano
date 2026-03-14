@@ -91,129 +91,157 @@ public class TimelineGraphRecord extends UpdatableRecordImpl<TimelineGraphRecord
 	}
 
 	/**
+	 * Setter for <code>timeline_graph.study_end_event_model_id</code>.
+	 */
+	public void setStudyEndEventModelId(UUID value) {
+		set(5, value);
+	}
+
+	/**
+	 * Getter for <code>timeline_graph.study_end_event_model_id</code>.
+	 */
+	public UUID getStudyEndEventModelId() {
+		return (UUID) get(5);
+	}
+
+	/**
 	 * Setter for <code>timeline_graph.study_period_is_default</code>.
 	 */
 	public void setStudyPeriodIsDefault(Boolean value) {
-		set(5, value);
+		set(6, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.study_period_is_default</code>.
 	 */
 	public Boolean getStudyPeriodIsDefault() {
-		return (Boolean) get(5);
+		return (Boolean) get(6);
+	}
+
+	/**
+	 * Setter for <code>timeline_graph.width</code>.
+	 */
+	public void setWidth(Integer value) {
+		set(7, value);
+	}
+
+	/**
+	 * Getter for <code>timeline_graph.width</code>.
+	 */
+	public Integer getWidth() {
+		return (Integer) get(7);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.height</code>.
 	 */
 	public void setHeight(Integer value) {
-		set(6, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.height</code>.
 	 */
 	public Integer getHeight() {
-		return (Integer) get(6);
+		return (Integer) get(8);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.legend_width</code>.
 	 */
 	public void setLegendWidth(Integer value) {
-		set(7, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.legend_width</code>.
 	 */
 	public Integer getLegendWidth() {
-		return (Integer) get(7);
+		return (Integer) get(9);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.scroller_height</code>.
 	 */
 	public void setScrollerHeight(Integer value) {
-		set(8, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.scroller_height</code>.
 	 */
 	public Integer getScrollerHeight() {
-		return (Integer) get(8);
+		return (Integer) get(10);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.show_scroller</code>.
 	 */
 	public void setShowScroller(Boolean value) {
-		set(9, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.show_scroller</code>.
 	 */
 	public Boolean getShowScroller() {
-		return (Boolean) get(9);
+		return (Boolean) get(11);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.shortname</code>.
 	 */
 	public void setShortname(String value) {
-		set(10, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.shortname</code>.
 	 */
 	public String getShortname() {
-		return (String) get(10);
+		return (String) get(12);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.longname</code>.
 	 */
 	public void setLongname(String value) {
-		set(11, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.longname</code>.
 	 */
 	public String getLongname() {
-		return (String) get(11);
+		return (String) get(13);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.description</code>.
 	 */
 	public void setDescription(String value) {
-		set(12, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.description</code>.
 	 */
 	public String getDescription() {
-		return (String) get(12);
+		return (String) get(14);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph.footnote</code>.
 	 */
 	public void setFootnote(String value) {
-		set(13, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph.footnote</code>.
 	 */
 	public String getFootnote() {
-		return (String) get(13);
+		return (String) get(15);
 	}
 
 	// -------------------------------------------------------------------------
@@ -239,7 +267,7 @@ public class TimelineGraphRecord extends UpdatableRecordImpl<TimelineGraphRecord
 	/**
 	 * Create a detached, initialised TimelineGraphRecord
 	 */
-	public TimelineGraphRecord(UUID timelineGraphId, UUID projectId, String code, UUID scopeModelId, UUID studyStartEventModelId, Boolean studyPeriodIsDefault, Integer height, Integer legendWidth, Integer scrollerHeight, Boolean showScroller, String shortname, String longname, String description, String footnote) {
+	public TimelineGraphRecord(UUID timelineGraphId, UUID projectId, String code, UUID scopeModelId, UUID studyStartEventModelId, UUID studyEndEventModelId, Boolean studyPeriodIsDefault, Integer width, Integer height, Integer legendWidth, Integer scrollerHeight, Boolean showScroller, String shortname, String longname, String description, String footnote) {
 		super(TimelineGraph.TIMELINE_GRAPH);
 
 		setTimelineGraphId(timelineGraphId);
@@ -247,7 +275,9 @@ public class TimelineGraphRecord extends UpdatableRecordImpl<TimelineGraphRecord
 		setCode(code);
 		setScopeModelId(scopeModelId);
 		setStudyStartEventModelId(studyStartEventModelId);
+		setStudyEndEventModelId(studyEndEventModelId);
 		setStudyPeriodIsDefault(studyPeriodIsDefault);
+		setWidth(width);
 		setHeight(height);
 		setLegendWidth(legendWidth);
 		setScrollerHeight(scrollerHeight);

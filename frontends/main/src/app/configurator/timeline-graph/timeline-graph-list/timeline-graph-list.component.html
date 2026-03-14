@@ -1,0 +1,214 @@
+<app-list-header title="Timeline Graphs" subtitle="Configure timeline graphs for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2"
+					[class.level-3]="viewLevel === 3">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading timeline graphs...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-timeline-graph" (click)="onCreateTimelineGraph()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Timeline Graph</h3>
+						<p>Add a new timeline graph</p>
+					</div>
+				</div>
+
+				@for (graph of timelineGraphs; track graph.timelineGraphId) {
+					<div class="primary-card theme-timeline-graph"
+										[class.selected]="isSelected(graph)"
+										[appModified]="modifiedTimelineGraphIds.has(graph.timelineGraphId)"
+										(click)="onSelectTimelineGraph(graph)">
+
+						@if (isSelected(graph)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(graph.shortname) }}</h3>
+								<p class="card-code">{{ graph.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (graph.studyPeriodIsDefault) {
+									<span class="status-badge third" matTooltip="Default Period">
+										<mat-icon class="badge-full">avg_time</mat-icon>
+										<mat-icon class="badge-short">avg_time</mat-icon>
+									</span>
+								}
+								@if (graph.showScroller) {
+									<span class="status-badge second" matTooltip="Default Period">
+										<mat-icon class="badge-full">mouse</mat-icon>
+										<mat-icon class="badge-short">mouse</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item" [class.unset]="!graph.scopeModelId">
+									<mat-icon>account_tree</mat-icon>
+									<span>Scope Model: <b>{{ graph.scopeModelId !== null && graph.scopeModelId !== undefined ? getScopeModelLabel(graph.scopeModelId) : 'Not set' }}</b></span>
+								</div>
+								<div class="detail-item" [class.unset]="!graph.studyStartEventModelId">
+									<mat-icon>event</mat-icon>
+									<span>Beginning Event Model: <b>{{ graph.studyStartEventModelId !== null && graph.studyStartEventModelId !== undefined ? getEventModelLabel(graph.studyStartEventModelId) : 'Not set' }}</b></span>
+								</div>
+								<div class="detail-item" [class.unset]="!graph.studyEndEventModelId">
+									<mat-icon>event</mat-icon>
+									<span>End Event Model: <b>{{ graph.studyEndEventModelId !== null && graph.studyEndEventModelId !== undefined ? getEventModelLabel(graph.studyEndEventModelId) : 'Not set' }}</b></span>
+								</div>
+							</div>
+						</div>
+
+						@if (modifiedTimelineGraphIds.has(graph.timelineGraphId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (timelineGraphs.length === 0) {
+				<app-empty-state
+					[icon]="'timeline'"
+					[title]="'No Timeline Graphs'"
+					[message]="'Create your first timeline graph to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (viewMode === 'section-list' || viewMode === 'section-detail') {
+			<div class="secondary-column">
+				<div class="secondary-column-header">
+					<div class="header-with-back">
+						<button class="btn-back" (click)="backToGraphDetail()">
+							<mat-icon>arrow_back</mat-icon>
+						</button>
+						<div>
+							<h2>Timeline Graph Sections</h2>
+							<p class="column-subtitle">{{ selectedTimelineGraph ? languageService.getTranslatedName(selectedTimelineGraph.shortname) : '' }}</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="secondary-column-content">
+					<div class="secondary-cards-grid">
+						<div class="secondary-card first-child-card create-card theme-timeline-graph-section" (click)="onCreateSection()">
+							<div class="create-content">
+								<mat-icon>add_circle_outline</mat-icon>
+								<h3>Create Timeline Graph Section</h3>
+								<p>Define a new section</p>
+							</div>
+						</div>
+
+						@for (section of sections; track section.graphSectionId) {
+							<div class="secondary-card first-child-card theme-timeline-graph-section"
+												[class.selected]="selectedGraphSectionId === section.graphSectionId"
+												[appModified]="isSectionModified(section.graphSectionId)"
+												(click)="onSelectSection(section.graphSectionId)">
+
+								@if (selectedGraphSectionId === section.graphSectionId) {
+									<div class="card-selection-icon">
+										<mat-icon>check</mat-icon>
+									</div>
+								}
+
+								<div class="card-header">
+									<div class="card-info">
+										<h3>{{ languageService.getTranslatedName(section.label) }}</h3>
+										<p class="card-code">{{ section.id }}</p>
+									</div>
+									<div class="card-header-badges">
+										@if (section.hiddenLegend) {
+											<span class="status-badge second" matTooltip="Hidden Legend">
+										<mat-icon class="badge-full">bar_chart_off</mat-icon>
+										<mat-icon class="badge-short">bar_chart_off</mat-icon>
+									</span>
+										}
+										@if (section.hidden) {
+											<span class="status-badge fourth" matTooltip="Hidden">
+										<mat-icon class="badge-full">preview_off</mat-icon>
+										<mat-icon class="badge-short">preview_off</mat-icon>
+									</span>
+										}
+									</div>
+								</div>
+
+								<div class="card-body">
+									<div class="card-details">
+										<div class="detail-item">
+											<mat-icon>input</mat-icon>
+											<span>Type: <b>{{ getTypeLabel(section.type) }}</b></span>
+										</div>
+										<div class="detail-item">
+											<mat-icon>event</mat-icon>
+											<span>{{ section.eventModelIds?.length }} {{ section.eventModelIds?.length === 1 ? 'Event Model' : 'Event Models' }}</span>
+										</div>
+										<div class="detail-item">
+											<mat-icon>text_ad</mat-icon>
+											<span>{{ section.metaFieldIds?.length }} {{ section.metaFieldIds?.length === 1 ? 'Meta-Data Field Model' : 'Meta-Data Field Models' }}</span>
+										</div>
+										<div class="detail-item">
+											<mat-icon>developer_guide</mat-icon>
+											<span>{{ section.references.length }} {{ section.references.length === 1 ? 'Section Reference' : 'Section References' }}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						}
+
+						@if (sections.length === 0) {
+							<app-empty-state
+								[icon]="'bid_landscape'"
+								[message]="'No sections yet. Create your first timeline graph section to get started.'"
+								[size]="'small'"
+							/>
+						}
+					</div>
+				</div>
+			</div>
+		}
+
+		@if (selectedTimelineGraph && viewMode === 'graph-detail') {
+			<div class="detail-panel">
+				<app-timeline-graph-detail
+					[timelineGraph]="selectedTimelineGraph"
+					[projectId]="projectId"
+					[project]="project"
+					[allTimelineGraphs]="timelineGraphs"
+					(timelineGraphUpdated)="onTimelineGraphUpdated($event)"
+					(timelineGraphDeleted)="onTimelineGraphDeleted($event)"
+					(closed)="onSelectTimelineGraph(selectedTimelineGraph)"
+					(switchToSections)="switchToSectionView()">
+				</app-timeline-graph-detail>
+			</div>
+		}
+
+		@if (viewMode === 'section-detail' && selectedGraphSectionId) {
+			<div class="detail-panel">
+			<app-timeline-graph-section-detail
+					[projectId]="projectId"
+					[graphSectionId]="selectedGraphSectionId"
+					[sections]="sections"
+					[originalSections]="originalSections"
+					[timelineGraph]="selectedTimelineGraph"
+					[project]="project"
+					(closed)="backToGraphDetail()"
+					(timelineGraphSectionUpdated)="onSectionUpdated($event)"
+					(timelineGraphSectionDeleted)="onSectionDeleted($event)">
+				</app-timeline-graph-section-detail>
+			</div>
+		}
+	}
+</div>

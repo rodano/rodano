@@ -368,6 +368,25 @@
 	text-transform: none;
 }
 
+input[type="color"].color-button {
+	width: 3.125rem !important;
+	height: 3.125rem !important;
+	flex-shrink: 0;
+	-webkit-appearance: none;
+	padding: 0;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+input[type="color"].color-button::-webkit-color-swatch-wrapper {
+	padding: 0;
+}
+
+input[type="color"].color-button::-webkit-color-swatch {
+	border: none;
+	border-radius: 0.25rem;
+}
+
 /* ==================== HTML/Code Textarea ==================== */
 .html-textarea {
 	width: 100%;

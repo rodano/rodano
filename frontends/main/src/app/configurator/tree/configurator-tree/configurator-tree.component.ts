@@ -14,6 +14,7 @@ import {ResourceCategoryTreeComponent} from '../resource-category-tree/resource-
 import {ReportTreeComponent} from '../report-tree/report-tree.component';
 import {ChartTreeComponent} from '../chart-tree/chart-tree.component';
 import {FormModelTreeComponent} from '../form-model-tree/form-model-tree.component';
+import {TimelineGraphTreeComponent} from '../timeline-graph-tree/timeline-graph-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -32,7 +33,8 @@ import {FormModelTreeComponent} from '../form-model-tree/form-model-tree.compone
 		ResourceCategoryTreeComponent,
 		ReportTreeComponent,
 		ChartTreeComponent,
-		FormModelTreeComponent
+		FormModelTreeComponent,
+		TimelineGraphTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -57,6 +59,8 @@ export class ConfiguratorTreeComponent {
 	@Input() charts: any[] = [];
 	@Input() formModels: any[] = [];
 	@Input() layouts: any[] = [];
+	@Input() timelineGraphs: any[] = [];
+	@Input() sections: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -74,11 +78,13 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedChartId: string | null = null;
 	@Input() selectedFormModelId: string | null = null;
 	@Input() selectedLayoutId: string | null = null;
+	@Input() selectedTimelineGraphId: string | null = null;
+	@Input() selectedGraphSectionId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -163,6 +169,13 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'form-models' ? null : 'form-models';
 			this.categoryClicked.emit('form-models');
+		});
+	}
+
+	onTimelineGraphClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'timeline-graphs' ? null : 'timeline-graphs';
+			this.categoryClicked.emit('timeline-graphs');
 		});
 	}
 

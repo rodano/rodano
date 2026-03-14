@@ -24,7 +24,7 @@
 					#collapsedInput
 					type="text"
 					formControlName="collapsedLabelPattern"
-					placeholder="${{'{shortname}'}}">
+					[placeholder]="'${shortname}'">
 				<span class="hint">Pattern for collapsed/compact display of dataset instances</span>
 			</div>
 
@@ -34,7 +34,7 @@
 					#expandedInput
 					type="text"
 					formControlName="expandedLabelPattern"
-					placeholder="${{'{longname}'}} - ${{'{description}'}}">
+					[placeholder]="'${longname} - ${description}'">
 				<span class="hint">Pattern for expanded/detailed display of dataset instances</span>
 			</div>
 		</form>

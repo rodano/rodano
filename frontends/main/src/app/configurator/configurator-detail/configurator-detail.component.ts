@@ -17,6 +17,7 @@ import {
 import {ReportListComponent} from '../report/report-list/report-list.component';
 import {ChartListComponent} from '../chart/chart-list/chart-list.component';
 import {FormModelListComponent} from '../form-model/form-model-list/form-model-list.component';
+import {TimelineGraphListComponent} from '../timeline-graph/timeline-graph-list/timeline-graph-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -38,6 +39,7 @@ import {FormModelListComponent} from '../form-model/form-model-list/form-model-l
 		ReportListComponent,
 		ChartListComponent,
 		FormModelListComponent,
+		TimelineGraphListComponent,
 		EmptyStateComponent
 	]
 })
@@ -53,6 +55,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(ReportListComponent) reportListComponent?: ReportListComponent;
 	@ViewChild(ChartListComponent) chartListComponent?: ChartListComponent;
 	@ViewChild(FormModelListComponent) formModelListComponent?: FormModelListComponent;
+	@ViewChild(TimelineGraphListComponent) timelineGraphListComponent?: TimelineGraphListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -137,7 +140,15 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFormModelId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'overview' | null = null;
+	@Output() timelineGraphsChanged = new EventEmitter<boolean>();
+	@Output() timelineGraphContextChanged = new EventEmitter<{
+		timelineGraphs: any[];
+		sections: any[];
+		selectedTimelineGraphId: string | null;
+		selectedGraphSectionId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -244,6 +255,15 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.formModelsChanged.emit(value);
 	}
 
+	onTimelineGraphSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onTimelineGraphsChanged(value: boolean): void {
+		this.timelineGraphsChanged.emit(value);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -262,6 +282,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode.startsWith('workflow-') || this.selectedNode.startsWith('workflow-state-') || this.selectedNode.startsWith('workflow-action-')) {
 			this.selectedNodeType = 'workflows';
+			return;
+		}
+
+		if(this.selectedNode.startsWith('timeline-graph-') || this.selectedNode.startsWith('timeline-graph-section-')) {
+			this.selectedNodeType = 'timeline-graphs';
 			return;
 		}
 
@@ -322,6 +347,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'form-models') {
 			this.selectedNodeType = 'form-models';
+			return;
+		}
+
+		if(this.selectedNode === 'timeline-graphs') {
+			this.selectedNodeType = 'timeline-graphs';
 			return;
 		}
 
@@ -413,5 +443,14 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedFormModelId: string | null;
 	}): void {
 		this.formModelContextChanged.emit(context);
+	}
+
+	onTimelineGraphContextChanged(context: {
+		timelineGraphs: any[];
+		sections: any[];
+		selectedTimelineGraphId: string | null;
+		selectedGraphSectionId: string | null;
+	}): void {
+		this.timelineGraphContextChanged.emit(context);
 	}
 }

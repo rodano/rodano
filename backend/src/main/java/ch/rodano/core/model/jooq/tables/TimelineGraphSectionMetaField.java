@@ -78,11 +78,6 @@ public class TimelineGraphSectionMetaField extends TableImpl<TimelineGraphSectio
 	 */
 	public final TableField<TimelineGraphSectionMetaFieldRecord, UUID> FIELD_MODEL_ID = createField(DSL.name("field_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
-	/**
-	 * The column <code>timeline_graph_section_meta_field.sort_order</code>.
-	 */
-	public final TableField<TimelineGraphSectionMetaFieldRecord, Integer> SORT_ORDER = createField(DSL.name("sort_order"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
 	private TimelineGraphSectionMetaField(Name alias, Table<TimelineGraphSectionMetaFieldRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

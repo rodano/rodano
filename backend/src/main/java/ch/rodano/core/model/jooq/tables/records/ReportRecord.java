@@ -63,30 +63,30 @@ public class ReportRecord extends UpdatableRecordImpl<ReportRecord> {
 	}
 
 	/**
-	 * Setter for <code>report.dataset_model_id</code>.
-	 */
-	public void setDatasetModelId(UUID value) {
-		set(3, value);
-	}
-
-	/**
-	 * Getter for <code>report.dataset_model_id</code>.
-	 */
-	public UUID getDatasetModelId() {
-		return (UUID) get(3);
-	}
-
-	/**
 	 * Setter for <code>report.workflow_id</code>.
 	 */
 	public void setWorkflowId(UUID value) {
-		set(4, value);
+		set(3, value);
 	}
 
 	/**
 	 * Getter for <code>report.workflow_id</code>.
 	 */
 	public UUID getWorkflowId() {
+		return (UUID) get(3);
+	}
+
+	/**
+	 * Setter for <code>report.dataset_model_id</code>.
+	 */
+	public void setDatasetModelId(UUID value) {
+		set(4, value);
+	}
+
+	/**
+	 * Getter for <code>report.dataset_model_id</code>.
+	 */
+	public UUID getDatasetModelId() {
 		return (UUID) get(4);
 	}
 
@@ -155,14 +155,14 @@ public class ReportRecord extends UpdatableRecordImpl<ReportRecord> {
 	/**
 	 * Create a detached, initialised ReportRecord
 	 */
-	public ReportRecord(UUID reportId, UUID projectId, String code, UUID datasetModelId, UUID workflowId, String shortname, String longname, String description) {
+	public ReportRecord(UUID reportId, UUID projectId, String code, UUID workflowId, UUID datasetModelId, String shortname, String longname, String description) {
 		super(Report.REPORT);
 
 		setReportId(reportId);
 		setProjectId(projectId);
 		setCode(code);
-		setDatasetModelId(datasetModelId);
 		setWorkflowId(workflowId);
+		setDatasetModelId(datasetModelId);
 		setShortname(shortname);
 		setLongname(longname);
 		setDescription(description);

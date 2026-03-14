@@ -1,0 +1,548 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(draftSection?.label) }}</h2>
+		<span class="detail-code theme-timeline-graph-section">{{ draftSection?.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (draftSection) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')">
+					{{ draftSection.id }}
+				</app-setting-item>
+
+				<app-setting-item label="Type"
+																						[modified]="isFieldModified('type')">
+					{{ draftSection.type }}
+				</app-setting-item>
+
+				<app-setting-item label="Label"
+																						[translated]="true"
+																						[modified]="isFieldModified('label')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftSection.label)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(draftSection.label)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(draftSection.label) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Resources</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Event Models"
+																						[modified]="isFieldModified('eventModelIds')"
+																						[fullWidth]="true"
+																						[plain]="true">
+					<div class="relationship-box">
+						@if (draftSection.eventModelIds && draftSection.eventModelIds.length > 0) {
+							<div class="chip-container">
+								@for (eventModelId of draftSection.eventModelIds; track eventModelId) {
+									<div class="chip theme-event-model">
+										<mat-icon class="resource-icon">event</mat-icon>
+										<span class="language-name">{{ getEventModelLabel(eventModelId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No event models configured</span>
+							</div>
+						}
+					</div>
+				</app-setting-item>
+
+				@if (draftSection.type === 'PERIOD') {
+					<app-setting-item label="Use Scope Paths" [modified]="isFieldModified('useScopePaths')">
+						@if (draftSection.useScopePaths) {
+							<span class="status-badge default">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</app-setting-item>
+				}
+
+				<app-setting-item label="Hide Expected Events"
+																						[modified]="isFieldModified('hideExpectedEvent')">
+					@if (draftSection.hideExpectedEvent) {
+						<span class="status-badge default">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Hide Done Events"
+																						[modified]="isFieldModified('hideDoneEvent')">
+					@if (draftSection.hideDoneEvent) {
+						<span class="status-badge default">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Dataset Model"
+																						[modified]="isFieldModified('datasetModelId')"
+																						[notConfigured]="!draftSection.datasetModelId">
+					@if (!draftSection.datasetModelId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-dataset-model">
+							<mat-icon class="resource-icon">dataset</mat-icon>
+							<span class="language-name">{{ getDatasetModelLabel(draftSection.datasetModelId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Date Field Model"
+																						[modified]="isFieldModified('dateFieldId')"
+																						[notConfigured]="!draftSection.dateFieldId">
+					@if (!draftSection.dateFieldId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-field-model">
+							<mat-icon class="resource-icon">text_ad</mat-icon>
+							<span class="language-name">{{ getFieldModelLabel(draftSection.dateFieldId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="End Date Field Model"
+																						[modified]="isFieldModified('endDateFieldId')"
+																						[notConfigured]="!draftSection.endDateFieldId">
+					@if (!draftSection.endDateFieldId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-field-model">
+							<mat-icon class="resource-icon">text_ad</mat-icon>
+							<span class="language-name">{{ getFieldModelLabel(draftSection.endDateFieldId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Value Field Model"
+																						[modified]="isFieldModified('valueFieldId')"
+																						[notConfigured]="!draftSection.valueFieldId">
+					@if (!draftSection.valueFieldId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-field-model">
+							<mat-icon class="resource-icon">text_ad</mat-icon>
+							<span class="language-name">{{ getFieldModelLabel(draftSection.valueFieldId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Label Field Model"
+																						[modified]="isFieldModified('labelFieldId')"
+																						[notConfigured]="!draftSection.labelFieldId">
+					@if (!draftSection.labelFieldId) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="chip theme-field-model">
+							<mat-icon class="resource-icon">text_ad</mat-icon>
+							<span class="language-name">{{ getFieldModelLabel(draftSection.labelFieldId) }}</span>
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Meta-Data Field Models"
+																						[modified]="isFieldModified('metaFieldIds')"
+																						[fullWidth]="true"
+																						[plain]="true">
+					<div class="relationship-box">
+						@if (draftSection.metaFieldIds && draftSection.metaFieldIds.length > 0) {
+							<div class="chip-container">
+								@for (fieldModelId of draftSection.metaFieldIds; track fieldModelId) {
+									<div class="chip theme-field-model">
+										<mat-icon class="resource-icon">text_ad</mat-icon>
+										<span class="language-name">{{ getFieldModelLabel(fieldModelId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No field models configured</span>
+							</div>
+						}
+					</div>
+				</app-setting-item>
+
+			</div>
+			<button class="btn-edit" (click)="onEditResources()">
+				<mat-icon>edit</mat-icon>
+				Edit Resources
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Appearance</h3>
+			<div class="settings-grid">
+
+				<app-setting-item label="Unit"
+																						[modified]="isFieldModified('unit')"
+																						[notConfigured]="!draftSection.unit">
+					@if (!draftSection.unit) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ draftSection.unit }}
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Color"
+																						[modified]="isFieldModified('color')"
+																						[notConfigured]="!draftSection.color">
+					@if (!draftSection.color) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="color-preview">
+							<span class="color-swatch" [style.background-color]="draftSection.color"></span>
+							{{ draftSection.color }}
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Stroke Color"
+																						[modified]="isFieldModified('strokeColor')"
+																						[notConfigured]="!draftSection.strokeColor">
+					@if (!draftSection.strokeColor) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						<div class="color-preview">
+							<span class="color-swatch" [style.background-color]="draftSection.strokeColor"></span>
+							{{ draftSection.strokeColor }}
+						</div>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Opacity"
+																						[modified]="isFieldModified('opacity')"
+																						[notConfigured]="draftSection.opacity === null || draftSection.opacity === undefined">
+					@if (draftSection.opacity === null || draftSection.opacity === undefined) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ draftSection.opacity }}
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Dashed"
+																						[modified]="isFieldModified('dashed')">
+					@if (draftSection.dashed) {
+						<span class="status-badge default">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Mark"
+																						[modified]="isFieldModified('mark')"
+																						[notConfigured]="!draftSection.mark">
+					@if (!draftSection.mark) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ draftSection.mark }}
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Hidden Legend"
+																						[modified]="isFieldModified('hiddenLegend')">
+					@if (draftSection.hiddenLegend) {
+						<span class="status-badge second">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Hidden"
+																						[modified]="isFieldModified('hidden')">
+					@if (draftSection.hidden) {
+						<span class="status-badge fourth">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Tooltip"
+																						[translated]="true"
+																						[modified]="isFieldModified('tooltip')"
+																						[notConfigured]="!languageService.getTranslatedValue(draftSection.tooltip)"
+																						[fullWidth]="true">
+					@if (!languageService.getTranslatedValue(draftSection.tooltip)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured for {{ languageService.getLanguageName(selectedLanguage) }}</span>
+					} @else {
+						<div style="white-space: pre-wrap">{{ languageService.getTranslatedValue(draftSection.tooltip) }}</div>
+					}
+				</app-setting-item>
+			</div>
+			<button class="btn-edit" (click)="onEditAppearance()">
+				<mat-icon>edit</mat-icon>
+				Edit Appearance
+			</button>
+		</div>
+
+		@if (showScale) {
+			<div class="settings-section">
+				<h3>Scale</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Minimum"
+																							[modified]="isFieldModified('scaleMin')"
+																							[notConfigured]="!draftSection.scaleMin">
+						@if (!draftSection.scaleMin) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.scaleMin }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Maximum"
+																							[modified]="isFieldModified('scaleMax')"
+																							[notConfigured]="!draftSection.scaleMax">
+						@if (!draftSection.scaleMax) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.scaleMax }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Number of Decimal Places"
+																							[modified]="isFieldModified('scaleDecimal')"
+																							[notConfigured]="!draftSection.scaleDecimal">
+						@if (!draftSection.scaleDecimal) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.scaleDecimal }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Mark interval"
+																							[modified]="isFieldModified('scaleMarkInterval')"
+																							[notConfigured]="!draftSection.scaleMarkInterval">
+						@if (!draftSection.scaleMarkInterval) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.scaleMarkInterval }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Label interval"
+																							[modified]="isFieldModified('scaleLabelInterval')"
+																							[notConfigured]="!draftSection.scaleLabelInterval">
+						@if (!draftSection.scaleLabelInterval) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.scaleLabelInterval }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Y-axis position"
+																							[modified]="isFieldModified('scalePosition')"
+																							[notConfigured]="!draftSection.scalePosition">
+						@if (!draftSection.scalePosition) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.scalePosition }}
+						}
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditScale()">
+					<mat-icon>edit</mat-icon>
+					Edit Scale
+				</button>
+			</div>
+		}
+
+		@if (showPosition) {
+			<div class="settings-section">
+				<h3>Position</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Beginning (in %)"
+																							[modified]="isFieldModified('positionStart')"
+																							[notConfigured]="!draftSection.positionStart">
+						@if (!draftSection.positionStart) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.positionStart }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="End (in %)"
+																							[modified]="isFieldModified('positionStop')"
+																							[notConfigured]="!draftSection.positionStop">
+						@if (!draftSection.positionStop) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftSection.positionStop }}
+						}
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditPosition()">
+					<mat-icon>edit</mat-icon>
+					Edit Position
+				</button>
+			</div>
+		}
+
+		<div class="settings-section">
+			<h3>
+				References
+				@if (isFieldModified('references')) {
+					<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+				}
+			</h3>
+
+			@if (!draftSection.references || draftSection.references.length === 0) {
+				<div class="relationship-box">
+					<div class="empty-message-centered">
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>No references configured</span>
+					</div>
+				</div>
+			} @else {
+				@for (ref of draftSection.references; track ref.graphReferenceId; let ri = $index) {
+					<div class="reference-detail-block">
+						<div class="reference-detail-header">
+            <span class="detail-code theme-timeline-graph-section">
+                {{ languageService.getTranslatedValue(ref.label) || 'Reference ' + (ri + 1) }}
+            </span>
+						</div>
+
+						<div class="settings-grid reference-detail-grid">
+							<app-setting-item label="Label"
+																									[modified]="isFieldModified('label')"
+																									[notConfigured]="!languageService.getTranslatedValue(ref.label)"
+																									[translated]="true">
+								@if (!languageService.getTranslatedValue(ref.label)) {
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ languageService.getTranslatedValue(ref.label) }}
+								}
+							</app-setting-item>
+
+							<app-setting-item label="Color"
+																									[modified]="isFieldModified('color')"
+																									[notConfigured]="!ref.color">
+								@if (!ref.color) {
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									<div class="color-preview">
+										<span class="color-swatch" [style.background-color]="ref.color"></span>
+										{{ ref.color }}
+									</div>
+								}
+							</app-setting-item>
+
+							<app-setting-item label="Dashed"
+																									[modified]="isFieldModified('dashed')">
+								@if (ref.dashed) {
+									<span class="status-badge default">Yes</span>
+								} @else {
+									<span class="status-badge">No</span>
+								}
+							</app-setting-item>
+
+							<app-setting-item label="Reference section"
+																									[notConfigured]="!ref.referenceSectionId">
+								@if (!ref.referenceSectionId) {
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									<div class="chip theme-timeline-graph-section">
+										<mat-icon class="resource-icon">bid_landscape</mat-icon>
+										<span class="language-name">{{ getSectionLabel(ref.referenceSectionId) }}</span>
+									</div>
+								}
+							</app-setting-item>
+
+								<app-setting-item label="Tooltip"
+																										[modified]="isFieldModified('tooltip')"
+																										[notConfigured]="!languageService.getTranslatedValue(ref.tooltip)"
+																										[translated]="true"
+																										[fullWidth]="true">
+									@if (!languageService.getTranslatedValue(ref.tooltip)) {
+										<mat-icon class="warning-icon">report</mat-icon>
+									}
+									<div style="white-space: pre-wrap">{{ languageService.getTranslatedValue(ref.tooltip) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}</div>
+								</app-setting-item>
+						</div>
+
+						@if (ref.entries && ref.entries.length > 0) {
+							<table class="ranges-detail-table">
+								<thead>
+								<tr>
+									<th>Time point</th>
+									<th>Value</th>
+									<th>Label</th>
+								</tr>
+								</thead>
+								<tbody>
+									@for (entry of ref.entries; track entry.sortOrder) {
+										<tr>
+											<td>
+												<span class="detail-code theme-timeline-graph-section timepoint-code">
+													{{ entry.timepoint }}
+												</span>
+											</td>
+											<td>{{ entry.value ?? '—' }}</td>
+											<td>{{ entry.label || '—' }}</td>
+										</tr>
+									}
+								</tbody>
+							</table>
+						} @else {
+							<p class="empty-message-centered">No entries</p>
+						}
+					</div>
+				}
+			}
+
+			<button class="btn-edit" style="margin-top: 1rem" (click)="onEditReference()">
+				<mat-icon>edit</mat-icon>
+				Edit References
+			</button>
+		</div>
+
+		<app-danger-zone
+			[title]="'Delete Timeline Graph Section'"
+			[message]="'Deleting this section is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
+	</div>
+}

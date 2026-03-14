@@ -251,6 +251,7 @@
 	flex-direction: column;
 	height: 200px;
 	position: relative;
+	overflow: hidden;
 }
 
 .primary-card:hover,
@@ -561,11 +562,14 @@
 	padding-bottom: 0.75rem;
 	border-bottom: 1px solid #e5e7eb;
 	gap: 0.5rem;
+	min-width: 0;
+	overflow: hidden;
 }
 
 .card-info {
 	flex: 1;
 	min-width: 0;
+	overflow: hidden;
 }
 
 .card-info h3 {
@@ -573,6 +577,9 @@
 	font-size: 1.125rem;
 	font-weight: 600;
 	color: #111827;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .card-code {
@@ -580,6 +587,9 @@
 	font-size: 0.875rem;
 	color: #6b7280;
 	font-family: monospace;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .card-header-badges {

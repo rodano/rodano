@@ -207,241 +207,255 @@ public class TimelineGraphSectionRecord extends UpdatableRecordImpl<TimelineGrap
 	}
 
 	/**
+	 * Setter for <code>timeline_graph_section.unit</code>.
+	 */
+	public void setUnit(String value) {
+		set(13, value);
+	}
+
+	/**
+	 * Getter for <code>timeline_graph_section.unit</code>.
+	 */
+	public String getUnit() {
+		return (String) get(13);
+	}
+
+	/**
 	 * Setter for <code>timeline_graph_section.color</code>.
 	 */
 	public void setColor(String value) {
-		set(13, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.color</code>.
 	 */
 	public String getColor() {
-		return (String) get(13);
+		return (String) get(14);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.stroke_color</code>.
 	 */
 	public void setStrokeColor(String value) {
-		set(14, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.stroke_color</code>.
 	 */
 	public String getStrokeColor() {
-		return (String) get(14);
+		return (String) get(15);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.opacity</code>.
 	 */
 	public void setOpacity(BigDecimal value) {
-		set(15, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.opacity</code>.
 	 */
 	public BigDecimal getOpacity() {
-		return (BigDecimal) get(15);
+		return (BigDecimal) get(16);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.dashed</code>.
 	 */
 	public void setDashed(Boolean value) {
-		set(16, value);
+		set(17, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.dashed</code>.
 	 */
 	public Boolean getDashed() {
-		return (Boolean) get(16);
+		return (Boolean) get(17);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.mark</code>.
 	 */
 	public void setMark(TimelineGraphSectionMark value) {
-		set(17, value);
+		set(18, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.mark</code>.
 	 */
 	public TimelineGraphSectionMark getMark() {
-		return (TimelineGraphSectionMark) get(17);
+		return (TimelineGraphSectionMark) get(18);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.position_start</code>.
 	 */
 	public void setPositionStart(Integer value) {
-		set(18, value);
+		set(19, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.position_start</code>.
 	 */
 	public Integer getPositionStart() {
-		return (Integer) get(18);
+		return (Integer) get(19);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.position_stop</code>.
 	 */
 	public void setPositionStop(Integer value) {
-		set(19, value);
+		set(20, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.position_stop</code>.
 	 */
 	public Integer getPositionStop() {
-		return (Integer) get(19);
+		return (Integer) get(20);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.scale_min</code>.
 	 */
 	public void setScaleMin(BigDecimal value) {
-		set(20, value);
+		set(21, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.scale_min</code>.
 	 */
 	public BigDecimal getScaleMin() {
-		return (BigDecimal) get(20);
+		return (BigDecimal) get(21);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.scale_max</code>.
 	 */
 	public void setScaleMax(BigDecimal value) {
-		set(21, value);
+		set(22, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.scale_max</code>.
 	 */
 	public BigDecimal getScaleMax() {
-		return (BigDecimal) get(21);
+		return (BigDecimal) get(22);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.scale_decimal</code>.
 	 */
 	public void setScaleDecimal(Integer value) {
-		set(22, value);
+		set(23, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.scale_decimal</code>.
 	 */
 	public Integer getScaleDecimal() {
-		return (Integer) get(22);
+		return (Integer) get(23);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.scale_mark_interval</code>.
 	 */
 	public void setScaleMarkInterval(BigDecimal value) {
-		set(23, value);
+		set(24, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.scale_mark_interval</code>.
 	 */
 	public BigDecimal getScaleMarkInterval() {
-		return (BigDecimal) get(23);
+		return (BigDecimal) get(24);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.scale_label_interval</code>.
 	 */
 	public void setScaleLabelInterval(BigDecimal value) {
-		set(24, value);
+		set(25, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.scale_label_interval</code>.
 	 */
 	public BigDecimal getScaleLabelInterval() {
-		return (BigDecimal) get(24);
+		return (BigDecimal) get(25);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.scale_position</code>.
 	 */
 	public void setScalePosition(TimelineGraphSectionScalePosition value) {
-		set(25, value);
+		set(26, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.scale_position</code>.
 	 */
 	public TimelineGraphSectionScalePosition getScalePosition() {
-		return (TimelineGraphSectionScalePosition) get(25);
+		return (TimelineGraphSectionScalePosition) get(26);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.hidden_legend</code>.
 	 */
 	public void setHiddenLegend(Boolean value) {
-		set(26, value);
+		set(27, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.hidden_legend</code>.
 	 */
 	public Boolean getHiddenLegend() {
-		return (Boolean) get(26);
+		return (Boolean) get(27);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.hidden</code>.
 	 */
 	public void setHidden(Boolean value) {
-		set(27, value);
+		set(28, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.hidden</code>.
 	 */
 	public Boolean getHidden() {
-		return (Boolean) get(27);
+		return (Boolean) get(28);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.label</code>.
 	 */
 	public void setLabel(String value) {
-		set(28, value);
+		set(29, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.label</code>.
 	 */
 	public String getLabel() {
-		return (String) get(28);
+		return (String) get(29);
 	}
 
 	/**
 	 * Setter for <code>timeline_graph_section.tooltip</code>.
 	 */
 	public void setTooltip(String value) {
-		set(29, value);
+		set(30, value);
 	}
 
 	/**
 	 * Getter for <code>timeline_graph_section.tooltip</code>.
 	 */
 	public String getTooltip() {
-		return (String) get(29);
+		return (String) get(30);
 	}
 
 	// -------------------------------------------------------------------------
@@ -467,7 +481,7 @@ public class TimelineGraphSectionRecord extends UpdatableRecordImpl<TimelineGrap
 	/**
 	 * Create a detached, initialised TimelineGraphSectionRecord
 	 */
-	public TimelineGraphSectionRecord(UUID graphSectionId, UUID projectId, UUID timelineGraphId, String code, TimelineGraphSectionType type, UUID datasetModelId, UUID dateFieldId, UUID endDateFieldId, UUID labelFieldId, UUID valueFieldId, Boolean hideExpectedEvent, Boolean hideDoneEvent, Boolean useScopePaths, String color, String strokeColor, BigDecimal opacity, Boolean dashed, TimelineGraphSectionMark mark, Integer positionStart, Integer positionStop, BigDecimal scaleMin, BigDecimal scaleMax, Integer scaleDecimal, BigDecimal scaleMarkInterval, BigDecimal scaleLabelInterval, TimelineGraphSectionScalePosition scalePosition, Boolean hiddenLegend, Boolean hidden, String label, String tooltip) {
+	public TimelineGraphSectionRecord(UUID graphSectionId, UUID projectId, UUID timelineGraphId, String code, TimelineGraphSectionType type, UUID datasetModelId, UUID dateFieldId, UUID endDateFieldId, UUID labelFieldId, UUID valueFieldId, Boolean hideExpectedEvent, Boolean hideDoneEvent, Boolean useScopePaths, String unit, String color, String strokeColor, BigDecimal opacity, Boolean dashed, TimelineGraphSectionMark mark, Integer positionStart, Integer positionStop, BigDecimal scaleMin, BigDecimal scaleMax, Integer scaleDecimal, BigDecimal scaleMarkInterval, BigDecimal scaleLabelInterval, TimelineGraphSectionScalePosition scalePosition, Boolean hiddenLegend, Boolean hidden, String label, String tooltip) {
 		super(TimelineGraphSection.TIMELINE_GRAPH_SECTION);
 
 		setGraphSectionId(graphSectionId);
@@ -483,6 +497,7 @@ public class TimelineGraphSectionRecord extends UpdatableRecordImpl<TimelineGrap
 		setHideExpectedEvent(hideExpectedEvent);
 		setHideDoneEvent(hideDoneEvent);
 		setUseScopePaths(useScopePaths);
+		setUnit(unit);
 		setColor(color);
 		setStrokeColor(strokeColor);
 		setOpacity(opacity);

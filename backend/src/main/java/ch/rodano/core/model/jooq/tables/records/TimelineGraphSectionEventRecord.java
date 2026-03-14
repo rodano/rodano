@@ -76,20 +76,6 @@ public class TimelineGraphSectionEventRecord extends UpdatableRecordImpl<Timelin
 		return (UUID) get(3);
 	}
 
-	/**
-	 * Setter for <code>timeline_graph_section_event.sort_order</code>.
-	 */
-	public void setSortOrder(Integer value) {
-		set(4, value);
-	}
-
-	/**
-	 * Getter for <code>timeline_graph_section_event.sort_order</code>.
-	 */
-	public Integer getSortOrder() {
-		return (Integer) get(4);
-	}
-
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -113,14 +99,13 @@ public class TimelineGraphSectionEventRecord extends UpdatableRecordImpl<Timelin
 	/**
 	 * Create a detached, initialised TimelineGraphSectionEventRecord
 	 */
-	public TimelineGraphSectionEventRecord(UUID projectId, UUID timelineGraphId, UUID graphSectionId, UUID eventModelId, Integer sortOrder) {
+	public TimelineGraphSectionEventRecord(UUID projectId, UUID timelineGraphId, UUID graphSectionId, UUID eventModelId) {
 		super(TimelineGraphSectionEvent.TIMELINE_GRAPH_SECTION_EVENT);
 
 		setProjectId(projectId);
 		setTimelineGraphId(timelineGraphId);
 		setGraphSectionId(graphSectionId);
 		setEventModelId(eventModelId);
-		setSortOrder(sortOrder);
 		resetChangedOnNotNull();
 	}
 }

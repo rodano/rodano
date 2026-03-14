@@ -261,7 +261,8 @@ alter table report_field
 
 alter table timeline_graph
 	add constraint fk_timeline_graph_scope_model foreign key (project_id, scope_model_id) references scope_model (project_id, scope_model_id),
-	add constraint fk_timeline_graph_event_model foreign key (project_id, study_start_event_model_id) references event_model (project_id, event_model_id);
+	add constraint fk_timeline_graph_start_event_model foreign key (project_id, study_start_event_model_id) references event_model (project_id, event_model_id),
+    add constraint fk_timeline_graph_end_event_model foreign key (project_id, study_end_event_model_id) references event_model (project_id, event_model_id);
 
 alter table timeline_graph_section
 	add constraint fk_timeline_graph_section_graph foreign key (project_id, timeline_graph_id) references timeline_graph (project_id, timeline_graph_id),

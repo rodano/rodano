@@ -90,9 +90,19 @@ public class TimelineGraph extends TableImpl<TimelineGraphRecord> {
 	public final TableField<TimelineGraphRecord, UUID> STUDY_START_EVENT_MODEL_ID = createField(DSL.name("study_start_event_model_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
 	/**
+	 * The column <code>timeline_graph.study_end_event_model_id</code>.
+	 */
+	public final TableField<TimelineGraphRecord, UUID> STUDY_END_EVENT_MODEL_ID = createField(DSL.name("study_end_event_model_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
+
+	/**
 	 * The column <code>timeline_graph.study_period_is_default</code>.
 	 */
 	public final TableField<TimelineGraphRecord, Boolean> STUDY_PERIOD_IS_DEFAULT = createField(DSL.name("study_period_is_default"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+
+	/**
+	 * The column <code>timeline_graph.width</code>.
+	 */
+	public final TableField<TimelineGraphRecord, Integer> WIDTH = createField(DSL.name("width"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
 	/**
 	 * The column <code>timeline_graph.height</code>.
@@ -218,19 +228,20 @@ public class TimelineGraph extends TableImpl<TimelineGraphRecord> {
 
 	@Override
 	public List<ForeignKey<TimelineGraphRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_EVENT_MODEL, Keys.FK_TIMELINE_GRAPH_SCOPE_MODEL);
+		return Arrays.asList(Keys.FK_TIMELINE_GRAPH_END_EVENT_MODEL, Keys.FK_TIMELINE_GRAPH_SCOPE_MODEL, Keys.FK_TIMELINE_GRAPH_START_EVENT_MODEL);
 	}
 
-	private transient EventModelPath _eventModel;
+	private transient EventModelPath _fkTimelineGraphEndEventModel;
 
 	/**
-	 * Get the implicit join path to the <code>event_model</code> table.
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_timeline_graph_end_event_model</code> key.
 	 */
-	public EventModelPath eventModel() {
-		if (_eventModel == null)
-			_eventModel = new EventModelPath(this, Keys.FK_TIMELINE_GRAPH_EVENT_MODEL, null);
+	public EventModelPath fkTimelineGraphEndEventModel() {
+		if (_fkTimelineGraphEndEventModel == null)
+			_fkTimelineGraphEndEventModel = new EventModelPath(this, Keys.FK_TIMELINE_GRAPH_END_EVENT_MODEL, null);
 
-		return _eventModel;
+		return _fkTimelineGraphEndEventModel;
 	}
 
 	private transient ScopeModelPath _scopeModel;
@@ -243,6 +254,19 @@ public class TimelineGraph extends TableImpl<TimelineGraphRecord> {
 			_scopeModel = new ScopeModelPath(this, Keys.FK_TIMELINE_GRAPH_SCOPE_MODEL, null);
 
 		return _scopeModel;
+	}
+
+	private transient EventModelPath _fkTimelineGraphStartEventModel;
+
+	/**
+	 * Get the implicit join path to the <code>event_model</code> table, via the
+	 * <code>fk_timeline_graph_start_event_model</code> key.
+	 */
+	public EventModelPath fkTimelineGraphStartEventModel() {
+		if (_fkTimelineGraphStartEventModel == null)
+			_fkTimelineGraphStartEventModel = new EventModelPath(this, Keys.FK_TIMELINE_GRAPH_START_EVENT_MODEL, null);
+
+		return _fkTimelineGraphStartEventModel;
 	}
 
 	private transient ProfileTimelineGraphGrantsPath _profileTimelineGraphGrants;

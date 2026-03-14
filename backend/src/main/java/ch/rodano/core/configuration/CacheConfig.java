@@ -69,7 +69,12 @@ public class CacheConfig {
 			"formModels",
 			"formModel",
 			"layouts",
-			"layout"
+			"layout",
+
+			"timelineGraphs",
+			"timelineGraph",
+			"timelineGraphSections",
+			"timelineGraphSection"
 		);
 	}
 }

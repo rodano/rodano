@@ -51,6 +51,7 @@ public class TimelineGraphWriter extends BaseWriter {
 
 				final UUID scopeModelId = resolveScopeModelId(tx, projectId, graph.getScopeModelId());
 				final UUID studyStartEventModelId = resolveEventModelId(tx, projectId, graph.getStudyStartEventModelId());
+				final UUID studyEndEventModelId = resolveEventModelId(tx, projectId, graph.getStudyEndEventModelId());
 
 				tx.insertInto(TIMELINE_GRAPH)
 					.set(TIMELINE_GRAPH.PROJECT_ID, projectId)
@@ -58,7 +59,9 @@ public class TimelineGraphWriter extends BaseWriter {
 					.set(TIMELINE_GRAPH.CODE, graphCode)
 					.set(TIMELINE_GRAPH.SCOPE_MODEL_ID, scopeModelId)
 					.set(TIMELINE_GRAPH.STUDY_START_EVENT_MODEL_ID, studyStartEventModelId)
+					.set(TIMELINE_GRAPH.STUDY_END_EVENT_MODEL_ID, studyEndEventModelId)
 					.set(TIMELINE_GRAPH.STUDY_PERIOD_IS_DEFAULT, graph.getStudyPeriodIsDefault())
+					.set(TIMELINE_GRAPH.WIDTH, graph.getWidth())
 					.set(TIMELINE_GRAPH.HEIGHT, graph.getHeight())
 					.set(TIMELINE_GRAPH.LEGEND_WIDTH, graph.getLegendWidth())
 					.set(TIMELINE_GRAPH.SCROLLER_HEIGHT, graph.getScrollerHeight())
@@ -70,7 +73,9 @@ public class TimelineGraphWriter extends BaseWriter {
 					.onDuplicateKeyUpdate()
 					.set(TIMELINE_GRAPH.SCOPE_MODEL_ID, scopeModelId)
 					.set(TIMELINE_GRAPH.STUDY_START_EVENT_MODEL_ID, studyStartEventModelId)
+					.set(TIMELINE_GRAPH.STUDY_END_EVENT_MODEL_ID, studyEndEventModelId)
 					.set(TIMELINE_GRAPH.STUDY_PERIOD_IS_DEFAULT, graph.getStudyPeriodIsDefault())
+					.set(TIMELINE_GRAPH.WIDTH, graph.getWidth())
 					.set(TIMELINE_GRAPH.HEIGHT, graph.getHeight())
 					.set(TIMELINE_GRAPH.LEGEND_WIDTH, graph.getLegendWidth())
 					.set(TIMELINE_GRAPH.SCROLLER_HEIGHT, graph.getScrollerHeight())
@@ -118,6 +123,7 @@ public class TimelineGraphWriter extends BaseWriter {
 							.set(TIMELINE_GRAPH_SECTION.HIDE_EXPECTED_EVENT, section.getHideExpectedEvent())
 							.set(TIMELINE_GRAPH_SECTION.HIDE_DONE_EVENT, section.getHideDoneEvent())
 							.set(TIMELINE_GRAPH_SECTION.USE_SCOPE_PATHS, section.getUseScopePaths())
+							.set(TIMELINE_GRAPH_SECTION.UNIT, section.getUnit())
 							.set(TIMELINE_GRAPH_SECTION.COLOR, section.getColor())
 							.set(TIMELINE_GRAPH_SECTION.STROKE_COLOR, section.getStrokeColor())
 							.set(TIMELINE_GRAPH_SECTION.OPACITY, section.getOpacity())
@@ -145,6 +151,7 @@ public class TimelineGraphWriter extends BaseWriter {
 							.set(TIMELINE_GRAPH_SECTION.HIDE_EXPECTED_EVENT, section.getHideExpectedEvent())
 							.set(TIMELINE_GRAPH_SECTION.HIDE_DONE_EVENT, section.getHideDoneEvent())
 							.set(TIMELINE_GRAPH_SECTION.USE_SCOPE_PATHS, section.getUseScopePaths())
+							.set(TIMELINE_GRAPH_SECTION.UNIT, section.getUnit())
 							.set(TIMELINE_GRAPH_SECTION.COLOR, section.getColor())
 							.set(TIMELINE_GRAPH_SECTION.STROKE_COLOR, section.getStrokeColor())
 							.set(TIMELINE_GRAPH_SECTION.OPACITY, section.getOpacity())
@@ -165,7 +172,6 @@ public class TimelineGraphWriter extends BaseWriter {
 							.execute();
 
 						if(section.getEventModelIds() != null && !section.getEventModelIds().isEmpty()) {
-							int evOrder = 0;
 							for(String eventCode : section.getEventModelIds()) {
 								final UUID eventId = resolveEventModelId(tx, projectId, eventCode);
 								if(eventId == null) {
@@ -178,15 +184,12 @@ public class TimelineGraphWriter extends BaseWriter {
 									.set(TIMELINE_GRAPH_SECTION_EVENT.TIMELINE_GRAPH_ID, graphId)
 									.set(TIMELINE_GRAPH_SECTION_EVENT.GRAPH_SECTION_ID, sectionId)
 									.set(TIMELINE_GRAPH_SECTION_EVENT.EVENT_MODEL_ID, eventId)
-									.set(TIMELINE_GRAPH_SECTION_EVENT.SORT_ORDER, evOrder++)
-									.onDuplicateKeyUpdate()
-									.set(TIMELINE_GRAPH_SECTION_EVENT.SORT_ORDER, evOrder - 1)
+									.onDuplicateKeyIgnore()
 									.execute();
 							}
 						}
 
 						if(section.getMetaFieldModelIds() != null && !section.getMetaFieldModelIds().isEmpty()) {
-							int mfOrder = 0;
 							for(String fieldCode : section.getMetaFieldModelIds()) {
 								final UUID fieldId = resolveFieldModelId(tx, projectId, datasetModelId, fieldCode);
 								tx.insertInto(TIMELINE_GRAPH_SECTION_META_FIELD)
@@ -194,9 +197,7 @@ public class TimelineGraphWriter extends BaseWriter {
 									.set(TIMELINE_GRAPH_SECTION_META_FIELD.TIMELINE_GRAPH_ID, graphId)
 									.set(TIMELINE_GRAPH_SECTION_META_FIELD.GRAPH_SECTION_ID, sectionId)
 									.set(TIMELINE_GRAPH_SECTION_META_FIELD.FIELD_MODEL_ID, fieldId)
-									.set(TIMELINE_GRAPH_SECTION_META_FIELD.SORT_ORDER, mfOrder++)
-									.onDuplicateKeyUpdate()
-									.set(TIMELINE_GRAPH_SECTION_META_FIELD.SORT_ORDER, mfOrder - 1)
+									.onDuplicateKeyIgnore()
 									.execute();
 							}
 						}

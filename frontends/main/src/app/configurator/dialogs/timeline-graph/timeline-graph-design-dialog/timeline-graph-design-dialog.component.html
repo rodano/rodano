@@ -1,0 +1,59 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Design</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+
+			<div class="form-field">
+				<label>Width</label>
+				<input
+					type="number"
+					formControlName="width"
+					placeholder="0">
+				<span class="hint">Determines the width of the graph</span>
+			</div>
+
+			<div class="form-field">
+				<label>Height</label>
+				<input
+					type="number"
+					formControlName="height"
+					placeholder="0">
+				<span class="hint">Determines the height of the graph</span>
+			</div>
+
+			<div class="form-field">
+				<label>Legend Width</label>
+				<input
+					type="number"
+					formControlName="legendWidth"
+					placeholder="0">
+				<span class="hint">Determines the width of the graph legend</span>
+			</div>
+
+			<div class="form-field">
+				<label>Scroller Height</label>
+				<input
+					type="number"
+					formControlName="scrollerHeight"
+					placeholder="0">
+				<span class="hint">Determines the height of the graph scroller</span>
+			</div>
+
+			<div class="form-field">
+				<mat-checkbox formControlName="showScroller">Show Scroller</mat-checkbox>
+				<span class="hint">Check this to show the scroller</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!form.valid">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>

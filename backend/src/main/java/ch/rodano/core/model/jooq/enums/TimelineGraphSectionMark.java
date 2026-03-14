@@ -19,6 +19,10 @@ public enum TimelineGraphSectionMark implements EnumType {
 
 	SQUARE("SQUARE"),
 
+	CROSS("CROSS"),
+
+	TRIANGLE("TRIANGLE"),
+
 	DIAMOND("DIAMOND");
 
 	private final String literal;

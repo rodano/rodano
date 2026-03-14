@@ -113,6 +113,16 @@
 	--entity-highlight: rgba(192, 115, 213, 0.12);
 }
 
+.theme-timeline-graph {
+	--entity-color: #9cb355;
+	--entity-highlight: rgba(156, 179, 85, 0.12);
+}
+
+.theme-timeline-graph-section {
+	--entity-color: #508534;
+	--entity-highlight: rgba(80, 133, 52, 0.12);
+}
+
 .theme-cron {
 	--entity-color: #475569;
 	--entity-highlight: rgba(71, 85, 105, 0.12);

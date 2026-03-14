@@ -1,0 +1,40 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Scale</h2>
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Minimum</label>
+				<input type="number" formControlName="scaleMin" step="any">
+			</div>
+			<div class="form-field">
+				<label>Maximum</label>
+				<input type="number" formControlName="scaleMax" step="any">
+			</div>
+			<div class="form-field">
+				<label>Number of Decimal Places</label>
+				<input type="number" formControlName="scaleDecimal" min="0" step="1">
+			</div>
+			<div class="form-field">
+				<label>Mark Interval (every...)</label>
+				<input type="number" formControlName="scaleMarkInterval" step="any">
+			</div>
+			<div class="form-field">
+				<label>Label Interval (every...)</label>
+				<input type="number" formControlName="scaleLabelInterval" step="any">
+			</div>
+			<div class="form-field">
+				<label>Y-Axis Position</label>
+				<mat-select formControlName="scalePosition" placeholder="None">
+					<mat-option [value]="null">None</mat-option>
+					@for (option of scalePositionOptions; track option.value) {
+						<mat-option [value]="option.value">{{ option.label }}</mat-option>
+					}
+				</mat-select>
+			</div>
+		</form>
+	</div>
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

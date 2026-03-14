@@ -76,20 +76,6 @@ public class TimelineGraphSectionMetaFieldRecord extends UpdatableRecordImpl<Tim
 		return (UUID) get(3);
 	}
 
-	/**
-	 * Setter for <code>timeline_graph_section_meta_field.sort_order</code>.
-	 */
-	public void setSortOrder(Integer value) {
-		set(4, value);
-	}
-
-	/**
-	 * Getter for <code>timeline_graph_section_meta_field.sort_order</code>.
-	 */
-	public Integer getSortOrder() {
-		return (Integer) get(4);
-	}
-
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -113,14 +99,13 @@ public class TimelineGraphSectionMetaFieldRecord extends UpdatableRecordImpl<Tim
 	/**
 	 * Create a detached, initialised TimelineGraphSectionMetaFieldRecord
 	 */
-	public TimelineGraphSectionMetaFieldRecord(UUID projectId, UUID timelineGraphId, UUID graphSectionId, UUID fieldModelId, Integer sortOrder) {
+	public TimelineGraphSectionMetaFieldRecord(UUID projectId, UUID timelineGraphId, UUID graphSectionId, UUID fieldModelId) {
 		super(TimelineGraphSectionMetaField.TIMELINE_GRAPH_SECTION_META_FIELD);
 
 		setProjectId(projectId);
 		setTimelineGraphId(timelineGraphId);
 		setGraphSectionId(graphSectionId);
 		setFieldModelId(fieldModelId);
-		setSortOrder(sortOrder);
 		resetChangedOnNotNull();
 	}
 }

@@ -16,8 +16,10 @@ public class TimelineGraph {
 
 	private String scopeModelId;
 	private String studyStartEventModelId;
+	private String studyEndEventModelId;
 
 	private Boolean studyPeriodIsDefault;
+	private Integer width;
 	private Integer height;
 	private Integer legendWidth;
 	private Integer scrollerHeight;
@@ -81,12 +83,28 @@ public class TimelineGraph {
 		this.studyStartEventModelId = studyStartEventModelId;
 	}
 
+	public String getStudyEndEventModelId() {
+		return studyEndEventModelId;
+	}
+
+	public void setStudyEndEventModelId(final String studyEndEventModelId) {
+		this.studyEndEventModelId = studyEndEventModelId;
+	}
+
 	public Boolean getStudyPeriodIsDefault() {
 		return studyPeriodIsDefault;
 	}
 
 	public void setStudyPeriodIsDefault(final Boolean studyPeriodIsDefault) {
 		this.studyPeriodIsDefault = studyPeriodIsDefault;
+	}
+
+	public Integer getWidth() {
+		return width;
+	}
+
+	public void setWidth(final Integer width) {
+		this.width = width;
 	}
 
 	public Integer getHeight() {
@@ -139,7 +157,9 @@ public class TimelineGraph {
 			", footnote=" + footnote +
 			", scopeModelId='" + scopeModelId + '\'' +
 			", studyStartEventModelId='" + studyStartEventModelId + '\'' +
+			", studyEndEventModelId='" + studyEndEventModelId + '\'' +
 			", studyPeriodIsDefault=" + studyPeriodIsDefault +
+			", width=" + width +
 			", height=" + height +
 			", legendWidth=" + legendWidth +
 			", scrollerHeight=" + scrollerHeight +

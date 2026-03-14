@@ -471,16 +471,17 @@ public class EventModel extends TableImpl<EventModelRecord> {
 		return _profileEventModelRights;
 	}
 
-	private transient TimelineGraphPath _timelineGraph;
+	private transient TimelineGraphPath _fkTimelineGraphEndEventModel;
 
 	/**
-	 * Get the implicit to-many join path to the <code>timeline_graph</code> table
+	 * Get the implicit to-many join path to the <code>timeline_graph</code> table,
+	 * via the <code>fk_timeline_graph_end_event_model</code> key
 	 */
-	public TimelineGraphPath timelineGraph() {
-		if (_timelineGraph == null)
-			_timelineGraph = new TimelineGraphPath(this, null, Keys.FK_TIMELINE_GRAPH_EVENT_MODEL.getInverseKey());
+	public TimelineGraphPath fkTimelineGraphEndEventModel() {
+		if (_fkTimelineGraphEndEventModel == null)
+			_fkTimelineGraphEndEventModel = new TimelineGraphPath(this, null, Keys.FK_TIMELINE_GRAPH_END_EVENT_MODEL.getInverseKey());
 
-		return _timelineGraph;
+		return _fkTimelineGraphEndEventModel;
 	}
 
 	private transient TimelineGraphSectionEventPath _timelineGraphSectionEvent;
@@ -494,6 +495,19 @@ public class EventModel extends TableImpl<EventModelRecord> {
 			_timelineGraphSectionEvent = new TimelineGraphSectionEventPath(this, null, Keys.FK_TIMELINE_GRAPH_SECTION_EVENT_MODEL.getInverseKey());
 
 		return _timelineGraphSectionEvent;
+	}
+
+	private transient TimelineGraphPath _fkTimelineGraphStartEventModel;
+
+	/**
+	 * Get the implicit to-many join path to the <code>timeline_graph</code> table,
+	 * via the <code>fk_timeline_graph_start_event_model</code> key
+	 */
+	public TimelineGraphPath fkTimelineGraphStartEventModel() {
+		if (_fkTimelineGraphStartEventModel == null)
+			_fkTimelineGraphStartEventModel = new TimelineGraphPath(this, null, Keys.FK_TIMELINE_GRAPH_START_EVENT_MODEL.getInverseKey());
+
+		return _fkTimelineGraphStartEventModel;
 	}
 
 	private transient WorkflowSummaryFilterEventModelPath _workflowSummaryFilterEventModel;

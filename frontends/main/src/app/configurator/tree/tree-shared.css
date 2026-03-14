@@ -21,7 +21,8 @@
 .tree-content {
 	flex: 1;
 	padding: 0.5rem;
-	overflow: hidden;
+	overflow-x: hidden;
+	overflow-y: auto;
 }
 
 .tree-node {
@@ -38,6 +39,8 @@
 	user-select: none;
 	font-size: 0.9375rem;
 	font-weight: 600;
+	overflow: hidden;
+	min-width: 0;
 }
 
 .node-content:hover {
@@ -64,6 +67,7 @@
 	height: 1.25rem !important;
 	margin-right: 0.75rem;
 	color: var(--entity-color) !important;
+	flex-shrink: 0;
 }
 
 .node-content.selected .node-icon {
@@ -74,6 +78,10 @@
 	font-size: 0.9375rem;
 	color: #111827;
 	font-weight: 600;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 
 .node-children {
@@ -103,6 +111,8 @@
 	position: relative;
 	font-size: 0.875rem;
 	margin-bottom: 0.125rem;
+	overflow: hidden;
+	min-width: 0;
 }
 
 .node::before {
@@ -136,6 +146,7 @@
 	height: 0.875rem !important;
 	margin-right: 0.625rem;
 	color: var(--entity-color) !important;
+	flex-shrink: 0;
 }
 
 .node.selected .node-icon {
@@ -145,6 +156,10 @@
 .node .node-label {
 	font-size: 0.875rem;
 	color: #374151;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	min-width: 0;
 }
 
 .node.selected .node-label {

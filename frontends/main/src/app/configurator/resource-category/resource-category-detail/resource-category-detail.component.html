@@ -36,10 +36,15 @@
 			<app-setting-item label="Color"
 																					[modified]="isFieldModified('color')"
 																					[notConfigured]="!resourceCategory.color">
-				<div class="setting-value color-preview">
-					<span class="color-swatch" [style.background-color]="resourceCategory.color"></span>
-					{{ resourceCategory.color }}
-				</div>
+				@if (!resourceCategory.color) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="setting-value color-preview">
+						<span class="color-swatch" [style.background-color]="resourceCategory.color"></span>
+						{{ resourceCategory.color }}
+					</div>
+				}
 			</app-setting-item>
 
 			<app-setting-item label="Short Name"

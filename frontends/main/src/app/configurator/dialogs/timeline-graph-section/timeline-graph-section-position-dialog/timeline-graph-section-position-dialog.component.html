@@ -1,0 +1,19 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Position</h2>
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Beginning (in %)</label>
+				<input type="number" formControlName="positionStart" min="0" max="100" step="1">
+			</div>
+			<div class="form-field">
+				<label>End (in %)</label>
+				<input type="number" formControlName="positionStop" min="0" max="100" step="1">
+			</div>
+		</form>
+	</div>
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

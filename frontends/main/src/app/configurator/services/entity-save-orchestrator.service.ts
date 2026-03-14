@@ -13,6 +13,7 @@ import {ResourceCategoryContext} from './contexts/resource-category-context';
 import {ReportContext} from './contexts/report-context';
 import {ChartContext} from './contexts/chart-context';
 import {FormModelContext} from './contexts/form-model-context';
+import {TimelineGraphContext} from './contexts/timeline-graph-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -253,6 +254,30 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveTimelineGraphs(projectId: string, context: TimelineGraphContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveTimelineGraphs(
+				projectId,
+				context.modifiedTimelineGraphIds,
+				context.timelineGraphs,
+				context.originalTimelineGraphs
+			),
+			this.draftSaveService.saveSections(
+				projectId,
+				context.modifiedTimelineGraphSections,
+				context.timelineGraphSections
+			)
+		]).pipe(
+			map(() => {
+				context.timelineGraphManager.syncOriginalsWithCurrent();
+				context.timelineGraphSectionManager.syncOriginalsWithCurrent();
+
+				context.timelineGraphManager.invalidate();
+				context.timelineGraphSectionManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -328,5 +353,13 @@ export class EntitySaveOrchestratorService {
 		context.formModelManager.invalidate();
 		context.formLayoutManager.resetToOriginals();
 		context.formLayoutManager.invalidate();
+	}
+
+	resetTimelineGraphsToOriginals(context: TimelineGraphContext): void {
+		context.timelineGraphManager.resetToOriginals();
+		context.timelineGraphSectionManager.resetToOriginals();
+
+		context.timelineGraphManager.invalidate();
+		context.timelineGraphSectionManager.invalidate();
 	}
 }

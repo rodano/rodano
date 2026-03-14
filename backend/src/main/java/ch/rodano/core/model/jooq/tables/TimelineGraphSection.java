@@ -136,6 +136,11 @@ public class TimelineGraphSection extends TableImpl<TimelineGraphSectionRecord> 
 	public final TableField<TimelineGraphSectionRecord, Boolean> USE_SCOPE_PATHS = createField(DSL.name("use_scope_paths"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
+	 * The column <code>timeline_graph_section.unit</code>.
+	 */
+	public final TableField<TimelineGraphSectionRecord, String> UNIT = createField(DSL.name("unit"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
 	 * The column <code>timeline_graph_section.color</code>.
 	 */
 	public final TableField<TimelineGraphSectionRecord, String> COLOR = createField(DSL.name("color"), SQLDataType.VARCHAR(16).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
@@ -158,7 +163,7 @@ public class TimelineGraphSection extends TableImpl<TimelineGraphSectionRecord> 
 	/**
 	 * The column <code>timeline_graph_section.mark</code>.
 	 */
-	public final TableField<TimelineGraphSectionRecord, TimelineGraphSectionMark> MARK = createField(DSL.name("mark"), SQLDataType.VARCHAR(7).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)).asEnumDataType(TimelineGraphSectionMark.class), this, "");
+	public final TableField<TimelineGraphSectionRecord, TimelineGraphSectionMark> MARK = createField(DSL.name("mark"), SQLDataType.VARCHAR(8).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)).asEnumDataType(TimelineGraphSectionMark.class), this, "");
 
 	/**
 	 * The column <code>timeline_graph_section.position_start</code>.

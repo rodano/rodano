@@ -21,7 +21,11 @@ public enum TimelineGraphSectionType implements EnumType {
 
 	DATE("DATE"),
 
-	LINE("LINE");
+	LINE("LINE"),
+
+	DOT("DOT"),
+
+	BAR("BAR");
 
 	private final String literal;
 

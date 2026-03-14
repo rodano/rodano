@@ -109,6 +109,8 @@
 					[charts]="charts"
 					[formModels]="formModels"
 					[layouts]="formLayouts"
+					[timelineGraphs]="timelineGraphs"
+					[sections]="sections"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -126,6 +128,8 @@
 					[selectedChartId]="selectedChartId"
 					[selectedFormModelId]="selectedFormModelId"
 					[selectedLayoutId]="selectedLayoutId"
+					[selectedTimelineGraphId]="selectedTimelineGraphId"
+					[selectedGraphSectionId]="selectedGraphSectionId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -149,6 +153,7 @@
 					(reportsChanged)="onReportsChanged($event)"
 					(chartsChanged)="onChartsChanged($event)"
 					(formModelsChanged)="onFormModelsChanged($event)"
+					(timelineGraphsChanged)="onTimelineGraphsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -159,7 +164,8 @@
 					(resourceCategoryContextChanged)="onResourceCategoryContextChanged($event)"
 					(reportContextChanged)="onReportContextChanged($event)"
 					(chartContextChanged)="onChartContextChanged($event)"
-					(formModelContextChanged)="onFormModelContextChanged($event)">
+					(formModelContextChanged)="onFormModelContextChanged($event)"
+					(timelineGraphContextChanged)="onTimelineGraphContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

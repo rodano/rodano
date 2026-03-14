@@ -78,11 +78,6 @@ public class TimelineGraphSectionEvent extends TableImpl<TimelineGraphSectionEve
 	 */
 	public final TableField<TimelineGraphSectionEventRecord, UUID> EVENT_MODEL_ID = createField(DSL.name("event_model_id"), SQLDataType.UUID.nullable(false), this, "");
 
-	/**
-	 * The column <code>timeline_graph_section_event.sort_order</code>.
-	 */
-	public final TableField<TimelineGraphSectionEventRecord, Integer> SORT_ORDER = createField(DSL.name("sort_order"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
-
 	private TimelineGraphSectionEvent(Name alias, Table<TimelineGraphSectionEventRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

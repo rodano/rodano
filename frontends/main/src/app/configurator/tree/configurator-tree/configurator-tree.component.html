@@ -95,12 +95,15 @@
 		(categoryClicked)="onChartClicked()">
 	</app-chart-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">timeline</mat-icon>
-			<span class="node-label">Timelines</span>
-		</div>
-	</div>
+	<app-timeline-graph-tree
+		[projectId]="projectId"
+		[timelineGraphs]="timelineGraphs"
+		[expanded]="expandedCategory === 'timeline-graphs'"
+		[sections]="sections"
+		[selectedTimelineGraphId]="selectedTimelineGraphId"
+		[selectedGraphSectionId]="selectedGraphSectionId"
+		(categoryClicked)="onTimelineGraphClicked()">
+	</app-timeline-graph-tree>
 
 	<app-resource-category-tree
 		[projectId]="projectId"
