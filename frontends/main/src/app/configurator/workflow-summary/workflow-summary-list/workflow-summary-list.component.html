@@ -1,0 +1,114 @@
+<app-list-header title="Validators" subtitle="Configure workflow summaries for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading workflow summaries...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-workflow-summary" (click)="onCreateWorkflowSummary()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Workflow Summary</h3>
+						<p>Add a new workflow summary</p>
+					</div>
+				</div>
+
+				@for (summary of workflowSummaries; track summary.workflowSummaryId) {
+					<div class="primary-card theme-workflow-summary"
+										[class.selected]="isSelected(summary)"
+										[appModified]="modifiedIds.has(summary.workflowSummaryId)"
+										(click)="onSelectWorkflowSummary(summary)">
+
+						@if (isSelected(summary)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(summary.title) }}</h3>
+								<p class="card-code">{{ summary.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (summary.displayLegend) {
+									<span class="status-badge first" matTooltip="Display Legend">
+										<mat-icon class="badge-full">legend_toggle</mat-icon>
+										<mat-icon class="badge-short">legend_toggle</mat-icon>
+									</span>
+								}
+								@if (summary.displayColumnExport) {
+									<span class="status-badge second" matTooltip="Display Column Export">
+										<mat-icon class="badge-full">outbound</mat-icon>
+										<mat-icon class="badge-short">outbound</mat-icon>
+									</span>
+								}
+								@if (summary.filterExpectedEvents) {
+									<span class="status-badge third" matTooltip="Hide Expected Events">
+										<mat-icon class="badge-full">hide</mat-icon>
+										<mat-icon class="badge-short">hide</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>circle</mat-icon>
+									<span>Workflow Entity: <b>{{ summary.workflowEntity ? summary.workflowEntity : 'Not set' }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>settings</mat-icon>
+									<span>{{ summary.workflowIds.length }} {{ summary.workflowIds.length === 1 ? 'Workflow' : 'Workflows' }}</span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>event</mat-icon>
+									<span>{{ summary.eventModelIds.length }} {{ summary.eventModelIds.length === 1 ? 'Event Model' : 'Event Models' }}</span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>view_column_2</mat-icon>
+									<span>{{ summary.columns.length }} {{ summary.columns.length === 1 ? 'Column' : 'Columns' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (isModified(summary.workflowSummaryId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (workflowSummaries.length === 0) {
+				<app-empty-state
+					[icon]="'summarize'"
+					[title]="'No Workflow Summaries'"
+					[message]="'Create your first workflow summary to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedWorkflowSummary && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-workflow-summary-detail
+					[workflowSummary]="selectedWorkflowSummary"
+					[projectId]="projectId"
+					[project]="project"
+					[allWorkflowSummaries]="workflowSummaries"
+					(workflowSummaryUpdated)="onWorkflowSummaryUpdated($event)"
+					(workflowSummaryDeleted)="onWorkflowSummaryDeleted($event)"
+					(closed)="onSelectWorkflowSummary(selectedWorkflowSummary)">
+				</app-workflow-summary-detail>
+			</div>
+		}
+	}
+</div>

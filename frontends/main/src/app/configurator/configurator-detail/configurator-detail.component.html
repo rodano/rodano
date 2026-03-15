@@ -140,6 +140,26 @@
 					(timelineGraphContextChanged)="onTimelineGraphContextChanged($event)">
 				</app-timeline-graph-list>
 			}
+			@case ('workflow-widgets') {
+				<app-workflow-widget-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onWorkflowWidgetSelected($event)"
+					(workflowWidgetsChanged)="onWorkflowWidgetsChanged($event)"
+					(workflowWidgetContextChanged)="onWorkflowWidgetContextChanged($event)">
+				</app-workflow-widget-list>
+			}
+			@case ('workflow-summaries') {
+				<app-workflow-summary-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onWorkflowSummarySelected($event)"
+					(workflowSummariesChanged)="onWorkflowSummariesChanged($event)"
+					(workflowSummaryContextChanged)="onWorkflowSummaryContextChanged($event)">
+				</app-workflow-summary-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

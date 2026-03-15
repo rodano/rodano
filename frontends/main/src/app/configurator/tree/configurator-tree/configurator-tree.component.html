@@ -129,19 +129,21 @@
 		(categoryClicked)="onReportClicked()">
 	</app-report-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">widgets</mat-icon>
-			<span class="node-label">Workflow Widgets</span>
-		</div>
-	</div>
+	<app-workflow-widget-tree
+		[projectId]="projectId"
+		[workflowWidgets]="workflowWidgets"
+		[expanded]="expandedCategory === 'workflow-widgets'"
+		[selectedWorkflowWidgetId]="selectedWorkflowWidgetId"
+		(categoryClicked)="onWorkflowWidgetClicked()">
+	</app-workflow-widget-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">summarize</mat-icon>
-			<span class="node-label">Workflow Summaries</span>
-		</div>
-	</div>
+	<app-workflow-summary-tree
+		[projectId]="projectId"
+		[workflowSummaries]="workflowSummaries"
+		[expanded]="expandedCategory === 'workflow-summaries'"
+		[selectedWorkflowSummaryId]="selectedWorkflowSummaryId"
+		(categoryClicked)="onWorkflowSummaryClicked()">
+	</app-workflow-summary-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('menus')">

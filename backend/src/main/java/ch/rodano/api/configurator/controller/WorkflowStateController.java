@@ -50,8 +50,8 @@ public class WorkflowStateController {
 		@PathVariable final UUID projectId,
 		@PathVariable final UUID workflowStateId
 	) {
-		final var WorkflowState = workflowStateService.getWorkflowState(projectId, workflowStateId);
-		return ResponseEntity.ok(WorkflowState);
+		final var workflowState = workflowStateService.getWorkflowState(projectId, workflowStateId);
+		return ResponseEntity.ok(workflowState);
 	}
 
 	/**

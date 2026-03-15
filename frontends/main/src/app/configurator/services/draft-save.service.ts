@@ -38,6 +38,10 @@ import {TimelineGraphService} from './api/timeline-graph.service';
 import {TimelineGraphSectionService} from './api/timeline-graph-section.service';
 import {TimelineGraph} from '@core/model/timeline-graph';
 import {TimelineGraphSection} from '@core/model/timeline-graph-section';
+import {WorkflowWidgetService} from './api/workflow-widget.service';
+import {WorkflowWidgetConfig} from '@core/model/workflow-widget-config';
+import {WorkflowSummaryService} from './api/workflow-summary.service';
+import {WorkflowSummary} from '@core/model/workflow-summary';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -60,7 +64,9 @@ export class DraftSaveService {
 		private formModelService: FormModelService,
 		private formLayoutService: FormLayoutService,
 		private timelineGraphService: TimelineGraphService,
-		private timelineGraphSectionService: TimelineGraphSectionService
+		private timelineGraphSectionService: TimelineGraphSectionService,
+		private workflowWidgetService: WorkflowWidgetService,
+		private workflowSummaryService: WorkflowSummaryService
 	) {}
 
 	saveScopeModels(
@@ -614,6 +620,76 @@ export class DraftSaveService {
 			const section = sections.find(tgs => tgs.graphSectionId === id);
 			if(section) {
 				saveObservables.push(this.timelineGraphSectionService.updateSection(projectId, section.timelineGraphId, id, section));
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveWorkflowWidgets(
+		projectId: string,
+		modifiedIds: Set<string>,
+		workflowWidgets: WorkflowWidgetConfig[],
+		originalWorkflowWidgets: WorkflowWidgetConfig[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalWorkflowWidgets.find(ww => ww.workflowWidgetId === originalId);
+				if(original) {
+					saveObservables.push(this.workflowWidgetService.deleteWorkflowWidget(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const workflowWidget = workflowWidgets.find(ww => ww.workflowWidgetId === id);
+				if(workflowWidget) {
+					saveObservables.push(this.workflowWidgetService.createWorkflowWidget(projectId, workflowWidget));
+				}
+			}
+			else {
+				const workflowWidget = workflowWidgets.find(ww => ww.workflowWidgetId === id);
+				if(workflowWidget) {
+					saveObservables.push(this.workflowWidgetService.updateWorkflowWidget(projectId, id, workflowWidget));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveWorkflowSummaries(
+		projectId: string,
+		modifiedIds: Set<string>,
+		workflowSummaries: WorkflowSummary[],
+		originalWorkflowSummaries: WorkflowSummary[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalWorkflowSummaries.find(ws => ws.workflowSummaryId === originalId);
+				if(original) {
+					saveObservables.push(this.workflowSummaryService.deleteWorkflowSummary(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const workflowSummary = workflowSummaries.find(ws => ws.workflowSummaryId === id);
+				if(workflowSummary) {
+					saveObservables.push(this.workflowSummaryService.createWorkflowSummary(projectId, workflowSummary));
+				}
+			}
+			else {
+				const workflowSummary = workflowSummaries.find(ws => ws.workflowSummaryId === id);
+				if(workflowSummary) {
+					saveObservables.push(this.workflowSummaryService.updateWorkflowSummary(projectId, id, workflowSummary));
+				}
 			}
 		});
 

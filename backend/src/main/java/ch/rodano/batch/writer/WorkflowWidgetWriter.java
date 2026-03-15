@@ -52,7 +52,8 @@ public class WorkflowWidgetWriter extends BaseWriter {
 					.execute();
 
 				if(widget.getColumns() != null && !widget.getColumns().isEmpty()) {
-					for(var col : widget.getColumns()) {
+					for(int i = 0; i < widget.getColumns().size(); i++) {
+						final var col = widget.getColumns().get(i);
 						final String columnCode = col.getId();
 						final UUID columnId = deterministic(projectId, "WORKFLOW_WIDGET_COLUMN", widgetCode + "|" + columnCode);
 
@@ -66,12 +67,14 @@ public class WorkflowWidgetWriter extends BaseWriter {
 							.set(WORKFLOW_WIDGET_COLUMN.SHORTNAME, toJson(col.getShortname()))
 							.set(WORKFLOW_WIDGET_COLUMN.LONGNAME, toJson(col.getLongname()))
 							.set(WORKFLOW_WIDGET_COLUMN.DESCRIPTION, toJson(col.getDescription()))
+							.set(WORKFLOW_WIDGET_COLUMN.SORT_ORDER, i)
 							.onDuplicateKeyUpdate()
 							.set(WORKFLOW_WIDGET_COLUMN.TYPE, col.getType())
 							.set(WORKFLOW_WIDGET_COLUMN.WIDTH, col.getWidth())
 							.set(WORKFLOW_WIDGET_COLUMN.SHORTNAME, toJson(col.getShortname()))
 							.set(WORKFLOW_WIDGET_COLUMN.LONGNAME, toJson(col.getLongname()))
 							.set(WORKFLOW_WIDGET_COLUMN.DESCRIPTION, toJson(col.getDescription()))
+							.set(WORKFLOW_WIDGET_COLUMN.SORT_ORDER, i)
 							.execute();
 					}
 				}

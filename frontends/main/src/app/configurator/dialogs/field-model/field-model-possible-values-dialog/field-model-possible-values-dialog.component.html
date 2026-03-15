@@ -37,8 +37,8 @@
 					<div class="possible-values-list" formArrayName="possibleValues">
 						@for (pvGroup of possibleValuesArray.controls; track pvGroup.get('code')?.value || $index; let i = $index) {
 							<div class="possible-value-item" [formGroupName]="i">
-								<div class="pv-header">
-									<div class="pv-controls">
+								<div class="ordered-list-header">
+									<div class="ordered-list-controls">
 										<button type="button" class="btn-icon" (click)="movePossibleValueUp(i)" [disabled]="i === 0">
 											<mat-icon>arrow_upward</mat-icon>
 										</button>
@@ -49,7 +49,7 @@
 											<mat-icon>delete</mat-icon>
 										</button>
 									</div>
-									<span class="pv-number">Value {{ i + 1 }}</span>
+									<span class="ordered-list-number">Value {{ i + 1 }}</span>
 								</div>
 
 								<div class="pv-content">

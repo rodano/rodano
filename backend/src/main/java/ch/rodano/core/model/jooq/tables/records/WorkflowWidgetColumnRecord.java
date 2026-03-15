@@ -146,6 +146,20 @@ public class WorkflowWidgetColumnRecord extends UpdatableRecordImpl<WorkflowWidg
 		return (String) get(8);
 	}
 
+	/**
+	 * Setter for <code>workflow_widget_column.sort_order</code>.
+	 */
+	public void setSortOrder(Integer value) {
+		set(9, value);
+	}
+
+	/**
+	 * Getter for <code>workflow_widget_column.sort_order</code>.
+	 */
+	public Integer getSortOrder() {
+		return (Integer) get(9);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -169,7 +183,7 @@ public class WorkflowWidgetColumnRecord extends UpdatableRecordImpl<WorkflowWidg
 	/**
 	 * Create a detached, initialised WorkflowWidgetColumnRecord
 	 */
-	public WorkflowWidgetColumnRecord(UUID workflowWidgetColumnId, UUID projectId, UUID workflowWidgetId, String code, String type, Integer width, String shortname, String longname, String description) {
+	public WorkflowWidgetColumnRecord(UUID workflowWidgetColumnId, UUID projectId, UUID workflowWidgetId, String code, String type, Integer width, String shortname, String longname, String description, Integer sortOrder) {
 		super(WorkflowWidgetColumn.WORKFLOW_WIDGET_COLUMN);
 
 		setWorkflowWidgetColumnId(workflowWidgetColumnId);
@@ -181,6 +195,7 @@ public class WorkflowWidgetColumnRecord extends UpdatableRecordImpl<WorkflowWidg
 		setShortname(shortname);
 		setLongname(longname);
 		setDescription(description);
+		setSortOrder(sortOrder);
 		resetChangedOnNotNull();
 	}
 }

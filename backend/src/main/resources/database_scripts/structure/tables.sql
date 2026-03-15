@@ -1404,6 +1404,7 @@ create table workflow_widget_column (
     shortname json null,
     longname json null,
     description json null,
+	sort_order int not null default 0,
     constraint pk_workflow_widget_column primary key (project_id, workflow_widget_id, workflow_widget_column_id),
     constraint uq_workflow_widget_column_code unique (project_id, workflow_widget_id, code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;

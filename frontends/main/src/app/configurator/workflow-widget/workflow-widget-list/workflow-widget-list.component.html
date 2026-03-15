@@ -1,0 +1,98 @@
+<app-list-header title="Workflow Widgets" subtitle="Configure workflow widgets for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading workflow widgets...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-workflow-widget" (click)="onCreateWorkflowWidget()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Workflow Widget</h3>
+						<p>Add a new workflow widget</p>
+					</div>
+				</div>
+
+				@for (widget of workflowWidgets; track widget.workflowWidgetId) {
+					<div class="primary-card theme-workflow-widget"
+										[class.selected]="isSelected(widget)"
+										[appModified]="modifiedIds.has(widget.workflowWidgetId)"
+										(click)="onSelectWorkflowWidget(widget)">
+
+						@if (isSelected(widget)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(widget.shortname) }}</h3>
+								<p class="card-code">{{ widget.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (widget.filterExpectedEvents) {
+									<span class="status-badge first" matTooltip="Hide Expected Events">
+										<mat-icon class="badge-full">hide</mat-icon>
+										<mat-icon class="badge-short">hide</mat-icon>
+									</span>
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>circle</mat-icon>
+									<span>Workflow Entity: <b>{{ widget.workflowEntity ? widget.workflowEntity : 'Not set' }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>adjust</mat-icon>
+									<span>{{ widget.workflowStateIds.length }} {{ widget.workflowStateIds.length === 1 ? 'Workflow State' : 'Workflow States' }}</span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>view_column_2</mat-icon>
+									<span>{{ widget.columns.length }} {{ widget.columns.length === 1 ? 'Column' : 'Columns' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (isModified(widget.workflowWidgetId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (workflowWidgets.length === 0) {
+				<app-empty-state
+					[icon]="'widgets'"
+					[title]="'No Workflow Widgets'"
+					[message]="'Create your first workflow widget to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedWorkflowWidget && viewMode === 'detail') {
+			<div class="detail-panel">
+			<app-workflow-widget-detail
+					[workflowWidget]="selectedWorkflowWidget"
+					[projectId]="projectId"
+					[project]="project"
+					[allWorkflowWidgets]="workflowWidgets"
+					(workflowWidgetUpdated)="onWorkflowWidgetUpdated($event)"
+					(workflowWidgetDeleted)="onWorkflowWidgetDeleted($event)"
+					(closed)="onSelectWorkflowWidget(selectedWorkflowWidget)">
+				</app-workflow-widget-detail>
+			</div>
+		}
+	}
+</div>

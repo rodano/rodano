@@ -14,6 +14,8 @@ import {ReportContext} from './contexts/report-context';
 import {ChartContext} from './contexts/chart-context';
 import {FormModelContext} from './contexts/form-model-context';
 import {TimelineGraphContext} from './contexts/timeline-graph-context';
+import {WorkflowWidgetContext} from './contexts/workflow-widget-context';
+import {WorkflowSummaryContext} from './contexts/workflow-summary-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -278,6 +280,40 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveWorkflowWidgets(projectId: string, context: WorkflowWidgetContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveWorkflowWidgets(
+				projectId,
+				context.modifiedWorkflowWidgetIds,
+				context.workflowWidgets,
+				context.originalWorkflowWidgets
+			)
+		]).pipe(
+			map(() => {
+				context.workflowWidgetManager.syncOriginalsWithCurrent();
+
+				context.workflowWidgetManager.invalidate();
+			})
+		);
+	}
+
+	saveWorkflowSummaries(projectId: string, context: WorkflowSummaryContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveWorkflowSummaries(
+				projectId,
+				context.modifiedWorkflowSummaryIds,
+				context.workflowSummaries,
+				context.originalWorkflowSummaries
+			)
+		]).pipe(
+			map(() => {
+				context.workflowSummaryManager.syncOriginalsWithCurrent();
+
+				context.workflowSummaryManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -361,5 +397,17 @@ export class EntitySaveOrchestratorService {
 
 		context.timelineGraphManager.invalidate();
 		context.timelineGraphSectionManager.invalidate();
+	}
+
+	resetWorkflowWidgetsToOriginals(context: WorkflowWidgetContext): void {
+		context.workflowWidgetManager.resetToOriginals();
+
+		context.workflowWidgetManager.invalidate();
+	}
+
+	resetWorkflowSummariesToOriginals(context: WorkflowSummaryContext): void {
+		context.workflowSummaryManager.resetToOriginals();
+
+		context.workflowSummaryManager.invalidate();
 	}
 }

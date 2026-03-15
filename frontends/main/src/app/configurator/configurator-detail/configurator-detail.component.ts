@@ -18,6 +18,10 @@ import {ReportListComponent} from '../report/report-list/report-list.component';
 import {ChartListComponent} from '../chart/chart-list/chart-list.component';
 import {FormModelListComponent} from '../form-model/form-model-list/form-model-list.component';
 import {TimelineGraphListComponent} from '../timeline-graph/timeline-graph-list/timeline-graph-list.component';
+import {WorkflowWidgetListComponent} from '../workflow-widget/workflow-widget-list/workflow-widget-list.component';
+import {
+	WorkflowSummaryListComponent
+} from '../workflow-summary/workflow-summary-list/workflow-summary-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -40,6 +44,8 @@ import {TimelineGraphListComponent} from '../timeline-graph/timeline-graph-list/
 		ChartListComponent,
 		FormModelListComponent,
 		TimelineGraphListComponent,
+		WorkflowWidgetListComponent,
+		WorkflowSummaryListComponent,
 		EmptyStateComponent
 	]
 })
@@ -56,6 +62,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(ChartListComponent) chartListComponent?: ChartListComponent;
 	@ViewChild(FormModelListComponent) formModelListComponent?: FormModelListComponent;
 	@ViewChild(TimelineGraphListComponent) timelineGraphListComponent?: TimelineGraphListComponent;
+	@ViewChild(WorkflowWidgetListComponent) workflowWidgetListComponent?: WorkflowWidgetListComponent;
+	@ViewChild(WorkflowSummaryListComponent) workflowSummaryListComponent?: WorkflowSummaryListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -148,7 +156,19 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedGraphSectionId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'overview' | null = null;
+	@Output() workflowWidgetsChanged = new EventEmitter<boolean>();
+	@Output() workflowWidgetContextChanged = new EventEmitter<{
+		workflowWidgets: any[];
+		selectedWorkflowWidgetId: string | null;
+	}>();
+
+	@Output() workflowSummariesChanged = new EventEmitter<boolean>();
+	@Output() workflowSummaryContextChanged = new EventEmitter<{
+		workflowSummaries: any[];
+		selectedWorkflowSummaryId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -264,6 +284,24 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.timelineGraphsChanged.emit(value);
 	}
 
+	onWorkflowWidgetSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onWorkflowWidgetsChanged(value: boolean): void {
+		this.workflowWidgetsChanged.emit(value);
+	}
+
+	onWorkflowSummarySelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onWorkflowSummariesChanged(value: boolean): void {
+		this.workflowSummariesChanged.emit(value);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -277,6 +315,16 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode.startsWith('dataset-model-') || this.selectedNode.startsWith('field-model-')) {
 			this.selectedNodeType = 'dataset-models';
+			return;
+		}
+
+		if(this.selectedNode === 'workflow-widgets') {
+			this.selectedNodeType = 'workflow-widgets';
+			return;
+		}
+
+		if(this.selectedNode === 'workflow-summaries') {
+			this.selectedNodeType = 'workflow-summaries';
 			return;
 		}
 
@@ -452,5 +500,19 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedGraphSectionId: string | null;
 	}): void {
 		this.timelineGraphContextChanged.emit(context);
+	}
+
+	onWorkflowWidgetContextChanged(context: {
+		workflowWidgets: any[];
+		selectedWorkflowWidgetId: string | null;
+	}): void {
+		this.workflowWidgetContextChanged.emit(context);
+	}
+
+	onWorkflowSummaryContextChanged(context: {
+		workflowSummaries: any[];
+		selectedWorkflowSummaryId: string | null;
+	}): void {
+		this.workflowSummaryContextChanged.emit(context);
 	}
 }

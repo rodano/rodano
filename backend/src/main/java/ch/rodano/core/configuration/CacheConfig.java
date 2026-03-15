@@ -74,7 +74,13 @@ public class CacheConfig {
 			"timelineGraphs",
 			"timelineGraph",
 			"timelineGraphSections",
-			"timelineGraphSection"
+			"timelineGraphSection",
+
+			"workflowWidgets",
+			"workflowWidget",
+
+			"workflowSummaries",
+			"workflowSummary"
 		);
 	}
 }

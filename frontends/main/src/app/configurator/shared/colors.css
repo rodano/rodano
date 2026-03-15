@@ -128,6 +128,11 @@
 	--entity-highlight: rgba(71, 85, 105, 0.12);
 }
 
+.theme-workflow-widget {
+	--entity-color: #d89a8f;
+	--entity-highlight: rgba(216, 154, 143, 0.12);
+}
+
 .theme-workflow-summary {
 	--entity-color: #831843;
 	--entity-highlight: rgba(131, 24, 67, 0.12);

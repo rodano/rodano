@@ -15,6 +15,8 @@ import {ReportTreeComponent} from '../report-tree/report-tree.component';
 import {ChartTreeComponent} from '../chart-tree/chart-tree.component';
 import {FormModelTreeComponent} from '../form-model-tree/form-model-tree.component';
 import {TimelineGraphTreeComponent} from '../timeline-graph-tree/timeline-graph-tree.component';
+import {WorkflowWidgetTreeComponent} from '../workflow-widget-tree/workflow-widget-tree.component';
+import {WorkflowSummaryTreeComponent} from '../workflow-summary-tree/workflow-summary-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -34,7 +36,9 @@ import {TimelineGraphTreeComponent} from '../timeline-graph-tree/timeline-graph-
 		ReportTreeComponent,
 		ChartTreeComponent,
 		FormModelTreeComponent,
-		TimelineGraphTreeComponent
+		TimelineGraphTreeComponent,
+		WorkflowWidgetTreeComponent,
+		WorkflowSummaryTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -61,6 +65,8 @@ export class ConfiguratorTreeComponent {
 	@Input() layouts: any[] = [];
 	@Input() timelineGraphs: any[] = [];
 	@Input() sections: any[] = [];
+	@Input() workflowWidgets: any[] = [];
+	@Input() workflowSummaries: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -80,11 +86,13 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedLayoutId: string | null = null;
 	@Input() selectedTimelineGraphId: string | null = null;
 	@Input() selectedGraphSectionId: string | null = null;
+	@Input() selectedWorkflowWidgetId: string | null = null;
+	@Input() selectedWorkflowSummaryId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -176,6 +184,20 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'timeline-graphs' ? null : 'timeline-graphs';
 			this.categoryClicked.emit('timeline-graphs');
+		});
+	}
+
+	onWorkflowWidgetClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'workflow-widgets' ? null : 'workflow-widgets';
+			this.categoryClicked.emit('workflow-widgets');
+		});
+	}
+
+	onWorkflowSummaryClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'workflow-summaries' ? null : 'workflow-summaries';
+			this.categoryClicked.emit('workflow-summaries');
 		});
 	}
 

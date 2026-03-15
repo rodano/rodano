@@ -1,0 +1,167 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">Edit Columns</h2>
+
+	<div class="dialog-content">
+		<div class="selectors-section">
+			<div class="section-header">
+				<h3>Columns</h3>
+				<button type="button" class="btn-add-item" (click)="addColumn()">
+					<mat-icon>add</mat-icon>
+					Add Column
+				</button>
+			</div>
+
+			@if (columns.length === 0) {
+				<div class="empty-state">
+					<mat-icon>view_column</mat-icon>
+					<p>No columns configured. Click "Add Column" to add one.</p>
+				</div>
+			} @else {
+				@for (col of columns; track col.summaryColumnId; let i = $index) {
+					<div class="form-section">
+						<div class="ordered-list-header">
+							<div class="ordered-list-controls">
+								<button type="button" class="btn-icon" [disabled]="i === 0" (click)="moveUp(i)">
+									<mat-icon>arrow_upward</mat-icon>
+								</button>
+								<button type="button" class="btn-icon" [disabled]="i === columns.length - 1" (click)="moveDown(i)">
+									<mat-icon>arrow_downward</mat-icon>
+								</button>
+								<button type="button" class="btn-delete" (click)="removeColumn(i)">
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+							<span class="ordered-list-number">Column {{ i + 1 }}</span>
+						</div>
+
+						<div class="form-field checkbox-field">
+							<mat-checkbox
+								[checked]="col.total"
+								(change)="updateField(i, 'total', $any($event).checked)">
+								Total
+							</mat-checkbox>
+							<span class="hint">When checked, this column shows totals and states are not applicable</span>
+						</div>
+
+						<div class="form-field checkbox-field">
+							<mat-checkbox [checked]="col.percent"
+																					(change)="updateField(i, 'percent', $any($event).checked)">
+								Percent
+							</mat-checkbox>
+							<span></span>
+						</div>
+
+						@if (!col.total) {
+							<div class="form-field">
+								<label>States</label>
+								<app-dual-list-box
+									[available]="columnStateLists[i].available"
+									[selected]="columnStateLists[i].selected"
+									[labelFn]="languageService.getLabel.bind(languageService)"
+									availablePlaceholder="No available states"
+									selectedPlaceholder="No states selected"
+									(add)="onAddState(i, $event)"
+									(remove)="onRemoveState(i, $event)">
+								</app-dual-list-box>
+							</div>
+						}
+
+						<div class="color-customization-section">
+							<span class="color-section-label">Customize color when value is not null</span>
+							<div class="form-row">
+								<div class="form-field">
+									<label>Text color</label>
+									<div class="color-picker-wrapper">
+										<input type="color"
+																	class="color-button"
+																	[value]="col.nonNullColor || '#000000'"
+																	(input)="updateField(i, 'nonNullColor', $any($event.target).value)">
+										<input type="text"
+																	class="color-text-input"
+																	[value]="col.nonNullColor || ''"
+																	(input)="updateField(i, 'nonNullColor', $any($event.target).value)"
+																	placeholder="#000000"
+																	maxlength="7">
+									</div>
+								</div>
+								<div class="form-field">
+									<label>Background color</label>
+									<div class="color-picker-wrapper">
+										<input type="color"
+																	class="color-button"
+																	[value]="col.nonNullBgColor || '#000000'"
+																	(input)="updateField(i, 'nonNullBgColor', $any($event.target).value)">
+										<input type="text"
+																	class="color-text-input"
+																	[value]="col.nonNullBgColor || ''"
+																	(input)="updateField(i, 'nonNullBgColor', $any($event.target).value)"
+																	placeholder="#000000"
+																	maxlength="7">
+									</div>
+								</div>
+							</div>
+						</div>
+
+						@if (availableLanguages.length === 1) {
+							@for (lang of availableLanguages; track lang.languageCode) {
+								<div class="form-field">
+									<label>Label *</label>
+									<input type="text"
+																[value]="col.label[lang.languageCode!] || ''"
+																(input)="updateTranslation(i, 'label', lang.languageCode!, $any($event.target).value)"
+																placeholder="Column label">
+									@if (lang.isDefault && !col.label[lang.languageCode!]) {
+										<span class="error-message">Label is required</span>
+									}
+								</div>
+								<div class="form-field">
+									<label>Description</label>
+									<textarea rows="2"
+																			[value]="col.description?.[lang.languageCode!] || ''"
+																			(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
+																			placeholder="Description">
+									</textarea>
+								</div>
+							}
+						} @else {
+							<mat-tab-group>
+								@for (lang of availableLanguages; track lang.languageCode) {
+									<mat-tab [label]="getLanguageLabel(lang)">
+										<div class="tab-content">
+											<div class="form-field">
+												<label>Label {{ lang.isDefault ? '*' : '' }}</label>
+												<input type="text"
+																			[value]="col.label[lang.languageCode!] || ''"
+																			(input)="updateTranslation(i, 'label', lang.languageCode!, $any($event.target).value)"
+																			placeholder="Column label">
+												@if (lang.isDefault && !col.label[lang.languageCode!]) {
+													<span class="error-message">Label is required</span>
+												}
+											</div>
+											<div class="form-field">
+												<label>Description</label>
+												<textarea rows="2"
+																						[value]="col.description?.[lang.languageCode!] || ''"
+																						(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
+																						placeholder="Description">
+												</textarea>
+											</div>
+										</div>
+									</mat-tab>
+								}
+							</mat-tab-group>
+						}
+					</div>
+				}
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!isValid()">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>

@@ -1,0 +1,29 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Filter</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+
+			<div class="form-field">
+				<mat-checkbox formControlName="filterExpectedEvents">Hide Expected Events</mat-checkbox>
+			</div>
+
+			<app-dual-list-box
+				title="Event Models"
+				hint="Select which event models are included in this section"
+				[available]="availableEventModels"
+				[selected]="selectedEventModels"
+				[labelFn]="languageService.getLabel.bind(languageService)"
+				availablePlaceholder="No available event models"
+				selectedPlaceholder="No event models selected"
+				(add)="addEventModel($event)"
+				(remove)="removeEventModel($event)">
+			</app-dual-list-box>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

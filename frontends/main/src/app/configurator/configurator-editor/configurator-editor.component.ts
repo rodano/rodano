@@ -38,6 +38,8 @@ import {FormModelManagerService} from '../services/manager/form-model-manager.se
 import {FormLayoutManagerService} from '../services/manager/form-layout-manager.service';
 import {TimelineGraphManagerService} from '../services/manager/timeline-graph-manager.service';
 import {TimelineGraphSectionManagerService} from '../services/manager/timeline-graph-section-manager.service';
+import {WorkflowWidgetManagerService} from '../services/manager/workflow-widget-manager.service';
+import {WorkflowSummaryManagerService} from '../services/manager/workflow-summary-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -79,6 +81,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	chartModified = false;
 	formModelModified = false;
 	timelineGraphModified = false;
+	workflowWidgetModified = false;
+	workflowSummaryModified = false;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -99,6 +103,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	formLayouts: any[] = [];
 	timelineGraphs: any[] = [];
 	sections: any[] = [];
+	workflowWidgets: any[] = [];
+	workflowSummaries: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -119,6 +125,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedLayoutId: string | null = null;
 	selectedTimelineGraphId: string | null = null;
 	selectedGraphSectionId: string | null = null;
+	selectedWorkflowWidgetId: string | null = null;
+	selectedWorkflowSummaryId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -151,6 +159,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private formLayoutManager: FormLayoutManagerService,
 		private timelineGraphManager: TimelineGraphManagerService,
 		private timelineGraphSectionManager: TimelineGraphSectionManagerService,
+		private workflowWidgetManager: WorkflowWidgetManagerService,
+		private workflowSummaryManager: WorkflowSummaryManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -201,6 +211,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.formLayoutManager.invalidate();
 		this.timelineGraphManager.invalidate();
 		this.timelineGraphSectionManager.invalidate();
+		this.workflowWidgetManager.invalidate();
+		this.workflowSummaryManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -284,6 +296,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: models => this.timelineGraphs = models,
 			error: error => console.error('Error loading timeline graphs:', error)
 		});
+
+		this.workflowWidgetManager.load(this.projectId).subscribe({
+			next: models => this.workflowWidgets = models,
+			error: error => console.error('Error loading workflow widgets:', error)
+		});
+
+		this.workflowSummaryManager.load(this.projectId).subscribe({
+			next: models => this.workflowSummaries = models,
+			error: error => console.error('Error loading workflow summaries:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -300,6 +322,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.formModels = this.formModelManager.getAll();
 		this.timelineGraphs = this.timelineGraphManager.getAll();
 		this.sections = this.timelineGraphSectionManager.getAll();
+		this.workflowWidgets = this.workflowWidgetManager.getAll();
+		this.workflowSummaries = this.workflowSummaryManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -338,7 +362,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -357,6 +381,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedFormModelId = null;
 			this.selectedTimelineGraphId = null;
 			this.selectedGraphSectionId = null;
+			this.selectedWorkflowWidgetId = null;
+			this.selectedWorkflowSummaryId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
@@ -372,6 +398,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.formModels = [];
 			this.timelineGraphs = [];
 			this.sections = [];
+			this.workflowWidgets = [];
+			this.workflowSummaries = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -385,6 +413,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.chartListComponent?.clearSelection();
 			this.detailComponent?.formModelListComponent?.clearSelection();
 			this.detailComponent?.timelineGraphListComponent?.clearSelection();
+			this.detailComponent?.workflowWidgetListComponent?.clearSelection();
+			this.detailComponent?.workflowSummaryListComponent?.clearSelection();
 		}
 	}
 
@@ -400,6 +430,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onChartsChanged(value: boolean): void {this.chartModified = value;}
 	onFormModelsChanged(value: boolean): void {this.formModelModified = value;}
 	onTimelineGraphsChanged(value: boolean): void {this.timelineGraphModified = value;}
+	onWorkflowWidgetsChanged(value: boolean): void {this.workflowWidgetModified = value;}
+	onWorkflowSummariesChanged(value: boolean): void {this.workflowSummaryModified = value;}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
@@ -479,6 +511,14 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(this.timelineGraphModified) {
 					saveObservables.push(this.saveTimelineGraphs());
+				}
+
+				if(this.workflowWidgetModified) {
+					saveObservables.push(this.saveWorkflowWidgets());
+				}
+
+				if(this.workflowSummaryModified) {
+					saveObservables.push(this.saveWorkflowSummaries());
 				}
 
 				if(saveObservables.length > 0) {
@@ -723,6 +763,38 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.datasetModels = this.datasetModelManager.getAll();
 	}
 
+	private async saveWorkflowWidgets(): Promise<void> {
+		const component = this.detailComponent?.workflowWidgetListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveWorkflowWidgets(this.projectId, {
+			workflowWidgetManager: component.workflowWidgetManager,
+			workflowWidgets: component.workflowWidgets,
+			originalWorkflowWidgets: component.originalWorkflowWidgets,
+			modifiedWorkflowWidgetIds: component.modifiedWorkflowWidgetIds
+		}));
+		component.loadWorkflowWidgets();
+		this.workflowWidgets = this.workflowWidgetManager.getAll();
+	}
+
+	private async saveWorkflowSummaries(): Promise<void> {
+		const component = this.detailComponent?.workflowSummaryListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveWorkflowSummaries(this.projectId, {
+			workflowSummaryManager: component.workflowSummaryManager,
+			workflowSummaries: component.workflowSummaries,
+			originalWorkflowSummaries: component.originalWorkflowSummaries,
+			modifiedWorkflowSummaryIds: component.modifiedWorkflowSummaryIds
+		}));
+		component.loadWorkflowSummaries();
+		this.workflowSummaries = this.workflowSummaryManager.getAll();
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -782,6 +854,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.formLayoutManager.resetToOriginals();
 		this.timelineGraphManager.resetToOriginals();
 		this.timelineGraphSectionManager.resetToOriginals();
+		this.workflowWidgetManager.resetToOriginals();
+		this.workflowSummaryManager.resetToOriginals();
 
 		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
 		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
@@ -796,6 +870,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.formModelListComponent?.loadFormModels();
 		this.detailComponent?.formModelListComponent?.discardLayouts();
 		this.detailComponent?.timelineGraphListComponent?.loadTimelineGraphs();
+		this.detailComponent?.workflowWidgetListComponent?.loadWorkflowWidgets();
+		this.detailComponent?.workflowSummaryListComponent?.loadWorkflowSummaries();
 
 		this.resetAllModifications();
 		this.refreshTreeData();
@@ -814,6 +890,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.chartModified = false;
 		this.formModelModified = false;
 		this.timelineGraphModified = false;
+		this.workflowWidgetModified = false;
+		this.workflowSummaryModified = false;
 	}
 
 	onCreateSnapshot(): void {
@@ -885,7 +963,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.reportModified
 		  || this.chartModified
 		  || this.formModelModified
-		  || this.timelineGraphModified;
+		  || this.timelineGraphModified
+		  || this.workflowWidgetModified
+		  || this.workflowSummaryModified;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -983,6 +1063,20 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.sections = context.sections;
 			this.selectedTimelineGraphId = context.selectedTimelineGraphId;
 			this.selectedGraphSectionId = context.selectedGraphSectionId;
+		});
+	}
+
+	onWorkflowWidgetContextChanged(context: any): void {
+		setTimeout(() => {
+			this.workflowWidgets = context.workflowWidgets;
+			this.selectedWorkflowWidgetId = context.selectedWorkflowWidgetId;
+		});
+	}
+
+	onWorkflowSummaryContextChanged(context: any): void {
+		setTimeout(() => {
+			this.workflowSummaries = context.workflowSummaries;
+			this.selectedWorkflowSummaryId = context.selectedWorkflowSummaryId;
 		});
 	}
 }

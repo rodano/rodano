@@ -1,0 +1,67 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">Workflow State Selectors</h2>
+
+	<div class="dialog-content">
+		<div class="selectors-section">
+			<div class="section-header">
+				<h3>Workflow State Selectors</h3>
+				<button type="button" class="btn-add-item" (click)="addSelector()">
+					<mat-icon>add</mat-icon>
+					Add Selector
+				</button>
+			</div>
+
+			@if (workflowStateSelectors.length === 0) {
+				<div class="empty-state">
+					<mat-icon>account_tree</mat-icon>
+					<p>No selectors configured. Click "Add Selector" to add one.</p>
+				</div>
+			} @else {
+				@for (selector of workflowStateSelectors; track selector.id) {
+					<div class="form-section workflow-state-selector">
+						<div class="selector-header">
+							<h3>Workflow State Selector</h3>
+							<button type="button" class="btn-delete" (click)="removeSelector(selector)">
+								<mat-icon>delete</mat-icon>
+							</button>
+						</div>
+
+						<div class="form-field">
+							<label>Workflow</label>
+							<mat-select
+								[value]="selector.selectedWorkflowId"
+								(valueChange)="onWorkflowSelected(selector, $event)">
+								<mat-option value="">Select a workflow</mat-option>
+								@for (wf of data.availableWorkflows; track wf.workflowId) {
+									<mat-option [value]="wf.workflowId">{{ getWorkflowLabel(wf) }}</mat-option>
+								}
+							</mat-select>
+							<span class="hint">Choose the workflow for this selector</span>
+						</div>
+
+						@if (selector.selectedWorkflowId) {
+							<app-dual-list-box
+								title="States"
+								[available]="selector.availableStates"
+								[selected]="selector.selectedStates"
+								[labelFn]="languageService.getLabel.bind(languageService)"
+								availablePlaceholder="No available states"
+								selectedPlaceholder="No states selected"
+								(add)="onAddState(selector, $event)"
+								(remove)="onRemoveState(selector, $event)">
+							</app-dual-list-box>
+						}
+					</div>
+				}
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>

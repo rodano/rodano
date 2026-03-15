@@ -1,0 +1,144 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">Edit Columns</h2>
+
+	<div class="dialog-content">
+		<div class="selectors-section">
+			<div class="section-header">
+				<h3>Columns</h3>
+				<button type="button" class="btn-add-item" (click)="addColumn()">
+					<mat-icon>add</mat-icon>
+					Add Column
+				</button>
+			</div>
+
+			@if (columns.length === 0) {
+				<div class="empty-state">
+					<mat-icon>view_column</mat-icon>
+					<p>No columns configured. Click "Add Column" to add one.</p>
+				</div>
+			} @else {
+				@for (col of columns; track col.workflowWidgetColumnId; let i = $index) {
+					<div class="form-section">
+						<div class="ordered-list-header">
+							<div class="ordered-list-controls">
+								<button type="button" class="btn-icon" [disabled]="i === 0" (click)="moveUp(i)">
+									<mat-icon>arrow_upward</mat-icon>
+								</button>
+								<button type="button" class="btn-icon" [disabled]="i === columns.length - 1" (click)="moveDown(i)">
+									<mat-icon>arrow_downward</mat-icon>
+								</button>
+								<button type="button" class="btn-delete" (click)="removeColumn(i)">
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+							<span class="ordered-list-number">Column {{ i + 1 }}</span>
+						</div>
+
+						<div class="form-field">
+							<label>Code *</label>
+							<input type="text"
+														[value]="col.id"
+														(input)="updateField(i, 'id', $any($event.target).value)"
+														placeholder="COLUMN_ID"
+														style="text-transform: uppercase">
+						</div>
+
+						<div class="form-row">
+							<div class="form-field">
+								<label>Type *</label>
+								<mat-select [value]="col.type"
+																				(selectionChange)="updateField(i, 'type', $event.value)">
+									<mat-option value="">Select a type</mat-option>
+									@for (t of columnTypes; track t.value) {
+										<mat-option [value]="t.value">{{ t.label }}</mat-option>
+									}
+								</mat-select>
+							</div>
+
+							<div class="form-field">
+								<label>Width (px)</label>
+								<input type="number"
+															[value]="col.width ?? ''"
+															(input)="updateField(i, 'width', $any($event.target).valueAsNumber || null)"
+															placeholder="100"
+															min="0">
+							</div>
+						</div>
+
+						@if (availableLanguages.length === 1) {
+							@for (lang of availableLanguages; track lang.languageCode) {
+								<div class="form-field">
+									<label>Short Name *</label>
+									<input type="text"
+																[value]="col.shortname[lang.languageCode!] || ''"
+																(input)="updateTranslation(i, 'shortname', lang.languageCode!, $any($event.target).value)"
+																placeholder="Column name">
+									@if (lang.isDefault && !col.shortname[lang.languageCode!]) {
+										<span class="error-message">Short name is required</span>
+									}
+								</div>
+								<div class="form-field">
+									<label>Long Name</label>
+									<input type="text"
+																[value]="col.longname?.[lang.languageCode!] || ''"
+																(input)="updateTranslation(i, 'longname', lang.languageCode!, $any($event.target).value)"
+																placeholder="Long name">
+								</div>
+								<div class="form-field">
+									<label>Description</label>
+									<textarea rows="2"
+																			[value]="col.description?.[lang.languageCode!] || ''"
+																			(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
+																			placeholder="Description">
+									</textarea>
+								</div>
+							}
+						} @else {
+							<mat-tab-group>
+								@for (lang of availableLanguages; track lang.languageCode) {
+									<mat-tab [label]="getLanguageLabel(lang)">
+										<div class="tab-content">
+											<div class="form-field">
+												<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+												<input type="text"
+																			[value]="col.shortname[lang.languageCode!] || ''"
+																			(input)="updateTranslation(i, 'shortname', lang.languageCode!, $any($event.target).value)"
+																			placeholder="Column name">
+												@if (lang.isDefault && !col.shortname[lang.languageCode!]) {
+													<span class="error-message">Short name is required</span>
+												}
+											</div>
+											<div class="form-field">
+												<label>Long Name</label>
+												<input type="text"
+																			[value]="col.longname?.[lang.languageCode!] || ''"
+																			(input)="updateTranslation(i, 'longname', lang.languageCode!, $any($event.target).value)"
+																			placeholder="Long name">
+											</div>
+											<div class="form-field">
+												<label>Description</label>
+												<textarea rows="2"
+																						[value]="col.description?.[lang.languageCode!] || ''"
+																						(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
+																						placeholder="Description">
+												</textarea>
+											</div>
+										</div>
+									</mat-tab>
+								}
+							</mat-tab-group>
+						}
+					</div>
+				}
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!isValid()">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>

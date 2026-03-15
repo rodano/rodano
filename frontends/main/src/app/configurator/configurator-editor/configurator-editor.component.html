@@ -111,6 +111,8 @@
 					[layouts]="formLayouts"
 					[timelineGraphs]="timelineGraphs"
 					[sections]="sections"
+					[workflowWidgets]="workflowWidgets"
+					[workflowSummaries]="workflowSummaries"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -130,6 +132,8 @@
 					[selectedLayoutId]="selectedLayoutId"
 					[selectedTimelineGraphId]="selectedTimelineGraphId"
 					[selectedGraphSectionId]="selectedGraphSectionId"
+					[selectedWorkflowWidgetId]="selectedWorkflowWidgetId"
+					[selectedWorkflowSummaryId]="selectedWorkflowSummaryId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -154,6 +158,8 @@
 					(chartsChanged)="onChartsChanged($event)"
 					(formModelsChanged)="onFormModelsChanged($event)"
 					(timelineGraphsChanged)="onTimelineGraphsChanged($event)"
+					(workflowWidgetsChanged)="onWorkflowWidgetsChanged($event)"
+					(workflowSummariesChanged)="onWorkflowSummariesChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -165,7 +171,9 @@
 					(reportContextChanged)="onReportContextChanged($event)"
 					(chartContextChanged)="onChartContextChanged($event)"
 					(formModelContextChanged)="onFormModelContextChanged($event)"
-					(timelineGraphContextChanged)="onTimelineGraphContextChanged($event)">
+					(timelineGraphContextChanged)="onTimelineGraphContextChanged($event)"
+					(workflowWidgetContextChanged)="onWorkflowWidgetContextChanged($event)"
+					(workflowSummaryContextChanged)="onWorkflowSummaryContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

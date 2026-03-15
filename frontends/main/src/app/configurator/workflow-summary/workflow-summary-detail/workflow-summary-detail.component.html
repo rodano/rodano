@@ -1,0 +1,279 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(workflowSummary.title) }}</h2>
+		<span class="detail-code theme-workflow-summary">{{ workflowSummary.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ workflowSummary.id }}
+			</app-setting-item>
+
+			<app-setting-item label="Title"
+																					[translated]="true"
+																					[modified]="isFieldModified('title')"
+																					[notConfigured]="!languageService.getTranslatedValue(workflowSummary.title)">
+				@if (!languageService.getTranslatedValue(workflowSummary.title)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workflowSummary.title) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Workflow Entity"
+																					[modified]="isFieldModified('workflowEntity')">
+				{{ workflowSummary.workflowEntity }}
+			</app-setting-item>
+
+			<app-setting-item label="Leaf Scope Model"
+																					[modified]="isFieldModified('leafScopeModelId')"
+																					[notConfigured]="!workflowSummary.leafScopeModelId">
+				@if (!workflowSummary.leafScopeModelId) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					<div class="chip theme-scope-model">
+						<mat-icon class="resource-icon">account_tree</mat-icon>
+						<span class="language-name">{{ getScopeModelLabel(workflowSummary.leafScopeModelId) }}</span>
+					</div>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Display Legend"
+																					[modified]="isFieldModified('displayLegend')">
+				@if (workflowSummary.displayLegend) {
+					<span class="status-badge first">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Display Column Export"
+																					[modified]="isFieldModified('displayColumnExport')">
+				@if (workflowSummary.displayColumnExport) {
+					<span class="status-badge second">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Associated Workflows</h3>
+		<div class="settings-grid">
+			<app-setting-item label="Workflows"
+																					[modified]="isFieldModified('workflowIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
+				<div class="relationship-box">
+					@if (workflowSummary.workflowIds.length > 0) {
+						<div class="chip-container">
+							@for (workflowId of workflowSummary.workflowIds; track workflowId) {
+								<div class="chip theme-workflow">
+									<mat-icon class="resource-icon">settings</mat-icon>
+									<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-message-centered">
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>No workflows configured</span>
+						</div>
+					}
+				</div>
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditWorkflows()">
+			<mat-icon>edit</mat-icon>
+			Edit Workflows
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Filter</h3>
+		<div class="settings-grid">
+
+			<app-setting-item label="Hide Expected Events"
+																					[modified]="isFieldModified('filterExpectedEvents')">
+				@if (workflowSummary.filterExpectedEvents) {
+					<span class="status-badge default">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Event Models"
+																					[modified]="isFieldModified('eventModelIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
+				<div class="relationship-box">
+					@if (workflowSummary.eventModelIds.length > 0) {
+						<div class="chip-container">
+							@for (eventModelId of workflowSummary.eventModelIds; track eventModelId) {
+								<div class="chip theme-event-model">
+									<mat-icon class="resource-icon">events</mat-icon>
+									<span class="language-name">{{ getEventModelLabel(eventModelId) }}</span>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-message-centered">
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>No event models configured</span>
+						</div>
+					}
+				</div>
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditFilter()">
+			<mat-icon>edit</mat-icon>
+			Edit Filter
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>
+			Columns
+			@if (isFieldModified('columns')) {
+				<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+			}
+		</h3>
+
+		@if (!workflowSummary.columns || workflowSummary.columns.length === 0) {
+			<div class="relationship-box">
+				<div class="empty-message-centered">
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>No columns configured</span>
+				</div>
+			</div>
+		} @else {
+			@for (col of workflowSummary.columns; track col.summaryColumnId; let i = $index) {
+				<div class="reference-detail-block">
+					<div class="reference-detail-header">
+						<span class="detail-code theme-workflow-summary">
+							{{ 'Column ' + (i + 1) }}
+						</span>
+					</div>
+
+					<div class="settings-grid reference-detail-grid">
+						<app-setting-item label="Label"
+																								[notConfigured]="!languageService.getTranslatedValue(col.label)"
+																								[translated]="true">
+							@if (!languageService.getTranslatedValue(col.label)) {
+								<mat-icon class="warning-icon">report</mat-icon>
+							}
+							{{ languageService.getTranslatedValue(col.label) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+						</app-setting-item>
+
+						<app-setting-item label="Description"
+																								[notConfigured]="!languageService.getTranslatedValue(col.description)"
+																								[translated]="true">
+							@if (!languageService.getTranslatedValue(col.description)) {
+								<mat-icon class="warning-icon">report</mat-icon>
+							}
+							{{ languageService.getTranslatedValue(col.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+						</app-setting-item>
+
+						<app-setting-item label="Total">
+							@if (col.total) {
+								<span class="status-badge default">Yes</span>
+							} @else {
+								<span class="status-badge">No</span>
+							}
+						</app-setting-item>
+
+						<app-setting-item label="Percent">
+							@if (col.percent) {
+								<span class="status-badge default">Yes</span>
+							} @else {
+								<span class="status-badge">No</span>
+							}
+						</app-setting-item>
+
+						<app-setting-item label="Text Color"
+																								[notConfigured]="!col.nonNullColor">
+							@if (!col.nonNullColor) {
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>Not configured</span>
+							} @else {
+								<div class="color-preview">
+									<span class="color-swatch" [style.background-color]="col.nonNullColor"></span>
+									{{ col.nonNullColor }}
+								</div>
+							}
+						</app-setting-item>
+
+						<app-setting-item label="Background Color"
+																								[notConfigured]="!col.nonNullBgColor">
+							@if (!col.nonNullBgColor) {
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>Not configured</span>
+							} @else {
+								<div class="color-preview">
+									<span class="color-swatch" [style.background-color]="col.nonNullBgColor"></span>
+									{{ col.nonNullBgColor }}
+								</div>
+							}
+						</app-setting-item>
+					</div>
+
+					@if (!col.total) {
+						<div class="settings-grid reference-detail-grid">
+							<app-setting-item label="Workflow States"
+																									[notConfigured]="!col.workflowStateIds || col.workflowStateIds.length === 0"
+																									[fullWidth]="true"
+																									[plain]="true">
+								<div class="relationship-box">
+									@if (col.workflowStateIds && col.workflowStateIds.length > 0) {
+										<div class="chip-container">
+											@for (stateId of col.workflowStateIds; track stateId) {
+												<div class="chip theme-workflow-state">
+													<mat-icon class="resource-icon">adjust</mat-icon>
+													<span class="language-name">{{ getWorkflowStateLabel(stateId) }}</span>
+												</div>
+											}
+										</div>
+									} @else {
+										<div class="empty-message-centered">
+											<mat-icon class="warning-icon">report</mat-icon>
+											<span>No states configured</span>
+										</div>
+									}
+								</div>
+							</app-setting-item>
+						</div>
+					}
+				</div>
+			}
+		}
+
+		<button class="btn-edit" style="margin-top: 1rem" (click)="onEditColumns()">
+			<mat-icon>edit</mat-icon>
+			Edit Columns
+		</button>
+	</div>
+
+	<app-danger-zone
+		[title]="'Delete Workflow Summary'"
+		[message]="'Deleting this workflow summary is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
+</div>

@@ -51,7 +51,7 @@ export interface User {
     passwordChangedDate?: Date;
     rights: UserRights;
     blocked: boolean;
-    admin?: boolean;
     superuser?: boolean;
+    admin?: boolean;
 }
 

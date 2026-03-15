@@ -14,14 +14,11 @@
 	<div class="settings-section">
 		<h3>Basic Information</h3>
 		<div class="settings-grid">
-
-			<app-setting-item label="Code"
-																					[modified]="isFieldModified('id')">
+			<app-setting-item label="Code" [modified]="isFieldModified('id')">
 				{{ chart.id }}
 			</app-setting-item>
 
-			<app-setting-item label="Type"
-																					[modified]="isFieldModified('type')">
+			<app-setting-item label="Type" [modified]="isFieldModified('type')">
 				@if (!chart.type) {
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
@@ -30,9 +27,7 @@
 				}
 			</app-setting-item>
 
-			<app-setting-item label="Short Name"
-																					[translated]="true"
-																					[modified]="isFieldModified('shortname')"
+			<app-setting-item label="Short Name" [translated]="true" [modified]="isFieldModified('shortname')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.shortname)">
 				@if (!languageService.getTranslatedValue(chart.shortname)) {
 					<mat-icon class="warning-icon">report</mat-icon>
@@ -40,9 +35,7 @@
 				{{ languageService.getTranslatedValue(chart.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 			</app-setting-item>
 
-			<app-setting-item label="Long Name"
-																					[translated]="true"
-																					[modified]="isFieldModified('longname')"
+			<app-setting-item label="Long Name" [translated]="true" [modified]="isFieldModified('longname')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.longname)">
 				@if (!languageService.getTranslatedValue(chart.longname)) {
 					<mat-icon class="warning-icon">report</mat-icon>
@@ -50,11 +43,8 @@
 				{{ languageService.getTranslatedValue(chart.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 			</app-setting-item>
 
-			<app-setting-item label="Description"
-																					[translated]="true"
-																					[modified]="isFieldModified('description')"
-																					[notConfigured]="!languageService.getTranslatedValue(chart.description)"
-																					[fullWidth]="true">
+			<app-setting-item label="Description" [translated]="true" [modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(chart.description)" [fullWidth]="true">
 				@if (!languageService.getTranslatedValue(chart.description)) {
 					<mat-icon class="warning-icon">report</mat-icon>
 				}
@@ -70,9 +60,7 @@
 	<div class="settings-section">
 		<h3>Settings</h3>
 		<div class="settings-grid">
-			<app-setting-item label="Title"
-																					[translated]="true"
-																					[modified]="isFieldModified('title')"
+			<app-setting-item label="Title" [translated]="true" [modified]="isFieldModified('title')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.title)">
 				@if (!languageService.getTranslatedValue(chart.title)) {
 					<mat-icon class="warning-icon">report</mat-icon>
@@ -80,9 +68,7 @@
 				{{ languageService.getTranslatedValue(chart.title) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 			</app-setting-item>
 
-			<app-setting-item label="Abscissa Legend (X-Axis)"
-																					[translated]="true"
-																					[modified]="isFieldModified('legendX')"
+			<app-setting-item label="Abscissa Legend (X-Axis)" [translated]="true" [modified]="isFieldModified('legendX')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.legendX)">
 				@if (!languageService.getTranslatedValue(chart.legendX)) {
 					<mat-icon class="warning-icon">report</mat-icon>
@@ -90,9 +76,7 @@
 				{{ languageService.getTranslatedValue(chart.legendX) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 			</app-setting-item>
 
-			<app-setting-item label="Ordinate Legend (Y-Axis)"
-																					[translated]="true"
-																					[modified]="isFieldModified('legendY')"
+			<app-setting-item label="Ordinate Legend (Y-Axis)" [translated]="true" [modified]="isFieldModified('legendY')"
 																					[notConfigured]="!languageService.getTranslatedValue(chart.legendY)">
 				@if (!languageService.getTranslatedValue(chart.legendY)) {
 					<mat-icon class="warning-icon">report</mat-icon>
@@ -100,8 +84,7 @@
 				{{ languageService.getTranslatedValue(chart.legendY) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
 			</app-setting-item>
 
-			<app-setting-item label="Override User Rights"
-																					[modified]="isFieldModified('legendY')">
+			<app-setting-item label="Override User Rights" [modified]="isFieldModified('overrideUserRights')">
 				@if (chart.overrideUserRights) {
 					<span class="status-badge third">Yes</span>
 				} @else {
@@ -110,8 +93,7 @@
 			</app-setting-item>
 
 			@if (chart.type !== 'WORKFLOW_STATUS') {
-				<app-setting-item label="Leaf Scope Model"
-																						[modified]="isFieldModified('leafScopeModelId')"
+				<app-setting-item label="Leaf Scope Model" [modified]="isFieldModified('leafScopeModelId')"
 																						[notConfigured]="!chart.leafScopeModelId">
 					@if (!chart.leafScopeModelId) {
 						<mat-icon class="warning-icon">report</mat-icon>
@@ -124,7 +106,6 @@
 					}
 				</app-setting-item>
 			}
-
 		</div>
 		<button class="btn-edit" (click)="onEditSettings()">
 			<mat-icon>edit</mat-icon>
@@ -135,10 +116,8 @@
 	<div class="settings-section">
 		<h3>Colors</h3>
 		<div class="settings-grid">
-			<app-setting-item label="Colors"
-																					[modified]="isFieldModified('colors')"
-																					[notConfigured]="!chart.colors.length"
-																					[fullWidth]="true">
+			<app-setting-item label="Colors" [modified]="isFieldModified('colors')"
+																					[notConfigured]="!chart.colors.length" [fullWidth]="true">
 				@if (!chart.colors.length) {
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>No colors configured</span>
@@ -161,27 +140,17 @@
 		<div class="settings-section">
 			<h3>
 				@switch (chart.type) {
-					@case ('STATISTICS') {
-						Statistics
-					}
-					@case ('ENROLLMENT') {
-						Enrollment
-					}
-					@case ('WORKFLOW_STATUS') {
-						Workflow Status
-					}
-					@case ('ENROLLMENT_BY_SCOPE') {
-						Enrollment by Scope
-					}
+					@case ('STATISTICS') { Statistics }
+					@case ('ENROLLMENT') { Enrollment }
+					@case ('WORKFLOW_STATUS') { Workflow Status }
+					@case ('ENROLLMENT_BY_SCOPE') { Enrollment by Scope }
 				}
 			</h3>
 
 			<div class="settings-grid">
 				@switch (chart.type) {
-
 					@case ('STATISTICS') {
-						<app-setting-item label="Field Model"
-																								[modified]="isFieldModified('fieldModelId')"
+						<app-setting-item label="Field Model" [modified]="isFieldModified('fieldModelId')"
 																								[notConfigured]="!chart.fieldModelId">
 							@if (!chart.fieldModelId) {
 								<mat-icon class="warning-icon">report</mat-icon>
@@ -194,64 +163,16 @@
 							}
 						</app-setting-item>
 
-						<app-setting-item label="With Statistics"
-																								[modified]="isFieldModified('withStatistics')">
+						<app-setting-item label="With Statistics" [modified]="isFieldModified('withStatistics')">
 							@if (chart.withStatistics) {
 								<span class="status-badge first">Yes</span>
 							} @else {
 								<span class="status-badge">No</span>
 							}
 						</app-setting-item>
-
-						<app-setting-item label="Ranges"
-																								[translated]="true"
-																								[modified]="isFieldModified('ranges')"
-																								[fullWidth]="true"
-																								[plain]="true">
-							<div class="relationship-box">
-								@if (!chart.ranges.length) {
-									<div class="empty-message-centered">
-										<mat-icon class="warning-icon">report</mat-icon>
-										<span>No ranges configured</span>
-									</div>
-								} @else {
-									<table class="ranges-detail-table">
-										<thead>
-										<tr>
-											<th>ID</th>
-											<th>Label</th>
-											<th>Value</th>
-											<th>Min</th>
-											<th>Max</th>
-											<th>Other</th>
-										</tr>
-										</thead>
-										<tbody>
-											@for (range of chart.ranges; track range.chartRangeId) {
-												<tr>
-													<td><span class="detail-code theme-chart">{{ range.id }}</span></td>
-													<td>{{ getRangeLabel(range) || '—' }}</td>
-													<td>{{ range.value || '—' }}</td>
-													<td>{{ range.min ?? '—' }}</td>
-													<td>{{ range.max ?? '—' }}</td>
-													<td>
-														@if (range.other) {
-															<span class="status-badge third">Yes</span>
-														} @else {
-															<span class="status-badge">No</span>
-														}
-													</td>
-												</tr>
-											}
-										</tbody>
-									</table>
-								}
-							</div>
-						</app-setting-item>
 					}
 					@case ('ENROLLMENT') {
-						<app-setting-item label="Display Expected"
-																								[modified]="isFieldModified('displayExpected')">
+						<app-setting-item label="Display Expected" [modified]="isFieldModified('displayExpected')">
 							@if (chart.displayExpected) {
 								<span class="status-badge second">Yes</span>
 							} @else {
@@ -259,8 +180,7 @@
 							}
 						</app-setting-item>
 
-						<app-setting-item label="Enrollment Workflow"
-																								[modified]="isFieldModified('workflowId')"
+						<app-setting-item label="Enrollment Workflow" [modified]="isFieldModified('workflowId')"
 																								[notConfigured]="!chart.workflowId">
 							@if (!chart.workflowId) {
 								<mat-icon class="warning-icon">report</mat-icon>
@@ -274,8 +194,7 @@
 						</app-setting-item>
 					}
 					@case ('WORKFLOW_STATUS') {
-						<app-setting-item label="Workflow"
-																								[modified]="isFieldModified('workflowId')"
+						<app-setting-item label="Workflow" [modified]="isFieldModified('workflowId')"
 																								[notConfigured]="!chart.workflowId">
 							@if (!chart.workflowId) {
 								<mat-icon class="warning-icon">report</mat-icon>
@@ -288,10 +207,8 @@
 							}
 						</app-setting-item>
 
-						<app-setting-item label="Included States"
-																								[modified]="isFieldModified('stateFilters')"
-																								[fullWidth]="true"
-																								[plain]="true">
+						<app-setting-item label="Included States" [modified]="isFieldModified('stateFilters')"
+																								[fullWidth]="true" [plain]="true">
 							<div class="relationship-box">
 								@if (getIncludedStates().length > 0) {
 									<div class="chip-container">
@@ -311,10 +228,8 @@
 							</div>
 						</app-setting-item>
 
-						<app-setting-item label="Excluded States"
-																								[modified]="isFieldModified('stateFilters')"
-																								[fullWidth]="true"
-																								[plain]="true">
+						<app-setting-item label="Excluded States" [modified]="isFieldModified('stateFilters')"
+																								[fullWidth]="true" [plain]="true">
 							<div class="relationship-box">
 								@if (getExcludedStates().length > 0) {
 									<div class="chip-container">
@@ -335,8 +250,7 @@
 						</app-setting-item>
 					}
 					@case ('ENROLLMENT_BY_SCOPE') {
-						<app-setting-item label="Scope Model"
-																								[modified]="isFieldModified('scopeModelId')"
+						<app-setting-item label="Scope Model" [modified]="isFieldModified('scopeModelId')"
 																								[notConfigured]="!chart.scopeModelId">
 							@if (!chart.scopeModelId) {
 								<mat-icon class="warning-icon">report</mat-icon>
@@ -349,11 +263,54 @@
 							}
 						</app-setting-item>
 					}
-
 				}
 			</div>
 
-			<button class="btn-edit" (click)="onEditTypeSettings()">
+			@if (chart.type === 'STATISTICS') {
+				@if (!chart.ranges.length) {
+					<div class="relationship-box" style="margin-top: 1rem">
+						<div class="empty-message-centered">
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>No ranges configured</span>
+						</div>
+					</div>
+				} @else {
+					<table class="ranges-detail-table" style="margin-top: 1rem">
+						<thead>
+						<tr>
+							<th>#</th>
+							<th>ID</th>
+							<th>Label</th>
+							<th>Value</th>
+							<th>Min</th>
+							<th>Max</th>
+							<th>Other</th>
+						</tr>
+						</thead>
+						<tbody>
+							@for (range of chart.ranges; track range.chartRangeId; let i = $index) {
+								<tr>
+									<td>{{ i + 1 }}</td>
+									<td><span class="detail-code theme-chart">{{ range.id }}</span></td>
+									<td>{{ getRangeLabel(range) || '—' }}</td>
+									<td>{{ range.value || '—' }}</td>
+									<td>{{ range.min ?? '—' }}</td>
+									<td>{{ range.max ?? '—' }}</td>
+									<td>
+										@if (range.other) {
+											<span class="status-badge third">Yes</span>
+										} @else {
+											<span class="status-badge">No</span>
+										}
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+			}
+
+			<button class="btn-edit" style="margin-top: 1rem" (click)="onEditTypeSettings()">
 				<mat-icon>edit</mat-icon>
 				Edit Data
 			</button>

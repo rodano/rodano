@@ -104,6 +104,11 @@ public class WorkflowWidgetColumn extends TableImpl<WorkflowWidgetColumnRecord> 
 	 */
 	public final TableField<WorkflowWidgetColumnRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
+	/**
+	 * The column <code>workflow_widget_column.sort_order</code>.
+	 */
+	public final TableField<WorkflowWidgetColumnRecord, Integer> SORT_ORDER = createField(DSL.name("sort_order"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "");
+
 	private WorkflowWidgetColumn(Name alias, Table<WorkflowWidgetColumnRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

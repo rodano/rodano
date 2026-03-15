@@ -1,0 +1,172 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(workflowWidget.shortname) }}</h2>
+		<span class="detail-code theme-workflow-widget">{{ workflowWidget.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ workflowWidget.id }}
+			</app-setting-item>
+
+			<app-setting-item label="Workflow Entity"
+																					[modified]="isFieldModified('workflowEntity')">
+				{{ workflowWidget.workflowEntity }}
+			</app-setting-item>
+
+
+			<app-setting-item label="Hide Expected Event"
+																					[modified]="isFieldModified('filterExpectedEvents')">
+				@if (workflowWidget.filterExpectedEvents) {
+					<span class="status-badge first">Yes</span>
+				} @else {
+					<span class="status-badge">No</span>
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Short Name"
+																					[translated]="true"
+																					[modified]="isFieldModified('shortname')"
+																					[notConfigured]="!languageService.getTranslatedValue(workflowWidget.shortname)">
+				@if (!languageService.getTranslatedValue(workflowWidget.shortname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workflowWidget.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Long Name"
+																					[translated]="true"
+																					[modified]="isFieldModified('longname')"
+																					[notConfigured]="!languageService.getTranslatedValue(workflowWidget.longname)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(workflowWidget.longname)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workflowWidget.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Description"
+																					[translated]="true"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(workflowWidget.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(workflowWidget.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(workflowWidget.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>Workflow State Configuration</h3>
+		<div class="settings-grid">
+			<app-setting-item label="Workflow State Selectors"
+																					[modified]="this.isFieldModified('workflowStateIds')"
+																					[fullWidth]="true"
+																					[plain]="true">
+				<div class="relationship-box">
+					@if (getWorkflowStateSelections().length > 0) {
+						<div class="workflow-state-selections">
+							@for (workflowGroup of getWorkflowStateSelections(); track workflowGroup.workflowId) {
+								<div class="workflow-state-group theme-workflow">
+									<div class="workflow-header theme-workflow">
+										<mat-icon class="resource-icon">settings</mat-icon>
+										<span class="workflow-name">{{ workflowGroup.workflowName }}</span>
+									</div>
+									<div class="chip-container">
+										@for (state of workflowGroup.states; track state.id) {
+											<div class="chip theme-workflow-state">
+												<mat-icon class="resource-icon">adjust</mat-icon>
+												<span class="language-name">{{ state.name }}</span>
+											</div>
+										}
+									</div>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-message-centered">
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>No workflow state selectors configured</span>
+						</div>
+					}
+				</div>
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditWorkflow()">
+			<mat-icon>edit</mat-icon>
+			Edit Workflow State Configuration
+		</button>
+	</div>
+
+	<div class="settings-section">
+		<h3>
+			Columns
+			@if (isFieldModified('columns')) {
+				<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+			}
+		</h3>
+
+		@if (!workflowWidget.columns || workflowWidget.columns.length === 0) {
+			<div class="relationship-box">
+				<div class="empty-message-centered">
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>No columns configured</span>
+				</div>
+			</div>
+		} @else {
+			<table class="ranges-detail-table">
+				<thead>
+				<tr>
+					<th>#</th>
+					<th>Code</th>
+					<th>Type</th>
+					<th>Short Name</th>
+					<th>Width</th>
+				</tr>
+				</thead>
+				<tbody>
+					@for (col of workflowWidget.columns; track col.workflowWidgetColumnId; let i = $index) {
+						<tr>
+							<td>{{ i + 1 }}</td>
+							<td><span class="detail-code theme-workflow-widget">{{ col.id }}</span></td>
+							<td>{{ getColumnTypeLabel(col.type) }}</td>
+							<td>{{ languageService.getTranslatedName(col.shortname) || '—' }}</td>
+							<td>{{ col.width ? col.width + 'px' : '—' }}</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		}
+
+		<button class="btn-edit" style="margin-top: 1rem" (click)="onEditColumns()">
+			<mat-icon>edit</mat-icon>
+			Edit Columns
+		</button>
+	</div>
+
+	<app-danger-zone
+		[title]="'Delete Workflow Widget'"
+		[message]="'Deleting this workflow widget is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
+</div>
