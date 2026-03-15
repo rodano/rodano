@@ -128,50 +128,52 @@
 		</button>
 	</div>
 
-	<div class="settings-section">
-		<h3>Label Patterns</h3>
-		<div class="settings-grid">
-			<app-setting-item label="Collapsed Label Pattern"
-																					[modified]="isFieldModified('collapsedLabelPattern')"
-																					[fullWidth]="true"
-																					[plain]="true">
-				<div class="relationship-box">
-					@if (datasetModel.collapsedLabelPattern) {
-						<div class="code-format-display">
-							<code>{{ datasetModel.collapsedLabelPattern }}</code>
-						</div>
-					} @else {
-						<div class="empty-message-centered">
-							<mat-icon class="warning-icon">report</mat-icon>
-							<span>No collapsed label pattern configured</span>
-						</div>
-					}
-				</div>
-			</app-setting-item>
+	@if (datasetModel.multiple) {
+		<div class="settings-section">
+			<h3>Label Patterns</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Collapsed Label Pattern"
+																						[modified]="isFieldModified('collapsedLabelPattern')"
+																						[fullWidth]="true"
+																						[plain]="true">
+					<div class="relationship-box">
+						@if (datasetModel.collapsedLabelPattern) {
+							<div class="code-format-display">
+								<code>{{ datasetModel.collapsedLabelPattern }}</code>
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No collapsed label pattern configured</span>
+							</div>
+						}
+					</div>
+				</app-setting-item>
 
-			<app-setting-item label="Expanded Label Pattern"
-																					[modified]="isFieldModified('expandedLabelPattern')"
-																					[fullWidth]="true"
-																					[plain]="true">
-				<div class="relationship-box">
-					@if (datasetModel.expandedLabelPattern) {
-						<div class="code-format-display">
-							<code>{{ datasetModel.expandedLabelPattern }}</code>
-						</div>
-					} @else {
-						<div class="empty-message-centered">
-							<mat-icon class="warning-icon">report</mat-icon>
-							<span>No expanded label pattern configured</span>
-						</div>
-					}
-				</div>
-			</app-setting-item>
+				<app-setting-item label="Expanded Label Pattern"
+																						[modified]="isFieldModified('expandedLabelPattern')"
+																						[fullWidth]="true"
+																						[plain]="true">
+					<div class="relationship-box">
+						@if (datasetModel.expandedLabelPattern) {
+							<div class="code-format-display">
+								<code>{{ datasetModel.expandedLabelPattern }}</code>
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No expanded label pattern configured</span>
+							</div>
+						}
+					</div>
+				</app-setting-item>
+			</div>
+			<button class="btn-edit" (click)="onEditLabelPatterns()">
+				<mat-icon>edit</mat-icon>
+				Edit Label Patterns
+			</button>
 		</div>
-		<button class="btn-edit" (click)="onEditLabelPatterns()">
-			<mat-icon>edit</mat-icon>
-			Edit Label Patterns
-		</button>
-	</div>
+	}
 
 	<app-danger-zone
 		[title]="'Delete Dataset Model'"

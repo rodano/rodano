@@ -18,6 +18,7 @@ import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confi
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
+import {FormModelManagerService} from '../../../services/manager/form-model-manager.service';
 
 @Component({
 	selector: 'app-event-model-detail',
@@ -42,6 +43,7 @@ export class EventModelDetailComponent extends BaseDraftDetailComponent<EventMod
 		private eventModelManager: EventModelManagerService,
 		private eventGroupManager: EventGroupManagerService,
 		private datasetModelManager: DatasetModelManagerService,
+		private formModelManager: FormModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private dialog: MatDialog,
 		snackBar: MatSnackBar
@@ -170,7 +172,7 @@ export class EventModelDetailComponent extends BaseDraftDetailComponent<EventMod
 	}
 
 	getFormModelLabel(formModelId: string): string {
-		return formModelId; //TODO: Implement when form models are ready
+		return this.languageService.getLabelById(formModelId, id => this.formModelManager.getById(id));
 	}
 
 	getWorkflowLabel(workflowId: string): string {

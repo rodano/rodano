@@ -21,6 +21,7 @@ import {
 import {DatasetModelManagerService} from '../manager/dataset-model-manager.service';
 import {WorkflowManagerService} from '../manager/workflow-manager.service';
 import {EventGroupManagerService} from '../manager/event-group-manager.service';
+import {FormModelManagerService} from '../manager/form-model-manager.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -29,6 +30,7 @@ export class EventModelDialogService {
 	constructor(
 		private dialog: MatDialog,
 		private datasetModelManager: DatasetModelManagerService,
+		private formModelManager: FormModelManagerService,
 		private eventGroupManager: EventGroupManagerService,
 		private workflowManager: WorkflowManagerService
 	) {}
@@ -122,7 +124,7 @@ export class EventModelDialogService {
 			width: '500px',
 			data: {
 				eventModel: JSON.parse(JSON.stringify(eventModel)),
-				availableFormModels: [],
+				availableFormModels: this.formModelManager.getAll(),
 				availableDatasetModels: this.datasetModelManager.getAll(),
 				availableWorkflows: this.workflowManager.getAll()
 			}

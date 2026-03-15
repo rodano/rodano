@@ -255,7 +255,7 @@
 							@for (formId of scopeModel.formModelIds; track formId) {
 								<div class="chip theme-form-model">
 									<mat-icon class="resource-icon">description</mat-icon>
-									<span class="language-name">{{ formId }}</span>
+									<span class="language-name">{{ getFormModelLabel(formId) }}</span>
 								</div>
 							}
 						</div>

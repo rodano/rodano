@@ -20,6 +20,7 @@ import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirma
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import { FormModelManagerService } from '../../services/manager/form-model-manager.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -53,6 +54,7 @@ export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeM
 		languageService: LanguageService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private datasetModelManager: DatasetModelManagerService,
+		private formModelManager: FormModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private profileManager: ProfileManagerService,
@@ -173,7 +175,7 @@ export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeM
 	}
 
 	getFormModelLabel(formModelId: string): string {
-		return formModelId; //TODO: Implement when form models are ready
+		return this.languageService.getLabelById(formModelId, id => this.formModelManager.getById(id));
 	}
 
 	getWorkflowLabel(workflowId: string): string {

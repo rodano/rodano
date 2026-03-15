@@ -21,6 +21,7 @@ import {
 import {DatasetModelManagerService} from '../manager/dataset-model-manager.service';
 import {WorkflowManagerService} from '../manager/workflow-manager.service';
 import {WorkflowStateManagerService} from '../manager/workflow-state-manager.service';
+import {FormModelManagerService} from '../manager/form-model-manager.service';
 
 @Injectable({
 	providedIn: 'root'
@@ -29,8 +30,9 @@ export class ScopeModelDialogService {
 	constructor(
 		private dialog: MatDialog,
 		private datasetModelManager: DatasetModelManagerService,
+		private formModelManager: FormModelManagerService,
 		private workflowManager: WorkflowManagerService,
-		private workflowStateManager: WorkflowStateManagerService,
+		private workflowStateManager: WorkflowStateManagerService
 	) {}
 
 	openCreateDialog(
@@ -120,7 +122,7 @@ export class ScopeModelDialogService {
 			width: '500px',
 			data: {
 				scopeModel: JSON.parse(JSON.stringify(scopeModel)),
-				availableForms: [],
+				availableForms: this.formModelManager.getAll(),
 				availableDatasets: this.datasetModelManager.getAll(),
 				availableWorkflows,
 				workflowStateSelections

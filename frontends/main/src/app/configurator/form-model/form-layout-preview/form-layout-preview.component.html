@@ -95,6 +95,55 @@
 																}
 															</select>
 														}
+
+														@if (fm.type === 'DATE') {
+															<div class="date-parts-row">
+																@for (part of getDateParts(fm); track part) {
+																	<input class="preview-input date-part-input"
+																								type="number"
+																								[placeholder]="getDatePartLabel(part)"
+																								[min]="1"
+																								[max]="getDatePartMax(part)"
+																								[value]="getDatePartValue(getRowKey(cell.id, rowId), part)"
+																								(input)="onDatePartChange(getRowKey(cell.id, rowId), part, $any($event.target).value)" />
+																}
+															</div>
+														}
+														@if (fm.type === 'DATE_SELECT') {
+															<div class="date-parts-row">
+																@if (fm.withYears) {
+																	<select class="preview-select date-part-select"
+																									[value]="getDatePartValue(getRowKey(cell.id, rowId), 'year')"
+																									(change)="onDatePartChange(getRowKey(cell.id, rowId), 'year', $any($event.target).value)">
+																		<option value="">YYYY</option>
+																		@for (y of getYearOptions(fm); track y) {
+																			<option [value]="y">{{ y }}</option>
+																		}
+																	</select>
+																}
+																@if (fm.withMonths) {
+																	<select class="preview-select date-part-select"
+																									[value]="getDatePartValue(getRowKey(cell.id, rowId), 'month')"
+																									(change)="onDatePartChange(getRowKey(cell.id, rowId), 'month', $any($event.target).value)">
+																		<option value="">MM</option>
+																		@for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
+																			<option [value]="m">{{ MONTH_NAMES[m - 1] }}</option>
+																		}
+																	</select>
+																}
+																@if (fm.withDays) {
+																	<select class="preview-select date-part-select"
+																									[value]="getDatePartValue(getRowKey(cell.id, rowId), 'day')"
+																									(change)="onDatePartChange(getRowKey(cell.id, rowId), 'day', $any($event.target).value)">
+																		<option value="">DD</option>
+																		@for (d of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]; track d) {
+																			<option [value]="d">{{ d | number:'2.0-0' }}</option>
+																		}
+																	</select>
+																}
+															</div>
+														}
+
 														@if (fm.type === 'RADIO') {
 															<div class="radio-group"
 																				[class.radio-grid]="cell.possibleValuesColumnNumber && cell.possibleValuesColumnNumber > 1"

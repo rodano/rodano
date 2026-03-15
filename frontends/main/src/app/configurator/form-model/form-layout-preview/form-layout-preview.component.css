@@ -328,9 +328,10 @@
 
 .date-parts-row {
 	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	gap: 0.25rem;
 	align-items: center;
-	gap: 3px;
-	flex-wrap: wrap;
 }
 
 .date-part-input {
@@ -340,6 +341,12 @@
 
 .date-part-select {
 	min-width: 66px;
+}
+
+.date-part-select,
+.date-part-input {
+	min-width: 0;
+	max-width: 80px;
 }
 
 .radio-group {
