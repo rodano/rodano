@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import ch.rodano.api.configuration.security.IsAdmin;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.core.configuration.core.Configurator;
@@ -139,20 +140,18 @@ public class SessionController extends AbstractSecuredController {
 
 	/**
 	 * Get an authentication key for another user
+	 * TODO For the time being, only admin can get a authentication token for another user, it has to be changed
 	 */
 	@Operation(summary = "Delegate a login", description = "Create a token that will be used to do requests on all protected resources, like a login")
 	@PostMapping("delegated")
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
+	@IsAdmin
 	public AuthenticationDTO delegateLogin(
 		@Valid @RequestBody final DelegateLoginDTO delegateLogin,
 		@RequestHeader("User-Agent") final String agent
 	) {
 		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-
-		// TODO For the time being, only admin can get a authentication token for another user, it has to be changed
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		final var token = userSecurityService.delegateLogin(
 			currentActor,
@@ -166,12 +165,9 @@ public class SessionController extends AbstractSecuredController {
 
 	@Operation(summary = "Get all sessions", description = "Available for admins only")
 	@GetMapping
+	@IsAdmin
 	@ResponseStatus(HttpStatus.OK)
 	public List<SessionDTO> getSessions() {
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
 		return sessionService.getSessions()
 			.stream()
 			.map(session -> new SessionDTO(session, userService.getUserByPk(session.getUserFk())))
@@ -195,17 +191,14 @@ public class SessionController extends AbstractSecuredController {
 		userSecurityService.logout(user, token, currentContext());
 	}
 
-	@Operation(summary = "Delete a user session", description = "Available for admins only", hidden = true)
+	@Operation(summary = "Delete a user session", description = "Available for admins only")
+	@IsAdmin
 	@DeleteMapping("{pk}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void deleteSession(
 		@PathVariable final Long pk
 	) {
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
 		final var session = sessionService.getSessionByPk(pk);
 		sessionService.deleteSession(session);
 	}

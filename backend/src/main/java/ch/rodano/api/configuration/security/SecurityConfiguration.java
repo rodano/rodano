@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +22,7 @@ import ch.rodano.core.model.user.User;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
 	private final BasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
 	private final RobotBasicAuthenticationProvider robotBasicAuthenticationProvider;
@@ -94,7 +96,7 @@ public class SecurityConfiguration {
 			)
 			.authorizeHttpRequests(
 				authorize -> authorize
-					.requestMatchers("/actuator/**").hasAuthority(Authority.ROLE_ADMIN.name())
+					.requestMatchers("/actuator/**").hasAuthority(Authority.ADMIN)
 					.anyRequest().authenticated()
 			)
 			//reject requests that are not authenticated with a custom HTTP response code

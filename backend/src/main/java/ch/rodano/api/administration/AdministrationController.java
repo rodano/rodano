@@ -30,6 +30,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
+import ch.rodano.api.configuration.security.IsAdmin;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.exception.http.BadArgumentException;
 import ch.rodano.api.request.context.RequestContextService;
@@ -76,12 +77,8 @@ public class AdministrationController extends AbstractSecuredController {
 	@PostMapping("reload")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@Transactional
+	@IsAdmin
 	public void reloadConfiguration() throws IOException {
-		//TODO see if it is not possible to throw an exception (this will create a 403 instead of a 401)
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
 		studyService.reload();
 	}
 
@@ -99,14 +96,10 @@ public class AdministrationController extends AbstractSecuredController {
 	@PostMapping("maintenance")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@Transactional
+	@IsAdmin
 	public void toggleMaintenance(
 		@RequestBody final Map<String, Boolean> payload
 	) {
-		//TODO see if it is not possible to throw an exception (this will create a 403 instead of a 401)
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
 		configurator.setMaintenanceMode(payload.getOrDefault("state", false));
 	}
 
@@ -125,14 +118,10 @@ public class AdministrationController extends AbstractSecuredController {
 	@PostMapping("debug")
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@Transactional
+	@IsAdmin
 	public void toggleDebug(
 		@RequestBody final Map<String, Boolean> payload
 	) {
-		//TODO see if it is not possible to throw an exception (this will create a 403 instead of a 401)
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
 		final var loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 		loggerContext.getLogger("ch.rodano.core").setLevel(payload.getOrDefault("state", false) ? Level.DEBUG : Level.INFO);
 	}

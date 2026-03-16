@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import ch.rodano.api.configuration.security.IsAdmin;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.api.utils.URLConsistencyUtils;
@@ -289,6 +290,7 @@ public class VersionsController extends AbstractSecuredController {
 
 	@GetMapping("robots/{robotPk}/versions")
 	@ResponseStatus(HttpStatus.OK)
+	@IsAdmin
 	public NavigableSet<RobotAuditTrail> getForRobot(
 		@PathVariable final Long robotPk,
 		@RequestParam final Optional<Long> auditActorPk
@@ -300,7 +302,6 @@ public class VersionsController extends AbstractSecuredController {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.VIEW_AUDIT_TRAIL);
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		return robotDAOService.getAuditTrails(robot, Optional.empty(), auditActorPk);
 	}
@@ -334,6 +335,7 @@ public class VersionsController extends AbstractSecuredController {
 
 	@GetMapping("robots/{robotPk}/roles/{rolePk}/versions")
 	@ResponseStatus(HttpStatus.OK)
+	@IsAdmin
 	public NavigableSet<RoleAuditTrail> getForRobotRole(
 		@PathVariable final Long robotPk,
 		@PathVariable final Long rolePk,
@@ -352,7 +354,6 @@ public class VersionsController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles();
 
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.VIEW_AUDIT_TRAIL);
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		return roleDAOService.getAuditTrails(role, Optional.empty(), auditActorPk);
 	}

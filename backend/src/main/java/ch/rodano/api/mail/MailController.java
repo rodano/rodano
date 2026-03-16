@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import ch.rodano.api.configuration.security.IsAdmin;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.request.context.RequestContextService;
@@ -89,14 +90,10 @@ public class MailController extends AbstractSecuredController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
+	@IsAdmin
 	public MailDTO sendMail(
 		@RequestBody final MailCreationDTO mailDTO
 	) {
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-
-		rightsService.checkRightAdmin(currentActor, currentRoles);
-
 		mailService.checkEmailAddress(mailDTO.recipient());
 
 		final var context = currentContext();

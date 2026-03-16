@@ -69,9 +69,9 @@ public class SessionOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
 		if(!roles.isEmpty()) {
 			if(!user.isShouldChangePassword()) {
-				authorities.add(new SimpleGrantedAuthority(Authority.ROLE_USER.name()));
+				authorities.add(new SimpleGrantedAuthority(Authority.USER));
 				if(rightsService.hasRightAdmin(roles)) {
-					authorities.add(new SimpleGrantedAuthority(Authority.ROLE_ADMIN.name()));
+					authorities.add(new SimpleGrantedAuthority(Authority.ADMIN));
 				}
 			}
 		}

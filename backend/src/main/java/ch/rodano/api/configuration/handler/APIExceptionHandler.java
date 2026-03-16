@@ -12,6 +12,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,7 @@ import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.exception.TechnicalException;
+import ch.rodano.core.model.exception.UnauthorizedException;
 import ch.rodano.core.model.mail.Mail;
 import ch.rodano.core.model.mail.MailOrigin;
 import ch.rodano.core.services.bll.mail.MailService;
@@ -66,6 +68,13 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
 		//a context must be provided to send an e-mail even if it will not be used because e-mails are not audited
 		this.context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, INTERNAL_ERROR_MESSAGE);
+	}
+
+	@ExceptionHandler(AccessDeniedException.class)
+	protected ResponseEntity<Object> handleAccessDeniedException(final AccessDeniedException e, final WebRequest request) {
+		logger.info(e.getLocalizedMessage(), e);
+		final var unauthorized = new UnauthorizedException();
+		return new ResponseEntity<>(new ErrorDetails(unauthorized.getHttpErrorStatus(), unauthorized.getMessage(), request.getDescription(false)), unauthorized.getHttpErrorStatus());
 	}
 
 	@ExceptionHandler(value = { Exception.class })

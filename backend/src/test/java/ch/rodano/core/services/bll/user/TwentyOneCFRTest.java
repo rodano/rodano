@@ -79,7 +79,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 
 		// Simulate the authentication procedure and set authentication.
 		// This is necessary for the MustChangePassword interceptor
-		final var authentication = new UsernamePasswordAuthenticationToken(user, sessionToken, Collections.singleton(new SimpleGrantedAuthority(Authority.ROLE_ADMIN.name())));
+		final var authentication = new UsernamePasswordAuthenticationToken(user, sessionToken, Collections.singleton(new SimpleGrantedAuthority(Authority.ADMIN)));
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
 		return sessionToken;

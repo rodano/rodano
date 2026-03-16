@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import ch.rodano.api.configuration.security.IsAdmin;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.request.context.RequestContextService;
@@ -80,6 +81,7 @@ public class RobotController extends AbstractSecuredController {
 	@Operation(summary = "Search robots")
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
+	@IsAdmin
 	public PagedResult<RobotDTO> search(
 		@Parameter(description = "Robot name") @RequestParam final Optional<String> name,
 		@Parameter(description = "Profile ID") @RequestParam final Optional<String> profileId,
@@ -90,7 +92,6 @@ public class RobotController extends AbstractSecuredController {
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		final var search = new RobotSearch()
 			.setName(name.filter(StringUtils::isNotBlank))
@@ -109,12 +110,12 @@ public class RobotController extends AbstractSecuredController {
 	@Operation(summary = "Get a robot")
 	@GetMapping("{robotPk}")
 	@ResponseStatus(HttpStatus.OK)
+	@IsAdmin
 	public RobotDTO getRobot(
 		@PathVariable final Long robotPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		// Retrieve user and check right
 		final var robot = robotDAOService.getRobotByPk(robotPk);
@@ -127,14 +128,12 @@ public class RobotController extends AbstractSecuredController {
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
+	@IsAdmin
 	public RobotDTO createRobot(
 		@Valid @RequestBody final RobotCreationDTO robotCreationDTO
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-
-		// Check if the user is an admin
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		// Check if the provided role scope is not null and that the user has rights to it
 		final var scope = scopeDAOService.getScopeByPk(robotCreationDTO.role().getScopePk());
@@ -162,6 +161,7 @@ public class RobotController extends AbstractSecuredController {
 	@PutMapping("/{robotPk}")
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
+	@IsAdmin
 	public RobotDTO updateRobot(
 		@PathVariable final Long robotPk,
 		@Valid @RequestBody final RobotUpdateDTO robotDTO
@@ -173,7 +173,6 @@ public class RobotController extends AbstractSecuredController {
 		//check rights
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		//update the existing user with the data from the DTO
 		actorDTOService.updateRobot(robot, robotDTO);
@@ -186,12 +185,12 @@ public class RobotController extends AbstractSecuredController {
 	@PutMapping("/{robotPk}/remove")
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
+	@IsAdmin
 	public RobotDTO removeRobot(
 		@PathVariable final Long robotPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		// Retrieve user and check right
 		final var robot = robotDAOService.getRobotByPk(robotPk);
@@ -206,12 +205,12 @@ public class RobotController extends AbstractSecuredController {
 	@PutMapping("/{robotPk}/restore")
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
+	@IsAdmin
 	public RobotDTO restoreRobot(
 		@PathVariable final Long robotPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		// Retrieve user and check right
 		final var robot = robotDAOService.getRobotByPk(robotPk);

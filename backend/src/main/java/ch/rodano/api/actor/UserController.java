@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
+import ch.rodano.api.configuration.security.IsAdmin;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.request.context.RequestContextService;
@@ -329,6 +330,7 @@ public class UserController extends AbstractSecuredController {
 	@PutMapping("{userPk}/convert-to-local")
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
+	@IsAdmin
 	public UserDTO convertToLocalUser(
 		@PathVariable final Long userPk
 	) {
@@ -339,7 +341,6 @@ public class UserController extends AbstractSecuredController {
 		//check rights
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		user.setExternallyManaged(false);
 		userService.saveUser(user, currentContext(), "Convert to a local user");
@@ -351,6 +352,7 @@ public class UserController extends AbstractSecuredController {
 	@PutMapping("{userPk}/convert-to-external")
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
+	@IsAdmin
 	public UserDTO convertToExternalUser(
 		@PathVariable final Long userPk
 	) {
@@ -361,7 +363,6 @@ public class UserController extends AbstractSecuredController {
 		//check rights
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
-		rightsService.checkRightAdmin(currentActor, currentRoles);
 
 		user.setExternallyManaged(true);
 		userService.saveUser(user, currentContext(), "Convert to an external user");
