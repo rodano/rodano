@@ -199,7 +199,7 @@ public class SessionController extends AbstractSecuredController {
 	@DeleteMapping("{pk}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
-	public void deleteToken(
+	public void deleteSession(
 		@PathVariable final Long pk
 	) {
 		final var currentActor = currentActor();

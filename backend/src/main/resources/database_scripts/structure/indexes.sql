@@ -36,3 +36,6 @@ alter table workflow_status add index idx_workflow_status_deleted (deleted);
 /* aggregate workflow states indices */
 alter table workflow_status add index aggregate_scope (workflow_id, deleted, scope_fk);
 alter table workflow_status add index aggregate_event (workflow_id, deleted, event_fk, form_fk, field_fk);
+
+/* user session */
+alter table user_session add unique index idx_user_session_token (token);

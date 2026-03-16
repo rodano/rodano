@@ -35,8 +35,8 @@ public class SessionServiceImpl implements SessionService {
 	}
 
 	@Override
-	public Session getAndUpdateSession(final String token) {
-		return sessionDAOService.getAndUpdateSession(token);
+	public void saveSession(final Session session) {
+		sessionDAOService.saveSession(session);
 	}
 
 	@Override
@@ -57,7 +57,12 @@ public class SessionServiceImpl implements SessionService {
 	@Override
 	public void deleteOldSessions(final Integer ageInMinutes) {
 		final var expiryDate = ZonedDateTime.now().minusMinutes(ageInMinutes);
-		sessionDAOService.deleteOlderSession(expiryDate);
+		sessionDAOService.deleteExpiredSessions(expiryDate);
+	}
+
+	@Override
+	public void updateLastAccessTime(final Long sessionPk, final ZonedDateTime time) {
+		sessionDAOService.updateLastAccessTime(sessionPk, time);
 	}
 
 	@Override

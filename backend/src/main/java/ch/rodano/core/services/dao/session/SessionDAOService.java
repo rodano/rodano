@@ -16,12 +16,12 @@ public interface SessionDAOService {
 	Session insertSession(Session session);
 
 	/**
-	 * Check if a session matches the given token and update its last access time
+	 * Save a session
 	 *
-	 * @param token The token
-	 * @return The session with the given token
+	 * @param session The session to save
+	 * @return The saved session
 	 */
-	Session getAndUpdateSession(String token);
+	void saveSession(Session session);
 
 	/**
 	 * Delete a session
@@ -58,6 +58,14 @@ public interface SessionDAOService {
 	 *
 	 * @param expiryDate The upper date limit
 	 */
-	void deleteOlderSession(ZonedDateTime expiryDate);
+	void deleteExpiredSessions(ZonedDateTime expiryDate);
+
+	/**
+	 * Update the last access time of a session
+	 *
+	 * @param sessionPk The pk of the session
+	 * @param time      The new last access time
+	 */
+	void updateLastAccessTime(Long sessionPk, ZonedDateTime time);
 
 }

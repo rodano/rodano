@@ -1,5 +1,6 @@
 package ch.rodano.core.services.bll.session;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import ch.rodano.core.model.session.Session;
@@ -18,12 +19,11 @@ public interface SessionService {
 	Session createSession(User user);
 
 	/**
-	 * Check if a session matches the given token and update its last access time
+	 * Save a session
 	 *
-	 * @param token The token
-	 * @return The session with the given token
+	 * @param session The session to save
 	 */
-	Session getAndUpdateSession(String token);
+	void saveSession(Session session);
 
 	/**
 	 * Delete a session
@@ -54,6 +54,14 @@ public interface SessionService {
 	 * @param ageInMinutes The maximum age of the session in minutes
 	 */
 	void deleteOldSessions(Integer ageInMinutes);
+
+	/**
+	 * Update the last access time of a session
+	 *
+	 * @param sessionPk The pk of the session
+	 * @param time      The new last access time
+	 */
+	void updateLastAccessTime(Long sessionPk, ZonedDateTime time);
 
 	/**
 	 * Get all sessions

@@ -4,7 +4,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -12,44 +14,75 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationEntryPoint;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.context.RequestAttributeSecurityContextRepository;
 
-import ch.rodano.api.configuration.filter.BearerTokenAuthenticationFilter;
+import ch.rodano.core.model.session.Session;
+import ch.rodano.core.model.user.User;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
 	private final BasicAuthenticationEntryPoint basicAuthenticationEntryPoint;
-	private final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter;
 	private final RobotBasicAuthenticationProvider robotBasicAuthenticationProvider;
+	private final SessionOpaqueTokenIntrospector sessionOpaqueTokenIntrospector;
 
 	public SecurityConfiguration(
 		final BasicAuthenticationEntryPoint basicAuthenticationEntryPoint,
-		final BearerTokenAuthenticationFilter bearerTokenAuthenticationFilter,
-		final RobotBasicAuthenticationProvider robotBasicAuthenticationProvider
+		final RobotBasicAuthenticationProvider robotBasicAuthenticationProvider,
+		final SessionOpaqueTokenIntrospector sessionOpaqueTokenIntrospector
 	) {
 		super();
 		this.basicAuthenticationEntryPoint = basicAuthenticationEntryPoint;
-		this.bearerTokenAuthenticationFilter = bearerTokenAuthenticationFilter;
 		this.robotBasicAuthenticationProvider = robotBasicAuthenticationProvider;
+		this.sessionOpaqueTokenIntrospector = sessionOpaqueTokenIntrospector;
+	}
+
+	//the goal of having 2 different security chain is to completely disabled authentication management for this endpoint
+	//bearer tokens are not even tried to be parsed
+	@Bean
+	@Order(1)
+	public SecurityFilterChain publicFilterChain(final HttpSecurity http) {
+		http
+			.securityMatchers(
+				matchers -> matchers
+					//config
+					.requestMatchers(HttpMethod.GET, "/config/public-study")
+					//administration and database
+					.requestMatchers(HttpMethod.GET, "/administration/database/status", "/administration/maintenance", "/administration/debug", "/administration/is-online")
+					.requestMatchers(HttpMethod.POST, "/administration/database/bootstrap")
+					//sessions
+					.requestMatchers(HttpMethod.POST, "/sessions")
+					.requestMatchers(HttpMethod.GET, "/sessions/delegated")
+					//user security tasks
+					.requestMatchers(HttpMethod.POST, "/auth/password/recover", "/auth/password/reset")
+					.requestMatchers(HttpMethod.POST, "/epro/robot")
+					.requestMatchers(HttpMethod.GET, "/user/activation/**")
+					.requestMatchers(HttpMethod.POST, "/user/activation/**")
+					.requestMatchers(HttpMethod.POST, "/users/email-verification/**", "/users/account-recovery/**")
+					//resources and documentation
+					.requestMatchers(HttpMethod.GET, "/resources/public", "/resources/public/*/file")
+					.requestMatchers(HttpMethod.GET, "/api-docs", "/api-docs/**", "/api-docs.html", "/swagger-ui/**")
+			)
+			.csrf(AbstractHttpConfigurer::disable)
+			.sessionManagement(
+				sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+			)
+			.authorizeHttpRequests(
+				authorize -> authorize.anyRequest().permitAll()
+			);
+		return http.build();
 	}
 
 	@Bean
-	public SecurityFilterChain filterChain(final HttpSecurity http) {
+	@Order(2)
+	public SecurityFilterChain privateFilterChain(final HttpSecurity http) {
 		http
 			//disable cross site request forging protection
-			.csrf(
-				AbstractHttpConfigurer::disable
-			)
+			.csrf(AbstractHttpConfigurer::disable)
 			//disable the default form login
-			.formLogin(
-				AbstractHttpConfigurer::disable
-			)
+			.formLogin(AbstractHttpConfigurer::disable)
 			//disable the default logout function
-			.logout(
-				AbstractHttpConfigurer::disable
-			)
+			.logout(AbstractHttpConfigurer::disable)
 			//disable the default session management
 			.sessionManagement(
 				sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -59,26 +92,8 @@ public class SecurityConfiguration {
 				securityContext -> securityContext
 					.securityContextRepository(new RequestAttributeSecurityContextRepository())
 			)
-			//configure the public and private endpoints
 			.authorizeHttpRequests(
 				authorize -> authorize
-					.requestMatchers(HttpMethod.GET, "/config/public-study").permitAll()
-					//administration and database
-					.requestMatchers(HttpMethod.GET, "/administration/database/status", "/administration/maintenance", "/administration/debug", "/administration/is-online").permitAll()
-					.requestMatchers(HttpMethod.POST, "/administration/database/bootstrap").permitAll()
-					//sessions
-					.requestMatchers(HttpMethod.POST, "/sessions").permitAll()
-					.requestMatchers(HttpMethod.GET, "/sessions/delegated").permitAll()
-					//user security tasks
-					.requestMatchers(HttpMethod.POST, "/auth/password/recover", "/auth/password/reset").permitAll()
-					.requestMatchers(HttpMethod.POST, "/epro/robot").permitAll()
-					.requestMatchers(HttpMethod.GET, "/user/activation/**").permitAll()
-					.requestMatchers(HttpMethod.POST, "/user/activation/**").permitAll()
-					.requestMatchers(HttpMethod.POST, "/users/email-verification/{verificationCode:[\\w\\-]+}").permitAll()
-					.requestMatchers(HttpMethod.POST, "/users/account-recovery/{recoveryCode:[\\w\\-]+}").permitAll()
-					//resources and documentation
-					.requestMatchers(HttpMethod.GET, "/resources/public", "/resources/public/{resourcePk:[0-9]+}/file").permitAll()
-					.requestMatchers(HttpMethod.GET, "/api-docs", "/api-docs/**", "/api-docs.html", "/swagger-ui/**").permitAll()
 					.requestMatchers("/actuator/**").hasAuthority(Authority.ROLE_ADMIN.name())
 					.anyRequest().authenticated()
 			)
@@ -92,11 +107,19 @@ public class SecurityConfiguration {
 			//this allows HTTP Basic authentication used by robots
 			.httpBasic(
 				httpBasic -> httpBasic.authenticationEntryPoint(basicAuthenticationEntryPoint)
+			)
+			//bearer token authentication via opaque token introspection against the session store
+			.oauth2ResourceServer(
+				oauth2 -> oauth2.opaqueToken(
+					opaque -> opaque
+						.introspector(sessionOpaqueTokenIntrospector)
+						.authenticationConverter((_, principal) -> {
+							final var user = (User) principal.getAttribute("user");
+							final var session = (Session) principal.getAttribute("session");
+							return new UsernamePasswordAuthenticationToken(user, session, principal.getAuthorities());
+						})
+				)
 			);
-
-		//add the bearer token auth filter to the filter chain
-		http.addFilterAfter(bearerTokenAuthenticationFilter, BasicAuthenticationFilter.class);
-
 		return http.build();
 	}
 

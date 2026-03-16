@@ -30,12 +30,9 @@ public class SessionDAOServiceImpl implements SessionDAOService {
 	}
 
 	@Override
-	public Session getAndUpdateSession(final String token) {
-		return create.update(USER_SESSION)
-			.set(USER_SESSION.LAST_ACCESS_TIME, ZonedDateTime.now())
-			.where(USER_SESSION.TOKEN.eq(token))
-			.returningResult(USER_SESSION.fields())
-			.fetchOneInto(Session.class);
+	public void saveSession(final Session session) {
+		final var record = create.newRecord(USER_SESSION, session);
+		record.update();
 	}
 
 	@Override
@@ -59,7 +56,15 @@ public class SessionDAOServiceImpl implements SessionDAOService {
 	}
 
 	@Override
-	public void deleteOlderSession(final ZonedDateTime expiryDate) {
+	public void deleteExpiredSessions(final ZonedDateTime expiryDate) {
 		create.deleteFrom(USER_SESSION).where(USER_SESSION.LAST_ACCESS_TIME.le(expiryDate)).execute();
+	}
+
+	@Override
+	public void updateLastAccessTime(final Long sessionPk, final ZonedDateTime time) {
+		create.update(USER_SESSION)
+			.set(USER_SESSION.LAST_ACCESS_TIME, time)
+			.where(USER_SESSION.PK.eq(sessionPk))
+			.execute();
 	}
 }

@@ -68,11 +68,9 @@ public class RobotBasicAuthenticationProvider implements AuthenticationProvider 
 
 		//retrieve authorities
 		final List<GrantedAuthority> authorities = new ArrayList<>();
-		if(!roles.isEmpty()) {
-			authorities.add(new SimpleGrantedAuthority(Authority.ROLE_USER.name()));
-			if(rightsService.hasRightAdmin(roles)) {
-				authorities.add(new SimpleGrantedAuthority(Authority.ROLE_ADMIN.name()));
-			}
+		authorities.add(new SimpleGrantedAuthority(Authority.ROLE_USER.name()));
+		if(rightsService.hasRightAdmin(roles)) {
+			authorities.add(new SimpleGrantedAuthority(Authority.ROLE_ADMIN.name()));
 		}
 
 		logger.debug("Robot {} is logging with authorities {}", name, authorities);
