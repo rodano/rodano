@@ -196,16 +196,56 @@ export class Layout extends Node {
 	createHTML(languages, datasets, objects) {
 		const that = this;
 
-		//TODO move this function from here! it's only related to grids
-		function draw_line(dataset) {
+		//find interesting field models for this dataset, used only by multiple layouts
+		const meaningful_field_models = this.getDatasetModel()?.getMeaningfulFieldModels() ?? [];
+
+		function draw_single_layout() {
+			//create table
+			const layout_table = document.createFullElement('table', {id: that.id, style: 'width: 100%;'});
+			//create columns
+			const layout_head = document.createElement('thead');
+			const columns = document.createElement('tr');
+			layout_head.appendChild(columns);
+			for(let i = 0, length = that.columns.length; i < length; i++) {
+				const column = that.columns[i];
+				columns.appendChild(document.createFullElement('th', {style: column.cssCode || ''}));
+			}
+			layout_table.appendChild(layout_head);
+			//create lines
+			const layout_body = document.createElement('tbody');
+			for(let i = 0, length = that.lines.length; i < length; i++) {
+				layout_body.appendChild(that.lines[i].createHTML(languages, datasets));
+			}
+			layout_table.appendChild(layout_body);
+			return layout_table;
+		}
+
+		function draw_lines(dataset) {
 			const layout_body_line = document.createElement('tr');
 			layout_body_line.data = dataset;
-			that.getCells().forEach(function(cell) {
-				const cell_name = `${dataset.datasetModelId}:${dataset.number}:${cell.fieldModelId}`;
+
+			//add one cell to expand/collapse line
+			const layout_line_cell_control = document.createFullElement('td', {style: 'padding: 0.5rem; border: 1px solid #ccc;'});
+			const layout_line_cell_control_toggle = document.createFullElement('img', {src: 'images/bullet_arrow_right.png', alt: 'Expand', title: 'Expand', style: 'cursor: pointer;'});
+			layout_line_cell_control_toggle.addEventListener(
+				'click',
+				function(event) {
+					event.stop();
+					layout_expanded.style.display = layout_expanded.style.display === 'none' ? '' : 'none';
+					this.setAttribute('src', layout_expanded.style.display === 'none' ? 'images/bullet_arrow_right.png' : 'images/bullet_arrow_down.png');
+				}
+			);
+			layout_line_cell_control.appendChild(layout_line_cell_control_toggle);
+			layout_body_line.appendChild(layout_line_cell_control);
+
+			//add one cell per meaningful field model
+			meaningful_field_models.forEach(function(field_model) {
+				const cell_name = `${dataset.datasetModelId}:${dataset.number}:${field_model.id}`;
 				const layout_body_cell = document.createFullElement('td', {id: cell_name, style: 'padding: 0.5rem; border: 1px solid #ccc;'});
-				layout_body_cell.appendChild(cell.getFieldModel().createHTML(languages, cell_name, dataset.getField(cell.fieldModelId).value));
+				layout_body_cell.appendChild(field_model.createHTML(undefined, languages, cell_name, dataset.getField(field_model.id).value));
 				layout_body_line.appendChild(layout_body_cell);
 			});
+
 			//add one column for actions
 			const layout_body_cell_actions = document.createFullElement('td', {style: 'padding: 0.5rem; border: 1px solid #ccc;'});
 			const layout_body_cell_actions_delete = document.createFullElement('img', {src: 'images/cross.png', alt: 'Delete', title: 'Delete', style: 'cursor: pointer;'});
@@ -215,13 +255,20 @@ export class Layout extends Node {
 					event.stop();
 					const line = this.parentNode.parentNode;
 					line.data.deleted = true;
-					line.parentNode.removeChild(line);
+					line.parentNode.removeChild(layout_expanded);
+					line.parentNode.removeChild(layout_body_line);
 				}
 			);
 			layout_body_cell_actions.appendChild(layout_body_cell_actions_delete);
 			layout_body_line.appendChild(layout_body_cell_actions);
 
-			return layout_body_line;
+			//add one hidden line to display dataset details
+			const layout_expanded = document.createFullElement('tr', {style: 'display: none; margin-top: 1rem;'});
+			const layout_expanded_cell = document.createFullElement('td', {colspan: meaningful_field_models.length + 2, style: 'padding: 0.5rem; border: 1px solid #ccc;'});
+			layout_expanded.appendChild(layout_expanded_cell);
+			layout_expanded_cell.appendChild(draw_single_layout());
+
+			return [layout_body_line, layout_expanded];
 		}
 
 		const layout_html = document.createFullElement('div', {id: this.id});
@@ -234,9 +281,6 @@ export class Layout extends Node {
 			const layout_table = document.createFullElement('table', {style: 'width: 100%; margin-top: 1rem; margin-bottom: 0.5rem; border-collapse: collapse;'});
 			layout_html.appendChild(layout_table);
 
-			const layout_cells = this.getCells();
-			const length = layout_cells.length;
-
 			//find multiple datasets
 			const layout_datasets = datasets ? datasets.filter(d => this.datasetModelId === d.datasetModelId) : [];
 
@@ -245,9 +289,11 @@ export class Layout extends Node {
 			layout_table.appendChild(layout_head);
 			const layout_head_line = document.createElement('tr');
 			layout_head.appendChild(layout_head_line);
-			for(let i = 0; i < length; i++) {
-				const cell = layout_cells[i];
-				layout_head_line.appendChild(document.createFullElement('th', {style: 'padding: 0.5rem; border: 1px solid #ccc;'}, cell.getFieldModel().getLocalizedShortname(languages)));
+			//add one column to expand/collapse lines
+			layout_head_line.appendChild(document.createFullElement('th', {style: 'padding: 0.5rem; width: 3rem; border: 1px solid #ccc;'}));
+			for(let i = 0; i < meaningful_field_models.length; i++) {
+				const field_model = meaningful_field_models[i];
+				layout_head_line.appendChild(document.createFullElement('th', {style: 'padding: 0.5rem; border: 1px solid #ccc;'}, field_model.getLocalizedShortname(languages)));
 			}
 			//add one column for actions
 			layout_head_line.appendChild(document.createFullElement('th', {style: 'padding: 0.5rem; width: 3rem; border: 1px solid #ccc;'}));
@@ -257,11 +303,11 @@ export class Layout extends Node {
 			layout_table.appendChild(layout_body);
 			if(layout_datasets.isEmpty()) {
 				const layout_empty_line = document.createElement('tr');
-				layout_empty_line.appendChild(document.createFullElement('td', {colspan: length + 1}, `No ${this.getDatasetModel().getLocalizedShortname(languages)} reported`));
+				layout_empty_line.appendChild(document.createFullElement('td', {colspan: meaningful_field_models.length + 2}, `No ${this.getDatasetModel().getLocalizedShortname(languages)} reported`));
 				layout_body.appendChild(layout_empty_line);
 			}
 			else {
-				layout_datasets.map(draw_line).forEach(Element.prototype.appendChild, layout_body);
+				layout_datasets.map(draw_lines).forEach(Element.prototype.appendChildren, layout_body);
 			}
 
 			//button
@@ -274,29 +320,12 @@ export class Layout extends Node {
 				const dataset = new objects.Entities.Dataset({datasetModelId: that.datasetModelId, number: Math.floor(new Date().getTime() * Math.random())});
 				datasets.push(dataset);
 				layout_datasets.push(dataset);
-				layout_body.appendChild(draw_line(dataset));
+				layout_body.appendChildren(draw_lines(dataset));
 			});
 			layout_html.appendChild(layout_add_button);
 		}
 		else {
-			//create table
-			const layout_table = document.createFullElement('table', {id: this.id, style: 'width: 100%;'});
-			layout_html.appendChild(layout_table);
-			//create columns
-			const layout_head = document.createElement('thead');
-			const columns = document.createElement('tr');
-			layout_head.appendChild(columns);
-			for(let i = 0, length = this.columns.length; i < length; i++) {
-				const column = this.columns[i];
-				columns.appendChild(document.createFullElement('th', {style: column.cssCode || ''}));
-			}
-			layout_html.appendChild(layout_head);
-			//create lines
-			const layout_body = document.createElement('tbody');
-			for(let i = 0, length = this.lines.length; i < length; i++) {
-				layout_body.appendChild(this.lines[i].createHTML(languages, datasets));
-			}
-			layout_html.appendChild(layout_body);
+			layout_html.appendChild(draw_single_layout());
 		}
 		if(!Object.isEmpty(this.textAfter)) {
 			const layout_text_after = document.createElement('div');

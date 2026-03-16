@@ -71,6 +71,9 @@ export class DatasetModel extends DisplayableNode {
 	getExportableFieldModels() {
 		return this.fieldModels.filter(f => f.exportable);
 	}
+	getMeaningfulFieldModels() {
+		return this.meaningfulFieldModelIds.map(id => this.getFieldModel(id));
+	}
 	getMasterDatasetModel() {
 		if(this.family && !this.master) {
 			const master_dataset_model = this.study.datasetModels.find(d => d.family === this.family && d.master);
