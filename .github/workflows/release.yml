@@ -30,7 +30,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
 
       - name: Checkout the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # create a GitHub release
       - name: Create a GitHub release

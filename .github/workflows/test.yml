@@ -28,7 +28,7 @@ jobs:
             - 3307:3306
     steps:
       - name: Checkout the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up the JDK
         uses: actions/setup-java@v5
@@ -59,7 +59,7 @@ jobs:
 
       # generate and transform test report
       - name: Retrieve JUnit report merger
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: rodano/action-junit-report-merger
           path: action-junit-report-merger
@@ -71,7 +71,7 @@ jobs:
             javac ../action-junit-report-merger/Reporter.java
             java -cp ../action-junit-report-merger/ Reporter
       - name: Retrieve JUnit PDF reporter
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: rodano/action-junit-pdf-reporter
           path: action-junit-pdf-reporter
@@ -87,20 +87,21 @@ jobs:
         shell: bash
         run: mvn jacoco:report
       - name: Transform coverage report to PDF
-        uses: ferdinandkeller/html-to-pdf-action@v2
+        uses: ferdinandkeller/html-to-pdf-action@v2.1
         with:
           source-path: backend/target/site/jacoco
           destination-path: coverage-report.pdf
 
       # store reports as artifacts
       - name: Store test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: backend-test-reports
           path: |
             backend/test-output/results.xml
             backend/test-output/results.pdf
             coverage-report.pdf
+          archive: false
 
       # publish module to the Maven repository
       - name: Publish to GitHub Packages
@@ -117,10 +118,10 @@ jobs:
         working-directory: ./frontends/main
     steps:
       - name: Checkout the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'npm'
@@ -140,10 +141,11 @@ jobs:
 
       # store reports as artifacts
       - name: Store test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-main-test-report
           path: frontends/main/test-output/results.xml
+          archive: false
 
   frontend-configurator:
     name: Test configurator frontend
@@ -153,10 +155,10 @@ jobs:
         working-directory: ./frontends/configurator
     steps:
       - name: Checkout the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'npm'
@@ -174,7 +176,7 @@ jobs:
       - name: Run tests
         run: npm test -- --debug
       - name: Retrieve JUnit PDF reporter
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: rodano/action-junit-pdf-reporter
           path: action-junit-pdf-reporter
@@ -186,12 +188,13 @@ jobs:
 
       # store reports as artifacts
       - name: Store test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-configurator-test-report
           path: |
             frontends/configurator/test-output/results.xml
             frontends/configurator/test-output/results.pdf
+          archive: false
 
   frontend-epro:
     name: Test ePro frontend
@@ -201,10 +204,10 @@ jobs:
         working-directory: ./frontends/epro
     steps:
       - name: Checkout the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: 22
           cache: 'npm'
@@ -221,7 +224,8 @@ jobs:
 
       # store reports as artifacts
       - name: Store test report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-epro-test-report
           path: frontends/epro/test-report.html
+          archive: false

@@ -15,13 +15,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -29,12 +29,12 @@ jobs:
 
       - name: Retrieve the metadata for the backend image
         id: backend-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/rodano/backend
 
       - name: Publish the backend image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           context: backend
@@ -43,12 +43,12 @@ jobs:
 
       - name: Retrieve the metadata for the plugins compiler image
         id: plugins-compiler-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/rodano/plugins-compiler
 
       - name: Publish the plugins compiler image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           context: backend
@@ -60,13 +60,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -74,12 +74,12 @@ jobs:
 
       - name: Retrieve the metadata for the manager image
         id: manager-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/rodano/manager
 
       - name: Publish the manager image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           context: manager
@@ -90,13 +90,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the project
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login to Docker registry
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
@@ -104,12 +104,12 @@ jobs:
 
       - name: Retrieve the metadata for the frontend image
         id: frontend-meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v6
         with:
           images: ${{ env.REGISTRY }}/rodano/frontend
 
       - name: Publish the frontend image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           push: true
           context: frontends
