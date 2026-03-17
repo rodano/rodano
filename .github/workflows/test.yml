@@ -101,7 +101,6 @@ jobs:
             backend/test-output/results.xml
             backend/test-output/results.pdf
             coverage-report.pdf
-          archive: false
 
       # publish module to the Maven repository
       - name: Publish to GitHub Packages
@@ -145,7 +144,6 @@ jobs:
         with:
           name: frontend-main-test-report
           path: frontends/main/test-output/results.xml
-          archive: false
 
   frontend-configurator:
     name: Test configurator frontend
@@ -194,7 +192,6 @@ jobs:
           path: |
             frontends/configurator/test-output/results.xml
             frontends/configurator/test-output/results.pdf
-          archive: false
 
   frontend-epro:
     name: Test ePro frontend
@@ -228,4 +225,3 @@ jobs:
         with:
           name: frontend-epro-test-report
           path: frontends/epro/test-report.html
-          archive: false
