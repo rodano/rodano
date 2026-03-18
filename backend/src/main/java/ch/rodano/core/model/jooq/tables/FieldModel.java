@@ -192,6 +192,11 @@ public class FieldModel extends TableImpl<FieldModelRecord> {
 	public final TableField<FieldModelRecord, Integer> MIN_YEAR = createField(DSL.name("min_year"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
 	/**
+	 * The column <code>field_model.max_year</code>.
+	 */
+	public final TableField<FieldModelRecord, Integer> MAX_YEAR = createField(DSL.name("max_year"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
+
+	/**
 	 * The column <code>field_model.dictionary</code>.
 	 */
 	public final TableField<FieldModelRecord, String> DICTIONARY = createField(DSL.name("dictionary"), SQLDataType.VARCHAR(256).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");

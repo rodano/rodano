@@ -109,17 +109,31 @@ public class RuleDefinitionActionParameterRecord extends UpdatableRecordImpl<Rul
 	}
 
 	/**
+	 * Setter for <code>rule_definition_action_parameter.options</code>.
+	 */
+	public void setOptions(String value) {
+		set(6, value);
+	}
+
+	/**
+	 * Getter for <code>rule_definition_action_parameter.options</code>.
+	 */
+	public String getOptions() {
+		return (String) get(6);
+	}
+
+	/**
 	 * Setter for <code>rule_definition_action_parameter.sort_order</code>.
 	 */
 	public void setSortOrder(Integer value) {
-		set(6, value);
+		set(7, value);
 	}
 
 	/**
 	 * Getter for <code>rule_definition_action_parameter.sort_order</code>.
 	 */
 	public Integer getSortOrder() {
-		return (Integer) get(6);
+		return (Integer) get(7);
 	}
 
 	// -------------------------------------------------------------------------
@@ -145,7 +159,7 @@ public class RuleDefinitionActionParameterRecord extends UpdatableRecordImpl<Rul
 	/**
 	 * Create a detached, initialised RuleDefinitionActionParameterRecord
 	 */
-	public RuleDefinitionActionParameterRecord(UUID projectId, UUID ruleDefinitionActionId, String paramCode, String label, String dataEntity, String configurationEntity, Integer sortOrder) {
+	public RuleDefinitionActionParameterRecord(UUID projectId, UUID ruleDefinitionActionId, String paramCode, String label, String dataEntity, String configurationEntity, String options, Integer sortOrder) {
 		super(RuleDefinitionActionParameter.RULE_DEFINITION_ACTION_PARAMETER);
 
 		setProjectId(projectId);
@@ -154,6 +168,7 @@ public class RuleDefinitionActionParameterRecord extends UpdatableRecordImpl<Rul
 		setLabel(label);
 		setDataEntity(dataEntity);
 		setConfigurationEntity(configurationEntity);
+		setOptions(options);
 		setSortOrder(sortOrder);
 		resetChangedOnNotNull();
 	}

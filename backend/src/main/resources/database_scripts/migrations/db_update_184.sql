@@ -291,6 +291,7 @@ alter table field_model
 	add column min_value                     decimal(18, 6) null,
 	add column max_value                     decimal(18, 6) null,
 	add column min_year                      int            null,
+	add column max_year                      int            null,
 	add column dictionary                    varchar(256)   null,
 	add column matcher                       varchar(128)   null,
 	add column inline_help                   text           null,
@@ -578,6 +579,7 @@ create table rule_definition_property (
 	target                      varchar(64)  null,
 	type                        varchar(64)  not null,
 	configuration_entity        varchar(64)  null,
+	options                     varchar(255) null,
 	constraint pk_rule_definition_property primary key (project_id, rule_definition_property_id),
 	constraint uq_rule_definition_property_code unique (project_id, code)
 ) engine = InnoDB
@@ -603,6 +605,7 @@ create table rule_definition_action_parameter (
 	label                     varchar(255) null,
 	data_entity               varchar(64)  null,
 	configuration_entity      varchar(64)  null,
+	options                   varchar(255) null,
 	sort_order                int          not null default 0,
 	constraint pk_rule_definition_action_parameter primary key (project_id, rule_definition_action_id, param_code)
 ) engine = InnoDB

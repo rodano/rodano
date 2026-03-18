@@ -11,6 +11,7 @@ public class RuleDefinitionProperty {
 	private String target;
 	private String type;
 	private String configurationEntity;
+	private String options;
 
 	public String getId() {
 		return id;
@@ -60,6 +61,14 @@ public class RuleDefinitionProperty {
 		this.configurationEntity = configurationEntity;
 	}
 
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(final String options) {
+		this.options = options;
+	}
+
 	@Override
 	public String toString() {
 		return "RuleDefinitionProperty{" +
@@ -69,6 +78,7 @@ public class RuleDefinitionProperty {
 			", target='" + target + '\'' +
 			", type='" + type + '\'' +
 			", configurationEntity='" + configurationEntity + '\'' +
+			", options='" + options + '\'' +
 			'}';
 	}
 }

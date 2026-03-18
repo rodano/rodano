@@ -98,6 +98,11 @@ public class RuleDefinitionProperty extends TableImpl<RuleDefinitionPropertyReco
 	 */
 	public final TableField<RuleDefinitionPropertyRecord, String> CONFIGURATION_ENTITY = createField(DSL.name("configuration_entity"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
+	/**
+	 * The column <code>rule_definition_property.options</code>.
+	 */
+	public final TableField<RuleDefinitionPropertyRecord, String> OPTIONS = createField(DSL.name("options"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
 	private RuleDefinitionProperty(Name alias, Table<RuleDefinitionPropertyRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

@@ -159,6 +159,7 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 			.set(FIELD_MODEL.MIN_VALUE, dto.getMinValue() != null ? BigDecimal.valueOf(dto.getMinValue()) : null)
 			.set(FIELD_MODEL.MAX_VALUE, dto.getMaxValue() != null ? BigDecimal.valueOf(dto.getMaxValue()) : null)
 			.set(FIELD_MODEL.MIN_YEAR, dto.getMinYear())
+			.set(FIELD_MODEL.MAX_YEAR, dto.getMaxYear())
 			.set(FIELD_MODEL.DICTIONARY, dto.getDictionary())
 			.set(FIELD_MODEL.MATCHER, dto.getMatcher())
 			.set(FIELD_MODEL.INLINE_HELP, dto.getInlineHelp())
@@ -214,6 +215,7 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 			.set(FIELD_MODEL.MIN_VALUE, dto.getMinValue() != null ? BigDecimal.valueOf(dto.getMinValue()) : null)
 			.set(FIELD_MODEL.MAX_VALUE, dto.getMaxValue() != null ? BigDecimal.valueOf(dto.getMaxValue()) : null)
 			.set(FIELD_MODEL.MIN_YEAR, dto.getMinYear())
+			.set(FIELD_MODEL.MAX_YEAR, dto.getMaxYear())
 			.set(FIELD_MODEL.DICTIONARY, dto.getDictionary())
 			.set(FIELD_MODEL.MATCHER, dto.getMatcher())
 			.set(FIELD_MODEL.INLINE_HELP, dto.getInlineHelp())
@@ -366,6 +368,7 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 		dto.setMinValue(record.getMinValue() != null ? record.getMinValue().doubleValue() : null);
 		dto.setMaxValue(record.getMaxValue() != null ? record.getMaxValue().doubleValue() : null);
 		dto.setMinYear(record.getMinYear());
+		dto.setMaxYear(record.getMaxYear());
 		dto.setDictionary(record.getDictionary());
 		dto.setMatcher(record.getMatcher());
 		dto.setInlineHelp(record.getInlineHelp());

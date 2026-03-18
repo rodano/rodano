@@ -69,6 +69,7 @@ export class FieldModelValidationDialogComponent extends BaseDialogComponent<Fie
 			maxValue: [fm.maxValue],
 
 			minYear: [fm.minYear],
+			maxYear: [fm.maxYear],
 			allowDateInFuture: [fm.allowDateInFuture || false],
 			withYears: [fm.withYears || false],
 			withMonths: [fm.withMonths || false],
@@ -185,6 +186,7 @@ export class FieldModelValidationDialogComponent extends BaseDialogComponent<Fie
 
 		if(this.showDateValidation()) {
 			result.minYear = formValue.minYear;
+			result.maxYear = formValue.maxYear;
 			result.allowDateInFuture = formValue.allowDateInFuture;
 			result.withYears = formValue.withYears;
 			result.withMonths = formValue.withMonths;
@@ -196,6 +198,7 @@ export class FieldModelValidationDialogComponent extends BaseDialogComponent<Fie
 
 		if(this.showDateSelectValidation()) {
 			result.minYear = formValue.minYear;
+			result.maxYear = formValue.maxYear;
 			result.allowDateInFuture = formValue.allowDateInFuture;
 			result.withYears = formValue.withYears;
 			result.withMonths = formValue.withMonths;

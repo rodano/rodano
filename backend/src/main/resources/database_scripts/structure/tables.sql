@@ -509,6 +509,7 @@ create table if not exists field_model (
     min_value decimal(18, 6) null,
     max_value decimal(18, 6) null,
     min_year int null,
+    max_year int null,
     dictionary varchar(256) null,
     matcher varchar(128) null,
     inline_help text null,
@@ -1213,6 +1214,7 @@ create table rule_definition_property (
     target varchar(64) null,
     type varchar(64) not null,
     configuration_entity varchar(64) null,
+    options varchar(255) null,
     constraint pk_rule_definition_property primary key (project_id, rule_definition_property_id),
     constraint uq_rule_definition_property_code unique (project_id, code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
@@ -1236,6 +1238,7 @@ create table rule_definition_action_parameter (
     label varchar(255) null,
     data_entity varchar(64) null,
     configuration_entity varchar(64) null,
+    options varchar(255) null,
     sort_order int not null default 0,
     constraint pk_rule_definition_action_parameter primary key (project_id, rule_definition_action_id, param_code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;

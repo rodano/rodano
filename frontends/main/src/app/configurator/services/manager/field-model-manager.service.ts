@@ -18,7 +18,7 @@ export class FieldModelManagerService extends BaseManagerService<FieldModel> {
 	protected getSimpleFields(): (keyof FieldModel)[] {
 		return ['id', 'type', 'dataType', 'datasetModelId', 'plugin', 'searchable',
 			'readOnly', 'exportable', 'allowDateInFuture', 'exportOrder', 'maxLength',
-			'maxIntegerDigits', 'maxDecimalDigits', 'minValue', 'maxValue', 'minYear',
+			'maxIntegerDigits', 'maxDecimalDigits', 'minValue', 'maxValue', 'minYear', 'maxYear',
 			'dictionary', 'matcher', 'inlineHelp', 'withYears', 'withMonths', 'withDays',
 			'withHours', 'withMinutes', 'withSeconds', 'yearsMandatory', 'monthsMandatory', 'daysMandatory',
 			'hoursMandatory', 'minutesMandatory', 'secondsMandatory', 'valueFormula',

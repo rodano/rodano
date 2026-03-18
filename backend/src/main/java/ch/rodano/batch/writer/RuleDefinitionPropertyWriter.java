@@ -43,12 +43,14 @@ public class RuleDefinitionPropertyWriter extends BaseWriter {
 					.set(RULE_DEFINITION_PROPERTY.TARGET, property.getTarget())
 					.set(RULE_DEFINITION_PROPERTY.TYPE, property.getType())
 					.set(RULE_DEFINITION_PROPERTY.CONFIGURATION_ENTITY, property.getConfigurationEntity())
+					.set(RULE_DEFINITION_PROPERTY.OPTIONS, property.getOptions())
 					.onDuplicateKeyUpdate()
 					.set(RULE_DEFINITION_PROPERTY.LABEL, property.getLabel())
 					.set(RULE_DEFINITION_PROPERTY.ENTITY_ID, property.getEntityId())
 					.set(RULE_DEFINITION_PROPERTY.TARGET, property.getTarget())
 					.set(RULE_DEFINITION_PROPERTY.TYPE, property.getType())
 					.set(RULE_DEFINITION_PROPERTY.CONFIGURATION_ENTITY, property.getConfigurationEntity())
+					.set(RULE_DEFINITION_PROPERTY.OPTIONS, property.getOptions())
 					.execute();
 			}
 		});

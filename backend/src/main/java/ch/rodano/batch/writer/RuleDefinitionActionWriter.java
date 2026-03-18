@@ -60,12 +60,14 @@ public class RuleDefinitionActionWriter extends BaseWriter {
 							.set(RULE_DEFINITION_ACTION_PARAMETER.LABEL, parameter.getLabel())
 							.set(RULE_DEFINITION_ACTION_PARAMETER.DATA_ENTITY, parameter.getDataEntity())
 							.set(RULE_DEFINITION_ACTION_PARAMETER.CONFIGURATION_ENTITY, parameter.getConfigurationEntity())
+							.set(RULE_DEFINITION_ACTION_PARAMETER.OPTIONS, parameter.getOptions())
 							.set(RULE_DEFINITION_ACTION_PARAMETER.SORT_ORDER, sortOrder)
 							.onDuplicateKeyUpdate()
 							.set(RULE_DEFINITION_ACTION_PARAMETER.PARAM_CODE, paramCode)
 							.set(RULE_DEFINITION_ACTION_PARAMETER.LABEL, parameter.getLabel())
 							.set(RULE_DEFINITION_ACTION_PARAMETER.DATA_ENTITY, parameter.getDataEntity())
 							.set(RULE_DEFINITION_ACTION_PARAMETER.CONFIGURATION_ENTITY, parameter.getConfigurationEntity())
+							.set(RULE_DEFINITION_ACTION_PARAMETER.OPTIONS, parameter.getOptions())
 							.set(RULE_DEFINITION_ACTION_PARAMETER.SORT_ORDER, sortOrder)
 							.execute();
 						sortOrder++;

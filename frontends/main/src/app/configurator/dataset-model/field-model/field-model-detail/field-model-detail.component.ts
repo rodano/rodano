@@ -238,4 +238,12 @@ export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldMod
 		  || this.isFieldModified('minutesMandatory')
 		  || this.isFieldModified('secondsMandatory');
 	}
+
+	get showPossibleValues(): boolean {
+		const type = this.draftEntity?.type;
+		if(!type) {
+			return false;
+		}
+		return ['SELECT', 'RADIO', 'CHECKBOX_GROUP', 'AUTO_COMPLETION'].includes(type);
+	}
 }

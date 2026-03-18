@@ -134,6 +134,20 @@ public class RuleDefinitionPropertyRecord extends UpdatableRecordImpl<RuleDefini
 		return (String) get(7);
 	}
 
+	/**
+	 * Setter for <code>rule_definition_property.options</code>.
+	 */
+	public void setOptions(String value) {
+		set(8, value);
+	}
+
+	/**
+	 * Getter for <code>rule_definition_property.options</code>.
+	 */
+	public String getOptions() {
+		return (String) get(8);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -157,7 +171,7 @@ public class RuleDefinitionPropertyRecord extends UpdatableRecordImpl<RuleDefini
 	/**
 	 * Create a detached, initialised RuleDefinitionPropertyRecord
 	 */
-	public RuleDefinitionPropertyRecord(UUID ruleDefinitionPropertyId, UUID projectId, String code, String label, String entityId, String target, String type, String configurationEntity) {
+	public RuleDefinitionPropertyRecord(UUID ruleDefinitionPropertyId, UUID projectId, String code, String label, String entityId, String target, String type, String configurationEntity, String options) {
 		super(RuleDefinitionProperty.RULE_DEFINITION_PROPERTY);
 
 		setRuleDefinitionPropertyId(ruleDefinitionPropertyId);
@@ -168,6 +182,7 @@ public class RuleDefinitionPropertyRecord extends UpdatableRecordImpl<RuleDefini
 		setTarget(target);
 		setType(type);
 		setConfigurationEntity(configurationEntity);
+		setOptions(options);
 		resetChangedOnNotNull();
 	}
 }

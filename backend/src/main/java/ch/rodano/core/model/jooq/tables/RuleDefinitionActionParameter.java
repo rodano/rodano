@@ -93,6 +93,11 @@ public class RuleDefinitionActionParameter extends TableImpl<RuleDefinitionActio
 	public final TableField<RuleDefinitionActionParameterRecord, String> CONFIGURATION_ENTITY = createField(DSL.name("configuration_entity"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
+	 * The column <code>rule_definition_action_parameter.options</code>.
+	 */
+	public final TableField<RuleDefinitionActionParameterRecord, String> OPTIONS = createField(DSL.name("options"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
 	 * The column <code>rule_definition_action_parameter.sort_order</code>.
 	 */
 	public final TableField<RuleDefinitionActionParameterRecord, Integer> SORT_ORDER = createField(DSL.name("sort_order"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "");

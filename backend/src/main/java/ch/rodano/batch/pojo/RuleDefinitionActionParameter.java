@@ -9,6 +9,7 @@ public class RuleDefinitionActionParameter {
 	private String label;
 	private String dataEntity;
 	private String configurationEntity;
+	private String options;
 
 	public String getId() {
 		return id;
@@ -42,6 +43,14 @@ public class RuleDefinitionActionParameter {
 		this.configurationEntity = configurationEntity;
 	}
 
+	public String getOptions() {
+		return options;
+	}
+
+	public void setOptions(final String options) {
+		this.options = options;
+	}
+
 	@Override
 	public String toString() {
 		return "RuleDefinitionActionParameter{" +
@@ -49,6 +58,7 @@ public class RuleDefinitionActionParameter {
 			", label='" + label + '\'' +
 			", dataEntity='" + dataEntity + '\'' +
 			", configurationEntity='" + configurationEntity + '\'' +
+			", options='" + options + '\'' +
 			'}';
 	}
 }

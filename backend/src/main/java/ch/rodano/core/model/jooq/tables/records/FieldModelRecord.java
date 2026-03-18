@@ -346,255 +346,269 @@ public class FieldModelRecord extends UpdatableRecordImpl<FieldModelRecord> {
 	}
 
 	/**
+	 * Setter for <code>field_model.max_year</code>.
+	 */
+	public void setMaxYear(Integer value) {
+		set(23, value);
+	}
+
+	/**
+	 * Getter for <code>field_model.max_year</code>.
+	 */
+	public Integer getMaxYear() {
+		return (Integer) get(23);
+	}
+
+	/**
 	 * Setter for <code>field_model.dictionary</code>.
 	 */
 	public void setDictionary(String value) {
-		set(23, value);
+		set(24, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.dictionary</code>.
 	 */
 	public String getDictionary() {
-		return (String) get(23);
+		return (String) get(24);
 	}
 
 	/**
 	 * Setter for <code>field_model.matcher</code>.
 	 */
 	public void setMatcher(String value) {
-		set(24, value);
+		set(25, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.matcher</code>.
 	 */
 	public String getMatcher() {
-		return (String) get(24);
+		return (String) get(25);
 	}
 
 	/**
 	 * Setter for <code>field_model.inline_help</code>.
 	 */
 	public void setInlineHelp(String value) {
-		set(25, value);
+		set(26, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.inline_help</code>.
 	 */
 	public String getInlineHelp() {
-		return (String) get(25);
+		return (String) get(26);
 	}
 
 	/**
 	 * Setter for <code>field_model.with_years</code>.
 	 */
 	public void setWithYears(Boolean value) {
-		set(26, value);
+		set(27, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.with_years</code>.
 	 */
 	public Boolean getWithYears() {
-		return (Boolean) get(26);
+		return (Boolean) get(27);
 	}
 
 	/**
 	 * Setter for <code>field_model.with_months</code>.
 	 */
 	public void setWithMonths(Boolean value) {
-		set(27, value);
+		set(28, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.with_months</code>.
 	 */
 	public Boolean getWithMonths() {
-		return (Boolean) get(27);
+		return (Boolean) get(28);
 	}
 
 	/**
 	 * Setter for <code>field_model.with_days</code>.
 	 */
 	public void setWithDays(Boolean value) {
-		set(28, value);
+		set(29, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.with_days</code>.
 	 */
 	public Boolean getWithDays() {
-		return (Boolean) get(28);
+		return (Boolean) get(29);
 	}
 
 	/**
 	 * Setter for <code>field_model.with_hours</code>.
 	 */
 	public void setWithHours(Boolean value) {
-		set(29, value);
+		set(30, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.with_hours</code>.
 	 */
 	public Boolean getWithHours() {
-		return (Boolean) get(29);
+		return (Boolean) get(30);
 	}
 
 	/**
 	 * Setter for <code>field_model.with_minutes</code>.
 	 */
 	public void setWithMinutes(Boolean value) {
-		set(30, value);
+		set(31, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.with_minutes</code>.
 	 */
 	public Boolean getWithMinutes() {
-		return (Boolean) get(30);
+		return (Boolean) get(31);
 	}
 
 	/**
 	 * Setter for <code>field_model.with_seconds</code>.
 	 */
 	public void setWithSeconds(Boolean value) {
-		set(31, value);
+		set(32, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.with_seconds</code>.
 	 */
 	public Boolean getWithSeconds() {
-		return (Boolean) get(31);
+		return (Boolean) get(32);
 	}
 
 	/**
 	 * Setter for <code>field_model.years_mandatory</code>.
 	 */
 	public void setYearsMandatory(Boolean value) {
-		set(32, value);
+		set(33, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.years_mandatory</code>.
 	 */
 	public Boolean getYearsMandatory() {
-		return (Boolean) get(32);
+		return (Boolean) get(33);
 	}
 
 	/**
 	 * Setter for <code>field_model.months_mandatory</code>.
 	 */
 	public void setMonthsMandatory(Boolean value) {
-		set(33, value);
+		set(34, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.months_mandatory</code>.
 	 */
 	public Boolean getMonthsMandatory() {
-		return (Boolean) get(33);
+		return (Boolean) get(34);
 	}
 
 	/**
 	 * Setter for <code>field_model.days_mandatory</code>.
 	 */
 	public void setDaysMandatory(Boolean value) {
-		set(34, value);
+		set(35, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.days_mandatory</code>.
 	 */
 	public Boolean getDaysMandatory() {
-		return (Boolean) get(34);
+		return (Boolean) get(35);
 	}
 
 	/**
 	 * Setter for <code>field_model.hours_mandatory</code>.
 	 */
 	public void setHoursMandatory(Boolean value) {
-		set(35, value);
+		set(36, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.hours_mandatory</code>.
 	 */
 	public Boolean getHoursMandatory() {
-		return (Boolean) get(35);
+		return (Boolean) get(36);
 	}
 
 	/**
 	 * Setter for <code>field_model.minutes_mandatory</code>.
 	 */
 	public void setMinutesMandatory(Boolean value) {
-		set(36, value);
+		set(37, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.minutes_mandatory</code>.
 	 */
 	public Boolean getMinutesMandatory() {
-		return (Boolean) get(36);
+		return (Boolean) get(37);
 	}
 
 	/**
 	 * Setter for <code>field_model.seconds_mandatory</code>.
 	 */
 	public void setSecondsMandatory(Boolean value) {
-		set(37, value);
+		set(38, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.seconds_mandatory</code>.
 	 */
 	public Boolean getSecondsMandatory() {
-		return (Boolean) get(37);
+		return (Boolean) get(38);
 	}
 
 	/**
 	 * Setter for <code>field_model.value_formula</code>.
 	 */
 	public void setValueFormula(String value) {
-		set(38, value);
+		set(39, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.value_formula</code>.
 	 */
 	public String getValueFormula() {
-		return (String) get(38);
+		return (String) get(39);
 	}
 
 	/**
 	 * Setter for <code>field_model.possible_values_provider</code>.
 	 */
 	public void setPossibleValuesProvider(String value) {
-		set(39, value);
+		set(40, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.possible_values_provider</code>.
 	 */
 	public String getPossibleValuesProvider() {
-		return (String) get(39);
+		return (String) get(40);
 	}
 
 	/**
 	 * Setter for <code>field_model.possible_values_provider_desc</code>.
 	 */
 	public void setPossibleValuesProviderDesc(String value) {
-		set(40, value);
+		set(41, value);
 	}
 
 	/**
 	 * Getter for <code>field_model.possible_values_provider_desc</code>.
 	 */
 	public String getPossibleValuesProviderDesc() {
-		return (String) get(40);
+		return (String) get(41);
 	}
 
 	// -------------------------------------------------------------------------
@@ -620,7 +634,7 @@ public class FieldModelRecord extends UpdatableRecordImpl<FieldModelRecord> {
 	/**
 	 * Create a detached, initialised FieldModelRecord
 	 */
-	public FieldModelRecord(UUID fieldModelId, UUID projectId, UUID datasetModelId, String code, FieldModelType type, FieldModelDataType dataType, String shortname, String longname, String description, String matcherMessage, String advancedHelp, Boolean plugin, Boolean searchable, Boolean readOnly, Boolean exportable, Boolean allowDateInFuture, Integer exportOrder, Integer maxLength, Integer maxIntegerDigits, Integer maxDecimalDigits, BigDecimal minValue, BigDecimal maxValue, Integer minYear, String dictionary, String matcher, String inlineHelp, Boolean withYears, Boolean withMonths, Boolean withDays, Boolean withHours, Boolean withMinutes, Boolean withSeconds, Boolean yearsMandatory, Boolean monthsMandatory, Boolean daysMandatory, Boolean hoursMandatory, Boolean minutesMandatory, Boolean secondsMandatory, String valueFormula, String possibleValuesProvider, String possibleValuesProviderDesc) {
+	public FieldModelRecord(UUID fieldModelId, UUID projectId, UUID datasetModelId, String code, FieldModelType type, FieldModelDataType dataType, String shortname, String longname, String description, String matcherMessage, String advancedHelp, Boolean plugin, Boolean searchable, Boolean readOnly, Boolean exportable, Boolean allowDateInFuture, Integer exportOrder, Integer maxLength, Integer maxIntegerDigits, Integer maxDecimalDigits, BigDecimal minValue, BigDecimal maxValue, Integer minYear, Integer maxYear, String dictionary, String matcher, String inlineHelp, Boolean withYears, Boolean withMonths, Boolean withDays, Boolean withHours, Boolean withMinutes, Boolean withSeconds, Boolean yearsMandatory, Boolean monthsMandatory, Boolean daysMandatory, Boolean hoursMandatory, Boolean minutesMandatory, Boolean secondsMandatory, String valueFormula, String possibleValuesProvider, String possibleValuesProviderDesc) {
 		super(FieldModel.FIELD_MODEL);
 
 		setFieldModelId(fieldModelId);
@@ -646,6 +660,7 @@ public class FieldModelRecord extends UpdatableRecordImpl<FieldModelRecord> {
 		setMinValue(minValue);
 		setMaxValue(maxValue);
 		setMinYear(minYear);
+		setMaxYear(maxYear);
 		setDictionary(dictionary);
 		setMatcher(matcher);
 		setInlineHelp(inlineHelp);

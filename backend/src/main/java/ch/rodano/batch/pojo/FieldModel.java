@@ -35,6 +35,7 @@ public class FieldModel {
 	private BigDecimal minValue;
 	private BigDecimal maxValue;
 	private Integer minYear;
+	private Integer maxYear;
 	private String dictionary;
 	private String inlineHelp;
 	private boolean withYears;
@@ -227,6 +228,14 @@ public class FieldModel {
 
 	public void setMinYear(final Integer minYear) {
 		this.minYear = minYear;
+	}
+
+	public Integer getMaxYear() {
+		return maxYear;
+	}
+
+	public void setMaxYear(final Integer maxYear) {
+		this.maxYear = maxYear;
 	}
 
 	public String getDictionary() {
@@ -422,8 +431,8 @@ public class FieldModel {
 			", description=" + description +
 			", matcherMessage=" + matcherMessage +
 			", advancedHelp=" + advancedHelp +
-			", type='" + type + '\'' +
-			", dataType='" + dataType + '\'' +
+			", type=" + type +
+			", dataType=" + dataType +
 			", valueFormula='" + valueFormula + '\'' +
 			", plugin=" + plugin +
 			", searchable=" + searchable +
@@ -437,6 +446,7 @@ public class FieldModel {
 			", minValue=" + minValue +
 			", maxValue=" + maxValue +
 			", minYear=" + minYear +
+			", maxYear=" + maxYear +
 			", dictionary='" + dictionary + '\'' +
 			", inlineHelp='" + inlineHelp + '\'' +
 			", withYears=" + withYears +
