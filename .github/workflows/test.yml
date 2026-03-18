@@ -82,15 +82,16 @@ jobs:
             npm -C ../action-junit-pdf-reporter install
             node ../action-junit-pdf-reporter/index.js
 
-      # generate and transform coverage report
-      - name: Generate coverage report
-        shell: bash
-        run: mvn jacoco:report
-      - name: Transform coverage report to PDF
-        uses: ferdinandkeller/html-to-pdf-action@v2.1
-        with:
-          source-path: backend/target/site/jacoco
-          destination-path: coverage-report.pdf
+# does not work
+#      # generate and transform coverage report
+#      - name: Generate coverage report
+#        shell: bash
+#        run: mvn jacoco:report
+#      - name: Transform coverage report to PDF
+#        uses: ferdinandkeller/html-to-pdf-action@v2.1
+#        with:
+#          source-path: backend/target/site/jacoco
+#          destination-path: coverage-report.pdf
 
       # store reports as artifacts
       - name: Store test report
@@ -100,7 +101,7 @@ jobs:
           path: |
             backend/test-output/results.xml
             backend/test-output/results.pdf
-            coverage-report.pdf
+            backend/target/site/jacoco.csv
 
       # publish module to the Maven repository
       - name: Publish to GitHub Packages
