@@ -95,7 +95,7 @@ export class WorkflowSummaryListComponent
 			.subscribe((result: WorkflowSummary | null) => {
 				if(result) {
 					this.workflowSummaryManager.create(this.projectId, result).subscribe({
-						next: () => this.afterCreate('WorkflowSummary'),
+						next: () => this.afterCreate('Workflow summary'),
 						error: e => {
 							console.error(e);
 							this.snackBar.open('Failed to create workflow summary', 'Close', {duration: 3000});

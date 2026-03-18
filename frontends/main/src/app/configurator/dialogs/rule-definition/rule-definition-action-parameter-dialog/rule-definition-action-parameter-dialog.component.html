@@ -1,0 +1,104 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">Edit Parameters</h2>
+
+	<div class="dialog-content">
+		<div class="selectors-section">
+			<div class="section-header">
+				<h3>Parameters</h3>
+				<button type="button" class="btn-add-item" (click)="addParameter()">
+					<mat-icon>add</mat-icon>
+					Add Parameter
+				</button>
+			</div>
+
+			@if (parameters.length === 0) {
+				<div class="empty-state">
+					<mat-icon>tune</mat-icon>
+					<p>No parameters configured. Click "Add Parameter" to add one.</p>
+				</div>
+			} @else {
+				@for (param of parameters; track $index; let i = $index) {
+					<div class="form-section">
+						<div class="ordered-list-header">
+							<div class="ordered-list-controls">
+								<button type="button" class="btn-icon" [disabled]="i === 0" (click)="moveUp(i)">
+									<mat-icon>arrow_upward</mat-icon>
+								</button>
+								<button type="button" class="btn-icon" [disabled]="i === parameters.length - 1" (click)="moveDown(i)">
+									<mat-icon>arrow_downward</mat-icon>
+								</button>
+								<button type="button" class="btn-delete" (click)="removeParameter(i)">
+									<mat-icon>delete</mat-icon>
+								</button>
+							</div>
+							<span class="ordered-list-number">Parameter {{ i + 1 }}</span>
+						</div>
+
+						<div class="form-field">
+							<label>Code *</label>
+							<input type="text"
+														[value]="param.id"
+														(input)="updateField(i, 'id', $any($event.target).value)"
+														placeholder="PARAMETER_CODE"
+														style="text-transform: uppercase">
+							@if (!param.id.trim()) {
+								<span class="error-message">Code is required</span>
+							}
+						</div>
+
+						<div class="form-field">
+							<label>Label *</label>
+							<input type="text"
+														[value]="param.label || ''"
+														(input)="updateField(i, 'label', $any($event.target).value)"
+														placeholder="Parameter label">
+							@if (!param.label.trim()) {
+								<span class="error-message">Label is required</span>
+							}
+						</div>
+
+						<div class="form-row">
+							<div class="form-field">
+								<label>Data Entity</label>
+								<mat-select [value]="param.dataEntity || ''"
+																				(selectionChange)="updateField(i, 'dataEntity', $event.value)">
+									<mat-option value="">None</mat-option>
+									@for (option of entityOptions; track option.value) {
+										<mat-option [value]="option.value">{{ option.label }}</mat-option>
+									}
+								</mat-select>
+							</div>
+
+							<div class="form-field">
+								<label>Configuration Entity</label>
+								<mat-select [value]="param.configurationEntity || ''"
+																				(selectionChange)="updateField(i, 'configurationEntity', $event.value)">
+									<mat-option value="">None</mat-option>
+									@for (option of configEntityOptions; track option) {
+										<mat-option [value]="option">{{ option }}</mat-option>
+									}
+								</mat-select>
+							</div>
+						</div>
+
+						<div class="form-field">
+							<label>Options</label>
+							<input type="text"
+														[value]="param.options || ''"
+														(input)="updateField(i, 'options', $any($event.target).value)"
+														placeholder="Additional options">
+						</div>
+					</div>
+				}
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="!isValid()">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>

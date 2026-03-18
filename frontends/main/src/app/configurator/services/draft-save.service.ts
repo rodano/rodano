@@ -42,6 +42,10 @@ import {WorkflowWidgetService} from './api/workflow-widget.service';
 import {WorkflowWidgetConfig} from '@core/model/workflow-widget-config';
 import {WorkflowSummaryService} from './api/workflow-summary.service';
 import {WorkflowSummary} from '@core/model/workflow-summary';
+import {RuleDefinitionPropertyService} from './api/rule-definition-property.service';
+import {RuleDefinitionProperty} from '@core/model/rule-definition-property';
+import {RuleDefinitionActionService} from './api/rule-definition-action.service';
+import {RuleDefinitionAction} from '@core/model/rule-definition-action';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -66,7 +70,9 @@ export class DraftSaveService {
 		private timelineGraphService: TimelineGraphService,
 		private timelineGraphSectionService: TimelineGraphSectionService,
 		private workflowWidgetService: WorkflowWidgetService,
-		private workflowSummaryService: WorkflowSummaryService
+		private workflowSummaryService: WorkflowSummaryService,
+		private ruleDefinitionPropertyService: RuleDefinitionPropertyService,
+		private ruleDefinitionActionService: RuleDefinitionActionService
 	) {}
 
 	saveScopeModels(
@@ -689,6 +695,76 @@ export class DraftSaveService {
 				const workflowSummary = workflowSummaries.find(ws => ws.workflowSummaryId === id);
 				if(workflowSummary) {
 					saveObservables.push(this.workflowSummaryService.updateWorkflowSummary(projectId, id, workflowSummary));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveRuleDefinitionProperties(
+		projectId: string,
+		modifiedIds: Set<string>,
+		ruleDefinitionProperties: RuleDefinitionProperty[],
+		originalRuleDefinitionProperties: RuleDefinitionProperty[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalRuleDefinitionProperties.find(rdp => rdp.ruleDefinitionPropertyId === originalId);
+				if(original) {
+					saveObservables.push(this.ruleDefinitionPropertyService.deleteRuleDefinitionProperty(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const ruleDefinitionProperty = ruleDefinitionProperties.find(rdp => rdp.ruleDefinitionPropertyId === id);
+				if(ruleDefinitionProperty) {
+					saveObservables.push(this.ruleDefinitionPropertyService.createRuleDefinitionProperty(projectId, ruleDefinitionProperty));
+				}
+			}
+			else {
+				const ruleDefinitionProperty = ruleDefinitionProperties.find(rdp => rdp.ruleDefinitionPropertyId === id);
+				if(ruleDefinitionProperty) {
+					saveObservables.push(this.ruleDefinitionPropertyService.updateRuleDefinitionProperty(projectId, id, ruleDefinitionProperty));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveRuleDefinitionActions(
+		projectId: string,
+		modifiedIds: Set<string>,
+		ruleDefinitionActions: RuleDefinitionAction[],
+		originalRuleDefinitionActions: RuleDefinitionAction[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalRuleDefinitionActions.find(rda => rda.ruleDefinitionActionId === originalId);
+				if(original) {
+					saveObservables.push(this.ruleDefinitionActionService.deleteRuleDefinitionAction(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const ruleDefinitionAction = ruleDefinitionActions.find(rda => rda.ruleDefinitionActionId === id);
+				if(ruleDefinitionAction) {
+					saveObservables.push(this.ruleDefinitionActionService.createRuleDefinitionAction(projectId, ruleDefinitionAction));
+				}
+			}
+			else {
+				const ruleDefinitionAction = ruleDefinitionActions.find(rda => rda.ruleDefinitionActionId === id);
+				if(ruleDefinitionAction) {
+					saveObservables.push(this.ruleDefinitionActionService.updateRuleDefinitionAction(projectId, id, ruleDefinitionAction));
 				}
 			}
 		});

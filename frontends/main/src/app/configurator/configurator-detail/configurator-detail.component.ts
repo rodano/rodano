@@ -22,6 +22,12 @@ import {WorkflowWidgetListComponent} from '../workflow-widget/workflow-widget-li
 import {
 	WorkflowSummaryListComponent
 } from '../workflow-summary/workflow-summary-list/workflow-summary-list.component';
+import {
+	RuleDefinitionPropertyListComponent
+} from '../rule-definition/rule-definition-property-list/rule-definition-property-list.component';
+import {
+	RuleDefinitionActionListComponent
+} from '../rule-definition/rule-definition-action-list/rule-definition-action-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -46,6 +52,8 @@ import {
 		TimelineGraphListComponent,
 		WorkflowWidgetListComponent,
 		WorkflowSummaryListComponent,
+		RuleDefinitionPropertyListComponent,
+		RuleDefinitionActionListComponent,
 		EmptyStateComponent
 	]
 })
@@ -64,6 +72,8 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(TimelineGraphListComponent) timelineGraphListComponent?: TimelineGraphListComponent;
 	@ViewChild(WorkflowWidgetListComponent) workflowWidgetListComponent?: WorkflowWidgetListComponent;
 	@ViewChild(WorkflowSummaryListComponent) workflowSummaryListComponent?: WorkflowSummaryListComponent;
+	@ViewChild(RuleDefinitionPropertyListComponent) ruleDefinitionPropertyListComponent?: RuleDefinitionPropertyListComponent;
+	@ViewChild(RuleDefinitionActionListComponent) ruleDefinitionActionListComponent?: RuleDefinitionActionListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -168,7 +178,19 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedWorkflowSummaryId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'overview' | null = null;
+	@Output() ruleDefinitionPropertiesChanged = new EventEmitter<boolean>();
+	@Output() ruleDefinitionPropertyContextChanged = new EventEmitter<{
+		ruleDefinitionProperties: any[];
+		selectedRuleDefinitionPropertyId: string | null;
+	}>();
+
+	@Output() ruleDefinitionActionsChanged = new EventEmitter<boolean>();
+	@Output() ruleDefinitionActionContextChanged = new EventEmitter<{
+		ruleDefinitionActions: any[];
+		selectedRuleDefinitionActionId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -302,6 +324,24 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.workflowSummariesChanged.emit(value);
 	}
 
+	onRuleDefinitionPropertySelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onRuleDefinitionPropertiesChanged(value: boolean): void {
+		this.ruleDefinitionPropertiesChanged.emit(value);
+	}
+
+	onRuleDefinitionActionSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onRuleDefinitionActionsChanged(value: boolean): void {
+		this.ruleDefinitionActionsChanged.emit(value);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -400,6 +440,16 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'timeline-graphs') {
 			this.selectedNodeType = 'timeline-graphs';
+			return;
+		}
+
+		if(this.selectedNode === 'rule-definition-properties') {
+			this.selectedNodeType = 'rule-definition-properties';
+			return;
+		}
+
+		if(this.selectedNode === 'rule-definition-actions') {
+			this.selectedNodeType = 'rule-definition-actions';
 			return;
 		}
 
@@ -514,5 +564,19 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedWorkflowSummaryId: string | null;
 	}): void {
 		this.workflowSummaryContextChanged.emit(context);
+	}
+
+	onRuleDefinitionPropertyContextChanged(context: {
+		ruleDefinitionProperties: any[];
+		selectedRuleDefinitionPropertyId: string | null;
+	}): void {
+		this.ruleDefinitionPropertyContextChanged.emit(context);
+	}
+
+	onRuleDefinitionActionContextChanged(context: {
+		ruleDefinitionActions: any[];
+		selectedRuleDefinitionActionId: string | null;
+	}): void {
+		this.ruleDefinitionActionContextChanged.emit(context);
 	}
 }

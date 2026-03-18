@@ -1,0 +1,86 @@
+<app-list-header title="Rule Definition Actions" subtitle="Configure rule definition actions for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading rule definition actions...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-rule-def-action" (click)="onCreateRuleDefinitionAction()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Rule Definition Action</h3>
+						<p>Add a new rule definition action</p>
+					</div>
+				</div>
+
+				@for (action of ruleDefinitionActions; track action.ruleDefinitionActionId) {
+					<div class="primary-card theme-rule-def-action"
+										[class.selected]="isSelected(action)"
+										[appModified]="modifiedIds.has(action.ruleDefinitionActionId)"
+										(click)="onSelectRuleDefinitionAction(action)">
+
+						@if (isSelected(action)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ action.label }}</h3>
+								<p class="card-code">{{ action.id }}</p>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>circle</mat-icon>
+									<span>Entity: <b>{{ action.entity }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>variables</mat-icon>
+									<span>{{ action.parameters.length }} {{ action.parameters.length === 1 ? 'Parameter' : 'Parameters' }}</span>
+								</div>
+							</div>
+						</div>
+
+						@if (isModified(action.ruleDefinitionActionId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (ruleDefinitionActions.length === 0) {
+				<app-empty-state
+					[icon]="'more_up'"
+					[title]="'No Rule Definition Actions'"
+					[message]="'Create your first action to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedRuleDefinitionAction && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-rule-definition-action-detail
+					[ruleDefinitionAction]="selectedRuleDefinitionAction"
+					[projectId]="projectId"
+					[project]="project"
+					[allRuleDefinitionActions]="ruleDefinitionActions"
+					(ruleDefinitionActionUpdated)="onRuleDefinitionActionUpdated($event)"
+					(ruleDefinitionActionDeleted)="onRuleDefinitionActionDeleted($event)"
+					(closed)="onSelectRuleDefinitionAction(selectedRuleDefinitionAction)">
+				</app-rule-definition-action-detail>
+			</div>
+		}
+	}
+</div>

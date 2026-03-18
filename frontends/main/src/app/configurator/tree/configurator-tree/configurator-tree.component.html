@@ -145,19 +145,21 @@
 		(categoryClicked)="onWorkflowSummaryClicked()">
 	</app-workflow-summary-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">apartment</mat-icon>
-			<span class="node-label">Rule Definition Properties</span>
-		</div>
-	</div>
+	<app-rule-definition-property-tree
+		[projectId]="projectId"
+		[ruleDefinitionProperties]="ruleDefinitionProperties"
+		[expanded]="expandedCategory === 'rule-definition-properties'"
+		[selectedRuleDefinitionPropertyId]="selectedRuleDefinitionPropertyId"
+		(categoryClicked)="onRuleDefinitionPropertyClicked()">
+	</app-rule-definition-property-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">more_up</mat-icon>
-			<span class="node-label">Rule Definition Actions</span>
-		</div>
-	</div>
+	<app-rule-definition-action-tree
+		[projectId]="projectId"
+		[ruleDefinitionActions]="ruleDefinitionActions"
+		[expanded]="expandedCategory === 'rule-definition-actions'"
+		[selectedRuleDefinitionActionId]="selectedRuleDefinitionActionId"
+		(categoryClicked)="onRuleDefinitionActionClicked()">
+	</app-rule-definition-action-tree>
 
 	<div class="tree-node">
 		<div class="node-content clickable" (click)="onCategoryClick('menus')">

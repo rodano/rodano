@@ -107,7 +107,7 @@ export class WorkflowSummaryDialogService {
 					.flatMap(workflowId => this.workflowStateManager.getAllForWorkflow(workflowId));
 
 				const dialogRef = this.dialog.open(WorkflowSummaryColumnDialogComponent, {
-					width: '700px',
+					width: '500px',
 					disableClose: true,
 					data: {
 						columns: JSON.parse(JSON.stringify(workflowSummary.columns ?? [])),

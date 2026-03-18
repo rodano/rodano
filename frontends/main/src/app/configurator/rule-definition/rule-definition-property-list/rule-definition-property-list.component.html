@@ -1,0 +1,94 @@
+<app-list-header title="Rule Definition Properties" subtitle="Configure rule definition properties for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading rule definition properties...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-rule-def-property" (click)="onCreateRuleDefinitionProperty()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Rule Definition Property</h3>
+						<p>Add a new rule definition property</p>
+					</div>
+				</div>
+
+				@for (property of ruleDefinitionProperties; track property.ruleDefinitionPropertyId) {
+					<div class="primary-card theme-rule-def-property"
+										[class.selected]="isSelected(property)"
+										[appModified]="modifiedIds.has(property.ruleDefinitionPropertyId)"
+										(click)="onSelectRuleDefinitionProperty(property)">
+
+						@if (isSelected(property)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ property.label }}</h3>
+								<p class="card-code">{{ property.id }}</p>
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>circle</mat-icon>
+									<span>Entity: <b>{{ property.entity }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>target</mat-icon>
+									<span>Target: <b>{{ property.target }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>type_specimen</mat-icon>
+									<span>Type: <b>{{ property.type }}</b></span>
+								</div>
+								<div class="detail-item">
+									<mat-icon>hexagon</mat-icon>
+									<span>Configuration Entity: <b>{{ property.configurationEntity }}</b></span>
+								</div>
+							</div>
+						</div>
+
+						@if (isModified(property.ruleDefinitionPropertyId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (ruleDefinitionProperties.length === 0) {
+				<app-empty-state
+					[icon]="'apartment'"
+					[title]="'No Rule Definition Properties'"
+					[message]="'Create your first property to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedRuleDefinitionProperty && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-rule-definition-property-detail
+					[ruleDefinitionProperty]="selectedRuleDefinitionProperty"
+					[projectId]="projectId"
+					[project]="project"
+					[allRuleDefinitionProperties]="ruleDefinitionProperties"
+					(ruleDefinitionPropertyUpdated)="onRuleDefinitionPropertyUpdated($event)"
+					(ruleDefinitionPropertyDeleted)="onRuleDefinitionPropertyDeleted($event)"
+					(closed)="onSelectRuleDefinitionProperty(selectedRuleDefinitionProperty)">
+				</app-rule-definition-property-detail>
+			</div>
+		}
+	}
+</div>

@@ -16,6 +16,8 @@ import {FormModelContext} from './contexts/form-model-context';
 import {TimelineGraphContext} from './contexts/timeline-graph-context';
 import {WorkflowWidgetContext} from './contexts/workflow-widget-context';
 import {WorkflowSummaryContext} from './contexts/workflow-summary-context';
+import {RuleDefinitionPropertyContext} from './contexts/rule-definition-property-context';
+import {RuleDefinitionActionContext} from './contexts/rule-definition-action-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -314,6 +316,40 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveRuleDefinitionProperties(projectId: string, context: RuleDefinitionPropertyContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveRuleDefinitionProperties(
+				projectId,
+				context.modifiedRuleDefinitionPropertyIds,
+				context.ruleDefinitionProperties,
+				context.originalRuleDefinitionProperties
+			)
+		]).pipe(
+			map(() => {
+				context.ruleDefinitionPropertyManager.syncOriginalsWithCurrent();
+
+				context.ruleDefinitionPropertyManager.invalidate();
+			})
+		);
+	}
+
+	saveRuleDefinitionActions(projectId: string, context: RuleDefinitionActionContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveRuleDefinitionActions(
+				projectId,
+				context.modifiedRuleDefinitionActionIds,
+				context.ruleDefinitionActions,
+				context.originalRuleDefinitionActions
+			)
+		]).pipe(
+			map(() => {
+				context.ruleDefinitionActionManager.syncOriginalsWithCurrent();
+
+				context.ruleDefinitionActionManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -409,5 +445,17 @@ export class EntitySaveOrchestratorService {
 		context.workflowSummaryManager.resetToOriginals();
 
 		context.workflowSummaryManager.invalidate();
+	}
+
+	resetRuleDefinitionPropertiesToOriginals(context: RuleDefinitionPropertyContext): void {
+		context.ruleDefinitionPropertyManager.resetToOriginals();
+
+		context.ruleDefinitionPropertyManager.invalidate();
+	}
+
+	resetRuleDefinitionActionsToOriginals(context: RuleDefinitionActionContext): void {
+		context.ruleDefinitionActionManager.resetToOriginals();
+
+		context.ruleDefinitionActionManager.invalidate();
 	}
 }

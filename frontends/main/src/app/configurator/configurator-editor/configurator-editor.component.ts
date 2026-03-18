@@ -40,6 +40,8 @@ import {TimelineGraphManagerService} from '../services/manager/timeline-graph-ma
 import {TimelineGraphSectionManagerService} from '../services/manager/timeline-graph-section-manager.service';
 import {WorkflowWidgetManagerService} from '../services/manager/workflow-widget-manager.service';
 import {WorkflowSummaryManagerService} from '../services/manager/workflow-summary-manager.service';
+import {RuleDefinitionPropertyManagerService} from '../services/manager/rule-definition-property-manager.service';
+import {RuleDefinitionActionManagerService} from '../services/manager/rule-definition-action-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -83,6 +85,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	timelineGraphModified = false;
 	workflowWidgetModified = false;
 	workflowSummaryModified = false;
+	ruleDefinitionPropertyModified = false;
+	ruleDefinitionActionModified = false;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -105,6 +109,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	sections: any[] = [];
 	workflowWidgets: any[] = [];
 	workflowSummaries: any[] = [];
+	ruleDefinitionProperties: any[] = [];
+	ruleDefinitionActions: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -127,6 +133,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedGraphSectionId: string | null = null;
 	selectedWorkflowWidgetId: string | null = null;
 	selectedWorkflowSummaryId: string | null = null;
+	selectedRuleDefinitionPropertyId: string | null = null;
+	selectedRuleDefinitionActionId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -161,6 +169,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private timelineGraphSectionManager: TimelineGraphSectionManagerService,
 		private workflowWidgetManager: WorkflowWidgetManagerService,
 		private workflowSummaryManager: WorkflowSummaryManagerService,
+		private ruleDefinitionPropertyManager: RuleDefinitionPropertyManagerService,
+		private ruleDefinitionActionManager: RuleDefinitionActionManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -213,6 +223,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.timelineGraphSectionManager.invalidate();
 		this.workflowWidgetManager.invalidate();
 		this.workflowSummaryManager.invalidate();
+		this.ruleDefinitionPropertyManager.invalidate();
+		this.ruleDefinitionActionManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -306,6 +318,16 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: models => this.workflowSummaries = models,
 			error: error => console.error('Error loading workflow summaries:', error)
 		});
+
+		this.ruleDefinitionPropertyManager.load(this.projectId).subscribe({
+			next: models => this.ruleDefinitionProperties = models,
+			error: error => console.error('Error loading rule definition properties:', error)
+		});
+
+		this.ruleDefinitionActionManager.load(this.projectId).subscribe({
+			next: models => this.ruleDefinitionActions = models,
+			error: error => console.error('Error loading rule definition actions:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -324,6 +346,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.sections = this.timelineGraphSectionManager.getAll();
 		this.workflowWidgets = this.workflowWidgetManager.getAll();
 		this.workflowSummaries = this.workflowSummaryManager.getAll();
+		this.ruleDefinitionProperties = this.ruleDefinitionPropertyManager.getAll();
+		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -362,7 +386,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries' || nodeId === 'rule-definition-properties' || nodeId === 'rule-definition-actions') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -383,6 +407,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedGraphSectionId = null;
 			this.selectedWorkflowWidgetId = null;
 			this.selectedWorkflowSummaryId = null;
+			this.selectedRuleDefinitionPropertyId = null;
+			this.selectedRuleDefinitionActionId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
@@ -400,6 +426,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.sections = [];
 			this.workflowWidgets = [];
 			this.workflowSummaries = [];
+			this.ruleDefinitionProperties = [];
+			this.ruleDefinitionActions = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -415,6 +443,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.timelineGraphListComponent?.clearSelection();
 			this.detailComponent?.workflowWidgetListComponent?.clearSelection();
 			this.detailComponent?.workflowSummaryListComponent?.clearSelection();
+			this.detailComponent?.ruleDefinitionPropertyListComponent?.clearSelection();
+			this.detailComponent?.ruleDefinitionActionListComponent?.clearSelection();
 		}
 	}
 
@@ -432,6 +462,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onTimelineGraphsChanged(value: boolean): void {this.timelineGraphModified = value;}
 	onWorkflowWidgetsChanged(value: boolean): void {this.workflowWidgetModified = value;}
 	onWorkflowSummariesChanged(value: boolean): void {this.workflowSummaryModified = value;}
+	onRuleDefinitionPropertiesChanged(value: boolean): void {this.ruleDefinitionPropertyModified = value;}
+	onRuleDefinitionActionsChanged(value: boolean): void {this.ruleDefinitionActionModified = value;}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
@@ -519,6 +551,14 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(this.workflowSummaryModified) {
 					saveObservables.push(this.saveWorkflowSummaries());
+				}
+
+				if(this.ruleDefinitionPropertyModified) {
+					saveObservables.push(this.saveRuleDefinitionProperties());
+				}
+
+				if(this.ruleDefinitionActionModified) {
+					saveObservables.push(this.saveRuleDefinitionActions());
 				}
 
 				if(saveObservables.length > 0) {
@@ -795,6 +835,38 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowSummaries = this.workflowSummaryManager.getAll();
 	}
 
+	private async saveRuleDefinitionProperties(): Promise<void> {
+		const component = this.detailComponent?.ruleDefinitionPropertyListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveRuleDefinitionProperties(this.projectId, {
+			ruleDefinitionPropertyManager: component.ruleDefinitionPropertyManager,
+			ruleDefinitionProperties: component.ruleDefinitionProperties,
+			originalRuleDefinitionProperties: component.originalRuleDefinitionProperties,
+			modifiedRuleDefinitionPropertyIds: component.modifiedRuleDefinitionPropertyIds
+		}));
+		component.loadRuleDefinitionProperties();
+		this.ruleDefinitionProperties = this.ruleDefinitionPropertyManager.getAll();
+	}
+
+	private async saveRuleDefinitionActions(): Promise<void> {
+		const component = this.detailComponent?.ruleDefinitionActionListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveRuleDefinitionActions(this.projectId, {
+			ruleDefinitionActionManager: component.ruleDefinitionActionManager,
+			ruleDefinitionActions: component.ruleDefinitionActions,
+			originalRuleDefinitionActions: component.originalRuleDefinitionActions,
+			modifiedRuleDefinitionActionIds: component.modifiedRuleDefinitionActionIds
+		}));
+		component.loadRuleDefinitionActions();
+		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -856,6 +928,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.timelineGraphSectionManager.resetToOriginals();
 		this.workflowWidgetManager.resetToOriginals();
 		this.workflowSummaryManager.resetToOriginals();
+		this.ruleDefinitionPropertyManager.resetToOriginals();
+		this.ruleDefinitionActionManager.resetToOriginals();
 
 		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
 		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
@@ -872,6 +946,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.timelineGraphListComponent?.loadTimelineGraphs();
 		this.detailComponent?.workflowWidgetListComponent?.loadWorkflowWidgets();
 		this.detailComponent?.workflowSummaryListComponent?.loadWorkflowSummaries();
+		this.detailComponent?.ruleDefinitionPropertyListComponent?.loadRuleDefinitionProperties();
+		this.detailComponent?.ruleDefinitionActionListComponent?.loadRuleDefinitionActions();
 
 		this.resetAllModifications();
 		this.refreshTreeData();
@@ -892,6 +968,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.timelineGraphModified = false;
 		this.workflowWidgetModified = false;
 		this.workflowSummaryModified = false;
+		this.ruleDefinitionPropertyModified = false;
+		this.ruleDefinitionActionModified = false;
 	}
 
 	onCreateSnapshot(): void {
@@ -965,7 +1043,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.formModelModified
 		  || this.timelineGraphModified
 		  || this.workflowWidgetModified
-		  || this.workflowSummaryModified;
+		  || this.workflowSummaryModified
+		  || this.ruleDefinitionPropertyModified
+		  || this.ruleDefinitionActionModified;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -1077,6 +1157,20 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.workflowSummaries = context.workflowSummaries;
 			this.selectedWorkflowSummaryId = context.selectedWorkflowSummaryId;
+		});
+	}
+
+	onRuleDefinitionPropertyContextChanged(context: any): void {
+		setTimeout(() => {
+			this.ruleDefinitionProperties = context.ruleDefinitionProperties;
+			this.selectedRuleDefinitionPropertyId = context.selectedRuleDefinitionPropertyId;
+		});
+	}
+
+	onRuleDefinitionActionContextChanged(context: any): void {
+		setTimeout(() => {
+			this.ruleDefinitionActions = context.ruleDefinitionActions;
+			this.selectedRuleDefinitionActionId = context.selectedRuleDefinitionActionId;
 		});
 	}
 }

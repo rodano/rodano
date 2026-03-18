@@ -1,0 +1,89 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">{{ isEditMode ? 'Edit Basic Information' : 'Create Rule Definition Property' }}</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Code *</label>
+				<input
+					type="text"
+					formControlName="id"
+					placeholder="RULE_DEFINITION_PROPERTY_CODE"
+					(input)="onCodeInput($event, form)"
+					style="text-transform: uppercase;">
+				<span class="hint">Uppercase letters, numbers, and underscores only</span>
+				@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+					<span class="error-message">Code is required</span>
+				}
+				@if (form.get('id')?.hasError('pattern') && form.get('id')?.touched) {
+					<span class="error-message">Invalid format. Use uppercase letters, numbers, and underscores.</span>
+				}
+			</div>
+
+			<div class="form-field">
+				<label>Label *</label>
+				<input
+					type="text"
+					formControlName="label"
+					placeholder="First custom scope property">
+				<span class="hint">Brief display label</span>
+			</div>
+
+			<div class="form-field">
+				<label>Entity *</label>
+				<mat-select formControlName="entity" required placeholder="Select entity type">
+					@for (option of entityOptions; track option.value) {
+						<mat-option [value]="option.value">{{ option.label }}</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Property entity type</span>
+			</div>
+
+			<div class="form-field">
+				<label>Target *</label>
+				<mat-select formControlName="target" required placeholder="Select target type">
+					@for (option of targetOptions; track option.value) {
+						<mat-option [value]="option.value">{{ option.label }}</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Property target type</span>
+			</div>
+
+			<div class="form-field">
+				<label>Type *</label>
+				<mat-select formControlName="type" required placeholder="Select type">
+					@for (option of typeOptions; track option.value) {
+						<mat-option [value]="option.value">{{ option.label }}</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Property type</span>
+			</div>
+
+			<div class="form-field">
+				<label>Configuration Entity *</label>
+				<mat-select formControlName="configurationEntity" required placeholder="Select configuration entity type">
+					@for (option of configEntityOptions; track option) {
+						<mat-option [value]="option">{{ option }}</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Property configuration entity type</span>
+			</div>
+
+			<div class="form-field">
+				<label>Options</label>
+				<input
+					type="text"
+					formControlName="options">
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">
+			Cancel
+		</button>
+		<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid">
+			{{ isEditMode ? 'Save Changes' : 'Create Rule Definition Property' }}
+		</button>
+	</div>
+</div>

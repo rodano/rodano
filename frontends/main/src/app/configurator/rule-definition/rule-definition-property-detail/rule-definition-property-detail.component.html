@@ -1,0 +1,73 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ ruleDefinitionProperty.label }}</h2>
+		<span class="detail-code theme-rule-def-property">{{ ruleDefinitionProperty.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (ruleDefinitionProperty) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')">
+					{{ ruleDefinitionProperty.id }}
+				</app-setting-item>
+
+				<app-setting-item label="Label"
+																						[modified]="isFieldModified('label')">
+					{{ ruleDefinitionProperty.label }}
+				</app-setting-item>
+
+				<app-setting-item label="Entity"
+																						[modified]="isFieldModified('entity')">
+					{{ ruleDefinitionProperty.entity }}
+				</app-setting-item>
+
+				<app-setting-item label="Target"
+																						[modified]="isFieldModified('target')">
+					{{ ruleDefinitionProperty.target }}
+				</app-setting-item>
+
+				<app-setting-item label="Type"
+																						[modified]="isFieldModified('type')">
+					{{ ruleDefinitionProperty.type }}
+				</app-setting-item>
+
+				<app-setting-item label="Configuration Entity"
+																						[modified]="isFieldModified('configurationEntity')">
+					{{ ruleDefinitionProperty.configurationEntity }}
+				</app-setting-item>
+
+				<app-setting-item label="Options"
+																						[modified]="isFieldModified('options')"
+																						[notConfigured]="!ruleDefinitionProperty.options">
+					@if (!ruleDefinitionProperty.options) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ ruleDefinitionProperty.options }}
+					}
+				</app-setting-item>
+
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<app-danger-zone
+			[title]="'Delete Rule Definition Property'"
+			[message]="'Deleting this property is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
+	</div>
+}

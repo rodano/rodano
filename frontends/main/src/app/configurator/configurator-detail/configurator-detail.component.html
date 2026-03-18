@@ -160,6 +160,27 @@
 					(workflowSummaryContextChanged)="onWorkflowSummaryContextChanged($event)">
 				</app-workflow-summary-list>
 			}
+			@case ('rule-definition-properties') {
+				<app-rule-definition-property-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onRuleDefinitionPropertySelected($event)"
+					(ruleDefinitionPropertiesChanged)="onRuleDefinitionPropertiesChanged($event)"
+					(ruleDefinitionPropertyContextChanged)="onRuleDefinitionPropertyContextChanged($event)">
+				</app-rule-definition-property-list>
+			}
+
+			@case ('rule-definition-actions') {
+				<app-rule-definition-action-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onRuleDefinitionActionSelected($event)"
+					(ruleDefinitionActionsChanged)="onRuleDefinitionActionsChanged($event)"
+					(ruleDefinitionActionContextChanged)="onRuleDefinitionActionContextChanged($event)">
+				</app-rule-definition-action-list>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

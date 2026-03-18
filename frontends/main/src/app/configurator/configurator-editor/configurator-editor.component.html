@@ -113,6 +113,8 @@
 					[sections]="sections"
 					[workflowWidgets]="workflowWidgets"
 					[workflowSummaries]="workflowSummaries"
+					[ruleDefinitionProperties]="ruleDefinitionProperties"
+					[ruleDefinitionActions]="ruleDefinitionActions"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -134,6 +136,8 @@
 					[selectedGraphSectionId]="selectedGraphSectionId"
 					[selectedWorkflowWidgetId]="selectedWorkflowWidgetId"
 					[selectedWorkflowSummaryId]="selectedWorkflowSummaryId"
+					[selectedRuleDefinitionPropertyId]="selectedRuleDefinitionPropertyId"
+					[selectedRuleDefinitionActionId]="selectedRuleDefinitionActionId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -160,6 +164,8 @@
 					(timelineGraphsChanged)="onTimelineGraphsChanged($event)"
 					(workflowWidgetsChanged)="onWorkflowWidgetsChanged($event)"
 					(workflowSummariesChanged)="onWorkflowSummariesChanged($event)"
+					(ruleDefinitionPropertiesChanged)="onRuleDefinitionPropertiesChanged($event)"
+					(ruleDefinitionActionsChanged)="onRuleDefinitionActionsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -173,7 +179,9 @@
 					(formModelContextChanged)="onFormModelContextChanged($event)"
 					(timelineGraphContextChanged)="onTimelineGraphContextChanged($event)"
 					(workflowWidgetContextChanged)="onWorkflowWidgetContextChanged($event)"
-					(workflowSummaryContextChanged)="onWorkflowSummaryContextChanged($event)">
+					(workflowSummaryContextChanged)="onWorkflowSummaryContextChanged($event)"
+					(ruleDefinitionPropertyContextChanged)="onRuleDefinitionPropertyContextChanged($event)"
+					(ruleDefinitionActionContextChanged)="onRuleDefinitionActionContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

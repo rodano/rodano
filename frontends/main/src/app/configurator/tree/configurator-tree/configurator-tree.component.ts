@@ -17,6 +17,12 @@ import {FormModelTreeComponent} from '../form-model-tree/form-model-tree.compone
 import {TimelineGraphTreeComponent} from '../timeline-graph-tree/timeline-graph-tree.component';
 import {WorkflowWidgetTreeComponent} from '../workflow-widget-tree/workflow-widget-tree.component';
 import {WorkflowSummaryTreeComponent} from '../workflow-summary-tree/workflow-summary-tree.component';
+import {
+	RuleDefinitionPropertyTreeComponent
+} from '../rule-definition-property-tree/rule-definition-property-tree.component';
+import {
+	RuleDefinitionActionTreeComponent
+} from '../rule-definition-action-tree/rule-definition-action-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -38,7 +44,9 @@ import {WorkflowSummaryTreeComponent} from '../workflow-summary-tree/workflow-su
 		FormModelTreeComponent,
 		TimelineGraphTreeComponent,
 		WorkflowWidgetTreeComponent,
-		WorkflowSummaryTreeComponent
+		WorkflowSummaryTreeComponent,
+		RuleDefinitionPropertyTreeComponent,
+		RuleDefinitionActionTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -67,6 +75,8 @@ export class ConfiguratorTreeComponent {
 	@Input() sections: any[] = [];
 	@Input() workflowWidgets: any[] = [];
 	@Input() workflowSummaries: any[] = [];
+	@Input() ruleDefinitionProperties: any[] = [];
+	@Input() ruleDefinitionActions: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -88,11 +98,13 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedGraphSectionId: string | null = null;
 	@Input() selectedWorkflowWidgetId: string | null = null;
 	@Input() selectedWorkflowSummaryId: string | null = null;
+	@Input() selectedRuleDefinitionPropertyId: string | null = null;
+	@Input() selectedRuleDefinitionActionId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -198,6 +210,20 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'workflow-summaries' ? null : 'workflow-summaries';
 			this.categoryClicked.emit('workflow-summaries');
+		});
+	}
+
+	onRuleDefinitionPropertyClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'rule-definition-properties' ? null : 'rule-definition-properties';
+			this.categoryClicked.emit('rule-definition-properties');
+		});
+	}
+
+	onRuleDefinitionActionClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'rule-definition-actions' ? null : 'rule-definition-actions';
+			this.categoryClicked.emit('rule-definition-actions');
 		});
 	}
 

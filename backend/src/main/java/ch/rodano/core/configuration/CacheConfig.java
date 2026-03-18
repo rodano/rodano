@@ -80,7 +80,13 @@ public class CacheConfig {
 			"workflowWidget",
 
 			"workflowSummaries",
-			"workflowSummary"
+			"workflowSummary",
+
+			"ruleDefinitionProperties",
+			"ruleDefinitionProperty",
+
+			"ruleDefinitionActions",
+			"ruleDefinitionAction"
 		);
 	}
 }

@@ -1,0 +1,122 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ ruleDefinitionAction.label }}</h2>
+		<span class="detail-code theme-rule-def-action">{{ ruleDefinitionAction.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+@if (ruleDefinitionAction) {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Code"
+																						[modified]="isFieldModified('id')">
+					{{ ruleDefinitionAction.id }}
+				</app-setting-item>
+
+				<app-setting-item label="Label"
+																						[modified]="isFieldModified('label')">
+					{{ ruleDefinitionAction.label }}
+				</app-setting-item>
+
+				<app-setting-item label="Entity"
+																						[modified]="isFieldModified('entity')">
+					{{ ruleDefinitionAction.entity }}
+				</app-setting-item>
+
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>
+				Parameters
+				@if (isFieldModified('parameters')) {
+					<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
+				}
+			</h3>
+
+			@if (!ruleDefinitionAction.parameters || ruleDefinitionAction.parameters.length === 0) {
+				<div class="relationship-box">
+					<div class="empty-message-centered">
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>No parameters configured</span>
+					</div>
+				</div>
+			} @else {
+				@for (param of ruleDefinitionAction.parameters; track param.id; let i = $index) {
+					<div class="reference-detail-block">
+						<div class="reference-detail-header">
+							<span class="detail-code theme-rule-def-action">
+								{{ 'Parameter ' + (i + 1) }}
+							</span>
+						</div>
+
+						<div class="settings-grid reference-detail-grid">
+							<app-setting-item label="Code">
+								{{ param.id }}
+							</app-setting-item>
+
+							<app-setting-item label="Label"
+																									[notConfigured]="!param.label">
+								@if (!param.label) {
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ param.label }}
+								}
+							</app-setting-item>
+
+							<app-setting-item label="Data Entity"
+																									[notConfigured]="!param.dataEntity">
+								@if (!param.dataEntity) {
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ param.dataEntity }}
+								}
+							</app-setting-item>
+
+							<app-setting-item label="Configuration Entity"
+																									[notConfigured]="!param.configurationEntity">
+								@if (!param.configurationEntity) {
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>Not configured</span>
+								} @else {
+									{{ param.configurationEntity }}
+								}
+							</app-setting-item>
+
+							@if (param.options) {
+								<app-setting-item label="Options" [fullWidth]="true">
+									{{ param.options }}
+								</app-setting-item>
+							}
+						</div>
+					</div>
+				}
+			}
+
+			<button class="btn-edit" style="margin-top: 1rem" (click)="onEditParameters()">
+				<mat-icon>edit</mat-icon>
+				Edit Parameters
+			</button>
+		</div>
+
+		<app-danger-zone
+			[title]="'Delete Rule Definition Action'"
+			[message]="'Deleting this action is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
+	</div>
+}
