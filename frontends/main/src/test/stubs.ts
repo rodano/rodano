@@ -7,6 +7,7 @@ import {Dataset} from '@core/model/dataset';
 import {Form} from '@core/model/form';
 import {FormModel} from '@core/model/form-model';
 import {User} from '@core/model/user';
+import {signal} from '@angular/core';
 
 export const FIELD_MODEL_DATE_OF_WITHDRAWAL = {
 	type: 'DATE',
@@ -76,7 +77,7 @@ export const FIELD_DATE_OF_WITHDRAWAL = {
 
 export const CRF_FIELD_DATE_OF_WITHDRAWAL = {
 	...FIELD_DATE_OF_WITHDRAWAL,
-	error: undefined,
+	error: signal(undefined),
 	shown: true
 } satisfies CRFField;
 
@@ -147,7 +148,7 @@ const FIELD_DATE_OF_VISIT = {
 
 const CRF_FIELD_DATE_OF_VISIT = {
 	...FIELD_DATE_OF_VISIT,
-	error: undefined,
+	error: signal(undefined),
 	shown: true
 } satisfies CRFField;
 
@@ -336,7 +337,7 @@ const FIELD_HEALTH = {
 
 const CRF_FIELD_HEALTH = {
 	...FIELD_HEALTH,
-	error: undefined,
+	error: signal(undefined),
 	shown: true
 } satisfies CRFField;
 
@@ -367,7 +368,7 @@ const FIELD_SELF_CARE = {
 
 const CRF_FIELD_SELF_CARE = {
 	...FIELD_SELF_CARE,
-	error: undefined,
+	error: signal(undefined),
 	shown: true
 } satisfies CRFField;
 

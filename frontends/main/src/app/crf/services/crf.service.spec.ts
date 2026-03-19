@@ -29,7 +29,12 @@ describe('CRFService', () => {
 		datasetServiceSpy.searchOnForm.mockReturnValue(of([DATASET_VISIT_DOCUMENTATION]));
 
 		service.getCRFDatasets(FORM).subscribe({
-			next: datasets => expect(datasets).toContainEqual(CRF_DATASET_VISIT_DOCUMENTATION)
+			next: datasets => {
+				expect(datasets).toHaveLength(1);
+				const {fields, ...properties} = CRF_DATASET_VISIT_DOCUMENTATION;
+				expect(datasets[0]).toMatchObject(properties);
+				expect(datasets[0].fields).toHaveLength(fields.length);
+			}
 		});
 	});
 });

@@ -23,8 +23,8 @@ describe('DateComponent', () => {
 		component = fixture.componentInstance;
 
 		//provide the field input
-		component.field = CRF_FIELD_DATE_OF_WITHDRAWAL;
-		component.disabled = false;
+		fixture.componentRef.setInput('field', CRF_FIELD_DATE_OF_WITHDRAWAL);
+		fixture.componentRef.setInput('disabled', false);
 		fixture.detectChanges();
 	});
 
