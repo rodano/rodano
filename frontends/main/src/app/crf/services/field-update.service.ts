@@ -15,7 +15,7 @@ export class FieldUpdateService {
 
 	public updateField(field: CRFField, value: string, valueLabel: string): void {
 		if(field.value !== value) {
-			this.loggingService.info(`Updating ${field.modelId} from ${value} to ${field.value}`);
+			this.loggingService.info(`Updating ${field.modelId} from ${field.value} to ${value}`);
 			field.value = value;
 			field.valueLabel = valueLabel;
 			this.fieldUpdatedStream$.next(field);
