@@ -41,13 +41,13 @@
 		<div class="form-section">
 			<h3>Translations</h3>
 
-			@if (availableLanguages.length === 1) {
-				<div class="language-fields">
-					@for (lang of availableLanguages; track lang.languageCode) {
-						@if (lang.languageCode) {
-							<div [formGroup]="languageForms.get(lang.languageCode)!">
+			<mat-tab-group>
+				@for (lang of availableLanguages; track lang.languageCode) {
+					@if (lang.languageCode) {
+						<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+							<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
 								<div class="form-field">
-									<label>Description</label>
+									<label>Description {{ lang.isDefault ? '*' : '' }}</label>
 									<textarea
 										formControlName="description"
 										placeholder="Brief description"
@@ -55,29 +55,10 @@
 									<span class="hint">Optional description</span>
 								</div>
 							</div>
-						}
+						</mat-tab>
 					}
-				</div>
-			} @else {
-				<mat-tab-group>
-					@for (lang of availableLanguages; track lang.languageCode) {
-						@if (lang.languageCode) {
-							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-									<div class="form-field">
-										<label>Description {{ lang.isDefault ? '*' : '' }}</label>
-										<textarea
-											formControlName="description"
-											placeholder="Brief description"
-											rows="3"></textarea>
-										<span class="hint">Optional description</span>
-									</div>
-								</div>
-							</mat-tab>
-						}
-					}
-				</mat-tab-group>
-			}
+				}
+			</mat-tab-group>
 		</div>
 	</form>
 </div>

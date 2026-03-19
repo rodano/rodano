@@ -102,55 +102,32 @@
 							</div>
 						</div>
 
-						@if (availableLanguages.length === 1) {
+						<mat-tab-group>
 							@for (lang of availableLanguages; track lang.languageCode) {
-								<div class="form-field">
-									<label>Label *</label>
-									<input type="text"
-																[value]="col.label[lang.languageCode!] || ''"
-																(input)="updateTranslation(i, 'label', lang.languageCode!, $any($event.target).value)"
-																placeholder="Column label">
-									@if (lang.isDefault && !col.label[lang.languageCode!]) {
-										<span class="error-message">Label is required</span>
-									}
-								</div>
-								<div class="form-field">
-									<label>Description</label>
-									<textarea rows="2"
-																			[value]="col.description?.[lang.languageCode!] || ''"
-																			(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
-																			placeholder="Description">
-									</textarea>
-								</div>
-							}
-						} @else {
-							<mat-tab-group>
-								@for (lang of availableLanguages; track lang.languageCode) {
-									<mat-tab [label]="getLanguageLabel(lang)">
-										<div class="tab-content">
-											<div class="form-field">
-												<label>Label {{ lang.isDefault ? '*' : '' }}</label>
-												<input type="text"
-																			[value]="col.label[lang.languageCode!] || ''"
-																			(input)="updateTranslation(i, 'label', lang.languageCode!, $any($event.target).value)"
-																			placeholder="Column label">
-												@if (lang.isDefault && !col.label[lang.languageCode!]) {
-													<span class="error-message">Label is required</span>
-												}
-											</div>
-											<div class="form-field">
-												<label>Description</label>
-												<textarea rows="2"
-																						[value]="col.description?.[lang.languageCode!] || ''"
-																						(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
-																						placeholder="Description">
-												</textarea>
-											</div>
+								<mat-tab [label]="getLanguageLabel(lang)">
+									<div class="tab-content">
+										<div class="form-field">
+											<label>Label {{ lang.isDefault ? '*' : '' }}</label>
+											<input type="text"
+																		[value]="col.label[lang.languageCode!] || ''"
+																		(input)="updateTranslation(i, 'label', lang.languageCode!, $any($event.target).value)"
+																		placeholder="Column label">
+											@if (lang.isDefault && !col.label[lang.languageCode!]) {
+												<span class="error-message">Label is required</span>
+											}
 										</div>
-									</mat-tab>
-								}
-							</mat-tab-group>
-						}
+										<div class="form-field">
+											<label>Description</label>
+											<textarea rows="2"
+																					[value]="col.description?.[lang.languageCode!] || ''"
+																					(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
+																					placeholder="Description">
+												</textarea>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						</mat-tab-group>
 					</div>
 				}
 			}

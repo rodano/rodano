@@ -118,43 +118,25 @@
 			<div class="form-section">
 				<h3>Translations</h3>
 
-				@if (availableLanguages.length === 1) {
+				<mat-tab-group>
 					@for (lang of availableLanguages; track lang.languageCode) {
 						@if (lang.languageCode) {
-							<div [formGroup]="tooltipForms.get(lang.languageCode)!">
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="tooltipForms.get(lang.languageCode)!">
 									<div class="form-field">
-									<label>Tooltip</label>
+										<label>Tooltip</label>
 										<textarea
 											#tooltipInput
 											formControlName="tooltip"
 											rows="6"
 											[placeholder]="'EDSS\nDate: ${entry.date.toDisplay()}\nValue: ${entry.value}'">
-										</textarea>
+											</textarea>
+									</div>
 								</div>
-							</div>
+							</mat-tab>
 						}
 					}
-				} @else {
-					<mat-tab-group>
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-									<div class="tab-content" [formGroup]="tooltipForms.get(lang.languageCode)!">
-										<div class="form-field">
-											<label>Tooltip</label>
-											<textarea
-												#tooltipInput
-												formControlName="tooltip"
-												rows="6"
-												[placeholder]="'EDSS\nDate: ${entry.date.toDisplay()}\nValue: ${entry.value}'">
-											</textarea>
-										</div>
-									</div>
-								</mat-tab>
-							}
-						}
-					</mat-tab-group>
-				}
+				</mat-tab-group>
 			</div>
 		</form>
 	</div>

@@ -65,69 +65,39 @@
 							</div>
 						</div>
 
-						@if (availableLanguages.length === 1) {
+						<mat-tab-group>
 							@for (lang of availableLanguages; track lang.languageCode) {
-								<div class="form-field">
-									<label>Short Name *</label>
-									<input type="text"
-																[value]="col.shortname[lang.languageCode!] || ''"
-																(input)="updateTranslation(i, 'shortname', lang.languageCode!, $any($event.target).value)"
-																placeholder="Column name">
-									@if (lang.isDefault && !col.shortname[lang.languageCode!]) {
-										<span class="error-message">Short name is required</span>
-									}
-								</div>
-								<div class="form-field">
-									<label>Long Name</label>
-									<input type="text"
-																[value]="col.longname?.[lang.languageCode!] || ''"
-																(input)="updateTranslation(i, 'longname', lang.languageCode!, $any($event.target).value)"
-																placeholder="Long name">
-								</div>
-								<div class="form-field">
-									<label>Description</label>
-									<textarea rows="2"
-																			[value]="col.description?.[lang.languageCode!] || ''"
-																			(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
-																			placeholder="Description">
-									</textarea>
-								</div>
-							}
-						} @else {
-							<mat-tab-group>
-								@for (lang of availableLanguages; track lang.languageCode) {
-									<mat-tab [label]="getLanguageLabel(lang)">
-										<div class="tab-content">
-											<div class="form-field">
-												<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
-												<input type="text"
-																			[value]="col.shortname[lang.languageCode!] || ''"
-																			(input)="updateTranslation(i, 'shortname', lang.languageCode!, $any($event.target).value)"
-																			placeholder="Column name">
-												@if (lang.isDefault && !col.shortname[lang.languageCode!]) {
-													<span class="error-message">Short name is required</span>
-												}
-											</div>
-											<div class="form-field">
-												<label>Long Name</label>
-												<input type="text"
-																			[value]="col.longname?.[lang.languageCode!] || ''"
-																			(input)="updateTranslation(i, 'longname', lang.languageCode!, $any($event.target).value)"
-																			placeholder="Long name">
-											</div>
-											<div class="form-field">
-												<label>Description</label>
-												<textarea rows="2"
-																						[value]="col.description?.[lang.languageCode!] || ''"
-																						(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
-																						placeholder="Description">
-												</textarea>
-											</div>
+								<mat-tab [label]="getLanguageLabel(lang)">
+									<div class="tab-content">
+										<div class="form-field">
+											<label>Short Name {{ lang.isDefault ? '*' : '' }}</label>
+											<input type="text"
+																		[value]="col.shortname[lang.languageCode!] || ''"
+																		(input)="updateTranslation(i, 'shortname', lang.languageCode!, $any($event.target).value)"
+																		placeholder="Column name">
+											@if (lang.isDefault && !col.shortname[lang.languageCode!]) {
+												<span class="error-message">Short name is required</span>
+											}
 										</div>
-									</mat-tab>
-								}
-							</mat-tab-group>
-						}
+										<div class="form-field">
+											<label>Long Name</label>
+											<input type="text"
+																		[value]="col.longname?.[lang.languageCode!] || ''"
+																		(input)="updateTranslation(i, 'longname', lang.languageCode!, $any($event.target).value)"
+																		placeholder="Long name">
+										</div>
+										<div class="form-field">
+											<label>Description</label>
+											<textarea rows="2"
+																					[value]="col.description?.[lang.languageCode!] || ''"
+																					(input)="updateTranslation(i, 'description', lang.languageCode!, $any($event.target).value)"
+																					placeholder="Description">
+												</textarea>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						</mat-tab-group>
 					</div>
 				}
 			}

@@ -26,6 +26,7 @@ interface FormLayoutCreateDialogData {
 	formModelId: string;
 	generateFromDataset: boolean;
 	layout?: Layout;
+	languages: ProjectLanguage[];
 }
 
 @Component({
@@ -122,7 +123,9 @@ export class FormLayoutCreateDialogComponent implements OnInit {
 	}
 
 	get projectLanguages(): ProjectLanguage[] {
-		return this.languageService.projectLanguages;
+		return this.data.languages?.length
+			? this.data.languages
+			: this.languageService.projectLanguages;
 	}
 
 	get fieldModels(): FieldModel[] {

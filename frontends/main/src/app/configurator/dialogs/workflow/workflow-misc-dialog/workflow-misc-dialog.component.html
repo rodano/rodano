@@ -17,37 +17,23 @@
 
 			<div class="form-section">
 				<h3>Message</h3>
-				@if (availableLanguages.length === 1) {
+				<mat-tab-group>
 					@for (lang of availableLanguages; track lang.languageCode) {
 						@if (lang.languageCode) {
-							<div class="form-field" [formGroup]="languageForms.get(lang.languageCode)!">
-								<label>Message</label>
-								<textarea
-									formControlName="message"
-									placeholder="Enter message"
-									rows="3"></textarea>
-							</div>
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Message</label>
+										<textarea
+											formControlName="message"
+											placeholder="Enter message"
+											rows="3"></textarea>
+									</div>
+								</div>
+							</mat-tab>
 						}
 					}
-				} @else {
-					<mat-tab-group>
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-										<div class="form-field">
-											<label>Message</label>
-											<textarea
-												formControlName="message"
-												placeholder="Enter message"
-												rows="3"></textarea>
-										</div>
-									</div>
-								</mat-tab>
-							}
-						}
-					</mat-tab-group>
-				}
+				</mat-tab-group>
 			</div>
 		</form>
 	</div>

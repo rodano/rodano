@@ -54,11 +54,11 @@
 			<div class="form-section">
 				<h3>Translations</h3>
 
-				@if (availableLanguages.length === 1) {
-					<div class="language-fields">
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<div [formGroup]="languageForms.get(lang.languageCode)!">
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
 									<div class="form-field">
 										<label>Title {{ lang.isDefault ? '*' : '' }}</label>
 										<input
@@ -71,32 +71,10 @@
 										}
 									</div>
 								</div>
-							}
+							</mat-tab>
 						}
-					</div>
-				} @else {
-					<mat-tab-group>
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-										<div class="form-field">
-											<label>Title {{ lang.isDefault ? '*' : '' }}</label>
-											<input
-												type="text"
-												formControlName="title"
-												placeholder="Data management status">
-											<span class="hint">Brief display name</span>
-											@if (languageForms.get(lang.languageCode)?.get('title')?.hasError('required') && languageForms.get(lang.languageCode)?.get('title')?.touched) {
-												<span class="error-message">Title is required</span>
-											}
-										</div>
-									</div>
-								</mat-tab>
-							}
-						}
-					</mat-tab-group>
-				}
+					}
+				</mat-tab-group>
 			</div>
 		</form>
 	</div>

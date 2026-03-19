@@ -61,11 +61,11 @@
 			<div class="form-section">
 				<h3>Translations</h3>
 
-				@if (availableLanguages.length === 1) {
-					<div class="language-fields">
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<div [formGroup]="languageForms.get(lang.languageCode)!">
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
 									<div class="form-field">
 										<label>Short Name</label>
 										<input
@@ -93,47 +93,10 @@
 										<span class="hint">Optional project description</span>
 									</div>
 								</div>
-							}
+							</mat-tab>
 						}
-					</div>
-				} @else {
-					<mat-tab-group>
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-										<div class="form-field">
-											<label>Short Name</label>
-											<input
-												type="text"
-												formControlName="shortname"
-												placeholder="Study Name">
-											<span class="hint">Brief display name for the project</span>
-										</div>
-
-										<div class="form-field">
-											<label>Long Name</label>
-											<input
-												type="text"
-												formControlName="longname"
-												placeholder="Full Study Title">
-											<span class="hint">Full descriptive name for the project</span>
-										</div>
-
-										<div class="form-field">
-											<label>Description</label>
-											<textarea
-												formControlName="description"
-												placeholder="Brief description of the project"
-												rows="3"></textarea>
-											<span class="hint">Optional project description</span>
-										</div>
-									</div>
-								</mat-tab>
-							}
-						}
-					</mat-tab-group>
-				}
+					}
+				</mat-tab-group>
 			</div>
 		</form>
 	</div>

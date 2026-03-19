@@ -25,11 +25,11 @@
 			<div class="form-section">
 				<h3>Translations</h3>
 
-				@if (availableLanguages.length === 1) {
-					<div class="language-fields">
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<div [formGroup]="languageForms.get(lang.languageCode)!">
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
 									<div class="form-field">
 										<label>Title</label>
 										<input type="text" formControlName="title" placeholder="Chart Title">
@@ -45,35 +45,10 @@
 										<span class="hint">Optional label for the vertical axis</span>
 									</div>
 								</div>
-							}
+							</mat-tab>
 						}
-					</div>
-				} @else {
-					<mat-tab-group>
-						@for (lang of availableLanguages; track lang.languageCode) {
-							@if (lang.languageCode) {
-								<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
-									<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
-										<div class="form-field">
-											<label>Title</label>
-											<input type="text" formControlName="title" placeholder="Chart Title">
-										</div>
-										<div class="form-field">
-											<label>Abscissa Legend (X-Axis)</label>
-											<input type="text" formControlName="legendX" placeholder="X-Axis">
-											<span class="hint">Optional label for the horizontal axis</span>
-										</div>
-										<div class="form-field">
-											<label>Ordinate Legend (Y-Axis)</label>
-											<input type="text" formControlName="legendY" placeholder="Y-Axis">
-											<span class="hint">Optional label for the vertical axis</span>
-										</div>
-									</div>
-								</mat-tab>
-							}
-						}
-					</mat-tab-group>
-				}
+					}
+				</mat-tab-group>
 			</div>
 		</form>
 	</div>

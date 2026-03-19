@@ -827,7 +827,8 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 				projectId: this.projectId,
 				formModelId: this.formModelId,
 				generateFromDataset: false,
-				layout
+				layout,
+				languages: this.projectLanguages
 			},
 			panelClass: 'rodano-dialog'
 		});
@@ -847,7 +848,8 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 				projectId: this.projectId,
 				formModelId: this.formModelId,
 				project: this.project,
-				generateFromDataset
+				generateFromDataset,
+				languages: this.projectLanguages
 			}
 		});
 		ref.afterClosed().subscribe((result: Layout | null) => {

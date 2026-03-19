@@ -26,53 +26,31 @@
 							</button>
 						</div>
 
-						@if (availableLanguages.length === 1) {
+						<mat-tab-group>
 							@for (lang of availableLanguages; track lang.languageCode) {
-								<div class="form-field">
-									<label>Label</label>
-									<input
-										type="text"
-										[value]="ref.label[lang.languageCode!] || ''"
-										(input)="updateReferenceTranslation(ri, 'label', lang.languageCode!, $any($event.target).value)"
-										placeholder="Reference label">
-								</div>
-								<div class="form-field">
-									<label>Tooltip</label>
-									<textarea
-										rows="3"
-										[value]="ref.tooltip?.[lang.languageCode!] || ''"
-										(input)="updateReferenceTranslation(ri, 'tooltip', lang.languageCode!, $any($event.target).value)"
-										[placeholder]="'20% percentile\n${entry.label}'">
-									</textarea>
-								</div>
-							}
-						} @else {
-							<mat-tab-group>
-								@for (lang of availableLanguages; track lang.languageCode) {
-									<mat-tab [label]="getLanguageLabel(lang)">
-										<div class="tab-content">
-											<div class="form-field">
-												<label>Label</label>
-												<input
-													type="text"
-													[value]="ref.label[lang.languageCode!] || ''"
-													(input)="updateReferenceTranslation(ri, 'label', lang.languageCode!, $any($event.target).value)"
-													placeholder="Reference label">
-											</div>
-											<div class="form-field">
-												<label>Tooltip</label>
-												<textarea
-													rows="3"
-													[value]="ref.tooltip?.[lang.languageCode!] || ''"
-													(input)="updateReferenceTranslation(ri, 'tooltip', lang.languageCode!, $any($event.target).value)"
-													[placeholder]="'20% percentile\n${entry.label}'">
-												</textarea>
-											</div>
+								<mat-tab [label]="getLanguageLabel(lang)">
+									<div class="tab-content">
+										<div class="form-field">
+											<label>Label</label>
+											<input
+												type="text"
+												[value]="ref.label[lang.languageCode!] || ''"
+												(input)="updateReferenceTranslation(ri, 'label', lang.languageCode!, $any($event.target).value)"
+												placeholder="Reference label">
 										</div>
-									</mat-tab>
-								}
-							</mat-tab-group>
-						}
+										<div class="form-field">
+											<label>Tooltip</label>
+											<textarea
+												rows="3"
+												[value]="ref.tooltip?.[lang.languageCode!] || ''"
+												(input)="updateReferenceTranslation(ri, 'tooltip', lang.languageCode!, $any($event.target).value)"
+												[placeholder]="'20% percentile\n${entry.label}'">
+												</textarea>
+										</div>
+									</div>
+								</mat-tab>
+							}
+						</mat-tab-group>
 
 						<div class="form-field">
 							<label>Reference section</label>
