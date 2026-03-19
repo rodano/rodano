@@ -36,7 +36,7 @@ export default [
 				canDeactivate: [UnsavedChangesGuard]
 			},
 			{
-				path: 'events/:eventPk/dashboard',
+				path: 'events/:eventPk',
 				component: EventDashboardComponent,
 				resolve: {
 					event: EventResolver

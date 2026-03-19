@@ -89,7 +89,7 @@
 		<td
 			mat-cell
 			*matCellDef="let status">
-			<a [routerLink]="['/crf', status.scopePk, 'events', status.eventPk, 'dashboard']">{{ status.eventLabel }}</a>
+			<a [routerLink]="['/crf', status.scopePk, 'events', status.eventPk]">{{ status.eventLabel }}</a>
 		</td>
 	</ng-container>
 

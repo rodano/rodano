@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, model, signal} f
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
-import {combineLatest, forkJoin, of, switchMap} from 'rxjs';
+import {EMPTY, combineLatest, forkJoin, of, switchMap} from 'rxjs';
 import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -25,7 +25,7 @@ import {SettingsService} from '@core/services/settings.service';
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-side-menu',
 	templateUrl: './side-menu.component.html',
-	styleUrls: ['./side-menu.component.scss'],
+	styleUrl: './side-menu.component.scss',
 	imports: [
 		RouterLink,
 		MatIcon,
@@ -125,20 +125,13 @@ export class SideMenuComponent implements OnInit {
 				this.loadSortSettings();
 				this.updateEventGroups();
 				//retrieve and manage expanded event pks
-				const expandedEventPksStr: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
-				const newExpandedEventPks = expandedEventPksStr.split(',').filter(p => !!p).map(p => parseInt(p));
+				const expandedEventParameter: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
+				const newExpandedEventPks = expandedEventParameter.split(',').filter(p => !!p).map(p => parseInt(p));
 				this.expandedEventPks.set(newExpandedEventPks);
 				//do not used the observed parameters, use the active route snapshot to access the child route parameters instead
 				const params = this.activatedRoute.firstChild?.snapshot.params || {};
 				const newEventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
 				this.eventPk.set(newEventPk);
-				//if the event is selected, add it to the expanded event pks
-				if(this.eventPk()) {
-					if(!this.expandedEventPks().includes(this.eventPk()!)) {
-						this.expandedEventPks.set([...this.expandedEventPks(), this.eventPk()!]);
-					}
-					//refrain from programmatically navigate to the URL as this will add an entry in the browser history
-				}
 				//load forms for every expanded event
 				const formsRequests = Object.fromEntries(this.expandedEventPks()
 					.filter(eventPk => !this.eventsForms()[eventPk])
@@ -147,7 +140,7 @@ export class SideMenuComponent implements OnInit {
 					forkJoin(formsRequests)
 						.pipe(takeUntilDestroyed(this.destroyRef))
 						.subscribe(eventForms => {
-							Object.assign(this.eventsForms, eventForms);
+							this.eventsForms.update(ef => ({...ef, ...eventForms}));
 						});
 				}
 			}
@@ -181,8 +174,8 @@ export class SideMenuComponent implements OnInit {
 		const isReverse = this.eventOrdersByEventGroupId[eventGroupId] || false;
 		return [...events].sort((a, b) => {
 			//sort events based on date if available, otherwise use the expected date
-			const dateA = a.date ? new Date(a.date) : (a.expectedDate ? new Date(a.expectedDate) : new Date(0));
-			const dateB = b.date ? new Date(b.date) : (b.expectedDate ? new Date(b.expectedDate) : new Date(0));
+			const dateA = new Date(a.date ?? a.expectedDate ?? 0);
+			const dateB = new Date(b.date ?? b.expectedDate ?? 0);
 
 			const comparison = dateA.getTime() - dateB.getTime();
 			return isReverse ? -comparison : comparison;
@@ -224,38 +217,29 @@ export class SideMenuComponent implements OnInit {
 
 	createEvent() {
 		this.scopeService.getAvailableEventModels(this.scope().pk).pipe(
-			switchMap(events => {
-				return this.dialog
-					.open(SelectEventComponent, {data: events})
-					.afterClosed();
+			switchMap(events => this.dialog.open(SelectEventComponent, {data: events}).afterClosed()),
+			switchMap(eventModelId => {
+				if(!eventModelId) {
+					return EMPTY;
+				}
+				return this.eventService.create(this.scope().pk, eventModelId).pipe(
+					switchMap(event => forkJoin({
+						event: of(event),
+						forms: this.formService.searchOnEvent(event.scopePk, event.pk)
+					}))
+				);
 			})
-		).subscribe(eventModelId => {
-			if(eventModelId) {
-				this.eventService.create(this.scope().pk, eventModelId).pipe(
-					switchMap(event => {
-						return forkJoin({
-							event: of(event),
-							forms: this.formService.searchOnEvent(event.scopePk, event.pk)
-						});
-					})
-				).subscribe({
-					next: ({event, forms}) => {
-						this.events.push(event);
-						this.updateEventGroups();
-						this.eventsForms.update(ef => ({...ef, [event.pk]: forms}));
-						this.router.navigate([
-							'/crf',
-							this.scope().pk,
-							'events',
-							event.pk,
-							'forms',
-							forms[0].pk
-						]);
-					},
-					error: error => {
-						this.notificationService.showError(error.error.message);
-					}
+		).subscribe({
+			next: ({event, forms}) => {
+				this.events.push(event);
+				this.updateEventGroups();
+				this.eventsForms.update(ef => ({...ef, [event.pk]: forms}));
+				this.router.navigate(['/crf', this.scope().pk, 'events', event.pk, 'forms', forms[0].pk], {
+					queryParams: {[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER]: event.pk.toString()}
 				});
+			},
+			error: error => {
+				this.notificationService.showError(error.error.message);
 			}
 		});
 	}

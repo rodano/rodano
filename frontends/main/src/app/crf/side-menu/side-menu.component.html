@@ -75,11 +75,7 @@
 			@for (event of getEvents(eventGroup.id); track event.pk) {
 				<li class="ending-block-light">
 					<a
-						[routerLink]="
-							expandedEventPks().includes(event.pk)
-								? ['/crf', scope().pk]
-								: ['/crf', scope().pk, 'events', event.pk, 'dashboard']
-						"
+						[routerLink]="['/crf', scope().pk, 'events', event.pk]"
 						[queryParams]="generateToggleParameters(event.pk)"
 						queryParamsHandling="merge"
 						[class.open]="expandedEventPks().includes(event.pk)"
@@ -120,15 +116,6 @@
 					<!-- Event forms -->
 					@if (expandedEventPks().includes(event.pk)) {
 						<ol class="submenu">
-							<li class="ending-block">
-								<a
-									[routerLink]="['/crf', scope().pk, 'events', event.pk, 'dashboard']"
-									routerLinkActive="active"
-									[routerLinkActiveOptions]="{exact: true}"
-									queryParamsHandling="preserve">
-									Status
-								</a>
-							</li>
 							@for (form of eventsForms()[event.pk]; track form.pk) {
 								<li>
 									<a
