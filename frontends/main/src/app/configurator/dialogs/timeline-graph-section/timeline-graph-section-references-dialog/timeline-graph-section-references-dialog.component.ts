@@ -24,7 +24,7 @@ export interface TimelineGraphSectionReferencesDialogData {
 	selector: 'app-timeline-graph-section-references-dialog',
 	standalone: true,
 	templateUrl: './timeline-graph-section-references-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css', '../../chart/chart-statistics-dialog/chart-statistics-dialog.component.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatIconModule, MatCheckboxModule,
 		MatTabsModule, MatSelectModule]
 })

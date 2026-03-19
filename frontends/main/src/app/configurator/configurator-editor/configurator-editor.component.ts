@@ -43,6 +43,7 @@ import {WorkflowSummaryManagerService} from '../services/manager/workflow-summar
 import {RuleDefinitionPropertyManagerService} from '../services/manager/rule-definition-property-manager.service';
 import {RuleDefinitionActionManagerService} from '../services/manager/rule-definition-action-manager.service';
 import {CronManagerService} from '../services/manager/cron-manager.service';
+import {MenuManagerService} from '../services/manager/menu-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -89,6 +90,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	ruleDefinitionPropertyModified = false;
 	ruleDefinitionActionModified = false;
 	cronModified = false;
+	menuModified = false;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -114,6 +116,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	ruleDefinitionProperties: any[] = [];
 	ruleDefinitionActions: any[] = [];
 	crons: any[] = [];
+	menus: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -139,6 +142,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedRuleDefinitionPropertyId: string | null = null;
 	selectedRuleDefinitionActionId: string | null = null;
 	selectedCronId: string | null = null;
+	selectedMenuId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -176,6 +180,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private ruleDefinitionPropertyManager: RuleDefinitionPropertyManagerService,
 		private ruleDefinitionActionManager: RuleDefinitionActionManagerService,
 		private cronManager: CronManagerService,
+		private menuManager: MenuManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -231,6 +236,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.ruleDefinitionPropertyManager.invalidate();
 		this.ruleDefinitionActionManager.invalidate();
 		this.cronManager.invalidate();
+		this.menuManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -339,6 +345,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: models => this.crons = models,
 			error: error => console.error('Error loading crons:', error)
 		});
+
+		this.menuManager.load(this.projectId).subscribe({
+			next: models => this.menus = models,
+			error: error => console.error('Error loading menus:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -360,6 +371,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.ruleDefinitionProperties = this.ruleDefinitionPropertyManager.getAll();
 		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
 		this.crons = this.cronManager.getAll();
+		this.menus = this.menuManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -398,7 +410,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries' || nodeId === 'rule-definition-properties' || nodeId === 'rule-definition-actions' || nodeId === 'crons') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries' || nodeId === 'rule-definition-properties' || nodeId === 'rule-definition-actions' || nodeId === 'crons' || nodeId === 'menus') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -422,6 +434,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedRuleDefinitionPropertyId = null;
 			this.selectedRuleDefinitionActionId = null;
 			this.selectedCronId = null;
+			this.selectedMenuId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
@@ -442,6 +455,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.ruleDefinitionProperties = [];
 			this.ruleDefinitionActions = [];
 			this.crons = [];
+			this.menus = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -460,6 +474,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.ruleDefinitionPropertyListComponent?.clearSelection();
 			this.detailComponent?.ruleDefinitionActionListComponent?.clearSelection();
 			this.detailComponent?.cronListComponent?.clearSelection();
+			this.detailComponent?.menuListComponent?.clearSelection();
 		}
 	}
 
@@ -480,6 +495,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onRuleDefinitionPropertiesChanged(value: boolean): void {this.ruleDefinitionPropertyModified = value;}
 	onRuleDefinitionActionsChanged(value: boolean): void {this.ruleDefinitionActionModified = value;}
 	onCronsChanged(value: boolean): void {this.cronModified = value;}
+	onMenusChanged(value: boolean): void {this.menuModified = value;}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
@@ -579,6 +595,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(this.cronModified) {
 					saveObservables.push(this.saveCrons());
+				}
+
+				if(this.menuModified) {
+					saveObservables.push(this.saveMenus());
 				}
 
 				if(saveObservables.length > 0) {
@@ -900,7 +920,23 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			modifiedCronIds: component.modifiedCronIds
 		}));
 		component.loadCrons();
-		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
+		this.crons = this.cronManager.getAll();
+	}
+
+	private async saveMenus(): Promise<void> {
+		const component = this.detailComponent?.menuListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveMenus(this.projectId, {
+			menuManager: component.menuManager,
+			menus: component.menus,
+			originalMenus: component.originalMenus,
+			modifiedMenuIds: component.modifiedMenuIds
+		}));
+		component.loadMenus();
+		this.menus = this.menuManager.getAll();
 	}
 
 	private confirmDiscardIfChanged(): Observable<boolean> {
@@ -967,6 +1003,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.ruleDefinitionPropertyManager.resetToOriginals();
 		this.ruleDefinitionActionManager.resetToOriginals();
 		this.cronManager.resetToOriginals();
+		this.menuManager.resetToOriginals();
 
 		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
 		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
@@ -986,6 +1023,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.ruleDefinitionPropertyListComponent?.loadRuleDefinitionProperties();
 		this.detailComponent?.ruleDefinitionActionListComponent?.loadRuleDefinitionActions();
 		this.detailComponent?.cronListComponent?.loadCrons();
+		this.detailComponent?.menuListComponent?.loadMenus();
 
 		this.resetAllModifications();
 		this.refreshTreeData();
@@ -1009,6 +1047,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.ruleDefinitionPropertyModified = false;
 		this.ruleDefinitionActionModified = false;
 		this.cronModified = false;
+		this.menuModified = false;
 	}
 
 	onCreateSnapshot(): void {
@@ -1085,7 +1124,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.workflowSummaryModified
 		  || this.ruleDefinitionPropertyModified
 		  || this.ruleDefinitionActionModified
-		  || this.cronModified;
+		  || this.cronModified
+		  || this.menuModified;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -1218,6 +1258,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.crons = context.crons;
 			this.selectedCronId = context.selectedCronId;
+		});
+	}
+
+	onMenuContextChanged(context: any): void {
+		setTimeout(() => {
+			this.menus = context.menus;
+			this.selectedMenuId = context.selectedMenuId;
 		});
 	}
 }

@@ -29,6 +29,7 @@ import {
 	RuleDefinitionActionListComponent
 } from '../rule-definition/rule-definition-action-list/rule-definition-action-list.component';
 import {CronListComponent} from '../cron/cron-list/cron-list.component';
+import {MenuListComponent} from '../menu/menu-list/menu-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -56,6 +57,7 @@ import {CronListComponent} from '../cron/cron-list/cron-list.component';
 		RuleDefinitionPropertyListComponent,
 		RuleDefinitionActionListComponent,
 		CronListComponent,
+		MenuListComponent,
 		EmptyStateComponent
 	]
 })
@@ -77,6 +79,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(RuleDefinitionPropertyListComponent) ruleDefinitionPropertyListComponent?: RuleDefinitionPropertyListComponent;
 	@ViewChild(RuleDefinitionActionListComponent) ruleDefinitionActionListComponent?: RuleDefinitionActionListComponent;
 	@ViewChild(CronListComponent) cronListComponent?: CronListComponent;
+	@ViewChild(MenuListComponent) menuListComponent?: MenuListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -199,7 +202,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedCronId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'overview' | null = null;
+	@Output() menusChanged = new EventEmitter<boolean>();
+	@Output() menuContextChanged = new EventEmitter<{
+		menus: any[];
+		selectedMenuId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -360,6 +369,15 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.cronsChanged.emit(value);
 	}
 
+	onMenuSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onMenusChanged(value: boolean): void {
+		this.menusChanged.emit(value);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -473,6 +491,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'crons') {
 			this.selectedNodeType = 'crons';
+			return;
+		}
+
+		if(this.selectedNode === 'menus') {
+			this.selectedNodeType = 'menus';
 			return;
 		}
 
@@ -608,5 +631,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedCronId: string | null;
 	}): void {
 		this.cronContextChanged.emit(context);
+	}
+
+	onMenuContextChanged(context: {
+		menus: any[];
+		selectedMenuId: string | null;
+	}): void {
+		this.menuContextChanged.emit(context);
 	}
 }

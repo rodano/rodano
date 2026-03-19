@@ -46,7 +46,6 @@ import ch.rodano.core.model.jooq.tables.FormModelWorkflow;
 import ch.rodano.core.model.jooq.tables.Mail;
 import ch.rodano.core.model.jooq.tables.MailAttachment;
 import ch.rodano.core.model.jooq.tables.Menu;
-import ch.rodano.core.model.jooq.tables.MenuAction;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSection;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter;
@@ -362,11 +361,6 @@ public class DefaultSchema extends SchemaImpl {
 	 * The table <code>menu</code>.
 	 */
 	public final Menu MENU = Menu.MENU;
-
-	/**
-	 * The table <code>menu_action</code>.
-	 */
-	public final MenuAction MENU_ACTION = MenuAction.MENU_ACTION;
 
 	/**
 	 * The table <code>menu_layout_section</code>.
@@ -846,7 +840,6 @@ public class DefaultSchema extends SchemaImpl {
 			Mail.MAIL,
 			MailAttachment.MAIL_ATTACHMENT,
 			Menu.MENU,
-			MenuAction.MENU_ACTION,
 			MenuLayoutSection.MENU_LAYOUT_SECTION,
 			MenuLayoutSectionWidget.MENU_LAYOUT_SECTION_WIDGET,
 			MenuLayoutSectionWidgetParameter.MENU_LAYOUT_SECTION_WIDGET_PARAMETER,

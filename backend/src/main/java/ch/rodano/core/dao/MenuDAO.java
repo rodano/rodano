@@ -13,11 +13,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import ch.rodano.configuration.model.cms.CMSAction;
 import ch.rodano.configuration.model.cms.CMSLayout;
 import ch.rodano.configuration.model.menu.Menu;
-import ch.rodano.core.model.jooq.tables.records.MenuActionRecord;
 import ch.rodano.core.model.jooq.tables.records.MenuRecord;
 
 import static ch.rodano.core.model.jooq.tables.Menu.MENU;
-import static ch.rodano.core.model.jooq.tables.MenuAction.MENU_ACTION;
 
 @Repository
 public class MenuDAO implements BaseProjectDAO<Menu> {
@@ -97,48 +95,26 @@ public class MenuDAO implements BaseProjectDAO<Menu> {
 			model.setLayout(layout);
 		}
 
-		final CMSAction action = loadAction(record.getMenuId());
-		if(action != null) {
+		if(record.getActionPage() != null) {
+			final CMSAction action = new CMSAction();
+			action.setPage(record.getActionPage());
+			if(record.getActionContext() != null && !record.getActionContext().isBlank()) {
+				try {
+					action.setContext(mappingHelper.parseJson(record.getActionContext(), new TypeReference<>() {
+					}));
+				}
+				catch(Exception e) {
+					action.setContext(List.of(record.getActionContext()));
+				}
+			}
+			if(record.getActionParams() != null && !record.getActionParams().isBlank()) {
+				action.setParameters(mappingHelper.parseJsonToMap(record.getActionParams()));
+			}
 			model.setAction(action);
 		}
 
 		model.setSubmenus(loadSubmenus(record.getMenuId(), record.getProjectId()));
-
 		return model;
-	}
-
-	private CMSAction loadAction(final UUID menuId) {
-		final var record = dslContext.selectFrom(MENU_ACTION)
-			.where(MENU_ACTION.MENU_ID.eq(menuId))
-			.fetchOne();
-
-		if(record == null) {
-			return null;
-		}
-
-		return mapActionToModel(record);
-	}
-
-	private CMSAction mapActionToModel(final MenuActionRecord record) {
-		final CMSAction action = new CMSAction();
-
-		action.setPage(record.getPage());
-		if(record.getContext() != null && !record.getContext().isBlank()) {
-			try {
-				final List<String> contextList = mappingHelper.parseJson(record.getContext(), new TypeReference<>() {
-				});
-				action.setContext(contextList);
-			}
-			catch(Exception e) {
-				action.setContext(List.of(record.getContext()));
-			}
-		}
-
-		if(record.getParams() != null && !record.getParams().isBlank()) {
-			action.setParameters(mappingHelper.parseJsonToMap(record.getParams()));
-		}
-
-		return action;
 	}
 
 	private SortedSet<Menu> loadSubmenus(final UUID parentMenuId, final UUID projectId) {

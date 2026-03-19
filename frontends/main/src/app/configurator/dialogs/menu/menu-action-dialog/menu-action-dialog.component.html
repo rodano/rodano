@@ -1,0 +1,141 @@
+<div class="dialog-container dialog-wide">
+	<h2 class="dialog-title">Edit Action</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Action Page</label>
+				<mat-select class="settings-select" formControlName="page">
+					<mat-option [value]="">None</mat-option>
+					@for (page of ACTION_PAGES; track page) {
+						<mat-option [value]="page">{{ page }}</mat-option>
+					}
+				</mat-select>
+				<span class="hint">The page this menu item navigates to</span>
+			</div>
+		</form>
+
+		<div class="list-section">
+			<div class="list-header">
+				<h3>Context</h3>
+				@if (!isScopesPage) {
+					<button class="btn-add-list" type="button" (click)="addContextItem()">
+						<mat-icon>add</mat-icon>
+						Add Entry
+					</button>
+				}
+			</div>
+
+			@if (isScopesPage) {
+				<div class="form-field">
+					<label>Scope Model</label>
+					<mat-select class="settings-select"
+													[value]="contextItems[0] ?? ''"
+													(change)="contextItems = [$any($event.target).value]">
+						<mat-option [value]="">None</mat-option>
+						@for (sm of data.scopeModels; track sm.scopeModelId) {
+							<mat-option [value]="sm.scopeModelId">
+								{{ languageService.getLabel(sm) }}
+							</mat-option>
+						}
+					</mat-select>
+				</div>
+			} @else {
+				@if (contextItems.length === 0) {
+					<div class="empty-state">
+						<mat-icon>list</mat-icon>
+						<p>No context entries. Click "Add Entry" to add one.</p>
+					</div>
+				} @else {
+					<div class="list-table-wrapper">
+						<table class="list-table">
+							<thead>
+							<tr>
+								<th>Value</th>
+								<th></th>
+							</tr>
+							</thead>
+							<tbody>
+								@for (item of contextItems; track $index; let i = $index) {
+									<tr>
+										<td>
+											<input type="text" class="list-input"
+																		[value]="item"
+																		(input)="updateContextItem(i, $any($event.target).value)"
+																		placeholder="Context value">
+										</td>
+										<td class="center">
+											<button class="btn-delete" type="button" (click)="removeContextItem(i)">
+												<mat-icon>delete</mat-icon>
+											</button>
+										</td>
+									</tr>
+								}
+							</tbody>
+						</table>
+					</div>
+				}
+			}
+		</div>
+
+		<div class="list-section">
+			<div class="list-header">
+				<h3>Parameters</h3>
+				<button class="btn-add-list" type="button" (click)="addParameter()">
+					<mat-icon>add</mat-icon>
+					Add Entry
+				</button>
+			</div>
+
+			@if (parameters.length === 0) {
+				<div class="empty-state">
+					<mat-icon>tune</mat-icon>
+					<p>No parameters configured. Click "Add Entry" to add one.</p>
+				</div>
+			} @else {
+				<div class="list-table-wrapper">
+					<table class="list-table">
+						<thead>
+						<tr>
+							<th>Key</th>
+							<th>Value</th>
+							<th></th>
+						</tr>
+						</thead>
+						<tbody>
+							@for (param of parameters; track $index; let i = $index) {
+								<tr>
+									<td>
+										<input type="text" class="list-input"
+																	[value]="param.key"
+																	(input)="updateParameter(i, 'key', $any($event.target).value)"
+																	placeholder="Key">
+									</td>
+									<td>
+										<input type="text" class="list-input"
+																	[value]="param.value"
+																	(input)="updateParameter(i, 'value', $any($event.target).value)"
+																	placeholder="Value">
+									</td>
+									<td class="center">
+										<button class="btn-delete" type="button" (click)="removeParameter(i)">
+											<mat-icon>delete</mat-icon>
+										</button>
+									</td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				</div>
+			}
+		</div>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">
+			<mat-icon>save</mat-icon>
+			Save Changes
+		</button>
+	</div>
+</div>

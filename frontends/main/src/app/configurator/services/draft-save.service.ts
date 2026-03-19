@@ -48,6 +48,8 @@ import {RuleDefinitionActionService} from './api/rule-definition-action.service'
 import {RuleDefinitionAction} from '@core/model/rule-definition-action';
 import {CronService} from './api/cron.service';
 import {Cron} from '@core/model/cron';
+import {MenuService} from './api/menu.service';
+import {MenuConfig} from '@core/model/menu-config';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -75,6 +77,7 @@ export class DraftSaveService {
 		private workflowSummaryService: WorkflowSummaryService,
 		private ruleDefinitionPropertyService: RuleDefinitionPropertyService,
 		private ruleDefinitionActionService: RuleDefinitionActionService,
+		private menuService: MenuService,
 		private cronService: CronService
 	) {}
 
@@ -803,6 +806,41 @@ export class DraftSaveService {
 				const cron = crons.find(c => c.cronId === id);
 				if(cron) {
 					saveObservables.push(this.cronService.updateCron(projectId, id, cron));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveMenus(
+		projectId: string,
+		modifiedIds: Set<string>,
+		menus: MenuConfig[],
+		originalMenus: MenuConfig[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalMenus.find(m => m.menuId === originalId);
+				if(original) {
+					saveObservables.push(this.menuService.deleteMenu(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const menu = menus.find(m => m.menuId === id);
+				if(menu) {
+					saveObservables.push(this.menuService.createMenu(projectId, menu));
+				}
+			}
+			else {
+				const menu = menus.find(m => m.menuId === id);
+				if(menu) {
+					saveObservables.push(this.menuService.updateMenu(projectId, id, menu));
 				}
 			}
 		});

@@ -1,0 +1,25 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Set Parent Menu</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Parent Menu</label>
+				<mat-select formControlName="parentMenuId" placeholder="None (top-level menu)">
+					<mat-option [value]="null">None (top-level)</mat-option>
+					@for (menu of availableParents; track menu.menuId) {
+						<mat-option [value]="menu.menuId">
+							{{ languageService.getLabel(menu) }}
+						</mat-option>
+					}
+				</mat-select>
+				<span class="hint">Assign this menu as a submenu of another menu.</span>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

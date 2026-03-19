@@ -439,9 +439,6 @@ alter table workflow_widget_column
 alter table menu
     add constraint fk_menu_parent foreign key (project_id, parent_menu_id) references menu (project_id, menu_id) on delete cascade;
 
-alter table menu_action
-    add constraint fk_menu_action_menu foreign key (project_id, menu_id) references menu (project_id, menu_id);
-
 alter table menu_layout_section
     add constraint fk_menu_layout_section_menu foreign key (project_id, menu_id) references menu (project_id, menu_id),
     add constraint fk_menu_layout_section_feature foreign key (project_id, required_feature_id) references feature (project_id, feature_id);

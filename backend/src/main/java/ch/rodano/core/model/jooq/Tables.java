@@ -46,7 +46,6 @@ import ch.rodano.core.model.jooq.tables.FormModelWorkflow;
 import ch.rodano.core.model.jooq.tables.Mail;
 import ch.rodano.core.model.jooq.tables.MailAttachment;
 import ch.rodano.core.model.jooq.tables.Menu;
-import ch.rodano.core.model.jooq.tables.MenuAction;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSection;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter;
@@ -348,11 +347,6 @@ public class Tables {
 	 * The table <code>menu</code>.
 	 */
 	public static final Menu MENU = Menu.MENU;
-
-	/**
-	 * The table <code>menu_action</code>.
-	 */
-	public static final MenuAction MENU_ACTION = MenuAction.MENU_ACTION;
 
 	/**
 	 * The table <code>menu_layout_section</code>.

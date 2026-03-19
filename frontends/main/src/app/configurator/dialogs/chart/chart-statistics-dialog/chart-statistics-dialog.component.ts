@@ -28,7 +28,7 @@ export interface ChartStatisticsDialogData {
 	selector: 'app-chart-statistics-dialog',
 	standalone: true,
 	templateUrl: './chart-statistics-dialog.component.html',
-	styleUrls: ['../../dialog-shared.css', './chart-statistics-dialog.component.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatCheckboxModule, MatIconModule, MatSelectModule,
 		MatTabsModule]
 })

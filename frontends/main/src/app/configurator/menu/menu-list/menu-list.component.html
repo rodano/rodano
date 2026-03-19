@@ -1,0 +1,122 @@
+<app-list-header title="Menus" subtitle="Configure menus for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading menus...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card create-card theme-menu" (click)="onCreateMenu()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Menu</h3>
+						<p>Add a new menu</p>
+					</div>
+				</div>
+
+				@for (menu of menus; track menu.menuId) {
+					<div class="primary-card theme-menu"
+										[class.selected]="isSelected(menu)"
+										[appModified]="modifiedIds.has(menu.menuId)"
+										(click)="onSelectMenu(menu)">
+
+						@if (isSelected(menu)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(menu.shortname) }}</h3>
+								<p class="card-code">{{ menu.id }}</p>
+							</div>
+							<div class="card-header-badges">
+								@if (menu.public) {
+									<span class="status-badge first" matTooltip="Public">
+										<mat-icon class="badge-full">public</mat-icon>
+										<mat-icon class="badge-short">public</mat-icon>
+									</span>
+								}
+								@if (menu.homePage) {
+									<span class="status-badge second" matTooltip="Home Page">
+										<mat-icon class="badge-full">home</mat-icon>
+										<mat-icon class="badge-short">home</mat-icon>
+									</span>
+								}
+								@switch (getMenuLevel(menu)) {
+									@case ('standalone') {
+										<span class="status-badge standalone" matTooltip="Standalone">
+            <mat-icon class="badge-full">crop_square</mat-icon>
+            <mat-icon class="badge-short">crop_square</mat-icon>
+        </span>
+									}
+									@case ('root') {
+										<span class="status-badge root" matTooltip="Root">
+            <mat-icon class="badge-full">vertical_align_top</mat-icon>
+            <mat-icon class="badge-short">vertical_align_top</mat-icon>
+        </span>
+									}
+									@case ('intermediate') {
+										<span class="status-badge intermediate" matTooltip="Intermediate">
+            <mat-icon class="badge-full">swap_vert</mat-icon>
+            <mat-icon class="badge-short">swap_vert</mat-icon>
+        </span>
+									}
+									@case ('leaf') {
+										<span class="status-badge leaf" matTooltip="Leaf">
+            <mat-icon class="badge-full">vertical_align_bottom</mat-icon>
+            <mat-icon class="badge-short">vertical_align_bottom</mat-icon>
+        </span>
+									}
+								}
+							</div>
+						</div>
+
+						<div class="card-body">
+							<div class="card-details">
+								<div class="detail-item">
+									<mat-icon>settings</mat-icon>
+									<span>Order by: <b>{{ menu.orderBy }}</b></span>
+								</div>
+							</div>
+						</div>
+
+						@if (isModified(menu.menuId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (menus.length === 0) {
+				<app-empty-state
+					[icon]="'menu'"
+					[title]="'No Menus'"
+					[message]="'Create your first menu to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedMenu && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-menu-detail
+					[menu]="selectedMenu"
+					[projectId]="projectId"
+					[project]="project"
+					[allMenus]="menus"
+					(menuUpdated)="onMenuUpdated($event)"
+					(menuDeleted)="onMenuDeleted($event)"
+					(closed)="onSelectMenu(selectedMenu)">
+				</app-menu-detail>
+			</div>
+		}
+	}
+</div>

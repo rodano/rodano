@@ -803,19 +803,11 @@ create table if not exists menu (
 	description    json         null,
 	is_public      boolean      not null default false,
 	is_home_page   boolean      not null default false,
+	action_page    varchar(128) null,
+	action_context json         null,
+	action_params  json         null,
 	constraint pk_menu primary key (project_id, menu_id),
 	constraint uq_menu_project_code unique (project_id, code)
-) engine = InnoDB
-  default charset = utf8mb4
-  collate = utf8mb4_unicode_ci;
-
-create table if not exists menu_action (
-	project_id uuid         not null,
-	menu_id    uuid         not null,
-	page       varchar(128) null,
-	context    json         null,
-	params     json         null,
-	constraint pk_menu_action primary key (project_id, menu_id)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;

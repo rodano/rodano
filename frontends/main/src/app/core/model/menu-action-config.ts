@@ -9,10 +9,9 @@
  */
 
 
-export interface TimelineGraphDataPeriod { 
-    label?: string;
-    'default'?: boolean;
-    stop_date_string?: string;
-    start_date_string?: string;
+export interface MenuActionConfig { 
+    page?: string;
+    context?: Array<string>;
+    parameters?: { [key: string]: string; };
 }
 

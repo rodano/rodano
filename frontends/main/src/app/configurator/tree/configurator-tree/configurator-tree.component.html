@@ -73,19 +73,13 @@
 		(categoryClicked)="onFeaturesClicked()">
 	</app-feature-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">menu</mat-icon>
-			<span class="node-label">Menus</span>
-		</div>
-	</div>
-
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">payments</mat-icon>
-			<span class="node-label">Payment Plans</span>
-		</div>
-	</div>
+	<app-menu-tree
+		[projectId]="projectId"
+		[menus]="menus"
+		[expanded]="expandedCategory === 'menus'"
+		[selectedMenuId]="selectedMenuId"
+		(categoryClicked)="onMenuClicked()">
+	</app-menu-tree>
 
 	<app-chart-tree
 		[projectId]="projectId"

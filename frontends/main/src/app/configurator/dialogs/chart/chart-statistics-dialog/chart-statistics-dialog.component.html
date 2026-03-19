@@ -39,10 +39,10 @@
 			</div>
 		</form>
 
-		<div class="ranges-section">
-			<div class="ranges-header">
+		<div class="list-section">
+			<div class="list-header">
 				<h3>Ranges</h3>
-				<button class="btn-add-range" type="button" (click)="addRange()">
+				<button class="btn-add-list" type="button" (click)="addRange()">
 					<mat-icon>add</mat-icon>
 					Add Range
 				</button>
@@ -62,8 +62,8 @@
 					<p>No ranges configured. Click "Add Range" to add one.</p>
 				</div>
 			} @else {
-				<div class="ranges-table-wrapper">
-					<table class="ranges-table">
+				<div class="list-table-wrapper">
+					<table class="list-table">
 						<thead>
 						<tr>
 							<th>ID *</th>
@@ -79,31 +79,31 @@
 							@for (range of ranges; track range.chartRangeId; let i = $index) {
 								<tr>
 									<td>
-										<input type="text" class="range-input"
+										<input type="text" class="list-input"
 																	[value]="range.id"
 																	(input)="updateRangeField(i, 'id', $any($event.target).value)"
 																	placeholder="RANGE_ID">
 									</td>
 									<td>
-										<input type="text" class="range-input"
+										<input type="text" class="list-input"
 																	[value]="getRangeLabelForLanguage(range)"
 																	(input)="updateRangeLabelForLanguage(i, $any($event.target).value)"
 																	placeholder="Label">
 									</td>
 									<td>
-										<input type="text" class="range-input range-input-sm"
+										<input type="text" class="list-input list-input-sm"
 																	[value]="range.value || ''"
 																	(input)="updateRangeField(i, 'value', $any($event.target).value)"
 																	placeholder="Value">
 									</td>
 									<td>
-										<input type="number" class="range-input range-input-sm"
+										<input type="number" class="list-input list-input-sm"
 																	[value]="range.min ?? ''"
 																	(input)="updateRangeField(i, 'min', isNaN($any($event.target).valueAsNumber) ? undefined : $any($event.target).valueAsNumber)"
 																	placeholder="Min">
 									</td>
 									<td>
-										<input type="number" class="range-input range-input-sm"
+										<input type="number" class="list-input list-input-sm"
 																	[value]="range.max ?? ''"
 																	(input)="updateRangeField(i, 'max', isNaN($any($event.target).valueAsNumber) ? undefined : $any($event.target).valueAsNumber)"
 																	placeholder="Max">

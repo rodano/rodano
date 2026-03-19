@@ -25,7 +25,6 @@ import static ch.rodano.batch.helper.ModelResolvers.resolveWorkflowSummaryId;
 import static ch.rodano.batch.helper.ModelResolvers.resolveWorkflowWidgetId;
 import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.tables.Menu.MENU;
-import static ch.rodano.core.model.jooq.tables.MenuAction.MENU_ACTION;
 import static ch.rodano.core.model.jooq.tables.MenuLayoutSection.MENU_LAYOUT_SECTION;
 import static ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidget.MENU_LAYOUT_SECTION_WIDGET;
 import static ch.rodano.core.model.jooq.tables.MenuLayoutSectionWidgetParameter.MENU_LAYOUT_SECTION_WIDGET_PARAMETER;
@@ -75,6 +74,27 @@ public class MenuWriter extends BaseWriter {
 		final UUID existingId = resolveMenuId(tx, projectId, menuCode);
 		final UUID menuId = existingId != null ? existingId : deterministic(projectId, "MENU", menuCode);
 
+		String actionPage = null;
+		String actionContext = null;
+		String actionParams = null;
+
+		final MenuAction action = menu.getAction();
+		if(action != null) {
+			actionPage = action.getPage();
+
+			List<String> resolvedContext = action.getContext();
+			if("scopes".equals(action.getPage()) && action.getContext() != null && !action.getContext().isEmpty()) {
+				resolvedContext = action.getContext().stream()
+					.map(code -> {
+						final UUID scopeModelId = resolveScopeModelId(tx, projectId, code);
+						return scopeModelId != null ? scopeModelId.toString() : code;
+					})
+					.toList();
+			}
+			actionContext = toJson(resolvedContext);
+			actionParams = toJson(action.getParameters());
+		}
+
 		tx.insertInto(MENU)
 			.set(MENU.PROJECT_ID, projectId)
 			.set(MENU.MENU_ID, menuId)
@@ -87,6 +107,9 @@ public class MenuWriter extends BaseWriter {
 			.set(MENU.SHORTNAME, toJson(menu.getShortname()))
 			.set(MENU.LONGNAME, toJson(menu.getLongname()))
 			.set(MENU.DESCRIPTION, toJson(menu.getDescription()))
+			.set(MENU.ACTION_PAGE, actionPage)
+			.set(MENU.ACTION_CONTEXT, actionContext)
+			.set(MENU.ACTION_PARAMS, actionParams)
 			.onDuplicateKeyUpdate()
 			.set(MENU.PARENT_MENU_ID, parentMenuId)
 			.set(MENU.SORT_ORDER, sortOrder)
@@ -96,33 +119,11 @@ public class MenuWriter extends BaseWriter {
 			.set(MENU.SHORTNAME, toJson(menu.getShortname()))
 			.set(MENU.LONGNAME, toJson(menu.getLongname()))
 			.set(MENU.DESCRIPTION, toJson(menu.getDescription()))
+			.set(MENU.ACTION_PAGE, actionPage)
+			.set(MENU.ACTION_CONTEXT, actionContext)
+			.set(MENU.ACTION_PARAMS, actionParams)
 			.execute();
 
-		final MenuAction action = menu.getAction();
-		if(action != null) {
-
-			List<String> resolvedContext = action.getContext();
-			if("scopes".equals(action.getPage()) && action.getContext() != null && !action.getContext().isEmpty()) {
-				resolvedContext = action.getContext().stream()
-					.map(code -> {
-						final UUID scopeModelId = resolveScopeModelId(tx, projectId, code);
-						return scopeModelId != null ? scopeModelId.toString(): code;
-					})
-					.toList();
-			}
-
-			tx.insertInto(MENU_ACTION)
-				.set(MENU_ACTION.PROJECT_ID, projectId)
-				.set(MENU_ACTION.MENU_ID, menuId)
-				.set(MENU_ACTION.PAGE, action.getPage())
-				.set(MENU_ACTION.CONTEXT, toJson(resolvedContext))
-				.set(MENU_ACTION.PARAMS, toJson(action.getParameters()))
-				.onDuplicateKeyUpdate()
-				.set(MENU_ACTION.PAGE, action.getPage())
-				.set(MENU_ACTION.CONTEXT, toJson(resolvedContext))
-				.set(MENU_ACTION.PARAMS, toJson(action.getParameters()))
-				.execute();
-		}
 		upsertSectionsAndWidgets(tx, projectId, menuId, menu);
 		return menuId;
 	}

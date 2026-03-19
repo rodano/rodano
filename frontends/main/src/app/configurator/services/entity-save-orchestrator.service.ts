@@ -19,6 +19,7 @@ import {WorkflowSummaryContext} from './contexts/workflow-summary-context';
 import {RuleDefinitionPropertyContext} from './contexts/rule-definition-property-context';
 import {RuleDefinitionActionContext} from './contexts/rule-definition-action-context';
 import {CronContext} from './contexts/cron-context';
+import {MenuContext} from './contexts/menu-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -368,6 +369,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveMenus(projectId: string, context: MenuContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveMenus(
+				projectId,
+				context.modifiedMenuIds,
+				context.menus,
+				context.originalMenus
+			)
+		]).pipe(
+			map(() => {
+				context.menuManager.syncOriginalsWithCurrent();
+
+				context.menuManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -481,5 +499,11 @@ export class EntitySaveOrchestratorService {
 		context.cronManager.resetToOriginals();
 
 		context.cronManager.invalidate();
+	}
+
+	resetMenusToOriginals(context: MenuContext): void {
+		context.menuManager.resetToOriginals();
+
+		context.menuManager.invalidate();
 	}
 }

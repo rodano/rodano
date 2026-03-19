@@ -174,6 +174,48 @@ public class MenuRecord extends UpdatableRecordImpl<MenuRecord> {
 		return (Boolean) get(10);
 	}
 
+	/**
+	 * Setter for <code>menu.action_page</code>.
+	 */
+	public void setActionPage(String value) {
+		set(11, value);
+	}
+
+	/**
+	 * Getter for <code>menu.action_page</code>.
+	 */
+	public String getActionPage() {
+		return (String) get(11);
+	}
+
+	/**
+	 * Setter for <code>menu.action_context</code>.
+	 */
+	public void setActionContext(String value) {
+		set(12, value);
+	}
+
+	/**
+	 * Getter for <code>menu.action_context</code>.
+	 */
+	public String getActionContext() {
+		return (String) get(12);
+	}
+
+	/**
+	 * Setter for <code>menu.action_params</code>.
+	 */
+	public void setActionParams(String value) {
+		set(13, value);
+	}
+
+	/**
+	 * Getter for <code>menu.action_params</code>.
+	 */
+	public String getActionParams() {
+		return (String) get(13);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -197,7 +239,7 @@ public class MenuRecord extends UpdatableRecordImpl<MenuRecord> {
 	/**
 	 * Create a detached, initialised MenuRecord
 	 */
-	public MenuRecord(UUID menuId, UUID projectId, UUID parentMenuId, Integer sortOrder, String code, Integer orderBy, String shortname, String longname, String description, Boolean isPublic, Boolean isHomePage) {
+	public MenuRecord(UUID menuId, UUID projectId, UUID parentMenuId, Integer sortOrder, String code, Integer orderBy, String shortname, String longname, String description, Boolean isPublic, Boolean isHomePage, String actionPage, String actionContext, String actionParams) {
 		super(Menu.MENU);
 
 		setMenuId(menuId);
@@ -211,6 +253,9 @@ public class MenuRecord extends UpdatableRecordImpl<MenuRecord> {
 		setDescription(description);
 		setIsPublic(isPublic);
 		setIsHomePage(isHomePage);
+		setActionPage(actionPage);
+		setActionContext(actionContext);
+		setActionParams(actionParams);
 		resetChangedOnNotNull();
 	}
 }

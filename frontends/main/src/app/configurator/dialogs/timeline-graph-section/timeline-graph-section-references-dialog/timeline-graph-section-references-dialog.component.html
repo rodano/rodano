@@ -2,10 +2,10 @@
 	<h2 class="dialog-title">References &amp; Entries</h2>
 
 	<div class="dialog-content">
-		<div class="ranges-section">
-			<div class="ranges-header">
+		<div class="list-section">
+			<div class="list-header">
 				<h3>References</h3>
-				<button class="btn-add-range" type="button" (click)="addReference()">
+				<button class="btn-add-list" type="button" (click)="addReference()">
 					<mat-icon>add</mat-icon>
 					Add Reference
 				</button>
@@ -109,8 +109,8 @@
 									<p>No entries yet. Click "Add Entry" to add one.</p>
 								</div>
 							} @else {
-								<div class="ranges-table-wrapper">
-									<table class="ranges-table">
+								<div class="list-table-wrapper">
+									<table class="list-table">
 										<thead>
 										<tr>
 											<th>Time point</th>
@@ -125,7 +125,7 @@
 													<td>
 														<input
 															type="text"
-															class="range-input"
+															class="list-input"
 															[value]="entry.timepoint"
 															(input)="updateEntryField(ri, ei, 'timepoint', $any($event.target).value)"
 															placeholder="1y6m">
@@ -133,7 +133,7 @@
 													<td>
 														<input
 															type="text"
-															class="range-input range-input-sm"
+															class="list-input list-input-sm"
 															[defaultValue]="entry.value ?? ''"
 															(input)="updateEntryField(ri, ei, 'value', parseDecimal($any($event.target).value))"
 															placeholder="0.0">
@@ -141,7 +141,7 @@
 													<td>
 														<input
 															type="text"
-															class="range-input"
+															class="list-input"
 															[value]="entry.label || ''"
 															(input)="updateEntryField(ri, ei, 'label', $any($event.target).value)"
 															placeholder="Label">

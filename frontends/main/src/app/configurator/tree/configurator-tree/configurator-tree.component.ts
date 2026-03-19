@@ -24,6 +24,7 @@ import {
 	RuleDefinitionActionTreeComponent
 } from '../rule-definition-action-tree/rule-definition-action-tree.component';
 import {CronTreeComponent} from '../cron-tree/cron-tree.component';
+import {MenuTreeComponent} from '../menu-tree/menu-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -48,7 +49,8 @@ import {CronTreeComponent} from '../cron-tree/cron-tree.component';
 		WorkflowSummaryTreeComponent,
 		RuleDefinitionPropertyTreeComponent,
 		RuleDefinitionActionTreeComponent,
-		CronTreeComponent
+		CronTreeComponent,
+		MenuTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -80,6 +82,7 @@ export class ConfiguratorTreeComponent {
 	@Input() ruleDefinitionProperties: any[] = [];
 	@Input() ruleDefinitionActions: any[] = [];
 	@Input() crons: any[] = [];
+	@Input() menus: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -104,11 +107,12 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedRuleDefinitionPropertyId: string | null = null;
 	@Input() selectedRuleDefinitionActionId: string | null = null;
 	@Input() selectedCronId: string | null = null;
+	@Input() selectedMenuId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -235,6 +239,13 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'crons' ? null : 'crons';
 			this.categoryClicked.emit('crons');
+		});
+	}
+
+	onMenuClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'menus' ? null : 'menus';
+			this.categoryClicked.emit('menus');
 		});
 	}
 

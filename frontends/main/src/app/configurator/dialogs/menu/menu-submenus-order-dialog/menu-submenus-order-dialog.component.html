@@ -1,0 +1,35 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Order Submenus</h2>
+
+	<div class="dialog-content">
+		@if (submenus.length === 0) {
+			<div class="empty-state">
+				<mat-icon>menu</mat-icon>
+				<p>No submenus configured.</p>
+			</div>
+		} @else {
+			<p class="hint" style="margin-bottom: 1rem">Drag items to reorder.</p>
+			<div class="drag-list" cdkDropList (cdkDropListDropped)="drop($event)">
+				@for (menu of submenus; track menu.menuId; let i = $index) {
+					<div class="drag-item" cdkDrag cdkDragLockAxis="y">
+						<div class="drag-item-preview" *cdkDragPlaceholder></div>
+						<div class="drag-handle" cdkDragHandle>
+							<mat-icon>drag_indicator</mat-icon>
+						</div>
+						<span class="drag-index">{{ i + 1 }}</span>
+						<span class="drag-label">{{ languageService.getLabel(menu) }}</span>
+						<span class="drag-orderby">{{ menu.orderBy ?? '—' }}</span>
+					</div>
+				}
+			</div>
+		}
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">
+			<mat-icon>save</mat-icon>
+			Save Order
+		</button>
+	</div>
+</div>

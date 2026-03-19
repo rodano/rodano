@@ -7,7 +7,6 @@ package ch.rodano.core.model.jooq.tables;
 import ch.rodano.core.model.jooq.DefaultSchema;
 import ch.rodano.core.model.jooq.Keys;
 import ch.rodano.core.model.jooq.tables.Menu.MenuPath;
-import ch.rodano.core.model.jooq.tables.MenuAction.MenuActionPath;
 import ch.rodano.core.model.jooq.tables.MenuLayoutSection.MenuLayoutSectionPath;
 import ch.rodano.core.model.jooq.tables.ProfileMenuGrants.ProfileMenuGrantsPath;
 import ch.rodano.core.model.jooq.tables.records.MenuRecord;
@@ -117,6 +116,21 @@ public class Menu extends TableImpl<MenuRecord> {
 	 */
 	public final TableField<MenuRecord, Boolean> IS_HOME_PAGE = createField(DSL.name("is_home_page"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
+	/**
+	 * The column <code>menu.action_page</code>.
+	 */
+	public final TableField<MenuRecord, String> ACTION_PAGE = createField(DSL.name("action_page"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
+	 * The column <code>menu.action_context</code>.
+	 */
+	public final TableField<MenuRecord, String> ACTION_CONTEXT = createField(DSL.name("action_context"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+
+	/**
+	 * The column <code>menu.action_params</code>.
+	 */
+	public final TableField<MenuRecord, String> ACTION_PARAMS = createField(DSL.name("action_params"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+
 	private Menu(Name alias, Table<MenuRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}
@@ -211,18 +225,6 @@ public class Menu extends TableImpl<MenuRecord> {
 		return _menu;
 	}
 
-	private transient MenuActionPath _menuAction;
-
-	/**
-	 * Get the implicit to-many join path to the <code>menu_action</code> table
-	 */
-	public MenuActionPath menuAction() {
-		if (_menuAction == null)
-			_menuAction = new MenuActionPath(this, null, Keys.FK_MENU_ACTION_MENU.getInverseKey());
-
-		return _menuAction;
-	}
-
 	private transient MenuLayoutSectionPath _menuLayoutSection;
 
 	/**
@@ -252,6 +254,8 @@ public class Menu extends TableImpl<MenuRecord> {
 	@Override
 	public List<Check<MenuRecord>> getChecks() {
 		return Arrays.asList(
+			Internal.createCheck(this, DSL.name("action_context"), "json_valid(`action_context`)", true),
+			Internal.createCheck(this, DSL.name("action_params"), "json_valid(`action_params`)", true),
 			Internal.createCheck(this, DSL.name("description"), "json_valid(`description`)", true),
 			Internal.createCheck(this, DSL.name("longname"), "json_valid(`longname`)", true),
 			Internal.createCheck(this, DSL.name("shortname"), "json_valid(`shortname`)", true)
