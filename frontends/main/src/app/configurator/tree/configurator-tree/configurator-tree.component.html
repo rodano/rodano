@@ -161,10 +161,11 @@
 		(categoryClicked)="onRuleDefinitionActionClicked()">
 	</app-rule-definition-action-tree>
 
-	<div class="tree-node">
-		<div class="node-content clickable" (click)="onCategoryClick('menus')">
-			<mat-icon class="node-icon">alarm</mat-icon>
-			<span class="node-label">Crons</span>
-		</div>
-	</div>
+	<app-cron-tree
+		[projectId]="projectId"
+		[crons]="crons"
+		[expanded]="expandedCategory === 'crons'"
+		[selectedCronId]="selectedCronId"
+		(categoryClicked)="onCronClicked()">
+	</app-cron-tree>
 </div>

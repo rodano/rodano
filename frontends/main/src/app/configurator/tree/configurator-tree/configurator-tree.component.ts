@@ -23,6 +23,7 @@ import {
 import {
 	RuleDefinitionActionTreeComponent
 } from '../rule-definition-action-tree/rule-definition-action-tree.component';
+import {CronTreeComponent} from '../cron-tree/cron-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -46,7 +47,8 @@ import {
 		WorkflowWidgetTreeComponent,
 		WorkflowSummaryTreeComponent,
 		RuleDefinitionPropertyTreeComponent,
-		RuleDefinitionActionTreeComponent
+		RuleDefinitionActionTreeComponent,
+		CronTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -77,6 +79,7 @@ export class ConfiguratorTreeComponent {
 	@Input() workflowSummaries: any[] = [];
 	@Input() ruleDefinitionProperties: any[] = [];
 	@Input() ruleDefinitionActions: any[] = [];
+	@Input() crons: any[] = [];
 	@Input() selectedScopeModelId: string | null = null;
 	@Input() selectedEventModelId: string | null = null;
 	@Input() selectedEventGroupId: string | null = null;
@@ -100,11 +103,12 @@ export class ConfiguratorTreeComponent {
 	@Input() selectedWorkflowSummaryId: string | null = null;
 	@Input() selectedRuleDefinitionPropertyId: string | null = null;
 	@Input() selectedRuleDefinitionActionId: string | null = null;
+	@Input() selectedCronId: string | null = null;
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | null = null;
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);
@@ -224,6 +228,13 @@ export class ConfiguratorTreeComponent {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'rule-definition-actions' ? null : 'rule-definition-actions';
 			this.categoryClicked.emit('rule-definition-actions');
+		});
+	}
+
+	onCronClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = this.expandedCategory === 'crons' ? null : 'crons';
+			this.categoryClicked.emit('crons');
 		});
 	}
 

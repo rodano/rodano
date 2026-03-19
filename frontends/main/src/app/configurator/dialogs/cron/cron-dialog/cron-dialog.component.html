@@ -1,0 +1,93 @@
+<h2 class="dialog-title">{{ isEditMode ? 'Edit Cron' : 'Create Cron' }}</h2>
+
+<div class="dialog-content">
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-field">
+			<label>Code *</label>
+			<input
+				type="text"
+				formControlName="id"
+				placeholder="CRON_CODE"
+				(input)="onCodeInput($event, form)"
+				style="text-transform: uppercase;">
+			<span class="hint">Uppercase letters, numbers, and underscores only</span>
+			@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+				<span class="error-message">Code is required</span>
+			}
+			@if (form.get('id')?.hasError('pattern') && form.get('id')?.touched) {
+				<span class="error-message">Invalid format. Use uppercase letters, numbers, and underscores.</span>
+			}
+		</div>
+
+		<div class="form-field">
+			<label>Interval Unit</label>
+			<mat-select formControlName="intervalUnit" required placeholder="Select interval unit">
+				@for (option of unitOptions; track option.value) {
+					<mat-option [value]="option.value">{{ option.label }}</mat-option>
+				}
+			</mat-select>
+			<span class="hint">Cron interval unit</span>
+		</div>
+
+		<div class="form-field">
+			<label>Interval Value</label>
+			<input
+				type="number"
+				formControlName="intervalValue"
+				placeholder="Enter number">
+			<span class="hint">Cron interval value</span>
+		</div>
+
+		<div class="form-section">
+			<h3>Translations</h3>
+
+			@if (availableLanguages.length === 1) {
+				<div class="language-fields">
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<div [formGroup]="languageForms.get(lang.languageCode)!">
+								<div class="form-field">
+									<label>Description</label>
+									<textarea
+										formControlName="description"
+										placeholder="Brief description"
+										rows="3"></textarea>
+									<span class="hint">Optional description</span>
+								</div>
+							</div>
+						}
+					}
+				</div>
+			} @else {
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Description {{ lang.isDefault ? '*' : '' }}</label>
+										<textarea
+											formControlName="description"
+											placeholder="Brief description"
+											rows="3"></textarea>
+										<span class="hint">Optional description</span>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			}
+		</div>
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">
+		Cancel
+	</button>
+	<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+		<mat-icon>save</mat-icon>
+		{{ isEditMode ? 'Save Changes' : 'Create Cron' }}
+	</button>
+</div>

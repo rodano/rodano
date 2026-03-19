@@ -28,6 +28,7 @@ import {
 import {
 	RuleDefinitionActionListComponent
 } from '../rule-definition/rule-definition-action-list/rule-definition-action-list.component';
+import {CronListComponent} from '../cron/cron-list/cron-list.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -54,6 +55,7 @@ import {
 		WorkflowSummaryListComponent,
 		RuleDefinitionPropertyListComponent,
 		RuleDefinitionActionListComponent,
+		CronListComponent,
 		EmptyStateComponent
 	]
 })
@@ -74,6 +76,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 	@ViewChild(WorkflowSummaryListComponent) workflowSummaryListComponent?: WorkflowSummaryListComponent;
 	@ViewChild(RuleDefinitionPropertyListComponent) ruleDefinitionPropertyListComponent?: RuleDefinitionPropertyListComponent;
 	@ViewChild(RuleDefinitionActionListComponent) ruleDefinitionActionListComponent?: RuleDefinitionActionListComponent;
+	@ViewChild(CronListComponent) cronListComponent?: CronListComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -190,7 +193,13 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedRuleDefinitionActionId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'overview' | null = null;
+	@Output() cronsChanged = new EventEmitter<boolean>();
+	@Output() cronContextChanged = new EventEmitter<{
+		crons: any[];
+		selectedCronId: string | null;
+	}>();
+
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -342,6 +351,15 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.ruleDefinitionActionsChanged.emit(value);
 	}
 
+	onCronSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
+	onCronsChanged(value: boolean): void {
+		this.cronsChanged.emit(value);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -450,6 +468,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'rule-definition-actions') {
 			this.selectedNodeType = 'rule-definition-actions';
+			return;
+		}
+
+		if(this.selectedNode === 'crons') {
+			this.selectedNodeType = 'crons';
 			return;
 		}
 
@@ -578,5 +601,12 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedRuleDefinitionActionId: string | null;
 	}): void {
 		this.ruleDefinitionActionContextChanged.emit(context);
+	}
+
+	onCronContextChanged(context: {
+		crons: any[];
+		selectedCronId: string | null;
+	}): void {
+		this.cronContextChanged.emit(context);
 	}
 }

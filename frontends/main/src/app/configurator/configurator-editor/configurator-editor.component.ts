@@ -42,6 +42,7 @@ import {WorkflowWidgetManagerService} from '../services/manager/workflow-widget-
 import {WorkflowSummaryManagerService} from '../services/manager/workflow-summary-manager.service';
 import {RuleDefinitionPropertyManagerService} from '../services/manager/rule-definition-property-manager.service';
 import {RuleDefinitionActionManagerService} from '../services/manager/rule-definition-action-manager.service';
+import {CronManagerService} from '../services/manager/cron-manager.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -87,6 +88,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	workflowSummaryModified = false;
 	ruleDefinitionPropertyModified = false;
 	ruleDefinitionActionModified = false;
+	cronModified = false;
 
 	scopeModels: any[] = [];
 	datasetModels: any[] = [];
@@ -111,6 +113,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	workflowSummaries: any[] = [];
 	ruleDefinitionProperties: any[] = [];
 	ruleDefinitionActions: any[] = [];
+	crons: any[] = [];
 
 	selectedScopeModelId: string | null = null;
 	selectedEventModelId: string | null = null;
@@ -135,6 +138,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	selectedWorkflowSummaryId: string | null = null;
 	selectedRuleDefinitionPropertyId: string | null = null;
 	selectedRuleDefinitionActionId: string | null = null;
+	selectedCronId: string | null = null;
 
 	canRollback = false;
 	canRollForward = false;
@@ -171,6 +175,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private workflowSummaryManager: WorkflowSummaryManagerService,
 		private ruleDefinitionPropertyManager: RuleDefinitionPropertyManagerService,
 		private ruleDefinitionActionManager: RuleDefinitionActionManagerService,
+		private cronManager: CronManagerService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -225,6 +230,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowSummaryManager.invalidate();
 		this.ruleDefinitionPropertyManager.invalidate();
 		this.ruleDefinitionActionManager.invalidate();
+		this.cronManager.invalidate();
 
 		this.configuratorService.getProject(this.projectId).subscribe({
 			next: project => {
@@ -328,6 +334,11 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			next: models => this.ruleDefinitionActions = models,
 			error: error => console.error('Error loading rule definition actions:', error)
 		});
+
+		this.cronManager.load(this.projectId).subscribe({
+			next: models => this.crons = models,
+			error: error => console.error('Error loading crons:', error)
+		});
 	}
 
 	private refreshTreeData(): void {
@@ -348,6 +359,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowSummaries = this.workflowSummaryManager.getAll();
 		this.ruleDefinitionProperties = this.ruleDefinitionPropertyManager.getAll();
 		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
+		this.crons = this.cronManager.getAll();
 	}
 
 	loadDraftVersion(): void {
@@ -386,7 +398,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onNodeSelected(nodeId: string | null): void {
 		this.selectedNode = nodeId;
 
-		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries' || nodeId === 'rule-definition-properties' || nodeId === 'rule-definition-actions') {
+		if(nodeId === 'scope-models' || nodeId === 'dataset-models' || nodeId === 'validators' || nodeId === 'workflows' || nodeId === 'profiles' || nodeId === 'form-models' || nodeId === 'timeline-graphs' || nodeId === 'workflow-widgets' || nodeId === 'workflow-summaries' || nodeId === 'rule-definition-properties' || nodeId === 'rule-definition-actions' || nodeId === 'crons') {
 			this.selectedScopeModelId = null;
 			this.selectedEventModelId = null;
 			this.selectedEventGroupId = null;
@@ -409,6 +421,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedWorkflowSummaryId = null;
 			this.selectedRuleDefinitionPropertyId = null;
 			this.selectedRuleDefinitionActionId = null;
+			this.selectedCronId = null;
 			this.eventModels = [];
 			this.eventGroups = [];
 			this.fieldModels = [];
@@ -428,6 +441,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.workflowSummaries = [];
 			this.ruleDefinitionProperties = [];
 			this.ruleDefinitionActions = [];
+			this.crons = [];
 
 			this.detailComponent?.scopeModelsListComponent?.clearSelection();
 			this.detailComponent?.datasetModelsListComponent?.clearSelection();
@@ -445,6 +459,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.detailComponent?.workflowSummaryListComponent?.clearSelection();
 			this.detailComponent?.ruleDefinitionPropertyListComponent?.clearSelection();
 			this.detailComponent?.ruleDefinitionActionListComponent?.clearSelection();
+			this.detailComponent?.cronListComponent?.clearSelection();
 		}
 	}
 
@@ -464,6 +479,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	onWorkflowSummariesChanged(value: boolean): void {this.workflowSummaryModified = value;}
 	onRuleDefinitionPropertiesChanged(value: boolean): void {this.ruleDefinitionPropertyModified = value;}
 	onRuleDefinitionActionsChanged(value: boolean): void {this.ruleDefinitionActionModified = value;}
+	onCronsChanged(value: boolean): void {this.cronModified = value;}
 
 	onFieldsUpdated(updates: Partial<ConfiguratorProject>): void {
 		this.workingProject = {...this.workingProject!, ...updates};
@@ -559,6 +575,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 
 				if(this.ruleDefinitionActionModified) {
 					saveObservables.push(this.saveRuleDefinitionActions());
+				}
+
+				if(this.cronModified) {
+					saveObservables.push(this.saveCrons());
 				}
 
 				if(saveObservables.length > 0) {
@@ -867,6 +887,22 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
 	}
 
+	private async saveCrons(): Promise<void> {
+		const component = this.detailComponent?.cronListComponent;
+		if(!component) {
+			return;
+		}
+
+		await lastValueFrom(this.entitySaveOrchestratorService.saveCrons(this.projectId, {
+			cronManager: component.cronManager,
+			crons: component.crons,
+			originalCrons: component.originalCrons,
+			modifiedCronIds: component.modifiedCronIds
+		}));
+		component.loadCrons();
+		this.ruleDefinitionActions = this.ruleDefinitionActionManager.getAll();
+	}
+
 	private confirmDiscardIfChanged(): Observable<boolean> {
 		if(!this.hasModifications) {
 			return of(true);
@@ -930,6 +966,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowSummaryManager.resetToOriginals();
 		this.ruleDefinitionPropertyManager.resetToOriginals();
 		this.ruleDefinitionActionManager.resetToOriginals();
+		this.cronManager.resetToOriginals();
 
 		this.detailComponent?.scopeModelsListComponent?.loadScopeModels();
 		this.detailComponent?.datasetModelsListComponent?.loadDatasetModels();
@@ -948,6 +985,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.detailComponent?.workflowSummaryListComponent?.loadWorkflowSummaries();
 		this.detailComponent?.ruleDefinitionPropertyListComponent?.loadRuleDefinitionProperties();
 		this.detailComponent?.ruleDefinitionActionListComponent?.loadRuleDefinitionActions();
+		this.detailComponent?.cronListComponent?.loadCrons();
 
 		this.resetAllModifications();
 		this.refreshTreeData();
@@ -970,6 +1008,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		this.workflowSummaryModified = false;
 		this.ruleDefinitionPropertyModified = false;
 		this.ruleDefinitionActionModified = false;
+		this.cronModified = false;
 	}
 
 	onCreateSnapshot(): void {
@@ -1045,7 +1084,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		  || this.workflowWidgetModified
 		  || this.workflowSummaryModified
 		  || this.ruleDefinitionPropertyModified
-		  || this.ruleDefinitionActionModified;
+		  || this.ruleDefinitionActionModified
+		  || this.cronModified;
 	}
 
 	onScopeModelContextChanged(context: any): void {
@@ -1171,6 +1211,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		setTimeout(() => {
 			this.ruleDefinitionActions = context.ruleDefinitionActions;
 			this.selectedRuleDefinitionActionId = context.selectedRuleDefinitionActionId;
+		});
+	}
+
+	onCronContextChanged(context: any): void {
+		setTimeout(() => {
+			this.crons = context.crons;
+			this.selectedCronId = context.selectedCronId;
 		});
 	}
 }

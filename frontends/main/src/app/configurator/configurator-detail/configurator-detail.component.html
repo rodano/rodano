@@ -170,7 +170,6 @@
 					(ruleDefinitionPropertyContextChanged)="onRuleDefinitionPropertyContextChanged($event)">
 				</app-rule-definition-property-list>
 			}
-
 			@case ('rule-definition-actions') {
 				<app-rule-definition-action-list
 					[projectId]="projectId"
@@ -180,6 +179,16 @@
 					(ruleDefinitionActionsChanged)="onRuleDefinitionActionsChanged($event)"
 					(ruleDefinitionActionContextChanged)="onRuleDefinitionActionContextChanged($event)">
 				</app-rule-definition-action-list>
+			}
+			@case ('crons') {
+				<app-cron-list
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onCronSelected($event)"
+					(cronsChanged)="onCronsChanged($event)"
+					(cronContextChanged)="onCronContextChanged($event)">
+				</app-cron-list>
 			}
 			@default {
 				<div class="detail-header">

@@ -9,10 +9,11 @@
  */
 
 
-export interface TimelineGraphDataPeriod { 
-    label?: string;
-    'default'?: boolean;
-    start_date_string?: string;
-    stop_date_string?: string;
+export interface Cron { 
+    cronId: string;
+    id: string;
+    description: { [key: string]: string; };
+    intervalValue: number;
+    intervalUnit: string;
 }
 

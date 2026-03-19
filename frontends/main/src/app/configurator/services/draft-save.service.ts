@@ -46,6 +46,8 @@ import {RuleDefinitionPropertyService} from './api/rule-definition-property.serv
 import {RuleDefinitionProperty} from '@core/model/rule-definition-property';
 import {RuleDefinitionActionService} from './api/rule-definition-action.service';
 import {RuleDefinitionAction} from '@core/model/rule-definition-action';
+import {CronService} from './api/cron.service';
+import {Cron} from '@core/model/cron';
 
 @Injectable({providedIn: 'root'})
 export class DraftSaveService {
@@ -72,7 +74,8 @@ export class DraftSaveService {
 		private workflowWidgetService: WorkflowWidgetService,
 		private workflowSummaryService: WorkflowSummaryService,
 		private ruleDefinitionPropertyService: RuleDefinitionPropertyService,
-		private ruleDefinitionActionService: RuleDefinitionActionService
+		private ruleDefinitionActionService: RuleDefinitionActionService,
+		private cronService: CronService
 	) {}
 
 	saveScopeModels(
@@ -765,6 +768,41 @@ export class DraftSaveService {
 				const ruleDefinitionAction = ruleDefinitionActions.find(rda => rda.ruleDefinitionActionId === id);
 				if(ruleDefinitionAction) {
 					saveObservables.push(this.ruleDefinitionActionService.updateRuleDefinitionAction(projectId, id, ruleDefinitionAction));
+				}
+			}
+		});
+
+		return saveObservables.length > 0
+			? forkJoin(saveObservables).pipe(map(() => undefined))
+			: of(undefined);
+	}
+
+	saveCrons(
+		projectId: string,
+		modifiedIds: Set<string>,
+		crons: Cron[],
+		originalCrons: Cron[]
+	): Observable<void> {
+		const saveObservables: Observable<any>[] = [];
+
+		modifiedIds.forEach(id => {
+			if(id.endsWith('-deleted')) {
+				const originalId = id.replace('-deleted', '');
+				const original = originalCrons.find(c => c.cronId === originalId);
+				if(original) {
+					saveObservables.push(this.cronService.deleteCron(projectId, originalId));
+				}
+			}
+			else if(id.startsWith('temp-')) {
+				const cron = crons.find(c => c.cronId === id);
+				if(cron) {
+					saveObservables.push(this.cronService.createCron(projectId, cron));
+				}
+			}
+			else {
+				const cron = crons.find(c => c.cronId === id);
+				if(cron) {
+					saveObservables.push(this.cronService.updateCron(projectId, id, cron));
 				}
 			}
 		});

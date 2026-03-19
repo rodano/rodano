@@ -1,0 +1,72 @@
+<app-list-header title="Crons" subtitle="Configure crons for data collection" />
+
+<div class="content-container"
+					[class.level-2]="viewLevel === 2">
+	@if (loading) {
+		<app-empty-state
+			style="width: 100%"
+			[icon]="'hourglass_empty'"
+			[message]="'Loading crons...'"
+		/>
+	} @else {
+		<div class="cards-container">
+			<div class="primary-cards-grid">
+				<div class="primary-card small-card create-card theme-cron" (click)="onCreateCron()">
+					<div class="create-content">
+						<mat-icon>add_circle_outline</mat-icon>
+						<h3>Create Cron</h3>
+					</div>
+				</div>
+
+				@for (cron of crons; track cron.cronId) {
+					<div class="primary-card small-card theme-cron"
+										[class.selected]="isSelected(cron)"
+										[appModified]="modifiedIds.has(cron.cronId)"
+										(click)="onSelectCron(cron)">
+
+						@if (isSelected(cron)) {
+							<div class="card-selection-icon">
+								<mat-icon>check</mat-icon>
+							</div>
+						}
+
+						<div class="card-header">
+							<div class="card-info">
+								<h3>{{ languageService.getTranslatedName(cron.description) }}</h3>
+								<p class="card-code">{{ cron.id }}</p>
+							</div>
+						</div>
+
+						@if (isModified(cron.cronId)) {
+							<div class="card-modified-indicator">
+								<mat-icon>edit</mat-icon>
+							</div>
+						}
+					</div>
+				}
+			</div>
+
+			@if (crons.length === 0) {
+				<app-empty-state
+					[icon]="'alarm'"
+					[title]="'No Crons'"
+					[message]="'Create your first cron to start collecting data'"
+				/>
+			}
+		</div>
+
+		@if (selectedCron && viewMode === 'detail') {
+			<div class="detail-panel">
+				<app-cron-detail
+					[cron]="selectedCron"
+					[projectId]="projectId"
+					[project]="project"
+					[allCrons]="crons"
+					(cronUpdated)="onCronUpdated($event)"
+					(cronDeleted)="onCronDeleted($event)"
+					(closed)="onSelectCron(selectedCron)">
+				</app-cron-detail>
+			</div>
+		}
+	}
+</div>

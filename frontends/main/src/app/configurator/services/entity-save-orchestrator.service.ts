@@ -18,6 +18,7 @@ import {WorkflowWidgetContext} from './contexts/workflow-widget-context';
 import {WorkflowSummaryContext} from './contexts/workflow-summary-context';
 import {RuleDefinitionPropertyContext} from './contexts/rule-definition-property-context';
 import {RuleDefinitionActionContext} from './contexts/rule-definition-action-context';
+import {CronContext} from './contexts/cron-context';
 
 @Injectable({providedIn: 'root'})
 export class EntitySaveOrchestratorService {
@@ -350,6 +351,23 @@ export class EntitySaveOrchestratorService {
 		);
 	}
 
+	saveCrons(projectId: string, context: CronContext): Observable<void> {
+		return forkJoin([
+			this.draftSaveService.saveCrons(
+				projectId,
+				context.modifiedCronIds,
+				context.crons,
+				context.originalCrons
+			)
+		]).pipe(
+			map(() => {
+				context.cronManager.syncOriginalsWithCurrent();
+
+				context.cronManager.invalidate();
+			})
+		);
+	}
+
 	resetScopeModelsToOriginals(context: ScopeModelContext): void {
 		context.scopeModelManager.resetToOriginals();
 		context.eventModelManager.resetToOriginals();
@@ -457,5 +475,11 @@ export class EntitySaveOrchestratorService {
 		context.ruleDefinitionActionManager.resetToOriginals();
 
 		context.ruleDefinitionActionManager.invalidate();
+	}
+
+	resetCronsToOriginals(context: CronContext): void {
+		context.cronManager.resetToOriginals();
+
+		context.cronManager.invalidate();
 	}
 }

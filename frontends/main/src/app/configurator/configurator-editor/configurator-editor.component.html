@@ -115,6 +115,7 @@
 					[workflowSummaries]="workflowSummaries"
 					[ruleDefinitionProperties]="ruleDefinitionProperties"
 					[ruleDefinitionActions]="ruleDefinitionActions"
+					[crons]="crons"
 					[selectedScopeModelId]="selectedScopeModelId"
 					[selectedEventModelId]="selectedEventModelId"
 					[selectedEventGroupId]="selectedEventGroupId"
@@ -138,6 +139,7 @@
 					[selectedWorkflowSummaryId]="selectedWorkflowSummaryId"
 					[selectedRuleDefinitionPropertyId]="selectedRuleDefinitionPropertyId"
 					[selectedRuleDefinitionActionId]="selectedRuleDefinitionActionId"
+					[selectedCronId]="selectedCronId"
 					[canNavigate]="canNavigate"
 					(categoryClicked)="onNodeSelected($event)">
 				</app-configurator-tree>
@@ -166,6 +168,7 @@
 					(workflowSummariesChanged)="onWorkflowSummariesChanged($event)"
 					(ruleDefinitionPropertiesChanged)="onRuleDefinitionPropertiesChanged($event)"
 					(ruleDefinitionActionsChanged)="onRuleDefinitionActionsChanged($event)"
+					(cronsChanged)="onCronsChanged($event)"
 					(scopeModelContextChanged)="onScopeModelContextChanged($event)"
 					(datasetModelContextChanged)="onDatasetModelContextChanged($event)"
 					(validatorContextChanged)="onValidatorContextChanged($event)"
@@ -181,7 +184,8 @@
 					(workflowWidgetContextChanged)="onWorkflowWidgetContextChanged($event)"
 					(workflowSummaryContextChanged)="onWorkflowSummaryContextChanged($event)"
 					(ruleDefinitionPropertyContextChanged)="onRuleDefinitionPropertyContextChanged($event)"
-					(ruleDefinitionActionContextChanged)="onRuleDefinitionActionContextChanged($event)">
+					(ruleDefinitionActionContextChanged)="onRuleDefinitionActionContextChanged($event)"
+					(cronContextChanged)="onCronContextChanged($event)">
 				</app-configurator-detail>
 			</div>
 		</div>

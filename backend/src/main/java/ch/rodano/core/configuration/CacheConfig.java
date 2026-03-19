@@ -86,7 +86,10 @@ public class CacheConfig {
 			"ruleDefinitionProperty",
 
 			"ruleDefinitionActions",
-			"ruleDefinitionAction"
+			"ruleDefinitionAction",
+
+			"crons",
+			"cron"
 		);
 	}
 }

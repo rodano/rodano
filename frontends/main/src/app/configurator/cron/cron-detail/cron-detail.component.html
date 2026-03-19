@@ -1,0 +1,68 @@
+<div class="detail-panel-header">
+	<div class="detail-title">
+		<h2>{{ languageService.getTranslatedName(cron.description) }}</h2>
+		<span class="detail-code theme-cron">{{ cron.id }}</span>
+	</div>
+	<div class="header-actions">
+		<button class="btn-close" (click)="onClose()">
+			<mat-icon>close</mat-icon>
+		</button>
+	</div>
+</div>
+
+<div class="detail-content">
+	<div class="settings-section">
+		<h3>Basic Information</h3>
+		<div class="settings-grid">
+
+			<app-setting-item label="Code"
+																					[modified]="isFieldModified('id')">
+				{{ cron.id }}
+			</app-setting-item>
+
+			<app-setting-item label="Description"
+																					[translated]="true"
+																					[modified]="isFieldModified('description')"
+																					[notConfigured]="!languageService.getTranslatedValue(cron.description)"
+																					[fullWidth]="true">
+				@if (!languageService.getTranslatedValue(cron.description)) {
+					<mat-icon class="warning-icon">report</mat-icon>
+				}
+				{{ languageService.getTranslatedValue(cron.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+			</app-setting-item>
+
+			<app-setting-item label="Interval Unit"
+																					[modified]="isFieldModified('intervalUnit')"
+																					[notConfigured]="!cron.intervalUnit">
+				@if (!cron.intervalUnit) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ cron.intervalUnit }}
+				}
+			</app-setting-item>
+
+			<app-setting-item label="Interval Value"
+																					[modified]="isFieldModified('intervalValue')"
+																					[notConfigured]="!cron.intervalValue === null || cron.intervalValue === undefined">
+				@if (cron.intervalValue === null || cron.intervalValue === undefined) {
+					<mat-icon class="warning-icon">report</mat-icon>
+					<span>Not configured</span>
+				} @else {
+					{{ cron.intervalValue }}
+				}
+			</app-setting-item>
+		</div>
+		<button class="btn-edit" (click)="onEditBasicInfo()">
+			<mat-icon>edit</mat-icon>
+			Edit Basic Information
+		</button>
+	</div>
+
+	<app-danger-zone
+		[title]="'Delete Cron'"
+		[message]="'Deleting this cron is permanent and cannot be undone.'"
+		[buttonLabel]="'Delete'"
+		(confirmed)="onDelete()">
+	</app-danger-zone>
+</div>
