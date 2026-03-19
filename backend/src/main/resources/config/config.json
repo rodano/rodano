@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 121,
-	"configDate": 1771687796781,
+	"configDate": 1773913371001,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -9674,7 +9674,8 @@
 					"allowDateInFuture": false,
 					"exportOrder": 10,
 					"maxLength": 3,
-					"maxIntegerDigits": 1,
+					"maxIntegerDigits": 3,
+					"maxDecimalDigits": 0,
 					"matcherMessage": {},
 					"withYears": false,
 					"withMonths": false,
