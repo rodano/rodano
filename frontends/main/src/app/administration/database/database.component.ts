@@ -89,10 +89,8 @@ export class DatabaseComponent implements AfterViewInit {
 		this.loading.set(true);
 		this.databaseService.runDatabaseUpdate(this.dryRun()).subscribe({
 			next: result => {
-				this.issues.data = result.issues;
-				if(result.consistent) {
-					this.issuesStatus.set('The database is consistent with the configuration. No issues detected.');
-				}
+				this.issues.data = result;
+				this.issuesStatus.set('No issues detected.');
 				this.loading.set(false);
 			},
 			error: () => this.loading.set(false)

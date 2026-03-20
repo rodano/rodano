@@ -1,5 +1,6 @@
 package ch.rodano.api.administration;
 
+import java.util.List;
 import java.util.Map;
 
 import jakarta.validation.Valid;
@@ -133,16 +134,14 @@ public class DatabaseController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	@Transactional
-	public ConsistencyCheckResultDTO updateDatabase(
+	public List<DatabaseIssueDTO> updateDatabase(
 		@RequestBody final Map<String, Boolean> payload
 	) {
 		final var dryRun = payload.getOrDefault("dryRun", true);
 		final var issues = databaseUpdateService.updateDatabase(dryRun, currentContext(), "Database consistency update");
-		return new ConsistencyCheckResultDTO(
-			issues.stream()
-				.map(i -> new DatabaseIssueDTO(i.entity(), i.pk(), i.error(), i.status()))
-				.toList()
-		);
+		return issues.stream()
+			.map(i -> new DatabaseIssueDTO(i.entity(), i.pk(), i.error(), i.status()))
+			.toList();
 	}
 
 }

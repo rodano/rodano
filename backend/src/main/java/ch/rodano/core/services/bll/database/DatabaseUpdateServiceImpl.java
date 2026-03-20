@@ -95,9 +95,9 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 		final var scopeQuery = create
 			.select(SCOPE.PK, SCOPE.SCOPE_MODEL_ID, datasetIdsField)
 			.from(SCOPE)
-			.leftJoin(DATASET).on(SCOPE.PK.eq(DATASET.SCOPE_FK)
-				.and(DATASET.DATASET_MODEL_ID.notIn(multipleDatasetIds)))
-			.groupBy(SCOPE.PK, SCOPE.SCOPE_MODEL_ID);
+			.innerJoin(DATASET).on(SCOPE.PK.eq(DATASET.SCOPE_FK))
+			.where(DATASET.DATASET_MODEL_ID.notIn(multipleDatasetIds))
+			.groupBy(SCOPE.PK);
 
 		try(var cursor = scopeQuery.fetchLazy()) {
 			while(cursor.hasNext()) {
