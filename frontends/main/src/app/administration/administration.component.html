@@ -22,6 +22,14 @@
 		</a>
 		<a
 			mat-tab-link
+			[routerLink]="['/administration', 'database']"
+			routerLinkActive
+			#database="routerLinkActive"
+			[active]="database.isActive">
+			Database
+		</a>
+		<a
+			mat-tab-link
 			[routerLink]="['/administration', 'connected-users']"
 			routerLinkActive
 			#users="routerLinkActive"
