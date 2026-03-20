@@ -30,7 +30,7 @@ import ch.rodano.core.database.initializer.RandomDataInitializer;
 import ch.rodano.core.model.exception.UnauthorizedException;
 import ch.rodano.core.model.exception.WrongDataConditionException;
 import ch.rodano.core.services.bll.actor.ActorService;
-import ch.rodano.core.services.bll.database.DBConsistencyService;
+import ch.rodano.core.services.bll.database.DatabaseUpdateService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.utils.RightsService;
@@ -47,7 +47,7 @@ public class DatabaseController extends AbstractSecuredController {
 	private final DemoUsersInitializer demoUsersInitializer;
 	private final RandomDataInitializer randomDataInitializer;
 	private final TaskExecutor taskExecutor;
-	private final DBConsistencyService dbConsistencyService;
+	private final DatabaseUpdateService databaseUpdateService;
 
 	public DatabaseController(
 		final RequestContextService requestContextService,
@@ -60,7 +60,7 @@ public class DatabaseController extends AbstractSecuredController {
 		final DemoUsersInitializer demoUsersInitializer,
 		final RandomDataInitializer randomDataInitializer,
 		final TaskExecutor taskExecutor,
-		final DBConsistencyService dbConsistencyService
+		final DatabaseUpdateService databaseUpdateService
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.configurator = configurator;
@@ -68,7 +68,7 @@ public class DatabaseController extends AbstractSecuredController {
 		this.demoUsersInitializer = demoUsersInitializer;
 		this.randomDataInitializer = randomDataInitializer;
 		this.taskExecutor = taskExecutor;
-		this.dbConsistencyService = dbConsistencyService;
+		this.databaseUpdateService = databaseUpdateService;
 	}
 
 	//TODO use a Spring actuator
@@ -128,12 +128,21 @@ public class DatabaseController extends AbstractSecuredController {
 		});
 	}
 
-	@Operation(summary = "Check database consistency against the study configuration")
-	@GetMapping("check-consistency")
+	@Operation(summary = "Check and optionally fix database consistency against the study configuration")
+	@PostMapping("update")
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
-	public ConsistencyCheckResultDTO checkDatabaseConsistency() {
-		return new ConsistencyCheckResultDTO(dbConsistencyService.checkConsistency());
+	@Transactional
+	public ConsistencyCheckResultDTO updateDatabase(
+		@RequestBody final Map<String, Boolean> payload
+	) {
+		final var dryRun = payload.getOrDefault("dryRun", true);
+		final var issues = databaseUpdateService.updateDatabase(dryRun, currentContext(), "Database consistency update");
+		return new ConsistencyCheckResultDTO(
+			issues.stream()
+				.map(i -> new DatabaseIssueDTO(i.entity(), i.pk(), i.error(), i.status()))
+				.toList()
+		);
 	}
 
 }

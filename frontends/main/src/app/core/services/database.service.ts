@@ -37,7 +37,7 @@ export class DatabaseService {
 		return this.http.post(`${this.serviceUrl}/generate-random-data`, undefined, {params});
 	}
 
-	checkConsistency(): Observable<ConsistencyCheckResult> {
-		return this.http.get<ConsistencyCheckResult>(`${this.serviceUrl}/check-consistency`);
+	runDatabaseUpdate(dryRun: boolean): Observable<ConsistencyCheckResult> {
+		return this.http.post<ConsistencyCheckResult>(`${this.serviceUrl}/update`, {dryRun});
 	}
 }
