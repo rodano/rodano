@@ -14,6 +14,7 @@ import { ChartType } from './chart-type';
  * Chart model
  */
 export interface ChartModel { 
+    languages?: Array<string>;
     id: string;
     type: ChartType;
     title: string;

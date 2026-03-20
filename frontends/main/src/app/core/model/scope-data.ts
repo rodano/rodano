@@ -15,10 +15,10 @@ import { EventConfigurationHook } from './event-configuration-hook';
 
 export interface ScopeData { 
     description?: { [key: string]: string; };
-    enrollmentModel?: EnrollmentModel;
     enrollmentStart?: Date;
     enrollmentStop?: Date;
     enrollmentTargets?: Array<EnrollmentTarget>;
+    enrollmentModel?: EnrollmentModel;
     eventConfigurationHooks?: Array<EventConfigurationHook>;
     subscriptionRestrictions?: Array<SubscriptionRestriction>;
 }

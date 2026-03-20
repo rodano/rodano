@@ -19,7 +19,7 @@ export interface UserCreation {
      */
     name: string;
     /**
-     * E-mail
+     * Mail
      */
     email: string;
     /**
