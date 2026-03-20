@@ -59,7 +59,7 @@ mvn test
 
 ### Main frontend (`frontends/main/`)
 - Purpose: Primary interface for medical staff
-- Technology: TypeScript, Angular 20, Angular Material
+- Technology: TypeScript, Angular 21, Angular Material
 - The TypeScript API model is auto-generated from the backend's OpenAPI spec. Regenerate it with `npm run generate-model` after changing backend DTOs.
 
 ### Configurator (`frontends/configurator/`)
