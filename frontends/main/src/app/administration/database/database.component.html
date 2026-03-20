@@ -3,28 +3,30 @@
 <form
 	[formGroup]="demoUserSchemeForm"
 	(ngSubmit)="createDemoUsers()">
-	<mat-form-field style="width: 20rem">
-		<mat-label>Base email</mat-label>
-		<input
-			matInput
-			formControlName="baseEmail"
-			name="baseEmail" />
-	</mat-form-field>
-	&nbsp;
-	<mat-form-field style="width: 20rem">
-		<mat-label>Password</mat-label>
-		<input
-			matInput
-			formControlName="password"
-			name="password" />
-	</mat-form-field>
-	&nbsp;
-	<button
-		mat-flat-button
-		[disabled]="demoUserSchemeForm.invalid"
-		type="submit">
-		Generate
-	</button>
+	<p>
+		<mat-form-field style="width: 20rem">
+			<mat-label>Base email</mat-label>
+			<input
+				matInput
+				formControlName="baseEmail"
+				name="baseEmail" />
+		</mat-form-field>
+		&nbsp;
+		<mat-form-field style="width: 20rem">
+			<mat-label>Password</mat-label>
+			<input
+				matInput
+				formControlName="password"
+				name="password" />
+		</mat-form-field>
+		&nbsp;
+		<button
+			mat-flat-button
+			[disabled]="demoUserSchemeForm.invalid || loading()"
+			type="submit">
+			Generate
+		</button>
+	</p>
 </form>
 
 <h3>Random data</h3>
@@ -34,19 +36,43 @@
 <form
 	[formGroup]="randomDataGenerationForm"
 	(ngSubmit)="generateRandomDatabaseData()">
-	<mat-form-field style="width: 5rem">
-		<mat-label>Scale</mat-label>
-		<input
-			matInput
-			formControlName="scale"
-			type="number"
-			name="scale" />
-	</mat-form-field>
-	&nbsp;
-	<button
-		mat-flat-button
-		[disabled]="randomDataGenerationForm.invalid"
-		type="submit">
-		Generate
-	</button>
+	<p>
+		<mat-form-field style="width: 5rem">
+			<mat-label>Scale</mat-label>
+			<input
+				matInput
+				formControlName="scale"
+				type="number"
+				name="scale" />
+		</mat-form-field>
+		&nbsp;
+		<button
+			mat-flat-button
+			[disabled]="randomDataGenerationForm.invalid || loading()"
+			type="submit">
+			Generate
+		</button>
+	</p>
 </form>
+
+<h3>Consistency check</h3>
+<p>Check that all datasets and fields in the database are consistent with the study configuration.</p>
+<button
+	mat-flat-button
+	[disabled]="loading()"
+	(click)="checkConsistency()">
+	Check consistency
+</button>
+
+@if (consistencyCheckResult(); as result) {
+	@if (result.consistent) {
+		<p class="success">Database is consistent with the configuration.</p>
+	} @else {
+		<p class="error">{{ result.issues.length }} inconsistencies detected:</p>
+		<ul>
+			@for (issue of result.issues; track issue) {
+				<li>{{ issue }}</li>
+			}
+		</ul>
+	}
+}

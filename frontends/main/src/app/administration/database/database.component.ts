@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
@@ -6,6 +6,7 @@ import {MatInput} from '@angular/material/input';
 import {DatabaseService} from '@core/services/database.service';
 import {DemoUserScheme} from '@core/model/demo-user-scheme';
 import {NotificationService} from '../../services/notification.service';
+import {ConsistencyCheckResult} from '@core/model/consistency-check-result';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,18 +29,47 @@ export class DatabaseComponent {
 		scale: new FormControl(10, {nonNullable: true, validators: [Validators.required, Validators.min(1), Validators.max(100)]})
 	});
 
+	loading = signal(false);
+	consistencyCheckResult = signal<ConsistencyCheckResult | undefined>(undefined);
+
 	constructor(
 		private databaseService: DatabaseService,
 		private notificationService: NotificationService
 	) {}
 
 	createDemoUsers() {
+		this.loading.set(true);
 		const demoUserScheme = this.demoUserSchemeForm.value as DemoUserScheme;
-		this.databaseService.createDemoUsers(demoUserScheme).subscribe(() => this.notificationService.showSuccess('Demo users created'));
+		this.databaseService.createDemoUsers(demoUserScheme).subscribe({
+			next: () => {
+				this.notificationService.showSuccess('Demo users created');
+				this.loading.set(false);
+			},
+			error: () => this.loading.set(false)
+		});
 	}
 
 	generateRandomDatabaseData() {
+		this.loading.set(true);
 		const scale = this.randomDataGenerationForm.value.scale as number;
-		this.databaseService.generateRandomData(scale).subscribe(() => this.notificationService.showSuccess('Database fill-in process started'));
+		this.databaseService.generateRandomData(scale).subscribe({
+			next: () => {
+				this.notificationService.showSuccess('Database fill-in process started');
+				this.loading.set(false);
+			},
+			error: () => this.loading.set(false)
+		});
+	}
+
+	checkConsistency() {
+		this.loading.set(true);
+		this.consistencyCheckResult.set(undefined);
+		this.databaseService.checkConsistency().subscribe({
+			next: result => {
+				this.consistencyCheckResult.set(result);
+				this.loading.set(false);
+			},
+			error: () => this.loading.set(false)
+		});
 	}
 }
