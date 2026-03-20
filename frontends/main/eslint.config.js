@@ -1,10 +1,11 @@
+import {defineConfig} from 'eslint/config';
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import tseslint from 'typescript-eslint';
 import angular from 'angular-eslint';
 import globals from 'globals';
 
-export default tseslint.config(
+export default defineConfig(
 	{
 		files: ['**/*.ts'],
 		ignores: [
@@ -83,7 +84,7 @@ export default tseslint.config(
 			'@stylistic/semi': ['error', 'always', {omitLastInOneLineBlock: false}],
 			'@stylistic/spaced-comment': ['error', 'never'],
 			//additions to typescript-eslint
-			'no-unused-vars': 'off', //disable the base rule because it conflicts TypeScript rules
+			'no-unused-vars': 'off', //disable the base rule because it conflicts with TypeScript rules
 			...tseslint.configs.recommendedTypeChecked[0].rules,
 			...tseslint.configs.stylisticTypeChecked[0].rules,
 			'@typescript-eslint/dot-notation': 'off',
