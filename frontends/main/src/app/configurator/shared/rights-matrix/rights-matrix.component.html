@@ -1,0 +1,98 @@
+<div class="matrix-container">
+	<div class="matrix-header">
+		<div class="matrix-title">
+			<h2>{{ title }}</h2>
+			<p class="matrix-subtitle">{{ subtitle }}</p>
+		</div>
+		<div class="matrix-actions">
+			@if (modified) {
+				<button type="button" class="btn-secondary" (click)="onClear()">
+					<mat-icon>undo</mat-icon>
+					Clear Changes
+				</button>
+				<button type="button" class="btn-primary" [disabled]="saving" (click)="onSave()">
+					<mat-icon>save</mat-icon>
+					{{ saving ? 'Saving...' : 'Save Changes' }}
+				</button>
+			}
+		</div>
+	</div>
+
+	@if (loading) {
+		<div class="matrix-loading">
+			<mat-icon>hourglass_empty</mat-icon>
+			<span>Loading rights...</span>
+		</div>
+	} @else {
+		<div class="matrix-scroll-wrapper">
+			<table class="matrix-table">
+				<thead>
+				<tr>
+					<th class="entity-header-cell">
+						<span>{{ title }}</span>
+						<span class="profile-count">{{ profiles.length }} profiles</span>
+					</th>
+					@for (profile of profiles; track profile.profileId) {
+						<th class="profile-header-cell">
+							<div class="profile-header-content">
+								<button type="button"
+																class="toggle-col-btn"
+																[ngClass]="themeClass"
+																[class.all-granted]="isAllWriteForProfile(profile.profileId)"
+																(click)="toggleAllWriteForProfile(profile.profileId)"
+																[matTooltip]="isAllWriteForProfile(profile.profileId) ? 'Remove all' : 'Grant all W+R'">
+									<mat-icon>{{ isAllWriteForProfile(profile.profileId) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+								</button>
+								<span class="profile-name">{{ languageService.getTranslatedName(profile.shortname) }}</span>
+								<span class="grant-count" [ngClass]="themeClass">{{ getGrantCount(profile.profileId) }}/{{ entities.length }}</span>
+							</div>
+						</th>
+					}
+				</tr>
+				</thead>
+				<tbody>
+					@for (entity of entities; track getEntityId(entity); let even = $even) {
+						<tr [class.even-row]="even">
+							<td class="entity-cell">
+								<div class="entity-cell-content">
+									<button type="button"
+																	class="toggle-row-btn"
+																	[ngClass]="themeClass"
+																	[class.all-granted]="isAllWriteForEntity(getEntityId(entity))"
+																	(click)="toggleAllWriteForEntity(getEntityId(entity))"
+																	[matTooltip]="isAllWriteForEntity(getEntityId(entity)) ? 'Remove from all profiles' : 'Grant W+R to all profiles'">
+										<mat-icon>{{ isAllWriteForEntity(getEntityId(entity)) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+									</button>
+									<div class="entity-label">
+										<span class="entity-name">{{ getEntityLabel(entity) }}</span>
+										<span class="entity-code">{{ getEntityCode(entity) }}</span>
+									</div>
+								</div>
+							</td>
+							@for (profile of profiles; track profile.profileId) {
+								<td class="rights-cell" [ngClass]="themeClass">
+									<div class="rights-cell-content">
+										<button type="button"
+																		class="right-btn"
+																		[class.active]="getRight(profile.profileId, getEntityId(entity)).canWrite"
+																		(click)="toggleWrite(profile.profileId, getEntityId(entity))"
+																		matTooltip="Write">
+											W
+										</button>
+										<button type="button"
+																		class="right-btn"
+																		[class.active]="getRight(profile.profileId, getEntityId(entity)).canRead"
+																		(click)="toggleRead(profile.profileId, getEntityId(entity))"
+																		matTooltip="Read">
+											R
+										</button>
+									</div>
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</div>

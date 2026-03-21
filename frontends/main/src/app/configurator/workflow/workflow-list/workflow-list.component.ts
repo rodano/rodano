@@ -25,6 +25,9 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {WorkflowRightsMatrixComponent} from '../workflow-rights-matrix/workflow-rights-matrix.component';
 
 type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-detail' | 'action-list' | 'action-detail';
 
@@ -33,8 +36,8 @@ type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-deta
 	standalone: true,
 	templateUrl: './workflow-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
-	imports: [CommonModule, MatIconModule, WorkflowDetailComponent, WorkflowStateDetailComponent,
-		WorkflowActionDetailComponent, MatTooltipModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective]
+	imports: [CommonModule, MatIconModule, WorkflowDetailComponent, WorkflowStateDetailComponent, WorkflowActionDetailComponent,
+		MatTooltipModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, WorkflowRightsMatrixComponent]
 })
 export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -64,11 +67,14 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	private currentWorkflowStates: WorkflowState[] = [];
 	private currentWorkflowActions: WorkflowAction[] = [];
 
+	showMatrix = false;
+
 	constructor(
 		public workflowManager: WorkflowManagerService,
 		public workflowStateManager: WorkflowStateManagerService,
 		public workflowActionManager: WorkflowActionManagerService,
 		public languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private workflowDialogService: WorkflowDialogService,
 		private workflowStateDialogService: WorkflowStateDialogService,
 		private workflowActionDialogService: WorkflowActionDialogService,
@@ -139,6 +145,10 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	get totalModificationCount(): number {
 		return this.workflowManager.getModificationCount() + this.workflowStateManager.getModificationCount() + this.workflowActionManager.getModificationCount();
 	}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
+
+	get allWorkflowActions(): WorkflowAction[] {return this.workflowActionManager.getAll();}
 
 	loadWorkflows(): void {
 		this.loading = true;
@@ -485,5 +495,12 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 
 	getWorkflowActionLabel(workflowActionId: string): string {
 		return this.languageService.getLabelById(workflowActionId, id => this.workflowActionManager.getById(id));
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selectedWorkflow = null;
+		}
 	}
 }

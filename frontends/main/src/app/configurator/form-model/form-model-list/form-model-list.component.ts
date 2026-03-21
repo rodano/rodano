@@ -19,6 +19,9 @@ import {FormModelDetailComponent} from '../form-model-detail/form-model-detail.c
 import {FormLayoutEditorComponent} from '../form-layout-editor/form-layout-editor.component';
 import {Layout} from '@core/model/layout';
 import {FormLayoutPreviewComponent} from '../form-layout-preview/form-layout-preview.component';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {FormModelRightsMatrixComponent} from '../form-model-rights-matrix/form-model-rights-matrix.component';
 
 type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview';
 
@@ -28,7 +31,7 @@ type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview'
 	templateUrl: './form-model-list.component.html',
 	styleUrls: ['./form-model-list.component.css'],
 	imports: [CommonModule, MatIconModule, MatTooltipModule, FormModelDetailComponent, FormLayoutEditorComponent,
-		EmptyStateComponent, ListHeaderComponent, ModifiedDirective, FormLayoutPreviewComponent]
+		EmptyStateComponent, ListHeaderComponent, ModifiedDirective, FormLayoutPreviewComponent, FormModelRightsMatrixComponent]
 })
 export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@ViewChild(FormLayoutEditorComponent) formLayoutEditor?: FormLayoutEditorComponent;
@@ -53,10 +56,13 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
 
+	showMatrix = false;
+
 	constructor(
 		public formModelManager: FormModelManagerService,
 		public formLayoutManager: FormLayoutManagerService,
 		public languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private formModelDialogService: FormModelDialogService,
 		private snackBar: MatSnackBar
 	) {}
@@ -115,6 +121,8 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	get totalModificationCount(): number {
 		return this.formModelManager.getModificationCount() + this.formLayoutManager.getModificationCount();
 	}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadFormModels(): void {
 		this.loading = true;
@@ -275,5 +283,12 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 			selectedFormModelId: this.selectedFormModel?.formModelId || null,
 			selectedLayoutId: null
 		});
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selectedFormModel = null;
+		}
 	}
 }

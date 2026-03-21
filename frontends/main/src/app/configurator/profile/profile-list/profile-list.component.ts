@@ -17,12 +17,13 @@ import {EmptyStateComponent} from '../../shared/empty-state/empty-state.componen
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {ProfileRightsMatrixComponent} from '../profile-rights-matrix/profile-rights-matrix.component';
 
 @Component({
 	selector: 'app-profile-list',
 	standalone: true,
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ProfileDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatSnackBarModule,
+		ProfileDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, ProfileRightsMatrixComponent],
 	templateUrl: './profile-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })
@@ -37,6 +38,8 @@ export class ProfileListComponent
 		profiles: any[];
 		selectedProfileId: string | null;
 	}>();
+
+	showMatrix = false;
 
 	constructor(
 		public profileManager: ProfileManagerService,
@@ -124,5 +127,12 @@ export class ProfileListComponent
 
 	getWorkflowLabel(id: string): string {
 		return this.languageService.getLabelById(id, i => this.workflowManager.getById(i));
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selected = null;
+		}
 	}
 }

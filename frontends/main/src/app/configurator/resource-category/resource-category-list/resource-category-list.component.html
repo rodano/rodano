@@ -1,8 +1,22 @@
-<app-list-header title="Resource Categories" subtitle="Configure resource categories for data collection" />
+<app-list-header title="Resource Categories" subtitle="Configure resource categories for data collection">
+	<button class="btn-view theme-resource-category" (click)="onToggleMatrix()">
+		<mat-icon>grid_on</mat-icon>
+		{{ showMatrix ? 'Back to List' : 'Resource Category Rights' }}
+	</button>
+</app-list-header>
 
 <div class="content-container"
-					[class.level-2]="viewLevel === 2">
-	@if (loading) {
+					[class.level-2]="viewLevel === 2 && !showMatrix">
+
+	@if (showMatrix) {
+		<app-resource-category-grants-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[resourceCategories]="resourceCategories"
+			[profiles]="profiles"
+			(closed)="showMatrix = false">
+		</app-resource-category-grants-matrix>
+	} @else if (loading) {
 		<app-empty-state
 			style="width: 100%"
 			[icon]="'hourglass_empty'"

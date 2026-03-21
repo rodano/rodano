@@ -27,6 +27,12 @@ import {MatDialog} from '@angular/material/dialog';
 import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {Profile} from '@core/model/profile';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {ScopeModelRightsMatrixComponent} from '../scope-model-rights-matrix/scope-model-rights-matrix.component';
+import {
+	EventModelRightsMatrixComponent
+} from '../event-model/event-model-rights-matrix/event-model-rights-matrix.component';
 
 type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
 
@@ -37,7 +43,7 @@ type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 
 	styleUrls: ['./scope-models-list.component.css'],
 	imports: [CommonModule, MatIconModule, ScopeModelDetailComponent, EventModelDetailComponent,
 		EventModelTimelineComponent, EventGroupDetailComponent, MatTooltipModule, EmptyStateComponent, ListHeaderComponent,
-		ModifiedDirective]
+		ModifiedDirective, ScopeModelRightsMatrixComponent, EventModelRightsMatrixComponent]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -67,11 +73,14 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	private currentEventModels: EventModel[] = [];
 	private currentEventGroups: EventGroup[] = [];
 
+	activeMatrix: 'scope-model' | 'event-model' | null = null;
+
 	constructor(
 		public scopeModelManager: ScopeModelManagerService,
 		public eventModelManager: EventModelManagerService,
 		public eventGroupManager: EventGroupManagerService,
 		public languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private eventModelDialogService: EventModelDialogService,
 		private eventGroupDialogService: EventGroupDialogService,
@@ -143,6 +152,10 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	get totalModificationCount(): number {
 		return this.scopeModelManager.getModificationCount() + this.eventModelManager.getModificationCount() + this.eventGroupManager.getModificationCount();
 	}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
+
+	get allEventModels(): EventModel[] {return this.eventModelManager.getAll();}
 
 	loadScopeModels(): void {
 		this.loading = true;
@@ -552,5 +565,25 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 
 	isEventGroupModified(eventGroupId: string): boolean {
 		return this.eventGroupManager.isModified(eventGroupId);
+	}
+
+	onToggleScopeModelMatrix(): void {
+		if(this.activeMatrix === 'scope-model') {
+			this.activeMatrix = null;
+		}
+		else {
+			this.activeMatrix = 'scope-model';
+			this.selectedScopeModel = null;
+		}
+	}
+
+	onToggleEventModelMatrix(): void {
+		if(this.activeMatrix === 'event-model') {
+			this.activeMatrix = null;
+		}
+		else {
+			this.activeMatrix = 'event-model';
+			this.selectedScopeModel = null;
+		}
 	}
 }

@@ -15,27 +15,27 @@ public class CacheConfig {
 		return new ConcurrentMapCacheManager(
 			"projects", "project", "draftVersion", "activeVersion", "projectVersions", "projectVersion",
 			"configSnapshot",
-			"scopeModels", "scopeModel",
-			"datasetModels", "datasetModel",
-			"eventModels", "eventModel",
+			"scopeModels", "scopeModel", "scopeModelRights",
+			"datasetModels", "datasetModel", "datasetModelRights",
+			"eventModels", "eventModel", "eventModelRights",
 			"eventGroups", "eventGroup", "eventGroupsByScopeModel",
 			"fieldModels", "fieldModel", "fieldModelsByDatasetModel",
 			"validators", "validator",
-			"workflows", "workflow", "workflowStates", "workflowState", "workflowActions", "workflowAction",
-			"profiles", "profile",
-			"features", "feature",
+			"workflows", "workflow", "workflowStates", "workflowState", "workflowActions", "workflowAction", "workflowRights",
+			"profiles", "profile", "profileRights",
+			"features", "feature", "featureGrants",
 			"privacy-policies", "privacy-policy",
-			"resource-categories", "resource-category",
-			"reports", "report",
+			"resourceCategories", "resourceCategory", "resourceCategoryGrants",
+			"reports", "report", "reportGrants",
 			"charts", "chart",
-			"formModels", "formModel", "layouts", "layout",
-			"timelineGraphs", "timelineGraph", "timelineGraphSections", "timelineGraphSection",
+			"formModels", "formModel", "layouts", "layout", "formModelRights",
+			"timelineGraphs", "timelineGraph", "timelineGraphSections", "timelineGraphSection", "timelineGraphGrants",
 			"workflowWidgets", "workflowWidget",
 			"workflowSummaries", "workflowSummary",
 			"ruleDefinitionProperties", "ruleDefinitionProperty",
 			"ruleDefinitionActions", "ruleDefinitionAction",
 			"crons", "cron",
-			"menus", "menu"
+			"menus", "menu", "menuGrants"
 		);
 	}
 }

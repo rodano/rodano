@@ -1,4 +1,11 @@
-<app-list-header title="Form Models" subtitle="Configure forms and their layouts" />
+<app-list-header title="Form Models" subtitle="Configure forms and their layouts">
+	@if (viewMode !== 'layout-editor' && viewMode !== 'layout-preview') {
+		<button class="btn-view theme-form-model" (click)="onToggleMatrix()">
+			<mat-icon>grid_on</mat-icon>
+			{{ showMatrix ? 'Back to List' : 'Form Model Rights' }}
+		</button>
+	}
+</app-list-header>
 
 @if (viewMode === 'layout-editor' && selectedFormModel) {
 	<div class="layout-fullscreen">
@@ -49,9 +56,18 @@
 	</div>
 } @else {
 	<div class="content-container"
-						[class.level-2]="viewLevel === 2"
+						[class.level-2]="viewLevel === 2 && !showMatrix"
 						[class.level-3]="viewLevel === 3">
-		@if (loading) {
+
+		@if (showMatrix) {
+			<app-form-model-rights-matrix
+				style="width: 100%"
+				[projectId]="projectId"
+				[formModels]="formModels"
+				[profiles]="profiles"
+				(closed)="showMatrix = false">
+			</app-form-model-rights-matrix>
+		} @else if (loading) {
 			<app-empty-state
 				style="width: 100%"
 				[icon]="'hourglass_empty'"

@@ -29,6 +29,11 @@ import {
 	TimelineGraphSectionDetailComponent
 } from '../timeline-graph-section-detail/timeline-graph-section-detail.component';
 import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
+import {
+	TimelineGraphGrantsMatrixComponent
+} from '../timeline-graph-grants-matrix/timeline-graph-grants-matrix.component';
+import {Profile} from '@core/model/profile';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 
 type ViewMode = 'graph-detail' | 'section-list' | 'section-detail';
 
@@ -37,18 +42,9 @@ type ViewMode = 'graph-detail' | 'section-list' | 'section-detail';
 	standalone: true,
 	templateUrl: './timeline-graph-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
-	imports: [
-		CommonModule,
-		MatIconModule,
-		MatButtonModule,
-		MatTooltipModule,
-		MatProgressSpinnerModule,
-		TimelineGraphDetailComponent,
-		TimelineGraphSectionDetailComponent,
-		EmptyStateComponent,
-		ListHeaderComponent,
-		ModifiedDirective
-	]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, MatProgressSpinnerModule,
+		TimelineGraphDetailComponent, TimelineGraphSectionDetailComponent, EmptyStateComponent, ListHeaderComponent,
+		ModifiedDirective, TimelineGraphGrantsMatrixComponent]
 })
 export class TimelineGraphListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -62,6 +58,8 @@ export class TimelineGraphListComponent implements OnInit, OnChanges, OnDestroy 
 		selectedTimelineGraphId: string | null;
 		selectedGraphSectionId: string | null;
 	}>();
+
+	showMatrix = false;
 
 	selectedTimelineGraph: TimelineGraph | null = null;
 	selectedGraphSectionId: string | null = null;
@@ -81,6 +79,7 @@ export class TimelineGraphListComponent implements OnInit, OnChanges, OnDestroy 
 		private scopeModelManager: ScopeModelManagerService,
 		private eventModelManager: EventModelManagerService,
 		private fieldModelManager: FieldModelManagerService,
+		private profileManager: ProfileManagerService,
 		private timelineGraphDialogService: TimelineGraphDialogService,
 		private timelineGraphSectionDialogService: TimelineGraphSectionDialogService,
 		private snackBar: MatSnackBar
@@ -147,6 +146,8 @@ export class TimelineGraphListComponent implements OnInit, OnChanges, OnDestroy 
 	get totalModificationCount(): number {
 		return this.timelineGraphManager.getModificationCount() + this.timelineGraphSectionManager.getModificationCount();
 	}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadTimelineGraphs(): void {
 		this.loading = true;
@@ -416,5 +417,12 @@ export class TimelineGraphListComponent implements OnInit, OnChanges, OnDestroy 
 			BAR: 'Bar'
 		};
 		return typeMap[type] || type;
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selectedTimelineGraph = null;
+		}
 	}
 }

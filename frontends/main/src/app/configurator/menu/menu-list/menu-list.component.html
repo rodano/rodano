@@ -1,8 +1,22 @@
-<app-list-header title="Menus" subtitle="Configure menus for data collection" />
+<app-list-header title="Menus" subtitle="Configure menus for data collection">
+	<button class="btn-view theme-menu" (click)="onToggleMatrix()">
+		<mat-icon>grid_on</mat-icon>
+		{{ showMatrix ? 'Back to List' : 'Menu Rights' }}
+	</button>
+</app-list-header>
 
 <div class="content-container"
-					[class.level-2]="viewLevel === 2">
-	@if (loading) {
+					[class.level-2]="viewLevel === 2 && !showMatrix">
+
+	@if (showMatrix) {
+		<app-menu-grants-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[menus]="menus"
+			[profiles]="profiles"
+			(closed)="showMatrix = false">
+		</app-menu-grants-matrix>
+	} @else if (loading) {
 		<app-empty-state
 			style="width: 100%"
 			[icon]="'hourglass_empty'"

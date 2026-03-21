@@ -1,9 +1,39 @@
-<app-list-header title="Scope Models" subtitle="Configure the hierarchy structure for your project" />
+<app-list-header title="Scope Models" subtitle="Configure the hierarchy structure for your project">
+	@if (viewMode === 'scope-list' || viewMode === 'scope-detail') {
+		<div class="matrix-buttons">
+			<button class="btn-view theme-scope-model" (click)="onToggleScopeModelMatrix()">
+				<mat-icon>grid_on</mat-icon>
+				{{ activeMatrix === 'scope-model' ? 'Back to List' : 'Scope Model Rights' }}
+			</button>
+			<button class="btn-view theme-event-model" (click)="onToggleEventModelMatrix()">
+				<mat-icon>grid_on</mat-icon>
+				{{ activeMatrix === 'event-model' ? 'Back to List' : 'Event Model Rights' }}
+			</button>
+		</div>
+	}
+</app-list-header>
 
 <div class="content-container"
-					[class.level-2]="viewLevel === 2"
+					[class.level-2]="viewLevel === 2 && !activeMatrix"
 					[class.level-3]="viewLevel === 3">
-	@if (loading) {
+
+	@if (activeMatrix === 'scope-model') {
+		<app-scope-model-rights-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[scopeModels]="scopeModels"
+			[profiles]="profiles"
+			(closed)="activeMatrix = null">
+		</app-scope-model-rights-matrix>
+	} @else if (activeMatrix === 'event-model') {
+		<app-event-model-rights-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[eventModels]="allEventModels"
+			[profiles]="profiles"
+			(closed)="activeMatrix = null">
+		</app-event-model-rights-matrix>
+	} @else if (loading) {
 		<app-empty-state
 			style="width: 100%"
 			[icon]="'hourglass_empty'"

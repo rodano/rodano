@@ -1,8 +1,22 @@
-<app-list-header title="Profiles" subtitle="Configure profiles for data collection" />
+<app-list-header title="Profiles" subtitle="Configure profiles for data collection">
+	<button class="btn-view theme-profile" (click)="onToggleMatrix()">
+		<mat-icon>grid_on</mat-icon>
+		{{ showMatrix ? 'Back to List' : 'Profile Rights' }}
+	</button>
+</app-list-header>
 
 <div class="content-container"
-					[class.level-2]="viewLevel === 2">
-	@if (loading) {
+					[class.level-2]="viewLevel === 2 && !showMatrix">
+
+	@if (showMatrix) {
+		<app-profile-rights-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[targetProfiles]="profiles"
+			[profiles]="profiles"
+			(closed)="showMatrix = false">
+		</app-profile-rights-matrix>
+	} @else if (loading) {
 		<app-empty-state
 			style="width: 100%"
 			[icon]="'hourglass_empty'"

@@ -1,0 +1,88 @@
+<div class="matrix-container">
+	<div class="matrix-header">
+		<div class="matrix-title">
+			<h2>{{ title }}</h2>
+			<p class="matrix-subtitle">{{ subtitle }}</p>
+		</div>
+		<div class="matrix-actions">
+			@if (modified) {
+				<button type="button" class="btn-secondary" (click)="onClear()">
+					<mat-icon>undo</mat-icon>
+					Clear Changes
+				</button>
+				<button type="button" class="btn-primary" [disabled]="saving" (click)="onSave()">
+					<mat-icon>save</mat-icon>
+					{{ saving ? 'Saving...' : 'Save Changes' }}
+				</button>
+			}
+		</div>
+	</div>
+
+	@if (loading) {
+		<div class="matrix-loading">
+			<mat-icon>hourglass_empty</mat-icon>
+			<span>Loading grants...</span>
+		</div>
+	} @else {
+		<div class="matrix-scroll-wrapper">
+			<table class="matrix-table">
+				<thead>
+				<tr>
+					<th class="entity-header-cell">
+						<span>{{ title }}</span>
+						<span class="profile-count">{{ profiles.length }} profiles</span>
+					</th>
+					@for (profile of profiles; track profile.profileId) {
+						<th class="profile-header-cell">
+							<div class="profile-header-content">
+								<button type="button"
+																class="toggle-col-btn"
+																[ngClass]="themeClass"
+																[class.all-granted]="isAllGrantedForProfile(profile.profileId)"
+																(click)="toggleAllForProfile(profile.profileId)"
+																[matTooltip]="isAllGrantedForProfile(profile.profileId) ? 'Remove all' : 'Grant all'">
+									<mat-icon>{{ isAllGrantedForProfile(profile.profileId) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+								</button>
+								<span class="profile-name">{{ languageService.getTranslatedName(profile.shortname) }}</span>
+								<span class="grant-count" [ngClass]="themeClass">{{ getGrantCount(profile.profileId) }}/{{ getEntityCount() }}</span>
+							</div>
+						</th>
+					}
+				</tr>
+				</thead>
+				<tbody>
+					@for (entity of entities; track getEntityId(entity); let even = $even) {
+						<tr [class.even-row]="even">
+							<td class="entity-cell">
+								<div class="entity-cell-content">
+									<button type="button"
+																	class="toggle-row-btn"
+																	[ngClass]="themeClass"
+																	[class.all-granted]="isAllGrantedForEntity(getEntityId(entity))"
+																	(click)="toggleAllForEntity(getEntityId(entity))"
+																	[matTooltip]="isAllGrantedForEntity(getEntityId(entity)) ? 'Remove from all profiles' : 'Grant to all profiles'">
+										<mat-icon>{{ isAllGrantedForEntity(getEntityId(entity)) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+									</button>
+									<div class="entity-label">
+										<span class="entity-name">{{ getEntityLabel(entity) }}</span>
+										<span class="entity-code">{{ getEntityCode(entity) }}</span>
+									</div>
+								</div>
+							</td>
+							@for (profile of profiles; track profile.profileId) {
+								<td class="grant-cell"
+												[ngClass]="themeClass"
+												[class.granted]="isGranted(profile.profileId, getEntityId(entity))"
+												(click)="toggleGrant(profile.profileId, getEntityId(entity))">
+									@if (isGranted(profile.profileId, getEntityId(entity))) {
+										<mat-icon class="check-icon">check</mat-icon>
+									}
+								</td>
+							}
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</div>

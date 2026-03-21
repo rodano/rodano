@@ -32,7 +32,7 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "resource-categories", key = "#projectId.toString()")
+	@Cacheable(value = "resourceCategories", key = "#projectId.toString()")
 	public List<ResourceCategoryDTO> getResourceCategories(final UUID projectId) {
 		final var resourceCategories = dslContext.selectFrom(RESOURCE_CATEGORY)
 			.where(RESOURCE_CATEGORY.PROJECT_ID.eq(projectId))
@@ -46,7 +46,7 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 
 	@Override
 	@Transactional(readOnly = true)
-	@Cacheable(value = "resource-category", key = "#projectId.toString() + ':' + #resourceCategoryId.toString()")
+	@Cacheable(value = "resourceCategory", key = "#projectId.toString() + ':' + #resourceCategoryId.toString()")
 	public ResourceCategoryDTO getResourceCategory(final UUID projectId, final UUID resourceCategoryId) {
 		final var record = dslContext.selectFrom(RESOURCE_CATEGORY)
 			.where(RESOURCE_CATEGORY.PROJECT_ID.eq(projectId))
@@ -62,7 +62,7 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 
 	@Override
 	@Transactional
-	@CacheEvict(value = "resource-categories", key = "#projectId.toString()")
+	@CacheEvict(value = "resourceCategories", key = "#projectId.toString()")
 	public ResourceCategoryDTO createResourceCategory(final UUID projectId, final ResourceCategoryDTO dto) {
 		final var categoryId = dto.getCategoryId() != null ? dto.getCategoryId() : UUID.randomUUID();
 
@@ -83,8 +83,8 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 	@Override
 	@Transactional
 	@Caching(evict = {
-		@CacheEvict(value = "resource-categories", key = "#projectId.toString()"),
-		@CacheEvict(value = "resource-category", key = "#projectId.toString() + ':' + #resourceCategoryId.toString()")
+		@CacheEvict(value = "resourceCategories", key = "#projectId.toString()"),
+		@CacheEvict(value = "resourceCategory", key = "#projectId.toString() + ':' + #resourceCategoryId.toString()")
 	})
 	public ResourceCategoryDTO updateResourceCategory(final UUID projectId, final UUID resourceCategoryId, final ResourceCategoryDTO dto) {
 		dslContext.update(RESOURCE_CATEGORY)
@@ -104,8 +104,8 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 	@Override
 	@Transactional
 	@Caching(evict = {
-		@CacheEvict(value = "resource-categories", key = "#projectId.toString()"),
-		@CacheEvict(value = "resource-category", key = "#projectId.toString() + ':' + #resourceCategoryId.toString()")
+		@CacheEvict(value = "resourceCategories", key = "#projectId.toString()"),
+		@CacheEvict(value = "resourceCategory", key = "#projectId.toString() + ':' + #resourceCategoryId.toString()")
 	})
 	public void deleteResourceCategory(final UUID projectId, final UUID resourceCategoryId) {
 		dslContext.deleteFrom(RESOURCE_CATEGORY)

@@ -1,0 +1,96 @@
+<div class="matrix-container">
+	<div class="matrix-header">
+		<div class="matrix-title">
+			<h2>Workflow Rights Matrix</h2>
+			<p class="matrix-subtitle">Define which profiles have access to each workflow and its actions</p>
+		</div>
+		<div class="matrix-actions">
+			@if (modified) {
+				<button type="button" class="btn-secondary" (click)="onClear()">
+					<mat-icon>undo</mat-icon>
+					Clear Changes
+				</button>
+				<button type="button" class="btn-primary" [disabled]="saving" (click)="onSave()">
+					<mat-icon>save</mat-icon>
+					{{ saving ? 'Saving...' : 'Save Changes' }}
+				</button>
+			}
+		</div>
+	</div>
+
+	@if (loading) {
+		<div class="matrix-loading">
+			<mat-icon>hourglass_empty</mat-icon>
+			<span>Loading workflow rights...</span>
+		</div>
+	} @else {
+		<div class="matrix-scroll-wrapper">
+			<table class="matrix-table">
+				<thead>
+				<tr>
+					<th class="entity-header-cell">
+						<span>Workflow / Action</span>
+						<span class="profile-count">{{ profiles.length }} profiles</span>
+					</th>
+					@for (profile of profiles; track profile.profileId) {
+						<th class="profile-header-cell">
+							<div class="profile-header-content">
+								<span class="profile-name">{{ languageService.getTranslatedName(profile.shortname) }}</span>
+								<span class="grant-count theme-workflow">
+									{{ getWorkflowRightCount(profile.profileId) }}/{{ workflows.length }}
+								</span>
+							</div>
+						</th>
+					}
+				</tr>
+				</thead>
+				<tbody>
+					@for (workflow of workflows; track workflow.workflowId) {
+
+						<tr class="workflow-row">
+							<td class="entity-cell workflow-label-cell">
+								<div class="entity-label">
+									<span class="entity-name">{{ languageService.getTranslatedName(workflow.shortname) }}</span>
+									<span class="entity-code">{{ workflow.id }}</span>
+								</div>
+							</td>
+							@for (profile of profiles; track profile.profileId) {
+								<td class="grant-cell theme-workflow"
+												[class.granted]="hasWorkflowRight(profile.profileId, workflow.workflowId)"
+												(click)="toggleWorkflowRight(profile.profileId, workflow.workflowId)">
+									@if (hasWorkflowRight(profile.profileId, workflow.workflowId)) {
+										<mat-icon class="check-icon">check</mat-icon>
+									}
+								</td>
+							}
+						</tr>
+
+						@for (action of getActionsForWorkflow(workflow.workflowId); track action.workflowActionId) {
+							<tr class="action-row">
+								<td class="entity-cell action-label-cell">
+									<div class="entity-cell-content">
+										<mat-icon class="action-indent-icon">subdirectory_arrow_right</mat-icon>
+										<div class="entity-label">
+											<span class="action-name">{{ languageService.getTranslatedName(action.shortname) }}</span>
+											<span class="entity-code">{{ action.id }}</span>
+										</div>
+									</div>
+								</td>
+								@for (profile of profiles; track profile.profileId) {
+									<td class="grant-cell theme-workflow-action"
+													[class.granted]="isActionGranted(action.workflowActionId, profile.profileId)"
+													[class.disabled-cell]="!hasWorkflowRight(profile.profileId, workflow.workflowId)"
+													(click)="hasWorkflowRight(profile.profileId, workflow.workflowId) && toggleActionRight(action.workflowActionId, profile.profileId)">
+										@if (isActionGranted(action.workflowActionId, profile.profileId)) {
+											<mat-icon class="check-icon">check</mat-icon>
+										}
+									</td>
+								}
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+</div>

@@ -1,9 +1,24 @@
-<app-list-header title="Workflows" subtitle="Configure workflows for data collection" />
+<app-list-header title="Workflows" subtitle="Configure workflows for data collection">
+	<button class="btn-view theme-workflow" (click)="onToggleMatrix()">
+		<mat-icon>grid_on</mat-icon>
+		{{ showMatrix ? 'Back to List' : 'Workflow Rights' }}
+	</button>
+</app-list-header>
 
 <div class="content-container"
-					[class.level-2]="viewLevel === 2"
+					[class.level-2]="viewLevel === 2 && !showMatrix"
 					[class.level-3]="viewLevel === 3">
-	@if (loading) {
+
+	@if (showMatrix) {
+		<app-workflow-rights-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[workflows]="workflows"
+			[workflowActions]="allWorkflowActions"
+			[profiles]="profiles"
+			(closed)="showMatrix = false">
+		</app-workflow-rights-matrix>
+	} @else if (loading) {
 		<app-empty-state
 			style="width: 100%"
 			[icon]="'hourglass_empty'"

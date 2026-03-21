@@ -18,14 +18,17 @@ import {DatasetModelManagerService} from '../../services/manager/dataset-model-m
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {ReportGrantsMatrixComponent} from '../report-grants-matrix/report-grants-matrix.component';
 
 @Component({
 	selector: 'app-report-list',
 	standalone: true,
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ReportDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './report-list.component.html',
-	styleUrls: ['../../shared/list-shared.css']
+	styleUrls: ['../../shared/list-shared.css'],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatSnackBarModule,
+		ReportDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, ReportGrantsMatrixComponent]
 })
 export class ReportListComponent
 	extends BaseListComponent<Report>
@@ -39,11 +42,14 @@ export class ReportListComponent
 		selectedReportId: string | null;
 	}>();
 
+	showMatrix = false;
+
 	constructor(
 		public reportManager: ReportManagerService,
 		public override languageService: LanguageService,
 		private workflowManager: WorkflowManagerService,
 		private datasetModelManager: DatasetModelManagerService,
+		private profileManager: ProfileManagerService,
 		private reportDialogService: ReportDialogService,
 		snackBar: MatSnackBar
 	) {
@@ -58,6 +64,8 @@ export class ReportListComponent
 	get selectedReport(): Report | null {return this.selected as Report | null;}
 	get modifiedReportIds(): Set<string> {return this.reportManager.getModifiedIds();}
 	get originalReports(): Report[] {return this.reportManager.getOriginals();}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadReports(): void {this.load();}
 	load(): void {
@@ -127,5 +135,12 @@ export class ReportListComponent
 
 	getDatasetModelLabel(datasetModelId: string): string {
 		return this.languageService.getLabelById(datasetModelId, id => this.datasetModelManager.getById(id));
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selected = null;
+		}
 	}
 }

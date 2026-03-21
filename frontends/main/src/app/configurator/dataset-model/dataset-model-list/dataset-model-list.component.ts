@@ -21,6 +21,11 @@ import {FieldModelDetailComponent} from '../field-model/field-model-detail/field
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {
+	DatasetModelRightsMatrixComponent
+} from '../dataset-model-rights-matrix/dataset-model-rights-matrix.component';
 
 type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 
@@ -30,7 +35,8 @@ type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
 	templateUrl: './dataset-model-list.component.html',
 	styleUrls: ['../../shared/list-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DatasetModelDetailComponent,
-		FieldModelDetailComponent, MatProgressSpinnerModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective]
+		FieldModelDetailComponent, MatProgressSpinnerModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective,
+		DatasetModelRightsMatrixComponent]
 })
 export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@Input() projectId = '';
@@ -56,10 +62,13 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	private currentFieldModels: FieldModel[] = [];
 
+	showMatrix = false;
+
 	constructor(
 		public datasetModelManager: DatasetModelManagerService,
 		public fieldModelManager: FieldModelManagerService,
 		public languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private datasetModelDialogService: DatasetModelDialogService,
 		private fieldModelDialogService: FieldModelDialogService,
 		private snackBar: MatSnackBar
@@ -123,6 +132,8 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	get totalModificationCount(): number {
 		return this.datasetModelManager.getModificationCount() + this.fieldModelManager.getModificationCount();
 	}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadDatasetModels(): void {
 		this.loading = true;
@@ -390,5 +401,12 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	getFieldModelCount(datasetModelId: string): number {
 		return this.fieldModelManager.getAllForDataset(datasetModelId).length;
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selectedDatasetModel = null;
+		}
 	}
 }

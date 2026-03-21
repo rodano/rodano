@@ -17,14 +17,18 @@ import {FeatureDetailComponent} from '../feature-detail/feature-detail.component
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {FeatureGrantsMatrixComponent} from '../feature-grants-matrix/feature-grants-matrix.component';
 
 @Component({
 	selector: 'app-feature-list',
 	standalone: true,
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, FeatureDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './feature-list.component.html',
-	styleUrls: ['../../shared/list-shared.css']
+	styleUrls: ['../../shared/list-shared.css'],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
+		MatSnackBarModule, FeatureDetailComponent, EmptyStateComponent, MatTooltip, ListHeaderComponent, ModifiedDirective,
+		FeatureGrantsMatrixComponent]
 })
 export class FeatureListComponent
 	extends BaseListComponent<Feature>
@@ -38,9 +42,12 @@ export class FeatureListComponent
 		selectedFeatureId: string | null;
 	}>();
 
+	showMatrix = false;
+
 	constructor(
 		public featureManager: FeatureManagerService,
 		public override languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private featureDialogService: FeatureDialogService,
 		snackBar: MatSnackBar
 	) {
@@ -55,6 +62,8 @@ export class FeatureListComponent
 	get selectedFeature(): Feature | null {return this.selected as Feature | null;}
 	get modifiedFeatureIds(): Set<string> {return this.featureManager.getModifiedIds();}
 	get originalFeatures(): Feature[] {return this.featureManager.getOriginals();}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadFeatures(): void {this.load();}
 	load(): void {
@@ -117,4 +126,11 @@ export class FeatureListComponent
 	onCreateFeature(): void {this.onCreate();}
 	onFeatureUpdated(f: Feature): void {this.onUpdated(f);}
 	onFeatureDeleted(id: string): void {this.onDeleted(id);}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selected = null;
+		}
+	}
 }

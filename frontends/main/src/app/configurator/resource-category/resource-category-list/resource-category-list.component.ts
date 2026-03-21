@@ -16,14 +16,20 @@ import {ResourceCategoryDetailComponent} from '../resource-category-detail/resou
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {
+	ResourceCategoryGrantsMatrixComponent
+} from '../resource-category-grants-matrix/resource-category-grants-matrix.component';
 
 @Component({
 	selector: 'app-resource-category-list',
 	standalone: true,
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, ResourceCategoryDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
 	templateUrl: './resource-category-list.component.html',
-	styleUrls: ['../../shared/list-shared.css']
+	styleUrls: ['../../shared/list-shared.css'],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
+		MatSnackBarModule, ResourceCategoryDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective,
+		ResourceCategoryGrantsMatrixComponent]
 })
 export class ResourceCategoryListComponent
 	extends BaseListComponent<ResourceCategory>
@@ -37,9 +43,12 @@ export class ResourceCategoryListComponent
 		selectedResourceCategoryId: string | null;
 	}>();
 
+	showMatrix = false;
+
 	constructor(
 		public resourceCategoryManager: ResourceCategoryManagerService,
 		public override languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private resourceCategoryDialogService: ResourceCategoryDialogService,
 		snackBar: MatSnackBar
 	) {
@@ -54,6 +63,8 @@ export class ResourceCategoryListComponent
 	get selectedResourceCategory(): ResourceCategory | null {return this.selected as ResourceCategory | null;}
 	get modifiedResourceCategoryIds(): Set<string> {return this.resourceCategoryManager.getModifiedIds();}
 	get originalResourceCategories(): ResourceCategory[] {return this.resourceCategoryManager.getOriginals();}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadResourceCategories(): void {this.load();}
 	load(): void {
@@ -116,4 +127,11 @@ export class ResourceCategoryListComponent
 	onCreateResourceCategory(): void {this.onCreate();}
 	onResourceCategoryUpdated(rc: ResourceCategory): void {this.onUpdated(rc);}
 	onResourceCategoryDeleted(id: string): void {this.onDeleted(id);}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selected = null;
+		}
+	}
 }

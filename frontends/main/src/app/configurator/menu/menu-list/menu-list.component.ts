@@ -17,12 +17,15 @@ import {MenuManagerService} from '../../services/manager/menu-manager.service';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MenuDetailComponent} from '../menu-detail/menu-detail.component';
 import {MenuDialogService} from '../../services/dialogs/menu-dialog.service';
+import {ProfileManagerService} from '../../services/manager/profile-manager.service';
+import {Profile} from '@core/model/profile';
+import {MenuGrantsMatrixComponent} from '../menu-grants-matrix/menu-grants-matrix.component';
 
 @Component({
 	selector: 'app-menu-list',
 	standalone: true,
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, MenuDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, MatTooltip],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatSnackBarModule,
+		MenuDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, MatTooltip, MenuGrantsMatrixComponent],
 	templateUrl: './menu-list.component.html',
 	styleUrls: ['../../shared/list-shared.css']
 })
@@ -38,9 +41,12 @@ export class MenuListComponent
 		selectedMenuId: string | null;
 	}>();
 
+	showMatrix = false;
+
 	constructor(
 		public menuManager: MenuManagerService,
 		public override languageService: LanguageService,
+		private profileManager: ProfileManagerService,
 		private menuDialogService: MenuDialogService,
 		snackBar: MatSnackBar
 	) {
@@ -55,6 +61,8 @@ export class MenuListComponent
 	get selectedMenu(): MenuConfig | null {return this.selected as MenuConfig | null;}
 	get modifiedMenuIds(): Set<string> {return this.menuManager.getModifiedIds();}
 	get originalMenus(): MenuConfig[] {return this.menuManager.getOriginals();}
+
+	get profiles(): Profile[] {return this.profileManager.getAll();}
 
 	loadMenus(): void {this.load();}
 	load(): void {
@@ -131,5 +139,12 @@ export class MenuListComponent
 			return 'intermediate';
 		}
 		return 'leaf';
+	}
+
+	onToggleMatrix(): void {
+		this.showMatrix = !this.showMatrix;
+		if(this.showMatrix) {
+			this.selected = null;
+		}
 	}
 }

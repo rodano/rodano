@@ -1,9 +1,25 @@
-<app-list-header title="Dataset Models" subtitle="Configure dataset models for data collection" />
+<app-list-header title="Dataset Models" subtitle="Configure dataset models for data collection">
+	@if (viewMode !== 'field-list' && viewMode !== 'field-detail') {
+		<button class="btn-view theme-dataset-model" (click)="onToggleMatrix()">
+			<mat-icon>grid_on</mat-icon>
+			{{ showMatrix ? 'Back to List' : 'Dataset Model Rights' }}
+		</button>
+	}
+</app-list-header>
 
 <div class="content-container"
-					[class.level-2]="viewLevel === 2"
+					[class.level-2]="viewLevel === 2 && !showMatrix"
 					[class.level-3]="viewLevel === 3">
-	@if (loading) {
+
+	@if (showMatrix) {
+		<app-dataset-model-rights-matrix
+			style="width: 100%"
+			[projectId]="projectId"
+			[datasetModels]="datasetModels"
+			[profiles]="profiles"
+			(closed)="showMatrix = false">
+		</app-dataset-model-rights-matrix>
+	} @else if (loading) {
 		<app-empty-state
 			style="width: 100%"
 			[icon]="'hourglass_empty'"
