@@ -30,6 +30,7 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 
 @Component({
 	selector: 'app-multiple-layout',
+	standalone: true,
 	templateUrl: './multiple-layout.component.html',
 	styleUrls: ['./multiple-layout.component.css'],
 	animations: [
@@ -70,9 +71,9 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	shown = true;
 
 	constructor(
-		private crfService: CRFService,
-		private visibilityService: VisibilityService,
-		private cellLoadingService: CellLoadingService,
+		protected crfService: CRFService,
+		protected visibilityService: VisibilityService,
+		protected cellLoadingService: CellLoadingService,
 		private notificationService: NotificationService,
 		private fieldService: FieldService,
 		private loggingService: LoggingService,

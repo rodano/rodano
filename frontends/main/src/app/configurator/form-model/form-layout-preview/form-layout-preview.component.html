@@ -1,12 +1,9 @@
 <div class="preview-root">
-
 	<div class="preview-toolbar">
 		<button class="btn-icon-sm" (click)="onClose()" matTooltip="Back to editor">
 			<mat-icon>arrow_back</mat-icon>
 		</button>
-		<span class="toolbar-title">
-			Form Preview
-		</span>
+		<span class="toolbar-title">Form Preview</span>
 		<span class="toolbar-spacer"></span>
 		<button class="btn-toolbar-action"
 										[class.active]="applyVisibilityRules"
@@ -22,7 +19,6 @@
 	</div>
 
 	<div class="preview-content">
-
 		<div class="preview-ruler-track">
 			<div class="preview-ruler">
 				@for (tick of rulerTicks; track tick) {
@@ -41,401 +37,27 @@
 			</div>
 		}
 
-		<div class="preview-layouts-area">
-			@for (layout of layouts; track layout.formLayoutId) {
-				@if (isLayoutVisible(layout.formLayoutId)) {
-
-					@if (isMultipleLayout(layout)) {
-						<div class="preview-layout preview-layout-multiple" [style.width]="getLayoutWidth()">
-							<table class="preview-multiple-table" [style.width]="getMultipleTableWidth()">
-								<thead>
-								<tr>
-									@for (cell of getMultipleCells(layout); track cell.formLayoutCellId) {
-										<th>
-											{{ getFieldLabel(cell) }}
-											@if (getFieldModel(cell.fieldModelId)?.required) {
-												<span class="required-star">*</span>
-											}
-										</th>
-									}
-									<th class="row-actions-th"></th>
-								</tr>
-								</thead>
-								<tbody>
-									@for (rowId of getRowIds(layout.formLayoutId); track rowId) {
-										<tr>
-											@for (cell of getMultipleCells(layout); track cell.formLayoutCellId) {
-												<td>
-													@let fm = getFieldModel(cell.fieldModelId);
-													@if (fm) {
-														@if (fm.type === 'STRING' || fm.type === 'AUTO_COMPLETION') {
-															<input class="preview-input" type="text"
-																						[value]="getRowValue(cell.id, rowId)"
-																						(input)="onRowValueChange(cell.id, rowId, $any($event.target).value)" />
-														}
-														@if (fm.type === 'TEXTAREA') {
-															<textarea class="preview-textarea"
-																									[value]="getRowValue(cell.id, rowId)"
-																									(input)="onRowValueChange(cell.id, rowId, $any($event.target).value)"></textarea>
-														}
-														@if (fm.type === 'NUMBER') {
-															<input class="preview-input" type="number"
-																						[value]="getRowValue(cell.id, rowId)"
-																						(input)="onRowValueChange(cell.id, rowId, $any($event.target).value)" />
-														}
-														@if (fm.type === 'SELECT') {
-															<select class="preview-select"
-																							[value]="getRowValue(cell.id, rowId)"
-																							(change)="onRowValueChange(cell.id, rowId, $any($event.target).value)">
-																<option value="">--</option>
-																@for (pv of fm.possibleValues; track pv.possibleValueId) {
-																	<option [value]="pv.possibleValueId">
-																		{{ cell.displayPossibleValueLabels ? (getLabel(pv.shortname) || pv.id) : pv.id }}
-																	</option>
-																}
-															</select>
-														}
-
-														@if (fm.type === 'DATE') {
-															<div class="date-parts-row">
-																@for (part of getDateParts(fm); track part) {
-																	<input class="preview-input date-part-input"
-																								type="number"
-																								[placeholder]="getDatePartLabel(part)"
-																								[min]="1"
-																								[max]="getDatePartMax(part)"
-																								[value]="getDatePartValue(getRowKey(cell.id, rowId), part)"
-																								(input)="onDatePartChange(getRowKey(cell.id, rowId), part, $any($event.target).value)" />
-																}
-															</div>
-														}
-														@if (fm.type === 'DATE_SELECT') {
-															<div class="date-parts-row">
-																@if (fm.withYears) {
-																	<select class="preview-select date-part-select"
-																									[value]="getDatePartValue(getRowKey(cell.id, rowId), 'year')"
-																									(change)="onDatePartChange(getRowKey(cell.id, rowId), 'year', $any($event.target).value)">
-																		<option value="">YYYY</option>
-																		@for (y of getYearOptions(fm); track y) {
-																			<option [value]="y">{{ y }}</option>
-																		}
-																	</select>
-																}
-																@if (fm.withMonths) {
-																	<select class="preview-select date-part-select"
-																									[value]="getDatePartValue(getRowKey(cell.id, rowId), 'month')"
-																									(change)="onDatePartChange(getRowKey(cell.id, rowId), 'month', $any($event.target).value)">
-																		<option value="">MM</option>
-																		@for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
-																			<option [value]="m">{{ MONTH_NAMES[m - 1] }}</option>
-																		}
-																	</select>
-																}
-																@if (fm.withDays) {
-																	<select class="preview-select date-part-select"
-																									[value]="getDatePartValue(getRowKey(cell.id, rowId), 'day')"
-																									(change)="onDatePartChange(getRowKey(cell.id, rowId), 'day', $any($event.target).value)">
-																		<option value="">DD</option>
-																		@for (d of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]; track d) {
-																			<option [value]="d">{{ d | number:'2.0-0' }}</option>
-																		}
-																	</select>
-																}
-															</div>
-														}
-
-														@if (fm.type === 'RADIO') {
-															<div class="radio-group"
-																				[class.radio-grid]="cell.possibleValuesColumnNumber && cell.possibleValuesColumnNumber > 1"
-																				[style.grid-template-columns]="cell.possibleValuesColumnNumber ? 'repeat(' + cell.possibleValuesColumnNumber + ', ' + (cell.possibleValuesColumnWidth ? cell.possibleValuesColumnWidth + 'px' : 'auto') + ')' : null">
-																@for (pv of fm.possibleValues; track pv.possibleValueId) {
-																	<label class="radio-option">
-																		<input type="radio"
-																									[name]="cell.formLayoutCellId + '__' + rowId"
-																									[value]="pv.possibleValueId"
-																									[checked]="getRowValue(cell.id, rowId) === pv.possibleValueId"
-																									(change)="onRowValueChange(cell.id, rowId, pv.possibleValueId)" />
-																		@if (cell.displayPossibleValueLabels) {
-																			<span>{{ getLabel(pv.shortname) || pv.id }}</span>
-																		}
-																	</label>
-																}
-															</div>
-														}
-														@if (fm.type === 'CHECKBOX') {
-															<label class="checkbox-option">
-																<input type="checkbox"
-																							[checked]="isRowCheckboxChecked(cell.id, rowId)"
-																							(change)="onRowCheckboxChange(cell.id, rowId, $any($event.target).checked)" />
-															</label>
-														}
-														@if (fm.type === 'CHECKBOX_GROUP') {
-															<div class="checkbox-group"
-																				[class.checkbox-grid]="cell.possibleValuesColumnNumber && cell.possibleValuesColumnNumber > 1"
-																				[style.grid-template-columns]="cell.possibleValuesColumnNumber ? 'repeat(' + cell.possibleValuesColumnNumber + ', ' + (cell.possibleValuesColumnWidth ? cell.possibleValuesColumnWidth + 'px' : 'auto') + ')' : null">
-																@for (pv of fm.possibleValues; track pv.possibleValueId) {
-																	<label class="checkbox-option">
-																		<input type="checkbox"
-																									[checked]="isRowCheckboxGroupChecked(cell.id, rowId, pv.possibleValueId)"
-																									(change)="onRowCheckboxGroupChange(cell.id, rowId, pv.possibleValueId, $any($event.target).checked)" />
-																		@if (cell.displayPossibleValueLabels) {
-																			<span>{{ getLabel(pv.shortname) || pv.id }}</span>
-																		}
-																	</label>
-																}
-															</div>
-														}
-														@if (fm.type === 'FILE') {
-															<input class="preview-file-input" type="file" />
-														}
-													}
-												</td>
-											}
-											<td class="row-actions-td">
-												<button class="btn-remove-row"
-																				[disabled]="getRowIds(layout.formLayoutId).length <= 1"
-																				(click)="removeRow(layout.formLayoutId, rowId)"
-																				matTooltip="Remove row">
-													<mat-icon>close</mat-icon>
-												</button>
-											</td>
-										</tr>
-									}
-								</tbody>
-							</table>
-
-							<button class="btn-add-row" [style.width]="getLayoutWidth()" (click)="addRow(layout.formLayoutId)">
-								<mat-icon>add</mat-icon>
-								Add {{ getAddRowLabel(layout) }}
-							</button>
-						</div>
-
+		@if (!rebuilding) {
+			<div class="preview-layouts-area" [style.width]="getLayoutWidth()">
+				@for (layout of layouts; track layout.formLayoutId) {
+					@if (layout.type === layoutType.SINGLE) {
+						<app-layout
+							[layout]="layout"
+							[datasets]="datasets"
+							[layoutUid]="layout.formLayoutId"
+							[disabled]="false">
+						</app-layout>
 					} @else {
-						<div class="preview-layout" [style.width]="getLayoutWidth()">
-
-							<div class="preview-layout-body">
-								@for (line of layout.lines; track $index) {
-									<div class="preview-line"
-														[style.grid-template-columns]="isTextLine(line) ? '1fr' : getGridTemplateColumns(layout)">
-
-										@for (cell of line.cells; track $index) {
-
-											@if (isSpacerCell(cell)) {
-												<div class="preview-spacer-cell"
-																	[style.grid-column]="'span ' + getCellSpan(cell)">
-												</div>
-
-											} @else if (isTextCell(cell)) {
-												@if (isCellVisible(cell)) {
-													<div class="preview-section-header"
-																		[style.grid-column]="'span ' + getFullSpan(layout)"
-																		[innerHTML]="getTextContent(cell)">
-													</div>
-												} @else {
-													<div [style.grid-column]="'span ' + getFullSpan(layout)"></div>
-												}
-
-											} @else {
-												@if (isCellVisible(cell)) {
-													<div class="preview-field-cell" [style.grid-column]="'span ' + getCellSpan(cell)">
-
-														@let fm = getFieldModel(cell.fieldModelId);
-
-														@if (getTextBefore(cell)) {
-															<div class="preview-text-before" [innerHTML]="getTextBefore(cell)"></div>
-														}
-
-														@if (fm) {
-															<div class="field-row">
-
-																@if (cell.displayLabel) {
-																	<label class="field-label"
-																								[class.required]="fm.required"
-																								[style]="getLabelStyle(cell)"
-																								[title]="'Label width: ' + (parsePx(cell.cssCodeForLabel) ?? 'auto')">
-																		{{ getFieldLabel(cell) }}
-																		@if (fm.required) {
-																			<span class="required-star">*</span>
-																		}
-																	</label>
-																}
-
-																<div class="field-input-area" [style]="getInputStyle(cell)">
-
-																	@if (fm.type === 'STRING' || fm.type === 'AUTO_COMPLETION') {
-																		<input class="preview-input"
-																									type="text"
-																									[placeholder]="getFieldLabel(cell)"
-																									[attr.maxlength]="fm.maxLength ?? null"
-																									[value]="getValue(cell.id)"
-																									(input)="onValueChange(cell.id, $any($event.target).value)" />
-																	}
-
-																	@if (fm.type === 'TEXTAREA') {
-																		<textarea class="preview-textarea"
-																												[placeholder]="getFieldLabel(cell)"
-																												[attr.maxlength]="fm.maxLength ?? null"
-																												[value]="getValue(cell.id)"
-																												(input)="onValueChange(cell.id, $any($event.target).value)">
-																		</textarea>
-																	}
-
-																	@if (fm.type === 'NUMBER') {
-																		<input class="preview-input"
-																									type="number"
-																									[min]="fm.minValue ?? null"
-																									[max]="fm.maxValue ?? null"
-																									[value]="getValue(cell.id)"
-																									(input)="onValueChange(cell.id, $any($event.target).value)" />
-																	}
-
-																	@if (fm.type === 'DATE') {
-																		<div class="date-parts-row">
-																			@for (part of getDateParts(fm); track part) {
-																				<input class="preview-input date-part-input"
-																											type="number"
-																											[placeholder]="getDatePartLabel(part)"
-																											[min]="1"
-																											[max]="getDatePartMax(part)"
-																											[value]="getDatePartValue(cell.id, part)"
-																											(input)="onDatePartChange(cell.id, part, $any($event.target).value)" />
-																			}
-																		</div>
-																	}
-
-																	@if (fm.type === 'DATE' && getDateParts(fm).length === 0) {
-																		<input class="preview-input" type="text" placeholder="Date"
-																									[value]="getValue(cell.id)"
-																									(input)="onValueChange(cell.id, $any($event.target).value)" />
-																	}
-
-																	@if (fm.type === 'DATE_SELECT') {
-																		<div class="date-parts-row">
-																			@if (fm.withYears) {
-																				<select class="preview-select date-part-select"
-																												[value]="getDatePartValue(cell.id, 'year')"
-																												(change)="onDatePartChange(cell.id, 'year', $any($event.target).value)">
-																					<option value="">YYYY</option>
-																					@for (y of getYearOptions(fm); track y) {
-																						<option [value]="y">{{ y }}</option>
-																					}
-																				</select>
-																			}
-																			@if (fm.withMonths) {
-																				<select class="preview-select date-part-select"
-																												[value]="getDatePartValue(cell.id, 'month')"
-																												(change)="onDatePartChange(cell.id, 'month', $any($event.target).value)">
-																					<option value="">MM</option>
-																					@for (m of [1,2,3,4,5,6,7,8,9,10,11,12]; track m) {
-																						<option [value]="m">{{ MONTH_NAMES[m - 1] }}</option>
-																					}
-																				</select>
-																			}
-																			@if (fm.withDays) {
-																				<select class="preview-select date-part-select"
-																												[value]="getDatePartValue(cell.id, 'day')"
-																												(change)="onDatePartChange(cell.id, 'day', $any($event.target).value)">
-																					<option value="">DD</option>
-																					@for (d of [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31]; track d) {
-																						<option [value]="d">{{ d | number:'2.0-0' }}</option>
-																					}
-																				</select>
-																			}
-																		</div>
-																	}
-
-																	@if (fm.type === 'SELECT') {
-																		<select class="preview-select"
-																										[value]="getValue(cell.id)"
-																										(change)="onValueChange(cell.id, $any($event.target).value)">
-																			<option value="">--</option>
-																			@for (pv of fm.possibleValues; track pv.possibleValueId) {
-																				<option [value]="pv.possibleValueId">
-																					{{ cell.displayPossibleValueLabels ? (getLabel(pv.shortname) || pv.id) : pv.id }}
-																				</option>
-																			}
-																		</select>
-																	}
-
-																	@if (fm.type === 'RADIO') {
-																		<div class="radio-group"
-																							[class.radio-grid]="cell.possibleValuesColumnNumber && cell.possibleValuesColumnNumber > 1"
-																							[style.grid-template-columns]="cell.possibleValuesColumnNumber ? 'repeat(' + cell.possibleValuesColumnNumber + ', ' + (cell.possibleValuesColumnWidth ? cell.possibleValuesColumnWidth + 'px' : 'auto') + ')' : null">
-																			@for (pv of fm.possibleValues; track pv.possibleValueId) {
-																				<label class="radio-option">
-																					<input type="radio"
-																												[name]="cell.formLayoutCellId"
-																												[value]="pv.possibleValueId"
-																												[checked]="getValue(cell.id) === pv.possibleValueId"
-																												(change)="onValueChange(cell.id, pv.possibleValueId)" />
-																					@if (cell.displayPossibleValueLabels) {
-																						<span>{{ getLabel(pv.shortname) || pv.id }}</span>
-																					}
-																				</label>
-																			}
-																		</div>
-																	}
-
-																	@if (fm.type === 'CHECKBOX') {
-																		<label class="checkbox-option">
-																			<input type="checkbox"
-																										[checked]="isCheckboxChecked(cell.id)"
-																										(change)="onCheckboxChange(cell.id, $any($event.target).checked)" />
-																		</label>
-																	}
-
-																	@if (fm.type === 'CHECKBOX_GROUP') {
-																		<div class="checkbox-group"
-																							[class.checkbox-grid]="cell.possibleValuesColumnNumber && cell.possibleValuesColumnNumber > 1"
-																							[style.grid-template-columns]="cell.possibleValuesColumnNumber ? 'repeat(' + cell.possibleValuesColumnNumber + ', ' + (cell.possibleValuesColumnWidth ? cell.possibleValuesColumnWidth + 'px' : 'auto') + ')' : null">
-																			@for (pv of fm.possibleValues; track pv.possibleValueId) {
-																				<label class="checkbox-option">
-																					<input type="checkbox"
-																												[checked]="isCheckboxGroupChecked(cell.id, pv.possibleValueId)"
-																												(change)="onCheckboxGroupChange(cell.id, pv.possibleValueId, $any($event.target).checked)" />
-																					@if (cell.displayPossibleValueLabels) {
-																						<span>{{ getLabel(pv.shortname) || pv.id }}</span>
-																					}
-																				</label>
-																			}
-																		</div>
-																	}
-
-																	@if (fm.type === 'FILE') {
-																		<input class="preview-file-input" type="file" />
-																	}
-
-																</div>
-															</div>
-														} @else {
-															<div class="field-missing">
-																<mat-icon>help_outline</mat-icon>
-																<span>{{ cell.fieldModelId }}</span>
-															</div>
-														}
-
-														@if (getTextAfter(cell)) {
-															<div class="preview-text-after" [innerHTML]="getTextAfter(cell)"></div>
-														}
-													</div>
-												} @else {
-													<div [style.grid-column]="'span ' + getCellSpan(cell)"></div>
-												}
-											}
-										}
-									</div>
-								}
-
-								@if (layout.lines.length === 0) {
-									<div class="layout-empty-hint">No lines configured</div>
-								}
-							</div>
-
+						<div [style.width]="getLayoutWidth()">
+							<app-preview-multiple-layout
+								[layout]="layout"
+								[datasets]="datasets"
+								[disabled]="false">
+							</app-preview-multiple-layout>
 						</div>
 					}
 				}
-			}
-		</div>
-
+			</div>
+		}
 	</div>
 </div>
