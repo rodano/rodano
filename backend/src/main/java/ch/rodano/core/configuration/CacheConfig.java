@@ -35,7 +35,8 @@ public class CacheConfig {
 			"ruleDefinitionProperties", "ruleDefinitionProperty",
 			"ruleDefinitionActions", "ruleDefinitionAction",
 			"crons", "cron",
-			"menus", "menu", "menuGrants"
+			"menus", "menu", "menuGrants",
+			"rules"
 		);
 	}
 }

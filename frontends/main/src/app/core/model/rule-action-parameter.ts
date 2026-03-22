@@ -9,11 +9,11 @@
  */
 
 
-export interface Statistics { 
-    sd?: number;
-    mean?: number;
-    count?: number;
-    min?: number;
-    max?: number;
+export interface RuleActionParameter { 
+    ruleActionParameterId?: string;
+    id?: string;
+    value?: string;
+    rulableEntity?: string;
+    conditionId?: string;
 }
 

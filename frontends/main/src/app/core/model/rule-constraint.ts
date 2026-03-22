@@ -7,13 +7,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { RuleConditionList } from './rule-condition-list';
 
 
-export interface Statistics { 
-    sd?: number;
-    mean?: number;
-    count?: number;
-    min?: number;
-    max?: number;
+export interface RuleConstraint { 
+    ruleConstraintId?: string;
+    conditions?: { [key: string]: RuleConditionList; };
 }
 

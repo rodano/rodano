@@ -7,13 +7,12 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { RuleCondition } from './rule-condition';
 
 
-export interface Statistics { 
-    sd?: number;
-    mean?: number;
-    count?: number;
-    min?: number;
-    max?: number;
+export interface RuleConditionList { 
+    ruleConditionListId?: string;
+    mode?: string;
+    conditions?: Array<RuleCondition>;
 }
 

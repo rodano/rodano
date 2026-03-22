@@ -9,11 +9,10 @@
  */
 
 
-export interface Statistics { 
-    sd?: number;
-    mean?: number;
-    count?: number;
-    min?: number;
-    max?: number;
+export interface RuleCriterion { 
+    ruleCriterionId?: string;
+    property?: string;
+    operator?: string;
+    values?: Array<string>;
 }
 

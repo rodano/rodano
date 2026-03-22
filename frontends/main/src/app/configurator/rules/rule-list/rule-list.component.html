@@ -1,0 +1,46 @@
+<div class="rule-list-container">
+	@if (loading) {
+		<div class="rule-loading">
+			<mat-icon>hourglass_empty</mat-icon>
+			<span>Loading rules...</span>
+		</div>
+	} @else {
+		@for (ruleType of ruleTypes; track ruleType.type) {
+			<div class="rule-type-section">
+				<div class="rule-type-header">
+					<h3>{{ ruleType.label }}</h3>
+					<button type="button" class="btn-add-item" (click)="onAddRule(ruleType.type)">
+						<mat-icon>add</mat-icon>
+						Add rule
+					</button>
+				</div>
+
+				@for (rule of getRulesForType(ruleType.type); track rule.ruleId) {
+					<div class="rule-item" [class.selected]="selectedRule?.ruleId === rule.ruleId">
+						<div class="rule-item-header" (click)="onSelectRule(rule)">
+							<mat-icon class="rule-icon">rule</mat-icon>
+							<span class="rule-description">
+                                {{ rule.description || 'Unnamed rule' }}
+                            </span>
+							<button type="button" class="btn-icon-sm danger" (click)="$event.stopPropagation(); onDeleteRule(rule)">
+								<mat-icon>delete</mat-icon>
+							</button>
+						</div>
+
+						@if (selectedRule?.ruleId === rule.ruleId) {
+							<div class="rule-detail-panel">
+								<div class="rule-detail-panel">
+									<!-- Placeholder -->
+								</div>
+							</div>
+						}
+					</div>
+				}
+
+				@if (getRulesForType(ruleType.type).length === 0) {
+					<div class="rule-empty">No rules configured.</div>
+				}
+			</div>
+		}
+	}
+</div>

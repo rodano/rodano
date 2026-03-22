@@ -13,13 +13,15 @@ import {SettingItemComponent} from '../../shared/setting-item/setting-item.compo
 import {Cron} from '@core/model/cron';
 import {CronManagerService} from '../../services/manager/cron-manager.service';
 import {CronDialogService} from '../../services/dialogs/cron-dialog.service';
+import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
 
 @Component({
 	selector: 'app-cron-detail',
 	standalone: true,
 	templateUrl: './cron-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent]
 })
 export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronManagerService> {
 	@Input() override entity!: Cron;
@@ -32,6 +34,8 @@ export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronMa
 
 	@Input() set allCrons(v: Cron[]) {this.allEntities = v;}
 
+	activeTab: 'general' | 'rules' = 'general';
+
 	constructor(
 		cronManager: CronManagerService,
 		languageService: LanguageService,
@@ -43,6 +47,10 @@ export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronMa
 	}
 
 	protected getEntityId(): string {return this.entity.cronId;}
+
+	get ruleTypes() {
+		return [{type: null, label: 'Rules'}];
+	}
 
 	onEditBasicInfo(): void {
 		this.cronDialogService.openBasicInfoDialog(

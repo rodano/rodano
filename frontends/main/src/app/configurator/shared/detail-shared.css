@@ -449,3 +449,32 @@
 	color: var(--entity-color);
 	font-size: 1.25rem;
 }
+
+.detail-tabs {
+	display: flex;
+	border-bottom: 1px solid #e5e7eb;
+	padding: 0 1.5rem;
+	flex-shrink: 0;
+}
+
+.detail-tab {
+	background: none;
+	border: none;
+	border-bottom: 2px solid transparent;
+	padding: 0.75rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	color: #6b7280;
+	cursor: pointer;
+	margin-bottom: -1px;
+	transition: all 0.15s;
+}
+
+.detail-tab:hover {
+	color: #374151;
+}
+
+.detail-tab.active {
+	color: #374151;
+	border-bottom-color: #374151;
+}
