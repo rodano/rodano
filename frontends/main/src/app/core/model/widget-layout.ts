@@ -7,13 +7,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { Section } from './section';
 
 
-export interface Statistics { 
-    mean?: number;
-    sd?: number;
-    count?: number;
-    min?: number;
-    max?: number;
+export interface WidgetLayout { 
+    sections?: Array<Section>;
 }
 

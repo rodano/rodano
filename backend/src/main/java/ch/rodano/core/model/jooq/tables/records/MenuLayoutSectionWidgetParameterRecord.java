@@ -135,17 +135,79 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	}
 
 	/**
+	 * Setter for
+	 * <code>menu_layout_section_widget_parameter.display_add_response</code>.
+	 */
+	public void setDisplayAddResponse(Boolean value) {
+		set(8, value);
+	}
+
+	/**
+	 * Getter for
+	 * <code>menu_layout_section_widget_parameter.display_add_response</code>.
+	 */
+	public Boolean getDisplayAddResponse() {
+		return (Boolean) get(8);
+	}
+
+	/**
+	 * Setter for
+	 * <code>menu_layout_section_widget_parameter.remove_profile_selector</code>.
+	 */
+	public void setRemoveProfileSelector(Boolean value) {
+		set(9, value);
+	}
+
+	/**
+	 * Getter for
+	 * <code>menu_layout_section_widget_parameter.remove_profile_selector</code>.
+	 */
+	public Boolean getRemoveProfileSelector() {
+		return (Boolean) get(9);
+	}
+
+	/**
+	 * Setter for <code>menu_layout_section_widget_parameter.overdue_type</code>.
+	 */
+	public void setOverdueType(String value) {
+		set(10, value);
+	}
+
+	/**
+	 * Getter for <code>menu_layout_section_widget_parameter.overdue_type</code>.
+	 */
+	public String getOverdueType() {
+		return (String) get(10);
+	}
+
+	/**
+	 * Setter for
+	 * <code>menu_layout_section_widget_parameter.specific_column_name</code>.
+	 */
+	public void setSpecificColumnName(String value) {
+		set(11, value);
+	}
+
+	/**
+	 * Getter for
+	 * <code>menu_layout_section_widget_parameter.specific_column_name</code>.
+	 */
+	public String getSpecificColumnName() {
+		return (String) get(11);
+	}
+
+	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.scope_model_id</code>.
 	 */
 	public void setScopeModelId(UUID value) {
-		set(8, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.scope_model_id</code>.
 	 */
 	public UUID getScopeModelId() {
-		return (UUID) get(8);
+		return (UUID) get(12);
 	}
 
 	/**
@@ -153,7 +215,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_widget_id</code>.
 	 */
 	public void setWorkflowWidgetId(UUID value) {
-		set(9, value);
+		set(13, value);
 	}
 
 	/**
@@ -161,7 +223,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_widget_id</code>.
 	 */
 	public UUID getWorkflowWidgetId() {
-		return (UUID) get(9);
+		return (UUID) get(13);
 	}
 
 	/**
@@ -169,7 +231,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_summary_id</code>.
 	 */
 	public void setWorkflowSummaryId(UUID value) {
-		set(10, value);
+		set(14, value);
 	}
 
 	/**
@@ -177,35 +239,35 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_summary_id</code>.
 	 */
 	public UUID getWorkflowSummaryId() {
-		return (UUID) get(10);
+		return (UUID) get(14);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.chart_id</code>.
 	 */
 	public void setChartId(UUID value) {
-		set(11, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.chart_id</code>.
 	 */
 	public UUID getChartId() {
-		return (UUID) get(11);
+		return (UUID) get(15);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.category_id</code>.
 	 */
 	public void setCategoryId(UUID value) {
-		set(12, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.category_id</code>.
 	 */
 	public UUID getCategoryId() {
-		return (UUID) get(12);
+		return (UUID) get(16);
 	}
 
 	// -------------------------------------------------------------------------
@@ -231,7 +293,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	/**
 	 * Create a detached, initialised MenuLayoutSectionWidgetParameterRecord
 	 */
-	public MenuLayoutSectionWidgetParameterRecord(UUID projectId, UUID menuId, UUID menuSectionId, UUID menuWidgetId, Integer widgetOrder, String type, String title, Integer width, UUID scopeModelId, UUID workflowWidgetId, UUID workflowSummaryId, UUID chartId, UUID categoryId) {
+	public MenuLayoutSectionWidgetParameterRecord(UUID projectId, UUID menuId, UUID menuSectionId, UUID menuWidgetId, Integer widgetOrder, String type, String title, Integer width, Boolean displayAddResponse, Boolean removeProfileSelector, String overdueType, String specificColumnName, UUID scopeModelId, UUID workflowWidgetId, UUID workflowSummaryId, UUID chartId, UUID categoryId) {
 		super(MenuLayoutSectionWidgetParameter.MENU_LAYOUT_SECTION_WIDGET_PARAMETER);
 
 		setProjectId(projectId);
@@ -242,6 +304,10 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 		setType(type);
 		setTitle(title);
 		setWidth(width);
+		setDisplayAddResponse(displayAddResponse);
+		setRemoveProfileSelector(removeProfileSelector);
+		setOverdueType(overdueType);
+		setSpecificColumnName(specificColumnName);
 		setScopeModelId(scopeModelId);
 		setWorkflowWidgetId(workflowWidgetId);
 		setWorkflowSummaryId(workflowSummaryId);

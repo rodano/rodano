@@ -133,59 +133,73 @@ public class MenuLayoutSectionWidgetRecord extends UpdatableRecordImpl<MenuLayou
 	}
 
 	/**
+	 * Setter for <code>menu_layout_section_widget.text_after</code>.
+	 */
+	public void setTextAfter(String value) {
+		set(8, value);
+	}
+
+	/**
+	 * Getter for <code>menu_layout_section_widget.text_after</code>.
+	 */
+	public String getTextAfter() {
+		return (String) get(8);
+	}
+
+	/**
 	 * Setter for <code>menu_layout_section_widget.required_feature_id</code>.
 	 */
 	public void setRequiredFeatureId(UUID value) {
-		set(8, value);
+		set(9, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget.required_feature_id</code>.
 	 */
 	public UUID getRequiredFeatureId() {
-		return (UUID) get(8);
+		return (UUID) get(9);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget.right_entity</code>.
 	 */
 	public void setRightEntity(String value) {
-		set(9, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget.right_entity</code>.
 	 */
 	public String getRightEntity() {
-		return (String) get(9);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget.right_value</code>.
 	 */
 	public void setRightValue(String value) {
-		set(10, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget.right_value</code>.
 	 */
 	public String getRightValue() {
-		return (String) get(10);
+		return (String) get(11);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget.right_target_id</code>.
 	 */
 	public void setRightTargetId(UUID value) {
-		set(11, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget.right_target_id</code>.
 	 */
 	public UUID getRightTargetId() {
-		return (UUID) get(11);
+		return (UUID) get(12);
 	}
 
 	// -------------------------------------------------------------------------
@@ -211,7 +225,7 @@ public class MenuLayoutSectionWidgetRecord extends UpdatableRecordImpl<MenuLayou
 	/**
 	 * Create a detached, initialised MenuLayoutSectionWidgetRecord
 	 */
-	public MenuLayoutSectionWidgetRecord(UUID menuWidgetId, UUID projectId, UUID menuId, UUID menuSectionId, Integer widgetOrder, String type, String width, String textBefore, UUID requiredFeatureId, String rightEntity, String rightValue, UUID rightTargetId) {
+	public MenuLayoutSectionWidgetRecord(UUID menuWidgetId, UUID projectId, UUID menuId, UUID menuSectionId, Integer widgetOrder, String type, String width, String textBefore, String textAfter, UUID requiredFeatureId, String rightEntity, String rightValue, UUID rightTargetId) {
 		super(MenuLayoutSectionWidget.MENU_LAYOUT_SECTION_WIDGET);
 
 		setMenuWidgetId(menuWidgetId);
@@ -222,6 +236,7 @@ public class MenuLayoutSectionWidgetRecord extends UpdatableRecordImpl<MenuLayou
 		setType(type);
 		setWidth(width);
 		setTextBefore(textBefore);
+		setTextAfter(textAfter);
 		setRequiredFeatureId(requiredFeatureId);
 		setRightEntity(rightEntity);
 		setRightValue(rightValue);

@@ -42,8 +42,8 @@ export class LanguageService {
 		return translations[defaultLang] || '';
 	}
 
-	getLabel(entity: {id: string; shortname?: Record<string, string>}): string {
-		const name = this.getDefaultTranslation(entity.shortname) || entity.id;
+	getLabel(entity: {id: string; shortname?: Record<string, string>; title?: Record<string, string>}): string {
+		const name = this.getDefaultTranslation(entity.shortname) || this.getDefaultTranslation(entity.title) || entity.id;
 		return `${name} (${entity.id})`;
 	}
 

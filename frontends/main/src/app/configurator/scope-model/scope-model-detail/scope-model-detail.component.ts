@@ -21,6 +21,7 @@ import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.componen
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 import {FormModelManagerService} from '../../services/manager/form-model-manager.service';
+import {LayoutEditorComponent} from '../../shared/layout-editor/layout-editor.component';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -33,7 +34,8 @@ interface WorkflowStateGroup {
 	standalone: true,
 	templateUrl: './scope-model-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		LayoutEditorComponent]
 })
 export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeModel, ScopeModelManagerService> {
 	@Input() override entity!: ScopeModel;
@@ -48,6 +50,8 @@ export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeM
 	@Output() scopeModelDeleted = this.entityDeleted;
 	@Output() switchToEventModels = new EventEmitter<void>();
 	@Output() switchToEventGroups = new EventEmitter<void>();
+
+	activeTab: 'general' | 'layout' = 'general';
 
 	constructor(
 		scopeModelManager: ScopeModelManagerService,

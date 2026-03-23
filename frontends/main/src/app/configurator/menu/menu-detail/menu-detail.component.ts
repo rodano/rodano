@@ -14,13 +14,15 @@ import {MenuConfig} from '@core/model/menu-config';
 import {MenuManagerService} from '../../services/manager/menu-manager.service';
 import {MenuDialogService} from '../../services/dialogs/menu-dialog.service';
 import {ScopeModelManagerService} from '../../services/manager/scope-model-manager.service';
+import {LayoutEditorComponent} from '../../shared/layout-editor/layout-editor.component';
 
 @Component({
 	selector: 'app-menu-detail',
 	standalone: true,
 	templateUrl: './menu-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		LayoutEditorComponent]
 })
 export class MenuDetailComponent extends BaseManagerDetailComponent<MenuConfig, MenuManagerService> {
 	@Input() override entity!: MenuConfig;
@@ -34,6 +36,8 @@ export class MenuDetailComponent extends BaseManagerDetailComponent<MenuConfig, 
 	@Input() set allMenus(v: MenuConfig[]) {this.allEntities = v;}
 
 	protected readonly Object = Object;
+
+	activeTab: 'general' | 'layout' = 'general';
 
 	constructor(
 		private menuManager: MenuManagerService,

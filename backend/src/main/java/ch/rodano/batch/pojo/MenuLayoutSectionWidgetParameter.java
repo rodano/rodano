@@ -8,6 +8,12 @@ public class MenuLayoutSectionWidgetParameter {
 	private String type;
 	private String title;
 	private Integer width;
+
+	private Boolean displayAddResponse;
+	private Boolean removeProfileSelector;
+	private String overdueType;
+	private String specificColumnName;
+
 	private String workflow;
 	private String summary;
 	private String chart;
@@ -36,6 +42,38 @@ public class MenuLayoutSectionWidgetParameter {
 
 	public void setWidth(final Integer width) {
 		this.width = width;
+	}
+
+	public Boolean getDisplayAddResponse() {
+		return displayAddResponse;
+	}
+
+	public void setDisplayAddResponse(final Boolean displayAddResponse) {
+		this.displayAddResponse = displayAddResponse;
+	}
+
+	public Boolean getRemoveProfileSelector() {
+		return removeProfileSelector;
+	}
+
+	public void setRemoveProfileSelector(final Boolean removeProfileSelector) {
+		this.removeProfileSelector = removeProfileSelector;
+	}
+
+	public String getOverdueType() {
+		return overdueType;
+	}
+
+	public void setOverdueType(final String overdueType) {
+		this.overdueType = overdueType;
+	}
+
+	public String getSpecificColumnName() {
+		return specificColumnName;
+	}
+
+	public void setSpecificColumnName(final String specificColumnName) {
+		this.specificColumnName = specificColumnName;
 	}
 
 	public String getWorkflow() {
@@ -84,6 +122,10 @@ public class MenuLayoutSectionWidgetParameter {
 			"type='" + type + '\'' +
 			", title='" + title + '\'' +
 			", width=" + width +
+			", displayAddResponse=" + displayAddResponse +
+			", removeProfileSelector=" + removeProfileSelector +
+			", overdueType='" + overdueType + '\'' +
+			", specificColumnName='" + specificColumnName + '\'' +
 			", workflow='" + workflow + '\'' +
 			", summary='" + summary + '\'' +
 			", chart='" + chart + '\'' +

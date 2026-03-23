@@ -1,0 +1,169 @@
+<div class="layout-editor">
+	<div class="layout-toolbar">
+		<span class="layout-toolbar-title">Layout Editor</span>
+		<span class="toolbar-spacer"></span>
+		@if (modified) {
+			<button type="button" class="btn-secondary" (click)="onDiscard()">
+				<mat-icon>undo</mat-icon>
+				Discard
+			</button>
+			<button type="button" class="btn-primary" [disabled]="saving" (click)="onSave()">
+				<mat-icon>save</mat-icon>
+				{{ saving ? 'Saving...' : 'Save Layout' }}
+			</button>
+		}
+	</div>
+
+	<div class="widget-palette">
+		<span class="palette-hint">Drag and drop widgets into the area below, or click a section first then click a widget</span>
+		<div class="palette-chips">
+			@for (type of widgetTypes; track type.type) {
+				<div class="palette-chip"
+									[class.disabled]="!selectedSection"
+									(click)="selectedSection && addWidget(type)"
+									[matTooltip]="selectedSection ? 'Add to selected section' : 'Select a section first'">
+					{{ type.label }}
+				</div>
+			}
+		</div>
+	</div>
+
+	@if (loading) {
+		<div class="layout-loading">
+			<mat-icon>hourglass_empty</mat-icon>
+			<span>Loading layout...</span>
+		</div>
+	} @else {
+		<div class="layout-body">
+
+			<div class="sections-panel">
+				<div class="sections-header">
+					<span>Sections</span>
+					<button type="button" class="btn-add-item" (click)="addSection()">
+						<mat-icon>add</mat-icon>
+						Add section
+					</button>
+				</div>
+
+				<div class="sections-list"
+									cdkDropList
+									(cdkDropListDropped)="dropSection($event)">
+					@for (section of layout.sections; track section.id) {
+						<div class="section-item"
+											cdkDrag
+											cdkDragLockAxis="y"
+											[class.selected]="selectedSection === section"
+											(click)="selectSection(section)">
+							<div class="section-drag-handle" cdkDragHandle>
+								<mat-icon>drag_indicator</mat-icon>
+							</div>
+							<span class="section-item-label">{{ getSectionLabel(section) }}</span>
+
+							<div class="item-badges">
+								@if (section.requiredFeatureId) {
+									<div class="badge theme-feature"
+														[matTooltip]="getFeatureTooltip(section.requiredFeatureId)">
+										<mat-icon>star</mat-icon>
+									</div>
+								}
+								@if (section.rightEntity) {
+									<div class="badge" [ngClass]="getRightThemeClass(section.rightEntity)"
+														[matTooltip]="getRightTooltip(section.rightEntity, section.rightValue, section.rightTargetId)">
+										<mat-icon>{{ getRightIcon(section.rightEntity) }}</mat-icon>
+									</div>
+								}
+							</div>
+
+							<button type="button" class="btn-icon-xs"
+															(click)="openSectionConfig(section, $event)"
+															matTooltip="Configure section">
+								<mat-icon>settings</mat-icon>
+							</button>
+							<button type="button" class="btn-icon-xs danger"
+															(click)="$event.stopPropagation(); deleteSection(section)"
+															matTooltip="Delete section">
+								<mat-icon>close</mat-icon>
+							</button>
+						</div>
+					}
+
+					@if ((layout.sections ?? []).length === 0) {
+						<div class="sections-empty">No sections. Add one to get started.</div>
+					}
+				</div>
+			</div>
+
+			<div class="widgets-panel">
+				@if (!selectedSection) {
+					<div class="widgets-empty-hint">
+						<mat-icon>arrow_back</mat-icon>
+						<span>Select a section to manage its widgets</span>
+					</div>
+				} @else {
+					<div class="widgets-section-header">
+						<input class="section-label-input"
+													[value]="getSectionLabel(selectedSection)"
+													(change)="selectedSection!.label = {en: $any($event.target).value}; modified = true"
+													placeholder="Section label" />
+					</div>
+
+					<div class="widgets-list"
+										cdkDropList
+										(cdkDropListDropped)="dropWidget($event)">
+						@for (widget of selectedSection.widgets; track $index) {
+							<div class="widget-item" cdkDrag cdkDragLockAxis="y">
+								<div class="widget-drag-handle" cdkDragHandle>
+									<mat-icon>drag_indicator</mat-icon>
+								</div>
+								<div class="widget-info">
+									<span class="widget-type-label">{{ getWidgetLabel(widget) }}</span>
+									@if (getWidgetParamSummary(widget)) {
+										<span class="widget-param-summary">{{ getWidgetParamSummary(widget) }}</span>
+									}
+								</div>
+
+								<div class="item-badges">
+									@if (widget.requiredFeatureId) {
+										<div class="badge theme-feature"
+															[matTooltip]="getFeatureTooltip(widget.requiredFeatureId)">
+											<mat-icon>star</mat-icon>
+										</div>
+									}
+									@if (widget.rightEntity) {
+										<div class="badge" [ngClass]="getRightThemeClass(widget.rightEntity)"
+															[matTooltip]="getRightTooltip(widget.rightEntity, widget.rightValue, widget.rightTargetId)">
+											<mat-icon>{{ getRightIcon(widget.rightEntity) }}</mat-icon>
+										</div>
+									}
+								</div>
+
+								@if (widget.width === 'HALF') {
+									<div class="badge theme-main" matTooltip="Half width">
+										<mat-icon>width_normal</mat-icon>
+									</div>
+								}
+
+								<button type="button" class="btn-icon-xs"
+																(click)="openWidgetConfig(widget)"
+																matTooltip="Configure widget">
+									<mat-icon>settings</mat-icon>
+								</button>
+								<button type="button" class="btn-icon-xs danger"
+																(click)="deleteWidget(widget)"
+																matTooltip="Remove widget">
+									<mat-icon>close</mat-icon>
+								</button>
+							</div>
+						}
+
+						@if ((selectedSection.widgets ?? []).length === 0) {
+							<div class="widgets-empty">
+								No widgets. Click a widget type above to add one.
+							</div>
+						}
+					</div>
+				}
+			</div>
+		</div>
+	}
+</div>

@@ -104,6 +104,29 @@ public class MenuLayoutSectionWidgetParameter extends TableImpl<MenuLayoutSectio
 	public final TableField<MenuLayoutSectionWidgetParameterRecord, Integer> WIDTH = createField(DSL.name("width"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
 	/**
+	 * The column
+	 * <code>menu_layout_section_widget_parameter.display_add_response</code>.
+	 */
+	public final TableField<MenuLayoutSectionWidgetParameterRecord, Boolean> DISPLAY_ADD_RESPONSE = createField(DSL.name("display_add_response"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BOOLEAN)), this, "");
+
+	/**
+	 * The column
+	 * <code>menu_layout_section_widget_parameter.remove_profile_selector</code>.
+	 */
+	public final TableField<MenuLayoutSectionWidgetParameterRecord, Boolean> REMOVE_PROFILE_SELECTOR = createField(DSL.name("remove_profile_selector"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BOOLEAN)), this, "");
+
+	/**
+	 * The column <code>menu_layout_section_widget_parameter.overdue_type</code>.
+	 */
+	public final TableField<MenuLayoutSectionWidgetParameterRecord, String> OVERDUE_TYPE = createField(DSL.name("overdue_type"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
+	 * The column
+	 * <code>menu_layout_section_widget_parameter.specific_column_name</code>.
+	 */
+	public final TableField<MenuLayoutSectionWidgetParameterRecord, String> SPECIFIC_COLUMN_NAME = createField(DSL.name("specific_column_name"), SQLDataType.VARCHAR(128).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
+	/**
 	 * The column <code>menu_layout_section_widget_parameter.scope_model_id</code>.
 	 */
 	public final TableField<MenuLayoutSectionWidgetParameterRecord, UUID> SCOPE_MODEL_ID = createField(DSL.name("scope_model_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");

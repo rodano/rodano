@@ -30,7 +30,7 @@
 				<div class="form-field">
 					<label>Scope Model</label>
 					<mat-select class="settings-select"
-													[value]="contextItems[0] ?? ''"
+													[value]="contextItems[0]"
 													(change)="contextItems = [$any($event.target).value]">
 						<mat-option [value]="">None</mat-option>
 						@for (sm of data.scopeModels; track sm.scopeModelId) {

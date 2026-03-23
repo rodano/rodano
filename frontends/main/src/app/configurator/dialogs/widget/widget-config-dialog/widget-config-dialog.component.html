@@ -1,0 +1,157 @@
+<h2 class="dialog-title">Configure {{ data.typeDef.label }}</h2>
+
+<div class="dialog-content">
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-field">
+			<label>Width</label>
+			<mat-select formControlName="width">
+				@for (opt of WIDTH_OPTIONS; track opt.value) {
+					<mat-option [value]="opt.value">{{ opt.label }}</mat-option>
+				}
+			</mat-select>
+		</div>
+
+		<div class="form-field">
+			<label>Text Before</label>
+			<textarea formControlName="textBefore" rows="3"
+													placeholder="Optional HTML content shown before the widget"></textarea>
+			<span class="hint">Supports HTML markup</span>
+		</div>
+
+		<div class="form-field">
+			<label>Text After</label>
+			<textarea formControlName="textAfter" rows="3"
+													placeholder="Optional HTML content shown after the widget"></textarea>
+			<span class="hint">Supports HTML markup</span>
+		</div>
+
+		<div class="form-field">
+			<label>Required Feature</label>
+			<mat-select formControlName="requiredFeatureId" placeholder="None">
+				<mat-option value="">None</mat-option>
+				@for (feature of availableFeatures; track feature.featureId) {
+					<mat-option [value]="feature.featureId">
+						{{ languageService.getLabel(feature) }}
+					</mat-option>
+				}
+			</mat-select>
+		</div>
+
+		<div class="form-field">
+			<label>Required Right</label>
+			<div class="inline-fields">
+				<mat-select formControlName="rightEntity" placeholder="Entity">
+					<mat-option [value]="">None</mat-option>
+					<mat-option value="SCOPE_MODEL">Scope Model</mat-option>
+					<mat-option value="EVENT_MODEL">Event Model</mat-option>
+					<mat-option value="DATASET_MODEL">Dataset Model</mat-option>
+					<mat-option value="FORM_MODEL">Form Model</mat-option>
+					<mat-option value="PROFILE">Profile</mat-option>
+				</mat-select>
+
+				<mat-select formControlName="rightValue" placeholder="Right">
+					<mat-option [value]="">None</mat-option>
+					<mat-option value="READ">Read</mat-option>
+					<mat-option value="WRITE">Write</mat-option>
+				</mat-select>
+
+				<mat-select formControlName="rightTargetId" placeholder="Target">
+					<mat-option [value]="">None</mat-option>
+					@for (opt of targetOptions; track opt.id) {
+						<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
+					}
+				</mat-select>
+			</div>
+		</div>
+
+		@if (data.typeDef.parameters.length > 0) {
+			<div class="form-section">
+				<h3>Parameters</h3>
+				@for (param of data.typeDef.parameters; track param.id) {
+					<div class="form-field" [formGroup]="getParamForm(param.id)">
+						<label>{{ param.label }}</label>
+
+						@if (param.kind === 'boolean') {
+							<mat-checkbox formControlName="value">{{ param.label }}</mat-checkbox>
+						} @else if (param.kind === 'number') {
+							<input type="number" formControlName="value" [placeholder]="param.label">
+						} @else if (param.kind === 'chart') {
+							<mat-select formControlName="value" placeholder="Select Chart">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (chart of data.charts; track chart.chartId) {
+									<mat-option [value]="chart.chartId">
+										{{ languageService.getLabel(chart) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else if (param.kind === 'workflowWidget') {
+							<mat-select formControlName="value" placeholder="Select Workflow Widget">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (ww of data.workflowWidgets; track ww.workflowWidgetId) {
+									<mat-option [value]="ww.workflowWidgetId">
+										{{ languageService.getLabel(ww) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else if (param.kind === 'workflowSummary') {
+							<mat-select formControlName="value" placeholder="Select Workflow Summary">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (ws of data.workflowSummaries; track ws.workflowSummaryId) {
+									<mat-option [value]="ws.workflowSummaryId">
+										{{ languageService.getLabel(ws) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else if (param.kind === 'resourceCategory') {
+							<mat-select formControlName="value" placeholder="Select Category">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (rc of data.resourceCategories; track rc.categoryId) {
+									<mat-option [value]="rc.categoryId">
+										{{ languageService.getLabel(rc) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else if (param.kind === 'scopeModel') {
+							<mat-select formControlName="value" placeholder="Select Scope Model">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (sm of data.scopeModels; track sm.scopeModelId) {
+									<mat-option [value]="sm.scopeModelId">
+										{{ languageService.getLabel(sm) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else if (param.kind === 'eventModel') {
+							<mat-select formControlName="value" placeholder="Select Event Model">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (em of data.eventModels; track em.eventModelId) {
+									<mat-option [value]="em.eventModelId">
+										{{ languageService.getLabel(em) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else if (param.kind === 'formModel') {
+							<mat-select formControlName="value" placeholder="Select Form Model">
+								<mat-option [value]="">-- None --</mat-option>
+								@for (fm of data.formModels; track fm.formModelId) {
+									<mat-option [value]="fm.formModelId">
+										{{ languageService.getLabel(fm) }}
+									</mat-option>
+								}
+							</mat-select>
+						} @else {
+							<input type="text" formControlName="value" [placeholder]="param.label">
+						}
+					</div>
+				}
+			</div>
+		}
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

@@ -15,7 +15,7 @@ public class CacheConfig {
 		return new ConcurrentMapCacheManager(
 			"projects", "project", "draftVersion", "activeVersion", "projectVersions", "projectVersion",
 			"configSnapshot",
-			"scopeModels", "scopeModel", "scopeModelRights",
+			"scopeModels", "scopeModel", "scopeModelRights", "scopeModelLayout",
 			"datasetModels", "datasetModel", "datasetModelRights",
 			"eventModels", "eventModel", "eventModelRights",
 			"eventGroups", "eventGroup", "eventGroupsByScopeModel",
@@ -35,7 +35,7 @@ public class CacheConfig {
 			"ruleDefinitionProperties", "ruleDefinitionProperty",
 			"ruleDefinitionActions", "ruleDefinitionAction",
 			"crons", "cron",
-			"menus", "menu", "menuGrants",
+			"menus", "menu", "menuGrants", "menuLayout",
 			"rules"
 		);
 	}

@@ -102,6 +102,11 @@ public class MenuLayoutSectionWidget extends TableImpl<MenuLayoutSectionWidgetRe
 	public final TableField<MenuLayoutSectionWidgetRecord, String> TEXT_BEFORE = createField(DSL.name("text_before"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	/**
+	 * The column <code>menu_layout_section_widget.text_after</code>.
+	 */
+	public final TableField<MenuLayoutSectionWidgetRecord, String> TEXT_AFTER = createField(DSL.name("text_after"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+
+	/**
 	 * The column <code>menu_layout_section_widget.required_feature_id</code>.
 	 */
 	public final TableField<MenuLayoutSectionWidgetRecord, UUID> REQUIRED_FEATURE_ID = createField(DSL.name("required_feature_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");

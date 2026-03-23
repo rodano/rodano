@@ -10,251 +10,268 @@
 	</div>
 </div>
 
-@if (menu) {
-	<div class="detail-content">
-		<div class="settings-section">
-			<h3>Basic Information</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Code"
-																						[modified]="isFieldModified('id')">
-					{{ menu.id }}
-				</app-setting-item>
+<div class="detail-tabs">
+	<button class="detail-tab" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">General</button>
+	<button class="detail-tab" [class.active]="activeTab === 'layout'" (click)="activeTab = 'layout'">Layout</button>
+</div>
 
-				<app-setting-item label="Order By"
-																						[modified]="isFieldModified('orderBy')"
-																						[notConfigured]="menu.orderBy === null || menu.orderBy === undefined">
-					@if (menu.orderBy === null || menu.orderBy === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ menu.orderBy }}
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Public"
-																						[modified]="isFieldModified('public')">
-					@if (menu.public) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Home Page"
-																						[modified]="isFieldModified('homePage')">
-					@if (menu.homePage) {
-						<span class="status-badge second">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Short Name"
-																						[translated]="true"
-																						[modified]="isFieldModified('shortname')"
-																						[notConfigured]="!languageService.getTranslatedValue(menu.shortname)">
-					@if (!languageService.getTranslatedValue(menu.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(menu.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</app-setting-item>
-
-				<app-setting-item label="Long Name"
-																						[translated]="true"
-																						[modified]="isFieldModified('longname')"
-																						[notConfigured]="!languageService.getTranslatedValue(menu.longname)"
-																						[fullWidth]="true">
-					@if (!languageService.getTranslatedValue(menu.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(menu.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</app-setting-item>
-
-				<app-setting-item label="Description"
-																						[translated]="true"
-																						[modified]="isFieldModified('description')"
-																						[notConfigured]="!languageService.getTranslatedValue(menu.description)"
-																						[fullWidth]="true">
-					@if (!languageService.getTranslatedValue(menu.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(menu.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditBasicInfo()">
-				<mat-icon>edit</mat-icon>
-				Edit Basic Information
-			</button>
-		</div>
-
-		<div class="settings-section">
-			<h3>Parent Menu</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Level">
-					@switch (menuLevel) {
-						@case ('standalone') {
-							<span class="status-badge standalone">Standalone</span>
-						}
-						@case ('root') {
-							<span class="status-badge root">Root Level</span>
-						}
-						@case ('intermediate') {
-							<span class="status-badge intermediate">Intermediate Level</span>
-						}
-						@case ('leaf') {
-							<span class="status-badge leaf">Leaf Level</span>
-						}
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Parent"
-																						[modified]="isFieldModified('parentMenuId')"
-																						[notConfigured]="!entity.parentMenuId">
-					@if (!entity.parentMenuId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-menu">
-							<mat-icon class="resource-icon">menu</mat-icon>
-							<span class="language-name">{{ getMenuLabel(entity.parentMenuId) }}</span>
-						</div>
-					}
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditParent()">
-				<mat-icon>edit</mat-icon>
-				Set Parent Menu
-			</button>
-		</div>
-
-		<div class="settings-section">
-			<h3>Submenus</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Submenus"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (submenus.length > 0) {
-							<div class="chip-container">
-								@for (submenu of submenus; track submenu.menuId; let i = $index) {
-									<div class="chip theme-menu">
-										<span class="detail-code" style="font-size: 0.7rem; margin-right: 0.25rem">{{ i + 1 }}</span>
-										<mat-icon class="resource-icon">subdirectory_arrow_right</mat-icon>
-										<span class="language-name">{{ languageService.getLabel(submenu) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No submenus configured</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-			</div>
-			@if (submenus.length > 0) {
-				<button class="btn-edit" (click)="onOrderSubmenus()">
-					<mat-icon>edit</mat-icon>
-					Order Submenus
-				</button>
-			}
-		</div>
-
-		<div class="settings-section">
-			<h3>Action</h3>
-			@if (entity.action) {
+@if (activeTab === 'general') {
+	@if (menu) {
+		<div class="detail-content">
+			<div class="settings-section">
+				<h3>Basic Information</h3>
 				<div class="settings-grid">
-					<app-setting-item label="Action Page"
-																							[modified]="isActionPageModified"
-																							[notConfigured]="!entity.action.page">
-						@if (!entity.action.page) {
+					<app-setting-item label="Code"
+																							[modified]="isFieldModified('id')">
+						{{ menu.id }}
+					</app-setting-item>
+
+					<app-setting-item label="Order By"
+																							[modified]="isFieldModified('orderBy')"
+																							[notConfigured]="menu.orderBy === null || menu.orderBy === undefined">
+						@if (menu.orderBy === null || menu.orderBy === undefined) {
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							{{ entity.action.page }}
+							{{ menu.orderBy }}
 						}
 					</app-setting-item>
 
-					<app-setting-item label="Action Context"
-																							[modified]="isActionContextModified"
+					<app-setting-item label="Public"
+																							[modified]="isFieldModified('public')">
+						@if (menu.public) {
+							<span class="status-badge first">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Home Page"
+																							[modified]="isFieldModified('homePage')">
+						@if (menu.homePage) {
+							<span class="status-badge second">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Short Name"
+																							[translated]="true"
+																							[modified]="isFieldModified('shortname')"
+																							[notConfigured]="!languageService.getTranslatedValue(menu.shortname)">
+						@if (!languageService.getTranslatedValue(menu.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(menu.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
+
+					<app-setting-item label="Long Name"
+																							[translated]="true"
+																							[modified]="isFieldModified('longname')"
+																							[notConfigured]="!languageService.getTranslatedValue(menu.longname)"
+																							[fullWidth]="true">
+						@if (!languageService.getTranslatedValue(menu.longname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(menu.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
+
+					<app-setting-item label="Description"
+																							[translated]="true"
+																							[modified]="isFieldModified('description')"
+																							[notConfigured]="!languageService.getTranslatedValue(menu.description)"
+																							[fullWidth]="true">
+						@if (!languageService.getTranslatedValue(menu.description)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(menu.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditBasicInfo()">
+					<mat-icon>edit</mat-icon>
+					Edit Basic Information
+				</button>
+			</div>
+
+			<div class="settings-section">
+				<h3>Parent Menu</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Level">
+						@switch (menuLevel) {
+							@case ('standalone') {
+								<span class="status-badge standalone">Standalone</span>
+							}
+							@case ('root') {
+								<span class="status-badge root">Root Level</span>
+							}
+							@case ('intermediate') {
+								<span class="status-badge intermediate">Intermediate Level</span>
+							}
+							@case ('leaf') {
+								<span class="status-badge leaf">Leaf Level</span>
+							}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Parent"
+																							[modified]="isFieldModified('parentMenuId')"
+																							[notConfigured]="!entity.parentMenuId">
+						@if (!entity.parentMenuId) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							<div class="chip theme-menu">
+								<mat-icon class="resource-icon">menu</mat-icon>
+								<span class="language-name">{{ getMenuLabel(entity.parentMenuId) }}</span>
+							</div>
+						}
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditParent()">
+					<mat-icon>edit</mat-icon>
+					Set Parent Menu
+				</button>
+			</div>
+
+			<div class="settings-section">
+				<h3>Submenus</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Submenus"
 																							[fullWidth]="true"
 																							[plain]="true">
 						<div class="relationship-box">
-							@if (entity.action.context && entity.action.context.length > 0) {
+							@if (submenus.length > 0) {
 								<div class="chip-container">
-									@for (item of entity.action.context; track item) {
-										@if (entity.action.page === 'scopes') {
-											<div class="chip theme-scope-model">
-												<mat-icon class="resource-icon">account_tree</mat-icon>
-												<span class="language-name">{{ getContextLabel(item) }}</span>
-											</div>
-										} @else {
-											<div class="chip theme-main">
-												<span class="language-name">{{ item }}</span>
-											</div>
-										}
+									@for (submenu of submenus; track submenu.menuId; let i = $index) {
+										<div class="chip theme-menu">
+											<span class="detail-code" style="font-size: 0.7rem; margin-right: 0.25rem">{{ i + 1 }}</span>
+											<mat-icon class="resource-icon">subdirectory_arrow_right</mat-icon>
+											<span class="language-name">{{ languageService.getLabel(submenu) }}</span>
+										</div>
 									}
 								</div>
 							} @else {
 								<div class="empty-message-centered">
 									<mat-icon class="warning-icon">report</mat-icon>
-									<span>No context configured</span>
+									<span>No submenus configured</span>
 								</div>
 							}
 						</div>
 					</app-setting-item>
+				</div>
+				@if (submenus.length > 0) {
+					<button class="btn-edit" (click)="onOrderSubmenus()">
+						<mat-icon>edit</mat-icon>
+						Order Submenus
+					</button>
+				}
+			</div>
 
-					<app-setting-item label="Action Parameters"
-																							[modified]="isActionParametersModified"
-																							[fullWidth]="true"
-																							[plain]="true">
-						<div class="relationship-box">
-							@if (entity.action.parameters && Object.keys(entity.action.parameters).length > 0) {
-								<table class="ranges-detail-table">
-									<thead>
-									<tr>
-										<th>Key</th>
-										<th>Value</th>
-									</tr>
-									</thead>
-									<tbody>
-										@for (entry of objectEntries(entity.action.parameters); track entry[0]) {
-											<tr>
-												<td><span class="detail-code theme-menu">{{ entry[0] }}</span></td>
-												<td>{{ entry[1] }}</td>
-											</tr>
-										}
-									</tbody>
-								</table>
+			<div class="settings-section">
+				<h3>Action</h3>
+				@if (entity.action) {
+					<div class="settings-grid">
+						<app-setting-item label="Action Page"
+																								[modified]="isActionPageModified"
+																								[notConfigured]="!entity.action.page">
+							@if (!entity.action.page) {
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>Not configured</span>
 							} @else {
-								<div class="empty-message-centered">
-									<mat-icon class="warning-icon">report</mat-icon>
-									<span>No parameters configured</span>
-								</div>
+								{{ entity.action.page }}
 							}
-						</div>
-					</app-setting-item>
-				</div>
-			} @else {
-				<div class="relationship-box">
-					<div class="empty-message-centered">
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>No action configured</span>
-					</div>
-				</div>
-			}
-			<button class="btn-edit" style="margin-top: 1rem" (click)="onEditAction()">
-				<mat-icon>edit</mat-icon>
-				Edit Action
-			</button>
-		</div>
+						</app-setting-item>
 
-		<app-danger-zone
-			[title]="'Delete Menu'"
-			[message]="'Deleting this menu is permanent and cannot be undone.'"
-			[buttonLabel]="'Delete'"
-			(confirmed)="onDelete()">
-		</app-danger-zone>
+						<app-setting-item label="Action Context"
+																								[modified]="isActionContextModified"
+																								[fullWidth]="true"
+																								[plain]="true">
+							<div class="relationship-box">
+								@if (entity.action.context && entity.action.context.length > 0) {
+									<div class="chip-container">
+										@for (item of entity.action.context; track item) {
+											@if (entity.action.page === 'scopes') {
+												<div class="chip theme-scope-model">
+													<mat-icon class="resource-icon">account_tree</mat-icon>
+													<span class="language-name">{{ getContextLabel(item) }}</span>
+												</div>
+											} @else {
+												<div class="chip theme-main">
+													<span class="language-name">{{ item }}</span>
+												</div>
+											}
+										}
+									</div>
+								} @else {
+									<div class="empty-message-centered">
+										<mat-icon class="warning-icon">report</mat-icon>
+										<span>No context configured</span>
+									</div>
+								}
+							</div>
+						</app-setting-item>
+
+						<app-setting-item label="Action Parameters"
+																								[modified]="isActionParametersModified"
+																								[fullWidth]="true"
+																								[plain]="true">
+							<div class="relationship-box">
+								@if (entity.action.parameters && Object.keys(entity.action.parameters).length > 0) {
+									<table class="ranges-detail-table">
+										<thead>
+										<tr>
+											<th>Key</th>
+											<th>Value</th>
+										</tr>
+										</thead>
+										<tbody>
+											@for (entry of objectEntries(entity.action.parameters); track entry[0]) {
+												<tr>
+													<td><span class="detail-code theme-menu">{{ entry[0] }}</span></td>
+													<td>{{ entry[1] }}</td>
+												</tr>
+											}
+										</tbody>
+									</table>
+								} @else {
+									<div class="empty-message-centered">
+										<mat-icon class="warning-icon">report</mat-icon>
+										<span>No parameters configured</span>
+									</div>
+								}
+							</div>
+						</app-setting-item>
+					</div>
+				} @else {
+					<div class="relationship-box">
+						<div class="empty-message-centered">
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>No action configured</span>
+						</div>
+					</div>
+				}
+				<button class="btn-edit" style="margin-top: 1rem" (click)="onEditAction()">
+					<mat-icon>edit</mat-icon>
+					Edit Action
+				</button>
+			</div>
+
+			<app-danger-zone
+				[title]="'Delete Menu'"
+				[message]="'Deleting this menu is permanent and cannot be undone.'"
+				[buttonLabel]="'Delete'"
+				(confirmed)="onDelete()">
+			</app-danger-zone>
+		</div>
+	}
+}
+
+@if (activeTab === 'layout') {
+	<div class="detail-content" style="padding: 0; overflow: hidden; flex: 1; display: flex; flex-direction: column;">
+		<app-layout-editor
+			[projectId]="projectId"
+			[entityPath]="'menus/' + menu.menuId"
+			(closed)="activeTab = 'general'">
+		</app-layout-editor>
 	</div>
 }

@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.MenuConfigDTO;
+import ch.rodano.api.config.WidgetLayoutDTO;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.MenuConfigService;
+import ch.rodano.core.services.bll.configurator.MenuLayoutService;
 
 @RestController
 @RequestMapping("/superuser/configurator/projects/{projectId}/config")
@@ -24,9 +26,11 @@ import ch.rodano.core.services.bll.configurator.MenuConfigService;
 public class MenuConfigController {
 
 	private final MenuConfigService menuConfigService;
+	private final MenuLayoutService menuLayoutService;
 
-	public MenuConfigController(final MenuConfigService menuConfigService) {
+	public MenuConfigController(final MenuConfigService menuConfigService, final MenuLayoutService menuLayoutService) {
 		this.menuConfigService = menuConfigService;
+		this.menuLayoutService = menuLayoutService;
 	}
 
 	/**
@@ -88,5 +92,23 @@ public class MenuConfigController {
 	) {
 		menuConfigService.deleteMenu(projectId, menuId);
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/menus/{menuId}/layout")
+	public ResponseEntity<WidgetLayoutDTO> getLayout(
+		@PathVariable final UUID projectId,
+		@PathVariable final UUID menuId
+	) {
+		return ResponseEntity.ok(menuLayoutService.getLayout(projectId, menuId));
+	}
+
+	@PutMapping("/menus/{menuId}/layout")
+	@SkipProjectAccessCheck
+	public ResponseEntity<WidgetLayoutDTO> saveLayout(
+		@PathVariable final UUID projectId,
+		@PathVariable final UUID menuId,
+		@RequestBody final WidgetLayoutDTO dto
+	) {
+		return ResponseEntity.ok(menuLayoutService.saveLayout(projectId, menuId, dto));
 	}
 }

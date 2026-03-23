@@ -1,0 +1,82 @@
+<h2 class="dialog-title">Configure Section</h2>
+
+<div class="dialog-content">
+	<form [formGroup]="form" class="settings-form">
+		<div class="form-field">
+			<label>Code *</label>
+			<input type="text" formControlName="id" placeholder="SECTION_CODE"
+										(input)="onCodeInput($event, form)" style="text-transform: uppercase;">
+			<span class="hint">Uppercase letters, numbers and underscores</span>
+			@if (form.get('id')?.hasError('required') && form.get('id')?.touched) {
+				<span class="error-message">Code is required</span>
+			}
+		</div>
+
+		<div class="form-section">
+			<h3>Translations</h3>
+			<mat-tab-group>
+				@for (lang of availableLanguages; track lang.languageCode) {
+					@if (lang.languageCode) {
+						<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+							<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+								<div class="form-field">
+									<label>Label {{ lang.isDefault ? '*' : '' }}</label>
+									<input type="text" formControlName="label" placeholder="Section label">
+								</div>
+							</div>
+						</mat-tab>
+					}
+				}
+			</mat-tab-group>
+		</div>
+
+		<div class="form-field">
+			<label>Required Feature</label>
+			<mat-select formControlName="requiredFeatureId" placeholder="None">
+				<mat-option value="">None</mat-option>
+				@for (feature of availableFeatures; track feature.featureId) {
+					<mat-option [value]="feature.featureId">
+						{{ languageService.getLabel(feature) }}
+					</mat-option>
+				}
+			</mat-select>
+			<span class="hint">Feature required to view this section</span>
+		</div>
+
+		<div class="form-field">
+			<label>Required Right</label>
+			<div class="inline-fields">
+				<mat-select formControlName="rightEntity" placeholder="Entity">
+					<mat-option [value]="">None</mat-option>
+					<mat-option value="SCOPE_MODEL">Scope Model</mat-option>
+					<mat-option value="EVENT_MODEL">Event Model</mat-option>
+					<mat-option value="DATASET_MODEL">Dataset Model</mat-option>
+					<mat-option value="FORM_MODEL">Form Model</mat-option>
+					<mat-option value="PROFILE">Profile</mat-option>
+				</mat-select>
+
+				<mat-select formControlName="rightValue" placeholder="Right">
+					<mat-option [value]="">None</mat-option>
+					<mat-option value="READ">Read</mat-option>
+					<mat-option value="WRITE">Write</mat-option>
+				</mat-select>
+
+				<mat-select formControlName="rightTargetId" placeholder="Target">
+					<mat-option [value]="">None</mat-option>
+					@for (opt of targetOptions; track opt.id) {
+						<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
+					}
+				</mat-select>
+			</div>
+			<span class="hint">Right required to view this section</span>
+		</div>
+	</form>
+</div>
+
+<div class="dialog-actions">
+	<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+	<button class="btn-primary" (click)="onSave()" [disabled]="form.invalid || !areLanguageFormsValid()">
+		<mat-icon>save</mat-icon>
+		Save Changes
+	</button>
+</div>

@@ -7,6 +7,7 @@ public class MenuLayoutSectionWidget {
 
 	private String type;
 	private String textBefore;
+	private String textAfter;
 	private String width;
 	private ScopeCriterionRight requiredRight;
 	private String requiredFeature;
@@ -26,6 +27,14 @@ public class MenuLayoutSectionWidget {
 
 	public void setTextBefore(final String textBefore) {
 		this.textBefore = textBefore;
+	}
+
+	public String getTextAfter() {
+		return textAfter;
+	}
+
+	public void setTextAfter(final String textAfter) {
+		this.textAfter = textAfter;
 	}
 
 	public MenuLayoutSectionWidgetParameter getParameters() {
@@ -65,10 +74,11 @@ public class MenuLayoutSectionWidget {
 		return "MenuLayoutSectionWidget{" +
 			"type='" + type + '\'' +
 			", textBefore='" + textBefore + '\'' +
-			", parameters=" + parameters +
+			", textAfter='" + textAfter + '\'' +
 			", width='" + width + '\'' +
 			", requiredRight=" + requiredRight +
 			", requiredFeature='" + requiredFeature + '\'' +
+			", parameters=" + parameters +
 			'}';
 	}
 }

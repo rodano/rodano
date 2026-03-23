@@ -5,7 +5,7 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatSnackBar, MatSnackBarModule} from '@angular/material/snack-bar';
 import {ConfiguratorProject} from '@core/model/configurator-project';
-import {forkJoin} from 'rxjs';
+import {forkJoin, of} from 'rxjs';
 import {LanguageService} from '../../services/language.service';
 import {HttpErrorResponse} from '@angular/common/http';
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
@@ -20,6 +20,7 @@ import {MenuDialogService} from '../../services/dialogs/menu-dialog.service';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {Profile} from '@core/model/profile';
 import {MenuGrantsMatrixComponent} from '../menu-grants-matrix/menu-grants-matrix.component';
+import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
 
 @Component({
 	selector: 'app-menu-list',
@@ -47,6 +48,7 @@ export class MenuListComponent
 		public menuManager: MenuManagerService,
 		public override languageService: LanguageService,
 		private profileManager: ProfileManagerService,
+		private eventModelManager: EventModelManagerService,
 		private menuDialogService: MenuDialogService,
 		snackBar: MatSnackBar
 	) {
@@ -68,7 +70,10 @@ export class MenuListComponent
 	load(): void {
 		this.loading = true;
 		forkJoin({
-			menus: this.menuManager.load(this.projectId)
+			menus: this.menuManager.load(this.projectId),
+			eventModels: this.eventModelManager.isLoaded()
+				? of(null)
+				: this.eventModelManager.load(this.projectId)
 		}).subscribe({
 			next: ({menus}) => this.afterLoad(menus),
 			error: (e: HttpErrorResponse) => this.handleLoadError(e, 'menus')
