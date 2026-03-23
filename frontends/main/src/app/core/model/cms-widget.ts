@@ -7,6 +7,7 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { WidgetType } from './widget-type';
 import { WidgetWidth } from './widget-width';
 
 
@@ -14,10 +15,7 @@ import { WidgetWidth } from './widget-width';
  * Widgets that are displayed in the layouts
  */
 export interface CMSWidget { 
-    /**
-     * Type of widget
-     */
-    type: string;
+    type: WidgetType;
     textBefore?: string;
     textAfter?: string;
     width: WidgetWidth;

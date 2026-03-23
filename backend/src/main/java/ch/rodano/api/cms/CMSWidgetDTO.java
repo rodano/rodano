@@ -8,13 +8,14 @@ import jakarta.validation.constraints.NotNull;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import ch.rodano.configuration.model.cms.CMSWidget;
+import ch.rodano.configuration.model.cms.WidgetType;
 import ch.rodano.configuration.model.cms.WidgetWidth;
 
 @Schema(description = "Widgets that are displayed in the layouts")
 public class CMSWidgetDTO {
 	@Schema(description = "Type of widget")
 	@NotBlank
-	String type;
+	WidgetType type;
 
 	String textBefore;
 	String textAfter;
@@ -36,11 +37,11 @@ public class CMSWidgetDTO {
 		this.parameters = cmsWidget.getParameters();
 	}
 
-	public String getType() {
+	public WidgetType getType() {
 		return type;
 	}
 
-	public void setType(final String type) {
+	public void setType(final WidgetType type) {
 		this.type = type;
 	}
 

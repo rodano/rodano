@@ -19,7 +19,7 @@ public class CMSWidget implements Node, Comparable<CMSWidget> {
 	private static final long serialVersionUID = 503573635425875692L;
 
 	private CMSSection section;
-	protected String type;
+	protected WidgetType type;
 
 	protected String textBefore;
 	protected String textAfter;
@@ -44,11 +44,11 @@ public class CMSWidget implements Node, Comparable<CMSWidget> {
 		this.section = section;
 	}
 
-	public final String getType() {
+	public WidgetType getType() {
 		return type;
 	}
 
-	public final void setType(final String type) {
+	public void setType(final WidgetType type) {
 		this.type = type;
 	}
 

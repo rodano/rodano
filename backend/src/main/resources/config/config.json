@@ -25,8 +25,8 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 121,
-	"configDate": 1773913371001,
+	"configVersion": 122,
+	"configDate": 1774261903826,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -2774,78 +2774,6 @@
 				"CENTER_STATUS"
 			],
 			"defaultProfileId": "PRINCIPAL_INVESTIGATOR",
-			"layout": {
-				"sections": [
-					{
-						"id": "SETTINGS",
-						"labels": {
-							"en": "Settings"
-						},
-						"requiredFeature": "ADMIN",
-						"requiredRight": {
-							"className": "ScopeCriterionRight"
-						},
-						"widgets": [
-							{
-								"type": "SCOPE_EDITION",
-								"parameters": {},
-								"width": "FULL",
-								"requiredFeature": "ADMIN",
-								"className": "CMSWidget"
-							}
-						],
-						"className": "CMSSection"
-					},
-					{
-						"id": "CENTER_DETAILS",
-						"labels": {
-							"en": "Center Details"
-						},
-						"requiredRight": {
-							"className": "ScopeCriterionRight"
-						},
-						"widgets": [
-							{
-								"type": "DOCUMENT",
-								"parameters": {
-									"document": "CENTER_INFORMATION",
-									"event_group": "CENTER_INIT",
-									"event": "CENTER_INIT",
-									"page": "CENTER_INFORMATION"
-								},
-								"width": "FULL",
-								"requiredRight": {
-									"className": "ScopeCriterionRight"
-								},
-								"className": "CMSWidget"
-							}
-						],
-						"className": "CMSSection"
-					},
-					{
-						"id": "CONTACTS",
-						"labels": {
-							"en": "Contacts"
-						},
-						"requiredRight": {
-							"className": "ScopeCriterionRight"
-						},
-						"widgets": [
-							{
-								"type": "CONTACTS",
-								"parameters": {},
-								"width": "FULL",
-								"requiredRight": {
-									"className": "ScopeCriterionRight"
-								},
-								"className": "CMSWidget"
-							}
-						],
-						"className": "CMSSection"
-					}
-				],
-				"className": "CMSLayout"
-			},
 			"workflowStatesSelectors": [],
 			"createRules": [],
 			"removeRules": [],

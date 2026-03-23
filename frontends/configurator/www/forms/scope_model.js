@@ -116,8 +116,6 @@ export default {
 				document.getElementById('scope_model_workflow_states_selectors').appendChild(draw_selector(selector));
 			}
 		);
-
-		FormStaticActions.ManageLayoutEdition(document.getElementById('scope_model_layout_add'), document.getElementById('scope_model_layout_edit'), document.getElementById('scope_model_layout_delete'));
 	},
 	open: function(scope_model) {
 		selected_scope_model = scope_model;
@@ -140,7 +138,6 @@ export default {
 		FormHelpers.UpdateForm(document.getElementById('edit_scope_model_form'), scope_model);
 
 		scope_model.workflowStatesSelectors.map(draw_selector).forEach(Node.prototype.appendChild, document.getElementById('scope_model_workflow_states_selectors').empty('div'));
-		FormStaticActions.UpdateLayoutEdition(scope_model, document.getElementById('scope_model_layout_add'), document.getElementById('scope_model_layout_edit'), document.getElementById('scope_model_layout_delete'));
 
 		FormStaticActions.DrawRules(scope_model, scope_model.createRules, scope_model.constructor.RuleEntities, document.getElementById('scope_model_create_rules'), 'Creation rules');
 		FormStaticActions.DrawRules(scope_model, scope_model.removeRules, scope_model.constructor.RuleEntities, document.getElementById('scope_model_remove_rules'), 'Removal rules');

@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 121;
+const CURRENT_VERSION = 122;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -177,6 +177,14 @@ const Migrations = {
 				}
 				delete dataset_model.collapsedLabelPattern;
 				delete dataset_model.expandedLabelPattern;
+			});
+		}
+	},
+	migrate_121: {
+		description: 'Delete scope model layouts',
+		migration: function(config) {
+			config.scopeModels.forEach(scope_model => {
+				delete scope_model.layout;
 			});
 		}
 	}

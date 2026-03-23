@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
-import ch.rodano.configuration.model.cms.CMSLayout;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
@@ -81,8 +80,6 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	private List<String> workflowIds;
 
 	private List<WorkflowStatesSelector> workflowStatesSelectors;
-
-	private CMSLayout layout;
 
 	private List<Rule> createRules;
 	private List<Rule> removeRules;
@@ -281,14 +278,6 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		this.workflowStatesSelectors = workflowStatesSelectors;
 	}
 
-	public final CMSLayout getLayout() {
-		return layout;
-	}
-
-	public final void setLayout(final CMSLayout layout) {
-		this.layout = layout;
-	}
-
 	public final String getScopeFormat() {
 		return scopeFormat;
 	}
@@ -319,11 +308,6 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 
 	public void setRestoreRules(final List<Rule> restoreRules) {
 		this.restoreRules = restoreRules;
-	}
-
-	@JsonIgnore
-	public final boolean hasLayout() {
-		return layout != null;
 	}
 
 	@JsonIgnore

@@ -10,6 +10,7 @@ import {WorkflowSummaryWidgetComponent} from '../workflow-summary/workflow-summa
 import {LockSummaryWidgetComponent} from '../lock-summary/lock-summary-widget.component';
 import {OverdueComponent} from '../overdue/overdue.component';
 import {WelcomeTextComponent} from '../welcome-text/welcome-text.component';
+import {WidgetType} from '@core/model/widget-type';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -28,6 +29,8 @@ import {WelcomeTextComponent} from '../welcome-text/welcome-text.component';
 	]
 })
 export class GenericWidgetComponent {
+	widgetType = WidgetType;
+
 	readonly widget = input.required<CMSWidget>();
 	readonly scopes = input<Scope[]>();
 	readonly criteria = input<FieldModelCriterion[]>();
