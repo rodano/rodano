@@ -103,13 +103,13 @@
 									</mat-icon>
 								}
 							</span>
-							<span class="time">
+							<time [attr.datetime]="event.date ? (event.date | dateUTC) : (event.expectedDate | dateUTC)">
 								@if (event.date) {
 									{{ event.date | dateUTC }}
 								} @else {
 									Expected on {{ event.expectedDate | dateUTC }}
 								}
-							</span>
+							</time>
 						</span>
 					</a>
 
