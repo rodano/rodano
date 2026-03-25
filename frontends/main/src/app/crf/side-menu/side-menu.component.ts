@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, model, signal} f
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
-import {EMPTY, combineLatest, forkJoin, of, switchMap} from 'rxjs';
+import {EMPTY, combineLatest, forkJoin, map, of, switchMap} from 'rxjs';
 import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -103,46 +103,45 @@ export class SideMenuComponent implements OnInit {
 			this.scope.set(scope);
 		});
 
-		combineLatest([
-			this.scope$,
-			this.activatedRoute.queryParams,
-			//watch active route params to detect when parameters change, including child routes
-			this.activatedRoute.params
-		]).pipe(
-			switchMap(([scope, queryParams]) => {
-				return combineLatest([
-					of(scope),
-					scope !== null ? this.formService.searchOnScope(scope.pk) : of([]),
-					scope !== null ? this.eventService.search(scope.pk) : of([]),
-					of(queryParams)
-				]);
-			}),
+		this.scope$.pipe(
+			//fetch forms and events only when the scope changes
+			switchMap(scope => forkJoin([
+				this.formService.searchOnScope(scope.pk),
+				this.eventService.search(scope.pk)
+			]).pipe(
+				//then keep listening to route param changes without re-fetching
+				switchMap(([forms, events]) => combineLatest([
+					this.activatedRoute.queryParams,
+					//watch active route params to detect when parameters change, including child routes
+					this.activatedRoute.params
+				]).pipe(
+					map(([queryParams]) => ({scope, forms, events, queryParams}))
+				))
+			)),
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(([scope, forms, events, queryParams]) => {
+		).subscribe(({scope, forms, events, queryParams}) => {
 			this.scopeForms.set(forms);
 			this.events = events;
-			if(scope !== null) {
-				this.loadSortSettings();
-				this.updateEventGroups();
-				//retrieve and manage expanded event pks
-				const expandedEventParameter: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
-				const newExpandedEventPks = expandedEventParameter.split(',').filter(p => !!p).map(p => parseInt(p));
-				this.expandedEventPks.set(newExpandedEventPks);
-				//do not used the observed parameters, use the active route snapshot to access the child route parameters instead
-				const params = this.activatedRoute.firstChild?.snapshot.params || {};
-				const newEventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
-				this.eventPk.set(newEventPk);
-				//load forms for every expanded event
-				const formsRequests = Object.fromEntries(this.expandedEventPks()
-					.filter(eventPk => !this.eventsForms()[eventPk])
-					.map(eventPk => [eventPk, this.formService.searchOnEvent(scope.pk, eventPk)]));
-				if(Object.keys(formsRequests).length > 0) {
-					forkJoin(formsRequests)
-						.pipe(takeUntilDestroyed(this.destroyRef))
-						.subscribe(eventForms => {
-							this.eventsForms.update(ef => ({...ef, ...eventForms}));
-						});
-				}
+			this.loadSortSettings();
+			this.updateEventGroups();
+			//retrieve and manage expanded event pks
+			const expandedEventParameter: string = queryParams[SideMenuComponent.EXPANDED_EVENT_PKS_PARAMETER] ?? '';
+			const newExpandedEventPks = expandedEventParameter.split(',').filter(p => !!p).map(p => parseInt(p));
+			this.expandedEventPks.set(newExpandedEventPks);
+			//do not used the observed parameters, use the active route snapshot to access the child route parameters instead
+			const params = this.activatedRoute.firstChild?.snapshot?.params || {};
+			const newEventPk = params['eventPk'] ? parseInt(params['eventPk']) : undefined;
+			this.eventPk.set(newEventPk);
+			//load forms for every expanded event
+			const formsRequests = Object.fromEntries(this.expandedEventPks()
+				.filter(eventPk => !this.eventsForms()[eventPk])
+				.map(eventPk => [eventPk, this.formService.searchOnEvent(scope.pk, eventPk)]));
+			if(Object.keys(formsRequests).length > 0) {
+				forkJoin(formsRequests)
+					.pipe(takeUntilDestroyed(this.destroyRef))
+					.subscribe(eventForms => {
+						this.eventsForms.update(ef => ({...ef, ...eventForms}));
+					});
 			}
 		});
 	}

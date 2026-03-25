@@ -17,7 +17,6 @@ export default [
 		resolve: {
 			scope: ScopeResolver
 		},
-		runGuardsAndResolvers: 'always',
 		children: [
 			{
 				path: '',
