@@ -1,20 +1,20 @@
 /* display flex to make the header and the content fill 100% of the height */
 #stamp {
 	color: white;
-	font-size: 2rem;
+	font-size: 1.5rem;
 	font-weight: bold;
 	background-color: red;
-	width: 20rem; /* must be wide enough to overflow the corner when rotated */
-	height: 3rem;
-	line-height: 3rem;
+	width: 16rem; /* must be wide enough to overflow the corner when rotated */
+	height: 2rem;
+	line-height: 2rem;
 	position: fixed;
 	/* position the center of the box at the position (0,0) */
-	top: -1.5rem; /* half height */
-	left: -10rem; /* half width */
+	top: -1rem; /* half height */
+	left: -8rem; /* half width */
 	text-align: center;
 	z-index: 10;
 	transform-origin: center;
-	transform: translate(2.5rem, 2.5rem) rotate(-45deg);
+	transform: translate(2rem, 2rem) rotate(-45deg);
 	user-select: none;
 	pointer-events: none;
 }
