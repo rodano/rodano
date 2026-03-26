@@ -28,7 +28,7 @@
 					[matMenuTriggerFor]="subMenu"
 					routerLinkActive="link-active">
 					{{ menu.shortname | localizeMap }}
-					<mat-icon inline="true">expand_more</mat-icon>
+					<mat-icon>expand_more</mat-icon>
 				</button>
 				<mat-menu #subMenu="matMenu">
 					@for (submenu of menu.submenus; track submenu.id) {
@@ -49,8 +49,8 @@
 		@if (user()) {
 			<a
 				[routerLink]="['/users', user()?.pk]"
-				mat-stroked-button
-				class="link-active"
+				mat-icon-button
+				routerLinkActive="link-active"
 				[matBadge]="pendingRolesNumber()"
 				matBadgeSize="small"
 				matBadgeDescription="Role to enable"
@@ -58,7 +58,7 @@
 				matBadgePosition="below after"
 				[matBadgeHidden]="pendingRolesNumber() === 0"
 				[matTooltip]="pendingRolesNumber() > 0 ? 'Pending roles: ' + pendingRolesNumber() : 'Your account'">
-				{{ user()?.name }}
+				<mat-icon>account_circle</mat-icon>
 			</a>
 
 			<!-- Profile selector for super users -->
@@ -84,7 +84,7 @@
 					mat-icon-button
 					type="button"
 					[matMenuTriggerFor]="appMenu"
-					matTooltip="Switch profile (only for superusers)">
+					matTooltip="Switch profile">
 					<mat-icon>domino_mask</mat-icon>
 				</button>
 			}
