@@ -62,13 +62,19 @@ export class ScopeCreateComponent implements OnInit {
 		scopeCandidate.startDate = new Date();
 		this.scopeService.create(scopeCandidate).pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(s => {
-			this.notificationService.showSuccess(`${this.scopeModel().shortname['en']} created`);
-			this.router.navigate([
-				'/scopes',
-				s.modelId,
-				s.pk
-			]);
+		).subscribe({
+			next: scope => {
+				this.notificationService.showSuccess(`${this.scopeModel().shortname['en']} created`);
+				this.router.navigate([
+					'/scopes',
+					scope.modelId,
+					scope.pk
+				]);
+			},
+			error: response => {
+				console.error(response);
+				this.notificationService.showError(`Failed to create ${this.scopeModel().shortname['en']}: ${response.error.message}`);
+			}
 		});
 	}
 }
