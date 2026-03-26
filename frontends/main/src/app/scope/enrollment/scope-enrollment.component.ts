@@ -235,17 +235,35 @@ export class ScopeEnrollmentComponent {
 		});
 	}
 
+	canEnroll(): boolean {
+		return this.scope().enrollmentModel?.type === EnrollmentType.AUTOMATIC;
+	}
+
 	enroll() {
-		this.scopeService.enroll(this.scope().pk).subscribe(() => {
-			this.notificationService.showSuccess('All scopes enrolled successfully');
-			this.loadChildScopes();
-		});
+		this.scopeService.enroll(this.scope().pk).subscribe(
+			{
+				next: () => {
+					this.notificationService.showSuccess('All scopes enrolled successfully');
+					this.loadChildScopes();
+				},
+				error: response => {
+					console.error(response);
+					this.notificationService.showError(`Failed to enroll scopes: ${response.error.message}`);
+				}
+			}
+		);
 	}
 
 	unenroll() {
-		this.scopeService.unenroll(this.scope().pk).subscribe(() => {
-			this.notificationService.showSuccess('All scopes unenrolled successfully');
-			this.loadChildScopes();
+		this.scopeService.unenroll(this.scope().pk).subscribe({
+			next: () => {
+				this.notificationService.showSuccess('All scopes unenrolled successfully');
+				this.loadChildScopes();
+			},
+			error: response => {
+				console.error(response);
+				this.notificationService.showError(`Failed to unenroll scopes: ${response.error.message}`);
+			}
 		});
 	}
 

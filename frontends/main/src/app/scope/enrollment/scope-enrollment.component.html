@@ -131,6 +131,7 @@
 <p>
 	<button
 		mat-flat-button
+		[disabled]="!canEnroll()"
 		(click)="enroll()">
 		Perform enrollment
 	</button>

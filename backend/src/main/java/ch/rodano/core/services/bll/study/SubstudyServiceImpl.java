@@ -14,6 +14,7 @@ import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
+import ch.rodano.core.model.exception.WrongDataConditionException;
 import ch.rodano.core.model.scope.EnrollmentType;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 import ch.rodano.core.model.scope.Scope;
@@ -149,13 +150,16 @@ public class SubstudyServiceImpl implements SubstudyService {
 	@Override
 	public List<Scope> enrollScopesInSubstudy(final Scope substudy, final DatabaseActionContext context, final String rationale) {
 		final var enrollmentModel = substudy.getData().getEnrollmentModel();
+		if(enrollmentModel == null) {
+			throw new WrongDataConditionException(String.format("Unable to perform enrollment if enrollment model is not defined in substudy %s", substudy.getCodeAndShortname()));
+		}
 		if(EnrollmentType.AUTOMATIC != enrollmentModel.getType()) {
-			throw new NoRespectForConfigurationException(String.format("Unable to auto enroll for non automatic enrollment substudy %s", substudy.getId()));
+			throw new NoRespectForConfigurationException(String.format("Unable to perform enrollment for non automatic enrollment substudy %s", substudy.getCodeAndShortname()));
 		}
 
 		final var candidates = findPotentialScopes(substudy);
 		for(final var candidate : candidates) {
-			// Save is done in addParent
+			//save is done in addParent
 			scopeRelationService.createRelation(candidate, substudy, context, rationale);
 		}
 		return candidates;
