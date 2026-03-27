@@ -17,6 +17,7 @@ import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
+import ch.rodano.core.model.exception.InconsistentStateDetectedException;
 import ch.rodano.core.model.exception.MissingDataException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.form.Form;
@@ -225,7 +226,10 @@ public class FormServiceImpl implements FormService {
 		if(forms.isEmpty()) {
 			throw new MissingDataException(String.format("No form with model id %s in scope %s", formModel.getId(), scope.getCode()));
 		}
-		return forms.get(0);
+		if(forms.size() > 1) {
+			throw new InconsistentStateDetectedException(String.format("Only one form with model id %s should exist in scope %s", formModel.getId(), scope.getCode()));
+		}
+		return forms.getFirst();
 	}
 
 	@Override

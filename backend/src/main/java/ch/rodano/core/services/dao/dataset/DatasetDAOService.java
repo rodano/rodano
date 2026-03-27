@@ -30,7 +30,7 @@ public interface DatasetDAOService {
 	/**
 	 * Search for datasets matching the provided criteria
 	 * @param scopePk The primary key of the scope
-	 * @param eventPk The primary key of the event
+	 * @param eventPk The primary key of the event. When empty, look for datasets that are directly attached to the scope.
 	 * @param includeDeleted Whether to include deleted datasets
 	 * @param datasetModelIds The dataset model ids to filter by
 	 * @return The list of datasets matching the criteria

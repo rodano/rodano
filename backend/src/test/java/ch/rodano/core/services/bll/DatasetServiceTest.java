@@ -155,7 +155,7 @@ public class DatasetServiceTest extends DatabaseTest {
 		assertEquals(dmtGridModel.getId(), datasets.getFirst().getDatasetModelId());
 
 		//delete dataset
-		datasetDAOService.deleteDataset(dmtDataset, context, TEST_RATIONALE);
+		datasetService.delete(patient, Optional.empty(), dmtDataset, context, TEST_RATIONALE);
 
 		datasets = datasetService.getAll(patient);
 		assertEquals(datasetNumber, datasets.size());
@@ -196,7 +196,7 @@ public class DatasetServiceTest extends DatabaseTest {
 		assertEquals(relapseGridModel.getId(), datasets.getFirst().getDatasetModelId());
 
 		//delete dataset
-		datasetDAOService.deleteDataset(dmtDataset, context, TEST_RATIONALE);
+		datasetService.delete(patient, Optional.empty(), dmtDataset, context, TEST_RATIONALE);
 
 		datasets = datasetService.getAll(visit6Event);
 		assertEquals(datasetNumber, datasets.size());

@@ -23,7 +23,7 @@ public interface FormDAOService {
 	/**
 	 * Search for forms matching the provided criteria
 	 * @param scopePk The primary key of the scope
-	 * @param eventPk The primary key of the event
+	 * @param eventPk The primary key of the event. When empty, look for forms that are directly attached to the scope.
 	 * @param includeDeleted Whether to include deleted forms
 	 * @param formModelIds The form model ids to filter by
 	 * @return The list of forms matching the criteria

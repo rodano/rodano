@@ -140,7 +140,7 @@ create table dataset (
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	dataset_model_id varchar(100) not null,
 	constraint pk_dataset primary key (pk),
@@ -159,7 +159,7 @@ create table dataset_audit (
 	audit_object_fk bigint(20) not null,
 	id varchar(200) not null,
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	dataset_model_id varchar(100) not null,
 	constraint pk_dataset_audit primary key (pk)
@@ -202,7 +202,7 @@ create table form (
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	form_model_id varchar(100) not null,
 	constraint pk_form primary key (pk)
@@ -219,7 +219,7 @@ create table form_audit (
 	audit_context text not null,
 	audit_object_fk bigint(20) not null,
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	form_model_id varchar(100) not null,
 	constraint pk_form_audit primary key (pk)

@@ -22,6 +22,7 @@ import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
+import ch.rodano.core.model.exception.InconsistentStateDetectedException;
 import ch.rodano.core.model.exception.MissingDataException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.rules.data.DataState;
@@ -363,7 +364,10 @@ public class DatasetServiceImpl implements DatasetService {
 		if(datasets.isEmpty()) {
 			throw new MissingDataException(String.format("No dataset with model id %s in scope %s", datasetModel.getId(), scope.getCode()));
 		}
-		return datasets.get(0);
+		if(datasets.size() > 1) {
+			throw new InconsistentStateDetectedException(String.format("Only one dataset with model id %s should exist in scope %s", datasetModel.getId(), scope.getCode()));
+		}
+		return datasets.getFirst();
 	}
 
 	//event
