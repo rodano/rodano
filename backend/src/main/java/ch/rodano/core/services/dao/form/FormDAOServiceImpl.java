@@ -1,9 +1,12 @@
 package ch.rodano.core.services.dao.form;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import org.jooq.DSLContext;
 import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -57,39 +60,56 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 	}
 
 	@Override
-	public List<Form> getFormsByScopePkIncludingRemoved(final Long scopePk) {
-		final var query = create.selectFrom(FORM).where(FORM.SCOPE_FK.eq(scopePk));
+	public List<Form> search(final Optional<Long> scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> formModelIds) {
+		final var query = create.selectFrom(FORM).where(
+			scopePk.map(FORM.SCOPE_FK::eq).orElse(DSL.noCondition())
+				.and(eventPk.map(FORM.EVENT_FK::eq).orElse(FORM.EVENT_FK.isNull()))
+				.and(includeDeleted ? DSL.noCondition() : FORM.DELETED.isFalse())
+				.and(formModelIds.map(FORM.FORM_MODEL_ID::in).orElse(DSL.noCondition()))
+		);
 		return find(query);
 	}
 
+	//scope
 	@Override
 	public List<Form> getFormsByScopePk(final Long scopePk) {
-		final var query = create.selectFrom(FORM).where(FORM.SCOPE_FK.eq(scopePk)).and(FORM.DELETED.isFalse());
-		return find(query);
+		return search(Optional.of(scopePk), Optional.empty(), false, Optional.empty());
 	}
 
 	@Override
-	public Form getFormByScopePkAndFormModelId(final Long scopePk, final String formModelId) {
-		final var query = create.selectFrom(FORM).where(FORM.SCOPE_FK.eq(scopePk).and(FORM.FORM_MODEL_ID.eq(formModelId)));
-		return findUnique(query);
+	public List<Form> getFormsByScopePkAndFormModelIds(final Long scopePk, final Collection<String> formModelIds) {
+		return search(Optional.of(scopePk), Optional.empty(), false, Optional.of(formModelIds));
 	}
 
 	@Override
-	public List<Form> getFormsByEventPkIncludingRemoved(final Long eventPk) {
-		final var query = create.selectFrom(FORM).where(FORM.EVENT_FK.eq(eventPk));
-		return find(query);
+	public List<Form> getAllFormsByScopePk(final Long scopePk) {
+		return search(Optional.of(scopePk), Optional.empty(), true, Optional.empty());
 	}
 
+	@Override
+	public List<Form> getAllFormsByScopePkAndFormModelIds(final Long scopePk, final Collection<String> formModelIds) {
+		return search(Optional.of(scopePk), Optional.empty(), true, Optional.of(formModelIds));
+	}
+
+	//event
 	@Override
 	public List<Form> getFormsByEventPk(final Long eventPk) {
-		final var query = create.selectFrom(FORM).where(FORM.EVENT_FK.eq(eventPk)).and(FORM.DELETED.isFalse());
-		return find(query);
+		return search(Optional.empty(), Optional.of(eventPk), false, Optional.empty());
 	}
 
 	@Override
-	public Form getFormByEventPkAndFormModelId(final Long eventPk, final String formModelId) {
-		final var query = create.selectFrom(FORM).where(FORM.EVENT_FK.eq(eventPk).and(FORM.FORM_MODEL_ID.eq(formModelId)));
-		return findUnique(query);
+	public List<Form> getFormsByEventPkAndFormModelIds(final Long eventPk, final Collection<String> formModelIds) {
+		return search(Optional.empty(), Optional.of(eventPk), false, Optional.of(formModelIds));
+	}
+
+	@Override
+	public List<Form> getAllFormsByEventPk(final Long eventPk) {
+		return search(Optional.empty(), Optional.of(eventPk), true, Optional.empty());
+	}
+
+	@Override
+	public List<Form> getAllFormsByEventPkAndFormModelIds(final Long eventPk, final Collection<String> formModelIds) {
+		return search(Optional.empty(), Optional.of(eventPk), true, Optional.of(formModelIds));
 	}
 
 	@Override

@@ -152,7 +152,7 @@ public class DatasetSubmissionServiceImpl implements DatasetSubmissionService {
 		}
 
 		//retrieve all datasets that match submitted dataset dtos
-		final var datasets = datasetDAOService.getDatasetByPks(datasetDTOs.stream().map(DatasetUpdateDTO::getPk).toList());
+		final var datasets = datasetDAOService.getDatasetsByPks(datasetDTOs.stream().map(DatasetUpdateDTO::getPk).toList());
 
 		//check dataset consistency to avoid forged datasetPks by the client
 		for(final Dataset dataset : datasets) {

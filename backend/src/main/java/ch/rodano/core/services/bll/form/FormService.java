@@ -101,13 +101,13 @@ public interface FormService {
 
 	List<Form> getAll(Scope scope);
 
-	Form get(Scope scope, String formId);
+	Form get(Scope scope, FormModel formModel);
 
 	List<Form> getAllIncludingRemoved(Event event);
 
 	List<Form> getAll(Event event);
 
-	Form get(Event event, String formId);
+	Form get(Event event, FormModel formModel);
 
 	Optional<Form> get(WorkflowStatus workflowStatus);
 }

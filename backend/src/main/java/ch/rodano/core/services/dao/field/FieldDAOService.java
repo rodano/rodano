@@ -53,5 +53,4 @@ public interface FieldDAOService {
 
 	NavigableSet<FieldAuditTrail> getAuditTrailsForProperty(Field field, Optional<Timeframe> timeframe, Function<FieldAuditTrail, Object> property);
 
-	List<Field> getSearchableFields(Collection<Long> scopePks, Collection<String> searchableFieldModel);
 }

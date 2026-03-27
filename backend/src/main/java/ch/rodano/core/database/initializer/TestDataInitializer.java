@@ -250,7 +250,7 @@ public class TestDataInitializer {
 		submitter.updateFields(studyEntryDataset, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study entry workflow
-		var studyEntry = formService.get(baseline, "STUDY_ENTRY");
+		var studyEntry = formService.get(baseline, study.getFormModel("STUDY_ENTRY"));
 		formDAOService.saveForm(studyEntry, context, DatabaseInitializer.RATIONALE);
 
 		var state = new DataState(fr01, Optional.of(baseline), studyEntry);
@@ -284,7 +284,7 @@ public class TestDataInitializer {
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		//ms history workflow
-		final var msHistory = formService.get(fr0103, "MS_HISTORY");
+		final var msHistory = formService.get(fr0103, study.getFormModel("MS_HISTORY"));
 		formDAOService.saveForm(msHistory, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.empty(), msHistory);
@@ -311,7 +311,7 @@ public class TestDataInitializer {
 		datasetDAOService.saveDataset(dmt2, context, DatabaseInitializer.RATIONALE);
 
 		//dmt workflow
-		final var dmt = formService.get(fr0103, "DMT");
+		final var dmt = formService.get(fr0103, study.getFormModel("DMT"));
 		formDAOService.saveForm(dmt, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.empty(), dmt);
@@ -340,7 +340,7 @@ public class TestDataInitializer {
 		submitter.updateFields(studyEntryDataset, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study entry workflow
-		studyEntry = formService.get(baseline, "STUDY_ENTRY");
+		studyEntry = formService.get(baseline, study.getFormModel("STUDY_ENTRY"));
 		formDAOService.saveForm(studyEntry, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(baseline), studyEntry);
@@ -350,7 +350,7 @@ public class TestDataInitializer {
 		var visitDocumentation = datasetService.get(baseline, visitDatasetModel);
 
 		//demographics workflow
-		final var demographics = formService.get(fr0103, "DEMOGRAPHICS");
+		final var demographics = formService.get(fr0103, study.getFormModel("DEMOGRAPHICS"));
 		formDAOService.saveForm(demographics, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.empty(), demographics);
@@ -373,7 +373,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
-		var edss = formService.get(baseline, "EDSS");
+		var edss = formService.get(baseline, study.getFormModel("EDSS"));
 		formDAOService.saveForm(edss, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(baseline), edss);
@@ -394,7 +394,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study status workflow
-		var studyStatus = formService.get(visit6, "STUDY_STATUS");
+		var studyStatus = formService.get(visit6, study.getFormModel("STUDY_STATUS"));
 		formDAOService.saveForm(studyStatus, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(baseline), studyStatus);
@@ -417,7 +417,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
-		edss = formService.get(visit6, "EDSS");
+		edss = formService.get(visit6, study.getFormModel("EDSS"));
 		formDAOService.saveForm(edss, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit6), edss);
@@ -464,7 +464,7 @@ public class TestDataInitializer {
 		datasetDAOService.saveDataset(relapse3, context, DatabaseInitializer.RATIONALE);
 
 		//relapse workflow
-		var relapse = formService.get(visit6, "RELAPSES");
+		var relapse = formService.get(visit6, study.getFormModel("RELAPSES"));
 		formDAOService.saveForm(relapse, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit6), relapse);
@@ -488,7 +488,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//study status workflow
-		studyStatus = formService.get(visit12, "STUDY_STATUS");
+		studyStatus = formService.get(visit12, study.getFormModel("STUDY_STATUS"));
 		formDAOService.saveForm(studyStatus, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit12), studyStatus);
@@ -511,7 +511,7 @@ public class TestDataInitializer {
 		submitter.updateFields(visitDocumentation, inputs).submit(DatabaseInitializer.RATIONALE);
 
 		//edss workflow
-		edss = formService.get(visit12, "EDSS");
+		edss = formService.get(visit12, study.getFormModel("EDSS"));
 		formDAOService.saveForm(edss, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit12), edss);
@@ -525,7 +525,7 @@ public class TestDataInitializer {
 		submitter.submit(DatabaseInitializer.RATIONALE);
 
 		//relapse workflow
-		relapse = formService.get(visit12, "RELAPSES");
+		relapse = formService.get(visit12, study.getFormModel("RELAPSES"));
 		formDAOService.saveForm(relapse, context, DatabaseInitializer.RATIONALE);
 
 		state = new DataState(fr0103, Optional.of(visit12), relapse);
