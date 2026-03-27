@@ -51,7 +51,7 @@ import {Reports} from './reports.js';
 //options
 const APPLICATION_MODES = ['DEV', 'TEST', 'PROD'];
 //---------------------------0-------1-------2
-const APPLICATION_MODE = APPLICATION_MODES[0];
+const APPLICATION_MODE = APPLICATION_MODES[2];
 
 const DEBUG_CONFIG_URL = `${window.location.protocol}//${window.location.hostname}/configs/test.json`;
 
