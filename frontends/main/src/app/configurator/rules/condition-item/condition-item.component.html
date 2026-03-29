@@ -1,0 +1,152 @@
+<div class="condition-item">
+	<div class="condition-card">
+		<div class="condition-left">
+			<div class="condition-flags">
+				<button type="button"
+												class="flag-btn flag-inverse"
+												[class.active]="condition.inverse"
+												(click)="condition.inverse = !condition.inverse; changed.emit()"
+												matTooltip="Inverse Condition">
+					<mat-icon>swap_horiz</mat-icon>
+				</button>
+				<button type="button"
+												class="flag-btn flag-dependency"
+												[class.active]="condition.dependency"
+												(click)="condition.dependency = !condition.dependency; changed.emit()"
+												matTooltip="Dependency Flag">
+					<mat-icon>link</mat-icon>
+				</button>
+			</div>
+
+			<mat-select [value]="condition.criterion?.property ?? ''"
+															(valueChange)="onPropertyChange($event)"
+															placeholder="Select property">
+				<mat-option [value]="">-- Select property --</mat-option>
+				@for (prop of propertiesForDomain; track prop.id) {
+					<mat-option [value]="prop.id">{{ prop.label }}</mat-option>
+				}
+			</mat-select>
+
+			@if (showOperator) {
+				<mat-select [(ngModel)]="condition.criterion!.operator"
+																(ngModelChange)="changed.emit()"
+																[ngModelOptions]="{standalone: true}"
+																placeholder="Operator">
+					@for (op of availableOperators; track op.value) {
+						<mat-option [value]="op.value">{{ op.label }}</mat-option>
+					}
+				</mat-select>
+			}
+		</div>
+
+		@if (showValue) {
+			<div class="value-rows">
+				@for (val of criterionValues; track $index; let i = $index; let first = $first) {
+					<div class="value-row">
+						@if (propertyDef?.options?.length) {
+							<mat-select [value]="val"
+																			(valueChange)="setValueAt(i, $event)"
+																			placeholder="Select value">
+								<mat-option value="">-- Select --</mat-option>
+								@for (opt of propertyDef!.options!; track opt) {
+									<mat-option [value]="opt">{{ opt }}</mat-option>
+								}
+							</mat-select>
+						} @else if (propertyDef?.configurationEntity) {
+							<mat-select [value]="val"
+																			(valueChange)="setValueAt(i, $event)"
+																			placeholder="Select value">
+								<mat-option value="">-- Select --</mat-option>
+								@for (opt of getEntityOptions(propertyDef!.configurationEntity!); track opt.id) {
+									<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
+								}
+							</mat-select>
+						} @else if (propertyDef?.type === 'NUMBER') {
+							<input type="number" [value]="val"
+														(input)="setValueAt(i, $any($event.target).value)"
+														class="condition-value-input" placeholder="Value">
+						} @else if (propertyDef?.type === 'DATE') {
+							<input type="date" [value]="val"
+														(input)="setValueAt(i, $any($event.target).value)"
+														class="condition-value-input">
+						} @else {
+							<input type="text" [value]="val"
+														(input)="setValueAt(i, $any($event.target).value)"
+														class="condition-value-input" placeholder="Value">
+						}
+
+						<div class="value-actions">
+							@if (first) {
+								<button type="button" class="value-btn value-add"
+																(click)="addValue()"
+																matTooltip="Add Another Value">
+									<mat-icon>add</mat-icon>
+								</button>
+							} @else {
+								<button type="button" class="value-btn value-remove"
+																(click)="removeValue(i)"
+																matTooltip="Remove Value">
+									<mat-icon>remove</mat-icon>
+								</button>
+							}
+						</div>
+					</div>
+				}
+			</div>
+		}
+
+		@if (isNavigationProperty) {
+			<span class="navigation-hint">Navigates to {{ propertyDef?.target }}</span>
+		}
+
+		<div class="condition-actions">
+			<button type="button"
+											class="break-btn"
+											[class.break-none]="condition.breakType === 'NONE' || !condition.breakType"
+											[class.break-allow]="condition.breakType === 'ALLOW'"
+											[class.break-deny]="condition.breakType === 'DENY'"
+											(click)="cycleBreakType()"
+											[matTooltip]="'Break: ' + (condition.breakType || 'NONE')">
+				<mat-icon>{{ getBreakIcon() }}</mat-icon>
+			</button>
+
+			<button type="button" class="btn-icon-m" (click)="addChild()"
+											matTooltip="Add Nested Condition">
+				<mat-icon>add</mat-icon>
+			</button>
+			<button type="button" class="btn-icon-m danger" (click)="remove.emit()"
+											matTooltip="Remove">
+				<mat-icon>close</mat-icon>
+			</button>
+		</div>
+	</div>
+
+	@if ((condition.conditions ?? []).length > 0) {
+		<div class="nested-conditions-tree" [class.nested-indented]="depth >= 0">
+			<div class="nested-line-col">
+				@if ((condition.conditions ?? []).length > 1) {
+					<div class="nested-line"></div>
+					<div class="nested-mode-label"
+										[class.mode-and]="condition.mode === 'AND'"
+										[class.mode-or]="condition.mode === 'OR'"
+										(click)="condition.mode = condition.mode === 'AND' ? 'OR' : 'AND'; changed.emit()"
+										[matTooltip]="condition.mode === 'AND' ? 'Switch to OR' : 'Switch to AND'">
+						{{ condition.mode }}
+					</div>
+				}
+			</div>
+			<div class="nested-conditions-list">
+				@for (child of condition.conditions; track child) {
+					<app-condition-item
+						[condition]="child"
+						[domain]="domain"
+						[depth]="depth + 1"
+						(remove)="removeChild(child)"
+						(insertSibling)="insertChildAfter(child)"
+						(changed)="changed.emit()">
+					</app-condition-item>
+				}
+			</div>
+		</div>
+	}
+</div>

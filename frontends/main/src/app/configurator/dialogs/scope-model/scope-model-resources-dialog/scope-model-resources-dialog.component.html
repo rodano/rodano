@@ -66,7 +66,7 @@
 						<mat-select
 							[value]="selector.selectedWorkflowId"
 							(valueChange)="onWorkflowSelected(selector, $event)">
-							<mat-option value="">Select a workflow</mat-option>
+							<mat-option [value]="">Select a workflow</mat-option>
 							@for (workflow of selectedWorkflows; track workflow.workflowId) {
 								<mat-option [value]="workflow.workflowId">{{ languageService.getLabel(workflow) }}</mat-option>
 							}

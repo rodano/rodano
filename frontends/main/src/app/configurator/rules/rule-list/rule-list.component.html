@@ -16,24 +16,17 @@
 				</div>
 
 				@for (rule of getRulesForType(ruleType.type); track rule.ruleId) {
-					<div class="rule-item" [class.selected]="selectedRule?.ruleId === rule.ruleId">
-						<div class="rule-item-header" (click)="onSelectRule(rule)">
+					<div class="rule-item" (click)="onSelectRule(rule)">
+						<div class="rule-item-header">
 							<mat-icon class="rule-icon">rule</mat-icon>
 							<span class="rule-description">
                                 {{ rule.description || 'Unnamed rule' }}
                             </span>
-							<button type="button" class="btn-icon-sm danger" (click)="$event.stopPropagation(); onDeleteRule(rule)">
+							<button type="button" class="btn-icon-sm danger"
+															(click)="$event.stopPropagation(); onDeleteRule(rule)">
 								<mat-icon>delete</mat-icon>
 							</button>
 						</div>
-
-						@if (selectedRule?.ruleId === rule.ruleId) {
-							<div class="rule-detail-panel">
-								<div class="rule-detail-panel">
-									<!-- Placeholder -->
-								</div>
-							</div>
-						}
 					</div>
 				}
 

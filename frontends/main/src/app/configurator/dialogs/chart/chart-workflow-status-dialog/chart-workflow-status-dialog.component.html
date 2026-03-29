@@ -6,7 +6,7 @@
 			<div class="form-field">
 				<label>Workflow</label>
 				<mat-select formControlName="workflowId" placeholder="Select a workflow">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (wf of data.availableWorkflows; track wf.workflowId) {
 						<mat-option [value]="wf.workflowId">
 							{{ languageService.getLabel(wf) }}

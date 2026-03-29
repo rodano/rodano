@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record RuleDTO(
 	UUID ruleId,
+	String ruleType,
 	String description,
 	SortedMap<String, String> message,
 	List<String> tags,

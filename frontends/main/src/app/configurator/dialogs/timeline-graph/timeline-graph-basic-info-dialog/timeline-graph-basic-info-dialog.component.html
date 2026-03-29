@@ -20,7 +20,7 @@
 			<div class="form-field">
 				<label>Scope Model</label>
 				<mat-select formControlName="scopeModelId" placeholder="Select scope model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (scopeModel of scopeModels; track scopeModel.scopeModelId) {
 						<mat-option [value]="scopeModel.scopeModelId">{{ languageService.getLabel(scopeModel) }}</mat-option>
 					}

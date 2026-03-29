@@ -81,7 +81,9 @@
 		<app-rule-list
 			[projectId]="projectId"
 			[entityPath]="'crons/' + cron.cronId"
-			[ruleTypes]="ruleTypes">
+			[ruleTypes]="ruleTypes"
+			[availableDomains]="ruleDomains"
+			(editRule)="switchToRuleEditor.emit($event)">
 		</app-rule-list>
 	</div>
 }

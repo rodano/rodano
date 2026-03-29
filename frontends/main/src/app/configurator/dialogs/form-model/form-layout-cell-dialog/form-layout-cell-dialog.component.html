@@ -110,7 +110,7 @@
 												[ngModel]="getCriterionValue(criterion)"
 												[ngModelOptions]="{standalone: true}"
 												(ngModelChange)="setCriterionValue(criterion, $event)">
-												<mat-option [value]="null">— any —</mat-option>
+												<mat-option [value]="null">-- Any --</mat-option>
 												@for (pv of fm.possibleValues; track pv.possibleValueId) {
 													<mat-option [value]="pv.possibleValueId">
 														{{ languageService.getLabel(pv) }}
@@ -125,7 +125,7 @@
 												[ngModel]="getCriterionValue(criterion)"
 												[ngModelOptions]="{standalone: true}"
 												(ngModelChange)="setCriterionValue(criterion, $event)">
-												<mat-option [value]="null">— any —</mat-option>
+												<mat-option [value]="null">-- Any --</mat-option>
 												<mat-option value="true">True</mat-option>
 												<mat-option value="false">False</mat-option>
 											</mat-select>

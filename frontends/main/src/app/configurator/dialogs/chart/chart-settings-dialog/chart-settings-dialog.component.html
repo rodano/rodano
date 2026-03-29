@@ -13,7 +13,7 @@
 				<div class="form-field">
 					<label>Leaf Scope Model</label>
 					<mat-select formControlName="leafScopeModelId">
-						<mat-option [value]="null">None</mat-option>
+						<mat-option [value]="null">-- None --</mat-option>
 						@for (sm of data.availableScopeModels; track sm.scopeModelId) {
 							<mat-option [value]="sm.scopeModelId">{{ languageService.getLabel(sm) }}</mat-option>
 						}

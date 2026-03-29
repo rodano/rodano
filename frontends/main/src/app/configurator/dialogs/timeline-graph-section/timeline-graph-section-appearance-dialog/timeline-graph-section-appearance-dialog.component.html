@@ -67,7 +67,7 @@
 			<div class="form-field">
 				<label>Mark</label>
 				<mat-select formControlName="mark" placeholder="None">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (option of markOptions; track option.value) {
 						<mat-option [value]="option.value">{{ option.label }}</mat-option>
 					}

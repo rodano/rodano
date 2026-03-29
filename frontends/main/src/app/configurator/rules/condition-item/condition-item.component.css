@@ -1,0 +1,354 @@
+.condition-item {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.condition-card {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.5rem;
+	flex-wrap: nowrap;
+	padding: 0.5rem 0.75rem;
+	background-color: white;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.375rem;
+	margin: 0.25rem 0;
+}
+
+.condition-left {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-shrink: 0;
+}
+
+.condition-card:hover {
+	border-color: #d1d5db;
+}
+
+.condition-card ::ng-deep .mat-mdc-select {
+	padding: 0.5rem 0.625rem;
+	border: 1px solid #d1d5db;
+	border-radius: 0.375rem;
+	font-size: 0.875rem;
+	color: #111827;
+	background-color: #f9fafb;
+	min-width: 150px;
+	max-width: 220px;
+}
+
+.condition-flags {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	flex-shrink: 0;
+}
+
+.condition-flags ::ng-deep .mat-mdc-checkbox .mdc-form-field label {
+	font-size: 0.75rem;
+	font-weight: 600;
+	color: #6b7280;
+}
+
+.condition-value-input {
+	flex: 1;
+	min-width: 110px;
+	max-width: 220px;
+	padding: 0.5rem 0.625rem;
+	border: 1px solid #d1d5db;
+	border-radius: 0.375rem;
+	background-color: #f9fafb;
+	color: #111827;
+	font-size: 0.875rem;
+	font-family: inherit;
+	transition: all 0.2s;
+}
+
+.condition-value-input:focus {
+	outline: none;
+	border-color: #5bd4d4;
+	box-shadow: 0 0 0 3px rgba(91, 212, 212, 0.1);
+	background-color: white;
+}
+
+.condition-value-input::placeholder {
+	color: #9ca3af;
+}
+
+.condition-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	margin-left: auto;
+	flex-shrink: 0;
+	align-self: flex-start;
+	padding-top: 0.4rem;
+}
+
+.condition-actions ::ng-deep .mat-mdc-select {
+	padding: 0.35rem 0.5rem;
+	border: 1px solid #d1d5db;
+	border-radius: 0.375rem;
+	font-size: 0.75rem;
+	color: #374151;
+	background-color: #f9fafb;
+	min-width: 80px;
+	max-width: 95px;
+}
+
+.nested-conditions-tree {
+	display: flex;
+	flex-direction: row;
+	margin-top: 0.25rem;
+	margin-left: 0;
+}
+
+.nested-conditions-tree.nested-indented {
+	margin-left: 1rem;
+}
+
+.nested-line-col {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 1.5rem;
+	flex-shrink: 0;
+	position: relative;
+}
+
+.nested-line {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 50%;
+	width: 2px;
+	background-color: #e5e7eb;
+	transform: translateX(-50%);
+}
+
+.nested-mode-label {
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%) rotate(-90deg);
+	left: 50%;
+	font-size: 0.6rem;
+	font-weight: 700;
+	padding: 0.15rem 0.35rem;
+	border-radius: 0.25rem;
+	border: 1px solid;
+	cursor: pointer;
+	transition: background 0.12s;
+	background: white;
+	white-space: nowrap;
+	z-index: 1;
+}
+
+.nested-mode-label.mode-or {
+	color: #0F766E;
+	border-color: #0F766E;
+	background: white;
+}
+
+.nested-mode-label.mode-or:hover {
+	background: rgba(15, 118, 110, 0.08);
+}
+
+.nested-mode-label.mode-and {
+	color: #6D28D9;
+	border-color: #6D28D9;
+	background: white;
+}
+
+.nested-mode-label.mode-and:hover {
+	background: rgba(109, 40, 217, 0.08);
+}
+
+.nested-conditions-list {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-width: 0;
+}
+
+.navigation-hint {
+	font-size: 0.75rem;
+	color: #9ca3af;
+	font-style: italic;
+	padding: 0.25rem 0.5rem;
+	background-color: #f9fafb;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.375rem;
+}
+
+.flag-btn {
+	width: 1.75rem;
+	height: 1.75rem;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid #d1d5db;
+	background: none;
+	cursor: pointer;
+	color: #d1d5db;
+	transition: all 0.15s;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.flag-btn mat-icon {
+	font-size: 1rem;
+	width: 1rem;
+	height: 1rem;
+}
+
+.flag-btn:hover {
+	border-color: #9ca3af;
+	color: #9ca3af;
+}
+
+.flag-btn.flag-inverse.active {
+	border-color: #0369A1;
+	color: #0369A1;
+	background: rgba(3, 105, 161, 0.08);
+}
+
+.flag-btn.flag-inverse.active:hover {
+	background: rgba(3, 105, 161, 0.15);
+}
+
+.flag-btn.flag-dependency.active {
+	border-color: #CA8A04;
+	color: #CA8A04;
+	background: rgba(202, 138, 4, 0.08);
+}
+
+.flag-btn.flag-dependency.active:hover {
+	background: rgba(202, 138, 4, 0.15);
+}
+
+.break-btn {
+	width: 1.75rem;
+	height: 1.75rem;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid #d1d5db;
+	background: none;
+	cursor: pointer;
+	transition: all 0.15s;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.break-btn mat-icon {
+	font-size: 1rem;
+	width: 1rem;
+	height: 1rem;
+}
+
+.break-btn.break-none {
+	color: #d1d5db;
+	border-color: #d1d5db;
+}
+
+.break-btn.break-none:hover {
+	color: #9ca3af;
+	border-color: #9ca3af;
+}
+
+.break-btn.break-allow {
+	color: #166534;
+	border-color: #166534;
+	background: rgba(22, 101, 52, 0.08);
+}
+
+.break-btn.break-allow:hover {
+	background: rgba(22, 101, 52, 0.15);
+}
+
+.break-btn.break-deny {
+	color: #dc2626;
+	border-color: #dc2626;
+	background: rgba(220, 38, 38, 0.08);
+}
+
+.break-btn.break-deny:hover {
+	background: rgba(220, 38, 38, 0.15);
+}
+
+.sibling-actions {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	flex-shrink: 0;
+}
+
+.value-rows {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	flex: 1;
+	min-width: 0;
+}
+
+.value-row {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+}
+
+.value-row mat-select,
+.value-row input {
+	flex: 1;
+	min-width: 0;
+}
+
+.value-actions {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
+.value-btn {
+	width: 1.75rem;
+	height: 1.75rem;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid;
+	background: none;
+	cursor: pointer;
+	transition: all 0.15s;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.value-btn mat-icon {
+	font-size: 1rem;
+	width: 1rem;
+	height: 1rem;
+}
+
+.value-add {
+	color: #166534;
+	border-color: #166534;
+	background: rgba(22, 101, 52, 0.08);
+}
+
+.value-add:hover {
+	background: rgba(22, 101, 52, 0.15);
+}
+
+.value-remove {
+	color: #dc2626;
+	border-color: #dc2626;
+	background: rgba(220, 38, 38, 0.08);
+}
+
+.value-remove:hover {
+	background: rgba(220, 38, 38, 0.15);
+}

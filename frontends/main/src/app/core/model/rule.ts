@@ -13,6 +13,7 @@ import { RuleConstraint } from './rule-constraint';
 
 export interface Rule { 
     ruleId?: string;
+    ruleType?: string;
     description?: string;
     message?: { [key: string]: string; };
     tags?: Array<string>;

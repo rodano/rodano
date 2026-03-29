@@ -1,4 +1,4 @@
-import {Component, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -14,6 +14,7 @@ import {Cron} from '@core/model/cron';
 import {CronManagerService} from '../../services/manager/cron-manager.service';
 import {CronDialogService} from '../../services/dialogs/cron-dialog.service';
 import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
+import {Rule} from '@core/model/rule';
 
 @Component({
 	selector: 'app-cron-detail',
@@ -28,6 +29,7 @@ export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronMa
 	@Input() override allEntities: Cron[] = [];
 	@Output() cronUpdated = this.entityUpdated;
 	@Output() cronDeleted = this.entityDeleted;
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
 
 	@Input() set cron(v: Cron) {this.entity = v;}
 	get cron(): Cron {return this.entity;}
@@ -35,6 +37,9 @@ export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronMa
 	@Input() set allCrons(v: Cron[]) {this.allEntities = v;}
 
 	activeTab: 'general' | 'rules' = 'general';
+
+	readonly ruleTypes = [{type: null, label: 'Rules'}];
+	readonly ruleDomains = ['SCOPE'];
 
 	constructor(
 		cronManager: CronManagerService,
@@ -47,10 +52,6 @@ export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronMa
 	}
 
 	protected getEntityId(): string {return this.entity.cronId;}
-
-	get ruleTypes() {
-		return [{type: null, label: 'Rules'}];
-	}
 
 	onEditBasicInfo(): void {
 		this.cronDialogService.openBasicInfoDialog(

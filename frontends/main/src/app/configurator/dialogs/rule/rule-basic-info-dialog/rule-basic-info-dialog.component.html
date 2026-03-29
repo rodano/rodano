@@ -1,0 +1,75 @@
+<div class="dialog-container">
+	<h2 class="dialog-title">Edit Rule</h2>
+
+	<div class="dialog-content">
+		<form [formGroup]="form" class="settings-form">
+			<div class="form-field">
+				<label>Description</label>
+				<input type="text" formControlName="description" placeholder="Rule description">
+			</div>
+
+			<div class="form-field">
+				<label>Tags</label>
+				<div class="tag-selector">
+					@if (selectedTags.length > 0) {
+						<div class="selected-tags">
+							@for (tag of selectedTags; track tag) {
+								<div class="tag-chip">
+									<span>{{ tag }}</span>
+									<button type="button" class="chip-remove" (click)="removeTag(tag)">
+										<mat-icon>close</mat-icon>
+									</button>
+								</div>
+							}
+						</div>
+					} @else {
+						<div class="empty-state">
+							<mat-icon>label</mat-icon>
+							<p>No tags added yet.</p>
+						</div>
+					}
+					<div class="add-tag-input">
+						<input type="text"
+													[(ngModel)]="newTagInput"
+													[ngModelOptions]="{standalone: true}"
+													(keypress)="onKeyPress($event)"
+													placeholder="Enter tag (e.g., INCLUSION)"
+													class="tag-input">
+						<button type="button" class="btn-add-tag"
+														(click)="addTag()"
+														[disabled]="!newTagInput.trim()">
+							<mat-icon>add</mat-icon>
+							Add Tag
+						</button>
+					</div>
+				</div>
+				<span class="hint">Press Enter or click Add. Tags are uppercased automatically.</span>
+			</div>
+
+			<div class="form-section">
+				<h3>Message</h3>
+				<mat-tab-group>
+					@for (lang of availableLanguages; track lang.languageCode) {
+						@if (lang.languageCode) {
+							<mat-tab [label]="getLanguageLabel(lang.languageCode, lang.isDefault ?? false)">
+								<div class="tab-content" [formGroup]="languageForms.get(lang.languageCode)!">
+									<div class="form-field">
+										<label>Message</label>
+										<input type="text" formControlName="message"
+																	placeholder="Message shown when rule triggers">
+										<span class="hint">Optional message displayed to users</span>
+									</div>
+								</div>
+							</mat-tab>
+						}
+					}
+				</mat-tab-group>
+			</div>
+		</form>
+	</div>
+
+	<div class="dialog-actions">
+		<button class="btn-secondary" (click)="onCancel()">Cancel</button>
+		<button class="btn-primary" (click)="onSave()">Save Changes</button>
+	</div>
+</div>

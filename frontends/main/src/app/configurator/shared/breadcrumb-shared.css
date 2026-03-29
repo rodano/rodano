@@ -1,0 +1,70 @@
+.fullscreen {
+	display: flex;
+	flex-direction: column;
+	height: calc(100vh - 120px);
+	overflow: hidden;
+	animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.breadcrumb {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 10px 20px;
+	background: #fff;
+	border-bottom: 1px solid #e5e7eb;
+	flex-shrink: 0;
+}
+
+.breadcrumb-btn {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	background: none;
+	border: none;
+	cursor: pointer;
+	font-size: 13px;
+	font-weight: 500;
+	color: #6b7280;
+	padding: 4px 8px;
+	border-radius: 6px;
+	transition: background 0.15s, color 0.15s;
+}
+
+.breadcrumb-btn:hover {
+	background: #f3f4f6;
+	color: #111827;
+}
+
+.breadcrumb-btn mat-icon {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+}
+
+.breadcrumb-sep {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	color: #d1d5db;
+}
+
+.breadcrumb-current {
+	font-size: 13px;
+	font-weight: 600;
+	color: #111827;
+	padding: 4px 8px;
+}
+
+.breadcrumb-actions {
+	margin-left: auto;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.breadcrumb-btn-active {
+	background: var(--entity-color, #0C4A6E);
+	color: #fff;
+	border-radius: 6px;
+}

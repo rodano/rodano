@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -18,6 +18,8 @@ export class RuleListComponent implements OnInit {
 	@Input() projectId = '';
 	@Input() entityPath = '';
 	@Input() ruleTypes: {type: string | null; label: string}[] = [];
+	@Input() availableDomains: string[] = ['SCOPE', 'EVENT', 'DATASET', 'FIELD', 'FORM', 'WORKFLOW'];
+	@Output() editRule = new EventEmitter<Rule>();
 
 	rules: Rule[] = [];
 	loading = false;
@@ -48,15 +50,16 @@ export class RuleListComponent implements OnInit {
 	}
 
 	getRulesForType(type: string | null): Rule[] {
-		return this.rules.filter(r => (r as any).ruleType === type);
+		return this.rules.filter(r => (r.ruleType ?? null) === type);
 	}
 
 	onSelectRule(rule: Rule): void {
-		this.selectedRule = this.selectedRule?.ruleId === rule.ruleId ? null : rule;
+		this.editRule.emit(rule);
 	}
 
 	onAddRule(type: string | null): void {
 		const newRule: Rule = {
+			ruleType: type ?? undefined,
 			description: '',
 			message: {},
 			tags: [],
@@ -75,7 +78,7 @@ export class RuleListComponent implements OnInit {
 
 		this.ruleService.createRule(this.projectId, this.entityPath, newRule).subscribe({
 			next: created => {
-				this.rules.push(created);
+				this.rules = [...this.rules, created];
 				this.selectedRule = created;
 				this.snackBar.open('Rule created', 'Close', {duration: 2000});
 			},

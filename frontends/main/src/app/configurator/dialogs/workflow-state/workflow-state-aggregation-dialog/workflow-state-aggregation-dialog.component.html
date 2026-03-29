@@ -15,7 +15,7 @@
 		<div class="form-field">
 			<label>Aggregate State</label>
 			<mat-select formControlName="aggregateStateId" placeholder="Select the aggregate state">
-				<mat-option [value]="null">None</mat-option>
+				<mat-option [value]="null">-- None --</mat-option>
 				@for (state of data.aggregatedWorkflowStates; track state.workflowStateId) {
 					<mat-option [value]="state.workflowStateId">{{ languageService.getLabel(state) }}</mat-option>
 				}

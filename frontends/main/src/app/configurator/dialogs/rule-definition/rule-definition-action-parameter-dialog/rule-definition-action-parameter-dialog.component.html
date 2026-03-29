@@ -62,7 +62,7 @@
 								<label>Data Entity</label>
 								<mat-select [value]="param.dataEntity || ''"
 																				(selectionChange)="updateField(i, 'dataEntity', $event.value)">
-									<mat-option value="">None</mat-option>
+									<mat-option [value]="">-- None --</mat-option>
 									@for (option of entityOptions; track option.value) {
 										<mat-option [value]="option.value">{{ option.label }}</mat-option>
 									}
@@ -73,7 +73,7 @@
 								<label>Configuration Entity</label>
 								<mat-select [value]="param.configurationEntity || ''"
 																				(selectionChange)="updateField(i, 'configurationEntity', $event.value)">
-									<mat-option value="">None</mat-option>
+									<mat-option [value]="">-- None --</mat-option>
 									@for (option of configEntityOptions; track option) {
 										<mat-option [value]="option">{{ option }}</mat-option>
 									}

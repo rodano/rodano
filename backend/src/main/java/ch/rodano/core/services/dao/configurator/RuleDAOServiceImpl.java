@@ -59,8 +59,15 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 	@Transactional(readOnly = true)
 	@Cacheable(value = "rules", key = "#projectId.toString() + ':' + #entityType.name() + ':' + #entityId.toString()")
 	public List<RuleDTO> getRules(final UUID projectId, final RuleEntityType entityType, final UUID entityId) {
+		final var ruleTypeMap = dslContext.selectFrom(RULE)
+			.where(RULE.PROJECT_ID.eq(projectId))
+			.and(RULE.ENTITY_TYPE.eq(entityType))
+			.and(RULE.ENTITY_ID.eq(entityId))
+			.fetch()
+			.intoMap(RULE.RULE_ID, RULE.RULE_TYPE);
+
 		return ruleDAO.findByEntity(entityType, entityId).stream()
-			.map(this::toDTO)
+			.map(rule -> toDTO(rule, ruleTypeMap.get(rule.getRuleId())))
 			.toList();
 	}
 
@@ -68,14 +75,15 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 	@Transactional
 	@CacheEvict(value = "rules", key = "#projectId.toString() + ':' + #entityType.name() + ':' + #entityId.toString()")
 	public RuleDTO createRule(final UUID projectId, final RuleEntityType entityType, final UUID entityId, final String ruleType, final RuleDTO dto) {
-		final UUID ruleId = UUID.randomUUID();
+		final UUID ruleId = dto.ruleId() != null ? dto.ruleId() : UUID.randomUUID();
+		final String resolvedType = ruleType != null ? ruleType : dto.ruleType();
 
 		dslContext.insertInto(RULE)
 			.set(RULE.RULE_ID, ruleId)
 			.set(RULE.PROJECT_ID, projectId)
 			.set(RULE.ENTITY_TYPE, entityType)
 			.set(RULE.ENTITY_ID, entityId)
-			.set(RULE.RULE_TYPE, ruleType)
+			.set(RULE.RULE_TYPE, resolvedType)
 			.set(RULE.DESCRIPTION, dto.description())
 			.set(RULE.MESSAGE, jsonMapperService.toJson(dto.message()))
 			.set(RULE.TAG, jsonMapperService.toJson(dto.tags()))
@@ -159,15 +167,20 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 		if(record == null) {
 			return null;
 		}
-		return toDTO(ruleDAO.findByEntity(
-			record.getEntityType(),
-			record.getEntityId()
-		).stream().filter(r -> r.getRuleId().equals(ruleId)).findFirst().orElseThrow());
+
+		final String ruleType = record.getRuleType();
+		return ruleDAO.findByEntity(record.getEntityType(), record.getEntityId())
+			.stream()
+			.filter(r -> r.getRuleId().equals(ruleId))
+			.findFirst()
+			.map(rule -> toDTO(rule, ruleType))
+			.orElseThrow();
 	}
 
-	private RuleDTO toDTO(final Rule rule) {
+	private RuleDTO toDTO(final Rule rule, final String ruleType) {
 		return new RuleDTO(
 			rule.getRuleId(),
+			ruleType,
 			rule.getDescription(),
 			rule.getMessage(),
 			new ArrayList<>(rule.getTags()),

@@ -29,7 +29,7 @@ type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview'
 	selector: 'app-form-model-list',
 	standalone: true,
 	templateUrl: './form-model-list.component.html',
-	styleUrls: ['./form-model-list.component.css'],
+	styleUrls: ['./form-model-list.component.css', '../../shared/breadcrumb-shared.css'],
 	imports: [CommonModule, MatIconModule, MatTooltipModule, FormModelDetailComponent, FormLayoutEditorComponent,
 		EmptyStateComponent, ListHeaderComponent, ModifiedDirective, FormLayoutPreviewComponent, FormModelRightsMatrixComponent]
 })

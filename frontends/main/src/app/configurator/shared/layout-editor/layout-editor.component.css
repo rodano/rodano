@@ -1,3 +1,5 @@
+@import "../../shared/buttons-shared.css";
+
 .layout-editor {
 	display: flex;
 	flex-direction: column;
@@ -244,61 +246,6 @@
 	color: #9ca3af;
 	text-align: center;
 	padding: 2rem;
-}
-
-.btn-add-item {
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-	background: none;
-	border: 1px solid #d1d5db;
-	border-radius: 0.375rem;
-	padding: 0.3rem 0.6rem;
-	font-size: 0.75rem;
-	font-weight: 500;
-	cursor: pointer;
-	color: #374151;
-	transition: all 0.12s;
-}
-
-.btn-add-item:hover {
-	background: #f3f4f6;
-	border-color: #9ca3af;
-}
-
-.btn-add-item mat-icon {
-	font-size: 1rem;
-	width: 1rem;
-	height: 1rem;
-}
-
-.btn-icon-xs {
-	background: none;
-	border: none;
-	cursor: pointer;
-	padding: 0.2rem;
-	border-radius: 0.25rem;
-	display: flex;
-	align-items: center;
-	color: #9ca3af;
-	transition: all 0.12s;
-	flex-shrink: 0;
-}
-
-.btn-icon-xs:hover {
-	background: #f3f4f6;
-	color: #374151;
-}
-
-.btn-icon-xs.danger:hover {
-	background: rgba(220, 38, 38, 0.08);
-	color: #dc2626;
-}
-
-.btn-icon-xs mat-icon {
-	font-size: 1rem;
-	width: 1rem;
-	height: 1rem;
 }
 
 .layout-toolbar .btn-primary,

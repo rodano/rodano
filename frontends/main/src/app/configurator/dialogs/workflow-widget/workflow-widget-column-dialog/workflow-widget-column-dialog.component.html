@@ -48,7 +48,7 @@
 								<label>Type *</label>
 								<mat-select [value]="col.type"
 																				(selectionChange)="updateField(i, 'type', $event.value)">
-									<mat-option value="">Select a type</mat-option>
+									<mat-option [value]="">-- Select a type --</mat-option>
 									@for (t of columnTypes; track t.value) {
 										<mat-option [value]="t.value">{{ t.label }}</mat-option>
 									}

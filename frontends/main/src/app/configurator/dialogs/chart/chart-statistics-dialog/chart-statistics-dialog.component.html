@@ -21,7 +21,7 @@
 			<div class="form-field">
 				<label>Field Model</label>
 				<mat-select formControlName="fieldModelId" placeholder="Select a field model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (fm of filteredFieldModels; track fm.fieldModelId) {
 						<mat-option [value]="fm.fieldModelId">
 							{{ languageService.getLabel(fm) }}

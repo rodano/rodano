@@ -15,7 +15,7 @@ export interface RuleTagsDialogData {
 	selector: 'app-edit-rule-tags-dialog',
 	standalone: true,
 	templateUrl: './project-settings-rule-tags-dialog.component.html',
-	styleUrls: ['./project-settings-rule-tags-dialog.component.css'],
+	styleUrls: ['../../dialog-shared.css'],
 	imports: [CommonModule, MatDialogModule, MatIconModule, MatTooltipModule, FormsModule]
 })
 export class ProjectSettingsRuleTagsDialogComponent extends BaseDialogComponent<RuleTagsDialogData> implements OnInit {

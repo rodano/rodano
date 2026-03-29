@@ -29,7 +29,7 @@
 			<div class="form-field">
 				<label>Event Group</label>
 				<mat-select formControlName="eventGroupId" placeholder="Select event group">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (group of eventGroups; track group.eventGroupId) {
 						<mat-option [value]="group.eventGroupId">{{ languageService.getLabel(group) }}</mat-option>
 					}

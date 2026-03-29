@@ -33,7 +33,7 @@
 		<div class="form-field">
 			<label>Required Feature</label>
 			<mat-select formControlName="requiredFeatureId" placeholder="None">
-				<mat-option value="">None</mat-option>
+				<mat-option [value]="">-- None --</mat-option>
 				@for (feature of availableFeatures; track feature.featureId) {
 					<mat-option [value]="feature.featureId">
 						{{ languageService.getLabel(feature) }}
@@ -47,7 +47,7 @@
 			<label>Required Right</label>
 			<div class="inline-fields">
 				<mat-select formControlName="rightEntity" placeholder="Entity">
-					<mat-option [value]="">None</mat-option>
+					<mat-option [value]="">-- None --</mat-option>
 					<mat-option value="SCOPE_MODEL">Scope Model</mat-option>
 					<mat-option value="EVENT_MODEL">Event Model</mat-option>
 					<mat-option value="DATASET_MODEL">Dataset Model</mat-option>
@@ -56,13 +56,13 @@
 				</mat-select>
 
 				<mat-select formControlName="rightValue" placeholder="Right">
-					<mat-option [value]="">None</mat-option>
+					<mat-option [value]="">-- None --</mat-option>
 					<mat-option value="READ">Read</mat-option>
 					<mat-option value="WRITE">Write</mat-option>
 				</mat-select>
 
 				<mat-select formControlName="rightTargetId" placeholder="Target">
-					<mat-option [value]="">None</mat-option>
+					<mat-option [value]="">-- None --</mat-option>
 					@for (opt of targetOptions; track opt.id) {
 						<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
 					}

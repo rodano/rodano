@@ -33,7 +33,7 @@
 			<div class="form-field">
 				<label>Dataset Model</label>
 				<mat-select formControlName="datasetModelId" placeholder="Select dataset model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (dataset of data.datasetModels; track dataset.datasetModelId) {
 						<mat-option [value]="dataset.datasetModelId">{{ languageService.getLabel(dataset) }}</mat-option>
 					}
@@ -43,7 +43,7 @@
 			<div class="form-field">
 				<label>Date Field Model</label>
 				<mat-select formControlName="dateFieldId" placeholder="Select field model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (field of filteredFieldModels; track field.fieldModelId) {
 						<mat-option [value]="field.fieldModelId">{{ languageService.getLabel(field) }}</mat-option>
 					}
@@ -53,7 +53,7 @@
 			<div class="form-field">
 				<label>End Date Field Model</label>
 				<mat-select formControlName="endDateFieldId" placeholder="Select field model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (field of filteredFieldModels; track field.fieldModelId) {
 						<mat-option [value]="field.fieldModelId">{{ languageService.getLabel(field) }}</mat-option>
 					}
@@ -63,7 +63,7 @@
 			<div class="form-field">
 				<label>Value Field Model</label>
 				<mat-select formControlName="valueFieldId" placeholder="Select field model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (field of filteredFieldModels; track field.fieldModelId) {
 						<mat-option [value]="field.fieldModelId">{{ languageService.getLabel(field) }}</mat-option>
 					}
@@ -73,7 +73,7 @@
 			<div class="form-field">
 				<label>Label Field Model</label>
 				<mat-select formControlName="labelFieldId" placeholder="Select field model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (field of filteredFieldModels; track field.fieldModelId) {
 						<mat-option [value]="field.fieldModelId">{{ languageService.getLabel(field) }}</mat-option>
 					}

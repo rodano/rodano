@@ -57,7 +57,7 @@
 							<mat-select
 								[value]="ref.referenceSectionId || ''"
 								(selectionChange)="updateReferenceField(ri, 'referenceSectionId', $event.value || undefined)">
-								<mat-option value="">None</mat-option>
+								<mat-option [value]="">-- None --</mat-option>
 								@for (section of data.allSections; track section.graphSectionId) {
 									<mat-option [value]="section.graphSectionId">
 										{{ languageService.getTranslatedName(section.label) || section.id }}

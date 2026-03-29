@@ -1,3 +1,5 @@
+@import "../../shared/buttons-shared.css";
+
 :host {
 	display: flex;
 	flex-direction: column;
@@ -444,42 +446,6 @@
 	font-size: 16px;
 	width: 16px;
 	height: 16px;
-}
-
-.btn-icon-sm {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 30px;
-	height: 30px;
-	border: 1px solid #e5e7eb;
-	border-radius: 6px;
-	background: #fff;
-	cursor: pointer;
-	color: #374151;
-	transition: background 0.15s, border-color 0.15s;
-}
-
-.btn-icon-sm:hover:not(:disabled) {
-	background: #f3f4f6;
-	border-color: #d1d5db;
-}
-
-.btn-icon-sm:disabled {
-	opacity: 0.35;
-	cursor: not-allowed;
-}
-
-.btn-icon-sm mat-icon {
-	font-size: 16px;
-	width: 16px;
-	height: 16px;
-}
-
-.btn-icon-danger:hover:not(:disabled) {
-	background: #fef2f2;
-	border-color: #fca5a5;
-	color: #dc2626;
 }
 
 .grid-area {

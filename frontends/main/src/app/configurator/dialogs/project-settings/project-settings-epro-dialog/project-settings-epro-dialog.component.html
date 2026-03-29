@@ -12,7 +12,7 @@
 			<div class="form-field">
 				<label>ePRO Profile</label>
 				<mat-select formControlName="eproProfileId" placeholder="Select ePRO profile">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (profile of data.availableProfiles; track profile.profileId) {
 						<mat-option [value]="profile.profileId">{{ getProfileLabel(profile.profileId) }}</mat-option>
 					}

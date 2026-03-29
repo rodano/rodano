@@ -16,14 +16,18 @@ import {Cron} from '@core/model/cron';
 import {CronManagerService} from '../../services/manager/cron-manager.service';
 import {CronDetailComponent} from '../cron-detail/cron-detail.component';
 import {CronDialogService} from '../../services/dialogs/cron-dialog.service';
+import {Rule} from '@core/model/rule';
+import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
+
+type CronViewMode = 'list' | 'detail' | 'rule-editor';
 
 @Component({
 	selector: 'app-cron-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, CronDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
+		MatSnackBarModule, CronDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, RuleDetailComponent],
 	templateUrl: './cron-list.component.html',
-	styleUrls: ['../../shared/list-shared.css']
+	styleUrls: ['../../shared/list-shared.css', '../../shared/breadcrumb-shared.css']
 })
 export class CronListComponent
 	extends BaseListComponent<Cron>
@@ -36,6 +40,12 @@ export class CronListComponent
 		crons: any[];
 		selectedCronId: string | null;
 	}>();
+
+	cronViewMode: CronViewMode = 'list';
+	selectedRule: Rule | null = null;
+
+	readonly ruleTypes = [{type: null, label: 'Rules'}];
+	readonly ruleDomains = ['SCOPE'];
 
 	constructor(
 		public cronManager: CronManagerService,
@@ -112,8 +122,26 @@ export class CronListComponent
 		});
 	}
 
-	onSelectCron(c: Cron): void {this.onSelect(c);}
+	onSelectCron(c: Cron): void {
+		this.onSelect(c);
+		this.cronViewMode = 'detail';
+	}
+
 	onCreateCron(): void {this.onCreate();}
 	onCronUpdated(c: Cron): void {this.onUpdated(c);}
 	onCronDeleted(id: string): void {this.onDeleted(id);}
+
+	switchToRuleEditor(rule: Rule): void {
+		this.selectedRule = rule;
+		this.cronViewMode = 'rule-editor';
+	}
+
+	backToCronDetail(): void {
+		this.selectedRule = null;
+		this.cronViewMode = 'detail';
+	}
+
+	onRuleSaved(rule: Rule): void {
+		this.selectedRule = rule;
+	}
 }

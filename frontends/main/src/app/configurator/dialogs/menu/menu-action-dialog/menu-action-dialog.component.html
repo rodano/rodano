@@ -6,7 +6,7 @@
 			<div class="form-field">
 				<label>Action Page</label>
 				<mat-select class="settings-select" formControlName="page">
-					<mat-option [value]="">None</mat-option>
+					<mat-option [value]="">-- None --</mat-option>
 					@for (page of ACTION_PAGES; track page) {
 						<mat-option [value]="page">{{ page }}</mat-option>
 					}
@@ -32,7 +32,7 @@
 					<mat-select class="settings-select"
 													[value]="contextItems[0]"
 													(change)="contextItems = [$any($event.target).value]">
-						<mat-option [value]="">None</mat-option>
+						<mat-option [value]="">-- None --</mat-option>
 						@for (sm of data.scopeModels; track sm.scopeModelId) {
 							<mat-option [value]="sm.scopeModelId">
 								{{ languageService.getLabel(sm) }}

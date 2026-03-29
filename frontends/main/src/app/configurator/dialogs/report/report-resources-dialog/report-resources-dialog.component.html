@@ -7,7 +7,7 @@
 			[value]="selectedWorkflowId"
 			(selectionChange)="onWorkflowChange($event.value)"
 			placeholder="Select a workflow">
-			<mat-option [value]="null">None</mat-option>
+			<mat-option [value]="null">-- None --</mat-option>
 			@for (w of data.workflows; track w.workflowId) {
 				<mat-option [value]="w.workflowId">
 					{{ languageService.getLabel(w) }}
@@ -23,7 +23,7 @@
 			[value]="selectedDatasetModelId"
 			(selectionChange)="onDatasetModelChange($event.value)"
 			placeholder="Select a dataset model">
-			<mat-option [value]="null">None</mat-option>
+			<mat-option [value]="null">-- None --</mat-option>
 			@for (dm of data.datasetModels; track dm.datasetModelId) {
 				<mat-option [value]="dm.datasetModelId">
 					{{ languageService.getLabel(dm) }}

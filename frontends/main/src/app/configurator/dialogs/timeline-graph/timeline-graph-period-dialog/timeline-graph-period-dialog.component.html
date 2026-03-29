@@ -12,7 +12,7 @@
 			<div class="form-field">
 				<label>Beginning Event Model</label>
 				<mat-select formControlName="studyStartEventModelId" placeholder="Select event model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (eventModel of data.eventModels; track eventModel.eventModelId) {
 						<mat-option [value]="eventModel.eventModelId">{{ languageService.getLabel(eventModel) }}</mat-option>
 					}
@@ -22,7 +22,7 @@
 			<div class="form-field">
 				<label>End Event Model</label>
 				<mat-select formControlName="studyEndEventModelId" placeholder="Select event model">
-					<mat-option [value]="null">None</mat-option>
+					<mat-option [value]="null">-- None --</mat-option>
 					@for (eventModel of data.eventModels; track eventModel.eventModelId) {
 						<mat-option [value]="eventModel.eventModelId">{{ languageService.getLabel(eventModel) }}</mat-option>
 					}
