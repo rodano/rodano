@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ConfiguratorProject} from '@core/model/configurator-project';
@@ -28,18 +28,22 @@ import {ModifiedDirective} from '../../shared/modified.directive';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {Profile} from '@core/model/profile';
 import {WorkflowRightsMatrixComponent} from '../workflow-rights-matrix/workflow-rights-matrix.component';
+import {Rule} from '@core/model/rule';
+import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
 
-type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-detail' | 'action-list' | 'action-detail';
+type ViewMode = 'workflow-list' | 'workflow-detail' | 'state-list' | 'state-detail' | 'action-list' | 'action-detail' | 'rule-editor';
 
 @Component({
 	selector: 'app-workflow-list',
 	standalone: true,
 	templateUrl: './workflow-list.component.html',
-	styleUrls: ['../../shared/list-shared.css'],
+	styleUrls: ['../../shared/list-shared.css', '../../shared/breadcrumb-shared.css'],
 	imports: [CommonModule, MatIconModule, WorkflowDetailComponent, WorkflowStateDetailComponent, WorkflowActionDetailComponent,
-		MatTooltipModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, WorkflowRightsMatrixComponent]
+		MatTooltipModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, WorkflowRightsMatrixComponent, RuleDetailComponent]
 })
 export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
+	@ViewChild(RuleDetailComponent) ruleDetailComponent!: RuleDetailComponent;
+
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
@@ -59,6 +63,15 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedWorkflowActionId: string | null = null;
 	viewMode: ViewMode = 'workflow-list';
 	loading = true;
+
+	selectedRule: Rule | null = null;
+	ruleModified = false;
+	returnTab: 'general' | 'rules' = 'general';
+	selectedRuleEntityPath = '';
+	ruleEditorContext: 'workflow' | 'workflow-action' = 'workflow';
+
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'DATASET', 'FIELD', 'FORM', 'WORKFLOW'];
+	private originalRule: Rule | null = null;
 
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
@@ -213,10 +226,29 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		this.nodeSelected.emit('workflows');
 	}
 
-	backWorkflowDetail(): void {
+	backToWorkflowDetail(): void {
 		this.viewMode = 'workflow-detail';
+		this.returnTab = 'general';
 		this.selectedWorkflowStateId = null;
 		this.selectedWorkflowActionId = null;
+		this.emitContext();
+	}
+
+	backToWorkflowActionDetail(): void {
+		this.viewMode = 'action-detail';
+		this.returnTab = 'general';
+		this.emitContext();
+	}
+
+	backToWorkflowActionRules(): void {
+		this.viewMode = 'action-detail';
+		this.returnTab = 'rules';
+		this.emitContext();
+	}
+
+	backToWorkflowRules(): void {
+		this.viewMode = 'workflow-detail';
+		this.returnTab = 'rules';
 		this.emitContext();
 	}
 
@@ -502,5 +534,44 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		if(this.showMatrix) {
 			this.selectedWorkflow = null;
 		}
+	}
+
+	switchToRuleEditor(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.selectedRuleEntityPath = `workflows/${this.selectedWorkflow?.workflowId}`;
+		this.ruleEditorContext = 'workflow';
+		this.viewMode = 'rule-editor';
+	}
+
+	onWorkflowActionRuleEdit(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.selectedRuleEntityPath = `workflow-actions/${this.selectedWorkflowActionId}`;
+		this.ruleEditorContext = 'workflow-action';
+		this.viewMode = 'rule-editor';
+	}
+
+	onRuleChanged(): void {
+		this.ruleModified = true;
+	}
+
+	onSaveRule(): void {
+		this.ruleDetailComponent?.onSave();
+	}
+
+	onRevertRule(): void {
+		if(this.originalRule) {
+			this.selectedRule = JSON.parse(JSON.stringify(this.originalRule));
+			this.ruleModified = false;
+		}
+	}
+
+	onRuleSaved(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
 	}
 }

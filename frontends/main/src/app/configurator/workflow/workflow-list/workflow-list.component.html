@@ -5,306 +5,365 @@
 	</button>
 </app-list-header>
 
-<div class="content-container"
-					[class.level-2]="viewLevel === 2 && !showMatrix"
-					[class.level-3]="viewLevel === 3">
+@if (viewMode === 'rule-editor' && selectedWorkflow && selectedRule) {
+	<div class="fullscreen">
+		<div class="breadcrumb">
+			<button class="breadcrumb-btn" (click)="backToWorkflowDetail()">
+				<mat-icon>settings</mat-icon>
+				<span>{{ languageService.getTranslatedName(selectedWorkflow.shortname) }}</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
 
-	@if (showMatrix) {
-		<app-workflow-rights-matrix
-			style="width: 100%"
+			@if (ruleEditorContext === 'workflow-action') {
+				<button class="breadcrumb-btn" (click)="backToWorkflowActionDetail()">
+					<mat-icon>play_circle</mat-icon>
+					<span>{{ getWorkflowActionLabel(selectedWorkflowActionId!) }}</span>
+				</button>
+				<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+				<button class="breadcrumb-btn" (click)="backToWorkflowActionRules()">
+					<mat-icon>rules</mat-icon>
+					<span>Rules</span>
+				</button>
+			} @else {
+				<button class="breadcrumb-btn" (click)="backToWorkflowRules()">
+					<mat-icon>rules</mat-icon>
+					<span>Rules</span>
+				</button>
+			}
+
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">{{ selectedRule.description || 'Unnamed rule' }}</span>
+
+			<div class="breadcrumb-actions">
+				@if (ruleModified) {
+					<button class="breadcrumb-btn" (click)="onRevertRule()" matTooltip="Revert changes">
+						<mat-icon>undo</mat-icon>
+						Revert
+					</button>
+					<button class="breadcrumb-btn breadcrumb-btn-active" (click)="onSaveRule()" matTooltip="Save rule">
+						<mat-icon>save</mat-icon>
+						Save
+					</button>
+				}
+			</div>
+		</div>
+
+		<app-rule-detail
+			[rule]="selectedRule"
 			[projectId]="projectId"
-			[workflows]="workflows"
-			[workflowActions]="allWorkflowActions"
-			[profiles]="profiles"
-			(closed)="showMatrix = false">
-		</app-workflow-rights-matrix>
-	} @else if (loading) {
-		<app-empty-state
-			style="width: 100%"
-			[icon]="'hourglass_empty'"
-			[message]="'Loading workflows...'"
-		/>
-	} @else {
-		<div class="cards-container">
-			<div class="primary-cards-grid">
-				<div class="primary-card create-card theme-workflow" (click)="onCreateWorkflow()">
-					<div class="create-content">
-						<mat-icon>add_circle_outline</mat-icon>
-						<h3>Create Workflow</h3>
-						<p>Add a new workflow</p>
+			[entityPath]="selectedRuleEntityPath"
+			[availableDomains]="ruleDomains"
+			[contextWorkflowId]="selectedWorkflow.workflowId"
+			(ruleSaved)="onRuleSaved($event)"
+			(ruleChanged)="onRuleChanged()">
+		</app-rule-detail>
+	</div>
+} @else {
+	<div class="content-container"
+	     [class.level-2]="viewLevel === 2 && !showMatrix"
+	     [class.level-3]="viewLevel === 3">
+
+		@if (showMatrix) {
+			<app-workflow-rights-matrix
+				style="width: 100%"
+				[projectId]="projectId"
+				[workflows]="workflows"
+				[workflowActions]="allWorkflowActions"
+				[profiles]="profiles"
+				(closed)="showMatrix = false">
+			</app-workflow-rights-matrix>
+		} @else if (loading) {
+			<app-empty-state
+				style="width: 100%"
+				[icon]="'hourglass_empty'"
+				[message]="'Loading workflows...'"
+			/>
+		} @else {
+			<div class="cards-container">
+				<div class="primary-cards-grid">
+					<div class="primary-card create-card theme-workflow" (click)="onCreateWorkflow()">
+						<div class="create-content">
+							<mat-icon>add_circle_outline</mat-icon>
+							<h3>Create Workflow</h3>
+							<p>Add a new workflow</p>
+						</div>
 					</div>
-				</div>
 
-				@for (workflow of workflows; track workflow.workflowId) {
-					<div class="primary-card theme-workflow"
-										[class.selected]="isSelected(workflow)"
-										[appModified]="modifiedWorkflowIds.has(workflow.workflowId)"
-										(click)="onSelectWorkflow(workflow)">
+					@for (workflow of workflows; track workflow.workflowId) {
+						<div class="primary-card theme-workflow"
+						     [class.selected]="isSelected(workflow)"
+						     [appModified]="modifiedWorkflowIds.has(workflow.workflowId)"
+						     (click)="onSelectWorkflow(workflow)">
 
-						@if (isSelected(workflow)) {
-							<div class="card-selection-icon">
-								<mat-icon>check</mat-icon>
-							</div>
-						}
+							@if (isSelected(workflow)) {
+								<div class="card-selection-icon">
+									<mat-icon>check</mat-icon>
+								</div>
+							}
 
-						<div class="card-header">
-							<div class="card-info">
-								<h3>{{ languageService.getTranslatedName(workflow.shortname) }}</h3>
-								<p class="card-code">{{ workflow.id }}</p>
-							</div>
-							<div class="card-header-badges">
-								@if (workflow.mandatory) {
-									<span class="status-badge third" matTooltip="Mandatory">
+							<div class="card-header">
+								<div class="card-info">
+									<h3>{{ languageService.getTranslatedName(workflow.shortname) }}</h3>
+									<p class="card-code">{{ workflow.id }}</p>
+								</div>
+								<div class="card-header-badges">
+									@if (workflow.mandatory) {
+										<span class="status-badge third" matTooltip="Mandatory">
 										<mat-icon class="badge-full">priority_high</mat-icon>
 										<mat-icon class="badge-short">priority_high</mat-icon>
 									</span>
-								}
-								@if (workflow.unique) {
-									<span class="status-badge second" matTooltip="Unique">
+									}
+									@if (workflow.unique) {
+										<span class="status-badge second" matTooltip="Unique">
 										<mat-icon class="badge-full">fingerprint</mat-icon>
 										<mat-icon class="badge-short">fingerprint</mat-icon>
 									</span>
-								}
-							</div>
-						</div>
-						<div class="card-body">
-							<div class="card-details">
-								<div class="detail-item" [class.unset]="!workflow.order">
-									<mat-icon>sort</mat-icon>
-									<span>Order: {{ workflow.order !== null && workflow.order !== undefined ? workflow.order : 'Not set' }}</span>
-								</div>
-								<div class="detail-item" [class.unset]="!workflow.aggregatedWorkflowId">
-									<mat-icon>settings</mat-icon>
-									<span>Aggregate Workflow: <b>{{ workflow.aggregatedWorkflowId ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</b></span>
-								</div>
-								<div class="detail-item" [class.unset]="!workflow.initialStateId">
-									<mat-icon>adjust</mat-icon>
-									<span>Initial State: <b>{{ workflow.initialStateId ? getWorkflowStateLabel(workflow.initialStateId) : 'Not set' }}</b></span>
-								</div>
-								<div class="detail-item" [class.unset]="!workflow.actionId">
-									<mat-icon>play_circle</mat-icon>
-									<span>Creation Action: <b>{{ workflow.actionId ? getWorkflowActionLabel(workflow.actionId) : 'Not set' }}</b></span>
+									}
 								</div>
 							</div>
-						</div>
+							<div class="card-body">
+								<div class="card-details">
+									<div class="detail-item" [class.unset]="!workflow.order">
+										<mat-icon>sort</mat-icon>
+										<span>Order: {{ workflow.order !== null && workflow.order !== undefined ? workflow.order : 'Not set' }}</span>
+									</div>
+									<div class="detail-item" [class.unset]="!workflow.aggregatedWorkflowId">
+										<mat-icon>settings</mat-icon>
+										<span>Aggregate Workflow: <b>{{ workflow.aggregatedWorkflowId ? getWorkflowLabel(workflow.aggregatedWorkflowId) : 'Not set' }}</b></span>
+									</div>
+									<div class="detail-item" [class.unset]="!workflow.initialStateId">
+										<mat-icon>adjust</mat-icon>
+										<span>Initial State: <b>{{ workflow.initialStateId ? getWorkflowStateLabel(workflow.initialStateId) : 'Not set' }}</b></span>
+									</div>
+									<div class="detail-item" [class.unset]="!workflow.actionId">
+										<mat-icon>play_circle</mat-icon>
+										<span>Creation Action: <b>{{ workflow.actionId ? getWorkflowActionLabel(workflow.actionId) : 'Not set' }}</b></span>
+									</div>
+								</div>
+							</div>
 
-						@if (modifiedWorkflowIds.has(workflow.workflowId)) {
-							<div class="card-modified-indicator">
-								<mat-icon>edit</mat-icon>
-							</div>
-						}
-					</div>
+							@if (modifiedWorkflowIds.has(workflow.workflowId)) {
+								<div class="card-modified-indicator">
+									<mat-icon>edit</mat-icon>
+								</div>
+							}
+						</div>
+					}
+				</div>
+
+				@if (workflows.length === 0) {
+					<app-empty-state
+						[icon]="'settings'"
+						[title]="'No Workflows'"
+						[message]="'Create your first workflow to start collecting data'"
+					/>
 				}
 			</div>
 
-			@if (workflows.length === 0) {
-				<app-empty-state
-					[icon]="'settings'"
-					[title]="'No Workflows'"
-					[message]="'Create your first workflow to start collecting data'"
-				/>
-			}
-		</div>
-
-		@if (viewMode === 'state-list' || viewMode === 'state-detail') {
-			<div class="secondary-column">
-				<div class="secondary-column-header">
-					<div class="header-with-back">
-						<button class="btn-close" (click)="backWorkflowDetail()">
-							<mat-icon>arrow_back</mat-icon>
-						</button>
-						<div>
-							<h2>Workflow States</h2>
-							<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
-						</div>
-					</div>
-				</div>
-
-				<div class="secondary-column-content">
-					<div class="secondary-cards-grid">
-						<div class="secondary-card first-child-card create-card theme-workflow-state" (click)="onCreateWorkflowState()">
-							<div class="create-content">
-								<mat-icon>add_circle_outline</mat-icon>
-								<h3>Create Workflow State</h3>
-								<p>Define a new state</p>
+			@if (viewMode === 'state-list' || viewMode === 'state-detail') {
+				<div class="secondary-column">
+					<div class="secondary-column-header">
+						<div class="header-with-back">
+							<button class="btn-close" (click)="backToWorkflowDetail()">
+								<mat-icon>arrow_back</mat-icon>
+							</button>
+							<div>
+								<h2>Workflow States</h2>
+								<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
 							</div>
 						</div>
+					</div>
 
-						@for (workflowState of workflowStates; track workflowState.workflowStateId) {
-							<div class="secondary-card first-child-card theme-workflow-state"
-												[class.selected]="selectedWorkflowStateId === workflowState.workflowStateId"
-												[appModified]="isWorkflowStateModified(workflowState.workflowStateId)"
-												(click)="onSelectWorkflowState(workflowState.workflowStateId)">
+					<div class="secondary-column-content">
+						<div class="secondary-cards-grid">
+							<div class="secondary-card first-child-card create-card theme-workflow-state" (click)="onCreateWorkflowState()">
+								<div class="create-content">
+									<mat-icon>add_circle_outline</mat-icon>
+									<h3>Create Workflow State</h3>
+									<p>Define a new state</p>
+								</div>
+							</div>
 
-								@if (selectedWorkflowStateId === workflowState.workflowStateId) {
-									<div class="card-selection-icon">
-										<mat-icon>check</mat-icon>
-									</div>
-								}
+							@for (workflowState of workflowStates; track workflowState.workflowStateId) {
+								<div class="secondary-card first-child-card theme-workflow-state"
+								     [class.selected]="selectedWorkflowStateId === workflowState.workflowStateId"
+								     [appModified]="isWorkflowStateModified(workflowState.workflowStateId)"
+								     (click)="onSelectWorkflowState(workflowState.workflowStateId)">
 
-								<div class="card-header">
-									<div class="card-info">
-										<h3>{{ languageService.getTranslatedName(workflowState.shortname) }}</h3>
-										<p class="card-code">{{ workflowState.id }}</p>
-									</div>
-									<div class="card-header-badges">
-										@if (workflowState.important) {
-											<span class="status-badge third" matTooltip="Important">
+									@if (selectedWorkflowStateId === workflowState.workflowStateId) {
+										<div class="card-selection-icon">
+											<mat-icon>check</mat-icon>
+										</div>
+									}
+
+									<div class="card-header">
+										<div class="card-info">
+											<h3>{{ languageService.getTranslatedName(workflowState.shortname) }}</h3>
+											<p class="card-code">{{ workflowState.id }}</p>
+										</div>
+										<div class="card-header-badges">
+											@if (workflowState.important) {
+												<span class="status-badge third" matTooltip="Important">
 												<mat-icon class="badge-full">priority_high</mat-icon>
 												<mat-icon class="badge-short">priority_high</mat-icon>
 											</span>
-										}
-									</div>
-								</div>
-
-								<div class="card-body">
-									<div class="card-details">
-										<div class="detail-item">
-											<mat-icon>play_circle</mat-icon>
-											<span>{{ workflowState.possibleActions.length || 0 }} {{ (workflowState.possibleActions.length || 0) === 1 ? 'Possible Workflow Action' : 'Possible Workflow Actions' }}</span>
-										</div>
-										<div class="detail-item" [class.unset]="!workflowState.aggregateStateId">
-											<mat-icon>adjust</mat-icon>
-											<span>Aggregate State: <b>{{ workflowState.aggregateStateId ? getWorkflowStateLabel(workflowState.aggregateStateId) : 'Not set' }}</b></span>
-										</div>
-										<div class="detail-item" [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
-											<mat-icon>equal</mat-icon>
-											<span>Aggregate State Matcher: {{ workflowState.aggregateStateMatcher !== null && workflowState.aggregateStateMatcher !== undefined ? workflowState.aggregateStateMatcher : 'Not set' }}</span>
+											}
 										</div>
 									</div>
+
+									<div class="card-body">
+										<div class="card-details">
+											<div class="detail-item">
+												<mat-icon>play_circle</mat-icon>
+												<span>{{ workflowState.possibleActions.length || 0 }} {{ (workflowState.possibleActions.length || 0) === 1 ? 'Possible Workflow Action' : 'Possible Workflow Actions' }}</span>
+											</div>
+											<div class="detail-item" [class.unset]="!workflowState.aggregateStateId">
+												<mat-icon>adjust</mat-icon>
+												<span>Aggregate State: <b>{{ workflowState.aggregateStateId ? getWorkflowStateLabel(workflowState.aggregateStateId) : 'Not set' }}</b></span>
+											</div>
+											<div class="detail-item" [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
+												<mat-icon>equal</mat-icon>
+												<span>Aggregate State Matcher: {{ workflowState.aggregateStateMatcher !== null && workflowState.aggregateStateMatcher !== undefined ? workflowState.aggregateStateMatcher : 'Not set' }}</span>
+											</div>
+										</div>
+									</div>
 								</div>
-							</div>
-						}
+							}
 
-						@if (workflowStates.length === 0) {
-							<app-empty-state
-								[icon]="'adjust'"
-								[message]="'No workflow states yet. Create your first workflow state to get started.'"
-								[size]="'small'"
-							/>
-						}
-					</div>
-				</div>
-			</div>
-		}
-
-		@if (viewMode === 'action-list' || viewMode === 'action-detail') {
-			<div class="secondary-column">
-				<div class="secondary-column-header">
-					<div class="header-with-back">
-						<button class="btn-close" (click)="backWorkflowDetail()">
-							<mat-icon>arrow_back</mat-icon>
-						</button>
-						<div>
-							<h2>Workflow Actions</h2>
-							<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
+							@if (workflowStates.length === 0) {
+								<app-empty-state
+									[icon]="'adjust'"
+									[message]="'No workflow states yet. Create your first workflow state to get started.'"
+									[size]="'small'"
+								/>
+							}
 						</div>
 					</div>
 				</div>
+			}
 
-				<div class="secondary-column-content">
-					<div class="secondary-cards-grid">
-						<div class="secondary-card second-child-card small-card create-card theme-workflow-action" (click)="onCreateWorkflowAction()">
-							<div class="create-content">
-								<mat-icon>add_circle_outline</mat-icon>
-								<h3>Create Workflow Action</h3>
-								<p>Define a new workflow action</p>
+			@if (viewMode === 'action-list' || viewMode === 'action-detail') {
+				<div class="secondary-column">
+					<div class="secondary-column-header">
+						<div class="header-with-back">
+							<button class="btn-close" (click)="backToWorkflowDetail()">
+								<mat-icon>arrow_back</mat-icon>
+							</button>
+							<div>
+								<h2>Workflow Actions</h2>
+								<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
 							</div>
 						</div>
+					</div>
 
-						@for (workflowAction of workflowActions; track workflowAction.workflowActionId) {
-							<div class="secondary-card second-child-card small-card theme-workflow-action"
-												[class.selected]="selectedWorkflowActionId === workflowAction.workflowActionId"
-												[appModified]="isWorkflowActionModified(workflowAction.workflowActionId)"
-												(click)="onSelectWorkflowAction(workflowAction.workflowActionId)">
+					<div class="secondary-column-content">
+						<div class="secondary-cards-grid">
+							<div class="secondary-card second-child-card small-card create-card theme-workflow-action" (click)="onCreateWorkflowAction()">
+								<div class="create-content">
+									<mat-icon>add_circle_outline</mat-icon>
+									<h3>Create Workflow Action</h3>
+									<p>Define a new workflow action</p>
+								</div>
+							</div>
 
-								@if (selectedWorkflowActionId === workflowAction.workflowActionId) {
-									<div class="card-selection-icon">
-										<mat-icon>check</mat-icon>
-									</div>
-								}
+							@for (workflowAction of workflowActions; track workflowAction.workflowActionId) {
+								<div class="secondary-card second-child-card small-card theme-workflow-action"
+								     [class.selected]="selectedWorkflowActionId === workflowAction.workflowActionId"
+								     [appModified]="isWorkflowActionModified(workflowAction.workflowActionId)"
+								     (click)="onSelectWorkflowAction(workflowAction.workflowActionId)">
 
-								<div class="card-header">
-									<div class="card-info">
-										<h3>{{ languageService.getTranslatedName(workflowAction.shortname) }}</h3>
-										<p class="card-code">{{ workflowAction.id }}</p>
-									</div>
-									<div class="card-header-badges">
-										@if (workflowAction.documentable) {
-											<span class="status-badge third" matTooltip="Documentable">
+									@if (selectedWorkflowActionId === workflowAction.workflowActionId) {
+										<div class="card-selection-icon">
+											<mat-icon>check</mat-icon>
+										</div>
+									}
+
+									<div class="card-header">
+										<div class="card-info">
+											<h3>{{ languageService.getTranslatedName(workflowAction.shortname) }}</h3>
+											<p class="card-code">{{ workflowAction.id }}</p>
+										</div>
+										<div class="card-header-badges">
+											@if (workflowAction.documentable) {
+												<span class="status-badge third" matTooltip="Documentable">
 												<mat-icon class="badge-full">article</mat-icon>
 												<mat-icon class="badge-short">article</mat-icon>
 											</span>
-										}
-										@if (workflowAction.requireSignature) {
-											<span class="status-badge fourth" matTooltip="Require Signature">
+											}
+											@if (workflowAction.requireSignature) {
+												<span class="status-badge fourth" matTooltip="Require Signature">
 												<mat-icon class="badge-full">stylus_note</mat-icon>
 												<mat-icon class="badge-short">stylus_note</mat-icon>
 											</span>
-										}
+											}
+										</div>
 									</div>
 								</div>
-							</div>
-						}
+							}
 
-						@if (workflowActions.length === 0) {
-							<app-empty-state
-								[icon]="'play_circle'"
-								[message]="'No workflow actions yet. Create your first workflow state to get started.'"
-								[size]="'small'"
-							/>
-						}
+							@if (workflowActions.length === 0) {
+								<app-empty-state
+									[icon]="'play_circle'"
+									[message]="'No workflow actions yet. Create your first workflow state to get started.'"
+									[size]="'small'"
+								/>
+							}
+						</div>
 					</div>
 				</div>
-			</div>
-		}
+			}
 
-		@if (selectedWorkflow && viewMode === 'workflow-detail') {
-			<div class="detail-panel">
-				<app-workflow-detail
-					[workflow]="selectedWorkflow"
-					[projectId]="projectId"
-					[project]="project"
-					[allWorkflows]="workflows"
-					(workflowUpdated)="onWorkflowUpdated($event)"
-					(workflowDeleted)="onWorkflowDeleted($event)"
-					(closed)="onSelectWorkflow(selectedWorkflow)"
-					(switchToWorkflowStates)="switchToWorkflowStateView()"
-					(switchToWorkflowActions)="switchToWorkflowActionView()">
-				</app-workflow-detail>
-			</div>
-		}
+			@if (selectedWorkflow && viewMode === 'workflow-detail') {
+				<div class="detail-panel">
+					<app-workflow-detail
+						[workflow]="selectedWorkflow"
+						[projectId]="projectId"
+						[project]="project"
+						[allWorkflows]="workflows"
+						[initialTab]="returnTab"
+						(workflowUpdated)="onWorkflowUpdated($event)"
+						(workflowDeleted)="onWorkflowDeleted($event)"
+						(closed)="onSelectWorkflow(selectedWorkflow)"
+						(switchToWorkflowStates)="switchToWorkflowStateView()"
+						(switchToWorkflowActions)="switchToWorkflowActionView()"
+						(switchToRuleEditor)="switchToRuleEditor($event)">
+					</app-workflow-detail>
+				</div>
+			}
 
-		@if (viewMode === 'state-detail' && selectedWorkflowStateId) {
-			<div class="detail-panel">
-				<app-workflow-state-detail
-					[projectId]="projectId"
-					[workflowStateId]="selectedWorkflowStateId"
-					[workflowStates]="workflowStates"
-					[originalWorkflowStates]="originalWorkflowStates"
-					[workflow]="selectedWorkflow"
-					[project]="project"
-					(closed)="backWorkflowDetail()"
-					(workflowStateUpdated)="onWorkflowStateUpdated($event)"
-					(workflowStateDeleted)="onWorkflowStateDeleted($event)">
-				</app-workflow-state-detail>
-			</div>
-		}
+			@if (viewMode === 'state-detail' && selectedWorkflowStateId) {
+				<div class="detail-panel">
+					<app-workflow-state-detail
+						[projectId]="projectId"
+						[workflowStateId]="selectedWorkflowStateId"
+						[workflowStates]="workflowStates"
+						[originalWorkflowStates]="originalWorkflowStates"
+						[workflow]="selectedWorkflow"
+						[project]="project"
+						(closed)="backToWorkflowDetail()"
+						(workflowStateUpdated)="onWorkflowStateUpdated($event)"
+						(workflowStateDeleted)="onWorkflowStateDeleted($event)">
+					</app-workflow-state-detail>
+				</div>
+			}
 
-		@if (viewMode === 'action-detail' && selectedWorkflowActionId) {
-			<div class="detail-panel">
-				<app-workflow-action-detail
-					[projectId]="projectId"
-					[workflowActionId]="selectedWorkflowActionId"
-					[workflowActions]="workflowActions"
-					[originalWorkflowActions]="originalWorkflowActions"
-					[workflow]="selectedWorkflow"
-					[project]="project"
-					(closed)="backWorkflowDetail()"
-					(workflowActionUpdated)="onWorkflowActionUpdated($event)"
-					(workflowActionDeleted)="onWorkflowActionDeleted($event)">
-				</app-workflow-action-detail>
-			</div>
+			@if (viewMode === 'action-detail' && selectedWorkflowActionId) {
+				<div class="detail-panel">
+					<app-workflow-action-detail
+						[projectId]="projectId"
+						[workflowActionId]="selectedWorkflowActionId"
+						[workflowActions]="workflowActions"
+						[originalWorkflowActions]="originalWorkflowActions"
+						[workflow]="selectedWorkflow"
+						[project]="project"
+						[initialTab]="returnTab"
+						(closed)="backToWorkflowDetail()"
+						(workflowActionUpdated)="onWorkflowActionUpdated($event)"
+						(workflowActionDeleted)="onWorkflowActionDeleted($event)"
+						(switchToRuleEditor)="onWorkflowActionRuleEdit($event)">
+					</app-workflow-action-detail>
+				</div>
+			}
 		}
-	}
-</div>
+	</div>
+}

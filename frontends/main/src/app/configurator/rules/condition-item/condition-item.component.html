@@ -1,26 +1,32 @@
 <div class="condition-item">
-	<div class="condition-card">
+	<div class="condition-card" [class.reparent-mode]="altDragService.isAltHeld()">
 		<div class="condition-left">
+			<div class="drag-handle"
+			     cdkDragHandle
+			     [class.reparent-mode]="altDragService.isAltHeld()"
+			     [matTooltip]="altDragService.isAltHeld() ? 'Alt+drag to reparent' : 'Drag to reorder'">
+				<mat-icon>{{ altDragService.isAltHeld() ? 'anchor' : 'drag_indicator' }}</mat-icon>
+			</div>
 			<div class="condition-flags">
 				<button type="button"
-												class="flag-btn flag-inverse"
-												[class.active]="condition.inverse"
-												(click)="condition.inverse = !condition.inverse; changed.emit()"
-												matTooltip="Inverse Condition">
+				        class="flag-btn flag-inverse"
+				        [class.active]="condition.inverse"
+				        (click)="condition.inverse = !condition.inverse; changed.emit()"
+				        matTooltip="Inverse Condition">
 					<mat-icon>swap_horiz</mat-icon>
 				</button>
 				<button type="button"
-												class="flag-btn flag-dependency"
-												[class.active]="condition.dependency"
-												(click)="condition.dependency = !condition.dependency; changed.emit()"
-												matTooltip="Dependency Flag">
+				        class="flag-btn flag-dependency"
+				        [class.active]="condition.dependency"
+				        (click)="condition.dependency = !condition.dependency; changed.emit()"
+				        matTooltip="Dependency Flag">
 					<mat-icon>link</mat-icon>
 				</button>
 			</div>
 
 			<mat-select [value]="condition.criterion?.property ?? ''"
-															(valueChange)="onPropertyChange($event)"
-															placeholder="Select property">
+			            (valueChange)="onPropertyChange($event)"
+			            placeholder="Select property">
 				<mat-option [value]="">-- Select property --</mat-option>
 				@for (prop of propertiesForDomain; track prop.id) {
 					<mat-option [value]="prop.id">{{ prop.label }}</mat-option>
@@ -29,13 +35,17 @@
 
 			@if (showOperator) {
 				<mat-select [(ngModel)]="condition.criterion!.operator"
-																(ngModelChange)="changed.emit()"
-																[ngModelOptions]="{standalone: true}"
-																placeholder="Operator">
+				            (ngModelChange)="changed.emit()"
+				            [ngModelOptions]="{standalone: true}"
+				            placeholder="Operator">
 					@for (op of availableOperators; track op.value) {
 						<mat-option [value]="op.value">{{ op.label }}</mat-option>
 					}
 				</mat-select>
+			}
+
+			@if (isNavigationProperty) {
+				<span class="navigation-hint">Navigates to {{ propertyDef?.target }}</span>
 			}
 		</div>
 
@@ -45,8 +55,8 @@
 					<div class="value-row">
 						@if (propertyDef?.options?.length) {
 							<mat-select [value]="val"
-																			(valueChange)="setValueAt(i, $event)"
-																			placeholder="Select value">
+							            (valueChange)="setValueAt(i, $event)"
+							            placeholder="Select value">
 								<mat-option value="">-- Select --</mat-option>
 								@for (opt of propertyDef!.options!; track opt) {
 									<mat-option [value]="opt">{{ opt }}</mat-option>
@@ -54,38 +64,47 @@
 							</mat-select>
 						} @else if (propertyDef?.configurationEntity) {
 							<mat-select [value]="val"
-																			(valueChange)="setValueAt(i, $event)"
-																			placeholder="Select value">
+							            (valueChange)="setValueAt(i, $event)"
+							            placeholder="Select value">
 								<mat-option value="">-- Select --</mat-option>
 								@for (opt of getEntityOptions(propertyDef!.configurationEntity!); track opt.id) {
 									<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
 								}
 							</mat-select>
+						} @else if (propertyDef?.id === 'VALUE' && possibleValuesForContext.length > 0) {
+							<mat-select [value]="val"
+							            (valueChange)="setValueAt(i, $event)"
+							            placeholder="Select value">
+								<mat-option value="">-- Select --</mat-option>
+								@for (opt of possibleValuesForContext; track opt) {
+									<mat-option [value]="opt">{{ opt }}</mat-option>
+								}
+							</mat-select>
 						} @else if (propertyDef?.type === 'NUMBER') {
 							<input type="number" [value]="val"
-														(input)="setValueAt(i, $any($event.target).value)"
-														class="condition-value-input" placeholder="Value">
+							       (input)="setValueAt(i, $any($event.target).value)"
+							       class="condition-value-input" placeholder="Value">
 						} @else if (propertyDef?.type === 'DATE') {
-							<input type="date" [value]="val"
-														(input)="setValueAt(i, $any($event.target).value)"
-														class="condition-value-input">
+							<input type="text" [value]="val"
+							       (input)="setValueAt(i, $any($event.target).value)"
+							       class="condition-value-input" placeholder="Date">
 						} @else {
 							<input type="text" [value]="val"
-														(input)="setValueAt(i, $any($event.target).value)"
-														class="condition-value-input" placeholder="Value">
+							       (input)="setValueAt(i, $any($event.target).value)"
+							       class="condition-value-input" placeholder="Value">
 						}
 
 						<div class="value-actions">
 							@if (first) {
 								<button type="button" class="value-btn value-add"
-																(click)="addValue()"
-																matTooltip="Add Another Value">
+								        (click)="addValue()"
+								        matTooltip="Add Another Value">
 									<mat-icon>add</mat-icon>
 								</button>
 							} @else {
 								<button type="button" class="value-btn value-remove"
-																(click)="removeValue(i)"
-																matTooltip="Remove Value">
+								        (click)="removeValue(i)"
+								        matTooltip="Remove Value">
 									<mat-icon>remove</mat-icon>
 								</button>
 							}
@@ -95,56 +114,84 @@
 			</div>
 		}
 
-		@if (isNavigationProperty) {
-			<span class="navigation-hint">Navigates to {{ propertyDef?.target }}</span>
-		}
-
 		<div class="condition-actions">
-			<button type="button"
-											class="break-btn"
-											[class.break-none]="condition.breakType === 'NONE' || !condition.breakType"
-											[class.break-allow]="condition.breakType === 'ALLOW'"
-											[class.break-deny]="condition.breakType === 'DENY'"
-											(click)="cycleBreakType()"
-											[matTooltip]="'Break: ' + (condition.breakType || 'NONE')">
-				<mat-icon>{{ getBreakIcon() }}</mat-icon>
-			</button>
+			<div class="action-group">
+				<button type="button"
+				        class="break-btn"
+				        [class.break-none]="condition.breakType === 'NONE' || !condition.breakType"
+				        [class.break-allow]="condition.breakType === 'ALLOW'"
+				        [class.break-deny]="condition.breakType === 'DENY'"
+				        (click)="cycleBreakType()"
+				        [matTooltip]="'Break: ' + (condition.breakType || 'NONE')">
+					<mat-icon>{{ getBreakIcon() }}</mat-icon>
+				</button>
+			</div>
 
-			<button type="button" class="btn-icon-m" (click)="addChild()"
-											matTooltip="Add Nested Condition">
-				<mat-icon>add</mat-icon>
-			</button>
-			<button type="button" class="btn-icon-m danger" (click)="remove.emit()"
-											matTooltip="Remove">
-				<mat-icon>close</mat-icon>
-			</button>
+			<div class="action-group">
+				<input #idInput
+				       class="condition-id-input"
+				       [value]="displayId"
+				       [size]="displayId.length || 2"
+				       (change)="onConditionIdChange($any($event.target).value, idInput)"
+				       (click)="$event.stopPropagation()"/>
+			</div>
+
+			<div class="action-group">
+				<button type="button" class="btn-icon-m" (click)="addChild()"
+				        matTooltip="Add Nested Condition">
+					<mat-icon>add</mat-icon>
+				</button>
+				<button type="button" class="btn-icon-m danger" (click)="remove.emit()"
+				        matTooltip="Remove">
+					<mat-icon>close</mat-icon>
+				</button>
+			</div>
 		</div>
 	</div>
 
-	@if ((condition.conditions ?? []).length > 0) {
-		<div class="nested-conditions-tree" [class.nested-indented]="depth >= 0">
+	@if ((condition.conditions ?? []).length > 0 || altDragService.isAltHeld()) {
+		<div class="nested-conditions-tree"
+		     [class.nested-indented]="depth >= 0"
+		     [class.alt-mode]="altDragService.isAltHeld()">
 			<div class="nested-line-col">
 				@if ((condition.conditions ?? []).length > 1) {
 					<div class="nested-line"></div>
 					<div class="nested-mode-label"
-										[class.mode-and]="condition.mode === 'AND'"
-										[class.mode-or]="condition.mode === 'OR'"
-										(click)="condition.mode = condition.mode === 'AND' ? 'OR' : 'AND'; changed.emit()"
-										[matTooltip]="condition.mode === 'AND' ? 'Switch to OR' : 'Switch to AND'">
+					     [class.mode-and]="condition.mode === 'AND'"
+					     [class.mode-or]="condition.mode === 'OR'"
+					     (click)="condition.mode = condition.mode === 'AND' ? 'OR' : 'AND'; changed.emit()"
+					     [matTooltip]="condition.mode === 'AND' ? 'Switch to OR' : 'Switch to AND'">
 						{{ condition.mode }}
 					</div>
 				}
 			</div>
-			<div class="nested-conditions-list">
+			<div class="nested-conditions-list"
+			     cdkDropList
+			     [id]="nestedDropListId"
+			     [cdkDropListData]="condition.conditions"
+			     [cdkDropListConnectedTo]="siblingDropListIds"
+			     (cdkDropListDropped)="onDropChild($event)">
 				@for (child of condition.conditions; track child) {
-					<app-condition-item
-						[condition]="child"
-						[domain]="domain"
-						[depth]="depth + 1"
-						(remove)="removeChild(child)"
-						(insertSibling)="insertChildAfter(child)"
-						(changed)="changed.emit()">
-					</app-condition-item>
+					<div cdkDrag [cdkDragData]="child">
+						<app-condition-item
+							[condition]="child"
+							[domain]="isNavigationProperty ? (propertyDef?.target ?? domain) : domain"
+							[contextScopeModelId]="contextScopeModelId"
+							[contextWorkflowId]="contextWorkflowId"
+							[contextFieldModelId]="isNavigationProperty && propertyDef?.target === 'FIELD' ? getContextFieldModelId() : contextFieldModelId"
+							[allConditionIds]="allConditionIds"
+							[depth]="depth + 1"
+							[dropListId]="getChildDropListId(child)"
+							[siblingDropListIds]="altDragService.isAltHeld() ? getChildSiblingDropListIds(child) : []"
+							(remove)="removeChild(child)"
+							(insertSibling)="insertChildAfter(child)"
+							(changed)="changed.emit()"
+							(idChanged)="idChanged.emit($event)">
+						</app-condition-item>
+					</div>
+				}
+				@if ((condition.conditions ?? []).length === 0 && altDragService.isAltHeld()) {
+					<div class="nested-drop-hint">Drop here</div>
 				}
 			</div>
 		</div>

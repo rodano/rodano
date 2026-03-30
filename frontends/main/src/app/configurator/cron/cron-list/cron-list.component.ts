@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -18,20 +18,23 @@ import {CronDetailComponent} from '../cron-detail/cron-detail.component';
 import {CronDialogService} from '../../services/dialogs/cron-dialog.service';
 import {Rule} from '@core/model/rule';
 import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
+import {MatTooltip} from '@angular/material/tooltip';
 
 type CronViewMode = 'list' | 'detail' | 'rule-editor';
 
 @Component({
 	selector: 'app-cron-list',
 	standalone: true,
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, CronDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, RuleDetailComponent],
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule, MatSnackBarModule,
+		CronDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, RuleDetailComponent, MatTooltip],
 	templateUrl: './cron-list.component.html',
 	styleUrls: ['../../shared/list-shared.css', '../../shared/breadcrumb-shared.css']
 })
 export class CronListComponent
 	extends BaseListComponent<Cron>
 	implements OnInit, OnChanges, OnDestroy {
+	@ViewChild(RuleDetailComponent) ruleDetailComponent!: RuleDetailComponent;
+
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
@@ -43,9 +46,12 @@ export class CronListComponent
 
 	cronViewMode: CronViewMode = 'list';
 	selectedRule: Rule | null = null;
+	ruleModified = false;
+	returnTab: 'general' | 'rules' = 'general';
 
-	readonly ruleTypes = [{type: null, label: 'Rules'}];
 	readonly ruleDomains = ['SCOPE'];
+
+	private originalRule: Rule | null = null;
 
 	constructor(
 		public cronManager: CronManagerService,
@@ -133,15 +139,35 @@ export class CronListComponent
 
 	switchToRuleEditor(rule: Rule): void {
 		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
 		this.cronViewMode = 'rule-editor';
 	}
 
-	backToCronDetail(): void {
+	onRuleChanged(): void {
+		this.ruleModified = true;
+	}
+
+	backToCronDetail(tab: 'general' | 'rules' = 'general'): void {
 		this.selectedRule = null;
+		this.returnTab = tab;
 		this.cronViewMode = 'detail';
+	}
+
+	onSaveRule(): void {
+		this.ruleDetailComponent?.onSave();
+	}
+
+	onRevertRule(): void {
+		if(this.originalRule) {
+			this.selectedRule = JSON.parse(JSON.stringify(this.originalRule));
+			this.ruleModified = false;
+		}
 	}
 
 	onRuleSaved(rule: Rule): void {
 		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
 	}
 }

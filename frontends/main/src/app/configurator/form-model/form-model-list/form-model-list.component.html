@@ -15,7 +15,7 @@
 				<span>Form Models</span>
 			</button>
 			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
-			<button class="breadcrumb-btn" (click)="backToFormDetail()">
+			<button class="breadcrumb-btn" (click)="backToFormDetail('general')">
 				<span>{{ languageService.getTranslatedName(selectedFormModel.shortname) }}</span>
 			</button>
 			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
@@ -40,10 +40,12 @@
 			[projectId]="projectId"
 			[project]="project"
 			[formModelId]="selectedFormModel.formModelId"
-			(closed)="backToFormDetail()"
+			(closed)="backToFormDetail('general')"
 			(unsavedChanges)="onLayoutUnsavedChanges($event)"
 			(layoutCreated)="onLayoutCreated($event)"
-			(layoutDeleted)="onLayoutDeleted($event)">
+			(layoutDeleted)="onLayoutDeleted($event)"
+			(editLayoutConstraint)="onEditLayoutConstraint($event)"
+			(editCellConstraint)="onEditCellConstraint($event)">
 		</app-form-layout-editor>
 	</div>
 } @else if (viewMode === 'layout-preview' && selectedFormModel) {
@@ -53,6 +55,85 @@
 			[formModelId]="selectedFormModel.formModelId"
 			(closed)="switchToLayoutView()">
 		</app-form-layout-preview>
+	</div>
+} @else if (viewMode === 'rule-editor' && selectedFormModel && selectedRule) {
+	<div class="fullscreen">
+		<div class="breadcrumb">
+			<button class="breadcrumb-btn" (click)="backToFormDetail('general')">
+				<mat-icon>description</mat-icon>
+				<span>{{ languageService.getTranslatedName(selectedFormModel.shortname) }}</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<button class="breadcrumb-btn" (click)="backToFormDetail('rules')">
+				<mat-icon>rules</mat-icon>
+				<span>Rules</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">{{ selectedRule.description || 'Unnamed rule' }}</span>
+
+			<div class="breadcrumb-actions">
+				@if (ruleModified) {
+					<button class="breadcrumb-btn" (click)="onRevertRule()" matTooltip="Revert changes">
+						<mat-icon>undo</mat-icon>
+						Revert
+					</button>
+					<button class="breadcrumb-btn breadcrumb-btn-active" (click)="onSaveRule()" matTooltip="Save rule">
+						<mat-icon>save</mat-icon>
+						Save
+					</button>
+				}
+			</div>
+		</div>
+
+		<app-rule-detail
+			[rule]="selectedRule"
+			[projectId]="projectId"
+			[entityPath]="'form-models/' + selectedFormModel.formModelId"
+			[availableDomains]="ruleDomains"
+			(ruleSaved)="onRuleSaved($event)"
+			(ruleChanged)="onRuleChanged()">
+		</app-rule-detail>
+	</div>
+} @else if (viewMode === 'constraint-editor' && selectedFormModel && constraintRule) {
+	<div class="fullscreen">
+		<div class="breadcrumb">
+			<button class="breadcrumb-btn" (click)="backToLayoutEditor()">
+				<mat-icon>description</mat-icon>
+				<span>{{ languageService.getTranslatedName(selectedFormModel.shortname) }}</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<button class="breadcrumb-btn" (click)="backToLayoutEditor()">
+				<mat-icon>view_quilt</mat-icon>
+				<span>Layouts</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">{{ constraintBreadcrumb }}</span>
+
+			<div class="breadcrumb-actions">
+				@if (constraintModified) {
+					<button class="breadcrumb-btn" (click)="onRevertConstraint()" matTooltip="Revert changes">
+						<mat-icon>undo</mat-icon>
+						Revert
+					</button>
+					<button class="breadcrumb-btn breadcrumb-btn-active" (click)="ruleDetailComponent.onSave()" matTooltip="Save constraint">
+						<mat-icon>save</mat-icon>
+						Save
+					</button>
+				}
+			</div>
+		</div>
+
+		<app-rule-detail
+			[rule]="constraintRule"
+			[projectId]="projectId"
+			[entityPath]="constraintEntityPath"
+			[availableDomains]="constraintDomains"
+			[showBasicInfo]="false"
+			[showActions]="false"
+			[constraintOnly]="true"
+			(ruleSaved)="onConstraintSaved($event)"
+			(ruleChanged)="onConstraintChanged()">
+		</app-rule-detail>
 	</div>
 } @else {
 	<div class="content-container"
@@ -146,10 +227,12 @@
 						[projectId]="projectId"
 						[project]="project"
 						[allFormModels]="formModels"
+						[initialTab]="returnTab"
 						(formModelUpdated)="onFormModelUpdated($event)"
 						(formModelDeleted)="onFormModelDeleted($event)"
 						(closed)="onSelectFormModel(selectedFormModel)"
-						(switchToLayouts)="switchToLayoutView()">
+						(switchToLayouts)="switchToLayoutView()"
+						(switchToRuleEditor)="switchToRuleEditor($event)">
 					</app-form-model-detail>
 				</div>
 			}

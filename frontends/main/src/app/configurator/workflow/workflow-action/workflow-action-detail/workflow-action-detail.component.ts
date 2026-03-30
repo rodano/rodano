@@ -1,4 +1,4 @@
-import {Component, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -13,22 +13,28 @@ import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.compo
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
+import {RuleListComponent} from '../../../rules/rule-list/rule-list.component';
+import {Rule} from '@core/model/rule';
 
 @Component({
 	selector: 'app-workflow-action-detail',
 	standalone: true,
 	templateUrl: './workflow-action-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
 })
 export class WorkflowActionDetailComponent extends BaseDraftDetailComponent<WorkflowAction> {
 	@Input() workflowActionId = '';
 	@Input() workflowActions: WorkflowAction[] = [];
 	@Input() originalWorkflowActions: WorkflowAction[] = [];
 	@Input() workflow: Workflow | null = null;
+	@Input() initialTab: 'general' | 'rules' = 'general';
 
 	@Output() workflowActionUpdated = this.entityUpdated;
 	@Output() workflowActionDeleted = this.entityDeleted;
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
+
+	readonly ruleTypes = [{type: null, label: 'Rules'}];
 
 	constructor(
 		languageService: LanguageService,

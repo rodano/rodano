@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -26,19 +26,23 @@ import {Profile} from '@core/model/profile';
 import {
 	DatasetModelRightsMatrixComponent
 } from '../dataset-model-rights-matrix/dataset-model-rights-matrix.component';
+import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
+import {Rule} from '@core/model/rule';
 
-type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail';
+type ViewMode = 'dataset-detail' | 'field-list' | 'field-detail' | 'rule-editor';
 
 @Component({
 	selector: 'app-dataset-model-list',
 	standalone: true,
 	templateUrl: './dataset-model-list.component.html',
-	styleUrls: ['../../shared/list-shared.css'],
+	styleUrls: ['../../shared/list-shared.css', '../../shared/breadcrumb-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DatasetModelDetailComponent,
 		FieldModelDetailComponent, MatProgressSpinnerModule, EmptyStateComponent, ListHeaderComponent, ModifiedDirective,
-		DatasetModelRightsMatrixComponent]
+		DatasetModelRightsMatrixComponent, RuleDetailComponent]
 })
 export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
+	@ViewChild(RuleDetailComponent) ruleDetailComponent!: RuleDetailComponent;
+
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
@@ -55,6 +59,15 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedFieldModelId: string | null = null;
 	viewMode: ViewMode = 'dataset-detail';
 	loading = false;
+
+	selectedRule: Rule | null = null;
+	ruleModified = false;
+	returnTab: 'general' | 'rules' = 'general';
+	selectedRuleEntityPath = '';
+	ruleEditorContext: 'dataset-model' | 'field-model' = 'dataset-model';
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'DATASET'];
+	readonly fieldModelRuleDomains = ['SCOPE', 'EVENT', 'DATASET', 'FIELD'];
+	private originalRule: Rule | null = null;
 
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
@@ -188,7 +201,26 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 
 	backToDatasetDetail(): void {
 		this.viewMode = 'dataset-detail';
+		this.returnTab = 'general';
 		this.selectedFieldModelId = null;
+		this.emitContext();
+	}
+
+	backToDatasetRules(): void {
+		this.viewMode = 'dataset-detail';
+		this.returnTab = 'rules';
+		this.emitContext();
+	}
+
+	backToFieldModelDetail(): void {
+		this.viewMode = 'field-detail';
+		this.returnTab = 'general';
+		this.emitContext();
+	}
+
+	backToFieldModelRules(): void {
+		this.viewMode = 'field-detail';
+		this.returnTab = 'rules';
 		this.emitContext();
 	}
 
@@ -408,5 +440,54 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		if(this.showMatrix) {
 			this.selectedDatasetModel = null;
 		}
+	}
+
+	get activeRuleDomains(): string[] {
+		return this.ruleEditorContext === 'field-model'
+			? this.fieldModelRuleDomains
+			: this.ruleDomains;
+	}
+
+	getFieldModelLabel(fieldModelId: string): string {
+		return this.languageService.getLabelById(fieldModelId, id => this.fieldModelManager.getById(id));
+	}
+
+	switchToRuleEditor(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.selectedRuleEntityPath = `dataset-models/${this.selectedDatasetModel?.datasetModelId}`;
+		this.ruleEditorContext = 'dataset-model';
+		this.viewMode = 'rule-editor';
+	}
+
+	onFieldModelRuleEdit(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.selectedRuleEntityPath = `field-models/${this.selectedFieldModelId}`;
+		this.ruleEditorContext = 'field-model';
+		this.viewMode = 'rule-editor';
+	}
+
+	onRuleChanged(): void {
+		this.ruleModified = true;
+	}
+
+	onSaveRule(): void {
+		this.ruleDetailComponent?.onSave();
+	}
+
+	onRevertRule(): void {
+		if(this.originalRule) {
+			this.selectedRule = JSON.parse(JSON.stringify(this.originalRule));
+			this.ruleModified = false;
+		}
+	}
+
+	onRuleSaved(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
 	}
 }

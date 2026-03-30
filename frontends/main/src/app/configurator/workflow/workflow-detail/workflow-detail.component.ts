@@ -15,13 +15,15 @@ import {WorkflowActionManagerService} from '../../services/manager/workflow-acti
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {Rule} from '@core/model/rule';
+import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
 
 @Component({
 	selector: 'app-workflow-detail',
 	standalone: true,
 	templateUrl: './workflow-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
 })
 export class WorkflowDetailComponent extends BaseManagerDetailComponent<Workflow, WorkflowManagerService> {
 	@Input() override entity!: Workflow;
@@ -32,11 +34,17 @@ export class WorkflowDetailComponent extends BaseManagerDetailComponent<Workflow
 
 	@Input() set allWorkflows(v: Workflow[]) {this.allEntities = v;}
 
+	@Input() initialTab: 'general' | 'rules' = 'general';
+
 	@Output() workflowUpdated = this.entityUpdated;
 	@Output() workflowDeleted = this.entityDeleted;
 
 	@Output() switchToWorkflowStates = new EventEmitter<void>();
 	@Output() switchToWorkflowActions = new EventEmitter<void>();
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
+
+	readonly ruleTypes = [{type: null, label: 'Rules'}];
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'DATASET', 'FIELD', 'FORM', 'WORKFLOW'];
 
 	constructor(
 		workflowManager: WorkflowManagerService,

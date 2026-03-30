@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -19,18 +19,27 @@ import {EmptyStateComponent} from '../../shared/empty-state/empty-state.componen
 import {BaseListComponent} from '../../shared/base-list.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
+import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
+import {RuleConstraint} from '@core/model/rule-constraint';
+import {RuleService} from '../../services/api/rule.service';
+import {Rule} from '@core/model/rule';
+import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
+
+type ValidatorViewMode = 'list' | 'detail' | 'constraint-editor';
 
 @Component({
 	selector: 'app-validators-list',
 	standalone: true,
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatProgressSpinnerModule,
-		MatSnackBarModule, MatTooltip, ValidatorDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective],
+		MatSnackBarModule, MatTooltip, ValidatorDetailComponent, EmptyStateComponent, ListHeaderComponent, ModifiedDirective, RuleDetailComponent],
 	templateUrl: './validators-list.component.html',
-	styleUrls: ['../../shared/list-shared.css']
+	styleUrls: ['../../shared/list-shared.css', '../../shared/breadcrumb-shared.css']
 })
 export class ValidatorsListComponent
 	extends BaseListComponent<Validator>
 	implements OnInit, OnChanges, OnDestroy {
+	@ViewChild(RuleDetailComponent) ruleDetailComponent!: RuleDetailComponent;
+
 	@Input() override projectId = '';
 	@Input() override project: ConfiguratorProject | null = null;
 	@Input() override selectedNode: string | null = null;
@@ -40,12 +49,21 @@ export class ValidatorsListComponent
 		selectedValidatorId: string | null;
 	}>();
 
+	override viewMode: ValidatorViewMode = 'list';
+	constraintModified = false;
+	constraintRule: Rule | null = null;
+	selectedConstraint: RuleConstraint | null = null;
+	private originalConstraint: RuleConstraint | null = null;
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'DATASET', 'FIELD'];
+
 	constructor(
 		public validatorManager: ValidatorManagerService,
 		public override languageService: LanguageService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
+		private fieldModelManager: FieldModelManagerService,
 		private validatorDialogService: ValidatorDialogService,
+		private ruleService: RuleService,
 		snackBar: MatSnackBar
 	) {
 		super(validatorManager, languageService, snackBar);
@@ -67,7 +85,10 @@ export class ValidatorsListComponent
 			validators: this.validatorManager.load(this.projectId),
 			workflowStates: this.workflowStateManager.isLoaded()
 				? of(null)
-				: this.workflowStateManager.load(this.projectId)
+				: this.workflowStateManager.load(this.projectId),
+			fieldModels: this.fieldModelManager.isLoaded()
+				? of(null)
+				: this.fieldModelManager.loadFull(this.projectId)
 		}).subscribe({
 			next: ({validators}) => this.afterLoad(validators),
 			error: (e: HttpErrorResponse) => this.handleLoadError(e, 'validators')
@@ -131,5 +152,55 @@ export class ValidatorsListComponent
 
 	getWorkflowStateLabel(id: string): string {
 		return this.languageService.getLabelById(id, i => this.workflowStateManager.getById(i));
+	}
+
+	switchToConstraintEditor(): void {
+		const v = this.selectedValidator;
+		if(!v) {
+			return;
+		}
+		this.ruleService.getConstraint(this.projectId, `validators/${v.validatorId}`).subscribe(constraint => {
+			this.selectedConstraint = constraint;
+			this.originalConstraint = JSON.parse(JSON.stringify(constraint));
+			this.constraintRule = {
+				ruleId: undefined,
+				constraint: constraint as any,
+				actions: [],
+				tags: [],
+				message: {}
+			};
+			this.constraintModified = false;
+			this.viewMode = 'constraint-editor';
+		});
+	}
+
+	backToValidatorDetail(): void {
+		this.selectedConstraint = null;
+		this.viewMode = 'detail';
+	}
+
+	onConstraintChanged(): void {
+		this.constraintModified = true;
+	}
+
+	onRevertConstraint(): void {
+		if(this.originalConstraint) {
+			this.selectedConstraint = JSON.parse(JSON.stringify(this.originalConstraint));
+			this.constraintRule = {
+				ruleId: undefined,
+				constraint: this.selectedConstraint as any,
+				actions: [],
+				tags: [],
+				message: {}
+			};
+			this.constraintModified = false;
+		}
+	}
+
+	onConstraintSaved(rule: Rule): void {
+		this.constraintModified = false;
+		this.selectedConstraint = rule.constraint as any;
+		this.originalConstraint = JSON.parse(JSON.stringify(this.selectedConstraint));
+		this.constraintRule = rule;
 	}
 }

@@ -105,10 +105,27 @@ public final class RuleHelper {
 					.set(RULE_CONDITION_LIST.MODE, toDomainMode(nz(list.getMode(), "OR")))
 					.execute();
 
+				final UUID rootConditionId = deterministic(projectId, "RULE_CONDITION",
+					listId + "|root|" + dom);
+
+				tx.insertInto(RULE_CONDITION)
+					.set(RULE_CONDITION.PROJECT_ID, projectId)
+					.set(RULE_CONDITION.CONDITION_ID, rootConditionId)
+					.set(RULE_CONDITION.CONDITION_LIST_ID, listId)
+					.set(RULE_CONDITION.PARENT_CONDITION_ID, (UUID) null)
+					.set(RULE_CONDITION.CODE, dom)
+					.set(RULE_CONDITION.MODE, RuleConditionMode.OR)
+					.set(RULE_CONDITION.INVERSE, false)
+					.set(RULE_CONDITION.DEPENDENCY, false)
+					.set(RULE_CONDITION.BREAK_TYPE, "NONE")
+					.set(RULE_CONDITION.CONDITION_ORDER, 0)
+					.onDuplicateKeyIgnore()
+					.execute();
+
 				final List<RuleCondition> roots = list.getConditions() == null ? List.of() : list.getConditions();
 				int sort = 0;
 				for(RuleCondition node : roots) {
-					final UUID nodeId = upsertNode(tx, projectId, listId, null, node, sort++);
+					final UUID nodeId = upsertNode(tx, projectId, listId, rootConditionId, node, sort++);
 					upsertCriterionAndValues(tx, projectId, nodeId, node);
 					putChildren(tx, projectId, listId, nodeId, node.getConditions());
 				}
@@ -204,7 +221,6 @@ public final class RuleHelper {
 		final RuleCondition node,
 		final int sort
 	) {
-
 		final String nodeCode = nz(node.getId(), "IDX_" + sort);
 		final UUID nodeId = deterministic(projectId, "RULE_CONDITION",
 			conditionListId + "|" + (parentNodeId == null ? "root" : parentNodeId) + "|" + nodeCode);
@@ -219,11 +235,13 @@ public final class RuleHelper {
 			.set(RULE_CONDITION.INVERSE, node.isInverse())
 			.set(RULE_CONDITION.DEPENDENCY, node.isDependency())
 			.set(RULE_CONDITION.BREAK_TYPE, n2(node.getBreakType()))
+			.set(RULE_CONDITION.CONDITION_ORDER, sort)
 			.onDuplicateKeyUpdate()
 			.set(RULE_CONDITION.MODE, toNodeMode(nz(node.getMode(), "OR")))
 			.set(RULE_CONDITION.INVERSE, node.isInverse())
 			.set(RULE_CONDITION.DEPENDENCY, node.isDependency())
 			.set(RULE_CONDITION.BREAK_TYPE, n2(node.getBreakType()))
+			.set(RULE_CONDITION.CONDITION_ORDER, sort)
 			.execute();
 
 		final boolean nodeExists = tx.fetchExists(

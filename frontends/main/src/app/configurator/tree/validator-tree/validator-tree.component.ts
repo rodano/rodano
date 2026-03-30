@@ -19,7 +19,7 @@ export class ValidatorTreeComponent extends BaseTreeComponent {
 		super(languageService);
 	}
 
-	getCategoryIcon(): string {return 'rule';}
+	getCategoryIcon(): string {return 'check_circle';}
 	getCategoryLabel(): string {return 'Validators';}
 	getCategoryTheme(): string {return 'theme-validator';}
 

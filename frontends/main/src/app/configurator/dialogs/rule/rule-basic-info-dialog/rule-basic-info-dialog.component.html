@@ -30,14 +30,20 @@
 					}
 					<div class="add-tag-input">
 						<input type="text"
-													[(ngModel)]="newTagInput"
-													[ngModelOptions]="{standalone: true}"
-													(keypress)="onKeyPress($event)"
-													placeholder="Enter tag (e.g., INCLUSION)"
-													class="tag-input">
+						       [(ngModel)]="newTagInput"
+						       [ngModelOptions]="{standalone: true}"
+						       (keypress)="onKeyPress($event)"
+						       placeholder="Enter tag (e.g., INCLUSION)"
+						       class="tag-input"
+						       [matAutocomplete]="tagAuto">
+						<mat-autocomplete #tagAuto="matAutocomplete" (optionSelected)="selectTag($event.option.value)">
+							@for (suggestion of tagSuggestions; track suggestion) {
+								<mat-option [value]="suggestion">{{ suggestion }}</mat-option>
+							}
+						</mat-autocomplete>
 						<button type="button" class="btn-add-tag"
-														(click)="addTag()"
-														[disabled]="!newTagInput.trim()">
+						        (click)="addTag()"
+						        [disabled]="!newTagInput.trim()">
 							<mat-icon>add</mat-icon>
 							Add Tag
 						</button>
@@ -56,7 +62,7 @@
 									<div class="form-field">
 										<label>Message</label>
 										<input type="text" formControlName="message"
-																	placeholder="Message shown when rule triggers">
+										       placeholder="Message shown when rule triggers">
 										<span class="hint">Optional message displayed to users</span>
 									</div>
 								</div>

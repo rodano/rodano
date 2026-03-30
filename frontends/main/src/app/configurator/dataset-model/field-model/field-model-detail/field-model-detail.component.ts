@@ -1,4 +1,4 @@
-import {Component, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -17,22 +17,29 @@ import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confi
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
+import {Rule} from '@core/model/rule';
+import {RuleListComponent} from '../../../rules/rule-list/rule-list.component';
 
 @Component({
 	selector: 'app-field-model-detail',
 	standalone: true,
 	templateUrl: './field-model-detail.component.html',
 	styleUrls: ['./field-model-detail.component.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent]
 })
 export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldModel> {
 	@Input() fieldModelId = '';
 	@Input() fieldModels: FieldModel[] = [];
 	@Input() originalFieldModels: FieldModel[] = [];
 	@Input() datasetModel: DatasetModel | null = null;
+	@Input() initialTab: 'general' | 'rules' = 'general';
 
 	@Output() fieldModelUpdated = this.entityUpdated;
 	@Output() fieldModelDeleted = this.entityDeleted;
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
+
+	readonly ruleTypes = [{type: null, label: 'Rules'}];
 
 	constructor(
 		languageService: LanguageService,

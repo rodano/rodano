@@ -11,374 +11,396 @@
 </div>
 
 @if (draftEventModel) {
-	<div class="detail-content">
-		<div class="settings-section">
-			<h3>Basic Information</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Code"
-																						[modified]="isFieldModified('id')">
-					{{ draftEventModel.id }}
-				</app-setting-item>
-
-				<app-setting-item label="Number"
-																						[modified]="isFieldModified('number')"
-																						[notConfigured]="draftEventModel.number === null || draftEventModel.number === undefined">
-					@if (draftEventModel.number === null || draftEventModel.number === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ draftEventModel.number }}
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Event Group"
-																						[modified]="isFieldModified('eventGroupId')"
-																						[notConfigured]="!draftEventModel.eventGroupId">
-					@if (!draftEventModel.eventGroupId) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						<div class="chip theme-event-group">
-							<mat-icon class="resource-icon">group</mat-icon>
-							<span class="language-name">{{ getEventGroupLabel(draftEventModel.eventGroupId) }}</span>
-						</div>
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Short Name"
-																						[translated]="true"
-																						[modified]="isFieldModified('shortname')"
-																						[notConfigured]="!languageService.getTranslatedValue(draftEventModel.shortname)">
-					@if (!languageService.getTranslatedValue(draftEventModel.shortname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(draftEventModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</app-setting-item>
-
-				<app-setting-item label="Long Name"
-																						[translated]="true"
-																						[modified]="isFieldModified('longname')"
-																						[notConfigured]="!languageService.getTranslatedValue(draftEventModel.longname)"
-																						[fullWidth]="true">
-					@if (!languageService.getTranslatedValue(draftEventModel.longname)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(draftEventModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</app-setting-item>
-
-				<app-setting-item label="Description"
-																						[translated]="true"
-																						[modified]="isFieldModified('description')"
-																						[notConfigured]="!languageService.getTranslatedValue(draftEventModel.description)"
-																						[fullWidth]="true">
-					@if (!languageService.getTranslatedValue(draftEventModel.description)) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ languageService.getTranslatedValue(draftEventModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-				</app-setting-item>
-
-				<app-setting-item label="Mandatory"
-																						[modified]="isFieldModified('mandatory')">
-					@if (draftEventModel.mandatory) {
-						<span class="status-badge third">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Inceptive"
-																						[modified]="isFieldModified('inceptive')">
-					@if (draftEventModel.inceptive) {
-						<span class="status-badge first">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Max Occurrence"
-																						[modified]="isFieldModified('maxOccurrence')"
-																						[notConfigured]="draftEventModel.maxOccurrence === null || draftEventModel.maxOccurrence === undefined">
-					@if (draftEventModel.maxOccurrence === null || draftEventModel.maxOccurrence === undefined) {
-						<mat-icon class="warning-icon">report</mat-icon>
-						<span>Not configured</span>
-					} @else {
-						{{ draftEventModel.maxOccurrence }}
-					}
-				</app-setting-item>
-
-				<app-setting-item label="Prevent Manual Addition"
-																						[modified]="isFieldModified('preventAdd')">
-					@if (draftEventModel.preventAdd) {
-						<span class="status-badge default">Yes</span>
-					} @else {
-						<span class="status-badge">No</span>
-					}
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditBasicInfo()">
-				<mat-icon>edit</mat-icon>
-				Edit Basic Information
-			</button>
-		</div>
-
-		<div class="settings-section">
-			<h3>Scheduling</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Deadline Value"
-																						[modified]="isFieldModified('deadline')"
-																						[notConfigured]="!draftEventModel.deadline">
-					@if (!draftEventModel.deadline) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ draftEventModel.deadline || 'Not configured' }}
-				</app-setting-item>
-
-				<app-setting-item label="Deadline Unit"
-																						[modified]="isFieldModified('deadlineUnit')"
-																						[notConfigured]="!draftEventModel.deadlineUnit">
-					@if (!draftEventModel.deadlineUnit) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ draftEventModel.deadlineUnit || 'Not configured' }}
-				</app-setting-item>
-
-				<app-setting-item label="Deadline Aggregation Function"
-																						[modified]="isFieldModified('deadlineAggregationFunction')"
-																						[notConfigured]="!draftEventModel.deadlineAggregationFunction"
-																						[fullWidth]="true">
-					@if (!draftEventModel.deadlineAggregationFunction) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ draftEventModel.deadlineAggregationFunction || 'Not configured' }}
-				</app-setting-item>
-
-				<app-setting-item label="Interval Value"
-																						[modified]="isFieldModified('interval')"
-																						[notConfigured]="!draftEventModel.interval">
-					@if (!draftEventModel.interval) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ draftEventModel.interval || 'Not configured' }}
-				</app-setting-item>
-
-				<app-setting-item label="Interval Unit"
-																						[modified]="isFieldModified('intervalUnit')"
-																						[notConfigured]="!draftEventModel.intervalUnit">
-					@if (!draftEventModel.intervalUnit) {
-						<mat-icon class="warning-icon">report</mat-icon>
-					}
-					{{ draftEventModel.intervalUnit || 'Not configured' }}
-				</app-setting-item>
-
-				<app-setting-item label="Deadline Reference Events"
-																						[modified]="isFieldModified('deadlineReferenceEventModelIds')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.deadlineReferenceEventModelIds?.length) {
-							<div class="chip-container">
-								@for (refId of draftEventModel.deadlineReferenceEventModelIds; track refId) {
-									<div class="chip third">
-										<mat-icon class="resource-icon">schedule</mat-icon>
-										<span class="language-name">{{ getEventModelLabel(refId) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No deadline reference events</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditScheduling()">
-				<mat-icon>edit</mat-icon>
-				Edit Scheduling
-			</button>
-		</div>
-
-		<div class="settings-section">
-			<h3>Pattern</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Label Pattern"
-																						[modified]="isFieldModified('labelPattern')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.labelPattern) {
-							<div class="code-format-display">
-								<code>{{ draftEventModel.labelPattern }}</code>
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No label pattern configured</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-
-				<app-setting-item label="Icon"
-																						[modified]="isFieldModified('icon')"
-																						[notConfigured]="!draftEventModel.icon"
-																						[fullWidth]="true">
-					@if (draftEventModel.icon) {
-						<div class="icon-preview">
-							<mat-icon>{{ draftEventModel.icon }}</mat-icon>
-							<span>{{ draftEventModel.icon }}</span>
-						</div>
-					} @else {
-						<mat-icon class="warning-icon">report</mat-icon>
-						Not configured
-					}
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditLabelPattern()">
-				<mat-icon>edit</mat-icon>
-				Edit Label Pattern
-			</button>
-		</div>
-
-		<div class="settings-section">
-			<h3>Associated Resources</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Form Models"
-																						[modified]="isFieldModified('formModelIds')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.formModelIds && draftEventModel.formModelIds.length > 0) {
-							<div class="chip-container">
-								@for (formId of draftEventModel.formModelIds; track formId) {
-									<div class="chip theme-form-model">
-										<mat-icon class="resource-icon">description</mat-icon>
-										<span class="language-name">{{ getFormModelLabel(formId) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No form models configured</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-
-				<app-setting-item label="Dataset Models"
-																						[modified]="isFieldModified('datasetModelIds')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.datasetModelIds && draftEventModel.datasetModelIds.length > 0) {
-							<div class="chip-container">
-								@for (datasetId of draftEventModel.datasetModelIds; track datasetId) {
-									<div class="chip theme-dataset-model">
-										<mat-icon class="resource-icon">dataset</mat-icon>
-										<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No dataset models configured</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-
-				<app-setting-item label="Workflows"
-																						[modified]="isFieldModified('workflowIds')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.workflowIds && draftEventModel.workflowIds.length > 0) {
-							<div class="chip-container">
-								@for (workflowId of draftEventModel.workflowIds; track workflowId) {
-									<div class="chip theme-workflow">
-										<mat-icon class="resource-icon">settings</mat-icon>
-										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No workflows configured</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditResources()">
-				<mat-icon>edit</mat-icon>
-				Edit Resources
-			</button>
-		</div>
-
-		<div class="settings-section">
-			<h3>Event Relationships</h3>
-			<div class="settings-grid">
-				<app-setting-item label="Blocked Events"
-																						[modified]="isFieldModified('blockedEventModelIds')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.blockedEventModelIds && draftEventModel.blockedEventModelIds.length > 0) {
-							<div class="chip-container">
-								@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
-									<div class="chip theme-event-model">
-										<mat-icon class="resource-icon">block</mat-icon>
-										<span class="language-name">{{ getEventModelLabel(blockedId) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No blocked events</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-
-				<app-setting-item label="Implied Events"
-																						[modified]="isFieldModified('impliedEventModelIds')"
-																						[fullWidth]="true"
-																						[plain]="true">
-					<div class="relationship-box">
-						@if (draftEventModel.impliedEventModelIds && draftEventModel.impliedEventModelIds.length > 0) {
-							<div class="chip-container">
-								@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
-									<div class="chip theme-event-model">
-										<mat-icon class="resource-icon">arrow_forward</mat-icon>
-										<span class="language-name">{{ getEventModelLabel(impliedId) }}</span>
-									</div>
-								}
-							</div>
-						} @else {
-							<div class="empty-message-centered">
-								<mat-icon class="warning-icon">report</mat-icon>
-								<span>No implied events</span>
-							</div>
-						}
-					</div>
-				</app-setting-item>
-			</div>
-			<button class="btn-edit" (click)="onEditRelationships()">
-				<mat-icon>edit</mat-icon>
-				Edit Relationships
-			</button>
-		</div>
-
-		<app-danger-zone
-			[title]="'Delete Event Model'"
-			[message]="'Deleting this event model is permanent and cannot be undone.'"
-			[buttonLabel]="'Delete'"
-			(confirmed)="onDelete()">
-		</app-danger-zone>
+	<div class="detail-tabs">
+		<button class="detail-tab" [class.active]="initialTab === 'general'" (click)="initialTab = 'general'">
+			General
+		</button>
+		<button class="detail-tab" [class.active]="initialTab === 'rules'" (click)="initialTab = 'rules'">
+			Rules
+		</button>
 	</div>
+
+	@if (initialTab === 'general') {
+		<div class="detail-content">
+			<div class="settings-section">
+				<h3>Basic Information</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Code"
+					                  [modified]="isFieldModified('id')">
+						{{ draftEventModel.id }}
+					</app-setting-item>
+
+					<app-setting-item label="Number"
+					                  [modified]="isFieldModified('number')"
+					                  [notConfigured]="draftEventModel.number === null || draftEventModel.number === undefined">
+						@if (draftEventModel.number === null || draftEventModel.number === undefined) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftEventModel.number }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Event Group"
+					                  [modified]="isFieldModified('eventGroupId')"
+					                  [notConfigured]="!draftEventModel.eventGroupId">
+						@if (!draftEventModel.eventGroupId) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							<div class="chip theme-event-group">
+								<mat-icon class="resource-icon">group</mat-icon>
+								<span class="language-name">{{ getEventGroupLabel(draftEventModel.eventGroupId) }}</span>
+							</div>
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Short Name"
+					                  [translated]="true"
+					                  [modified]="isFieldModified('shortname')"
+					                  [notConfigured]="!languageService.getTranslatedValue(draftEventModel.shortname)">
+						@if (!languageService.getTranslatedValue(draftEventModel.shortname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(draftEventModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
+
+					<app-setting-item label="Long Name"
+					                  [translated]="true"
+					                  [modified]="isFieldModified('longname')"
+					                  [notConfigured]="!languageService.getTranslatedValue(draftEventModel.longname)"
+					                  [fullWidth]="true">
+						@if (!languageService.getTranslatedValue(draftEventModel.longname)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(draftEventModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
+
+					<app-setting-item label="Description"
+					                  [translated]="true"
+					                  [modified]="isFieldModified('description')"
+					                  [notConfigured]="!languageService.getTranslatedValue(draftEventModel.description)"
+					                  [fullWidth]="true">
+						@if (!languageService.getTranslatedValue(draftEventModel.description)) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ languageService.getTranslatedValue(draftEventModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+					</app-setting-item>
+
+					<app-setting-item label="Mandatory"
+					                  [modified]="isFieldModified('mandatory')">
+						@if (draftEventModel.mandatory) {
+							<span class="status-badge third">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Inceptive"
+					                  [modified]="isFieldModified('inceptive')">
+						@if (draftEventModel.inceptive) {
+							<span class="status-badge first">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Max Occurrence"
+					                  [modified]="isFieldModified('maxOccurrence')"
+					                  [notConfigured]="draftEventModel.maxOccurrence === null || draftEventModel.maxOccurrence === undefined">
+						@if (draftEventModel.maxOccurrence === null || draftEventModel.maxOccurrence === undefined) {
+							<mat-icon class="warning-icon">report</mat-icon>
+							<span>Not configured</span>
+						} @else {
+							{{ draftEventModel.maxOccurrence }}
+						}
+					</app-setting-item>
+
+					<app-setting-item label="Prevent Manual Addition"
+					                  [modified]="isFieldModified('preventAdd')">
+						@if (draftEventModel.preventAdd) {
+							<span class="status-badge default">Yes</span>
+						} @else {
+							<span class="status-badge">No</span>
+						}
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditBasicInfo()">
+					<mat-icon>edit</mat-icon>
+					Edit Basic Information
+				</button>
+			</div>
+
+			<div class="settings-section">
+				<h3>Scheduling</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Deadline Value"
+					                  [modified]="isFieldModified('deadline')"
+					                  [notConfigured]="!draftEventModel.deadline">
+						@if (!draftEventModel.deadline) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.deadline || 'Not configured' }}
+					</app-setting-item>
+
+					<app-setting-item label="Deadline Unit"
+					                  [modified]="isFieldModified('deadlineUnit')"
+					                  [notConfigured]="!draftEventModel.deadlineUnit">
+						@if (!draftEventModel.deadlineUnit) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.deadlineUnit || 'Not configured' }}
+					</app-setting-item>
+
+					<app-setting-item label="Deadline Aggregation Function"
+					                  [modified]="isFieldModified('deadlineAggregationFunction')"
+					                  [notConfigured]="!draftEventModel.deadlineAggregationFunction"
+					                  [fullWidth]="true">
+						@if (!draftEventModel.deadlineAggregationFunction) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.deadlineAggregationFunction || 'Not configured' }}
+					</app-setting-item>
+
+					<app-setting-item label="Interval Value"
+					                  [modified]="isFieldModified('interval')"
+					                  [notConfigured]="!draftEventModel.interval">
+						@if (!draftEventModel.interval) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.interval || 'Not configured' }}
+					</app-setting-item>
+
+					<app-setting-item label="Interval Unit"
+					                  [modified]="isFieldModified('intervalUnit')"
+					                  [notConfigured]="!draftEventModel.intervalUnit">
+						@if (!draftEventModel.intervalUnit) {
+							<mat-icon class="warning-icon">report</mat-icon>
+						}
+						{{ draftEventModel.intervalUnit || 'Not configured' }}
+					</app-setting-item>
+
+					<app-setting-item label="Deadline Reference Events"
+					                  [modified]="isFieldModified('deadlineReferenceEventModelIds')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.deadlineReferenceEventModelIds?.length) {
+								<div class="chip-container">
+									@for (refId of draftEventModel.deadlineReferenceEventModelIds; track refId) {
+										<div class="chip third">
+											<mat-icon class="resource-icon">schedule</mat-icon>
+											<span class="language-name">{{ getEventModelLabel(refId) }}</span>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No deadline reference events</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditScheduling()">
+					<mat-icon>edit</mat-icon>
+					Edit Scheduling
+				</button>
+			</div>
+
+			<div class="settings-section">
+				<h3>Pattern</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Label Pattern"
+					                  [modified]="isFieldModified('labelPattern')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.labelPattern) {
+								<div class="code-format-display">
+									<code>{{ draftEventModel.labelPattern }}</code>
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No label pattern configured</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+
+					<app-setting-item label="Icon"
+					                  [modified]="isFieldModified('icon')"
+					                  [notConfigured]="!draftEventModel.icon"
+					                  [fullWidth]="true">
+						@if (draftEventModel.icon) {
+							<div class="icon-preview">
+								<mat-icon>{{ draftEventModel.icon }}</mat-icon>
+								<span>{{ draftEventModel.icon }}</span>
+							</div>
+						} @else {
+							<mat-icon class="warning-icon">report</mat-icon>
+							Not configured
+						}
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditLabelPattern()">
+					<mat-icon>edit</mat-icon>
+					Edit Label Pattern
+				</button>
+			</div>
+
+			<div class="settings-section">
+				<h3>Associated Resources</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Form Models"
+					                  [modified]="isFieldModified('formModelIds')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.formModelIds && draftEventModel.formModelIds.length > 0) {
+								<div class="chip-container">
+									@for (formId of draftEventModel.formModelIds; track formId) {
+										<div class="chip theme-form-model">
+											<mat-icon class="resource-icon">description</mat-icon>
+											<span class="language-name">{{ getFormModelLabel(formId) }}</span>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No form models configured</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+
+					<app-setting-item label="Dataset Models"
+					                  [modified]="isFieldModified('datasetModelIds')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.datasetModelIds && draftEventModel.datasetModelIds.length > 0) {
+								<div class="chip-container">
+									@for (datasetId of draftEventModel.datasetModelIds; track datasetId) {
+										<div class="chip theme-dataset-model">
+											<mat-icon class="resource-icon">dataset</mat-icon>
+											<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No dataset models configured</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+
+					<app-setting-item label="Workflows"
+					                  [modified]="isFieldModified('workflowIds')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.workflowIds && draftEventModel.workflowIds.length > 0) {
+								<div class="chip-container">
+									@for (workflowId of draftEventModel.workflowIds; track workflowId) {
+										<div class="chip theme-workflow">
+											<mat-icon class="resource-icon">settings</mat-icon>
+											<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No workflows configured</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditResources()">
+					<mat-icon>edit</mat-icon>
+					Edit Resources
+				</button>
+			</div>
+
+			<div class="settings-section">
+				<h3>Event Relationships</h3>
+				<div class="settings-grid">
+					<app-setting-item label="Blocked Events"
+					                  [modified]="isFieldModified('blockedEventModelIds')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.blockedEventModelIds && draftEventModel.blockedEventModelIds.length > 0) {
+								<div class="chip-container">
+									@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
+										<div class="chip theme-event-model">
+											<mat-icon class="resource-icon">block</mat-icon>
+											<span class="language-name">{{ getEventModelLabel(blockedId) }}</span>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No blocked events</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+
+					<app-setting-item label="Implied Events"
+					                  [modified]="isFieldModified('impliedEventModelIds')"
+					                  [fullWidth]="true"
+					                  [plain]="true">
+						<div class="relationship-box">
+							@if (draftEventModel.impliedEventModelIds && draftEventModel.impliedEventModelIds.length > 0) {
+								<div class="chip-container">
+									@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
+										<div class="chip theme-event-model">
+											<mat-icon class="resource-icon">arrow_forward</mat-icon>
+											<span class="language-name">{{ getEventModelLabel(impliedId) }}</span>
+										</div>
+									}
+								</div>
+							} @else {
+								<div class="empty-message-centered">
+									<mat-icon class="warning-icon">report</mat-icon>
+									<span>No implied events</span>
+								</div>
+							}
+						</div>
+					</app-setting-item>
+				</div>
+				<button class="btn-edit" (click)="onEditRelationships()">
+					<mat-icon>edit</mat-icon>
+					Edit Relationships
+				</button>
+			</div>
+
+			<app-danger-zone
+				[title]="'Delete Event Model'"
+				[message]="'Deleting this event model is permanent and cannot be undone.'"
+				[buttonLabel]="'Delete'"
+				(confirmed)="onDelete()">
+			</app-danger-zone>
+		</div>
+	}
+
+	@if (initialTab === 'rules') {
+		<div class="detail-content">
+			<app-rule-list
+				[projectId]="projectId"
+				[entityPath]="'event-models/' + draftEventModel.eventModelId"
+				[ruleTypes]="ruleTypes"
+				(editRule)="switchToRuleEditor.emit($event)">
+			</app-rule-list>
+		</div>
+	}
 }

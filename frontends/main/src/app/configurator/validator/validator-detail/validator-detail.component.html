@@ -4,6 +4,11 @@
 		<span class="detail-code theme-validator">{{ validator.id }}</span>
 	</div>
 	<div class="header-actions">
+		<button class="btn-view theme-validator" (click)="switchToConstraintEditor.emit()"
+		        matTooltip="Edit Constraint">
+			<mat-icon>rule</mat-icon>
+			<span>Constraint</span>
+		</button>
 		<button class="btn-close" (click)="onClose()">
 			<mat-icon>close</mat-icon>
 		</button>

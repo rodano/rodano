@@ -11,7 +11,7 @@ import {FormModelDialogService} from '../../services/dialogs/form-model-dialog.s
 import {EmptyStateComponent} from '../../shared/empty-state/empty-state.component';
 import {ListHeaderComponent} from '../../shared/list-header/list-header.component';
 import {ModifiedDirective} from '../../shared/modified.directive';
-import {Subscription} from 'rxjs';
+import {forkJoin, of, Subscription} from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {HttpErrorResponse} from '@angular/common/http';
 import {ProjectLanguage} from '@core/model/project-language';
@@ -22,8 +22,15 @@ import {FormLayoutPreviewComponent} from '../form-layout-preview/form-layout-pre
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {Profile} from '@core/model/profile';
 import {FormModelRightsMatrixComponent} from '../form-model-rights-matrix/form-model-rights-matrix.component';
+import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
+import {Rule} from '@core/model/rule';
+import {RuleConstraint} from '@core/model/rule-constraint';
+import {RuleService} from '../../services/api/rule.service';
+import {Cell} from '@core/model/cell';
+import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
+import {EventGroupManagerService} from '../../services/manager/event-group-manager.service';
 
-type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview';
+type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview' | 'rule-editor' | 'constraint-editor';
 
 @Component({
 	selector: 'app-form-model-list',
@@ -31,10 +38,11 @@ type ViewMode = 'form-list' | 'form-detail' | 'layout-editor' | 'layout-preview'
 	templateUrl: './form-model-list.component.html',
 	styleUrls: ['./form-model-list.component.css', '../../shared/breadcrumb-shared.css'],
 	imports: [CommonModule, MatIconModule, MatTooltipModule, FormModelDetailComponent, FormLayoutEditorComponent,
-		EmptyStateComponent, ListHeaderComponent, ModifiedDirective, FormLayoutPreviewComponent, FormModelRightsMatrixComponent]
+		EmptyStateComponent, ListHeaderComponent, ModifiedDirective, FormLayoutPreviewComponent, FormModelRightsMatrixComponent, RuleDetailComponent]
 })
 export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	@ViewChild(FormLayoutEditorComponent) formLayoutEditor?: FormLayoutEditorComponent;
+	@ViewChild(RuleDetailComponent) ruleDetailComponent!: RuleDetailComponent;
 
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
@@ -52,6 +60,19 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 	viewMode: ViewMode = 'form-list';
 	loading = false;
 
+	selectedRule: Rule | null = null;
+	ruleModified = false;
+	returnTab: 'general' | 'rules' = 'general';
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'FORM'];
+	private originalRule: Rule | null = null;
+
+	constraintRule: Rule | null = null;
+	constraintModified = false;
+	constraintEntityPath = '';
+	constraintBreadcrumb = '';
+	private originalConstraint: RuleConstraint | null = null;
+	readonly constraintDomains = ['SCOPE', 'EVENT', 'DATASET', 'FIELD', 'FORM'];
+
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
 	private languageSubscription: Subscription;
@@ -63,7 +84,10 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		public formLayoutManager: FormLayoutManagerService,
 		public languageService: LanguageService,
 		private profileManager: ProfileManagerService,
+		private eventModelManager: EventModelManagerService,
+		private eventGroupManager: EventGroupManagerService,
 		private formModelDialogService: FormModelDialogService,
+		private ruleService: RuleService,
 		private snackBar: MatSnackBar
 	) {}
 
@@ -211,9 +235,10 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		this.emitContext();
 	}
 
-	backToFormDetail(): void {
+	backToFormDetail(tab: 'general' | 'rules' = 'general'): void {
+		this.selectedRule = null;
+		this.returnTab = tab;
 		this.viewMode = 'form-detail';
-		this.emitContext();
 	}
 
 	onLayoutCreated(_layout: Layout): void {
@@ -289,6 +314,106 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		this.showMatrix = !this.showMatrix;
 		if(this.showMatrix) {
 			this.selectedFormModel = null;
+		}
+	}
+
+	switchToRuleEditor(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.viewMode = 'rule-editor';
+	}
+
+	onRuleChanged(): void {
+		this.ruleModified = true;
+	}
+
+	onSaveRule(): void {
+		this.ruleDetailComponent?.onSave();
+	}
+
+	onRevertRule(): void {
+		if(this.originalRule) {
+			this.selectedRule = JSON.parse(JSON.stringify(this.originalRule));
+			this.ruleModified = false;
+		}
+	}
+
+	onRuleSaved(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+	}
+
+	onEditLayoutConstraint(event: {layout: Layout}): void {
+		const fm = this.selectedFormModel;
+		if(!fm) {
+			return;
+		}
+		const path = `form-models/${fm.formModelId}/layouts/${event.layout.formLayoutId}`;
+		this.constraintBreadcrumb = `Layout: ${event.layout.id}`;
+		this.openConstraintEditor(path);
+	}
+
+	onEditCellConstraint(event: {layout: Layout; cell: Cell}): void {
+		const fm = this.selectedFormModel;
+		if(!fm) {
+			return;
+		}
+		const path = `form-models/${fm.formModelId}/layouts/${event.layout.formLayoutId}/cells/${event.cell.formLayoutCellId}`;
+		this.constraintBreadcrumb = `Cell: ${event.cell.id}`;
+		this.openConstraintEditor(path);
+	}
+
+	private openConstraintEditor(entityPath: string): void {
+		this.constraintEntityPath = entityPath;
+		forkJoin({
+			constraint: this.ruleService.getConstraint(this.projectId, entityPath),
+			eventModels: this.eventModelManager.isLoaded()
+				? of(null)
+				: this.eventModelManager.load(this.projectId),
+			eventGroups: this.eventGroupManager.isLoaded()
+				? of(null)
+				: this.eventGroupManager.load(this.projectId)
+		}).subscribe(({constraint}) => {
+			this.constraintRule = {
+				ruleId: undefined,
+				constraint: constraint as any,
+				actions: [],
+				tags: [],
+				message: {}
+			};
+			this.originalConstraint = JSON.parse(JSON.stringify(constraint));
+			this.constraintModified = false;
+			this.viewMode = 'constraint-editor';
+		});
+	}
+
+	backToLayoutEditor(): void {
+		this.constraintRule = null;
+		this.viewMode = 'layout-editor';
+	}
+
+	onConstraintChanged(): void {
+		this.constraintModified = true;
+	}
+
+	onConstraintSaved(rule: Rule): void {
+		this.constraintModified = false;
+		this.originalConstraint = JSON.parse(JSON.stringify(rule.constraint));
+		this.constraintRule = rule;
+	}
+
+	onRevertConstraint(): void {
+		if(this.originalConstraint) {
+			this.constraintRule = {
+				ruleId: undefined,
+				constraint: this.originalConstraint as any,
+				actions: [],
+				tags: [],
+				message: {}
+			};
+			this.constraintModified = false;
 		}
 	}
 }

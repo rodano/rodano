@@ -27,6 +27,7 @@ import {Rule} from '@core/model/rule';
 export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronManagerService> {
 	@Input() override entity!: Cron;
 	@Input() override allEntities: Cron[] = [];
+	@Input() initialTab: 'general' | 'rules' = 'general';
 	@Output() cronUpdated = this.entityUpdated;
 	@Output() cronDeleted = this.entityDeleted;
 	@Output() switchToRuleEditor = new EventEmitter<Rule>();
@@ -35,8 +36,6 @@ export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronMa
 	get cron(): Cron {return this.entity;}
 
 	@Input() set allCrons(v: Cron[]) {this.allEntities = v;}
-
-	activeTab: 'general' | 'rules' = 'general';
 
 	readonly ruleTypes = [{type: null, label: 'Rules'}];
 	readonly ruleDomains = ['SCOPE'];

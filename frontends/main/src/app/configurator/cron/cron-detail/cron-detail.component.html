@@ -11,15 +11,15 @@
 </div>
 
 <div class="detail-tabs">
-	<button class="detail-tab" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+	<button class="detail-tab" [class.active]="initialTab === 'general'" (click)="initialTab = 'general'">
 		General
 	</button>
-	<button class="detail-tab" [class.active]="activeTab === 'rules'" (click)="activeTab = 'rules'">
+	<button class="detail-tab" [class.active]="initialTab === 'rules'" (click)="initialTab = 'rules'">
 		Rules
 	</button>
 </div>
 
-@if (activeTab === 'general') {
+@if (initialTab === 'general') {
 	<div class="detail-content">
 		<div class="settings-section">
 			<h3>Basic Information</h3>
@@ -76,7 +76,7 @@
 	</div>
 }
 
-@if (activeTab === 'rules') {
+@if (initialTab === 'rules') {
 	<div class="detail-content">
 		<app-rule-list
 			[projectId]="projectId"

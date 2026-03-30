@@ -1,52 +1,54 @@
 <div class="rule-detail">
 
-	<div class="settings-section">
-		<h3>Basic Information</h3>
-		<div class="settings-grid">
-			<app-setting-item label="Description"
-																					[notConfigured]="!rule.description">
-				@if (!rule.description) {
-					<mat-icon class="warning-icon">report</mat-icon>
-					<span>Not configured</span>
-				} @else {
-					{{ rule.description }}
-				}
-			</app-setting-item>
+	@if (showBasicInfo) {
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Description"
+				                  [notConfigured]="!rule.description">
+					@if (!rule.description) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ rule.description }}
+					}
+				</app-setting-item>
 
-			<app-setting-item label="Tags"
-																					[notConfigured]="(rule.tags ?? []).length < 1">
-				@if ((rule.tags ?? []).length > 0) {
-					<div class="chip-container">
-						@for (tag of rule.tags; track tag) {
-							<div class="chip theme-rule">
-								<mat-icon class="resource-icon">label</mat-icon>
-								<span class="language-name">{{ tag }}</span>
-							</div>
-						}
-					</div>
-				} @else {
-					<mat-icon class="warning-icon">report</mat-icon>
-					<span>No tags</span>
-				}
-			</app-setting-item>
+				<app-setting-item label="Tags"
+				                  [notConfigured]="(rule.tags ?? []).length < 1">
+					@if ((rule.tags ?? []).length > 0) {
+						<div class="chip-container">
+							@for (tag of rule.tags; track tag) {
+								<div class="chip theme-rule">
+									<mat-icon class="resource-icon">label</mat-icon>
+									<span class="language-name">{{ tag }}</span>
+								</div>
+							}
+						</div>
+					} @else {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>No tags</span>
+					}
+				</app-setting-item>
 
-			<app-setting-item label="Message"
-																					[translated]="true"
-																					[fullWidth]="true"
-																					[notConfigured]="!getMessageForCurrentLanguage()">
-				@if (!getMessageForCurrentLanguage()) {
-					<mat-icon class="warning-icon">report</mat-icon>
-					<span>Not configured</span>
-				} @else {
-					{{ getMessageForCurrentLanguage() }}
-				}
-			</app-setting-item>
+				<app-setting-item label="Message"
+				                  [translated]="true"
+				                  [fullWidth]="true"
+				                  [notConfigured]="!getMessageForCurrentLanguage()">
+					@if (!getMessageForCurrentLanguage()) {
+						<mat-icon class="warning-icon">report</mat-icon>
+						<span>Not configured</span>
+					} @else {
+						{{ getMessageForCurrentLanguage() }}
+					}
+				</app-setting-item>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
 		</div>
-		<button class="btn-edit" (click)="onEditBasicInfo()">
-			<mat-icon>edit</mat-icon>
-			Edit Basic Information
-		</button>
-	</div>
+	}
 
 	<div class="settings-section">
 		<h3>Conditions</h3>
@@ -55,14 +57,20 @@
 			<div class="domain-section">
 				<div class="domain-section-header">
 					<h4 class="domain-title">{{ domain }}</h4>
-					<button class="btn-add-item-editor" (click)="addCondition(domain)">
-						<mat-icon>add</mat-icon>
-						Add
-					</button>
+					<div class="domain-header-right">
+						<span class="condition-id-badge">{{ domain }}</span>
+						<button class="btn-add-item-editor" (click)="addCondition(domain)">
+							<mat-icon>add</mat-icon>
+							Add
+						</button>
+					</div>
 				</div>
 
 				@if (getConditionsForDomain(domain).length > 0) {
-					<div class="domain-conditions">
+					<div class="domain-conditions"
+					     cdkDropList
+					     [cdkDropListData]="getConditionsForDomain(domain)"
+					     (cdkDropListDropped)="onDropCondition(domain, $event)">
 						<div class="nested-conditions-tree">
 							<div class="nested-line-col">
 								@if (getConditionsForDomain(domain).length > 1) {
@@ -78,14 +86,26 @@
 							</div>
 							<div class="nested-conditions-list">
 								@for (condition of getConditionsForDomain(domain); track condition) {
-									<app-condition-item
-										[condition]="condition"
-										[domain]="domain"
-										[depth]="0"
-										(remove)="removeCondition(domain, condition)"
-										(insertSibling)="insertConditionAfter(domain, condition)"
-										(changed)="onConditionChanged()">
-									</app-condition-item>
+									<div cdkDrag [cdkDragData]="condition">
+										<div class="drag-handle" cdkDragHandle>
+											<mat-icon>drag_indicator</mat-icon>
+										</div>
+										<app-condition-item
+											[condition]="condition"
+											[domain]="domain"
+											[contextScopeModelId]="getScopeModelIdFromConditions()"
+											[contextWorkflowId]="contextWorkflowId"
+											[contextFieldModelId]="getContextFieldModelIdForDomain(domain)"
+											[allConditionIds]="getAllConditionIds()"
+											[depth]="0"
+											[dropListId]="getTopLevelDropListId(condition)"
+											[siblingDropListIds]="altDragService.isAltHeld() ? getTopLevelSiblingDropListIds(domain, condition) : []"
+											(remove)="removeCondition(domain, condition)"
+											(insertSibling)="insertConditionAfter(domain, condition)"
+											(changed)="onConditionChanged()"
+											(idChanged)="onConditionIdChanged($event)">
+										</app-condition-item>
+									</div>
 								}
 							</div>
 						</div>
@@ -99,125 +119,38 @@
 		}
 	</div>
 
-	<div class="rule-block">
-		<div class="rule-block-header">
-			<h3>Actions</h3>
-			<button type="button" class="btn-add-item-editor" (click)="addAction()">
-				<mat-icon>add</mat-icon>
-				Add Action
-			</button>
-		</div>
+	@if (showActions) {
+		<div class="settings-section">
+			<div class="settings-section-header">
+				<h3>Actions</h3>
+				<button type="button" class="btn-add-item-editor" (click)="addAction()">
+					<mat-icon>add</mat-icon>
+					Add Action
+				</button>
+			</div>
 
-		<div class="action-list">
-			@for (action of rule.actions ?? []; track $index) {
-				<div class="action-row-item">
-					<div class="action-controls">
-						<mat-checkbox [(ngModel)]="action.optional" [ngModelOptions]="{standalone: true}"
-																				matTooltip="Rule continues even if this action fails">
-							Optional
-						</mat-checkbox>
-
-						<mat-select [value]="getActionType(action)"
-																		(valueChange)="onActionTypeChanged(action, $event)"
-																		placeholder="Action type">
-							@for (t of actionTypes; track t.value) {
-								<mat-option [value]="t.value">{{ t.label }}</mat-option>
-							}
-						</mat-select>
-
-						@if (getActionType(action) === 'STATIC_ACTION') {
-							<mat-select [(ngModel)]="action.staticActionId" [ngModelOptions]="{standalone: true}"
-																			(ngModelChange)="onStaticActionChanged(action)"
-																			placeholder="Select action">
-								<mat-option value="">Select action</mat-option>
-								@for (sa of getStaticActionList(); track sa.id) {
-									<mat-option [value]="sa.id">{{ sa.label }}</mat-option>
-								}
-							</mat-select>
-						}
-
-						@if (getActionType(action) === 'ENTITY_ACTION') {
-							<mat-select [(ngModel)]="action.rulableEntity" [ngModelOptions]="{standalone: true}"
-																			(ngModelChange)="onRulableEntityChanged(action)"
-																			placeholder="Select domain">
-								<mat-option value="">Select domain</mat-option>
-								@for (d of availableDomains; track d) {
-									<mat-option [value]="d">{{ d }}</mat-option>
-								}
-							</mat-select>
-
-							@if (action.rulableEntity) {
-								<mat-select [value]="getActionId(action)"
-																				(valueChange)="setActionId(action, $event)"
-																				placeholder="Select action">
-									<mat-option value="">Select action</mat-option>
-									@for (a of getEntityActionsForDomain(action.rulableEntity!); track a.id) {
-										<mat-option [value]="a.id">{{ a.label }}</mat-option>
-									}
-								</mat-select>
-							}
-						}
-
-						@if (getActionType(action) === 'CONFIGURATION_ACTION') {
-							<mat-select [(ngModel)]="action.configurationWorkflowId"
-																			[ngModelOptions]="{standalone: true}"
-																			placeholder="Select workflow">
-								<mat-option value="">Select workflow</mat-option>
-								@for (wf of workflowManager.getAll(); track wf.workflowId) {
-									<mat-option [value]="wf.workflowId">{{ languageService.getLabel(wf) }}</mat-option>
-								}
-							</mat-select>
-							<input type="text" [(ngModel)]="action.configurationActionId"
-														[ngModelOptions]="{standalone: true}"
-														class="action-config-input" placeholder="Action ID">
-						}
-
-						<button type="button" class="btn-icon-xs danger" (click)="removeAction(action)">
-							<mat-icon>delete</mat-icon>
-						</button>
-					</div>
-
-					@if (getActionParamDefs(action).length > 0) {
-						<div class="action-params-grid">
-							@for (param of getActionParamDefs(action); track param.id) {
-								<div class="action-param-field">
-									<label>{{ param.label }}</label>
-									@if (param.options?.length) {
-										<mat-select [value]="getParamValue(action, param.id)"
-																						(valueChange)="setParamValue(action, param.id, $event)">
-											<mat-option value="">-- Select --</mat-option>
-											@for (opt of param.options!; track opt) {
-												<mat-option [value]="opt">{{ opt }}</mat-option>
-											}
-										</mat-select>
-									} @else if (param.configurationEntity) {
-										<mat-select [value]="getParamValue(action, param.id)"
-																						(valueChange)="setParamValue(action, param.id, $event)">
-											<mat-option value="">-- Select --</mat-option>
-											@for (opt of getEntityOptions(param.configurationEntity!); track opt.id) {
-												<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
-											}
-										</mat-select>
-									} @else if (param.type === 'TEXT') {
-										<textarea [value]="getParamValue(action, param.id)"
-																				(input)="setParamValue(action, param.id, $any($event.target).value)"
-																				rows="2" [placeholder]="param.label"></textarea>
-									} @else {
-										<input type="text"
-																	[value]="getParamValue(action, param.id)"
-																	(input)="setParamValue(action, param.id, $any($event.target).value)"
-																	[placeholder]="param.label">
-									}
-								</div>
-							}
+			@if ((rule.actions ?? []).length > 0) {
+				<div class="action-list"
+				     cdkDropList
+				     [cdkDropListData]="rule.actions"
+				     (cdkDropListDropped)="onDropAction($event)">
+					@for (action of rule.actions ?? []; track $index) {
+						<div cdkDrag [cdkDragData]="action">
+							<app-action-item
+								[action]="action"
+								[availableDomains]="availableDomains"
+								[conditionEntities]="getConditionEntities()"
+								[contextWorkflowId]="contextWorkflowId"
+								[conditionIdToWorkflowId]="getConditionIdToWorkflowId()"
+								(remove)="removeAction(action)"
+								(changed)="onConditionChanged()">
+							</app-action-item>
 						</div>
 					}
 				</div>
-			}
-
-			@if ((rule.actions ?? []).length === 0) {
-				<div class="action-empty-hint">No actions configured.</div>
+			} @else {
+				<div class="domain-empty-hint">No actions configured — click Add Action to create one</div>
 			}
 		</div>
-	</div>
+	}
 </div>

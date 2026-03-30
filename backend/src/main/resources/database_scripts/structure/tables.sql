@@ -1873,6 +1873,7 @@ create table if not exists rule_condition (
     inverse boolean not null default false,
     dependency boolean not null default false,
     break_type varchar(16) null,
+	condition_order int(11) null default 0,
     constraint pk_rule_condition primary key (project_id, condition_id)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 

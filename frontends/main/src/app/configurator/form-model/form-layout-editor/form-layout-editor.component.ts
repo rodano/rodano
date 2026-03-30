@@ -39,6 +39,8 @@ export class FormLayoutEditorComponent implements OnInit, OnChanges {
 	@Output() layoutCreated = new EventEmitter<Layout>();
 	@Output() layoutDeleted = new EventEmitter<string>();
 	@Output() unsavedChanges = new EventEmitter<boolean>();
+	@Output() editLayoutConstraint = new EventEmitter<{layout: Layout}>();
+	@Output() editCellConstraint = new EventEmitter<{layout: Layout; cell: Cell}>();
 
 	workingLayouts: Layout[] = [];
 	selectedCell: Cell | null = null;

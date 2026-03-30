@@ -3,16 +3,30 @@
 @if (cronViewMode === 'rule-editor' && selectedCron && selectedRule) {
 	<div class="fullscreen">
 		<div class="breadcrumb">
-			<button class="breadcrumb-btn" (click)="backToCronDetail()">
+			<button class="breadcrumb-btn" (click)="backToCronDetail('general')">
 				<mat-icon>alarm</mat-icon>
 				<span>{{ languageService.getTranslatedName(selectedCron.description) }}</span>
 			</button>
 			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
-			<button class="breadcrumb-btn" (click)="backToCronDetail()">
+			<button class="breadcrumb-btn" (click)="backToCronDetail('rules')">
+				<mat-icon>rules</mat-icon>
 				<span>Rules</span>
 			</button>
 			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
 			<span class="breadcrumb-current">{{ selectedRule.description || 'Unnamed rule' }}</span>
+
+			<div class="breadcrumb-actions">
+				@if (ruleModified) {
+					<button class="breadcrumb-btn" (click)="onRevertRule()" matTooltip="Revert changes">
+						<mat-icon>undo</mat-icon>
+						Revert
+					</button>
+					<button class="breadcrumb-btn breadcrumb-btn-active" (click)="onSaveRule()" matTooltip="Save rule">
+						<mat-icon>save</mat-icon>
+						Save
+					</button>
+				}
+			</div>
 		</div>
 
 		<app-rule-detail
@@ -20,7 +34,8 @@
 			[projectId]="projectId"
 			[entityPath]="'crons/' + selectedCron.cronId"
 			[availableDomains]="ruleDomains"
-			(ruleSaved)="onRuleSaved($event)">
+			(ruleSaved)="onRuleSaved($event)"
+			(ruleChanged)="onRuleChanged()">
 		</app-rule-detail>
 	</div>
 } @else {
@@ -86,6 +101,7 @@
 						[projectId]="projectId"
 						[project]="project"
 						[allCrons]="crons"
+						[initialTab]="returnTab"
 						(cronUpdated)="onCronUpdated($event)"
 						(cronDeleted)="onCronDeleted($event)"
 						(closed)="onSelectCron(selectedCron)"

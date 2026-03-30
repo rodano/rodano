@@ -20,53 +20,53 @@ import ch.rodano.core.model.jooq.enums.RuleEntityType;
 import ch.rodano.core.services.dao.configurator.RuleDAOService;
 
 @RestController
-@RequestMapping("/superuser/configurator/projects/{projectId}/config/crons/{cronId}/rules")
+@RequestMapping("/superuser/configurator/projects/{projectId}/config/scope-models/{scopeModelId}/rules")
 @PreAuthorize("@userSecurityService.isSuperuser()")
-public class CronRuleController {
+public class ScopeModelRuleController {
 
 	private final RuleDAOService ruleDAOService;
 
-	public CronRuleController(final RuleDAOService ruleDAOService) {
+	public ScopeModelRuleController(final RuleDAOService ruleDAOService) {
 		this.ruleDAOService = ruleDAOService;
 	}
 
 	@GetMapping
 	public ResponseEntity<List<RuleDTO>> getRules(
 		@PathVariable final UUID projectId,
-		@PathVariable final UUID cronId
+		@PathVariable final UUID scopeModelId
 	) {
-		return ResponseEntity.ok(ruleDAOService.getRules(projectId, RuleEntityType.CRON, cronId));
+		return ResponseEntity.ok(ruleDAOService.getRules(projectId, RuleEntityType.SCOPE_MODEL, scopeModelId));
 	}
 
 	@PostMapping
 	@SkipProjectAccessCheck
 	public ResponseEntity<RuleDTO> createRule(
 		@PathVariable final UUID projectId,
-		@PathVariable final UUID cronId,
+		@PathVariable final UUID scopeModelId,
 		@RequestBody final RuleDTO dto
 	) {
-		return ResponseEntity.ok(ruleDAOService.createRule(projectId, RuleEntityType.CRON, cronId, null, dto));
+		return ResponseEntity.ok(ruleDAOService.createRule(projectId, RuleEntityType.SCOPE_MODEL, scopeModelId, null, dto));
 	}
 
 	@PutMapping("/{ruleId}")
 	@SkipProjectAccessCheck
 	public ResponseEntity<RuleDTO> updateRule(
 		@PathVariable final UUID projectId,
-		@PathVariable final UUID cronId,
+		@PathVariable final UUID scopeModelId,
 		@PathVariable final UUID ruleId,
 		@RequestBody final RuleDTO dto
 	) {
-		return ResponseEntity.ok(ruleDAOService.updateRule(projectId, RuleEntityType.CRON, cronId, ruleId, dto));
+		return ResponseEntity.ok(ruleDAOService.updateRule(projectId, RuleEntityType.SCOPE_MODEL, scopeModelId, ruleId, dto));
 	}
 
 	@DeleteMapping("/{ruleId}")
 	@SkipProjectAccessCheck
 	public ResponseEntity<Void> deleteRule(
 		@PathVariable final UUID projectId,
-		@PathVariable final UUID cronId,
+		@PathVariable final UUID scopeModelId,
 		@PathVariable final UUID ruleId
 	) {
-		ruleDAOService.deleteRule(projectId, RuleEntityType.CRON, cronId, ruleId);
+		ruleDAOService.deleteRule(projectId, RuleEntityType.SCOPE_MODEL, scopeModelId, ruleId);
 		return ResponseEntity.noContent().build();
 	}
 }

@@ -13,6 +13,13 @@ export const OPERATORS = [
 	{value: 'NOT_BLANK', label: 'Is not blank', hasValue: false}
 ];
 
+export const OPERATORS_BY_TYPE: Record<string, string[]> = {
+	BOOLEAN: ['EQUALS', 'NOT_EQUALS', 'NULL', 'NOT_NULL'],
+	STRING: ['EQUALS', 'NOT_EQUALS', 'CONTAINS', 'NOT_CONTAINS', 'NULL', 'NOT_NULL', 'BLANK', 'NOT_BLANK'],
+	NUMBER: ['EQUALS', 'NOT_EQUALS', 'GREATER', 'GREATER_EQUALS', 'LOWER', 'LOWER_EQUALS', 'NULL', 'NOT_NULL'],
+	DATE: ['EQUALS', 'NOT_EQUALS', 'GREATER', 'GREATER_EQUALS', 'LOWER', 'LOWER_EQUALS', 'NULL', 'NOT_NULL']
+};
+
 export const ACTION_TYPES = [
 	{value: 'ENTITY_ACTION', label: 'On your selection'},
 	{value: 'STATIC_ACTION', label: 'Using a pre-configured action'},

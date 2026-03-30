@@ -11,10 +11,16 @@ import {ProjectLanguage} from '@core/model/project-language';
 import {LanguageService} from '../../../services/language.service';
 import {BaseInfoDialogComponent} from '../../base-info-dialog.component';
 import {MatIcon} from '@angular/material/icon';
+import {RuleService} from '../../../services/api/rule.service';
+import {MatAutocompleteModule} from '@angular/material/autocomplete';
+import {MatOptionModule} from '@angular/material/core';
 
 interface RuleBasicInfoDialogData {
 	rule: Rule;
 	languages: ProjectLanguage[];
+	projectId: string;
+	entityPath: string;
+	availableTags: string[];
 }
 
 @Component({
@@ -22,21 +28,26 @@ interface RuleBasicInfoDialogData {
 	standalone: true,
 	templateUrl: './rule-basic-info-dialog.component.html',
 	styleUrls: ['../../dialog-shared.css'],
-	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatInputModule, MatTabsModule, MatIcon, FormsModule]
+	imports: [CommonModule, ReactiveFormsModule, MatDialogModule, MatButtonModule, MatInputModule, MatTabsModule, MatIcon,
+		FormsModule, MatAutocompleteModule, MatOptionModule]
 })
 export class RuleBasicInfoDialogComponent extends BaseInfoDialogComponent implements OnInit {
 	form: FormGroup;
 	selectedTags: string[] = [];
 	newTagInput = '';
 
+	private readonly sb: MatSnackBar;
+
 	constructor(
 		fb: FormBuilder,
 		languageService: LanguageService,
 		dialogRef: MatDialogRef<RuleBasicInfoDialogComponent>,
 		@Inject(MAT_DIALOG_DATA) data: RuleBasicInfoDialogData,
-		snackBar: MatSnackBar
+		snackBar: MatSnackBar,
+		private ruleService: RuleService
 	) {
 		super(fb, languageService, dialogRef, data, snackBar);
+		this.sb = snackBar;
 	}
 
 	ngOnInit(): void {
@@ -71,6 +82,21 @@ export class RuleBasicInfoDialogComponent extends BaseInfoDialogComponent implem
 		this.selectedTags = this.selectedTags.filter(t => t !== tag);
 	}
 
+	get tagSuggestions(): string[] {
+		const input = this.newTagInput.trim().toUpperCase();
+		if(!input) {
+			return [];
+		}
+		return (this.data.availableTags as string[] ?? [])
+			.map((t: string) => t.toUpperCase())
+			.filter((t: string) => t.includes(input) && !this.selectedTags.includes(t));
+	}
+
+	selectTag(tag: string): void {
+		this.newTagInput = tag;
+		this.addTag();
+	}
+
 	onKeyPress(event: KeyboardEvent): void {
 		if(event.key === 'Enter') {
 			event.preventDefault();
@@ -87,10 +113,25 @@ export class RuleBasicInfoDialogComponent extends BaseInfoDialogComponent implem
 				message[lang] = val;
 			}
 		});
-		this.dialogRef.close({
+
+		const updated = {
+			...this.data.rule,
 			description: v.description,
 			tags: this.selectedTags,
 			message
+		};
+
+		this.ruleService.updateRule(
+			this.data.projectId,
+			this.data.entityPath,
+			this.data.rule.ruleId!,
+			updated
+		).subscribe({
+			next: saved => {
+				this.sb.open('Rule saved', 'Close', {duration: 2000});
+				this.dialogRef.close(saved);
+			},
+			error: () => this.sb.open('Failed to save rule', 'Close', {duration: 3000})
 		});
 	}
 }

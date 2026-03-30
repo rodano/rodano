@@ -130,6 +130,11 @@
 														matTooltip="Layout settings">
 							<mat-icon>settings</mat-icon>
 						</button>
+						<button class="btn-icon-sm"
+						        (click)="editLayoutConstraint.emit({layout: wl}); $event.stopPropagation()"
+						        matTooltip="Edit layout constraint">
+							<mat-icon>rule</mat-icon>
+						</button>
 						<button class="btn-icon-sm btn-icon-danger"
 														(click)="onDeleteLayout(wl); $event.stopPropagation()"
 														matTooltip="Delete layout">
@@ -259,7 +264,6 @@
 																			[class.is-resizing]="isSplitResizingCell(cell)"
 																			(click)="$event.stopPropagation()">
 
-															<!-- Per-cell mini ruler -->
 															<div class="cell-mini-ruler">
 																@for (tick of getMiniRulerTicks(wl, cell, i); track tick.pct) {
 																	<div class="cell-ruler-tick"
@@ -300,7 +304,14 @@
 												}
 
 												@if (!isSpacerCell(cell) && !isSplitEditActive()) {
-													<button class="cell-delete-btn"
+													@if (!isTextCell(cell)) {
+														<button class="cell-btn cell-btn-primary"
+														        (click)="editCellConstraint.emit({layout: wl, cell}); $event.stopPropagation()"
+														        matTooltip="Edit cell constraint">
+															<mat-icon>rule</mat-icon>
+														</button>
+													}
+													<button class="cell-btn cell-btn-danger"
 																					(click)="deleteCell(wl, i, ci, $event)"
 																					matTooltip="Remove cell">
 														<mat-icon>close</mat-icon>

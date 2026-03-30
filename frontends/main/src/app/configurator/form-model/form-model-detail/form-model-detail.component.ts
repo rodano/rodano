@@ -14,13 +14,15 @@ import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirma
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {Rule} from '@core/model/rule';
+import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
 
 @Component({
 	selector: 'app-form-model-detail',
 	standalone: true,
 	templateUrl: './form-model-detail.component.html',
 	styleUrls: ['./form-model-detail.component.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
 })
 export class FormModelDetailComponent extends BaseManagerDetailComponent<FormModel, FormModelManagerService> {
 	@Input() override entity!: FormModel;
@@ -31,9 +33,15 @@ export class FormModelDetailComponent extends BaseManagerDetailComponent<FormMod
 
 	@Input() set allFormModels(v: FormModel[]) {this.allEntities = v;}
 
+	@Input() initialTab: 'general' | 'rules' = 'general';
+
 	@Output() formModelUpdated = this.entityUpdated;
 	@Output() formModelDeleted = this.entityDeleted;
 	@Output() switchToLayouts = new EventEmitter<void>();
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
+
+	readonly ruleTypes = [{type: null, label: 'Rules'}];
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'FORM'];
 
 	constructor(
 		formModelManager: FormModelManagerService,

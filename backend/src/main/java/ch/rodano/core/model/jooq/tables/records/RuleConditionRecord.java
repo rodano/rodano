@@ -147,6 +147,20 @@ public class RuleConditionRecord extends UpdatableRecordImpl<RuleConditionRecord
 		return (String) get(8);
 	}
 
+	/**
+	 * Setter for <code>rule_condition.condition_order</code>.
+	 */
+	public void setConditionOrder(Integer value) {
+		set(9, value);
+	}
+
+	/**
+	 * Getter for <code>rule_condition.condition_order</code>.
+	 */
+	public Integer getConditionOrder() {
+		return (Integer) get(9);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -170,7 +184,7 @@ public class RuleConditionRecord extends UpdatableRecordImpl<RuleConditionRecord
 	/**
 	 * Create a detached, initialised RuleConditionRecord
 	 */
-	public RuleConditionRecord(UUID conditionId, UUID projectId, UUID conditionListId, UUID parentConditionId, String code, RuleConditionMode mode, Boolean inverse, Boolean dependency, String breakType) {
+	public RuleConditionRecord(UUID conditionId, UUID projectId, UUID conditionListId, UUID parentConditionId, String code, RuleConditionMode mode, Boolean inverse, Boolean dependency, String breakType, Integer conditionOrder) {
 		super(RuleCondition.RULE_CONDITION);
 
 		setConditionId(conditionId);
@@ -182,6 +196,7 @@ public class RuleConditionRecord extends UpdatableRecordImpl<RuleConditionRecord
 		setInverse(inverse);
 		setDependency(dependency);
 		setBreakType(breakType);
+		setConditionOrder(conditionOrder);
 		resetChangedOnNotNull();
 	}
 }

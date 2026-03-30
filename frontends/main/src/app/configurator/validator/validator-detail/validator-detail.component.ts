@@ -1,4 +1,4 @@
-import {Component, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -28,6 +28,7 @@ export class ValidatorDetailComponent extends BaseManagerDetailComponent<Validat
 	@Input() override allEntities: Validator[] = [];
 	@Output() validatorUpdated = this.entityUpdated;
 	@Output() validatorDeleted = this.entityDeleted;
+	@Output() switchToConstraintEditor = new EventEmitter<void>();
 
 	@Input() set validator(v: Validator) {this.entity = v;}
 	get validator(): Validator {return this.entity;}

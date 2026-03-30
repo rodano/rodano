@@ -7,250 +7,309 @@
 	}
 </app-list-header>
 
-<div class="content-container"
-					[class.level-2]="viewLevel === 2 && !showMatrix"
-					[class.level-3]="viewLevel === 3">
+@if (viewMode === 'rule-editor' && selectedDatasetModel && selectedRule) {
+	<div class="fullscreen">
+		<div class="breadcrumb">
+			<button class="breadcrumb-btn" (click)="backToDatasetDetail()">
+				<mat-icon>dataset</mat-icon>
+				<span>{{ languageService.getTranslatedName(selectedDatasetModel.shortname) }}</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
 
-	@if (showMatrix) {
-		<app-dataset-model-rights-matrix
-			style="width: 100%"
+			@if (ruleEditorContext === 'field-model') {
+				<button class="breadcrumb-btn" (click)="backToFieldModelDetail()">
+					<mat-icon>text_ad</mat-icon>
+					<span>{{ getFieldModelLabel(selectedFieldModelId!) }}</span>
+				</button>
+				<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+				<button class="breadcrumb-btn" (click)="backToFieldModelRules()">
+					<mat-icon>rules</mat-icon>
+					<span>Rules</span>
+				</button>
+			} @else {
+				<button class="breadcrumb-btn" (click)="backToDatasetRules()">
+					<mat-icon>rules</mat-icon>
+					<span>Rules</span>
+				</button>
+			}
+
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">{{ selectedRule.description || 'Unnamed rule' }}</span>
+
+			<div class="breadcrumb-actions">
+				@if (ruleModified) {
+					<button class="breadcrumb-btn" (click)="onRevertRule()" matTooltip="Revert changes">
+						<mat-icon>undo</mat-icon>
+						Revert
+					</button>
+					<button class="breadcrumb-btn breadcrumb-btn-active" (click)="onSaveRule()" matTooltip="Save rule">
+						<mat-icon>save</mat-icon>
+						Save
+					</button>
+				}
+			</div>
+		</div>
+
+		<app-rule-detail
+			[rule]="selectedRule"
 			[projectId]="projectId"
-			[datasetModels]="datasetModels"
-			[profiles]="profiles"
-			(closed)="showMatrix = false">
-		</app-dataset-model-rights-matrix>
-	} @else if (loading) {
-		<app-empty-state
-			style="width: 100%"
-			[icon]="'hourglass_empty'"
-			[message]="'Loading dataset models...'"
-		/>
-	} @else {
-		<div class="cards-container">
-			<div class="primary-cards-grid">
-				<div class="primary-card create-card theme-dataset-model" (click)="onCreateDatasetModel()">
-					<div class="create-content">
-						<mat-icon>add_circle_outline</mat-icon>
-						<h3>Create Dataset Model</h3>
-						<p>Add a new dataset</p>
+			[entityPath]="selectedRuleEntityPath"
+			[availableDomains]="activeRuleDomains"
+			[contextWorkflowId]="selectedDatasetModel.datasetModelId"
+			(ruleSaved)="onRuleSaved($event)"
+			(ruleChanged)="onRuleChanged()">
+		</app-rule-detail>
+	</div>
+} @else {
+	<div class="content-container"
+	     [class.level-2]="viewLevel === 2 && !showMatrix"
+	     [class.level-3]="viewLevel === 3">
+
+		@if (showMatrix) {
+			<app-dataset-model-rights-matrix
+				style="width: 100%"
+				[projectId]="projectId"
+				[datasetModels]="datasetModels"
+				[profiles]="profiles"
+				(closed)="showMatrix = false">
+			</app-dataset-model-rights-matrix>
+		} @else if (loading) {
+			<app-empty-state
+				style="width: 100%"
+				[icon]="'hourglass_empty'"
+				[message]="'Loading dataset models...'"
+			/>
+		} @else {
+			<div class="cards-container">
+				<div class="primary-cards-grid">
+					<div class="primary-card create-card theme-dataset-model" (click)="onCreateDatasetModel()">
+						<div class="create-content">
+							<mat-icon>add_circle_outline</mat-icon>
+							<h3>Create Dataset Model</h3>
+							<p>Add a new dataset</p>
+						</div>
 					</div>
-				</div>
 
-				@for (datasetModel of datasetModels; track datasetModel.datasetModelId) {
-					<div class="primary-card theme-dataset-model"
-										[class.selected]="isSelected(datasetModel)"
-										[appModified]="modifiedDatasetModelIds.has(datasetModel.datasetModelId)"
-										(click)="onSelectDatasetModel(datasetModel)">
+					@for (datasetModel of datasetModels; track datasetModel.datasetModelId) {
+						<div class="primary-card theme-dataset-model"
+						     [class.selected]="isSelected(datasetModel)"
+						     [appModified]="modifiedDatasetModelIds.has(datasetModel.datasetModelId)"
+						     (click)="onSelectDatasetModel(datasetModel)">
 
-						@if (isSelected(datasetModel)) {
-							<div class="card-selection-icon">
-								<mat-icon>check</mat-icon>
-							</div>
-						}
+							@if (isSelected(datasetModel)) {
+								<div class="card-selection-icon">
+									<mat-icon>check</mat-icon>
+								</div>
+							}
 
-						<div class="card-header">
-							<div class="card-info">
-								<h3>{{ languageService.getTranslatedName(datasetModel.shortname) }}</h3>
-								<p class="card-code">{{ datasetModel.id }}</p>
-							</div>
-							<div class="card-header-badges">
-								@if (datasetModel.multiple) {
-									<span class="status-badge first" matTooltip="Multiple instances allowed">
+							<div class="card-header">
+								<div class="card-info">
+									<h3>{{ languageService.getTranslatedName(datasetModel.shortname) }}</h3>
+									<p class="card-code">{{ datasetModel.id }}</p>
+								</div>
+								<div class="card-header-badges">
+									@if (datasetModel.multiple) {
+										<span class="status-badge first" matTooltip="Multiple instances allowed">
 										<mat-icon class="badge-full">stack</mat-icon>
 										<mat-icon class="badge-short">stack</mat-icon>
 									</span>
-								}
-								@if (datasetModel.master) {
-									<span class="status-badge second" matTooltip="Master dataset">
+									}
+									@if (datasetModel.master) {
+										<span class="status-badge second" matTooltip="Master dataset">
 										<mat-icon class="badge-full">star</mat-icon>
 										<mat-icon class="badge-short">star</mat-icon>
 									</span>
-								}
-								@if (datasetModel.exportable) {
-									<span class="status-badge third" matTooltip="Exportable">
+									}
+									@if (datasetModel.exportable) {
+										<span class="status-badge third" matTooltip="Exportable">
 										<mat-icon class="badge-full">arrow_upward</mat-icon>
 										<mat-icon class="badge-short">arrow_upward</mat-icon>
 									</span>
-								}
+									}
+								</div>
 							</div>
-						</div>
 
-						<div class="card-body">
-							<div class="card-details">
-								<div class="detail-item" [class.unset]="!datasetModel.family">
-									<mat-icon>folder</mat-icon>
-									<span>{{ datasetModel.family || 'No family' }}</span>
-								</div>
-								<div class="detail-item" [class.unset]="!datasetModel.exportOrder">
-									<mat-icon>sort</mat-icon>
-									<span>Export Order: {{ datasetModel.exportOrder !== null && datasetModel.exportOrder !== undefined ? datasetModel.exportOrder : 'Not exportable' }}</span>
-								</div>
-								<div class="detail-item" [class.unset]="!hasLabelPatterns(datasetModel)">
-									<mat-icon>label</mat-icon>
-									<span>{{ hasLabelPatterns(datasetModel) ? 'Patterns configured' : 'No patterns' }}</span>
-								</div>
-								<div class="detail-item" [class.unset]="!datasetModel.fieldModels || datasetModel.fieldModels.length === 0">
-									<mat-icon>view_list</mat-icon>
-									<span>{{ getFieldModelCount(datasetModel.datasetModelId) }} {{ getFieldModelCount(datasetModel.datasetModelId) === 1 ? 'Field Model' : 'Field Models' }}</span>
+							<div class="card-body">
+								<div class="card-details">
+									<div class="detail-item" [class.unset]="!datasetModel.family">
+										<mat-icon>folder</mat-icon>
+										<span>{{ datasetModel.family || 'No family' }}</span>
+									</div>
+									<div class="detail-item" [class.unset]="!datasetModel.exportOrder">
+										<mat-icon>sort</mat-icon>
+										<span>Export Order: {{ datasetModel.exportOrder !== null && datasetModel.exportOrder !== undefined ? datasetModel.exportOrder : 'Not exportable' }}</span>
+									</div>
+									<div class="detail-item" [class.unset]="!hasLabelPatterns(datasetModel)">
+										<mat-icon>label</mat-icon>
+										<span>{{ hasLabelPatterns(datasetModel) ? 'Patterns configured' : 'No patterns' }}</span>
+									</div>
+									<div class="detail-item" [class.unset]="!datasetModel.fieldModels || datasetModel.fieldModels.length === 0">
+										<mat-icon>view_list</mat-icon>
+										<span>{{ getFieldModelCount(datasetModel.datasetModelId) }} {{ getFieldModelCount(datasetModel.datasetModelId) === 1 ? 'Field Model' : 'Field Models' }}</span>
+									</div>
 								</div>
 							</div>
-						</div>
 
-						@if (modifiedDatasetModelIds.has(datasetModel.datasetModelId)) {
-							<div class="card-modified-indicator">
-								<mat-icon>edit</mat-icon>
-							</div>
-						}
-					</div>
+							@if (modifiedDatasetModelIds.has(datasetModel.datasetModelId)) {
+								<div class="card-modified-indicator">
+									<mat-icon>edit</mat-icon>
+								</div>
+							}
+						</div>
+					}
+				</div>
+
+				@if (datasetModels.length === 0) {
+					<app-empty-state
+						[icon]="'dataset'"
+						[title]="'No Dataset Models'"
+						[message]="'Create your first dataset model to start collecting data'"
+					/>
 				}
 			</div>
 
-			@if (datasetModels.length === 0) {
-				<app-empty-state
-					[icon]="'dataset'"
-					[title]="'No Dataset Models'"
-					[message]="'Create your first dataset model to start collecting data'"
-				/>
-			}
-		</div>
-
-		@if (viewMode === 'field-list' || viewMode === 'field-detail') {
-			<div class="secondary-column">
-				<div class="secondary-column-header">
-					<div class="header-with-back">
-						<button class="btn-close" (click)="backToDatasetDetail()">
-							<mat-icon>arrow_back</mat-icon>
-						</button>
-						<div>
-							<h2>Field Models</h2>
-							<p class="column-subtitle">{{ selectedDatasetModel ? languageService.getTranslatedName(selectedDatasetModel.shortname) : '' }}</p>
-						</div>
-					</div>
-				</div>
-
-				<div class="secondary-column-content">
-					<div class="secondary-cards-grid">
-						<div class="secondary-card first-child-card create-card theme-field-model" (click)="onCreateFieldModel()">
-							<div class="create-content">
-								<mat-icon>add_circle_outline</mat-icon>
-								<h3>Create Field Model</h3>
-								<p>Define a new field</p>
+			@if (viewMode === 'field-list' || viewMode === 'field-detail') {
+				<div class="secondary-column">
+					<div class="secondary-column-header">
+						<div class="header-with-back">
+							<button class="btn-close" (click)="backToDatasetDetail()">
+								<mat-icon>arrow_back</mat-icon>
+							</button>
+							<div>
+								<h2>Field Models</h2>
+								<p class="column-subtitle">{{ selectedDatasetModel ? languageService.getTranslatedName(selectedDatasetModel.shortname) : '' }}</p>
 							</div>
 						</div>
+					</div>
 
-						@for (fieldModel of fieldModels; track fieldModel.fieldModelId) {
-							<div class="secondary-card first-child-card theme-field-model"
-												[class.selected]="selectedFieldModelId === fieldModel.fieldModelId"
-												[appModified]="isFieldModelModified(fieldModel.fieldModelId)"
-												(click)="onSelectFieldModel(fieldModel.fieldModelId)">
+					<div class="secondary-column-content">
+						<div class="secondary-cards-grid">
+							<div class="secondary-card first-child-card create-card theme-field-model" (click)="onCreateFieldModel()">
+								<div class="create-content">
+									<mat-icon>add_circle_outline</mat-icon>
+									<h3>Create Field Model</h3>
+									<p>Define a new field</p>
+								</div>
+							</div>
 
-								@if (selectedFieldModelId === fieldModel.fieldModelId) {
-									<div class="card-selection-icon">
-										<mat-icon>check</mat-icon>
-									</div>
-								}
+							@for (fieldModel of fieldModels; track fieldModel.fieldModelId) {
+								<div class="secondary-card first-child-card theme-field-model"
+								     [class.selected]="selectedFieldModelId === fieldModel.fieldModelId"
+								     [appModified]="isFieldModelModified(fieldModel.fieldModelId)"
+								     (click)="onSelectFieldModel(fieldModel.fieldModelId)">
 
-								<div class="card-header">
-									<div class="card-info">
-										<h3>{{ languageService.getTranslatedName(fieldModel.shortname) }}</h3>
-										<p class="card-code">{{ fieldModel.id }}</p>
-									</div>
-									<div class="card-header-badges">
-										@if (fieldModel.readOnly) {
-											<span class="status-badge first" matTooltip="Read Only">
+									@if (selectedFieldModelId === fieldModel.fieldModelId) {
+										<div class="card-selection-icon">
+											<mat-icon>check</mat-icon>
+										</div>
+									}
+
+									<div class="card-header">
+										<div class="card-info">
+											<h3>{{ languageService.getTranslatedName(fieldModel.shortname) }}</h3>
+											<p class="card-code">{{ fieldModel.id }}</p>
+										</div>
+										<div class="card-header-badges">
+											@if (fieldModel.readOnly) {
+												<span class="status-badge first" matTooltip="Read Only">
 												<mat-icon class="badge-full">edit_off</mat-icon>
 												<mat-icon class="badge-short">edit_off</mat-icon>
 											</span>
-										}
-										@if (fieldModel.searchable) {
-											<span class="status-badge second" matTooltip="Searchable">
+											}
+											@if (fieldModel.searchable) {
+												<span class="status-badge second" matTooltip="Searchable">
 												<mat-icon class="badge-full">search</mat-icon>
 												<mat-icon class="badge-short">search</mat-icon>
 											</span>
-										}
-										@if (fieldModel.exportable) {
-											<span class="status-badge third" matTooltip="Exportable">
+											}
+											@if (fieldModel.exportable) {
+												<span class="status-badge third" matTooltip="Exportable">
 												<mat-icon class="badge-full">arrow_upwards</mat-icon>
 												<mat-icon class="badge-short">arrow_upwards</mat-icon>
 											</span>
-										}
-										@if (fieldModel.plugin) {
-											<span class="status-badge fourth" matTooltip="Dynamic">
+											}
+											@if (fieldModel.plugin) {
+												<span class="status-badge fourth" matTooltip="Dynamic">
 												<mat-icon class="badge-full">bolt</mat-icon>
 												<mat-icon class="badge-short">bolt</mat-icon>
 											</span>
-										}
-									</div>
-								</div>
-
-								<div class="card-body">
-									<div class="card-details">
-										<div class="detail-item">
-											<mat-icon>input</mat-icon>
-											<span>Type: <b>{{ getTypeLabel(fieldModel.type) }}</b></span>
-										</div>
-										<div class="detail-item">
-											<mat-icon>storage</mat-icon>
-											<span>Data Type: <b>{{ getDataTypeLabel(fieldModel.dataType) }}</b></span>
-										</div>
-										<div class="detail-item">
-											<mat-icon>rule</mat-icon>
-											<span>{{ fieldModel.validatorIds?.length }} {{ fieldModel.validatorIds?.length === 1 ? 'Validator' : 'Validators' }}</span>
-										</div>
-										<div class="detail-item">
-											<mat-icon>settings</mat-icon>
-											<span>{{ fieldModel.workflowIds?.length }} {{ fieldModel.workflowIds?.length === 1 ? 'Workflow' : 'Workflows' }}</span>
-										</div>
-										<div class="detail-item">
-											<mat-icon>list</mat-icon>
-											<span>{{ fieldModel.possibleValues.length }} {{ fieldModel.possibleValues.length === 1 ? 'Possible Value' : 'Possible Values' }}</span>
+											}
 										</div>
 									</div>
-								</div>
-							</div>
-						}
 
-						@if (fieldModels.length === 0) {
-							<app-empty-state
-								[icon]="'text_ad'"
-								[message]="'No field models yet. Create your first field model to get started.'"
-								[size]="'small'"
-							/>
-						}
+									<div class="card-body">
+										<div class="card-details">
+											<div class="detail-item">
+												<mat-icon>input</mat-icon>
+												<span>Type: <b>{{ getTypeLabel(fieldModel.type) }}</b></span>
+											</div>
+											<div class="detail-item">
+												<mat-icon>storage</mat-icon>
+												<span>Data Type: <b>{{ getDataTypeLabel(fieldModel.dataType) }}</b></span>
+											</div>
+											<div class="detail-item">
+												<mat-icon>rule</mat-icon>
+												<span>{{ fieldModel.validatorIds?.length }} {{ fieldModel.validatorIds?.length === 1 ? 'Validator' : 'Validators' }}</span>
+											</div>
+											<div class="detail-item">
+												<mat-icon>settings</mat-icon>
+												<span>{{ fieldModel.workflowIds?.length }} {{ fieldModel.workflowIds?.length === 1 ? 'Workflow' : 'Workflows' }}</span>
+											</div>
+											<div class="detail-item">
+												<mat-icon>list</mat-icon>
+												<span>{{ fieldModel.possibleValues.length }} {{ fieldModel.possibleValues.length === 1 ? 'Possible Value' : 'Possible Values' }}</span>
+											</div>
+										</div>
+									</div>
+								</div>
+							}
+
+							@if (fieldModels.length === 0) {
+								<app-empty-state
+									[icon]="'text_ad'"
+									[message]="'No field models yet. Create your first field model to get started.'"
+									[size]="'small'"
+								/>
+							}
+						</div>
 					</div>
 				</div>
-			</div>
-		}
+			}
 
-		@if (selectedDatasetModel && viewMode === 'dataset-detail') {
-			<div class="detail-panel">
-				<app-dataset-model-detail
-					[datasetModel]="selectedDatasetModel"
-					[projectId]="projectId"
-					[project]="project"
-					[allDatasetModels]="datasetModels"
-					(datasetModelUpdated)="onDatasetModelUpdated($event)"
-					(datasetModelDeleted)="onDatasetModelDeleted($event)"
-					(closed)="onSelectDatasetModel(selectedDatasetModel)"
-					(switchToFieldModels)="switchToFieldModelView()">
-				</app-dataset-model-detail>
-			</div>
-		}
+			@if (selectedDatasetModel && viewMode === 'dataset-detail') {
+				<div class="detail-panel">
+					<app-dataset-model-detail
+						[datasetModel]="selectedDatasetModel"
+						[projectId]="projectId"
+						[project]="project"
+						[allDatasetModels]="datasetModels"
+						[initialTab]="returnTab"
+						(datasetModelUpdated)="onDatasetModelUpdated($event)"
+						(datasetModelDeleted)="onDatasetModelDeleted($event)"
+						(closed)="onSelectDatasetModel(selectedDatasetModel)"
+						(switchToFieldModels)="switchToFieldModelView()"
+						(switchToRuleEditor)="switchToRuleEditor($event)">
+					</app-dataset-model-detail>
+				</div>
+			}
 
-		@if (viewMode === 'field-detail' && selectedFieldModelId) {
-			<div class="detail-panel">
-				<app-field-model-detail
-					[projectId]="projectId"
-					[fieldModelId]="selectedFieldModelId"
-					[fieldModels]="fieldModels"
-					[originalFieldModels]="originalFieldModels"
-					[datasetModel]="selectedDatasetModel"
-					[project]="project"
-					(closed)="backToDatasetDetail()"
-					(fieldModelUpdated)="onFieldModelUpdated($event)"
-					(fieldModelDeleted)="onFieldModelDeleted($event)">
-				</app-field-model-detail>
-			</div>
+			@if (viewMode === 'field-detail' && selectedFieldModelId) {
+				<div class="detail-panel">
+					<app-field-model-detail
+						[projectId]="projectId"
+						[fieldModelId]="selectedFieldModelId"
+						[fieldModels]="fieldModels"
+						[originalFieldModels]="originalFieldModels"
+						[datasetModel]="selectedDatasetModel"
+						[project]="project"
+						[initialTab]="returnTab"
+						(closed)="backToDatasetDetail()"
+						(fieldModelUpdated)="onFieldModelUpdated($event)"
+						(fieldModelDeleted)="onFieldModelDeleted($event)"
+						(switchToRuleEditor)="onFieldModelRuleEdit($event)">
+					</app-field-model-detail>
+				</div>
+			}
 		}
-	}
-</div>
+	</div>
+}

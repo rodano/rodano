@@ -1,16 +1,23 @@
 package ch.rodano.core.services.dao.configurator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.jooq.DSLContext;
+import org.jspecify.annotations.NonNull;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 
 import ch.rodano.api.config.RuleActionDTO;
 import ch.rodano.api.config.RuleActionParameterDTO;
@@ -20,18 +27,17 @@ import ch.rodano.api.config.RuleConstraintDTO;
 import ch.rodano.api.config.RuleCriterionDTO;
 import ch.rodano.api.config.RuleDTO;
 import ch.rodano.configuration.model.rules.Rule;
-import ch.rodano.configuration.model.rules.RuleAction;
-import ch.rodano.configuration.model.rules.RuleActionParameter;
 import ch.rodano.configuration.model.rules.RuleCondition;
 import ch.rodano.configuration.model.rules.RuleConditionCriterion;
 import ch.rodano.configuration.model.rules.RuleConditionList;
-import ch.rodano.configuration.model.rules.RuleConstraint;
 import ch.rodano.core.dao.RuleDAO;
 import ch.rodano.core.model.jooq.enums.RuleConditionListDomain;
 import ch.rodano.core.model.jooq.enums.RuleConditionListMode;
 import ch.rodano.core.model.jooq.enums.RuleConditionMode;
+import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
+import ch.rodano.core.model.jooq.tables.records.RuleActionRecord;
 
 import static ch.rodano.core.model.jooq.tables.Rule.RULE;
 import static ch.rodano.core.model.jooq.tables.RuleAction.RULE_ACTION;
@@ -68,6 +74,68 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 
 		return ruleDAO.findByEntity(entityType, entityId).stream()
 			.map(rule -> toDTO(rule, ruleTypeMap.get(rule.getRuleId())))
+			.toList();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public RuleConstraintDTO getConstraint(final UUID projectId, final UUID ownerId) {
+		final var constraintRecord = dslContext.selectFrom(RULE_CONSTRAINT)
+			.where(RULE_CONSTRAINT.OWNER_ID.eq(ownerId))
+			.fetchOne();
+		if(constraintRecord == null) {
+			return new RuleConstraintDTO(null, Map.of());
+		}
+		return toConstraintDTO(constraintRecord.getConstraintId());
+	}
+
+	@Override
+	@Transactional
+	public RuleConstraintDTO saveConstraint(final UUID projectId, final UUID ownerId, final RuleConstraintOwnerType ownerType,
+	                                        final RuleConstraintConstraintType constraintType, final RuleConstraintDTO dto) {
+		final var constraintRecord = dslContext.selectFrom(RULE_CONSTRAINT)
+			.where(RULE_CONSTRAINT.OWNER_ID.eq(ownerId))
+			.fetchOne();
+
+		final UUID constraintId;
+		if(constraintRecord == null) {
+			constraintId = UUID.randomUUID();
+			dslContext.insertInto(RULE_CONSTRAINT)
+				.set(RULE_CONSTRAINT.CONSTRAINT_ID, constraintId)
+				.set(RULE_CONSTRAINT.PROJECT_ID, projectId)
+				.set(RULE_CONSTRAINT.OWNER_TYPE, ownerType)
+				.set(RULE_CONSTRAINT.OWNER_ID, ownerId)
+				.set(RULE_CONSTRAINT.CONSTRAINT_TYPE, constraintType)
+				.execute();
+		}
+		else {
+			constraintId = constraintRecord.getConstraintId();
+			deleteConditionListsForConstraint(constraintId);
+		}
+
+		if(dto.conditions() != null) {
+			saveConditionLists(projectId, constraintId, dto.conditions());
+		}
+
+		return toConstraintDTO(constraintId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<String> getAllTags(final UUID projectId) {
+		return dslContext.select(RULE.TAG)
+			.from(RULE)
+			.where(RULE.PROJECT_ID.eq(projectId))
+			.and(RULE.TAG.isNotNull())
+			.fetch(RULE.TAG)
+			.stream()
+			.flatMap(json -> {
+				final List<String> tags = jsonMapperService.fromJson(json, new TypeReference<>() {
+				});
+				return tags != null ? tags.stream() : Stream.empty();
+			})
+			.distinct()
+			.sorted()
 			.toList();
 	}
 
@@ -178,36 +246,97 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 	}
 
 	private RuleDTO toDTO(final Rule rule, final String ruleType) {
+		final List<RuleActionDTO> actions = dslContext.selectFrom(RULE_ACTION)
+			.where(RULE_ACTION.RULE_ID.eq(rule.getRuleId()))
+			.orderBy(RULE_ACTION.ACTION_ORDER)
+			.fetch()
+			.stream()
+			.map(record -> {
+				final List<RuleActionParameterDTO> parameters = dslContext.selectFrom(RULE_ACTION_PARAMETER)
+					.where(RULE_ACTION_PARAMETER.RULE_ACTION_ID.eq(record.get(RULE_ACTION.RULE_ACTION_ID)))
+					.fetch()
+					.stream()
+					.map(p -> new RuleActionParameterDTO(
+						p.get(RULE_ACTION_PARAMETER.RULE_ACTION_PARAMETER_ID),
+						p.get(RULE_ACTION_PARAMETER.CODE),
+						p.get(RULE_ACTION_PARAMETER.VALUE),
+						p.get(RULE_ACTION_PARAMETER.RULING_ENTITY),
+						p.get(RULE_ACTION_PARAMETER.CONDITION_ID)
+					))
+					.toList();
+				return toActionDTO(record, parameters);
+			})
+			.toList();
+
+		final var constraintRecord = dslContext.selectFrom(RULE_CONSTRAINT)
+			.where(RULE_CONSTRAINT.OWNER_ID.eq(rule.getRuleId()))
+			.fetchOne();
+
+		final RuleConstraintDTO constraintDTO = constraintRecord != null
+			? toConstraintDTO(constraintRecord.getConstraintId())
+			: null;
+
 		return new RuleDTO(
 			rule.getRuleId(),
 			ruleType,
 			rule.getDescription(),
 			rule.getMessage(),
 			new ArrayList<>(rule.getTags()),
-			toConstraintDTO(rule.getConstraint()),
-			rule.getActions().stream().map(this::toActionDTO).toList()
+			constraintDTO,
+			actions
 		);
 	}
 
-	private RuleConstraintDTO toConstraintDTO(final RuleConstraint constraint) {
-		if(constraint == null) {
-			return null;
-		}
+	private RuleConstraintDTO toConstraintDTO(final UUID constraintId) {
 		final Map<String, RuleConditionListDTO> conditions = new TreeMap<>();
-		constraint.getConditions().forEach((entity, list) ->
-			conditions.put(entity.name(), toConditionListDTO(list))
-		);
-		return new RuleConstraintDTO(constraint.getRuleConstraintId(), conditions);
+
+		dslContext.selectFrom(RULE_CONDITION_LIST)
+			.where(RULE_CONDITION_LIST.CONSTRAINT_ID.eq(constraintId))
+			.fetch()
+			.forEach(listRecord -> {
+				final String domainName = listRecord.getDomain().name();
+				final UUID listId = listRecord.getConditionListId();
+
+				final var rootCondition = dslContext.selectFrom(RULE_CONDITION)
+					.where(RULE_CONDITION.CONDITION_LIST_ID.eq(listId))
+					.and(RULE_CONDITION.CODE.eq(domainName))
+					.and(RULE_CONDITION.PARENT_CONDITION_ID.isNull())
+					.fetchOne();
+
+				final List<RuleConditionDTO> topLevel;
+				if(rootCondition != null) {
+					topLevel = loadChildConditions(listId, rootCondition.getConditionId());
+				}
+				else {
+					topLevel = loadChildConditions(listId, null);
+				}
+
+				conditions.put(domainName, new RuleConditionListDTO(
+					listId,
+					listRecord.getMode().name(),
+					topLevel
+				));
+			});
+
+		return new RuleConstraintDTO(constraintId, conditions);
 	}
 
-	private RuleConditionListDTO toConditionListDTO(final RuleConditionList list) {
+	private RuleConditionListDTO toConditionListDTO(final RuleConditionList list, final String domainName) {
 		if(list == null) {
 			return null;
 		}
+		final var rootCondition = list.getConditions().stream()
+			.filter(c -> domainName.equals(c.getId()))
+			.findFirst();
+
+		final var topLevelConditions = rootCondition
+			.map(root -> root.getConditions().stream().map(this::toConditionDTO).toList())
+			.orElse(list.getConditions().stream().map(this::toConditionDTO).toList());
+
 		return new RuleConditionListDTO(
 			list.getRuleConditionListId(),
 			list.getMode().name(),
-			list.getConditions().stream().map(this::toConditionDTO).toList()
+			topLevelConditions
 		);
 	}
 
@@ -236,29 +365,44 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 		);
 	}
 
-	private RuleActionDTO toActionDTO(final RuleAction action) {
-		return new RuleActionDTO(
-			action.getRuleActionId(),
-			action.getId(),
-			action.getLabel(),
-			action.isOptional(),
-			action.getStaticActionId(),
-			action.getConfigurationWorkflowId(),
-			action.getConfigurationActionId(),
-			action.getRulableEntity() != null ? action.getRulableEntity().name() : null,
-			action.getConditionId(),
-			action.getActionId(),
-			action.getParameters().stream().map(this::toParameterDTO).toList()
-		);
-	}
+	private RuleActionDTO toActionDTO(final RuleActionRecord record, final List<RuleActionParameterDTO> parameters) {
+		final UUID conditionUUID = record.get(RULE_ACTION.CONDITION_ID);
+		final String rulableEntity = record.get(RULE_ACTION.RULABLE_ENTITY);
+		final String actionIdCode = record.get(RULE_ACTION.ACTION_ID_CODE);
 
-	private RuleActionParameterDTO toParameterDTO(final RuleActionParameter param) {
-		return new RuleActionParameterDTO(
-			param.getRuleActionParameterId(),
-			param.getId(),
-			param.getValue(),
-			param.getRulableEntity() != null ? param.getRulableEntity().name() : null,
-			param.getConditionId()
+		String conditionCode = null;
+		String configurationWorkflowId = null;
+		String configurationActionId = null;
+		String actionId = null;
+
+		if(rulableEntity != null) {
+			if(conditionUUID != null) {
+				conditionCode = dslContext
+					.select(RULE_CONDITION.CODE)
+					.from(RULE_CONDITION)
+					.where(RULE_CONDITION.CONDITION_ID.eq(conditionUUID))
+					.fetchOne(RULE_CONDITION.CODE);
+			}
+			actionId = actionIdCode;
+		}
+		else if(conditionUUID != null) {
+			configurationWorkflowId = conditionUUID.toString();
+			configurationActionId = actionIdCode;
+		}
+
+		return new RuleActionDTO(
+			record.get(RULE_ACTION.RULE_ACTION_ID),
+			record.get(RULE_ACTION.CODE),
+			jsonMapperService.fromJson(record.get(RULE_ACTION.LABEL), new TypeReference<SortedMap<String, String>>() {
+			}),
+			record.get(RULE_ACTION.OPTIONAL),
+			record.get(RULE_ACTION.STATIC_ACTION_ID),
+			configurationWorkflowId,
+			configurationActionId,
+			rulableEntity,
+			conditionCode,
+			actionId,
+			parameters
 		);
 	}
 
@@ -276,13 +420,29 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 				.set(RULE_CONDITION_LIST.MODE, RuleConditionListMode.valueOf(listDTO.mode() != null ? listDTO.mode() : "OR"))
 				.execute();
 
+			final UUID rootConditionId = UUID.randomUUID();
+			dslContext.insertInto(RULE_CONDITION)
+				.set(RULE_CONDITION.CONDITION_ID, rootConditionId)
+				.set(RULE_CONDITION.PROJECT_ID, projectId)
+				.set(RULE_CONDITION.CONDITION_LIST_ID, listId)
+				.set(RULE_CONDITION.PARENT_CONDITION_ID, (UUID) null)
+				.set(RULE_CONDITION.CODE, domainName)
+				.set(RULE_CONDITION.MODE, RuleConditionMode.OR)
+				.set(RULE_CONDITION.INVERSE, false)
+				.set(RULE_CONDITION.DEPENDENCY, false)
+				.set(RULE_CONDITION.BREAK_TYPE, "NONE")
+				.set(RULE_CONDITION.CONDITION_ORDER, 0)
+				.execute();
+
 			if(listDTO.conditions() != null) {
-				listDTO.conditions().forEach(c -> saveCondition(projectId, listId, null, c));
+				for(int i = 0; i < listDTO.conditions().size(); i++) {
+					saveCondition(projectId, listId, rootConditionId, listDTO.conditions().get(i), i);
+				}
 			}
 		});
 	}
 
-	private void saveCondition(final UUID projectId, final UUID listId, final UUID parentConditionId, final RuleConditionDTO dto) {
+	private void saveCondition(final UUID projectId, final UUID listId, final UUID parentConditionId, final RuleConditionDTO dto, final int order) {
 		final UUID conditionId = dto.ruleConditionId() != null ? dto.ruleConditionId() : UUID.randomUUID();
 
 		dslContext.insertInto(RULE_CONDITION)
@@ -295,6 +455,7 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 			.set(RULE_CONDITION.INVERSE, dto.inverse())
 			.set(RULE_CONDITION.DEPENDENCY, dto.dependency())
 			.set(RULE_CONDITION.BREAK_TYPE, dto.breakType())
+			.set(RULE_CONDITION.CONDITION_ORDER, order)
 			.execute();
 
 		if(dto.criterion() != null) {
@@ -302,7 +463,9 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 		}
 
 		if(dto.conditions() != null) {
-			dto.conditions().forEach(child -> saveCondition(projectId, listId, conditionId, child));
+			for(int i = 0; i < dto.conditions().size(); i++) {
+				saveCondition(projectId, listId, conditionId, dto.conditions().get(i), i);
+			}
 		}
 	}
 
@@ -330,20 +493,46 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 	}
 
 	private void saveActions(final UUID projectId, final UUID ruleId, final List<RuleActionDTO> actions) {
+		final Set<String> usedCodes = new HashSet<>();
 		for(int i = 0; i < actions.size(); i++) {
 			final RuleActionDTO dto = actions.get(i);
 			final UUID actionId = dto.ruleActionId() != null ? dto.ruleActionId() : UUID.randomUUID();
+
+			final String code = getString(dto, usedCodes);
+			usedCodes.add(code);
+
+			final UUID conditionUUID;
+			if(dto.configurationWorkflowId() != null && !dto.configurationWorkflowId().isBlank()) {
+				conditionUUID = UUID.fromString(dto.configurationWorkflowId());
+			}
+			else if(dto.conditionId() != null && !dto.conditionId().isBlank()) {
+				conditionUUID = dslContext
+					.select(RULE_CONDITION.CONDITION_ID)
+					.from(RULE_CONDITION)
+					.join(RULE_CONDITION_LIST)
+					.on(RULE_CONDITION.CONDITION_LIST_ID.eq(RULE_CONDITION_LIST.CONDITION_LIST_ID))
+					.join(RULE_CONSTRAINT)
+					.on(RULE_CONDITION_LIST.CONSTRAINT_ID.eq(RULE_CONSTRAINT.CONSTRAINT_ID))
+					.where(RULE_CONSTRAINT.OWNER_ID.eq(ruleId))
+					.and(RULE_CONDITION.CODE.eq(dto.conditionId()))
+					.fetchOne(RULE_CONDITION.CONDITION_ID);
+			}
+			else {
+				conditionUUID = null;
+			}
+
+			final String actionIdCode = dto.actionId() != null ? dto.actionId() : dto.configurationActionId();
 
 			dslContext.insertInto(RULE_ACTION)
 				.set(RULE_ACTION.RULE_ACTION_ID, actionId)
 				.set(RULE_ACTION.PROJECT_ID, projectId)
 				.set(RULE_ACTION.RULE_ID, ruleId)
-				.set(RULE_ACTION.CODE, dto.id())
+				.set(RULE_ACTION.CODE, code)
 				.set(RULE_ACTION.STATIC_ACTION_ID, dto.staticActionId())
-				.set(RULE_ACTION.ACTION_ID_CODE, dto.actionId())
+				.set(RULE_ACTION.ACTION_ID_CODE, actionIdCode)
 				.set(RULE_ACTION.OPTIONAL, dto.optional())
 				.set(RULE_ACTION.LABEL, jsonMapperService.toJson(dto.label()))
-				.set(RULE_ACTION.CONDITION_ID, dto.conditionId() != null ? UUID.fromString(dto.conditionId()) : null)
+				.set(RULE_ACTION.CONDITION_ID, conditionUUID)
 				.set(RULE_ACTION.RULABLE_ENTITY, dto.rulableEntity())
 				.set(RULE_ACTION.ACTION_ORDER, i)
 				.execute();
@@ -352,6 +541,23 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 				dto.parameters().forEach(p -> saveParameter(projectId, actionId, p));
 			}
 		}
+	}
+
+	private static @NonNull String getString(final RuleActionDTO dto, final Set<String> usedCodes) {
+		final String actionIdentifier = dto.staticActionId() != null
+			? dto.staticActionId() : dto.actionId() != null
+									 ? dto.actionId() : dto.configurationActionId() != null
+														? dto.configurationActionId() : null;
+
+		final String baseCode = (dto.id() != null && !dto.id().isBlank())
+			? dto.id() : (actionIdentifier != null ? actionIdentifier : "ACTION");
+
+		String code = baseCode;
+		int suffix = 1;
+		while(usedCodes.contains(code)) {
+			code = baseCode + "_" + (++suffix);
+		}
+		return code;
 	}
 
 	private void saveParameter(final UUID projectId, final UUID actionId, final RuleActionParameterDTO dto) {
@@ -373,36 +579,49 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 			.fetch(RULE_CONDITION_LIST.CONDITION_LIST_ID);
 
 		for(final UUID listId : listIds) {
-			final var conditionIds = dslContext.select(RULE_CONDITION.CONDITION_ID)
-				.from(RULE_CONDITION)
-				.where(RULE_CONDITION.CONDITION_LIST_ID.eq(listId))
-				.fetch(RULE_CONDITION.CONDITION_ID);
-
-			for(final UUID conditionId : conditionIds) {
-				final var criterionIds = dslContext.select(RULE_CRITERION.CRITERION_ID)
-					.from(RULE_CRITERION)
-					.where(RULE_CRITERION.CONDITION_ID.eq(conditionId))
-					.fetch(RULE_CRITERION.CRITERION_ID);
-
-				criterionIds.forEach(cid ->
-					dslContext.deleteFrom(RULE_CRITERION_VALUE)
-						.where(RULE_CRITERION_VALUE.CRITERION_ID.eq(cid))
-						.execute()
-				);
-
-				dslContext.deleteFrom(RULE_CRITERION)
-					.where(RULE_CRITERION.CONDITION_ID.eq(conditionId))
-					.execute();
-			}
-
-			dslContext.deleteFrom(RULE_CONDITION)
-				.where(RULE_CONDITION.CONDITION_LIST_ID.eq(listId))
-				.execute();
+			deleteConditionsForList(listId);
 		}
 
 		dslContext.deleteFrom(RULE_CONDITION_LIST)
 			.where(RULE_CONDITION_LIST.CONSTRAINT_ID.eq(constraintId))
 			.execute();
+	}
+
+	private void deleteConditionsForList(final UUID listId) {
+		deleteConditionsRecursive(listId, null);
+	}
+
+	private void deleteConditionsRecursive(final UUID listId, final UUID parentConditionId) {
+		final var conditionIds = dslContext.select(RULE_CONDITION.CONDITION_ID)
+			.from(RULE_CONDITION)
+			.where(RULE_CONDITION.CONDITION_LIST_ID.eq(listId))
+			.and(parentConditionId == null
+				? RULE_CONDITION.PARENT_CONDITION_ID.isNull()
+				: RULE_CONDITION.PARENT_CONDITION_ID.eq(parentConditionId))
+			.fetch(RULE_CONDITION.CONDITION_ID);
+
+		for(final UUID conditionId : conditionIds) {
+			deleteConditionsRecursive(listId, conditionId);
+
+			final var criterionIds = dslContext.select(RULE_CRITERION.CRITERION_ID)
+				.from(RULE_CRITERION)
+				.where(RULE_CRITERION.CONDITION_ID.eq(conditionId))
+				.fetch(RULE_CRITERION.CRITERION_ID);
+
+			criterionIds.forEach(cid ->
+				dslContext.deleteFrom(RULE_CRITERION_VALUE)
+					.where(RULE_CRITERION_VALUE.CRITERION_ID.eq(cid))
+					.execute()
+			);
+
+			dslContext.deleteFrom(RULE_CRITERION)
+				.where(RULE_CRITERION.CONDITION_ID.eq(conditionId))
+				.execute();
+
+			dslContext.deleteFrom(RULE_CONDITION)
+				.where(RULE_CONDITION.CONDITION_ID.eq(conditionId))
+				.execute();
+		}
 	}
 
 	private void deleteActionsForRule(final UUID ruleId) {
@@ -420,5 +639,41 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 		dslContext.deleteFrom(RULE_ACTION)
 			.where(RULE_ACTION.RULE_ID.eq(ruleId))
 			.execute();
+	}
+
+	private List<RuleConditionDTO> loadChildConditions(final UUID listId, final UUID parentId) {
+		return dslContext.selectFrom(RULE_CONDITION)
+			.where(RULE_CONDITION.CONDITION_LIST_ID.eq(listId))
+			.and(parentId == null
+				? RULE_CONDITION.PARENT_CONDITION_ID.isNull()
+				: RULE_CONDITION.PARENT_CONDITION_ID.eq(parentId))
+			.orderBy(RULE_CONDITION.CONDITION_ORDER)
+			.fetch()
+			.stream()
+			.map(c -> {
+				final var criterion = dslContext.selectFrom(RULE_CRITERION)
+					.where(RULE_CRITERION.CONDITION_ID.eq(c.getConditionId()))
+					.fetchOne();
+				final RuleCriterionDTO criterionDTO = criterion == null ? null : new RuleCriterionDTO(
+					criterion.getCriterionId(),
+					criterion.getProperty(),
+					criterion.getOperator(),
+					dslContext.selectFrom(RULE_CRITERION_VALUE)
+					.where(RULE_CRITERION_VALUE.CRITERION_ID.eq(criterion.getCriterionId()))
+					.orderBy(RULE_CRITERION_VALUE.VALUE_ORDER)
+					.fetch(RULE_CRITERION_VALUE.VALUE_TEXT)
+				);
+				return new RuleConditionDTO(
+					c.getConditionId(),
+					c.getCode(),
+					criterionDTO,
+					c.getInverse(),
+					c.getDependency(),
+					c.getBreakType(),
+					c.getMode().name(),
+					loadChildConditions(listId, c.getConditionId())
+				);
+			})
+			.toList();
 	}
 }

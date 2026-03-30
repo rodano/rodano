@@ -1,4 +1,4 @@
-import {Component, Input, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -19,13 +19,15 @@ import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.compo
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
 import {FormModelManagerService} from '../../../services/manager/form-model-manager.service';
+import {Rule} from '@core/model/rule';
+import { RuleListComponent } from '../../../rules/rule-list/rule-list.component';
 
 @Component({
 	selector: 'app-event-model-detail',
 	standalone: true,
 	templateUrl: './event-model-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
 })
 export class EventModelDetailComponent extends BaseDraftDetailComponent<EventModel> {
 	@Input() eventModelId = '';
@@ -33,9 +35,17 @@ export class EventModelDetailComponent extends BaseDraftDetailComponent<EventMod
 	@Input() eventGroups: EventGroup[] = [];
 	@Input() originalEventModels: EventModel[] = [];
 	@Input() scopeModel: ScopeModel | null = null;
+	@Input() initialTab: 'general' | 'rules' = 'general';
 
 	@Output() eventModelUpdated = this.entityUpdated;
 	@Output() eventModelDeleted = this.entityDeleted;
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
+
+	readonly ruleTypes = [
+		{type: 'CREATE', label: 'Creation Rules'},
+		{type: 'DELETE', label: 'Removal Rules'},
+		{type: 'RESTORE', label: 'Restoration Rules'}
+	];
 
 	constructor(
 		languageService: LanguageService,

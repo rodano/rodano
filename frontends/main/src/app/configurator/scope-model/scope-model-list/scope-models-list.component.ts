@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModel} from '@core/model/scope-model';
@@ -33,19 +33,23 @@ import {ScopeModelRightsMatrixComponent} from '../scope-model-rights-matrix/scop
 import {
 	EventModelRightsMatrixComponent
 } from '../event-model/event-model-rights-matrix/event-model-rights-matrix.component';
+import {RuleDetailComponent} from '../../rules/rule-detail/rule-detail.component';
+import {Rule} from '@core/model/rule';
 
-type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail';
+type ViewMode = 'scope-list' | 'scope-detail' | 'event-list' | 'event-detail' | 'event-group-list' | 'event-group-detail' | 'rule-editor';
 
 @Component({
 	selector: 'app-scope-models-list',
 	standalone: true,
 	templateUrl: './scope-models-list.component.html',
-	styleUrls: ['./scope-models-list.component.css'],
+	styleUrls: ['./scope-models-list.component.css', '../../shared/breadcrumb-shared.css'],
 	imports: [CommonModule, MatIconModule, ScopeModelDetailComponent, EventModelDetailComponent,
 		EventModelTimelineComponent, EventGroupDetailComponent, MatTooltipModule, EmptyStateComponent, ListHeaderComponent,
-		ModifiedDirective, ScopeModelRightsMatrixComponent, EventModelRightsMatrixComponent]
+		ModifiedDirective, ScopeModelRightsMatrixComponent, EventModelRightsMatrixComponent, RuleDetailComponent]
 })
 export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
+	@ViewChild(RuleDetailComponent) ruleDetailComponent!: RuleDetailComponent;
+
 	@Input() projectId = '';
 	@Input() project: ConfiguratorProject | null = null;
 	@Input() selectedNode: string | null = null;
@@ -65,6 +69,15 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 	selectedEventGroupId: string | null = null;
 	viewMode: ViewMode = 'scope-list';
 	loading = false;
+
+	selectedRule: Rule | null = null;
+	ruleModified = false;
+	returnTab: 'general' | 'rules' = 'general';
+	selectedRuleEntityPath = '';
+	ruleEditorContext: 'scope-model' | 'event-model' = 'scope-model';
+	readonly ruleDomains = ['SCOPE'];
+	readonly eventModelRuleDomains = ['SCOPE', 'EVENT'];
+	private originalRule: Rule | null = null;
 
 	projectLanguages: ProjectLanguage[] = [];
 	selectedLanguage = '';
@@ -270,11 +283,30 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.confirmViewChange().subscribe(confirmed => {
 			if(confirmed) {
 				this.viewMode = 'scope-detail';
+				this.returnTab = 'general';
 				this.selectedEventModelId = null;
 				this.selectedEventGroupId = null;
 				this.emitContext();
 			}
 		});
+	}
+
+	backToScopeRules(): void {
+		this.viewMode = 'scope-detail';
+		this.returnTab = 'rules';
+		this.emitContext();
+	}
+
+	backToEventModelDetail(): void {
+		this.viewMode = 'event-detail';
+		this.returnTab = 'general';
+		this.emitContext();
+	}
+
+	backToEventModelRules(): void {
+		this.viewMode = 'event-detail';
+		this.returnTab = 'rules';
+		this.emitContext();
 	}
 
 	private selectScopeModel(scopeModel: ScopeModel): void {
@@ -585,5 +617,54 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 			this.activeMatrix = 'event-model';
 			this.selectedScopeModel = null;
 		}
+	}
+
+	get activeRuleDomains(): string[] {
+		return this.ruleEditorContext === 'event-model'
+			? this.eventModelRuleDomains
+			: this.ruleDomains;
+	}
+
+	getEventModelLabel(eventModelId: string): string {
+		return this.languageService.getLabelById(eventModelId, id => this.eventModelManager.getById(id));
+	}
+
+	switchToRuleEditor(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.selectedRuleEntityPath = `scope-models/${this.selectedScopeModel?.scopeModelId}`;
+		this.ruleEditorContext = 'scope-model';
+		this.viewMode = 'rule-editor';
+	}
+
+	onEventModelRuleEdit(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
+		this.selectedRuleEntityPath = `event-models/${this.selectedEventModelId}`;
+		this.ruleEditorContext = 'event-model';
+		this.viewMode = 'rule-editor';
+	}
+
+	onRuleChanged(): void {
+		this.ruleModified = true;
+	}
+
+	onSaveRule(): void {
+		this.ruleDetailComponent?.onSave();
+	}
+
+	onRevertRule(): void {
+		if(this.originalRule) {
+			this.selectedRule = JSON.parse(JSON.stringify(this.originalRule));
+			this.ruleModified = false;
+		}
+	}
+
+	onRuleSaved(rule: Rule): void {
+		this.selectedRule = rule;
+		this.originalRule = JSON.parse(JSON.stringify(rule));
+		this.ruleModified = false;
 	}
 }

@@ -107,6 +107,11 @@ public class RuleCondition extends TableImpl<RuleConditionRecord> {
 	 */
 	public final TableField<RuleConditionRecord, String> BREAK_TYPE = createField(DSL.name("break_type"), SQLDataType.VARCHAR(16).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
+	/**
+	 * The column <code>rule_condition.condition_order</code>.
+	 */
+	public final TableField<RuleConditionRecord, Integer> CONDITION_ORDER = createField(DSL.name("condition_order"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.INTEGER)), this, "");
+
 	private RuleCondition(Name alias, Table<RuleConditionRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

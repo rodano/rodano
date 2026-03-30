@@ -15,108 +15,131 @@
 	</div>
 </div>
 
-<div class="detail-content">
-	<div class="settings-section">
-		<h3>Basic Information</h3>
-		<div class="settings-grid">
-			<app-setting-item label="Code"
-																					[modified]="isFieldModified('id')">
-				{{ formModel.id }}
-			</app-setting-item>
-
-			<app-setting-item label="Optional"
-																					[modified]="isFieldModified('optional')">
-				@if (formModel.optional) {
-					<span class="status-badge first">Yes</span>
-				} @else {
-					<span class="status-badge">No</span>
-				}
-			</app-setting-item>
-
-			<app-setting-item label="Short Name"
-																					[translated]="true"
-																					[modified]="isFieldModified('shortname')"
-																					[notConfigured]="!languageService.getTranslatedValue(formModel.shortname)">
-				@if (!languageService.getTranslatedValue(formModel.shortname)) {
-					<mat-icon class="warning-icon">report</mat-icon>
-				}
-				{{ languageService.getTranslatedValue(formModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-			</app-setting-item>
-
-			<app-setting-item label="Long Name"
-																					[translated]="true"
-																					[modified]="isFieldModified('longname')"
-																					[notConfigured]="!languageService.getTranslatedValue(formModel.longname)">
-				@if (!languageService.getTranslatedValue(formModel.longname)) {
-					<mat-icon class="warning-icon">report</mat-icon>
-				}
-				{{ languageService.getTranslatedValue(formModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-			</app-setting-item>
-
-			<app-setting-item label="Description"
-																					[translated]="true"
-																					[modified]="isFieldModified('description')"
-																					[notConfigured]="!languageService.getTranslatedValue(formModel.description)"
-																					[fullWidth]="true">
-				@if (!languageService.getTranslatedValue(formModel.description)) {
-					<mat-icon class="warning-icon">report</mat-icon>
-				}
-				{{ languageService.getTranslatedValue(formModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-			</app-setting-item>
-
-			<app-setting-item label="Print Button Label"
-																					[translated]="true"
-																					[modified]="isFieldModified('printButtonLabel')"
-																					[notConfigured]="!languageService.getTranslatedValue(formModel.printButtonLabel)"
-																					[fullWidth]="true">
-				@if (!languageService.getTranslatedValue(formModel.printButtonLabel)) {
-					<mat-icon class="warning-icon">report</mat-icon>
-				}
-				{{ languageService.getTranslatedValue(formModel.printButtonLabel) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
-			</app-setting-item>
-		</div>
-		<button class="btn-edit" (click)="onEditBasicInfo()">
-			<mat-icon>edit</mat-icon>
-			Edit Basic Information
-		</button>
-	</div>
-
-	<div class="settings-section">
-		<h3>Associated Workflows</h3>
-		<div class="settings-grid">
-			<app-setting-item label="Workflows"
-																					[modified]="isFieldModified('workflowIds')"
-																					[fullWidth]="true"
-																					[plain]="true">
-				<div class="relationship-box">
-					@if (formModel.workflowIds && formModel.workflowIds.length > 0) {
-						<div class="chip-container">
-							@for (workflowId of formModel.workflowIds; track workflowId) {
-								<div class="chip theme-workflow">
-									<mat-icon class="resource-icon">settings</mat-icon>
-									<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
-								</div>
-							}
-						</div>
-					} @else {
-						<div class="empty-message-centered">
-							<mat-icon class="warning-icon">report</mat-icon>
-							<span>No workflows configured</span>
-						</div>
-					}
-				</div>
-			</app-setting-item>
-		</div>
-		<button class="btn-edit" (click)="onEditResources()">
-			<mat-icon>edit</mat-icon>
-			Edit Workflows
-		</button>
-	</div>
-
-	<app-danger-zone
-		[title]="'Delete Form Model'"
-		[message]="'Deleting this form model is permanent and cannot be undone.'"
-		[buttonLabel]="'Delete'"
-		(confirmed)="onDelete()">
-	</app-danger-zone>
+<div class="detail-tabs">
+	<button class="detail-tab" [class.active]="initialTab === 'general'" (click)="initialTab = 'general'">
+		General
+	</button>
+	<button class="detail-tab" [class.active]="initialTab === 'rules'" (click)="initialTab = 'rules'">
+		Rules
+	</button>
 </div>
+
+@if (initialTab === 'general') {
+	<div class="detail-content">
+		<div class="settings-section">
+			<h3>Basic Information</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Code"
+				                  [modified]="isFieldModified('id')">
+					{{ formModel.id }}
+				</app-setting-item>
+
+				<app-setting-item label="Optional"
+				                  [modified]="isFieldModified('optional')">
+					@if (formModel.optional) {
+						<span class="status-badge first">Yes</span>
+					} @else {
+						<span class="status-badge">No</span>
+					}
+				</app-setting-item>
+
+				<app-setting-item label="Short Name"
+				                  [translated]="true"
+				                  [modified]="isFieldModified('shortname')"
+				                  [notConfigured]="!languageService.getTranslatedValue(formModel.shortname)">
+					@if (!languageService.getTranslatedValue(formModel.shortname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(formModel.shortname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
+
+				<app-setting-item label="Long Name"
+				                  [translated]="true"
+				                  [modified]="isFieldModified('longname')"
+				                  [notConfigured]="!languageService.getTranslatedValue(formModel.longname)">
+					@if (!languageService.getTranslatedValue(formModel.longname)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(formModel.longname) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
+
+				<app-setting-item label="Description"
+				                  [translated]="true"
+				                  [modified]="isFieldModified('description')"
+				                  [notConfigured]="!languageService.getTranslatedValue(formModel.description)"
+				                  [fullWidth]="true">
+					@if (!languageService.getTranslatedValue(formModel.description)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(formModel.description) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
+
+				<app-setting-item label="Print Button Label"
+				                  [translated]="true"
+				                  [modified]="isFieldModified('printButtonLabel')"
+				                  [notConfigured]="!languageService.getTranslatedValue(formModel.printButtonLabel)"
+				                  [fullWidth]="true">
+					@if (!languageService.getTranslatedValue(formModel.printButtonLabel)) {
+						<mat-icon class="warning-icon">report</mat-icon>
+					}
+					{{ languageService.getTranslatedValue(formModel.printButtonLabel) || 'Not configured for ' + languageService.getLanguageName(selectedLanguage) }}
+				</app-setting-item>
+			</div>
+			<button class="btn-edit" (click)="onEditBasicInfo()">
+				<mat-icon>edit</mat-icon>
+				Edit Basic Information
+			</button>
+		</div>
+
+		<div class="settings-section">
+			<h3>Associated Workflows</h3>
+			<div class="settings-grid">
+				<app-setting-item label="Workflows"
+				                  [modified]="isFieldModified('workflowIds')"
+				                  [fullWidth]="true"
+				                  [plain]="true">
+					<div class="relationship-box">
+						@if (formModel.workflowIds && formModel.workflowIds.length > 0) {
+							<div class="chip-container">
+								@for (workflowId of formModel.workflowIds; track workflowId) {
+									<div class="chip theme-workflow">
+										<mat-icon class="resource-icon">settings</mat-icon>
+										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
+									</div>
+								}
+							</div>
+						} @else {
+							<div class="empty-message-centered">
+								<mat-icon class="warning-icon">report</mat-icon>
+								<span>No workflows configured</span>
+							</div>
+						}
+					</div>
+				</app-setting-item>
+			</div>
+			<button class="btn-edit" (click)="onEditResources()">
+				<mat-icon>edit</mat-icon>
+				Edit Workflows
+			</button>
+		</div>
+
+		<app-danger-zone
+			[title]="'Delete Form Model'"
+			[message]="'Deleting this form model is permanent and cannot be undone.'"
+			[buttonLabel]="'Delete'"
+			(confirmed)="onDelete()">
+		</app-danger-zone>
+	</div>
+}
+
+@if (initialTab === 'rules') {
+	<div class="detail-content">
+		<app-rule-list
+			[projectId]="projectId"
+			[entityPath]="'form-models/' + formModel.formModelId"
+			[ruleTypes]="ruleTypes"
+			[availableDomains]="ruleDomains"
+			(editRule)="switchToRuleEditor.emit($event)">
+		</app-rule-list>
+	</div>
+}

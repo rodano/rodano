@@ -21,6 +21,8 @@ import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.componen
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 import {FormModelManagerService} from '../../services/manager/form-model-manager.service';
+import {Rule} from '@core/model/rule';
+import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -33,7 +35,8 @@ interface WorkflowStateGroup {
 	standalone: true,
 	templateUrl: './scope-model-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent]
 })
 export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeModel, ScopeModelManagerService> {
 	@Input() override entity!: ScopeModel;
@@ -44,10 +47,21 @@ export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeM
 
 	@Input() set allScopeModels(v: ScopeModel[]) {this.allEntities = v;}
 
+	@Input() initialTab: 'general' | 'rules' = 'general';
+
 	@Output() scopeModelUpdated = this.entityUpdated;
 	@Output() scopeModelDeleted = this.entityDeleted;
 	@Output() switchToEventModels = new EventEmitter<void>();
 	@Output() switchToEventGroups = new EventEmitter<void>();
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
+
+	readonly ruleTypes = [
+		{type: 'CREATE', label: 'Creation Rules'},
+		{type: 'DELETE', label: 'Removal Rules'},
+		{type: 'RESTORE', label: 'Restoration Rules'}
+	];
+
+	readonly ruleDomains = ['SCOPE'];
 
 	constructor(
 		scopeModelManager: ScopeModelManagerService,

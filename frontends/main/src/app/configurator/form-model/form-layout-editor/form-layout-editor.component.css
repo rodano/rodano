@@ -763,7 +763,7 @@
 	flex-shrink: 0;
 }
 
-.cell-delete-btn {
+.cell-btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -778,17 +778,23 @@
 	flex-shrink: 0;
 }
 
-.cell-delete-btn:hover {
+.cell-btn mat-icon {
+	font-size: 15px;
+	width: 15px;
+	height: 15px;
+	line-height: 15px;
+}
+
+.cell-btn-danger:hover {
 	border: 1px solid #ef5350;
 	background: #ffebee;
 	color: #ef5350;
 }
 
-.cell-delete-btn mat-icon {
-	font-size: 15px;
-	width: 15px;
-	height: 15px;
-	line-height: 15px;
+.cell-btn-primary:hover {
+	border: 1px solid #1565c0;
+	background: #e3f2fd;
+	color: #1565c0;
 }
 
 .resize-handle {

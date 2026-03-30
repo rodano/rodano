@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {MatButtonModule} from '@angular/material/button';
@@ -6,6 +6,14 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {RuleService} from '../../services/api/rule.service';
 import {LanguageService} from '../../services/language.service';
 import {Rule} from '@core/model/rule';
+import {forkJoin, of} from 'rxjs';
+import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
+import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
+import {MatDialog} from '@angular/material/dialog';
+import {ConfirmationDialogComponent} from '../../../confirmation-dialog/confirmation-dialog.component';
+import {EventGroupManagerService} from '../../services/manager/event-group-manager.service';
+import {WorkflowActionManagerService} from '../../services/manager/workflow-action-manager.service';
+import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
 
 @Component({
 	selector: 'app-rule-list',
@@ -14,7 +22,7 @@ import {Rule} from '@core/model/rule';
 	styleUrls: ['./rule-list.component.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule]
 })
-export class RuleListComponent implements OnInit {
+export class RuleListComponent implements OnInit, OnChanges {
 	@Input() projectId = '';
 	@Input() entityPath = '';
 	@Input() ruleTypes: {type: string | null; label: string}[] = [];
@@ -28,17 +36,46 @@ export class RuleListComponent implements OnInit {
 	constructor(
 		public languageService: LanguageService,
 		private ruleService: RuleService,
-		private snackBar: MatSnackBar
+		private fieldModelManager: FieldModelManagerService,
+		private eventModelManager: EventModelManagerService,
+		private eventGroupManager: EventGroupManagerService,
+		private workflowActionManager: WorkflowActionManagerService,
+		private workflowStateManager: WorkflowStateManagerService,
+		private snackBar: MatSnackBar,
+		private dialog: MatDialog
 	) {}
 
 	ngOnInit(): void {
 		this.loadRules();
 	}
 
+	ngOnChanges(changes: SimpleChanges): void {
+		if(changes['entityPath'] && !changes['entityPath'].firstChange) {
+			this.loadRules();
+		}
+	}
+
 	loadRules(): void {
 		this.loading = true;
-		this.ruleService.getRules(this.projectId, this.entityPath).subscribe({
-			next: rules => {
+		forkJoin({
+			rules: this.ruleService.getRules(this.projectId, this.entityPath),
+			fieldModels: this.fieldModelManager.isLoaded()
+				? of(null)
+				: this.fieldModelManager.loadFull(this.projectId),
+			eventModels: this.eventModelManager.isLoaded()
+				? of(null)
+				: this.eventModelManager.load(this.projectId),
+			eventGroups: this.eventGroupManager.isLoaded()
+				? of(null)
+				: this.eventGroupManager.load(this.projectId),
+			workflowActions: this.workflowActionManager.isLoaded()
+				? of(null)
+				: this.workflowActionManager.load(this.projectId),
+			workflowStates: this.workflowStateManager.isLoaded()
+				? of(null)
+				: this.workflowStateManager.load(this.projectId)
+		}).subscribe({
+			next: ({rules}) => {
 				this.rules = rules;
 				this.loading = false;
 			},
@@ -50,7 +87,10 @@ export class RuleListComponent implements OnInit {
 	}
 
 	getRulesForType(type: string | null): Rule[] {
-		return this.rules.filter(r => (r.ruleType ?? null) === type);
+		if(type === null) {
+			return this.rules;
+		}
+		return this.rules.filter(r => r.ruleType === type);
 	}
 
 	onSelectRule(rule: Rule): void {
@@ -63,16 +103,6 @@ export class RuleListComponent implements OnInit {
 			description: '',
 			message: {},
 			tags: [],
-			constraint: {
-				conditions: {
-					SCOPE: {mode: 'OR', conditions: []},
-					EVENT: {mode: 'OR', conditions: []},
-					DATASET: {mode: 'OR', conditions: []},
-					FIELD: {mode: 'OR', conditions: []},
-					FORM: {mode: 'OR', conditions: []},
-					WORKFLOW: {mode: 'OR', conditions: []}
-				}
-			},
 			actions: []
 		};
 
@@ -87,15 +117,30 @@ export class RuleListComponent implements OnInit {
 	}
 
 	onDeleteRule(rule: Rule): void {
-		this.ruleService.deleteRule(this.projectId, this.entityPath, rule.ruleId!).subscribe({
-			next: () => {
-				this.rules = this.rules.filter(r => r.ruleId !== rule.ruleId);
-				if(this.selectedRule?.ruleId === rule.ruleId) {
-					this.selectedRule = null;
-				}
-				this.snackBar.open('Rule deleted', 'Close', {duration: 2000});
-			},
-			error: () => this.snackBar.open('Failed to delete rule', 'Close', {duration: 3000})
+		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+			width: '500px',
+			data: {
+				title: 'Delete Rule',
+				message: `Are you sure you want to delete "${rule.description || 'Unnamed rule'}"? This action cannot be undone.`,
+				confirmText: 'Delete',
+				cancelText: 'Cancel',
+				type: 'danger'
+			}
+		});
+		dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+			if(!confirmed) {
+				return;
+			}
+			this.ruleService.deleteRule(this.projectId, this.entityPath, rule.ruleId!).subscribe({
+				next: () => {
+					this.rules = this.rules.filter(r => r.ruleId !== rule.ruleId);
+					if(this.selectedRule?.ruleId === rule.ruleId) {
+						this.selectedRule = null;
+					}
+					this.snackBar.open('Rule deleted', 'Close', {duration: 2000});
+				},
+				error: () => this.snackBar.open('Failed to delete rule', 'Close', {duration: 3000})
+			});
 		});
 	}
 

@@ -13,13 +13,15 @@ import {DatasetModelDialogService} from '../../services/dialogs/dataset-model-di
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {Rule} from '@core/model/rule';
+import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
 
 @Component({
 	selector: 'app-dataset-model-detail',
 	standalone: true,
 	templateUrl: './dataset-model-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
 })
 export class DatasetModelDetailComponent extends BaseManagerDetailComponent<DatasetModel, DatasetModelManagerService> {
 	@Input() override entity!: DatasetModel;
@@ -30,10 +32,20 @@ export class DatasetModelDetailComponent extends BaseManagerDetailComponent<Data
 
 	@Input() set allDatasetModels(v: DatasetModel[]) {this.allEntities = v;}
 
+	@Input() initialTab: 'general' | 'rules' = 'general';
+
 	@Output() datasetModelUpdated = this.entityUpdated;
 	@Output() datasetModelDeleted = this.entityDeleted;
+	@Output() switchToRuleEditor = new EventEmitter<Rule>();
 
 	@Output() switchToFieldModels = new EventEmitter<void>();
+
+	readonly ruleTypes = [
+		{type: 'DELETE', label: 'Removal Rules'},
+		{type: 'RESTORE', label: 'Restoration Rules'}
+	];
+
+	readonly ruleDomains = ['SCOPE', 'EVENT', 'DATASET'];
 
 	constructor(
 		datasetModelManager: DatasetModelManagerService,

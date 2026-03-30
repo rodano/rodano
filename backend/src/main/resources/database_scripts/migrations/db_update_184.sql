@@ -27,33 +27,33 @@ alter table project
 	add column active_config_version_fk   bigint(20)                            null;
 
 insert into project (project_id,
-					 code,
-					 shortname,
-					 longname,
-					 description,
-					 smtp_tls,
-					 password_strong,
-					 password_unique,
-					 epro_enabled,
-					 status,
-					 created)
+                     code,
+                     shortname,
+                     longname,
+                     description,
+                     smtp_tls,
+                     password_strong,
+                     password_unique,
+                     epro_enabled,
+                     status,
+                     created)
 values (UNHEX(REPLACE('00000000-0000-0000-0000-000000000000', '-', '')),
-		'SYSTEM',
-		'{
+        'SYSTEM',
+        '{
           "en": "System Administration"
         }',
-		'{
+        '{
           "en": "System Administration Project"
         }',
-		'{
+        '{
           "en": "Internal system project for administrative operations"
         }',
-		FALSE,
-		FALSE,
-		FALSE,
-		FALSE,
-		'ACTIVE',
-		NOW())
+        FALSE,
+        FALSE,
+        FALSE,
+        FALSE,
+        'ACTIVE',
+        NOW())
 on duplicate key update code = code;
 
 create table if not exists project_audit (
@@ -420,7 +420,7 @@ create table if not exists form_layout_cell (
 	possible_values_column_width  int           null,
 	colspan                       int           not null default 1,
 	constraint pk_form_layout_cell primary key (project_id, form_model_id, form_layout_id, form_layout_line_id,
-												form_layout_cell_id),
+	                                            form_layout_cell_id),
 	constraint uq_form_layout_cell_id unique (project_id, form_layout_cell_id),
 	constraint uq_form_layout_cell_code unique (project_id, form_model_id, form_layout_id, form_layout_line_id, code)
 ) engine = InnoDB
@@ -447,7 +447,7 @@ create table if not exists form_cell_visibility_criteria_target_cell (
 	line_order                    int  not null,
 	target_cell_id                uuid not null,
 	constraint pk_form_cell_visibility_criteria_target_cell primary key (project_id, form_layout_cell_id,
-																		 form_cell_visible_criteria_id, target_cell_id)
+	                                                                     form_cell_visible_criteria_id, target_cell_id)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
@@ -459,8 +459,8 @@ create table if not exists form_cell_visibility_criteria_target_layout (
 	line_order                    int  not null,
 	target_layout_id              uuid not null,
 	constraint pk_form_cell_visibility_criteria_target_layout primary key (project_id, form_layout_cell_id,
-																		   form_cell_visible_criteria_id,
-																		   target_layout_id)
+	                                                                       form_cell_visible_criteria_id,
+	                                                                       target_layout_id)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
@@ -473,7 +473,7 @@ create table if not exists form_cell_visibility_criteria_value (
 	possible_value_id             UUID         null,
 	value                         varchar(255) null,
 	constraint pk_form_cell_visibility_criteria_value primary key (project_id, form_layout_cell_id,
-																   form_cell_visible_criteria_id, line_order)
+	                                                               form_cell_visible_criteria_id, line_order)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
@@ -1020,7 +1020,7 @@ create table if not exists timeline_graph_section_reference_entry (
 	label              varchar(128)   null,
 	sort_order         int            null,
 	constraint pk_timeline_graph_section_reference_entry primary key (project_id, timeline_graph_id, graph_section_id,
-																	  graph_reference_id, timepoint)
+	                                                                  graph_reference_id, timepoint)
 ) engine = InnoDB
   default charset = utf8mb4
   collate = utf8mb4_unicode_ci;
@@ -1270,6 +1270,7 @@ create table if not exists rule_condition (
 	inverse             boolean            not null default false,
 	dependency          boolean            not null default false,
 	break_type          varchar(16)        null,
+	condition_order     int(11)            null     default 0,
 	constraint pk_rule_condition primary key (project_id, condition_id)
 ) engine = InnoDB
   default charset = utf8mb4

@@ -1,0 +1,185 @@
+<div class="action-item">
+	<div class="condition-card">
+
+		<div class="action-left">
+			<div class="drag-handle" cdkDragHandle matTooltip="Drag to reorder">
+				<mat-icon>drag_indicator</mat-icon>
+			</div>
+
+			<button type="button"
+			        class="flag-btn flag-optional"
+			        [class.active]="action.optional"
+			        (click)="onOptionalToggle()"
+			        matTooltip="Optional — rule continues even if this action fails">
+				<mat-icon>playlist_add_check</mat-icon>
+			</button>
+
+			<mat-select [value]="actionType"
+			            (valueChange)="onTypeChange($event)"
+			            placeholder="Action type">
+				@for (t of actionTypes; track t.value) {
+					<mat-option [value]="t.value">{{ t.label }}</mat-option>
+				}
+			</mat-select>
+
+			@if (actionType === 'STATIC_ACTION') {
+				<mat-select [(ngModel)]="action.staticActionId"
+				            [ngModelOptions]="{standalone: true}"
+				            (ngModelChange)="onStaticActionChanged()"
+				            placeholder="Select action">
+					<mat-option [value]="">-- Select action --</mat-option>
+					@for (sa of getStaticActionList(); track sa.id) {
+						<mat-option [value]="sa.id">{{ sa.label }}</mat-option>
+					}
+				</mat-select>
+			}
+
+			@if (actionType === 'ENTITY_ACTION') {
+				<mat-select [(ngModel)]="action.conditionId"
+				            [ngModelOptions]="{standalone: true}"
+				            (ngModelChange)="onRulableEntityChanged()"
+				            placeholder="Select condition">
+					<mat-option [value]="">-- Select condition --</mat-option>
+					@for (ce of conditionEntities; track ce.id) {
+						<mat-option [value]="ce.id">{{ ce.id }}</mat-option>
+					}
+				</mat-select>
+
+				@if (action.rulableEntity && selectedEntityType) {
+					<mat-select [value]="actionId"
+					            (valueChange)="setActionId($event)"
+					            placeholder="Select action">
+						<mat-option [value]="">-- Select action --</mat-option>
+						@for (a of getActionsForEntityType(selectedEntityType); track a.id) {
+							<mat-option [value]="a.id">{{ a.label }}</mat-option>
+						}
+					</mat-select>
+				}
+			}
+
+			@if (actionType === 'CONFIGURATION_ACTION') {
+				<mat-select [(ngModel)]="action.configurationWorkflowId"
+				            [ngModelOptions]="{standalone: true}"
+				            (ngModelChange)="onWorkflowChanged()"
+				            placeholder="Select workflow">
+					<mat-option [value]="">-- Select workflow --</mat-option>
+					@for (wf of workflowManager.getAll(); track wf.workflowId) {
+						<mat-option [value]="wf.workflowId">{{ languageService.getLabel(wf) }}</mat-option>
+					}
+				</mat-select>
+
+				@if (action.configurationWorkflowId) {
+					<mat-select [(ngModel)]="action.configurationActionId"
+					            [ngModelOptions]="{standalone: true}"
+					            (ngModelChange)="onWorkflowActionChanged()"
+					            placeholder="Select action">
+						<mat-option [value]="">-- Select action --</mat-option>
+						@for (wa of workflowActions; track wa.workflowActionId) {
+							<mat-option [value]="wa.workflowActionId">
+								{{ languageService.getLabel(wa) }}
+							</mat-option>
+						}
+					</mat-select>
+				}
+			}
+		</div>
+
+		@if (paramDefs.length > 0) {
+			<div class="action-params-col">
+				@for (param of paramDefs; track param.id) {
+					<div class="param-row">
+						<span class="param-label">
+							{{ param.label }}
+							@if (!param.optional) {
+								<span class="param-required-star">*</span>
+							}
+						</span>
+						<div class="param-input-wrap"
+						     [class.param-required-empty]="!param.optional && !getParamValue(param.id)">
+							@if (param.options?.length) {
+								<mat-select [value]="getParamValue(param.id)"
+								            (valueChange)="setParamValue(param.id, $event)">
+									<mat-option [value]="">-- Select --</mat-option>
+									@for (opt of param.options!; track opt) {
+										<mat-option [value]="opt">{{ opt }}</mat-option>
+									}
+								</mat-select>
+							} @else if (param.configurationEntity) {
+								<mat-select [value]="getParamValue(param.id)"
+								            (valueChange)="setParamValue(param.id, $event)">
+									<mat-option [value]="">-- Select --</mat-option>
+									@for (opt of getEntityOptions(param.configurationEntity!); track opt.id) {
+										<mat-option [value]="opt.id">{{ opt.label }}</mat-option>
+									}
+								</mat-select>
+							} @else if (param.type === 'TEXT') {
+								<textarea [value]="getParamValue(param.id)"
+								          (input)="setParamValue(param.id, $any($event.target).value)"
+								          rows="1"
+								          class="param-textarea"
+								          [placeholder]="param.label"></textarea>
+							} @else if (param.dataEntity) {
+								<mat-select [value]="getParamValue(param.id)"
+								            (valueChange)="setParamValue(param.id, $event)">
+									<mat-option [value]="">-- Select --</mat-option>
+									@for (ce of getConditionEntitiesByType(param.dataEntity); track ce.id) {
+										<mat-option [value]="ce.id">{{ ce.id }}</mat-option>
+									}
+								</mat-select>
+							}	@else {
+								<input type="text"
+								       [value]="getParamValue(param.id)"
+								       (input)="setParamValue(param.id, $any($event.target).value)"
+								       class="condition-value-input"
+								       [placeholder]="param.label">
+							}
+						</div>
+					</div>
+				}
+
+				@if (action.optional) {
+					<div class="action-params-col action-optional-section">
+						<div class="param-row">
+							<span class="param-label">Code</span>
+							<div class="param-input-wrap">
+								<input type="text"
+								       [(ngModel)]="action.id"
+								       [ngModelOptions]="{standalone: true}"
+								       (ngModelChange)="changed.emit()"
+								       placeholder="OPTIONAL_CODE"
+								       class="condition-value-input">
+							</div>
+						</div>
+						<div class="param-row">
+							<span class="param-label">Label</span>
+							<div class="param-input-wrap">
+								<mat-tab-group>
+									@for (lang of languageService.projectLanguages; track lang.languageCode) {
+										@if (lang.languageCode) {
+											<mat-tab [label]="lang.languageCode">
+												<input type="text"
+												       [value]="getLabelForLang(lang.languageCode)"
+												       (input)="setLabelForLang(lang.languageCode, $any($event.target).value)"
+												       placeholder="Label"
+												       class="condition-value-input"
+																			style="margin-top: 0.5rem">
+											</mat-tab>
+										}
+									}
+								</mat-tab-group>
+							</div>
+						</div>
+					</div>
+				}
+			</div>
+		}
+
+		<button type="button"
+		        class="btn-icon-m danger action-delete-btn"
+		        (click)="remove.emit()"
+		        matTooltip="Remove action">
+			<mat-icon>close</mat-icon>
+		</button>
+
+	</div>
+</div>

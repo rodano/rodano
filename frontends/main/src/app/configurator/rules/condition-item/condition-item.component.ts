@@ -15,9 +15,15 @@ import {ProfileManagerService} from '../../services/manager/profile-manager.serv
 import {FeatureManagerService} from '../../services/manager/feature-manager.service';
 import {EventGroupManagerService} from '../../services/manager/event-group-manager.service';
 import {RuleConditionExtended} from '../rule-condition-extended';
-import {OPERATORS} from '../rule-constants';
+import {OPERATORS, OPERATORS_BY_TYPE} from '../rule-constants';
 import {RULE_ENTITIES, RuleProperty} from '../rule-entities';
 import {MatSelectModule} from '@angular/material/select';
+import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray} from '@angular/cdk/drag-drop';
+import {AltDragService} from '../alt-drag.service';
+import {ValidatorManagerService} from '../../services/manager/validator-manager.service';
+import {WorkflowActionManagerService} from '../../services/manager/workflow-action-manager.service';
 
 @Component({
 	selector: 'app-condition-item',
@@ -25,35 +31,49 @@ import {MatSelectModule} from '@angular/material/select';
 	templateUrl: './condition-item.component.html',
 	styleUrls: ['./condition-item.component.css', '../../dialogs/dialog-shared.css'],
 	imports: [CommonModule, FormsModule, MatIconModule, MatCheckboxModule, MatTooltipModule, ConditionItemComponent,
-		MatSelectModule]
+		MatSelectModule, CdkDragHandle, CdkDropList, CdkDrag]
 })
 export class ConditionItemComponent implements OnInit {
 	@Input() condition!: RuleConditionExtended;
 	@Input() domain = '';
 	@Input() depth = 0;
+	@Input() contextScopeModelId = '';
+	@Input() contextFieldModelId = '';
+	@Input() contextWorkflowId = '';
+	@Input() conditionId = '';
+	@Input() allConditionIds = new Set<string>();
+	@Input() dropListId = '';
+	@Input() siblingDropListIds: string[] = [];
 	@Output() remove = new EventEmitter<void>();
 	@Output() insertSibling = new EventEmitter<void>();
 	@Output() changed = new EventEmitter<void>();
+	@Output() conditionIdChange = new EventEmitter<string>();
+	@Output() idChanged = new EventEmitter<{oldId: string; newId: string}>();
 
 	readonly operators = OPERATORS;
-	readonly conditionModes = ['AND', 'OR'];
-	readonly breakTypes = ['NONE', 'ALLOW', 'DENY'];
-	readonly BOOLEAN_OPERATORS = ['EQUALS', 'NOT_EQUALS', 'NULL', 'NOT_NULL'];
 
 	constructor(
 		public languageService: LanguageService,
 		private scopeModelManager: ScopeModelManagerService,
 		private eventModelManager: EventModelManagerService,
 		private datasetModelManager: DatasetModelManagerService,
+		private fieldModelManager: FieldModelManagerService,
 		private formModelManager: FormModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
+		private workflowActionManager: WorkflowActionManagerService,
 		private profileManager: ProfileManagerService,
 		private featureManager: FeatureManagerService,
-		private eventGroupManager: EventGroupManagerService
+		private eventGroupManager: EventGroupManagerService,
+		private validatorManager: ValidatorManagerService,
+		private snackBar: MatSnackBar,
+		public altDragService: AltDragService
 	) {}
 
 	ngOnInit(): void {
+		if(!this.condition.id) {
+			this.condition.id = this.conditionId;
+		}
 		if(!this.condition.criterion) {
 			this.condition.criterion = {property: '', operator: 'EQUALS', values: ['']};
 		}
@@ -66,6 +86,20 @@ export class ConditionItemComponent implements OnInit {
 		if(!this.condition.breakType) {
 			this.condition.breakType = 'NONE';
 		}
+	}
+
+	get nestedDropListId(): string {
+		return this.dropListId || `cond-nested-${this.displayId}`;
+	}
+
+	getChildDropListId(child: RuleConditionExtended): string {
+		return `cond-nested-${child.id ?? 'noid'}`;
+	}
+
+	getChildSiblingDropListIds(child: RuleConditionExtended): string[] {
+		return (this.condition.conditions ?? [])
+			.filter(c => c !== child)
+			.map(c => this.getChildDropListId(c));
 	}
 
 	get propertiesForDomain(): RuleProperty[] {
@@ -84,10 +118,6 @@ export class ConditionItemComponent implements OnInit {
 		return !prop.type;
 	}
 
-	get isBooleanProperty(): boolean {
-		return this.propertyDef?.type === 'BOOLEAN';
-	}
-
 	get isValueProperty(): boolean {
 		const prop = this.propertyDef;
 		if(!prop) {
@@ -97,10 +127,9 @@ export class ConditionItemComponent implements OnInit {
 	}
 
 	get availableOperators() {
-		if(this.isBooleanProperty) {
-			return this.operators.filter(o => this.BOOLEAN_OPERATORS.includes(o.value));
-		}
-		return this.operators;
+		const type = this.propertyDef?.type;
+		const keys = type ? OPERATORS_BY_TYPE[type] : null;
+		return keys ? this.operators.filter(o => keys.includes(o.value)) : this.operators;
 	}
 
 	get showOperator(): boolean {
@@ -115,6 +144,37 @@ export class ConditionItemComponent implements OnInit {
 		return this.operators.find(o => o.value === op)?.hasValue ?? true;
 	}
 
+	get displayId(): string {
+		return this.condition.id ?? this.conditionId;
+	}
+
+	onConditionIdChange(value: string, input: HTMLInputElement): void {
+		if(this.allConditionIds.has(value) && value !== this.condition.id) {
+			this.snackBar.open(`ID "${value}" is already in use`, 'Close', {duration: 3000});
+			input.value = this.condition.id ?? this.conditionId;
+			return;
+		}
+		const oldId = this.condition.id ?? '';
+		this.condition.id = value;
+		this.idChanged.emit({oldId, newId: value});
+		this.changed.emit();
+	}
+
+	getContextFieldModelId(): string {
+		const idCondition = this.condition.conditions?.find(
+			c => c.criterion?.property === 'ID'
+		);
+		return idCondition?.criterion?.values?.[0] ?? '';
+	}
+
+	get possibleValuesForContext(): string[] {
+		if(!this.contextFieldModelId) {
+			return [];
+		}
+		const fm = this.fieldModelManager.getById(this.contextFieldModelId);
+		return fm?.possibleValues?.map((pv: any) => pv.id ?? pv) ?? [];
+	}
+
 	getEntityOptions(entityName: string): {id: string; label: string}[] {
 		switch(entityName) {
 			case 'ScopeModel':
@@ -123,25 +183,55 @@ export class ConditionItemComponent implements OnInit {
 				return this.eventModelManager.getAll().map(e => ({id: e.eventModelId, label: this.languageService.getLabel(e)}));
 			case 'DatasetModel':
 				return this.datasetModelManager.getAll().map(e => ({id: e.datasetModelId, label: this.languageService.getLabel(e)}));
+			case 'FieldModel': {
+				let fieldModels = this.fieldModelManager.getAll();
+				if(this.contextScopeModelId) {
+					const scopeModel = this.scopeModelManager.getById(this.contextScopeModelId);
+					const linkedDatasetIds = new Set(scopeModel?.datasetModelIds ?? []);
+					fieldModels = fieldModels.filter(f => linkedDatasetIds.has(f.datasetModelId));
+				}
+				return fieldModels.map(f => {
+					const ds = this.datasetModelManager.getById(f.datasetModelId);
+					const dsLabel = ds ? this.languageService.getLabel(ds) : f.datasetModelId;
+					return {id: f.fieldModelId, label: `${dsLabel} - ${this.languageService.getLabel(f)}`};
+				});
+			}
 			case 'FormModel':
 				return this.formModelManager.getAll().map(e => ({id: e.formModelId, label: this.languageService.getLabel(e)}));
 			case 'Workflow':
 				return this.workflowManager.getAll().map(e => ({id: e.workflowId, label: this.languageService.getLabel(e)}));
 			case 'WorkflowState':
-				return this.workflowStateManager.getAll().map(e => ({id: e.workflowStateId, label: this.languageService.getLabel(e)}));
+				return this.workflowStateManager.getAll()
+					.filter((e: any) => !this.contextWorkflowId || e.workflowId === this.contextWorkflowId)
+					.map((e: any) => {
+						const wf = this.workflowManager.getById(e.workflowId);
+						const wfLabel = wf ? this.languageService.getLabel(wf) : e.workflowId;
+						return {id: e.workflowStateId, label: `${wfLabel} - ${this.languageService.getLabel(e)}`};
+					});
+			case 'WorkflowAction':
+				return this.workflowActionManager.getAll()
+					.filter((e: any) => !this.contextWorkflowId || e.workflowId === this.contextWorkflowId)
+					.map((e: any) => {
+						const wf = this.workflowManager.getById(e.workflowId);
+						const wfLabel = wf ? this.languageService.getLabel(wf) : e.workflowId;
+						return {id: e.workflowActionId, label: `${wfLabel} - ${this.languageService.getLabel(e)}`};
+					});
 			case 'Profile':
 				return this.profileManager.getAll().map(e => ({id: e.profileId, label: this.languageService.getLabel(e)}));
 			case 'Feature':
 				return this.featureManager.getAll().map(e => ({id: e.featureId, label: this.languageService.getLabel(e)}));
 			case 'EventGroup':
 				return this.eventGroupManager.getAll().map(e => ({id: e.eventGroupId, label: this.languageService.getLabel(e)}));
+			case 'Validator':
+				return this.validatorManager.getAll()
+					.filter((e: any) => !this.contextWorkflowId || e.workflowId === this.contextWorkflowId)
+					.map((e: any) => ({
+						id: e.validatorId,
+						label: this.languageService.getLabel(e)
+					}));
 			default:
 				return [];
 		}
-	}
-
-	getValueAt(index: number): string {
-		return this.condition.criterion?.values?.[index] ?? '';
 	}
 
 	setValueAt(index: number, value: string): void {
@@ -204,7 +294,10 @@ export class ConditionItemComponent implements OnInit {
 	}
 
 	insertChildAfter(after: RuleConditionExtended): void {
+		const index = (this.condition.conditions ?? []).indexOf(after);
+		const newId = `${this.displayId}${index + 2}`;
 		const newCondition: RuleConditionExtended = {
+			id: newId,
 			mode: 'OR',
 			inverse: false,
 			dependency: false,
@@ -213,14 +306,15 @@ export class ConditionItemComponent implements OnInit {
 			criterion: {property: '', operator: 'EQUALS', values: ['']}
 		};
 		const conditions = [...(this.condition.conditions ?? [])];
-		const index = conditions.indexOf(after);
 		conditions.splice(index + 1, 0, newCondition);
 		this.condition.conditions = conditions;
 		this.changed.emit();
 	}
 
 	addChild(): void {
+		const newId = `${this.displayId}${(this.condition.conditions?.length ?? 0) + 1}`;
 		const newCondition: RuleConditionExtended = {
+			id: newId,
 			mode: 'OR',
 			inverse: false,
 			dependency: false,
@@ -234,6 +328,26 @@ export class ConditionItemComponent implements OnInit {
 
 	removeChild(child: RuleConditionExtended): void {
 		this.condition.conditions = (this.condition.conditions ?? []).filter(c => c !== child);
+		this.changed.emit();
+	}
+
+	onDropChild(event: CdkDragDrop<RuleConditionExtended[] | undefined>): void {
+		if(event.previousContainer === event.container) {
+			const conditions = [...(this.condition.conditions ?? [])];
+			moveItemInArray(conditions, event.previousIndex, event.currentIndex);
+			this.condition.conditions = conditions;
+		}
+		else {
+			const source = event.previousContainer.data;
+			if(!source) {
+				return;
+			}
+			const moved = source[event.previousIndex];
+			source.splice(event.previousIndex, 1);
+			const target = [...(this.condition.conditions ?? [])];
+			target.splice(event.currentIndex, 0, moved);
+			this.condition.conditions = target;
+		}
 		this.changed.emit();
 	}
 }
