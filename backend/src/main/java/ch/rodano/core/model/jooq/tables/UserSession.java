@@ -162,6 +162,11 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	}
 
 	@Override
+	public List<UniqueKey<UserSessionRecord>> getUniqueKeys() {
+		return Arrays.asList(Keys.KEY_USER_SESSION_IDX_USER_SESSION_TOKEN);
+	}
+
+	@Override
 	public List<ForeignKey<UserSessionRecord, ?>> getReferences() {
 		return Arrays.asList(Keys.FK_USER_SESSION_USER_FK);
 	}
