@@ -55,13 +55,15 @@
 							<mat-icon>restore_from_trash</mat-icon>
 						</button>
 					} @else {
-						<button
-							mat-icon-button
-							type="button"
-							matTooltip="Delete"
-							(click)="removeDataset(dataset); $event.stopPropagation()">
-							<mat-icon>delete</mat-icon>
-						</button>
+						@if (!previewMode) {
+							<button
+								mat-icon-button
+								type="button"
+								matTooltip="Delete"
+								(click)="removeDataset(dataset); $event.stopPropagation()">
+								<mat-icon>delete</mat-icon>
+							</button>
+						}
 					}
 				}
 				<app-audit-trail-button [dataset]="dataset" />

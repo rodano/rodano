@@ -90,8 +90,7 @@ export class FormLayoutPreviewComponent implements OnInit, OnChanges {
 			datasetModel: {
 				...layout.datasetModel,
 				fieldModels,
-				collapsedLabelPattern: layout.datasetModel.collapsedLabelPattern ?? '',
-				canWrite: true
+				collapsedLabelPattern: layout.datasetModel.collapsedLabelPattern ?? ''
 			}
 		};
 	}

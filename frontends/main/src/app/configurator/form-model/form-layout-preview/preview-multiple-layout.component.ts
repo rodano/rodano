@@ -40,6 +40,8 @@ import {FieldModel} from '@core/model/field-model';
 	]
 })
 export class PreviewMultipleLayoutComponent extends MultipleLayoutComponent {
+	override readonly previewMode = true;
+
 	override addDataset(): void {
 		const newDataset = {
 			pk: undefined,

@@ -69,6 +69,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 	dataSource = new MatTableDataSource<CRFDataset>([]);
 
 	shown = true;
+	previewMode = false;
 
 	constructor(
 		protected crfService: CRFService,
