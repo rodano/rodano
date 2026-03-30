@@ -2,6 +2,14 @@
 @import "./buttons-shared.css";
 
 /* ==================== Status Badges ==================== */
+:host {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
 .status-badge {
 	display: inline-flex;
 	align-items: center;
@@ -65,7 +73,8 @@
 /* ==================== Content Container ==================== */
 .content-container {
 	display: flex;
-	height: calc(100vh - 200px);
+	flex: 1;
+	min-height: 0;
 	background-color: #f8f9fa;
 	overflow: hidden;
 	position: relative;
@@ -775,6 +784,14 @@
 	flex-direction: column;
 	gap: 1.5rem;
 	background-color: #f8f9fa;
+	min-height: 0;
+}
+
+.detail-content::after {
+	content: '';
+	display: block;
+	height: 1.5rem;
+	flex-shrink: 0;
 }
 
 /* ==================== Settings Sections ==================== */

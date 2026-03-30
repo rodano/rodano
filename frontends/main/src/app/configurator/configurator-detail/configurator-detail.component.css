@@ -1,8 +1,16 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
 .detail-container {
 	display: flex;
 	flex-direction: column;
 	background-color: #f8f9fa;
-	height: 100%;
+	flex: 1;
 	min-height: 0;
 	overflow: hidden;
 }
@@ -107,7 +115,14 @@
 .detail-container > app-resource-category-list,
 .detail-container > app-report-list,
 .detail-container > app-chart-list,
-.detail-container > app-project-settings-detail {
+.detail-container > app-project-settings-detail,
+.detail-container > app-timeline-graph-list,
+.detail-container > app-workflow-widget-list,
+.detail-container > app-workflow-summary-list,
+.detail-container > app-rule-definition-property-list,
+.detail-container > app-rule-definition-action-list,
+.detail-container > app-cron-list,
+.detail-container > app-menu-list {
 	flex: 1;
 	min-height: 0;
 	display: flex;

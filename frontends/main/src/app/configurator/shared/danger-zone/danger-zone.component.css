@@ -1,5 +1,10 @@
 @import "../detail-shared.css";
 
+:host {
+	display: block;
+	margin-bottom: 7rem;
+}
+
 .danger-section {
 	border-color: var(--entity-border);
 	background-color: var(--entity-bg);
