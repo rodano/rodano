@@ -389,12 +389,12 @@ export default async function test(bundle, assert, driver) {
 			await driver.click('#tree img[title="Add workflow widget"]');
 			await driver.wait();
 			await driver.type('#workflow_widget_id', 'WORKFLOW_WIDGET_1');
-			await driver.type(await driver.getShadow('#workflow_widget_shortname', 'input'), 'Workflow widget 1');
+			await driver.type(await driver.getShadow('#workflow_widget_label', 'input'), 'Workflow widget 1');
 			await driver.submit('#edit_workflow_widget_form');
 
 			assert.equal(study.workflowWidgets.length, 1, 'Workflow widget is added');
 			assert.equal(study.workflowWidgets.last().id, 'WORKFLOW_WIDGET_1', 'Workflow widget is added with good id');
-			assert.equal(study.workflowWidgets.last().shortname['en'], 'Workflow widget 1', 'Workflow widget is added with good shortname');
+			assert.equal(study.workflowWidgets.last().label['en'], 'Workflow widget 1', 'Workflow widget is added with good label');
 		});
 
 		//add privacy policy
@@ -981,12 +981,12 @@ export default async function test(bundle, assert, driver) {
 		await driver.click('#tree ul.workflow_widget > li a[href="#node=Study:TEST|WorkflowWidget:WORKFLOW_WIDGET_1"]');
 		await driver.wait();
 		await driver.type('#workflow_widget_id', 'WORKFLOW_WIDGET_MODIFIED');
-		await driver.type(await driver.getShadow('#workflow_widget_shortname', 'input'), 'Workflow widget modified');
+		await driver.type(await driver.getShadow('#workflow_widget_label', 'input'), 'Workflow widget modified');
 		await driver.submit('#edit_workflow_widget_form');
 
 		await feature.it('edits workflow widget (FS_WORKFLOW_WIDGET_002)', async () => {
 			assert.equal(study.workflowWidgets.last().id, 'WORKFLOW_WIDGET_MODIFIED', 'Workflow widget is modified');
-			assert.equal(study.workflowWidgets.last().shortname['en'], 'Workflow widget modified', 'Workflow widget shortname is modified');
+			assert.equal(study.workflowWidgets.last().label['en'], 'Workflow widget modified', 'Workflow widget label is modified');
 		});
 
 		//edit resource category

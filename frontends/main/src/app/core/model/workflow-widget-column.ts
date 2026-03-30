@@ -15,17 +15,10 @@ import { WorkflowWidgetColumnType } from './workflow-widget-column-type';
  */
 export interface WorkflowWidgetColumn { 
     /**
-     * Column ID
+     * Column label
      */
-    id: string;
-    shortname: { [key: string]: string; };
-    longname?: { [key: string]: string; };
-    description?: { [key: string]: string; };
+    label: { [key: string]: string; };
     type: WorkflowWidgetColumnType;
-    /**
-     * Width of the column in px
-     */
-    width: number;
 }
 export namespace WorkflowWidgetColumn {
 }

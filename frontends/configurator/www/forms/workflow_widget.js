@@ -78,13 +78,9 @@ function draw_column(column, index) {
 	instance.querySelector('span').textContent = `Column n°${index + 1}`;
 	instance.querySelector('button').addEventListener('click', delete_column);
 
-	/**@type {HTMLInputElement}*/ (instance.querySelector('input[data-name="id"]')).value = column.id || '';
-	FormHelpers.FillLocalizedInput(instance.querySelector('app-localized-input[data-name="shortname"]'), column.widget.study.languages, column.shortname);
-	FormHelpers.FillLocalizedInput(instance.querySelector('app-localized-input[data-name="longname"]'), column.widget.study.languages, column.longname);
-	FormHelpers.FillLocalizedInput(instance.querySelector('app-localized-input[data-name="description"]'), column.widget.study.languages, column.description);
+	FormHelpers.FillLocalizedInput(instance.querySelector('app-localized-input[data-name="label"]'), column.widget.study.languages, column.label);
 	const column_types = get_column_types(/**@type {HTMLSelectElement}*/ (document.getElementById('workflow_widget_workflow_entity')).value);
 	FormHelpers.FillSelectEnum(instance.querySelector('select[data-name="type"]'), column_types, true, column.type);
-	/**@type {HTMLInputElement}*/ (instance.querySelector('input[data-name="width"]')).value = column.width || '';
 
 	return instance;
 }
@@ -109,13 +105,8 @@ export default {
 
 					document.querySelectorAll('#workflow_widget_columns > div').forEach(function(column_div) {
 						const column = column_div.column;
-						column.id = column_div.querySelector('input[data-name="id"]').value || undefined;
-						column.shortname = JSON.parse(column_div.querySelector('app-localized-input[data-name="shortname"]').value);
-						column.longname = JSON.parse(column_div.querySelector('app-localized-input[data-name="longname"]').value);
-						column.description = JSON.parse(column_div.querySelector('app-localized-input[data-name="description"]').value);
+						column.label = JSON.parse(column_div.querySelector('app-localized-input[data-name="label"]').value);
 						column.type = column_div.querySelector('select[data-name="type"]').value;
-						const column_width = column_div.querySelector('input[data-name="width"]').value;
-						column.width = column_width ? parseInt(column_width) : undefined;
 					});
 
 					FormStaticActions.AfterSubmission(selected_workflow_widget);
@@ -169,9 +160,7 @@ export default {
 	open: function(workflow_widget) {
 		selected_workflow_widget = workflow_widget;
 
-		FormHelpers.FillLocalizedInput(document.getElementById('workflow_widget_shortname'), workflow_widget.study.languages);
-		FormHelpers.FillLocalizedInput(document.getElementById('workflow_widget_longname'), workflow_widget.study.languages);
-		FormHelpers.FillLocalizedInput(document.getElementById('workflow_widget_description'), workflow_widget.study.languages);
+		FormHelpers.FillLocalizedInput(document.getElementById('workflow_widget_label'), workflow_widget.study.languages);
 		FormHelpers.FillSelectEnum(document.getElementById('workflow_widget_workflow_entity'), Config.Enums.WorkflowEntities);
 		FormHelpers.UpdateForm(document.getElementById('edit_workflow_widget_form'), workflow_widget);
 

@@ -123,6 +123,6 @@ export class WorkflowWidgetComponent implements OnInit {
 	}
 
 	getColumnHeader(columnType: string) {
-		return this.widget()?.columns.find(c => c.type === columnType)?.shortname || {};
+		return this.widget()?.columns.find(c => c.type === columnType)?.label || {};
 	}
 }

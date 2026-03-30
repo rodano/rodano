@@ -153,7 +153,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 
 		//send response
 		final StreamingResponseBody stream = os -> workflowWidgetService.getExport(os, widget, scopes, languages);
-		final var widgetLabel = Strings.CI.replace(widget.getLocalizedShortname(languages).toLowerCase(), " ", "_");
+		final var widgetLabel = Strings.CI.replace(widget.getLocalizedLabel(languages).toLowerCase(), " ", "_");
 		final var filename = study.generateFilename(widgetLabel, ExportFormat.CSV);
 		return exportResponse(ExportFormat.CSV, stream, filename);
 	}

@@ -1,19 +1,18 @@
 import '../../../basic-tools/extension.js';
 import {Entities} from '../entities.js';
-
 import {EntitiesHooks} from '../entities_hooks.js';
-import {DisplayableNode} from '../node_displayable.js';
+import {IdentifiableNode} from '../node_identifiable.js';
+import {Report} from '../report.js';
+import {Utils} from '../utils.js';
 import {WorkflowEntities} from '../workflow_entities.js';
 import {WorkflowWidgetColumnType} from '../workflow_widget_column_type.js';
 
-export class WorkflowWidget extends DisplayableNode {
+export class WorkflowWidget extends IdentifiableNode {
 	static getProperties() {
 		return {
 			study: {type: Entities.Study.name, back_reference: true},
 			id: {type: 'string'},
-			shortname: {type: 'object'},
-			longname: {type: 'object'},
-			description: {type: 'object'},
+			label: {type: 'object'},
 			workflowEntity: {type: 'string'},
 			workflowStatesSelectors: {type: 'array'},
 			filterExpectedEvents: {type: 'boolean'},
@@ -25,9 +24,7 @@ export class WorkflowWidget extends DisplayableNode {
 		super();
 		this.study = undefined;
 		this.id = undefined;
-		this.shortname = {};
-		this.longname = {};
-		this.description = {};
+		this.label = {};
 		this.workflowEntity = undefined;
 		this.workflowStatesSelectors = [];
 		this.filterExpectedEvents = true;
@@ -35,7 +32,20 @@ export class WorkflowWidget extends DisplayableNode {
 		EntitiesHooks?.CreateNode.call(this, values);
 	}
 
+	//label
+	getLocalizedLabel(languages) {
+		return Utils.getLocalizedField.call(this, 'label', languages) || this.id;
+	}
+
 	//bus
+	onChangeLanguageId(event) {
+		this.label[event.newValue] = this.label[event.oldValue];
+		delete this.label[event.oldValue];
+	}
+	onDeleteLanguage(event) {
+		delete this.label[event.node.id];
+	}
+
 	onDeleteWorkflowStatesSelector(event) {
 		this.workflowStatesSelectors.removeElement(event.node);
 	}
@@ -60,6 +70,7 @@ export class WorkflowWidget extends DisplayableNode {
 	//report
 	report(settings) {
 		const report = super.report(settings);
+		Report.checkLocalizedLabel(report, this, 'label');
 		//retrieve workflow
 		const reference_workflow = this.study.getWorkflow(this.workflowStatesSelectors[0].workflowId);
 		const field_model_workflow = !reference_workflow.getFieldModels().isEmpty();

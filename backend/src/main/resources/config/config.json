@@ -25,8 +25,8 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 122,
-	"configDate": 1774261903826,
+	"configVersion": 123,
+	"configDate": 1774866106152,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -28611,11 +28611,9 @@
 	"workflowWidgets": [
 		{
 			"id": "VISITS_TO_CLOSE",
-			"shortname": {
+			"label": {
 				"en": "Visits to close"
 			},
-			"longname": {},
-			"description": {},
 			"workflowEntity": "EVENT",
 			"workflowStatesSelectors": [
 				{
@@ -28629,59 +28627,40 @@
 			"filterExpectedEvents": false,
 			"columns": [
 				{
-					"id": "PATIENT",
-					"shortname": {
+					"label": {
 						"en": "Patient"
 					},
-					"longname": {},
-					"description": {},
 					"type": "SCOPE_CODE",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Visit"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_DATE",
-					"shortname": {
+					"label": {
 						"en": "Visit date"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Status",
 						"fr": "Status"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_DATE",
-					"shortname": {
+					"label": {
 						"en": "Date",
 						"fr": "Date"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				}
 			],
@@ -28689,11 +28668,9 @@
 		},
 		{
 			"id": "VISITS_INCOMPLETE",
-			"shortname": {
+			"label": {
 				"en": "Visits incomplete"
 			},
-			"longname": {},
-			"description": {},
 			"workflowEntity": "EVENT",
 			"workflowStatesSelectors": [
 				{
@@ -28707,59 +28684,40 @@
 			"filterExpectedEvents": false,
 			"columns": [
 				{
-					"id": "PATIENT",
-					"shortname": {
+					"label": {
 						"en": "Patient"
 					},
-					"longname": {},
-					"description": {},
 					"type": "SCOPE_CODE",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Visit"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_DATE",
-					"shortname": {
+					"label": {
 						"en": "Visit date"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Status",
 						"fr": "Status"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_DATE",
-					"shortname": {
+					"label": {
 						"en": "Date",
 						"fr": "Date"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				}
 			],
@@ -28767,12 +28725,10 @@
 		},
 		{
 			"id": "QUERIES_OPEN",
-			"shortname": {
+			"label": {
 				"en": "Queries open",
 				"fr": "Queries ouvertes"
 			},
-			"longname": {},
-			"description": {},
 			"workflowEntity": "FIELD",
 			"workflowStatesSelectors": [
 				{
@@ -28793,83 +28749,57 @@
 			"filterExpectedEvents": true,
 			"columns": [
 				{
-					"id": "PATIENT",
-					"shortname": {
+					"label": {
 						"en": "Patient"
 					},
-					"longname": {},
-					"description": {},
 					"type": "SCOPE_CODE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT",
-					"shortname": {
+					"label": {
 						"en": "Visit",
 						"fr": "Visite"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_DATE",
-					"shortname": {
+					"label": {
 						"en": "Visit date",
 						"fr": "Date de visite"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VALUE_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Field",
 						"fr": "Champ"
 					},
-					"longname": {},
-					"description": {},
 					"type": "FIELD_LABEL",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "WORKFLOW",
-					"shortname": {
+					"label": {
 						"en": "Workflow"
 					},
-					"longname": {},
-					"description": {},
 					"type": "WORKFLOW_LABEL",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Status",
 						"fr": "Status"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_DATE",
-					"shortname": {
+					"label": {
 						"en": "Date",
 						"fr": "Date"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				}
 			],
@@ -28877,12 +28807,10 @@
 		},
 		{
 			"id": "PROTOCOL_DEVIATIONS_OPEN",
-			"shortname": {
+			"label": {
 				"en": "Protocol deviations open",
 				"fr": "Déviations de protocole"
 			},
-			"longname": {},
-			"description": {},
 			"workflowEntity": "FIELD",
 			"workflowStatesSelectors": [
 				{
@@ -28896,84 +28824,57 @@
 			"filterExpectedEvents": true,
 			"columns": [
 				{
-					"id": "PATIENT",
-					"shortname": {
+					"label": {
 						"en": "Patient"
 					},
-					"longname": {},
-					"description": {},
 					"type": "SCOPE_CODE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Visit",
 						"fr": "Visite"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VISIT_DATE",
-					"shortname": {
+					"label": {
 						"en": "Visit date",
 						"fr": "Date de visite"
 					},
-					"longname": {},
-					"description": {},
 					"type": "EVENT_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "VALUE_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Field",
 						"fr": "Champ"
 					},
-					"longname": {},
-					"description": {},
 					"type": "FIELD_LABEL",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Status",
 						"fr": "Status"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_LABEL",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_DATE",
-					"shortname": {
+					"label": {
 						"en": "Date",
 						"fr": "Date"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_DATE",
-					"width": 80,
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "TRIGGER_MESSAGE",
-					"shortname": {
+					"label": {
 						"en": "Message"
 					},
-					"longname": {},
-					"description": {},
 					"type": "WORKFLOW_TRIGGER_MESSAGE",
-					"width": 100,
 					"className": "WorkflowWidgetColumn"
 				}
 			],
@@ -28981,11 +28882,9 @@
 		},
 		{
 			"id": "PATIENTS_TO_SIGN",
-			"shortname": {
+			"label": {
 				"en": "Patients to sign"
 			},
-			"longname": {},
-			"description": {},
 			"workflowEntity": "SCOPE",
 			"workflowStatesSelectors": [
 				{
@@ -28999,32 +28898,23 @@
 			"filterExpectedEvents": true,
 			"columns": [
 				{
-					"id": "CENTER",
-					"shortname": {
+					"label": {
 						"en": "Center"
 					},
-					"longname": {},
-					"description": {},
 					"type": "PARENT_SCOPE_CODE",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "SCOPE",
-					"shortname": {
+					"label": {
 						"en": "Patient"
 					},
-					"longname": {},
-					"description": {},
 					"type": "SCOPE_CODE",
 					"className": "WorkflowWidgetColumn"
 				},
 				{
-					"id": "STATUS_LABEL",
-					"shortname": {
+					"label": {
 						"en": "Status"
 					},
-					"longname": {},
-					"description": {},
 					"type": "STATUS_LABEL",
 					"className": "WorkflowWidgetColumn"
 				}

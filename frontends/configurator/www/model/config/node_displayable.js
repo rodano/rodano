@@ -1,10 +1,8 @@
-import {Node} from './node.js';
+import {IdentifiableNode} from './node_identifiable.js';
 import {Report} from './report.js';
 import {Utils} from './utils.js';
 
-export class DisplayableNode extends Node {
-	static ID_MAX_LENGTH = 62;
-	static ID_REGEXP = /^[A-Z][A-Z0-9_]{0,61}$/;
+export class DisplayableNode extends IdentifiableNode {
 
 	constructor() {
 		super();
@@ -12,18 +10,6 @@ export class DisplayableNode extends Node {
 		this.shortname = {};
 		this.longname = {};
 		this.description = {};
-	}
-
-	static checkId(id, check_format) {
-		if(id) {
-			if(id.length > DisplayableNode.ID_MAX_LENGTH) {
-				return 'Too long';
-			}
-			if(check_format && !DisplayableNode.ID_REGEXP.test(id)) {
-				return 'Wrong format';
-			}
-		}
-		return undefined;
 	}
 
 	//prototype localization methods for displayable entities
@@ -51,13 +37,6 @@ export class DisplayableNode extends Node {
 		return this.getLocalizedLabel(languages);
 	}
 
-	//get node full id
-	getFullId() {
-		if(!this.hasParent()) {
-			return this.id;
-		}
-		return `${this.getParent().getFullId()}_${this.id}`;
-	}
 	//get full shortname
 	getLocalizedFullShortname(languages) {
 		const shortname = this.getLocalizedShortname(languages);
@@ -98,8 +77,7 @@ export class DisplayableNode extends Node {
 		delete this.description[event.node.id];
 	}
 	report(settings) {
-		const report = new Report(this);
-		Report.checkId(report, this, settings.id_check !== false);
+		const report = super.report(settings);
 		Report.checkLocalizedLabel(report, this, 'shortname');
 		Report.checkLocalizedLabel(report, this, 'longname');
 		Report.checkLocalizedLabel(report, this, 'description');

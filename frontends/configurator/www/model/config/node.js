@@ -4,7 +4,6 @@ import {ComparatorUtils} from './comparator_utils.js';
 import {DifferenceArrayElement, DifferenceArrayLength, DifferenceArrayOrdering, DifferenceChild, DifferenceProperty} from './compare.js';
 import {Entities} from './entities.js';
 import {EntitiesHooks} from './entities_hooks.js';
-import {DisplayableNode} from './node_displayable.js';
 
 export class Node {
 	static getBackReferences(constructor) {
@@ -353,7 +352,7 @@ export class Node {
 					if(child.id?.toLowerCase().includes(filter)) {
 						results.push(child);
 					}
-					else if(child instanceof DisplayableNode) {
+					else if(typeof child.getLocalizedLabel === 'function') {
 						const child_label = child.getLocalizedLabel(languages);
 						if(child_label?.toLowerCase().includes(filter)) {
 							results.push(child);

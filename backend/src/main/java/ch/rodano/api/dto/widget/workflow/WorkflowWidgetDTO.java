@@ -19,10 +19,9 @@ public class WorkflowWidgetDTO {
 	@Schema(description = "Widget ID")
 	@NotBlank
 	private String id;
+	@Schema(description = "Widget label")
 	@NotNull
-	private Map<String, String> shortname;
-	private Map<String, String> longname;
-	private Map<String, String> description;
+	private Map<String, String> label;
 
 	@Schema(description = "Are the workflows related to the expected events filtered out from the widget?")
 	@NotNull
@@ -41,9 +40,7 @@ public class WorkflowWidgetDTO {
 
 	public WorkflowWidgetDTO(final WorkflowWidget workflowWidget) {
 		this.id = workflowWidget.getId();
-		this.shortname = workflowWidget.getShortname();
-		this.longname = workflowWidget.getLongname();
-		this.description = workflowWidget.getDescription();
+		this.label = workflowWidget.getLabel();
 		this.filterExpectedEvents = workflowWidget.isFilterExpectedEvents();
 		this.workflowEntity = workflowWidget.getWorkflowEntity();
 		this.workflowStatesSelectors = workflowWidget.getWorkflowStatesSelectors();
@@ -60,28 +57,12 @@ public class WorkflowWidgetDTO {
 		this.id = id;
 	}
 
-	public Map<String, String> getShortname() {
-		return shortname;
+	public Map<String, String> getLabel() {
+		return label;
 	}
 
-	public void setShortname(final Map<String, String> shortname) {
-		this.shortname = shortname;
-	}
-
-	public Map<String, String> getLongname() {
-		return longname;
-	}
-
-	public void setLongname(final Map<String, String> longname) {
-		this.longname = longname;
-	}
-
-	public Map<String, String> getDescription() {
-		return description;
-	}
-
-	public void setDescription(final Map<String, String> description) {
-		this.description = description;
+	public void setLabel(final Map<String, String> label) {
+		this.label = label;
 	}
 
 	public boolean isFilterExpectedEvents() {

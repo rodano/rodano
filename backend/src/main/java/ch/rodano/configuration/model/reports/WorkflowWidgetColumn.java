@@ -4,35 +4,24 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
-import ch.rodano.configuration.model.common.SuperDisplayable;
+import ch.rodano.configuration.utils.DisplayableUtils;
 
-public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Node, Comparable<WorkflowWidgetColumn> {
+public class WorkflowWidgetColumn implements Serializable, Node {
 	@Serial
 	private static final long serialVersionUID = 2737350294266317303L;
 
 	private WorkflowWidget widget;
 
-	private String id;
-	private SortedMap<String, String> shortname;
-	private SortedMap<String, String> longname;
-	private SortedMap<String, String> description;
-
+	private Map<String, String> label = new HashMap<>();
 	private WorkflowWidgetColumnType type;
-	private int width;
-
-	public WorkflowWidgetColumn() {
-		shortname = new TreeMap<>();
-		longname = new TreeMap<>();
-		description = new TreeMap<>();
-	}
 
 	@JsonBackReference
 	public final WorkflowWidget getWidget() {
@@ -44,40 +33,12 @@ public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Nod
 		this.widget = widget;
 	}
 
-	@Override
-	public String getId() {
-		return id;
+	public Map<String, String> getLabel() {
+		return label;
 	}
 
-	public void setId(final String id) {
-		this.id = id;
-	}
-
-	@Override
-	public final SortedMap<String, String> getShortname() {
-		return shortname;
-	}
-
-	public final void setShortname(final SortedMap<String, String> shortname) {
-		this.shortname = shortname;
-	}
-
-	@Override
-	public final SortedMap<String, String> getLongname() {
-		return longname;
-	}
-
-	public final void setLongname(final SortedMap<String, String> longname) {
-		this.longname = longname;
-	}
-
-	@Override
-	public final SortedMap<String, String> getDescription() {
-		return description;
-	}
-
-	public final void setDescription(final SortedMap<String, String> description) {
-		this.description = description;
+	public void setLabel(final Map<String, String> label) {
+		this.label = label;
 	}
 
 	public WorkflowWidgetColumnType getType() {
@@ -89,16 +50,8 @@ public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Nod
 	}
 
 	@JsonIgnore
-	public final String getIdForExtJs() {
-		return id.replaceAll("\\.", "");
-	}
-
-	public final int getWidth() {
-		return width;
-	}
-
-	public final void setWidth(final int width) {
-		this.width = width;
+	public String getLocalizedlabel(final String... languages) {
+		return DisplayableUtils.getLocalizedMap(label, languages);
 	}
 
 	@Override
@@ -110,10 +63,5 @@ public class WorkflowWidgetColumn implements SuperDisplayable, Serializable, Nod
 	@Override
 	public final Entity getEntity() {
 		return Entity.WORKFLOW_WIDGET_COLUMN;
-	}
-
-	@Override
-	public final int compareTo(final WorkflowWidgetColumn o) {
-		return getWidget().getColumns().indexOf(this) - o.getWidget().getColumns().indexOf(o);
 	}
 }

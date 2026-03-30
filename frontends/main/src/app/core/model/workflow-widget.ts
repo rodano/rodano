@@ -19,9 +19,10 @@ export interface WorkflowWidget {
      * Widget ID
      */
     id: string;
-    shortname: { [key: string]: string; };
-    longname?: { [key: string]: string; };
-    description?: { [key: string]: string; };
+    /**
+     * Widget label
+     */
+    label: { [key: string]: string; };
     /**
      * Are the workflows related to the expected events filtered out from the widget?
      */

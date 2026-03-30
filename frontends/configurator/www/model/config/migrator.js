@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 122;
+const CURRENT_VERSION = 123;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -185,6 +185,25 @@ const Migrations = {
 		migration: function(config) {
 			config.scopeModels.forEach(scope_model => {
 				delete scope_model.layout;
+			});
+		}
+	},
+	migrate_122: {
+		description: 'Simplify configuration of workflow widget columns',
+		migration: function(config) {
+			config.workflowWidgets.forEach(widget => {
+				widget.label = widget.shortname;
+				delete widget.shortname;
+				delete widget.longname;
+				delete widget.description;
+				widget.columns.forEach(column => {
+					column.label = column.shortname;
+					delete column.id;
+					delete column.shortname;
+					delete column.longname;
+					delete column.description;
+					delete column.width;
+				});
 			});
 		}
 	}

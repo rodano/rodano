@@ -395,7 +395,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 			//custom columns
 			for(final var column : widget.getColumns()) {
 				if(!column.getType().equals(WorkflowWidgetColumnType.SCOPE_CODE) && !column.getType().equals(WorkflowWidgetColumnType.PARENT_SCOPE_CODE)) {
-					header.add(column.getLocalizedShortname(languages));
+					header.add(column.getLocalizedlabel(languages));
 				}
 			}
 

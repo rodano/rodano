@@ -53,7 +53,7 @@ public class NodeCopyServiceTest {
 		assertNotSame(widget, widgetCopy);
 		assertEquals(columnsCopy.size(), columns.size());
 		for(var i = 0; i < columns.size(); i++) {
-			assertEquals(columnsCopy.get(i).getId(), columns.get(i).getId());
+			assertEquals(columnsCopy.get(i).getType(), columns.get(i).getType());
 			assertNotSame(columns.get(i), columnsCopy.get(i));
 		}
 	}

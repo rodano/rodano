@@ -1,29 +1,26 @@
 import {Entities} from '../entities.js';
 import {EntitiesHooks} from '../entities_hooks.js';
 import {Node} from '../node.js';
+import {Utils} from '../utils.js';
 
 export class WorkflowWidgetColumn extends Node {
 	static getProperties() {
 		return {
 			widget: {type: Entities.WorkflowWidget.name, back_reference: true},
-			id: {type: 'string'},
-			shortname: {type: 'object'},
-			longname: {type: 'object'},
-			description: {type: 'object'},
-			type: {type: 'string'},
-			width: {type: 'number'}
+			label: {type: 'object'},
+			type: {type: 'string'}
 		};
 	}
 
 	constructor(values) {
 		super();
 		this.widget = undefined;
-		this.id = undefined;
-		this.shortname = {};
-		this.longname = {};
-		this.description = {};
+		this.label = {};
 		this.type = undefined;
-		this.width = undefined;
 		EntitiesHooks?.CreateNode.call(this, values);
+	}
+
+	getLocalizedLabel(languages) {
+		return Utils.getLocalizedField.call(this, 'label', languages);
 	}
 }

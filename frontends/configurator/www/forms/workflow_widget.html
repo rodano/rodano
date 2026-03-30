@@ -8,16 +8,8 @@
 			<input id="workflow_widget_id" type="text" name="id" required="required" pattern="[A-Z][A-Z0-9_]{0,61}" />
 		</p>
 		<p>
-			<label for="workflow_widget_shortname">Shortname</label>
-			<app-localized-input id="workflow_widget_shortname" name="shortname"></app-localized-input>
-		</p>
-		<p>
-			<label for="workflow_widget_longname">Longname</label>
-			<app-localized-input id="workflow_widget_longname" name="longname"></app-localized-input>
-		</p>
-		<p>
-			<label for="workflow_widget_description">Description</label>
-			<app-localized-input id="workflow_widget_description" name="description"></app-localized-input>
+			<label for="workflow_widget_label">Label</label>
+			<app-localized-input id="workflow_widget_label" name="label"></app-localized-input>
 		</p>
 		<p>
 			<label for="workflow_widget_filter_expected_events" title="Do not display workflow states that are linked to expected events">Hide expected events</label>
@@ -65,38 +57,14 @@
 					<div>
 						<p>
 							<label>
-								<span>Id</span>
-								<input data-name="id" />
-							</label>
-						</p>
-						<p>
-							<label>
-								<span>Shortname</span>
-								<app-localized-input data-name="shortname" class="long"></app-localized-input>
-							</label>
-						</p>
-						<p>
-							<label>
-								<span>Longname</span>
-								<app-localized-input data-name="longname" class="long"></app-localized-input>
-							</label>
-						</p>
-						<p>
-							<label>
-								<span>Description</span>
-								<app-localized-input data-name="description" class="long"></app-localized-input>
+								<span>Label</span>
+								<app-localized-input data-name="label" class="long"></app-localized-input>
 							</label>
 						</p>
 						<p>
 							<label>
 								<span>Type</span>
 								<select data-name="type" class="long"></select>
-							</label>
-						</p>
-						<p>
-							<label>
-								<span>Width</span>
-								<input type="number" data-name="width" />
 							</label>
 						</p>
 					</div>

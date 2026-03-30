@@ -1,5 +1,5 @@
 import '../../basic-tools/extension.js';
-import {DisplayableNode} from './node_displayable.js';
+import {IdentifiableNode} from './node_identifiable.js';
 import {Utils} from './utils.js';
 
 class Report {
@@ -19,7 +19,7 @@ class Report {
 	}
 
 	static checkId(report, node, check_format) {
-		const error = DisplayableNode.checkId(node.id, check_format);
+		const error = IdentifiableNode.checkId(node.id, check_format);
 		if(error) {
 			report.addError(`${node.getEntity().label} has an invalid id ${node.id}: ${error}`);
 		}
