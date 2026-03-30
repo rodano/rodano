@@ -28,7 +28,7 @@ export class RuleConditionCriterion extends Node {
 	}
 
 	isValid() {
-		const study = this.condition.getConstraint().constrainable.getStudy();
+		const study = this.condition.getConstraint().getContainer().getStudy();
 		const entity = this.condition.getParent().getRuleEntity();
 		if(this.property) {
 			const property = study.getAllRuleDefinitionProperty(entity, this.property);

@@ -74,7 +74,8 @@ const RuleEntities = Object.freeze({
 				label: 'Model',
 				type: 'STRING',
 				target: 'SCOPE',
-				configurationEntity: Entities.ScopeModel.name
+				configurationEntity: Entities.ScopeModel.name,
+				identifier: true
 			},
 			{
 				id: 'NUMBER_OF_LEAF',
@@ -329,7 +330,8 @@ const RuleEntities = Object.freeze({
 				label: 'Id',
 				type: 'STRING',
 				target: 'EVENT',
-				configurationEntity: Entities.EventModel.name
+				configurationEntity: Entities.EventModel.name,
+				identifier: true
 			},
 			{
 				id: 'EVENT_GROUP_ID',
@@ -661,7 +663,8 @@ const RuleEntities = Object.freeze({
 				label: 'Id',
 				type: 'STRING',
 				target: 'DATASET',
-				configurationEntity: Entities.DatasetModel.name
+				configurationEntity: Entities.DatasetModel.name,
+				identifier: true
 			},
 			{
 				id: 'REMOVED',
@@ -700,7 +703,8 @@ const RuleEntities = Object.freeze({
 				label: 'Id',
 				type: 'STRING',
 				target: 'FIELD',
-				configurationEntity: Entities.FieldModel.name
+				configurationEntity: Entities.FieldModel.name,
+				identifier: true
 			},
 			{
 				id: 'VALUE',
@@ -839,7 +843,8 @@ const RuleEntities = Object.freeze({
 				label: 'Id',
 				type: 'STRING',
 				target: 'FORM',
-				configurationEntity: Entities.FormModel.name
+				configurationEntity: Entities.FormModel.name,
+				identifier: true
 			},
 			{
 				id: 'IS_ATTACHED_TO_SCOPE',
@@ -922,7 +927,8 @@ const RuleEntities = Object.freeze({
 				label: 'Id',
 				type: 'STRING',
 				target: 'WORKFLOW',
-				configurationEntity: Entities.Workflow.name
+				configurationEntity: Entities.Workflow.name,
+				identifier: true
 			},
 			{
 				id: 'STATUS',

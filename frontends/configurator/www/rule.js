@@ -314,7 +314,7 @@ function update_and_check_condition(condition) {
 	//update condition ui
 	const property_name = condition_ui.querySelector('select[name="property"]').value;
 	if(property_name) {
-		const entity = condition.getRuleEntity();
+		const entity = condition.getParent().getRuleEntity();
 		const property = selected_study.getAllRuleDefinitionProperty(entity, property_name);
 		if(property.configurationEntity || property.options) {
 			const operator_name = condition_ui.querySelector('select[name="operator"]').value;

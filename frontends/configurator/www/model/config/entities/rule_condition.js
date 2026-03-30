@@ -153,13 +153,13 @@ export class RuleCondition extends Node {
 	//retrieve result entity for a condition
 	getRuleEntity() {
 		//the last parent (the root ancestor) is a rule condition list
-		const study = this.getConstraint().constrainable.getStudy();
+		const study = this.getConstraint().getContainer().getStudy();
 		const target = study.getAllRuleDefinitionProperty(this.parent.getRuleEntity(), this.criterion.property).target;
 		return RuleEntities[target];
 	}
 	getResults() {
 		const results = this.parent.getResults();
-		const study = this.getConstraint().constrainable.getStudy();
+		const study = this.getConstraint().getContainer().getStudy();
 		const entity = this.parent.getRuleEntity();
 		const property = study.getAllRuleDefinitionProperty(entity, this.criterion.property);
 		//property leads to an other entity
@@ -169,7 +169,7 @@ export class RuleCondition extends Node {
 			const configuration_entity = entity.getConfigurationEntity();
 			//build new results list
 			const new_results = [];
-			results.forEach(function(result) {
+			results.forEach(result => {
 				//specific function to jump
 				if(property.jump) {
 					try {
@@ -184,8 +184,8 @@ export class RuleCondition extends Node {
 				else if(target === entity) {
 					//determine if result is valid
 					let is_valid = false;
-					//check result is valid for property id
-					if(property.id === 'ID') {
+					//check result is valid if the property is an identifier
+					if(property.identifier) {
 						const operator = Operator[this.criterion.operator];
 						if(operator.has_value) {
 							is_valid = this.criterion.values.some(v => operator.test(result.id, v));
@@ -226,7 +226,7 @@ export class RuleCondition extends Node {
 						}
 					}
 				}
-			}, this);
+			});
 			return new_results;
 		}
 		return results;
