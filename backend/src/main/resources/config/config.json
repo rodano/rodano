@@ -26575,7 +26575,6 @@
 							{
 								"type": "WORKFLOW",
 								"parameters": {
-									"width": 790,
 									"workflow": "QUERIES_OPEN"
 								},
 								"width": "FULL",
@@ -26599,7 +26598,6 @@
 							{
 								"type": "WORKFLOW",
 								"parameters": {
-									"width": 790,
 									"workflow": "PROTOCOL_DEVIATIONS_OPEN"
 								},
 								"width": "FULL",
