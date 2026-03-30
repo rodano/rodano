@@ -81,9 +81,6 @@ public class MenuLayoutDAOServiceImpl implements MenuLayoutDAOService {
 					if(pr.getTitle() != null) {
 						params.put("title", pr.getTitle());
 					}
-					if(pr.getWidth() != null) {
-						params.put("width", pr.getWidth().toString());
-					}
 					if(pr.getDisplayAddResponse() != null) {
 						params.put("displayAddResponse", pr.getDisplayAddResponse().toString());
 					}
@@ -277,11 +274,6 @@ public class MenuLayoutDAOServiceImpl implements MenuLayoutDAOService {
 		final String title = params.get("title");
 		if(title != null) {
 			insert = insert.set(MENU_LAYOUT_SECTION_WIDGET_PARAMETER.TITLE, title);
-		}
-
-		final String width = params.get("width");
-		if(width != null) {
-			insert = insert.set(MENU_LAYOUT_SECTION_WIDGET_PARAMETER.WIDTH, Integer.parseInt(width));
 		}
 
 		final String displayAddResponse = params.get("displayAddResponse");

@@ -127,10 +127,7 @@ public class CMSWidgetDAO {
 			addParameterIfNotNull(parameters, "summary", paramRecord.getWorkflowSummaryId());
 			addParameterIfNotNull(parameters, "chart", paramRecord.getChartId());
 			addParameterIfNotNull(parameters, "category", paramRecord.getCategoryId());
-
 			addParameterIfNotNull(parameters, "title", paramRecord.getTitle());
-			addParameterIfNotNull(parameters, "width", paramRecord.getWidth());
-			addParameterIfNotNull(parameters, "type", paramRecord.getType());
 		}
 
 		return parameters;

@@ -93,45 +93,17 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	}
 
 	/**
-	 * Setter for <code>menu_layout_section_widget_parameter.type</code>.
-	 */
-	public void setType(String value) {
-		set(5, value);
-	}
-
-	/**
-	 * Getter for <code>menu_layout_section_widget_parameter.type</code>.
-	 */
-	public String getType() {
-		return (String) get(5);
-	}
-
-	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.title</code>.
 	 */
 	public void setTitle(String value) {
-		set(6, value);
+		set(5, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.title</code>.
 	 */
 	public String getTitle() {
-		return (String) get(6);
-	}
-
-	/**
-	 * Setter for <code>menu_layout_section_widget_parameter.width</code>.
-	 */
-	public void setWidth(Integer value) {
-		set(7, value);
-	}
-
-	/**
-	 * Getter for <code>menu_layout_section_widget_parameter.width</code>.
-	 */
-	public Integer getWidth() {
-		return (Integer) get(7);
+		return (String) get(5);
 	}
 
 	/**
@@ -139,7 +111,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.display_add_response</code>.
 	 */
 	public void setDisplayAddResponse(Boolean value) {
-		set(8, value);
+		set(6, value);
 	}
 
 	/**
@@ -147,7 +119,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.display_add_response</code>.
 	 */
 	public Boolean getDisplayAddResponse() {
-		return (Boolean) get(8);
+		return (Boolean) get(6);
 	}
 
 	/**
@@ -155,7 +127,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.remove_profile_selector</code>.
 	 */
 	public void setRemoveProfileSelector(Boolean value) {
-		set(9, value);
+		set(7, value);
 	}
 
 	/**
@@ -163,21 +135,21 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.remove_profile_selector</code>.
 	 */
 	public Boolean getRemoveProfileSelector() {
-		return (Boolean) get(9);
+		return (Boolean) get(7);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.overdue_type</code>.
 	 */
 	public void setOverdueType(String value) {
-		set(10, value);
+		set(8, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.overdue_type</code>.
 	 */
 	public String getOverdueType() {
-		return (String) get(10);
+		return (String) get(8);
 	}
 
 	/**
@@ -185,7 +157,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.specific_column_name</code>.
 	 */
 	public void setSpecificColumnName(String value) {
-		set(11, value);
+		set(9, value);
 	}
 
 	/**
@@ -193,21 +165,21 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.specific_column_name</code>.
 	 */
 	public String getSpecificColumnName() {
-		return (String) get(11);
+		return (String) get(9);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.scope_model_id</code>.
 	 */
 	public void setScopeModelId(UUID value) {
-		set(12, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.scope_model_id</code>.
 	 */
 	public UUID getScopeModelId() {
-		return (UUID) get(12);
+		return (UUID) get(10);
 	}
 
 	/**
@@ -215,7 +187,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_widget_id</code>.
 	 */
 	public void setWorkflowWidgetId(UUID value) {
-		set(13, value);
+		set(11, value);
 	}
 
 	/**
@@ -223,7 +195,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_widget_id</code>.
 	 */
 	public UUID getWorkflowWidgetId() {
-		return (UUID) get(13);
+		return (UUID) get(11);
 	}
 
 	/**
@@ -231,7 +203,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_summary_id</code>.
 	 */
 	public void setWorkflowSummaryId(UUID value) {
-		set(14, value);
+		set(12, value);
 	}
 
 	/**
@@ -239,35 +211,35 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	 * <code>menu_layout_section_widget_parameter.workflow_summary_id</code>.
 	 */
 	public UUID getWorkflowSummaryId() {
-		return (UUID) get(14);
+		return (UUID) get(12);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.chart_id</code>.
 	 */
 	public void setChartId(UUID value) {
-		set(15, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.chart_id</code>.
 	 */
 	public UUID getChartId() {
-		return (UUID) get(15);
+		return (UUID) get(13);
 	}
 
 	/**
 	 * Setter for <code>menu_layout_section_widget_parameter.category_id</code>.
 	 */
 	public void setCategoryId(UUID value) {
-		set(16, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>menu_layout_section_widget_parameter.category_id</code>.
 	 */
 	public UUID getCategoryId() {
-		return (UUID) get(16);
+		return (UUID) get(14);
 	}
 
 	// -------------------------------------------------------------------------
@@ -293,7 +265,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 	/**
 	 * Create a detached, initialised MenuLayoutSectionWidgetParameterRecord
 	 */
-	public MenuLayoutSectionWidgetParameterRecord(UUID projectId, UUID menuId, UUID menuSectionId, UUID menuWidgetId, Integer widgetOrder, String type, String title, Integer width, Boolean displayAddResponse, Boolean removeProfileSelector, String overdueType, String specificColumnName, UUID scopeModelId, UUID workflowWidgetId, UUID workflowSummaryId, UUID chartId, UUID categoryId) {
+	public MenuLayoutSectionWidgetParameterRecord(UUID projectId, UUID menuId, UUID menuSectionId, UUID menuWidgetId, Integer widgetOrder, String title, Boolean displayAddResponse, Boolean removeProfileSelector, String overdueType, String specificColumnName, UUID scopeModelId, UUID workflowWidgetId, UUID workflowSummaryId, UUID chartId, UUID categoryId) {
 		super(MenuLayoutSectionWidgetParameter.MENU_LAYOUT_SECTION_WIDGET_PARAMETER);
 
 		setProjectId(projectId);
@@ -301,9 +273,7 @@ public class MenuLayoutSectionWidgetParameterRecord extends UpdatableRecordImpl<
 		setMenuSectionId(menuSectionId);
 		setMenuWidgetId(menuWidgetId);
 		setWidgetOrder(widgetOrder);
-		setType(type);
 		setTitle(title);
-		setWidth(width);
 		setDisplayAddResponse(displayAddResponse);
 		setRemoveProfileSelector(removeProfileSelector);
 		setOverdueType(overdueType);

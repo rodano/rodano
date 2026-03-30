@@ -5,9 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class MenuLayoutSectionWidgetParameter {
 
-	private String type;
 	private String title;
-	private Integer width;
 
 	private Boolean displayAddResponse;
 	private Boolean removeProfileSelector;
@@ -20,28 +18,12 @@ public class MenuLayoutSectionWidgetParameter {
 	private String scopeModelId;
 	private String category;
 
-	public String getType() {
-		return type;
-	}
-
-	public void setType(final String type) {
-		this.type = type;
-	}
-
 	public String getTitle() {
 		return title;
 	}
 
 	public void setTitle(final String title) {
 		this.title = title;
-	}
-
-	public Integer getWidth() {
-		return width;
-	}
-
-	public void setWidth(final Integer width) {
-		this.width = width;
 	}
 
 	public Boolean getDisplayAddResponse() {
@@ -119,9 +101,7 @@ public class MenuLayoutSectionWidgetParameter {
 	@Override
 	public String toString() {
 		return "MenuLayoutSectionWidgetParameter{" +
-			"type='" + type + '\'' +
-			", title='" + title + '\'' +
-			", width=" + width +
+			"title='" + title + '\'' +
 			", displayAddResponse=" + displayAddResponse +
 			", removeProfileSelector=" + removeProfileSelector +
 			", overdueType='" + overdueType + '\'' +

@@ -380,8 +380,6 @@ export class LayoutEditorComponent implements OnInit, OnChanges {
 				const e = this.resourceCategoryManager.getById(value);
 				return e ? this.languageService.getLabel(e) : value;
 			}
-			case 'number':
-				return value ? `${value}px` : value;
 			default: return value;
 		}
 	}

@@ -32,8 +32,7 @@ export const WIDGET_TYPES: WidgetTypeDef[] = [
 	]},
 	{type: 'WELCOME_TEXT', label: 'Welcome Text', parameters: []},
 	{type: 'WORKFLOW', label: 'Workflow', parameters: [
-		{id: 'workflow', label: 'Workflow Widget', kind: 'workflowWidget'},
-		{id: 'width', label: 'Display Width (px)', kind: 'number'}
+		{id: 'workflow', label: 'Workflow Widget', kind: 'workflowWidget'}
 	]},
 	{type: 'WORKFLOWS_SUMMARY', label: 'Workflow Summary', parameters: [
 		{id: 'summary', label: 'Workflow Summary', kind: 'workflowSummary'}

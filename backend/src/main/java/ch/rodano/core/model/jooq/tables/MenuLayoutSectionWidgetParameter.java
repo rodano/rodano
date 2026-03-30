@@ -89,19 +89,9 @@ public class MenuLayoutSectionWidgetParameter extends TableImpl<MenuLayoutSectio
 	public final TableField<MenuLayoutSectionWidgetParameterRecord, Integer> WIDGET_ORDER = createField(DSL.name("widget_order"), SQLDataType.INTEGER.nullable(false), this, "");
 
 	/**
-	 * The column <code>menu_layout_section_widget_parameter.type</code>.
-	 */
-	public final TableField<MenuLayoutSectionWidgetParameterRecord, String> TYPE = createField(DSL.name("type"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
-
-	/**
 	 * The column <code>menu_layout_section_widget_parameter.title</code>.
 	 */
 	public final TableField<MenuLayoutSectionWidgetParameterRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
-
-	/**
-	 * The column <code>menu_layout_section_widget_parameter.width</code>.
-	 */
-	public final TableField<MenuLayoutSectionWidgetParameterRecord, Integer> WIDTH = createField(DSL.name("width"), SQLDataType.INTEGER.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.INTEGER)), this, "");
 
 	/**
 	 * The column
