@@ -27,7 +27,6 @@ export interface ScopeModel {
     expectedNumber?: number;
     maxNumber?: number;
     scopeFormat?: string;
-    layout?: string;
     /**
      * Event groups
      */

@@ -119,8 +119,7 @@ alter table scope_model
 	add column max_number         int          null,
 	add column scope_format       varchar(512) null,
 	add column default_parent_id  uuid         null,
-	add column default_profile_id uuid         null,
-	add column layout             json         null;
+	add column default_profile_id uuid         null;
 
 create table if not exists scope_model_parent (
 	project_id            uuid    not null,

@@ -202,20 +202,6 @@ public class ScopeModelRecord extends UpdatableRecordImpl<ScopeModelRecord> {
 		return (UUID) get(12);
 	}
 
-	/**
-	 * Setter for <code>scope_model.layout</code>.
-	 */
-	public void setLayout(String value) {
-		set(13, value);
-	}
-
-	/**
-	 * Getter for <code>scope_model.layout</code>.
-	 */
-	public String getLayout() {
-		return (String) get(13);
-	}
-
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -239,7 +225,7 @@ public class ScopeModelRecord extends UpdatableRecordImpl<ScopeModelRecord> {
 	/**
 	 * Create a detached, initialised ScopeModelRecord
 	 */
-	public ScopeModelRecord(UUID scopeModelId, UUID projectId, String code, String shortname, String longname, String description, String pluralShortname, Boolean virtual, Integer expectedNumber, Integer maxNumber, String scopeFormat, UUID defaultParentId, UUID defaultProfileId, String layout) {
+	public ScopeModelRecord(UUID scopeModelId, UUID projectId, String code, String shortname, String longname, String description, String pluralShortname, Boolean virtual, Integer expectedNumber, Integer maxNumber, String scopeFormat, UUID defaultParentId, UUID defaultProfileId) {
 		super(ScopeModel.SCOPE_MODEL);
 
 		setScopeModelId(scopeModelId);
@@ -255,7 +241,6 @@ public class ScopeModelRecord extends UpdatableRecordImpl<ScopeModelRecord> {
 		setScopeFormat(scopeFormat);
 		setDefaultParentId(defaultParentId);
 		setDefaultProfileId(defaultProfileId);
-		setLayout(layout);
 		resetChangedOnNotNull();
 	}
 }

@@ -142,11 +142,6 @@ public class ScopeModel extends TableImpl<ScopeModelRecord> {
 	 */
 	public final TableField<ScopeModelRecord, UUID> DEFAULT_PROFILE_ID = createField(DSL.name("default_profile_id"), SQLDataType.UUID.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.UUID)), this, "");
 
-	/**
-	 * The column <code>scope_model.layout</code>.
-	 */
-	public final TableField<ScopeModelRecord, String> LAYOUT = createField(DSL.name("layout"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
-
 	private ScopeModel(Name alias, Table<ScopeModelRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}
@@ -497,7 +492,6 @@ public class ScopeModel extends TableImpl<ScopeModelRecord> {
 	public List<Check<ScopeModelRecord>> getChecks() {
 		return Arrays.asList(
 			Internal.createCheck(this, DSL.name("description"), "json_valid(`description`)", true),
-			Internal.createCheck(this, DSL.name("layout"), "json_valid(`layout`)", true),
 			Internal.createCheck(this, DSL.name("longname"), "json_valid(`longname`)", true),
 			Internal.createCheck(this, DSL.name("plural_shortname"), "json_valid(`plural_shortname`)", true),
 			Internal.createCheck(this, DSL.name("shortname"), "json_valid(`shortname`)", true)

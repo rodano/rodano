@@ -38,7 +38,6 @@ public class ScopeModelDTO {
 	Integer expectedNumber;
 	Integer maxNumber;
 	String scopeFormat;
-	String layout;
 
 	@Schema(description = "Event groups")
 	@NotNull
@@ -178,14 +177,6 @@ public class ScopeModelDTO {
 
 	public void setScopeFormat(final String scopeFormat) {
 		this.scopeFormat = scopeFormat;
-	}
-
-	public String getLayout() {
-		return layout;
-	}
-
-	public void setLayout(final String layout) {
-		this.layout = layout;
 	}
 
 	public List<EventGroupDTO> getEventGroups() {

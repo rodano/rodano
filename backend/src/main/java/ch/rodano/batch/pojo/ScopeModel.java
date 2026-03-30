@@ -39,8 +39,6 @@ public class ScopeModel {
 	private List<Rule> removeRules;
 	private List<Rule> restoreRules;
 
-	private Map<String, Object> layout;
-
 	public String getId() {
 		return id;
 	}
@@ -209,14 +207,6 @@ public class ScopeModel {
 		this.defaultProfileId = defaultProfileId;
 	}
 
-	public Map<String, Object> getLayout() {
-		return layout;
-	}
-
-	public void setLayout(final Map<String, Object> layout) {
-		this.layout = layout;
-	}
-
 	@Override
 	public String toString() {
 		return "ScopeModel{" +
@@ -241,7 +231,6 @@ public class ScopeModel {
 			", createRules=" + createRules +
 			", removeRules=" + removeRules +
 			", restoreRules=" + restoreRules +
-			", layout=" + layout +
 			'}';
 	}
 }

@@ -198,7 +198,6 @@ create table if not exists scope_model (
     scope_format varchar(512) null,
 	default_parent_id uuid null,
     default_profile_id uuid null,
-    layout json null,
     constraint pk_scope_model primary key (project_id, scope_model_id),
     constraint uq_scope_model_code unique (project_id, code)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;

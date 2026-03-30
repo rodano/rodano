@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
-import ch.rodano.configuration.model.cms.CMSLayout;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.jooq.enums.RuleEntityType;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelRecord;
@@ -99,10 +98,6 @@ public class ScopeModelDAO implements BaseProjectDAO<ScopeModel> {
 		if(record.getDefaultProfileId() != null) {
 			final String profileCode = getProfileCode(record.getDefaultProfileId());
 			model.setDefaultProfileId(profileCode);
-		}
-
-		if(record.getLayout() != null && !record.getLayout().isBlank()) {
-			model.setLayout(mappingHelper.parseJson(record.getLayout(), CMSLayout.class));
 		}
 
 		model.setParentIds(loadParentIds(record.getScopeModelId()));

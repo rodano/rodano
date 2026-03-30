@@ -16,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.ScopeModelDTO;
-import ch.rodano.api.config.WidgetLayoutDTO;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
-import ch.rodano.core.services.bll.configurator.ScopeModelLayoutService;
 import ch.rodano.core.services.bll.configurator.ScopeModelService;
 
 @RestController
@@ -27,11 +25,9 @@ import ch.rodano.core.services.bll.configurator.ScopeModelService;
 public class ScopeModelController {
 
 	private final ScopeModelService scopeModelService;
-	private final ScopeModelLayoutService scopeModelLayoutService;
 
-	public ScopeModelController(final ScopeModelService scopeModelService, final ScopeModelLayoutService scopeModelLayoutService) {
+	public ScopeModelController(final ScopeModelService scopeModelService) {
 		this.scopeModelService = scopeModelService;
-		this.scopeModelLayoutService = scopeModelLayoutService;
 	}
 
 	/**
@@ -96,23 +92,5 @@ public class ScopeModelController {
 	) {
 		scopeModelService.deleteScopeModel(projectId, scopeModelId);
 		return ResponseEntity.noContent().build();
-	}
-
-	@GetMapping("/scope-models/{scopeModelId}/layout")
-	public ResponseEntity<WidgetLayoutDTO> getLayout(
-		@PathVariable final UUID projectId,
-		@PathVariable final UUID scopeModelId
-	) {
-		return ResponseEntity.ok(scopeModelLayoutService.getLayout(projectId, scopeModelId));
-	}
-
-	@PutMapping("/scope-models/{scopeModelId}/layout")
-	@SkipProjectAccessCheck
-	public ResponseEntity<WidgetLayoutDTO> saveLayout(
-		@PathVariable final UUID projectId,
-		@PathVariable final UUID scopeModelId,
-		@RequestBody final WidgetLayoutDTO dto
-	) {
-		return ResponseEntity.ok(scopeModelLayoutService.saveLayout(projectId, scopeModelId, dto));
 	}
 }

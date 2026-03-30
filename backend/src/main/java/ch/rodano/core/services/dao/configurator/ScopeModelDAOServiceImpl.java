@@ -150,7 +150,6 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.set(SCOPE_MODEL.EXPECTED_NUMBER, dto.getExpectedNumber())
 			.set(SCOPE_MODEL.MAX_NUMBER, dto.getMaxNumber())
 			.set(SCOPE_MODEL.SCOPE_FORMAT, dto.getScopeFormat())
-			.set(SCOPE_MODEL.LAYOUT, dto.getLayout())
 			.execute();
 
 		replaceRelations(projectId, scopeModelId, dto);
@@ -178,7 +177,6 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 			.set(SCOPE_MODEL.EXPECTED_NUMBER, dto.getExpectedNumber())
 			.set(SCOPE_MODEL.MAX_NUMBER, dto.getMaxNumber())
 			.set(SCOPE_MODEL.SCOPE_FORMAT, dto.getScopeFormat())
-			.set(SCOPE_MODEL.LAYOUT, dto.getLayout())
 			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
 			.and(SCOPE_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
 			.execute();
