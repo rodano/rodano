@@ -1,165 +1,192 @@
 <div class="tree-content">
+	<div class="tree-scroll-area">
+		<app-project-settings-tree
+			[collapsed]="collapsed"
+			[selected]="selectedNode === 'project-settings'"
+			(categoryClicked)="onCategoryClick('project-settings')">
+		</app-project-settings-tree>
 
-	<app-project-settings-tree
-		[selected]="selectedNode === 'project-settings'"
-		(categoryClicked)="onCategoryClick('project-settings')">
-	</app-project-settings-tree>
+		<app-scope-models-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[scopeModels]="scopeModels"
+			[expanded]="expandedCategory === 'scope-models'"
+			[eventModels]="eventModels"
+			[eventGroups]="eventGroups"
+			[selectedScopeModelId]="selectedScopeModelId"
+			[selectedEventModelId]="selectedEventModelId"
+			[selectedEventGroupId]="selectedEventGroupId"
+			(categoryClicked)="onScopeModelsClicked()">
+		</app-scope-models-tree>
 
-	<app-scope-models-tree
-		[projectId]="projectId"
-		[scopeModels]="scopeModels"
-		[expanded]="expandedCategory === 'scope-models'"
-		[eventModels]="eventModels"
-		[eventGroups]="eventGroups"
-		[selectedScopeModelId]="selectedScopeModelId"
-		[selectedEventModelId]="selectedEventModelId"
-		[selectedEventGroupId]="selectedEventGroupId"
-		(categoryClicked)="onScopeModelsClicked()">
-	</app-scope-models-tree>
+		<app-dataset-models-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[datasetModels]="datasetModels"
+			[expanded]="expandedCategory === 'dataset-models'"
+			[fieldModels]="fieldModels"
+			[selectedDatasetModelId]="selectedDatasetModelId"
+			[selectedFieldModelId]="selectedFieldModelId"
+			(categoryClicked)="onDatasetModelsClicked()">
+		</app-dataset-models-tree>
 
-	<app-dataset-models-tree
-		[projectId]="projectId"
-		[datasetModels]="datasetModels"
-		[expanded]="expandedCategory === 'dataset-models'"
-		[fieldModels]="fieldModels"
-		[selectedDatasetModelId]="selectedDatasetModelId"
-		[selectedFieldModelId]="selectedFieldModelId"
-		(categoryClicked)="onDatasetModelsClicked()">
-	</app-dataset-models-tree>
+		<app-validator-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[validators]="validators"
+			[expanded]="expandedCategory === 'validators'"
+			[selectedValidatorId]="selectedValidatorId"
+			(categoryClicked)="onValidatorsClicked()">
+		</app-validator-tree>
 
-	<app-validator-tree
-		[projectId]="projectId"
-		[validators]="validators"
-		[expanded]="expandedCategory === 'validators'"
-		[selectedValidatorId]="selectedValidatorId"
-		(categoryClicked)="onValidatorsClicked()">
-	</app-validator-tree>
+		<app-form-model-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[formModels]="formModels"
+			[expanded]="expandedCategory === 'form-models'"
+			[layouts]="layouts"
+			[selectedFormModelId]="selectedFormModelId"
+			[selectedLayoutId]="selectedLayoutId"
+			(categoryClicked)="onFormModelClicked()">
+		</app-form-model-tree>
 
-	<app-form-model-tree
-		[projectId]="projectId"
-		[formModels]="formModels"
-		[expanded]="expandedCategory === 'form-models'"
-		[layouts]="layouts"
-		[selectedFormModelId]="selectedFormModelId"
-		[selectedLayoutId]="selectedLayoutId"
-		(categoryClicked)="onFormModelClicked()">
-	</app-form-model-tree>
+		<app-workflow-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[workflows]="workflows"
+			[expanded]="expandedCategory === 'workflows'"
+			[workflowStates]="workflowStates"
+			[workflowActions]="workflowActions"
+			[selectedWorkflowId]="selectedWorkflowId"
+			[selectedWorkflowStateId]="selectedWorkflowStateId"
+			[selectedWorkflowActionId]="selectedWorkflowActionId"
+			(categoryClicked)="onWorkflowsClicked()">
+		</app-workflow-tree>
 
-	<app-workflow-tree
-		[projectId]="projectId"
-		[workflows]="workflows"
-		[expanded]="expandedCategory === 'workflows'"
-		[workflowStates]="workflowStates"
-		[workflowActions]="workflowActions"
-		[selectedWorkflowId]="selectedWorkflowId"
-		[selectedWorkflowStateId]="selectedWorkflowStateId"
-		[selectedWorkflowActionId]="selectedWorkflowActionId"
-		(categoryClicked)="onWorkflowsClicked()">
-	</app-workflow-tree>
+		<app-profile-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[profiles]="profiles"
+			[expanded]="expandedCategory === 'profiles'"
+			[selectedProfileId]="selectedProfileId"
+			(categoryClicked)="onProfilesClicked()">
+		</app-profile-tree>
 
-	<app-profile-tree
-		[projectId]="projectId"
-		[profiles]="profiles"
-		[expanded]="expandedCategory === 'profiles'"
-		[selectedProfileId]="selectedProfileId"
-		(categoryClicked)="onProfilesClicked()">
-	</app-profile-tree>
+		<app-feature-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[features]="features"
+			[expanded]="expandedCategory === 'features'"
+			[selectedFeatureId]="selectedFeatureId"
+			(categoryClicked)="onFeaturesClicked()">
+		</app-feature-tree>
 
-	<app-feature-tree
-		[projectId]="projectId"
-		[features]="features"
-		[expanded]="expandedCategory === 'features'"
-		[selectedFeatureId]="selectedFeatureId"
-		(categoryClicked)="onFeaturesClicked()">
-	</app-feature-tree>
+		<app-menu-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[menus]="menus"
+			[expanded]="expandedCategory === 'menus'"
+			[selectedMenuId]="selectedMenuId"
+			(categoryClicked)="onMenuClicked()">
+		</app-menu-tree>
 
-	<app-menu-tree
-		[projectId]="projectId"
-		[menus]="menus"
-		[expanded]="expandedCategory === 'menus'"
-		[selectedMenuId]="selectedMenuId"
-		(categoryClicked)="onMenuClicked()">
-	</app-menu-tree>
+		<app-chart-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[charts]="charts"
+			[expanded]="expandedCategory === 'charts'"
+			[selectedChartId]="selectedChartId"
+			(categoryClicked)="onChartClicked()">
+		</app-chart-tree>
 
-	<app-chart-tree
-		[projectId]="projectId"
-		[charts]="charts"
-		[expanded]="expandedCategory === 'charts'"
-		[selectedChartId]="selectedChartId"
-		(categoryClicked)="onChartClicked()">
-	</app-chart-tree>
+		<app-timeline-graph-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[timelineGraphs]="timelineGraphs"
+			[expanded]="expandedCategory === 'timeline-graphs'"
+			[sections]="sections"
+			[selectedTimelineGraphId]="selectedTimelineGraphId"
+			[selectedGraphSectionId]="selectedGraphSectionId"
+			(categoryClicked)="onTimelineGraphClicked()">
+		</app-timeline-graph-tree>
 
-	<app-timeline-graph-tree
-		[projectId]="projectId"
-		[timelineGraphs]="timelineGraphs"
-		[expanded]="expandedCategory === 'timeline-graphs'"
-		[sections]="sections"
-		[selectedTimelineGraphId]="selectedTimelineGraphId"
-		[selectedGraphSectionId]="selectedGraphSectionId"
-		(categoryClicked)="onTimelineGraphClicked()">
-	</app-timeline-graph-tree>
+		<app-resource-category-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[resourceCategories]="resourceCategories"
+			[expanded]="expandedCategory === 'resource-categories'"
+			[selectedResourceCategoryId]="selectedResourceCategoryId"
+			(categoryClicked)="onResourceCategoryClicked()">
+		</app-resource-category-tree>
 
-	<app-resource-category-tree
-		[projectId]="projectId"
-		[resourceCategories]="resourceCategories"
-		[expanded]="expandedCategory === 'resource-categories'"
-		[selectedResourceCategoryId]="selectedResourceCategoryId"
-		(categoryClicked)="onResourceCategoryClicked()">
-	</app-resource-category-tree>
+		<app-privacy-policy-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[privacyPolicies]="privacyPolicies"
+			[expanded]="expandedCategory === 'privacy-policies'"
+			[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
+			(categoryClicked)="onPrivacyPolicyClicked()">
+		</app-privacy-policy-tree>
 
-	<app-privacy-policy-tree
-		[projectId]="projectId"
-		[privacyPolicies]="privacyPolicies"
-		[expanded]="expandedCategory === 'privacy-policies'"
-		[selectedPrivacyPolicyId]="selectedPrivacyPolicyId"
-		(categoryClicked)="onPrivacyPolicyClicked()">
-	</app-privacy-policy-tree>
+		<app-report-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[reports]="reports"
+			[expanded]="expandedCategory === 'reports'"
+			[selectedReportId]="selectedReportId"
+			(categoryClicked)="onReportClicked()">
+		</app-report-tree>
 
-	<app-report-tree
-		[projectId]="projectId"
-		[reports]="reports"
-		[expanded]="expandedCategory === 'reports'"
-		[selectedReportId]="selectedReportId"
-		(categoryClicked)="onReportClicked()">
-	</app-report-tree>
+		<app-workflow-widget-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[workflowWidgets]="workflowWidgets"
+			[expanded]="expandedCategory === 'workflow-widgets'"
+			[selectedWorkflowWidgetId]="selectedWorkflowWidgetId"
+			(categoryClicked)="onWorkflowWidgetClicked()">
+		</app-workflow-widget-tree>
 
-	<app-workflow-widget-tree
-		[projectId]="projectId"
-		[workflowWidgets]="workflowWidgets"
-		[expanded]="expandedCategory === 'workflow-widgets'"
-		[selectedWorkflowWidgetId]="selectedWorkflowWidgetId"
-		(categoryClicked)="onWorkflowWidgetClicked()">
-	</app-workflow-widget-tree>
+		<app-workflow-summary-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[workflowSummaries]="workflowSummaries"
+			[expanded]="expandedCategory === 'workflow-summaries'"
+			[selectedWorkflowSummaryId]="selectedWorkflowSummaryId"
+			(categoryClicked)="onWorkflowSummaryClicked()">
+		</app-workflow-summary-tree>
 
-	<app-workflow-summary-tree
-		[projectId]="projectId"
-		[workflowSummaries]="workflowSummaries"
-		[expanded]="expandedCategory === 'workflow-summaries'"
-		[selectedWorkflowSummaryId]="selectedWorkflowSummaryId"
-		(categoryClicked)="onWorkflowSummaryClicked()">
-	</app-workflow-summary-tree>
+		<app-rule-definition-property-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[ruleDefinitionProperties]="ruleDefinitionProperties"
+			[expanded]="expandedCategory === 'rule-definition-properties'"
+			[selectedRuleDefinitionPropertyId]="selectedRuleDefinitionPropertyId"
+			(categoryClicked)="onRuleDefinitionPropertyClicked()">
+		</app-rule-definition-property-tree>
 
-	<app-rule-definition-property-tree
-		[projectId]="projectId"
-		[ruleDefinitionProperties]="ruleDefinitionProperties"
-		[expanded]="expandedCategory === 'rule-definition-properties'"
-		[selectedRuleDefinitionPropertyId]="selectedRuleDefinitionPropertyId"
-		(categoryClicked)="onRuleDefinitionPropertyClicked()">
-	</app-rule-definition-property-tree>
+		<app-rule-definition-action-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[ruleDefinitionActions]="ruleDefinitionActions"
+			[expanded]="expandedCategory === 'rule-definition-actions'"
+			[selectedRuleDefinitionActionId]="selectedRuleDefinitionActionId"
+			(categoryClicked)="onRuleDefinitionActionClicked()">
+		</app-rule-definition-action-tree>
 
-	<app-rule-definition-action-tree
-		[projectId]="projectId"
-		[ruleDefinitionActions]="ruleDefinitionActions"
-		[expanded]="expandedCategory === 'rule-definition-actions'"
-		[selectedRuleDefinitionActionId]="selectedRuleDefinitionActionId"
-		(categoryClicked)="onRuleDefinitionActionClicked()">
-	</app-rule-definition-action-tree>
+		<app-cron-tree
+			[collapsed]="collapsed"
+			[projectId]="projectId"
+			[crons]="crons"
+			[expanded]="expandedCategory === 'crons'"
+			[selectedCronId]="selectedCronId"
+			(categoryClicked)="onCronClicked()">
+		</app-cron-tree>
+	</div>
 
-	<app-cron-tree
-		[projectId]="projectId"
-		[crons]="crons"
-		[expanded]="expandedCategory === 'crons'"
-		[selectedCronId]="selectedCronId"
-		(categoryClicked)="onCronClicked()">
-	</app-cron-tree>
+	<div class="tree-collapse-btn" (click)="toggleCollapsed()" [matTooltip]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">
+		<mat-icon>{{ collapsed ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+		@if (!collapsed) {
+			<span>Collapse</span>
+		}
+	</div>
 </div>

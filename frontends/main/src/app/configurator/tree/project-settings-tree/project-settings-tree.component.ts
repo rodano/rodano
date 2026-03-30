@@ -11,6 +11,7 @@ import {MatIconModule} from '@angular/material/icon';
 })
 export class ProjectSettingsTreeComponent {
 	@Input() selected = false;
+	@Input() collapsed = false;
 	@Output() categoryClicked = new EventEmitter<void>();
 
 	onCategoryClick(): void {

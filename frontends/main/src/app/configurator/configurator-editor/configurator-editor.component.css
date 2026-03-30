@@ -211,6 +211,12 @@ mat-spinner {
 	border-right: 1px solid #e5e7eb;
 	overflow-y: auto;
 	flex-shrink: 0;
+	transition: width 0.2s ease;
+}
+
+.editor-sidebar.collapsed {
+	width: 70px;
+	overflow-x: hidden;
 }
 
 /* ==================== Main Panel ==================== */

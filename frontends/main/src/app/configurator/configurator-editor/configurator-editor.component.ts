@@ -147,6 +147,8 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	canRollback = false;
 	canRollForward = false;
 
+	treeCollapsed = localStorage.getItem('configurator-tree-collapsed') === 'true';
+
 	canNavigate = () => this.confirmDiscardIfChanged();
 
 	constructor(
@@ -192,6 +194,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.initializeProject();
 			}
 		});
+	}
+
+	onTreeCollapsedChanged(collapsed: boolean): void {
+		this.treeCollapsed = collapsed;
 	}
 
 	canDeactivate(): boolean {

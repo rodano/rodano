@@ -6,6 +6,7 @@ import {LanguageService} from '../services/language.service';
 export abstract class BaseTreeComponent implements OnChanges {
 	@Input() projectId = '';
 	@Input() expanded = false;
+	@Input() collapsed = false;
 	@Output() categoryClicked = new EventEmitter<void>();
 
 	treeNodes: TreeNode[] = [];

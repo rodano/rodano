@@ -1,9 +1,11 @@
 <div class="tree-node">
 	<div
-		[ngClass]="['node-content', 'clickable', 'theme-main']"
+		[ngClass]="['node-content', 'clickable', 'theme-main', collapsed ? 'node-collapsed' : '']"
 		[class.selected]="selected"
 		(click)="onCategoryClick()">
 		<mat-icon class="node-icon">menu_book</mat-icon>
-		<span class="node-label">Project Settings</span>
+		@if (!collapsed) {
+			<span class="node-label">Project Settings</span>
+		}
 	</div>
 </div>

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from '@angular/material/icon';
 import {ScopeModelsTreeComponent} from '../scope-models-tree/scope-models-tree.component';
@@ -25,6 +25,7 @@ import {
 } from '../rule-definition-action-tree/rule-definition-action-tree.component';
 import {CronTreeComponent} from '../cron-tree/cron-tree.component';
 import {MenuTreeComponent} from '../menu-tree/menu-tree.component';
+import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -50,12 +51,13 @@ import {MenuTreeComponent} from '../menu-tree/menu-tree.component';
 		RuleDefinitionPropertyTreeComponent,
 		RuleDefinitionActionTreeComponent,
 		CronTreeComponent,
-		MenuTreeComponent
+		MenuTreeComponent,
+		MatTooltip
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })
-export class ConfiguratorTreeComponent {
+export class ConfiguratorTreeComponent implements OnInit {
 	@Input() projectId = '';
 	@Input() selectedNode: string | null = null;
 	@Input() scopeModels: any[] = [];
@@ -111,8 +113,21 @@ export class ConfiguratorTreeComponent {
 	@Input() canNavigate?: () => Observable<boolean>;
 
 	@Output() categoryClicked = new EventEmitter<string>();
+	@Output() sidebarCollapsed = new EventEmitter<boolean>();
+
+	collapsed = false;
 
 	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | null = null;
+
+	ngOnInit(): void {
+		this.collapsed = localStorage.getItem('configurator-tree-collapsed') === 'true';
+	}
+
+	toggleCollapsed(): void {
+		this.collapsed = !this.collapsed;
+		localStorage.setItem('configurator-tree-collapsed', String(this.collapsed));
+		this.sidebarCollapsed.emit(this.collapsed);
+	}
 
 	private runGuarded(action: () => void): void {
 		const guard$ = this.canNavigate ? this.canNavigate() : of(true);

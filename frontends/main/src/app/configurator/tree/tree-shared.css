@@ -19,10 +19,10 @@
 }
 
 .tree-content {
-	flex: 1;
-	padding: 0.5rem;
-	overflow-x: hidden;
-	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	overflow: hidden;
 }
 
 .tree-node {
@@ -51,6 +51,35 @@
 	background-color: var(--entity-highlight);
 	border-left: 3px solid var(--entity-color);
 	font-weight: 700;
+}
+
+.node-content.selected.node-collapsed {
+	border-left: none;
+	border-radius: 0.5rem;
+	justify-content: center;
+}
+
+.node-content.node-collapsed {
+	padding: 0.75rem;
+	justify-content: center;
+}
+
+.node-content.node-collapsed .node-icon {
+	margin-right: 0;
+}
+
+.node-content.node-collapsed .node-icon {
+	font-size: 1.5rem !important;
+	width: 1.5rem !important;
+	height: 1.5rem !important;
+}
+
+.node-content.selected.node-collapsed .node-icon {
+	color: var(--entity-color) !important;
+}
+
+.node-content.node-collapsed .node-icon {
+	color: #6b7280 !important;
 }
 
 .node-content.clickable {
@@ -85,19 +114,12 @@
 }
 
 .node-children {
-	position: relative;
-	padding-left: 2rem;
-	margin-top: 0.25rem;
+	padding-left: 1.25rem;
+	margin-top: 0.125rem;
 }
 
 .node-children::before {
-	content: '';
-	position: absolute;
-	left: 0.625rem;
-	top: 0;
-	bottom: 0;
-	width: 1px;
-	background-color: #cbd5e1;
+	display: none;
 }
 
 .node {
@@ -118,20 +140,20 @@
 .node::before {
 	content: '';
 	position: absolute;
-	left: -1.375rem;
+	left: -0.75rem;
 	top: 50%;
-	width: 0.75rem;
+	width: 0.5rem;
 	height: 1px;
 	background-color: #cbd5e1;
 }
 
 .node:last-child::after {
-	content: '';
-	position: absolute;
-	left: -1.375rem;
-	top: 50%;
-	height: 100vh;
-	width: 1px;
+	display: none;
+}
+
+.node-children .node-children .node::before {
+	width: 0.75rem;
+	left: -1rem;
 }
 
 .node.selected {
@@ -197,4 +219,41 @@
 	font-size: 0.75rem;
 	color: #9ca3af;
 	font-style: italic;
+}
+
+.tree-scroll-area {
+	flex: 1;
+	overflow-y: auto;
+	overflow-x: hidden;
+	min-height: 0;
+	padding: 0.5rem;
+	box-sizing: border-box;
+}
+
+.tree-collapse-btn {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	padding: 0.625rem 0.75rem;
+	cursor: pointer;
+	color: #6b7280;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	border-top: 1px solid #e5e7eb;
+	transition: background-color 0.15s;
+	user-select: none;
+	flex-shrink: 0;
+}
+
+.tree-collapse-btn:hover {
+	background-color: #f3f4f6;
+	color: #374151;
+}
+
+.tree-collapse-btn mat-icon {
+	font-size: 1.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	flex-shrink: 0;
 }

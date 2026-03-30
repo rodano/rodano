@@ -88,7 +88,7 @@
 		</div>
 
 		<div class="editor-content">
-			<div class="editor-sidebar">
+			<div class="editor-sidebar" [class.collapsed]="treeCollapsed">
 				<app-configurator-tree
 					[projectId]="projectId"
 					[selectedNode]="selectedNode"
@@ -143,7 +143,8 @@
 					[selectedCronId]="selectedCronId"
 					[selectedMenuId]="selectedMenuId"
 					[canNavigate]="canNavigate"
-					(categoryClicked)="onNodeSelected($event)">
+					(categoryClicked)="onNodeSelected($event)"
+					(sidebarCollapsed)="onTreeCollapsedChanged($event)">
 				</app-configurator-tree>
 			</div>
 

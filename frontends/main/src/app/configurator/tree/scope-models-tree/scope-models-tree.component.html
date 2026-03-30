@@ -1,12 +1,14 @@
 <div class="tree-node">
 	<div
-		[ngClass]="['node-content', 'clickable', 'theme-scope-model', expanded ? 'selected' : '']"
+		[ngClass]="['node-content', 'clickable', 'theme-scope-model', expanded ? 'selected' : '', collapsed ? 'node-collapsed' : '']"
 		(click)="onCategoryClick()">
 		<mat-icon class="node-icon">account_tree</mat-icon>
-		<span class="node-label">Scope Models</span>
+		@if (!collapsed) {
+			<span class="node-label">Scope Models</span>
+		}
 	</div>
 
-	@if (expanded && treeNodes.length > 0) {
+	@if (expanded && treeNodes.length > 0 && !collapsed) {
 		<div class="node-children">
 			@for (node of treeNodes; track node.id) {
 				<ng-container *ngTemplateOutlet="nodeTemplate; context: {$implicit: node}"></ng-container>
