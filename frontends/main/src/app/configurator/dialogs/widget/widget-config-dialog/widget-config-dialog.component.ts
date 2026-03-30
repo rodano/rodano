@@ -68,7 +68,6 @@ export class WidgetConfigDialogComponent extends BaseDialogComponent<WidgetConfi
 
 	ngOnInit(): void {
 		this.form = this.fb.group({
-			width: [this.data.widget.width ?? 'FULL'],
 			textBefore: [this.data.widget.textBefore ?? ''],
 			textAfter: [this.data.widget.textAfter ?? ''],
 			requiredFeatureId: [this.data.widget.requiredFeatureId ?? ''],
@@ -150,8 +149,7 @@ export class WidgetConfigDialogComponent extends BaseDialogComponent<WidgetConfi
 			}
 		});
 		const v = this.form.getRawValue();
-		const result: any = {parameters, width: v.width};
-
+		const result: any = {parameters};
 		if(v.textBefore) {
 			result.textBefore = v.textBefore;
 		}

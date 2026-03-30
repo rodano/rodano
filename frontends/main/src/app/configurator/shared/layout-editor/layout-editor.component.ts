@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
+import {Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule} from '@angular/forms';
 import {MatIconModule} from '@angular/material/icon';
@@ -41,6 +41,11 @@ export class LayoutEditorComponent implements OnInit, OnChanges {
 	loading = false;
 	saving = false;
 	modified = false;
+
+	private widgetResizing = false;
+	private widgetResizeTarget: Widget | null = null;
+	private widgetResizeContainerWidth = 0;
+	private widgetResizeContainerLeft = 0;
 
 	readonly widgetTypes = WIDGET_TYPES;
 
@@ -214,6 +219,38 @@ export class LayoutEditorComponent implements OnInit, OnChanges {
 		this.modified = true;
 	}
 
+	@HostListener('document:mousemove', ['$event'])
+	onResizeMove(event: MouseEvent): void {
+		if(this.widgetResizing && this.widgetResizeTarget) {
+			const relativeX = event.clientX - this.widgetResizeContainerLeft;
+			const pct = relativeX / this.widgetResizeContainerWidth;
+			const newWidth = pct < 0.6 ? 'HALF' : 'FULL';
+			if(newWidth !== this.widgetResizeTarget.width) {
+				this.widgetResizeTarget.width = newWidth;
+				this.layout = {...this.layout};
+				this.modified = true;
+			}
+		}
+	}
+
+	@HostListener('document:mouseup')
+	onResizeEnd(): void {
+		this.widgetResizing = false;
+		this.widgetResizeTarget = null;
+	}
+
+	onWidgetResizeStart(event: MouseEvent, widget: Widget): void {
+		event.stopPropagation();
+		event.preventDefault();
+		this.widgetResizing = true;
+		this.widgetResizeTarget = widget;
+		const container = (event.target as HTMLElement)
+			.closest('.widgets-list') as HTMLElement;
+		const rect = container?.getBoundingClientRect();
+		this.widgetResizeContainerWidth = rect?.width ?? 600;
+		this.widgetResizeContainerLeft = rect?.left ?? 0;
+	}
+
 	openSectionConfig(section: Section, event: Event): void {
 		event.stopPropagation();
 		this.layoutDialogService.openSectionConfig(section).subscribe(result => {
@@ -238,9 +275,8 @@ export class LayoutEditorComponent implements OnInit, OnChanges {
 		this.layoutDialogService.openWidgetConfig(widget, typeDef).subscribe(result => {
 			if(result) {
 				widget.parameters = result.parameters;
-				widget.width = result.width;
-
-				const optionalFields = ['textBefore', 'textAfter', 'requiredFeatureId', 'rightEntity', 'rightValue', 'rightTargetId'] as const;
+				const optionalFields = ['textBefore', 'textAfter', 'requiredFeatureId',
+					'rightEntity', 'rightValue', 'rightTargetId'] as const;
 				for(const field of optionalFields) {
 					if(result[field]) {
 						(widget as any)[field] = result[field];
@@ -249,7 +285,6 @@ export class LayoutEditorComponent implements OnInit, OnChanges {
 						delete (widget as any)[field];
 					}
 				}
-
 				this.layout = {...this.layout};
 				this.modified = true;
 			}

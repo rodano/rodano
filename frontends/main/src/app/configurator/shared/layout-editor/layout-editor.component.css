@@ -197,22 +197,58 @@
 }
 
 .widgets-list {
-	flex: 1;
-	overflow-y: auto;
-	padding: 0.75rem 1rem;
 	display: flex;
-	flex-direction: column;
-	gap: 0.375rem;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	padding: 0.5rem;
+	gap: 0;
 }
 
 .widget-item {
+	position: relative;
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
-	padding: 0.6rem 0.75rem;
+	padding: 0.625rem 1.5rem 0.625rem 0.75rem;
+	background: white;
 	border: 1px solid #e5e7eb;
 	border-radius: 0.375rem;
-	background: #ffffff;
+	margin: 0.25rem 0;
+	width: 100%;
+	box-sizing: border-box;
+	cursor: grab;
+}
+
+.widget-item.widget-half {
+	width: calc(50% - 0.25rem);
+	margin: 0.25rem 0.125rem;
+}
+
+.widget-resize-handle {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 1rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: col-resize;
+	color: #d1d5db;
+	border-radius: 0 0.375rem 0.375rem 0;
+	transition: color 0.15s, background 0.15s;
+}
+
+.widget-resize-handle:hover {
+	color: #6b7280;
+	background: #f3f4f6;
+}
+
+.widget-resize-handle mat-icon {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	transform: rotate(90deg);
 }
 
 .widget-drag-handle {

@@ -3,15 +3,6 @@
 <div class="dialog-content">
 	<form [formGroup]="form" class="settings-form">
 		<div class="form-field">
-			<label>Width</label>
-			<mat-select formControlName="width">
-				@for (opt of WIDTH_OPTIONS; track opt.value) {
-					<mat-option [value]="opt.value">{{ opt.label }}</mat-option>
-				}
-			</mat-select>
-		</div>
-
-		<div class="form-field">
 			<label>Text Before</label>
 			<textarea formControlName="textBefore" rows="3"
 													placeholder="Optional HTML content shown before the widget"></textarea>

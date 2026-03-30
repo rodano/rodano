@@ -111,7 +111,10 @@
 										cdkDropList
 										(cdkDropListDropped)="dropWidget($event)">
 						@for (widget of selectedSection.widgets; track $index) {
-							<div class="widget-item" cdkDrag cdkDragLockAxis="y">
+							<div class="widget-item"
+												cdkDrag
+												cdkDragLockAxis="y"
+												[class.widget-half]="widget.width === 'HALF'">
 								<div class="widget-drag-handle" cdkDragHandle>
 									<mat-icon>drag_indicator</mat-icon>
 								</div>
@@ -137,12 +140,6 @@
 									}
 								</div>
 
-								@if (widget.width === 'HALF') {
-									<div class="badge theme-main" matTooltip="Half width">
-										<mat-icon>width_normal</mat-icon>
-									</div>
-								}
-
 								<button type="button" class="btn-icon-xs"
 																(click)="openWidgetConfig(widget)"
 																matTooltip="Configure widget">
@@ -153,6 +150,12 @@
 																matTooltip="Remove widget">
 									<mat-icon>close</mat-icon>
 								</button>
+
+								<div class="widget-resize-handle"
+													(mousedown)="onWidgetResizeStart($event, widget)"
+													matTooltip="Drag to resize">
+									<mat-icon>drag_handle</mat-icon>
+								</div>
 							</div>
 						}
 
