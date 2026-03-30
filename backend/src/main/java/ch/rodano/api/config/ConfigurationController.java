@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -202,18 +203,16 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/workflows")
 	public List<WorkflowDTO> getWorkflowsOnScopeModel(
 		@PathVariable final String scopeModelId,
-		@RequestParam(name = "isAggregator", required = false) final Boolean isAggregator
+		@RequestParam(name = "isAggregator") final Optional<Boolean> isAggregator
 	) {
 		final var acl = rightsService.getACL(currentActor());
 
 		return studyService.getStudy().getScopeModel(scopeModelId).getWorkflows().stream()
 			.filter(w -> acl.hasRight(w))
-			.filter(w -> {
-				if(isAggregator == null) {
-					return !w.isAggregator(); // preserve previous default behavior
-				}
-				return w.isAggregator() == isAggregator;
-			})
+			.filter(w -> isAggregator
+				.map(value -> w.isAggregator() == value)
+				.orElseGet(() -> !w.isAggregator())
+			)
 			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
 			.toList();
 	}
@@ -251,11 +250,11 @@ public class ConfigurationController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<FieldModelDTO> getFieldModels(
 		@PathVariable final String scopeModelId,
-		@RequestParam(name = "searchable", required = false) final Boolean searchable
+		@RequestParam(name = "searchable") final Optional<Boolean> searchable
 	) {
 		final var acl = rightsService.getACL(currentActor());
 		final var languages = actorService.getLanguages(acl.actor());
-		final var searchableOnly = Boolean.TRUE.equals(searchable);
+		final var searchableOnly = searchable.orElse(false);
 		final var searchableFieldModels = studyService.getStudy().getSearchableFieldModels();
 
 		return studyService.getStudy().getScopeModel(scopeModelId).getDatasetModels().stream()

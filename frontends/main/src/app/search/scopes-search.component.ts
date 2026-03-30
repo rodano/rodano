@@ -1,6 +1,6 @@
 import {Component, ViewChild, DestroyRef, OnInit, signal} from '@angular/core';
 import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
-import {Observable, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
+import {Observable, Subject, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
 import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Scope} from '@core/model/scope';
@@ -89,7 +89,7 @@ export class SearchComponent implements OnInit {
 	Object = Object;
 	FieldModelType = FieldModelType;
 
-	@Input() scopeModel: ScopeModel;
+	readonly scopeModel = input<ScopeModel | undefined>();
 
 	scopeModelId: string;
 	readonly selectedScopeModel = signal<ScopeModel>({} as ScopeModel);
@@ -128,6 +128,8 @@ export class SearchComponent implements OnInit {
 
 	loading = signal(false);
 
+	private readonly searchTrigger$ = new Subject<ScopeSearch>();
+
 	//Caches
 	private readonly fieldModelCache = new Map<string, FieldModel>();
 	private readonly workflowCache = new Map<string, Workflow>();
@@ -154,10 +156,11 @@ export class SearchComponent implements OnInit {
 		//Get scopeModelId from URL query params
 		this.scopeModelId = this.route.snapshot.queryParams['scopeModelId'];
 
-		if(this.scopeModel) {
+		const providedScopeModel = this.scopeModel();
+		if(providedScopeModel) {
 			//If scopeModel is provided as input, use it and update URL
-			this.selectedScopeModel.set(this.scopeModel);
-			this.scopeModelId = this.scopeModel.id;
+			this.selectedScopeModel.set(providedScopeModel);
+			this.scopeModelId = providedScopeModel.id;
 		}
 
 		//Get showRemovedScopes state from URL query params
@@ -199,7 +202,7 @@ export class SearchComponent implements OnInit {
 				}
 
 				this.selectedScopeModelParentModel.set(scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel().defaultParentId) ?? ({} as ScopeModel));
-				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.some(f => f === 'MANAGE_DELETED_DATA')) ?? false);
+				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.includes('MANAGE_DELETED_DATA')) ?? false);
 
 				//Load dependent data after we have the scope model
 				return forkJoin({
@@ -278,16 +281,23 @@ export class SearchComponent implements OnInit {
 	}
 
 	private setupFormListeners(): void {
-		const formChanges$ = [
+		const criteriaChanges$ = merge(
 			this.searchForm.controls.scopeCode.valueChanges.pipe(debounceTime(300)),
 			...this.createFormControlsAndObservables(),
 			this.parentScopeControl.valueChanges,
-			this.showRemovedScopesControl.valueChanges,
-			this.paginator.page,
-			this.sort.sortChange
-		];
+			this.showRemovedScopesControl.valueChanges
+		);
 
-		merge(...formChanges$)
+		//When filters/sort change, always go back to the first page.
+		merge(criteriaChanges$, this.sort.sortChange)
+			.pipe(takeUntilDestroyed(this.destroyRef))
+			.subscribe(() => {
+				this.paginator.pageIndex = 0;
+				this.search();
+			});
+
+		//When only paging changes (page index / page size), keep the current page index.
+		this.paginator.page
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => this.search());
 	}
@@ -324,38 +334,46 @@ export class SearchComponent implements OnInit {
 	}
 
 	search(): void {
-		const path = this.httpParamsService.toHttpParams(this.generateScopeSearch());
-		this.router.navigateByUrl(`/search?${path.toString()}`);
+		const scopeSearch = this.generateScopeSearch();
+		const path = this.httpParamsService.toHttpParams(scopeSearch);
+		this.location.replaceState(`/search?${path.toString()}`);
+		this.searchTrigger$.next(scopeSearch);
 	}
 
 	private loadData(): void {
-		this.route.queryParams.pipe(
+		this.searchTrigger$.pipe(
 			tap(() => {
 				this.loading.set(true);
 				this.extendedScopeSearchResult.set([]);
 				this.resultsLength.set(0);
 			}),
-			switchMap(params => {
-				let scopeSearchObj: ScopeSearch;
-
-				//if no parameters are provided, use default search object
-				if(Object.entries(params).length === 0) {
-					scopeSearchObj = new ScopeSearch();
-				}
-				else {
-					scopeSearchObj = this.httpParamsService.toScopeSearch(params);
-				}
-
+			switchMap(scopeSearchObj => {
 				scopeSearchObj.scopeModelId = this.selectedScopeModel().id;
-
 				this.syncFormAndUrl(scopeSearchObj);
 				return this.scopeService.extendedSearch(scopeSearchObj);
 			}),
 			tap(() => this.loading.set(false))
 		).subscribe(scopeResults => {
+			//If the current pageIndex is out of range (e.g. filters reduced total), jump to the last valid page.
+			if(scopeResults.objects.length === 0 && scopeResults.paging.total > 0) {
+				const lastPageIndex = Math.max(0, Math.ceil(scopeResults.paging.total / scopeResults.paging.pageSize) - 1);
+				if(this.paginator.pageIndex > lastPageIndex) {
+					this.paginator.pageIndex = lastPageIndex;
+					this.search();
+					return;
+				}
+			}
+
 			this.extendedScopeSearchResult.set(scopeResults.objects);
 			this.resultsLength.set(scopeResults.paging.total);
 		});
+
+		//Trigger initial load from URL params
+		const params = this.route.snapshot.queryParams;
+		const initialScopeSearch = Object.entries(params).length === 0
+			? new ScopeSearch()
+			: this.httpParamsService.toScopeSearch(params);
+		this.searchTrigger$.next(initialScopeSearch);
 	}
 
 	getWSFormControlName(workflow: Workflow): string {
@@ -367,7 +385,7 @@ export class SearchComponent implements OnInit {
 		return fieldName;
 	}
 
-	createPatient() {
+	createScope() {
 		const scopeSearch = new ScopeSearch();
 		scopeSearch.scopeModelId = this.selectedScopeModel().parentIds[0];
 
@@ -375,7 +393,7 @@ export class SearchComponent implements OnInit {
 		//2. if there is more than one scope available, open the scope selection dialog, otherwise pick the only one that is available
 		//3. get the candidate scope
 		//4. send the scope creation request
-		//5. redirect to the newly created patient on success
+		//5. redirect to the newly created scope on success
 		this.scopeService.search(scopeSearch).pipe(
 			switchMap(searchResult => {
 				const parentScopes = searchResult.objects;
@@ -466,6 +484,7 @@ export class SearchComponent implements OnInit {
 
 		//Sync the table paginator
 		this.paginator.pageIndex = scopeSearch.pageIndex;
+		this.paginator.pageSize = scopeSearch.pageSize;
 
 		//Sync the sort
 		//transform 'scopeCode' to 'code', use other sort fields as-is
@@ -499,6 +518,12 @@ export class SearchComponent implements OnInit {
 		this.searchableFields.forEach(fieldModel => {
 			const control = this.searchForm.controls[this.getSFFormControlName(fieldModel)];
 			if(!control?.value) {
+				const removeIndex = this.fieldModelCriteria.findIndex(
+					c => c.datasetModelId === fieldModel.datasetModelId && c.fieldModelId === fieldModel.id
+				);
+				if(removeIndex >= 0) {
+					this.fieldModelCriteria.splice(removeIndex, 1);
+				}
 				return;
 			}
 
@@ -538,6 +563,7 @@ export class SearchComponent implements OnInit {
 		}
 
 		search.pageIndex = this.paginator.pageIndex;
+		search.pageSize = this.paginator.pageSize;
 
 		//Sync the sort
 		//transform 'scopeCode' to 'code', use other sort fields as-is

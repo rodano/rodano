@@ -13,6 +13,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.SelectFieldOrAsterisk;
 import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,14 +38,18 @@ import static ch.rodano.core.model.jooq.Tables.WORKFLOW_STATUS;
 @Transactional(readOnly = true)
 public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultService {
 
+	final Integer defaultPageSize;
 	private final StudyService studyService;
 	private final DSLContext create;
 
 	public ExtendedScopeResultServiceImpl(
 		final StudyService studyService,
-		final DSLContext create) {
+		final DSLContext create,
+		@Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize
+	) {
 		this.studyService = studyService;
 		this.create = create;
+		this.defaultPageSize = defaultPageSize;
 	}
 
 	private static String sqlWorkflowsStateColumnAlias(final String workflowId) {
@@ -306,14 +311,23 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		// Apply sorting once using custom sort field when available, otherwise default sort field.
 		final var effectiveSortField = sortField != null ? sortField : search.getSortBy().getField();
 		filteredPkQuery.orderBy(effectiveSortField.sort(search.getOrder()));
-		
+
+		// Counting and paging
+		final int totalCount = total == null ? 0 : total;
+		final int pageSize = Math.max(1, search.getPageSize().orElse(this.defaultPageSize));
+		final int pageIndex = Math.max(0, search.getPageIndex().orElse(0));
+
+		//That line is just a safe calculation of the SQL OFFSET used for pagination.
+		final long offsetLong = Math.min(Integer.MAX_VALUE, (long) pageSize * (long) pageIndex);
+		final int offset = (int) offsetLong;
+
 		// Establish the list of scope PKs for the requested page.
-		final var pagePks = filteredPkQuery.limit(search.getLimitField())
-			.offset(search.getOffsetField())
+		final var pagePks = filteredPkQuery.limit(pageSize)
+			.offset(offset)
 			.fetch(SCOPE.PK);
 
 		if(pagePks.isEmpty()) {
-			return new PagedResult<>(Collections.emptyList(), search.getPageSize(), search.getPageIndex(), total == null ? 0 : total);
+			return new PagedResult<>(Collections.emptyList(), pageSize, pageIndex, totalCount);
 		}
 
 		// Start of the "details" query construction: select all fields needed to build the final DTO, including workflow states and field values.
@@ -459,6 +473,6 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			}
 		}
 
-		return new PagedResult<>(results, search.getPageSize(), search.getPageIndex(), total == null ? 0 : total);
+		return new PagedResult<>(results, pageSize, pageIndex, totalCount);
 	}
 }

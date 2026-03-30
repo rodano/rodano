@@ -1,5 +1,3 @@
-<p></p>
-
 <div class="table-container">
 	<table
 		mat-table
@@ -173,8 +171,8 @@
 		<mat-toolbar-row>
 			<button
 				mat-flat-button
-				(click)="createPatient()"
-				[disabled]="!writeAccessOnParent"
+				(click)="createScope()"
+				[disabled]="!writeAccessOnParent()"
 				type="button">
 				<mat-icon>add</mat-icon>
 				New {{ selectedScopeModel().shortname | localizeMap | lowercase }}
@@ -196,7 +194,7 @@
 				<mat-icon>refresh</mat-icon>
 				Clear filters
 			</button>
-			<mat-paginator [length]="resultsLength"></mat-paginator>
+			<mat-paginator [length]="resultsLength()"></mat-paginator>
 		</mat-toolbar-row>
 	</mat-toolbar>
 </div>

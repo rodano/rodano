@@ -6,8 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,12 +36,11 @@ import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.utils.RightsService;
 
 
-@Tag(name = "Search")
+@Tag(name = "Scope")
 @RestController
 @RequestMapping(value = "/scopes/extended-search")
 @Transactional(readOnly = true)
 public class ExtendedScopeSearchController extends AbstractSecuredController {
-	private static final Logger LOG = LoggerFactory.getLogger(ExtendedScopeSearchController.class);
 
 	final Integer defaultPageSize;
 	final ExtendedScopeResultService extendedScopeResultService;
