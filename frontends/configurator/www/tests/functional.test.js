@@ -485,7 +485,7 @@ export default async function test(bundle, assert, driver) {
 			await driver.click('img[title="Give right on ACTION of WORKFLOW for profile INVESTIGATOR"]');
 
 			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds.hasOwnProperty('WORKFLOW'), 'Profile has right on workflow');
-			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW'].childRights.hasOwnProperty('ACTION'), 'Profile has right on action');
+			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW'].includes('ACTION'), 'Profile has right on action');
 		});
 
 		//give right on form models to a profile
@@ -730,8 +730,8 @@ export default async function test(bundle, assert, driver) {
 		});
 
 		await feature.it('edits action and updates profiles (FS_ACTION_003)', async () => {
-			assert.notOk(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW'].childRights.hasOwnProperty('ACTION'), 'Profile has right on updated action');
-			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW'].childRights.hasOwnProperty('ACTION_MODIFIED'), 'Profile has right on updated action');
+			assert.notOk(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW'].includes('ACTION'), 'Profile has right on updated action');
+			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW'].includes('ACTION_MODIFIED'), 'Profile has right on updated action');
 		});
 
 		await feature.it('edits action and updates workflows (FS_ACTION_004)', async () => {
@@ -770,7 +770,7 @@ export default async function test(bundle, assert, driver) {
 		await feature.it('edits workflow and updates profiles (FS_WORKFLOW_003)', async () => {
 			assert.notOk(study.getProfile('INVESTIGATOR').grantedWorkflowIds.hasOwnProperty('WORKFLOW'), 'Profile has right on modified workflow');
 			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds.hasOwnProperty('WORKFLOW_MODIFIED'), 'Profile has right on modified workflow');
-			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW_MODIFIED'].childRights.hasOwnProperty('ACTION_MODIFIED'), 'Profile has right on action');
+			assert.ok(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW_MODIFIED'].includes('ACTION_MODIFIED'), 'Profile has right on action');
 		});
 
 		await feature.it('edits workflow and updates scope models (FS_WORKFLOW_004)', async () => {
@@ -1052,7 +1052,7 @@ export default async function test(bundle, assert, driver) {
 
 		await feature.it('deletes action and updates profiles, workflows and workflow states (FS_ACTION_006, FS_ACTION_007, FS_ACTION_008, FS_ACTION_009)', async () => {
 			assert.equal(study.getWorkflow('WORKFLOW_MODIFIED').actions.length, 0, 'Action is deleted');
-			assert.notOk(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW_MODIFIED'].childRights.hasOwnProperty('ACTION_MODIFIED'), 'Deleted action is removed from profile');
+			assert.notOk(study.getProfile('INVESTIGATOR').grantedWorkflowIds['WORKFLOW_MODIFIED'].includes('ACTION_MODIFIED'), 'Deleted action is removed from profile');
 			assert.equal(study.getWorkflow('WORKFLOW_MODIFIED').actionId, undefined, 'Deleted action is removed from workflow');
 			assert.notOk(study.getWorkflow('WORKFLOW_MODIFIED').getState('STATE_MODIFIED').possibleActionIds.includes('ACTION_MODIFIED'), 'Deleted action is removed from workflow state');
 		});

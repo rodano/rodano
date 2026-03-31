@@ -32,10 +32,9 @@ import ch.rodano.configuration.model.common.Displayable;
 import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.layout.Layout;
 import ch.rodano.configuration.model.profile.Profile;
-import ch.rodano.configuration.model.profile.ProfileRight;
-import ch.rodano.configuration.model.rights.Right;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.study.Study;
+import ch.rodano.configuration.model.workflow.Action;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.configuration.LZW;
@@ -161,23 +160,11 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		try {
 			final Profile admin = study.getProfile("ADMIN");
 
-			// Give rights on workflows
-			// Retrieve profile ids
-			final Set<String> profileIds = study.getProfiles().stream().map(Profile::getId).collect(Collectors.toSet());
-
-			final SortedMap<String, Right> workflowRights = new TreeMap<>();
+			//give rights on workflows
+			final SortedMap<String, Set<String>> workflowRights = new TreeMap<>();
 			study.getWorkflows().forEach(workflow -> {
-				final Right right = new Right();
-				right.setRight(true);
-				final SortedMap<String, ProfileRight> childRights = new TreeMap<>();
-				workflow.getActions().forEach(action -> {
-					final ProfileRight profileRight = new ProfileRight();
-					profileRight.setSystem(true);
-					profileRight.setProfileIds(profileIds);
-					childRights.put(action.getId(), profileRight);
-				});
-				right.setChildRights(childRights);
-				workflowRights.put(workflow.getId(), right);
+				final var actionIds = workflow.getActions().stream().map(Action::getId).collect(Collectors.toSet());
+				workflowRights.put(workflow.getId(), actionIds);
 			});
 
 			admin.setGrantedWorkflowIds(workflowRights);

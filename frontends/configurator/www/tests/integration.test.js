@@ -1862,8 +1862,8 @@ export default async function test(bundle, assert, driver) {
 		});
 	});
 
-	await bundle.describe('attributable matrix', async feature => {
-		await feature.it('displays the attributable matrix', async () => {
+	await bundle.describe('family assignable matrix', async feature => {
+		await feature.it('displays the family assignable matrix', async () => {
 			await driver.click('a[href="#matrix=profile&entity=Workflow"]');
 			await driver.wait();
 
@@ -1872,69 +1872,40 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.eval('#matrix > table > caption', e => e.textContent), 'Workflows', 'First matrix is workflows matrix');
 			assert.equal(await driver.eval('#matrix > table > tbody', e => e.childNodes.length), 40, 'Matrix contains 40 lines because there are 40 workflows and actions in configuration');
 
-			//give right on attributable
-			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s not possible to give right on an assignable if no right has been given on its attributable');
-			assert.ok(await driver.eval('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s not possible to see right details of an assignable if no right has been given on its attributable');
-			assert.ok(await driver.eval('img[title="Give right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'If no right has been given to an attributable, there is no check displayed');
+			//give right on parent assignable
+			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s not possible to give right on a child assignable if no right has been given on its parent assignable');
+			assert.ok(await driver.eval('img[title="Give right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'If no right has been given to a parent assignable, there is no check displayed');
 			await driver.click('img[title="Give right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'Giving the right on an attributable adds the associated check');
-			assert.notOk(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s possible to give right on an assignable if the right has been given on its attributable');
-			assert.notOk(await driver.eval('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s possible to see right details of an assignable if the right has been given on its attributable');
+			assert.ok(await driver.eval('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'Giving the right on a parent assignable adds the associated check');
+			assert.notOk(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s possible to give right on a child assignable if the right has been given on its parent assignable');
 
-			//check no right has been given on assignable
-			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'If no right has been given to an attributable, there is no check displayed');
-			await driver.click('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul', e => e.children.every(c => c.firstElementChild.src.includes('/untick.png'))), 'If no right has been given to an assignable, no check is displayed in details panel');
-			await driver.click('#profile_right_matrix_matrix > h2 > img');
+			//check no right has been given on child assignable
+			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'If no right has been given to a child assignable, there is no check displayed');
 
-			//give right on assignable
+			//give right on child assignable
 			await driver.click('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('img[title="Remove right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to an attributable, there is a check displayed');
-
-			//check that every profile is checked in details panel
-			await driver.click('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul', e => e.children.every(c => c.firstElementChild.src.includes('/tick.png'))), 'If no right has been given to an assignable, no check is displayed in details panel');
-			await driver.click('#profile_right_matrix_matrix > h2 > img');
-
-			//give partial right on an assignable
-			await driver.click('img[title="See details of UNVERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			await driver.click('#profile_right_matrix_matrix > ul > li:nth-child(10) > img');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul > li:nth-child(10) > img', e => e.src.includes('/tick.png')), 'Giving custom right to an assignable displays the appropriate check');
-			await driver.click('#profile_right_matrix_matrix > h2 > img');
-			assert.ok(await driver.eval('img[title="Remove right on UNVERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"', e => e.src.includes('/check_error.png')), 'Giving custom right to an assignable displays the appropriate icon');
+			assert.ok(await driver.eval('img[title="Remove right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to a child assignable, there is a check displayed');
 
 			//reload the matrix to check if modifications are persistent
 			await driver.click('#tree ul.study > li:first-child a[href="#node=Study:TEST"]');
 			await driver.wait();
 			await driver.click('a[href="#matrix=profile&entity=Workflow"]');
 			await driver.wait();
-			//check that rights have been preserved on attributable
-			assert.ok(await driver.eval('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to an attributable, there is a check displayed');
-			//check that rights have been preserved on assignable
-			assert.ok(await driver.eval('img[title="Remove right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to an attributable, there is a check displayed');
-			await driver.click('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul', e => e.children.every(c => c.firstElementChild.src.includes('/tick.png'))), 'If no right has been given to an assignable, no check is displayed in details panel');
-			await driver.click('#profile_right_matrix_matrix > h2 > img');
-			//check that partial rights have been preserved on assignable
-			assert.ok(await driver.eval('img[title="Remove right on UNVERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/check_error.png')), 'Giving custom right to an assignable displays the appropriate icon');
-			await driver.click('img[title="See details of UNVERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul > li:nth-child(9) > img', e => e.src.includes('/untick.png')), 'Giving custom right to an assignable displays the appropriate check');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul > li:nth-child(10) > img', e => e.src.includes('/tick.png')), 'Giving custom right to an assignable displays the appropriate check');
-			assert.ok(await driver.eval('#profile_right_matrix_matrix > ul > li:nth-child(11) > img', e => e.src.includes('/untick.png')), 'Giving custom right to an assignable displays the appropriate check');
-			await driver.click('#profile_right_matrix_matrix > h2 > img');
+			//check that rights have been preserved on parent assignable
+			assert.ok(await driver.eval('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to a parent assignable, there is a check displayed');
+			//check that rights have been preserved on child assignable
+			assert.ok(await driver.eval('img[title="Remove right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to a child assignable, there is a check displayed');
 
-			//remove right on attributable
-			assert.ok(await driver.eval('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to an attributable, there is a check displayed');
-			assert.notOk(await driver.eval('img[title="Remove right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s possible to give right on an assignable if the right has been given on its attributable');
-			assert.notOk(await driver.eval('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s possible to see right details of an assignable if the right has been given on its attributable');
+			//remove right on parent assignable
+			assert.ok(await driver.eval('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/tick.png')), 'If right has been given to a parent assignable, there is a check displayed');
+			assert.notOk(await driver.eval('img[title="Remove right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s possible to give right on a child assignable if the right has been given on its parent assignable');
 			await driver.click('img[title="Remove right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]');
-			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s not possible to give right on an assignable if no right has been given on its attributable');
-			assert.ok(await driver.eval('img[title="See details of VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s not possible to see right details of an assignable if no right has been given on its attributable');
-			assert.ok(await driver.eval('img[title="Give right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'Removing the right on an attributable removes the associated check');
+			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.hasAttribute('disabled')), 'It\'s not possible to give right on a child assignable if no right has been given on its parent assignable');
+			assert.ok(await driver.eval('img[title="Give right on SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'Removing the right on a parent assignable removes the associated check');
 
-			//removing right on an attributable also removes right on all attributable assignables
-			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'Removing right on an attributable also removes right on all attributable assignables');
-			assert.ok(await driver.eval('img[title="Give right on UNVERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'Removing right on an attributable also removes right on all attributable assignables');
+			//removing right on a parent assignable also removes right on all child assignables
+			assert.ok(await driver.eval('img[title="Give right on VERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'Removing right on a parent assignable also removes right on all child assignables');
+			assert.ok(await driver.eval('img[title="Give right on UNVERIFY of SOURCE_DATA_VERIFICATION for profile PRINCIPAL_INVESTIGATOR"]', e => e.src.includes('/untick.png')), 'Removing right on a parent assignable also removes right on all child assignables');
 		});
 	});
 

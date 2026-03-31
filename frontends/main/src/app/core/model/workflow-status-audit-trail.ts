@@ -17,7 +17,6 @@ export interface WorkflowStatusAuditTrail {
     formFk?: number;
     userFk?: number;
     robotFk?: number;
-    profileId?: string;
     stateId?: string;
     workflowId?: string;
     actionId?: string;

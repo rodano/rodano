@@ -119,11 +119,6 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	public final TableField<WorkflowStatusRecord, Long> ROBOT_FK = createField(DSL.name("robot_fk"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
 
 	/**
-	 * The column <code>workflow_status.profile_id</code>.
-	 */
-	public final TableField<WorkflowStatusRecord, String> PROFILE_ID = createField(DSL.name("profile_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
-
-	/**
 	 * The column <code>workflow_status.state_id</code>.
 	 */
 	public final TableField<WorkflowStatusRecord, String> STATE_ID = createField(DSL.name("state_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");

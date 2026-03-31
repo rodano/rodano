@@ -2,20 +2,17 @@ package ch.rodano.core.model.exception;
 
 import java.io.Serial;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 
 import ch.rodano.api.exception.ManagedException;
 import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rights.Assignable;
-import ch.rodano.configuration.model.rights.Attributable;
-import ch.rodano.configuration.model.rights.ProfileRightAssignable;
+import ch.rodano.configuration.model.rights.FamilyAssignableChild;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
-import ch.rodano.core.model.actor.Actor;
 
 public class UnauthorizedException extends RuntimeException implements ManagedException {
 
@@ -34,7 +31,7 @@ public class UnauthorizedException extends RuntimeException implements ManagedEx
 	private static final String RIGHT_ASSIGNABLE_MESSAGE = "You do not have enough rights on this object. You must have rights to %s";
 
 	//profile right assignable
-	private static final String PROFILE_RIGHT_ASSIGNABLE_MESSAGE = "You do not have enough rights on this object. You must have rights on %s managed by %s";
+	private static final String FAMILY_ASSIGNABLE_MESSAGE = "You do not have enough rights on this object. You must have rights on %s";
 
 	public UnauthorizedException() {
 		super(DEFAULT_MESSAGE);
@@ -58,9 +55,9 @@ public class UnauthorizedException extends RuntimeException implements ManagedEx
 		super(String.format(ASSIGNABLE_MESSAGE, assignable.getEntity().name(), assignable.getId()));
 	}
 
-	//attributable
-	public UnauthorizedException(final Attributable<?> attributable) {
-		super(String.format(ASSIGNABLE_MESSAGE, attributable.getEntity().name(), attributable.getId()));
+	//family assignable
+	public UnauthorizedException(final FamilyAssignableParent<?> familyAssignable) {
+		super(String.format(ASSIGNABLE_MESSAGE, familyAssignable.getEntity().name(), familyAssignable.getId()));
 	}
 
 	//right assignable
@@ -77,9 +74,8 @@ public class UnauthorizedException extends RuntimeException implements ManagedEx
 	}
 
 	//profile right assignable
-	public static UnauthorizedException getInstance(final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> profile) {
-		final var creator = profile.map(Profile::getId).orElse(Actor.SYSTEM_USERNAME);
-		return new UnauthorizedException(String.format(PROFILE_RIGHT_ASSIGNABLE_MESSAGE, profileRightAssignable.getId(), creator));
+	public static UnauthorizedException getInstance(final FamilyAssignableChild<?> familyAssignable) {
+		return new UnauthorizedException(String.format(FAMILY_ASSIGNABLE_MESSAGE, familyAssignable.getId()));
 	}
 
 	@Override

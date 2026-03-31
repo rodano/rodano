@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record16;
+import org.jooq.Record15;
 import org.jooq.Select;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -256,7 +256,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 		final Table<?> table;
 		if(isAggregator) {
-			Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> tableQuery = null;
+			Select<Record15<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String>> tableQuery = null;
 			//a widget displaying an aggregation workflow is either on scopes or events
 			if(WorkflowableEntity.SCOPE.equals(entity)) {
 				tableQuery = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.getFirst()), Optional.empty());

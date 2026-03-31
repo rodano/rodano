@@ -22,8 +22,6 @@ import {Workflow} from './entities/workflow.js';
 import {WorkflowState} from './entities/workflow_state.js';
 import {Action} from './entities/action.js';
 import {Profile} from './entities/profile.js';
-import {Right} from './entities/right.js';
-import {ProfileRight} from './entities/profile_right.js';
 import {Feature} from './entities/feature.js';
 import {PaymentPlan} from './entities/payment_plan.js';
 import {PaymentStep} from './entities/payment_step.js';
@@ -126,8 +124,6 @@ export function create_config() {
 
 		//rights
 		Profile: Profile,
-		Right: Right,
-		ProfileRight: ProfileRight,
 		Feature: Feature,
 
 		//payment

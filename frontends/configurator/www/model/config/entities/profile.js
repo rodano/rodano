@@ -221,50 +221,28 @@ export class Profile extends DisplayableNode {
 	}
 
 	onChangeWorkflowId(event) {
-		this.grantedWorkflowIds[event.newValue] = this.grantedWorkflowIds[event.oldValue];
-		delete this.grantedWorkflowIds[event.oldValue];
+		if(event.oldValue) {
+			//for a family assignable, the entry must be updated only if it exists
+			//otherwise, this will add an entry with the value undefined (because this.grantedWorkflowIds[event.newValue] would return undefined)
+			//this would be wrong as these rights are based on the existence or not of the entry in the object, not on its value
+			if(this.grantedWorkflowIds.hasOwnProperty(event.oldValue)) {
+				this.grantedWorkflowIds[event.newValue] = this.grantedWorkflowIds[event.oldValue];
+				delete this.grantedWorkflowIds[event.oldValue];
+			}
+		}
 	}
 	onDeleteWorkflow(event) {
 		delete this.grantedWorkflowIds[event.node.id];
 	}
 
 	onChangeActionId(event) {
-		if(this.grantedWorkflowIds[event.node.workflow.id]) {
-			const child_rights = this.grantedWorkflowIds[event.node.workflow.id].childRights;
-			if(child_rights[event.oldValue]) {
-				child_rights[event.newValue] = child_rights[event.oldValue];
-				delete child_rights[event.oldValue];
-			}
+		if(this.grantedWorkflowIds.hasOwnProperty(event.node.workflow.id)) {
+			this.grantedWorkflowIds[event.node.workflow.id].replace(event.oldValue, event.newValue);
 		}
 	}
 	onDeleteAction(event) {
-		if(this.grantedWorkflowIds[event.node.workflow.id]) {
-			delete this.grantedWorkflowIds[event.node.workflow.id].childRights[event.node.id];
+		if(this.grantedWorkflowIds.hasOwnProperty(event.node.workflow.id)) {
+			this.grantedWorkflowIds[event.node.workflow.id].removeElement(event.node.id);
 		}
-	}
-
-	//report
-	report(settings) {
-		const report = super.report(settings);
-		//TODO make this generic, using ProfileRightAssignables
-		for(const [workflow_id, right] of Object.entries(this.grantedWorkflowIds)) {
-			if(right && !right.right) {
-				const has_child_right = Object.values(right.childRights).some(r => r.system || !r.profileIds.isEmpty());
-				if(has_child_right) {
-					report.addError(
-						`Profile ${this.id} has right on at least one action of workflow ${workflow_id} but not on the workflow itself`,
-						this,
-						(function(workflow_id) {
-							return function() {
-								//TODO assign workflow the right way using profile rights method
-								this.grantedWorkflowIds[workflow_id].right = true;
-							};
-						})(workflow_id),
-						'Give right on workflow to this profile'
-					);
-				}
-			}
-		}
-		return report;
 	}
 }

@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.profile.Profile;
-import ch.rodano.configuration.model.rights.Attributable;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.actor.Actor;
@@ -33,7 +33,7 @@ public interface ActorService {
 
 	List<Scope> getRootScopes(Actor actor, RightAssignable<?> rightAssignable, Rights right);
 
-	List<Scope> getRootScopes(Actor actor, Attributable<?> attributable);
+	List<Scope> getRootScopes(Actor actor, FamilyAssignableParent<?> familyAssignable);
 
 	/**
 	 * Retrieve the highest scopes on which actor has an active role
@@ -46,6 +46,6 @@ public interface ActorService {
 
 	Optional<Scope> getRootScope(Actor actor, RightAssignable<?> rightAssignable, Rights right);
 
-	Optional<Scope> getRootScope(Actor actor, Attributable<?> attributable);
+	Optional<Scope> getRootScope(Actor actor, FamilyAssignableParent<?> familyAssignable);
 
 }

@@ -19,9 +19,7 @@ import {PaymentPlan} from './entities/payment_plan.js';
 import {PaymentStep} from './entities/payment_step.js';
 import {PrivacyPolicy} from './entities/privacy_policy.js';
 import {Profile} from './entities/profile.js';
-import {ProfileRight} from './entities/profile_right.js';
 import {ResourceCategory} from './entities/resource_category.js';
-import {Right} from './entities/right.js';
 import {ScopeModel} from './entities/scope_model.js';
 import {TimelineGraph} from './entities/timeline_graph.js';
 import {TimelineGraphSection} from './entities/timeline_graph_section.js';
@@ -132,22 +130,22 @@ export default async function test(bundle, assert) {
 	const workflow = new Workflow({id: 'DATA_MANAGEMENT'});
 	workflow.study = study;
 	study.workflows.push(workflow);
-	profile.grantedWorkflowIds[workflow.id] = new Right({right: true});
+	profile.grantedWorkflowIds[workflow.id] = [];
 
 	const workflow_2 = new Workflow({id: 'SDV'});
 	workflow_2.study = study;
 	study.workflows.push(workflow_2);
-	profile.grantedWorkflowIds[workflow_2.id] = new Right({right: true});
+	profile.grantedWorkflowIds[workflow_2.id] = [];
 
 	const workflow_3 = new Workflow({id: 'QUERY'});
 	workflow_3.study = study;
 	study.workflows.push(workflow_3);
-	profile.grantedWorkflowIds[workflow_3.id] = new Right({right: true});
+	profile.grantedWorkflowIds[workflow_3.id] = [];
 
 	const workflow_4 = new Workflow({id: 'PROTOCOL_DEVIATION'});
 	workflow_4.study = study;
 	study.workflows.push(workflow_4);
-	profile.grantedWorkflowIds[workflow_4.id] = new Right({right: true});
+	profile.grantedWorkflowIds[workflow_4.id] = [];
 
 	//workflow widget
 	const workflow_widget = new WorkflowWidget({id: 'SDV_WIDGET'});
@@ -168,10 +166,7 @@ export default async function test(bundle, assert) {
 
 	state.possibleActionIds.push(action.id);
 
-	const profile_right = new ProfileRight();
-	profile_right.system = true;
-	profile_right.profileIds = ['ADMIN', 'CRA'];
-	profile.grantedWorkflowIds[action.workflow.id].childRights[action.id] = profile_right;
+	profile.grantedWorkflowIds[action.workflow.id].push(action.id);
 
 	//scope model
 	const scope_model = new ScopeModel({id: 'PATIENT'});
@@ -489,8 +484,8 @@ export default async function test(bundle, assert) {
 		//change action id
 		await feature.it('updates profiles and workflow states when an action is updated', () => {
 			action.id = 'SAVE';
-			assert.notOk(profile.grantedWorkflowIds[action.workflow.id].childRights.hasOwnProperty('REVIEW'), 'Profile no more contains id of action "REVIEW"');
-			assert.ok(profile.grantedWorkflowIds[action.workflow.id].childRights.hasOwnProperty('SAVE'), 'Profile contains id of action "SAVE"');
+			assert.notOk(profile.grantedWorkflowIds[action.workflow.id].includes('REVIEW'), 'Profile no more contains id of action "REVIEW"');
+			assert.ok(profile.grantedWorkflowIds[action.workflow.id].includes('SAVE'), 'Profile contains id of action "SAVE"');
 			assert.notOk(state.possibleActionIds.includes('REVIEW'), 'State no more contains action with id "REVIEW"');
 			assert.ok(state.possibleActionIds.includes('SAVE'), 'State contains action with id "SAVE"');
 		});
@@ -498,7 +493,7 @@ export default async function test(bundle, assert) {
 		//delete action
 		await feature.it('deletes action properly and updates workflows and workflow states', () => {
 			action['delete']();
-			assert.notOk(profile.grantedWorkflowIds[action.workflow.id].childRights.hasOwnProperty('SAVE'), 'Profile no more contains id of action "SAVE"');
+			assert.notOk(profile.grantedWorkflowIds[action.workflow.id].includes('SAVE'), 'Profile no more contains id of action "SAVE"');
 			assert.notOk(state.possibleActionIds.includes('SAVE'), 'State no more contains action with id "SAVE"');
 			assert.notOk(workflow.actions.includes(action), 'Workflow no more contains action');
 		});

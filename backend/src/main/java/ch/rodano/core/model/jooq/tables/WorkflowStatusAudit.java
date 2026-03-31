@@ -96,7 +96,7 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	/**
 	 * The column <code>workflow_status_audit.audit_context</code>.
 	 */
-	public final TableField<WorkflowStatusAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<WorkflowStatusAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>workflow_status_audit.audit_object_fk</code>.
@@ -137,11 +137,6 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	 * The column <code>workflow_status_audit.robot_fk</code>.
 	 */
 	public final TableField<WorkflowStatusAuditRecord, Long> ROBOT_FK = createField(DSL.name("robot_fk"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
-
-	/**
-	 * The column <code>workflow_status_audit.profile_id</code>.
-	 */
-	public final TableField<WorkflowStatusAuditRecord, String> PROFILE_ID = createField(DSL.name("profile_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>workflow_status_audit.state_id</code>.

@@ -13,7 +13,7 @@ import {Matrices} from './matrices.js';
 import {Digests} from './digests.js';
 import {Themes} from './themes.js';
 import {Entities} from './model/config/entities.js';
-import {Assignables, Attributables, RightAssignables} from './model/config/entities_categories.js';
+import {Assignables, FamilyAssignableParents, RightAssignables} from './model/config/entities_categories.js';
 
 //listeners for menu items (a and button elements)
 function add_top_item_listeners(items) {
@@ -240,7 +240,7 @@ export const Menu = {
 		const matrices = [];
 		matrices.pushAll(Assignables);
 		matrices.pushAll(RightAssignables);
-		matrices.pushAll(Attributables.filter(a => Entities.Study.children.hasOwnProperty(a.name)));
+		matrices.pushAll(FamilyAssignableParents.filter(a => Entities.Study.children.hasOwnProperty(a.name)));
 		matrices.map(draw_menu_matrix).forEach(Node.prototype.appendChild, document.getElementById('menu_matrices').empty());
 
 		//triggers menu

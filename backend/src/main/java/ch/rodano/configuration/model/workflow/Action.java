@@ -16,10 +16,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
-import ch.rodano.configuration.model.rights.ProfileRightAssignable;
+import ch.rodano.configuration.model.rights.FamilyAssignableChild;
 import ch.rodano.configuration.model.rules.Rule;
 
-public class Action implements Serializable, SuperDisplayable, Node, ProfileRightAssignable<Action>, Comparable<Action> {
+public class Action implements Serializable, SuperDisplayable, Node, FamilyAssignableChild<Action>, Comparable<Action> {
 	@Serial
 	private static final long serialVersionUID = -4500446941849236252L;
 

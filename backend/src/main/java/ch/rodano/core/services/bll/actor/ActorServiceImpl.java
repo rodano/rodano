@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.profile.Profile;
-import ch.rodano.configuration.model.rights.Attributable;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.scope.ScopeModel;
@@ -106,8 +106,8 @@ public class ActorServiceImpl implements ActorService {
 	}
 
 	@Override
-	public List<Scope> getRootScopes(final Actor actor, final Attributable<?> attributable) {
-		final var scopePks = roleService.getActiveRoles(actor, attributable).stream().map(Role::getScopeFk).toList();
+	public List<Scope> getRootScopes(final Actor actor, final FamilyAssignableParent<?> familyAssignable) {
+		final var scopePks = roleService.getActiveRoles(actor, familyAssignable).stream().map(Role::getScopeFk).toList();
 		return scopeDAOService.getScopesByPks(scopePks);
 	}
 
@@ -136,8 +136,8 @@ public class ActorServiceImpl implements ActorService {
 	}
 
 	@Override
-	public Optional<Scope> getRootScope(final Actor actor, final Attributable<?> attributable) {
-		final var scopes = getRootScopes(actor, attributable);
+	public Optional<Scope> getRootScope(final Actor actor, final FamilyAssignableParent<?> familyAssignable) {
+		final var scopes = getRootScopes(actor, familyAssignable);
 		return findHighestScopeInHierarchy(scopes);
 	}
 
