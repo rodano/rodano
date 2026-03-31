@@ -96,7 +96,7 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>event_audit.audit_context</code>.
 	 */
-	public final TableField<EventAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<EventAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>event_audit.audit_object_fk</code>.

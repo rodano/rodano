@@ -119,7 +119,7 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.recipients</code>.
 	 */
-	public final TableField<MailRecord, Set> RECIPIENTS = createField(DSL.name("recipients"), SQLDataType.CLOB.nullable(false), this, "", new StringSetConverter());
+	public final TableField<MailRecord, Set> RECIPIENTS = createField(DSL.name("recipients"), SQLDataType.CLOB(65535).nullable(false), this, "", new StringSetConverter());
 
 	/**
 	 * The column <code>mail.reply_to</code>.
@@ -134,12 +134,12 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.text_body</code>.
 	 */
-	public final TableField<MailRecord, String> TEXT_BODY = createField(DSL.name("text_body"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<MailRecord, String> TEXT_BODY = createField(DSL.name("text_body"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>mail.html_body</code>.
 	 */
-	public final TableField<MailRecord, String> HTML_BODY = createField(DSL.name("html_body"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+	public final TableField<MailRecord, String> HTML_BODY = createField(DSL.name("html_body"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	private Mail(Name alias, Table<MailRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

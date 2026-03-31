@@ -95,7 +95,7 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>robot_audit.audit_context</code>.
 	 */
-	public final TableField<RobotAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<RobotAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>robot_audit.audit_object_fk</code>.

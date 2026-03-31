@@ -96,7 +96,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>role_audit.audit_context</code>.
 	 */
-	public final TableField<RoleAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<RoleAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>role_audit.audit_object_fk</code>.

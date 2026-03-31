@@ -98,7 +98,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>scope_audit.audit_context</code>.
 	 */
-	public final TableField<ScopeAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<ScopeAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>scope_audit.audit_object_fk</code>.

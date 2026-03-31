@@ -94,7 +94,7 @@ public class Field extends TableImpl<FieldRecord> {
 	/**
 	 * The column <code>field.value</code>.
 	 */
-	public final TableField<FieldRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+	public final TableField<FieldRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	private Field(Name alias, Table<FieldRecord> aliased) {
 		this(alias, aliased, (org.jooq.Field<?>[]) null, null);

@@ -153,7 +153,7 @@ public class User extends TableImpl<UserRecord> {
 	/**
 	 * The column <code>user.previous_passwords</code>.
 	 */
-	public final TableField<UserRecord, String> PREVIOUS_PASSWORDS = createField(DSL.name("previous_passwords"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+	public final TableField<UserRecord, String> PREVIOUS_PASSWORDS = createField(DSL.name("previous_passwords"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	/**
 	 * The column <code>user.password_attempts</code>.

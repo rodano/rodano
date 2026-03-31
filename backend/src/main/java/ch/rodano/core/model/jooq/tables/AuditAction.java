@@ -92,7 +92,7 @@ public class AuditAction extends TableImpl<AuditActionRecord> {
 	/**
 	 * The column <code>audit_action.context</code>.
 	 */
-	public final TableField<AuditActionRecord, String> CONTEXT = createField(DSL.name("context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<AuditActionRecord, String> CONTEXT = createField(DSL.name("context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	private AuditAction(Name alias, Table<AuditActionRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

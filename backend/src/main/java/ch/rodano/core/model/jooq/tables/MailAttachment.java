@@ -87,7 +87,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	/**
 	 * The column <code>mail_attachment.content</code>.
 	 */
-	public final TableField<MailAttachmentRecord, byte[]> CONTENT = createField(DSL.name("content"), SQLDataType.BLOB.nullable(false), this, "");
+	public final TableField<MailAttachmentRecord, byte[]> CONTENT = createField(DSL.name("content"), SQLDataType.BLOB(65535).nullable(false), this, "");
 
 	private MailAttachment(Name alias, Table<MailAttachmentRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

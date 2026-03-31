@@ -96,7 +96,7 @@ public class FormAudit extends TableImpl<FormAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>form_audit.audit_context</code>.
 	 */
-	public final TableField<FormAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<FormAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>form_audit.audit_object_fk</code>.

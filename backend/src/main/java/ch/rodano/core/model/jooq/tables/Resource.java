@@ -105,7 +105,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	/**
 	 * The column <code>resource.description</code>.
 	 */
-	public final TableField<ResourceRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+	public final TableField<ResourceRecord, String> DESCRIPTION = createField(DSL.name("description"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	/**
 	 * The column <code>resource.category_id</code>.

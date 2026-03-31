@@ -95,7 +95,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>user_audit.audit_context</code>.
 	 */
-	public final TableField<UserAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<UserAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>user_audit.audit_object_fk</code>.
@@ -165,7 +165,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>user_audit.previous_passwords</code>.
 	 */
-	public final TableField<UserAuditRecord, String> PREVIOUS_PASSWORDS = createField(DSL.name("previous_passwords"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+	public final TableField<UserAuditRecord, String> PREVIOUS_PASSWORDS = createField(DSL.name("previous_passwords"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	/**
 	 * The column <code>user_audit.password_attempts</code>.

@@ -96,7 +96,7 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>field_audit.audit_context</code>.
 	 */
-	public final TableField<FieldAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<FieldAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>field_audit.audit_object_fk</code>.
@@ -121,7 +121,7 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>field_audit.value</code>.
 	 */
-	public final TableField<FieldAuditRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
+	public final TableField<FieldAuditRecord, String> VALUE = createField(DSL.name("value"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	private FieldAudit(Name alias, Table<FieldAuditRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);

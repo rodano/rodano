@@ -96,7 +96,7 @@ public class DatasetAudit extends TableImpl<DatasetAuditRecord> implements Audit
 	/**
 	 * The column <code>dataset_audit.audit_context</code>.
 	 */
-	public final TableField<DatasetAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB.nullable(false), this, "");
+	public final TableField<DatasetAuditRecord, String> AUDIT_CONTEXT = createField(DSL.name("audit_context"), SQLDataType.CLOB(65535).nullable(false), this, "");
 
 	/**
 	 * The column <code>dataset_audit.audit_object_fk</code>.
