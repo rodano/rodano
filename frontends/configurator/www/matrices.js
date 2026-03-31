@@ -398,24 +398,30 @@ export const Matrices = {
 			//create label values
 			const values = {assignable: assignable_id, profile: this.dataset.profileId, right: right};
 			if(profile.isAssignedRight(assignable_entity, assignable_id, right)) {
-				profile.unassignRight(assignable_entity, assignable_id, right);
-				this.setAttribute('title', RightAssignableToggle.unselected.label.replaceObject(values));
-				this.classList.remove('selected');
+				//removing a right also removes more important rights
+				const superior_rights = rights.slice(0, rights.indexOf(right) + 1);
+				superior_rights.forEach(r => profile.unassignRight(assignable_entity, assignable_id, r));
+				//manage interface
+				let element = this;
+				do {
+					values.right = element.dataset.right;
+					element.classList.remove('selected');
+					element.setAttribute('title', RightAssignableToggle.unselected.label.replaceObject(values));
+					element = element.previousElementSibling;
+				} while(element);
 			}
 			else {
-				//having an important right gives all less important rights
+				//adding a right also gives less important rights
 				const inferior_rights = rights.slice(rights.indexOf(right), rights.length);
 				inferior_rights.forEach(r => profile.assignRight(assignable_entity, assignable_id, r));
-				//manage rights
-				this.setAttribute('title', RightAssignableToggle.selected.label.replaceObject(values));
-				this.classList.add('selected');
+				//manage interface
 				let element = this;
-				while(element.nextElementSibling) {
-					element = element.nextElementSibling;
-					element.classList.add('selected');
+				do {
 					values.right = element.dataset.right;
+					element.classList.add('selected');
 					element.setAttribute('title', RightAssignableToggle.selected.label.replaceObject(values));
-				}
+					element = element.nextElementSibling;
+				} while(element);
 			}
 		}
 
