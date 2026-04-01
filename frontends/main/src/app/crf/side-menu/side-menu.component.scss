@@ -2,10 +2,11 @@ ol.submenu {
 	list-style-type: none;
 	padding: 0;
 	background-color: var(--themed-highlight-color);
-	border-left: 1rem solid var(--mat-sys-primary);
+	//width of the border is the width of the toggle icon plus the padding of the form items
+	border-left: calc(24px - 0.4rem) solid var(--mat-sys-primary);
 
 	& li {
-		padding-left: 0.2rem;
+		padding: 0;
 		border-top: 1px solid var(--light-border-color);
 	}
 }
@@ -23,6 +24,7 @@ ol.submenu {
 .event {
 	display: flex;
 	align-items: center;
+	padding-left: 0;
 	&.open {
 		background-color: var(--themed-highlight-color);
 	}
