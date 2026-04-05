@@ -4,11 +4,12 @@ import {MatIconModule} from '@angular/material/icon';
 import {LanguageService} from '../../services/language.service';
 import {TreeNode} from '../tree-node';
 import {BaseTreeComponent} from '../base-tree.component';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 @Component({
 	selector: 'app-timeline-graph-tree',
 	standalone: true,
-	imports: [CommonModule, MatIconModule],
+	imports: [CommonModule, MatIconModule, MatTooltipModule],
 	templateUrl: './timeline-graph-tree.component.html',
 	styleUrls: ['../tree-shared.css']
 })

@@ -1,7 +1,9 @@
 <div class="tree-node">
 	<div
 		[ngClass]="['node-content', 'clickable', 'theme-workflow', expanded ? 'selected' : '', collapsed ? 'node-collapsed' : '']"
-		(click)="onCategoryClick()">
+		(click)="onCategoryClick()"
+		[matTooltip]="collapsed ? getCategoryLabel() : ''"
+		matTooltipPosition="right">
 		<mat-icon class="node-icon">settings</mat-icon>
 		@if (!collapsed) {
 			<span class="node-label">Workflows</span>

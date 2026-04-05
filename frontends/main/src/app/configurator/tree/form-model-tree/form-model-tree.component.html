@@ -1,7 +1,9 @@
 <div class="tree-node">
 	<div
 		[ngClass]="['node-content', 'clickable', 'theme-form-model', expanded ? 'selected' : '', collapsed ? 'node-collapsed' : '']"
-		(click)="onCategoryClick()">
+		(click)="onCategoryClick()"
+		[matTooltip]="collapsed ? getCategoryLabel() : ''"
+		matTooltipPosition="right">
 		<mat-icon class="node-icon">description</mat-icon>
 		@if (!collapsed) {
 			<span class="node-label">Form Models</span>

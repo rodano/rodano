@@ -2,7 +2,9 @@
 	<div
 		[ngClass]="['node-content', 'clickable', 'theme-main', collapsed ? 'node-collapsed' : '']"
 		[class.selected]="selected"
-		(click)="onCategoryClick()">
+		(click)="onCategoryClick()"
+		[matTooltip]="collapsed ? 'Project Settings' : ''"
+		matTooltipPosition="right">
 		<mat-icon class="node-icon">menu_book</mat-icon>
 		@if (!collapsed) {
 			<span class="node-label">Project Settings</span>

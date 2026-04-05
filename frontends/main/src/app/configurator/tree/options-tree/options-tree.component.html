@@ -1,6 +1,8 @@
 <div class="tree-node">
 	<div [ngClass]="['node-content', 'clickable', 'theme-options', selected ? 'selected' : '', collapsed ? 'node-collapsed' : '']"
-	     (click)="categoryClicked.emit()">
+	     (click)="categoryClicked.emit()"
+	     [matTooltip]="collapsed ? 'Options' : ''"
+	     matTooltipPosition="right">
 		<mat-icon class="node-icon">tune</mat-icon>
 		@if (!collapsed) {
 			<span class="node-label">Options</span>

@@ -1,6 +1,8 @@
 <div class="tree-node">
 	<div [ngClass]="['node-content', 'clickable', getCategoryTheme(), expanded ? 'selected' : '', collapsed ? 'node-collapsed' : '']"
-						(click)="onCategoryClick()">
+	     (click)="onCategoryClick()"
+	     [matTooltip]="collapsed ? getCategoryLabel() : ''"
+	     matTooltipPosition="right">
 		<mat-icon class="node-icon">{{ getCategoryIcon() }}</mat-icon>
 		@if (!collapsed) {
 			<span class="node-label">{{ getCategoryLabel() }}</span>
