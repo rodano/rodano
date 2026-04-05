@@ -138,6 +138,11 @@
 	--entity-highlight: rgba(131, 24, 67, 0.12);
 }
 
+.theme-options {
+	--entity-color: #546e7a;
+	--entity-highlight: rgb(84 110 122 / 0.12);
+}
+
 .status-badge.standalone {
 	background-color: #1e293b;
 	color: #ffffff;

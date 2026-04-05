@@ -1273,4 +1273,13 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.selectedMenuId = context.selectedMenuId;
 		});
 	}
+
+	onProjectTitleClick(): void {
+		this.confirmDiscardIfChanged().subscribe(confirmed => {
+			if(confirmed) {
+				this.selectedNode = null;
+				this.treeComponent.expandedCategory = null;
+			}
+		});
+	}
 }

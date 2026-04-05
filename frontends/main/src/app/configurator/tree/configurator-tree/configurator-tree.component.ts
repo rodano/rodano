@@ -26,6 +26,7 @@ import {
 import {CronTreeComponent} from '../cron-tree/cron-tree.component';
 import {MenuTreeComponent} from '../menu-tree/menu-tree.component';
 import {MatTooltip} from '@angular/material/tooltip';
+import {OptionsTreeComponent} from '../options-tree/options-tree.component';
 
 @Component({
 	selector: 'app-configurator-tree',
@@ -52,7 +53,8 @@ import {MatTooltip} from '@angular/material/tooltip';
 		RuleDefinitionActionTreeComponent,
 		CronTreeComponent,
 		MenuTreeComponent,
-		MatTooltip
+		MatTooltip,
+		OptionsTreeComponent
 	],
 	templateUrl: './configurator-tree.component.html',
 	styleUrls: ['../tree-shared.css']
@@ -117,7 +119,7 @@ export class ConfiguratorTreeComponent implements OnInit {
 
 	collapsed = false;
 
-	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | null = null;
+	expandedCategory: 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | 'options' | null = null;
 
 	ngOnInit(): void {
 		this.collapsed = localStorage.getItem('configurator-tree-collapsed') === 'true';
@@ -261,6 +263,13 @@ export class ConfiguratorTreeComponent implements OnInit {
 		this.runGuarded(() => {
 			this.expandedCategory = this.expandedCategory === 'menus' ? null : 'menus';
 			this.categoryClicked.emit('menus');
+		});
+	}
+
+	onOptionsClicked(): void {
+		this.runGuarded(() => {
+			this.expandedCategory = null;
+			this.categoryClicked.emit('project-options');
 		});
 	}
 

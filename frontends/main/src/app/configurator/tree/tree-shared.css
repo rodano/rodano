@@ -222,12 +222,18 @@
 }
 
 .tree-scroll-area {
+	display: flex;
+	flex-direction: column;
 	flex: 1;
 	overflow-y: auto;
 	overflow-x: hidden;
 	min-height: 0;
 	padding: 0.5rem;
 	box-sizing: border-box;
+}
+
+.tree-spacer {
+	flex: 1;
 }
 
 .tree-collapse-btn {

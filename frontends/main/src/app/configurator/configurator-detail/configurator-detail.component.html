@@ -200,6 +200,14 @@
 					(menuContextChanged)="onMenuContextChanged($event)">
 				</app-menu-list>
 			}
+			@case ('project-options') {
+				<app-project-options
+					[projectId]="projectId"
+					[project]="project"
+					[selectedNode]="selectedNode"
+					(nodeSelected)="onOptionsSelected($event)">
+				</app-project-options>
+			}
 			@default {
 				<div class="detail-header">
 					<h2>{{ selectedNode }}</h2>

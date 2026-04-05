@@ -30,6 +30,7 @@ import {
 } from '../rule-definition/rule-definition-action-list/rule-definition-action-list.component';
 import {CronListComponent} from '../cron/cron-list/cron-list.component';
 import {MenuListComponent} from '../menu/menu-list/menu-list.component';
+import { ProjectOptionsComponent } from '../project-options/project-options.component';
 
 @Component({
 	selector: 'app-configurator-detail',
@@ -58,6 +59,7 @@ import {MenuListComponent} from '../menu/menu-list/menu-list.component';
 		RuleDefinitionActionListComponent,
 		CronListComponent,
 		MenuListComponent,
+		ProjectOptionsComponent,
 		EmptyStateComponent
 	]
 })
@@ -208,7 +210,7 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		selectedMenuId: string | null;
 	}>();
 
-	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | 'overview' | null = null;
+	selectedNodeType: 'project-settings' | 'scope-models' | 'dataset-models' | 'validators' | 'workflows' | 'profiles' | 'features' | 'privacy-policies' | 'resource-categories' | 'reports' | 'charts' | 'form-models' | 'timeline-graphs' | 'workflow-widgets' | 'workflow-summaries' | 'rule-definition-properties' | 'rule-definition-actions' | 'crons' | 'menus' | 'project-options' | 'overview' | null = null;
 
 	ngOnChanges(changes: SimpleChanges): void {
 		if(changes['selectedNode']) {
@@ -378,6 +380,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 		this.menusChanged.emit(value);
 	}
 
+	onOptionsSelected(nodeId: string | null): void {
+		this.selectedNode = nodeId;
+		this.nodeSelected.emit(nodeId);
+	}
+
 	private determineNodeType(): void {
 		if(!this.selectedNode) {
 			this.selectedNodeType = 'overview';
@@ -496,6 +503,11 @@ export class ConfiguratorDetailComponent implements OnChanges {
 
 		if(this.selectedNode === 'menus') {
 			this.selectedNodeType = 'menus';
+			return;
+		}
+
+		if(this.selectedNode === 'project-options' || this.selectedNode === 'options-triggers') {
+			this.selectedNodeType = 'project-options';
 			return;
 		}
 

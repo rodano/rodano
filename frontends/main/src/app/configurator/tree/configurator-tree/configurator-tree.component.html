@@ -181,6 +181,14 @@
 			[selectedCronId]="selectedCronId"
 			(categoryClicked)="onCronClicked()">
 		</app-cron-tree>
+
+		<div class="tree-spacer"></div>
+
+		<app-options-tree
+			[collapsed]="collapsed"
+			[selected]="selectedNode === 'project-options' || selectedNode === 'options-triggers'"
+			(categoryClicked)="onOptionsClicked()">
+		</app-options-tree>
 	</div>
 
 	<div class="tree-collapse-btn" (click)="toggleCollapsed()" [matTooltip]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'">

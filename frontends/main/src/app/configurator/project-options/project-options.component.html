@@ -1,0 +1,83 @@
+<app-list-header title="Options" subtitle="Project-wide settings and actions" />
+
+@if (selectedRule && viewMode === 'triggers') {
+	<div class="fullscreen">
+		<div class="breadcrumb">
+			<button class="breadcrumb-btn" (click)="backToOptions()">
+				<mat-icon>tune</mat-icon>
+				<span>Options</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<button class="breadcrumb-btn" (click)="backToTriggers()">
+				<mat-icon>bolt</mat-icon>
+				<span>Triggers</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">{{ selectedRule.description || 'Unnamed rule' }}</span>
+
+			<div class="breadcrumb-actions">
+				@if (ruleModified) {
+					<button class="breadcrumb-btn" (click)="onRevertRule()" matTooltip="Revert changes">
+						<mat-icon>undo</mat-icon>
+						Revert
+					</button>
+					<button class="breadcrumb-btn breadcrumb-btn-active" (click)="onSaveRule()" matTooltip="Save rule">
+						<mat-icon>save</mat-icon>
+						Save
+					</button>
+				}
+			</div>
+		</div>
+
+		<app-rule-detail
+			[rule]="selectedRule"
+			[projectId]="projectId"
+			[entityPath]="'triggers'"
+			[availableDomains]="activeTriggerDomains"
+			(ruleSaved)="onRuleSaved($event)"
+			(ruleChanged)="onRuleChanged()">
+		</app-rule-detail>
+	</div>
+} @else if (viewMode === 'triggers') {
+	<div class="fullscreen">
+		<div class="breadcrumb">
+			<button class="breadcrumb-btn" (click)="backToOptions()">
+				<mat-icon>tune</mat-icon>
+				<span>Options</span>
+			</button>
+			<mat-icon class="breadcrumb-sep">chevron_right</mat-icon>
+			<span class="breadcrumb-current">Triggers</span>
+		</div>
+
+		<app-rule-list
+			[projectId]="projectId"
+			[entityPath]="'triggers'"
+			[ruleTypes]="ruleTypes"
+			(editRule)="switchToRuleEditor($event)">
+		</app-rule-list>
+	</div>
+} @else {
+	<div class="options-grid">
+		<div class="option-card" (click)="switchToTriggers()">
+			<div class="option-card-icon theme-trigger">
+				<mat-icon>bolt</mat-icon>
+			</div>
+			<div class="option-card-content">
+				<h3>Triggers</h3>
+				<p>Configure rules that fire on system events</p>
+			</div>
+			<mat-icon class="option-card-arrow">chevron_right</mat-icon>
+		</div>
+
+		<div class="option-card option-card-disabled">
+			<div class="option-card-icon theme-export">
+				<mat-icon>download</mat-icon>
+			</div>
+			<div class="option-card-content">
+				<h3>Export Configuration</h3>
+				<p>Download the full project configuration as JSON</p>
+			</div>
+			<mat-icon class="option-card-arrow">chevron_right</mat-icon>
+		</div>
+	</div>
+}

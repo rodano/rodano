@@ -122,7 +122,8 @@
 .detail-container > app-rule-definition-property-list,
 .detail-container > app-rule-definition-action-list,
 .detail-container > app-cron-list,
-.detail-container > app-menu-list {
+.detail-container > app-menu-list,
+.detail-container > app-project-options {
 	flex: 1;
 	min-height: 0;
 	display: flex;

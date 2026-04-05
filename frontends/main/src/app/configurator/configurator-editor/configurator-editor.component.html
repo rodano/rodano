@@ -14,7 +14,7 @@
 					matTooltip="Back to Overview">
 					<mat-icon>arrow_back</mat-icon>
 				</button>
-				<div class="project-info">
+				<div class="project-info" (click)="onProjectTitleClick()">
 					<h1 class="project-title">{{ languageService.getTranslatedName(project?.shortname) }}</h1>
 					<span class="project-code">{{ project?.code }}</span>
 				</div>
@@ -70,7 +70,7 @@
 					(click)="onCreateSnapshot()"
 					[disabled]="saving"
 					matTooltip="Create Snapshot">
-					<mat-icon>photo_camera</mat-icon>
+					<mat-icon>camera</mat-icon>
 				</button>
 				<button
 					class="btn-icon"
