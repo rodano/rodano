@@ -98,4 +98,8 @@ export class ConfiguratorService {
 	exportConfig(projectId: string): Observable<Blob> {
 		return this.http.get(`/api/superuser/configurator/projects/${projectId}/config/export`, {responseType: 'blob'});
 	}
+
+	cloneProject(projectId: string, request: any): Observable<ConfiguratorProject> {
+		return this.http.post<ConfiguratorProject>(`/api/superuser/configurator/projects/${projectId}/clone`, request);
+	}
 }

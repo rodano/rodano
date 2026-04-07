@@ -82,4 +82,9 @@ public interface ConfiguratorService {
 	 * Get all snapshots for a version
 	 */
 	ConfigSnapshotDTO getSnapshots(UUID projectId, Long versionId);
+
+	/**
+	 * Clone the configuration from an existing project
+	 */
+	ConfiguratorProjectDTO cloneProject(UUID sourceProjectId, CreateProjectRequest request);
 }

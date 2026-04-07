@@ -324,6 +324,13 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 		}
 	}
 
+	@Override
+	public ConfiguratorProjectDTO cloneProject(final UUID sourceProjectId, final CreateProjectRequest request) {
+		final var newProject = configuratorDAOService.createProject(request);
+		snapshotRestoreService.cloneProjectData(sourceProjectId, newProject.projectId());
+		return newProject;
+	}
+
 	private String compressToBase64(final String json) throws IOException {
 		final var bos = new ByteArrayOutputStream();
 		try(final var gz = new GZIPOutputStream(bos)) {

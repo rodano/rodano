@@ -1,7 +1,7 @@
-import {Component} from '@angular/core';
+import {Component, Inject, Optional } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatDialogModule, MatDialogRef} from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
 import {MatIconModule} from '@angular/material/icon';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import {MatTooltipModule} from '@angular/material/tooltip';
@@ -30,6 +30,7 @@ import {MatSelectChange, MatSelectModule} from '@angular/material/select';
 export class CreateProjectDialogComponent {
 	projectForm: FormGroup;
 	loading = false;
+	cloneMode = false;
 
 	selectedLanguages: {code: string; name: string; isDefault: boolean}[] = [];
 
@@ -38,13 +39,15 @@ export class CreateProjectDialogComponent {
 	constructor(
 		private fb: FormBuilder,
 		private configuratorService: ConfiguratorService,
-		private dialogRef: MatDialogRef<CreateProjectDialogComponent>
+		private dialogRef: MatDialogRef<CreateProjectDialogComponent>,
+		@Inject(MAT_DIALOG_DATA) @Optional() private data: {cloneMode?: boolean} | null
 	) {
 		this.projectForm = this.fb.group({
 			code: ['', [Validators.required, Validators.pattern(/^[A-Z0-9_]+$/)]],
 			url: ['', Validators.pattern(/^https?:\/\/.+/)],
 			color: ['#5bd4d4']
 		});
+		this.cloneMode = data?.cloneMode ?? false;
 	}
 
 	onIdInput(event: Event): void {
@@ -60,8 +63,6 @@ export class CreateProjectDialogComponent {
 			this.languageForms.forEach(form => form.markAllAsTouched());
 			return;
 		}
-
-		this.loading = true;
 
 		const formValue = this.projectForm.value;
 
@@ -97,6 +98,12 @@ export class CreateProjectDialogComponent {
 			languages: languages
 		};
 
+		if(this.cloneMode) {
+			this.dialogRef.close(request);
+			return;
+		}
+
+		this.loading = true;
 		this.configuratorService.createProject(request).subscribe({
 			next: project => {
 				this.loading = false;
@@ -233,7 +240,7 @@ export class CreateProjectDialogComponent {
 			return false;
 		}
 
-		for(const [_, form] of this.languageForms) {
+		for(const [, form] of this.languageForms) {
 			if(form.invalid) {
 				return false;
 			}

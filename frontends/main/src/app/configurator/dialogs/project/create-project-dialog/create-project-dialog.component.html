@@ -1,5 +1,5 @@
 <div class="dialog-container">
-	<h2 class="dialog-title">Create New Project</h2>
+	<h2 class="dialog-title">{{ cloneMode ? 'Clone Project' : 'Create New Project' }}</h2>
 
 	<div class="dialog-content">
 		<form [formGroup]="projectForm" class="project-form">
@@ -178,12 +178,11 @@
 		<button class="btn-secondary" (click)="onCancel()" [disabled]="loading">
 			Cancel
 		</button>
-		<button
-			class="btn-primary" (click)="onSubmit()" [disabled]="loading || !isFormValid()">
+		<button class="btn-primary" (click)="onSubmit()" [disabled]="loading || !isFormValid()">
 			@if (loading) {
 				<mat-spinner diameter="20"></mat-spinner>
 			} @else {
-				<span>Create & Configure</span>
+				<span>{{ cloneMode ? 'Clone Project' : 'Create & Configure' }}</span>
 			}
 		</button>
 	</div>

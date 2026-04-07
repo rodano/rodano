@@ -216,6 +216,17 @@ public class ConfiguratorController {
 	}
 
 	/**
+	 * Clone the configuration from an existing project
+	 */
+	@PostMapping("/projects/{projectId}/clone")
+	public ConfiguratorProjectDTO cloneProject(
+		@PathVariable final UUID projectId,
+		@RequestBody final CreateProjectRequest request
+	) {
+		return configuratorService.cloneProject(projectId, request);
+	}
+
+	/**
 	 * Request record for publishing a draft
 	 */
 	public record PublishRequest(String changeSummary) {

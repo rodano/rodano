@@ -3,10 +3,12 @@ package ch.rodano.core.services.bll.configurator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import org.jooq.DSLContext;
 import org.jooq.Table;
@@ -176,7 +178,6 @@ public class SnapshotRestoreService {
 		return tables;
 	}
 
-	@Transactional
 	public void restoreProjectData(final UUID projectId, final Map<String, String> tables) {
 		deleteAll(projectId);
 		dslContext.execute("SET FOREIGN_KEY_CHECKS = 0");
@@ -214,6 +215,76 @@ public class SnapshotRestoreService {
 					.where(projectIdField.eq(projectId))
 					.execute();
 			}
+		}
+		finally {
+			dslContext.execute("SET FOREIGN_KEY_CHECKS = 1");
+		}
+	}
+
+	@Transactional
+	public void cloneProjectData(final UUID sourceProjectId, final UUID targetProjectId) {
+		final Map<String, String> tables = captureProjectData(sourceProjectId);
+
+		final Pattern uuidPattern = Pattern.compile(
+			"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+			Pattern.CASE_INSENSITIVE
+		);
+
+		final Map<String, String> uuidMapping = new HashMap<>();
+		uuidMapping.put(sourceProjectId.toString(), targetProjectId.toString());
+
+		for(final String json : tables.values()) {
+			final var matcher = uuidPattern.matcher(json);
+			while(matcher.find()) {
+				final String found = matcher.group().toLowerCase();
+				if(!found.equals(sourceProjectId.toString())) {
+					uuidMapping.computeIfAbsent(found, _ -> UUID.randomUUID().toString());
+				}
+			}
+		}
+
+		final Map<String, String> remapped = new LinkedHashMap<>();
+		for(final var entry : tables.entrySet()) {
+			String json = entry.getValue();
+			for(final var mapping : uuidMapping.entrySet()) {
+				json = json.replace(mapping.getKey(), mapping.getValue());
+			}
+			remapped.put(entry.getKey(), json);
+		}
+
+		final var targetLanguages = dslContext.selectFrom(PROJECT_LANGUAGE)
+			.where(PROJECT_LANGUAGE.PROJECT_ID.eq(targetProjectId))
+			.fetch();
+
+		deleteAll(targetProjectId);
+
+		dslContext.execute("SET FOREIGN_KEY_CHECKS = 0");
+		try {
+			for(final Table<?> table : TABLE_ORDER) {
+				if(table.equals(PROJECT_LANGUAGE)) {
+					continue;
+				}
+
+				final String json = remapped.get(table.getName());
+				if(json == null) {
+					continue;
+				}
+				dslContext.loadInto(table)
+					.loadJSON(json)
+					.fields(table.fields())
+					.execute();
+			}
+
+			for(final var lang : targetLanguages) {
+				dslContext.insertInto(PROJECT_LANGUAGE)
+					.set(PROJECT_LANGUAGE.PROJECT_ID, lang.getProjectId())
+					.set(PROJECT_LANGUAGE.LANGUAGE, lang.getLanguage())
+					.set(PROJECT_LANGUAGE.IS_DEFAULT, lang.getIsDefault())
+					.execute();
+			}
+		}
+		catch(IOException e) {
+			throw new RuntimeException("Failed to clone project data", e);
 		}
 		finally {
 			dslContext.execute("SET FOREIGN_KEY_CHECKS = 1");

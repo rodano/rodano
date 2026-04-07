@@ -232,8 +232,26 @@ export class ConfiguratorListComponent implements OnInit {
 	}
 
 	copyProject(project: ConfiguratorProject): void {
-		//TODO: Implement copy project
-		console.log('Copy project:', project.projectId);
+		const dialogRef = this.dialog.open(CreateProjectDialogComponent, {
+			width: '500px',
+			disableClose: true,
+			autoFocus: false,
+			data: {cloneMode: true}
+		});
+
+		dialogRef.afterClosed().subscribe(result => {
+			if(!result) {
+				return;
+			}
+
+			this.configuratorService.cloneProject(project.projectId!, result).subscribe({
+				next: newProject => {
+					this.snackBar.open('Project cloned successfully', 'Close', {duration: 3000});
+					this.router.navigate(['/configurator/projects', newProject.projectId, 'edit']);
+				},
+				error: () => this.snackBar.open('Failed to clone project', 'Close', {duration: 3000})
+			});
+		});
 	}
 
 	archiveProject(project: ConfiguratorProject): void {
