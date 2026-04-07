@@ -19,6 +19,8 @@ import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.compon
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
 import {Rule} from '@core/model/rule';
 import {RuleListComponent} from '../../../rules/rule-list/rule-list.component';
+import {UsedByComponent} from '../../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-field-model-detail',
@@ -26,7 +28,7 @@ import {RuleListComponent} from '../../../rules/rule-list/rule-list.component';
 	templateUrl: './field-model-detail.component.html',
 	styleUrls: ['./field-model-detail.component.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
-		RuleListComponent]
+		RuleListComponent, UsedByComponent]
 })
 export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldModel> {
 	@Input() fieldModelId = '';
@@ -43,6 +45,7 @@ export class FieldModelDetailComponent extends BaseDraftDetailComponent<FieldMod
 
 	constructor(
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private fieldModelDialogService: FieldModelDialogService,
 		private fieldModelManager: FieldModelManagerService,
 		private validatorManager: ValidatorManagerService,

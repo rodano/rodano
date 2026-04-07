@@ -16,13 +16,16 @@ import {DatasetModelManagerService} from '../../services/manager/dataset-model-m
 import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-report-detail',
 	standalone: true,
 	templateUrl: './report-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class ReportDetailComponent extends BaseManagerDetailComponent<Report, ReportManagerService> {
 	@Input() override entity!: Report;
@@ -37,6 +40,7 @@ export class ReportDetailComponent extends BaseManagerDetailComponent<Report, Re
 
 	constructor(
 		reportManager: ReportManagerService,
+		public navigationService: ConfiguratorNavigationService,
 		private workflowManager: WorkflowManagerService,
 		private datasetModelManager: DatasetModelManagerService,
 		private fieldModelManager: FieldModelManagerService,

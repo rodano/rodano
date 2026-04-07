@@ -125,6 +125,13 @@ export class FormModelListComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription.unsubscribe();
 	}
 
+	selectById(id: string): void {
+		const entity = this.formModels.find(fm => fm.formModelId === id);
+		if(entity) {
+			this.selectFormModel(entity);
+		}
+	}
+
 	get viewLevel(): number {
 		if(!this.selectedFormModel) {
 			return 0;

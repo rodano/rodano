@@ -101,7 +101,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-workflow">
+					<div class="chip theme-workflow clickable"
+					     (click)="navigationService.navigateTo('workflow', validator.workflowId)">
 						<mat-icon class="resource-icon">settings</mat-icon>
 						<span class="language-name">{{ getWorkflowLabel(validator.workflowId) }}</span>
 					</div>
@@ -115,7 +116,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-workflow-state">
+					<div class="chip theme-workflow-state clickable"
+					     (click)="navigationService.navigateTo('workflow-state', validator.invalidStateId)">
 						<mat-icon class="resource-icon">cancel</mat-icon>
 						<span class="language-name">{{ getWorkflowStateLabel(validator.invalidStateId) }}</span>
 					</div>
@@ -129,7 +131,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-workflow-state">
+					<div class="chip theme-workflow-state clickable"
+					     (click)="navigationService.navigateTo('workflow-state', validator.validStateId)">
 						<mat-icon class="resource-icon">check_circle</mat-icon>
 						<span class="language-name">{{ getWorkflowStateLabel(validator.validStateId) }}</span>
 					</div>
@@ -140,6 +143,10 @@
 			<mat-icon>edit</mat-icon>
 			Edit Workflow Configuration
 		</button>
+	</div>
+
+	<div class="settings-section">
+		<app-used-by [entityId]="validator.validatorId" />
 	</div>
 
 	<app-danger-zone

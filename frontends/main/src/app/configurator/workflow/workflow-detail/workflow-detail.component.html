@@ -98,7 +98,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-workflow">
+						<div class="chip theme-workflow clickable"
+						     (click)="navigationService.navigateTo('workflow', workflow.aggregatedWorkflowId)">
 							<mat-icon class="resource-icon">settings</mat-icon>
 							<span class="language-name">{{ getWorkflowLabel(workflow.aggregatedWorkflowId) }}</span>
 						</div>
@@ -122,7 +123,8 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip theme-workflow-state">
+							<div class="chip theme-workflow-state clickable"
+							     (click)="navigationService.navigateTo('workflow-state', workflow.initialStateId)">
 								<mat-icon class="resource-icon">adjust</mat-icon>
 								<span class="language-name">{{ getWorkflowStateLabel(workflow.initialStateId) }}</span>
 							</div>
@@ -147,7 +149,8 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip theme-workflow-action">
+							<div class="chip theme-workflow-action clickable"
+							     (click)="navigationService.navigateTo('workflow-action', workflow.actionId)">
 								<mat-icon class="resource-icon">play_circle</mat-icon>
 								<span class="language-name">{{ getWorkflowActionLabel(workflow.actionId) }}</span>
 							</div>
@@ -192,6 +195,10 @@
 				<mat-icon>edit</mat-icon>
 				Edit Message & Icon
 			</button>
+		</div>
+
+		<div class="settings-section">
+			<app-used-by [entityId]="workflow.workflowId" />
 		</div>
 
 		<app-danger-zone

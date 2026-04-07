@@ -15,13 +15,16 @@ import {WorkflowStateManagerService} from '../../services/manager/workflow-state
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-validator-detail',
 	standalone: true,
 	templateUrl: './validator-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class ValidatorDetailComponent extends BaseManagerDetailComponent<Validator, ValidatorManagerService> {
 	@Input() override entity!: Validator;
@@ -38,6 +41,7 @@ export class ValidatorDetailComponent extends BaseManagerDetailComponent<Validat
 	constructor(
 		validatorManager: ValidatorManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private validatorDialogService: ValidatorDialogService,

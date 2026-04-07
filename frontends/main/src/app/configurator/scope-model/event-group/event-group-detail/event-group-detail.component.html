@@ -94,6 +94,10 @@
 			</button>
 		</div>
 
+		<div class="settings-section">
+			<app-used-by [entityId]="draftEventGroup.eventGroupId" />
+		</div>
+
 		<app-danger-zone
 			[title]="'Delete Event Group'"
 			[message]="'Deleting this event group is permanent and cannot be undone.'"

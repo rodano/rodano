@@ -48,7 +48,8 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip theme-event-group">
+							<div class="chip theme-event-group clickable"
+							     (click)="navigationService.navigateTo('event-group', draftEventModel.eventGroupId)">
 								<mat-icon class="resource-icon">group</mat-icon>
 								<span class="language-name">{{ getEventGroupLabel(draftEventModel.eventGroupId) }}</span>
 							</div>
@@ -262,7 +263,8 @@
 							@if (draftEventModel.formModelIds && draftEventModel.formModelIds.length > 0) {
 								<div class="chip-container">
 									@for (formId of draftEventModel.formModelIds; track formId) {
-										<div class="chip theme-form-model">
+										<div class="chip theme-form-model clickable"
+										     (click)="navigationService.navigateTo('form-model', formId)">
 											<mat-icon class="resource-icon">description</mat-icon>
 											<span class="language-name">{{ getFormModelLabel(formId) }}</span>
 										</div>
@@ -285,7 +287,8 @@
 							@if (draftEventModel.datasetModelIds && draftEventModel.datasetModelIds.length > 0) {
 								<div class="chip-container">
 									@for (datasetId of draftEventModel.datasetModelIds; track datasetId) {
-										<div class="chip theme-dataset-model">
+										<div class="chip theme-dataset-model clickable"
+										     (click)="navigationService.navigateTo('dataset-model', datasetId)">
 											<mat-icon class="resource-icon">dataset</mat-icon>
 											<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
 										</div>
@@ -308,7 +311,8 @@
 							@if (draftEventModel.workflowIds && draftEventModel.workflowIds.length > 0) {
 								<div class="chip-container">
 									@for (workflowId of draftEventModel.workflowIds; track workflowId) {
-										<div class="chip theme-workflow">
+										<div class="chip theme-workflow clickable"
+										     (click)="navigationService.navigateTo('workflow', workflowId)">
 											<mat-icon class="resource-icon">settings</mat-icon>
 											<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 										</div>
@@ -340,7 +344,8 @@
 							@if (draftEventModel.blockedEventModelIds && draftEventModel.blockedEventModelIds.length > 0) {
 								<div class="chip-container">
 									@for (blockedId of draftEventModel.blockedEventModelIds; track blockedId) {
-										<div class="chip theme-event-model">
+										<div class="chip theme-event-model clickable"
+										     (click)="navigationService.navigateTo('event-model', blockedId)">
 											<mat-icon class="resource-icon">block</mat-icon>
 											<span class="language-name">{{ getEventModelLabel(blockedId) }}</span>
 										</div>
@@ -363,7 +368,8 @@
 							@if (draftEventModel.impliedEventModelIds && draftEventModel.impliedEventModelIds.length > 0) {
 								<div class="chip-container">
 									@for (impliedId of draftEventModel.impliedEventModelIds; track impliedId) {
-										<div class="chip theme-event-model">
+										<div class="chip theme-event-model clickable"
+										     (click)="navigationService.navigateTo('event-model', impliedId)">
 											<mat-icon class="resource-icon">arrow_forward</mat-icon>
 											<span class="language-name">{{ getEventModelLabel(impliedId) }}</span>
 										</div>
@@ -382,6 +388,10 @@
 					<mat-icon>edit</mat-icon>
 					Edit Relationships
 				</button>
+			</div>
+
+			<div class="settings-section">
+				<app-used-by [entityId]="draftEventModel.eventModelId" />
 			</div>
 
 			<app-danger-zone

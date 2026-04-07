@@ -51,7 +51,7 @@ export class ScopeModelDefaultSettingsDialogComponent extends BaseDialogComponen
 
 	onSave(): void {
 		this.dialogRef.close({
-			efaultProfileId: this.form.getRawValue().defaultProfileId || null
+			defaultProfileId: this.form.getRawValue().defaultProfileId || null
 		});
 	}
 }

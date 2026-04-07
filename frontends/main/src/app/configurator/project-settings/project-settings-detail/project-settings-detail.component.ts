@@ -9,6 +9,7 @@ import {LanguageService} from '../../services/language.service';
 import {Subscription} from 'rxjs';
 import {ProfileManagerService} from '../../services/manager/profile-manager.service';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-project-settings-detail',
@@ -29,6 +30,7 @@ export class ProjectSettingsDetailComponent implements OnInit, OnChanges, OnDest
 
 	constructor(
 		public languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private dialogService: ProjectSettingsDialogService,
 		private profileManager: ProfileManagerService
 	) {}

@@ -69,7 +69,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-workflow">
+					<div class="chip theme-workflow clickable"
+					     (click)="navigationService.navigateTo('workflow', profile.workflowOfInterestId)">
 						<mat-icon class="resource-icon">settings</mat-icon>
 						<span class="language-name">{{ getWorkflowLabel(profile.workflowOfInterestId) }}</span>
 					</div>
@@ -80,6 +81,10 @@
 			<mat-icon>edit</mat-icon>
 			Edit Basic Information
 		</button>
+	</div>
+
+	<div class="settings-section">
+		<app-used-by [entityId]="profile.profileId" />
 	</div>
 
 	<app-danger-zone

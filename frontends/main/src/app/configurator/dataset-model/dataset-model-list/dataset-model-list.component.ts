@@ -117,6 +117,24 @@ export class DatasetModelListComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription.unsubscribe();
 	}
 
+	selectById(id: string): void {
+		const entity = this.datasetModels.find(dm => dm.datasetModelId === id);
+		if(entity) {
+			this.selectDatasetModel(entity);
+		}
+	}
+
+	selectFieldModelById(id: string): void {
+		this.viewMode = 'field-list';
+		this.updateFilteredFieldModels();
+		if(this.currentFieldModels.some(fm => fm.fieldModelId === id)) {
+			this.selectedFieldModelId = id;
+			this.viewMode = 'field-detail';
+			this.nodeSelected.emit(`field-model-${id}`);
+			this.emitContext();
+		}
+	}
+
 	get viewLevel(): number {
 		if(!this.selectedDatasetModel) {
 			return 0;

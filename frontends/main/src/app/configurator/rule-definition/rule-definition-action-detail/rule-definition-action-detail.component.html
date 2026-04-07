@@ -112,6 +112,10 @@
 			</button>
 		</div>
 
+		<div class="settings-section">
+			<app-used-by [entityId]="ruleDefinitionAction.ruleDefinitionActionId" />
+		</div>
+
 		<app-danger-zone
 			[title]="'Delete Rule Definition Action'"
 			[message]="'Deleting this action is permanent and cannot be undone.'"

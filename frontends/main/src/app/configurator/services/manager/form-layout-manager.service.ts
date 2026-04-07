@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {Observable, of} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {Layout} from '@core/model/layout';
 import {FormLayoutService} from '../api/form-layout.service';
@@ -33,6 +33,24 @@ export class FormLayoutManagerService {
 				this.tracker.initialize(layouts);
 				this.loaded = true;
 				this.currentFormModelId = formModelId;
+				return this.tracker.getCurrent();
+			})
+		);
+	}
+
+	loadAllForFormModels(projectId: string, formModelIds: string[]): Observable<Layout[]> {
+		if(formModelIds.length === 0) {
+			return of([]);
+		}
+		return forkJoin(
+			formModelIds.map(id =>
+				this.formLayoutService.getLayouts(projectId, id)
+			)
+		).pipe(
+			map(results => {
+				const all = results.flat();
+				this.tracker.initialize(all);
+				this.loaded = true;
 				return this.tracker.getCurrent();
 			})
 		);

@@ -63,6 +63,10 @@
 			</button>
 		</div>
 
+		<div class="settings-section">
+			<app-used-by [entityId]="ruleDefinitionProperty.ruleDefinitionPropertyId" />
+		</div>
+
 		<app-danger-zone
 			[title]="'Delete Rule Definition Property'"
 			[message]="'Deleting this property is permanent and cannot be undone.'"

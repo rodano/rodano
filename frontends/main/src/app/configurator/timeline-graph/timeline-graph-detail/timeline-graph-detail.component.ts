@@ -15,13 +15,16 @@ import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.componen
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 import {ScopeModelManagerService} from '../../services/manager/scope-model-manager.service';
 import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-timeline-graph-detail',
 	standalone: true,
 	templateUrl: './timeline-graph-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class TimelineGraphDetailComponent extends BaseManagerDetailComponent<TimelineGraph, TimelineGraphManagerService> {
 	@Input() override entity!: TimelineGraph;
@@ -40,6 +43,7 @@ export class TimelineGraphDetailComponent extends BaseManagerDetailComponent<Tim
 	constructor(
 		timelineGraphManager: TimelineGraphManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private scopeModelManager: ScopeModelManagerService,
 		private eventModelManager: EventModelManagerService,
 		private timelineGraphDialogService: TimelineGraphDialogService,

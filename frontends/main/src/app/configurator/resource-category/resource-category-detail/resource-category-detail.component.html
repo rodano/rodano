@@ -86,6 +86,10 @@
 		</button>
 	</div>
 
+	<div class="settings-section">
+		<app-used-by [entityId]="resourceCategory.categoryId" />
+	</div>
+
 	<app-danger-zone
 		[title]="'Delete Resource Category'"
 		[message]="'Deleting this resource category is permanent and cannot be undone.'"

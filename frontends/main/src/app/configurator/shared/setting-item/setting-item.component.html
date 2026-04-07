@@ -10,7 +10,7 @@
 			<mat-icon class="modified-icon" matTooltip="Modified">edit</mat-icon>
 		}
 	</label>
-	<div [class.setting-value]="!plain" [class.not-configured]="notConfigured">
+	<div [class.setting-value]="!plain" [class.not-configured]="notConfigured && !plain">
 		<ng-content />
 	</div>
 </div>

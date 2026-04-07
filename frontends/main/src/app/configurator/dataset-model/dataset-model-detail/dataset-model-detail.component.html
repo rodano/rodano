@@ -185,6 +185,10 @@
 			</div>
 		}
 
+		<div class="settings-section">
+			<app-used-by [entityId]="datasetModel.datasetModelId" />
+		</div>
+
 		<app-danger-zone
 			[title]="'Delete Dataset Model'"
 			[message]="'Deleting this dataset model is permanent and cannot be undone.'"

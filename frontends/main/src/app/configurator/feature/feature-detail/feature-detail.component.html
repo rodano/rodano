@@ -66,6 +66,10 @@
 		</button>
 	</div>
 
+	<div class="settings-section">
+		<app-used-by [entityId]="feature.featureId" />
+	</div>
+
 	<app-danger-zone
 		[title]="'Delete Feature'"
 		[message]="'Deleting this feature is permanent and cannot be undone.'"

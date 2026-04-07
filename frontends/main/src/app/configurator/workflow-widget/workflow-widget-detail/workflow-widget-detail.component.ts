@@ -15,6 +15,8 @@ import {SettingItemComponent} from '../../shared/setting-item/setting-item.compo
 import {WorkflowWidgetConfig} from '@core/model/workflow-widget-config';
 import {WorkflowWidgetManagerService} from '../../services/manager/workflow-widget-manager.service';
 import {WorkflowWidgetDialogService} from '../../services/dialogs/workflow-widget-dialog.service';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -27,7 +29,8 @@ interface WorkflowStateGroup {
 	standalone: true,
 	templateUrl: './workflow-widget-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class WorkflowWidgetDetailComponent extends BaseManagerDetailComponent<WorkflowWidgetConfig, WorkflowWidgetManagerService> {
 	@Input() override entity!: WorkflowWidgetConfig;
@@ -58,6 +61,7 @@ export class WorkflowWidgetDetailComponent extends BaseManagerDetailComponent<Wo
 	constructor(
 		workflowWidgetManager: WorkflowWidgetManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private workflowManager: WorkflowManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private workflowWidgetDialogService: WorkflowWidgetDialogService,

@@ -127,6 +127,35 @@ export class WorkflowListComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription.unsubscribe();
 	}
 
+	selectById(id: string): void {
+		const entity = this.workflows.find(wf => wf.workflowId === id);
+		if(entity) {
+			this.selectWorkflow(entity);
+		}
+	}
+
+	selectStateById(id: string): void {
+		this.viewMode = 'state-list';
+		this.updateFilteredWorkflowStates();
+		if(this.currentWorkflowStates.some(s => s.workflowStateId === id)) {
+			this.selectedWorkflowStateId = id;
+			this.viewMode = 'state-detail';
+			this.nodeSelected.emit(`workflow-state-${id}`);
+			this.emitContext();
+		}
+	}
+
+	selectActionById(id: string): void {
+		this.viewMode = 'action-list';
+		this.updateFilteredWorkflowActions();
+		if(this.currentWorkflowActions.some(a => a.workflowActionId === id)) {
+			this.selectedWorkflowActionId = id;
+			this.viewMode = 'action-detail';
+			this.nodeSelected.emit(`workflow-action-${id}`);
+			this.emitContext();
+		}
+	}
+
 	get viewLevel(): number {
 		if(!this.selectedWorkflow) {
 			return 0;

@@ -17,13 +17,16 @@ import {SettingItemComponent} from '../../shared/setting-item/setting-item.compo
 import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
 import {DatasetModelManagerService} from '../../services/manager/dataset-model-manager.service';
 import {FieldModelManagerService} from '../../services/manager/field-model-manager.service';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-timeline-graph-section-detail',
 	standalone: true,
 	templateUrl: './timeline-graph-section-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class TimelineGraphSectionDetailComponent extends BaseDraftDetailComponent<TimelineGraphSection> {
 	@Input() graphSectionId = '';
@@ -36,6 +39,7 @@ export class TimelineGraphSectionDetailComponent extends BaseDraftDetailComponen
 
 	constructor(
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private timelineGraphSectionDialogService: TimelineGraphSectionDialogService,
 		private timelineGraphSectionManager: TimelineGraphSectionManagerService,
 		private eventModelManager: EventModelManagerService,

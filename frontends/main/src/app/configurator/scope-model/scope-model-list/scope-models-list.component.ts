@@ -134,6 +134,35 @@ export class ScopeModelsListComponent implements OnInit, OnChanges, OnDestroy {
 		this.languageSubscription.unsubscribe();
 	}
 
+	selectById(id: string): void {
+		const entity = this.scopeModels.find(sm => sm.scopeModelId === id);
+		if(entity) {
+			this.selectScopeModel(entity);
+		}
+	}
+
+	selectEventModelById(id: string): void {
+		this.viewMode = 'event-list';
+		this.updateFilteredEventModels();
+		if(this.currentEventModels.some(em => em.eventModelId === id)) {
+			this.selectedEventModelId = id;
+			this.viewMode = 'event-detail';
+			this.nodeSelected.emit(`event-model-${id}`);
+			this.emitContext();
+		}
+	}
+
+	selectEventGroupById(id: string): void {
+		this.viewMode = 'event-group-list';
+		this.updateFilteredEventGroups();
+		if(this.currentEventGroups.some(eg => eg.eventGroupId === id)) {
+			this.selectedEventGroupId = id;
+			this.viewMode = 'event-group-detail';
+			this.nodeSelected.emit(`event-group-${id}`);
+			this.emitContext();
+		}
+	}
+
 	get viewLevel(): number {
 		if(!this.selectedScopeModel) {
 			return 0;

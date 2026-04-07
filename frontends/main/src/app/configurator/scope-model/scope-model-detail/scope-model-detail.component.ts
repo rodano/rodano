@@ -23,6 +23,8 @@ import {SettingItemComponent} from '../../shared/setting-item/setting-item.compo
 import {FormModelManagerService} from '../../services/manager/form-model-manager.service';
 import {Rule} from '@core/model/rule';
 import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 interface WorkflowStateGroup {
 	workflowId: string;
@@ -36,7 +38,7 @@ interface WorkflowStateGroup {
 	templateUrl: './scope-model-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
-		RuleListComponent]
+		RuleListComponent, UsedByComponent]
 })
 export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeModel, ScopeModelManagerService> {
 	@Input() override entity!: ScopeModel;
@@ -66,6 +68,7 @@ export class ScopeModelDetailComponent extends BaseManagerDetailComponent<ScopeM
 	constructor(
 		scopeModelManager: ScopeModelManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private scopeModelDialogService: ScopeModelDialogService,
 		private datasetModelManager: DatasetModelManagerService,
 		private formModelManager: FormModelManagerService,

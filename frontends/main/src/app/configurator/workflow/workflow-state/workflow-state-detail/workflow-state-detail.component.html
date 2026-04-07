@@ -104,7 +104,8 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip theme-workflow-state">
+							<div class="chip theme-workflow-state clickable"
+							     (click)="navigationService.navigateTo('workflow-state', draftWorkflowState.aggregateStateId)">
 								<mat-icon class="resource-icon">adjust</mat-icon>
 								<span class="language-name">{{ getWorkflowStateLabel(draftWorkflowState.aggregateStateId) }}</span>
 							</div>
@@ -139,7 +140,8 @@
 						@if (draftWorkflowState.possibleActions.length > 0) {
 							<div class="chip-container">
 								@for (action of draftWorkflowState.possibleActions; track action.workflowActionId) {
-									<div class="chip theme-workflow-action">
+									<div class="chip theme-workflow-action clickable"
+									     (click)="navigationService.navigateTo('workflow-action', action.workflowActionId)">
 										<mat-icon class="resource-icon">play_circle</mat-icon>
 										<span class="tag">{{ languageService.getLabel(action) }}</span>
 									</div>
@@ -158,6 +160,10 @@
 				<mat-icon>edit</mat-icon>
 				Edit Possible Actions
 			</button>
+		</div>
+
+		<div class="settings-section">
+			<app-used-by [entityId]="draftWorkflowState.workflowStateId" />
 		</div>
 
 		<app-danger-zone

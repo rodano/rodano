@@ -449,7 +449,8 @@
 							@if (draftFieldModel.validatorIds && draftFieldModel.validatorIds.length > 0) {
 								<div class="chip-container">
 									@for (validatorId of draftFieldModel.validatorIds; track validatorId) {
-										<div class="chip theme-validator">
+										<div class="chip theme-validator clickable"
+										     (click)="navigationService.navigateTo('validator', validatorId)">
 											<mat-icon class="resource-icon">rule</mat-icon>
 											<span class="language-name">{{ getValidatorLabel(validatorId) }}</span>
 										</div>
@@ -472,7 +473,8 @@
 							@if (draftFieldModel.workflowIds && draftFieldModel.workflowIds.length > 0) {
 								<div class="chip-container">
 									@for (workflowId of draftFieldModel.workflowIds; track workflowId) {
-										<div class="chip theme-workflow">
+										<div class="chip theme-workflow clickable"
+										     (click)="navigationService.navigateTo('workflow', workflowId)">
 											<mat-icon class="resource-icon">settings</mat-icon>
 											<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 										</div>
@@ -491,6 +493,10 @@
 					<mat-icon>edit</mat-icon>
 					Edit Resources
 				</button>
+			</div>
+
+			<div class="settings-section">
+				<app-used-by [entityId]="draftFieldModel.fieldModelId" />
 			</div>
 
 			<app-danger-zone

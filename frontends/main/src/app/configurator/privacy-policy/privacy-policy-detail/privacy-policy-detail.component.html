@@ -81,7 +81,8 @@
 					@if (privacyPolicy.profileIds.length > 0) {
 						<div class="chip-container">
 							@for (profileId of privacyPolicy.profileIds; track profileId) {
-								<div class="chip theme-profile">
+								<div class="chip theme-profile clickable"
+								     (click)="navigationService.navigateTo('profile', profileId)">
 									<mat-icon class="resource-icon">badge</mat-icon>
 									<span class="language-name">{{ getProfileLabel(profileId) }}</span>
 								</div>
@@ -100,6 +101,10 @@
 			<mat-icon>edit</mat-icon>
 			Edit Resources
 		</button>
+	</div>
+
+	<div class="settings-section">
+		<app-used-by [entityId]="privacyPolicy.policyId" />
 	</div>
 
 	<app-danger-zone

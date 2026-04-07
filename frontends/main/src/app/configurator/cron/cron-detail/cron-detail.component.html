@@ -67,6 +67,10 @@
 			</button>
 		</div>
 
+		<div class="settings-section">
+			<app-used-by [entityId]="cron.cronId" />
+		</div>
+
 		<app-danger-zone
 			[title]="'Delete Cron'"
 			[message]="'Deleting this cron is permanent and cannot be undone.'"

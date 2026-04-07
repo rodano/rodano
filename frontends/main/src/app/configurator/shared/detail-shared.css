@@ -215,6 +215,16 @@
 	border: 1px solid #93c5fd;
 }
 
+.chip.clickable {
+	cursor: pointer;
+	transition: background-color 0.15s, border-color 0.15s;
+}
+
+.chip.clickable:hover {
+	background-color: color-mix(in srgb, var(--entity-color) 15%, transparent);
+	border-color: var(--entity-color);
+}
+
 /* ==================== Color Preview ==================== */
 .color-preview {
 	display: flex;
@@ -496,5 +506,73 @@
 .empty-value {
 	color: #9ca3af;
 	font-style: italic;
+}
+
+.icon-preview {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: #374151;
+}
+
+.icon-preview mat-icon {
+	font-size: 1.5rem;
+	width: 1.5rem;
+	height: 1.5rem;
+	flex-shrink: 0;
+}
+
+.icon-preview span {
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+/* ==================== Used By Section ==================== */
+.used-by-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+}
+
+.used-by-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.625rem 0.75rem;
+	background: none;
+	border: 1px solid #e5e7eb;
+	border-radius: 0.375rem;
+	cursor: pointer;
+	font-size: 0.875rem;
+	color: #374151;
+	text-align: left;
+	transition: background 0.15s;
+	width: 100%;
+}
+
+.used-by-item:hover {
+	background-color: #f3f4f6;
+	border-color: var(--entity-color);
+}
+
+.used-by-type {
+	font-weight: 600;
+	color: var(--entity-color);
+	min-width: 8rem;
+}
+
+.used-by-icon {
+	color: var(--entity-color);
+}
+
+.used-by-name {
+	flex: 1;
+	color: #111827;
+}
+
+.used-by-arrow {
+	color: #9ca3af;
+	margin-left: auto;
+	flex-shrink: 0;
 }
 

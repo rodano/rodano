@@ -1,8 +1,9 @@
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {forkJoin, Observable, of} from 'rxjs';
 import {TimelineGraphSection} from '@core/model/timeline-graph-section';
 import {TimelineGraphSectionService} from '../api/timeline-graph-section.service';
 import {BaseManagerService} from './base-manager.service';
+import {map} from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
 export class TimelineGraphSectionManagerService extends BaseManagerService<TimelineGraphSection> {
@@ -36,6 +37,24 @@ export class TimelineGraphSectionManagerService extends BaseManagerService<Timel
 		this.currentTimelineGraphId = timelineGraphId;
 		this.invalidate();
 		return this.load(projectId);
+	}
+
+	loadAllForGraphs(projectId: string, timelineGraphIds: string[]): Observable<TimelineGraphSection[]> {
+		if(timelineGraphIds.length === 0) {
+			return of([]);
+		}
+		return forkJoin(
+			timelineGraphIds.map(id =>
+				this.timelineGraphSectionService.getSections(projectId, id)
+			)
+		).pipe(
+			map(results => {
+				const all = results.flat();
+				this.tracker.initialize(all);
+				this.loaded = true;
+				return this.tracker.getCurrent();
+			})
+		);
 	}
 
 	protected fetchAll(projectId: string): Observable<TimelineGraphSection[]> {

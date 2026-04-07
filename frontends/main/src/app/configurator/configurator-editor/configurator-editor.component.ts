@@ -44,6 +44,7 @@ import {RuleDefinitionPropertyManagerService} from '../services/manager/rule-def
 import {RuleDefinitionActionManagerService} from '../services/manager/rule-definition-action-manager.service';
 import {CronManagerService} from '../services/manager/cron-manager.service';
 import {MenuManagerService} from '../services/manager/menu-manager.service';
+import {ConfiguratorNavigationService, NavigationRequest} from '../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-configurator-editor',
@@ -183,6 +184,7 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		private ruleDefinitionActionManager: RuleDefinitionActionManagerService,
 		private cronManager: CronManagerService,
 		private menuManager: MenuManagerService,
+		private navigationService: ConfiguratorNavigationService,
 		private snackBar: MatSnackBar,
 		private dialog: MatDialog
 	) {}
@@ -193,6 +195,9 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			if(this.projectId) {
 				this.initializeProject();
 			}
+		});
+		this.navigationService.navigate$.subscribe(req => {
+			this.handleNavigation(req);
 		});
 	}
 
@@ -318,12 +323,34 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 		});
 
 		this.formModelManager.load(this.projectId).subscribe({
-			next: formModels => this.formModels = formModels,
+			next: formModels => {
+				this.formModels = formModels;
+				if(formModels.length > 0) {
+					this.formLayoutManager.loadAllForFormModels(
+						this.projectId,
+						formModels.map(fm => fm.formModelId)
+					).subscribe({
+						next: () => this.formLayouts = this.formLayoutManager.getAll(),
+						error: error => console.error('Error loading form layouts:', error)
+					});
+				}
+			},
 			error: error => console.error('Error loading form models:', error)
 		});
 
 		this.timelineGraphManager.load(this.projectId).subscribe({
-			next: models => this.timelineGraphs = models,
+			next: graphs => {
+				this.timelineGraphs = graphs;
+				if(graphs.length > 0) {
+					this.timelineGraphSectionManager.loadAllForGraphs(
+						this.projectId,
+						graphs.map(g => g.timelineGraphId)
+					).subscribe({
+						next: () => this.sections = this.timelineGraphSectionManager.getAll(),
+						error: error => console.error('Error loading timeline graph sections:', error)
+					});
+				}
+			},
 			error: error => console.error('Error loading timeline graphs:', error)
 		});
 
@@ -1284,5 +1311,242 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				this.treeComponent.expandedCategory = null;
 			}
 		});
+	}
+
+	private handleNavigation(req: NavigationRequest): void {
+		const entityType = req.entityType;
+		const entityId = req.entityId;
+
+		this.selectedDatasetModelId = null;
+		this.selectedScopeModelId = null;
+		this.selectedFormModelId = null;
+		this.selectedWorkflowId = null;
+		this.selectedWorkflowSummaryId = null;
+		this.selectedWorkflowWidgetId = null;
+		this.selectedTimelineGraphId = null;
+		this.selectedProfileId = null;
+		this.selectedCronId = null;
+		this.selectedMenuId = null;
+		this.selectedReportId = null;
+		this.selectedChartId = null;
+		this.selectedValidatorId = null;
+
+		switch(entityType) {
+			case 'scope-model':
+				this.selectedNode = 'scope-models';
+				this.selectedScopeModelId = entityId;
+				this.treeComponent.expandedCategory = 'scope-models';
+				setTimeout(() => this.detailComponent?.scopeModelsListComponent?.selectById(entityId));
+				break;
+			case 'event-model':
+				this.selectedNode = 'scope-models';
+				this.treeComponent.expandedCategory = 'scope-models';
+				setTimeout(() => {
+					const eventModel = this.eventModelManager.getById(req.entityId);
+					if(!eventModel) {
+						return;
+					}
+					const scopeModel = this.scopeModelManager.getAll()
+						.find(sm => sm.scopeModelId === eventModel.scopeModelId);
+					if(scopeModel) {
+						this.selectedScopeModelId = scopeModel.scopeModelId;
+						this.detailComponent?.scopeModelsListComponent?.selectById(scopeModel.scopeModelId);
+						setTimeout(() => {
+							this.detailComponent?.scopeModelsListComponent?.selectEventModelById(req.entityId);
+						}, 200);
+					}
+				});
+				break;
+			case 'event-group':
+				this.selectedNode = 'scope-models';
+				this.treeComponent.expandedCategory = 'scope-models';
+				setTimeout(() => {
+					const eventGroup = this.eventGroupManager.getById(req.entityId);
+					if(!eventGroup) {
+						return;
+					}
+					const scopeModel = this.scopeModelManager.getAll()
+						.find(sm => sm.scopeModelId === eventGroup.scopeModelId);
+					if(scopeModel) {
+						this.selectedScopeModelId = scopeModel.scopeModelId;
+						this.detailComponent?.scopeModelsListComponent?.selectById(scopeModel.scopeModelId);
+						setTimeout(() => {
+							this.detailComponent?.scopeModelsListComponent?.selectEventGroupById(req.entityId);
+						}, 200);
+					}
+				});
+				break;
+			case 'dataset-model':
+				this.selectedNode = 'dataset-models';
+				this.selectedDatasetModelId = entityId;
+				this.treeComponent.expandedCategory = 'dataset-models';
+				setTimeout(() => this.detailComponent?.datasetModelsListComponent?.selectById(entityId));
+				break;
+			case 'field-model':
+				this.selectedNode = 'dataset-models';
+				this.treeComponent.expandedCategory = 'dataset-models';
+				setTimeout(() => {
+					const datasetModel = this.datasetModelManager.getAll()
+						.find(dm => this.fieldModelManager.getAllForDataset(dm.datasetModelId)
+							.some(fm => fm.fieldModelId === req.entityId));
+					if(datasetModel) {
+						this.selectedDatasetModelId = datasetModel.datasetModelId;
+						this.detailComponent?.datasetModelsListComponent?.selectById(datasetModel.datasetModelId);
+						setTimeout(() => {
+							this.detailComponent?.datasetModelsListComponent?.selectFieldModelById(req.entityId);
+						});
+					}
+				});
+				break;
+			case 'form-model':
+				this.selectedNode = 'form-models';
+				this.selectedFormModelId = entityId;
+				this.treeComponent.expandedCategory = 'form-models';
+				setTimeout(() => this.detailComponent?.formModelListComponent?.selectById(entityId));
+				break;
+			case 'form-layout':
+				this.selectedNode = 'form-models';
+				this.treeComponent.expandedCategory = 'form-models';
+				setTimeout(() => {
+					const layout = this.formLayoutManager.getAll()
+						.find(l => l.formLayoutId === req.entityId);
+					if(!layout) {
+						return;
+					}
+					this.selectedFormModelId = layout.formModelId;
+					this.detailComponent?.formModelListComponent?.selectById(layout.formModelId);
+					setTimeout(() => {
+						this.detailComponent?.formModelListComponent?.switchToLayoutView();
+					}, 200);
+				});
+				break;
+			case 'workflow':
+				this.selectedNode = 'workflows';
+				this.selectedWorkflowId = entityId;
+				this.treeComponent.expandedCategory = 'workflows';
+				setTimeout(() => this.detailComponent?.workflowListComponent?.selectById(entityId));
+				break;
+			case 'workflow-state':
+				this.selectedNode = 'workflows';
+				this.treeComponent.expandedCategory = 'workflows';
+				setTimeout(() => {
+					const state = this.workflowStateManager.getById(req.entityId);
+					if(!state) {
+						return;
+					}
+					const workflow = this.workflowManager.getAll()
+						.find(w => w.workflowId === state.workflowId);
+					if(workflow) {
+						this.selectedWorkflowId = workflow.workflowId;
+						this.detailComponent?.workflowListComponent?.selectById(workflow.workflowId);
+						setTimeout(() => {
+							this.detailComponent?.workflowListComponent?.selectStateById(req.entityId);
+						}, 200);
+					}
+				});
+				break;
+			case 'workflow-action':
+				this.selectedNode = 'workflows';
+				this.treeComponent.expandedCategory = 'workflows';
+				setTimeout(() => {
+					const action = this.workflowActionManager.getById(req.entityId);
+					if(!action) {
+						return;
+					}
+					const workflow = this.workflowManager.getAll()
+						.find(w => w.workflowId === action.workflowId);
+					if(workflow) {
+						this.selectedWorkflowId = workflow.workflowId;
+						this.detailComponent?.workflowListComponent?.selectById(workflow.workflowId);
+						setTimeout(() => {
+							this.detailComponent?.workflowListComponent?.selectActionById(req.entityId);
+						}, 200);
+					}
+				});
+				break;
+			case 'workflow-summary':
+				this.selectedNode = 'workflow-summaries';
+				this.selectedWorkflowSummaryId = entityId;
+				this.treeComponent.expandedCategory = 'workflow-summaries';
+				setTimeout(() => this.detailComponent?.workflowSummaryListComponent?.selectById(entityId));
+				break;
+			case 'workflow-widget':
+				this.selectedNode = 'workflow-widgets';
+				this.selectedWorkflowWidgetId = entityId;
+				this.treeComponent.expandedCategory = 'workflow-widgets';
+				setTimeout(() => this.detailComponent?.workflowWidgetListComponent?.selectById(entityId));
+				break;
+			case 'timeline-graph':
+				this.selectedNode = 'timeline-graphs';
+				this.selectedTimelineGraphId = entityId;
+				this.treeComponent.expandedCategory = 'timeline-graphs';
+				setTimeout(() => this.detailComponent?.timelineGraphListComponent?.selectById(entityId));
+				break;
+			case 'timeline-graph-section':
+				this.selectedNode = 'timeline-graphs';
+				this.treeComponent.expandedCategory = 'timeline-graphs';
+				setTimeout(() => {
+					const section = this.timelineGraphSectionManager.getById(req.entityId);
+					if(!section) {
+						return;
+					}
+					const graph = this.timelineGraphManager.getAll()
+						.find(tg => tg.timelineGraphId === section.timelineGraphId);
+					if(graph) {
+						this.selectedTimelineGraphId = graph.timelineGraphId;
+						this.detailComponent?.timelineGraphListComponent?.selectById(graph.timelineGraphId);
+						setTimeout(() => {
+							this.detailComponent?.timelineGraphListComponent?.selectSectionById(req.entityId);
+						}, 200);
+					}
+				});
+				break;
+			case 'privacy-policy':
+				this.selectedNode = 'privacy-policies';
+				this.treeComponent.expandedCategory = 'privacy-policies';
+				setTimeout(() => this.detailComponent?.privacyPolicyListComponent?.selectById(req.entityId));
+				break;
+			case 'resource-category':
+				this.selectedNode = 'resource-categories';
+				this.treeComponent.expandedCategory = 'resource-categories';
+				setTimeout(() => this.detailComponent?.resourceCategoryListComponent?.selectById(req.entityId));
+				break;
+			case 'profile':
+				this.selectedNode = 'profiles';
+				this.selectedProfileId = entityId;
+				this.treeComponent.expandedCategory = 'profiles';
+				setTimeout(() => this.detailComponent?.profileListComponent?.selectById(entityId));
+				break;
+			case 'cron':
+				this.selectedNode = 'crons';
+				this.selectedCronId = entityId;
+				this.treeComponent.expandedCategory = 'crons';
+				setTimeout(() => this.detailComponent?.cronListComponent?.selectById(entityId));
+				break;
+			case 'menu':
+				this.selectedNode = 'menus';
+				this.selectedMenuId = entityId;
+				this.treeComponent.expandedCategory = 'menus';
+				setTimeout(() => this.detailComponent?.menuListComponent?.selectById(entityId));
+				break;
+			case 'report':
+				this.selectedNode = 'reports';
+				this.selectedReportId = entityId;
+				this.treeComponent.expandedCategory = 'reports';
+				setTimeout(() => this.detailComponent?.reportListComponent?.selectById(entityId));
+				break;
+			case 'chart':
+				this.selectedNode = 'charts';
+				this.selectedChartId = entityId;
+				this.treeComponent.expandedCategory = 'charts';
+				setTimeout(() => this.detailComponent?.chartListComponent?.selectById(entityId));
+				break;
+			case 'validator':
+				this.selectedNode = 'validators';
+				this.selectedValidatorId = entityId;
+				this.treeComponent.expandedCategory = 'validators';
+				setTimeout(() => this.detailComponent?.validatorsListComponent?.selectById(entityId));
+				break;
+		}
 	}
 }

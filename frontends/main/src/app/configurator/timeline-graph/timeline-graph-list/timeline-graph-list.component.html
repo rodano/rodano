@@ -1,8 +1,10 @@
 <app-list-header title="Timeline Graphs" subtitle="Configure timeline graphs for data collection">
-	<button class="btn-view theme-timeline-graph" (click)="onToggleMatrix()">
-		<mat-icon>grid_on</mat-icon>
-		{{ showMatrix ? 'Back to List' : 'Timeline Graph Rights' }}
-	</button>
+	@if (viewMode === 'graph-detail') {
+		<button class="btn-view theme-timeline-graph" (click)="onToggleMatrix()">
+			<mat-icon>grid_on</mat-icon>
+			{{ showMatrix ? 'Back to List' : 'Timeline Graph Rights' }}
+		</button>
+	}
 </app-list-header>
 
 <div class="content-container"

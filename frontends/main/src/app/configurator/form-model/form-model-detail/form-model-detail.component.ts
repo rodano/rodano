@@ -16,13 +16,16 @@ import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.compo
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 import {Rule} from '@core/model/rule';
 import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-form-model-detail',
 	standalone: true,
 	templateUrl: './form-model-detail.component.html',
 	styleUrls: ['./form-model-detail.component.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent, UsedByComponent]
 })
 export class FormModelDetailComponent extends BaseManagerDetailComponent<FormModel, FormModelManagerService> {
 	@Input() override entity!: FormModel;
@@ -46,6 +49,7 @@ export class FormModelDetailComponent extends BaseManagerDetailComponent<FormMod
 	constructor(
 		formModelManager: FormModelManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private formModelDialogService: FormModelDialogService,
 		private workflowManager: WorkflowManagerService,
 		private dialog: MatDialog,

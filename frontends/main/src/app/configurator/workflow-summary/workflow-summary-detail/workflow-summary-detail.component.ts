@@ -17,13 +17,16 @@ import {ScopeModelManagerService} from '../../services/manager/scope-model-manag
 import {WorkflowSummaryDialogService} from '../../services/dialogs/workflow-summary-dialog.service';
 import {EventModelManagerService} from '../../services/manager/event-model-manager.service';
 import {WorkflowStateManagerService} from '../../services/manager/workflow-state-manager.service';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-workflow-summary-detail',
 	standalone: true,
 	templateUrl: './workflow-summary-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class WorkflowSummaryDetailComponent extends BaseManagerDetailComponent<WorkflowSummary, WorkflowSummaryManagerService> {
 	@Input() override entity!: WorkflowSummary;
@@ -39,6 +42,7 @@ export class WorkflowSummaryDetailComponent extends BaseManagerDetailComponent<W
 	constructor(
 		workflowSummaryManager: WorkflowSummaryManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private scopeModelManager: ScopeModelManagerService,
 		private workflowManager: WorkflowManagerService,
 		private eventModelManager: EventModelManagerService,

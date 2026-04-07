@@ -120,7 +120,8 @@
 							<mat-icon class="warning-icon">report</mat-icon>
 							<span>Not configured</span>
 						} @else {
-							<div class="chip theme-menu">
+							<div class="chip theme-menu clickable"
+							     (click)="navigationService.navigateTo('menu', entity.parentMenuId)">
 								<mat-icon class="resource-icon">menu</mat-icon>
 								<span class="language-name">{{ getMenuLabel(entity.parentMenuId) }}</span>
 							</div>
@@ -143,7 +144,8 @@
 							@if (submenus.length > 0) {
 								<div class="chip-container">
 									@for (submenu of submenus; track submenu.menuId; let i = $index) {
-										<div class="chip theme-menu">
+										<div class="chip theme-menu clickable"
+										     (click)="navigationService.navigateTo('menu', submenu.menuId)">
 											<span class="detail-code" style="font-size: 0.7rem; margin-right: 0.25rem">{{ i + 1 }}</span>
 											<mat-icon class="resource-icon">subdirectory_arrow_right</mat-icon>
 											<span class="language-name">{{ languageService.getLabel(submenu) }}</span>
@@ -191,7 +193,8 @@
 									<div class="chip-container">
 										@for (item of entity.action.context; track item) {
 											@if (entity.action.page === 'scopes') {
-												<div class="chip theme-scope-model">
+												<div class="chip theme-scope-model clickable"
+												     (click)="navigationService.navigateTo('scope-model', entity.action.context[0])">
 													<mat-icon class="resource-icon">account_tree</mat-icon>
 													<span class="language-name">{{ getContextLabel(item) }}</span>
 												</div>
@@ -254,6 +257,10 @@
 					<mat-icon>edit</mat-icon>
 					Edit Action
 				</button>
+			</div>
+
+			<div class="settings-section">
+				<app-used-by [entityId]="menu.menuId" />
 			</div>
 
 			<app-danger-zone

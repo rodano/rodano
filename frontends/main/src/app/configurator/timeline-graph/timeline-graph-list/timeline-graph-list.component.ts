@@ -121,6 +121,24 @@ export class TimelineGraphListComponent implements OnInit, OnChanges, OnDestroy 
 		this.languageSubscription.unsubscribe();
 	}
 
+	selectById(id: string): void {
+		const entity = this.timelineGraphs.find(tg => tg.timelineGraphId === id);
+		if(entity) {
+			this.selectTimelineGraph(entity);
+		}
+	}
+
+	selectSectionById(id: string): void {
+		this.viewMode = 'section-list';
+		this.updateFilteredSections();
+		if(this.currentSections.some(tgs => tgs.graphSectionId === id)) {
+			this.selectedGraphSectionId = id;
+			this.viewMode = 'section-detail';
+			this.nodeSelected.emit(`timeline-graph-model-${id}`);
+			this.emitContext();
+		}
+	}
+
 	get viewLevel(): number {
 		if(!this.selectedTimelineGraph) {
 			return 0;

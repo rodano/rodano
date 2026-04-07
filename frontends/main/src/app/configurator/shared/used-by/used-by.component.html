@@ -1,0 +1,21 @@
+<h3>Used by</h3>
+@if (usages.length === 0) {
+	<div class="relationship-box">
+		<div class="empty-message-centered">
+			<mat-icon>info</mat-icon>
+			<span>Not used by any entity</span>
+		</div>
+	</div>
+} @else {
+	<div class="used-by-list">
+		@for (usage of usages; track usage.entityId) {
+			<button [class]="'used-by-item theme-' + usage.entityType"
+			        (click)="navigationService.navigateTo(usage.entityType, usage.entityId)">
+				<mat-icon class="used-by-icon">{{ navigationService.getEntityIcon(usage.entityType) }}</mat-icon>
+				<span class="used-by-type">{{ navigationService.getEntityLabel(usage.entityType) }}</span>
+				<span class="used-by-name">{{ languageService.getLabel(usage) }}</span>
+				<mat-icon class="used-by-arrow">chevron_right</mat-icon>
+			</button>
+		}
+	</div>
+}

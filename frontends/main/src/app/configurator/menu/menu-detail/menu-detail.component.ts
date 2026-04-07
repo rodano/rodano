@@ -15,6 +15,8 @@ import {MenuManagerService} from '../../services/manager/menu-manager.service';
 import {MenuDialogService} from '../../services/dialogs/menu-dialog.service';
 import {ScopeModelManagerService} from '../../services/manager/scope-model-manager.service';
 import {LayoutEditorComponent} from '../../shared/layout-editor/layout-editor.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-menu-detail',
@@ -22,7 +24,7 @@ import {LayoutEditorComponent} from '../../shared/layout-editor/layout-editor.co
 	templateUrl: './menu-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
-		LayoutEditorComponent]
+		LayoutEditorComponent, UsedByComponent]
 })
 export class MenuDetailComponent extends BaseManagerDetailComponent<MenuConfig, MenuManagerService> {
 	@Input() override entity!: MenuConfig;
@@ -42,6 +44,7 @@ export class MenuDetailComponent extends BaseManagerDetailComponent<MenuConfig, 
 	constructor(
 		private menuManager: MenuManagerService,
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private menuDialogService: MenuDialogService,
 		private scopeModelManager: ScopeModelManagerService,
 		private dialog: MatDialog,

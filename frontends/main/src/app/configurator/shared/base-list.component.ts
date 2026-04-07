@@ -86,6 +86,14 @@ export abstract class BaseListComponent<T extends Record<string, any>> implement
 		this.nodeSelected.emit(this.getListNodeName());
 	}
 
+	selectById(id: string): void {
+		const entity = this.manager.getAll().find(e => this.getEntityId(e) === id);
+		if(entity) {
+			this.selectEntity(entity);
+			this.emitContextEvent();
+		}
+	}
+
 	protected selectEntity(entity: T): void {
 		const previousId = this.selected ? this.getEntityId(this.selected) : null;
 		this.selected = entity;

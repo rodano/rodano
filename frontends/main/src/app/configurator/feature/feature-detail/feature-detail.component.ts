@@ -13,13 +13,15 @@ import {FeatureDialogService} from '../../services/dialogs/feature-dialog.servic
 import {DangerZoneComponent} from '../../shared/danger-zone/danger-zone.component';
 import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.component';
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-feature-detail',
 	standalone: true,
 	templateUrl: './feature-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class FeatureDetailComponent extends BaseManagerDetailComponent<Feature, FeatureManagerService> {
 	@Input() override entity!: Feature;

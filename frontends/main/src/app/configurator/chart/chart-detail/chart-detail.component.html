@@ -99,7 +99,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-scope-model">
+						<div class="chip theme-scope-model clickable"
+						     (click)="navigationService.navigateTo('scope-model', chart.leafScopeModelId)">
 							<mat-icon class="resource-icon">account_tree</mat-icon>
 							<span class="language-name">{{ getScopeModelLabel(chart.leafScopeModelId) }}</span>
 						</div>
@@ -156,7 +157,8 @@
 								<mat-icon class="warning-icon">report</mat-icon>
 								<span>Not configured</span>
 							} @else {
-								<div class="chip theme-field-model">
+								<div class="chip theme-field-model clickable"
+								     (click)="navigationService.navigateTo('field-model', chart.fieldModelId)">
 									<mat-icon class="resource-icon">text_ad</mat-icon>
 									<span class="language-name">{{ getFieldModelLabel(chart.fieldModelId) }}</span>
 								</div>
@@ -186,7 +188,8 @@
 								<mat-icon class="warning-icon">report</mat-icon>
 								<span>Not configured</span>
 							} @else {
-								<div class="chip theme-scope-model">
+								<div class="chip theme-workflow clickable"
+								     (click)="navigationService.navigateTo('workflow', chart.workflowId)">
 									<mat-icon class="resource-icon">settings</mat-icon>
 									<span class="language-name">{{ getWorkflowLabel(chart.workflowId) }}</span>
 								</div>
@@ -200,7 +203,8 @@
 								<mat-icon class="warning-icon">report</mat-icon>
 								<span>Not configured</span>
 							} @else {
-								<div class="chip theme-scope-model">
+								<div class="chip theme-workflow clickable"
+								     (click)="navigationService.navigateTo('workflow', chart.workflowId)">
 									<mat-icon class="resource-icon">settings</mat-icon>
 									<span class="language-name">{{ getWorkflowLabel(chart.workflowId) }}</span>
 								</div>
@@ -213,7 +217,8 @@
 								@if (getIncludedStates().length > 0) {
 									<div class="chip-container">
 										@for (includedState of getIncludedStates(); track includedState) {
-											<div class="chip theme-workflow-state">
+											<div class="chip theme-workflow-state clickable"
+											     (click)="navigationService.navigateTo('workflow-state', includedState.workflowStateId)">
 												<mat-icon class="resource-icon">adjust</mat-icon>
 												<span class="language-name">{{ getWorkflowStateLabel(includedState.workflowStateId) }}</span>
 											</div>
@@ -234,7 +239,8 @@
 								@if (getExcludedStates().length > 0) {
 									<div class="chip-container">
 										@for (excludedState of getExcludedStates(); track excludedState) {
-											<div class="chip theme-workflow-state">
+											<div class="chip theme-workflow-state clickable"
+											     (click)="navigationService.navigateTo('workflow-state', excludedState.workflowStateId)">
 												<mat-icon class="resource-icon">adjust</mat-icon>
 												<span class="language-name">{{ getWorkflowStateLabel(excludedState.workflowStateId) }}</span>
 											</div>
@@ -256,7 +262,8 @@
 								<mat-icon class="warning-icon">report</mat-icon>
 								<span>Not configured</span>
 							} @else {
-								<div class="chip theme-scope-model">
+								<div class="chip theme-scope-model clickable"
+								     (click)="navigationService.navigateTo('scope-model', chart.scopeModelId)">
 									<mat-icon class="resource-icon">account_tree</mat-icon>
 									<span class="language-name">{{ getScopeModelLabel(chart.scopeModelId) }}</span>
 								</div>
@@ -316,6 +323,10 @@
 			</button>
 		</div>
 	}
+
+	<div class="settings-section">
+		<app-used-by [entityId]="chart.chartId" />
+	</div>
 
 	<app-danger-zone
 		[title]="'Delete Chart'"

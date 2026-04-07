@@ -93,7 +93,8 @@
 									</div>
 									<div class="chip-container">
 										@for (state of workflowGroup.states; track state.id) {
-											<div class="chip theme-workflow-state">
+											<div class="chip theme-workflow-state clickable"
+											     (click)="navigationService.navigateTo('workflow-state', state.id)">
 												<mat-icon class="resource-icon">adjust</mat-icon>
 												<span class="language-name">{{ state.name }}</span>
 											</div>
@@ -161,6 +162,10 @@
 			<mat-icon>edit</mat-icon>
 			Edit Columns
 		</button>
+	</div>
+
+	<div class="settings-section">
+		<app-used-by [entityId]="workflowWidget.workflowWidgetId" />
 	</div>
 
 	<app-danger-zone

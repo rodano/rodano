@@ -184,7 +184,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-profile">
+					<div class="chip theme-profile clickable"
+					     (click)="navigationService.navigateTo('profile', workingProject!.eproProfileId ?? '')">
 						<mat-icon class="resource-icon">badge</mat-icon>
 						<span class="language-name">{{ getProfileLabel(workingProject!.eproProfileId!) }}</span>
 					</div>

@@ -1,8 +1,10 @@
 <app-list-header title="Workflows" subtitle="Configure workflows for data collection">
-	<button class="btn-view theme-workflow" (click)="onToggleMatrix()">
-		<mat-icon>grid_on</mat-icon>
-		{{ showMatrix ? 'Back to List' : 'Workflow Rights' }}
-	</button>
+	@if (viewMode === 'workflow-list' || viewMode === 'workflow-detail') {
+		<button class="btn-view theme-workflow" (click)="onToggleMatrix()">
+			<mat-icon>grid_on</mat-icon>
+			{{ showMatrix ? 'Back to List' : 'Workflow Rights' }}
+		</button>
+	}
 </app-list-header>
 
 @if (viewMode === 'rule-editor' && selectedWorkflow && selectedRule) {
@@ -169,7 +171,8 @@
 							</button>
 							<div>
 								<h2>Workflow States</h2>
-								<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
+								<p
+									class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
 							</div>
 						</div>
 					</div>
@@ -221,7 +224,8 @@
 												<mat-icon>adjust</mat-icon>
 												<span>Aggregate State: <b>{{ workflowState.aggregateStateId ? getWorkflowStateLabel(workflowState.aggregateStateId) : 'Not set' }}</b></span>
 											</div>
-											<div class="detail-item" [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
+											<div class="detail-item"
+											     [class.unset]="workflowState.aggregateStateMatcher === null || workflowState.aggregateStateMatcher === undefined">
 												<mat-icon>equal</mat-icon>
 												<span>Aggregate State Matcher: {{ workflowState.aggregateStateMatcher !== null && workflowState.aggregateStateMatcher !== undefined ? workflowState.aggregateStateMatcher : 'Not set' }}</span>
 											</div>
@@ -251,14 +255,16 @@
 							</button>
 							<div>
 								<h2>Workflow Actions</h2>
-								<p class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
+								<p
+									class="column-subtitle">{{ selectedWorkflow ? languageService.getTranslatedName(selectedWorkflow.shortname) : '' }}</p>
 							</div>
 						</div>
 					</div>
 
 					<div class="secondary-column-content">
 						<div class="secondary-cards-grid">
-							<div class="secondary-card second-child-card small-card create-card theme-workflow-action" (click)="onCreateWorkflowAction()">
+							<div class="secondary-card second-child-card small-card create-card theme-workflow-action"
+							     (click)="onCreateWorkflowAction()">
 								<div class="create-content">
 									<mat-icon>add_circle_outline</mat-icon>
 									<h3>Create Workflow Action</h3>

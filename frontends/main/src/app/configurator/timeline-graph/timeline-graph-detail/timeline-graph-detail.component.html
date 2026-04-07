@@ -31,7 +31,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-scope-model">
+					<div class="chip theme-scope-model clickable"
+					     (click)="navigationService.navigateTo('scope-model', timelineGraph.scopeModelId)">
 						<mat-icon class="resource-icon">account_tree</mat-icon>
 						<span class="language-name">{{ getScopeModelLabel(timelineGraph.scopeModelId) }}</span>
 					</div>
@@ -96,7 +97,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-event-model">
+					<div class="chip theme-event-model clickable"
+					     (click)="navigationService.navigateTo('event-model', timelineGraph.studyStartEventModelId)">
 						<mat-icon class="resource-icon">event</mat-icon>
 						<span class="language-name">{{ getEventModelLabel(timelineGraph.studyStartEventModelId) }}</span>
 					</div>
@@ -110,7 +112,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-event-model">
+					<div class="chip theme-event-model clickable"
+					     (click)="navigationService.navigateTo('event-model', timelineGraph.studyEndEventModelId)">
 						<mat-icon class="resource-icon">event</mat-icon>
 						<span class="language-name">{{ getEventModelLabel(timelineGraph.studyEndEventModelId) }}</span>
 					</div>
@@ -193,6 +196,10 @@
 			<mat-icon>edit</mat-icon>
 			Edit Design
 		</button>
+	</div>
+
+	<div class="settings-section">
+		<app-used-by [entityId]="timelineGraph.timelineGraphId" />
 	</div>
 
 	<app-danger-zone

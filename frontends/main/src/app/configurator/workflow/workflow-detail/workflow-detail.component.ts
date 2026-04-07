@@ -17,13 +17,16 @@ import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.compo
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 import {Rule} from '@core/model/rule';
 import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-workflow-detail',
 	standalone: true,
 	templateUrl: './workflow-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent, UsedByComponent]
 })
 export class WorkflowDetailComponent extends BaseManagerDetailComponent<Workflow, WorkflowManagerService> {
 	@Input() override entity!: Workflow;
@@ -50,6 +53,7 @@ export class WorkflowDetailComponent extends BaseManagerDetailComponent<Workflow
 		workflowManager: WorkflowManagerService,
 		public workflowStateManager: WorkflowStateManagerService,
 		public workflowActionManager: WorkflowActionManagerService,
+		public navigationService: ConfiguratorNavigationService,
 		languageService: LanguageService,
 		private workflowDialogService: WorkflowDialogService,
 		private dialog: MatDialog,

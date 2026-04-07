@@ -15,13 +15,15 @@ import {MatSnackBar} from '@angular/material/snack-bar';
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
 import {RuleListComponent} from '../../../rules/rule-list/rule-list.component';
 import {Rule} from '@core/model/rule';
+import {UsedByComponent} from '../../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-workflow-action-detail',
 	standalone: true,
 	templateUrl: './workflow-action-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent, UsedByComponent]
 })
 export class WorkflowActionDetailComponent extends BaseDraftDetailComponent<WorkflowAction> {
 	@Input() workflowActionId = '';

@@ -15,13 +15,15 @@ import {BaseManagerDetailComponent} from '../../shared/base-manager-detail.compo
 import {SettingItemComponent} from '../../shared/setting-item/setting-item.component';
 import {Rule} from '@core/model/rule';
 import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-dataset-model-detail',
 	standalone: true,
 	templateUrl: './dataset-model-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent, UsedByComponent]
 })
 export class DatasetModelDetailComponent extends BaseManagerDetailComponent<DatasetModel, DatasetModelManagerService> {
 	@Input() override entity!: DatasetModel;

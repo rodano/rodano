@@ -139,7 +139,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-scope-model">
+						<div class="chip theme-scope-model clickable"
+						     (click)="navigationService.navigateTo('scope-model', scopeModel.defaultParentId)">
 							<mat-icon class="resource-icon">account_tree</mat-icon>
 							<span class="language-name">{{ getScopeModelLabel(scopeModel.defaultParentId) }}</span>
 						</div>
@@ -154,7 +155,8 @@
 						@if (scopeModel.parentIds.length > 0) {
 							<div class="chip-container">
 								@for (parentId of scopeModel.parentIds; track parentId) {
-									<div class="chip theme-scope-model">
+									<div class="chip theme-scope-model clickable"
+									     (click)="navigationService.navigateTo('scope-model', parentId)">
 										@if (parentId === scopeModel.defaultParentId) {
 											<mat-icon class="resource-icon">star</mat-icon>
 										} @else {
@@ -180,7 +182,8 @@
 						@if (scopeModel.childScopeModelIds.length > 0) {
 							<div class="chip-container">
 								@for (childId of scopeModel.childScopeModelIds; track childId) {
-									<div class="chip theme-scope-model">
+									<div class="chip theme-scope-model clickable"
+									     (click)="navigationService.navigateTo('scope-model', childId)">
 										<mat-icon class="resource-icon">arrow_downward</mat-icon>
 										<span class="language-name">{{ getScopeModelLabel(childId) }}</span>
 									</div>
@@ -212,7 +215,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-profile">
+						<div class="chip theme-profile clickable"
+						     (click)="navigationService.navigateTo('profile', scopeModel.defaultProfileId)">
 							<mat-icon class="resource-icon">badge</mat-icon>
 							<span class="language-name">{{ getProfileLabel(scopeModel.defaultProfileId) }}</span>
 						</div>
@@ -263,7 +267,8 @@
 						@if (scopeModel.formModelIds.length > 0) {
 							<div class="chip-container">
 								@for (formId of scopeModel.formModelIds; track formId) {
-									<div class="chip theme-form-model">
+									<div class="chip theme-form-model clickable"
+									     (click)="navigationService.navigateTo('form-model', formId)">
 										<mat-icon class="resource-icon">description</mat-icon>
 										<span class="language-name">{{ getFormModelLabel(formId) }}</span>
 									</div>
@@ -286,7 +291,8 @@
 						@if (scopeModel.datasetModelIds.length > 0) {
 							<div class="chip-container">
 								@for (datasetId of scopeModel.datasetModelIds; track datasetId) {
-									<div class="chip theme-dataset-model">
+									<div class="chip theme-dataset-model clickable"
+									     (click)="navigationService.navigateTo('dataset-model', datasetId)">
 										<mat-icon class="resource-icon">dataset</mat-icon>
 										<span class="language-name">{{ getDatasetModelLabel(datasetId) }}</span>
 									</div>
@@ -309,7 +315,8 @@
 						@if (scopeModel.workflowIds.length > 0) {
 							<div class="chip-container">
 								@for (workflowId of scopeModel.workflowIds; track workflowId) {
-									<div class="chip theme-workflow">
+									<div class="chip theme-workflow clickable"
+									     (click)="navigationService.navigateTo('workflow', workflowId)">
 										<mat-icon class="resource-icon">settings</mat-icon>
 										<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 									</div>
@@ -339,7 +346,8 @@
 										</div>
 										<div class="chip-container">
 											@for (state of workflowGroup.states; track state.id) {
-												<div class="chip theme-workflow-state">
+												<div class="chip theme-workflow-state clickable"
+												     (click)="navigationService.navigateTo('workflow-state', state.id)">
 													<mat-icon class="resource-icon">adjust</mat-icon>
 													<span class="language-name">{{ state.name }}</span>
 												</div>
@@ -361,6 +369,10 @@
 				<mat-icon>edit</mat-icon>
 				Edit Resources
 			</button>
+		</div>
+
+		<div class="settings-section">
+			<app-used-by [entityId]="scopeModel.scopeModelId" />
 		</div>
 
 		<app-danger-zone

@@ -13,13 +13,15 @@ import {ConfirmationDialogComponent} from '../../../../confirmation-dialog/confi
 import {DangerZoneComponent} from '../../../shared/danger-zone/danger-zone.component';
 import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.component';
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
+import {UsedByComponent} from '../../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-event-group-detail',
 	standalone: true,
 	templateUrl: './event-group-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class EventGroupDetailComponent extends BaseDraftDetailComponent<EventGroup> {
 	@Input() eventGroupId: string | null = null;

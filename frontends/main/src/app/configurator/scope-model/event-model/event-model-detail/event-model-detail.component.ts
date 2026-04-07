@@ -20,14 +20,17 @@ import {BaseDraftDetailComponent} from '../../../shared/base-draft-detail.compon
 import {SettingItemComponent} from '../../../shared/setting-item/setting-item.component';
 import {FormModelManagerService} from '../../../services/manager/form-model-manager.service';
 import {Rule} from '@core/model/rule';
-import { RuleListComponent } from '../../../rules/rule-list/rule-list.component';
+import {RuleListComponent} from '../../../rules/rule-list/rule-list.component';
+import {UsedByComponent} from '../../../shared/used-by/used-by.component';
+import {ConfiguratorNavigationService} from '../../../services/configurator-navigation.service';
 
 @Component({
 	selector: 'app-event-model-detail',
 	standalone: true,
 	templateUrl: './event-model-detail.component.html',
 	styleUrls: ['../../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent, RuleListComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		RuleListComponent, UsedByComponent]
 })
 export class EventModelDetailComponent extends BaseDraftDetailComponent<EventModel> {
 	@Input() eventModelId = '';
@@ -49,6 +52,7 @@ export class EventModelDetailComponent extends BaseDraftDetailComponent<EventMod
 
 	constructor(
 		languageService: LanguageService,
+		public navigationService: ConfiguratorNavigationService,
 		private eventModelDialogService: EventModelDialogService,
 		private eventModelManager: EventModelManagerService,
 		private eventGroupManager: EventGroupManagerService,

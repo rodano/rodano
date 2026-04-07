@@ -13,13 +13,15 @@ import {SettingItemComponent} from '../../shared/setting-item/setting-item.compo
 import {RuleDefinitionProperty} from '@core/model/rule-definition-property';
 import {RuleDefinitionPropertyManagerService} from '../../services/manager/rule-definition-property-manager.service';
 import {RuleDefinitionPropertyDialogService} from '../../services/dialogs/rule-definition-property-dialog.service';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-rule-definition-property-detail',
 	standalone: true,
 	templateUrl: './rule-definition-property-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class RuleDefinitionPropertyDetailComponent extends BaseManagerDetailComponent<RuleDefinitionProperty, RuleDefinitionPropertyManagerService> {
 	@Input() override entity!: RuleDefinitionProperty;

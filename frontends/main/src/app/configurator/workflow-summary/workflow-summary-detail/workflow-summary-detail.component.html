@@ -42,7 +42,8 @@
 					<mat-icon class="warning-icon">report</mat-icon>
 					<span>Not configured</span>
 				} @else {
-					<div class="chip theme-scope-model">
+					<div class="chip theme-scope-model clickable"
+					     (click)="navigationService.navigateTo('scope-model', workflowSummary.leafScopeModelId)">
 						<mat-icon class="resource-icon">account_tree</mat-icon>
 						<span class="language-name">{{ getScopeModelLabel(workflowSummary.leafScopeModelId) }}</span>
 					</div>
@@ -85,7 +86,8 @@
 					@if (workflowSummary.workflowIds.length > 0) {
 						<div class="chip-container">
 							@for (workflowId of workflowSummary.workflowIds; track workflowId) {
-								<div class="chip theme-workflow">
+								<div class="chip theme-workflow clickable"
+								     (click)="navigationService.navigateTo('workflow', workflowId)">
 									<mat-icon class="resource-icon">settings</mat-icon>
 									<span class="language-name">{{ getWorkflowLabel(workflowId) }}</span>
 								</div>
@@ -127,7 +129,8 @@
 					@if (workflowSummary.eventModelIds.length > 0) {
 						<div class="chip-container">
 							@for (eventModelId of workflowSummary.eventModelIds; track eventModelId) {
-								<div class="chip theme-event-model">
+								<div class="chip theme-event-model clickable"
+								     (click)="navigationService.navigateTo('event-model', eventModelId)">
 									<mat-icon class="resource-icon">events</mat-icon>
 									<span class="language-name">{{ getEventModelLabel(eventModelId) }}</span>
 								</div>
@@ -244,7 +247,8 @@
 									@if (col.workflowStateIds && col.workflowStateIds.length > 0) {
 										<div class="chip-container">
 											@for (stateId of col.workflowStateIds; track stateId) {
-												<div class="chip theme-workflow-state">
+												<div class="chip theme-workflow-state clickable"
+												     (click)="navigationService.navigateTo('workflow-state', stateId)">
 													<mat-icon class="resource-icon">adjust</mat-icon>
 													<span class="language-name">{{ getWorkflowStateLabel(stateId) }}</span>
 												</div>
@@ -268,6 +272,10 @@
 			<mat-icon>edit</mat-icon>
 			Edit Columns
 		</button>
+	</div>
+
+	<div class="settings-section">
+		<app-used-by [entityId]="workflowSummary.workflowSummaryId" />
 	</div>
 
 	<app-danger-zone

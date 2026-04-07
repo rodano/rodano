@@ -13,13 +13,15 @@ import {SettingItemComponent} from '../../shared/setting-item/setting-item.compo
 import {RuleDefinitionAction} from '@core/model/rule-definition-action';
 import {RuleDefinitionActionManagerService} from '../../services/manager/rule-definition-action-manager.service';
 import {RuleDefinitionActionDialogService} from '../../services/dialogs/rule-definition-action-dialog.service';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-rule-definition-action-detail',
 	standalone: true,
 	templateUrl: './rule-definition-action-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
-	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent]
+	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
+		UsedByComponent]
 })
 export class RuleDefinitionActionDetailComponent extends BaseManagerDetailComponent<RuleDefinitionAction, RuleDefinitionActionManagerService> {
 	@Input() override entity!: RuleDefinitionAction;

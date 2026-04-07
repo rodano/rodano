@@ -15,6 +15,7 @@ import {CronManagerService} from '../../services/manager/cron-manager.service';
 import {CronDialogService} from '../../services/dialogs/cron-dialog.service';
 import {RuleListComponent} from '../../rules/rule-list/rule-list.component';
 import {Rule} from '@core/model/rule';
+import {UsedByComponent} from '../../shared/used-by/used-by.component';
 
 @Component({
 	selector: 'app-cron-detail',
@@ -22,7 +23,7 @@ import {Rule} from '@core/model/rule';
 	templateUrl: './cron-detail.component.html',
 	styleUrls: ['../../shared/detail-shared.css'],
 	imports: [CommonModule, MatIconModule, MatButtonModule, MatTooltipModule, DangerZoneComponent, SettingItemComponent,
-		RuleListComponent]
+		RuleListComponent, UsedByComponent]
 })
 export class CronDetailComponent extends BaseManagerDetailComponent<Cron, CronManagerService> {
 	@Input() override entity!: Cron;

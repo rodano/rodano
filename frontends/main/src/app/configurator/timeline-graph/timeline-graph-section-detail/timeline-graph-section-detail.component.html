@@ -53,7 +53,8 @@
 						@if (draftSection.eventModelIds && draftSection.eventModelIds.length > 0) {
 							<div class="chip-container">
 								@for (eventModelId of draftSection.eventModelIds; track eventModelId) {
-									<div class="chip theme-event-model">
+									<div class="chip theme-event-model clickable"
+									     (click)="navigationService.navigateTo('event-model', eventModelId)">
 										<mat-icon class="resource-icon">event</mat-icon>
 										<span class="language-name">{{ getEventModelLabel(eventModelId) }}</span>
 									</div>
@@ -103,7 +104,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-dataset-model">
+						<div class="chip theme-dataset-model clickable"
+						     (click)="navigationService.navigateTo('dataset-model', draftSection.datasetModelId)">
 							<mat-icon class="resource-icon">dataset</mat-icon>
 							<span class="language-name">{{ getDatasetModelLabel(draftSection.datasetModelId) }}</span>
 						</div>
@@ -117,7 +119,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-field-model">
+						<div class="chip theme-field-model clickable"
+						     (click)="navigationService.navigateTo('field-model', draftSection.dateFieldId)">
 							<mat-icon class="resource-icon">text_ad</mat-icon>
 							<span class="language-name">{{ getFieldModelLabel(draftSection.dateFieldId) }}</span>
 						</div>
@@ -131,7 +134,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-field-model">
+						<div class="chip theme-field-model clickable"
+						     (click)="navigationService.navigateTo('field-model', draftSection.endDateFieldId)">
 							<mat-icon class="resource-icon">text_ad</mat-icon>
 							<span class="language-name">{{ getFieldModelLabel(draftSection.endDateFieldId) }}</span>
 						</div>
@@ -145,7 +149,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-field-model">
+						<div class="chip theme-field-model clickable"
+						     (click)="navigationService.navigateTo('field-model', draftSection.valueFieldId)">
 							<mat-icon class="resource-icon">text_ad</mat-icon>
 							<span class="language-name">{{ getFieldModelLabel(draftSection.valueFieldId) }}</span>
 						</div>
@@ -159,7 +164,8 @@
 						<mat-icon class="warning-icon">report</mat-icon>
 						<span>Not configured</span>
 					} @else {
-						<div class="chip theme-field-model">
+						<div class="chip theme-field-model clickable"
+						     (click)="navigationService.navigateTo('field-model', draftSection.labelFieldId)">
 							<mat-icon class="resource-icon">text_ad</mat-icon>
 							<span class="language-name">{{ getFieldModelLabel(draftSection.labelFieldId) }}</span>
 						</div>
@@ -174,7 +180,8 @@
 						@if (draftSection.metaFieldIds && draftSection.metaFieldIds.length > 0) {
 							<div class="chip-container">
 								@for (fieldModelId of draftSection.metaFieldIds; track fieldModelId) {
-									<div class="chip theme-field-model">
+									<div class="chip theme-field-model clickable"
+									     (click)="navigationService.navigateTo('field-model', fieldModelId)">
 										<mat-icon class="resource-icon">text_ad</mat-icon>
 										<span class="language-name">{{ getFieldModelLabel(fieldModelId) }}</span>
 									</div>
@@ -536,6 +543,10 @@
 				<mat-icon>edit</mat-icon>
 				Edit References
 			</button>
+		</div>
+
+		<div class="settings-section">
+			<app-used-by [entityId]="draftSection.graphSectionId" />
 		</div>
 
 		<app-danger-zone

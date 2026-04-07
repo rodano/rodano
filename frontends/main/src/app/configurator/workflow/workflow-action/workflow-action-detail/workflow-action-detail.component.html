@@ -153,6 +153,10 @@
 				</button>
 			</div>
 
+			<div class="settings-section">
+				<app-used-by [entityId]="draftWorkflowAction.workflowActionId" />
+			</div>
+
 			<app-danger-zone
 				[title]="'Delete Workflow Action'"
 				[message]="'Deleting this workflow action is permanent and cannot be undone.'"
