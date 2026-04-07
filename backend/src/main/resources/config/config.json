@@ -27,7 +27,6 @@
 	"versionDate": "25-Dec-2014",
 	"configVersion": 125,
 	"configDate": 1785853373960,
-	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
 		"en",
@@ -17871,6 +17870,7 @@
 			"initialStateId": "PENDING",
 			"unique": false,
 			"icon": "domain",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -17937,6 +17937,7 @@
 			"unique": true,
 			"aggregateWorkflowId": "FORM_REPORTING",
 			"icon": "event",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -18246,6 +18247,7 @@
 			"initialStateId": "NOT_VERIFIED",
 			"unique": true,
 			"icon": "fact_check",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -18334,6 +18336,7 @@
 			"initialStateId": "REGISTERED",
 			"unique": false,
 			"icon": "person",
+			"searchable": true,
 			"className": "Workflow"
 		},
 		{
@@ -18380,6 +18383,7 @@
 			"initialStateId": "NOT_SAVED",
 			"unique": false,
 			"icon": "description",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -18734,6 +18738,7 @@
 			"unique": true,
 			"aggregateWorkflowId": "SOURCE_DATA_VERIFICATION",
 			"icon": "fact_check",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -19164,6 +19169,7 @@
 			"actionId": "CREATE_PD",
 			"unique": false,
 			"icon": "flag",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -19727,6 +19733,7 @@
 			"actionId": "CREATE_QUERY",
 			"unique": false,
 			"icon": "comment",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -19857,6 +19864,7 @@
 			"initialStateId": "UNSIGNED",
 			"unique": false,
 			"icon": "verified_user",
+			"searchable": true,
 			"className": "Workflow"
 		},
 		{
@@ -20245,6 +20253,7 @@
 			"unique": true,
 			"aggregateWorkflowId": "SOURCE_DATA_VERIFICATION",
 			"icon": "fact_check",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -20462,6 +20471,7 @@
 			"initialStateId": "READY_TO_REVIEW",
 			"unique": false,
 			"icon": "manufacturing",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -21354,6 +21364,7 @@
 			"unique": true,
 			"aggregateWorkflowId": "SOURCE_DATA_VERIFICATION",
 			"icon": "fact_check",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -21389,6 +21400,7 @@
 			"unique": true,
 			"aggregateWorkflowId": "QUERY",
 			"icon": "comment",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -21458,6 +21470,7 @@
 			"unique": true,
 			"aggregateWorkflowId": "PROTOCOL_DEVIATION",
 			"icon": "flag",
+			"searchable": false,
 			"className": "Workflow"
 		},
 		{
@@ -21803,6 +21816,7 @@
 			"initialStateId": "OPEN",
 			"unique": false,
 			"icon": "comment",
+			"searchable": false,
 			"className": "Workflow"
 		}
 	],
@@ -22189,7 +22203,7 @@
 				"REPORTS",
 				"OVERVIEW",
 				"DOCUMENTATION",
-				"SEARCH",
+				"PATIENTS",
 				"DOCUMENTS",
 				"EXTRACTS",
 				"COUNTRIES_MANAGEMENT",
@@ -22456,7 +22470,7 @@
 				"DOCUMENTS",
 				"PROTOCOL_DEVIATION_STATUS",
 				"VISIT_STATUS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
 				"DATA_MANAGEMENT_STATUS"
@@ -22692,7 +22706,7 @@
 				"DOCUMENTS",
 				"PROTOCOL_DEVIATION_STATUS",
 				"VISIT_STATUS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
 				"DATA_MANAGEMENT_STATUS"
@@ -22791,7 +22805,7 @@
 				"DASHBOARD",
 				"HELP",
 				"USERS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT"
 			],
@@ -22879,7 +22893,7 @@
 				"DASHBOARD",
 				"HELP",
 				"USERS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT"
 			],
@@ -22979,7 +22993,7 @@
 				"DASHBOARD",
 				"HELP",
 				"USERS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT"
 			],
@@ -23263,7 +23277,7 @@
 				"VISIT_STATUS",
 				"PROTOCOL_DEVIATION_STATUS",
 				"CENTERS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
 				"LOCK_SUMMARY",
@@ -23506,7 +23520,7 @@
 				"PROTOCOL_DEVIATION_STATUS",
 				"SIGNATURE_STATUS",
 				"REPORTS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
 				"DATA_MANAGEMENT_STATUS"
@@ -23749,7 +23763,7 @@
 				"DOCUMENTS",
 				"PROTOCOL_DEVIATION_STATUS",
 				"REPORTS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
 				"DATA_MANAGEMENT_STATUS",
@@ -24005,7 +24019,7 @@
 				"EXTRACTS",
 				"VISIT_STATUS",
 				"PROTOCOL_DEVIATION_STATUS",
-				"SEARCH",
+				"PATIENTS",
 				"BENCHMARKING",
 				"COHORTS_MANAGEMENT",
 				"DATA_MANAGEMENT_STATUS",
@@ -24290,7 +24304,7 @@
 			"grantedFeatureIds": [],
 			"grantedMenuIds": [
 				"HELP",
-				"SEARCH",
+				"PATIENTS",
 				"DASHBOARD",
 				"USERS",
 				"CENTERS",
@@ -24507,9 +24521,9 @@
 			"className": "Menu"
 		},
 		{
-			"id": "SEARCH",
+			"id": "PATIENTS",
 			"shortname": {
-				"en": "Search"
+				"en": "Patients"
 			},
 			"longname": {},
 			"description": {},

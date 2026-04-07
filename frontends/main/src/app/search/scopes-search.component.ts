@@ -304,6 +304,7 @@ export class SearchComponent implements OnInit {
 
 	private createFormControlsAndObservables(): Observable<any>[] {
 		const observables: Observable<any>[] = [];
+		let hasDateFields = false;
 
 		//Create workflow controls
 		this.searchableWorkflows.forEach(workflow => {
@@ -318,17 +319,21 @@ export class SearchComponent implements OnInit {
 			this.searchForm.addControl(this.getSFFormControlName(fieldModel), control);
 
 			if(this.getIsSearchableDate(fieldModel)) {
-				const enterKeyPress$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
-					filter(event => event.key === 'Enter'),
-					map(() => control.value),
-					takeUntilDestroyed(this.destroyRef)
-				);
-				observables.push(enterKeyPress$);
+				hasDateFields = true;
 			}
 			else {
 				observables.push(control.valueChanges);
 			}
 		});
+
+		//Add a single shared Enter key observable for all date fields
+		if(hasDateFields) {
+			const enterKeyPress$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
+				filter(event => event.key === 'Enter'),
+				takeUntilDestroyed(this.destroyRef)
+			);
+			observables.push(enterKeyPress$);
+		}
 
 		return observables;
 	}
@@ -514,16 +519,11 @@ export class SearchComponent implements OnInit {
 			search.workflowStates[workflowId] = value;
 		});
 
-		//Process field model criteria
+		//Rebuild fieldModelCriteria from current control values
+		const newFieldModelCriteria: FieldModelCriterion[] = [];
 		this.searchableFields.forEach(fieldModel => {
 			const control = this.searchForm.controls[this.getSFFormControlName(fieldModel)];
 			if(!control?.value) {
-				const removeIndex = this.fieldModelCriteria.findIndex(
-					c => c.datasetModelId === fieldModel.datasetModelId && c.fieldModelId === fieldModel.id
-				);
-				if(removeIndex >= 0) {
-					this.fieldModelCriteria.splice(removeIndex, 1);
-				}
 				return;
 			}
 
@@ -536,23 +536,15 @@ export class SearchComponent implements OnInit {
 			}
 
 			const operator = isString ? Operator.CONTAINS : Operator.EQUALS;
-			const existingIndex = this.fieldModelCriteria.findIndex(
-				c => c.datasetModelId === fieldModel.datasetModelId && c.fieldModelId === fieldModel.id
-			);
-
-			if(existingIndex >= 0) {
-				this.fieldModelCriteria[existingIndex] = {...this.fieldModelCriteria[existingIndex], value, operator};
-			}
-			else {
-				this.fieldModelCriteria.push({
-					value,
-					operator,
-					datasetModelId: fieldModel.datasetModelId,
-					fieldModelId: fieldModel.id
-				});
-			}
+			newFieldModelCriteria.push({
+				value,
+				operator,
+				datasetModelId: fieldModel.datasetModelId,
+				fieldModelId: fieldModel.id
+			});
 		});
 
+		this.fieldModelCriteria = newFieldModelCriteria;
 		if(this.fieldModelCriteria.length > 0) {
 			search.fieldModelCriteria = JSON.stringify(this.fieldModelCriteria);
 		}
