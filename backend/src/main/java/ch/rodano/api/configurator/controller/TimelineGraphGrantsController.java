@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.TimelineGraphGrantsService;
 
 @RestController
@@ -32,6 +33,7 @@ public class TimelineGraphGrantsController {
 	}
 
 	@PutMapping("/timeline-graph-grants")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveTimelineGraphGrants(
 		@PathVariable final UUID projectId,
 		@RequestBody final Map<UUID, List<UUID>> profileTimelineGraphMap

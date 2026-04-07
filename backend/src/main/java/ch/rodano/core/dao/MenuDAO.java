@@ -32,20 +32,11 @@ public class MenuDAO implements BaseProjectDAO<Menu> {
 
 	@Override
 	public List<Menu> findByProject(final UUID projectId) {
-		final var allMenus = dslContext.selectFrom(MENU)
+		return dslContext.selectFrom(MENU)
 			.where(MENU.PROJECT_ID.eq(projectId))
+			.and(MENU.PARENT_MENU_ID.isNull())
 			.orderBy(MENU.ORDER_BY)
 			.fetch(this::mapToModel);
-
-		return allMenus.stream()
-			.filter(menu -> {
-				final var record = dslContext.selectFrom(MENU)
-					.where(MENU.PROJECT_ID.eq(projectId))
-					.and(MENU.CODE.eq(menu.getId()))
-					.fetchOne();
-				return record != null && record.getParentMenuId() == null;
-			})
-			.toList();
 	}
 
 	@Override

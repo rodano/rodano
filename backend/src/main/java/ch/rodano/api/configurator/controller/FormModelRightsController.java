@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.EntityRightDTO;
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.FormModelRightsService;
 
 @RestController
@@ -32,6 +33,7 @@ public class FormModelRightsController {
 	}
 
 	@PutMapping("/form-model-rights")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveFormModelRights(
 		@PathVariable final UUID projectId,
 		@RequestBody final Map<UUID, Map<UUID, EntityRightDTO>> rights

@@ -80,9 +80,10 @@
 					matTooltip="View Snapshots">
 					<mat-icon>photo_library</mat-icon>
 				</button>
-				<button class="btn-primary" (click)="onPublish()" [disabled]="saving">
+				<button class="btn-primary" (click)="onPublish()"
+				        [disabled]="saving || draftVersion?.status === 'PUBLISHED'">
 					<mat-icon>publish</mat-icon>
-					Publish
+					{{ draftVersion?.status === 'PUBLISHED' ? 'Published' : 'Publish' }}
 				</button>
 			</div>
 		</div>

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.WorkflowRightsDTO;
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.WorkflowRightsService;
 
 @RestController
@@ -31,6 +32,7 @@ public class WorkflowRightsController {
 	}
 
 	@PutMapping("/workflow-rights")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveWorkflowRights(
 		@PathVariable final UUID projectId,
 		@RequestBody final WorkflowRightsDTO dto

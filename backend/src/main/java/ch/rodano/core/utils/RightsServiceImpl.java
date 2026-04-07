@@ -41,7 +41,7 @@ import static ch.rodano.core.model.jooq.Tables.SCOPE_ANCESTOR;
 @Service
 public class RightsServiceImpl implements RightsService {
 
-	private static final Logger LOGGER =  LoggerFactory.getLogger(RightsServiceImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(RightsServiceImpl.class);
 
 	private final DSLContext create;
 	private final StudyService studyService;
@@ -62,6 +62,13 @@ public class RightsServiceImpl implements RightsService {
 
 	@Override
 	public ACL getACL(final Actor actor) {
+		if(actor instanceof User user && user.isSuperuser()) {
+			final var permissions = studyService.getStudy().getProfiles().stream()
+				.map(profile -> new Permission(profile, Timeframe.INFINITE_TIMEFRAME))
+				.toList();
+			return new ACL(actor, Optional.empty(), permissions);
+		}
+
 		final var currentProjectId = studyService.getCurrentProjectId();
 		final var conditions = new ArrayList<Condition>();
 		if(actor instanceof User) {
@@ -95,6 +102,13 @@ public class RightsServiceImpl implements RightsService {
 
 	@Override
 	public ACL getACL(final Actor actor, final Scope scope) {
+		if(actor instanceof User user && user.isSuperuser()) {
+			final var permissions = studyService.getStudy().getProfiles().stream()
+				.map(profile -> new Permission(profile, Timeframe.INFINITE_TIMEFRAME))
+				.toList();
+			return new ACL(actor, Optional.of(scope), permissions);
+		}
+
 		final var currentProjectId = studyService.getCurrentProjectId();
 		final var conditions = new ArrayList<Condition>();
 		if(actor instanceof User) {

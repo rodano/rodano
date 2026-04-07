@@ -195,8 +195,7 @@ public class ConfiguratorDAOServiceImpl implements ConfiguratorDAOService {
 			.on(activeVersion.PK.eq(PROJECT.ACTIVE_CONFIG_VERSION_FK))
 			.leftJoin(draftVersion)
 			.on(draftVersion.PROJECT_ID.eq(PROJECT.PROJECT_ID)
-				.and(draftVersion.STATUS.in(ProjectConfigVersionStatus.DRAFT, ProjectConfigVersionStatus.ARCHIVED))
-				.and(draftVersion.PK.ne(activeVersion.PK).or(activeVersion.PK.isNull())))
+				.and(draftVersion.STATUS.eq(ProjectConfigVersionStatus.DRAFT)))
 			.where(PROJECT.PROJECT_ID.eq(projectId))
 			.fetchOne(record -> new ConfiguratorProjectDTO(
 				record.get(PROJECT.PROJECT_ID),

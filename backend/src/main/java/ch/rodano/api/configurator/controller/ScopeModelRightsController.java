@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ch.rodano.api.config.EntityRightDTO;
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.ScopeModelRightsService;
 
 @RestController
@@ -32,6 +33,7 @@ public class ScopeModelRightsController {
 	}
 
 	@PutMapping("/scope-model-rights")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveScopeModelRights(
 		@PathVariable final UUID projectId,
 		@RequestBody final Map<UUID, Map<UUID, EntityRightDTO>> rights

@@ -1130,7 +1130,50 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 	}
 
 	onPublish(): void {
-		console.log('Publish clicked');
+		if(!this.draftVersion) {
+			return;
+		}
+
+		if(this.hasModifications) {
+			this.snackBar.open('Please save your changes before publishing', 'Close', {duration: 3000});
+			return;
+		}
+
+		const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+			width: '500px',
+			data: {
+				title: 'Publish Configuration',
+				message: `Publishing will make this configuration active and visible to users. Version ${this.draftVersion.versionNumber} will become the active version. Continue?`,
+				confirmText: 'Publish',
+				cancelText: 'Cancel',
+				type: 'warning'
+			}
+		});
+
+		dialogRef.afterClosed().subscribe(confirmed => {
+			if(!confirmed) {
+				return;
+			}
+
+			this.saving = true;
+			this.configuratorService.publishDraft(
+				this.projectId,
+				this.draftVersion!.pk!,
+				`Published version ${this.draftVersion!.versionNumber}`
+			).subscribe({
+				next: () => {
+					this.saving = false;
+					this.snackBar.open('Configuration published successfully', 'Close', {duration: 3000});
+					this.initializeProject();
+				},
+				error: error => {
+					console.error('Error publishing:', error);
+					this.saving = false;
+					this.snackBar.open('Failed to publish configuration', 'Close', {duration: 3000});
+					this.router.navigate(['/configurator']);
+				}
+			});
+		});
 	}
 
 	onBack(): void {

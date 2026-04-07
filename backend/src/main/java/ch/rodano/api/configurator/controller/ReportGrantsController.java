@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.ReportGrantsService;
 
 @RestController
@@ -32,6 +33,7 @@ public class ReportGrantsController {
 	}
 
 	@PutMapping("/report-grants")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveReportGrants(
 		@PathVariable final UUID projectId,
 		@RequestBody final Map<UUID, List<UUID>> profileReportMap

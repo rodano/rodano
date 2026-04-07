@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.FeatureGrantsService;
 
 @RestController
@@ -32,6 +33,7 @@ public class FeatureGrantsController {
 	}
 
 	@PutMapping("/feature-grants")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveFeatureGrants(
 		@PathVariable final UUID projectId,
 		@RequestBody final Map<UUID, List<UUID>> profileFeatureMap

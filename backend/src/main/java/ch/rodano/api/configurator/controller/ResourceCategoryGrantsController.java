@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.services.bll.configurator.ResourceCategoryGrantsService;
 
 @RestController
@@ -32,6 +33,7 @@ public class ResourceCategoryGrantsController {
 	}
 
 	@PutMapping("/category-grants")
+	@SkipProjectAccessCheck
 	public ResponseEntity<Void> saveResourceCategoryGrants(
 		@PathVariable final UUID projectId,
 		@RequestBody final Map<UUID, List<UUID>> profileResourceCategoryMap

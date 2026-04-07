@@ -72,24 +72,24 @@ public class DatabaseStudyLoader {
 	private final RuleDAO ruleDAO;
 
 	public DatabaseStudyLoader(final ProjectDAO projectDAO,
-							   final ScopeModelDAO scopeModelDAO,
-							   final DatasetModelDAO datasetModelDAO,
-							   final FormModelDAO formModelDAO,
-							   final WorkflowDAO workflowDAO,
-							   final FeatureDAO featureDAO,
-							   final PaymentPlanDAO paymentPlanDAO,
-							   final PrivacyPolicyDAO privacyPolicyDAO,
-							   final ReportDAO reportDAO,
-							   final WorkflowSummaryDAO workflowSummaryDAO,
-							   final WorkflowWidgetDAO workflowWidgetDAO,
-							   final ResourceCategoryDAO resourceCategoryDAO,
-							   final TimelineGraphDAO timelineGraphDAO,
-							   final CronDAO cronDAO,
-							   final MenuDAO menuDAO,
-							   final ChartDAO chartDAO,
-							   final ProfileDAO profileDAO,
-							   final ValidatorDAO validatorDAO,
-							   final RuleDAO ruleDAO) {
+	                           final ScopeModelDAO scopeModelDAO,
+	                           final DatasetModelDAO datasetModelDAO,
+	                           final FormModelDAO formModelDAO,
+	                           final WorkflowDAO workflowDAO,
+	                           final FeatureDAO featureDAO,
+	                           final PaymentPlanDAO paymentPlanDAO,
+	                           final PrivacyPolicyDAO privacyPolicyDAO,
+	                           final ReportDAO reportDAO,
+	                           final WorkflowSummaryDAO workflowSummaryDAO,
+	                           final WorkflowWidgetDAO workflowWidgetDAO,
+	                           final ResourceCategoryDAO resourceCategoryDAO,
+	                           final TimelineGraphDAO timelineGraphDAO,
+	                           final CronDAO cronDAO,
+	                           final MenuDAO menuDAO,
+	                           final ChartDAO chartDAO,
+	                           final ProfileDAO profileDAO,
+	                           final ValidatorDAO validatorDAO,
+	                           final RuleDAO ruleDAO) {
 		this.projectDAO = projectDAO;
 		this.scopeModelDAO = scopeModelDAO;
 		this.datasetModelDAO = datasetModelDAO;

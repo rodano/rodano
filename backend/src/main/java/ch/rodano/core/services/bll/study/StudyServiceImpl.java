@@ -1,6 +1,5 @@
 package ch.rodano.core.services.bll.study;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Map;
@@ -173,7 +172,7 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 	}
 
 	@Override
-	public void reloadStudyFromDatabase() throws IOException {
+	public void reloadStudyFromDatabase() {
 		if(study == null) {
 			throw new IllegalStateException("No study loaded. Cannot reload.");
 		}
