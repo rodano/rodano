@@ -94,4 +94,8 @@ export class ConfiguratorService {
 	getSnapshots(projectId: string, versionId: number): Observable<ConfigSnapshot> {
 		return this.http.get<ConfigSnapshot>(`${this.baseUrl}/projects/${projectId}/versions/${versionId}/snapshots`);
 	}
+
+	exportConfig(projectId: string): Observable<Blob> {
+		return this.http.get(`/api/superuser/configurator/projects/${projectId}/config/export`, {responseType: 'blob'});
+	}
 }

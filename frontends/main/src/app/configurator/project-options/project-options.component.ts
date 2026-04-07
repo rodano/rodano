@@ -15,6 +15,8 @@ import {EventGroupManagerService} from '../services/manager/event-group-manager.
 import {WorkflowStateManagerService} from '../services/manager/workflow-state-manager.service';
 import {WorkflowActionManagerService} from '../services/manager/workflow-action-manager.service';
 import {FieldModelManagerService} from '../services/manager/field-model-manager.service';
+import {ConfiguratorService} from '../services/api/configurator.service';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 type ViewMode = 'options-list' | 'triggers';
 
@@ -44,11 +46,13 @@ export class ProjectOptionsComponent implements OnInit, OnChanges {
 
 	constructor(
 		public languageService: LanguageService,
+		private configuratorService: ConfiguratorService,
 		private eventModelManager: EventModelManagerService,
 		private eventGroupManager: EventGroupManagerService,
 		private workflowStateManager: WorkflowStateManagerService,
 		private workflowActionManager: WorkflowActionManagerService,
-		private fieldModelManager: FieldModelManagerService
+		private fieldModelManager: FieldModelManagerService,
+		private snackBar: MatSnackBar
 	) {}
 
 	ngOnInit(): void {
@@ -85,6 +89,23 @@ export class ProjectOptionsComponent implements OnInit, OnChanges {
 		}).subscribe(() => {
 			this.viewMode = 'triggers';
 			this.nodeSelected.emit('options-triggers');
+		});
+	}
+
+	onExportConfig(): void {
+		this.configuratorService.exportConfig(this.projectId).subscribe({
+			next: blob => {
+				const url = URL.createObjectURL(blob);
+				const a = document.createElement('a');
+				a.href = url;
+				a.download = `${this.project?.code ?? 'config'}.json`;
+				a.click();
+				URL.revokeObjectURL(url);
+			},
+			error: e => {
+				console.error('Export failed:', e);
+				this.snackBar.open('Failed to export configuration', 'Close', {duration: 3000});
+			}
 		});
 	}
 
