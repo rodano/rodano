@@ -18,7 +18,9 @@ import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
 import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
 import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.request.UpdateProjectRequest;
+import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
+import ch.rodano.core.loader.DatabaseStudyLoader;
 import ch.rodano.core.services.bll.configurator.ConfiguratorService;
 
 @RestController
@@ -27,9 +29,11 @@ import ch.rodano.core.services.bll.configurator.ConfiguratorService;
 public class ConfiguratorController {
 
 	private final ConfiguratorService configuratorService;
+	private final DatabaseStudyLoader databaseStudyLoader;
 
-	public ConfiguratorController(final ConfiguratorService configuratorService) {
+	public ConfiguratorController(final ConfiguratorService configuratorService, final DatabaseStudyLoader databaseStudyLoader) {
 		this.configuratorService = configuratorService;
+		this.databaseStudyLoader = databaseStudyLoader;
 	}
 
 	/**
@@ -197,6 +201,18 @@ public class ConfiguratorController {
 	) {
 		final var snapshots = configuratorService.getSnapshots(projectId, versionId);
 		return ResponseEntity.ok(snapshots);
+	}
+
+	/**
+	 * Download the project as JSON
+	 */
+	@GetMapping("/projects/{projectId}/config/export")
+	public ResponseEntity<Study> exportConfig(@PathVariable final UUID projectId) {
+		final Study study = databaseStudyLoader.loadStudy(projectId);
+		return ResponseEntity.ok()
+			.header("Content-Disposition",
+				"attachment; filename=\"" + study.generateFilename("config") + ".json\"")
+			.body(study);
 	}
 
 	/**

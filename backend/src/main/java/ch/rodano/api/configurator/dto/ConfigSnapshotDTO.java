@@ -2,6 +2,7 @@ package ch.rodano.api.configurator.dto;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 public record ConfigSnapshotDTO(
 	List<SnapshotEntry> snapshots,
@@ -11,7 +12,7 @@ public record ConfigSnapshotDTO(
 	public record SnapshotEntry(
 		ZonedDateTime timestamp,
 		String summary,
-		ConfiguratorProjectDTO data
+		Map<String, String> tables
 	) {
 	}
 }

@@ -56,11 +56,11 @@
 							<div class="card-details">
 								<div class="detail-item">
 									<mat-icon>settings</mat-icon>
-									<span>Workflow: <b>{{ getWorkflowLabel(report.workflowId) }}</b></span>
+									<span>Workflow: <b>{{ report.workflowId ? getWorkflowLabel(report.workflowId) : 'Not set' }}</b></span>
 								</div>
 								<div class="detail-item">
 									<mat-icon>dataset</mat-icon>
-									<span>Dataset Model: <b>{{ getDatasetModelLabel(report.datasetModelId) }}</b></span>
+									<span>Dataset Model: <b>{{ report.datasetModelId ? getDatasetModelLabel(report.datasetModelId) : 'Not set' }}</b></span>
 								</div>
 								<div class="detail-item">
 									<mat-icon>text_ad</mat-icon>

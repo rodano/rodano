@@ -16,7 +16,7 @@ import {ConfirmationDialogComponent} from '../../confirmation-dialog/confirmatio
 import {ComponentCanDeactivate} from '../../guards/unsaved-changes.guard';
 import {LanguageService} from '../services/language.service';
 import {SnapshotManagerService} from '../services/manager/snapshot-manager.service';
-import {forkJoin, Observable, of, lastValueFrom} from 'rxjs';
+import {forkJoin, lastValueFrom, Observable, of} from 'rxjs';
 import {map} from 'rxjs/operators';
 import {EntitySaveOrchestratorService} from '../services/entity-save-orchestrator.service';
 import {ScopeModelManagerService} from '../services/manager/scope-model-manager.service';
@@ -1090,11 +1090,14 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 			this.draftVersion.pk!,
 			targetIndex
 		).subscribe({
-			next: updatedProject => {
-				this.project = updatedProject;
-				this.workingProject = {...updatedProject};
-				this.modifiedFields.clear();
-				this.loadSnapshotState();
+			next: () => {
+				this.resetAllModifications();
+				this.initializeProject();
+				this.snackBar.open('Snapshot restored', 'Close', {duration: 2000});
+			},
+			error: error => {
+				console.error('Error restoring snapshot:', error);
+				this.snackBar.open('Failed to restore snapshot', 'Close', {duration: 3000});
 			}
 		});
 	}

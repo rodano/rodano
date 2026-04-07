@@ -1,12 +1,20 @@
 package ch.rodano.core.services.bll.configurator;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
@@ -29,15 +37,20 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 	private final UserSecurityService userSecurityService;
 	private final ObjectMapper objectMapper;
 
+	private final SnapshotRestoreService snapshotRestoreService;
+
 	public ConfiguratorServiceImpl(
 		final ConfiguratorDAOService configuratorDAOService,
 		final UserSecurityService userSecurityService,
-		final ObjectMapper objectMapper
+		final ObjectMapper objectMapper,
+		final SnapshotRestoreService snapshotRestoreService
 	) {
 		this.configuratorDAOService = configuratorDAOService;
 		this.userSecurityService = userSecurityService;
 		this.objectMapper = new ObjectMapper();
 		this.objectMapper.registerModule(new JavaTimeModule());
+		this.objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		this.snapshotRestoreService = snapshotRestoreService;
 	}
 
 	@Override
@@ -199,22 +212,21 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 
 	@Override
 	public void createSnapshot(final UUID projectId, final Long versionId, final String summary) {
-		final var project = configuratorDAOService.getProject(projectId);
 		final var version = configuratorDAOService.getVersion(projectId, versionId);
-
 		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
 			throw new IllegalStateException("Can only create snapshots for DRAFT versions");
 		}
 
-		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
+		final var tableData = snapshotRestoreService.captureProjectData(projectId);
 
+		final var configSnapshotRaw = configuratorDAOService.getConfigSnapshot(versionId);
 		ConfigSnapshotDTO snapshots;
 		try {
-			if(configSnapshotJson == null || configSnapshotJson.isEmpty() || "{}".equals(configSnapshotJson)) {
+			if(configSnapshotRaw == null || configSnapshotRaw.isEmpty() || "{}".equals(configSnapshotRaw)) {
 				snapshots = new ConfigSnapshotDTO(new java.util.ArrayList<>(), -1);
 			}
 			else {
-				snapshots = objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+				snapshots = objectMapper.readValue(decompressFromBase64(configSnapshotRaw), ConfigSnapshotDTO.class);
 			}
 		}
 		catch(Exception e) {
@@ -226,58 +238,42 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 			snapshotList.subList(snapshots.currentIndex() + 1, snapshotList.size()).clear();
 		}
 
-		final var newSnapshot = new ConfigSnapshotDTO.SnapshotEntry(
-			ZonedDateTime.now(),
-			summary,
-			project
-		);
-		snapshotList.add(newSnapshot);
+		snapshotList.add(new ConfigSnapshotDTO.SnapshotEntry(ZonedDateTime.now(), summary, tableData));
 
-		final var updatedSnapshots = new ConfigSnapshotDTO(
-			snapshotList,
-			snapshotList.size() - 1
-		);
-
+		final var updatedSnapshots = new ConfigSnapshotDTO(snapshotList, snapshotList.size() - 1);
 		try {
-			final var snapshotJson = objectMapper.writeValueAsString(updatedSnapshots);
-			configuratorDAOService.updateConfigSnapshot(versionId, snapshotJson);
-			incrementVersionNumber(versionId);
+			configuratorDAOService.updateConfigSnapshot(versionId, compressToBase64(objectMapper.writeValueAsString(updatedSnapshots)));
+			configuratorDAOService.incrementVersionNumber(versionId);
 		}
 		catch(Exception e) {
 			throw new RuntimeException("Failed to create snapshot", e);
 		}
 	}
 
-	private void incrementVersionNumber(final Long versionId) {
-		configuratorDAOService.incrementVersionNumber(versionId);
-	}
-
 	@Override
 	public void rollbackSnapshot(final UUID projectId, final Long versionId) {
 		final var version = configuratorDAOService.getVersion(projectId, versionId);
-
 		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
 			throw new IllegalStateException("Can only rollback DRAFT versions");
 		}
 
-		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
-
 		try {
-			final var snapshots = objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+			final var snapshots = objectMapper.readValue(
+				decompressFromBase64(configuratorDAOService.getConfigSnapshot(versionId)),
+				ConfigSnapshotDTO.class);
 
 			if(snapshots.currentIndex() == null || snapshots.currentIndex() <= 0) {
 				throw new IllegalStateException("No previous snapshot to rollback to");
 			}
 
 			final var newIndex = snapshots.currentIndex() - 1;
-			final var snapshotToRestore = snapshots.snapshots().get(newIndex);
+			snapshotRestoreService.restoreProjectData(projectId, snapshots.snapshots().get(newIndex).tables());
 
-			final var updateRequest = buildUpdateRequest(snapshotToRestore.data());
-
-			configuratorDAOService.updateProject(projectId, updateRequest);
-
-			final var updated = new ConfigSnapshotDTO(snapshots.snapshots(), newIndex);
-			configuratorDAOService.updateConfigSnapshot(versionId, objectMapper.writeValueAsString(updated));
+			configuratorDAOService.updateConfigSnapshot(versionId,
+				compressToBase64(objectMapper.writeValueAsString(new ConfigSnapshotDTO(snapshots.snapshots(), newIndex))));
+		}
+		catch(RuntimeException e) {
+			throw e;
 		}
 		catch(Exception e) {
 			throw new RuntimeException("Failed to rollback snapshot", e);
@@ -287,29 +283,27 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 	@Override
 	public void rollForwardSnapshot(final UUID projectId, final Long versionId) {
 		final var version = configuratorDAOService.getVersion(projectId, versionId);
-
 		if(version.status() != ProjectConfigVersionStatus.DRAFT) {
 			throw new IllegalStateException("Can only roll forward DRAFT versions");
 		}
 
-		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
-
 		try {
-			final var snapshots = objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+			final var snapshots = objectMapper.readValue(
+				decompressFromBase64(configuratorDAOService.getConfigSnapshot(versionId)),
+				ConfigSnapshotDTO.class);
 
 			if(snapshots.currentIndex() == null || snapshots.currentIndex() >= snapshots.snapshots().size() - 1) {
 				throw new IllegalStateException("No next snapshot to roll forward to");
 			}
 
 			final var newIndex = snapshots.currentIndex() + 1;
-			final var snapshotToRestore = snapshots.snapshots().get(newIndex);
+			snapshotRestoreService.restoreProjectData(projectId, snapshots.snapshots().get(newIndex).tables());
 
-			final var updateRequest = buildUpdateRequest(snapshotToRestore.data());
-
-			configuratorDAOService.updateProject(projectId, updateRequest);
-
-			final var updated = new ConfigSnapshotDTO(snapshots.snapshots(), newIndex);
-			configuratorDAOService.updateConfigSnapshot(versionId, objectMapper.writeValueAsString(updated));
+			configuratorDAOService.updateConfigSnapshot(versionId,
+				compressToBase64(objectMapper.writeValueAsString(new ConfigSnapshotDTO(snapshots.snapshots(), newIndex))));
+		}
+		catch(RuntimeException e) {
+			throw e;
 		}
 		catch(Exception e) {
 			throw new RuntimeException("Failed to roll forward snapshot", e);
@@ -319,42 +313,32 @@ public class ConfiguratorServiceImpl implements ConfiguratorService {
 	@Override
 	public ConfigSnapshotDTO getSnapshots(final UUID projectId, final Long versionId) {
 		final var configSnapshotJson = configuratorDAOService.getConfigSnapshot(versionId);
-
 		try {
 			if(configSnapshotJson == null || configSnapshotJson.isEmpty() || "{}".equals(configSnapshotJson)) {
 				return new ConfigSnapshotDTO(List.of(), -1);
 			}
-			return objectMapper.readValue(configSnapshotJson, ConfigSnapshotDTO.class);
+			return objectMapper.readValue(decompressFromBase64(configSnapshotJson), ConfigSnapshotDTO.class);
 		}
 		catch(Exception e) {
 			return new ConfigSnapshotDTO(List.of(), -1);
 		}
 	}
 
-	private UpdateProjectRequest buildUpdateRequest(final ConfiguratorProjectDTO data) {
-		return new UpdateProjectRequest(
-			data.code(),
-			data.shortname(),
-			data.longname(),
-			data.description(),
-			data.url(),
-			data.color(),
-			data.introductionText(),
-			data.versionDate(),
-			data.email(),
-			data.smtpTls(),
-			data.passwordStrong(),
-			data.passwordLength(),
-			data.passwordValidityDuration(),
-			data.passwordUnique(),
-			data.eproEnabled(),
-			data.eproProfileId(),
-			data.clientName(),
-			data.clientEmail(),
-			data.protocolNo(),
-			data.versionNumber(),
-			data.languages(),
-			data.ruleTags()
-		);
+	private String compressToBase64(final String json) throws IOException {
+		final var bos = new ByteArrayOutputStream();
+		try(final var gz = new GZIPOutputStream(bos)) {
+			gz.write(json.getBytes(StandardCharsets.UTF_8));
+		}
+		return Base64.getEncoder().encodeToString(bos.toByteArray());
+	}
+
+	private String decompressFromBase64(final String base64) throws IOException {
+		if(base64 == null || base64.startsWith("{")) {
+			return base64;
+		}
+		final byte[] compressed = Base64.getDecoder().decode(base64);
+		try(final var gz = new GZIPInputStream(new ByteArrayInputStream(compressed))) {
+			return new String(gz.readAllBytes(), StandardCharsets.UTF_8);
+		}
 	}
 }

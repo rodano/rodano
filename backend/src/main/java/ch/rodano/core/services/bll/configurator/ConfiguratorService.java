@@ -5,8 +5,8 @@ import java.util.UUID;
 
 import ch.rodano.api.configurator.dto.ConfigSnapshotDTO;
 import ch.rodano.api.configurator.dto.ConfiguratorProjectDTO;
-import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.dto.ProjectConfigVersionDTO;
+import ch.rodano.api.configurator.request.CreateProjectRequest;
 import ch.rodano.api.configurator.request.UpdateProjectRequest;
 
 public interface ConfiguratorService {
