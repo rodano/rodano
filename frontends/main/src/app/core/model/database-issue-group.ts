@@ -15,24 +15,28 @@ import { DatabaseIssueType } from './database-issue-type';
 /**
  * An issue detected during a database consistency check
  */
-export interface DatabaseIssue { 
+export interface DatabaseIssueGroup { 
     entity: DatabaseIssueEntity;
     /**
      * Model id of the affected entity
      */
     modelId: string;
     /**
-     * Primary key of the affected entity
+     * Primary keys of the affected entities
      */
-    pk: number;
+    pks: Array<number>;
+    /**
+     * Number of affected entities
+     */
+    count?: number;
     type: DatabaseIssueType;
     /**
-     * Description of the issue
+     * Id of the entity missing in the database or in the configuration
      */
-    error: string;
+    missingEntityId?: string;
     status: DatabaseIssueStatus;
 }
-export namespace DatabaseIssue {
+export namespace DatabaseIssueGroup {
 }
 
 

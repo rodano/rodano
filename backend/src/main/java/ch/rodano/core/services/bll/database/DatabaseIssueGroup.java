@@ -1,9 +1,11 @@
 package ch.rodano.core.services.bll.database;
 
-public record DatabaseIssue(
+import java.util.List;
+
+public record DatabaseIssueGroup(
 	DatabaseIssueEntity entity,
 	String modelId,
-	Long pk,
+	List<Long> pks,
 	DatabaseIssueType type,
 	String missingEntityId,
 	DatabaseIssueStatus status

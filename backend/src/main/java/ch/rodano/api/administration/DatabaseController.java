@@ -134,13 +134,13 @@ public class DatabaseController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	@Transactional
-	public List<DatabaseIssueDTO> updateDatabase(
+	public List<DatabaseIssueGroupDTO> updateDatabase(
 		@RequestBody final Map<String, Boolean> payload
 	) {
 		final var dryRun = payload.getOrDefault("dryRun", true);
 		final var issues = databaseUpdateService.updateDatabase(dryRun, currentContext(), "Database consistency update");
 		return issues.stream()
-			.map(DatabaseIssueDTO::new)
+			.map(DatabaseIssueGroupDTO::new)
 			.toList();
 	}
 

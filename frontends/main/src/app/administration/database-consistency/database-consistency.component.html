@@ -17,10 +17,58 @@
 	</button>
 </p>
 
+<div class="browse-entities">
+	<form
+		[formGroup]="filterForm"
+		(ngSubmit)="search()">
+		<mat-form-field>
+			<mat-label>Entity</mat-label>
+			<mat-select
+				multiple
+				formControlName="entity">
+				@for (entity of entityOptions; track entity) {
+					<mat-option [value]="entity">{{ entity }}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<mat-form-field>
+			<mat-label>Type</mat-label>
+			<mat-select
+				multiple
+				formControlName="type">
+				@for (type of typeOptions; track type) {
+					<mat-option [value]="type">{{ getDatabaseIssueTypeDisplay(type).label }}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<mat-form-field>
+			<mat-label>Status</mat-label>
+			<mat-select
+				multiple
+				formControlName="status">
+				@for (status of statusOptions; track status) {
+					<mat-option [value]="status">{{ getDatabaseIssueStatusDisplay(status).label }}</mat-option>
+				}
+			</mat-select>
+		</mat-form-field>
+		<button
+			mat-flat-button
+			type="submit">
+			Search
+		</button>
+		<button
+			mat-stroked-button
+			type="reset"
+			(click)="resetFilters()">
+			Clear
+		</button>
+	</form>
+</div>
+
 <table
 	mat-table
 	matSort
-	[dataSource]="issues">
+	[dataSource]="issueGroups">
 	<tr
 		*matNoDataRow
 		class="no-data-row">
@@ -36,8 +84,8 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let issue">
-			{{ issue.entity }}
+			*matCellDef="let issueGroup">
+			{{ issueGroup.entity }}
 		</td>
 	</ng-container>
 
@@ -50,22 +98,8 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let issue">
-			{{ issue.modelId }}
-		</td>
-	</ng-container>
-
-	<ng-container matColumnDef="pk">
-		<th
-			mat-header-cell
-			mat-sort-header
-			*matHeaderCellDef>
-			PK
-		</th>
-		<td
-			mat-cell
-			*matCellDef="let issue">
-			{{ issue.pk }}
+			*matCellDef="let issueGroup">
+			{{ issueGroup.modelId }}
 		</td>
 	</ng-container>
 
@@ -74,26 +108,41 @@
 			mat-header-cell
 			mat-sort-header
 			*matHeaderCellDef>
-			Type
+			Issue type
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let issue">
-			{{ getDatabaseIssueTypeDisplay(issue.type).label }}
+			*matCellDef="let issueGroup"
+			[matTooltip]="getDatabaseIssueTypeDisplay(issueGroup.type).tooltip">
+			{{ getDatabaseIssueTypeDisplay(issueGroup.type).label }}
 		</td>
 	</ng-container>
 
-	<ng-container matColumnDef="error">
+	<ng-container matColumnDef="missingEntityId">
 		<th
 			mat-header-cell
 			mat-sort-header
 			*matHeaderCellDef>
-			Error
+			Missing entity
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let issue">
-			{{ issue.error }}
+			*matCellDef="let issueGroup">
+			{{ issueGroup.missingEntityId }}
+		</td>
+	</ng-container>
+
+	<ng-container matColumnDef="count">
+		<th
+			mat-header-cell
+			mat-sort-header
+			*matHeaderCellDef>
+			Count
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let issueGroup">
+			{{ issueGroup.pks.length }}
 		</td>
 	</ng-container>
 
@@ -106,9 +155,9 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let issue"
-			[matTooltip]="getDatabaseIssueStatusDisplay(issue.status).tooltip">
-			{{ getDatabaseIssueStatusDisplay(issue.status).status }}
+			*matCellDef="let issueGroup"
+			[matTooltip]="getDatabaseIssueStatusDisplay(issueGroup.status).tooltip">
+			{{ getDatabaseIssueStatusDisplay(issueGroup.status).label }}
 		</td>
 	</ng-container>
 

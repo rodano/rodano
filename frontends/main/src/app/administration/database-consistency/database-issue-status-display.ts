@@ -1,21 +1,21 @@
 import {DatabaseIssueStatus} from '@core/model/database-issue-status';
 
 export interface DatabaseIssueDisplay {
-	status: string;
+	label: string;
 	tooltip: string;
 }
 
 export const DATABASE_ISSUE_STATUS_DISPLAY: Record<DatabaseIssueStatus, DatabaseIssueDisplay> = {
 	FIXABLE: {
-		status: 'Fixable',
+		label: 'Fixable',
 		tooltip: 'Issue detected but not fixed (dry run)'
 	},
 	FIXED: {
-		status: 'Fixed',
+		label: 'Fixed',
 		tooltip: 'Issue has been fixed'
 	},
 	NOT_FIXABLE: {
-		status: 'Not fixable',
+		label: 'Not fixable',
 		tooltip: 'Issue cannot be automatically fixed'
 	}
 };

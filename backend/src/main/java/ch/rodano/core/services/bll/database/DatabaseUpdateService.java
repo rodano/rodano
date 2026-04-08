@@ -12,7 +12,7 @@ public interface DatabaseUpdateService {
 	 * @param dryRun    When true, only detects issues without fixing them
 	 * @param context   Action context for auditing
 	 * @param rationale Rationale for the operation
-	 * @return a list of detected issues; empty if the database is consistent
+	 * @return a list of grouped database issues; empty if the database is consistent
 	 */
-	List<DatabaseIssue> updateDatabase(boolean dryRun, DatabaseActionContext context, String rationale);
+	List<DatabaseIssueGroup> updateDatabase(boolean dryRun, DatabaseActionContext context, String rationale);
 }
