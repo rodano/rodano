@@ -12,6 +12,7 @@ create table internal_patch (
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 insert into internal_patch (script, date, context, name) values (179, now(3), 'Remove country from user', 'db_update_179.sql');
+insert into internal_patch (script, date, context, name) values (180, now(3), 'Denormalize scope fk property on datasets and forms', 'db_update_180.sql');
 
 /***********************************
 *                                  *
