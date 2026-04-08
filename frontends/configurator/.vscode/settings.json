@@ -6,11 +6,26 @@
 		"node_modules": true,
 		".vscode/chrome": true
 	},
-	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
-	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
-	"eslint.lintTask.enable": true
+	"css.format.maxPreserveNewLines": 2,
+	"css.format.newlineBetweenRules": false,
+	"css.format.newlineBetweenSelectors": false,
+	"css.format.spaceAroundSelectorSeparator": true,
+	"css.lint.duplicateProperties": "error",
+	"css.lint.emptyRules": "error",
+	"css.lint.zeroUnits": "error",
+	"eslint.lintTask.enable": true,
+	"files.insertFinalNewline": true,
+	"files.eol": "\n",
+	"html.format.extraLiners": "",
+	"html.format.indentInnerHtml": true,
+	"html.format.wrapAttributes": "preserve",
+	"html.format.wrapLineLength": 250,
+	"js/ts.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"js/ts.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+	"js/ts.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"js/ts.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+	"js/ts.preferences.quoteStyle": "single",
+	"cSpell.words": [
+		"rodano"
+	]
 }

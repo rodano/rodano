@@ -20,16 +20,11 @@
 	"html.format.indentInnerHtml": true,
 	"html.format.wrapAttributes": "preserve",
 	"html.format.wrapLineLength": 250,
-	"javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
-	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
-	"javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-	"javascript.preferences.quoteStyle": "single",
-	"typescript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
-	"typescript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
-	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
-	"typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
-	"typescript.preferences.quoteStyle": "single",
+	"js/ts.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
+	"js/ts.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+	"js/ts.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+	"js/ts.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+	"js/ts.preferences.quoteStyle": "single",
 	"cSpell.words": [
 		"rodano"
 	]
