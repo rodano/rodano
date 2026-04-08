@@ -140,7 +140,7 @@ public class DatabaseController extends AbstractSecuredController {
 		final var dryRun = payload.getOrDefault("dryRun", true);
 		final var issues = databaseUpdateService.updateDatabase(dryRun, currentContext(), "Database consistency update");
 		return issues.stream()
-			.map(i -> new DatabaseIssueDTO(i.entity(), i.pk(), i.error(), i.status()))
+			.map(DatabaseIssueDTO::new)
 			.toList();
 	}
 

@@ -132,17 +132,17 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 									.findFirst()
 									.orElseThrow();
 								datasetService.create(scope, datasetModel, context, rationale);
-								issues.add(new DatabaseIssue("scope", scopePk, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXED));
+								issues.add(new DatabaseIssue(DatabaseIssueEntity.SCOPE, scopeModel.getId(), scopePk, DatabaseIssueType.MISSING_IN_DATABASE, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXED));
 							}
 						}
 						else {
 							for(final String datasetModelId : missingDatasetIds) {
-								issues.add(new DatabaseIssue("scope", scopePk, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXABLE));
+								issues.add(new DatabaseIssue(DatabaseIssueEntity.SCOPE, scopeModel.getId(), scopePk, DatabaseIssueType.MISSING_IN_DATABASE, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXABLE));
 							}
 						}
 					}
 					for(final String datasetModelId : extraDatasetIds) {
-						issues.add(new DatabaseIssue("scope", scopePk, String.format("Extra dataset '%s' has no dataset model", datasetModelId), DatabaseIssueStatus.NOT_FIXABLE));
+						issues.add(new DatabaseIssue(DatabaseIssueEntity.SCOPE, scopeModel.getId(), scopePk, DatabaseIssueType.MISSING_IN_CONFIGURATION, String.format("Extra dataset '%s' has no dataset model", datasetModelId), DatabaseIssueStatus.NOT_FIXABLE));
 					}
 				}
 			}
@@ -204,17 +204,17 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 									.findFirst()
 									.orElseThrow();
 								datasetService.create(scope, event, datasetModel, context, rationale);
-								issues.add(new DatabaseIssue("event", eventPk, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXED));
+								issues.add(new DatabaseIssue(DatabaseIssueEntity.EVENT, eventModel.getId(), eventPk, DatabaseIssueType.MISSING_IN_DATABASE, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXED));
 							}
 						}
 						else {
 							for(final String datasetModelId : missingDatasetIds) {
-								issues.add(new DatabaseIssue("event", eventPk, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXABLE));
+								issues.add(new DatabaseIssue(DatabaseIssueEntity.EVENT, eventModel.getId(), eventPk, DatabaseIssueType.MISSING_IN_DATABASE, String.format("Missing dataset '%s'", datasetModelId), DatabaseIssueStatus.FIXABLE));
 							}
 						}
 					}
 					for(final String datasetModelId : extraDatasetIds) {
-						issues.add(new DatabaseIssue("event", eventPk, String.format("Extra dataset '%s' has no dataset model", datasetModelId), DatabaseIssueStatus.NOT_FIXABLE));
+						issues.add(new DatabaseIssue(DatabaseIssueEntity.EVENT, eventModel.getId(), eventPk, DatabaseIssueType.MISSING_IN_CONFIGURATION, String.format("Extra dataset '%s' has no dataset model", datasetModelId), DatabaseIssueStatus.NOT_FIXABLE));
 					}
 				}
 			}
@@ -251,7 +251,7 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 
 				//if the dataset model is not found in the configuration, it means that it exists only in the database
 				if(datasetModel == null) {
-					issues.add(new DatabaseIssue("dataset", datasetPk, String.format("No dataset model '%s' in configuration", datasetModelId), DatabaseIssueStatus.NOT_FIXABLE));
+					issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_CONFIGURATION, String.format("No dataset model '%s' in configuration", datasetModelId), DatabaseIssueStatus.NOT_FIXABLE));
 				}
 				else {
 					final var requiredFieldIds = datasetModel.getFieldModels().stream()
@@ -280,17 +280,17 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 								for(final String fieldModelId : missingFieldIds) {
 									final var fieldModel = datasetModel.getFieldModel(fieldModelId);
 									fieldService.create(scope, event, dataset, fieldModel, context, rationale);
-									issues.add(new DatabaseIssue("dataset", datasetPk, String.format("Missing field '%s'", fieldModelId), DatabaseIssueStatus.FIXED));
+									issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_DATABASE, String.format("Missing field '%s'", fieldModelId), DatabaseIssueStatus.FIXED));
 								}
 							}
 							else {
 								for(final String fieldModelId : missingFieldIds) {
-									issues.add(new DatabaseIssue("dataset", datasetPk, String.format("Missing field '%s'", fieldModelId), DatabaseIssueStatus.FIXABLE));
+									issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_DATABASE, String.format("Missing field '%s'", fieldModelId), DatabaseIssueStatus.FIXABLE));
 								}
 							}
 						}
 						for(final String fieldModelId : extraFieldIds) {
-							issues.add(new DatabaseIssue("dataset", datasetPk, String.format("Extra field '%s' has no field model", fieldModelId), DatabaseIssueStatus.NOT_FIXABLE));
+							issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_CONFIGURATION, String.format("Field '%s' does not exist in configuration", fieldModelId), DatabaseIssueStatus.NOT_FIXABLE));
 						}
 					}
 				}

@@ -1,61 +1,4 @@
-<h3>Demo users</h3>
-<p>Fill-in the database with demo users. One user per profile will be created using the base email provided.</p>
-<form
-	[formGroup]="demoUserSchemeForm"
-	(ngSubmit)="createDemoUsers()">
-	<p>
-		<mat-form-field style="width: 20rem">
-			<mat-label>Base email</mat-label>
-			<input
-				matInput
-				formControlName="baseEmail"
-				name="baseEmail" />
-		</mat-form-field>
-		&nbsp;
-		<mat-form-field style="width: 20rem">
-			<mat-label>Password</mat-label>
-			<input
-				matInput
-				formControlName="password"
-				name="password" />
-		</mat-form-field>
-		&nbsp;
-		<button
-			mat-flat-button
-			[disabled]="demoUserSchemeForm.invalid || loading()"
-			type="submit">
-			Generate
-		</button>
-	</p>
-</form>
-
-<h3>Random data</h3>
-<p>
-	Fill-in the database with randomly generated data. The scale defines the number of leaf scopes that will be created.
-</p>
-<form
-	[formGroup]="randomDataGenerationForm"
-	(ngSubmit)="generateRandomDatabaseData()">
-	<p>
-		<mat-form-field style="width: 5rem">
-			<mat-label>Scale</mat-label>
-			<input
-				matInput
-				formControlName="scale"
-				type="number"
-				name="scale" />
-		</mat-form-field>
-		&nbsp;
-		<button
-			mat-flat-button
-			[disabled]="randomDataGenerationForm.invalid || loading()"
-			type="submit">
-			Generate
-		</button>
-	</p>
-</form>
-
-<h3>Database update</h3>
+<h3>Configuration inconsistency</h3>
 <p>
 	Detect and optionally fix missing datasets and fields. In dry run mode, issues are only listed without being fixed.
 </p>
@@ -76,6 +19,7 @@
 
 <table
 	mat-table
+	matSort
 	[dataSource]="issues">
 	<tr
 		*matNoDataRow
@@ -86,6 +30,7 @@
 	<ng-container matColumnDef="entity">
 		<th
 			mat-header-cell
+			mat-sort-header
 			*matHeaderCellDef>
 			Entity
 		</th>
@@ -96,9 +41,24 @@
 		</td>
 	</ng-container>
 
+	<ng-container matColumnDef="modelId">
+		<th
+			mat-header-cell
+			mat-sort-header
+			*matHeaderCellDef>
+			Model
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let issue">
+			{{ issue.modelId }}
+		</td>
+	</ng-container>
+
 	<ng-container matColumnDef="pk">
 		<th
 			mat-header-cell
+			mat-sort-header
 			*matHeaderCellDef>
 			PK
 		</th>
@@ -109,9 +69,24 @@
 		</td>
 	</ng-container>
 
+	<ng-container matColumnDef="type">
+		<th
+			mat-header-cell
+			mat-sort-header
+			*matHeaderCellDef>
+			Type
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let issue">
+			{{ getDatabaseIssueTypeDisplay(issue.type).label }}
+		</td>
+	</ng-container>
+
 	<ng-container matColumnDef="error">
 		<th
 			mat-header-cell
+			mat-sort-header
 			*matHeaderCellDef>
 			Error
 		</th>
@@ -125,12 +100,14 @@
 	<ng-container matColumnDef="status">
 		<th
 			mat-header-cell
+			mat-sort-header
 			*matHeaderCellDef>
 			Status
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let issue">
+			*matCellDef="let issue"
+			[matTooltip]="getDatabaseIssueStatusDisplay(issue.status).tooltip">
 			{{ getDatabaseIssueStatusDisplay(issue.status).status }}
 		</td>
 	</ng-container>

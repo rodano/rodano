@@ -8,20 +8,24 @@
  * Do not edit the class manually.
  */
 import { DatabaseIssueStatus } from './database-issue-status';
+import { DatabaseIssueEntity } from './database-issue-entity';
+import { DatabaseIssueType } from './database-issue-type';
 
 
 /**
  * An issue detected during a database consistency check
  */
 export interface DatabaseIssue { 
+    entity: DatabaseIssueEntity;
     /**
-     * Entity type: scope, event or dataset
+     * Model id of the affected entity
      */
-    entity: string;
+    modelId: string;
     /**
      * Primary key of the affected entity
      */
     pk: number;
+    type: DatabaseIssueType;
     /**
      * Description of the issue
      */
