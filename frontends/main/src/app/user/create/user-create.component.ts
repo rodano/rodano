@@ -5,7 +5,7 @@ import {UserService} from '@core/services/user.service';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Profile} from '@core/model/profile';
 import {forkJoin} from 'rxjs';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {UserCreation} from '@core/model/user-creation';
 import {Language} from '@core/model/language';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -16,10 +16,10 @@ import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {User} from '@core/model/user';
-import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
+import {ArraySortPipe} from '../../pipes/sort-array.pipe';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
-import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
+import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

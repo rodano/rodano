@@ -18,7 +18,7 @@ import {Field} from '@core/model/field';
 import {CRFField} from '../models/crf-field';
 import {OperandType} from '@core/model/operand-type';
 import {FieldModelType} from '@core/model/field-model-type';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
 @Injectable({
 	providedIn: 'root'

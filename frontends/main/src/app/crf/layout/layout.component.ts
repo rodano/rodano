@@ -9,9 +9,9 @@ import {CRFField} from '../models/crf-field';
 import {CRFService} from '../services/crf.service';
 import {LoggingService} from '@core/services/logging.service';
 import {LayoutType} from '@core/model/layout-type';
-import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
-import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
+import {EmptyObjectCheck} from '../../utils/empty-object-check';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
+import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

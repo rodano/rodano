@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, Component, effect, inject, signal} from '@angular/core';
 import {UserSearch} from '@core/utilities/search/user-search';
-import {UserListComponent} from 'src/app/user/user-list/user-list.component';
+import {UserListComponent} from '../../user/user-list/user-list.component';
 import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({

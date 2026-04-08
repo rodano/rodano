@@ -11,7 +11,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatFormField, MatInput, MatLabel} from '@angular/material/input';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {UserListComponent} from '../user-list/user-list.component';
-import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
+import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {ScopeMini} from '@core/model/scope-mini';
 import {MeService} from '@core/services/me.service';
 import {forkJoin} from 'rxjs';

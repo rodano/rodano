@@ -1,12 +1,12 @@
 import {ChangeDetectionStrategy, Component, model} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {TimelineGraphData} from '@core/model/timeline-graph-data';
 import {WorkflowStatusComponent} from '../workflow-status/workflow-status.component';
 import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 import {IssueViewerComponent} from '../issue-viewer/issue-viewer.component';
 import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';

@@ -3,7 +3,7 @@ import {Injectable} from '@angular/core';
 import {catchError, Observable, of} from 'rxjs';
 import {User} from '../model/user';
 import {APIService} from './api.service';
-import {SKIP_ERROR_HANDLING_HEADER} from 'src/app/interceptors/auth.interceptor';
+import {SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {Scope} from '../model/scope';
 import {ScopeMini} from '../model/scope-mini';

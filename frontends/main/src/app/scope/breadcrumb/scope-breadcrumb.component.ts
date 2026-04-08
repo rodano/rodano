@@ -3,7 +3,7 @@ import {MatButton} from '@angular/material/button';
 import {Scope} from '@core/model/scope';
 import {ScopeMini} from '@core/model/scope-mini';
 import {ScopeTiny} from '@core/model/scope-tiny';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

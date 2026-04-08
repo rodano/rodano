@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, Component, input, DestroyRef, signal} from '@an
 import {FileService} from '@core/services/file.service';
 import {tap, last, map} from 'rxjs/operators';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../../services/notification.service';
 import {FileModel} from '@core/model/file-model';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {DownloadDirective} from '../../../directives/download.component';

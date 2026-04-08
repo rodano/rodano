@@ -4,9 +4,9 @@ import {Scope} from '@core/model/scope';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatLabel, MatOption, MatSelect} from '@angular/material/select';
 import {ScopeModel} from '@core/model/scope-model';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {LowerCasePipe} from '@angular/common';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../../pipes/scope-code-shortname.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

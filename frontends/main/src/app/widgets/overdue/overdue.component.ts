@@ -18,8 +18,8 @@ import {WidgetService} from '@core/services/widget.service';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {OverdueWidgetSearch} from '@core/utilities/search/overdue-widget-search';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
-import {DownloadDirective} from 'src/app/directives/download.component';
-import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
+import {DownloadDirective} from '../../directives/download.component';
+import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

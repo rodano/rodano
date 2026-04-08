@@ -7,7 +7,7 @@ import {UserSearch} from '../utilities/search/user-search';
 import {APIService} from './api.service';
 import {HttpParamsService} from './http-params.service';
 import {PagedResultUser} from '../model/paged-result-user';
-import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from 'src/app/interceptors/auth.interceptor';
+import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
 @Injectable({

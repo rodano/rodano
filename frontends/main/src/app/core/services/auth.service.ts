@@ -1,7 +1,7 @@
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from 'src/app/interceptors/auth.interceptor';
+import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 import {Authentication} from '../model/authentication';
 import {Credentials} from '../model/credentials';
 import {APIService} from './api.service';

@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {ScopeModel} from '@core/model/scope-model';
 import {Scope} from '@core/model/scope';
 import {ScopeService} from '@core/services/scope.service';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatButton} from '@angular/material/button';
 import {MatOption} from '@angular/material/core';
@@ -12,7 +12,7 @@ import {MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {ScopeCandidate} from '@core/model/scope-candidate';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Rights} from '@core/model/rights';
 

@@ -13,7 +13,7 @@ import {HttpParamsService} from '@core/services/http-params.service';
 import {Router, ActivatedRoute, RouterLink, Routes} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {SelectScopeComponent} from './dialogs/create-scope/select-scope.component';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../services/notification.service';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {WorkflowStatusSearch} from '@core/utilities/search/workflow-status-search';
 import {WorkflowStatus} from '@core/model/workflow-status';

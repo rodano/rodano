@@ -1,6 +1,6 @@
 import {Directive} from '@angular/core';
 import {MAT_DATE_FORMATS} from '@angular/material/core';
-import {YEAR_FORMAT} from 'src/app/utils/app-date-formats';
+import {YEAR_FORMAT} from '../../utils/app-date-formats';
 
 @Directive({
 	selector: '[appDateFormatYear]',

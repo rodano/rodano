@@ -5,7 +5,7 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatInput} from '@angular/material/input';
 import {DatabaseService} from '@core/services/database.service';
 import {DemoUserScheme} from '@core/model/demo-user-scheme';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

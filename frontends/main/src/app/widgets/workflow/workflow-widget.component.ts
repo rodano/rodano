@@ -19,7 +19,7 @@ import {RouterLink} from '@angular/router';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {takeUntilDestroyed, toSignal, toObservable} from '@angular/core/rxjs-interop';
 import {WorkflowWidgetSearch} from '@core/utilities/search/workflow-widget-search';
-import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
+import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({

@@ -9,7 +9,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {RouterLink} from '@angular/router';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {ScopeBreadcrumbComponent} from '../../scope/breadcrumb/scope-breadcrumb.component';

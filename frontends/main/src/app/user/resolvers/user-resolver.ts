@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve, Router} from '@angular/router';
 import {Observable, EMPTY} from 'rxjs';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
 

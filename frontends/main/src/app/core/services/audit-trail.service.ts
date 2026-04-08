@@ -5,10 +5,10 @@ import {VersionsService} from './versions.service';
 import {PropertyAuditTrail} from '../model/property-audit-trail';
 import {EntityVersion} from '../model/entity-version';
 import {EntityAuditTrail} from '../model/entity-audit-trail';
-import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
+import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 import {Role} from '../model/role';
 import {FieldEventAuditTrail, FieldEventEntityType} from '../model/field-event-audit-trail';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
 @Injectable({
 	providedIn: 'root'

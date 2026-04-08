@@ -23,15 +23,15 @@ import {MeService} from '@core/services/me.service';
 import {Operator} from '@core/model/operator';
 import {operatorByType} from '@core/enums/operator-by-type';
 import {PossibleValue} from '@core/model/possible-value';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
-import {CapitalizeFirstPipe} from 'src/app/pipes/capitalize-first.pipe';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
+import {CapitalizeFirstPipe} from '../../pipes/capitalize-first.pipe';
 import {EnrollmentModel} from '@core/model/enrollment-model';
 import {EnrollmentType} from '@core/model/enrollment-type';
 import {ScopeService} from '@core/services/scope.service';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {LowerCasePipe} from '@angular/common';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
-import {DateTimeUTCPipe} from 'src/app/pipes/date-time-utc.pipe';
+import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({

@@ -4,7 +4,7 @@ import {ActuatorService} from '@core/services/actuator.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatTableModule} from '@angular/material/table';
 import {MatButton} from '@angular/material/button';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {AdministrationService} from '@core/services/administration.service';
 
 @Component({

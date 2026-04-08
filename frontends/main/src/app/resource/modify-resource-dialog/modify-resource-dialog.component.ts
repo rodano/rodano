@@ -4,7 +4,7 @@ import {filter, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 import {Resource} from '@core/model/resource';
 import {ResourceSubmission} from '@core/model/resource-submission';
 import {ResourceService} from '@core/services/resource.service';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {MatSlideToggleModule} from '@angular/material/slide-toggle';
 import {MatIcon} from '@angular/material/icon';
 import {MatButton} from '@angular/material/button';
@@ -15,10 +15,10 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {HttpResponse} from '@angular/common/http';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {ResourceCategory} from '@core/model/resource-category';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
-import {ScopePickerComponent} from 'src/app/scope-picker/scope-picker.component';
+import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({

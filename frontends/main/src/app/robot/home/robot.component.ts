@@ -14,14 +14,14 @@ import {MatSelect} from '@angular/material/select';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatHint, MatLabel} from '@angular/material/form-field';
 import {RobotService} from '@core/services/robot.service';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {RobotCreation} from '@core/model/robot-creation';
 import {MatIcon} from '@angular/material/icon';
 import {RobotUpdate} from '@core/model/robot-update';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 import {MatTooltip} from '@angular/material/tooltip';
-import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
-import {ScopeFinderComponent} from 'src/app/scope-finder/scope-finder.component';
+import {ArraySortPipe} from '../../pipes/sort-array.pipe';
+import {ScopeFinderComponent} from '../../scope-finder/scope-finder.component';
 import {RoleCreation} from '@core/model/role-creation';
 
 @Component({

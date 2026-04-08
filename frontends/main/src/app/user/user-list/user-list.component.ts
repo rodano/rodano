@@ -23,7 +23,7 @@ import {RoleStatus, getRoleStatusDisplay} from '../role-status-display';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
-import {YesNoPipe} from 'src/app/pipes/yes-no.pipe';
+import {YesNoPipe} from '../../pipes/yes-no.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

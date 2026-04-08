@@ -4,7 +4,7 @@ import {ResourceService} from '@core/services/resource.service';
 import {Expandable} from '@core/utilities/expandable';
 import {ResourceSearch} from '@core/utilities/search/resource-search';
 import {MatButton, MatIconButton} from '@angular/material/button';
-import {DownloadDirective} from 'src/app/directives/download.component';
+import {DownloadDirective} from '../../directives/download.component';
 import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {MatIcon} from '@angular/material/icon';
 

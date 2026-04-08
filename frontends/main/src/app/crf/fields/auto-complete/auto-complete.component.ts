@@ -8,7 +8,7 @@ import {CRFField} from '../../models/crf-field';
 import {FieldUpdateService} from '../../services/field-update.service';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {of, switchMap} from 'rxjs';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

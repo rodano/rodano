@@ -1,5 +1,5 @@
-import {CRFDataset} from 'src/app/crf/models/crf-dataset';
-import {CRFField} from 'src/app/crf/models/crf-field';
+import {CRFDataset} from '../app/crf/models/crf-dataset';
+import {CRFField} from '../app/crf/models/crf-field';
 import {DatasetModel} from '@core/model/dataset-model';
 import {FieldModel} from '@core/model/field-model';
 import {Field} from '@core/model/field';

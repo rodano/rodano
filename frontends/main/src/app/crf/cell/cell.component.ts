@@ -8,9 +8,9 @@ import {FieldComponent} from '../fields/field/field.component';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {LoggingService} from '@core/services/logging.service';
 import {FieldUpdateService} from '../services/field-update.service';
-import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
+import {EmptyObjectCheck} from '../../utils/empty-object-check';
 import {merge} from 'rxjs';
-import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
+import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

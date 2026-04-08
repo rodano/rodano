@@ -4,7 +4,7 @@ import {forkJoin} from 'rxjs';
 import {ScopeModel} from '@core/model/scope-model';
 import {Scope} from '@core/model/scope';
 import {ScopeRelation} from '@core/model/scope-relation';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {ScopeRelationCreation} from '@core/model/scope-relation-creation';
 import {DateUTCPipe} from '../../pipes/date-utc.pipe';
@@ -17,10 +17,10 @@ import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} fr
 import {MatButton} from '@angular/material/button';
 import {MatIcon} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {Rights} from '@core/model/rights';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {ArraySortPipe} from 'src/app/pipes/sort-array.pipe';
+import {ArraySortPipe} from '../../pipes/sort-array.pipe';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {SCOPE_TOKEN} from '../home/scope.component';
 

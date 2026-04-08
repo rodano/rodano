@@ -11,7 +11,7 @@ import {PagedResultScope} from '@core/model/paged-result-scope';
 import {Subject, forkJoin, merge, of} from 'rxjs';
 import {EPROInvitation} from '@core/model/epro-invitation';
 import {EproInvitationComponent} from '../epro-invitation/epro-invitation.component';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
@@ -27,7 +27,7 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {Rights} from '@core/model/rights';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {Profile} from '@core/model/profile';
 
 @Component({

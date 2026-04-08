@@ -3,7 +3,7 @@ import {ActivatedRouteSnapshot, Router, Resolve} from '@angular/router';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {Observable, EMPTY} from 'rxjs';
 import {tap} from 'rxjs/operators';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {FormInfo} from '@core/model/form-info';
 import {SideMenuComponent} from '../side-menu/side-menu.component';
 

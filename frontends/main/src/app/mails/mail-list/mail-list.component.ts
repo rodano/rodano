@@ -28,7 +28,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {MatCheckbox} from '@angular/material/checkbox';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {MailOrigin} from '@core/model/mail-origin';

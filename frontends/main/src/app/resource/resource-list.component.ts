@@ -9,7 +9,7 @@ import {ConfigurationService} from '@core/services/configuration.service';
 import {ResourceService} from '@core/services/resource.service';
 import {ResourceSearch} from '@core/utilities/search/resource-search';
 import {ResourceSubmission} from '@core/model/resource-submission';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../services/notification.service';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatToolbarModule} from '@angular/material/toolbar';
 import {MatDivider} from '@angular/material/divider';

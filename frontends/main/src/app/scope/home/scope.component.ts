@@ -10,7 +10,7 @@ import {LowerCasePipe} from '@angular/common';
 import {FormService} from '@core/services/form.service';
 import {Form} from '@core/model/form';
 import {MatTooltip} from '@angular/material/tooltip';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 
 export const SCOPE_TOKEN = new InjectionToken<WritableSignal<Scope>>('scope');
 

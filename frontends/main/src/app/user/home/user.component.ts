@@ -5,9 +5,9 @@ import {MatTabsModule} from '@angular/material/tabs';
 import {MatIcon} from '@angular/material/icon';
 import {MatIconButton} from '@angular/material/button';
 import {MatBadge} from '@angular/material/badge';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 import {MatTooltip} from '@angular/material/tooltip';
-import {AuthStateService} from 'src/app/services/auth-state.service';
+import {AuthStateService} from '../../services/auth-state.service';
 
 export const USER_TOKEN = new InjectionToken<WritableSignal<User>>('user');
 

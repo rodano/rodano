@@ -16,8 +16,8 @@ import {SelectEventComponent} from '../dialogs/add-event/select-event.component'
 import {CRFChangeService} from '../services/crf-change.service';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {EventGroup} from '@core/model/event-group';
-import {NotificationService} from 'src/app/services/notification.service';
-import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
+import {NotificationService} from '../../services/notification.service';
+import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {SettingsService} from '@core/services/settings.service';
 

@@ -8,7 +8,7 @@ import {ConfigurationService} from '@core/services/configuration.service';
 import {BaseChartDirective} from 'ng2-charts';
 import {ChartConfiguration, ChartData, TooltipItem} from 'chart.js';
 import {ChartType} from '@core/model/chart-type';
-import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
+import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {ChartDatasetPointObjectObject} from '@core/model/chart-dataset-point-object-object';
 import 'chartjs-adapter-date-fns';
 import {forkJoin} from 'rxjs';

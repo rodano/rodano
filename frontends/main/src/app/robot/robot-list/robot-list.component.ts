@@ -23,7 +23,7 @@ import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatProgressBar} from '@angular/material/progress-bar';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {MatSort, MatSortHeader} from '@angular/material/sort';

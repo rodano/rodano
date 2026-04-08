@@ -11,7 +11,7 @@ import {MatFormField} from '@angular/material/form-field';
 import {NotificationService} from '../services/notification.service';
 import {getPasswordErrorMessage} from '@core/utilities/error-utils';
 import {HttpErrorResponse} from '@angular/common/http';
-import {RegistrationStep} from 'src/app/registration/registration-step';
+import {RegistrationStep} from '../registration/registration-step';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

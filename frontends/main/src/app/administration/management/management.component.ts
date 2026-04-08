@@ -4,8 +4,8 @@ import {forkJoin} from 'rxjs';
 import {Study} from '@core/model/study';
 import {AdministrationService} from '@core/services/administration.service';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {AuthStateService} from 'src/app/services/auth-state.service';
-import {NotificationService} from 'src/app/services/notification.service';
+import {AuthStateService} from '../../services/auth-state.service';
+import {NotificationService} from '../../services/notification.service';
 import {MatAnchor, MatButton} from '@angular/material/button';
 
 @Component({

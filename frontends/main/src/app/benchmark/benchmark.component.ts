@@ -17,7 +17,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Operator} from '@core/model/operator';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
-import {ChartWidgetComponent} from 'src/app/widgets/chart/chart-widget.component';
+import {ChartWidgetComponent} from '../widgets/chart/chart-widget.component';
 import {CMSLayout} from '@core/model/cms-layout';
 import {ScopeModel} from '@core/model/scope-model';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';

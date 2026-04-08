@@ -14,7 +14,7 @@ import {Event} from '@core/model/event';
 import {Form} from '@core/model/form';
 import {Field} from '@core/model/field';
 import {Workflow} from '@core/model/workflow';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

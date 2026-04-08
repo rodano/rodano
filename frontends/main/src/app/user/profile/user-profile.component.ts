@@ -2,16 +2,16 @@ import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, O
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Language} from '@core/model/language';
 import {MatOption} from '@angular/material/core';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {MatSelect} from '@angular/material/select';
 import {USER_TOKEN} from '../home/user.component';
 

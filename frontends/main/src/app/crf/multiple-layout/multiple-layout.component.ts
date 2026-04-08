@@ -6,7 +6,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
-import {NotificationService} from 'src/app/services/notification.service';
+import {NotificationService} from '../../services/notification.service';
 import {CellLoadingService} from '../services/cell-loading.service';
 import {VisibilityService} from '../services/visibility.service';
 import {CRFService} from '../services/crf.service';
@@ -17,15 +17,15 @@ import {Observable} from 'rxjs';
 import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.component';
 import {NoDateFormatError} from '../errors/NoDateFormatError';
 import {LayoutComponent} from '../layout/layout.component';
-import {LocalizeMapPipe} from 'src/app/pipes/localize-map.pipe';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {CRFField} from '../models/crf-field';
 import {LoggingService} from '@core/services/logging.service';
 import {parse} from 'date-fns';
-import {AuditTrailButtonComponent} from 'src/app/audit-trail-button/audit-trail-button.component';
+import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 import {FieldModelType} from '@core/model/field-model-type';
 import {FieldService} from '@core/services/field.service';
-import {EmptyObjectCheck} from 'src/app/utils/empty-object-check';
-import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
+import {EmptyObjectCheck} from '../../utils/empty-object-check';
+import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,

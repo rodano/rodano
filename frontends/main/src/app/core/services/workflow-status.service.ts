@@ -12,7 +12,7 @@ import {FormInfo} from '../model/form-info';
 import {WorkflowStatusSearch} from '../utilities/search/workflow-status-search';
 import {HttpParamsService} from './http-params.service';
 import {reviveDates} from '../decorators/revive-dates.decorator';
-import {SKIP_ERROR_HANDLING_HEADER} from 'src/app/interceptors/auth.interceptor';
+import {SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 
 @Injectable({
 	providedIn: 'root'

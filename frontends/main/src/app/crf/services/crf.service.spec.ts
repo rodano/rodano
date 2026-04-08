@@ -3,7 +3,7 @@ import {CRFService} from './crf.service';
 import {DatasetService} from '@core/services/dataset.service';
 import {TestBed} from '@angular/core/testing';
 import {of} from 'rxjs';
-import {DATASET_VISIT_DOCUMENTATION, CRF_DATASET_VISIT_DOCUMENTATION, FORM} from 'src/test/stubs';
+import {DATASET_VISIT_DOCUMENTATION, CRF_DATASET_VISIT_DOCUMENTATION, FORM} from '../../../test/stubs';
 
 describe('CRFService', () => {
 	let service: CRFService;

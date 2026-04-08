@@ -14,7 +14,7 @@ import {RouterLink} from '@angular/router';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {ScopeModel} from '@core/model/scope-model';
 import {MatOption, MatSelect} from '@angular/material/select';
-import {ScopeCodeShortnamePipe} from 'src/app/pipes/scope-code-shortname.pipe';
+import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';

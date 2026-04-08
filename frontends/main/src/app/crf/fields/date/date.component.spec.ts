@@ -1,9 +1,9 @@
 import {beforeEach, describe, it, expect} from 'vitest';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {DateComponent} from './date.component';
-import {CRF_FIELD_DATE_OF_WITHDRAWAL} from 'src/test/stubs';
+import {CRF_FIELD_DATE_OF_WITHDRAWAL} from '../../../../test/stubs';
 import {DateAdapter, MAT_DATE_FORMATS, MAT_NATIVE_DATE_FORMATS} from '@angular/material/core';
-import {CustomDateAdapter} from 'src/app/utils/custom-date-adapter';
+import {CustomDateAdapter} from '../../../utils/custom-date-adapter';
 
 describe('DateComponent', () => {
 	let component: DateComponent;
