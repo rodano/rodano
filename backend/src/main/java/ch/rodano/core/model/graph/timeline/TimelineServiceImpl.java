@@ -185,7 +185,7 @@ public class TimelineServiceImpl implements TimelineService {
 						graphValue.setLabel(eventService.getLabel(scope, event, languages));
 						graphValue.setDate(event.getDateOrExpectedDate());
 						if(!event.isExpected()) {
-							graphValue.setLink(String.format("/crf/%d/event/%d", scope.getPk(), event.getPk()));
+							graphValue.setLink(String.format("/crf/%d/events/%d?expandedEventPks=%d", scope.getPk(), event.getPk(), event.getPk()));
 						}
 						graphData.getValues().add(graphValue);
 					}
@@ -298,26 +298,26 @@ public class TimelineServiceImpl implements TimelineService {
 						}
 
 						//add link
+						final var baseLink = String.format("/crf/%s", scope.getPk());
 						if(referenceFieldModel != null) {
 							//find form model
 							final var formModel = referenceFieldModel.getFormModels().stream()
 								.findFirst();
 							if(formModel.isPresent()) {
 								final var formModelId = formModel.get().getId();
-								final var baseLink = String.format("/crf/%s", scope.getPk());
 								//find form
 								if(eventPk == null) {
 									final var formPk = formsByFormModelId.get(formModelId);
-									graphValue.setLink(String.format("%s/form/%d", baseLink, formPk));
+									graphValue.setLink(String.format("%s/forms/%d", baseLink, formPk));
 								}
 								else {
 									final var formPk = formsByEventPkAndFormModelId.get(eventPk).get(formModelId);
-									graphValue.setLink(String.format("%s/event/%d/form/%d", baseLink, eventPk, formPk));
+									graphValue.setLink(String.format("%s/events/%d/forms/%d?expandedEventPks=%d", baseLink, eventPk, formPk, eventPk));
 								}
 							}
 						}
 						if(graphValue.getLink() == null && eventPk != null) {
-							graphValue.setLink(String.format("/%d", eventPk));
+							graphValue.setLink(String.format("/%s/events/%d?expandedEventPks=%d", baseLink, eventPk, eventPk));
 						}
 
 						//add meta data

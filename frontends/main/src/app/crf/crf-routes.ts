@@ -17,7 +17,6 @@ export default [
 		resolve: {
 			scope: ScopeResolver
 		},
-		runGuardsAndResolvers: 'always',
 		children: [
 			{
 				path: '',
@@ -28,7 +27,7 @@ export default [
 				component: ScopeDashboardComponent
 			},
 			{
-				path: 'form/:formPk',
+				path: 'forms/:formPk',
 				component: FormComponent,
 				resolve: {
 					form: FormResolver
@@ -36,14 +35,14 @@ export default [
 				canDeactivate: [UnsavedChangesGuard]
 			},
 			{
-				path: 'event/:eventPk',
+				path: 'events/:eventPk',
 				component: EventDashboardComponent,
 				resolve: {
 					event: EventResolver
 				}
 			},
 			{
-				path: 'event/:eventPk/form/:formPk',
+				path: 'events/:eventPk/forms/:formPk',
 				component: FormComponent,
 				resolve: {
 					event: EventResolver,

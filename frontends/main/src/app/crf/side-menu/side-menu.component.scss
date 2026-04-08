@@ -1,57 +1,18 @@
-:host {
-	--tree-line-colors: black;
-	--tree-line-height: 1rem;
-}
-
-li:has(ol.submenu) {
-	position: relative;
-
-	// extend vertical line down to connect with submenu
-	&::after {
-		content: '';
-		position: absolute;
-		left: 0.7rem;
-		top: 2rem;
-		bottom: 0.9rem;
-		width: 1px;
-		background-color: var(--tree-line-colors);
-	}
-}
 ol.submenu {
 	list-style-type: none;
-	margin-left: 0.7rem;
 	padding: 0;
+	background-color: var(--themed-highlight-color);
+	//width of the border is the width of the toggle icon plus the padding of the form items
+	border-left: calc(24px - 0.4rem) solid var(--mat-sys-primary);
 
 	& li {
-		position: relative;
-		padding-left: 1rem;
-
-		//horizontal line for each item
-		&::after {
-			content: '';
-			position: absolute;
-			left: 0;
-			top: var(--tree-line-height);
-			width: 0.6rem;
-			height: 1px;
-			background-color: var(--tree-line-colors);
-		}
-
-		//remove bottom part of vertical line for last item
-		&:last-child::before {
-			bottom: auto;
-			height: var(--tree-line-height);
-		}
-
-		& .main-content {
-			padding: 0.2rem;
-		}
+		padding: 0;
+		border-top: 1px solid var(--light-border-color);
 	}
 }
-.time {
-	display: block;
-	font-size: 0.7rem;
-	color: #555;
+.action {
+	float: right;
+	padding: 0;
 }
 .statuses {
 	height: 24px;
@@ -59,6 +20,22 @@ ol.submenu {
 	& .mat-icon + .mat-icon {
 		margin-left: 0.2rem;
 	}
+}
+.event {
+	display: flex;
+	align-items: center;
+	padding-left: 0;
+	&.open {
+		background-color: var(--themed-highlight-color);
+	}
+	& .label {
+		flex-grow: 1;
+	}
+}
+time {
+	display: block;
+	font-size: 0.8rem;
+	color: #555;
 }
 a.disabled {
 	pointer-events: none;
