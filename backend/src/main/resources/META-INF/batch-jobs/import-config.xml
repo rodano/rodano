@@ -751,7 +751,7 @@
     </step>
 
     <!-- 23) ADD MISSING PROFILE ID TO PROJECT MODEL -->
-    <step id="projectBackfill">
+    <step id="projectBackfill" next="workflowRule">
         <listeners>
             <listener ref="ch.rodano.batch.TraceListener"/>
         </listeners>
@@ -768,6 +768,195 @@
                 </properties>
             </processor>
             <writer ref="ch.rodano.batch.writer.ProjectWriterBackfill">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <!-- 24) RULES -->
+    <step id="workflowRule" next="datasetModelRule">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="200" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/workflows"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.Workflow"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.WorkflowRuleWriter">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="datasetModelRule" next="formModelRule">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="100" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/datasetModels"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.DatasetModel"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.DatasetModelRuleWriter">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="formModelRule" next="scopeModelRule">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="200" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/formModels"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.FormModel"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.FormModelRuleWriter">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="scopeModelRule" next="validatorRule">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="200" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/scopeModels"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.ScopeModel"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.ScopeModelRuleWriter">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="validatorRule" next="cronRule">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="200" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/validators"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.Validator"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.ValidatorRuleWriter">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="cronRule" next="statusParameterBackfill">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="200" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="jsonPointer" value="/crons"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.Cron"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.CronRuleWriter">
+                <properties>
+                    <property name="db.url" value="#{jobParameters['db.url']}"/>
+                    <property name="db.user" value="#{jobParameters['db.user']}"/>
+                    <property name="db.pass" value="#{jobParameters['db.pass']}"/>
+                </properties>
+            </writer>
+        </chunk>
+    </step>
+
+    <step id="statusParameterBackfill">
+        <listeners>
+            <listener ref="ch.rodano.batch.TraceListener"/>
+        </listeners>
+        <chunk item-count="1" checkpoint-policy="item">
+            <reader ref="ch.rodano.batch.reader.JsonPointerItemReader">
+                <properties>
+                    <property name="resource" value="#{jobParameters['config']}"/>
+                    <property name="beanType" value="ch.rodano.batch.pojo.Project"/>
+                </properties>
+            </reader>
+            <processor ref="ch.rodano.batch.processor.ProjectIdProcessor">
+                <properties>
+                    <property name="projectId" value="#{jobParameters['projectId']}"/>
+                </properties>
+            </processor>
+            <writer ref="ch.rodano.batch.writer.StatusParameterBackfillWriter">
                 <properties>
                     <property name="db.url" value="#{jobParameters['db.url']}"/>
                     <property name="db.user" value="#{jobParameters['db.user']}"/>

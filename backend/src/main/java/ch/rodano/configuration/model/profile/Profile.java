@@ -475,13 +475,37 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	@JsonIgnore
 	public boolean hasRight(final RightAssignable<?> rightAssignable, final Rights right) {
 		final var assignables = getEnumRightMatrixIds(rightAssignable.getEntity());
-		return assignables.containsKey(rightAssignable.getId()) && assignables.get(rightAssignable.getId()).contains(right);
+		if(assignables.containsKey(rightAssignable.getId()) && assignables.get(rightAssignable.getId()).contains(right)) {
+			return true;
+		}
+		return assignables.entrySet().stream()
+			.filter(e -> e.getValue().contains(right))
+			.anyMatch(e -> {
+				if(e.getKey().length() != 36 || e.getKey().chars().filter(c -> c == '-').count() != 4) {
+					return false;
+				}
+				final var keyUuid = UUID.fromString(e.getKey());
+				return switch(rightAssignable) {
+					case ScopeModel sm -> keyUuid.equals(sm.getScopeModelId());
+					case DatasetModel dm -> keyUuid.equals(dm.getDatasetModelId());
+					case FormModel fm -> keyUuid.equals(fm.getFormModelId());
+					case Profile p -> keyUuid.equals(p.getProfileId());
+					case EventModel em -> keyUuid.equals(em.getEventModelId());
+					case Workflow w -> keyUuid.equals(w.getWorkflowId());
+					default -> false;
+				};
+			});
 	}
 
 	@JsonIgnore
 	public boolean hasRight(final Entity entity, final String assignableId, final Rights right) {
 		final var assignables = getEnumRightMatrixIds(entity);
-		return assignables.containsKey(assignableId) && assignables.get(assignableId).contains(right);
+		if(assignables.containsKey(assignableId) && assignables.get(assignableId).contains(right)) {
+			return true;
+		}
+		return assignables.entrySet().stream()
+			.filter(e -> e.getValue().contains(right))
+			.anyMatch(e -> e.getKey().equalsIgnoreCase(assignableId));
 	}
 
 	@JsonIgnore

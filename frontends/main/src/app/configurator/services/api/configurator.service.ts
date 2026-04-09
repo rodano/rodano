@@ -102,4 +102,8 @@ export class ConfiguratorService {
 	cloneProject(projectId: string, request: any): Observable<ConfiguratorProject> {
 		return this.http.post<ConfiguratorProject>(`/api/superuser/configurator/projects/${projectId}/clone`, request);
 	}
+
+	initializeProject(projectId: string): Observable<void> {
+		return this.http.post<void>(`${this.baseUrl}/projects/${projectId}/initialize`, {});
+	}
 }

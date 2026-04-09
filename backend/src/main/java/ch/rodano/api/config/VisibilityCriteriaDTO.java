@@ -31,8 +31,8 @@ public class VisibilityCriteriaDTO {
 		this.operator = visibilityCriteria.getOperator();
 		this.values = visibilityCriteria.getValues();
 		this.action = visibilityCriteria.getAction();
-		this.targetLayoutIds = visibilityCriteria.getTargetLayoutIds();
-		this.targetCellIds = visibilityCriteria.getTargetCellIds();
+		this.targetLayoutIds = visibilityCriteria.getTargetLayoutUuids().stream().map(UUID::toString).toList();
+		this.targetCellIds = visibilityCriteria.getTargetCellUuids().stream().map(UUID::toString).toList();
 	}
 
 	public UUID getFormCellVisibilityCriteriaId() {

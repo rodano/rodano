@@ -74,8 +74,9 @@ public class ConstraintEvaluationService {
 			for(final var entity : RulableEntity.values()) {
 				if(constraint.getConditions().containsKey(entity)) {
 					final var conditionList = constraint.getConditions().get(entity);
-					//no need to check validity of children if there is no children
 					boolean isValidEntity = true;
+					DataState lastState = null;
+
 					if(!conditionList.getConditions().isEmpty()) {
 						//evaluate entity conditions using [mode] operator
 						isValidEntity = RuleConditionListEvaluationMode.AND.equals(conditionList.getMode());
@@ -86,6 +87,7 @@ public class ConstraintEvaluationService {
 							//all conditions must be evaluated to retrieve data state for each condition
 							try {
 								final boolean evaluation = evaluate(dataEvaluation, specificState, condition);
+								lastState = dataEvaluation.getStates().get(condition.getRuleConditionId().toString());
 								//[and] operator
 								if(RuleConditionListEvaluationMode.AND.equals(conditionList.getMode()) && !evaluation) {
 									isValidEntity = false;
@@ -103,6 +105,18 @@ public class ConstraintEvaluationService {
 								throw new RuntimeException(e);
 							}
 						}
+					}
+					else {
+						// empty condition list = match all, use initial state for this entity
+						lastState = new DataState(dataEvaluation.getInitialState()).withReference(entity);
+					}
+
+					// save final state keyed by the condition list ID so rule actions can reference it
+					if(conditionList.getRuleConditionListId() != null) {
+						final DataState stateToSave = lastState != null
+							? lastState
+							: new DataState(dataEvaluation.getInitialState()).withReference(entity);
+						dataEvaluation.getStates().put(conditionList.getRuleConditionListId().toString(), stateToSave);
 					}
 
 					if(!isValidEntity) {
@@ -221,6 +235,11 @@ public class ConstraintEvaluationService {
 		}
 		else {
 			//relations
+			if(criterion.getProperty() == null && StringUtils.isBlank(criterion.getConditionId())) {
+				dataEvaluation.getStates().put(condition.getRuleConditionId().toString(), state);
+				dataEvaluation.getStates().put(condition.getId(), state);
+				return true;
+			}
 			final EntityRelation relation = rulableEntityBinderService.getRelation(state.reference(), criterion.getProperty());
 
 			//retrieve results of relation

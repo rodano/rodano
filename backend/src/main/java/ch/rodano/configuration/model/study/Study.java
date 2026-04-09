@@ -551,7 +551,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public ScopeModel getScopeModel(final String scopeModelCode) {
 		return scopeModels.stream()
-			.filter(s -> s.getId().equalsIgnoreCase(scopeModelCode))
+			.filter(s -> s.getId().equalsIgnoreCase(scopeModelCode)
+				|| s.getScopeModelId() != null && s.getScopeModelId().toString().equalsIgnoreCase(scopeModelCode))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.SCOPE_MODEL, scopeModelCode));
 	}
@@ -577,7 +578,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Menu getMenu(final String menuId) {
 		return menus.stream()
-			.filter(m -> m.getId().equalsIgnoreCase(menuId))
+			.filter(m -> m.getId().equalsIgnoreCase(menuId)
+				|| m.getMenuId() != null && m.getMenuId().toString().equalsIgnoreCase(menuId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.MENU, menuId));
 	}
@@ -593,7 +595,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Menu getAllMenu(final String menuId) {
 		return getAllMenus().stream()
-			.filter(m -> m.getId().equalsIgnoreCase(menuId))
+			.filter(m -> m.getId().equalsIgnoreCase(menuId)
+				|| m.getMenuId() != null && m.getMenuId().toString().equalsIgnoreCase(menuId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.MENU, menuId));
 	}
@@ -631,7 +634,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Workflow getWorkflow(final String workflowCode) {
 		return workflows.stream()
-			.filter(w -> w.getId().equalsIgnoreCase(workflowCode))
+			.filter(w -> w.getId().equalsIgnoreCase(workflowCode)
+				|| w.getWorkflowId() != null && w.getWorkflowId().toString().equalsIgnoreCase(workflowCode))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW, workflowCode));
 	}
@@ -657,7 +661,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public WorkflowWidget getWorkflowWidget(final String workflowWidgetId) {
 		return workflowWidgets.stream()
-			.filter(w -> w.getId().equalsIgnoreCase(workflowWidgetId))
+			.filter(w -> w.getId().equalsIgnoreCase(workflowWidgetId)
+				|| w.getWorkflowWidgetId() != null && w.getWorkflowWidgetId().toString().equalsIgnoreCase(workflowWidgetId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_WIDGET, workflowWidgetId));
 	}
@@ -683,7 +688,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public WorkflowSummary getWorkflowSummary(final String workflowSummaryId) {
 		return workflowSummaries.stream()
-			.filter(w -> w.getId().equalsIgnoreCase(workflowSummaryId))
+			.filter(w -> w.getId().equalsIgnoreCase(workflowSummaryId)
+				|| w.getWorkflowSummaryId() != null && w.getWorkflowSummaryId().toString().equalsIgnoreCase(workflowSummaryId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_SUMMARY, workflowSummaryId));
 	}
@@ -709,7 +715,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Chart getChart(final String chartId) {
 		return charts.stream()
-			.filter(c -> c.getId().equalsIgnoreCase(chartId))
+			.filter(c -> c.getId().equalsIgnoreCase(chartId)
+				|| c.getChartId() != null && c.getChartId().toString().equalsIgnoreCase(chartId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.CHART, chartId));
 	}
@@ -735,7 +742,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public TimelineGraph getTimelineGraph(final String timelineGraphId) {
 		return timelineGraphs.stream()
-			.filter(t -> t.getId().equalsIgnoreCase(timelineGraphId))
+			.filter(t -> t.getId().equalsIgnoreCase(timelineGraphId)
+				|| t.getTimelineGraphId() != null && t.getTimelineGraphId().toString().equalsIgnoreCase(timelineGraphId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.TIMELINE_GRAPH, timelineGraphId));
 	}
@@ -761,7 +769,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Report getReport(final String reportId) {
 		return reports.stream()
-			.filter(r -> r.getId().equalsIgnoreCase(reportId))
+			.filter(r -> r.getId().equalsIgnoreCase(reportId)
+				|| r.getReportId() != null && r.getReportId().toString().equalsIgnoreCase(reportId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.REPORT, reportId));
 	}
@@ -985,7 +994,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public FormModel getFormModel(final String formModelCode) {
 		return formModels.stream()
-			.filter(p -> p.getId().equalsIgnoreCase(formModelCode))
+			.filter(p -> p.getId().equalsIgnoreCase(formModelCode)
+				|| p.getFormModelId() != null && p.getFormModelId().toString().equalsIgnoreCase(formModelCode))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.FORM_MODEL, formModelCode));
 	}
@@ -1011,7 +1021,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public DatasetModel getDatasetModel(final String datasetModelCode) {
 		return datasetModels.stream()
-			.filter(d -> d.getId().equalsIgnoreCase(datasetModelCode))
+			.filter(d -> d.getId().equalsIgnoreCase(datasetModelCode)
+				|| d.getDatasetModelId() != null && d.getDatasetModelId().toString().equalsIgnoreCase(datasetModelCode))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.DATASET_MODEL, datasetModelCode));
 	}
@@ -1037,7 +1048,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Feature getFeature(final String featureId) {
 		return features.stream()
-			.filter(f -> f.getId().equalsIgnoreCase(featureId))
+			.filter(f -> f.getId().equalsIgnoreCase(featureId)
+				|| f.getFeatureId() != null && f.getFeatureId().toString().equalsIgnoreCase(featureId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.FEATURE, featureId));
 	}
@@ -1091,7 +1103,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Profile getProfile(final String profileCode) {
 		return profiles.stream()
-			.filter(p -> p.getId().equalsIgnoreCase(profileCode))
+			.filter(p -> p.getId().equalsIgnoreCase(profileCode)
+				|| p.getProfileId() != null && p.getProfileId().toString().equalsIgnoreCase(profileCode))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.PROFILE, profileCode));
 	}
@@ -1122,7 +1135,8 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	@JsonIgnore
 	public Validator getValidator(final String validatorId) {
 		return validators.stream()
-			.filter(v -> v.getId().equalsIgnoreCase(validatorId))
+			.filter(v -> v.getId().equalsIgnoreCase(validatorId)
+				|| v.getValidatorId() != null && v.getValidatorId().toString().equalsIgnoreCase(validatorId))
 			.findAny()
 			.orElseThrow(() -> new NoNodeException(this, Entity.VALIDATOR, validatorId));
 	}

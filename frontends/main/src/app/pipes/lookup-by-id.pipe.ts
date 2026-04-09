@@ -5,6 +5,6 @@ import {Pipe, PipeTransform} from '@angular/core';
 })
 export class LookupByIdPipe<T extends {id: string}> implements PipeTransform {
 	transform(id: string, objects: T[]): T | undefined {
-		return objects?.find(o => o.id === id);
+		return objects?.find(o => (o as any).profileId === id || o.id === id);
 	}
 }

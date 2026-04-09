@@ -158,7 +158,16 @@ public class StatisticsChartFactoryService {
 			//there may be no data for the scope
 			if(results.containsKey(scope.getPk())) {
 				for(final var record : results.get(scope.getPk())) {
-					final var key = StringUtils.defaultIfBlank(record.value2(), "");
+					String key = StringUtils.defaultIfBlank(record.value2(), "");
+					if(!key.isEmpty() && chart.getFieldModel() != null && !chart.getFieldModel().getPossibleValues().isEmpty()) {
+						final String resolvedKey = key;
+						final var pv = chart.getFieldModel().getPossibleValues().stream()
+							.filter(p -> p.getPossibleValueId() != null && p.getPossibleValueId().toString().equals(resolvedKey))
+							.findFirst();
+						if(pv.isPresent()) {
+							key = pv.get().getId();
+						}
+					}
 					scopeResult.put(key, record.value3());
 				}
 			}

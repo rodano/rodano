@@ -67,4 +67,6 @@ public interface UserDAOService {
 	 */
 	List<UserManagementDTO> getAllUsersForManagement();
 
+	List<User> getSuperusers();
+
 }

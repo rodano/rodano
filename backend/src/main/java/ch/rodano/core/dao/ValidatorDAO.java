@@ -7,6 +7,7 @@ import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
 import ch.rodano.configuration.model.validator.Validator;
+import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
 import ch.rodano.core.model.jooq.tables.records.ValidatorRecord;
 
 import static ch.rodano.core.model.jooq.tables.Validator.VALIDATOR;
@@ -18,13 +19,16 @@ public class ValidatorDAO implements BaseProjectDAO<Validator> {
 
 	private final DSLContext dslContext;
 	private final MappingHelper mappingHelper;
+	private final RuleDAO ruleDAO;
 
 	public ValidatorDAO(
 		final DSLContext dslContext,
-		final MappingHelper mappingHelper
+		final MappingHelper mappingHelper,
+		final RuleDAO ruleDAO
 	) {
 		this.dslContext = dslContext;
 		this.mappingHelper = mappingHelper;
+		this.ruleDAO = ruleDAO;
 	}
 
 	@Override
@@ -88,6 +92,8 @@ public class ValidatorDAO implements BaseProjectDAO<Validator> {
 		if(record.getValidStateId() != null) {
 			model.setValidStateId(getWorkflowStateCode(record.getValidStateId()));
 		}
+
+		model.setConstraint(ruleDAO.loadConstraintForOwner(RuleConstraintOwnerType.VALIDATOR, record.getValidatorId()));
 
 		return model;
 	}

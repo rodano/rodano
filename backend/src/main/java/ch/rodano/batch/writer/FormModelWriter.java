@@ -15,9 +15,6 @@ import ch.rodano.batch.pojo.FormModelLayout;
 import ch.rodano.batch.pojo.FormModelLayoutCell;
 import ch.rodano.batch.pojo.FormModelLayoutColumn;
 import ch.rodano.batch.pojo.FormModelLayoutLine;
-import ch.rodano.batch.pojo.Rule;
-import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
-import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.batch.helper.ModelResolvers.resolveDatasetModelId;
@@ -25,8 +22,6 @@ import static ch.rodano.batch.helper.ModelResolvers.resolveFieldModelId;
 import static ch.rodano.batch.helper.ModelResolvers.resolveFormModelId;
 import static ch.rodano.batch.helper.ModelResolvers.resolvePossibleValueIdForCell;
 import static ch.rodano.batch.helper.ModelResolvers.resolveWorkflowId;
-import static ch.rodano.batch.helper.RuleHelper.insertConstraintForOwner;
-import static ch.rodano.batch.helper.RuleHelper.insertRuleActions;
 import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteria.FORM_CELL_VISIBILITY_CRITERIA;
 import static ch.rodano.core.model.jooq.tables.FormCellVisibilityCriteriaTargetCell.FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL;
@@ -38,7 +33,6 @@ import static ch.rodano.core.model.jooq.tables.FormLayoutColumn.FORM_LAYOUT_COLU
 import static ch.rodano.core.model.jooq.tables.FormLayoutLine.FORM_LAYOUT_LINE;
 import static ch.rodano.core.model.jooq.tables.FormModel.FORM_MODEL;
 import static ch.rodano.core.model.jooq.tables.FormModelWorkflow.FORM_MODEL_WORKFLOW;
-import static ch.rodano.core.model.jooq.tables.Rule.RULE;
 
 public class FormModelWriter extends BaseWriter {
 
@@ -80,7 +74,6 @@ public class FormModelWriter extends BaseWriter {
 
 				if(formModel.getWorkflowIds() != null && !formModel.getWorkflowIds().isEmpty()) {
 					for(String workflowCode : formModel.getWorkflowIds()) {
-
 						final var existingWorkflowId = resolveWorkflowId(tx, projectId, workflowCode);
 						final UUID workflowId = existingWorkflowId != null
 							? existingWorkflowId
@@ -94,8 +87,6 @@ public class FormModelWriter extends BaseWriter {
 							.execute();
 					}
 				}
-
-				putFormRules(tx, projectId, formModel.getId(), formModelId, formModel.getRules());
 
 				final List<PendingTarget> pendingTargets = new java.util.ArrayList<>();
 
@@ -134,10 +125,6 @@ public class FormModelWriter extends BaseWriter {
 
 						layoutOrder++;
 
-						if(layout.getConstraint() != null) {
-							insertConstraintForOwner(tx, projectId, "FORM_LAYOUT", layoutId, layout.getConstraint(), RuleConstraintConstraintType.DEFAULT);
-						}
-
 						if(layout.getColumns() != null && !layout.getColumns().isEmpty()) {
 							int colOrder = 0;
 							for(FormModelLayoutColumn column : layout.getColumns()) {
@@ -156,7 +143,6 @@ public class FormModelWriter extends BaseWriter {
 						int lineOrder = 0;
 						if(layout.getLines() != null && !layout.getLines().isEmpty()) {
 							for(FormModelLayoutLine line : layout.getLines()) {
-
 								final UUID lineId = deterministic(projectId, "FORM_LAYOUT_LINE",
 									formModel.getId() + "|" + layoutCode + "|" + lineOrder);
 
@@ -212,15 +198,10 @@ public class FormModelWriter extends BaseWriter {
 											.set(FORM_LAYOUT_CELL.TEXT_AFTER, toJson(cell.getTextAfter()))
 											.execute();
 
-										if(cell.getConstraint() != null) {
-											insertConstraintForOwner(tx, projectId, "FORM_LAYOUT_CELL", cellId, cell.getConstraint(), RuleConstraintConstraintType.DEFAULT);
-										}
-
 										final List<FormCellVisibilityCriteria> visCriteria = cell.getVisibilityCriteria();
 										if(visCriteria != null && !visCriteria.isEmpty()) {
 											int visCriteriaIndex = 0;
 											for(FormCellVisibilityCriteria vis : visCriteria) {
-
 												final UUID visCriteriaId = deterministic(projectId, "FORM_CELL_VISIBILITY_CRITERIA",
 													formModel.getId() + "|" + layoutCode + "|" + cellCode + "|" + visCriteriaIndex);
 
@@ -240,14 +221,11 @@ public class FormModelWriter extends BaseWriter {
 
 												if(vis.getValues() != null && !vis.getValues().isEmpty()) {
 													for(String value : vis.getValues()) {
-
 														final UUID possibleValueId = resolvePossibleValueIdForCell(tx, projectId, cellId, value);
-
 														if(possibleValueId == null) {
 															LOGGER.warn("No possible value for project={}, cell={}, value={}", projectId, cellId, value);
 															continue;
 														}
-
 														tx.insertInto(FORM_CELL_VISIBILITY_CRITERIA_VALUE)
 															.set(FORM_CELL_VISIBILITY_CRITERIA_VALUE.PROJECT_ID, projectId)
 															.set(FORM_CELL_VISIBILITY_CRITERIA_VALUE.FORM_CELL_VISIBLE_CRITERIA_ID, visCriteriaId)
@@ -263,7 +241,6 @@ public class FormModelWriter extends BaseWriter {
 												if(vis.getTargetCellIds() != null && !vis.getTargetCellIds().isEmpty()) {
 													for(String targetCellCode : vis.getTargetCellIds()) {
 														final UUID targetCellId = resolveCellId(tx, projectId, formModelId, layoutId, targetCellCode);
-
 														if(targetCellId != null) {
 															tx.insertInto(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL)
 																.set(FORM_CELL_VISIBILITY_CRITERIA_TARGET_CELL.PROJECT_ID, projectId)
@@ -286,7 +263,6 @@ public class FormModelWriter extends BaseWriter {
 												if(vis.getTargetLayoutIds() != null && !vis.getTargetLayoutIds().isEmpty()) {
 													for(String targetLayoutCode : vis.getTargetLayoutIds()) {
 														final UUID targetLayoutId = resolveLayoutId(tx, projectId, formModelId, targetLayoutCode);
-
 														if(targetLayoutId != null) {
 															tx.insertInto(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT)
 																.set(FORM_CELL_VISIBILITY_CRITERIA_TARGET_LAYOUT.PROJECT_ID, projectId)
@@ -313,6 +289,7 @@ public class FormModelWriter extends BaseWriter {
 							}
 						}
 					}
+
 					for(PendingTarget p : pendingTargets) {
 						switch(p.kind) {
 							case CELL -> {
@@ -341,9 +318,7 @@ public class FormModelWriter extends BaseWriter {
 										.execute();
 								}
 							}
-							default -> {
-								System.out.println("DEFAULT");
-							}
+							default -> System.out.println("DEFAULT");
 						}
 					}
 				}
@@ -351,56 +326,14 @@ public class FormModelWriter extends BaseWriter {
 		});
 	}
 
-	private static void putFormRules(final DSLContext tx,
-									 final UUID projectId,
-									 final String formCode,
-									 final UUID formModelId,
-									 final List<Rule> rules) {
-
-		if(rules == null || rules.isEmpty()) {
-			return;
-		}
-
-		for(int idx = 0; idx < rules.size(); idx++) {
-			final Rule rule = rules.get(idx);
-			final UUID ruleId = deterministic(projectId, "FORM_MODEL_RULE", formCode + "|" + idx);
-
-			tx.insertInto(RULE)
-				.set(RULE.PROJECT_ID, projectId)
-				.set(RULE.RULE_ID, ruleId)
-				.set(RULE.ENTITY_TYPE, RuleEntityType.FORM_MODEL)
-				.set(RULE.ENTITY_ID, formModelId)
-				.set(RULE.RULE_TYPE, DSL.val((String) null))
-				.set(RULE.DESCRIPTION, rule.getDescription())
-				.set(RULE.MESSAGE, toJson(rule.getMessage()))
-				.set(RULE.TAG, toJson(rule.getTags()))
-				.onDuplicateKeyUpdate()
-				.set(RULE.DESCRIPTION, rule.getDescription())
-				.set(RULE.MESSAGE, toJson(rule.getMessage()))
-				.set(RULE.TAG, toJson(rule.getTags()))
-				.execute();
-
-			if(rule.getConstraint() != null) {
-				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
-			}
-			if(rule.getActions() != null && !rule.getActions().isEmpty()) {
-				insertRuleActions(tx, projectId, ruleId, rule.getActions());
-			}
-		}
-	}
-
-	private static UUID resolveLayoutId(final DSLContext tx,
-										final UUID projectId,
-										final UUID defaultFormModelId,
-										final String layoutRef) {
-
+	static UUID resolveLayoutId(final DSLContext tx, final UUID projectId,
+	                            final UUID defaultFormModelId, final String layoutRef) {
 		if(layoutRef == null || layoutRef.isBlank()) {
 			return null;
 		}
 		final String[] p = splitRef(layoutRef);
 		UUID formId = defaultFormModelId;
-		String layoutCode = null;
-
+		final String layoutCode;
 		if(p.length == 1) {
 			layoutCode = p[0];
 		}
@@ -408,25 +341,22 @@ public class FormModelWriter extends BaseWriter {
 			formId = resolveFormModelId(tx, projectId, p[0]);
 			layoutCode = p[1];
 		}
-
+		else {
+			return null;
+		}
 		if(formId == null || layoutCode == null || layoutCode.isBlank()) {
 			return null;
 		}
-
-		return tx.select(FORM_LAYOUT.FORM_LAYOUT_ID)
-			.from(FORM_LAYOUT)
+		return tx.select(FORM_LAYOUT.FORM_LAYOUT_ID).from(FORM_LAYOUT)
 			.where(FORM_LAYOUT.PROJECT_ID.eq(projectId)
 				.and(FORM_LAYOUT.FORM_MODEL_ID.eq(formId))
 				.and(FORM_LAYOUT.CODE.eq(layoutCode)))
 			.fetchOne(FORM_LAYOUT.FORM_LAYOUT_ID);
 	}
 
-	private static UUID resolveCellId(final DSLContext tx,
-									  final UUID projectId,
-									  final UUID defaultFormModelId,
-									  final UUID defaultLayoutId,
-									  final String cellRef) {
-
+	static UUID resolveCellId(final DSLContext tx, final UUID projectId,
+	                          final UUID defaultFormModelId, final UUID defaultLayoutId,
+	                          final String cellRef) {
 		if(cellRef == null || cellRef.isBlank()) {
 			return null;
 		}
@@ -434,7 +364,6 @@ public class FormModelWriter extends BaseWriter {
 		UUID formId = defaultFormModelId;
 		UUID layoutId = defaultLayoutId;
 		final String cellCode;
-
 		if(p.length == 1) {
 			cellCode = p[0];
 		}
@@ -447,13 +376,10 @@ public class FormModelWriter extends BaseWriter {
 			layoutId = resolveLayoutId(tx, projectId, formId, p[1]);
 			cellCode = p[2];
 		}
-
 		if(formId == null || layoutId == null || cellCode == null || cellCode.isBlank()) {
 			return null;
 		}
-
-		return tx.select(FORM_LAYOUT_CELL.FORM_LAYOUT_CELL_ID)
-			.from(FORM_LAYOUT_CELL)
+		return tx.select(FORM_LAYOUT_CELL.FORM_LAYOUT_CELL_ID).from(FORM_LAYOUT_CELL)
 			.where(FORM_LAYOUT_CELL.PROJECT_ID.eq(projectId)
 				.and(FORM_LAYOUT_CELL.FORM_MODEL_ID.eq(formId))
 				.and(FORM_LAYOUT_CELL.FORM_LAYOUT_ID.eq(layoutId))
@@ -482,7 +408,7 @@ public class FormModelWriter extends BaseWriter {
 		final int lineOrder;
 
 		PendingTarget(final Kind kind, final UUID projectId, final UUID formModelId, final UUID layoutId,
-					  final String ref, final UUID visCriteriaId, final UUID sourceCellId, final int lineOrder) {
+		              final String ref, final UUID visCriteriaId, final UUID sourceCellId, final int lineOrder) {
 			this.kind = kind;
 			this.projectId = projectId;
 			this.formModelId = formModelId;

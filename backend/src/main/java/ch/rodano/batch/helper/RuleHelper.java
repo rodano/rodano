@@ -21,6 +21,12 @@ import ch.rodano.core.model.jooq.enums.RuleConstraintOwnerType;
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.batch.helper.ModelResolvers.resolveRuleConditionId;
 import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
+import static ch.rodano.core.model.jooq.tables.DatasetModel.DATASET_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventGroup.EVENT_GROUP;
+import static ch.rodano.core.model.jooq.tables.EventModel.EVENT_MODEL;
+import static ch.rodano.core.model.jooq.tables.Feature.FEATURE;
+import static ch.rodano.core.model.jooq.tables.FieldModel.FIELD_MODEL;
+import static ch.rodano.core.model.jooq.tables.FormModel.FORM_MODEL;
 import static ch.rodano.core.model.jooq.tables.RuleAction.RULE_ACTION;
 import static ch.rodano.core.model.jooq.tables.RuleActionParameter.RULE_ACTION_PARAMETER;
 import static ch.rodano.core.model.jooq.tables.RuleCondition.RULE_CONDITION;
@@ -28,9 +34,15 @@ import static ch.rodano.core.model.jooq.tables.RuleConditionList.RULE_CONDITION_
 import static ch.rodano.core.model.jooq.tables.RuleConstraint.RULE_CONSTRAINT;
 import static ch.rodano.core.model.jooq.tables.RuleCriterion.RULE_CRITERION;
 import static ch.rodano.core.model.jooq.tables.RuleCriterionValue.RULE_CRITERION_VALUE;
-import static org.jooq.impl.DSL.val;
+import static ch.rodano.core.model.jooq.tables.ScopeModel.SCOPE_MODEL;
+import static ch.rodano.core.model.jooq.tables.Validator.VALIDATOR;
+import static ch.rodano.core.model.jooq.tables.Workflow.WORKFLOW;
+import static ch.rodano.core.model.jooq.tables.WorkflowAction.WORKFLOW_ACTION;
+import static ch.rodano.core.model.jooq.tables.WorkflowState.WORKFLOW_STATE;
 
 public final class RuleHelper {
+
+	private static final String UUID_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}";
 
 	private RuleHelper() {
 	}
@@ -38,12 +50,23 @@ public final class RuleHelper {
 	public static void insertConstraintForOwner(
 		final DSLContext tx,
 		final UUID projectId,
-		final String ownerTypeLiteral,  // "RULE","FIELD_MODEL","VALIDATOR","FORM_LAYOUT","FORM_LAYOUT_CELL"
+		final String ownerTypeLiteral,
 		final UUID ownerId,
 		final RuleConstraint constraint,
 		final RuleConstraintConstraintType constraintType
 	) {
+		insertConstraintForOwner(tx, projectId, ownerTypeLiteral, ownerId, constraint, constraintType, null);
+	}
 
+	public static void insertConstraintForOwner(
+		final DSLContext tx,
+		final UUID projectId,
+		final String ownerTypeLiteral,
+		final UUID ownerId,
+		final RuleConstraint constraint,
+		final RuleConstraintConstraintType constraintType,
+		final UUID contextWorkflowId
+	) {
 		if(constraint == null) {
 			return;
 		}
@@ -126,8 +149,10 @@ public final class RuleHelper {
 				int sort = 0;
 				for(RuleCondition node : roots) {
 					final UUID nodeId = upsertNode(tx, projectId, listId, rootConditionId, node, sort++);
-					upsertCriterionAndValues(tx, projectId, nodeId, node);
-					putChildren(tx, projectId, listId, nodeId, node.getConditions());
+					upsertCriterionAndValues(tx, projectId, nodeId, node, dom, contextWorkflowId);
+					final String nextEntity = getNextEntityType(
+						node.getCriterion() != null ? node.getCriterion().getProperty() : null, dom);
+					putChildren(tx, projectId, listId, nodeId, node.getConditions(), nextEntity, contextWorkflowId);
 				}
 			}
 		}
@@ -139,7 +164,16 @@ public final class RuleHelper {
 		final UUID ruleId,
 		final List<RuleAction> actions
 	) {
+		insertRuleActions(tx, projectId, ruleId, actions, null);
+	}
 
+	public static void insertRuleActions(
+		final DSLContext tx,
+		final UUID projectId,
+		final UUID ruleId,
+		final List<RuleAction> actions,
+		final UUID contextWorkflowId
+	) {
 		if(actions == null || actions.isEmpty()) {
 			return;
 		}
@@ -191,18 +225,36 @@ public final class RuleHelper {
 					final String pCode = (p.getId() == null || p.getId().isBlank()) ? "P" + pi : p.getId();
 					final UUID paramId = deterministic(projectId, "RULE_ACTION_PARAMETER", actionId + "|" + pCode);
 
+					String paramValue = n2(p.getValue());
+					if("STATUS".equals(p.getId()) && paramValue != null
+						&& !paramValue.matches(UUID_PATTERN)) {
+						final UUID resolved = resolveStatusParam(tx, projectId, conditionId, paramValue, contextWorkflowId);
+						if(resolved != null) {
+							paramValue = resolved.toString();
+						}
+					}
+					if("FEATURE_ID".equals(p.getId()) && paramValue != null
+						&& !paramValue.matches(UUID_PATTERN)) {
+						final UUID resolved = tx.select(FEATURE.FEATURE_ID).from(FEATURE)
+							.where(FEATURE.PROJECT_ID.eq(projectId).and(FEATURE.CODE.eq(paramValue)))
+							.fetchOne(FEATURE.FEATURE_ID);
+						if(resolved != null) {
+							paramValue = resolved.toString();
+						}
+					}
+
 					tx.insertInto(RULE_ACTION_PARAMETER)
 						.set(RULE_ACTION_PARAMETER.PROJECT_ID, projectId)
 						.set(RULE_ACTION_PARAMETER.RULE_ACTION_ID, actionId)
 						.set(RULE_ACTION_PARAMETER.RULE_ACTION_PARAMETER_ID, paramId)
 						.set(RULE_ACTION_PARAMETER.CODE, p.getId())
-						.set(RULE_ACTION_PARAMETER.VALUE, n2(p.getValue()))
-						.set(RULE_ACTION_PARAMETER.RULING_ENTITY, val((String) null))
+						.set(RULE_ACTION_PARAMETER.VALUE, paramValue)
+						.set(RULE_ACTION_PARAMETER.RULING_ENTITY, n2(p.getRulableEntity()))
 						.set(RULE_ACTION_PARAMETER.CONDITION_ID, n2(p.getConditionId()))
 						.onDuplicateKeyUpdate()
 						.set(RULE_ACTION_PARAMETER.CODE, p.getId())
-						.set(RULE_ACTION_PARAMETER.VALUE, n2(p.getValue()))
-						.set(RULE_ACTION_PARAMETER.RULING_ENTITY, val((String) null))
+						.set(RULE_ACTION_PARAMETER.VALUE, paramValue)
+						.set(RULE_ACTION_PARAMETER.RULING_ENTITY, n2(p.getRulableEntity()))
 						.set(RULE_ACTION_PARAMETER.CONDITION_ID, n2(p.getConditionId()))
 						.execute();
 					pi++;
@@ -211,6 +263,56 @@ public final class RuleHelper {
 
 			order++;
 		}
+	}
+
+	private static UUID resolveStatusParam(final DSLContext tx, final UUID projectId,
+	                                       final UUID conditionId, final String stateCode,
+	                                       final UUID contextWorkflowId) {
+		if(conditionId != null) {
+			final UUID parentId = tx.select(RULE_CONDITION.PARENT_CONDITION_ID)
+				.from(RULE_CONDITION)
+				.where(RULE_CONDITION.CONDITION_ID.eq(conditionId))
+				.fetchOne(RULE_CONDITION.PARENT_CONDITION_ID);
+
+			if(parentId != null) {
+				final String workflowCode = tx
+					.select(RULE_CRITERION_VALUE.VALUE_TEXT)
+					.from(RULE_CONDITION)
+					.join(RULE_CRITERION).on(RULE_CRITERION.CONDITION_ID.eq(RULE_CONDITION.CONDITION_ID))
+					.join(RULE_CRITERION_VALUE).on(RULE_CRITERION_VALUE.CRITERION_ID.eq(RULE_CRITERION.CRITERION_ID))
+					.where(RULE_CONDITION.PARENT_CONDITION_ID.eq(parentId))
+					.and(RULE_CRITERION.PROPERTY.eq("ID"))
+					.and(RULE_CONDITION.CONDITION_ID.ne(conditionId))
+					.fetchOne(RULE_CRITERION_VALUE.VALUE_TEXT);
+
+				if(workflowCode != null) {
+					final UUID stateUuid = tx.select(WORKFLOW_STATE.WORKFLOW_STATE_ID)
+						.from(WORKFLOW_STATE)
+						.join(WORKFLOW).on(WORKFLOW.WORKFLOW_ID.eq(WORKFLOW_STATE.WORKFLOW_ID))
+						.where(WORKFLOW_STATE.PROJECT_ID.eq(projectId))
+						.and(WORKFLOW.CODE.eq(workflowCode))
+						.and(WORKFLOW_STATE.CODE.eq(stateCode))
+						.fetchOne(WORKFLOW_STATE.WORKFLOW_STATE_ID);
+					if(stateUuid != null) {
+						return stateUuid;
+					}
+				}
+			}
+		}
+
+		if(contextWorkflowId != null) {
+			final UUID stateUuid = tx.select(WORKFLOW_STATE.WORKFLOW_STATE_ID)
+				.from(WORKFLOW_STATE)
+				.where(WORKFLOW_STATE.PROJECT_ID.eq(projectId))
+				.and(WORKFLOW_STATE.WORKFLOW_ID.eq(contextWorkflowId))
+				.and(WORKFLOW_STATE.CODE.eq(stateCode))
+				.fetchOne(WORKFLOW_STATE.WORKFLOW_STATE_ID);
+			if(stateUuid != null) {
+				return stateUuid;
+			}
+		}
+
+		return resolveWorkflowStateUnique(tx, projectId, stateCode);
 	}
 
 	private static UUID upsertNode(
@@ -261,17 +363,20 @@ public final class RuleHelper {
 		final UUID projectId,
 		final UUID conditionListId,
 		final UUID parentNodeId,
-		final List<RuleCondition> children
+		final List<RuleCondition> children,
+		final String entityType,
+		final UUID contextWorkflowId
 	) {
-
 		if(children == null || children.isEmpty()) {
 			return;
 		}
 		int sort = 0;
 		for(RuleCondition child : children) {
 			final UUID nodeId = upsertNode(tx, projectId, conditionListId, parentNodeId, child, sort++);
-			upsertCriterionAndValues(tx, projectId, nodeId, child);
-			putChildren(tx, projectId, conditionListId, nodeId, child.getConditions());
+			upsertCriterionAndValues(tx, projectId, nodeId, child, entityType, contextWorkflowId);
+			final String nextEntity = getNextEntityType(
+				child.getCriterion() != null ? child.getCriterion().getProperty() : null, entityType);
+			putChildren(tx, projectId, conditionListId, nodeId, child.getConditions(), nextEntity, contextWorkflowId);
 		}
 	}
 
@@ -279,11 +384,15 @@ public final class RuleHelper {
 		final DSLContext tx,
 		final UUID projectId,
 		final UUID nodeId,
-		final RuleCondition node
+		final RuleCondition node,
+		final String entityType,
+		final UUID contextWorkflowId
 	) {
 		if(node.getCriterion() == null || node.getCriterion().getProperty() == null) {
 			return;
 		}
+
+		final String property = node.getCriterion().getProperty();
 
 		final UUID criterionId = deterministic(projectId, "RULE_CRITERION", nodeId.toString());
 
@@ -291,7 +400,7 @@ public final class RuleHelper {
 			.set(RULE_CRITERION.PROJECT_ID, projectId)
 			.set(RULE_CRITERION.CRITERION_ID, criterionId)
 			.set(RULE_CRITERION.CONDITION_ID, nodeId)
-			.set(RULE_CRITERION.PROPERTY, node.getCriterion().getProperty())
+			.set(RULE_CRITERION.PROPERTY, property)
 			.set(RULE_CRITERION.OPERATOR, n2(node.getCriterion().getOperator()))
 			.onDuplicateKeyUpdate()
 			.set(RULE_CRITERION.OPERATOR, n2(node.getCriterion().getOperator()))
@@ -299,14 +408,98 @@ public final class RuleHelper {
 
 		final List<String> values = node.getCriterion().getValues() == null ? List.of() : node.getCriterion().getValues();
 		for(int i = 0; i < values.size(); i++) {
+			String value = values.get(i);
+
+			if(value != null && !value.isBlank()
+				&& !value.matches(UUID_PATTERN)) {
+				final UUID resolved = resolveEntityValue(tx, projectId, entityType, property, value, contextWorkflowId);
+				if(resolved != null) {
+					value = resolved.toString();
+				}
+			}
+
 			tx.insertInto(RULE_CRITERION_VALUE)
 				.set(RULE_CRITERION_VALUE.PROJECT_ID, projectId)
 				.set(RULE_CRITERION_VALUE.CRITERION_ID, criterionId)
 				.set(RULE_CRITERION_VALUE.VALUE_ORDER, i)
-				.set(RULE_CRITERION_VALUE.VALUE_TEXT, values.get(i))
-				.onDuplicateKeyIgnore()
+				.set(RULE_CRITERION_VALUE.VALUE_TEXT, value)
+				.onDuplicateKeyUpdate()
+				.set(RULE_CRITERION_VALUE.VALUE_TEXT, value)
 				.execute();
 		}
+	}
+
+	private static UUID resolveEntityValue(final DSLContext tx, final UUID projectId,
+	                                       final String entityType, final String property,
+	                                       final String code, final UUID contextWorkflowId) {
+		return switch(entityType + "." + property) {
+			case "SCOPE.MODEL", "SCOPE.ID" -> tx.select(SCOPE_MODEL.SCOPE_MODEL_ID).from(SCOPE_MODEL)
+				.where(SCOPE_MODEL.PROJECT_ID.eq(projectId).and(SCOPE_MODEL.CODE.eq(code)))
+				.fetchOne(SCOPE_MODEL.SCOPE_MODEL_ID);
+			case "EVENT.ID" -> tx.select(EVENT_MODEL.EVENT_MODEL_ID).from(EVENT_MODEL)
+				.where(EVENT_MODEL.PROJECT_ID.eq(projectId).and(EVENT_MODEL.CODE.eq(code)))
+				.fetchOne(EVENT_MODEL.EVENT_MODEL_ID);
+			case "EVENT.EVENT_GROUP_ID" -> tx.select(EVENT_GROUP.EVENT_GROUP_ID).from(EVENT_GROUP)
+				.where(EVENT_GROUP.PROJECT_ID.eq(projectId).and(EVENT_GROUP.CODE.eq(code)))
+				.fetchOne(EVENT_GROUP.EVENT_GROUP_ID);
+			case "DATASET.ID" -> tx.select(DATASET_MODEL.DATASET_MODEL_ID).from(DATASET_MODEL)
+				.where(DATASET_MODEL.PROJECT_ID.eq(projectId).and(DATASET_MODEL.CODE.eq(code)))
+				.fetchOne(DATASET_MODEL.DATASET_MODEL_ID);
+			case "FIELD.ID" -> tx.select(FIELD_MODEL.FIELD_MODEL_ID).from(FIELD_MODEL)
+				.where(FIELD_MODEL.PROJECT_ID.eq(projectId).and(FIELD_MODEL.CODE.eq(code)))
+				.fetchOne(FIELD_MODEL.FIELD_MODEL_ID);
+			case "FORM.ID" -> tx.select(FORM_MODEL.FORM_MODEL_ID).from(FORM_MODEL)
+				.where(FORM_MODEL.PROJECT_ID.eq(projectId).and(FORM_MODEL.CODE.eq(code)))
+				.fetchOne(FORM_MODEL.FORM_MODEL_ID);
+			case "WORKFLOW.ID" -> tx.select(WORKFLOW.WORKFLOW_ID).from(WORKFLOW)
+				.where(WORKFLOW.PROJECT_ID.eq(projectId).and(WORKFLOW.CODE.eq(code)))
+				.fetchOne(WORKFLOW.WORKFLOW_ID);
+			case "WORKFLOW.STATUS" -> {
+				if(contextWorkflowId != null) {
+					final UUID stateUuid = tx.select(WORKFLOW_STATE.WORKFLOW_STATE_ID)
+						.from(WORKFLOW_STATE)
+						.where(WORKFLOW_STATE.PROJECT_ID.eq(projectId))
+						.and(WORKFLOW_STATE.WORKFLOW_ID.eq(contextWorkflowId))
+						.and(WORKFLOW_STATE.CODE.eq(code))
+						.fetchOne(WORKFLOW_STATE.WORKFLOW_STATE_ID);
+					if(stateUuid != null) {
+						yield stateUuid;
+					}
+				}
+				yield resolveWorkflowStateUnique(tx, projectId, code);
+			}
+			case "WORKFLOW.CREATION_ACTION" -> tx.select(WORKFLOW_ACTION.WORKFLOW_ACTION_ID).from(WORKFLOW_ACTION)
+				.where(WORKFLOW_ACTION.PROJECT_ID.eq(projectId).and(WORKFLOW_ACTION.CODE.eq(code)))
+				.fetchOne(WORKFLOW_ACTION.WORKFLOW_ACTION_ID);
+			case "WORKFLOW.VALIDATOR_ID" -> tx.select(VALIDATOR.VALIDATOR_ID).from(VALIDATOR)
+				.where(VALIDATOR.PROJECT_ID.eq(projectId).and(VALIDATOR.CODE.eq(code)))
+				.fetchOne(VALIDATOR.VALIDATOR_ID);
+			default -> null;
+		};
+	}
+
+	private static UUID resolveWorkflowStateUnique(final DSLContext tx, final UUID projectId, final String code) {
+		final var candidates = tx.select(WORKFLOW_STATE.WORKFLOW_STATE_ID).from(WORKFLOW_STATE)
+			.where(WORKFLOW_STATE.PROJECT_ID.eq(projectId).and(WORKFLOW_STATE.CODE.eq(code)))
+			.fetch(WORKFLOW_STATE.WORKFLOW_STATE_ID);
+		return candidates.size() == 1 ? candidates.getFirst() : null;
+	}
+
+	private static String getNextEntityType(final String property, final String currentEntity) {
+		if(property == null) {
+			return currentEntity;
+		}
+		return switch(property) {
+			case "WORKFLOW" -> "WORKFLOW";
+			case "DATASET" -> "DATASET";
+			case "FIELD", "FIELD_HAVING_VALUE", "LAST_NON_EMPTY_VALUE" -> "FIELD";
+			case "FORM" -> "FORM";
+			case "EVENT", "INCEPTIVE_EVENT", "PREVIOUS", "ALL_PREVIOUS",
+			     "NEXT", "ALL_NEXT", "ALL_NEXT_INCLUDING_REMOVED" -> "EVENT";
+			case "SCOPE", "ANCESTOR", "PARENT", "DEFAULT_PARENT",
+			     "DESCENDANT", "LEAF" -> "SCOPE";
+			default -> currentEntity;
+		};
 	}
 
 	private static RuleConstraintOwnerType toOwnerType(final String s) {

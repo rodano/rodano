@@ -1164,7 +1164,10 @@ export class ConfiguratorEditorComponent implements OnInit, ComponentCanDeactiva
 				next: () => {
 					this.saving = false;
 					this.snackBar.open('Configuration published successfully', 'Close', {duration: 3000});
-					this.initializeProject();
+					this.configuratorService.initializeProject(this.projectId).subscribe({
+						next: () => this.initializeProject(),
+						error: () => this.initializeProject()
+					});
 				},
 				error: error => {
 					console.error('Error publishing:', error);

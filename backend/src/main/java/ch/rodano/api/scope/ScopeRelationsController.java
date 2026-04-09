@@ -208,37 +208,45 @@ public class ScopeRelationsController extends AbstractSecuredController {
 		@RequestParam final boolean onlyDefault
 	) {
 		final var currentRoles = currentActiveRoles();
-
 		final var scopeModel = studyService.getStudy().getScopeModel(scopeModelId);
 
 		if(scopeModel.isRoot()) {
 			return Collections.emptyList();
 		}
 
-		//retrieve parent scope models
 		final Set<UUID> parentModelIds = (
-			onlyDefault
+			onlyDefault && scopeModel.getDefaultParentId() != null
 				? Stream.of(scopeModel.getDefaultParentId())
-				: scopeModel.getParentIds().stream()
+				: onlyDefault && !scopeModel.getParentIds().isEmpty()
+				  ? Stream.of(scopeModel.getParentIds().getFirst())
+				  : scopeModel.getParentIds().stream()
 		)
 			.filter(Objects::nonNull)
 			.map(code -> {
 				final var parentModel = studyService.getStudy().getScopeModel(code);
-				if(parentModel == null) {
-					throw new IllegalStateException("Unknown parent ScopeModel code: " + code);
-				}
 				return parentModel.getScopeModelId();
 			}).collect(Collectors.toSet());
 
-		final var rootScopesPks = rightsService.filterRoles(currentRoles, scopeModel, right).stream().map(Role::getScopeFk).collect(Collectors.toSet());
-		final List<Scope> scopes = scopeDAOService.getScopesByScopeModelIdHavingAncestor(parentModelIds, rootScopesPks).stream()
-			//when asking for parent to create a scope, do a special filter
+		final var rootScopesPks = rightsService.filterRoles(currentRoles, scopeModel, right)
+			.stream()
+			.map(Role::getScopeFk)
+			.collect(Collectors.toSet());
+
+		final var scopesViaAncestor = scopeDAOService.getScopesByScopeModelIdHavingAncestor(parentModelIds, rootScopesPks);
+
+		final var directScopes = rootScopesPks.stream()
+			.map(scopeDAOService::getScopeByPk)
+			.filter(s -> s != null && parentModelIds.contains(s.getScopeModelId()))
+			.toList();
+
+		final var allScopes = Stream.concat(scopesViaAncestor.stream(), directScopes.stream())
+			.distinct()
 			.filter(s -> Rights.WRITE != right || s.canEnroll())
 			.sorted(Comparator.comparing(Scope::getCode))
 			.toList();
 
 		final var acl = rightsService.getACL(currentActor());
-		return scopeDTOService.createDTOs(scopes, acl);
+		return scopeDTOService.createDTOs(allScopes, acl);
 	}
 
 	@Operation(summary = "Get default parent scope")

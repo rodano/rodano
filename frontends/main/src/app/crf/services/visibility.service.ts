@@ -45,7 +45,11 @@ export class VisibilityService {
 	public triggerCriteria(cell: Cell, layoutUid: string, field: CRFField): void {
 		cell.visibilityCriteria.forEach(criterion => {
 			const fieldValues = this.crfService.parseFieldValue(field);
-			const criterionValues = this.crfService.typeFieldValues(field.model, criterion.values);
+			const resolvedCriterionValues = criterion.values.map(v => {
+				const pv = field.model.possibleValues?.find(p => p.id === v);
+				return pv ? pv.possibleValueId : v;
+			});
+			const criterionValues = this.crfService.typeFieldValues(field.model, resolvedCriterionValues);
 			//check if current value match visibility criterion
 			const reverse = !criterionValues.some(criterionValue => {
 				return fieldValues.some(fieldValue => {

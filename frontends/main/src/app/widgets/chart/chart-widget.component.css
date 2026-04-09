@@ -1,3 +1,12 @@
+:host {
+	display: block;
+	width: 100%;
+}
+
+canvas {
+	width: 100% !important;
+}
+
 table {
 	border-collapse: collapse;
 	width: 100%;

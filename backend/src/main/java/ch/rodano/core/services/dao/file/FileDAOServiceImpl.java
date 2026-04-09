@@ -118,12 +118,14 @@ public class FileDAOServiceImpl extends AbstractDAOService<File, FileRecord> imp
 
 	@Override
 	public File getUnsubmittedFileByFieldPk(final Long fieldPk) {
-		final var query = create.selectFrom(FILE)
+		return create.selectFrom(FILE)
 			.where(
 				FILE.FIELD_FK.eq(fieldPk)
 					.and(FILE.SUBMITTED.isFalse())
-			);
-		return findUnique(query);
+			)
+			.orderBy(FILE.CREATION_TIME.desc())
+			.limit(1)
+			.fetchOne(record -> record.into(File.class));
 	}
 
 	@Override

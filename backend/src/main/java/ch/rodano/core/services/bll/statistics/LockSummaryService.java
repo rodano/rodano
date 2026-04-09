@@ -66,7 +66,6 @@ public class LockSummaryService {
 	 * @return a summary
 	 */
 	public SummaryDTO getSummary(final Scope scope, final ScopeModel leafScopeModel) {
-		//in any case, child scopes must be retrieved to be able to generate the final DTO
 		final var childScopes = scopeRelationService.getEnabledChildren(scope, ZonedDateTime.now()).stream()
 			.filter(s -> !s.getVirtual())
 			.collect(Collectors.toSet());
@@ -75,10 +74,24 @@ public class LockSummaryService {
 		final var scopesByPk = childScopes.stream().collect(Collectors.toMap(Scope::getPk, Function.identity()));
 		scopesByPk.put(scope.getPk(), scope);
 
+		final var projectId = studyService.getStudy().getProjectId();
+		final var entityLockStatuses = EntityLockStatus.values();
+		final var columns = new ArrayList<SummaryColumnDTO>();
+		final var statusToColumnId = new LinkedHashMap<String, String>();
+		for(int i = 0; i < entityLockStatuses.length; i++) {
+			final var status = entityLockStatuses[i];
+			final var summaryColumnId = deterministic(projectId, "WORKFLOW_SUMMARY_COLUMN", "LOCK_SUMMARY|" + i);
+			columns.add(new SummaryColumnDTO(summaryColumnId, status.name(), status.getLabel(leafScopeModel), false, false));
+			statusToColumnId.put(status.name(), summaryColumnId.toString());
+		}
+
+		final var defaultValues = statusToColumnId.values().stream()
+			.collect(Collectors.toMap(uuid -> uuid, _ -> 0L));
+
 		final var summaryByScopePk = new LinkedHashMap<Long, Map<String, Long>>();
 
 		//add root scope
-		final var rootScopeValues = new HashMap<>(DEFAULT_VALUES);
+		final var rootScopeValues = new HashMap<>(defaultValues);
 		summaryByScopePk.put(scope.getPk(), rootScopeValues);
 
 		//fetch scope and event statuses
@@ -99,7 +112,6 @@ public class LockSummaryService {
 			.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
 			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getScopeModelId()))
 			.and(SCOPE.DELETED.isFalse())
-			//remember that the scope may not have any event
 			.and(EVENT.DELETED.isNull().or(EVENT.DELETED.isFalse()))
 			.groupBy(SCOPE_ANCESTOR.ANCESTOR_FK, SCOPE.PK).asTable("x");
 
@@ -115,21 +127,22 @@ public class LockSummaryService {
 
 		for(final var record : query.fetch()) {
 			final var status = Map.of(
-				EntityLockStatus.SCOPES_LOCKED.name(), record.component2(),
-				EntityLockStatus.SCOPES_UNLOCKED.name(), record.component3(),
-				EntityLockStatus.EVENTS_LOCKED.name(), record.component4(),
-				EntityLockStatus.EVENTS_UNLOCKED.name(), record.component5()
+				statusToColumnId.get(EntityLockStatus.SCOPES_LOCKED.name()), record.component2(),
+				statusToColumnId.get(EntityLockStatus.SCOPES_UNLOCKED.name()), record.component3(),
+				statusToColumnId.get(EntityLockStatus.EVENTS_LOCKED.name()), record.component4(),
+				statusToColumnId.get(EntityLockStatus.EVENTS_UNLOCKED.name()), record.component5()
 			);
 			summaryByScopePk.put(record.get(SCOPE_ANCESTOR.ANCESTOR_FK), status);
 			for(final var entityLockStatus : EntityLockStatus.values()) {
-				rootScopeValues.compute(entityLockStatus.name(), (k, v) -> v + status.get(k));
+				final var columnId = statusToColumnId.get(entityLockStatus.name());
+				rootScopeValues.compute(columnId, (k, v) -> v + status.get(k));
 			}
 		}
 
 		//add missing child scopes
 		for(final var childScope : childScopes) {
 			if(!summaryByScopePk.containsKey(childScope.getPk())) {
-				summaryByScopePk.put(childScope.getPk(), DEFAULT_VALUES);
+				summaryByScopePk.put(childScope.getPk(), defaultValues);
 			}
 		}
 
@@ -140,30 +153,7 @@ public class LockSummaryService {
 			})
 			.toList();
 
-		final var projectId = studyService.getStudy().getProjectId();
-		final var entityLockStatuses = EntityLockStatus.values();
-		final var columns = new ArrayList<SummaryColumnDTO>();
-		for(int i = 0; i < entityLockStatuses.length; i++) {
-			final var status = entityLockStatuses[i];
-			final var summaryColumnId = deterministic(
-				projectId,
-				"WORKFLOW_SUMMARY_COLUMN",
-				"LOCK_SUMMARY|" + i
-			);
-			columns.add(new SummaryColumnDTO(
-				summaryColumnId,
-				status.name(),
-				status.getLabel(leafScopeModel),
-				false,
-				false
-			));
-		}
-
-		final var workflowSummaryId = deterministic(
-			projectId,
-			"WORKFLOW_SUMMARY",
-			"LOCK_SUMMARY"
-		);
+		final var workflowSummaryId = deterministic(projectId, "WORKFLOW_SUMMARY", "LOCK_SUMMARY");
 
 		return new SummaryDTO(
 			workflowSummaryId,

@@ -8,12 +8,10 @@ import org.jooq.impl.DSL;
 
 import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.Validator;
-import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.batch.helper.ModelResolvers.resolveWorkflowId;
 import static ch.rodano.batch.helper.ModelResolvers.resolveWorkflowStateId;
-import static ch.rodano.batch.helper.RuleHelper.insertConstraintForOwner;
 import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.tables.Validator.VALIDATOR;
 
@@ -64,10 +62,6 @@ public class ValidatorWriter extends BaseWriter {
 					.set(VALIDATOR.DESCRIPTION, toJson(validator.getDescription()))
 					.set(VALIDATOR.MESSAGE, toJson(validator.getMessage()))
 					.execute();
-
-				if(validator.getConstraint() != null) {
-					insertConstraintForOwner(tx, projectId, "VALIDATOR", validatorId, validator.getConstraint(), RuleConstraintConstraintType.VALIDATION);
-				}
 			}
 		});
 	}

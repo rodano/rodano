@@ -12,12 +12,13 @@ import {DateUTCPipe} from 'src/app/pipes/date-utc.pipe';
 import {ChartDatasetPointObjectObject} from '@core/model/chart-dataset-point-object-object';
 import 'chartjs-adapter-date-fns';
 import {forkJoin} from 'rxjs';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
 @Component({
 	selector: 'app-chart-widget',
 	templateUrl: './chart-widget.component.html',
 	styleUrls: ['./chart-widget.component.css'],
-	imports: [BaseChartDirective]
+	imports: [BaseChartDirective, LocalizeMapPipe]
 })
 export class ChartWidgetComponent implements OnChanges {
 	private static DEFAULT_OPTIONS = {
@@ -60,6 +61,7 @@ export class ChartWidgetComponent implements OnChanges {
 
 	chart: Chart;
 	studyColor: string;
+	studyLanguage = 'en';
 	data: ChartData<any>;
 	options: ChartConfiguration<any>['options'];
 
@@ -77,6 +79,7 @@ export class ChartWidgetComponent implements OnChanges {
 			this.widgetService.getChart(this.id, scopePks, this.criteria)
 		]).subscribe(([study, chart]) => {
 			this.studyColor = study.color;
+			this.studyLanguage = study.defaultLanguage?.id || 'en';
 			this.chart = chart;
 			this.graphType = this.getGraphType(this.chart.model.type);
 			this.data = {datasets: this.chart.datasets};
@@ -112,12 +115,12 @@ export class ChartWidgetComponent implements OnChanges {
 						point.y = x;
 					});
 				});
-				this.options.scales.x.title.text = this.chart.model.legendY;
-				this.options.scales.y.title.text = this.chart.model.legendX;
+				this.options.scales.x.title.text = this.localize(this.chart.model.legendX);
+				this.options.scales.y.title.text = this.localize(this.chart.model.legendY);
 			}
 			else {
-				this.options.scales.x.title.text = this.chart.model.legendX;
-				this.options.scales.y.title.text = this.chart.model.legendY;
+				this.options.scales.x.title.text = this.localize(this.chart.model.legendX);
+				this.options.scales.y.title.text = this.localize(this.chart.model.legendY);
 			}
 
 			//configure x-scale for chart based on time
@@ -159,5 +162,12 @@ export class ChartWidgetComponent implements OnChanges {
 			default:
 				throw new Error(`Unknown chart type: ${type}`);
 		}
+	}
+
+	private localize(map: Record<string, string> | undefined): string {
+		if(!map) {
+			return '';
+		}
+		return map[this.studyLanguage] || map['en'] || Object.values(map)[0] || '';
 	}
 }

@@ -14,6 +14,7 @@ import ch.rodano.configuration.model.workflow.Action;
 import ch.rodano.configuration.model.workflow.StateMatcher;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
+import ch.rodano.core.model.jooq.enums.RuleEntityType;
 import ch.rodano.core.model.jooq.tables.records.WorkflowRecord;
 
 import static ch.rodano.core.model.jooq.tables.Workflow.WORKFLOW;
@@ -26,13 +27,16 @@ public class WorkflowDAO implements BaseProjectDAO<Workflow> {
 
 	private final DSLContext dslContext;
 	private final MappingHelper mappingHelper;
+	private final RuleDAO ruleDAO;
 
 	public WorkflowDAO(
 		final DSLContext dslContext,
-		final MappingHelper mappingHelper
+		final MappingHelper mappingHelper,
+		final RuleDAO ruleDAO
 	) {
 		this.dslContext = dslContext;
 		this.mappingHelper = mappingHelper;
+		this.ruleDAO = ruleDAO;
 	}
 
 	@Override
@@ -96,8 +100,13 @@ public class WorkflowDAO implements BaseProjectDAO<Workflow> {
 			model.setAggregateWorkflowId(getWorkflowCode(record.getAggregateWorkflowId()));
 		}
 
+		if(record.getCreationActionId() != null) {
+			model.setActionId(getWorkflowActionCode(record.getCreationActionId()));
+		}
+
 		model.setStates(loadWorkflowStates(record.getWorkflowId()));
 		model.setActions(loadWorkflowActions(record.getWorkflowId()));
+		model.setRules(ruleDAO.findByEntity(RuleEntityType.WORKFLOW, record.getWorkflowId()));
 
 		return model;
 	}
@@ -183,7 +192,8 @@ public class WorkflowDAO implements BaseProjectDAO<Workflow> {
 				action.setDocumentableOptions(
 					mappingHelper.parseJson(
 						record.getDocumentableOptions(),
-						new TypeReference<>() {}
+						new TypeReference<>() {
+						}
 					)
 				);
 			}
@@ -191,9 +201,18 @@ public class WorkflowDAO implements BaseProjectDAO<Workflow> {
 			action.setRequireSignature(record.getRequireSignature() != null ? record.getRequireSignature() : false);
 			action.setRequiredSignatureText(mappingHelper.parseJsonToMap(record.getRequiredSignatureText()));
 
+			action.setRules(ruleDAO.findByEntity(RuleEntityType.WORKFLOW_ACTION, record.getWorkflowActionId()));
+
 			actions.add(action);
 		});
 
 		return actions;
+	}
+
+	private String getWorkflowActionCode(final UUID actionId) {
+		return dslContext.select(WORKFLOW_ACTION.CODE)
+			.from(WORKFLOW_ACTION)
+			.where(WORKFLOW_ACTION.WORKFLOW_ACTION_ID.eq(actionId))
+			.fetchOne(WORKFLOW_ACTION.CODE);
 	}
 }

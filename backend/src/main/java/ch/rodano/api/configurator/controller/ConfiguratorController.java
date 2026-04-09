@@ -1,10 +1,14 @@
 package ch.rodano.api.configurator.controller;
 
+import java.io.IOException;
+import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +25,16 @@ import ch.rodano.api.configurator.request.UpdateProjectRequest;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.aspects.SkipProjectAccessCheck;
 import ch.rodano.core.loader.DatabaseStudyLoader;
+import ch.rodano.core.model.role.Role;
+import ch.rodano.core.model.role.RoleStatus;
+import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.configurator.ConfiguratorService;
+import ch.rodano.core.services.bll.scope.ScopeService;
+import ch.rodano.core.services.bll.study.StudyService;
+import ch.rodano.core.services.dao.audit.AuditActionService;
+import ch.rodano.core.services.dao.role.RoleDAOService;
+import ch.rodano.core.services.dao.scope.ScopeDAOService;
+import ch.rodano.core.services.dao.user.UserDAOService;
 
 @RestController
 @RequestMapping("/superuser/configurator")
@@ -30,10 +43,29 @@ public class ConfiguratorController {
 
 	private final ConfiguratorService configuratorService;
 	private final DatabaseStudyLoader databaseStudyLoader;
+	private final StudyService studyService;
+	private final ScopeDAOService scopeDAOService;
+	private final ScopeService scopeService;
+	private final AuditActionService auditActionService;
+	private final UserDAOService userDAOService;
+	private final RoleDAOService roleDAOService;
 
-	public ConfiguratorController(final ConfiguratorService configuratorService, final DatabaseStudyLoader databaseStudyLoader) {
+	public ConfiguratorController(final ConfiguratorService configuratorService,
+	                              final DatabaseStudyLoader databaseStudyLoader,
+	                              final StudyService studyService,
+	                              final ScopeDAOService scopeDAOService,
+	                              final ScopeService scopeService,
+	                              final AuditActionService auditActionService,
+	                              final UserDAOService userDAOService,
+	                              final RoleDAOService roleDAOService) {
 		this.configuratorService = configuratorService;
 		this.databaseStudyLoader = databaseStudyLoader;
+		this.studyService = studyService;
+		this.scopeDAOService = scopeDAOService;
+		this.scopeService = scopeService;
+		this.auditActionService = auditActionService;
+		this.userDAOService = userDAOService;
+		this.roleDAOService = roleDAOService;
 	}
 
 	/**
@@ -224,6 +256,59 @@ public class ConfiguratorController {
 		@RequestBody final CreateProjectRequest request
 	) {
 		return configuratorService.cloneProject(projectId, request);
+	}
+
+	/**
+	 * Initialize the root scope and assign every profile to superusers
+	 */
+	@PostMapping("/projects/{projectId}/initialize")
+	@Transactional
+	public ResponseEntity<Void> initializeProject(@PathVariable final UUID projectId) throws IOException {
+		studyService.loadStudyForProject(projectId);
+		final var study = studyService.getStudy();
+
+		final var context = auditActionService.createAuditActionAndGenerateContext(
+			Optional.empty(), "Initialize project", projectId
+		);
+
+		final var rootModel = study.getRootScopeModel();
+		final var existing = scopeDAOService.getScopesByScopeModelId(rootModel.getScopeModelId());
+		final Scope rootScope;
+		if(existing == null || existing.isEmpty()) {
+			final var newScope = new Scope();
+			newScope.setProjectId(study.getProjectId());
+			newScope.setScopeModel(rootModel);
+			newScope.setVirtual(rootModel.isVirtual());
+			newScope.setCode(study.getId());
+			newScope.setShortname(study.getDefaultLocalizedShortname());
+			newScope.setStartDate(ZonedDateTime.now());
+			scopeService.create(newScope, null, context, "Initialize project");
+			rootScope = newScope;
+		}
+		else {
+			rootScope = existing.getFirst();
+		}
+
+		for(final var superuser : userDAOService.getSuperusers()) {
+			for(final var profile : study.getProfiles()) {
+				final var existingRoles = roleDAOService.getActiveRolesByUserPkOverScopePk(
+					superuser.getPk(), rootScope.getPk()
+				);
+				final boolean alreadyHasProfile = existingRoles.stream()
+					.anyMatch(r -> r.getProfileId().equals(profile.getProfileId()));
+				if(!alreadyHasProfile) {
+					final var role = new Role();
+					role.setProjectId(projectId);
+					role.setUserFk(superuser.getPk());
+					role.setProfileId(profile.getProfileId());
+					role.setScopeFk(rootScope.getPk());
+					role.setStatus(RoleStatus.ENABLED);
+					roleDAOService.saveRole(role, context, "Initialize project");
+				}
+			}
+		}
+
+		return ResponseEntity.ok().build();
 	}
 
 	/**

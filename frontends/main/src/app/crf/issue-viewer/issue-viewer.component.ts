@@ -8,7 +8,6 @@ import {PagedResultWorkflowStatus} from '@core/model/paged-result-workflow-statu
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {WorkflowStatusSearch} from '@core/utilities/search/workflow-status-search';
-import {CapitalizeFirstPipe} from '../../pipes/capitalize-first.pipe';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {RouterLink} from '@angular/router';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
@@ -27,7 +26,6 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		RouterLink,
 		MatPaginator,
 		LocalizeMapPipe,
-		CapitalizeFirstPipe,
 		DateUTCPipe
 	]
 })

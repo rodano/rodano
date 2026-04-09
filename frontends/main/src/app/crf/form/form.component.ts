@@ -79,6 +79,16 @@ export class FormComponent implements OnInit, OnChanges {
 			.subscribe(() => {
 				this.formLoading = false;
 			});
+		this.crfChangeService.updatedWorkflowable$.pipe(
+			takeUntilDestroyed(this.destroyRef),
+			filter(typed => typed.entity === WorkflowableEntity.FIELD)
+		).subscribe(typed => {
+			this.formService.get(this.scope.pk, this.event?.pk, this.form.pk)
+				.subscribe(newForm => {
+					this.form = newForm;
+					this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.FORM, this.form);
+				});
+		});
 	}
 
 	ngOnChanges() {

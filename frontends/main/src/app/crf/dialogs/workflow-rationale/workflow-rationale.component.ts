@@ -3,7 +3,6 @@ import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {WorkflowUpdate} from '@core/model/workflow-update';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {WorkflowStatus} from '@core/model/workflow-status';
-import {CapitalizeFirstPipe} from '../../../pipes/capitalize-first.pipe';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
@@ -25,8 +24,7 @@ import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 		MatFormField,
 		MatInput,
 		MatButton,
-		LocalizeMapPipe,
-		CapitalizeFirstPipe
+		LocalizeMapPipe
 	]
 })
 export class WorkflowRationaleComponent {

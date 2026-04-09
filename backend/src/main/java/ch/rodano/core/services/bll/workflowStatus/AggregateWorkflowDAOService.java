@@ -349,12 +349,20 @@ public class AggregateWorkflowDAOService {
 	private Optional<WorkflowState> retriveState(final List<WorkflowStatus> statuses, final Workflow workflow) {
 		if(!statuses.isEmpty()) {
 			for(final var state : workflow.getStatesHavingMatcher(StateMatcher.ALL)) {
-				if(statuses.stream().allMatch(s -> s.getState().getId().equals(state.getAggregateStateId()))) {
+				final UUID aggregateStateUuid = state.getAggregateStateUuid();
+				final boolean matches = aggregateStateUuid != null
+					? statuses.stream().allMatch(s -> aggregateStateUuid.equals(s.getState().getWorkflowStateId()))
+					: statuses.stream().allMatch(s -> s.getState().getId().equals(state.getAggregateStateId()));
+				if(matches) {
 					return Optional.of(state);
 				}
 			}
 			for(final var state : workflow.getStatesHavingMatcher(StateMatcher.ONE)) {
-				if(statuses.stream().anyMatch(s -> s.getState().getId().equals(state.getAggregateStateId()))) {
+				final UUID aggregateStateUuid = state.getAggregateStateUuid();
+				final boolean matches = aggregateStateUuid != null
+					? statuses.stream().anyMatch(s -> aggregateStateUuid.equals(s.getState().getWorkflowStateId()))
+					: statuses.stream().anyMatch(s -> s.getState().getId().equals(state.getAggregateStateId()));
+				if(matches) {
 					return Optional.of(state);
 				}
 			}
@@ -363,14 +371,16 @@ public class AggregateWorkflowDAOService {
 				return Optional.of(defaultStates.getFirst());
 			}
 		}
-		return Optional.<WorkflowState> empty();
+		return Optional.empty();
 	}
 
 	private List<AggregateWorkflowStatus> getAggregateWorkflowStatusByForm(final Form form, final List<WorkflowStatus> containedStatuses) {
 		final List<AggregateWorkflowStatus> formStatuses = new ArrayList<>();
 		for(final Workflow workflow : form.getFormModel().getWorkflows()) {
 			if(workflow.isAggregator()) {
-				final List<WorkflowStatus> statuses = containedStatuses.stream().filter(ws -> ws.getWorkflow().getId().equals(workflow.getAggregateWorkflowId())).toList();
+				final List<WorkflowStatus> statuses = containedStatuses.stream()
+					.filter(ws -> ws.getWorkflow().getId().equals(workflow.getAggregateWorkflowId()))
+					.toList();
 				final Optional<WorkflowState> state = retriveState(statuses, workflow);
 				if(state.isPresent()) {
 					final var status = new AggregateWorkflowStatus();

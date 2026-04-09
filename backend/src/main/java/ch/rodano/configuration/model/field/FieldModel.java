@@ -726,7 +726,7 @@ public class FieldModel implements WorkflowableModel, SuperDisplayable, Serializ
 
 	private String getPossibleValueLabel(final List<PossibleValue> actualPossibleValues, final String value, final String... languages) {
 		return actualPossibleValues.stream()
-			.filter(p -> p.getId().equals(value))
+			.filter(p -> p.getId().equals(value) || p.getPossibleValueId().toString().equals(value))
 			.findAny().map(p -> p.getLocalizedShortname(languages))
 			.orElse(value);
 	}

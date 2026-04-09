@@ -89,7 +89,7 @@ public class RuleServiceImpl implements RuleService {
 	) {
 		final List<Map<String, String>> messages = new ArrayList<>();
 
-		if (rules == null || rules.isEmpty()) {
+		if(rules == null || rules.isEmpty()) {
 			logger.debug("No rules to execute");
 			return messages;
 		}
@@ -187,7 +187,7 @@ public class RuleServiceImpl implements RuleService {
 
 				// Entity action
 				final RulableEntity entity;
-				final DataState ruleActionState;
+				DataState ruleActionState;
 
 				// Action using context
 				if(ruleAction.getRulableEntity() != null) {
@@ -197,6 +197,16 @@ public class RuleServiceImpl implements RuleService {
 				// Action using condition
 				else {
 					ruleActionState = evaluation.getStates().get(ruleAction.getConditionId());
+					if(ruleActionState == null) {
+						for(final RulableEntity candidate : RulableEntity.values()) {
+							if(rulableEntityBinderService.actionExists(candidate, ruleAction.getActionId())) {
+								logger.warn("No state found for conditionId {}, falling back to entity {} for action {} in rule [{}]",
+									ruleAction.getConditionId(), candidate, ruleAction.getActionId(), ruleDescription);
+								ruleActionState = new DataState(state).withReference(candidate);
+								break;
+							}
+						}
+					}
 					if(ruleActionState == null) {
 						throw new UnsupportedOperationException(String.format("No state matching condition %s in rule %s", ruleAction.getConditionId(), ruleDescription));
 					}

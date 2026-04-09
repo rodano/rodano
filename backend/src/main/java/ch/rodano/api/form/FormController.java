@@ -1,5 +1,6 @@
 package ch.rodano.api.form;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,7 @@ import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.event.EventDAOService;
 import ch.rodano.core.services.dao.form.FormDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
+import ch.rodano.core.services.dao.workflow.WorkflowStatusDAOService;
 import ch.rodano.core.services.rule.RuleService;
 import ch.rodano.core.utils.RightsService;
 import ch.rodano.core.utils.UtilsService;
@@ -57,6 +59,7 @@ public class FormController extends AbstractSecuredController {
 	private final ScopeDAOService scopeDAOService;
 	private final EventDAOService eventDAOService;
 	private final FormDAOService formDAOService;
+	private final WorkflowStatusDAOService workflowStatusDAOService;
 	private final FormService formService;
 	private final FormDTOService formDTOService;
 	private final ConfigDTOService configDTOService;
@@ -78,6 +81,7 @@ public class FormController extends AbstractSecuredController {
 		final ConfigDTOService configDTOService,
 		final UtilsService utilsService,
 		final FormDAOService formDAOService,
+		final WorkflowStatusDAOService workflowStatusDAOService,
 		final DatasetDTOService datasetDTOService,
 		final DatasetSubmissionService datasetSubmissionService,
 		final RuleService ruleService
@@ -86,6 +90,7 @@ public class FormController extends AbstractSecuredController {
 		this.scopeDAOService = scopeDAOService;
 		this.eventDAOService = eventDAOService;
 		this.formDAOService = formDAOService;
+		this.workflowStatusDAOService = workflowStatusDAOService;
 		this.formService = formService;
 		this.formDTOService = formDTOService;
 		this.configDTOService = configDTOService;
@@ -201,7 +206,10 @@ public class FormController extends AbstractSecuredController {
 
 		final var datasets = datasetSubmissionService.submit(acl, scope, event, datasetSubmissionDTO, currentContext(), Optional.empty());
 
-		final var state = new DataState(scope, event, form);
+		final var formWorkflowStatuses = new HashSet<>(
+			workflowStatusDAOService.getWorkflowStatusesByFormPk(form.getPk())
+		);
+		final var state = new DataState(scope, event, form).withWorkflows(formWorkflowStatuses);
 
 		//execute form save rules
 		var rules = form.getFormModel().getRules();

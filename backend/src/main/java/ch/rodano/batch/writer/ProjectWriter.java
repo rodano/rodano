@@ -115,10 +115,10 @@ public class ProjectWriter extends BaseWriter {
 					.set(PROJECT.STATUS, ProjectStatus.ACTIVE)
 					.execute();
 
-				final Long configVersionPk = tx.insertInto(PROJECT_CONFIG_VERSION)
+				tx.insertInto(PROJECT_CONFIG_VERSION)
 					.set(PROJECT_CONFIG_VERSION.PROJECT_ID, projectId)
 					.set(PROJECT_CONFIG_VERSION.VERSION_NUMBER, project.getConfigVersion() != null ? project.getConfigVersion() : 1)
-					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
+					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.DRAFT)
 					.set(PROJECT_CONFIG_VERSION.CREATED_AT, configDateTime)
 					.set(PROJECT_CONFIG_VERSION.CREATED_BY, (Long) null)
 					.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, configDateTime)
@@ -130,17 +130,12 @@ public class ProjectWriter extends BaseWriter {
 							: "Migrated from JSON configuration"
 					)
 					.onDuplicateKeyUpdate()
-					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.PUBLISHED)
+					.set(PROJECT_CONFIG_VERSION.STATUS, ProjectConfigVersionStatus.DRAFT)
 					.set(PROJECT_CONFIG_VERSION.PUBLISHED_AT, configDateTime)
 					.set(PROJECT_CONFIG_VERSION.PUBLISHED_BY, (Long) null)
 					.returning(PROJECT_CONFIG_VERSION.PK)
 					.fetchOne()
 					.getPk();
-
-				tx.update(PROJECT)
-					.set(PROJECT.ACTIVE_CONFIG_VERSION_FK, configVersionPk)
-					.where(PROJECT.PROJECT_ID.eq(projectId))
-					.execute();
 
 				if(project.getLanguageIds() != null) {
 					for(String lang : project.getLanguageIds()) {

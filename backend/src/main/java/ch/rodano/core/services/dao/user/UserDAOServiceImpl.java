@@ -243,4 +243,10 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 				record.get(USER.PHONE)
 			));
 	}
+
+	@Override
+	public List<User> getSuperusers() {
+		final var query = create.selectFrom(USER).where(USER.IS_SUPERUSER.isTrue());
+		return find(query);
+	}
 }

@@ -205,7 +205,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		//filter on workflows and states
 		final List<Condition> wssConditions = new ArrayList<>();
 		for(final var filter : widget.getWorkflowStatesSelectors()) {
-			wssConditions.add(WORKFLOW_STATUS.WORKFLOW_ID.eq(filter.getWorkflowUuid(study)).and(WORKFLOW_STATUS.WORKFLOW_STATE_ID.in(filter.getStateIds())));
+			wssConditions.add(WORKFLOW_STATUS.WORKFLOW_ID.eq(filter.getWorkflowUuid(study)).and(WORKFLOW_STATUS.WORKFLOW_STATE_ID.in(filter.getStateUuids(study))));
 		}
 		query.and(DSL.or(wssConditions));
 

@@ -54,10 +54,27 @@ public class RoleServiceImpl implements RoleService {
 
 	@Override
 	public List<Role> getRoles(final Actor actor) {
+		final List<Role> roles;
 		if(actor instanceof User) {
-			return roleDAOService.getRolesByUserPk(actor.getPk());
+			roles = roleDAOService.getRolesByUserPk(actor.getPk());
 		}
-		return roleDAOService.getRolesByRobotPk(actor.getPk());
+		else {
+			roles = roleDAOService.getRolesByRobotPk(actor.getPk());
+		}
+		if(studyService.isStudyLoaded()) {
+			final var study = studyService.getStudy();
+			roles.forEach(role -> {
+				if(role.getProfile() == null && role.getProfileId() != null) {
+					try {
+						role.setProfile(study.getProfile(role.getProfileId()));
+					}
+					catch(Exception e) {
+						logger.warn("Profile {} not found in study", role.getProfileId());
+					}
+				}
+			});
+		}
+		return roles;
 	}
 
 	// TODO rename this to getEnabledRoles

@@ -280,7 +280,9 @@ public class ScopeActionEntityDefiner extends AbstractScopeEntityDefiner {
 					//rule can execute only if the form model is allowed for scope model
 					if(scope.getScopeModel().getFormModelIds().contains(formModel.getId())) {
 						final var forms = formService.getAllIncludingRemoved(scope);
-						final var form = forms.stream().filter(f -> f.getFormModelId().equals(formModel.getId())).findFirst();
+						final var form = forms.stream()
+							.filter(f -> formModel.getFormModelId().equals(f.getFormModelId()))
+							.findFirst();
 						//create form if it does not exist
 						if(form.isEmpty()) {
 							formService.create(scope, formModel, context, rationale);

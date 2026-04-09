@@ -204,7 +204,8 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	@JsonIgnore
 	public Action getAction(final String containedActionId) {
 		return getActions().stream()
-			.filter(a -> a.getId().equals(containedActionId))
+			.filter(a -> a.getId().equalsIgnoreCase(containedActionId)
+				|| a.getWorkflowActionId() != null && a.getWorkflowActionId().toString().equalsIgnoreCase(containedActionId))
 			.findFirst()
 			.orElseThrow(() -> new NoNodeException(this, Entity.ACTION, containedActionId));
 	}
@@ -315,7 +316,8 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 	@JsonIgnore
 	public WorkflowState getState(final String stateCode) {
 		return getStates().stream()
-			.filter(s -> s.getId().equals(stateCode))
+			.filter(s -> s.getId().equalsIgnoreCase(stateCode)
+				|| s.getWorkflowStateId() != null && s.getWorkflowStateId().toString().equalsIgnoreCase(stateCode))
 			.findFirst()
 			.orElseThrow(() -> new NoNodeException(this, Entity.WORKFLOW_STATE, stateCode));
 	}
@@ -413,6 +415,6 @@ public class Workflow implements SuperDisplayable, Serializable, Attributable<Wo
 		if(this.study == null || StringUtils.isBlank(actionId)) {
 			return null;
 		}
-		return deterministic(this.study.getProjectId(), "WORKFLOW_ACTION", this.workflowId + "|" + this.actionId);
+		return deterministic(this.study.getProjectId(), "WORKFLOW_ACTION", this.id + "|" + this.actionId);
 	}
 }

@@ -12,20 +12,14 @@ import ch.rodano.batch.helper.ProjectScoped;
 import ch.rodano.batch.pojo.DatasetModel;
 import ch.rodano.batch.pojo.FieldModel;
 import ch.rodano.batch.pojo.PossibleValue;
-import ch.rodano.batch.pojo.Rule;
-import ch.rodano.core.model.jooq.enums.RuleConstraintConstraintType;
-import ch.rodano.core.model.jooq.enums.RuleEntityType;
 
 import static ch.rodano.batch.helper.JsonWriter.toJson;
 import static ch.rodano.batch.helper.ModelResolvers.resolveDatasetModelId;
 import static ch.rodano.batch.helper.ModelResolvers.resolveFieldModelId;
-import static ch.rodano.batch.helper.RuleHelper.insertConstraintForOwner;
-import static ch.rodano.batch.helper.RuleHelper.insertRuleActions;
 import static ch.rodano.configuration.jackson.DeterministicUuid.deterministic;
 import static ch.rodano.core.model.jooq.tables.DatasetModel.DATASET_MODEL;
 import static ch.rodano.core.model.jooq.tables.FieldModel.FIELD_MODEL;
 import static ch.rodano.core.model.jooq.tables.FieldPossibleValue.FIELD_POSSIBLE_VALUE;
-import static ch.rodano.core.model.jooq.tables.Rule.RULE;
 
 public class DatasetModelWriter extends BaseWriter {
 
@@ -79,64 +73,20 @@ public class DatasetModelWriter extends BaseWriter {
 					.set(DATASET_MODEL.DESCRIPTION, toJson(datasetModel.getDescription()))
 					.execute();
 
-				putDatasetRules(tx, projectId, datasetModelId, code, datasetModel.getDeleteRules(), "DELETE", "DATASET_DELETE");
-				putDatasetRules(tx, projectId, datasetModelId, code, datasetModel.getRestoreRules(), "RESTORE", "DATASET_RESTORE");
-
 				if(datasetModel.getFieldModels() != null && !datasetModel.getFieldModels().isEmpty()) {
 					for(FieldModel fieldModel : datasetModel.getFieldModels()) {
-						writeFieldModels(tx, projectId, datasetModel, datasetModelId, fieldModel);
+						writeFieldModel(tx, projectId, datasetModel, datasetModelId, fieldModel);
 					}
 				}
 			}
 		});
 	}
 
-	private void putDatasetRules(final DSLContext tx,
-								 final UUID projectId,
-								 final UUID datasetModelId,
-								 final String datasetCode,
-								 final List<Rule> rules,
-								 final String ruleType,
-								 final String saltPrefix) {
-
-		if(rules == null || rules.isEmpty()) {
-			return;
-		}
-
-		for(int idx = 0; idx < rules.size(); idx++) {
-			final Rule rule = rules.get(idx);
-
-			final UUID ruleId = deterministic(projectId, saltPrefix, datasetCode + "|" + idx);
-
-			tx.insertInto(RULE)
-				.set(RULE.PROJECT_ID, projectId)
-				.set(RULE.RULE_ID, ruleId)
-				.set(RULE.ENTITY_TYPE, RuleEntityType.DATASET_MODEL)
-				.set(RULE.ENTITY_ID, datasetModelId)
-				.set(RULE.RULE_TYPE, ruleType)
-				.set(RULE.DESCRIPTION, rule.getDescription())
-				.set(RULE.MESSAGE, toJson(rule.getMessage()))
-				.set(RULE.TAG, toJson(rule.getTags()))
-				.onDuplicateKeyUpdate()
-				.set(RULE.DESCRIPTION, rule.getDescription())
-				.set(RULE.MESSAGE, toJson(rule.getMessage()))
-				.set(RULE.TAG, toJson(rule.getTags()))
-				.execute();
-
-			if(rule.getConstraint() != null) {
-				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
-			}
-			if(rule.getActions() != null && !rule.getActions().isEmpty()) {
-				insertRuleActions(tx, projectId, ruleId, rule.getActions());
-			}
-		}
-	}
-
-	private void writeFieldModels(final DSLContext tx,
-								  final UUID projectId,
-								  final DatasetModel datasetModel,
-								  final UUID datasetModelId,
-								  final FieldModel fieldModel) {
+	private void writeFieldModel(final DSLContext tx,
+	                             final UUID projectId,
+	                             final DatasetModel datasetModel,
+	                             final UUID datasetModelId,
+	                             final FieldModel fieldModel) {
 
 		final String datasetCode = datasetModel.getId();
 		final String fieldCode = fieldModel.getId();
@@ -145,6 +95,7 @@ public class DatasetModelWriter extends BaseWriter {
 			LOGGER.warn("Skipping field with blank code in dataset {}", datasetCode);
 			return;
 		}
+
 		final var existing = resolveFieldModelId(tx, projectId, datasetModelId, fieldCode);
 		final UUID fieldModelId = existing != null
 			? existing
@@ -233,23 +184,12 @@ public class DatasetModelWriter extends BaseWriter {
 			.execute();
 
 		upsertPossibleValues(tx, projectId, fieldModelId, fieldModel.getPossibleValues());
-
-		if(fieldModel.getConstraint() != null) {
-			insertConstraintForOwner(tx, projectId, "FIELD_MODEL", fieldModelId, fieldModel.getConstraint(), RuleConstraintConstraintType.VISIBILITY);
-		}
-
-		if(fieldModel.getValueConstraint() != null) {
-			insertConstraintForOwner(tx, projectId, "FIELD_MODEL", fieldModelId, fieldModel.getValueConstraint(), RuleConstraintConstraintType.VALUE_FORMULA);
-		}
-
-		putFieldRules(tx, projectId, datasetModel, fieldModel, fieldModelId);
 	}
 
 	private void upsertPossibleValues(final DSLContext tx,
-									  final UUID projectId,
-									  final UUID fieldModelId,
-									  final List<PossibleValue> values) {
-
+	                                  final UUID projectId,
+	                                  final UUID fieldModelId,
+	                                  final List<PossibleValue> values) {
 		if(values == null || values.isEmpty()) {
 			return;
 		}
@@ -271,47 +211,6 @@ public class DatasetModelWriter extends BaseWriter {
 				.set(FIELD_POSSIBLE_VALUE.SORT_ORDER, idx)
 				.set(FIELD_POSSIBLE_VALUE.SHORTNAME, toJson(pv.getShortname()))
 				.execute();
-		}
-	}
-
-	private void putFieldRules(final DSLContext tx,
-							   final UUID projectId,
-							   final DatasetModel datasetModel,
-							   final FieldModel fieldModel,
-							   final UUID fieldModelId) {
-
-		final List<Rule> rules = fieldModel.getRules();
-		if(rules == null || rules.isEmpty()) {
-			return;
-		}
-		final String datasetCode = datasetModel.getId();
-		final String fieldCode = fieldModel.getId();
-
-		for(int idx = 0; idx < rules.size(); idx++) {
-			final Rule rule = rules.get(idx);
-			final UUID ruleId = deterministic(projectId, "FIELD_MODEL_RULE", datasetCode + "|" + fieldCode + "|" + idx);
-			tx.insertInto(RULE)
-				.set(RULE.PROJECT_ID, projectId)
-				.set(RULE.RULE_ID, ruleId)
-				.set(RULE.ENTITY_TYPE, RuleEntityType.FIELD_MODEL)
-				.set(RULE.ENTITY_ID, fieldModelId)
-				.set(RULE.RULE_TYPE, DSL.val((String) null))
-				.set(RULE.DESCRIPTION, rule.getDescription())
-				.set(RULE.MESSAGE, toJson(rule.getMessage()))
-				.set(RULE.TAG, toJson(rule.getTags()))
-				.onDuplicateKeyUpdate()
-				.set(RULE.DESCRIPTION, rule.getDescription())
-				.set(RULE.MESSAGE, toJson(rule.getMessage()))
-				.set(RULE.TAG, toJson(rule.getTags()))
-				.execute();
-
-			if(rule.getConstraint() != null) {
-				insertConstraintForOwner(tx, projectId, "RULE", ruleId, rule.getConstraint(), RuleConstraintConstraintType.RULE);
-			}
-
-			if(rule.getActions() != null && !rule.getActions().isEmpty()) {
-				insertRuleActions(tx, projectId, ruleId, rule.getActions());
-			}
 		}
 	}
 }

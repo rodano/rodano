@@ -8,6 +8,7 @@ public class RuleActionParameter {
 	private String id;
 	private String value;
 	private String conditionId;
+	private String rulableEntity;
 
 	public String getId() {
 		return id;
@@ -33,12 +34,21 @@ public class RuleActionParameter {
 		this.conditionId = conditionId;
 	}
 
+	public String getRulableEntity() {
+		return rulableEntity;
+	}
+
+	public void setRulableEntity(final String rulableEntity) {
+		this.rulableEntity = rulableEntity;
+	}
+
 	@Override
 	public String toString() {
 		return "RuleActionParameter{" +
 			"id='" + id + '\'' +
 			", value='" + value + '\'' +
 			", conditionId='" + conditionId + '\'' +
+			", rulableEntity='" + rulableEntity + '\'' +
 			'}';
 	}
 }

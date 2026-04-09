@@ -1,4 +1,4 @@
-import {Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {Layout} from '@core/model/layout';
 import {animate, state, style, transition, trigger} from '@angular/animations';
 import {MatSortModule, Sort} from '@angular/material/sort';
@@ -33,6 +33,7 @@ import {SafeHtmlPipe} from 'src/app/pipes/safe-html.pipe';
 	standalone: true,
 	templateUrl: './multiple-layout.component.html',
 	styleUrls: ['./multiple-layout.component.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	animations: [
 		trigger('layoutExpand', [
 			state('collapsed', style({height: '0', minHeight: '0', marginTop: '0', marginBottom: '0'})),
@@ -79,7 +80,8 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		private fieldService: FieldService,
 		private loggingService: LoggingService,
 		private dialog: MatDialog,
-		private destroyRef: DestroyRef
+		private destroyRef: DestroyRef,
+		private cdr: ChangeDetectorRef
 	) {}
 
 	ngOnInit() {
@@ -103,6 +105,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 			this.shown = shown;
 			//mark the datasets
 			this.multipleDatasets.forEach(d => d.show = shown);
+			this.cdr.markForCheck();
 		});
 
 		/*this.fieldUpdateService.datasetFieldUpdated$(this.layout.datasetModel.id).subscribe(() => {
@@ -118,7 +121,7 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 				element = element.trim();
 				if(element.startsWith('fieldModelId:')) {
 					const fieldModelId = element.slice(13, -1);
-					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.fieldModelId === fieldModelId) as FieldModel;
+					const fieldModel = this.layout.datasetModel.fieldModels.find(a => a.fieldModelId === fieldModelId || a.id === fieldModelId) as FieldModel;
 					if(fieldModel) {
 						this.fieldModelsToDisplay.push(fieldModel);
 					}
@@ -128,9 +131,16 @@ export class MultipleLayoutComponent implements OnInit, OnChanges {
 		this.columnsToDisplay = [...this.fieldModelsToDisplay.map(f => f.fieldModelId), 'actions'];
 		this.multipleDatasets = this.datasets.filter(d => d.modelId === this.layout.datasetModel.datasetModelId);
 		if(this.fieldModelsToDisplay.length > 0) {
-			this.sortDatasets(this.fieldModelsToDisplay[0], true);
+			setTimeout(() => this.sortDatasets(this.fieldModelsToDisplay[0], true));
 		}
-		this.dataSource = new MatTableDataSource<CRFDataset>(this.multipleDatasets);
+		this.dataSource.data = [...this.multipleDatasets];
+		if(this.fieldModelsToDisplay.length > 0) {
+			setTimeout(() => {
+				this.sortDatasets(this.fieldModelsToDisplay[0], true);
+				this.cdr.markForCheck();
+			});
+		}
+		this.cdr.markForCheck();
 	}
 
 	trackBy(_: number, dataset: CRFDataset) {

@@ -166,23 +166,27 @@ public class RuleDAO {
 	}
 
 	private RuleConditionList mapConditionListToModel(final RuleConditionListRecord record) {
-		if(record == null) {
-			return null;
-		}
-
 		final RuleConditionList model = new RuleConditionList();
-
 		model.setRuleConditionListId(record.getConditionListId());
 
 		if(record.getMode() != null) {
 			model.setMode(mappingHelper.parseEnum(RuleConditionListEvaluationMode.class, record.getMode().name(), "mode"));
 		}
-
 		if(model.getMode() == null) {
 			model.setMode(RuleConditionListEvaluationMode.OR);
 		}
 
-		model.setConditions(loadConditionsForList(record.getConditionListId(), null));
+		final var rootRecord = dslContext.selectFrom(RULE_CONDITION)
+			.where(RULE_CONDITION.CONDITION_LIST_ID.eq(record.getConditionListId()))
+			.and(RULE_CONDITION.PARENT_CONDITION_ID.isNull())
+			.fetchOne();
+
+		if(rootRecord != null) {
+			model.setConditions(loadConditionsForList(record.getConditionListId(), rootRecord.getConditionId()));
+		}
+		else {
+			model.setConditions(new ArrayList<>());
+		}
 
 		return model;
 	}
@@ -298,7 +302,7 @@ public class RuleDAO {
 		model.setRulableEntity(mappingHelper.parseEnum(RulableEntity.class, record.getRulableEntity(), "rulableEntity"));
 
 		if(record.getConditionId() != null) {
-			model.setConditionId(record.getConditionId().toString());
+			model.setConditionId(getConditionCode(record.getConditionId()));
 		}
 
 		model.setParameters(loadParametersForAction(record.getRuleActionId()));
@@ -367,5 +371,12 @@ public class RuleDAO {
 		}
 
 		return grouped;
+	}
+
+	private String getConditionCode(final UUID conditionId) {
+		return dslContext.select(RULE_CONDITION.CODE)
+			.from(RULE_CONDITION)
+			.where(RULE_CONDITION.CONDITION_ID.eq(conditionId))
+			.fetchOne(RULE_CONDITION.CODE);
 	}
 }

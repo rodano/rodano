@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -375,25 +374,32 @@ public class RuleDAOServiceImpl implements RuleDAOService {
 		String configurationActionId = null;
 		String actionId = null;
 
+		if(conditionUUID != null) {
+			conditionCode = dslContext
+				.select(RULE_CONDITION.CODE)
+				.from(RULE_CONDITION)
+				.where(RULE_CONDITION.CONDITION_ID.eq(conditionUUID))
+				.fetchOne(RULE_CONDITION.CODE);
+		}
+
 		if(rulableEntity != null) {
-			if(conditionUUID != null) {
-				conditionCode = dslContext
-					.select(RULE_CONDITION.CODE)
-					.from(RULE_CONDITION)
-					.where(RULE_CONDITION.CONDITION_ID.eq(conditionUUID))
-					.fetchOne(RULE_CONDITION.CODE);
-			}
+			actionId = actionIdCode;
+		}
+		else if(conditionCode != null) {
 			actionId = actionIdCode;
 		}
 		else if(conditionUUID != null) {
 			configurationWorkflowId = conditionUUID.toString();
 			configurationActionId = actionIdCode;
 		}
+		else {
+			actionId = actionIdCode;
+		}
 
 		return new RuleActionDTO(
 			record.get(RULE_ACTION.RULE_ACTION_ID),
 			record.get(RULE_ACTION.CODE),
-			jsonMapperService.fromJson(record.get(RULE_ACTION.LABEL), new TypeReference<SortedMap<String, String>>() {
+			jsonMapperService.fromJson(record.get(RULE_ACTION.LABEL), new TypeReference<>() {
 			}),
 			record.get(RULE_ACTION.OPTIONAL),
 			record.get(RULE_ACTION.STATIC_ACTION_ID),

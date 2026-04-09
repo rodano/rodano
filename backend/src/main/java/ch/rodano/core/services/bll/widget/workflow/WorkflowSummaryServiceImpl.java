@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,7 +37,6 @@ import ch.rodano.configuration.model.language.LanguageStatic;
 import ch.rodano.configuration.model.reports.WorkflowSummary;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.workflow.Workflow;
-import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 import ch.rodano.core.model.jooq.tables.records.WorkflowStatusRecord;
 import ch.rodano.core.model.scope.Scope;
@@ -103,9 +103,21 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 		final Map<Long, SummaryRowDTO> summaryByScopePk = new LinkedHashMap<>();
 
-		final var defaultValues = workflow.getStates()
-			.stream()
-			.collect(Collectors.toMap(WorkflowState::getId, _ -> 0L));
+		final var projectId = studyService.getStudy().getProjectId();
+		final var summaryColumns = new ArrayList<SummaryColumnDTO>();
+		final var stateCodeToColumnId = new LinkedHashMap<String, String>();
+		int colOrder = 0;
+		for(final var state : workflow.getStates()) {
+			final var summaryColumnId = deterministic(projectId, "WORKFLOW_SUMMARY_COLUMN", workflow.getId() + "|" + colOrder);
+			summaryColumns.add(new SummaryColumnDTO(summaryColumnId, state.getId(), state.getShortname(), true, false));
+			stateCodeToColumnId.put(state.getId(), summaryColumnId.toString());
+			colOrder++;
+		}
+		final var totalColumnId = deterministic(projectId, "WORKFLOW_SUMMARY_COLUMN", workflow.getId() + "|" + colOrder);
+		summaryColumns.add(new SummaryColumnDTO(totalColumnId, "total", Collections.singletonMap(LanguageStatic.en.name(), "Total"), false, true));
+
+		final var defaultValues = stateCodeToColumnId.values().stream()
+			.collect(Collectors.toMap(uuid -> uuid, _ -> 0L));
 
 		//add root scope
 		final var rootScopeValues = new HashMap<>(defaultValues);
@@ -138,8 +150,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 		//query conditions
 		final var conditions = new ArrayList<Condition>();
 		conditions.add(
-			SCOPE_ANCESTOR.DEFAULT.isTrue()
-				.and(SCOPE_ANCESTOR.START_DATE.le(now))
+			SCOPE_ANCESTOR.START_DATE.le(now)
 				.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.ge(now)))
 				.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 		);
@@ -149,7 +160,11 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				.and(SCOPE_RELATION.END_DATE.isNull().or(SCOPE_RELATION.END_DATE.ge(now)))
 				.and(SCOPE_RELATION.PARENT_FK.eq(scope.getPk()))
 		);
-		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
+		final var workflowUuids = summary.getWorkflowIds().stream()
+			.map(code -> studyService.getStudy().getWorkflow(code).getWorkflowId())
+			.filter(Objects::nonNull)
+			.toList();
+		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflowUuids));
 		conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
 		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelUuid()));
 		conditions.add(SCOPE.DELETED.isFalse());
@@ -202,6 +217,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			final var childScopePk = record.getValue(childScopeTable.PK);
 			final var stateCode = record.get(stateCodeField);
 			final var count = record.getValue(countColumn);
+			final var columnId = stateCodeToColumnId.getOrDefault(stateCode, stateCode);
 			if(!summaryByScopePk.containsKey(childScopePk)) {
 				final var scopeDTO = new ScopeTinyDTO(
 					childScopePk,
@@ -212,48 +228,14 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				);
 				summaryByScopePk.put(childScopePk, new SummaryRowDTO(scopeDTO, new HashMap<>(defaultValues)));
 			}
-			summaryByScopePk.get(childScopePk).values().put(stateCode, count);
+			summaryByScopePk.get(childScopePk).values().put(columnId, count);
 		}
 
 		//the SQL query returns results for all children of the selected root scope
 		//we need to aggregate the result for the selected root scope
 		summaryByScopePk.values().stream()
 			.flatMap(r -> r.values().entrySet().stream())
-			.forEach(e -> rootScopeValues.put(e.getKey(), rootScopeValues.get(e.getKey()) + e.getValue()));
-
-		final var summaryColumns = new ArrayList<SummaryColumnDTO>();
-		final var projectId = studyService.getStudy().getProjectId();
-		int colOrder = 0;
-		for(final var state : workflow.getStates()) {
-			final var summaryColumnId = deterministic(
-				projectId,
-				"WORKFLOW_SUMMARY_COLUMN",
-				workflow.getId() + "|" + colOrder
-			);
-			summaryColumns.add(new SummaryColumnDTO(
-				summaryColumnId,
-				state.getId(),
-				state.getShortname(),
-				true,
-				false
-			));
-			colOrder++;
-		}
-
-		final var totalColumnId = deterministic(
-			projectId,
-			"WORKFLOW_SUMMARY_COLUMN",
-			workflow.getId() + "|" + colOrder
-		);
-		summaryColumns.add(
-			new SummaryColumnDTO(
-				totalColumnId,
-				"total",
-				Collections.singletonMap(LanguageStatic.en.name(), "Total"),
-				false,
-				true
-			)
-		);
+			.forEach(e -> rootScopeValues.merge(e.getKey(), e.getValue(), Long::sum));
 
 		return new SummaryDTO(
 			summary.getWorkflowSummaryId(),
@@ -341,7 +323,11 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 			)
 		);
-		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
+		final var workflowUuids = summary.getWorkflowIds().stream()
+			.map(code -> studyService.getStudy().getWorkflow(code).getWorkflowId())
+			.filter(Objects::nonNull)
+			.toList();
+		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflowUuids));
 		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelUuid()));
 		//do not consider workflows on field that are empty
 		if(WorkflowableEntity.FIELD.equals(entity)) {
@@ -570,7 +556,11 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					.and(SCOPE_ANCESTOR.VIRTUAL.isFalse()).and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
 			)
 		);
-		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
+		final var workflowUuids = summary.getWorkflowIds().stream()
+			.map(code -> studyService.getStudy().getWorkflow(code).getWorkflowId())
+			.filter(Objects::nonNull)
+			.toList();
+		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflowUuids));
 		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelUuid()));
 		//do not consider workflows on field that are empty
 		if(WorkflowableEntity.FIELD.equals(entity)) {

@@ -69,23 +69,21 @@ export class CellComponent implements OnInit, AfterViewInit {
 		this.visibilityService.cellVisibilityEvents$(this.cell.formLayoutCellId, this.layoutUid).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
-			this.loggingService.info(`Cell ${this.cell.id} receiving visibility event containing ${shown}`);
-			this.shown = shown;
-			//mark the field
-			if(this.field) {
-				this.field.shown = this.shown;
-			}
-			//if the cell becomes visible, its visibility criteria must be re-triggered
-			if(shown) {
-				this.triggerCriteria();
-			}
-			//if the cell is hidden its targets must be hidden as well
-			else {
-				this.cell.visibilityCriteria.forEach(criterion => {
-					criterion.targetCellIds.forEach(c => this.visibilityService.triggerCellVisibilityEvent(c, this.layoutUid, false));
-					criterion.targetLayoutIds.forEach(l => this.visibilityService.triggerLayoutVisibilityEvent(l, false));
-				});
-			}
+			setTimeout(() => {
+				this.loggingService.info(`Cell ${this.cell.id} receiving visibility event containing ${shown}`);
+				this.shown = shown;
+				if(this.field) {
+					this.field.shown = this.shown;
+				}
+				if(shown) {
+					this.triggerCriteria();
+				} else {
+					this.cell.visibilityCriteria.forEach(criterion => {
+						criterion.targetCellIds.forEach(c => this.visibilityService.triggerCellVisibilityEvent(c, this.layoutUid, false));
+						criterion.targetLayoutIds.forEach(l => this.visibilityService.triggerLayoutVisibilityEvent(l, false));
+					});
+				}
+			}, 0);
 		});
 
 		if(this.field) {

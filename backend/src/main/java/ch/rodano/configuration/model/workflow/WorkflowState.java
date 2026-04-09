@@ -218,6 +218,10 @@ public class WorkflowState implements Serializable, SuperDisplayable, Node, Comp
 		if(this.aggregateStateId == null || this.aggregateStateId.isBlank() || this.workflow == null || this.workflow.getStudy() == null) {
 			return null;
 		}
-		return deterministic(this.workflow.getStudy().getProjectId(), "WORKFLOW_STATE", this.workflow.getId() + "|" + this.aggregateStateId);
+		final String aggregatedWorkflowId = this.workflow.getAggregateWorkflowId();
+		if(aggregatedWorkflowId == null || aggregatedWorkflowId.isBlank()) {
+			return null;
+		}
+		return deterministic(this.workflow.getStudy().getProjectId(), "WORKFLOW_STATE", aggregatedWorkflowId + "|" + this.aggregateStateId);
 	}
 }

@@ -180,7 +180,7 @@ export class ScopeParentsComponent implements OnInit {
 			.filter(rel => this.isCurrent(rel))
 			.map(rel => rel.parent.pk);
 		this.parentScopes = this.allParentScopes.filter(s => !currentParentScopePks.includes(s.pk));
-		const defaultParentScopeModelId = this.scopeModel.defaultParentId;
+		const defaultParentScopeModelId = this.scopeModel.defaultParentId ?? this.scopeModel.parentIds?.[0];
 		this.transferParentScopes = this.parentScopes.filter(s => s.modelId === defaultParentScopeModelId);
 	}
 

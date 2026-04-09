@@ -106,6 +106,22 @@ export class SideMenuComponent implements OnInit {
 			if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {
 				this.scope = typedWorkflowable.workflowable as Scope;
 			}
+			else if(typedWorkflowable.entity === WorkflowableEntity.FORM) {
+				const updatedForm = typedWorkflowable.workflowable as Form;
+				const scopeFormIndex = this.scopeForms?.findIndex(f => f.pk === updatedForm.pk);
+				if(scopeFormIndex !== undefined && scopeFormIndex >= 0) {
+					this.scopeForms[scopeFormIndex] = updatedForm;
+				}
+				else {
+					for(const eventPk of Object.keys(this.eventsForms)) {
+						const idx = this.eventsForms[+eventPk].findIndex(f => f.pk === updatedForm.pk);
+						if(idx >= 0) {
+							this.eventsForms[+eventPk][idx] = updatedForm;
+							break;
+						}
+					}
+				}
+			}
 		});
 
 		combineLatest([

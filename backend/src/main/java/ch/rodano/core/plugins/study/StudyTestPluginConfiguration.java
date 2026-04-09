@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -55,6 +56,24 @@ public class StudyTestPluginConfiguration {
 		return new StudyTestValidatorPlugin(datasetService, fieldService, fileService);
 	}
 
+	static String resolveFieldValue(final Field f) {
+		final String value = f.getValue();
+		if(StringUtils.isBlank(value)) {
+			return value;
+		}
+		try {
+			UUID.fromString(value);
+			return f.getFieldModel().getPossibleValues().stream()
+				.filter(pv -> value.equals(pv.getPossibleValueId() != null ? pv.getPossibleValueId().toString() : null))
+				.map(PossibleValue::getId)
+				.findFirst()
+				.orElse(value);
+		}
+		catch(IllegalArgumentException e) {
+			return value;
+		}
+	}
+
 	public static class StudyTestValidatorPlugin implements ValidatorPlugin {
 		final DatasetService datasetService;
 		final FieldService fieldService;
@@ -76,7 +95,7 @@ public class StudyTestPluginConfiguration {
 				.findFirst()
 				.orElse(null);
 
-			if (femalePossibleValue == null) {
+			if(femalePossibleValue == null) {
 				return true;
 			}
 
@@ -87,7 +106,7 @@ public class StudyTestPluginConfiguration {
 				.findFirst()
 				.orElse(null);
 
-			if (employedPossibleValue == null) {
+			if(employedPossibleValue == null) {
 				return true;
 			}
 
@@ -143,22 +162,32 @@ public class StudyTestPluginConfiguration {
 		@SuppressWarnings("unused")
 		public String EDSS_CALC(final Scope scope, final Optional<Event> event, final Dataset dataset, final Field field) {
 			final var datasetModel = dataset.getDatasetModel();
-			final var kfs1 = fieldService.get(dataset, datasetModel.getFieldModel("KFS1")).getValue();
-			final var kfs2 = fieldService.get(dataset, datasetModel.getFieldModel("KFS2")).getValue();
-			final var kfs3 = fieldService.get(dataset, datasetModel.getFieldModel("KFS3")).getValue();
-			final var kfs4 = fieldService.get(dataset, datasetModel.getFieldModel("KFS4")).getValue();
-			final var kfs5 = fieldService.get(dataset, datasetModel.getFieldModel("KFS5")).getValue();
-			final var kfs6 = fieldService.get(dataset, datasetModel.getFieldModel("KFS6")).getValue();
-			final var kfs7 = fieldService.get(dataset, datasetModel.getFieldModel("KFS7")).getValue();
-			final var ambulation = fieldService.get(dataset, datasetModel.getFieldModel("AMBULATION")).getValue();
+
+			final var kfs1Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS1"));
+			final var kfs2Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS2"));
+			final var kfs3Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS3"));
+			final var kfs4Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS4"));
+			final var kfs5Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS5"));
+			final var kfs6Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS6"));
+			final var kfs7Raw = fieldService.get(dataset, datasetModel.getFieldModel("KFS7"));
+			final var ambulationRaw = fieldService.get(dataset, datasetModel.getFieldModel("AMBULATION"));
+
+			final var kfs1 = resolveFieldValue(kfs1Raw);
+			final var kfs2 = resolveFieldValue(kfs2Raw);
+			final var kfs3 = resolveFieldValue(kfs3Raw);
+			final var kfs4 = resolveFieldValue(kfs4Raw);
+			final var kfs5 = resolveFieldValue(kfs5Raw);
+			final var kfs6 = resolveFieldValue(kfs6Raw);
+			final var kfs7 = resolveFieldValue(kfs7Raw);
+			final var ambulation = resolveFieldValue(ambulationRaw);
 
 			if(StringUtils.isAnyBlank(kfs1, kfs2, kfs3, kfs4, kfs5, kfs6, kfs7, ambulation)) {
 				LOGGER.info("Unable to calculate plugin [EDSS_CALC] because of missing values");
 				return "";
 			}
 
-			//fake EDSS score calculation
-			final var score = Stream.of(kfs2, kfs2, kfs3, kfs4, kfs5, kfs6, kfs7, ambulation).mapToDouble(Double::valueOf).average().orElseThrow();
+			final var score = Stream.of(kfs2, kfs2, kfs3, kfs4, kfs5, kfs6, kfs7, ambulation)
+				.mapToDouble(Double::valueOf).average().orElseThrow();
 			return field.getFieldModel().objectToString(score);
 		}
 
@@ -239,7 +268,8 @@ public class StudyTestPluginConfiguration {
 				final var VISIT_DOCUMENTATION = datasetService.get(previousEvent.get(), datasetModel);
 				final var ambulationFieldModel = VISIT_DOCUMENTATION.getDatasetModel().getFieldModel("AMBULATION");
 				final var AMBULATION = fieldService.get(VISIT_DOCUMENTATION, ambulationFieldModel);
-				ambulationValue = Integer.parseInt(AMBULATION.getValue());
+				final var ambulationValueStr = resolveFieldValue(AMBULATION);
+				ambulationValue = StringUtils.isBlank(ambulationValueStr) ? 0 : Integer.parseInt(ambulationValueStr);
 			}
 
 			final List<PossibleValue> possibleValues = new ArrayList<>();

@@ -8,7 +8,7 @@
 	<mat-dialog-content>
 		@if (data.workflow) {
 			<p>
-				<span class="label">Status:</span><strong>{{ data.workflow.statusId | capitalizeFirst }}</strong>
+				<span class="label">Status:</span><strong>{{ data.workflow.state.shortname | localizeMap }}</strong>
 			</p>
 			<p><span class="label">Message:</span>{{ data.workflow.triggerMessage }}</p>
 		}
