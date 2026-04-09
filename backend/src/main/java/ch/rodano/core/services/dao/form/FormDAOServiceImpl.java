@@ -59,8 +59,7 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 		return findUnique(query);
 	}
 
-	@Override
-	public List<Form> search(final Optional<Long> scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> formModelIds) {
+	private List<Form> search(final Optional<Long> scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> formModelIds) {
 		final var query = create.selectFrom(FORM).where(
 			scopePk.map(FORM.SCOPE_FK::eq).orElse(DSL.noCondition())
 				.and(eventPk.map(FORM.EVENT_FK::eq).orElse(FORM.EVENT_FK.isNull()))
@@ -68,6 +67,11 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 				.and(formModelIds.map(FORM.FORM_MODEL_ID::in).orElse(DSL.noCondition()))
 		);
 		return find(query);
+	}
+
+	@Override
+	public List<Form> search(final Long scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> formModelIds) {
+		return search(Optional.of(scopePk), eventPk, includeDeleted, formModelIds);
 	}
 
 	//scope

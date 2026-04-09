@@ -28,7 +28,7 @@ public interface FormDAOService {
 	 * @param formModelIds The form model ids to filter by
 	 * @return The list of forms matching the criteria
 	 */
-	List<Form> search(Optional<Long> scopePk, Optional<Long> eventPk, boolean includeDeleted, Optional<Collection<String>> formModelIds);
+	List<Form> search(Long scopePk, Optional<Long> eventPk, boolean includeDeleted, Optional<Collection<String>> formModelIds);
 
 	/**
 	 * Get the forms associated with a given scope pk

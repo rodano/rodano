@@ -315,7 +315,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<Dataset> search(final Scope scope, final Optional<Event> event, final Optional<Collection<DatasetModel>> datasetModels, final ACL acl) {
 		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
 		final var datasets = datasetDAOService.search(
-			Optional.of(scope.getPk()),
+			scope.getPk(),
 			event.map(Event::getPk),
 			includeDeleted,
 			datasetModels.map(dms -> dms.stream().map(DatasetModel::getId).toList())

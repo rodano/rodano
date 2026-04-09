@@ -72,8 +72,7 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 		return find(query);
 	}
 
-	@Override
-	public List<Dataset> search(final Optional<Long> scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> datasetModelIds) {
+	private List<Dataset> search(final Optional<Long> scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> datasetModelIds) {
 		final var query = create.selectFrom(DATASET).where(
 			scopePk.map(DATASET.SCOPE_FK::eq).orElse(DSL.noCondition())
 				.and(eventPk.map(DATASET.EVENT_FK::eq).orElse(DATASET.EVENT_FK.isNull()))
@@ -81,6 +80,11 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 				.and(datasetModelIds.map(DATASET.DATASET_MODEL_ID::in).orElse(DSL.noCondition()))
 		);
 		return find(query);
+	}
+
+	@Override
+	public List<Dataset> search(final Long scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> datasetModelIds) {
+		return search(Optional.of(scopePk), eventPk, includeDeleted, datasetModelIds);
 	}
 
 	//scope

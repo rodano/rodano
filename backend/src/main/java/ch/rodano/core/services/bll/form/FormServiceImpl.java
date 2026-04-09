@@ -200,7 +200,7 @@ public class FormServiceImpl implements FormService {
 		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
 		final var forms = new ArrayList<>(
 			formDAOService.search(
-				Optional.of(scope.getPk()),
+				scope.getPk(),
 				event.map(Event::getPk),
 				includeDeleted,
 				Optional.of(formModelIds)

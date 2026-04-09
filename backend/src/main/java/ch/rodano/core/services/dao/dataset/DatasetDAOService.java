@@ -35,7 +35,7 @@ public interface DatasetDAOService {
 	 * @param datasetModelIds The dataset model ids to filter by
 	 * @return The list of datasets matching the criteria
 	 */
-	List<Dataset> search(Optional<Long> scopePk, Optional<Long> eventPk, boolean includeDeleted, Optional<Collection<String>> datasetModelIds);
+	List<Dataset> search(Long scopePk, Optional<Long> eventPk, boolean includeDeleted, Optional<Collection<String>> datasetModelIds);
 
 	/**
 	 * Get all the datasets (including deleted) matching the provided dataset model ids
