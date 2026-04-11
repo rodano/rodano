@@ -1,5 +1,6 @@
 package ch.rodano.api.administration;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -80,14 +81,13 @@ public class DatabaseController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public void bootstrap(
 		@Valid @RequestBody final BootstrapDTO bootstrap
-	) throws SQLException {
+	) {
 		if(!databaseInitializer.isDatabaseEmpty()) {
 			throw new WrongDataConditionException("Database has already been bootstrapped");
 		}
 
 		databaseInitializer.initializeStructure();
 		databaseInitializer.bootstrap(
-			bootstrap.rootScopeName(),
 			bootstrap.userEmail(),
 			bootstrap.userPassword(),
 			bootstrap.userName()

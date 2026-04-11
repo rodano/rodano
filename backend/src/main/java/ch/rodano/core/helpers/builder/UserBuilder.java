@@ -55,6 +55,11 @@ public class UserBuilder {
 		return this;
 	}
 
+	public UserBuilder setSuperuser(final boolean superuser) {
+		userAndRoles.user().setSuperuser(superuser);
+		return this;
+	}
+
 	public UserCreatorService.UserCreation getUserAndRoles() {
 		return userAndRoles;
 	}

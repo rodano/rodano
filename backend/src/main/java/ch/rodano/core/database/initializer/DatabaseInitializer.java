@@ -1,11 +1,8 @@
 package ch.rodano.core.database.initializer;
 
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
 import javax.sql.DataSource;
 
 import org.jooq.DSLContext;
@@ -20,26 +17,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.configuration.model.language.LanguageStatic;
-import ch.rodano.configuration.model.scope.ScopeModel;
-import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.helpers.UserCreatorService;
 import ch.rodano.core.helpers.builder.UserBuilder;
 import ch.rodano.core.model.actor.Actor;
-import ch.rodano.core.model.audit.DatabaseActionContext;
-import ch.rodano.core.model.scope.Scope;
-import ch.rodano.core.services.bll.dataset.DatasetService;
-import ch.rodano.core.services.bll.event.EventService;
-import ch.rodano.core.services.bll.form.FormService;
-import ch.rodano.core.services.bll.scope.ScopeService;
-import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.user.UserSecurityService;
-import ch.rodano.core.services.bll.workflowStatus.DataFamily;
-import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
-import ch.rodano.core.services.project.ProjectIdResolver;
 
-import static ch.rodano.core.model.jooq.Tables.PROJECT;
-import static ch.rodano.core.model.jooq.Tables.SCOPE;
+import static ch.rodano.core.model.jooq.tables.User.USER;
 
 @Component
 @Profile({ "api", "test", "database" })
@@ -53,47 +37,25 @@ public class DatabaseInitializer {
 
 	private final DataSource dataSource;
 	private final DSLContext create;
-	private final StudyService studyService;
-	private final ScopeService scopeService;
-	private final EventService eventService;
-	private final FormService formService;
-	private final DatasetService datasetService;
-	private final WorkflowStatusService workflowStatusService;
 	private final AuditActionService auditActionService;
 	private final UserCreatorService userCreatorService;
 	private final UserSecurityService userSecurityService;
 
 	private final String databaseName;
 
-	private final ProjectIdResolver projectIdResolver;
-
 	public DatabaseInitializer(
 		final DataSource dataSource,
 		final DSLContext create,
-		final StudyService studyService,
-		final ScopeService scopeService,
-		final EventService eventService,
-		final FormService formService,
-		final DatasetService datasetService,
-		final WorkflowStatusService workflowStatusService,
 		final AuditActionService auditActionService,
 		final UserCreatorService userCreatorService,
 		@Value("${rodano.database.name}") final String databaseName,
-		final UserSecurityService userSecurityService,
-		final ProjectIdResolver projectIdResolver) {
+		final UserSecurityService userSecurityService) {
 		this.dataSource = dataSource;
 		this.create = create;
-		this.studyService = studyService;
-		this.scopeService = scopeService;
-		this.eventService = eventService;
-		this.formService = formService;
-		this.datasetService = datasetService;
-		this.workflowStatusService = workflowStatusService;
 		this.auditActionService = auditActionService;
 		this.userCreatorService = userCreatorService;
 		this.userSecurityService = userSecurityService;
 		this.databaseName = databaseName;
-		this.projectIdResolver = projectIdResolver;
 	}
 
 	public List<String> getTables() {
@@ -112,7 +74,7 @@ public class DatabaseInitializer {
 
 	//check if the database is empty (existing structure, but no data)
 	public boolean isDatabaseEmpty() {
-		return create.selectCount().from(SCOPE).fetchOne(0, int.class).equals(0);
+		return create.selectCount().from(USER).fetchOne(0, int.class).equals(0);
 	}
 
 	public void initializeStructure() {
@@ -134,72 +96,27 @@ public class DatabaseInitializer {
 		return tables.contains("project") && tables.contains("scope");
 	}
 
-	private Scope createRootScope(final DatabaseActionContext context, final ZonedDateTime origin, final String scopeName) {
-		final Study study = studyService.getStudy();
-
-		// Create the root scope
-		final ScopeModel rootScopeModel = study.getRootScopeModel();
-		final Scope root = new Scope();
-		root.setProjectId(study.getProjectId());
-		root.setScopeModel(rootScopeModel);
-		root.setId(UUID.randomUUID().toString());
-		root.setCode(study.getId());
-		root.setShortname(scopeName);
-		root.setStartDate(origin);
-
-		scopeService.create(root, null, context, "Create root scope");
-
-		// Initialize root scope data
-		final var family = new DataFamily(root);
-		workflowStatusService.createAll(family, root, null, context, RATIONALE);
-		eventService.createAll(root, context, RATIONALE);
-		datasetService.createAll(root, context, RATIONALE);
-		formService.createAll(root, context, RATIONALE);
-
-		return root;
-	}
-
-	private void ensureProjectExists(final Study study) {
-		if(study.getProjectId() == null || !study.getProjectId().equals(projectIdResolver.id())) {
-			study.setProjectId(projectIdResolver.id());
-		}
-
-		create.insertInto(PROJECT)
-			.set(PROJECT.PROJECT_ID, projectIdResolver.id())
-			.set(PROJECT.CODE, projectIdResolver.code())
-			.onDuplicateKeyUpdate()
-			.set(PROJECT.CODE, projectIdResolver.code())
-			.execute();
-	}
-
 	/**
 	 * Bootstrap the database
 	 *
 	 */
 	@Transactional
-	public void bootstrap(final String rootScopeName, final String userEmail, final String userPassword, final String userName) {
-		final var origin = ZonedDateTime.now().minusMinutes(1).truncatedTo(ChronoUnit.MILLIS);
-		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE);
-
-		final Study study = studyService.getStudy();
-		ensureProjectExists(study);
-		//ensureModelCatalogExists(study);
-
-		final var root = createRootScope(context, origin, rootScopeName);
-
-		// Create first user
-		final var adminProfile = study.getProfile("ADMIN");
-		final var password = userSecurityService.encodePassword(userPassword);
-		final var users = new ArrayList<UserCreatorService.UserCreation>();
-		users.add(
-			UserBuilder.createUser(userName, userEmail)
-				.setHashedPassword(password)
-				.setLanguage(LanguageStatic.en)
-				.addRole(root, adminProfile)
-				.getUserAndRoles()
+	public void bootstrap(final String userEmail, final String userPassword, final String userName) {
+		final UUID systemProjectId = UUID.fromString("00000000-0000-0000-0000-000000000000");
+		final var context = auditActionService.createAuditActionAndGenerateContext(
+			Actor.SYSTEM,
+			DatabaseInitializer.RATIONALE,
+			ZonedDateTime.now(),
+			systemProjectId
 		);
 
-		// Save the first user
-		userCreatorService.batchCreateAndEnable(users, context);
+		final var password = userSecurityService.encodePassword(userPassword);
+		final var user = UserBuilder.createUser(userName, userEmail)
+			.setHashedPassword(password)
+			.setLanguage(LanguageStatic.en)
+			.setSuperuser(true)
+			.getUserAndRoles();
+
+		userCreatorService.createAndEnable(user, context);
 	}
 }

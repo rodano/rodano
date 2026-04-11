@@ -407,7 +407,7 @@ public class UserSecurityService {
 		userDAOService.saveUser(user, context, "User entered a valid password");
 
 		//check active role
-		if(roleService.getActiveRoles(user).isEmpty()) {
+		if(!user.isSuperuser() && roleService.getActiveRoles(user).isEmpty()) {
 			throw new NoEnabledRoleException();
 		}
 	}

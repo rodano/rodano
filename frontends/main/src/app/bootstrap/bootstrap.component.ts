@@ -25,10 +25,6 @@ export class BootstrapComponent {
 	error?: string;
 
 	bootstrapForm = new FormGroup({
-		rootScopeName: new FormControl('', {
-			nonNullable: true,
-			validators: [Validators.required]
-		}),
 		userEmail: new FormControl('', {
 			nonNullable: true,
 			validators: [Validators.required, Validators.email]

@@ -137,11 +137,6 @@
 					<mat-spinner></mat-spinner>
 					<p>Loading projects...</p>
 				</div>
-			} @else if (filteredProjects.length === 0 && !hasActiveFilters()) {
-				<div class="empty-state">
-					<mat-icon>folder_open</mat-icon>
-					<p>No projects found</p>
-				</div>
 			} @else {
 				<div class="projects-grid">
 					<div class="project-card create-card" (click)="openCreateDialog()">
