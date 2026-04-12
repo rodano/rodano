@@ -25,6 +25,7 @@ import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.configuration.model.event.DateAggregationFunction;
 import ch.rodano.core.model.jooq.tables.records.EventModelRecord;
 
+import static ch.rodano.core.model.jooq.tables.Event.EVENT;
 import static ch.rodano.core.model.jooq.tables.EventModel.EVENT_MODEL;
 import static ch.rodano.core.model.jooq.tables.EventModelBlockedEvent.EVENT_MODEL_BLOCKED_EVENT;
 import static ch.rodano.core.model.jooq.tables.EventModelDatasetModel.EVENT_MODEL_DATASET_MODEL;
@@ -219,6 +220,17 @@ public class EventModelDAOServiceImpl implements EventModelDAOService {
 			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
 			.and(EVENT_MODEL.EVENT_MODEL_ID.eq(eventModelId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID eventModelId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(EVENT)
+				.where(EVENT.PROJECT_ID.eq(projectId))
+				.and(EVENT.EVENT_MODEL_ID.eq(eventModelId))
+		);
 	}
 
 	private void replaceRelations(final UUID projectId, final UUID eventModelId, final EventModelDTO dto) {

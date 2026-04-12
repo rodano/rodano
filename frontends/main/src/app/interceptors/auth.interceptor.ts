@@ -105,6 +105,12 @@ export class AuthInterceptor implements HttpInterceptor {
 							this.router.navigate(['/error', {context: ErrorContext.FORBIDDEN}]);
 						}
 						break;
+					case HttpStatusCode.Conflict:
+						this.notificationService.showError(
+							response.error?.message || 'This entity cannot be deleted because it is still in use.',
+							5000
+						);
+						return EMPTY;
 					//404, 500 and 504 and no network
 					case HttpStatusCode.NotFound:
 					case HttpStatusCode.InternalServerError:

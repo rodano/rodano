@@ -20,4 +20,6 @@ public interface ScopeModelDAOService {
 	ScopeModelDTO updateScopeModel(UUID projectId, UUID scopeModelId, ScopeModelDTO scopeModel);
 
 	void deleteScopeModel(UUID projectId, UUID scopeModelId);
+
+	boolean hasPatientData(UUID projectId, UUID scopeModelId);
 }

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import ch.rodano.api.config.ResourceCategoryDTO;
 import ch.rodano.core.model.jooq.tables.records.ResourceCategoryRecord;
 
+import static ch.rodano.core.model.jooq.tables.Resource.RESOURCE;
 import static ch.rodano.core.model.jooq.tables.ResourceCategory.RESOURCE_CATEGORY;
 
 @Repository
@@ -112,6 +113,17 @@ public class ResourceCategoryDAOServiceImpl implements ResourceCategoryDAOServic
 			.where(RESOURCE_CATEGORY.PROJECT_ID.eq(projectId))
 			.and(RESOURCE_CATEGORY.CATEGORY_ID.eq(resourceCategoryId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasResources(final UUID projectId, final UUID resourceCategoryId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(RESOURCE)
+				.where(RESOURCE.PROJECT_ID.eq(projectId))
+				.and(RESOURCE.CATEGORY_ID.eq(resourceCategoryId))
+		);
 	}
 
 	private ResourceCategoryDTO mapToDTO(final ResourceCategoryRecord record) {

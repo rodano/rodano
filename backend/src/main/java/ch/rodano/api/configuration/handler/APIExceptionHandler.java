@@ -7,6 +7,7 @@ import java.util.Collections;
 import jakarta.validation.ConstraintViolationException;
 
 import org.apache.catalina.connector.ClientAbortException;
+import org.jooq.exception.IntegrityConstraintViolationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -97,6 +98,14 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 		if(e instanceof final ManagedException me) {
 			logger.info(e.getLocalizedMessage(), e);
 			return new ResponseEntity<>(new ErrorDetails(me.getHttpErrorStatus(), e.getMessage(), path), me.getHttpErrorStatus());
+		}
+
+		if(e instanceof IntegrityConstraintViolationException) {
+			logger.info(e.getLocalizedMessage(), e);
+			return new ResponseEntity<>(
+				new ErrorDetails(HttpStatus.CONFLICT, "This entity cannot be deleted because it is still referenced by other configuration entities. Please remove those references first.", path),
+				HttpStatus.CONFLICT
+			);
 		}
 
 		// Specific Java exception

@@ -15,9 +15,9 @@ export class NotificationService {
 		});
 	}
 
-	showError(message: string) {
+	showError(message: string, duration = 3000) {
 		this.snackBar.open(message, '', {
-			duration: 3000,
+			duration,
 			horizontalPosition: 'center',
 			verticalPosition: 'bottom'
 		});

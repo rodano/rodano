@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.config.FormModelDTO;
+import ch.rodano.api.exception.ConfigurationConstraintException;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.services.dao.configurator.FormModelDAOService;
 
@@ -55,6 +56,11 @@ public class FormModelServiceImpl implements FormModelService {
 		final var existing = formModelDAOService.getFormModel(projectId, formModelId);
 		if(existing == null) {
 			throw new NotFoundException("Form model not found: " + formModelId);
+		}
+		if(formModelDAOService.hasPatientData(projectId, formModelId)) {
+			throw new ConfigurationConstraintException(
+				"Form model '%s' cannot be deleted: it has existing patient data".formatted(existing.getId())
+			);
 		}
 		formModelDAOService.deleteFormModel(projectId, formModelId);
 	}

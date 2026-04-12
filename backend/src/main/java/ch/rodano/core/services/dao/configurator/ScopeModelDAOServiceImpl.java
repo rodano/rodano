@@ -23,6 +23,16 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import ch.rodano.api.config.ScopeModelDTO;
 import ch.rodano.core.model.jooq.tables.records.ScopeModelRecord;
 
+import static ch.rodano.core.model.jooq.tables.Event.EVENT;
+import static ch.rodano.core.model.jooq.tables.EventGroup.EVENT_GROUP;
+import static ch.rodano.core.model.jooq.tables.EventModel.EVENT_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventModelBlockedEvent.EVENT_MODEL_BLOCKED_EVENT;
+import static ch.rodano.core.model.jooq.tables.EventModelDatasetModel.EVENT_MODEL_DATASET_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventModelDeadlineReference.EVENT_MODEL_DEADLINE_REFERENCE;
+import static ch.rodano.core.model.jooq.tables.EventModelFormModel.EVENT_MODEL_FORM_MODEL;
+import static ch.rodano.core.model.jooq.tables.EventModelImpliedEvent.EVENT_MODEL_IMPLIED_EVENT;
+import static ch.rodano.core.model.jooq.tables.EventModelWorkflow.EVENT_MODEL_WORKFLOW;
+import static ch.rodano.core.model.jooq.tables.Scope.SCOPE;
 import static ch.rodano.core.model.jooq.tables.ScopeModel.SCOPE_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelDatasetModel.SCOPE_MODEL_DATASET_MODEL;
 import static ch.rodano.core.model.jooq.tables.ScopeModelFormModel.SCOPE_MODEL_FORM_MODEL;
@@ -194,16 +204,48 @@ public class ScopeModelDAOServiceImpl implements ScopeModelDAOService {
 		@CacheEvict(value = "scopeModel", key = "#projectId.toString() + ':' + #scopeModelId.toString()")
 	})
 	public void deleteScopeModel(final UUID projectId, final UUID scopeModelId) {
+		final var eventModelIds = dslContext
+			.select(EVENT_MODEL.EVENT_MODEL_ID).from(EVENT_MODEL)
+			.where(EVENT_MODEL.PROJECT_ID.eq(projectId))
+			.and(EVENT_MODEL.SCOPE_MODEL_ID.eq(scopeModelId));
+
+		dslContext.deleteFrom(EVENT_MODEL_DATASET_MODEL).where(EVENT_MODEL_DATASET_MODEL.PROJECT_ID.eq(projectId)).and(EVENT_MODEL_DATASET_MODEL.EVENT_MODEL_ID.in(eventModelIds)).execute();
+		dslContext.deleteFrom(EVENT_MODEL_FORM_MODEL).where(EVENT_MODEL_FORM_MODEL.PROJECT_ID.eq(projectId)).and(EVENT_MODEL_FORM_MODEL.EVENT_MODEL_ID.in(eventModelIds)).execute();
+		dslContext.deleteFrom(EVENT_MODEL_WORKFLOW).where(EVENT_MODEL_WORKFLOW.PROJECT_ID.eq(projectId)).and(EVENT_MODEL_WORKFLOW.EVENT_MODEL_ID.in(eventModelIds)).execute();
+		dslContext.deleteFrom(EVENT_MODEL_DEADLINE_REFERENCE).where(EVENT_MODEL_DEADLINE_REFERENCE.PROJECT_ID.eq(projectId)).and(EVENT_MODEL_DEADLINE_REFERENCE.EVENT_MODEL_ID.in(eventModelIds)).execute();
+		dslContext.deleteFrom(EVENT_MODEL_BLOCKED_EVENT).where(EVENT_MODEL_BLOCKED_EVENT.PROJECT_ID.eq(projectId)).and(EVENT_MODEL_BLOCKED_EVENT.EVENT_MODEL_ID.in(eventModelIds)).execute();
+		dslContext.deleteFrom(EVENT_MODEL_IMPLIED_EVENT).where(EVENT_MODEL_IMPLIED_EVENT.PROJECT_ID.eq(projectId)).and(EVENT_MODEL_IMPLIED_EVENT.EVENT_MODEL_ID.in(eventModelIds)).execute();
+		dslContext.deleteFrom(EVENT_MODEL).where(EVENT_MODEL.PROJECT_ID.eq(projectId)).and(EVENT_MODEL.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+
+		dslContext.deleteFrom(EVENT_GROUP).where(EVENT_GROUP.PROJECT_ID.eq(projectId)).and(EVENT_GROUP.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+
 		dslContext.deleteFrom(SCOPE_MODEL_PARENT).where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_PARENT.CHILD_SCOPE_MODEL_ID.eq(scopeModelId)).execute();
 		dslContext.deleteFrom(SCOPE_MODEL_PARENT).where(SCOPE_MODEL_PARENT.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_PARENT.PARENT_SCOPE_MODEL_ID.eq(scopeModelId)).execute();
 		dslContext.deleteFrom(SCOPE_MODEL_DATASET_MODEL).where(SCOPE_MODEL_DATASET_MODEL.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_DATASET_MODEL.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
 		dslContext.deleteFrom(SCOPE_MODEL_FORM_MODEL).where(SCOPE_MODEL_FORM_MODEL.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_FORM_MODEL.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
 		dslContext.deleteFrom(SCOPE_MODEL_WORKFLOW).where(SCOPE_MODEL_WORKFLOW.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_WORKFLOW.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+		dslContext.deleteFrom(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR).where(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL_WORKFLOW_STATE_SELECTOR.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
 
-		dslContext.deleteFrom(SCOPE_MODEL)
-			.where(SCOPE_MODEL.PROJECT_ID.eq(projectId))
-			.and(SCOPE_MODEL.SCOPE_MODEL_ID.eq(scopeModelId))
-			.execute();
+		dslContext.deleteFrom(SCOPE_MODEL).where(SCOPE_MODEL.PROJECT_ID.eq(projectId)).and(SCOPE_MODEL.SCOPE_MODEL_ID.eq(scopeModelId)).execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID scopeModelId) {
+		if(dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(SCOPE)
+				.where(SCOPE.PROJECT_ID.eq(projectId))
+				.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
+		)) {
+			return true;
+		}
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(EVENT)
+				.where(EVENT.PROJECT_ID.eq(projectId))
+				.and(EVENT.SCOPE_MODEL_ID.eq(scopeModelId))
+		);
 	}
 
 	private void replaceRelations(final UUID projectId, final UUID scopeModelId, final ScopeModelDTO dto) {

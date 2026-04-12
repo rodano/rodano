@@ -17,4 +17,6 @@ public interface ResourceCategoryDAOService {
 	ResourceCategoryDTO updateResourceCategory(UUID projectId, UUID resourceCategoryId, ResourceCategoryDTO resourceCategory);
 
 	void deleteResourceCategory(UUID projectId, UUID resourceCategoryId);
+
+	boolean hasResources(UUID projectId, UUID resourceCategoryId);
 }

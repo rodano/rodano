@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.config.ResourceCategoryDTO;
+import ch.rodano.api.exception.ConfigurationConstraintException;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.services.dao.configurator.ResourceCategoryDAOService;
 
@@ -56,7 +57,11 @@ public class ResourceCategoryServiceImpl implements ResourceCategoryService {
 		if(existing == null) {
 			throw new NotFoundException("Resource category not found: " + resourceCategoryId);
 		}
-
+		if(resourceCategoryDAOService.hasResources(projectId, resourceCategoryId)) {
+			throw new ConfigurationConstraintException(
+				"Resource category '%s' cannot be deleted: it still has resources attached to it".formatted(existing.getId())
+			);
+		}
 		resourceCategoryDAOService.deleteResourceCategory(projectId, resourceCategoryId);
 	}
 }

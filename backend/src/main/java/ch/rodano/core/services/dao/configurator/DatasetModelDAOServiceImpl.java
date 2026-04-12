@@ -19,7 +19,13 @@ import ch.rodano.api.config.DatasetModelDTO;
 import ch.rodano.api.config.FieldModelDTO;
 import ch.rodano.core.model.jooq.tables.records.DatasetModelRecord;
 
+import static ch.rodano.core.model.jooq.tables.Dataset.DATASET;
 import static ch.rodano.core.model.jooq.tables.DatasetModel.DATASET_MODEL;
+import static ch.rodano.core.model.jooq.tables.Field.FIELD;
+import static ch.rodano.core.model.jooq.tables.FieldModel.FIELD_MODEL;
+import static ch.rodano.core.model.jooq.tables.FieldModelValidator.FIELD_MODEL_VALIDATOR;
+import static ch.rodano.core.model.jooq.tables.FieldModelWorkflow.FIELD_MODEL_WORKFLOW;
+import static ch.rodano.core.model.jooq.tables.FieldPossibleValue.FIELD_POSSIBLE_VALUE;
 
 @Repository
 public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
@@ -32,8 +38,8 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 	private final FieldModelDAOService fieldModelDAOService;
 
 	public DatasetModelDAOServiceImpl(final DSLContext dslContext,
-									  final JsonMapperService jsonMapperService,
-									  final FieldModelDAOService fieldModelDAOService) {
+	                                  final JsonMapperService jsonMapperService,
+	                                  final FieldModelDAOService fieldModelDAOService) {
 		this.dslContext = dslContext;
 		this.jsonMapperService = jsonMapperService;
 		this.fieldModelDAOService = fieldModelDAOService;
@@ -175,10 +181,58 @@ public class DatasetModelDAOServiceImpl implements DatasetModelDAOService {
 		@CacheEvict(value = "datasetModel", key = "#projectId.toString() + ':' + #datasetModelId.toString()")
 	})
 	public void deleteDatasetModel(final UUID projectId, final UUID datasetModelId) {
+		dslContext.deleteFrom(FIELD_POSSIBLE_VALUE)
+			.where(FIELD_POSSIBLE_VALUE.PROJECT_ID.eq(projectId))
+			.and(FIELD_POSSIBLE_VALUE.FIELD_MODEL_ID.in(
+				dslContext.select(FIELD_MODEL.FIELD_MODEL_ID).from(FIELD_MODEL)
+					.where(FIELD_MODEL.PROJECT_ID.eq(projectId))
+					.and(FIELD_MODEL.DATASET_MODEL_ID.eq(datasetModelId))
+			)).execute();
+
+		dslContext.deleteFrom(FIELD_MODEL_VALIDATOR)
+			.where(FIELD_MODEL_VALIDATOR.PROJECT_ID.eq(projectId))
+			.and(FIELD_MODEL_VALIDATOR.FIELD_MODEL_ID.in(
+				dslContext.select(FIELD_MODEL.FIELD_MODEL_ID).from(FIELD_MODEL)
+					.where(FIELD_MODEL.PROJECT_ID.eq(projectId))
+					.and(FIELD_MODEL.DATASET_MODEL_ID.eq(datasetModelId))
+			)).execute();
+
+		dslContext.deleteFrom(FIELD_MODEL_WORKFLOW)
+			.where(FIELD_MODEL_WORKFLOW.PROJECT_ID.eq(projectId))
+			.and(FIELD_MODEL_WORKFLOW.FIELD_MODEL_ID.in(
+				dslContext.select(FIELD_MODEL.FIELD_MODEL_ID).from(FIELD_MODEL)
+					.where(FIELD_MODEL.PROJECT_ID.eq(projectId))
+					.and(FIELD_MODEL.DATASET_MODEL_ID.eq(datasetModelId))
+			)).execute();
+
+		dslContext.deleteFrom(FIELD_MODEL)
+			.where(FIELD_MODEL.PROJECT_ID.eq(projectId))
+			.and(FIELD_MODEL.DATASET_MODEL_ID.eq(datasetModelId))
+			.execute();
+
 		dslContext.deleteFrom(DATASET_MODEL)
 			.where(DATASET_MODEL.PROJECT_ID.eq(projectId))
 			.and(DATASET_MODEL.DATASET_MODEL_ID.eq(datasetModelId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID datasetModelId) {
+		if(dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(DATASET)
+				.where(DATASET.PROJECT_ID.eq(projectId))
+				.and(DATASET.DATASET_MODEL_ID.eq(datasetModelId))
+		)) {
+			return true;
+		}
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(FIELD)
+				.where(FIELD.PROJECT_ID.eq(projectId))
+				.and(FIELD.DATASET_MODEL_ID.eq(datasetModelId))
+		);
 	}
 
 	private DatasetModelDTO mapToDTO(final DatasetModelRecord record, final List<FieldModelDTO> fieldModels) {

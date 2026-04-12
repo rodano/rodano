@@ -31,6 +31,7 @@ import ch.rodano.core.model.jooq.enums.FieldModelDataType;
 import ch.rodano.core.model.jooq.tables.records.FieldModelRecord;
 import ch.rodano.core.model.jooq.tables.records.FieldPossibleValueRecord;
 
+import static ch.rodano.core.model.jooq.tables.Field.FIELD;
 import static ch.rodano.core.model.jooq.tables.FieldModel.FIELD_MODEL;
 import static ch.rodano.core.model.jooq.tables.FieldModelValidator.FIELD_MODEL_VALIDATOR;
 import static ch.rodano.core.model.jooq.tables.FieldModelWorkflow.FIELD_MODEL_WORKFLOW;
@@ -259,6 +260,17 @@ public class FieldModelDAOServiceImpl implements FieldModelDAOService {
 			.where(FIELD_MODEL.PROJECT_ID.eq(projectId))
 			.and(FIELD_MODEL.FIELD_MODEL_ID.eq(fieldModelId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID fieldModelId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(FIELD)
+				.where(FIELD.PROJECT_ID.eq(projectId))
+				.and(FIELD.FIELD_MODEL_ID.eq(fieldModelId))
+		);
 	}
 
 	private Map<UUID, List<PossibleValueDTO>> loadPossibleValues(final UUID projectId, final List<UUID> fieldModelIds) {

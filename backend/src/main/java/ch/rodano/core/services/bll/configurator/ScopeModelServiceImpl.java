@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.config.ScopeModelDTO;
+import ch.rodano.api.exception.ConfigurationConstraintException;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.services.dao.configurator.ScopeModelDAOService;
 
@@ -55,6 +56,11 @@ public class ScopeModelServiceImpl implements ScopeModelService {
 		final var existing = scopeModelDAOService.getScopeModel(projectId, scopeModelId);
 		if(existing == null) {
 			throw new NotFoundException("Scope model not found: " + scopeModelId);
+		}
+		if(scopeModelDAOService.hasPatientData(projectId, scopeModelId)) {
+			throw new ConfigurationConstraintException(
+				"Scope model '%s' cannot be deleted: it has existing patient data".formatted(existing.getId())
+			);
 		}
 		scopeModelDAOService.deleteScopeModel(projectId, scopeModelId);
 	}

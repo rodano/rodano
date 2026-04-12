@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.config.FieldModelDTO;
+import ch.rodano.api.exception.ConfigurationConstraintException;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.services.dao.configurator.FieldModelDAOService;
 
@@ -54,7 +55,12 @@ public class FieldModelServiceImpl implements FieldModelService {
 	public void deleteFieldModel(final UUID projectId, final UUID fieldModelId) {
 		final var existing = fieldModelDAOService.getFieldModel(projectId, fieldModelId);
 		if(existing == null) {
-			throw new NotFoundException("Field model not found:  " + fieldModelId);
+			throw new NotFoundException("Field model not found: " + fieldModelId);
+		}
+		if(fieldModelDAOService.hasPatientData(projectId, fieldModelId)) {
+			throw new ConfigurationConstraintException(
+				"Field model '%s' cannot be deleted: it has existing patient data".formatted(existing.getId())
+			);
 		}
 		fieldModelDAOService.deleteFieldModel(projectId, fieldModelId);
 	}

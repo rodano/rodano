@@ -16,4 +16,6 @@ public interface FormModelDAOService {
 	FormModelDTO updateFormModel(UUID projectId, UUID formModelId, FormModelDTO formModel);
 
 	void deleteFormModel(UUID projectId, UUID formModelId);
+
+	boolean hasPatientData(UUID projectId, UUID formModelId);
 }

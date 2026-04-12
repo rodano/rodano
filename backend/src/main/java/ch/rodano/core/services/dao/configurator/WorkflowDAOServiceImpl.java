@@ -17,6 +17,10 @@ import ch.rodano.api.workflow.WorkflowDTO;
 import ch.rodano.core.model.jooq.tables.records.WorkflowRecord;
 
 import static ch.rodano.core.model.jooq.tables.Workflow.WORKFLOW;
+import static ch.rodano.core.model.jooq.tables.WorkflowAction.WORKFLOW_ACTION;
+import static ch.rodano.core.model.jooq.tables.WorkflowState.WORKFLOW_STATE;
+import static ch.rodano.core.model.jooq.tables.WorkflowStatePossibleAction.WORKFLOW_STATE_POSSIBLE_ACTION;
+import static ch.rodano.core.model.jooq.tables.WorkflowStatus.WORKFLOW_STATUS;
 
 @Repository
 public class WorkflowDAOServiceImpl implements WorkflowDAOService {
@@ -123,10 +127,27 @@ public class WorkflowDAOServiceImpl implements WorkflowDAOService {
 		@CacheEvict(value = "workflow", key = "#projectId.toString() + ':' + #workflowId.toString()")
 	})
 	public void deleteWorkflow(final UUID projectId, final UUID workflowId) {
-		dslContext.deleteFrom(WORKFLOW)
-			.where(WORKFLOW.PROJECT_ID.eq(projectId))
-			.and(WORKFLOW.WORKFLOW_ID.eq(workflowId))
-			.execute();
+		final var workflowStateIds = dslContext
+			.select(WORKFLOW_STATE.WORKFLOW_STATE_ID).from(WORKFLOW_STATE)
+			.where(WORKFLOW_STATE.PROJECT_ID.eq(projectId))
+			.and(WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId));
+
+		dslContext.deleteFrom(WORKFLOW_STATE_POSSIBLE_ACTION).where(WORKFLOW_STATE_POSSIBLE_ACTION.PROJECT_ID.eq(projectId)).and(WORKFLOW_STATE_POSSIBLE_ACTION.WORKFLOW_STATE_ID.in(workflowStateIds)).execute();
+		dslContext.deleteFrom(WORKFLOW_STATE).where(WORKFLOW_STATE.PROJECT_ID.eq(projectId)).and(WORKFLOW_STATE.WORKFLOW_ID.eq(workflowId)).execute();
+		dslContext.deleteFrom(WORKFLOW_ACTION).where(WORKFLOW_ACTION.PROJECT_ID.eq(projectId)).and(WORKFLOW_ACTION.WORKFLOW_ID.eq(workflowId)).execute();
+
+		dslContext.deleteFrom(WORKFLOW).where(WORKFLOW.PROJECT_ID.eq(projectId)).and(WORKFLOW.WORKFLOW_ID.eq(workflowId)).execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID workflowId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(WORKFLOW_STATUS)
+				.where(WORKFLOW_STATUS.PROJECT_ID.eq(projectId))
+				.and(WORKFLOW_STATUS.WORKFLOW_ID.eq(workflowId))
+		);
 	}
 
 	private WorkflowDTO mapToDTO(final WorkflowRecord record) {

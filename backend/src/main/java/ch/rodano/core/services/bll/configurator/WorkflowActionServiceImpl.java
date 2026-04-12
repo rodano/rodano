@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ch.rodano.api.exception.ConfigurationConstraintException;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.api.workflow.WorkflowActionDTO;
 import ch.rodano.core.services.dao.configurator.WorkflowActionDAOService;
@@ -55,6 +56,11 @@ public class WorkflowActionServiceImpl implements WorkflowActionService {
 		final var existing = workflowActionDAOService.getWorkflowAction(projectId, workflowActionId);
 		if(existing == null) {
 			throw new NotFoundException("Workflow action not found: " + workflowActionId);
+		}
+		if(workflowActionDAOService.hasPatientData(projectId, workflowActionId)) {
+			throw new ConfigurationConstraintException(
+				"Workflow action '%s' cannot be deleted: it has existing patient data".formatted(existing.getId())
+			);
 		}
 		workflowActionDAOService.deleteWorkflowAction(projectId, workflowActionId);
 	}

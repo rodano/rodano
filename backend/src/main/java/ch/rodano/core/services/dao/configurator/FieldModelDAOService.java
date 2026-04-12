@@ -20,4 +20,6 @@ public interface FieldModelDAOService {
 	FieldModelDTO updateFieldModel(UUID projectId, UUID fieldModelId, FieldModelDTO fieldModel);
 
 	void deleteFieldModel(UUID projectId, UUID fieldModelId);
+
+	boolean hasPatientData(UUID projectId, UUID fieldModelId);
 }

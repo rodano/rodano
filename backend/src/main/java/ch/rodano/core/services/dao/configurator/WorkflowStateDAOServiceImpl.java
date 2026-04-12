@@ -23,6 +23,7 @@ import ch.rodano.core.model.jooq.tables.records.WorkflowStateRecord;
 
 import static ch.rodano.core.model.jooq.tables.WorkflowState.WORKFLOW_STATE;
 import static ch.rodano.core.model.jooq.tables.WorkflowStatePossibleAction.WORKFLOW_STATE_POSSIBLE_ACTION;
+import static ch.rodano.core.model.jooq.tables.WorkflowStatus.WORKFLOW_STATUS;
 
 @Service
 @Transactional
@@ -36,8 +37,8 @@ public class WorkflowStateDAOServiceImpl implements WorkflowStateDAOService {
 	private final WorkflowActionDAOService workflowActionDAOService;
 
 	public WorkflowStateDAOServiceImpl(final DSLContext dslContext,
-									   final JsonMapperService jsonMapperService,
-									   final WorkflowActionDAOService workflowActionDAOService) {
+	                                   final JsonMapperService jsonMapperService,
+	                                   final WorkflowActionDAOService workflowActionDAOService) {
 		this.dslContext = dslContext;
 		this.jsonMapperService = jsonMapperService;
 		this.workflowActionDAOService = workflowActionDAOService;
@@ -180,6 +181,17 @@ public class WorkflowStateDAOServiceImpl implements WorkflowStateDAOService {
 			.where(WORKFLOW_STATE.PROJECT_ID.eq(projectId))
 			.and(WORKFLOW_STATE.WORKFLOW_STATE_ID.eq(workflowStateId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID workflowStateId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(WORKFLOW_STATUS)
+				.where(WORKFLOW_STATUS.PROJECT_ID.eq(projectId))
+				.and(WORKFLOW_STATUS.WORKFLOW_STATE_ID.eq(workflowStateId))
+		);
 	}
 
 	private Map<UUID, List<WorkflowActionDTO>> loadPossibleActions(final UUID projectId, final List<UUID> workflowStateIds) {

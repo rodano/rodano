@@ -20,4 +20,6 @@ public interface EventModelDAOService {
 	EventModelDTO updateEventModel(UUID projectId, UUID eventModelId, EventModelDTO eventModelDTO);
 
 	void deleteEventModel(UUID projectId, UUID eventModelId);
+
+	boolean hasPatientData(UUID projectId, UUID eventModelId);
 }

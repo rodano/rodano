@@ -16,4 +16,6 @@ public interface WorkflowDAOService {
 	WorkflowDTO updateWorkflow(UUID projectId, UUID workflowId, WorkflowDTO workflow);
 
 	void deleteWorkflow(UUID projectId, UUID workflowId);
+
+	boolean hasPatientData(UUID projectId, UUID workflowId);
 }

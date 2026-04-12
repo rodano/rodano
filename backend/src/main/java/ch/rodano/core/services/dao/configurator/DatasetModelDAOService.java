@@ -20,4 +20,6 @@ public interface DatasetModelDAOService {
 	DatasetModelDTO updateDatasetModel(UUID projectId, UUID datasetModelId, DatasetModelDTO datasetModel);
 
 	void deleteDatasetModel(UUID projectId, UUID datasetModelId);
+
+	boolean hasPatientData(UUID projectId, UUID datasetModelId);
 }

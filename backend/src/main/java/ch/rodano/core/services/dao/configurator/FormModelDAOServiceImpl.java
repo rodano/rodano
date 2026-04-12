@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import ch.rodano.api.config.FormModelDTO;
 import ch.rodano.core.model.jooq.tables.records.FormModelRecord;
 
+import static ch.rodano.core.model.jooq.tables.Form.FORM;
 import static ch.rodano.core.model.jooq.tables.FormModel.FORM_MODEL;
 import static ch.rodano.core.model.jooq.tables.FormModelWorkflow.FORM_MODEL_WORKFLOW;
 
@@ -134,6 +135,17 @@ public class FormModelDAOServiceImpl implements FormModelDAOService {
 			.where(FORM_MODEL.PROJECT_ID.eq(projectId))
 			.and(FORM_MODEL.FORM_MODEL_ID.eq(formModelId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID formModelId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(FORM)
+				.where(FORM.PROJECT_ID.eq(projectId))
+				.and(FORM.FORM_MODEL_ID.eq(formModelId))
+		);
 	}
 
 	private void replaceWorkflows(final UUID projectId, final UUID formModelId, final FormModelDTO dto) {

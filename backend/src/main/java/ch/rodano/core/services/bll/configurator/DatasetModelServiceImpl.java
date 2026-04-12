@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.config.DatasetModelDTO;
+import ch.rodano.api.exception.ConfigurationConstraintException;
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.services.dao.configurator.DatasetModelDAOService;
 
@@ -55,6 +56,11 @@ public class DatasetModelServiceImpl implements DatasetModelService {
 		final var existing = datasetModelDAOService.getDatasetModel(projectId, datasetModelId);
 		if(existing == null) {
 			throw new NotFoundException("Dataset model not found: " + datasetModelId);
+		}
+		if(datasetModelDAOService.hasPatientData(projectId, datasetModelId)) {
+			throw new ConfigurationConstraintException(
+				"Dataset model '%s' cannot be deleted: it has existing patient data".formatted(existing.getId())
+			);
 		}
 		datasetModelDAOService.deleteDatasetModel(projectId, datasetModelId);
 	}

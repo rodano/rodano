@@ -18,6 +18,7 @@ import ch.rodano.api.workflow.WorkflowActionDTO;
 import ch.rodano.core.model.jooq.tables.records.WorkflowActionRecord;
 
 import static ch.rodano.core.model.jooq.tables.WorkflowAction.WORKFLOW_ACTION;
+import static ch.rodano.core.model.jooq.tables.WorkflowStatus.WORKFLOW_STATUS;
 
 @Repository
 public class WorkflowActionDAOServiceImpl implements WorkflowActionDAOService {
@@ -141,6 +142,17 @@ public class WorkflowActionDAOServiceImpl implements WorkflowActionDAOService {
 			.where(WORKFLOW_ACTION.PROJECT_ID.eq(projectId))
 			.and(WORKFLOW_ACTION.WORKFLOW_ACTION_ID.eq(workflowActionId))
 			.execute();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public boolean hasPatientData(final UUID projectId, final UUID workflowActionId) {
+		return dslContext.fetchExists(
+			dslContext.selectOne()
+				.from(WORKFLOW_STATUS)
+				.where(WORKFLOW_STATUS.PROJECT_ID.eq(projectId))
+				.and(WORKFLOW_STATUS.WORKFLOW_ACTION_ID.eq(workflowActionId))
+		);
 	}
 
 	private WorkflowActionDTO mapToDTO(final WorkflowActionRecord record) {

@@ -20,4 +20,6 @@ public interface WorkflowStateDAOService {
 	WorkflowStateDTO updateWorkflowState(UUID projectId, UUID workflowStateId, WorkflowStateDTO workflowState);
 
 	void deleteWorkflowState(UUID projectId, UUID workflowStateId);
+
+	boolean hasPatientData(UUID projectId, UUID workflowStateId);
 }
