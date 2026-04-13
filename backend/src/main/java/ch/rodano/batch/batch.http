@@ -11,8 +11,8 @@ POST http://localhost:8080/api/batch/import
 Content-Type: application/json
 
 {
-  "projectId": "TEST_FARIS",
-  "config": "classpath:config/config2.json",
+  "projectId": "TEST",
+  "config": "classpath:config/config.json",
   "dbUrl": "jdbc:mariadb://localhost:3306/rodano",
   "dbUser": "root",
   "dbPassword": "root"
