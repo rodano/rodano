@@ -61,86 +61,58 @@ mvn spring-boot:run -Dspring-boot.run.profiles=migration -Dspring-boot.run.jvmAr
 
 ## Batch Import
 
-The application uses JBeret (Jakarta Batch implementation) to import configuration from JSON files into the database. The batch import reads the study configuration and populates model tables including:
+The application uses JBeret (Jakarta Batch implementation) to import configuration from JSON files into the database. The batch import reads the study configuration and populates all model tables, including workflows, forms, field models, charts, reports, profiles, scope models, event models, validators, rules, menus, widgets, and more.
 
-* Workflows and workflow states
-* Forms and field models
-* Charts and reports
-* Profiles and permissions
-* Scope models and event models
-* Validators and rules
-* Menus and widgets
-* And other configuration entities
+### How It Works
 
-### Batch Import Process
+The batch import job (`import-config`) runs 35 sequential steps, each populating a specific set of model tables from the JSON configuration file. Steps cover:
 
-The batch import job (`import-config`) consists of 21 sequential steps that populate different model tables. Each step reads a specific section from the JSON configuration file and inserts the corresponding records into the database.
+1. Project
+2. Rule definition properties
+3. Rule definition actions
+4. Static features
+5. Features
+6. Resource categories
+7. Dataset models
+8. Workflows
+9. Profiles
+10. Form models
+11. Scope models
+12. Scope model parents
+13. Payment plans
+14. Reports
+15. Charts
+16. Timeline graphs
+17. Workflow widgets
+18. Workflow summaries
+19. Menus
+20. Profile rights
+21. Privacy policies
+22. Validators
+23. Event action rules
+24. Crons
+25. Selections
+26. Field model backfill (missing links)
+27. Workflow backfill (missing links)
+28. Project backfill (missing profile ID)
+29. Workflow rules
+30. Dataset model rules
+31. Form model rules
+32. Scope model rules
+33. Validator rules
+34. Cron rules
+35. Status parameter backfill
 
-The main steps include:
-1. Project and rule definitions
-2. Features and resource categories
-3. Dataset models
-4. **Workflows** (including workflow states and actions)
-5. Profiles
-6. Form models and field models
-7. Scope models and event models
-8. Payment plans
-9. Reports, charts, and graphs
-10. Workflow widgets and summaries
-11. Menus
-12. Profile rights and permissions
-13. Privacy policies
-14. Validators
-15. Event action rules
-16. Crons and selections
+Steps 26–35 are backfill and rule-linking passes that run after the primary data is inserted. They resolve cross-entity references and attach rules to their respective owners. Each step runs in its own transaction, processing records in chunks of 100–200 items. The import uses deterministic UUID generation to ensure consistent identifiers across repeated imports.
 
-### Running Batch Import via API
+### Prerequisites
 
-The batch import is executed via REST API endpoints. Start the application in `api` profile, then make HTTP requests to trigger the import.
+The batch import must be run **after** the database schema has been initialized (see [Full Initialization Workflow](#full-initialization-workflow)). The application must be running in `api` profile when triggering the import via HTTP.
 
-#### Start a Batch Import Job
+### Configuration
 
-Using default configuration from `application.yml`:
-```http
-POST http://localhost:8080/api/batch/import
-Content-Type: application/json
+Default batch import parameters can be set in `application.yml`:
 
-{}
-```
-
-With custom parameters:
-```http
-POST http://localhost:8080/api/batch/import
-Content-Type: application/json
-
-{
-  "projectId": "MY_PROJECT",
-  "config": "file:/path/to/config.json",
-  "dbUrl": "jdbc:mariadb://localhost:3306/rodano",
-  "dbUser": "user",
-  "dbPass": "password"
-}
-```
-
-#### Check Batch Job Status by Execution ID
-```http
-GET http://localhost:8080/api/batch/execution/1
-```
-
-Response includes:
-- Job execution status (STARTING, STARTED, COMPLETED, FAILED)
-- Start and end times
-- Exit status
-- Details for each step
-
-#### Stop a Running Batch Job
-```http
-POST http://localhost:8080/api/batch/execution/1/stop
-```
-
-### Batch Import Configuration
-
-Configure default batch import parameters in `application.yml`:
 ```yaml
 batch:
   import:
@@ -153,46 +125,146 @@ batch:
       password: password
 ```
 
-These defaults are used when making a batch import request without parameters.
+Any of these defaults can be overridden per-request in the request body.
 
-### Full Database Initialization Workflow
+### API Endpoints
 
-To initialize a completely new database:
+#### Start a batch import
 
-1. **Create the database schema:**
-```bash
-   mvn spring-boot:run \
-  -Dspring-boot.run.profiles=database \
-  -Dspring-boot.run.arguments="--rodano.config=/absolute/path/to/config.json \ 
-  --rodano.database.name=database_name \ 
-  --rodano.init.with-data=true --rodano.init.with-users=true --rodano.init.users-password=MySuperPassword"
-```
-This creates all tables and seeds the runtime tables (scope, user, etc.) and creates the uuid links to the models.
+Starts an import job. All fields are optional — omitted fields fall back to the defaults configured in `application.yml`. `projectId` can be either a UUID or a project code string.
 
-2. **Start the Application:**
-```bash
-   mvn spring-boot:run
-```
-
-3. **Run the batch import via HTTP:**
 ```http
-   POST http://localhost:8080/api/batch/import
-   Content-Type: application/json
-   
-   {}
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
+
+{
+  "projectId": "MY_PROJECT"
+}
 ```
 
-4. **Wait for completion** - Monitor the job status until it shows `COMPLETED`
+With full overrides:
 
+```http
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
 
-### Important Notes
+{
+  "projectId": "MY_PROJECT",
+  "config": "classpath:config/config.json",
+  "dbUrl": "jdbc:mariadb://localhost:3306/rodano",
+  "dbUser": "root",
+  "dbPassword": "root"
+}
+```
 
-* The batch import must be run **after** the database schema is created
-* The batch import uses deterministic UUID generation to ensure consistent identifiers across imports
-* If you modify your JSON configuration, truncate the model tables and re-run the batch import
-* Each batch import execution is tracked with a unique execution ID that can be used to monitor progress
-* The batch import runs in a separate transaction for each chunk (default 100-200 items per chunk)
+The response returns HTTP 202 with the execution ID and the resolved parameters used for the job:
 
+```json
+{
+  "executionId": 1,
+  "job": "import-config",
+  "parameters": { ... }
+}
+```
+
+#### Check job status
+
+```http
+GET http://localhost:8080/api/batch/execution/1
+```
+
+Returns the overall job status (`STARTING`, `STARTED`, `COMPLETED`, `FAILED`) along with per-step details including start/end times and exit status.
+
+#### Stop a running job
+
+```http
+POST http://localhost:8080/api/batch/execution/1/stop
+```
+
+Returns HTTP 202. Stopping is asynchronous — the job may finish processing its current chunk before halting. If stopped mid-run, the model tables may be in a partially imported state; truncate the affected tables and re-run the import before proceeding.
+
+### Initialize Project Runtime Data
+
+After a successful batch import, the project configuration exists in the model tables but has no runtime data yet. The initialization step creates the root scope, sets up the model catalog (UUID links for scope models, dataset models, event models, form models, and field models), creates the initial admin user, and optionally seeds demo users and data.
+
+If the provided admin email already exists in the database, the user will not be recreated — instead, an ADMIN role for this project will be added to the existing user.
+
+```http
+POST http://localhost:8080/administration/projects/initialize
+Content-Type: application/json
+
+{
+  "projectCode": "MY_PROJECT",
+  "adminName": "Admin User",
+  "adminEmail": "admin@example.ch",
+  "adminPassword": "Password1!",
+  "withDemoUsers": false,
+  "withDemoData": false
+}
+```
+
+| Field | Required | Default | Description |
+|---|---|---|---|
+| `projectCode` | Yes | — | Code of the project to initialize. Must match a project already imported via the batch import. |
+| `adminName` | No | `Admin User` | Display name for the initial admin user |
+| `adminEmail` | Yes | — | Email of the initial admin user |
+| `adminPassword` | Yes | — | Password for the initial admin user |
+| `withDemoUsers` | No | `false` | Generate one user per profile defined in the configuration |
+| `withDemoData` | No | `false` | Seed predefined demo data — only works with the `test` study. Demo data is backdated 3 years. |
+
+Returns HTTP 200 with a confirmation message including the project code and resolved UUID, or HTTP 400 if the project code is not found (i.e. the batch import has not been run yet).
+
+### Full Initialization Workflow
+
+To set up a project from scratch:
+
+1. **Initialize the database schema:**
+```bash
+mvn spring-boot:run \
+  -Dspring-boot.run.profiles=database \
+  -Dspring-boot.run.arguments="--rodano.database.name=database_name"
+```
+
+2. **Start the API:**
+```bash
+mvn spring-boot:run
+```
+
+3. **Run the batch import:**
+```http
+POST http://localhost:8080/api/batch/import
+Content-Type: application/json
+
+{
+  "projectId": "MY_PROJECT"
+}
+```
+
+4. **Monitor until complete:**
+```http
+GET http://localhost:8080/api/batch/execution/1
+```
+
+5. **Initialize runtime data:**
+```http
+POST http://localhost:8080/administration/projects/initialize
+Content-Type: application/json
+
+{
+  "projectCode": "MY_PROJECT",
+  "adminName": "Admin User",
+  "adminEmail": "admin@example.ch",
+  "adminPassword": "Password1!"
+}
+```
+
+### Notes
+
+- The batch import must be run before initializing runtime data — the initialize endpoint will return HTTP 400 if the project code is not found in the database.
+- If you modify the JSON configuration, truncate the model tables and re-run the batch import to apply changes.
+- Each batch import execution gets a unique execution ID that can be used to monitor progress.
+- `projectId` in the import request accepts either a UUID or a project code. If a code is provided but cannot be resolved to an existing project, a random UUID is generated.
+- Demo data is only supported with the `test` study configuration.
 
 ## Configuration properties
 
