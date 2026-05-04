@@ -2,7 +2,8 @@ import {Route} from '@angular/router';
 import {AuthGuard} from '../guards/authentication.guard';
 import {AdministrationComponent} from './administration.component';
 import {ConnectedUsersComponent} from './connected-users/connected-users.component';
-import {DatabaseComponent} from './database/database.component';
+import {DatabaseConsistencyComponent} from './database-consistency/database-consistency.component';
+import {DatabaseSeedingComponent} from './database-seeding/database-seeding.component';
 import {DetailsComponent} from './details/details.component';
 import {ManagementComponent} from './management/management.component';
 import {ScheduledTasksComponent} from './scheduled-tasks/scheduled-tasks.component';
@@ -22,8 +23,12 @@ export default [
 				component: DetailsComponent
 			},
 			{
-				path: 'database',
-				component: DatabaseComponent
+				path: 'database-seeding',
+				component: DatabaseSeedingComponent
+			},
+			{
+				path: 'database-consistency',
+				component: DatabaseConsistencyComponent
 			},
 			{
 				path: 'connected-users',

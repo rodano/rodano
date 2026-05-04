@@ -1,0 +1,56 @@
+<h3>Demo users</h3>
+<p>Fill-in the database with demo users. One user per profile will be created using the base email provided.</p>
+<form
+	[formGroup]="demoUserSchemeForm"
+	(ngSubmit)="createDemoUsers()">
+	<p>
+		<mat-form-field style="width: 20rem">
+			<mat-label>Base email</mat-label>
+			<input
+				matInput
+				formControlName="baseEmail"
+				name="baseEmail" />
+		</mat-form-field>
+		&nbsp;
+		<mat-form-field style="width: 20rem">
+			<mat-label>Password</mat-label>
+			<input
+				matInput
+				formControlName="password"
+				name="password" />
+		</mat-form-field>
+		&nbsp;
+		<button
+			mat-flat-button
+			[disabled]="demoUserSchemeForm.invalid || loading()"
+			type="submit">
+			Generate
+		</button>
+	</p>
+</form>
+
+<h3>Random data</h3>
+<p>
+	Fill-in the database with randomly generated data. The scale defines the number of leaf scopes that will be created.
+</p>
+<form
+	[formGroup]="randomDataGenerationForm"
+	(ngSubmit)="generateRandomDatabaseData()">
+	<p>
+		<mat-form-field style="width: 5rem">
+			<mat-label>Scale</mat-label>
+			<input
+				matInput
+				formControlName="scale"
+				type="number"
+				name="scale" />
+		</mat-form-field>
+		&nbsp;
+		<button
+			mat-flat-button
+			[disabled]="randomDataGenerationForm.invalid || loading()"
+			type="submit">
+			Generate
+		</button>
+	</p>
+</form>

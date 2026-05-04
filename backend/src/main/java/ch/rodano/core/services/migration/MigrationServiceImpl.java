@@ -29,10 +29,6 @@ public class MigrationServiceImpl implements MigrationService {
 	 */
 	@Override
 	public Boolean run() {
-		if("DBConsistencyCheck".equals(script)) {
-			final var dbConsistencyCheck = (AbstractDatabaseMigration) context.getBean(script);
-			return dbConsistencyCheck.runConsistencyCheck();
-		}
 		final var migration = (AbstractDatabaseMigration) context.getBean(script);
 		return migration.runMigration();
 	}

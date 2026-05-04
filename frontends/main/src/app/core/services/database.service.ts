@@ -4,6 +4,7 @@ import {APIService} from './api.service';
 import {Bootstrap} from '../model/bootstrap';
 import {Observable} from 'rxjs';
 import {DemoUserScheme} from '../model/demo-user-scheme';
+import {DatabaseIssueGroup} from '@core/model/database-issue-group';
 
 @Injectable({
 	providedIn: 'root'
@@ -34,5 +35,9 @@ export class DatabaseService {
 		const params = new HttpParams()
 			.set('scale', scale);
 		return this.http.post(`${this.serviceUrl}/generate-random-data`, undefined, {params});
+	}
+
+	runDatabaseUpdate(dryRun: boolean): Observable<DatabaseIssueGroup[]> {
+		return this.http.post<DatabaseIssueGroup[]>(`${this.serviceUrl}/update`, {dryRun});
 	}
 }

@@ -1,0 +1,15 @@
+.mat-column-entity {
+	width: 8rem;
+}
+.mat-column-modelId {
+	width: 18rem;
+}
+.mat-column-type {
+	width: 14rem;
+}
+.mat-column-count {
+	width: 8rem;
+}
+.mat-column-status {
+	width: 10rem;
+}

@@ -22,11 +22,19 @@
 		</a>
 		<a
 			mat-tab-link
-			[routerLink]="['/administration', 'database']"
+			[routerLink]="['/administration', 'database-seeding']"
 			routerLinkActive
-			#database="routerLinkActive"
-			[active]="database.isActive">
-			Database
+			#databaseSeeding="routerLinkActive"
+			[active]="databaseSeeding.isActive">
+			Database seeding
+		</a>
+		<a
+			mat-tab-link
+			[routerLink]="['/administration', 'database-consistency']"
+			routerLinkActive
+			#databaseConsistency="routerLinkActive"
+			[active]="databaseConsistency.isActive">
+			Database consistency
 		</a>
 		<a
 			mat-tab-link
