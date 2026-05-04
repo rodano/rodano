@@ -65,6 +65,9 @@
 	</form>
 </div>
 
+<mat-progress-bar
+	mode="indeterminate"
+	[style.visibility]="loading() ? 'visible' : 'hidden'"></mat-progress-bar>
 <table
 	mat-table
 	matSort

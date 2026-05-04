@@ -17,6 +17,7 @@ import {DatabaseIssueGroup} from '@core/model/database-issue-group';
 import {DatabaseIssueEntity} from '@core/model/database-issue-entity';
 import {DatabaseIssueStatus} from '@core/model/database-issue-status';
 import {DatabaseIssueType} from '@core/model/database-issue-type';
+import {MatProgressBar} from '@angular/material/progress-bar';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -36,14 +37,15 @@ import {DatabaseIssueType} from '@core/model/database-issue-type';
 		MatTableModule,
 		MatTooltip,
 		MatToolbar,
-		MatToolbarRow
+		MatToolbarRow,
+		MatProgressBar
 	]
 })
 export class DatabaseConsistencyComponent implements AfterViewInit {
 	getDatabaseIssueStatusDisplay = getDatabaseIssueStatusDisplay;
 	getDatabaseIssueTypeDisplay = getDatabaseIssueTypeDisplay;
 
-	loading = signal(false);
+	readonly loading = signal(false);
 
 	readonly entityOptions = Object.values(DatabaseIssueEntity) as DatabaseIssueEntity[];
 	readonly typeOptions = Object.values(DatabaseIssueType) as DatabaseIssueType[];
