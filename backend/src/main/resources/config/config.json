@@ -24532,8 +24532,8 @@
 			"homePage": false,
 			"action": {
 				"labels": {},
-				"page": "search",
-				"context": [],
+				"page": "scopes-search",
+				"context": ["PATIENT"],
 				"parameters": {},
 				"className": "CMSAction"
 			},

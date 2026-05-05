@@ -5,12 +5,6 @@ import {ScopeModelResolver} from '../resolvers/scope-model-resolver';
 
 export default [
 	{
-		path: '',
-		canActivate: [AuthGuard],
-		component: SearchComponent
-
-	},
-	{
 		path: ':scopeModelId',
 		canActivate: [AuthGuard],
 		component: SearchComponent,

@@ -136,6 +136,4 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 			.fetchSingle()
 			.value1() > 0;
 	}
-
-	@Override
 }

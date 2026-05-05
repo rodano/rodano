@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,7 +39,7 @@ import ch.rodano.core.utils.RightsService;
 
 @Tag(name = "Scope")
 @RestController
-@RequestMapping(value = "/scopes/extended-search")
+@RequestMapping(value = "/scopes/extended-search/{scopeModelId}")
 @Transactional(readOnly = true)
 public class ExtendedScopeSearchController extends AbstractSecuredController {
 
@@ -76,7 +77,7 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 
 	@GetMapping
 	public PagedResult<ExtendedScopeSearchResultDTO> search(
-		@Parameter(description = "Scope model ID") @RequestParam final Optional<String> scopeModelId,
+		@Parameter(description = "Scope model ID") @PathVariable("scopeModelId") final String scopeModelId,
 		@Parameter(description = "Full text search on code, shortname and longname") @RequestParam final Optional<String> fullText,
 		@Parameter(description = "Scope code") @RequestParam final Optional<String> code,
 		@Parameter(description = "Scope IDs") @RequestParam final Optional<List<String>> ids,
@@ -93,6 +94,9 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
 	) {
 
+		//Validate that the scopeModelId exists (will throw NoNodeException if not found)
+		studyService.getStudy().getScopeModel(scopeModelId);
+
 		final var acl = rightsService.getACL(currentActor());
 		final var currentRoles = currentActiveRoles();
 
@@ -107,22 +111,21 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		final Optional<List<FieldModelCriterion>> fieldModelCriterionList = fieldModelCriteria.map(s -> readFromURI(s, criteriaType));
 
 		final var search = new ScopeSearch()
-					   .setCode(code.filter(StringUtils::isNotBlank))
-					   .setIds(ids)
-					   .setPks(pks)
-					   .setParentPks(parentPks)
-					   .setAncestorPks(ancestorPks)
-					   .setScopeModelId(scopeModelId)
-					   .setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, scopeModelId))
-					   .setWorkflowStates(workflowStatesMap)
-					   .setFieldModelCriteria(fieldModelCriterionList)
-					   .setLeaf(leaf)
-					   .setFullText(fullText.filter(StringUtils::isNotBlank))
-					   .setIncludeDeleted(includeDeletedFinal)
-					   .setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
-					   .setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex)
-					   .setScopeModelId(scopeModelId.isEmpty() ? Optional.ofNullable(studyService.getStudy().getLeafScopeModel().getId()) : scopeModelId);
-
+		.setCode(code.filter(StringUtils::isNotBlank))
+		.setIds(ids)
+		.setPks(pks)
+		.setParentPks(parentPks)
+		.setAncestorPks(ancestorPks)
+		.setScopeModelId(Optional.of(scopeModelId))
+		.setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, Optional.of(scopeModelId)))
+		.setWorkflowStates(workflowStatesMap)
+		.setFieldModelCriteria(fieldModelCriterionList)
+		.setLeaf(leaf)
+		.setFullText(fullText.filter(StringUtils::isNotBlank))
+		.setIncludeDeleted(includeDeletedFinal)
+		.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
+		.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
+		
 		//set sort if provided
 		sortBy.ifPresent(sort -> {
 			if(Arrays.stream(ScopeSortBy.class.getEnumConstants()).anyMatch(e -> e.name().equals(sort))) {
@@ -132,7 +135,7 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 				search.setExtendedSortBy(sort);
 			}
 		});
-		orderAscending.map(search::setSortAscending);
+		orderAscending.ifPresent(search::setSortAscending);
 
 		return extendedScopeResultService.search(search);
 	}

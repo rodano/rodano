@@ -131,8 +131,8 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 		final var now = ZonedDateTime.now();
 		final List<Condition> conditions = new ArrayList<>();
 
-		final var workflowsOnScopeModel = studyService.getStudy().getScopeModel(search.getScopeModelId().get()).getSearchableWorkflowsOnScopeModel();
-		final var searchableFieldsOnScopeModel = studyService.getStudy().getScopeModel(search.getScopeModelId().get()).getSearchableFieldsOnScopeModel();
+		final var workflowsOnScopeModel = studyService.getStudy().getScopeModel(search.getScopeModelId().get()).getSearchableWorkflows();
+		final var searchableFieldsOnScopeModel = studyService.getStudy().getScopeModel(search.getScopeModelId().get()).getSearchableFields();
 
 		final var workflowStateColumnAliases = workflowsOnScopeModel.stream()
 			.map(wf -> sqlWorkflowsStateColumnAlias(wf.getId()))

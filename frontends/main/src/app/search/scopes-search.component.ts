@@ -10,7 +10,7 @@ import {ScopeModel} from '@core/model/scope-model';
 import {Workflow} from '@core/model/workflow';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {HttpParamsService} from '@core/services/http-params.service';
-import {Router, ActivatedRoute, Routes} from '@angular/router';
+import {Router, ActivatedRoute} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {SelectScopeComponent} from './dialogs/create-scope/select-scope.component';
 import {NotificationService} from '../services/notification.service';
@@ -77,19 +77,12 @@ import {AutofocusDirective} from '../directives/autofocus.directive';
 	]
 })
 export class SearchComponent implements OnInit {
-	static readonly ROUTES: Routes = [
-		{
-			path: '',
-			component: SearchComponent
-		}
-	];
+	private static readonly ROUTE_PATH = '/scopes-search';
 
 	readonly columnsToDisplay = signal<string[]>([]);
 
 	Object = Object;
 	FieldModelType = FieldModelType;
-
-	readonly scopeModel = input<ScopeModel | undefined>();
 
 	scopeModelId: string;
 	readonly selectedScopeModel = signal<ScopeModel>({} as ScopeModel);
@@ -150,18 +143,11 @@ export class SearchComponent implements OnInit {
 		private readonly destroyRef: DestroyRef,
 		private readonly formService: FormService,
 		private readonly scopeRelationService: ScopeRelationsService
-	) {}
+	) { }
 
 	ngOnInit(): void {
-		//Get scopeModelId from URL query params
-		this.scopeModelId = this.route.snapshot.queryParams['scopeModelId'];
-
-		const providedScopeModel = this.scopeModel();
-		if(providedScopeModel) {
-			//If scopeModel is provided as input, use it and update URL
-			this.selectedScopeModel.set(providedScopeModel);
-			this.scopeModelId = providedScopeModel.id;
-		}
+		//Get scopeModelId from URL path params
+		this.scopeModelId = this.route.snapshot.params['scopeModelId'];
 
 		//Get showRemovedScopes state from URL query params
 		const showRemovedScopes = this.route.snapshot.queryParams['includeDeleted'];
@@ -183,30 +169,15 @@ export class SearchComponent implements OnInit {
 			switchMap(results => {
 				const scopeModels = results.scopeModels;
 
-				const resolvedScopeModel = this.resolveScopeModel(scopeModels);
-				if(!resolvedScopeModel) {
-					throw new Error('No scope models available');
-				}
-
+				//Use the resolved scope model from the resolver
+				const resolvedScopeModel = this.route.snapshot.data['scopeModel'];
 				this.selectedScopeModel.set(resolvedScopeModel);
-				this.scopeModelId = resolvedScopeModel.id;
-
-				const queryScopeModelId = this.route.snapshot.queryParams['scopeModelId'];
-				if(queryScopeModelId !== this.scopeModelId) {
-					const queryParams = {
-						...this.route.snapshot.queryParams,
-						scopeModelId: this.scopeModelId
-					};
-					const query = this.httpParamsService.toHttpParams(queryParams).toString();
-					this.location.replaceState(`/search?${query}`);
-				}
-
 				this.selectedScopeModelParentModel.set(scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel().defaultParentId) ?? ({} as ScopeModel));
 				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.includes('MANAGE_DELETED_DATA')) ?? false);
 
 				//Load dependent data after we have the scope model
 				return forkJoin({
-					searchableWorkflows: this.configurationService.getSearchableWorkflowsOnScope(this.selectedScopeModel()),
+					searchableWorkflows: this.configurationService.getScopeModelSearchableWorkflows(this.selectedScopeModel()),
 					parentScopes: this.meService.getScopes(undefined, true, false),
 					searchableFields: this.configurationService.getScopeModelFieldModels(this.selectedScopeModel().id, true)
 				});
@@ -238,14 +209,6 @@ export class SearchComponent implements OnInit {
 		).subscribe(({parentsWithWriteAccess}) => {
 			this.writeAccessOnParent.set(parentsWithWriteAccess.length > 0);
 		});
-	}
-
-	private resolveScopeModel(scopeModels: ScopeModel[]): ScopeModel | undefined {
-		if(scopeModels.length === 0) {
-			return undefined;
-		}
-
-		return scopeModels.find(sm => sm.id === this.scopeModelId) ?? scopeModels.find(sm => sm.id === this.selectedScopeModel().id) ?? scopeModels.find(sm => sm.leaf) ?? scopeModels[0];
 	}
 
 	private buildMapsAndColumns(): void {
@@ -340,8 +303,12 @@ export class SearchComponent implements OnInit {
 
 	search(): void {
 		const scopeSearch = this.generateScopeSearch();
-		const path = this.httpParamsService.toHttpParams(scopeSearch);
-		this.location.replaceState(`/search?${path.toString()}`);
+		//Remove scopeModelId from query params since it's in the path
+		delete (scopeSearch as any).scopeModelId;
+		const query = this.httpParamsService.toHttpParams(scopeSearch);
+		const queryString = query.toString();
+		const path = queryString ? `?${queryString}` : '';
+		this.location.replaceState(`${SearchComponent.ROUTE_PATH}/${this.scopeModelId}${path}`);
 		this.searchTrigger$.next(scopeSearch);
 	}
 
@@ -427,7 +394,7 @@ export class SearchComponent implements OnInit {
 			)
 		).subscribe(({newScope, forms}) => {
 			if(forms.length > 0) {
-				this.router.navigate(['crf', newScope.pk, 'form', forms[0].pk]);
+				this.router.navigate(['crf', newScope.pk, 'forms', forms[0].pk]);
 			}
 			else {
 				this.router.navigate(['crf', newScope.pk]);

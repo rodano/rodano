@@ -347,22 +347,17 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
-	public List<Workflow> getAggregatedWorkflowsOnScopeModel() {
+	public List<Workflow> getAggregatedWorkflows() {
 		return this.getWorkflows().stream().filter(Workflow::isAggregator).toList();
 	}
 
 	@JsonIgnore
-	public List<Workflow> getWorkflowsOnScopeModel() {
-		return this.getWorkflows().stream().filter(workflow -> !workflow.isAggregator()).toList();
-	}
-
-	@JsonIgnore
-	public List<Workflow> getSearchableWorkflowsOnScopeModel() {
+	public List<Workflow> getSearchableWorkflows() {
 		return this.getWorkflows().stream().filter(workflow -> !workflow.isAggregator()).filter(Workflow::isSearchable).toList();
 	}
 
 	@JsonIgnore
-	public List<FieldModel> getSearchableFieldsOnScopeModel() {
+	public List<FieldModel> getSearchableFields() {
 		return this.getDatasetModels().stream().flatMap(d -> d.getFieldModels().stream()).filter(FieldModel::isSearchable).toList();
 	}
 
@@ -395,7 +390,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		if(getParentIds().contains(model.getId())) {
 			models.add(model);
 		}
-		else{
+		else {
 			for(final var parent : getScopeModelParents()) {
 				for(final var branch : parent.getBranch(model)) {
 					if(!models.contains(branch)) {

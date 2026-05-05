@@ -32,7 +32,15 @@ export class ScopeService {
 	}
 
 	extendedSearch(search: ScopeSearch): Observable<PagedResultExtendedScopeSearchResult> {
-		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/scopes/extended-search`, {params: this.httpParamsService.toHttpParams(search)});
+		const scopeModelId = search.scopeModelId;
+		if(!scopeModelId) {
+			throw new Error('scopeModelId is required for extended search');
+		}
+		//Create a copy without scopeModelId for query params
+		const searchCopy = {...search};
+		delete searchCopy.scopeModelId;
+		const params = this.httpParamsService.toHttpParams(searchCopy);
+		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/scopes/extended-search/${scopeModelId}`, {params});
 	}
 
 	getExportUrl(search: ScopeSearch): string {

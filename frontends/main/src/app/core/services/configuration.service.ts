@@ -90,12 +90,12 @@ export class ConfigurationService {
 		return this.getStudy().pipe(map(study => study.workflows));
 	}
 
-	getWorkflowsOnScope(scopeModel: ScopeModel): Observable<Workflow[]> {
-		return this.http.get<Workflow[]>(`${this.serviceUrl}/scope-model/${scopeModel.id}/workflows`);
+	getScopeModelWorkflows(scopeModel: ScopeModel, searchable = false): Observable<Workflow[]> {
+		return this.http.get<Workflow[]>(`${this.serviceUrl}/scope-model/${scopeModel.id}/workflows?searchable=${searchable}`);
 	}
 
-	getSearchableWorkflowsOnScope(scopeModel: ScopeModel): Observable<Workflow[]> {
-		return this.getWorkflowsOnScope(scopeModel).pipe(
+	getScopeModelSearchableWorkflows(scopeModel: ScopeModel): Observable<Workflow[]> {
+		return this.getScopeModelWorkflows(scopeModel).pipe(
 			map(workflows => workflows.filter(w => w.searchable))
 		);
 	}

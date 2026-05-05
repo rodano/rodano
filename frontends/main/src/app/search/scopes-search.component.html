@@ -1,3 +1,8 @@
+<mat-progress-bar
+	mode="indeterminate"
+	[style.visibility]="loading() ? 'visible' : 'hidden'">
+</mat-progress-bar>
+
 <div class="table-container">
 	<table
 		mat-table
@@ -6,64 +11,62 @@
 		<tr
 			*matNoDataRow
 			class="no-data-row">
-			<td [attr.colspan]="columnsToDisplay().length">
-				{{ loading() ? 'Loading data...' : 'No data found' }}
-			</td>
+			<td [attr.colspan]="columnsToDisplay().length">No data</td>
 		</tr>
 		<form [formGroup]="searchForm">
+			<ng-container
+				matColumnDef="parentScopeCode"
+				[sticky]="true">
+				<th
+					mat-header-cell
+					*matHeaderCellDef>
+					<mat-form-field>
+						<mat-label>{{ selectedScopeModelParentModel().shortname | localizeMap }}</mat-label>
+						<mat-select
+							[formControl]="parentScopeControl"
+							multiple>
+							@for (parentScope of parentScopes(); track parentScope.pk) {
+								<mat-option [value]="parentScope.pk">
+									{{ parentScope.shortname }}
+								</mat-option>
+							}
+						</mat-select>
+					</mat-form-field>
+				</th>
+				<td
+					mat-cell
+					*matCellDef="let result"
+					class="value-cell">
+					{{ result.parentScope.code }}
+				</td>
+			</ng-container>
+
+			<ng-container
+				matColumnDef="scopeCode"
+				[sticky]="true">
+				<th
+					mat-header-cell
+					*matHeaderCellDef
+					mat-sort-header>
+					<mat-form-field (click)="$event.stopPropagation()">
+						<input
+							matInput
+							type="text"
+							formControlName="scopeCode"
+							appAutofocus
+							[placeholder]="selectedScopeModel().shortname | localizeMap" />
+					</mat-form-field>
+				</th>
+				<td
+					mat-cell
+					*matCellDef="let result"
+					class="value-cell">
+					{{ result.shortname }}
+				</td>
+			</ng-container>
+
 			@for (column of columnsToDisplay(); track column) {
-				@if (column === 'parentScopeCode') {
-					<ng-container
-						matColumnDef="parentScopeCode"
-						[sticky]="true">
-						<th
-							mat-header-cell
-							*matHeaderCellDef>
-							<mat-form-field>
-								<mat-label>{{ selectedScopeModelParentModel().shortname | localizeMap }}</mat-label>
-								<mat-select
-									[formControl]="parentScopeControl"
-									multiple>
-									@for (parentScope of parentScopes(); track parentScope.pk) {
-										<mat-option [value]="parentScope.pk">
-											{{ parentScope.shortname }}
-										</mat-option>
-									}
-								</mat-select>
-							</mat-form-field>
-						</th>
-						<td
-							mat-cell
-							*matCellDef="let result"
-							class="value-cell">
-							{{ result.parentScope.code }}
-						</td>
-					</ng-container>
-				} @else if (column === 'scopeCode') {
-					<ng-container
-						matColumnDef="scopeCode"
-						[sticky]="true">
-						<th
-							mat-header-cell
-							*matHeaderCellDef
-							mat-sort-header>
-							<mat-form-field (click)="$event.stopPropagation()">
-								<input
-									matInput
-									type="text"
-									formControlName="scopeCode"
-									appAutofocus
-									[placeholder]="selectedScopeModel().shortname | localizeMap" />
-							</mat-form-field>
-						</th>
-						<td
-							mat-cell
-							*matCellDef="let result"
-							class="value-cell">
-							{{ result.shortname }}
-						</td>
-					</ng-container>
-				} @else {
+				@if (column !== 'parentScopeCode' && column !== 'scopeCode') {
 					<ng-container [matColumnDef]="column">
 						<th
 							mat-header-cell
@@ -165,36 +168,37 @@
 				*matRowDef="let result; columns: columnsToDisplay()"></tr>
 		</form>
 	</table>
-	<mat-divider></mat-divider>
-
-	<mat-toolbar>
-		<mat-toolbar-row>
-			<button
-				mat-flat-button
-				(click)="createScope()"
-				[disabled]="!writeAccessOnParent()"
-				type="button">
-				<mat-icon>add</mat-icon>
-				New {{ selectedScopeModel().shortname | localizeMap | lowercase }}
-			</button>
-
-			<span class="toolbar-spacer"></span>
-
-			@if (hasManageDeletedDataFeature()) {
-				<mat-checkbox
-					class="filter-options"
-					[formControl]="showRemovedScopesControl">
-					Show removed {{ selectedScopeModel().pluralShortname | localizeMap | lowercase }}
-				</mat-checkbox>
-			}
-			<button
-				mat-flat-button
-				(click)="resetSearchCriteria()"
-				type="button">
-				<mat-icon>refresh</mat-icon>
-				Clear filters
-			</button>
-			<mat-paginator [length]="resultsLength()"></mat-paginator>
-		</mat-toolbar-row>
-	</mat-toolbar>
 </div>
+
+<mat-divider></mat-divider>
+
+<mat-toolbar>
+	<mat-toolbar-row>
+		<button
+			mat-flat-button
+			(click)="createScope()"
+			[disabled]="!writeAccessOnParent()"
+			type="button">
+			<mat-icon>add</mat-icon>
+			New {{ selectedScopeModel().shortname | localizeMap | lowercase }}
+		</button>
+
+		<span class="toolbar-spacer"></span>
+
+		@if (hasManageDeletedDataFeature()) {
+			<mat-checkbox
+				class="filter-options"
+				[formControl]="showRemovedScopesControl">
+				Show removed {{ selectedScopeModel().pluralShortname | localizeMap | lowercase }}
+			</mat-checkbox>
+		}
+		<button
+			mat-flat-button
+			(click)="resetSearchCriteria()"
+			type="button">
+			<mat-icon>refresh</mat-icon>
+			Clear filters
+		</button>
+		<mat-paginator [length]="resultsLength()"></mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>
