@@ -13,9 +13,29 @@ import ch.rodano.core.model.event.Timeframe;
 
 public interface DatasetDAOService {
 
+	/**
+	 * Get the dataset associated with a given primary key
+	 * @param pk
+	 * @return The dataset associated with the primary key
+	 */
 	Dataset getDatasetByPk(Long pk);
 
-	List<Dataset> getDatasetByPks(List<Long> pks);
+	/**
+	 * Get the datasets associated with given primary keys
+	 * @param pks
+	 * @return The datasets associated with the given primary keys
+	 */
+	List<Dataset> getDatasetsByPks(List<Long> pks);
+
+	/**
+	 * Search for datasets matching the provided criteria
+	 * @param scopePk The primary key of the scope
+	 * @param eventPk The primary key of the event. When empty, look for datasets that are directly attached to the scope.
+	 * @param includeDeleted Whether to include deleted datasets
+	 * @param datasetModelIds The dataset model ids to filter by
+	 * @return The list of datasets matching the criteria
+	 */
+	List<Dataset> search(Long scopePk, Optional<Long> eventPk, boolean includeDeleted, Optional<Collection<String>> datasetModelIds);
 
 	/**
 	 * Get all the datasets (including deleted) matching the provided dataset model ids
@@ -33,6 +53,13 @@ public interface DatasetDAOService {
 	 */
 	List<Dataset> getDatasetsByScopePk(Long scopePk);
 
+	/**
+	 * Get the datasets associated with a given scope pk and dataset model ids
+	 *
+	 * @param scopePk The scope pk
+	 * @param datasetModelIds The dataset model ids
+	 * @return The datasets associated with the scope pk and dataset model ids
+	 */
 	List<Dataset> getDatasetsByScopePkAndDatasetModelIds(Long scopePk, Collection<String> datasetModelIds);
 
 	/**
@@ -44,10 +71,10 @@ public interface DatasetDAOService {
 	List<Dataset> getAllDatasetsByScopePk(Long scopePk);
 
 	/**
-	 * Get all the datasets (including deleted) associated with the given scope pk
+	 * Get all the datasets (including deleted) associated with the given scope pk and dataset model ids
 	 * @param scopePk The scope pk
 	 * @param datasetModelIds The dataset model ids
-	 * @return The datasets associated with the scope pk
+	 * @return The datasets associated with the scope pk and dataset model ids
 	 */
 	List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(Long scopePk, Collection<String> datasetModelIds);
 
@@ -59,6 +86,13 @@ public interface DatasetDAOService {
 	 */
 	List<Dataset> getDatasetsByEventPk(Long eventPk);
 
+	/**
+	 * Get the datasets associated with a given event pk and dataset model ids
+	 *
+	 * @param eventPk The event pk
+	 * @param datasetModelIds The dataset model ids
+	 * @return The datasets associated with the event pk and dataset model ids
+	 */
 	List<Dataset> getDatasetsByEventPkAndDatasetModelIds(Long eventPk, Collection<String> datasetModelIds);
 
 	/**
@@ -70,10 +104,10 @@ public interface DatasetDAOService {
 	List<Dataset> getAllDatasetsByEventPk(Long eventPk);
 
 	/**
-	 * Get all the datasets (including deleted) associated with the given event pk
+	 * Get all the datasets (including deleted) associated with the given event pk and dataset model ids
 	 * @param eventPk The pk of the event
 	 * @param datasetModelIds The dataset model ids
-	 * @return The datasets associated with the event pk
+	 * @return The datasets associated with the event pk and dataset model ids
 	 */
 	List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(Long eventPk, Collection<String> datasetModelIds);
 

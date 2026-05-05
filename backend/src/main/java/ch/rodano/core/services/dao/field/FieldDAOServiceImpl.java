@@ -138,9 +138,4 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 		return find(query);
 	}
 
-	public List<Field> getSearchableFields(final Collection<Long> scopePk, final Collection<String> fieldModelIds){
-		final var query = create.selectFrom(FIELD).where(FIELD.FIELD_MODEL_ID.in(fieldModelIds).and(FIELD.dataset().SCOPE_FK.in(scopePk)));
-		return find(query);
-	}
-
 }

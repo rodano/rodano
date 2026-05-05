@@ -124,7 +124,7 @@ public class DatasetController extends AbstractSecuredController {
 		event.ifPresent(e -> acl.checkRight(e.getEventModel(), Rights.READ));
 
 		final var datasetModels = datasetModelIds
-			.map(d -> (Collection<DatasetModel>) d.stream().map(i -> studyService.getStudy().getDatasetModel(i)).collect(Collectors.toList()));
+			.map(d -> (Collection<DatasetModel>) d.stream().map(i -> studyService.getStudy().getDatasetModel(i)).toList());
 		final var datasets = datasetService.search(scope, event, datasetModels, acl);
 
 		return datasets

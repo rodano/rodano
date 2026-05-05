@@ -2,10 +2,12 @@ package ch.rodano.core.services.dao.dataset;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
 import org.jooq.Table;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -59,20 +61,8 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 	}
 
 	@Override
-	public List<Dataset> getDatasetByPks(final List<Long> pks) {
+	public List<Dataset> getDatasetsByPks(final List<Long> pks) {
 		final var query = create.selectFrom(DATASET).where(DATASET.PK.in(pks));
-		return find(query);
-	}
-
-	@Override
-	public List<Dataset> getDatasetsByScopePk(final Long scopePk) {
-		final var query = create.selectFrom(DATASET).where(DATASET.SCOPE_FK.eq(scopePk).and(DATASET.DELETED.isFalse()));
-		return find(query);
-	}
-
-	@Override
-	public List<Dataset> getDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
-		final var query = create.selectFrom(DATASET).where(DATASET.SCOPE_FK.eq(scopePk).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds)).and(DATASET.DELETED.isFalse()));
 		return find(query);
 	}
 
@@ -82,40 +72,61 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 		return find(query);
 	}
 
+	private List<Dataset> search(final Optional<Long> scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> datasetModelIds) {
+		final var query = create.selectFrom(DATASET).where(
+			scopePk.map(DATASET.SCOPE_FK::eq).orElse(DSL.noCondition())
+				.and(eventPk.map(DATASET.EVENT_FK::eq).orElse(DATASET.EVENT_FK.isNull()))
+				.and(includeDeleted ? DSL.noCondition() : DATASET.DELETED.isFalse())
+				.and(datasetModelIds.map(DATASET.DATASET_MODEL_ID::in).orElse(DSL.noCondition()))
+		);
+		return find(query);
+	}
+
+	@Override
+	public List<Dataset> search(final Long scopePk, final Optional<Long> eventPk, final boolean includeDeleted, final Optional<Collection<String>> datasetModelIds) {
+		return search(Optional.of(scopePk), eventPk, includeDeleted, datasetModelIds);
+	}
+
+	//scope
+	@Override
+	public List<Dataset> getDatasetsByScopePk(final Long scopePk) {
+		return search(Optional.of(scopePk), Optional.empty(), false, Optional.empty());
+	}
+
+	@Override
+	public List<Dataset> getDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
+		return search(Optional.of(scopePk), Optional.empty(), false, Optional.of(datasetModelIds));
+	}
+
 	@Override
 	public List<Dataset> getAllDatasetsByScopePk(final Long scopePk) {
-		final var query = create.selectFrom(DATASET).where(DATASET.SCOPE_FK.eq(scopePk));
-		return find(query);
+		return search(Optional.of(scopePk), Optional.empty(), true, Optional.empty());
 	}
 
 	@Override
 	public List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
-		final var query = create.selectFrom(DATASET).where(DATASET.SCOPE_FK.eq(scopePk)).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds));
-		return find(query);
+		return search(Optional.of(scopePk), Optional.empty(), true, Optional.of(datasetModelIds));
 	}
 
+	//event
 	@Override
 	public List<Dataset> getDatasetsByEventPk(final Long eventPk) {
-		final var query = create.selectFrom(DATASET).where(DATASET.EVENT_FK.eq(eventPk).and(DATASET.DELETED.isFalse()));
-		return find(query);
-	}
-
-	@Override
-	public List<Dataset> getAllDatasetsByEventPk(final Long eventPk) {
-		final var query = create.selectFrom(DATASET).where(DATASET.EVENT_FK.eq(eventPk));
-		return find(query);
+		return search(Optional.empty(), Optional.of(eventPk), false, Optional.empty());
 	}
 
 	@Override
 	public List<Dataset> getDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<String> datasetModelIds) {
-		final var query = create.selectFrom(DATASET).where(DATASET.EVENT_FK.eq(eventPk).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds)).and(DATASET.DELETED.isFalse()));
-		return find(query);
+		return search(Optional.empty(), Optional.of(eventPk), false, Optional.of(datasetModelIds));
+	}
+
+	@Override
+	public List<Dataset> getAllDatasetsByEventPk(final Long eventPk) {
+		return search(Optional.empty(), Optional.of(eventPk), true, Optional.empty());
 	}
 
 	@Override
 	public List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<String> datasetModelIds) {
-		final var query = create.selectFrom(DATASET).where(DATASET.EVENT_FK.eq(eventPk).and(DATASET.DATASET_MODEL_ID.in(datasetModelIds)));
-		return find(query);
+		return search(Optional.empty(), Optional.of(eventPk), true, Optional.of(datasetModelIds));
 	}
 
 	@Override

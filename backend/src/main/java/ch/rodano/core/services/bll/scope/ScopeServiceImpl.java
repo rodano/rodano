@@ -48,7 +48,6 @@ import ch.rodano.core.services.bll.form.FormService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
-import ch.rodano.core.services.dao.event.EventDAOService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.rule.RuleService;
@@ -60,7 +59,6 @@ public class ScopeServiceImpl implements ScopeService {
 	private final StudyService studyService;
 	private final RuleService ruleService;
 	private final EventService eventService;
-	private final EventDAOService eventDAOService;
 	private final DatasetService datasetService;
 	private final FormService formService;
 	private final ScopeDAOService scopeDAOService;
@@ -76,7 +74,6 @@ public class ScopeServiceImpl implements ScopeService {
 		final StudyService studyService,
 		final RuleService ruleService,
 		final EventService eventService,
-		final EventDAOService eventDAOService,
 		final DatasetService datasetService,
 		final FormService formService,
 		final FieldDAOService fieldDAOService,
@@ -87,7 +84,6 @@ public class ScopeServiceImpl implements ScopeService {
 	) {
 		this.studyService = studyService;
 		this.ruleService = ruleService;
-		this.eventDAOService = eventDAOService;
 		this.eventService = eventService;
 		this.datasetService = datasetService;
 		this.formService = formService;
@@ -372,8 +368,8 @@ public class ScopeServiceImpl implements ScopeService {
 		for(final var dataset : datasetService.getAll(scope)) {
 			datasetService.validateFieldsOnDataset(scope, Optional.empty(), dataset, context, rationale);
 		}
-		for(final var event : eventService.getAllIncludingRemoved(scope)) {
-			if(!event.getDeleted() && !event.getLocked()) {
+		for(final var event : eventService.getAll(scope)) {
+			if(!event.getLocked()) {
 				eventService.validate(scope, event, context, rationale);
 			}
 		}
@@ -408,20 +404,12 @@ public class ScopeServiceImpl implements ScopeService {
 
 	@Override
 	public Scope get(final Form form) {
-		if(form.getScopeFk() != null) {
-			return scopeDAOService.getScopeByPk(form.getScopeFk());
-		}
-		final var event = eventDAOService.getEventByPk(form.getEventFk());
-		return get(event);
+		return scopeDAOService.getScopeByPk(form.getScopeFk());
 	}
 
 	@Override
 	public Scope get(final Dataset dataset) {
-		if(dataset.getScopeFk() != null) {
-			return scopeDAOService.getScopeByPk(dataset.getScopeFk());
-		}
-		final var event = eventDAOService.getEventByPk(dataset.getEventFk());
-		return get(event);
+		return scopeDAOService.getScopeByPk(dataset.getScopeFk());
 	}
 
 	@Override

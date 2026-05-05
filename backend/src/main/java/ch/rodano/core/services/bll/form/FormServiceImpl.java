@@ -17,7 +17,7 @@ import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
-import ch.rodano.core.model.exception.LockedObjectException;
+import ch.rodano.core.model.exception.InconsistentStateDetectedException;
 import ch.rodano.core.model.exception.MissingDataException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.form.Form;
@@ -25,6 +25,7 @@ import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.workflow.WorkflowStatus;
 import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.field.FieldService;
+import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.form.FormDAOService;
@@ -33,6 +34,7 @@ import ch.rodano.core.utils.UtilsService;
 
 @Service
 public class FormServiceImpl implements FormService {
+	private final StudyService studyService;
 	private final FormDAOService formDAOService;
 	private final DatasetService datasetService;
 	private final FieldService fieldService;
@@ -41,6 +43,7 @@ public class FormServiceImpl implements FormService {
 	private final UtilsService utilsService;
 
 	public FormServiceImpl(
+		final StudyService studyService,
 		final FormDAOService formDAOService,
 		final DatasetService datasetService,
 		final FieldService fieldService,
@@ -48,6 +51,7 @@ public class FormServiceImpl implements FormService {
 		final FormContentService formContentService,
 		final UtilsService utilsService
 	) {
+		this.studyService = studyService;
 		this.formDAOService = formDAOService;
 		this.datasetService = datasetService;
 		this.fieldService = fieldService;
@@ -74,55 +78,46 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public Form create(final Scope scope, final FormModel formModel, final DatabaseActionContext context, final String rationale) {
-		//check that scope is not locked
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
+		return create(scope, Optional.empty(), formModel, context, rationale);
+	}
 
-		//check that the form model is allowed for the scope model
-		if(!scope.getScopeModel().getFormModelIds().contains(formModel.getId())) {
-			throw new NoRespectForConfigurationException(
-				String.format(
-					"Form model %s is not allowed for the scope model %s", formModel.getId(), scope.getScopeModelId()
-				)
-			);
+	@Override
+	public Form create(final Scope scope, final Event event, final FormModel formModel, final DatabaseActionContext context, final String rationale) {
+		return create(scope, Optional.of(event), formModel, context, rationale);
+	}
+
+	private Form create(final Scope scope, final Optional<Event> event, final FormModel formModel, final DatabaseActionContext context, final String rationale) {
+		utilsService.checkNotDeleted(scope);
+		event.ifPresent(utilsService::checkNotDeleted);
+
+		utilsService.checkNotLocked(scope);
+		event.ifPresent(utilsService::checkNotLocked);
+
+		if(event.isEmpty()) {
+			//check that the form model is allowed for the scope model
+			if(!scope.getScopeModel().getFormModelIds().contains(formModel.getId())) {
+				throw new NoRespectForConfigurationException(
+					String.format(
+						"Form model %s is not allowed for the scope model %s", formModel.getId(), scope.getScopeModelId()
+					)
+				);
+			}
+		}
+		else {
+			//check that the form model is allowed for the event model
+			if(!event.get().getEventModel().getFormModelIds().contains(formModel.getId())) {
+				throw new NoRespectForConfigurationException(
+					String.format(
+						"Form model %s is not allowed for the event model %s", formModel.getId(), event.get().getEventModelId()
+					)
+				);
+			}
 		}
 
 		final var form = new Form();
 		form.setFormModel(formModel);
 		form.setScopeFk(scope.getPk());
-
-		final var enhancedRationale = StringUtils.isBlank(rationale) ? "Create form" : "Create form: " + rationale;
-
-		formDAOService.saveForm(form, context, enhancedRationale);
-		final var family = new DataFamily(scope, form);
-		workflowStatusService.createAll(family, form, Collections.emptyMap(), context, enhancedRationale);
-
-		return form;
-	}
-
-	@Override
-	public Form create(final Scope scope, final Event event, final FormModel formModel, final DatabaseActionContext context, final String rationale) {
-		//check that scope and event are not locked
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
-		if(event.getLocked()) {
-			throw new LockedObjectException(event);
-		}
-
-		//check that the form model is allowed for the event model
-		if(!event.getEventModel().getFormModelIds().contains(formModel.getId())) {
-			throw new NoRespectForConfigurationException(
-				String.format(
-					"Form model %s is not allowed for the event model %s", formModel.getId(), event.getEventModelId()
-				)
-			);
-		}
-
-		final var form = new Form();
-		form.setFormModel(formModel);
-		form.setEventFk(event.getPk());
+		event.map(Event::getPk).ifPresent(form::setEventFk);
 
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? "Create form" : "Create form: " + rationale;
 
@@ -198,24 +193,26 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public List<Form> search(final Scope scope, final Optional<Event> event, final ACL acl) {
+		final var formModelIds = this.studyService.getStudy().getFormModels().stream().filter(fm -> acl.hasRight(fm, Rights.READ)).map(FormModel::getId).toList();
+		if(formModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
-		final List<Form> forms;
-		if(includeDeleted) {
-			forms = event.isPresent() ? getAllIncludingRemoved(event.get()) : getAllIncludingRemoved(scope);
-		}
-		else {
-			forms = event.isPresent() ? getAll(event.get()) : getAll(scope);
-		}
-		return forms.stream()
-			//TOOD add a date
-			.filter(f -> acl.hasRight(f.getFormModel(), Rights.READ))
-			.sorted()
-			.toList();
+		final var forms = new ArrayList<>(
+			formDAOService.search(
+				scope.getPk(),
+				event.map(Event::getPk),
+				includeDeleted,
+				Optional.of(formModelIds)
+			)
+		);
+		Collections.sort(forms);
+		return forms;
 	}
 
 	@Override
 	public List<Form> getAllIncludingRemoved(final Scope scope) {
-		return formDAOService.getFormsByScopePkIncludingRemoved(scope.getPk());
+		return formDAOService.getAllFormsByScopePk(scope.getPk());
 	}
 
 	@Override
@@ -224,17 +221,20 @@ public class FormServiceImpl implements FormService {
 	}
 
 	@Override
-	public Form get(final Scope scope, final String formId) {
-		final var form = formDAOService.getFormByScopePkAndFormModelId(scope.getPk(), formId);
-		if(formId != null) {
-			return form;
+	public Form get(final Scope scope, final FormModel formModel) {
+		final var forms = formDAOService.getFormsByScopePkAndFormModelIds(scope.getPk(), Collections.singletonList(formModel.getId()));
+		if(forms.isEmpty()) {
+			throw new MissingDataException(String.format("No form with model id %s in scope %s", formModel.getId(), scope.getCode()));
 		}
-		throw new MissingDataException(String.format("No form with id %s for scope %s", formId, scope.getCode()));
+		if(forms.size() > 1) {
+			throw new InconsistentStateDetectedException(String.format("Only one form with model id %s should exist in scope %s", formModel.getId(), scope.getCode()));
+		}
+		return forms.getFirst();
 	}
 
 	@Override
 	public List<Form> getAllIncludingRemoved(final Event event) {
-		return formDAOService.getFormsByEventPkIncludingRemoved(event.getPk());
+		return formDAOService.getAllFormsByEventPk(event.getPk());
 	}
 
 	@Override
@@ -243,12 +243,12 @@ public class FormServiceImpl implements FormService {
 	}
 
 	@Override
-	public Form get(final Event event, final String formId) {
-		final var form = formDAOService.getFormByEventPkAndFormModelId(event.getPk(), formId);
-		if(formId != null) {
-			return form;
+	public Form get(final Event event, final FormModel formModel) {
+		final var forms = formDAOService.getFormsByEventPkAndFormModelIds(event.getPk(), Collections.singletonList(formModel.getId()));
+		if(forms.isEmpty()) {
+			throw new MissingDataException(String.format("No form with model id %s in event %s", formModel.getId(), event.getEventModelId()));
 		}
-		throw new MissingDataException(String.format("No form with id %s for event %s", formId, event.getEventModelId()));
+		return forms.get(0);
 	}
 
 	@Override

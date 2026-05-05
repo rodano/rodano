@@ -91,9 +91,9 @@ public interface FormService {
 	 * Search for forms for the given scope and event and the given ACL.
 	 *
 	 * @param scope The scope
-	 * @param event The optional event
+	 * @param event The optional event. When empty, look for forms that are directly attached to the scope.
 	 * @param acl The ACL
-	 * @return Events associated with the scope
+	 * @return Forms associated with the scope or one of its events, filtered by the ACL
 	 */
 	List<Form> search(Scope scope, Optional<Event> event, ACL acl);
 
@@ -101,13 +101,13 @@ public interface FormService {
 
 	List<Form> getAll(Scope scope);
 
-	Form get(Scope scope, String formId);
+	Form get(Scope scope, FormModel formModel);
 
 	List<Form> getAllIncludingRemoved(Event event);
 
 	List<Form> getAll(Event event);
 
-	Form get(Event event, String formId);
+	Form get(Event event, FormModel formModel);
 
 	Optional<Form> get(WorkflowStatus workflowStatus);
 }

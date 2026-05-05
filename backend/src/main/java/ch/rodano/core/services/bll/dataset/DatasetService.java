@@ -167,12 +167,12 @@ public interface DatasetService {
 	Dataset get(Field field);
 
 	/**
-	 * Search for datasets matching the criteria and the provided ACL
+	 * Search for datasets for the given scope and event and the provided ACL
 	 * @param scope The scope
-	 * @param event The optional event
+	 * @param event The optional event. When empty, look for datasets that are directly attached to the scope.
 	 * @param datasetModels An optional filter on dataset models
-	 * @param acl The ACL for the scope
-	 * @return
+	 * @param acl The ACL
+	 * @return Datasets associated with the scope or one of its events, filtered by the ACL
 	 */
 	List<Dataset> search(Scope scope, Optional<Event> event, Optional<Collection<DatasetModel>> datasetModels, ACL acl);
 

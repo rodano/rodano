@@ -12,6 +12,7 @@ create table internal_patch (
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 insert into internal_patch (script, date, context, name) values (179, now(3), 'Remove country from user', 'db_update_179.sql');
+insert into internal_patch (script, date, context, name) values (180, now(3), 'Denormalize scope fk property on datasets and forms', 'db_update_180.sql');
 
 /***********************************
 *                                  *
@@ -140,7 +141,7 @@ create table dataset (
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	dataset_model_id varchar(100) not null,
 	constraint pk_dataset primary key (pk),
@@ -159,7 +160,7 @@ create table dataset_audit (
 	audit_object_fk bigint(20) not null,
 	id varchar(200) not null,
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	dataset_model_id varchar(100) not null,
 	constraint pk_dataset_audit primary key (pk)
@@ -202,7 +203,7 @@ create table form (
 	creation_time datetime(3) not null default now(3),
 	last_update_time datetime(3) not null default now(3),
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	form_model_id varchar(100) not null,
 	constraint pk_form primary key (pk)
@@ -219,7 +220,7 @@ create table form_audit (
 	audit_context text not null,
 	audit_object_fk bigint(20) not null,
 	deleted boolean not null default false,
-	scope_fk bigint(20) default null,
+	scope_fk bigint(20) not null,
 	event_fk bigint(20) default null,
 	form_model_id varchar(100) not null,
 	constraint pk_form_audit primary key (pk)

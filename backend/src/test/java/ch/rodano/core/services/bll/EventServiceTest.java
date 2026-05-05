@@ -355,7 +355,7 @@ public class EventServiceTest extends DatabaseTest {
 		}
 
 		//check number of fields in first form
-		final var form = formService.get(baselineVisit, "STUDY_ENTRY");
+		final var form = formService.get(baselineVisit, study.getFormModel("STUDY_ENTRY"));
 		final var formContent = formContentService.generateFormContent(patient, Optional.of(baselineVisit), form);
 		assertEquals(4, formContent.getAllNonDeletedFields().size());
 

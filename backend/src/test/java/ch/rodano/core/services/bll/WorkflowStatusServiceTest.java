@@ -133,10 +133,10 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		//find every scope-related workflow statuses created by this operation
 		final List<WorkflowStatus> recordedWorkflowStatuses = new ArrayList<>();
 		for(final Scope scope : scopes) {
+			recordedWorkflowStatuses.addAll(workflowStatusService.getAll(scope));
 			for(final var form : formService.getAll(scope)) {
 				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(form));
 			}
-			recordedWorkflowStatuses.addAll(workflowStatusService.getAll(scope));
 			for(final var event : eventService.getAll(scope)) {
 				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(event));
 				for(final var form : formService.getAll(event)) {
@@ -165,7 +165,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		final var foundWorkflowStatuses = workflowStatusService.search(predicate);
 
 		//the results should be the same
-		assertEquals(recordedWorkflowStatuses.size(), foundWorkflowStatuses.getPaging().total());
+		assertEquals(foundWorkflowStatuses.getPaging().total(), recordedWorkflowStatuses.size());
 
 		final var recordedWorkflowStatusPks = recordedWorkflowStatuses.stream()
 			.map(WorkflowStatus::getPk)
@@ -175,7 +175,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 			.map(WorkflowStatus::getPk)
 			.sorted()
 			.toArray();
-		assertArrayEquals(recordedWorkflowStatusPks, foundWorkflowStatusPks);
+		assertArrayEquals(foundWorkflowStatusPks, recordedWorkflowStatusPks);
 	}
 
 	@Test
@@ -463,7 +463,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		);
 
 		//form
-		final var form = formService.get(baselineVisit, "STUDY_ENTRY");
+		final var form = formService.get(baselineVisit, studyService.getStudy().getFormModel("STUDY_ENTRY"));
 
 		//get state
 		assertEquals(formReporting.getInitialStateId(), workflowStatusService.getMostRecent(form, formReporting).get().getStateId());
@@ -496,7 +496,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		// upon empty cache and null key, returned null : ok behavior ???
 
 		//form
-		final var form = formService.get(baselineEvent, "STUDY_ENTRY");
+		final var form = formService.get(baselineEvent, studyService.getStudy().getFormModel("STUDY_ENTRY"));
 		final var formReportingWS = workflowStatusService.getMostRecent(form, formReporting);
 		final var formWorkflowable = workflowStatusService.getWorkflowable(formReportingWS.get());
 

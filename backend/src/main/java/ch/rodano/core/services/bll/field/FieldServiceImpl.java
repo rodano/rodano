@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -383,20 +382,6 @@ public class FieldServiceImpl implements FieldService {
 	public Optional<Field> get(final WorkflowStatus workflowStatus) {
 		//workflow status may not be linked to a field
 		return Optional.ofNullable(workflowStatus.getFieldFk()).map(fieldDAOService::getFieldByPk);
-	}
-
-	public List<Field> getSearchableFieldsOnScopes(final List<Scope> scopes) {
-		// searchablefieldModels
-		final var searchableFieldModel = studyService.getStudy().getLeafScopeModel().getDatasetModels().stream()
-			.flatMap(dm -> dm.getFieldModels().stream())
-			.filter(FieldModel::isSearchable)
-			.map(FieldModel::getId)
-			.collect(Collectors.toList());
-
-		return fieldDAOService.getSearchableFields(
-			scopes.stream().map(Scope::getPk).collect(Collectors.toList()),
-			searchableFieldModel
-		);
 	}
 
 	private void executeRules(

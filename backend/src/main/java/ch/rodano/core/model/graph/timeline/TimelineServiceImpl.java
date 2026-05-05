@@ -108,7 +108,7 @@ public class TimelineServiceImpl implements TimelineService {
 		//retrieve scope forms by form model id
 		final Map<String, Long> formsByFormModelId = create.select(FORM.FORM_MODEL_ID, FORM.PK)
 			.from(FORM)
-			.where(FORM.SCOPE_FK.eq(scope.getPk()))
+			.where(FORM.SCOPE_FK.eq(scope.getPk()).and(FORM.EVENT_FK.isNull()))
 			.fetchMap(FORM.FORM_MODEL_ID, FORM.PK);
 
 		//retrieve forms by events and form model ids
@@ -116,8 +116,7 @@ public class TimelineServiceImpl implements TimelineService {
 			FORM.EVENT_FK,
 			DSL.multisetAgg(FORM.FORM_MODEL_ID, FORM.PK).convertFrom(r -> r.map(rec -> Map.entry(rec.value1(), rec.value2())))
 		).from(FORM)
-			.join(EVENT).on(FORM.EVENT_FK.eq(EVENT.PK))
-			.where(EVENT.SCOPE_FK.eq(scope.getPk()))
+			.where(FORM.SCOPE_FK.eq(scope.getPk()).and(FORM.EVENT_FK.isNotNull()))
 			.groupBy(FORM.EVENT_FK)
 			.fetchMap(FORM.EVENT_FK, r -> r.value2().stream().collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
 

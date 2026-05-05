@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -23,7 +22,8 @@ import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
-import ch.rodano.core.model.exception.LockedObjectException;
+import ch.rodano.core.model.exception.InconsistentStateDetectedException;
+import ch.rodano.core.model.exception.MissingDataException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.rules.data.DataState;
 import ch.rodano.core.model.scope.Scope;
@@ -123,38 +123,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Dataset create(final Scope scope, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale, final Optional<String> id) {
-		//check that scope is not locked
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
-
-		//check that the dataset model is allowed for the scope model
-		if(!scope.getScopeModel().getDatasetModelIds().contains(datasetModel.getId())) {
-			throw new NoRespectForConfigurationException(
-				String.format(
-					"Dataset model %s is not allowed for the scope model %s", datasetModel.getId(), scope.getScopeModel().getId()
-				)
-			);
-		}
-
-		//dataset
-		final var dataset = new Dataset();
-		id.ifPresent(dataset::setId);
-		dataset.setDatasetModel(datasetModel);
-		dataset.setScopeFk(scope.getPk());
-
-		final var enhancedRationale = StringUtils.isBlank(rationale) ? "Create dataset" : "Create dataset: " + rationale;
-		datasetDAOService.saveDataset(dataset, context, enhancedRationale);
-		fieldService.createAll(scope, Optional.empty(), dataset, context, enhancedRationale);
-
-		//trigger rules
-		final var rules = studyService.getStudy().getEventActions().get(WorkflowAction.CREATE_DATASET);
-		if(rules != null && !rules.isEmpty()) {
-			final var state = new DataState(scope, Optional.empty(), dataset);
-			ruleService.execute(state, rules, context);
-		}
-
-		return dataset;
+		return create(scope, Optional.empty(), datasetModel, context, rationale, id);
 	}
 
 	@Override
@@ -164,37 +133,52 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public Dataset create(final Scope scope, final Event event, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale, final Optional<String> id) {
-		//check that scope and event are not locked
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
-		if(event.getLocked()) {
-			throw new LockedObjectException(event);
-		}
+		return create(scope, Optional.of(event), datasetModel, context, rationale, id);
+	}
 
-		//check that the dataset model is allowed for the event model
-		if(!event.getEventModel().getDatasetModelIds().contains(datasetModel.getId())) {
-			throw new NoRespectForConfigurationException(
-				String.format(
-					"Dataset model %s is not allowed for the event model %s", datasetModel.getId(), event.getEventModelId()
-				)
-			);
+	private Dataset create(final Scope scope, final Optional<Event> event, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale, final Optional<String> id) {
+		utilsService.checkNotDeleted(scope);
+		event.ifPresent(utilsService::checkNotDeleted);
+
+		utilsService.checkNotLocked(scope);
+		event.ifPresent(utilsService::checkNotLocked);
+
+		if(event.isEmpty()) {
+			//check that the dataset model is allowed for the scope model
+			if(!scope.getScopeModel().getDatasetModelIds().contains(datasetModel.getId())) {
+				throw new NoRespectForConfigurationException(
+					String.format(
+						"Dataset model %s is not allowed for the scope model %s", datasetModel.getId(), scope.getScopeModel().getId()
+					)
+				);
+			}
+		}
+		else {
+			//check that the dataset model is allowed for the event model
+			if(!event.get().getEventModel().getDatasetModelIds().contains(datasetModel.getId())) {
+				throw new NoRespectForConfigurationException(
+					String.format(
+						"Dataset model %s is not allowed for the event model %s", datasetModel.getId(), event.get().getEventModelId()
+					)
+				);
+			}
 		}
 
 		//dataset
 		final var dataset = new Dataset();
 		id.ifPresent(dataset::setId);
 		dataset.setDatasetModel(datasetModel);
-		dataset.setEventFk(event.getPk());
+		dataset.setScopeFk(scope.getPk());
+		event.map(Event::getPk).ifPresent(dataset::setEventFk);
 
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? "Create dataset" : "Create dataset: " + rationale;
 		datasetDAOService.saveDataset(dataset, context, enhancedRationale);
-		fieldService.createAll(scope, Optional.of(event), dataset, context, enhancedRationale);
+		fieldService.createAll(scope, event, dataset, context, enhancedRationale);
 
 		//trigger rules
 		final var rules = studyService.getStudy().getEventActions().get(WorkflowAction.CREATE_DATASET);
 		if(rules != null && !rules.isEmpty()) {
-			final var state = new DataState(scope, Optional.of(event), dataset);
+			final var state = new DataState(scope, event, dataset);
 			ruleService.execute(state, rules, context);
 		}
 
@@ -329,28 +313,22 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> search(final Scope scope, final Optional<Event> event, final Optional<Collection<DatasetModel>> datasetModels, final ACL acl) {
-		//TODO make this legible and do not fetch deleted datasets if they are filtered out afterwards
-		final List<Dataset> datasets;
-		if(datasetModels.isPresent()) {
-			datasets = event.isPresent() ? getAllIncludingRemoved(event.get(), datasetModels.get()) : getAllIncludingRemoved(scope, datasetModels.get());
-		}
-		else {
-			datasets = event.isPresent() ? getAllIncludingRemoved(event.get()) : getAllIncludingRemoved(scope);
-		}
-
 		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
+		final var datasets = datasetDAOService.search(
+			scope.getPk(),
+			event.map(Event::getPk),
+			includeDeleted,
+			datasetModels.map(dms -> dms.stream().map(DatasetModel::getId).toList())
+		);
 		return datasets
 			.stream()
-			.filter(d -> !d.getDeleted() || includeDeleted)
-			.filter(
-				d -> event.isPresent() && acl.hasRight(event.get().getDateOrExpectedDate(), d.getDatasetModel(), Rights.READ) || acl.hasRight(d.getCreationTime(), d.getDatasetModel(), Rights.READ)
-			)
+			.filter(d -> acl.hasRight(event.map(Event::getDateOrExpectedDate).orElse(d.getCreationTime()), d.getDatasetModel(), Rights.READ))
 			.toList();
 	}
 
 	@Override
 	public List<Dataset> getAllIncludingRemoved(final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).toList();
 		return datasetDAOService.getAllDatasetsByDatasetModelIds(datasetModelIds);
 	}
 
@@ -362,7 +340,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAllIncludingRemoved(final Scope scope, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).toList();
 		return datasetDAOService.getAllDatasetsByScopePkAndDatasetModelIds(scope.getPk(), datasetModelIds);
 	}
 
@@ -373,7 +351,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAll(final Scope scope, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).toList();
 		return datasetDAOService.getDatasetsByScopePkAndDatasetModelIds(scope.getPk(), datasetModelIds);
 	}
 
@@ -382,7 +360,14 @@ public class DatasetServiceImpl implements DatasetService {
 		if(datasetModel.isMultiple()) {
 			throw new InvalidParameterException("Unable to retrieve unique dataset if dataset model is a multiple");
 		}
-		return datasetDAOService.getDatasetsByScopePkAndDatasetModelIds(scope.getPk(), Collections.singletonList(datasetModel.getId())).get(0);
+		final var datasets = datasetDAOService.getDatasetsByScopePkAndDatasetModelIds(scope.getPk(), Collections.singletonList(datasetModel.getId()));
+		if(datasets.isEmpty()) {
+			throw new MissingDataException(String.format("No dataset with model id %s in scope %s", datasetModel.getId(), scope.getCode()));
+		}
+		if(datasets.size() > 1) {
+			throw new InconsistentStateDetectedException(String.format("Only one dataset with model id %s should exist in scope %s", datasetModel.getId(), scope.getCode()));
+		}
+		return datasets.getFirst();
 	}
 
 	//event
@@ -393,7 +378,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAllIncludingRemoved(final Event event, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).toList();
 		return datasetDAOService.getAllDatasetsByEventPkAndDatasetModelIds(event.getPk(), datasetModelIds);
 	}
 
@@ -404,7 +389,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> getAll(final Event event, final Collection<DatasetModel> datasetModels) {
-		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).collect(Collectors.toList());
+		final var datasetModelIds = datasetModels.stream().map(DatasetModel::getId).toList();
 		return datasetDAOService.getDatasetsByEventPkAndDatasetModelIds(event.getPk(), datasetModelIds);
 	}
 
@@ -413,7 +398,11 @@ public class DatasetServiceImpl implements DatasetService {
 		if(datasetModel.isMultiple()) {
 			throw new InvalidParameterException("Unable to retrieve unique dataset if dataset model is a multiple");
 		}
-		return datasetDAOService.getDatasetsByEventPkAndDatasetModelIds(event.getPk(), Collections.singletonList(datasetModel.getId())).get(0);
+		final var datasets = datasetDAOService.getDatasetsByEventPkAndDatasetModelIds(event.getPk(), Collections.singletonList(datasetModel.getId()));
+		if(datasets.isEmpty()) {
+			throw new MissingDataException(String.format("No dataset with model id %s in event %s", datasetModel.getId(), event.getEventModelId()));
+		}
+		return datasets.get(0);
 	}
 
 }
