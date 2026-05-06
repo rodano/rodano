@@ -13,7 +13,7 @@ create table internal_patch (
 
 insert into internal_patch (script, date, context, name) values (179, now(3), 'Remove country from user', 'db_update_179.sql');
 insert into internal_patch (script, date, context, name) values (180, now(3), 'Denormalize scope fk property on datasets and forms', 'db_update_180.sql');
-insert into internal_patch (script, date, context, name) values (181, now(3), 'Delete profile id column on workflows', 'db_update_181.sql');
+insert into internal_patch (script, date, context, name) values (181, now(3), 'Delete profile id column on workflow statuses', 'db_update_181.sql');
 
 /***********************************
 *                                  *

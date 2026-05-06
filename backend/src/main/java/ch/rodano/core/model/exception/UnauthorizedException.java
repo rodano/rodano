@@ -31,7 +31,7 @@ public class UnauthorizedException extends RuntimeException implements ManagedEx
 	private static final String RIGHT_ASSIGNABLE_MESSAGE = "You do not have enough rights on this object. You must have rights to %s";
 
 	//profile right assignable
-	private static final String FAMILY_ASSIGNABLE_MESSAGE = "You do not have enough rights on this object. You must have rights on %s";
+	private static final String FAMILY_ASSIGNABLE_MESSAGE = "You do not have enough rights on this object. You must have rights on %s of %s";
 
 	public UnauthorizedException() {
 		super(DEFAULT_MESSAGE);
@@ -75,7 +75,7 @@ public class UnauthorizedException extends RuntimeException implements ManagedEx
 
 	//profile right assignable
 	public static UnauthorizedException getInstance(final FamilyAssignableChild<?> familyAssignable) {
-		return new UnauthorizedException(String.format(FAMILY_ASSIGNABLE_MESSAGE, familyAssignable.getId()));
+		return new UnauthorizedException(String.format(FAMILY_ASSIGNABLE_MESSAGE, familyAssignable.getId(), familyAssignable.getParentId()));
 	}
 
 	@Override
