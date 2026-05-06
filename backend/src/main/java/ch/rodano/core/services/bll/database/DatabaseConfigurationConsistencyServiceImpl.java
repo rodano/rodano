@@ -28,7 +28,7 @@ import static ch.rodano.core.model.jooq.tables.Field.FIELD;
 import static ch.rodano.core.model.jooq.tables.Scope.SCOPE;
 
 @Service
-public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
+public class DatabaseConfigurationConsistencyServiceImpl implements DatabaseConfigurationConsistencyService {
 
 	private final StudyService studyService;
 	private final DSLContext create;
@@ -40,7 +40,7 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 	private final DatasetService datasetService;
 	private final FieldService fieldService;
 
-	public DatabaseUpdateServiceImpl(
+	public DatabaseConfigurationConsistencyServiceImpl(
 		final StudyService studyService,
 		final DSLContext create,
 		final ScopeDAOService scopeDAOService,
@@ -63,23 +63,23 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 	}
 
 	@Override
-	public List<DatabaseIssueGroup> updateDatabase(
+	public List<ConfigurationInconsistencyGroup> fixInconsistencies(
 		final boolean dryRun,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		final var issues = new ArrayList<DatabaseIssue>();
+		final var issues = new ArrayList<ConfigurationInconsistency>();
 		issues.addAll(checkDatasetConsistencyInScopes(dryRun, context, rationale));
 		issues.addAll(checkDatasetConsistencyInEvents(dryRun, context, rationale));
 		issues.addAll(checkFieldConsistency(dryRun, context, rationale));
-		final var issuesGroups = new ArrayList<DatabaseIssueGroup>();
+		final var issuesGroups = new ArrayList<ConfigurationInconsistencyGroup>();
 		for(final var issue : issues) {
 			var group = issuesGroups.stream()
 				.filter(g -> g.entity().equals(issue.entity()) && g.modelId().equals(issue.modelId()) && g.type().equals(issue.type()) && g.missingEntityId() == issue.missingEntityId() && g.status() == issue.status())
 				.findFirst()
 				.orElse(null);
 			if(group == null) {
-				group = new DatabaseIssueGroup(issue.entity(), issue.modelId(), new ArrayList<>(), issue.type(), issue.missingEntityId(), issue.status());
+				group = new ConfigurationInconsistencyGroup(issue.entity(), issue.modelId(), new ArrayList<>(), issue.type(), issue.missingEntityId(), issue.status());
 				issuesGroups.add(group);
 			}
 			group.pks().add(issue.pk());
@@ -87,12 +87,12 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 		return issuesGroups;
 	}
 
-	private List<DatabaseIssue> checkDatasetConsistencyInScopes(
+	private List<ConfigurationInconsistency> checkDatasetConsistencyInScopes(
 		final boolean dryRun,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		final var issues = new ArrayList<DatabaseIssue>();
+		final var issues = new ArrayList<ConfigurationInconsistency>();
 		//retrieve multiple datasets to exclude them from the query
 		final var multipleDatasetIds = studyService.getStudy().getDatasetModels().stream()
 			.filter(DatasetModel::isMultiple)
@@ -108,7 +108,8 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 			.select(SCOPE.PK, SCOPE.SCOPE_MODEL_ID, datasetIdsField)
 			.from(SCOPE)
 			.innerJoin(DATASET).on(SCOPE.PK.eq(DATASET.SCOPE_FK))
-			.where(DATASET.DATASET_MODEL_ID.notIn(multipleDatasetIds))
+			.where(DATASET.EVENT_FK.isNull())
+			.and(DATASET.DATASET_MODEL_ID.notIn(multipleDatasetIds))
 			.groupBy(SCOPE.PK);
 
 		try(var cursor = scopeQuery.fetchLazy()) {
@@ -144,17 +145,17 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 									.findFirst()
 									.orElseThrow();
 								datasetService.create(scope, datasetModel, context, rationale);
-								issues.add(new DatabaseIssue(DatabaseIssueEntity.SCOPE, scopeModel.getId(), scopePk, DatabaseIssueType.MISSING_IN_DATABASE, datasetModelId, DatabaseIssueStatus.FIXED));
+								issues.add(new ConfigurationInconsistency(InconsistentEntity.SCOPE, scopeModel.getId(), scopePk, ConfigurationInconsistencyType.MISSING_IN_DATABASE, datasetModelId, InconsistencyStatus.FIXED));
 							}
 						}
 						else {
 							for(final String datasetModelId : missingDatasetIds) {
-								issues.add(new DatabaseIssue(DatabaseIssueEntity.SCOPE, scopeModel.getId(), scopePk, DatabaseIssueType.MISSING_IN_DATABASE, datasetModelId, DatabaseIssueStatus.FIXABLE));
+								issues.add(new ConfigurationInconsistency(InconsistentEntity.SCOPE, scopeModel.getId(), scopePk, ConfigurationInconsistencyType.MISSING_IN_DATABASE, datasetModelId, InconsistencyStatus.FIXABLE));
 							}
 						}
 					}
 					for(final String datasetModelId : extraDatasetIds) {
-						issues.add(new DatabaseIssue(DatabaseIssueEntity.SCOPE, scopeModel.getId(), scopePk, DatabaseIssueType.MISSING_IN_CONFIGURATION, datasetModelId, DatabaseIssueStatus.NOT_FIXABLE));
+						issues.add(new ConfigurationInconsistency(InconsistentEntity.SCOPE, scopeModel.getId(), scopePk, ConfigurationInconsistencyType.MISSING_IN_CONFIGURATION, datasetModelId, InconsistencyStatus.NOT_FIXABLE));
 					}
 				}
 			}
@@ -162,12 +163,12 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 		return issues;
 	}
 
-	private List<DatabaseIssue> checkDatasetConsistencyInEvents(
+	private List<ConfigurationInconsistency> checkDatasetConsistencyInEvents(
 		final boolean dryRun,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		final var issues = new ArrayList<DatabaseIssue>();
+		final var issues = new ArrayList<ConfigurationInconsistency>();
 		final var multipleDatasetIds = studyService.getStudy().getDatasetModels().stream()
 			.filter(DatasetModel::isMultiple)
 			.map(DatasetModel::getId)
@@ -216,17 +217,17 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 									.findFirst()
 									.orElseThrow();
 								datasetService.create(scope, event, datasetModel, context, rationale);
-								issues.add(new DatabaseIssue(DatabaseIssueEntity.EVENT, eventModel.getId(), eventPk, DatabaseIssueType.MISSING_IN_DATABASE, datasetModelId, DatabaseIssueStatus.FIXED));
+								issues.add(new ConfigurationInconsistency(InconsistentEntity.EVENT, eventModel.getId(), eventPk, ConfigurationInconsistencyType.MISSING_IN_DATABASE, datasetModelId, InconsistencyStatus.FIXED));
 							}
 						}
 						else {
 							for(final String datasetModelId : missingDatasetIds) {
-								issues.add(new DatabaseIssue(DatabaseIssueEntity.EVENT, eventModel.getId(), eventPk, DatabaseIssueType.MISSING_IN_DATABASE, datasetModelId, DatabaseIssueStatus.FIXABLE));
+								issues.add(new ConfigurationInconsistency(InconsistentEntity.EVENT, eventModel.getId(), eventPk, ConfigurationInconsistencyType.MISSING_IN_DATABASE, datasetModelId, InconsistencyStatus.FIXABLE));
 							}
 						}
 					}
 					for(final String datasetModelId : extraDatasetIds) {
-						issues.add(new DatabaseIssue(DatabaseIssueEntity.EVENT, eventModel.getId(), eventPk, DatabaseIssueType.MISSING_IN_CONFIGURATION, datasetModelId, DatabaseIssueStatus.NOT_FIXABLE));
+						issues.add(new ConfigurationInconsistency(InconsistentEntity.EVENT, eventModel.getId(), eventPk, ConfigurationInconsistencyType.MISSING_IN_CONFIGURATION, datasetModelId, InconsistencyStatus.NOT_FIXABLE));
 					}
 				}
 			}
@@ -234,12 +235,12 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 		return issues;
 	}
 
-	private List<DatabaseIssue> checkFieldConsistency(
+	private List<ConfigurationInconsistency> checkFieldConsistency(
 		final boolean dryRun,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		final var issues = new ArrayList<DatabaseIssue>();
+		final var issues = new ArrayList<ConfigurationInconsistency>();
 		final Map<String, DatasetModel> datasetModelsById = studyService.getStudy().getDatasetModels().stream()
 			.collect(Collectors.toMap(DatasetModel::getId, d -> d));
 
@@ -289,17 +290,17 @@ public class DatabaseUpdateServiceImpl implements DatabaseUpdateService {
 								for(final String fieldModelId : missingFieldIds) {
 									final var fieldModel = datasetModel.getFieldModel(fieldModelId);
 									fieldService.create(scope, event, dataset, fieldModel, context, rationale);
-									issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_DATABASE, fieldModelId, DatabaseIssueStatus.FIXED));
+									issues.add(new ConfigurationInconsistency(InconsistentEntity.DATASET, datasetModelId, datasetPk, ConfigurationInconsistencyType.MISSING_IN_DATABASE, fieldModelId, InconsistencyStatus.FIXED));
 								}
 							}
 							else {
 								for(final String fieldModelId : missingFieldIds) {
-									issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_DATABASE, fieldModelId, DatabaseIssueStatus.FIXABLE));
+									issues.add(new ConfigurationInconsistency(InconsistentEntity.DATASET, datasetModelId, datasetPk, ConfigurationInconsistencyType.MISSING_IN_DATABASE, fieldModelId, InconsistencyStatus.FIXABLE));
 								}
 							}
 						}
 						for(final String fieldModelId : extraFieldIds) {
-							issues.add(new DatabaseIssue(DatabaseIssueEntity.DATASET, datasetModelId, datasetPk, DatabaseIssueType.MISSING_IN_CONFIGURATION, fieldModelId, DatabaseIssueStatus.NOT_FIXABLE));
+							issues.add(new ConfigurationInconsistency(InconsistentEntity.DATASET, datasetModelId, datasetPk, ConfigurationInconsistencyType.MISSING_IN_CONFIGURATION, fieldModelId, InconsistencyStatus.NOT_FIXABLE));
 						}
 					}
 				}

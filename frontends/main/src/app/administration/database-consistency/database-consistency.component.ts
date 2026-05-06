@@ -11,13 +11,14 @@ import {MatTableDataSource, MatTableModule} from '@angular/material/table';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {DatabaseService} from '@core/services/database.service';
-import {getDatabaseIssueStatusDisplay} from './database-issue-status-display';
-import {getDatabaseIssueTypeDisplay} from './database-issue-type-display';
-import {DatabaseIssueGroup} from '@core/model/database-issue-group';
-import {DatabaseIssueEntity} from '@core/model/database-issue-entity';
-import {DatabaseIssueStatus} from '@core/model/database-issue-status';
-import {DatabaseIssueType} from '@core/model/database-issue-type';
+import {getInconsistencyStatusDisplay} from './inconsistency-status-display';
+import {getInconsistencyTypeDisplay} from './inconsistency-type-display';
 import {MatProgressBar} from '@angular/material/progress-bar';
+import {InconsistentEntity} from '@core/model/inconsistent-entity';
+import {InconsistencyStatus} from '@core/model/inconsistency-status';
+import {ConfigurationInconsistencyGroup} from '@core/model/configuration-inconsistency-group';
+import {DenormalizationInconsistencyGroup} from '@core/model/denormalization-inconsistency-group';
+import {ConfigurationInconsistencyType} from '@core/model/configuration-inconsistency-type';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -42,37 +43,49 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 	]
 })
 export class DatabaseConsistencyComponent implements AfterViewInit {
-	getDatabaseIssueStatusDisplay = getDatabaseIssueStatusDisplay;
-	getDatabaseIssueTypeDisplay = getDatabaseIssueTypeDisplay;
+	getInconsistencyStatusDisplay = getInconsistencyStatusDisplay;
+	getInconsistencyTypeDisplay = getInconsistencyTypeDisplay;
 
-	readonly loading = signal(false);
+	//configuration inconsistencies
+	readonly configurationLoading = signal(false);
 
-	readonly entityOptions = Object.values(DatabaseIssueEntity) as DatabaseIssueEntity[];
-	readonly typeOptions = Object.values(DatabaseIssueType) as DatabaseIssueType[];
-	readonly statusOptions = Object.values(DatabaseIssueStatus) as DatabaseIssueStatus[];
+	readonly entityOptions = Object.values(InconsistentEntity) as InconsistentEntity[];
+	readonly typeOptions = Object.values(ConfigurationInconsistencyType) as ConfigurationInconsistencyType[];
+	readonly statusOptions = Object.values(InconsistencyStatus) as InconsistencyStatus[];
 
 	filterForm = new FormGroup({
-		entity: new FormControl<DatabaseIssueEntity[]>([], {nonNullable: true}),
-		type: new FormControl<DatabaseIssueType[]>([], {nonNullable: true}),
-		status: new FormControl<DatabaseIssueStatus[]>([], {nonNullable: true})
+		entity: new FormControl<InconsistentEntity[]>([], {nonNullable: true}),
+		type: new FormControl<ConfigurationInconsistencyType[]>([], {nonNullable: true}),
+		status: new FormControl<InconsistencyStatus[]>([], {nonNullable: true})
 	});
 
-	@ViewChild(MatPaginator) paginator!: MatPaginator;
-	@ViewChild(MatSort) sort!: MatSort;
-	issueGroups = new MatTableDataSource<DatabaseIssueGroup>([]);
-	issuesStatus = signal('Run the database update to check the consistency of the database and see potential issues');
-	dryRun = signal(true);
+	@ViewChild('configPaginator') configPaginator!: MatPaginator;
+	@ViewChild('configSort') configSort!: MatSort;
+	configurationInconsistencyGroups = new MatTableDataSource<ConfigurationInconsistencyGroup>([]);
+	configurationInconsistencyStatus = signal('Run the configuration consistency check to detect inconsistencies');
+	configurationDryRun = signal(true);
 
-	protected readonly displayedColumns = ['entity', 'modelId', 'type', 'missingEntityId', 'count', 'status'];
+	protected readonly configDisplayedColumns = ['entity', 'modelId', 'type', 'missingEntityId', 'count', 'status'];
+
+	//denormalization inconsistencies
+	readonly denormalizationLoading = signal(false);
+
+	@ViewChild('denormalizationPaginator') denormalizationPaginator!: MatPaginator;
+	@ViewChild('denormalizationSort') denormalizationSort!: MatSort;
+	denormalizationInconsistencyGroups = new MatTableDataSource<DenormalizationInconsistencyGroup>([]);
+	denormalizationInconsistencyStatus = signal('Run the denormalization consistency check to detect inconsistencies');
+	denormalizationDryRun = signal(true);
+
+	protected readonly denormalizationDisplayedColumns = ['entity', 'modelId', 'count', 'status'];
 
 	constructor(
 		private databaseService: DatabaseService
 	) {
-		this.issueGroups.filterPredicate = (data: DatabaseIssueGroup, filter: string) => {
+		this.configurationInconsistencyGroups.filterPredicate = (data: ConfigurationInconsistencyGroup, filter: string) => {
 			const {entity, type, status} = JSON.parse(filter) as {
-				entity: DatabaseIssueEntity[];
-				type: DatabaseIssueType[];
-				status: DatabaseIssueStatus[];
+				entity: InconsistentEntity[];
+				type: ConfigurationInconsistencyType[];
+				status: InconsistencyStatus[];
 			};
 			if(entity.length > 0 && !entity.includes(data.entity)) {
 				return false;
@@ -91,28 +104,42 @@ export class DatabaseConsistencyComponent implements AfterViewInit {
 		const value = this.filterForm.value;
 		const {entity, type, status} = value;
 		const hasFilter = (entity?.length ?? 0) > 0 || (type?.length ?? 0) > 0 || (status?.length ?? 0) > 0;
-		this.issueGroups.filter = hasFilter ? JSON.stringify(value) : '';
+		this.configurationInconsistencyGroups.filter = hasFilter ? JSON.stringify(value) : '';
 	}
 
 	resetFilters() {
 		this.filterForm.reset();
-		this.issueGroups.filter = '';
+		this.configurationInconsistencyGroups.filter = '';
 	}
 
 	ngAfterViewInit() {
-		this.issueGroups.paginator = this.paginator;
-		this.issueGroups.sort = this.sort;
+		this.configurationInconsistencyGroups.paginator = this.configPaginator;
+		this.configurationInconsistencyGroups.sort = this.configSort;
+		this.denormalizationInconsistencyGroups.paginator = this.denormalizationPaginator;
+		this.denormalizationInconsistencyGroups.sort = this.denormalizationSort;
 	}
 
-	runDatabaseUpdate() {
-		this.loading.set(true);
-		this.databaseService.runDatabaseUpdate(this.dryRun()).subscribe({
+	runConfigurationConsistency() {
+		this.configurationLoading.set(true);
+		this.databaseService.fixConfigConsistency(this.configurationDryRun()).subscribe({
 			next: result => {
-				this.issueGroups.data = result;
-				this.issuesStatus.set('No issues detected.');
-				this.loading.set(false);
+				this.configurationInconsistencyGroups.data = result;
+				this.configurationInconsistencyStatus.set('No configuration inconsistencies detected');
+				this.configurationLoading.set(false);
 			},
-			error: () => this.loading.set(false)
+			error: () => this.configurationLoading.set(false)
+		});
+	}
+
+	runDenormalizationConsistency() {
+		this.denormalizationLoading.set(true);
+		this.databaseService.fixDenormalizationConsistency(this.denormalizationDryRun()).subscribe({
+			next: result => {
+				this.denormalizationInconsistencyGroups.data = result;
+				this.denormalizationInconsistencyStatus.set('No denormalization inconsistencies detected');
+				this.denormalizationLoading.set(false);
+			},
+			error: () => this.denormalizationLoading.set(false)
 		});
 	}
 }

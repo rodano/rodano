@@ -31,7 +31,8 @@ import ch.rodano.core.database.initializer.RandomDataInitializer;
 import ch.rodano.core.model.exception.UnauthorizedException;
 import ch.rodano.core.model.exception.WrongDataConditionException;
 import ch.rodano.core.services.bll.actor.ActorService;
-import ch.rodano.core.services.bll.database.DatabaseUpdateService;
+import ch.rodano.core.services.bll.database.DatabaseConfigurationConsistencyService;
+import ch.rodano.core.services.bll.database.DatabaseDenormalizationConsistencyService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.utils.RightsService;
@@ -48,7 +49,8 @@ public class DatabaseController extends AbstractSecuredController {
 	private final DemoUsersInitializer demoUsersInitializer;
 	private final RandomDataInitializer randomDataInitializer;
 	private final TaskExecutor taskExecutor;
-	private final DatabaseUpdateService databaseUpdateService;
+	private final DatabaseConfigurationConsistencyService configurationConsistencyService;
+	private final DatabaseDenormalizationConsistencyService denormalizationConsistencyService;
 
 	public DatabaseController(
 		final RequestContextService requestContextService,
@@ -61,7 +63,8 @@ public class DatabaseController extends AbstractSecuredController {
 		final DemoUsersInitializer demoUsersInitializer,
 		final RandomDataInitializer randomDataInitializer,
 		final TaskExecutor taskExecutor,
-		final DatabaseUpdateService databaseUpdateService
+		final DatabaseConfigurationConsistencyService configurationConsistencyService,
+		final DatabaseDenormalizationConsistencyService denormalizationConsistencyService
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.configurator = configurator;
@@ -69,7 +72,8 @@ public class DatabaseController extends AbstractSecuredController {
 		this.demoUsersInitializer = demoUsersInitializer;
 		this.randomDataInitializer = randomDataInitializer;
 		this.taskExecutor = taskExecutor;
-		this.databaseUpdateService = databaseUpdateService;
+		this.configurationConsistencyService = configurationConsistencyService;
+		this.denormalizationConsistencyService = denormalizationConsistencyService;
 	}
 
 	//TODO use a Spring actuator
@@ -130,17 +134,32 @@ public class DatabaseController extends AbstractSecuredController {
 	}
 
 	@Operation(summary = "Check and optionally fix database consistency against the study configuration")
-	@PostMapping("update")
+	@PostMapping("consistency/configuration")
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	@Transactional
-	public List<DatabaseIssueGroupDTO> updateDatabase(
+	public List<ConfigurationInconsistencyGroupDTO> checkConfigConsistency(
 		@RequestBody final Map<String, Boolean> payload
 	) {
 		final var dryRun = payload.getOrDefault("dryRun", true);
-		final var issues = databaseUpdateService.updateDatabase(dryRun, currentContext(), "Database consistency update");
+		final var issues = configurationConsistencyService.fixInconsistencies(dryRun, currentContext(), "Database consistency update");
 		return issues.stream()
-			.map(DatabaseIssueGroupDTO::new)
+			.map(ConfigurationInconsistencyGroupDTO::new)
+			.toList();
+	}
+
+	@Operation(summary = "Check and optionally fix inconsistent denormalized columns")
+	@PostMapping("consistency/denormalization")
+	@ResponseStatus(HttpStatus.OK)
+	@IsAdmin
+	@Transactional
+	public List<DenormalizationInconsistencyGroupDTO> checkDenormalizationConsistency(
+		@RequestBody final Map<String, Boolean> payload
+	) {
+		final var dryRun = payload.getOrDefault("dryRun", true);
+		final var issues = denormalizationConsistencyService.fixInconsistencies(dryRun);
+		return issues.stream()
+			.map(DenormalizationInconsistencyGroupDTO::new)
 			.toList();
 	}
 

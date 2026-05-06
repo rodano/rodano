@@ -1,6 +1,6 @@
 package ch.rodano.core.services.bll.database;
 
-public enum DatabaseIssueStatus {
+public enum InconsistencyStatus {
 	FIXABLE,
 	FIXED,
 	NOT_FIXABLE

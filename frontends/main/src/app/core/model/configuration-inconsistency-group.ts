@@ -7,16 +7,16 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { DatabaseIssueStatus } from './database-issue-status';
-import { DatabaseIssueEntity } from './database-issue-entity';
-import { DatabaseIssueType } from './database-issue-type';
+import { InconsistencyStatus } from './inconsistency-status';
+import { InconsistentEntity } from './inconsistent-entity';
+import { ConfigurationInconsistencyType } from './configuration-inconsistency-type';
 
 
 /**
- * An issue detected during a database consistency check
+ * A group of configuration inconsistencies detected during a database consistency check
  */
-export interface DatabaseIssueGroup { 
-    entity: DatabaseIssueEntity;
+export interface ConfigurationInconsistencyGroup { 
+    entity: InconsistentEntity;
     /**
      * Model id of the affected entity
      */
@@ -29,14 +29,14 @@ export interface DatabaseIssueGroup {
      * Number of affected entities
      */
     count?: number;
-    type: DatabaseIssueType;
+    type: ConfigurationInconsistencyType;
     /**
      * Id of the entity missing in the database or in the configuration
      */
     missingEntityId?: string;
-    status: DatabaseIssueStatus;
+    status: InconsistencyStatus;
 }
-export namespace DatabaseIssueGroup {
+export namespace ConfigurationInconsistencyGroup {
 }
 
 
