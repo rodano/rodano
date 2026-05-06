@@ -10,7 +10,6 @@ import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.core.model.workflow.WorkflowStatus;
 import ch.rodano.core.services.bll.workflowStatus.DataFamily;
-import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.event.EventDAOService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
@@ -22,10 +21,8 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 	private final ScopeDAOService scopeDAOService;
 	private final EventDAOService eventDAOService;
 	private final FieldDAOService fieldDAOService;
-	private final WorkflowStatusService workflowStatusService;
 
 	public WorkflowDTOServiceImpl(
-		final WorkflowStatusService workflowStatusService,
 		final ScopeDAOService scopeDAOService,
 		final EventDAOService eventDAOService,
 		final FieldDAOService fieldDAOService
@@ -33,7 +30,6 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		this.scopeDAOService = scopeDAOService;
 		this.eventDAOService = eventDAOService;
 		this.fieldDAOService = fieldDAOService;
-		this.workflowStatusService = workflowStatusService;
 	}
 
 	@Override
@@ -83,10 +79,8 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 	@Override
 	public WorkflowStateDTO createWorkflowStateDTO(final WorkflowStatus status, final ACL acl) {
 		final var state = status.getState();
-		//retrieve workflow creator
-		final var creatorProfile = workflowStatusService.getCreatorProfile(status);
 		final var actions = state.getPossibleActions().stream()
-			.filter(a -> acl.hasRight(a, creatorProfile))
+			.filter(a -> acl.hasRight(a))
 			.toList();
 		return createWorkflowStateDTO(state, actions);
 	}

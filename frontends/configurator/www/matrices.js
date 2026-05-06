@@ -7,9 +7,7 @@ import {NodeTools} from './node_tools.js';
 import {StudyHandler} from './study_handler.js';
 import {Entities} from './model/config/entities.js';
 import {Profile} from './model/config/entities/profile.js';
-import {Right} from './model/config/entities/right.js';
-import {ProfileRight} from './model/config/entities/profile_right.js';
-import {Assignables, Attributables, RightAssignables} from './model/config/entities_categories.js';
+import {Assignables, FamilyAssignableParents, RightAssignables} from './model/config/entities_categories.js';
 
 const AssignableProfileToggle = {
 	selected: {
@@ -55,45 +53,22 @@ const RightAssignableToggle = {
 	}
 };
 
-const AttributableToggle = {
-	attributable_selected: {
+const FamilyAssignableToggle = {
+	parent_selected: {
 		image: 'images/tick.png',
-		label: 'Remove right on ${attributableId} for profile ${profileId}'
+		label: 'Remove right on ${parentAssignableId} for profile ${profileId}'
 	},
-	attributable_unselected: {
+	parent_unselected: {
 		image: 'images/untick.png',
-		label: 'Give right on ${attributableId} for profile ${profileId}'
+		label: 'Give right on ${parentAssignableId} for profile ${profileId}'
 	},
-	assignable_selected: {
+	child_selected: {
 		image: 'images/tick.png',
-		label: 'Remove right on ${assignableId} of ${attributableId} for profile ${profileId}'
+		label: 'Remove right on ${childAssignableId} of ${parentAssignableId} for profile ${profileId}'
 	},
-	assignable_unselected: {
+	child_unselected: {
 		image: 'images/untick.png',
-		label: 'Give right on ${assignableId} of ${attributableId} for profile ${profileId}'
-	},
-	assignable_partially_selected: {
-		image: 'images/check_error.png',
-		label: 'Remove right on ${assignableId} of ${attributableId} for profile ${profileId}'
-	},
-	assignable_details: {
-		label: 'See details of ${assignableId} of ${attributableId} for profile ${profileId}'
-	},
-	profile_selected: {
-		image: 'images/tick.png',
-		label: 'Remove right on ${assignableId} for profile ${profileId} if ${attributableId} has been created by profile ${creatorProfileId}'
-	},
-	profile_unselected: {
-		image: 'images/untick.png',
-		label: 'Give right on ${assignableId} for profile ${profileId} if ${attributableId} has been created by profile ${creatorProfileId}'
-	},
-	system_selected: {
-		image: 'images/tick.png',
-		label: 'Remove right on ${assignableId} for profile ${profileId} if ${attributableId} has been created by the system'
-	},
-	system_unselected: {
-		image: 'images/untick.png',
-		label: 'Give right on ${assignableId} for profile ${profileId} if ${attributableId} has been created by the system'
+		label: 'Give right on ${childAssignableId} of ${parentAssignableId} for profile ${profileId}'
 	}
 };
 
@@ -171,39 +146,27 @@ function generate_export_right_assignable_matrix(study, assignable_entity) {
 	return data;
 }
 
-function generate_export_attributable_matrix(study, assignable_entity) {
+function generate_export_family_assignable_matrix(study, assignable_entity) {
 	const data = [];
 	//add header
 	data.push(generate_export_matrix_header(study, assignable_entity));
 	//add data
 	const profiles = get_sorted_profiles(study);
 	//TODO find real descendants
-	//const attributables = study.getDescendants(assignable_entity);
-	const attributables = study.workflows.slice();
-	attributables.sort(Config.Entities[assignable_entity.name].getComparator(Languages.GetLanguage()));
-	attributables.forEach(function(attributable) {
-		//add line for attributable
+	//const assignables = study.getDescendants(assignable_entity);
+	const assignables = study.workflows.slice();
+	assignables.sort(Config.Entities[assignable_entity.name].getComparator(Languages.GetLanguage()));
+	assignables.forEach(parent_assignable => {
+		//add line for parent assignable
 		const line = [];
-		line.push(attributable.getLocalizedShortname(Languages.GetLanguage()));
-		line.pushAll(profiles.map(p => p.grantedWorkflowIds[attributable.id]?.right ? 'X' : ''));
+		line.push(parent_assignable.getLocalizedShortname(Languages.GetLanguage()));
+		line.pushAll(profiles.map(p => p.grantedWorkflowIds.hasOwnProperty(parent_assignable.id) ? 'X' : ''));
 		data.push(line);
-		//add lines for actions
-		attributable.actions.forEach(function(assignable) {
+		//add lines for child assignable
+		parent_assignable.actions.forEach(function(child_assignable) {
 			const line = [];
-			line.push(assignable.getLocalizedShortname(Languages.GetLanguage()));
-			profiles.forEach(function(profile) {
-				const rights = [];
-				if(profile.grantedWorkflowIds[attributable.id]) {
-					const profile_right = profile.grantedWorkflowIds[attributable.id].childRights[assignable.id];
-					if(profile_right) {
-						if(profile_right.system) {
-							rights.push('SYSTEM');
-						}
-						rights.pushAll(profile_right.profileIds);
-					}
-				}
-				line.push(rights.join(', '));
-			});
+			line.push(child_assignable.getLocalizedShortname(Languages.GetLanguage()));
+			line.pushAll(profiles.map(p => p.grantedWorkflowIds[parent_assignable.id]?.includes(child_assignable.id) ? 'X' : ''));
 			data.push(line);
 		});
 	});
@@ -211,235 +174,63 @@ function generate_export_attributable_matrix(study, assignable_entity) {
 }
 
 export const Matrices = {
-	DrawAttributableMatrix: function(study, assignable_entity) {
-		function toggle_attributable() {
+	DrawFamilyAssignableMatrix: function(study, assignable_entity) {
+		function toggle_parent_assignable() {
 			const profile = study.getProfile(this.dataset.profileId);
-			//create profile right if needed
-			if(!profile.grantedWorkflowIds[this.dataset.attributableId]) {
-				profile.grantedWorkflowIds[this.dataset.attributableId] = new Right();
-			}
-			//adjust right
-			if(profile.grantedWorkflowIds[this.dataset.attributableId].right) {
-				profile.grantedWorkflowIds[this.dataset.attributableId].right = false;
-				const label = AttributableToggle.attributable_unselected.label.replaceObject(this.dataset);
-				this.setAttributes({src: AttributableToggle.attributable_unselected.image, alt: label, title: label});
-				//remove right on all attributable assignable and disable attributable assignable toggles
-				profile.grantedWorkflowIds[this.dataset.attributableId].childRights = {};
-				const attributable = study.getWorkflow(this.dataset.attributableId);
-				attributable.actions.forEach(function(assignable) {
-					const assignable_toggles = document.querySelectorAll(`[data-attributable-id="${attributable.id}"][data-assignable-id="${assignable.id}"][data-profile-id="${profile.id}"]`);
-					const label = AttributableToggle.assignable_unselected.label.replaceObject(assignable_toggles[0].dataset);
-					assignable_toggles[0].setAttributes({src: AttributableToggle.assignable_unselected.image, alt: label, title: label});
+			if(profile.grantedWorkflowIds.hasOwnProperty(this.dataset.parentAssignableId)) {
+				delete profile.grantedWorkflowIds[this.dataset.parentAssignableId];
+				const label = FamilyAssignableToggle.parent_unselected.label.replaceObject(this.dataset);
+				this.setAttributes({src: FamilyAssignableToggle.parent_unselected.image, alt: label, title: label});
+				//disable child assignable toggles
+				const parent_assignable = study.getWorkflow(this.dataset.parentAssignableId);
+				parent_assignable.actions.forEach(child_assignable => {
+					const assignable_toggles = document.querySelectorAll(`[data-parent-assignable-id="${parent_assignable.id}"][data-child-assignable-id="${child_assignable.id}"][data-profile-id="${profile.id}"]`);
+					const label = FamilyAssignableToggle.child_unselected.label.replaceObject(assignable_toggles[0].dataset);
+					assignable_toggles[0].setAttributes({src: FamilyAssignableToggle.child_unselected.image, alt: label, title: label});
 					assignable_toggles.forEach(a => a.setAttribute('disabled', 'disabled'));
 				});
 			}
 			else {
-				profile.grantedWorkflowIds[this.dataset.attributableId].right = true;
-				const label = AttributableToggle.attributable_selected.label.replaceObject(this.dataset);
-				this.setAttributes({src: AttributableToggle.attributable_selected.image, alt: label, title: label});
-				//enable attributable assignable toggles
-				const attributable = study.getWorkflow(this.dataset.attributableId);
-				attributable.actions.forEach(function(assignable) {
-					const assignable_toggles = document.querySelectorAll(`[data-attributable-id="${attributable.id}"][data-assignable-id="${assignable.id}"][data-profile-id="${profile.id}"]`);
+				profile.grantedWorkflowIds[this.dataset.parentAssignableId] = [];
+				const label = FamilyAssignableToggle.parent_selected.label.replaceObject(this.dataset);
+				this.setAttributes({src: FamilyAssignableToggle.parent_selected.image, alt: label, title: label});
+				//enable child assignable toggles
+				const parent_assignable = study.getWorkflow(this.dataset.parentAssignableId);
+				parent_assignable.actions.forEach(child_assignable => {
+					const assignable_toggles = document.querySelectorAll(`[data-parent-assignable-id="${parent_assignable.id}"][data-child-assignable-id="${child_assignable.id}"][data-profile-id="${profile.id}"]`);
 					assignable_toggles.forEach(a => a.removeAttribute('disabled'));
 				});
 			}
 		}
 
-		function toggle_assignable() {
-			//toggle may be disable if no right has been given on attributable
+		function toggle_child_assignable() {
+			//toggle may be disable if no right has been given on parent assignable
 			if(this.hasAttribute('disabled')) {
 				return;
 			}
 
 			const profile = study.getProfile(this.dataset.profileId);
-			//create profile right if needed
-			if(!profile.grantedWorkflowIds[this.dataset.attributableId]) {
-				profile.grantedWorkflowIds[this.dataset.attributableId] = new Right();
-			}
-			if(!profile.grantedWorkflowIds[this.dataset.attributableId].childRights[this.dataset.assignableId]) {
-				profile.grantedWorkflowIds[this.dataset.attributableId].childRights[this.dataset.assignableId] = new ProfileRight();
-			}
-			const assignable_right = profile.grantedWorkflowIds[this.dataset.attributableId].childRights[this.dataset.assignableId];
-			//create label values
-			if(this.src.includes(AttributableToggle.assignable_unselected.image)) {
-				assignable_right.profileIds = profile_ids.slice();
-				assignable_right.system = true;
-				const label = AttributableToggle.assignable_selected.label.replaceObject(this.dataset);
-				this.setAttributes({src: AttributableToggle.assignable_selected.image, alt: label, title: label});
+			const child_rights = profile.grantedWorkflowIds[this.dataset.parentAssignableId];
+			if(child_rights.includes(this.dataset.childAssignableId)) {
+				child_rights.removeElement(this.dataset.childAssignableId);
+				const label = FamilyAssignableToggle.child_unselected.label.replaceObject(this.dataset);
+				this.setAttributes({src: FamilyAssignableToggle.child_unselected.image, alt: label, title: label});
 			}
 			else {
-				assignable_right.profileIds.length = 0;
-				assignable_right.system = false;
-				const label = AttributableToggle.assignable_unselected.label.replaceObject(this.dataset);
-				this.setAttributes({src: AttributableToggle.assignable_unselected.image, alt: label, title: label});
-			}
-		}
-
-		function details_assignable(event) {
-			event.stop();
-			//toggle may be disable if no right has been given on attributable
-			if(this.hasAttribute('disabled')) {
-				return;
-			}
-
-			const profile = study.getProfile(this.dataset.profileId);
-			const that = this;
-
-			function draw_creator_profile_item(creator_profile) {
-				const profile_item = document.createFullElement('li');
-				//build profile icon
-				const selected = profile.grantedWorkflowIds[that.dataset.attributableId].childRights[that.dataset.assignableId]?.profileIds.includes(creator_profile.id);
-				const properties = selected ? AttributableToggle.profile_selected : AttributableToggle.profile_unselected;
-				const values = {
-					attributableId: that.dataset.attributableId,
-					assignableId: that.dataset.assignableId,
-					profileId: profile.id,
-					creatorProfileId: creator_profile.id
-				};
-				const label = properties.label.replaceObject(values);
-				const profile_item_icon = document.createFullElement('img', {src: properties.image, alt: label, title: label});
-				Object.assign(profile_item_icon.dataset, values);
-				profile_item_icon.addEventListener('click', toggle_click_listener);
-				profile_item.appendChild(profile_item_icon);
-				profile_item.appendChild(document.createTextNode(creator_profile.getLocalizedShortname(Languages.GetLanguage())));
-				return profile_item;
-			}
-
-			function toggle_click_listener() {
-				const profile = study.getProfile(this.dataset.profileId);
-				//create profile right if needed
-				if(!profile.grantedWorkflowIds[this.dataset.attributableId]) {
-					profile.grantedWorkflowIds[this.dataset.attributableId] = new Right();
-				}
-				if(!profile.grantedWorkflowIds[this.dataset.attributableId].childRights[this.dataset.assignableId]) {
-					profile.grantedWorkflowIds[this.dataset.attributableId].childRights[this.dataset.assignableId] = new ProfileRight();
-				}
-				const profile_right = profile.grantedWorkflowIds[this.dataset.attributableId].childRights[this.dataset.assignableId];
-				//toggle right
-				if(this.dataset.system) {
-					if(profile_right.system) {
-						profile_right.system = false;
-						this.setAttributes({src: AttributableToggle.system_unselected.image, alt: AttributableToggle.system_unselected.label.replaceObject(this.dataset), title: AttributableToggle.system_unselected.label.replaceObject(this.dataset)});
-					}
-					else {
-						profile_right.system = true;
-						this.setAttributes({src: AttributableToggle.system_selected.image, alt: AttributableToggle.system_selected.label.replaceObject(this.dataset), title: AttributableToggle.system_selected.label.replaceObject(this.dataset)});
-					}
-				}
-				else {
-					if(profile_right.profileIds.includes(this.dataset.creatorProfileId)) {
-						profile_right.profileIds.removeElement(this.dataset.creatorProfileId);
-						this.setAttributes({src: AttributableToggle.profile_unselected.image, alt: AttributableToggle.profile_unselected.label.replaceObject(this.dataset), title: AttributableToggle.profile_unselected.label.replaceObject(this.dataset)});
-					}
-					else {
-						profile_right.profileIds.push(this.dataset.creatorProfileId);
-						this.setAttributes({src: AttributableToggle.profile_selected.image, alt: AttributableToggle.profile_selected.label.replaceObject(this.dataset), title: AttributableToggle.profile_selected.label.replaceObject(this.dataset)});
-					}
-				}
-
-				//update labels
-				let properties;
-				if(profile_right.profileIds.isEmpty() && !profile_right.system) {
-					properties = AttributableToggle.assignable_unselected;
-				}
-				else if(Object.equals(profile_right.profileIds.sort(), profile_ids.sort()) && profile_right.system) {
-					properties = AttributableToggle.assignable_selected;
-				}
-				else {
-					properties = AttributableToggle.assignable_partially_selected;
-				}
-				const assignable_toggle = document.querySelector(`[data-attributable-id="${this.dataset.attributableId}"][data-assignable-id="${this.dataset.assignableId}"][data-profile-id="${this.dataset.profileId}"]`);
-				assignable_toggle.setAttributes({src: properties.image, alt: properties.label.replaceObject(this.dataset), title: properties.label.replaceObject(this.dataset)});
-			}
-
-			//remove previous details window
-			let details = document.getElementById('profile_right_matrix_matrix');
-			if(details) {
-				details.parentNode.removeChild(details);
-			}
-			//calculate window position
-			const position = this.getPosition();
-			//create window
-			details = document.createFullElement('div', {id: 'profile_right_matrix_matrix', style: `left: ${position.left}px; top: ${position.top}px;`});
-			//title
-			const title = document.createFullElement('h2');
-			const details_close = document.createFullElement('img', {src: 'images/cross.png', alt: 'Close', title: 'Close', style: 'position: absolute; right: 0.5rem; top: 0.5rem; cursor: pointer;'});
-			details_close.addEventListener('click', function() {
-				document.body.removeChild(details);
-			});
-			title.appendChild(document.createTextNode('Rights'));//for ' + profile.id + ' on ' + that.dataset.assignableId));
-			title.appendChild(details_close);
-			details.appendChild(title);
-			//creator rights list
-			const profile_list = document.createFullElement('ul');
-			details.appendChild(profile_list);
-			//creator profiles items
-			profiles.map(draw_creator_profile_item).forEach(Node.prototype.appendChild, profile_list);
-			//system item
-			const system_item = document.createFullElement('li');
-			const selected = profile.grantedWorkflowIds[that.dataset.attributableId].childRights[that.dataset.assignableId]?.system;
-			const properties = selected ? AttributableToggle.system_selected : AttributableToggle.system_unselected;
-			const values = {
-				attributableId: that.dataset.attributableId,
-				assignableId: that.dataset.assignableId,
-				profileId: profile.id,
-				system: true
-			};
-			const system_item_icon = document.createFullElement('img', {src: properties.image, alt: properties.label.replaceObject(values), title: properties.label.replaceObject(values)});
-			Object.assign(system_item_icon.dataset, values);
-			system_item_icon.addEventListener('click', toggle_click_listener);
-			system_item.appendChild(system_item_icon);
-			system_item.appendChild(document.createTextNode('SYSTEM'));
-			profile_list.appendChild(system_item);
-
-			//TODO this is standard but does not work on chrome
-			/*profile_list.addEventListener('mouseleave', function(event) {
-				document.body.removeChild(this);
-			});*/
-			//other strategy
-			/*function hide_profile_list(event) {
-				if(!profile_list.contains(event.target)) {
-					document.removeEventListener('mousemove', hide_profile_list);
-					document.body.removeChild(profile_list);
-				}
-			}
-			document.addEventListener('mousemove', hide_profile_list);*/
-			/*profile_list.addEventListener('mouseout', function(event) {
-				if(event.target === profile_list) {
-					document.body.removeChild(profile_list);
-				}
-			});*/
-
-			document.body.appendChild(details);
-			//adjust position according to actual height
-			details.style.marginTop = `${-Math.round(details.offsetHeight / 2)}px`;
-			//adjust position if window is outside browser window
-			//overflow on top
-			if(details.offsetTop < 70) {
-				details.style.top = `${parseInt(details.style.top) + 70}px`;
-			}
-			//overflow on bottom
-			const offset_bottom = details.offsetTop + details.offsetHeight;
-			if(offset_bottom > (document.body.offsetHeight - 5)) {
-				details.style.top = `${parseInt(details.style.top) + (document.body.offsetHeight - offset_bottom - 5)}px`;
-			}
-			//overflow on right
-			const offset_right = details.offsetLeft + details.offsetWidth;
-			if(offset_right > (document.body.offsetWidth - 5)) {
-				details.style.left = `${parseInt(details.style.left) + (document.body.offsetWidth - offset_right - 5)}px`;
+				child_rights.push(this.dataset.childAssignableId);
+				const label = FamilyAssignableToggle.child_selected.label.replaceObject(this.dataset);
+				this.setAttributes({src: FamilyAssignableToggle.child_selected.image, alt: label, title: label});
 			}
 		}
 
 		const profiles = get_sorted_profiles(study);
-		const profile_ids = profiles.map(p => p.id);
 		//TODO find real descendants
-		//const attributables = study.getDescendants(assignable_entity);
-		const attributables = study.workflows.slice();
-		attributables.sort(Config.Entities[assignable_entity.name].getComparator(Languages.GetLanguage()));
+		//const parent_assignables = study.getDescendants(assignable_entity);
+		const parent_assignables = study.workflows.slice();
+		parent_assignables.sort(Config.Entities[assignable_entity.name].getComparator(Languages.GetLanguage()));
 
 		//table
-		const table = document.createFullElement('table', {'class': 'attributable_matrix'});
+		const table = document.createFullElement('table', {'class': 'family_assignable_matrix'});
 
 		//caption
 		const caption = document.createFullElement('caption');
@@ -448,7 +239,7 @@ export const Matrices = {
 		download.addEventListener(
 			'click',
 			function() {
-				const data = generate_export_attributable_matrix(study, assignable_entity);
+				const data = generate_export_family_assignable_matrix(study, assignable_entity);
 				new CSV(data).download(`${assignable_entity.id}_matrix.csv`);
 			}
 		);
@@ -479,10 +270,10 @@ export const Matrices = {
 		const tbody = document.createElement('tbody');
 		table.appendChild(tbody);
 
-		attributables.forEach(function(attributable) {
+		parent_assignables.forEach(function(parent_assignable) {
 			const workflow_line = document.createFullElement('tr', {'class': 'assignable'});
 			const workflow_cell = document.createFullElement('td');
-			workflow_cell.appendChild(NodeTools.Draw(attributable));
+			workflow_cell.appendChild(NodeTools.Draw(parent_assignable));
 			workflow_line.appendChild(workflow_cell);
 			tbody.appendChild(workflow_line);
 
@@ -492,32 +283,32 @@ export const Matrices = {
 				cell.addEventListener('mouseout', unhighlight_cell);
 
 				//create label values
-				const values = {attributableId: attributable.id, profileId: profile.id};
+				const values = {parentAssignableId: parent_assignable.id, profileId: profile.id};
 
 				//toggle
 				const toggle = document.createFullElement('img');
 				let properties;
-				if(profile.grantedWorkflowIds[attributable.id]?.right) {
-					properties = AttributableToggle.attributable_selected;
+				if(profile.grantedWorkflowIds.hasOwnProperty(parent_assignable.id)) {
+					properties = FamilyAssignableToggle.parent_selected;
 				}
 				else {
-					properties = AttributableToggle.attributable_unselected;
+					properties = FamilyAssignableToggle.parent_unselected;
 				}
 				const label = properties.label.replaceObject(values);
 				toggle.setAttributes({src: properties.image, alt: label, title: label});
 				Object.assign(toggle.dataset, values);
-				toggle.addEventListener('click', toggle_attributable);
+				toggle.addEventListener('click', toggle_parent_assignable);
 				cell.appendChild(toggle);
 
 				workflow_line.appendChild(cell);
 			});
 
-			attributable.actions.forEach(function(assignable) {
+			parent_assignable.actions.forEach(function(child_assignable) {
 				const line = document.createElement('tr');
 				tbody.appendChild(line);
 
 				const assignable_cell = document.createFullElement('td', {style: 'padding-left: 2rem;'});
-				assignable_cell.appendChild(NodeTools.Draw(assignable));
+				assignable_cell.appendChild(NodeTools.Draw(child_assignable));
 				line.appendChild(assignable_cell);
 
 				profiles.forEach(function(profile) {
@@ -525,43 +316,28 @@ export const Matrices = {
 					cell.addEventListener('mouseover', highlight_cell);
 					cell.addEventListener('mouseout', unhighlight_cell);
 
-					if(!profile.grantedWorkflowIds[attributable.id]) {
-						profile.grantedWorkflowIds[attributable.id] = new Right();
-					}
-
 					//create label values
-					const values = {attributableId: attributable.id, assignableId: assignable.id, profileId: profile.id};
+					const values = {parentAssignableId: parent_assignable.id, childAssignableId: child_assignable.id, profileId: profile.id};
 
 					//toggle
 					const toggle = document.createFullElement('img');
-					const profile_right = profile.grantedWorkflowIds[attributable.id].childRights[assignable.id];
-					if(!profile_right || profile_right.profileIds.isEmpty() && !profile_right.system) {
-						const label = AttributableToggle.assignable_unselected.label.replaceObject(values);
-						toggle.setAttributes({src: AttributableToggle.assignable_unselected.image, alt: label, title: label});
-					}
-					else if(Object.equals(profile_right.profileIds.sort(), profile_ids.sort()) && profile_right.system) {
-						const label = AttributableToggle.assignable_selected.label.replaceObject(values);
-						toggle.setAttributes({src: AttributableToggle.assignable_selected.image, alt: label, title: label});
+					let properties;
+					const child_rights = profile.grantedWorkflowIds[parent_assignable.id] ?? [];
+					if(!child_rights.includes(child_assignable.id)) {
+						properties = FamilyAssignableToggle.child_unselected;
 					}
 					else {
-						const label = AttributableToggle.assignable_partially_selected.label.replaceObject(values);
-						toggle.setAttributes({src: AttributableToggle.assignable_partially_selected.image, alt: label, title: label});
+						properties = FamilyAssignableToggle.child_selected;
 					}
+					const label = properties.label.replaceObject(values);
+					toggle.setAttributes({src: properties.image, alt: label, title: label});
 					Object.assign(toggle.dataset, values);
-					toggle.addEventListener('click', toggle_assignable);
+					toggle.addEventListener('click', toggle_child_assignable);
 					cell.appendChild(toggle);
 
-					//details
-					const label = AttributableToggle.assignable_details.label.replaceObject(values);
-					const details = document.createFullElement('img', {src: 'images/bullet_toggle_plus.png', alt: label, title: label});
-					Object.assign(details.dataset, values);
-					details.addEventListener('click', details_assignable);
-					cell.appendChild(details);
-
-					//disable toggle if no right has been given on attributable
-					if(!profile.grantedWorkflowIds[attributable.id].right) {
+					//disable toggle if no right has been given on parent assignable
+					if(!profile.grantedWorkflowIds.hasOwnProperty(parent_assignable.id)) {
 						toggle.setAttribute('disabled', 'disabled');
-						details.setAttribute('disabled', 'disabled');
 					}
 
 					line.appendChild(cell);
@@ -877,9 +653,9 @@ export const Matrices = {
 			data.pushAll(generate_export_right_assignable_matrix(study, entity));
 			data.push([]);
 		});
-		Attributables.forEach(function(entity) {
+		FamilyAssignableParents.forEach(function(entity) {
 			if(Entities.Study.children.hasOwnProperty(entity.name)) {
-				data.pushAll(generate_export_attributable_matrix(study, entity));
+				data.pushAll(generate_export_family_assignable_matrix(study, entity));
 				data.push([]);
 			}
 		});

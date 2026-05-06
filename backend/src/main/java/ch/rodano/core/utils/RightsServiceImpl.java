@@ -13,10 +13,9 @@ import org.springframework.stereotype.Service;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.feature.Feature;
 import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rights.Assignable;
-import ch.rodano.configuration.model.rights.Attributable;
-import ch.rodano.configuration.model.rights.ProfileRightAssignable;
+import ch.rodano.configuration.model.rights.FamilyAssignableChild;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.actor.Actor;
@@ -170,7 +169,7 @@ public class RightsServiceImpl implements RightsService {
 	}
 
 	@Override
-	public void checkRight(final Actor actor, final Collection<Role> roles, final Attributable<?> node) {
+	public void checkRight(final Actor actor, final Collection<Role> roles, final FamilyAssignableParent<?> node) {
 		if(!hasRight(roles, node)) {
 			throw new UnauthorizedException(node);
 		}
@@ -198,9 +197,9 @@ public class RightsServiceImpl implements RightsService {
 	}
 
 	@Override
-	public void checkRight(final Actor actor, final Collection<Role> roles, final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> creatorProfile) {
-		if(!hasRight(roles, profileRightAssignable, creatorProfile)) {
-			throw UnauthorizedException.getInstance(profileRightAssignable, creatorProfile);
+	public void checkRight(final Actor actor, final Collection<Role> roles, final FamilyAssignableChild<?> familyAssignable) {
+		if(!hasRight(roles, familyAssignable)) {
+			throw UnauthorizedException.getInstance(familyAssignable);
 		}
 	}
 
@@ -223,7 +222,7 @@ public class RightsServiceImpl implements RightsService {
 	@Override
 	public boolean hasRight(final Collection<Role> roles, final Entity entity, final Rights right) {
 		return roles.stream()
-			.flatMap(r -> r.getProfile().getEnumRightMatrixIds(entity).values().stream())
+			.flatMap(r -> r.getProfile().getRightAssignables(entity).values().stream())
 			.anyMatch(r -> r.contains(right));
 	}
 
@@ -259,19 +258,13 @@ public class RightsServiceImpl implements RightsService {
 	}
 
 	@Override
-	public boolean hasRight(final Collection<Role> roles, final Attributable<?> attributable) {
-		return roles.stream().map(Role::getProfile).anyMatch(p -> p.hasRight(attributable));
+	public boolean hasRight(final Collection<Role> roles, final FamilyAssignableParent<?> familyAssignable) {
+		return roles.stream().map(Role::getProfile).anyMatch(p -> p.hasRight(familyAssignable));
 	}
 
 	@Override
-	public boolean hasRight(final Collection<Role> roles, final ProfileRightAssignable<?> profileRightAssignable) {
-		return roles.stream().map(Role::getProfile).anyMatch(p -> p.hasRight(profileRightAssignable, Optional.empty()));
-	}
-
-	//TODO delete this when the advanced workflow matrix has been updated
-	@Override
-	public boolean hasRight(final Collection<Role> roles, final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> creatorProfile) {
-		return roles.stream().map(Role::getProfile).anyMatch(p -> p.hasRight(profileRightAssignable, creatorProfile));
+	public boolean hasRight(final Collection<Role> roles, final FamilyAssignableChild<?> familyAssignable) {
+		return roles.stream().map(Role::getProfile).anyMatch(p -> p.hasRight(familyAssignable));
 	}
 
 	@Override

@@ -167,7 +167,7 @@ public class StudyTest {
 		study.getFeatures().add(feature);
 
 		//assign feature to profile
-		profile.addAssignableToProfileItem(feature);
+		profile.addAssignable(feature);
 
 		assertEquals(1, study.getProfile("TEST_PROFILE").getFeatures().size());
 		assertEquals(feature, study.getProfile("TEST_PROFILE").getFeatures().get(0));

@@ -25,7 +25,7 @@ import {FormStaticActions} from './form_static_actions.js';
 import {EntitiesPlaceholders} from './entities_placeholders.js';
 import {Entities} from './model/config/entities.js';
 import {Importer} from './importer.js';
-import {Attributables, RightAssignables} from './model/config/entities_categories.js';
+import {FamilyAssignableParents, RightAssignables} from './model/config/entities_categories.js';
 
 function hashchange(data) {
 	const study = StudyHandler.GetStudy();
@@ -450,8 +450,8 @@ export const Router = {
 		const matrix = document.getElementById('matrix');
 		matrix.style.display = 'block';
 		let content;
-		if(Attributables.includes(entity)) {
-			content = Matrices.DrawAttributableMatrix(study, entity);
+		if(FamilyAssignableParents.includes(entity)) {
+			content = Matrices.DrawFamilyAssignableMatrix(study, entity);
 		}
 		else if(RightAssignables.includes(entity)) {
 			content = Matrices.DrawRightAssignableMatrix(study, entity);

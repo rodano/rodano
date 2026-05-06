@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.workflow.WorkflowStatusSearch;
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
-import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.validator.Validator;
 import ch.rodano.configuration.model.workflow.Action;
 import ch.rodano.configuration.model.workflow.Workflow;
@@ -130,16 +129,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 	}
 
 	@Override
-	public Optional<Profile> getCreatorProfile(final WorkflowStatus workflowStatus) {
-		if(workflowStatus.getUserFk() == null && workflowStatus.getRobotFk() == null) {
-			return Optional.empty();
-		}
-
-		final var profile = studyService.getStudy().getProfile(workflowStatus.getProfileId());
-		return Optional.of(profile);
-	}
-
-	@Override
 	public WorkflowStatus create(
 		final DataFamily family,
 		final Workflowable workflowable,
@@ -147,7 +136,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final Optional<WorkflowState> state,
 		final Optional<Action> action,
 		final Optional<Validator> validator,
-		final Optional<Profile> profile,
 		final Map<String, Object> data,
 		final DatabaseActionContext context,
 		final String rationale
@@ -199,7 +187,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		ws.setState(state.orElseGet(() -> workflow.getInitialState()));
 		action.ifPresent(ws::setAction);
 		validator.ifPresent(ws::setValidator);
-		profile.ifPresent(ws::setProfile);
 
 		workflowStatusDAOService.saveWorkflowStatus(ws, context, rationale);
 
@@ -228,7 +215,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final Workflowable workflowable,
 		final Workflow workflow,
 		final Action action,
-		final Profile profile,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
@@ -239,7 +225,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 			Optional.empty(),
 			Optional.of(action),
 			Optional.empty(),
-			Optional.of(profile),
 			Collections.emptyMap(),
 			context,
 			rationale
@@ -259,31 +244,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 			family,
 			workflowable,
 			workflow,
-			Optional.empty(),
-			Optional.empty(),
-			Optional.empty(),
-			Optional.empty(),
-			data,
-			context,
-			rationale
-		);
-	}
-
-	@Override
-	public WorkflowStatus create(
-		final DataFamily family,
-		final Workflowable workflowable,
-		final Workflow workflow,
-		final WorkflowState state,
-		final Map<String, Object> data,
-		final DatabaseActionContext context,
-		final String rationale
-	) {
-		return create(
-			family,
-			workflowable,
-			workflow,
-			Optional.of(state),
 			Optional.empty(),
 			Optional.empty(),
 			Optional.empty(),

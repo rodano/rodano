@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.workflow.WorkflowStatusSearch;
-import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.validator.Validator;
 import ch.rodano.configuration.model.workflow.Action;
 import ch.rodano.configuration.model.workflow.Workflow;
@@ -47,17 +46,6 @@ public interface WorkflowStatusService {
 
 	PagedResult<WorkflowStatus> search(WorkflowStatusSearch search);
 
-	/**
-	 * Retrieve an optional profile of the user who created the workflow status
-	 * If the workflow status has been created by the system, the optional will be empty
-	 * this is wrong because we retrieve the current profiles of the creator
-	 * these profiles may have been different at the time the workflow has been created
-	 * even worst, we only return one profile but we don't know with "which" profile the workflow has been created
-	 * 	TODO remove this when advanced workflow matrix has been deleted
-	 * @return an optional list of profiles of the user who created the workflow status
-	 */
-	Optional<Profile> getCreatorProfile(WorkflowStatus workflowStatus);
-
 	//// Workflowable functions
 
 	/**
@@ -72,7 +60,6 @@ public interface WorkflowStatusService {
 		Optional<WorkflowState> state,
 		Optional<Action> action,
 		Optional<Validator> validator,
-		Optional<Profile> profile,
 		Map<String, Object> data,
 		DatabaseActionContext context,
 		String rationale
@@ -89,13 +76,12 @@ public interface WorkflowStatusService {
 		Workflowable workflowable,
 		Workflow workflow,
 		Action action,
-		Profile profile,
 		DatabaseActionContext context,
 		String rationale
 	);
 
 	/**
-	 * Initialize a workflow on a workflowable with default state, no action and no validator and no profile.
+	 * Initialize a workflow on a workflowable with default state, no action and no validator.
 	 * Mainly used to create a system workflow.
 	 *
 	 * @return The workflow status created
@@ -104,22 +90,6 @@ public interface WorkflowStatusService {
 		DataFamily family,
 		Workflowable workflowable,
 		Workflow workflow,
-		Map<String, Object> data,
-		DatabaseActionContext context,
-		String rationale
-	);
-
-	/**
-	 * Initialize a workflow on a workflowable with no action, no validator and no profile.
-	 * Mainly used to create a system workflow and set it to a specific state.
-	 *
-	 * @return The workflow status created
-	 */
-	WorkflowStatus create(
-		final DataFamily family,
-		Workflowable workflowable,
-		Workflow workflow,
-		WorkflowState state,
 		Map<String, Object> data,
 		DatabaseActionContext context,
 		String rationale

@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rights.Assignable;
-import ch.rodano.configuration.model.rights.Attributable;
-import ch.rodano.configuration.model.rights.ProfileRightAssignable;
+import ch.rodano.configuration.model.rights.FamilyAssignableChild;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.actor.Actor;
@@ -107,16 +107,12 @@ public record ACL(
 		return hasRight(p -> p.hasRight(rightAssignable, right));
 	}
 
-	public boolean hasRight(final Attributable<?> attributable) {
-		return hasRight(p -> p.hasRight(attributable));
+	public boolean hasRight(final FamilyAssignableParent<?> familyAssignable) {
+		return hasRight(p -> p.hasRight(familyAssignable));
 	}
 
-	public boolean hasRight(final ProfileRightAssignable<?> profileRightAssignable) {
-		return hasRight(p -> p.hasRight(profileRightAssignable, Optional.empty()));
-	}
-
-	public boolean hasRight(final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> creatorProfile) {
-		return hasRight(p -> p.hasRight(profileRightAssignable, creatorProfile));
+	public boolean hasRight(final FamilyAssignableChild<?> familyAssignable) {
+		return hasRight(p -> p.hasRight(familyAssignable));
 	}
 
 	/**
@@ -145,16 +141,12 @@ public record ACL(
 		return hasRight(date, p -> p.hasRight(rightAssignable, right));
 	}
 
-	public boolean hasRight(final ZonedDateTime date, final Attributable<?> attributable) {
-		return hasRight(date, p -> p.hasRight(attributable));
+	public boolean hasRight(final ZonedDateTime date, final FamilyAssignableParent<?> familyAssignable) {
+		return hasRight(date, p -> p.hasRight(familyAssignable));
 	}
 
-	public boolean hasRight(final ZonedDateTime date, final ProfileRightAssignable<?> profileRightAssignable) {
-		return hasRight(date, p -> p.hasRight(profileRightAssignable, Optional.empty()));
-	}
-
-	public boolean hasRight(final ZonedDateTime date, final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> creatorProfile) {
-		return hasRight(date, p -> p.hasRight(profileRightAssignable, creatorProfile));
+	public boolean hasRight(final ZonedDateTime date, final FamilyAssignableChild<?> familyAssignable) {
+		return hasRight(date, p -> p.hasRight(familyAssignable));
 	}
 
 	//has historical right
@@ -179,15 +171,15 @@ public record ACL(
 		}
 	}
 
-	public void checkRight(final Attributable<?> attributable) {
-		if(!hasRight(attributable)) {
-			throw new UnauthorizedException(attributable);
+	public void checkRight(final FamilyAssignableParent<?> familyAssignable) {
+		if(!hasRight(familyAssignable)) {
+			throw new UnauthorizedException(familyAssignable);
 		}
 	}
 
-	public void checkRight(final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> creatorProfile) {
-		if(!hasRight(profileRightAssignable, creatorProfile)) {
-			throw UnauthorizedException.getInstance(profileRightAssignable, creatorProfile);
+	public void checkRight(final FamilyAssignableChild<?> familyAssignable) {
+		if(!hasRight(familyAssignable)) {
+			throw UnauthorizedException.getInstance(familyAssignable);
 		}
 	}
 }

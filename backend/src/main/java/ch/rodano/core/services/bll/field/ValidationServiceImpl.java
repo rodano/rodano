@@ -248,7 +248,6 @@ public class ValidationServiceImpl implements ValidationService {
 					Optional.of(validator.getInvalidWorkflowState()),
 					Optional.empty(),
 					Optional.of(validator),
-					Optional.empty(),
 					Collections.emptyMap(),
 					context,
 					message

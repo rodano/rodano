@@ -653,7 +653,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		family.checkNotLocked();
 		family.checkNotDeleted();
 
-		// Retrieve current status to retrieve creator role
+		// Retrieve current status
 		final var workflowStatus = workflowStatusDAOService.getWorkflowStatusByPk(workflowStatusPk);
 
 		// Retrieve workflow and check rights
@@ -667,7 +667,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		checkRequiredParameters(acl, email, password, rationale, action);
 
 		// Check right on action
-		acl.checkRight(action, workflowStatusService.getCreatorProfile(workflowStatus));
+		acl.checkRight(action);
 
 		ruleService.execute(new DataState(family, workflowStatus), action.getRules(), currentContext(), rationale, Collections.emptyMap());
 
@@ -698,7 +698,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		checkRequiredParameters(acl, email, password, rationale, action);
 
 		//Check right on action
-		acl.checkRight(action, Optional.empty());
+		acl.checkRight(action);
 
 		ruleService.execute(new DataState(family), action.getRules(), currentContext(), rationale, Collections.emptyMap());
 
@@ -727,10 +727,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		checkRequiredParameters(acl, email, password, rationale, action);
 
 		// Check right on action
-		acl.checkRight(action, Optional.empty());
-
-		//find profile
-		final var profile = actorService.getActiveProfiles(acl.actor()).getFirst();
+		acl.checkRight(action);
 
 		// Initialize workflow
 		workflowStatusService.create(
@@ -738,7 +735,6 @@ public class WorkflowStatusController extends AbstractSecuredController {
 			workflowable,
 			workflow,
 			action,
-			profile,
 			currentContext(),
 			//rational will be empty if the workflow is not documentable
 			//however, a rationale is still required for the context

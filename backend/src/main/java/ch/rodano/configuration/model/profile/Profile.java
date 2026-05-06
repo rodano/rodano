@@ -7,7 +7,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -32,9 +31,8 @@ import ch.rodano.configuration.model.policy.PrivacyPolicy;
 import ch.rodano.configuration.model.reports.Report;
 import ch.rodano.configuration.model.resource.ResourceCategory;
 import ch.rodano.configuration.model.rights.Assignable;
-import ch.rodano.configuration.model.rights.Attributable;
-import ch.rodano.configuration.model.rights.ProfileRightAssignable;
-import ch.rodano.configuration.model.rights.Right;
+import ch.rodano.configuration.model.rights.FamilyAssignableChild;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.scope.ScopeModel;
@@ -95,8 +93,8 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	private Map<String, Set<Rights>> grantedEventModelIdRights;
 	private Map<String, Set<Rights>> grantedFormModelIdRights;
 
-	//attributables
-	private SortedMap<String, Right> grantedWorkflowIds;
+	//family assignables
+	private SortedMap<String, Set<String>> grantedWorkflowIds;
 
 	public Profile() {
 		shortname = new TreeMap<>();
@@ -266,11 +264,11 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 		this.grantedEventModelIdRights = grantedEventIdRights;
 	}
 
-	public final SortedMap<String, Right> getGrantedWorkflowIds() {
+	public SortedMap<String, Set<String>> getGrantedWorkflowIds() {
 		return grantedWorkflowIds;
 	}
 
-	public final void setGrantedWorkflowIds(final SortedMap<String, Right> grantedWorkflowIds) {
+	public void setGrantedWorkflowIds(final SortedMap<String, Set<String>> grantedWorkflowIds) {
 		this.grantedWorkflowIds = grantedWorkflowIds;
 	}
 
@@ -293,7 +291,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	public final List<Report> getReports() {
 		return study.getNodesFromIds(Entity.REPORT, grantedReportIds);
 	}
-
 
 	private <T> List<T> getNodes(final Entity entity, final Map<String, Set<Rights>> rights, final Rights right) {
 		final var nodeIds = rights.entrySet().stream()
@@ -368,24 +365,23 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 			case MENU -> getGrantedMenuIds();
 			case RESOURCE_CATEGORY -> getGrantedCategoryIds();
 			case TIMELINE_GRAPH -> getGrantedTimelineGraphIds();
-			default ->
-				throw new UnsupportedOperationException(String.format("%s is not an assignable entity", entity.getId()));
+			default -> throw new UnsupportedOperationException(String.format("%s is not an assignable entity", entity.getId()));
 		};
 	}
 
 	@JsonIgnore
-	public void addAssignableToProfileItem(final Assignable<?> item) {
-		getAssignableIds(item.getEntity()).add(item.getId());
+	public void addAssignable(final Assignable<?> assignable) {
+		getAssignableIds(assignable.getEntity()).add(assignable.getId());
 	}
 
 	@JsonIgnore
-	public void removeAssignableToProfileItem(final Assignable<?> item) {
-		getAssignableIds(item.getEntity()).remove(item.getId());
+	public void removeAssignable(final Assignable<?> assignable) {
+		getAssignableIds(assignable.getEntity()).remove(assignable.getId());
 	}
 
 	//right assignable
 	@JsonIgnore
-	public Map<String, Set<Rights>> getEnumRightMatrixIds(final Entity entity) {
+	public Map<String, Set<Rights>> getRightAssignables(final Entity entity) {
 		return switch(entity) {
 			case DATASET_MODEL -> grantedDatasetModelIdRights;
 			case FORM_MODEL -> grantedFormModelIdRights;
@@ -393,36 +389,35 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 			case SCOPE_MODEL -> grantedScopeModelIdRights;
 			case PAYMENT_PLAN -> grantedPaymentIdRights;
 			case EVENT_MODEL -> grantedEventModelIdRights;
-			default ->
-				throw new UnsupportedOperationException(String.format("%s is not a right assignable entity", entity.getId()));
+			default -> throw new UnsupportedOperationException(String.format("%s is not a right assignable entity", entity.getId()));
 		};
 	}
 
 	@JsonIgnore
-	public void addRightToItem(final RightAssignable<?> item, final Rights right) {
-		final var assignables = getEnumRightMatrixIds(item.getEntity());
-		if(!assignables.containsKey(item.getId())) {
-			assignables.put(item.getId(), new TreeSet<>());
+	public void addRightAssignable(final RightAssignable<?> assignable, final Rights right) {
+		final var assignables = getRightAssignables(assignable.getEntity());
+		if(!assignables.containsKey(assignable.getId())) {
+			assignables.put(assignable.getId(), new TreeSet<>());
 		}
-		assignables.get(item.getId()).add(right);
+		assignables.get(assignable.getId()).add(right);
 	}
 
 	@JsonIgnore
-	public void removeRightFromItem(final RightAssignable<?> item, final Rights right) {
-		final var assignables = getEnumRightMatrixIds(item.getEntity());
-		if(assignables.containsKey(item.getId())) {
-			assignables.get(item.getId()).remove(right);
+	public void removeRightAssignable(final RightAssignable<?> assignable, final Rights right) {
+		final var assignables = getRightAssignables(assignable.getEntity());
+		if(assignables.containsKey(assignable.getId())) {
+			assignables.get(assignable.getId()).remove(right);
 		}
 	}
 
-	//attributable
+	//family assignables
 	@JsonIgnore
-	public SortedMap<String, Right> getAttributables(final Entity entity) {
+	public SortedMap<String, Set<String>> getFamilyAssignables(final Entity entity) {
 		switch(entity) {
 			case WORKFLOW:
-				return getGrantedWorkflowIds();
+				return grantedWorkflowIds;
 			default:
-				throw new UnsupportedOperationException(String.format("%s is not an attributable entity", entity.getId()));
+				throw new UnsupportedOperationException(String.format("%s is not a family assignable entity", entity.getId()));
 		}
 	}
 
@@ -450,48 +445,36 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	//right on right assignable
 	@JsonIgnore
 	public boolean hasRight(final RightAssignable<?> rightAssignable, final Rights right) {
-		final var assignables = getEnumRightMatrixIds(rightAssignable.getEntity());
+		final var assignables = getRightAssignables(rightAssignable.getEntity());
 		return assignables.containsKey(rightAssignable.getId()) && assignables.get(rightAssignable.getId()).contains(right);
 	}
 
 	@JsonIgnore
 	public boolean hasRight(final Entity entity, final String assignableId, final Rights right) {
-		final var assignables = getEnumRightMatrixIds(entity);
+		final var assignables = getRightAssignables(entity);
 		return assignables.containsKey(assignableId) && assignables.get(assignableId).contains(right);
 	}
 
 	@JsonIgnore
 	public boolean hasRight(final Entity entity, final Rights right) {
-		return getEnumRightMatrixIds(entity).entrySet().stream().anyMatch(e -> e.getValue().contains(right));
+		return getRightAssignables(entity).entrySet().stream().anyMatch(e -> e.getValue().contains(right));
 	}
 
-	//rights on profile right assignable
+	//rights on family assignable (child)
 	@JsonIgnore
-	public boolean hasRight(final ProfileRightAssignable<?> profileRightAssignable, final Optional<Profile> creator) {
-		if(!getGrantedWorkflowIds().containsKey(profileRightAssignable.getParentId())) {
+	public boolean hasRight(final FamilyAssignableChild<?> familyAssignable) {
+		if(!getGrantedWorkflowIds().containsKey(familyAssignable.getParentId())) {
 			return false;
 		}
 
-		final var assignables = getGrantedWorkflowIds().get(profileRightAssignable.getParentId());
-		if(!assignables.getChildRights().containsKey(profileRightAssignable.getId())) {
-			return false;
-		}
-
-		final var profileRight = assignables.getChildRights().get(profileRightAssignable.getId());
-		//workflow created by system
-		if(creator.isEmpty()) {
-			return profileRight.isSystem();
-		}
-
-		//workflow created by a user
-		return profileRight.getProfileIds().contains(creator.get().getId());
+		return getGrantedWorkflowIds().get(familyAssignable.getParentId()).contains(familyAssignable.getId());
 	}
 
-	//right on attributable
+	//right on family assignable (parent)
 	@JsonIgnore
-	public boolean hasRight(final Attributable<?> attributable) {
-		final var attributables = getAttributables(attributable.getEntity());
-		return attributables.containsKey(attributable.getId()) && attributables.get(attributable.getId()).isRight();
+	public boolean hasRight(final FamilyAssignableParent<?> familyAssignable) {
+		final var assignables = getFamilyAssignables(familyAssignable.getEntity());
+		return assignables.containsKey(familyAssignable.getId());
 	}
 
 	@Override

@@ -28,11 +28,11 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
 import ch.rodano.configuration.model.payment.PaymentPlan;
-import ch.rodano.configuration.model.rights.Attributable;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.study.Study;
 
-public class Workflow implements SuperDisplayable, Serializable, Attributable<Workflow>, Node {
+public class Workflow implements SuperDisplayable, Serializable, FamilyAssignableParent<Workflow>, Node {
 	@Serial
 	private static final long serialVersionUID = -2909356306271744756L;
 

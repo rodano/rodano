@@ -1827,47 +1827,21 @@ main menu {
 	color: var(--text-color);
 }
 
-/* adjustments for attributable matrices */
-#matrix table.attributable_matrix th:not(:first-child), #matrix table.attributable_matrix td:not(:first-child) {
+/* adjustments for family assignable matrices */
+#matrix table.family_assignable_matrix th:not(:first-child), #matrix table.family_assignable_matrix td:not(:first-child) {
 	width: 3.5rem;
 }
-#matrix table.attributable_matrix th span {
+#matrix table.family_assignable_matrix th span {
 	height: calc(3.2rem);
 }
-#matrix table.attributable_matrix td {
+#matrix table.family_assignable_matrix td {
 	text-align: left;
 }
-#matrix table.attributable_matrix tr.assignable {
+#matrix table.family_assignable_matrix tr.assignable {
 	background-color: var(--background-rehighlight-color);
 }
-#matrix table.attributable_matrix tr.assignable:hover {
+#matrix table.family_assignable_matrix tr.assignable:hover {
 	background-color: var(--background-light-color);
-}
-
-#profile_right_matrix_matrix {
-	position: fixed;
-	width: 180px;
-	margin-left: -90px;
-	background-color: var(--background-main-color);
-	border: 5px solid var(--background-highlight-color);
-	z-index: 3;
-	white-space: nowrap;
-	overflow-x: hidden;
-}
-#profile_right_matrix_matrix > h2 {
-	padding: 4px;
-	margin: 0;
-}
-#profile_right_matrix_matrix > ul > li {
-	padding: 2px 4px;
-}
-#profile_right_matrix_matrix > ul > li:hover {
-	background-color: var(--background-light-color);
-}
-#profile_right_matrix_matrix > ul > li > img {
-	cursor: pointer;
-	vertical-align: text-top;
-	margin-right: 0.5rem;
 }
 
 /* layout */

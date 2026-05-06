@@ -4,7 +4,7 @@ import java.util.List;
 
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.profile.Profile;
-import ch.rodano.configuration.model.rights.Attributable;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.actor.Actor;
@@ -41,7 +41,7 @@ public interface RoleService {
 
 	List<Role> getActiveRoles(Actor actor, RightAssignable<?> rightAssignable, Rights right);
 
-	List<Role> getActiveRoles(Actor actor, Attributable<?> attributable);
+	List<Role> getActiveRoles(Actor actor, FamilyAssignableParent<?> familyAssignable);
 
 	List<Role> getActiveRoles(Scope scope, Profile profile);
 

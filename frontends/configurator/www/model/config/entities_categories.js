@@ -18,12 +18,11 @@ const RightAssignables = [
 	Entities.PaymentPlan
 ];
 
-const Attributables = [
+const FamilyAssignableParents = [
 	Entities.Workflow,
-	Entities.Action
 ];
 
-const ProfileRightAssignables = [
+const FamilyAssignableChildren = [
 	Entities.Action
 ];
 
@@ -62,4 +61,4 @@ const Templatables = [
 	Entities.FormModel
 ];
 
-export {Assignables, RightAssignables, Attributables, ProfileRightAssignables, Rulables, Constrainables, Conditionnables, Templatables};
+export {Assignables, RightAssignables, FamilyAssignableParents, FamilyAssignableChildren, Rulables, Constrainables, Conditionnables, Templatables};

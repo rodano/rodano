@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 123;
+const CURRENT_VERSION = 124;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -204,6 +204,25 @@ const Migrations = {
 					delete column.description;
 					delete column.width;
 				});
+			});
+		}
+	},
+	migrate_123: {
+		description: 'Simplify workflow rights',
+		migration: function(config) {
+			config.profiles.forEach(profile => {
+				const rights = {};
+				for(const [workflow_id, workflow_right] of Object.entries(profile.grantedWorkflowIds)) {
+					if(workflow_right.right) {
+						rights[workflow_id] = [];
+						for(const [action_id, action_rights] of Object.entries(workflow_right.childRights)) {
+							if(action_rights.system || action_rights.profileIds.length > 0) {
+								rights[workflow_id].push(action_id);
+							}
+						}
+					}
+				}
+				profile.grantedWorkflowIds = rights;
 			});
 		}
 	}

@@ -7,10 +7,9 @@ import java.util.Optional;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.feature.Feature;
 import ch.rodano.configuration.model.feature.FeatureStatic;
-import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rights.Assignable;
-import ch.rodano.configuration.model.rights.Attributable;
-import ch.rodano.configuration.model.rights.ProfileRightAssignable;
+import ch.rodano.configuration.model.rights.FamilyAssignableChild;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.actor.Actor;
@@ -50,9 +49,8 @@ public interface RightsService {
 
 	void checkRight(Actor actor, Collection<Role> roles, FeatureStatic staticFeature);
 
+	//assignable
 	void checkRight(Actor actor, Collection<Role> roles, Assignable<?> node);
-
-	void checkRight(Actor actor, Collection<Role> roles, Attributable<?> node);
 
 	//right assignable
 	Role checkRight(Actor actor, Collection<Role> roles, RightAssignable<?> rightAssignable, Rights right);
@@ -61,7 +59,10 @@ public interface RightsService {
 
 	void checkRight(Actor actor, List<Role> roles, User targetUser, Rights right);
 
-	void checkRight(Actor actor, Collection<Role> roles, ProfileRightAssignable<?> profileRightAssignable, Optional<Profile> creatorProfile);
+	//family assignable
+	void checkRight(Actor actor, Collection<Role> roles, FamilyAssignableParent<?> node);
+
+	void checkRight(Actor actor, Collection<Role> roles, FamilyAssignableChild<?> familyAssignable);
 
 	void checkRightToRead(Actor actor, List<Role> roles, Resource resource);
 
@@ -82,12 +83,9 @@ public interface RightsService {
 
 	boolean hasRight(Collection<Role> roles, RightAssignable<?> rightAssignable, Rights right);
 
-	boolean hasRight(Collection<Role> roles, Attributable<?> attributable);
+	boolean hasRight(Collection<Role> roles, FamilyAssignableParent<?> familyAssignable);
 
-	boolean hasRight(Collection<Role> roles, ProfileRightAssignable<?> profileRightAssignable);
-
-	//TODO delete this when the advanced workflow matrix has been updated
-	boolean hasRight(Collection<Role> roles, ProfileRightAssignable<?> profileRightAssignable, Optional<Profile> creatorProfile);
+	boolean hasRight(Collection<Role> roles, FamilyAssignableChild<?> familyAssignable);
 
 	boolean hasRightToRead(Collection<Role> roles, Resource resource);
 

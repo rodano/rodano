@@ -79,7 +79,7 @@ public class StudyBuilder {
 		builder.addFeature(FEATURE_ID, FEATURE_ID);
 		builder.addProfile(PROFILE_ID, PROFILE_ID);
 		//assign feature to profile
-		builder.getStudy().getProfile(PROFILE_ID).addAssignableToProfileItem(builder.getStudy().getFeature(FEATURE_ID));
+		builder.getStudy().getProfile(PROFILE_ID).addAssignable(builder.getStudy().getFeature(FEATURE_ID));
 
 		//scope models
 		builder.addScopeModel(SCOPE_MODEL_STUDY_ID, SCOPE_MODEL_STUDY_ID, null);

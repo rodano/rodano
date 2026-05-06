@@ -161,87 +161,73 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	}
 
 	/**
-	 * Setter for <code>workflow_status.profile_id</code>.
-	 */
-	public void setProfileId(String value) {
-		set(10, value);
-	}
-
-	/**
-	 * Getter for <code>workflow_status.profile_id</code>.
-	 */
-	public String getProfileId() {
-		return (String) get(10);
-	}
-
-	/**
 	 * Setter for <code>workflow_status.state_id</code>.
 	 */
 	public void setStateId(String value) {
-		set(11, value);
+		set(10, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.state_id</code>.
 	 */
 	public String getStateId() {
-		return (String) get(11);
+		return (String) get(10);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.workflow_id</code>.
 	 */
 	public void setWorkflowId(String value) {
-		set(12, value);
+		set(11, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.workflow_id</code>.
 	 */
 	public String getWorkflowId() {
-		return (String) get(12);
+		return (String) get(11);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.action_id</code>.
 	 */
 	public void setActionId(String value) {
-		set(13, value);
+		set(12, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.action_id</code>.
 	 */
 	public String getActionId() {
-		return (String) get(13);
+		return (String) get(12);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.validator_id</code>.
 	 */
 	public void setValidatorId(String value) {
-		set(14, value);
+		set(13, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.validator_id</code>.
 	 */
 	public String getValidatorId() {
-		return (String) get(14);
+		return (String) get(13);
 	}
 
 	/**
 	 * Setter for <code>workflow_status.trigger_message</code>.
 	 */
 	public void setTriggerMessage(String value) {
-		set(15, value);
+		set(14, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status.trigger_message</code>.
 	 */
 	public String getTriggerMessage() {
-		return (String) get(15);
+		return (String) get(14);
 	}
 
 	// -------------------------------------------------------------------------
@@ -267,7 +253,7 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	/**
 	 * Create a detached, initialised WorkflowStatusRecord
 	 */
-	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String profileId, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
 		super(WorkflowStatus.WORKFLOW_STATUS);
 
 		setPk(pk);
@@ -280,7 +266,6 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 		setFieldFk(fieldFk);
 		setUserFk(userFk);
 		setRobotFk(robotFk);
-		setProfileId(profileId);
 		setStateId(stateId);
 		setWorkflowId(workflowId);
 		setActionId(actionId);

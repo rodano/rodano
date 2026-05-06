@@ -10,7 +10,6 @@ public class WorkflowStatusRecord {
 	protected Long formFk;
 	protected Long userFk;
 	protected Long robotFk;
-	protected String profileId;
 	protected String stateId;
 	protected String workflowId;
 	protected String actionId;
@@ -77,14 +76,6 @@ public class WorkflowStatusRecord {
 	// WARNING: only use this method if you know exactly what you are doing
 	public void setRobotFk(final Long robotFk) {
 		this.robotFk = robotFk;
-	}
-
-	public String getProfileId() {
-		return profileId;
-	}
-
-	public void setProfileId(final String profileId) {
-		this.profileId = profileId;
 	}
 
 	public String getStateId() {

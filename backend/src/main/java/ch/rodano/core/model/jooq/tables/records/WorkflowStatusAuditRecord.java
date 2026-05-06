@@ -232,87 +232,73 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 	}
 
 	/**
-	 * Setter for <code>workflow_status_audit.profile_id</code>.
-	 */
-	public void setProfileId(String value) {
-		set(15, value);
-	}
-
-	/**
-	 * Getter for <code>workflow_status_audit.profile_id</code>.
-	 */
-	public String getProfileId() {
-		return (String) get(15);
-	}
-
-	/**
 	 * Setter for <code>workflow_status_audit.state_id</code>.
 	 */
 	public void setStateId(String value) {
-		set(16, value);
+		set(15, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.state_id</code>.
 	 */
 	public String getStateId() {
-		return (String) get(16);
+		return (String) get(15);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.workflow_id</code>.
 	 */
 	public void setWorkflowId(String value) {
-		set(17, value);
+		set(16, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.workflow_id</code>.
 	 */
 	public String getWorkflowId() {
-		return (String) get(17);
+		return (String) get(16);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.action_id</code>.
 	 */
 	public void setActionId(String value) {
-		set(18, value);
+		set(17, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.action_id</code>.
 	 */
 	public String getActionId() {
-		return (String) get(18);
+		return (String) get(17);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.validator_id</code>.
 	 */
 	public void setValidatorId(String value) {
-		set(19, value);
+		set(18, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.validator_id</code>.
 	 */
 	public String getValidatorId() {
-		return (String) get(19);
+		return (String) get(18);
 	}
 
 	/**
 	 * Setter for <code>workflow_status_audit.trigger_message</code>.
 	 */
 	public void setTriggerMessage(String value) {
-		set(20, value);
+		set(19, value);
 	}
 
 	/**
 	 * Getter for <code>workflow_status_audit.trigger_message</code>.
 	 */
 	public String getTriggerMessage() {
-		return (String) get(20);
+		return (String) get(19);
 	}
 
 	// -------------------------------------------------------------------------
@@ -338,7 +324,7 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 	/**
 	 * Create a detached, initialised WorkflowStatusAuditRecord
 	 */
-	public WorkflowStatusAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String profileId, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
 		super(WorkflowStatusAudit.WORKFLOW_STATUS_AUDIT);
 
 		setPk(pk);
@@ -356,7 +342,6 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 		setFieldFk(fieldFk);
 		setUserFk(userFk);
 		setRobotFk(robotFk);
-		setProfileId(profileId);
 		setStateId(stateId);
 		setWorkflowId(workflowId);
 		setActionId(actionId);

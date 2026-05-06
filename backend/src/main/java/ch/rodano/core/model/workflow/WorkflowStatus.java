@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rules.RulableEntity;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.validator.Validator;
@@ -45,7 +44,6 @@ public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObj
 	private WorkflowState state;
 	private Action action;
 	private Validator validator;
-	private Profile profile;
 
 	public WorkflowStatus() {
 		super();
@@ -101,11 +99,6 @@ public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObj
 		this.validatorId = validator.getId();
 	}
 
-	public void setProfile(final Profile profile) {
-		this.profile = profile;
-		this.profileId = profile.getId();
-	}
-
 	public Workflow getWorkflow() {
 		return workflow;
 	}
@@ -120,10 +113,6 @@ public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObj
 
 	public Validator getValidator() {
 		return validator;
-	}
-
-	public Profile getProfile() {
-		return profile;
 	}
 
 	public WorkflowableEntity getWorkflowableType() {
@@ -192,6 +181,5 @@ public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObj
 		state = workflow.getState(stateId);
 		action = StringUtils.isNotBlank(actionId) ? workflow.getAction(actionId) : null;
 		validator = StringUtils.isNotBlank(validatorId) ? study.getValidator(validatorId) : null;
-		profile = StringUtils.isNotBlank(profileId) ? study.getProfile(profileId) : null;
 	}
 }

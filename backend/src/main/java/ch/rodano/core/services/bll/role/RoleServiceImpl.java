@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.profile.Profile;
-import ch.rodano.configuration.model.rights.Attributable;
+import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rights.RightAssignable;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
@@ -96,9 +96,9 @@ public class RoleServiceImpl implements RoleService {
 	}
 
 	@Override
-	public List<Role> getActiveRoles(final Actor actor, final Attributable<?> attributable) {
+	public List<Role> getActiveRoles(final Actor actor, final FamilyAssignableParent<?> familyAssignable) {
 		return getActiveRoles(actor).stream()
-			.filter(r -> r.getProfile().hasRight(attributable))
+			.filter(r -> r.getProfile().hasRight(familyAssignable))
 			.toList();
 	}
 

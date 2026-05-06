@@ -75,11 +75,11 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		final var family = new DataFamily(center);
 
 		workflow.setInitialStateId("OPEN");
-		final var openWorkflowStatus = workflowStatusService.create(family, center, workflow, null, context, TEST_RATIONALE);
+		final var openWorkflowStatus = workflowStatusService.create(family, center, workflow, Collections.emptyMap(), context, TEST_RATIONALE);
 		assertEquals(openWorkflowStatus.getStateId(), "OPEN");
 
 		workflow.setInitialStateId("PENDING");
-		final var pendingWorkflowStatus = workflowStatusService.create(family, center, workflow, null, context, TEST_RATIONALE);
+		final var pendingWorkflowStatus = workflowStatusService.create(family, center, workflow, Collections.emptyMap(), context, TEST_RATIONALE);
 		assertEquals(pendingWorkflowStatus.getStateId(), "PENDING");
 	}
 
@@ -98,7 +98,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 			family,
 			center,
 			workflow,
-			null,
+			Collections.emptyMap(),
 			context,
 			TEST_RATIONALE
 		);
