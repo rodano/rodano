@@ -10,7 +10,7 @@
 
 
 /**
- * FIXABLE: issue detected but not fixed (dry run); FIXED: issue has been fixed
+ * Status of the inconsistency
  */
 export type InconsistencyStatus = 'FIXABLE' | 'FIXED' | 'NOT_FIXABLE';
 

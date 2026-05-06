@@ -124,7 +124,12 @@ export class DatabaseConsistencyComponent implements AfterViewInit {
 		this.databaseService.fixConfigConsistency(this.configurationDryRun()).subscribe({
 			next: result => {
 				this.configurationInconsistencyGroups.data = result;
-				this.configurationInconsistencyStatus.set('No configuration inconsistencies detected');
+				if(result.length === 0) {
+					this.configurationInconsistencyStatus.set('No configuration inconsistencies detected');
+				}
+				else {
+					this.configurationInconsistencyStatus.set(`${result.length} configuration inconsistencies detected`);
+				}
 				this.configurationLoading.set(false);
 			},
 			error: () => this.configurationLoading.set(false)
@@ -136,7 +141,12 @@ export class DatabaseConsistencyComponent implements AfterViewInit {
 		this.databaseService.fixDenormalizationConsistency(this.denormalizationDryRun()).subscribe({
 			next: result => {
 				this.denormalizationInconsistencyGroups.data = result;
-				this.denormalizationInconsistencyStatus.set('No denormalization inconsistencies detected');
+				if(result.length === 0) {
+					this.denormalizationInconsistencyStatus.set('No denormalization inconsistencies detected');
+				}
+				else {
+					this.denormalizationInconsistencyStatus.set(`${result.length} denormalization inconsistencies detected`);
+				}
 				this.denormalizationLoading.set(false);
 			},
 			error: () => this.denormalizationLoading.set(false)

@@ -18,7 +18,7 @@ public record DenormalizationInconsistencyGroupDTO(
 	@Schema(description = "Model id of the affected entity") @NotBlank String modelId,
 	@Schema(description = "Primary keys of the affected records") @NotEmpty List<Long> pks,
 	@Schema(description = "Number of affected records") int count,
-	@Schema(description = "FIXABLE: issue detected but not fixed (dry run); FIXED: issue has been fixed") @NotNull InconsistencyStatus status
+	@Schema(description = "Status of the inconsistency") @NotNull InconsistencyStatus status
 ) {
 	public DenormalizationInconsistencyGroupDTO(final DenormalizationInconsistencyGroup issueGroup) {
 		this(issueGroup.entity(), issueGroup.modelId(), issueGroup.pks(), issueGroup.pks().size(), issueGroup.status());
