@@ -1,0 +1,299 @@
+{
+	"folders": [
+		{
+			"name": "🏠 Root",
+			"path": "."
+		},
+		{
+			"name": "☕ Backend",
+			"path": "./backend"
+		},
+		{
+			"name": "🖥️ Frontend (Main)",
+			"path": "./frontends/main"
+		},
+		{
+			"name": "📱 Frontend (ePRO)",
+			"path": "./frontends/epro"
+		},
+		{
+			"name": "⚙️ Configurator",
+			"path": "./frontends/configurator"
+		},
+		{
+			"name": "🐳 Manager",
+			"path": "./manager"
+		},
+		{
+			"name": "🚀 Ansible",
+			"path": "./ansible"
+		}
+	],
+	"settings": {
+		//global workspace settings
+		"editor.tabSize": 4,
+		"editor.insertSpaces": false,
+		"editor.detectIndentation": false,
+		"files.trimTrailingWhitespace": true,
+		"files.insertFinalNewline": true,
+		"files.eol": "\n",
+
+		//exclusions
+		"search.exclude": {
+			"**/node_modules": true,
+			"**/target": true,
+			"**/dist": true,
+			"**/build": true,
+			"**/.angular": true,
+			"**/coverage": true
+		},
+
+		//Java settings
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"java.compile.nullAnalysis.mode": "disabled",
+	},
+	"tasks": {
+		"version": "2.0.0",
+		"tasks": [
+			//backend
+			{
+				"label": "Backend: Initialize Database",
+				"type": "shell",
+				"command": "mvn",
+				"args": [
+					"spring-boot:run",
+					"-Dspring-boot.run.profiles=database,local",
+					"-Dspring-boot.run.jvmArguments='-Drodano.init.with-data=true'"
+				],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"problemMatcher": []
+			},
+			{
+				"label": "Backend: Start",
+				"type": "shell",
+				"command": "mvn",
+				"args": [
+					"spring-boot:run",
+					"-Dspring-boot.run.profiles=api,local"
+				],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"problemMatcher": [],
+			},
+			{
+				"label": "Backend: Build",
+				"type": "shell",
+				"command": "mvn",
+				"args": ["clean", "compile"],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"problemMatcher": [],
+				"group": "build"
+			},
+			{
+				"label": "Backend: Test",
+				"type": "shell",
+				"command": "mvn",
+				"args": ["test"],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"problemMatcher": [],
+				"group": { "kind": "test", "isDefault": true }
+			},
+			{
+				"label": "Backend: Checkstyle",
+				"type": "shell",
+				"command": "mvn",
+				"args": ["checkstyle:check"],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"problemMatcher": []
+			},
+			//frontend: main
+			{
+				"label": "Frontend Main: Start",
+				"type": "shell",
+				"command": "npm",
+				"args": ["start"],
+				"options": { "cwd": "${workspaceFolder:🖥️ Frontend (Main)}" },
+				"isBackground": true,
+				"problemMatcher": {
+					"pattern": { "regexp": "^$" },
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".*",
+						"endsPattern": ".*Application bundle generation complete."
+					}
+				}
+			},
+			{
+				"label": "Frontend Main: Build",
+				"type": "shell",
+				"command": "npm",
+				"args": ["run", "build"],
+				"options": { "cwd": "${workspaceFolder:🖥️ Frontend (Main)}" },
+				"problemMatcher": "$tsc",
+				"group": "build"
+			},
+			{
+				"label": "Frontend Main: Test",
+				"type": "shell",
+				"command": "npm",
+				"args": ["test"],
+				"options": { "cwd": "${workspaceFolder:🖥️ Frontend (Main)}" },
+				"problemMatcher": [],
+				"group": "test"
+			},
+			{
+				"label": "Frontend Main: Lint",
+				"type": "shell",
+				"command": "npm",
+				"args": ["run", "lint"],
+				"options": { "cwd": "${workspaceFolder:🖥️ Frontend (Main)}" },
+				"problemMatcher": "$eslint-stylish"
+			},
+			{
+				"label": "Frontend Main: Generate API Model",
+				"type": "shell",
+				"command": "npm",
+				"args": ["run", "generate-model"],
+				"options": { "cwd": "${workspaceFolder:🖥️ Frontend (Main)}" },
+				"problemMatcher": []
+			},
+			//frontend: ePRO
+			{
+				"label": "Frontend ePRO: Serve",
+				"type": "shell",
+				"command": "npm",
+				"args": ["start"],
+				"options": { "cwd": "${workspaceFolder:📱 Frontend (ePRO)}" },
+				"isBackground": true,
+				"problemMatcher": {
+					"pattern": { "regexp": "^$" },
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".*",
+						"endsPattern": ".*Compiled successfully.*"
+					}
+				}
+			},
+			{
+				"label": "Frontend ePRO: Build",
+				"type": "shell",
+				"command": "npm",
+				"args": ["run", "build"],
+				"options": { "cwd": "${workspaceFolder:📱 Frontend (ePRO)}" },
+				"problemMatcher": "$tsc",
+				"group": "build"
+			},
+			{
+				"label": "Frontend ePRO: Lint",
+				"type": "shell",
+				"command": "npm",
+				"args": ["run", "lint"],
+				"options": { "cwd": "${workspaceFolder:📱 Frontend (ePRO)}" },
+				"problemMatcher": "$eslint-stylish"
+			},
+			//configurator
+			{
+				"label": "Configurator: Serve",
+				"type": "shell",
+				"command": "npm",
+				"args": ["start"],
+				"options": { "cwd": "${workspaceFolder:⚙️ Configurator}" },
+				"isBackground": true,
+				"problemMatcher": {
+					"pattern": { "regexp": "^$" },
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".*",
+						"endsPattern": ".*Open http://.*"
+					}
+				}
+			},
+			{
+				"label": "Configurator: Test",
+				"type": "shell",
+				"command": "npm",
+				"args": ["test"],
+				"options": { "cwd": "${workspaceFolder:⚙️ Configurator}" },
+				"problemMatcher": [],
+				"group": "test"
+			},
+			{
+				"label": "Configurator: Lint",
+				"type": "shell",
+				"command": "npm",
+				"args": ["run", "lint"],
+				"options": { "cwd": "${workspaceFolder:⚙️ Configurator}" },
+				"problemMatcher": "$eslint-stylish"
+			}
+		]
+	},
+	"launch": {
+		"version": "0.2.0",
+		"configurations": [
+			//backend
+			{
+				"type": "java",
+				"name": "Backend: Launch",
+				"request": "launch",
+				"mainClass": "ch.rodano.application.RodanoApplication",
+				"projectName": "rodano-backend",
+				"cwd": "${workspaceFolder:☕ Backend}",
+				"vmArgs": "-Drodano.environment=DEV -Dspring.profiles.active=api,local"
+			},
+			//frontend: main
+			{
+				"type": "chrome",
+				"name": "Frontend Main: Debug in Chrome",
+				"request": "launch",
+				"url": "http://localhost:4200",
+				"webRoot": "${workspaceFolder:🖥️ Frontend (Main)}/src",
+				"sourceMaps": true,
+				"preLaunchTask": "Frontend Main: Start"
+			},
+			{
+				"type": "chrome",
+				"name": "Frontend Main: Attach to Chrome",
+				"request": "attach",
+				"port": 9222,
+				"webRoot": "${workspaceFolder:🖥️ Frontend (Main)}/src",
+				"sourceMaps": true
+			},
+			//frontend: ePRO
+			{
+				"type": "chrome",
+				"name": "Frontend ePRO: Debug in Chrome",
+				"request": "launch",
+				"url": "http://localhost:8100",
+				"webRoot": "${workspaceFolder:📱 Frontend (ePRO)}/src",
+				"sourceMaps": true,
+				"preLaunchTask": "Frontend ePRO: Serve"
+			},
+			//configurator
+			{
+				"type": "chrome",
+				"name": "Configurator: Debug in Chrome",
+				"request": "launch",
+				"url": "http://localhost:1337",
+				"webRoot": "${workspaceFolder:⚙️ Configurator}/www",
+				"sourceMaps": true,
+				"preLaunchTask": "Configurator: Serve"
+			}
+		],
+		"compounds": [
+			{
+				"name": "Full Stack: Backend + Main Frontend",
+				"configurations": ["Backend: Launch", "Frontend Main: Debug in Chrome"],
+				"stopAll": true
+			},
+			{
+				"name": "Full Stack: Backend + ePRO",
+				"configurations": ["Backend: Launch", "Frontend ePRO: Debug in Chrome"],
+				"stopAll": true
+			},
+			{
+				"name": "Full Stack: Backend + All Frontends",
+				"configurations": ["Backend: Launch", "Frontend Main: Debug in Chrome", "Frontend ePRO: Debug in Chrome"],
+				"stopAll": true
+			}
+		]
+	}
+}
