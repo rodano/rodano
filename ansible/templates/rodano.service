@@ -4,8 +4,10 @@ Description=Rodano
 [Service]
 WorkingDirectory={{ rodano_path }}
 #do not use -d (daemon mode) for Docker command to let systemd handle the process
-ExecStart=/usr/bin/docker compose --env-file {{ rodano_path }}/.env up
-ExecStop=/usr/bin/docker compose --env-file {{ rodano_path }}/.env down
+ExecStart=/usr/bin/docker compose --env-file {{ rodano_path }}/.env --project-name {{ docker_project_name }} up
+ExecStop=/usr/bin/docker compose --env-file {{ rodano_path }}/.env --project-name {{ docker_project_name }} down --timeout 60
+ExecStopPost=/bin/sh -c 'while docker ps --quiet --filter label=com.docker.compose.project={{ docker_project_name }} 2>/dev/null | grep -q .; do sleep 1; done'
+TimeoutStopSec=120
 SyslogIdentifier=rodano
 #restart service if the app crashes
 Restart=always

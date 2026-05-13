@@ -40,3 +40,10 @@ Finally, run the playbook:
 ansible-playbook -i hosts.yml debian-setup.yml
 ```
 The playbook will set up or update the instances with the specified parameters.
+
+## Development
+
+To lint the Ansible scripts, use:
+```
+ansible-lint *
+```

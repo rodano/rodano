@@ -4,15 +4,16 @@
   vars:
     study_path: /opt/study
     rodano_path: /opt/rodano
+    docker_project_name: rodano
   vars_prompt:
     - name: reset_database
-      prompt: Do you wan to reset the database?
+      prompt: Do you want to reset the database?
       default: "false"
       private: false
   tasks:
     - name: Print debug message
       ansible.builtin.debug:
-        msg: "Run by {{ lookup('env', 'USER') }} on {{ inventory_hostname }} at {{ ansible_date_time.date }}."
+        msg: "Run by {{ lookup('env', 'USER') }} on {{ inventory_hostname }} at {{ ansible_facts['date_time']['date'] }}."
 
     - name: Install basic tools
       ansible.builtin.apt:
@@ -237,6 +238,20 @@
         creates: /etc/letsencrypt/live/{{ server_name }}
       become: true
 
+    - name: Create maintenance page directory
+      ansible.builtin.file:
+        state: directory
+        dest: /var/www/rodano
+        mode: "0755"
+      become: true
+
+    - name: Deploy maintenance page
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../frontends/maintenance.html"
+        dest: /var/www/rodano/maintenance.html
+        mode: "0644"
+      become: true
+
     - name: Add Nginx configuration
       ansible.builtin.template:
         src: "templates/nginx.conf"
@@ -261,7 +276,7 @@
     - name: Prepare systemd folder
       ansible.builtin.file:
         state: directory
-        dest: "{{ ansible_env.HOME }}/.config/systemd/user"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.config/systemd/user"
         mode: "0700"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
@@ -276,7 +291,7 @@
     - name: Create systemd service
       ansible.builtin.template:
         src: "templates/rodano.service"
-        dest: "{{ ansible_env.HOME }}/.config/systemd/user/rodano.service"
+        dest: "{{ ansible_facts['env']['HOME'] }}/.config/systemd/user/rodano.service"
         mode: "0600"
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
@@ -300,9 +315,24 @@
         XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
         DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
 
+    - name: Stop the rodano service
+      ansible.builtin.systemd:
+        name: rodano
+        state: stopped
+        scope: user
+      environment:
+        XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
+
+    - name: Remove database container
+      community.docker.docker_container:
+        name: "{{ docker_project_name }}-database-1"
+        state: absent
+      when: reset_database | bool
+
     - name: Reset database volume
       community.docker.docker_volume:
-        name: "{{ (rodano_path | basename) }}_database"
+        name: rodano_database
         state: absent
       when: reset_database | bool
 
