@@ -38,7 +38,7 @@ services:
 
 #this service can be removed if an external SMTP server is used
   smtp:
-    image: ixdotai/smtp
+    image: registry.gitlab.com/egos-tech/smtp:1.2.6
     restart: on-failure
 
   backend:
