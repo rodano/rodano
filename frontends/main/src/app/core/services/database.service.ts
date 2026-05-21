@@ -4,7 +4,8 @@ import {APIService} from './api.service';
 import {Bootstrap} from '../model/bootstrap';
 import {Observable} from 'rxjs';
 import {DemoUserScheme} from '../model/demo-user-scheme';
-import {DatabaseIssueGroup} from '@core/model/database-issue-group';
+import {DenormalizationInconsistencyGroup} from '@core/model/denormalization-inconsistency-group';
+import {ConfigurationInconsistencyGroup} from '@core/model/configuration-inconsistency-group';
 
 @Injectable({
 	providedIn: 'root'
@@ -37,7 +38,11 @@ export class DatabaseService {
 		return this.http.post(`${this.serviceUrl}/generate-random-data`, undefined, {params});
 	}
 
-	runDatabaseUpdate(dryRun: boolean): Observable<DatabaseIssueGroup[]> {
-		return this.http.post<DatabaseIssueGroup[]>(`${this.serviceUrl}/update`, {dryRun});
+	fixConfigConsistency(dryRun: boolean): Observable<ConfigurationInconsistencyGroup[]> {
+		return this.http.post<ConfigurationInconsistencyGroup[]>(`${this.serviceUrl}/consistency/configuration`, {dryRun});
+	}
+
+	fixDenormalizationConsistency(dryRun: boolean): Observable<DenormalizationInconsistencyGroup[]> {
+		return this.http.post<DenormalizationInconsistencyGroup[]>(`${this.serviceUrl}/consistency/denormalization`, {dryRun});
 	}
 }
