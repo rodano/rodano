@@ -12,13 +12,16 @@
 /**
  * Entity type
  */
-export type InconsistentEntity = 'SCOPE' | 'EVENT' | 'DATASET' | 'FORM' | 'WORKFLOW_STATUS';
+export type InconsistentEntity = 'SCOPE' | 'EVENT' | 'DATASET' | 'DATASET_AUDIT' | 'FORM' | 'FORM_AUDIT' | 'WORKFLOW_STATUS' | 'WORKFLOW_STATUS_AUDIT';
 
 export const InconsistentEntity = {
     SCOPE: 'SCOPE' as InconsistentEntity,
     EVENT: 'EVENT' as InconsistentEntity,
     DATASET: 'DATASET' as InconsistentEntity,
+    DATASET_AUDIT: 'DATASET_AUDIT' as InconsistentEntity,
     FORM: 'FORM' as InconsistentEntity,
-    WORKFLOW_STATUS: 'WORKFLOW_STATUS' as InconsistentEntity
+    FORM_AUDIT: 'FORM_AUDIT' as InconsistentEntity,
+    WORKFLOW_STATUS: 'WORKFLOW_STATUS' as InconsistentEntity,
+    WORKFLOW_STATUS_AUDIT: 'WORKFLOW_STATUS_AUDIT' as InconsistentEntity
 };
 

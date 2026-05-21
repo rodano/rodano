@@ -228,7 +228,7 @@ public class DatabaseDenormalizationConsistencyServiceImpl implements DatabaseDe
 						.where(FORM_AUDIT.PK.eq(auditPk))
 						.execute();
 				}
-				issues.add(new DenormalizationInconsistency(InconsistentEntity.FORM, formModelId, auditPk, status));
+				issues.add(new DenormalizationInconsistency(InconsistentEntity.FORM_AUDIT, formModelId, auditPk, status));
 			}
 		}
 		return issues;
@@ -255,7 +255,7 @@ public class DatabaseDenormalizationConsistencyServiceImpl implements DatabaseDe
 						.where(DATASET_AUDIT.PK.eq(auditPk))
 						.execute();
 				}
-				issues.add(new DenormalizationInconsistency(InconsistentEntity.DATASET, datasetModelId, auditPk, status));
+				issues.add(new DenormalizationInconsistency(InconsistentEntity.DATASET_AUDIT, datasetModelId, auditPk, status));
 			}
 		}
 		return issues;
@@ -284,7 +284,7 @@ public class DatabaseDenormalizationConsistencyServiceImpl implements DatabaseDe
 						.where(WORKFLOW_STATUS_AUDIT.PK.eq(auditPk))
 						.execute();
 				}
-				issues.add(new DenormalizationInconsistency(InconsistentEntity.WORKFLOW_STATUS, workflowId, auditPk, status));
+				issues.add(new DenormalizationInconsistency(InconsistentEntity.WORKFLOW_STATUS_AUDIT, workflowId, auditPk, status));
 			}
 		}
 		return issues;
@@ -318,7 +318,7 @@ public class DatabaseDenormalizationConsistencyServiceImpl implements DatabaseDe
 						.where(WORKFLOW_STATUS_AUDIT.PK.eq(auditPk))
 						.execute();
 				}
-				issues.add(new DenormalizationInconsistency(InconsistentEntity.WORKFLOW_STATUS, workflowId, auditPk, status));
+				issues.add(new DenormalizationInconsistency(InconsistentEntity.WORKFLOW_STATUS_AUDIT, workflowId, auditPk, status));
 			}
 		}
 		return issues;
@@ -352,7 +352,7 @@ public class DatabaseDenormalizationConsistencyServiceImpl implements DatabaseDe
 						.where(WORKFLOW_STATUS_AUDIT.PK.eq(auditPk))
 						.execute();
 				}
-				issues.add(new DenormalizationInconsistency(InconsistentEntity.WORKFLOW_STATUS, workflowId, auditPk, status));
+				issues.add(new DenormalizationInconsistency(InconsistentEntity.WORKFLOW_STATUS_AUDIT, workflowId, auditPk, status));
 			}
 		}
 		return issues;
