@@ -44,6 +44,7 @@ import {Rights} from '@core/model/rights';
 import {ExtendedScopeSearchResult} from '@core/model/extended-scope-search-result';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {AutofocusDirective} from '../directives/autofocus.directive';
+import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -108,17 +109,6 @@ export class SearchComponent implements OnInit {
 
 	resultsLength = signal(0);
 
-	//Map to hold the workflowStatus model shortname
-	readonly workflowStatusModelMap = signal<Map<string, Record<string, string>>>(new Map());
-
-	readonly statusModelMap = signal<Map<string, Record<string, string>>>(new Map());
-
-	//Map to hold the fieldModel
-	readonly fieldModelMap = signal<Map<string, Record<string, string>>>(new Map());
-
-	//Map to hold the aggregated workflow ID for a workflow aggregator
-	readonly aggregatedWorkflowMap = signal<Map<string, string>>(new Map());
-
 	loading = signal(false);
 
 	private readonly searchTrigger$ = new Subject<ScopeSearch>();
@@ -173,74 +163,49 @@ export class SearchComponent implements OnInit {
 				const resolvedScopeModel = this.route.snapshot.data['scopeModel'];
 				this.selectedScopeModel.set(resolvedScopeModel);
 				this.selectedScopeModelParentModel.set(scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel().defaultParentId) ?? ({} as ScopeModel));
-				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.includes('MANAGE_DELETED_DATA')) ?? false);
+				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.includes(FeatureStatic.MANAGE_DELETED_DATA)) ?? false);
 
 				//Load dependent data after we have the scope model
 				return forkJoin({
 					searchableWorkflows: this.configurationService.getScopeModelSearchableWorkflows(this.selectedScopeModel()),
 					parentScopes: this.meService.getScopes(undefined, true, false),
-					searchableFields: this.configurationService.getScopeModelFieldModels(this.selectedScopeModel().id, true)
+					searchableFields: this.configurationService.getScopeModelFieldModels(this.selectedScopeModel().id, true),
+					parentsWithWriteAccess: this.scopeRelationService.getParents(this.selectedScopeModel().id, Rights.WRITE)
 				});
-			}),
-			switchMap(results => {
-				this.searchableWorkflows = results.searchableWorkflows;
-				this.parentScopes.set(results.parentScopes.filter(scope => scope.modelId === this.selectedScopeModel().defaultParentId));
-
-				this.searchableFields = results.searchableFields;
-
-				this.buildMapsAndColumns();
-
-				//Cache workflows and fields
-				this.searchableWorkflows.forEach(workflow => this.workflowCache.set(workflow.id, workflow));
-				this.searchableFields.forEach(field => {
-					const key = `${field.datasetModelId.toUpperCase()}.${field.id.toUpperCase()}`;
-					this.fieldModelCache.set(key, field);
-				});
-				this.setupFormListeners();
-				this.loadData();
-
-				//Return the parentsWithWriteAccess observable
-				return this.scopeRelationService.getParents(this.selectedScopeModel().id, Rights.WRITE).pipe(
-					map(parentsWithWriteAccess => ({
-						parentsWithWriteAccess
-					}))
-				);
 			})
-		).subscribe(({parentsWithWriteAccess}) => {
-			this.writeAccessOnParent.set(parentsWithWriteAccess.length > 0);
+		).subscribe(results => {
+			this.searchableWorkflows = results.searchableWorkflows;
+			this.parentScopes.set(results.parentScopes.filter(scope => scope.modelId === this.selectedScopeModel().defaultParentId));
+
+			this.searchableFields = results.searchableFields;
+
+			this.buildColumnsArray();
+
+			//Cache workflows and fields
+			this.searchableWorkflows.forEach(workflow => this.workflowCache.set(workflow.id, workflow));
+			this.searchableFields.forEach(field => {
+				const key = `${field.datasetModelId.toUpperCase()}.${field.id.toUpperCase()}`;
+				this.fieldModelCache.set(key, field);
+			});
+			this.setupFormListeners();
+			this.loadData();
+
+			this.writeAccessOnParent.set(results.parentsWithWriteAccess.length > 0);
 		});
 	}
 
-	private buildMapsAndColumns(): void {
+	private buildColumnsArray(): void {
 		const newColumns = ['parentScopeCode', 'scopeCode'];
-		const newWorkflowStatusMap = new Map<string, Record<string, string>>();
-		const newStatusModelMap = new Map<string, Record<string, string>>();
-		const newAggregatedWorkflowMap = new Map<string, string>();
-		const newFieldModelMap = new Map<string, Record<string, string>>();
-		//Build all maps in one pass
+
 		this.searchableFields.forEach(fieldModel => {
-			const controlName = this.getSFFormControlName(fieldModel);
-			newColumns.push(controlName);
-			newFieldModelMap.set(controlName, fieldModel.shortname);
+			newColumns.push(this.getSFFormControlName(fieldModel));
 		});
 
 		this.searchableWorkflows.forEach(workflow => {
 			newColumns.push(workflow.id);
-			newWorkflowStatusMap.set(workflow.id, workflow.shortname);
-
-			workflow.states.forEach(state => {
-				newStatusModelMap.set(`${workflow.id}_${state.id}`, state.shortname);
-			});
-
-			if(workflow.aggregator && workflow.aggregatedWorkflowId) {
-				newAggregatedWorkflowMap.set(workflow.id, workflow.aggregatedWorkflowId);
-			}
 		});
+
 		this.columnsToDisplay.set(newColumns);
-		this.fieldModelMap.set(newFieldModelMap);
-		this.workflowStatusModelMap.set(newWorkflowStatusMap);
-		this.statusModelMap.set(newStatusModelMap);
-		this.aggregatedWorkflowMap.set(newAggregatedWorkflowMap);
 	}
 
 	private setupFormListeners(): void {
@@ -281,7 +246,7 @@ export class SearchComponent implements OnInit {
 			const control = new FormControl();
 			this.searchForm.addControl(this.getSFFormControlName(fieldModel), control);
 
-			if(this.getIsSearchableDate(fieldModel)) {
+			if(SearchComponent.getIsSearchableDate(fieldModel)) {
 				hasDateFields = true;
 			}
 			else {
@@ -313,7 +278,7 @@ export class SearchComponent implements OnInit {
 	}
 
 	private loadData(): void {
-		this.searchTrigger$.pipe(
+		this.searchTrigger$.pipe(takeUntilDestroyed(this.destroyRef),
 			tap(() => {
 				this.loading.set(true);
 				this.extendedScopeSearchResult.set([]);
@@ -434,7 +399,7 @@ export class SearchComponent implements OnInit {
 
 				const control = this.searchForm.controls[this.getSFFormControlName(fieldModel)];
 				if(control) {
-					if(criteria.value && this.getIsSearchableDate(fieldModel)) {
+					if(criteria.value && SearchComponent.getIsSearchableDate(fieldModel)) {
 						const date = parse(criteria.value, 'dd.MM.yyyy', 0);
 						control.setValue(date, {emitEvent: false});
 					}
@@ -482,7 +447,7 @@ export class SearchComponent implements OnInit {
 				return;
 			}
 
-			const workflowId = this.aggregatedWorkflowMap().get(workflow.id) ?? workflow.id;
+			const workflowId = workflow.aggregatedWorkflowId ?? workflow.id;
 			search.workflowStates[workflowId] = value;
 		});
 
@@ -541,8 +506,10 @@ export class SearchComponent implements OnInit {
 			.afterClosed();
 	}
 
-	getStatusModel(workflowId: string, stateId: string) {
-		return this.statusModelMap().get(`${workflowId}_${stateId}`);
+	getStatusModel(workflowId: string, stateId: string): Record<string, string> | undefined {
+		const workflow = this.workflowCache.get(workflowId);
+		const state = workflow?.states.find(s => s.id === stateId);
+		return state?.shortname;
 	}
 
 	getValueShortname(datasetModelId: string, fieldId: string, field: any): Record<string, string> | undefined {
@@ -601,14 +568,14 @@ export class SearchComponent implements OnInit {
 	}
 
 	getFieldValueForCriteria(fieldModel: FieldModel, value: string): string {
-		if(this.getIsSearchableDate(fieldModel)) {
+		if(SearchComponent.getIsSearchableDate(fieldModel)) {
 			const dateValue = new Date(value);
 			return format(dateValue, 'dd.MM.yyyy');
 		}
 		return value;
 	}
 
-	getIsSearchableDate(fieldModel: FieldModel): boolean {
+	static getIsSearchableDate(fieldModel: FieldModel): boolean {
 		return fieldModel?.type === FieldModelType.DATE || (fieldModel?.type === FieldModelType.DATE_SELECT && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory);
 	}
 
@@ -622,11 +589,11 @@ export class SearchComponent implements OnInit {
 		return date;
 	}
 
-	//return the searchable field from the form control ID
-	getSearchableFieldFromFormControlId(formControlId: string): FieldModel | undefined {
-		const [datasetModelId, fieldModelId] = formControlId.split('.');
-
-		return this.getFieldModel(datasetModelId, fieldModelId);
+	getFieldValueForDisplay(result: ExtendedScopeSearchResult, fieldModel: FieldModel | undefined): string | undefined {
+		if(!result.fieldValues || !fieldModel) {
+			return undefined;
+		}
+		return result.fieldValues[fieldModel.datasetModelId]?.[fieldModel.id];
 	}
 
 	resetSearchCriteria(): void {

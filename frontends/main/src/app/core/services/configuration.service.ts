@@ -95,7 +95,7 @@ export class ConfigurationService {
 	}
 
 	getScopeModelSearchableWorkflows(scopeModel: ScopeModel): Observable<Workflow[]> {
-		return this.getScopeModelWorkflows(scopeModel).pipe(
+		return this.getScopeModelWorkflows(scopeModel, true).pipe(
 			map(workflows => workflows.filter(w => w.searchable))
 		);
 	}
