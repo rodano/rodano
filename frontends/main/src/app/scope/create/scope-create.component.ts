@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {ScopeModel} from '@core/model/scope-model';
@@ -17,7 +17,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Rights} from '@core/model/rights';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope-create.component.html',
 	styleUrls: ['./scope-create.component.css'],
 	imports: [

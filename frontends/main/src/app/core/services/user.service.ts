@@ -1,5 +1,5 @@
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {User} from '../model/user';
 import {UserCreation} from '../model/user-creation';
@@ -10,17 +10,15 @@ import {PagedResultUser} from '../model/paged-result-user';
 import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class UserService {
 	private readonly serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private httpParamsService: HttpParamsService,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly httpParamsService = inject(HttpParamsService);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/users`;
 	}
 

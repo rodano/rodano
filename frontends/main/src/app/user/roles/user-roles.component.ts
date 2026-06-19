@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
@@ -30,7 +30,6 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {USER_TOKEN} from '../home/user.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-roles.component.html',
 	styleUrls: ['./user-roles.component.css'],
 	imports: [

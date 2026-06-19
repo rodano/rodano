@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, InjectionToken, OnInit, WritableSignal, inject, input, signal} from '@angular/core';
+import {Component, InjectionToken, OnInit, WritableSignal, inject, input, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
 import {Scope} from '@core/model/scope';
 import {ScopeModel} from '@core/model/scope-model';
@@ -15,7 +15,6 @@ import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-bu
 export const SCOPE_TOKEN = new InjectionToken<WritableSignal<Scope>>('scope');
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope.component.html',
 	styleUrls: ['./scope.component.css'],
 	imports: [

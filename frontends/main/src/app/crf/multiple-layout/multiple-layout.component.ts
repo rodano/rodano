@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
 import {Layout} from '@core/model/layout';
 import {MatSortModule, Sort} from '@angular/material/sort';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -28,7 +28,6 @@ import {EmptyObjectCheck} from '../../utils/empty-object-check';
 import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-multiple-layout',
 	templateUrl: './multiple-layout.component.html',
 	styleUrls: ['./multiple-layout.component.css'],

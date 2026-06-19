@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, input, DestroyRef, signal} from '@angular/core';
+import {Component, input, DestroyRef, signal} from '@angular/core';
 import {FileService} from '@core/services/file.service';
 import {tap, last, map} from 'rxjs/operators';
 import {HttpEventType, HttpResponse} from '@angular/common/http';
@@ -13,7 +13,6 @@ import {FieldUpdateService} from '../../services/field-update.service';
 import {CRFField} from '../../models/crf-field';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-file-upload',
 	templateUrl: './file-upload.component.html',
 	styleUrls: ['../field/field.component.css', './file-upload.component.css'],

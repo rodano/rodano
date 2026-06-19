@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {HeaderComponent} from './header/header.component';
 import {Environment} from '@core/model/environment';
@@ -9,8 +9,7 @@ import {ConfigurationService} from '@core/services/configuration.service';
 	selector: 'app-root',
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css'],
-	imports: [HeaderComponent, RouterOutlet],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	imports: [HeaderComponent, RouterOutlet]
 })
 export class AppComponent implements OnInit {
 	constructor(private configurationService: ConfigurationService) {}

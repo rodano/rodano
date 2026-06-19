@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ViewChild, OnInit, DestroyRef, input, signal} from '@angular/core';
+import {Component, ViewChild, OnInit, DestroyRef, input, signal} from '@angular/core';
 import {WidgetService} from '@core/services/widget.service';
 import {forkJoin, Observable, of, Subject} from 'rxjs';
 import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
@@ -29,7 +29,6 @@ import {MatTooltip} from '@angular/material/tooltip';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './summary-widget.component.html',
 	styleUrls: ['./summary-widget.component.css'],
 	imports: [

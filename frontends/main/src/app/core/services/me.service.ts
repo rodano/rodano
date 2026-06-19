@@ -1,5 +1,5 @@
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {catchError, Observable, of} from 'rxjs';
 import {User} from '../model/user';
 import {APIService} from './api.service';
@@ -8,16 +8,14 @@ import {reviveDates} from '../decorators/revive-dates.decorator';
 import {Scope} from '../model/scope';
 import {ScopeMini} from '../model/scope-mini';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class MeService {
 	private readonly serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/me`;
 	}
 

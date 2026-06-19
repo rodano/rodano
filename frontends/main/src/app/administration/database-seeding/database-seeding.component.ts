@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
@@ -8,7 +8,6 @@ import {DemoUserScheme} from '@core/model/demo-user-scheme';
 import {NotificationService} from '../../services/notification.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './database-seeding.component.html',
 	imports: [
 		ReactiveFormsModule,

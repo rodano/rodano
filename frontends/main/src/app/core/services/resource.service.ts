@@ -1,5 +1,5 @@
 import {HttpClient, HttpEvent, HttpRequest} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {PagedResultResource} from '../model/paged-result-resource';
 import {ResourceSearch} from '../utilities/search/resource-search';
@@ -9,17 +9,15 @@ import {ResourceSubmission} from '../model/resource-submission';
 import {Resource} from '../model/resource';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ResourceService {
 	serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService,
-		private httpParamsService: HttpParamsService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+	private readonly httpParamsService = inject(HttpParamsService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/resources`;
 	}
 

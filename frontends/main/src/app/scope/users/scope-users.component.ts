@@ -1,10 +1,9 @@
-import {ChangeDetectionStrategy, Component, effect, inject, signal} from '@angular/core';
+import {Component, effect, inject, signal} from '@angular/core';
 import {UserSearch} from '@core/utilities/search/user-search';
 import {UserListComponent} from '../../user/user-list/user-list.component';
 import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope-users.component.html',
 	imports: [UserListComponent]
 })

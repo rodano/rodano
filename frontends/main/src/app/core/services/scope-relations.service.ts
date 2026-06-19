@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Scope} from '../model/scope';
 import {ScopeRelationCreation} from '../model/scope-relation-creation';
@@ -8,16 +8,14 @@ import {reviveDates} from '../decorators/revive-dates.decorator';
 import {APIService} from './api.service';
 import {Rights} from '../model/rights';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ScopeRelationsService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/scopes`;
 	}
 

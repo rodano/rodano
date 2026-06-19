@@ -1,5 +1,5 @@
 import {HttpErrorResponse} from '@angular/common/http';
-import {ChangeDetectionStrategy, Component, effect, input, signal} from '@angular/core';
+import {Component, effect, input, signal} from '@angular/core';
 import {FormGroup, FormControl, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {finalize} from 'rxjs/operators';
@@ -17,7 +17,6 @@ import {ChangePassword} from '@core/model/change-password';
 import {User} from '@core/model/user';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-change-password',
 	templateUrl: './change-password.component.html',
 	styleUrls: ['./change-password.component.css'],

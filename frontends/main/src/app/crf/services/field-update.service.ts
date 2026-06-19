@@ -1,13 +1,11 @@
-import {Injectable} from '@angular/core';
+import {inject, Service} from '@angular/core';
 import {filter, Observable, Subject} from 'rxjs';
 import {CRFField} from '../models/crf-field';
 import {LoggingService} from '@core/services/logging.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class FieldUpdateService {
-	public constructor(private loggingService: LoggingService) { }
+	private readonly loggingService = inject(LoggingService);
 
 	private readonly fieldUpdatedStream$ = new Subject<CRFField>();
 

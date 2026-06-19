@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {MatButton} from '@angular/material/button';
@@ -8,7 +8,6 @@ import {Bootstrap} from '@core/model/bootstrap';
 import {DatabaseService} from '@core/services/database.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-bootstrap',
 	templateUrl: './bootstrap.component.html',
 	styleUrls: ['./bootstrap.component.css'],

@@ -1,8 +1,7 @@
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {ErrorContext} from './error-context';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './error.component.html',
 	styleUrls: ['./error.component.css']
 })

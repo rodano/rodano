@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, Inject, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, Inject, OnInit, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogRef, MatDialogModule} from '@angular/material/dialog';
 import {filter, forkJoin, map, Observable, of, switchMap} from 'rxjs';
 import {Resource} from '@core/model/resource';
@@ -22,7 +22,6 @@ import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-modify-resource-dialog',
 	templateUrl: './modify-resource-dialog.component.html',
 	styleUrls: ['./modify-resource-dialog.component.css'],

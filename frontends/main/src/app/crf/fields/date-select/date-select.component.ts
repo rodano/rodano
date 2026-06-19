@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, computed, effect, input} from '@angular/core';
+import {Component, OnInit, DestroyRef, computed, effect, input} from '@angular/core';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
@@ -9,7 +9,6 @@ import {FieldUpdateService} from '../../services/field-update.service';
 import {CRFField} from '../../models/crf-field';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-date-select',
 	templateUrl: './date-select.component.html',
 	styleUrls: ['../field/field.component.css', './date-select.component.css'],

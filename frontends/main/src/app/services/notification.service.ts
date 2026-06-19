@@ -1,13 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class NotificationService {
-	constructor(
-		public snackBar: MatSnackBar
-	) { }
+	public readonly snackBar = inject(MatSnackBar);
 
 	showSuccess(message: string): void {
 		this.snackBar.open(message, '', {

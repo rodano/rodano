@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, computed, DestroyRef, OnInit, signal} from '@angular/core';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {UserSearch} from '@core/utilities/search/user-search';
@@ -22,7 +22,6 @@ import {getRoleStatusDisplay} from '../role-status-display';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-browse.component.html',
 	styleUrls: ['./user-browse.component.css'],
 	imports: [

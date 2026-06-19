@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {ScheduledTask} from '@core/model/scheduled-task';
 import {ActuatorService} from '@core/services/actuator.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -14,8 +14,7 @@ import {AdministrationService} from '@core/services/administration.service';
 		MatButton,
 		MatProgressBar,
 		MatTableModule
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class ScheduledTasksComponent implements OnInit {
 	columnsToDisplay: string[] = ['target', 'schedule', 'actions'];

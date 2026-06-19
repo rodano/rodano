@@ -1,11 +1,9 @@
-import {Injectable} from '@angular/core';
+import {Service} from '@angular/core';
 import {Field} from '../model/field';
 import {FieldModelType} from '../model/field-model-type';
 import {FieldModel} from '../model/field-model';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class FieldService {
 	isBlank(field: Field): boolean {
 		return field.value === undefined || field.value === null || field.value === '';

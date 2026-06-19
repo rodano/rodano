@@ -1,19 +1,15 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve, Router} from '@angular/router';
 import {Observable, EMPTY} from 'rxjs';
 import {NotificationService} from '../../services/notification.service';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class UserResolver implements Resolve<User> {
-	constructor(
-		private userService: UserService,
-		private router: Router,
-		private notificationService: NotificationService
-	) {}
+	private readonly userService = inject(UserService);
+	private readonly router = inject(Router);
+	private readonly notificationService = inject(NotificationService);
 
 	resolve(route: ActivatedRouteSnapshot): Observable<User> {
 		//Since this resolver is used on two levels of the router hierarchy, we need

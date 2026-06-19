@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatSort, MatSortModule} from '@angular/material/sort';
@@ -19,7 +19,6 @@ import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-issue-viewer',
 	templateUrl: './issue-viewer.component.html',
 	styleUrls: ['./issue-viewer.component.css'],

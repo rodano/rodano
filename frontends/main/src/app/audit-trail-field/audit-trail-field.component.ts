@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, OnInit, signal} from '@angular/core';
+import {Component, Inject, OnInit, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
@@ -15,7 +15,6 @@ export interface WorkflowRationaleData {
 }
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-audit-trail-field',
 	templateUrl: 'audit-trail-field.component.html',
 	styleUrls: ['./audit-trail-field.component.css'],

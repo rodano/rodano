@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Subject, BehaviorSubject} from 'rxjs';
 import {Layout} from '@core/model/layout';
 import {CRFDataset} from '../models/crf-dataset';
@@ -6,9 +6,7 @@ import {CRFService} from './crf.service';
 import {LoggingService} from '@core/services/logging.service';
 import {LayoutType} from '@core/model/layout-type';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class CellLoadingService {
 	//The subject for collective cell loading completion
 	private readonly allCellsLoadedSource = new BehaviorSubject<boolean>(false);
@@ -22,10 +20,10 @@ export class CellLoadingService {
 	//The subject used to monitor the individual cell loading completion
 	private readonly cellLoaded$ = new Subject<string>();
 
-	constructor(
-		private dataStateService: CRFService,
-		private loggingService: LoggingService
-	) {
+	private readonly dataStateService = inject(CRFService);
+	private readonly loggingService = inject(LoggingService);
+
+	constructor() {
 		//whenever a cell finishes loading, remove it from the list
 		//when the list is empty announce the loading completion to all the subscribers
 		this.cellLoaded$.asObservable().subscribe(cellId => {

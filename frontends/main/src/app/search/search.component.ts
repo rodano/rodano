@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ViewChild, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, ViewChild, DestroyRef, OnInit, signal} from '@angular/core';
 import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
 import {Observable, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
 import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
@@ -47,7 +47,6 @@ import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-search',
 	templateUrl: './search.component.html',
 	styleUrls: ['./search.component.css'],

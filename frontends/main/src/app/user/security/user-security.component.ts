@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input} from '@angular/core';
+import {Component, DestroyRef, effect, inject, input} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
@@ -19,7 +19,6 @@ import {of} from 'rxjs';
 import {USER_TOKEN} from '../home/user.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-security.component.html',
 	styleUrls: ['./user-security.component.css'],
 	imports: [

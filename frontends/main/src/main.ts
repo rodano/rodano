@@ -11,7 +11,7 @@ import {DateAdapter, MatNativeDateModule} from '@angular/material/core';
 import {authInterceptor} from './app/interceptors/auth.interceptor';
 import {withInterceptors, provideHttpClient} from '@angular/common/http';
 import {GlobalErrorHandler} from './app/services/error/global-error-handler.service';
-import {provideRouter, withComponentInputBinding, withRouterConfig} from '@angular/router';
+import {provideRouter, withComponentInputBinding} from '@angular/router';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {MAT_ICON_DEFAULT_OPTIONS} from '@angular/material/icon';
@@ -34,7 +34,7 @@ bootstrapApplication(AppComponent, {
 		{provide: DateAdapter, useClass: CustomDateAdapter},
 		provideZonelessChangeDetection(),
 		provideHttpClient(withInterceptors([authInterceptor])),
-		provideRouter(APP_ROUTES, withComponentInputBinding(), withRouterConfig({paramsInheritanceStrategy: 'always'})),
+		provideRouter(APP_ROUTES, withComponentInputBinding()),
 		provideCharts(withDefaultRegisterables())
 	]
 }).catch(err => console.error(err));

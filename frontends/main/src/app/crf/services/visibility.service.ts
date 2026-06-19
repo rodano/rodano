@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable, Subject} from 'rxjs';
 import {filter, map} from 'rxjs/operators';
 import {Cell} from '@core/model/cell';
@@ -9,13 +9,9 @@ import {LayoutVisibilityEvent} from './visibility-event-layout';
 import {Operator} from '@core/model/operator';
 import {VisibilityCriterionAction} from '@core/model/visibility-criterion-action';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class VisibilityService {
-	constructor(
-		private crfService: CRFService
-	) { }
+	private readonly crfService = inject(CRFService);
 
 	//subject for the visibility of cells
 	private cellVisibilityStream$ = new Subject<CellVisibilityEvent>();

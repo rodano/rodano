@@ -1,19 +1,14 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
 import {Session} from '../model/session';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class SessionService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
-	}
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
 
 	@reviveDates
 	get(): Observable<Session[]> {

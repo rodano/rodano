@@ -1,9 +1,8 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {Study} from '@core/model/study';
 import {ConfigurationService} from '@core/services/configuration.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './support.component.html',
 	styleUrls: ['./support.component.css']
 })

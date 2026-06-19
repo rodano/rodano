@@ -1,16 +1,14 @@
 import {HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {APIService} from './api.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ReportService {
 	private serviceUrl: string;
 
-	constructor(
-		private apiService: APIService
-	) {
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/reports`;
 	}
 

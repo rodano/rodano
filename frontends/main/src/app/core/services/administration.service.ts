@@ -1,20 +1,18 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {APIService} from './api.service';
 import {map, shareReplay} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class AdministrationService {
 	private serviceUrl: string;
 	private isInDebug$: Observable<boolean>;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/administration`;
 		//cache debug mode
 		//TODO this is not optimal (when the cache is reset)

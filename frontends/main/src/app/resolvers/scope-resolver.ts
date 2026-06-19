@@ -1,16 +1,12 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {ActivatedRouteSnapshot, Resolve} from '@angular/router';
 import {Observable, EMPTY} from 'rxjs';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ScopeResolver implements Resolve<Scope> {
-	constructor(
-		private scopeService: ScopeService
-	) {}
+	private readonly scopeService = inject(ScopeService);
 
 	resolve(route: ActivatedRouteSnapshot): Observable<Scope> {
 		//Since this resolver is used on two levels of the router hierarchy, we need

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, model} from '@angular/core';
+import {Component, model} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 import {NotificationService} from '../../services/notification.service';
@@ -15,7 +15,6 @@ import {of, switchMap} from 'rxjs';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-dashboard',
 	templateUrl: './scope-dashboard.component.html',
 	styleUrls: ['./scope-dashboard.component.css'],

@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Observable, EMPTY, of} from 'rxjs';
 import {catchError, mergeMap, switchMap, tap} from 'rxjs/operators';
@@ -18,18 +18,16 @@ import {Workflowable} from '@core/utilities/workflowable';
 import {Form} from '@core/model/form';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class WorkflowActionService {
 	private capitalizeFirstPipe: CapitalizeFirstPipe;
 	private localizeMapPipe: LocalizeMapPipe;
 
-	constructor(
-		private workflowStatusService: WorkflowStatusService,
-		private notificationService: NotificationService,
-		private dialog: MatDialog
-	) {
+	private readonly workflowStatusService = inject(WorkflowStatusService);
+	private readonly notificationService = inject(NotificationService);
+	private readonly dialog = inject(MatDialog);
+
+	constructor() {
 		this.capitalizeFirstPipe = new CapitalizeFirstPipe();
 		this.localizeMapPipe = new LocalizeMapPipe();
 	}

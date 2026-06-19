@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {Subject, merge} from 'rxjs';
 import {startWith, switchMap} from 'rxjs/operators';
@@ -32,7 +32,6 @@ import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-resource-list',
 	templateUrl: './resource-list.component.html',
 	styleUrls: ['./resource-list.component.css'],

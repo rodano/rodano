@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, computed, effect, input, model, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, computed, effect, input, model, signal} from '@angular/core';
 import {Cell} from '@core/model/cell';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {FileUploadComponent} from '../file-upload/file-upload.component';
@@ -42,7 +42,6 @@ import {Field} from '@core/model/field';
 import {WorkflowableUpdateService} from '../../services/workflowable-update.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-field',
 	templateUrl: './field.component.html',
 	styleUrls: ['./field.component.css'],

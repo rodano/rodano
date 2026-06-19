@@ -1,10 +1,9 @@
-import {ChangeDetectionStrategy, Component, effect, input, signal} from '@angular/core';
+import {Component, effect, input, signal} from '@angular/core';
 import {Router} from '@angular/router';
 import {NotificationService} from '../services/notification.service';
 import {UserService} from '@core/services/user.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-account-recovery',
 	templateUrl: './account-recovery.component.html',
 	styleUrl: './account-recovery.component.css'

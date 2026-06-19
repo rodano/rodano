@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {APIService} from './api.service';
 import {Scope} from '../model/scope';
@@ -12,17 +12,15 @@ import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ScopeService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService,
-		private httpParamsService: HttpParamsService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+	private readonly httpParamsService = inject(HttpParamsService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/scopes`;
 	}
 

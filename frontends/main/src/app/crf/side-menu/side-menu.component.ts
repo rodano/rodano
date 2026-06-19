@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, model, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, model, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -22,7 +22,6 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {SettingsService} from '@core/services/settings.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-side-menu',
 	templateUrl: './side-menu.component.html',
 	styleUrl: './side-menu.component.scss',

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, input, signal} from '@angular/core';
+import {Component, effect, input, signal} from '@angular/core';
 import {Validators, ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import {PrivacyPolicy} from '@core/model/privacy-policy';
@@ -14,7 +14,6 @@ import {HttpErrorResponse} from '@angular/common/http';
 import {RegistrationStep} from '../registration/registration-step';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './registration.component.html',
 	styleUrls: ['./registration.component.css'],
 	imports: [

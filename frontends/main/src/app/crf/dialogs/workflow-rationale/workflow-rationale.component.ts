@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, signal} from '@angular/core';
+import {Component, Inject, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {WorkflowUpdate} from '@core/model/workflow-update';
 import {WorkflowAction} from '@core/model/workflow-action';
@@ -12,7 +12,6 @@ import {MatRadioButton, MatRadioGroup} from '@angular/material/radio';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-rationale',
 	templateUrl: 'workflow-rationale.component.html',
 	styleUrls: ['./workflow-rationale.component.css'],

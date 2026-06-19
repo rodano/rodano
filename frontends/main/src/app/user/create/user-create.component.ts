@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router} from '@angular/router';
 import {UserService} from '@core/services/user.service';
@@ -22,7 +22,6 @@ import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-create.component.html',
 	styleUrls: ['./user-create.component.css'],
 	imports: [

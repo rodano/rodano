@@ -1,5 +1,5 @@
 import {HttpClient, HttpHeaders} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Field} from '../model/field';
 import {Form} from '../model/form';
@@ -14,15 +14,11 @@ import {HttpParamsService} from './http-params.service';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class WorkflowStatusService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService,
-		private httpParamsService: HttpParamsService
-	) { }
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+	private readonly httpParamsService = inject(HttpParamsService);
 
 	getFormForWorkflowStatus(statusPk: number): Observable<FormInfo> {
 		return this.http.get<FormInfo>(`${this.apiService.getApiUrl()}/workflows/${statusPk}/form`);

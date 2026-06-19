@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {forkJoin, map, Observable} from 'rxjs';
 import {Field} from '../model/field';
 import {VersionsService} from './versions.service';
@@ -10,16 +10,14 @@ import {Role} from '../model/role';
 import {FieldEventAuditTrail, FieldEventEntityType} from '../model/field-event-audit-trail';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class AuditTrailService {
 	dateTimeUTCPipe: DateTimeUTCPipe;
 	localizeMapPipe: LocalizeMapPipe;
 
-	constructor(
-		private versionsService: VersionsService
-	) {
+	private readonly versionsService = inject(VersionsService);
+
+	constructor() {
 		this.dateTimeUTCPipe = new DateTimeUTCPipe();
 		this.localizeMapPipe = new LocalizeMapPipe();
 	}

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {Health} from '@core/model/health';
 import {Info} from '@core/model/info';
@@ -12,8 +12,7 @@ import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 	imports: [
 		DateTimeUTCPipe,
 		HumanReadableFileSizePipe
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class DetailsComponent implements OnInit {
 	readonly info = signal<Info | undefined>(undefined);

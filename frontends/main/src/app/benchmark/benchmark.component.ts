@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, OnInit, input, signal} from '@angular/core';
+import {Component, computed, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {PossibleValue} from '@core/model/possible-value';
 import {operatorByType} from '@core/enums/operator-by-type';
@@ -23,7 +23,6 @@ import {ScopeModel} from '@core/model/scope-model';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-benchmark',
 	templateUrl: './benchmark.component.html',
 	styleUrls: ['./benchmark.component.css'],

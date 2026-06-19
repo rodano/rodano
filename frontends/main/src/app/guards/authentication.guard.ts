@@ -1,16 +1,11 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot} from '@angular/router';
 import {AuthStateService} from '../services/auth-state.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class AuthGuard implements CanActivate {
-	constructor(
-		private authService: AuthStateService,
-		private router: Router
-	) {
-	}
+	private readonly authService = inject(AuthStateService);
+	private readonly router = inject(Router);
 
 	canActivate(_: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
 		if(this.authService.hasToken()) {

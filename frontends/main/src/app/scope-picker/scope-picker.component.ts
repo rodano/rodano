@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, HostBinding, Input, OnInit, Optional, Self, ViewChild, input, signal} from '@angular/core';
+import {Component, HostBinding, Input, OnInit, Optional, Self, ViewChild, input, signal} from '@angular/core';
 import {ControlValueAccessor, NgControl, ReactiveFormsModule} from '@angular/forms';
 import {MatOptgroup, MatOption, MatSelect} from '@angular/material/select';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -10,7 +10,6 @@ import {ScopeModel} from '@core/model/scope-model';
 import {ScopeCodeShortnamePipe} from '../pipes/scope-code-shortname.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-picker',
 	templateUrl: './scope-picker.component.html',
 	styleUrls: ['./scope-picker.component.css'],

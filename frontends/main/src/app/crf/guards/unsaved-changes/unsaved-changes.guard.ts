@@ -1,15 +1,13 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {CanDeactivate} from '@angular/router';
 import {MatDialog} from '@angular/material/dialog';
 import {map, Observable, of} from 'rxjs';
 import {UnsavedChangesComponent} from '../../dialogs/unsaved-changes/unsaved-changes.component';
 import {FormComponent} from '../../form/form.component';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class UnsavedChangesGuard implements CanDeactivate<FormComponent> {
-	constructor(private dialog: MatDialog) {}
+	private readonly dialog = inject(MatDialog);
 
 	canDeactivate(
 		component: FormComponent

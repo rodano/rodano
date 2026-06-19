@@ -1,16 +1,12 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Resolve} from '@angular/router';
 import {Observable} from 'rxjs';
 import {Scope} from '@core/model/scope';
 import {MeService} from '@core/services/me.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class RootScopesResolver implements Resolve<Scope[]> {
-	constructor(
-		private meService: MeService
-	) {}
+	private readonly meService = inject(MeService);
 
 	resolve(): Observable<Scope[]> {
 		return this.meService.getRootScopes();

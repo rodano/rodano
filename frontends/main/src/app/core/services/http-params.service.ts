@@ -1,11 +1,9 @@
 import {HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service} from '@angular/core';
 import {ScopeSearch} from '../utilities/search/scope-search';
 import {Params} from '@angular/router';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class HttpParamsService {
 	toHttpParams(object: any, filter?: string[]): HttpParams {
 		let httpParams = new HttpParams();

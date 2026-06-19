@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service} from '@angular/core';
 import {environment} from '../../../environments/environment';
 
 enum LogLevel {
@@ -6,9 +6,7 @@ enum LogLevel {
 	ERROR = 'ERROR'
 }
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class LoggingService {
 	info(...args: any[]): void {
 		this.log(LogLevel.INFO, args);

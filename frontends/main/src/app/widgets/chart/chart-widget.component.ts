@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ViewChild, effect, input, signal} from '@angular/core';
+import {Component, ViewChild, effect, input, signal} from '@angular/core';
 import {Chart} from '@core/model/chart';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
 import {WidgetService} from '@core/services/widget.service';
@@ -14,7 +14,6 @@ import 'chartjs-adapter-date-fns';
 import {forkJoin} from 'rxjs';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-chart-widget',
 	templateUrl: './chart-widget.component.html',
 	styleUrls: ['./chart-widget.component.css'],

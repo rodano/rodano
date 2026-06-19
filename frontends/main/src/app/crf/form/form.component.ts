@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, effect, input, model, signal, untracked} from '@angular/core';
+import {Component, DestroyRef, OnInit, effect, input, model, signal, untracked} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {forkJoin, of} from 'rxjs';
 import {Form} from '@core/model/form';
@@ -29,7 +29,6 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {Workflowable} from '@core/utilities/workflowable';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-form',
 	templateUrl: './form.component.html',
 	styleUrls: ['./form.component.scss'],

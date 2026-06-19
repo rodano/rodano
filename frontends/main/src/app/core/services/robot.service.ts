@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Robot} from '../model/robot';
 import {APIService} from './api.service';
@@ -9,17 +9,15 @@ import {HttpParamsService} from './http-params.service';
 import {RobotCreation} from '../model/robot-creation';
 import {RobotUpdate} from '../model/robot-update';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class RobotService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private httpParamsService: HttpParamsService,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly httpParamsService = inject(HttpParamsService);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/robots`;
 	}
 

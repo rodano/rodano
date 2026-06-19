@@ -1,19 +1,14 @@
 import {Router, CanActivate} from '@angular/router';
 import {AuthStateService} from '../services/auth-state.service';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {DatabaseService} from '@core/services/database.service';
 import {map, Observable} from 'rxjs';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class LoginGuard implements CanActivate {
-	constructor(
-		private databaseService: DatabaseService,
-		private authService: AuthStateService,
-		private router: Router
-	) {
-	}
+	private readonly databaseService = inject(DatabaseService);
+	private readonly authService = inject(AuthStateService);
+	private readonly router = inject(Router);
 
 	canActivate(): Observable<boolean> {
 		//if the database is blank, direct him to the bootstrap page

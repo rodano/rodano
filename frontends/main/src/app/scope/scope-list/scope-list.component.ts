@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ViewChild, DestroyRef, OnInit, effect, input, signal} from '@angular/core';
+import {Component, ViewChild, DestroyRef, OnInit, effect, input, signal} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {RouterLink} from '@angular/router';
@@ -31,7 +31,6 @@ import {Rights} from '@core/model/rights';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-list',
 	templateUrl: './scope-list.component.html',
 	styleUrls: ['./scope-list.component.css'],

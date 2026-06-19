@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {Scope} from '@core/model/scope';
 import {User} from '@core/model/user';
 import {MatIcon} from '@angular/material/icon';
@@ -24,7 +24,6 @@ import {FeatureStatic} from '@core/model/feature-static';
 import {WorkflowStatus} from '@core/model/workflow-status';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-audit-trail-button',
 	templateUrl: './audit-trail-button.component.html',
 	styleUrls: ['./audit-trail-button.component.css'],

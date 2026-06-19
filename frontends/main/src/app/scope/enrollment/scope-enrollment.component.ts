@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, signal} from '@angular/core';
+import {Component, DestroyRef, effect, inject, input, signal} from '@angular/core';
 import {Validators, FormControl, FormGroup, ReactiveFormsModule, FormArray} from '@angular/forms';
 import {forkJoin, of} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, catchError} from 'rxjs/operators';
@@ -35,7 +35,6 @@ import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-enrollment',
 	templateUrl: './scope-enrollment.component.html',
 	styleUrls: ['./scope-enrollment.component.css'],

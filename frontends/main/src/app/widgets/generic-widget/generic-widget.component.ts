@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, input, output} from '@angular/core';
+import {Component, input, output} from '@angular/core';
 import {CMSWidget} from '@core/model/cms-widget';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
 import {Scope} from '@core/model/scope';
@@ -13,7 +13,6 @@ import {WelcomeTextComponent} from '../welcome-text/welcome-text.component';
 import {WidgetType} from '@core/model/widget-type';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-generic-widget',
 	templateUrl: './generic-widget.component.html',
 	styleUrls: ['./generic-widget.component.css'],

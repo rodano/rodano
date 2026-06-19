@@ -1,19 +1,17 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {APIService} from './api.service';
 import {map, Observable} from 'rxjs';
 import {CRFDocumentationGenerationStatus} from '../model/crf-documentation-generation-status';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class DocumentationService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/documentation`;
 	}
 

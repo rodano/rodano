@@ -1,4 +1,4 @@
-import {Component, OnInit, DestroyRef, ChangeDetectionStrategy, input, signal, computed} from '@angular/core';
+import {Component, OnInit, DestroyRef, input, signal, computed} from '@angular/core';
 import {Router, RouterLinkActive, RouterLink} from '@angular/router';
 import {Menu} from '@core/model/menu';
 import {switchMap} from 'rxjs/operators';
@@ -34,8 +34,7 @@ import {NotificationService} from '../services/notification.service';
 		MatMenuModule,
 		LocalizeMapPipe,
 		MatBadge
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class HeaderComponent implements OnInit {
 	environment = Environment;

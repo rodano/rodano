@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, input, signal} from '@angular/core';
+import {Component, OnInit, input, signal} from '@angular/core';
 import {Resource} from '@core/model/resource';
 import {ResourceService} from '@core/services/resource.service';
 import {Expandable} from '@core/utilities/expandable';
@@ -9,7 +9,6 @@ import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {MatIcon} from '@angular/material/icon';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-resource-widget',
 	templateUrl: './resource-widget.component.html',
 	styleUrls: ['./resource-widget.component.css'],

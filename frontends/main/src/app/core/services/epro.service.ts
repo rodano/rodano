@@ -1,20 +1,18 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
 import {EPROInvitation} from '../model/epro-invitation';
 import {EproRobot} from '../model/epro-robot';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class EproService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/epro`;
 	}
 

@@ -1,10 +1,9 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {WidgetService} from '@core/services/widget.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatTableModule} from '@angular/material/table';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-general-info-widget',
 	templateUrl: './general-info-widget.component.html',
 	styleUrls: ['./general-info-widget.component.css'],

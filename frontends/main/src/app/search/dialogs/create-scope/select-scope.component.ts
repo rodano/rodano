@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, signal} from '@angular/core';
+import {Component, Inject, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {Scope} from '@core/model/scope';
 import {MatButton} from '@angular/material/button';
@@ -9,7 +9,6 @@ import {LowerCasePipe} from '@angular/common';
 import {ScopeCodeShortnamePipe} from '../../../pipes/scope-code-shortname.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-select-scope',
 	templateUrl: './select-scope.component.html',
 	imports: [

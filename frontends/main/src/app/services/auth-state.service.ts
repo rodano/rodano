@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {concat, Observable, Subject} from 'rxjs';
 import {map, shareReplay, switchMap, tap} from 'rxjs/operators';
 import {Credentials} from '@core/model/credentials';
@@ -7,9 +7,7 @@ import {User} from '@core/model/user';
 import {MeService} from '@core/services/me.service';
 import {RoleStatus} from '@core/model/role-status';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class AuthStateService {
 	private static TOKEN_STORAGE_KEY = 'token';
 
@@ -21,10 +19,10 @@ export class AuthStateService {
 
 	private connectedUserStream: Observable<User | undefined>;
 
-	constructor(
-		private authService: AuthService,
-		private meService: MeService
-	) {
+	private readonly authService = inject(AuthService);
+	private readonly meService = inject(MeService);
+
+	constructor() {
 		this.connectedUserStream = concat(
 			this.meService.tryToGet(),
 			this.connectedUserSubject

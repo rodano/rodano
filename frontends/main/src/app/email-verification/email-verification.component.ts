@@ -1,10 +1,9 @@
-import {ChangeDetectionStrategy, Component, effect, input, signal} from '@angular/core';
+import {Component, effect, input, signal} from '@angular/core';
 import {UserService} from '@core/services/user.service';
 import {Router} from '@angular/router';
 import {NotificationService} from '../services/notification.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-email-verification',
 	templateUrl: './email-verification.component.html',
 	styleUrl: './email-verification.component.css'

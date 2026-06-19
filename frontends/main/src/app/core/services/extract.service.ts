@@ -1,20 +1,18 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
 import {ScopeMini} from '../model/scope-mini';
 import {DatasetModel} from '../model/dataset-model';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ExtractService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/extracts`;
 	}
 

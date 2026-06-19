@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject} from '@angular/core';
+import {Component, Inject} from '@angular/core';
 import {Validators, ReactiveFormsModule, FormGroup, FormControl} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {WorkflowAction} from '@core/model/workflow-action';
@@ -12,7 +12,6 @@ import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-signature',
 	templateUrl: './workflow-signature.component.html',
 	styleUrls: ['./workflow-signature.component.css'],

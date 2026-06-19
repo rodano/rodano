@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {Session} from '@core/model/session';
 import {SessionService} from '@core/services/session.service';
 import {MatProgressBar} from '@angular/material/progress-bar';
@@ -15,8 +15,7 @@ import {MatTableModule} from '@angular/material/table';
 		MatButton,
 		MatProgressBar,
 		DateTimeUTCPipe
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class ConnectedUsersComponent implements OnInit {
 	columnsToDisplay: string[] = [

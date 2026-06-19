@@ -1,5 +1,5 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {APIService} from './api.service';
 import {Bootstrap} from '../model/bootstrap';
 import {Observable} from 'rxjs';
@@ -7,16 +7,14 @@ import {DemoUserScheme} from '../model/demo-user-scheme';
 import {DenormalizationInconsistencyGroup} from '@core/model/denormalization-inconsistency-group';
 import {ConfigurationInconsistencyGroup} from '@core/model/configuration-inconsistency-group';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class DatabaseService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/administration/database`;
 	}
 

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, effect, inject} from '@angular/core';
+import {Component, effect, inject} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Scope} from '@core/model/scope';
 import {ScopeService} from '@core/services/scope.service';
@@ -16,7 +16,6 @@ import {Workflowable} from '@core/utilities/workflowable';
 import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './scope-settings.component.html',
 	styleUrls: ['./scope-settings.component.css'],
 	imports: [

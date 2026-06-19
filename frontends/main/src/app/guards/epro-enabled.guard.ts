@@ -1,17 +1,13 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {CanActivate, Router} from '@angular/router';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class EproEnabledGuard implements CanActivate {
-	constructor(
-		private configurationService: ConfigurationService,
-		private router: Router
-	) {}
+	private readonly configurationService = inject(ConfigurationService);
+	private readonly router = inject(Router);
 
 	canActivate(): Observable<boolean> {
 		return this.configurationService.getStudy().pipe(

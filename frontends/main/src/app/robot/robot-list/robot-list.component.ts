@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, DestroyRef, signal, ChangeDetectionStrategy} from '@angular/core';
+import {Component, OnInit, ViewChild, DestroyRef, signal} from '@angular/core';
 import {Robot} from '@core/model/robot';
 import {RobotService} from '@core/services/robot.service';
 import {startWith, switchMap} from 'rxjs/operators';
@@ -53,8 +53,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		LocalizeMapPipe,
 		LookupByIdPipe,
 		GetFieldPipe
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class RobotListComponent implements OnInit {
 	readonly profiles = signal<Profile[]>([]);

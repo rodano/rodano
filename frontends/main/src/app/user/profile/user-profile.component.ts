@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, input, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, effect, inject, input, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
@@ -16,7 +16,6 @@ import {MatSelect} from '@angular/material/select';
 import {USER_TOKEN} from '../home/user.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-profile.component.html',
 	styleUrls: ['./user-profile.component.css'],
 	imports: [

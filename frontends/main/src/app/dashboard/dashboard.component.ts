@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {CMSLayout} from '@core/model/cms-layout';
 import {CMSSection} from '@core/model/cms-section';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -7,7 +7,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './dashboard.component.html',
 	styleUrls: ['./dashboard.component.scss'],
 	imports: [

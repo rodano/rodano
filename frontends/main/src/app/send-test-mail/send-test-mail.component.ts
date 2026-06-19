@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {Validators, ReactiveFormsModule, FormGroup, FormControl} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
@@ -18,8 +18,7 @@ import {MailStatus} from '@core/model/mail-status';
 		MatFormField,
 		MatInput,
 		MatButton
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class SendTestMailComponent implements OnInit {
 	readonly error = signal<string | undefined>(undefined);

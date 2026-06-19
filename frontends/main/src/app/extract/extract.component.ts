@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {forkJoin} from 'rxjs';
 import {ExtractService} from '@core/services/extract.service';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -23,7 +23,6 @@ import {MeService} from '@core/services/me.service';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './extract.component.html',
 	styleUrls: ['./extract.component.css'],
 	imports: [

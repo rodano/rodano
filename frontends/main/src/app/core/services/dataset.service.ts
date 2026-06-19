@@ -1,21 +1,19 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {APIService} from './api.service';
 import {Observable} from 'rxjs';
 import {Dataset} from '../model/dataset';
 import {HttpParamsService} from './http-params.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class DatasetService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService,
-		private httpHelperService: HttpParamsService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+	private readonly httpHelperService = inject(HttpParamsService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/scopes`;
 	}
 

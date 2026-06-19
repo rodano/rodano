@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, computed, effect, inject, input, signal} from '@angular/core';
+import {Component, DestroyRef, computed, effect, inject, input, signal} from '@angular/core';
 import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {forkJoin} from 'rxjs';
 import {ScopeModel} from '@core/model/scope-model';
@@ -25,7 +25,6 @@ import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {SCOPE_TOKEN} from '../home/scope.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-parents',
 	templateUrl: './scope-parents.component.html',
 	styleUrls: ['./scope-parents.component.css'],

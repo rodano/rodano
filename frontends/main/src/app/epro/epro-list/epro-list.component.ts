@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {EproService} from '@core/services/epro.service';
 import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
@@ -31,7 +31,6 @@ import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {Profile} from '@core/model/profile';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './epro-list.component.html',
 	styleUrls: ['./epro-list.component.css'],
 	imports: [

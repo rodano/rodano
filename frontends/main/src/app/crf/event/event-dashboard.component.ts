@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, input, model} from '@angular/core';
+import {Component, computed, input, model} from '@angular/core';
 import {Event} from '@core/model/event';
 import {Scope} from '@core/model/scope';
 import {EventService} from '@core/services/event.service';
@@ -18,7 +18,6 @@ import {of, switchMap} from 'rxjs';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-event-dashboard',
 	templateUrl: './event-dashboard.component.html',
 	styleUrls: ['./event-dashboard.component.css'],

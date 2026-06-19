@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, signal} from '@angular/core';
+import {Component, Inject, signal} from '@angular/core';
 import {MatTableModule} from '@angular/material/table';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {DateTimeUTCPipe} from '../pipes/date-time-utc.pipe';
@@ -7,7 +7,6 @@ import {EntityAuditTrail} from '@core/model/entity-audit-trail';
 import {MatIcon} from '@angular/material/icon';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-audit-trail-entity',
 	templateUrl: './audit-trail-entity.component.html',
 	styleUrls: ['./audit-trail-entity.component.css'],

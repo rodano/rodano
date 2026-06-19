@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, booleanAttribute, Component, input, output} from '@angular/core';
+import {booleanAttribute, Component, input, output} from '@angular/core';
 import {MatButton} from '@angular/material/button';
 import {Scope} from '@core/model/scope';
 import {ScopeMini} from '@core/model/scope-mini';
@@ -6,7 +6,6 @@ import {ScopeTiny} from '@core/model/scope-tiny';
 import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-breadcrumb',
 	templateUrl: './scope-breadcrumb.component.html',
 	styleUrls: ['./scope-breadcrumb.component.css'],

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {startWith, switchMap} from 'rxjs/operators';
@@ -36,7 +36,6 @@ import {MailStatus} from '@core/model/mail-status';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-mail-list',
 	templateUrl: './mail-list.component.html',
 	styleUrls: ['./mail-list.component.css'],

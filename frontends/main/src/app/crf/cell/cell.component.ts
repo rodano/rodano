@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, AfterViewInit, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, AfterViewInit, input, signal} from '@angular/core';
 import {Cell} from '@core/model/cell';
 import {VisibilityService} from '../services/visibility.service';
 import {CellLoadingService} from '../services/cell-loading.service';
@@ -13,7 +13,6 @@ import {merge} from 'rxjs';
 import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-cell',
 	templateUrl: './cell.component.html',
 	styleUrls: ['./cell.component.scss'],

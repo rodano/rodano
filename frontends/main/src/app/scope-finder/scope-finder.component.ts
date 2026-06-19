@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, ElementRef, HostBinding, Input, OnInit, Optional, Self, ViewChild} from '@angular/core';
+import {Component, DestroyRef, ElementRef, HostBinding, Input, OnInit, Optional, Self, ViewChild} from '@angular/core';
 import {ControlValueAccessor, NgControl, ReactiveFormsModule} from '@angular/forms';
 import {MatOptgroup, MatOption} from '@angular/material/select';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
@@ -16,7 +16,6 @@ import {ScopeSearch} from '@core/utilities/search/scope-search';
 import {Scope} from '@core/model/scope';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-scope-finder',
 	templateUrl: './scope-finder.component.html',
 	styleUrls: ['./scope-finder.component.css'],

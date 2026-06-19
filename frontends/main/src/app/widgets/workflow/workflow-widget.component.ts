@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, ViewChild, computed, input, output, OnInit, DestroyRef, signal} from '@angular/core';
+import {Component, ViewChild, computed, input, output, OnInit, DestroyRef, signal} from '@angular/core';
 import {WidgetService} from '@core/services/widget.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {merge} from 'rxjs';
@@ -23,7 +23,6 @@ import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-widget',
 	templateUrl: './workflow-widget.component.html',
 	styleUrls: ['./workflow-widget.component.css'],

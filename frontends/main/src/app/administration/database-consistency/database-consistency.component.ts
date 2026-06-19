@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, ViewChild, signal} from '@angular/core';
+import {AfterViewInit, Component, ViewChild, signal} from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
 import {MatCheckbox} from '@angular/material/checkbox';
@@ -21,7 +21,6 @@ import {DenormalizationInconsistencyGroup} from '@core/model/denormalization-inc
 import {ConfigurationInconsistencyType} from '@core/model/configuration-inconsistency-type';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './database-consistency.component.html',
 	styleUrl: './database-consistency.component.css',
 	imports: [

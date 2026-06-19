@@ -1,14 +1,10 @@
-import {Injectable, ErrorHandler} from '@angular/core';
+import {ErrorHandler, Service, inject} from '@angular/core';
 import {HttpErrorResponse} from '@angular/common/http';
 import {NotificationService} from '../notification.service';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class GlobalErrorHandler implements ErrorHandler {
-	constructor(
-		private notificationService: NotificationService
-	) { }
+	private readonly notificationService = inject(NotificationService);
 
 	handleError(error: Error | HttpErrorResponse) {
 		console.error(error);

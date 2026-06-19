@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, ViewChild, DestroyRef, computed, input, signal, effect} from '@angular/core';
+import {Component, OnInit, ViewChild, DestroyRef, computed, input, signal, effect} from '@angular/core';
 import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
@@ -26,7 +26,6 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 import {YesNoPipe} from '../../pipes/yes-no.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user-list.component.html',
 	styleUrls: ['./user-list.component.css'],
 	selector: 'app-user-list',

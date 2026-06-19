@@ -1,10 +1,8 @@
 import {NativeDateAdapter} from '@angular/material/core';
 import {format} from 'date-fns';
-import {Injectable} from '@angular/core';
+import {Service} from '@angular/core';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class CustomDateAdapter extends NativeDateAdapter {
 	override createDate(year: number, month: number, date: number): Date {
 		//create a UTC date from the parts provided by the date component

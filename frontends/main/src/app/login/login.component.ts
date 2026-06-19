@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Router, ActivatedRoute} from '@angular/router';
 import {finalize} from 'rxjs/operators';
@@ -16,7 +16,6 @@ import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-login',
 	templateUrl: './login.component.html',
 	styleUrls: ['./login.component.css'],

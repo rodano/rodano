@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, effect, input} from '@angular/core';
+import {Component, DestroyRef, effect, input} from '@angular/core';
 import {ReactiveFormsModule, FormGroup, FormControl} from '@angular/forms';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatInput} from '@angular/material/input';
@@ -9,7 +9,6 @@ import {CRFField} from '../../models/crf-field';
 import {FieldUpdateService} from '../../services/field-update.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-checkbox-group',
 	templateUrl: './checkbox-group.component.html',
 	styleUrls: ['../field/field.component.css', './checkbox-group.component.css'],

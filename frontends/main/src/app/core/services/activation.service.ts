@@ -1,18 +1,14 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {APIService} from './api.service';
 import {User} from '../model/user';
 import {UserPrivacyPolicies} from '../model/user-privacy-policies';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ActivationService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) { }
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
 
 	getPrivacyPolicies(activationCode: string): Observable<UserPrivacyPolicies> {
 		return this.http.get<UserPrivacyPolicies>(`${this.apiService.getApiUrl()}/user/activation/${activationCode}`);

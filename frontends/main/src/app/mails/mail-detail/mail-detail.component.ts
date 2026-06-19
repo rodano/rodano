@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Inject, signal} from '@angular/core';
+import {Component, Inject, signal} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {MailsService} from '@core/services/mails.service';
 import {Mail} from '@core/model/mail';
@@ -9,7 +9,6 @@ import {MatTableModule} from '@angular/material/table';
 import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-mail-detail',
 	templateUrl: './mail-detail.component.html',
 	styleUrls: ['./mail-detail.component.css'],

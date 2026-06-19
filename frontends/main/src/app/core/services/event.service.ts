@@ -1,18 +1,14 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Event} from '../model/event';
 import {APIService} from './api.service';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class EventService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) { }
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
 
 	@reviveDates
 	create(scopePk: number, eventModelId: string): Observable<Event> {

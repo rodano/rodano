@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {ActivatedRouteSnapshot, Router, Resolve} from '@angular/router';
 import {WorkflowStatusService} from '@core/services/workflow-status.service';
 import {Observable, EMPTY} from 'rxjs';
@@ -9,15 +9,11 @@ import {SideMenuComponent} from '../side-menu/side-menu.component';
 
 //TODO rework this resolver or find another way to navigate to issues
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class WorkflowStatusPathResolver implements Resolve<FormInfo> {
-	constructor(
-		private workflowStatusService: WorkflowStatusService,
-		private router: Router,
-		private notificationService: NotificationService
-	) {}
+	private readonly workflowStatusService = inject(WorkflowStatusService);
+	private readonly router = inject(Router);
+	private readonly notificationService = inject(NotificationService);
 
 	resolve(route: ActivatedRouteSnapshot): Observable<FormInfo> {
 		const wsPkParam = route.paramMap.get('statusPk');

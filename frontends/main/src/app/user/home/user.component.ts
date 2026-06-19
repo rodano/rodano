@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, InjectionToken, OnInit, WritableSignal, inject, model, signal} from '@angular/core';
+import {Component, InjectionToken, OnInit, WritableSignal, inject, model, signal} from '@angular/core';
 import {ActivatedRoute, RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
 import {User} from '@core/model/user';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -12,7 +12,6 @@ import {AuthStateService} from '../../services/auth-state.service';
 export const USER_TOKEN = new InjectionToken<WritableSignal<User>>('user');
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './user.component.html',
 	styleUrls: ['./user.component.css'],
 	imports: [

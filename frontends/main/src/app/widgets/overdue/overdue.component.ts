@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, input, OnInit, output, ViewChild, signal} from '@angular/core';
+import {Component, computed, DestroyRef, input, OnInit, output, ViewChild, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {MatButton} from '@angular/material/button';
@@ -22,7 +22,6 @@ import {DownloadDirective} from '../../directives/download.component';
 import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-overdue-widget',
 	imports: [
 		ReactiveFormsModule,

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, model, signal} from '@angular/core';
+import {Component, OnInit, model, signal} from '@angular/core';
 import {RouterLink, Router} from '@angular/router';
 import {Robot} from '@core/model/robot';
 import {Validators, ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
@@ -25,7 +25,6 @@ import {ScopeFinderComponent} from '../../scope-finder/scope-finder.component';
 import {RoleCreation} from '@core/model/role-creation';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './robot.component.html',
 	styleUrls: ['./robot.component.css'],
 	imports: [

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, booleanAttribute, Component, computed, input, output} from '@angular/core';
+import {booleanAttribute, Component, computed, input, output} from '@angular/core';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowActionService} from '../services/workflow-action.service';
@@ -17,7 +17,6 @@ import {Workflow} from '@core/model/workflow';
 import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-status',
 	templateUrl: './workflow-status.component.html',
 	styleUrls: ['./workflow-status.component.css'],

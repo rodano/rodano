@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, input} from '@angular/core';
+import {Component, input} from '@angular/core';
 import {Observable} from 'rxjs';
 import {MatTableModule} from '@angular/material/table';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
@@ -19,7 +19,6 @@ import {SummaryWidgetComponent} from '../summary/summary-widget.component';
 import {MatDivider} from '@angular/material/divider';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-workflow-summary-widget',
 	templateUrl: '../summary/summary-widget.component.html',
 	styleUrls: ['../summary/summary-widget.component.css'],

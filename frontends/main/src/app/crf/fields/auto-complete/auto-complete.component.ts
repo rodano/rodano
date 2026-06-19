@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, effect, input, signal} from '@angular/core';
+import {Component, OnInit, DestroyRef, effect, input, signal} from '@angular/core';
 import {ReactiveFormsModule, FormControl} from '@angular/forms';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatInput} from '@angular/material/input';
@@ -11,7 +11,6 @@ import {of, switchMap} from 'rxjs';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-auto-complete',
 	templateUrl: './auto-complete.component.html',
 	styleUrls: ['../field/field.component.css', './auto-complete.component.css'],

@@ -1,17 +1,13 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {HttpClient, HttpRequest, HttpEvent} from '@angular/common/http';
 import {APIService} from './api.service';
 import {Observable} from 'rxjs';
 import {FileModel} from '../model/file-model';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class FileService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) { }
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
 
 	upload(scopePk: number, file: File, eventPk?: number): Observable<HttpEvent<FileModel>> {
 		const formData = new FormData();

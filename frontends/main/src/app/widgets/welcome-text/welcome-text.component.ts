@@ -1,9 +1,8 @@
-import {ChangeDetectionStrategy, Component, OnInit, signal} from '@angular/core';
+import {Component, OnInit, signal} from '@angular/core';
 import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 import {ConfigurationService} from '@core/services/configuration.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-welcome-text',
 	templateUrl: './welcome-text.component.html',
 	styleUrl: './welcome-text.component.css'

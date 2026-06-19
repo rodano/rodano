@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, effect, input} from '@angular/core';
+import {Component, OnInit, DestroyRef, effect, input} from '@angular/core';
 import {ReactiveFormsModule, FormControl, Validators} from '@angular/forms';
 import {MatDatepicker, MatDatepickerModule} from '@angular/material/datepicker';
 import {parse, format} from 'date-fns';
@@ -13,7 +13,6 @@ import {FieldService} from '@core/services/field.service';
 import {merge} from 'rxjs';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-date',
 	templateUrl: './date.component.html',
 	styleUrls: ['../field/field.component.css', './date.component.css'],

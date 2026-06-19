@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {ScopeModel} from '@core/model/scope-model';
@@ -21,7 +21,6 @@ import {CRFDocumentationGenerationStatus} from '@core/model/crf-documentation-ge
 import {ScopeFinderComponent} from '../scope-finder/scope-finder.component';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './documentation.component.html',
 	styleUrls: ['./documentation.component.css'],
 	imports: [

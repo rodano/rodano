@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {HttpParamsService} from './http-params.service';
 import {APIService} from './api.service';
@@ -9,17 +9,15 @@ import {PagedResultMail} from '../model/paged-result-mail';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {MailCreation} from '../model/mail-creation';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class MailsService {
 	private serviceUrl: string;
 
-	constructor(
-		private http: HttpClient,
-		private httpParamsService: HttpParamsService,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly httpParamsService = inject(HttpParamsService);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/mails`;
 	}
 

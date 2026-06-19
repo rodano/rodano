@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, DestroyRef, input, signal} from '@angular/core';
+import {Component, OnInit, DestroyRef, input, signal} from '@angular/core';
 import {Layout} from '@core/model/layout';
 import {VisibilityService} from '../services/visibility.service';
 import {CellComponent} from '../cell/cell.component';
@@ -14,7 +14,6 @@ import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-layout',
 	templateUrl: './layout.component.html',
 	styleUrls: ['./layout.component.css'],

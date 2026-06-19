@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {forkJoin} from 'rxjs';
 import {Study} from '@core/model/study';
@@ -14,8 +14,7 @@ import {MatAnchor, MatButton} from '@angular/material/button';
 	imports: [
 		MatAnchor,
 		MatButton
-	],
-	changeDetection: ChangeDetectionStrategy.OnPush
+	]
 })
 export class ManagementComponent implements OnInit {
 	readonly study = signal<Study | undefined>(undefined);

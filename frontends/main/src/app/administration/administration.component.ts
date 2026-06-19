@@ -1,9 +1,8 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {Component} from '@angular/core';
 import {RouterLinkActive, RouterLink, RouterOutlet} from '@angular/router';
 import {MatTabsModule} from '@angular/material/tabs';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './administration.component.html',
 	styleUrls: ['./administration.component.css'],
 	imports: [

@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Form} from '../model/form';
 import {Layout} from '../model/layout';
@@ -7,14 +7,10 @@ import {APIService} from './api.service';
 import {DatasetSubmission} from '../model/dataset-submission';
 import {Dataset} from '../model/dataset';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class FormService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) { }
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
 
 	searchOnScope(scopePk: number): Observable<Form[]> {
 		return this.http.get<Form[]>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/forms`);

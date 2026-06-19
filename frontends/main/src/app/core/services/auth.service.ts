@@ -1,5 +1,5 @@
 import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 import {Authentication} from '../model/authentication';
@@ -8,14 +8,10 @@ import {APIService} from './api.service';
 import {ResetPassword} from '../model/reset-password';
 import {ChangePassword} from '../model/change-password';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class AuthService {
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {}
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
 
 	login(credentials: Credentials): Observable<Authentication> {
 		return this.http.post<Authentication>(

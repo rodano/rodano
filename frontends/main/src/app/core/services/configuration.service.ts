@@ -1,5 +1,5 @@
 import {HttpClient} from '@angular/common/http';
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {identity, Observable} from 'rxjs';
 import {concatMap, map, first, shareReplay} from 'rxjs/operators';
 import {Menu} from '../model/menu';
@@ -16,17 +16,15 @@ import {FormModel} from '../model/form-model';
 import {FieldModel} from '../model/field-model';
 import {Language} from '../model/language';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class ConfigurationService {
 	private readonly serviceUrl: string;
 	private readonly publicStudy$: Observable<PublicStudy>;
 
-	constructor(
-		private http: HttpClient,
-		private apiService: APIService
-	) {
+	private readonly http = inject(HttpClient);
+	private readonly apiService = inject(APIService);
+
+	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/config`;
 		//cache public study
 		this.publicStudy$ = this.http.get<Study>(`${this.serviceUrl}/public-study`).pipe(shareReplay());

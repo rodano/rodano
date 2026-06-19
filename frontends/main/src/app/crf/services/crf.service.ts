@@ -1,4 +1,4 @@
-import {Injectable, signal} from '@angular/core';
+import {Service, inject, signal} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Dataset} from '@core/model/dataset';
 import {map} from 'rxjs/operators';
@@ -20,14 +20,10 @@ import {OperandType} from '@core/model/operand-type';
 import {FieldModelType} from '@core/model/field-model-type';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class CRFService {
-	constructor(
-		private datasetService: DatasetService,
-		private formService: FormService
-	) { }
+	private readonly datasetService = inject(DatasetService);
+	private readonly formService = inject(FormService);
 
 	getLayoutsCells(layouts: Layout[]): Cell[] {
 		return layouts.flatMap(l => this.getLayoutCells(l));

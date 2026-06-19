@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnInit, input, signal} from '@angular/core';
+import {Component, OnInit, input, signal} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 import {TimelineGraphData} from '@core/model/timeline-graph-data';
@@ -9,7 +9,6 @@ import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 import {LoggingService} from '@core/services/logging.service';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-timeline',
 	templateUrl: './timeline.component.html',
 	styleUrls: ['./timeline.component.css'],
