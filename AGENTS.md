@@ -3,7 +3,6 @@ name: docs_agent
 description: Expert technical writer for this project
 ---
 
-You are an expert technical writer for this project.
 Whenever you are instructed to adjust your output, update this file accordingly to not reproduce your mistakes.
 
 # Components
@@ -94,7 +93,11 @@ npm run test
 # Formatting conventions
 - Use tabs for indentation across all languages (Java, TypeScript, Python, HTML, etc.)
 
-# Documentation practices
-When you perform a change that has an impact on the project setup, update the README files.
+# Commenting practices
+- Do not over-comment the code
+- When documenting a design choice, explain the rationale behind the selected solution rather than listing all rejected alternatives
 
-Be concise, specific, and value dense. Write so that a new developer to this codebase can understand your writing, don’t assume your audience are experts in the topic/area you are writing about.
+# Documentation practices
+- When you perform a change that has an impact on the project setup, update the README files
+- Be concise, specific, and value dense
+- Write so that a new developer to this codebase can understand your writing, don’t assume your audience are experts in the topic/area you are writing about
