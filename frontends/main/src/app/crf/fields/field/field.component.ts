@@ -39,6 +39,7 @@ import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowStatusNotImportantPipe} from '../../../pipes/workflow-status-not-important';
 import {FeatureStatic} from '@core/model/feature-static';
 import {Field} from '@core/model/field';
+import {WorkflowableUpdateService} from '../../services/workflowable-update.service';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,6 +86,7 @@ export class FieldComponent implements OnInit {
 		private crfService: CRFService,
 		private authStateService: AuthStateService,
 		private fieldUpdateService: FieldUpdateService,
+		private workflowableUpdateService: WorkflowableUpdateService,
 		private workflowActionService: WorkflowActionService,
 		private administrationService: AdministrationService,
 		private dialog: MatDialog,
@@ -187,6 +189,7 @@ export class FieldComponent implements OnInit {
 	updateWorkflow(status: WorkflowStatus, action: WorkflowAction) {
 		this.workflowActionService.executeActionOnField(this.field(), status, action).subscribe(newField => {
 			this.field.update(f => ({...newField, shown: f.shown, error: f.error}));
+			this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.FIELD, newField);
 		});
 	}
 

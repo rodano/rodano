@@ -5,13 +5,13 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {TypedWorkflowable} from './typed-workflowable';
 
 /**
- * Service used to monitor entities changes in the CRF
- * It allows to emit an event when a CRF (scope/event/form/workflow status) is updated
+ * Service used to monitor workflowable entities updates statuses changes in the application, especially in the CRF
+ * It allows to emit an event when a workflowable entity is updated
  */
 @Injectable({
 	providedIn: 'root'
 })
-export class CRFChangeService {
+export class WorkflowableUpdateService {
 	private readonly updatedWorkflowableStream$ = new Subject<TypedWorkflowable>();
 	public readonly updatedWorkflowable$ = this.updatedWorkflowableStream$.asObservable();
 
@@ -21,5 +21,9 @@ export class CRFChangeService {
 			workflowable
 		};
 		this.updatedWorkflowableStream$.next(typedWorkflowable);
+	}
+
+	public match(workflowable: TypedWorkflowable, entity: WorkflowableEntity, pk: number): boolean {
+		return workflowable.entity === entity && workflowable.workflowable.pk === pk;
 	}
 }

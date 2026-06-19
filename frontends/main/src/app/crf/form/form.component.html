@@ -30,7 +30,7 @@
 
 	<div id="form-actions">
 		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
-		@for (status of form().workflowStatuses; track status.pk || status.workflowId) {
+		@for (status of workflowStatuses(); track status.pk || status.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.FORM"
 				[workflowStatus]="status"

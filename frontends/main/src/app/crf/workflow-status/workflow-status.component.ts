@@ -8,7 +8,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIcon} from '@angular/material/icon';
 import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
-import {CRFChangeService} from '../services/crf-change.service';
+import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 import {Scope} from '@core/model/scope';
 import {Event} from '@core/model/event';
 import {Form} from '@core/model/form';
@@ -47,7 +47,7 @@ export class WorkflowStatusComponent {
 
 	constructor(
 		private workflowActionService: WorkflowActionService,
-		private crfChangeService: CRFChangeService
+		private workflowableUpdateService: WorkflowableUpdateService
 	) { }
 
 	executeWorkflowAction(action: WorkflowAction) {
@@ -69,7 +69,7 @@ export class WorkflowStatusComponent {
 		}
 		request.subscribe({
 			next: updatedWorkflowable => {
-				this.crfChangeService.emitUpdatedWorkflowable(this.entity(), updatedWorkflowable);
+				this.workflowableUpdateService.emitUpdatedWorkflowable(this.entity(), updatedWorkflowable);
 				this.actionResponse.emit(updatedWorkflowable);
 			}
 			//error management is done in the service

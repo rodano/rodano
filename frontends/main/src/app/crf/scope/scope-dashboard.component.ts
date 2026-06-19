@@ -12,7 +12,7 @@ import {MatButton} from '@angular/material/button';
 import {MatDialog} from '@angular/material/dialog';
 import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.component';
 import {of, switchMap} from 'rxjs';
-import {CRFChangeService} from '../services/crf-change.service';
+import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -34,7 +34,7 @@ export class ScopeDashboardComponent {
 
 	constructor(
 		private scopeService: ScopeService,
-		private crfChangeService: CRFChangeService,
+		private workflowableUpdateService: WorkflowableUpdateService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog
 	) { }
@@ -56,7 +56,7 @@ export class ScopeDashboardComponent {
 					if(scope) {
 						this.scope.set(scope);
 						//used by the side menu to refresh the entities
-						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
+						this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
 						this.notificationService.showSuccess(`${this.scope().model.shortname['en']} removed`);
 					}
 				},
@@ -83,7 +83,7 @@ export class ScopeDashboardComponent {
 					if(scope) {
 						this.scope.set(scope);
 						//used by the side menu to refresh the entities
-						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
+						this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
 						this.notificationService.showSuccess(`${this.scope().model.shortname['en']} restored`);
 					}
 				},
@@ -98,7 +98,7 @@ export class ScopeDashboardComponent {
 			next: scope => {
 				this.scope.set(scope);
 				//used by the side menu to refresh the entities
-				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
+				this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
 				this.notificationService.showSuccess(`${this.scope().model.shortname['en']} locked`);
 			},
 			error: response => {
@@ -112,7 +112,7 @@ export class ScopeDashboardComponent {
 			next: scope => {
 				this.scope.set(scope);
 				//used by the side menu to refresh the entities
-				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
+				this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.SCOPE, scope);
 				this.notificationService.showSuccess(`${this.scope().model.shortname['en']} unlocked`);
 			},
 			error: response => {

@@ -13,7 +13,7 @@ import {Event} from '@core/model/event';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {ScopeService} from '@core/services/scope.service';
 import {SelectEventComponent} from '../dialogs/add-event/select-event.component';
-import {CRFChangeService} from '../services/crf-change.service';
+import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 import {takeUntilDestroyed, toObservable} from '@angular/core/rxjs-interop';
 import {EventGroup} from '@core/model/event-group';
 import {NotificationService} from '../../services/notification.service';
@@ -73,7 +73,7 @@ export class SideMenuComponent implements OnInit {
 		private scopeService: ScopeService,
 		private eventService: EventService,
 		private formService: FormService,
-		private crfChangeService: CRFChangeService,
+		private workflowableUpdateService: WorkflowableUpdateService,
 		private destroyRef: DestroyRef,
 		private notificationService: NotificationService,
 		private router: Router,
@@ -86,7 +86,7 @@ export class SideMenuComponent implements OnInit {
 		//when any workflowable is updated, refresh the whole menu
 		//that's because rules may change workflow states on any other workflowable
 		//it may also add/remove forms and events
-		this.crfChangeService.updatedWorkflowable$.pipe(
+		this.workflowableUpdateService.updatedWorkflowable$.pipe(
 			switchMap(typedWorkflowable => {
 				//if the workflowable is a scope, use it as-is
 				if(typedWorkflowable.entity === WorkflowableEntity.SCOPE) {

@@ -15,7 +15,7 @@ import {MatButton} from '@angular/material/button';
 import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.component';
 import {MatDialog} from '@angular/material/dialog';
 import {of, switchMap} from 'rxjs';
-import {CRFChangeService} from '../services/crf-change.service';
+import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 
 @Component({
 	changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,7 +46,7 @@ export class EventDashboardComponent {
 	constructor(
 		private eventService: EventService,
 		private notificationService: NotificationService,
-		private crfChangeService: CRFChangeService,
+		private workflowableUpdateService: WorkflowableUpdateService,
 		private dialog: MatDialog
 	) {}
 
@@ -67,7 +67,7 @@ export class EventDashboardComponent {
 					if(event) {
 						this.event.set(event);
 						//used by the side menu to refresh the entities
-						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
+						this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 						this.notificationService.showSuccess('Event removed');
 					}
 				},
@@ -94,7 +94,7 @@ export class EventDashboardComponent {
 					if(event) {
 						this.event.set(event);
 						//used by the side menu to refresh the entities
-						this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
+						this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 						this.notificationService.showSuccess('Event restored');
 					}
 				},
@@ -109,7 +109,7 @@ export class EventDashboardComponent {
 			next: event => {
 				this.event.set(event);
 				//used by the side menu to refresh the entities
-				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
+				this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 				this.notificationService.showSuccess('Event locked');
 			},
 			error: response => {
@@ -123,7 +123,7 @@ export class EventDashboardComponent {
 			next: event => {
 				this.event.set(event);
 				//used by the side menu to refresh the entities
-				this.crfChangeService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
+				this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.EVENT, event);
 				this.notificationService.showSuccess('Event unlocked');
 			},
 			error: response => {
