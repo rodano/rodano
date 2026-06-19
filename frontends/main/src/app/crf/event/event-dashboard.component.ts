@@ -36,6 +36,11 @@ export class EventDashboardComponent {
 	workflowableEntity = WorkflowableEntity;
 
 	readonly scope = input.required<Scope>();
+	//using a writable signal so it can be updated when the event is updated (e.g. after lock/unlock/remove/restore)
+	//however, this gives the illusion that this will be propagated to the route resolver, which is not the case
+	//the route resolver will still have the old scope reference until a new resolve process is triggered
+	//this means other components in the same router-outlet will not see the updated scope until a new resolve is triggered, which can be confusing
+	//maybe at some point we will have "withComponentModelBinding" instead of "withComponentInputBinding"
 	readonly event = model.required<Event>();
 
 	readonly dateDifferenceInDays = computed(() => {

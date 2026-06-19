@@ -48,6 +48,11 @@ export class FormComponent implements OnInit {
 	readonly scope = input.required<Scope>();
 	//event may be null for form attached directly to the scope
 	readonly event = input<Event>();
+	//using a writable signal so it can be updated when the form is updated
+	//however, this gives the illusion that this will be propagated to the route resolver, which is not the case
+	//the route resolver will still have the old form reference until a new resolve process is triggered
+	//this means other components in the same router-outlet will not see the updated form until a new resolve is triggered, which can be confusing
+	//maybe at some point we will have "withComponentModelBinding" instead of "withComponentInputBinding"
 	readonly form = model.required<Form>();
 
 	layoutType = LayoutType;

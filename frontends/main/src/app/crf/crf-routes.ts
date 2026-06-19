@@ -14,6 +14,7 @@ export default [
 	{
 		path: ':scopePk',
 		component: CRFComponent,
+		runGuardsAndResolvers: 'always',
 		resolve: {
 			scope: ScopeResolver
 		},
