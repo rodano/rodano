@@ -28,7 +28,7 @@
 		"eslint-plugin-jsdoc": "^50.6.1",
 		"globals": "^15.13.0",
 		"xmlbuilder2": "3.1.1",
-		"puppeteer": "23.10.4",
+		"puppeteer": "25.1.0",
 		"rimraf": "6.0.1",
 		"typescript": "5.7.2"
 	}
