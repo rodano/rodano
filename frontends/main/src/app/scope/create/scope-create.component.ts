@@ -33,10 +33,10 @@ import {Rights} from '@core/model/rights';
 export class ScopeCreateComponent implements OnInit {
 	readonly scopeModel = input.required<ScopeModel>();
 
-	scopeCreationForm = this.formBuilder.nonNullable.group({
-		code: ['', [Validators.required]],
-		shortname: ['', [Validators.required]],
-		parentScopePk: [1, [Validators.required]]
+	scopeCreationForm = this.formBuilder.group({
+		code: this.formBuilder.nonNullable.control('', [Validators.required]),
+		shortname: this.formBuilder.nonNullable.control('', [Validators.required]),
+		parentScopePk: this.formBuilder.control<number | undefined>(undefined, [Validators.required])
 	});
 
 	readonly parentScopes = signal<Scope[]>([]);
