@@ -18,13 +18,14 @@ import ch.rodano.configuration.model.workflow.WorkflowableModel;
 import ch.rodano.configuration.utils.DisplayableUtils;
 import ch.rodano.core.model.common.AuditableObject;
 import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.LockableObject;
 import ch.rodano.core.model.common.PersistentObject;
 import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.model.enrollment.EnrollmentTarget;
 import ch.rodano.core.model.rules.Evaluable;
 import ch.rodano.core.model.workflow.Workflowable;
 
-public class Scope extends ScopeRecord implements DeletableObject, TimestampableObject, AuditableObject, PersistentObject, Comparable<Scope>, Workflowable, Payable, Evaluable {
+public class Scope extends ScopeRecord implements DeletableObject, LockableObject, TimestampableObject, AuditableObject, PersistentObject, Comparable<Scope>, Workflowable, Payable, Evaluable {
 	public static final Comparator<Scope> DEFAULT_COMPARATOR = Comparator
 		.comparing(Scope::getScopeModel)
 		.thenComparing(Scope::getCode)

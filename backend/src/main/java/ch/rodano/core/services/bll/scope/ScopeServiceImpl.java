@@ -25,8 +25,6 @@ import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.event.Timeframe;
-import ch.rodano.core.model.exception.DeletedObjectException;
-import ch.rodano.core.model.exception.LockedObjectException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.form.Form;
 import ch.rodano.core.model.resource.Resource;
@@ -51,6 +49,7 @@ import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.rule.RuleService;
+import ch.rodano.core.utils.UtilsService;
 
 @Service
 public class ScopeServiceImpl implements ScopeService {
@@ -66,6 +65,7 @@ public class ScopeServiceImpl implements ScopeService {
 	private final ValidationService validationService;
 	private final FieldDAOService fieldDAOService;
 	private final WorkflowStatusService workflowStatusService;
+	private final UtilsService utilsService;
 
 	private final Pattern siblingsPattern;
 	private final Pattern sameScopeModelPattern;
@@ -80,7 +80,8 @@ public class ScopeServiceImpl implements ScopeService {
 		final WorkflowStatusService workflowStatusService,
 		final ValidationService validationService,
 		final ScopeDAOService scopeDAOService,
-		final ScopeRelationService scopeRelationService
+		final ScopeRelationService scopeRelationService,
+		final UtilsService utilsService
 	) {
 		this.studyService = studyService;
 		this.ruleService = ruleService;
@@ -92,6 +93,7 @@ public class ScopeServiceImpl implements ScopeService {
 		this.validationService = validationService;
 		this.scopeDAOService = scopeDAOService;
 		this.scopeRelationService = scopeRelationService;
+		this.utilsService = utilsService;
 
 		siblingsPattern = Pattern.compile("\\$\\{siblingsNumber:(\\d+)}");
 		sameScopeModelPattern = Pattern.compile("\\$\\{sameScopeModelNumber:(\\d+)}");
@@ -195,8 +197,8 @@ public class ScopeServiceImpl implements ScopeService {
 	) {
 		// If the scope is added with no parent, we assume that it is the root scope
 		// Otherwise need to check if the parent scope is locked or not
-		if(parent != null && parent.getLocked()) {
-			throw new LockedObjectException(parent);
+		if(parent != null) {
+			utilsService.checkNotLocked(parent);
 		}
 
 		if(parent != null && parent.isClosed()) {
@@ -217,9 +219,7 @@ public class ScopeServiceImpl implements ScopeService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
+		utilsService.checkNotLocked(scope);
 
 		final var scopeModel = scope.getScopeModel();
 
@@ -254,9 +254,7 @@ public class ScopeServiceImpl implements ScopeService {
 			return;
 		}
 
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
+		utilsService.checkNotLocked(scope);
 
 		final var scopeModel = scope.getScopeModel();
 
@@ -285,10 +283,7 @@ public class ScopeServiceImpl implements ScopeService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		// Check if the scope is locked
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
+		utilsService.checkNotLocked(scope);
 
 		// Check if the code has already been used.
 		final var scopeHavingSameCode = scopeDAOService.getScopeByCode(scope.getCode());
@@ -302,9 +297,7 @@ public class ScopeServiceImpl implements ScopeService {
 	@Override
 	//refrain from optimizing this using an SQL query because the audit trail is required
 	public void lock(final Scope scope, final DatabaseActionContext context) {
-		if(scope.getDeleted()) {
-			throw new DeletedObjectException(scope);
-		}
+		utilsService.checkNotDeleted(scope);
 
 		lockScope(scope, context, "Lock scope");
 		eventService.getAll(scope).forEach(e -> eventService.lock(scope, e, context, "Lock scope"));
@@ -325,9 +318,7 @@ public class ScopeServiceImpl implements ScopeService {
 	@Override
 	//refrain from optimizing this using an SQL query because the audit trail is required
 	public void unlock(final Scope scope, final DatabaseActionContext context) {
-		if(scope.getDeleted()) {
-			throw new DeletedObjectException(scope);
-		}
+		utilsService.checkNotDeleted(scope);
 
 		unlockScope(scope, context, "Unlock scope");
 		eventService.getAll(scope).forEach(e -> eventService.unlock(scope, e, context, "Unlock scope"));
@@ -736,12 +727,12 @@ public class ScopeServiceImpl implements ScopeService {
 	}
 
 	private void lockScope(final Scope scope, final DatabaseActionContext context, final String rationale) {
-		scope.setLocked(true);
+		scope.lock();
 		scopeDAOService.saveScope(scope, context, rationale);
 	}
 
 	private void unlockScope(final Scope scope, final DatabaseActionContext context, final String rationale) {
-		scope.setLocked(false);
+		scope.unlock();
 		scopeDAOService.saveScope(scope, context, rationale);
 	}
 }

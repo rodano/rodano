@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.model.audit.DatabaseActionContext;
-import ch.rodano.core.model.exception.LockedObjectException;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.scope.ScopeRelation;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
@@ -22,13 +21,16 @@ import ch.rodano.core.utils.UtilsService;
 public class ScopeRelationServiceImpl implements ScopeRelationService {
 	private final ScopeRelationDAOService scopeRelationDAOService;
 	private final ScopeDAOService scopeDAOService;
+	private final UtilsService utilsService;
 
 	public ScopeRelationServiceImpl(
 		final ScopeRelationDAOService scopeRelationDAOService,
-		final ScopeDAOService scopeDAOService
+		final ScopeDAOService scopeDAOService,
+		final UtilsService utilsService
 	) {
 		this.scopeRelationDAOService = scopeRelationDAOService;
 		this.scopeDAOService = scopeDAOService;
+		this.utilsService = utilsService;
 	}
 
 	@Override
@@ -428,18 +430,12 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	private void checkLockedOrDeleted(final Scope scope, final Scope parent) {
 		// If one of the scopes is deleted, no relation can be created
-		if(scope.getDeleted() || parent.getDeleted()) {
-			throw new ScopeRelationException("Can not add a relation to a scope that is deleted");
-		}
+		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotDeleted(parent);
 
 		// If either of the scopes is locked, no relation can be created
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
-
-		if(parent.getLocked()) {
-			throw new LockedObjectException(parent);
-		}
+		utilsService.checkNotLocked(scope);
+		utilsService.checkNotLocked(parent);
 	}
 
 	/**

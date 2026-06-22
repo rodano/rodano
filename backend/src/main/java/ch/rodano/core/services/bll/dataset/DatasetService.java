@@ -127,6 +127,8 @@ public interface DatasetService {
 	);
 
 	void save(
+		Scope scope,
+		Optional<Event> event,
 		Dataset dataset,
 		DatabaseActionContext context,
 		String rationale

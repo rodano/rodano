@@ -137,11 +137,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Dataset create(final Scope scope, final Optional<Event> event, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale, final Optional<String> id) {
-		utilsService.checkNotDeleted(scope);
-		event.ifPresent(utilsService::checkNotDeleted);
-
-		utilsService.checkNotLocked(scope);
-		event.ifPresent(utilsService::checkNotLocked);
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		if(event.isEmpty()) {
 			//check that the dataset model is allowed for the scope model
@@ -187,11 +184,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void delete(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope);
-		event.ifPresent(utilsService::checkNotDeleted);
-
-		utilsService.checkNotLocked(scope);
-		event.ifPresent(utilsService::checkNotLocked);
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		final var datasetModel = dataset.getDatasetModel();
 
@@ -216,11 +210,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void restore(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope);
-		event.ifPresent(utilsService::checkNotDeleted);
-
-		utilsService.checkNotLocked(scope);
-		event.ifPresent(utilsService::checkNotLocked);
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		final var datasetModel = dataset.getDatasetModel();
 
@@ -255,12 +246,18 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void save(final Dataset dataset, final DatabaseActionContext context, final String rationale) {
+	public void save(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
+
 		datasetDAOService.saveDataset(dataset, context, rationale);
 	}
 
 	@Override
 	public void reset(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
+
 		for(final var f : fieldService.getAll(dataset)) {
 			fieldService.reset(scope, event, dataset, f, context, rationale);
 		}

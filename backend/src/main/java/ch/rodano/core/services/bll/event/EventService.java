@@ -30,6 +30,7 @@ public interface EventService {
 	);
 
 	void save(
+		Scope scope,
 		Event event,
 		DatabaseActionContext context,
 		String rationale

@@ -27,7 +27,6 @@ import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.event.Progression;
-import ch.rodano.core.model.exception.LockedObjectException;
 import ch.rodano.core.model.exception.WrongDataConditionException;
 import ch.rodano.core.model.form.Form;
 import ch.rodano.core.model.rules.data.ConstraintEvaluationService;
@@ -100,10 +99,7 @@ public class EventServiceImpl implements EventService {
 	 * @param eventModel The concerned event model
 	 */
 	private Optional<RuntimeException> verifyScopePreRequisites(final Scope scope, final List<Event> existingEvents, final EventModel eventModel) {
-		//check that scope is not locked
-		if(scope.getLocked()) {
-			return Optional.of(new LockedObjectException(scope));
-		}
+		utilsService.checkNotLocked(scope);
 
 		//check that the event model is allowed for the scope model
 		if(!scope.getScopeModel().getEventModels().contains(eventModel)) {
@@ -231,13 +227,15 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public void save(
+		final Scope scope,
 		final Event event,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		if(event.getLocked()) {
-			throw new LockedObjectException(event);
-		}
+		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotLocked(scope);
+		utilsService.checkNotLocked(event);
+
 		eventDAOService.saveEvent(event, context, rationale);
 	}
 
@@ -249,6 +247,7 @@ public class EventServiceImpl implements EventService {
 		final String rationale
 	) {
 		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotLocked(scope);
 		utilsService.checkNotLocked(event);
 
 		final var eventModel = event.getEventModel();
@@ -283,6 +282,7 @@ public class EventServiceImpl implements EventService {
 		final String rationale
 	) {
 		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotLocked(scope);
 		utilsService.checkNotLocked(event);
 
 		//retrieve all existing events
@@ -340,7 +340,7 @@ public class EventServiceImpl implements EventService {
 		utilsService.checkNotDeleted(scope);
 		utilsService.checkNotDeleted(event);
 
-		event.setLocked(true);
+		event.lock();
 		eventDAOService.saveEvent(event, context, rationale);
 	}
 
@@ -354,7 +354,7 @@ public class EventServiceImpl implements EventService {
 		utilsService.checkNotDeleted(scope);
 		utilsService.checkNotDeleted(event);
 
-		event.setLocked(false);
+		event.unlock();
 		eventDAOService.saveEvent(event, context, rationale);
 	}
 
@@ -398,9 +398,9 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
+		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotLocked(scope);
+
 		resetEventsDate(getAll(scope), context, rationale);
 	}
 

@@ -15,13 +15,14 @@ import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 import ch.rodano.core.model.common.AuditableObject;
 import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.LockableObject;
 import ch.rodano.core.model.common.PersistentObject;
 import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.model.rules.Evaluable;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.workflow.Workflowable;
 
-public class Event extends EventRecord implements DeletableObject, TimestampableObject, PersistentObject, AuditableObject, Workflowable, Comparable<Event>, Evaluable {
+public class Event extends EventRecord implements DeletableObject, LockableObject, TimestampableObject, PersistentObject, AuditableObject, Workflowable, Comparable<Event>, Evaluable {
 
 	// Used in study specific code
 	public static final Comparator<Event> COMPARATOR_CONFIG = (v1, v2) -> {

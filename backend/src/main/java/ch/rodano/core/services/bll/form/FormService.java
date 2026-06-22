@@ -69,7 +69,13 @@ public interface FormService {
 		String rationale
 	);
 
-	void save(Form form, DatabaseActionContext context, String rationale);
+	void save(
+		Scope scope,
+		Optional<Event> event,
+		Form form,
+		DatabaseActionContext context,
+		String rationale
+	);
 
 	void delete(
 		Scope scope,

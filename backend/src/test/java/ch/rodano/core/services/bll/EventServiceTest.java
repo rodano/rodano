@@ -76,13 +76,13 @@ public class EventServiceTest extends DatabaseTest {
 		event.setBlocking(true);
 		final var newDate = ZonedDateTime.now();
 		event.setExpectedDate(newDate);
-		eventService.save(event, context, TEST_RATIONALE);
+		eventService.save(patient, event, context, TEST_RATIONALE);
 		assertTrue(event.getBlocking());
 		assertEquals(newDate, event.getExpectedDate());
 
 		event.setBlocking(false);
 		event.setDate(newDate);
-		eventService.save(event, context, TEST_RATIONALE);
+		eventService.save(patient, event, context, TEST_RATIONALE);
 		assertFalse(event.getBlocking());
 		assertEquals(newDate, event.getDate());
 	}
@@ -103,7 +103,7 @@ public class EventServiceTest extends DatabaseTest {
 		// the operation must fail
 		assertThrows(
 			LockedObjectException.class,
-			() -> eventService.save(event, context, TEST_RATIONALE),
+			() -> eventService.save(patient, event, context, TEST_RATIONALE),
 			"Event could be modified, even though it was locked"
 		);
 
@@ -113,7 +113,7 @@ public class EventServiceTest extends DatabaseTest {
 		// try to modify it
 		final var newDate = ZonedDateTime.now();
 		event.setDate(newDate);
-		eventService.save(event, context, TEST_RATIONALE);
+		eventService.save(patient, event, context, TEST_RATIONALE);
 
 		// must work
 		assertEquals(newDate, event.getDate());

@@ -103,9 +103,10 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 					final Map<String, Object> data
 				) {
 					final var event = (Event) evaluable;
+					final var scope = scopeService.get(event);
 					final var blocking = Boolean.parseBoolean((String) parameters.get("BLOCKING"));
 					event.setBlocking(blocking);
-					eventService.save(event, context, "Set blocking");
+					eventService.save(scope, event, context, "Set blocking");
 				}
 
 				@Override
@@ -123,9 +124,10 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 					final Map<String, Object> data
 				) {
 					final var event = (Event) evaluable;
+					final var scope = scopeService.get(event);
 					final var locked = Boolean.parseBoolean((String) parameters.get("LOCKED"));
 					event.setLocked(locked);
-					eventService.save(event, context, "Set locked");
+					eventService.save(scope, event, context, "Set locked");
 				}
 
 				@Override
@@ -148,8 +150,9 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 						if(event.getEventModel().isPlanned()) {
 							throw new NoRespectForConfigurationException("Can not set expected date for a event that is planned");
 						}
+						final var scope = scopeService.get(event);
 						event.setExpectedDate(eventDate.toZonedDateTime().get());
-						eventService.save(event, context, "Set expected date");
+						eventService.save(scope, event, context, "Set expected date");
 					}
 				}
 
@@ -167,10 +170,10 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 					final String message,
 					final Map<String, Object> data
 				) {
-					final var event = (Event) evaluable;
-					final var scope = scopeService.get(event);
 					final var eventDate = (PartialDate) parameters.get("DATE");
 					if(eventDate.isAnchoredInTime()) {
+						final var event = (Event) evaluable;
+						final var scope = scopeService.get(event);
 						eventService.updateDate(scope, event, eventDate.toZonedDateTime().get(), context, "Set date");
 					}
 				}
@@ -192,8 +195,9 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 					final var eventDate = (PartialDate) parameters.get("DATE");
 					if(eventDate.isAnchoredInTime()) {
 						final Event event = (Event) evaluable;
+						final var scope = scopeService.get(event);
 						event.setEndDate(eventDate.toZonedDateTime().get());
-						eventService.save(event, context, "Set end date");
+						eventService.save(scope, event, context, "Set end date");
 					}
 				}
 
@@ -270,8 +274,9 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 					final Map<String, Object> data
 				) {
 					final var event = (Event) evaluable;
+					final var scope = scopeService.get(event);
 					event.setNotDone(true);
-					eventService.save(event, context, "Set not done");
+					eventService.save(scope, event, context, "Set not done");
 				}
 
 				@Override
@@ -290,7 +295,8 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 				) {
 					final var event = (Event) evaluable;
 					event.setNotDone(false);
-					eventService.save(event, context, "Set done");
+					final var scope = scopeService.get(event);
+					eventService.save(scope, event, context, "Set done");
 				}
 
 				@Override

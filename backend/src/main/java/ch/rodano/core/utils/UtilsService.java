@@ -5,9 +5,9 @@ import java.util.Optional;
 
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.LockableObject;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.exception.DeletedObjectException;
-import ch.rodano.core.model.exception.LockedObjectException;
 import ch.rodano.core.model.scope.Scope;
 
 public interface UtilsService {
@@ -50,16 +50,23 @@ public interface UtilsService {
 	void checkNotDeleted(DeletableObject o);
 
 	/**
-	 * Checks if the scope is not locked, throws an exception otherwise.
-	 * @param scope         The scope
-	 * @throws LockedObjectException    Thrown if the scope is locked
+	 * Checks if the scope is not deleted and, if the event is present, that it is not deleted either, throws an exception otherwise.
+	 * @param scope     The scope
+	 * @param event     The optional event belonging to the scope
+	 * @throws DeletedObjectException    Thrown if the scope or the event is deleted
 	 */
-	void checkNotLocked(Scope scope);
+	void checkNotDeleted(Scope scope, Optional<Event> event);
 
 	/**
-	 * Checks if the event is not locked, throws an exception otherwise.
-	 * @param event         The event
-	 * @throws LockedObjectException    Thrown if the event is locked
+	 * Checks if the object is not locked, throws an exception otherwise.
+	 * @param o         The object itself
 	 */
-	void checkNotLocked(Event event);
+	void checkNotLocked(LockableObject o);
+
+	/**
+	 * Checks if the scope is not locked and, if the event is present, that it is not locked either, throws an exception otherwise.
+	 * @param scope     The scope
+	 * @param event     The optional event belonging to the scope
+	 */
+	void checkNotLocked(Scope scope, Optional<Event> event);
 }

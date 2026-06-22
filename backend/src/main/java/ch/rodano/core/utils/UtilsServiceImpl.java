@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.LockableObject;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.exception.DeletedObjectException;
 import ch.rodano.core.model.exception.LockedObjectException;
@@ -43,16 +44,29 @@ public class UtilsServiceImpl implements UtilsService {
 	}
 
 	@Override
-	public void checkNotLocked(final Scope scope) {
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
+	public void checkNotDeleted(final Scope scope, final Optional<Event> event) {
+		if(scope.getDeleted()) {
+			throw new DeletedObjectException(scope);
+		}
+		if(event.isPresent() && event.get().getDeleted()) {
+			throw new DeletedObjectException(event.get());
 		}
 	}
 
 	@Override
-	public void checkNotLocked(final Event event) {
-		if(event.getLocked()) {
-			throw new LockedObjectException(event);
+	public void checkNotLocked(final LockableObject o) {
+		if(o.getLocked()) {
+			throw new LockedObjectException(o);
+		}
+	}
+
+	@Override
+	public void checkNotLocked(final Scope scope, final Optional<Event> event) {
+		if(scope.getLocked()) {
+			throw new LockedObjectException(scope);
+		}
+		if(event.isPresent() && event.get().getLocked()) {
+			throw new LockedObjectException(event.get());
 		}
 	}
 }

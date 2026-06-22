@@ -32,13 +32,13 @@ import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
-import ch.rodano.core.model.exception.LockedObjectException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.file.File;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.file.FileDAOService;
+import ch.rodano.core.utils.UtilsService;
 
 import static ch.rodano.core.model.jooq.Tables.DATASET;
 import static ch.rodano.core.model.jooq.Tables.EVENT;
@@ -55,17 +55,20 @@ public class FileServiceImpl implements FileService {
 	private final FileDAOService fileDAOService;
 	private final StudyService studyService;
 	private final Configurator configurator;
+	private final UtilsService utilsService;
 
 	public FileServiceImpl(
 		final FileDAOService fileDAOService,
 		final StudyService studyService,
 		final Configurator configurator,
-		final DSLContext create
+		final DSLContext create,
+		final UtilsService utilsService
 	) {
 		this.create = create;
 		this.fileDAOService = fileDAOService;
 		this.studyService = studyService;
 		this.configurator = configurator;
+		this.utilsService = utilsService;
 	}
 
 	private void attacheContentToFile(final File file, final InputStream content) throws IOException {
@@ -101,12 +104,8 @@ public class FileServiceImpl implements FileService {
 		final DatabaseActionContext context,
 		final String rationale
 	) throws IOException {
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
-		if(event.isPresent() && event.get().getLocked()) {
-			throw new LockedObjectException(event.get());
-		}
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		final var file = new File();
 		file.setScopeFk(scope.getPk());
@@ -135,12 +134,8 @@ public class FileServiceImpl implements FileService {
 		final DatabaseActionContext context,
 		final String rationale
 	) throws IOException {
-		if(scope.getLocked()) {
-			throw new LockedObjectException(scope);
-		}
-		if(event.isPresent() && event.get().getLocked()) {
-			throw new LockedObjectException(event.get());
-		}
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		final var file = new File();
 		file.setScopeFk(scope.getPk());

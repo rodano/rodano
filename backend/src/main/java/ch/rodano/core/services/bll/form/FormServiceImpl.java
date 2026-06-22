@@ -87,11 +87,8 @@ public class FormServiceImpl implements FormService {
 	}
 
 	private Form create(final Scope scope, final Optional<Event> event, final FormModel formModel, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope);
-		event.ifPresent(utilsService::checkNotDeleted);
-
-		utilsService.checkNotLocked(scope);
-		event.ifPresent(utilsService::checkNotLocked);
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		if(event.isEmpty()) {
 			//check that the form model is allowed for the scope model
@@ -130,11 +127,8 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public void delete(final Scope scope, final Optional<Event> event, final Form form, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope);
-		event.ifPresent(utilsService::checkNotDeleted);
-
-		utilsService.checkNotLocked(scope);
-		event.ifPresent(utilsService::checkNotLocked);
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		final var baseRationale = "Form removed";
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? baseRationale : String.format("%s: %s", baseRationale, rationale);
@@ -179,11 +173,8 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public void restore(final Scope scope, final Optional<Event> event, final Form form, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope);
-		event.ifPresent(utilsService::checkNotDeleted);
-
-		utilsService.checkNotLocked(scope);
-		event.ifPresent(utilsService::checkNotLocked);
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
 
 		final var baseRationale = "Form restored";
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? baseRationale : String.format("%s: %s", baseRationale, rationale);
@@ -252,7 +243,10 @@ public class FormServiceImpl implements FormService {
 	}
 
 	@Override
-	public void save(final Form form, final DatabaseActionContext context, final String rationale) {
+	public void save(final Scope scope, final Optional<Event> event, final Form form, final DatabaseActionContext context, final String rationale) {
+		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotLocked(scope, event);
+
 		formDAOService.saveForm(form, context, rationale);
 	}
 
