@@ -79,7 +79,7 @@ export class LayoutComponent implements OnInit {
 		const dataset = this.crfService.getCellDataset(cell, this.datasets());
 		//dataset may not be found if the user does not have the right to all datasets used in the form
 		if(!dataset) {
-			throw new Error(`Missing rights to access dataset ${cell.datasetModelId} (due to a misconfiguration`);
+			throw new Error(`Missing rights to access dataset ${cell.datasetModelId} (due to a misconfiguration)`);
 		}
 		return !dataset.canWrite;
 	}

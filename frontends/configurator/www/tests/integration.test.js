@@ -800,7 +800,7 @@ export default async function test(bundle, assert, driver) {
 	await bundle.describe('constraints', async feature => {
 		await feature.it('manages constraint properly', async () => {
 			//layout
-			await driver.click('#tree ul.entities > li > ul.form_model > li:nth-child(10) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
+			await driver.click('#tree ul.entities > li > ul.form_model > li:nth-child(11) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
 			await driver.wait();
 			await driver.click('#form_model_layouts > div > h3 > a[title="Edit layout"]');
 			await driver.wait();
@@ -969,7 +969,7 @@ export default async function test(bundle, assert, driver) {
 			//check initial model state
 			assert.equal(study.id, 'TEST', 'Study id is "TEST"');
 			assert.equal(study.getEventModels().length, 8, 'There are 8 event models in the configuration');
-			assert.equal(study.formModels.length, 20, 'There are 20 form models in the configuration');
+			assert.equal(study.formModels.length, 21, 'There are 21 form models in the configuration');
 
 			//select study
 			await driver.click('#tree ul.study > li a[href="#node=Study:TEST"]');
@@ -1004,14 +1004,14 @@ export default async function test(bundle, assert, driver) {
 
 			//delete form model
 			//await driver.click(await driver.eval('#tree a[href="#node=Study:TEST_BIS&entity=FormModel"]', e => e.previousElementSibling));
-			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 20, 'There are 20 form models in the tree');
-			await driver.contextMenu('#tree ul.form_model > li:nth-child(11) a[href="#node=Study:TEST_BIS|FormModel:RELAPSES"]');
+			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 21, 'There are 21 form models in the tree');
+			await driver.contextMenu('#tree ul.form_model > li:nth-child(12) a[href="#node=Study:TEST_BIS|FormModel:RELAPSES"]');
 			await driver.wait();
 			await driver.click('#node_menu_delete');
 			await driver.click('#validate_buttons > li:last-child > button');
 			//check modifications in ui and model
-			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 19, 'There are 19 form models in the tree after 1 form model has been deleted');
-			assert.equal(study.formModels.length, 19, 'There are 19 form models in configuration');
+			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 20, 'There are 20 form models in the tree after 1 form model has been deleted');
+			assert.equal(study.formModels.length, 20, 'There are 20 form models in configuration');
 
 			//create event model
 			//await driver.click(await driver.eval('#tree a[href="#node=Study:TEST_BIS|ScopeModel:PATIENT&entity=EventModel"]', e => e.previousElementSibling));
@@ -1043,7 +1043,7 @@ export default async function test(bundle, assert, driver) {
 			//check model has been restored
 			assert.equal(study.id, 'TEST', 'Study id has been restored to "TEST"');
 			assert.equal(study.getEventModels().length, 8, 'There are 8 event models in configuration');
-			assert.equal(study.formModels.length, 20, 'There are 20 form models in configuration');
+			assert.equal(study.formModels.length, 21, 'There are 21 form models in configuration');
 
 			//check selection has been kept
 			//assert.equal(await driver.get('#tree a.selected'), await driver.get('#tree ul.validator > li a[href="#node=Study:TEST|Validator:REQUIRED"]'), 'Selection has been restored a reset based on url and is study');
@@ -1056,8 +1056,8 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.getValue('#study_email'), 'info@rodano.ch', 'Study email is "info@rodano.ch"');
 
 			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST&entity=FormModel"]', e => e.previousElementSibling));
-			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 20, 'There are now 20 form models');
-			await driver.click('#tree ul.form_model > li:nth-child(11) a[href="#node=Study:TEST|FormModel:RELAPSES"]');
+			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 21, 'There are now 21 form models');
+			await driver.click('#tree ul.form_model > li:nth-child(12) a[href="#node=Study:TEST|FormModel:RELAPSES"]');
 			await driver.wait();
 			assert.equal(await driver.getValue('#form_model_id'), 'RELAPSES', 'Ninth form model id is "RELAPSES"');
 			assert.equal(await driver.getValueShadow('#form_model_shortname', 'input'), 'Relapses', 'Ninth form model shortname is "Relapses"');
@@ -1401,7 +1401,7 @@ export default async function test(bundle, assert, driver) {
 		await feature.it('edits form models', async () => {
 			//form model
 			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST&entity=FormModel"]', e => e.previousElementSibling));
-			await driver.click('#tree ul.form_model > li:nth-child(10) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
+			await driver.click('#tree ul.form_model > li:nth-child(11) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
 			//let time for form to load
 			await driver.wait();
 			assert.equal(await driver.getValue('#form_model_id'), 'MS_HISTORY', 'Fifth form model has id "MS_HISTORY"');

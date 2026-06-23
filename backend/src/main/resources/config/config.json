@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 124,
-	"configDate": 1774881242840,
+	"configDate": 1782144563622,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -2066,6 +2066,7 @@
 						"STUDY_STATUS",
 						"EDSS",
 						"RELAPSES",
+						"DMT_REMINDER",
 						"EQ5D_PAGE",
 						"SF_36_FULL_PAGE"
 					],
@@ -2112,6 +2113,7 @@
 						"STUDY_STATUS",
 						"EDSS",
 						"RELAPSES",
+						"DMT_REMINDER",
 						"EQ5D_PAGE",
 						"SF_36_FULL_PAGE"
 					],
@@ -2158,6 +2160,7 @@
 						"STUDY_STATUS",
 						"EDSS",
 						"RELAPSES",
+						"DMT_REMINDER",
 						"EQ5D_PAGE",
 						"SF_36_FULL_PAGE"
 					],
@@ -2204,6 +2207,7 @@
 						"STUDY_STATUS",
 						"EDSS",
 						"RELAPSES",
+						"DMT_REMINDER",
 						"EQ5D_PAGE",
 						"SF_36_FULL_PAGE"
 					],
@@ -15259,13 +15263,12 @@
 						{
 							"cells": [
 								{
-									"id": "ACTUAL_MS_COURSE",
-									"datasetModelId": "VISIT_DOCUMENTATION",
-									"fieldModelId": "ACTUAL_MS_COURSE",
-									"textBefore": {},
+									"id": "DEMOGRAPHICS_HEADING",
+									"textBefore": {
+										"en": "<h3>Demographics</h3>"
+									},
 									"textAfter": {},
 									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 380px;",
 									"displayLabel": true,
 									"displayPossibleValueLabels": true,
 									"colspan": 1,
@@ -15390,7 +15393,60 @@
 						{
 							"cells": [
 								{
-									"id": "HEADING",
+									"id": "PATIENT_DOCUMENTATION_EDUCATION",
+									"datasetModelId": "PATIENT_DOCUMENTATION",
+									"fieldModelId": "EDUCATION",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"cssCodeForLabel": "width: 380px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
+						{
+							"cells": [
+								{
+									"id": "MS_STATUS_HEADING",
+									"textBefore": {
+										"en": "<h3>MS status</h3>"
+									},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
+						{
+							"cells": [
+								{
+									"id": "ACTUAL_MS_COURSE",
+									"datasetModelId": "VISIT_DOCUMENTATION",
+									"fieldModelId": "ACTUAL_MS_COURSE",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"cssCodeForLabel": "width: 380px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
+						{
+							"cells": [
+								{
+									"id": "WITHWRAWAL_HEADING",
 									"textBefore": {
 										"en": "<h3>Patient withdrawal</h3>"
 									},
@@ -17346,6 +17402,167 @@
 				}
 			],
 			"workflowIds": [],
+			"rules": [],
+			"optional": false,
+			"printButtonLabel": {},
+			"className": "FormModel"
+		},
+		{
+			"id": "DMT_REMINDER",
+			"shortname": {
+				"en": "Disease Modifying Therapies"
+			},
+			"longname": {},
+			"description": {
+				"en": ""
+			},
+			"layouts": [
+				{
+					"id": "DMT_GRID",
+					"description": {
+						"en": "List of all Disease Modifying Treatments"
+					},
+					"type": "MULTIPLE",
+					"datasetModelId": "DMT_GRID",
+					"defaultSortFieldModelId": "DMT_BEGIN_DATE",
+					"textBefore": {
+						"en": "History of Disease Modifying Treatments, including systemic steroids and MS symptomatic medications. Please complete or update the list as appropriate."
+					},
+					"textAfter": {},
+					"columns": [
+						{
+							"cssCode": "width: 500px;",
+							"className": "Column"
+						},
+						{
+							"cssCode": "width: 500px;",
+							"className": "Column"
+						}
+					],
+					"lines": [
+						{
+							"cells": [
+								{
+									"id": "DMT_TREATMENT",
+									"datasetModelId": "DMT_GRID",
+									"fieldModelId": "DMT_TREATMENT",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [
+										{
+											"values": [
+												"OTHER"
+											],
+											"targetCellIds": [
+												"DMT_OTHER"
+											],
+											"targetLayoutIds": [],
+											"action": "SHOW",
+											"className": "VisibilityCriteria"
+										}
+									],
+									"cssCodeForLabel": "width: 145px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								},
+								{
+									"id": "DMT_OTHER",
+									"datasetModelId": "DMT_GRID",
+									"fieldModelId": "DMT_OTHER",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"cssCodeForLabel": "width: 145px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
+						{
+							"cells": [
+								{
+									"id": "DMT_BEGIN_DATE",
+									"datasetModelId": "DMT_GRID",
+									"fieldModelId": "DMT_BEGIN_DATE",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"cssCodeForLabel": "width: 145px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								},
+								{
+									"id": "DMT_GRID_2_0_1744885734444",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						},
+						{
+							"cells": [
+								{
+									"id": "DMT_ONGOING",
+									"datasetModelId": "DMT_GRID",
+									"fieldModelId": "DMT_ONGOING",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [
+										{
+											"values": [
+												"true"
+											],
+											"targetCellIds": [
+												"DMT_END_DATE"
+											],
+											"targetLayoutIds": [],
+											"action": "HIDE",
+											"className": "VisibilityCriteria"
+										}
+									],
+									"cssCodeForLabel": "width: 200px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								},
+								{
+									"id": "DMT_END_DATE",
+									"datasetModelId": "DMT_GRID",
+									"fieldModelId": "DMT_END_DATE",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"cssCodeForLabel": "width: 145px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						}
+					],
+					"className": "Layout"
+				}
+			],
+			"workflowIds": [
+				"FORM_REPORTING",
+				"QUERY_SUMMARY",
+				"PROTOCOL_DEVIATION_SUMMARY"
+			],
 			"rules": [],
 			"optional": false,
 			"printButtonLabel": {},
@@ -21900,6 +22117,10 @@
 				"SLEEP": [
 					"WRITE",
 					"READ"
+				],
+				"DMT_REMINDER": [
+					"WRITE",
+					"READ"
 				]
 			},
 			"grantedWorkflowIds": {
@@ -22195,6 +22416,9 @@
 				],
 				"SF_36_FULL_PAGE": [
 					"READ"
+				],
+				"DMT_REMINDER": [
+					"READ"
 				]
 			},
 			"grantedWorkflowIds": {
@@ -22450,6 +22674,9 @@
 					"READ"
 				],
 				"SF_36_FULL_PAGE": [
+					"READ"
+				],
+				"DMT_REMINDER": [
 					"READ"
 				]
 			},
@@ -23003,6 +23230,9 @@
 				"STUDY_INFORMATION": [
 					"READ",
 					"WRITE"
+				],
+				"DMT_REMINDER": [
+					"READ"
 				]
 			},
 			"grantedWorkflowIds": {
@@ -23261,6 +23491,10 @@
 				],
 				"SF_36_FULL_PAGE": [
 					"READ"
+				],
+				"DMT_REMINDER": [
+					"WRITE",
+					"READ"
 				]
 			},
 			"grantedWorkflowIds": {
@@ -23499,6 +23733,10 @@
 					"WRITE"
 				],
 				"SF_36_FULL_PAGE": [
+					"READ"
+				],
+				"DMT_REMINDER": [
+					"WRITE",
 					"READ"
 				]
 			},
@@ -23744,6 +23982,9 @@
 					"READ"
 				],
 				"DATA_MANAGEMENT_PAYMENT_PAGE": [
+					"READ"
+				],
+				"DMT_REMINDER": [
 					"READ"
 				]
 			},
@@ -24050,6 +24291,9 @@
 					"READ"
 				],
 				"SF_36_FULL_PAGE": [
+					"READ"
+				],
+				"DMT_REMINDER": [
 					"READ"
 				]
 			},

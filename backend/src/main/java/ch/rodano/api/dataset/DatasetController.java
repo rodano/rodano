@@ -1,5 +1,6 @@
 package ch.rodano.api.dataset;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -160,7 +161,12 @@ public class DatasetController extends AbstractSecuredController {
 
 		//retrieve form dataset models
 		final var datasetModels = form.getFormModel().getDatasetModels();
-		final var datasets = datasetService.search(scope, event, Optional.of(datasetModels), acl);
+		final var datasets = new ArrayList<Dataset>();
+		datasets.addAll(datasetService.search(scope, event, Optional.of(datasetModels), acl));
+		//if the form is attached on an event, it can display fields (hence datasets) attached directly to the scope
+		if(event.isPresent()) {
+			datasets.addAll(datasetService.search(scope, Optional.empty(), Optional.of(datasetModels), acl));
+		}
 
 		return datasetDTOService.createDTOs(scope, event, form, datasets, acl);
 	}

@@ -115,7 +115,10 @@ export class MultipleLayoutComponent implements OnInit {
 
 	addDataset() {
 		const layout = this.layout();
-		this.crfService.getCandidateCRFDataset(layout.scopePk, layout.eventPk, layout.datasetModel.id).subscribe(newDataset => {
+		//remember that forms attached to events can display content from datasets attached to the scope
+		//in that case, the candidate datasets should be "asked" for the scope, not for the event, even if the eventPk is available
+		const eventPk = layout.datasetModel.scopeDocumentation ? undefined : layout.eventPk;
+		this.crfService.getCandidateCRFDataset(layout.scopePk, eventPk, layout.datasetModel.id).subscribe(newDataset => {
 			newDataset.expanded = true;
 			this.datasets().push(newDataset);
 			this.multipleDatasets.push(newDataset);
