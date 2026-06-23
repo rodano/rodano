@@ -5799,8 +5799,8 @@
 					},
 					"longname": {},
 					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
+					"type": "STRING",
+					"dataType": "STRING",
 					"plugin": true,
 					"valueConstraint": {
 						"conditions": {
@@ -5912,7 +5912,7 @@
 						"evaluations": [],
 						"className": "RuleConstraint"
 					},
-					"valueFormula": "=EDSS_SCORE:VALUE_NUMBER",
+					"valueFormula": "=EDSS_SCORE:VALUE",
 					"possibleValues": [],
 					"validatorIds": [],
 					"workflowIds": [],
