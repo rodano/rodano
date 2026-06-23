@@ -26,7 +26,6 @@ import ch.rodano.api.controller.form.exception.DatasetSubmissionException;
 import ch.rodano.api.dataset.DatasetDTO;
 import ch.rodano.api.dataset.DatasetDTOService;
 import ch.rodano.api.dataset.DatasetSubmissionDTO;
-import ch.rodano.api.exception.http.BadArgumentException;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.api.utils.URLConsistencyUtils;
 import ch.rodano.configuration.model.rights.Rights;
@@ -190,10 +189,7 @@ public class FormController extends AbstractSecuredController {
 		utilsService.checkNotNull(Form.class, form, formPk);
 		URLConsistencyUtils.checkConsistency(scope, event, form);
 
-		//cannot save a form if it's deleted
-		if(form.getDeleted()) {
-			throw new BadArgumentException("Form has been removed");
-		}
+		utilsService.checkNotDeleted(form);
 
 		//check rights
 		final var acl = rightsService.getACL(currentActor(), scope);
