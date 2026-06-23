@@ -399,7 +399,10 @@ public class DatasetServiceImpl implements DatasetService {
 		if(datasets.isEmpty()) {
 			throw new MissingDataException(String.format("No dataset with model id %s in event %s", datasetModel.getId(), event.getEventModelId()));
 		}
-		return datasets.get(0);
+		if(datasets.size() > 1) {
+			throw new InconsistentStateDetectedException(String.format("Only one dataset with model id %s should exist in event %s", datasetModel.getId(), event.getEventModelId()));
+		}
+		return datasets.getFirst();
 	}
 
 }
