@@ -62,7 +62,7 @@ public class FormulaParserService {
 			return (T) result.value;
 		}
 		catch(final Exception e) {
-			throw new UnableToCalculateFormulaException(e);
+			throw new UnableToCalculateFormulaException(formula, e);
 		}
 	}
 
