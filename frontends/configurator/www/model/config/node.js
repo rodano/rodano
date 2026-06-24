@@ -240,7 +240,7 @@ export class Node {
 	//get global id for all nodes
 	getGlobalId(reference) {
 		let id = '';
-		let node = this;
+		let node;
 		let parent = this;
 		do {
 			node = parent;
@@ -334,7 +334,7 @@ export class Node {
 				node = node.getChild(entity, index, local_id[1]);
 			}
 			catch(exception) {
-				throw new Error(`No node matching id ${global_id} in ${entity.name} ${this.id || ''}: ${exception.message}`);
+				throw new Error(`No node matching id ${global_id} in ${entity.name} ${this.id || ''}: ${exception.message}`, {cause: exception});
 			}
 		}
 		return node;

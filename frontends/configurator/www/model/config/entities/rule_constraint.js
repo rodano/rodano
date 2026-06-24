@@ -208,7 +208,7 @@ export class RuleConstraint extends Node {
 			result.last_part = last_part;
 			if(last_condition_id) {
 				//retrieve condition entity or entity itself
-				let entity = undefined;
+				let entity;
 				//id is the id a condition
 				try {
 					const condition = this.getCondition(last_condition_id);

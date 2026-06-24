@@ -183,7 +183,7 @@ export class RuleCondition extends Node {
 				//property does not lead to a different entity
 				else if(target === entity) {
 					//determine if result is valid
-					let is_valid = false;
+					let is_valid;
 					//check result is valid if the property is an identifier
 					if(property.identifier) {
 						const operator = Operator[this.criterion.operator];

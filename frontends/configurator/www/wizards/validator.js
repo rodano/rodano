@@ -43,7 +43,7 @@ function generate_rules_for_dependency(validated_field_model, dependency_field_m
 		const dependency_event_models = dependency_dataset_model.getEventModels();
 		const dependency_scope_models = dependency_dataset_model.getScopeModels();
 		//check if both dataset models are on the same scope model or the same event
-		let root_condition = undefined;
+		let root_condition;
 		if(scope_models.includesOne(dependency_scope_models)) {
 			root_condition = 'SCOPE';
 		}
@@ -393,8 +393,6 @@ Wizards.Register('validator', {
 				const min_set = min_value || min.dataset.nodeId;
 				const max_set = max_value || max.dataset.nodeId;
 
-				let validator_type;
-				let min_value_message, max_value_message;
 
 				bus.disable();
 
@@ -403,9 +401,13 @@ Wizards.Register('validator', {
 				});
 				validator.constraint = constraint;
 
+				let validator_type;
+				let min_value_message, max_value_message;
+
 				//retrieve dependencies if required
 				if(min.dataset.nodeId) {
 					const min_field_model = study.getNode(min.dataset.nodeId);
+					//eslint-disable-next-line no-useless-assignment
 					validator_type = min_field_model.dataType;
 					min_value_message = min_field_model.getLocalizedLabel(Languages.GetLanguage());
 					try {
@@ -417,6 +419,7 @@ Wizards.Register('validator', {
 					}
 				}
 				else {
+					//eslint-disable-next-line no-useless-assignment
 					validator_type = Number.isNumber(min_value) ? 'NUMBER' : 'DATE';
 					min_value_message = min_value;
 				}

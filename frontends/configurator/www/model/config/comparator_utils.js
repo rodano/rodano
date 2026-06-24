@@ -19,7 +19,7 @@ export class ComparatorUtils {
 
 	static compareFields(object_1, object_2, fields) {
 		let index = 0;
-		let comparison = 0;
+		let comparison;
 		do {
 			comparison = ComparatorUtils.compareField(object_1, object_2, fields[index]);
 			index++;

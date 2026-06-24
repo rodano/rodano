@@ -424,7 +424,7 @@ function mouseover_cell() {
 	//highlight cells
 	const that = this;
 	this.parentNode.parentNode.querySelectorAll('td').filter(e => e.cell).forEach(function(element) {
-		let highlight = false;
+		let highlight;
 		//cell is a target
 		if(targets.includes(element.cell.id)) {
 			highlight = true;

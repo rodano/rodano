@@ -59,19 +59,19 @@ class Tree {
 							else {
 								const parent = selected_element.parent;
 								const siblings = parent.getChildrenDisplayed();
-								let index = siblings.indexOf(selected_element);
+								const index = siblings.indexOf(selected_element);
 								//select next sibling if any
 								if(index < siblings.length - 1) {
-									keyboard_selection(siblings[++index]);
+									keyboard_selection(siblings[index + 1]);
 								}
 								//select cousin
 								else {
 									let ancestor = parent;
 									while(ancestor.parent) {
 										const cousins = ancestor.parent.getChildrenDisplayed();
-										index = cousins.indexOf(ancestor);
-										if(index < cousins.length - 1) {
-											keyboard_selection(cousins[++index]);
+										const cousin_index = cousins.indexOf(ancestor);
+										if(cousin_index < cousins.length - 1) {
+											keyboard_selection(cousins[cousin_index + 1]);
 											break;
 										}
 										ancestor = ancestor.parent;
@@ -84,11 +84,11 @@ class Tree {
 						case 'ArrowUp': {
 							const parent = selected_element.parent;
 							if(parent) {
-								let index = parent.getChildrenDisplayed().indexOf(selected_element);
+								const index = parent.getChildrenDisplayed().indexOf(selected_element);
 								//select last expanded descendant in previous brother
 								if(index > 0) {
 									//select last non expanded descendant in previous brother
-									let cousin = parent.getChildrenDisplayed()[--index];
+									let cousin = parent.getChildrenDisplayed()[index - 1];
 									while(cousin.expanded && !cousin.getChildrenDisplayed().isEmpty()) {
 										cousin = cousin.getChildrenDisplayed().last();
 									}
