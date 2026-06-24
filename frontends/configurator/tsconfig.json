@@ -4,7 +4,6 @@
 		"allowSyntheticDefaultImports": true,
 		"checkJs": true,
 		"declaration": false,
-		"downlevelIteration": true,
 		"emitDecoratorMetadata": true,
 		"experimentalDecorators": true,
 		"forceConsistentCasingInFileNames": true,
@@ -13,8 +12,8 @@
 			"ESNext",
 			"DOM"
 		],
-		"module": "ESNext",
-		"moduleResolution": "node",
+		"module": "NodeNext",
+		"moduleResolution": "nodenext",
 		"noFallthroughCasesInSwitch": true,
 		"noEmit": true,
 		"noImplicitOverride": true,

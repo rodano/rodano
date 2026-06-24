@@ -1,7 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 //@ts-ignore
-import archiver from 'archiver';
+import {ZipArchive} from 'archiver';
 import {ListFiles} from './list_files.js';
 
 const ROOT_FOLDER = 'www';
@@ -20,7 +20,7 @@ console.log(`Found ${filenames.length} files`);
 
 console.log('Creating bundle...');
 const result = fs.createWriteStream(bundle_name);
-const archive = archiver('zip');
+const archive = new ZipArchive();
 archive.pipe(result);
 
 console.log('Adding files...');
