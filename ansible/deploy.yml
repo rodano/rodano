@@ -1,0 +1,6 @@
+---
+- name: Deploy Rodano on a Debian server
+  hosts: all
+  tasks:
+    - name: Deploy application
+      ansible.builtin.include_tasks: tasks/deploy.yml

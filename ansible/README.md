@@ -6,7 +6,7 @@ This folder contains an Ansible playbook to deploy Rodano and manage a pool of R
 
 To start, fill-in the `hosts.yml` file with the right information:
 ```
-rodanos:
+all:
   hosts:
     my-study.com:
       ansible_ssh_user: debian
@@ -37,9 +37,31 @@ ansible-galaxy install -r requirements.yml
 
 Finally, run the playbook:
 ```
-ansible-playbook -i hosts.yml debian-setup.yml
+ansible-playbook site.yml
 ```
 The playbook will set up or update the instances with the specified parameters.
+
+### Optional runtime parameters
+
+The following optional parameters can be passed to the playbook using `--extra-vars`:
+
+- `reset_database`: When set to `true`, removes the database container and deletes the database volume before starting the service. This will destroy all existing data. Default: `false`.
+- `initialize_database`: When set to `true`, runs the database initialization routine to populate the database with initial data and users. This can be used only for the test study. Default: `false`.
+
+### Fast deployment
+
+For quick application updates without infrastructure setup, use the `deploy.yml` playbook. This playbook skips all server setup tasks and only performs the deployment steps. This is significantly faster than running the full `site.yml` playbook and should be used for routine application updates:
+
+```
+ansible-playbook deploy.yml
+```
+
+The `deploy.yml` playbook supports the same optional parameters as `site.yml`:
+```
+ansible-playbook deploy.yml --extra-vars "initialize_database=true"
+```
+
+**Note:** Use `site.yml` for initial server setup or when infrastructure changes are needed. Use `deploy.yml` for application updates only.
 
 ## Development
 

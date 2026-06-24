@@ -1,15 +1,6 @@
 ---
 - name: Set up Rodano on a Debian server
-  hosts: rodanos
-  vars:
-    study_path: /opt/study
-    rodano_path: /opt/rodano
-    docker_project_name: rodano
-  vars_prompt:
-    - name: reset_database
-      prompt: Do you want to reset the database?
-      default: "false"
-      private: false
+  hosts: all
   tasks:
     - name: Print debug message
       ansible.builtin.debug:
@@ -192,14 +183,6 @@
         group: "{{ ansible_user }}"
       become: true
 
-    - name: Clone study Git repository
-      ansible.builtin.git:
-        accept_hostkey: true
-        repo: "{{ study_git_url }}"
-        dest: "{{ study_path }}"
-        version: "{{ study_git_reference }}"
-        force: true
-
     # Set up Rodano
     - name: Prepare rodano folder
       ansible.builtin.file:
@@ -209,27 +192,6 @@
         owner: "{{ ansible_user }}"
         group: "{{ ansible_user }}"
       become: true
-
-    - name: Copy Docker Compose file
-      ansible.builtin.template:
-        src: "../docker-compose.yml"
-        dest: "{{ rodano_path }}/docker-compose.yml"
-        mode: "0644"
-
-    - name: Create Docker Compose environment file
-      ansible.builtin.template:
-        src: "templates/.env"
-        dest: "{{ rodano_path }}/.env"
-        mode: "0600"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-      become: true
-
-    - name: Pull or refresh Docker images
-      community.docker.docker_compose_v2_pull:
-        project_src: "{{ rodano_path }}"
-        env_files:
-          - "{{ rodano_path }}/.env"
 
     # Set up Nginx
     - name: Setup Let's Encrypt certificate
@@ -315,32 +277,5 @@
         XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
         DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
 
-    - name: Stop the rodano service
-      ansible.builtin.systemd:
-        name: rodano
-        state: stopped
-        scope: user
-      environment:
-        XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
-        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
-
-    - name: Remove database container
-      community.docker.docker_container:
-        name: "{{ docker_project_name }}-database-1"
-        state: absent
-      when: reset_database | bool
-
-    - name: Reset database volume
-      community.docker.docker_volume:
-        name: rodano_database
-        state: absent
-      when: reset_database | bool
-
-    - name: Start the rodano service
-      ansible.builtin.systemd:
-        name: rodano
-        state: started
-        scope: user
-      environment:
-        XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
-        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
+    - name: Deploy application
+      ansible.builtin.include_tasks: tasks/deploy.yml

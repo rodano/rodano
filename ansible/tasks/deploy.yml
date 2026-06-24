@@ -1,0 +1,80 @@
+- name: Update study Git repository
+  ansible.builtin.git:
+    accept_hostkey: true
+    repo: "{{ study_git_url }}"
+    dest: "{{ study_path }}"
+    version: "{{ study_git_reference }}"
+    force: true
+
+- name: Copy Docker Compose file
+  ansible.builtin.template:
+    src: "../docker-compose.yml"
+    dest: "{{ rodano_path }}/docker-compose.yml"
+    mode: "0644"
+
+- name: Create Docker Compose environment file
+  ansible.builtin.template:
+    src: "templates/.env"
+    dest: "{{ rodano_path }}/.env"
+    mode: "0600"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+  become: true
+
+- name: Pull or refresh Docker images
+  community.docker.docker_compose_v2_pull:
+    project_src: "{{ rodano_path }}"
+    env_files:
+      - "{{ rodano_path }}/.env"
+
+- name: Retrieve user UID
+  ansible.builtin.command: "id -u {{ ansible_user }}"
+  register: uid
+  changed_when: false
+
+- name: Stop the rodano service
+  ansible.builtin.systemd:
+    name: rodano
+    state: stopped
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
+    DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
+
+- name: Remove database container
+  community.docker.docker_container:
+    name: "{{ docker_project_name }}-database-1"
+    state: absent
+  when: reset_database | default(false) | bool
+
+- name: Reset database volume
+  community.docker.docker_volume:
+    name: rodano_database
+    state: absent
+  when: reset_database | default(false) | bool
+
+- name: Initialize database
+  community.docker.docker_compose_v2_run:
+    project_src: "{{ rodano_path }}"
+    project_name: "{{ docker_project_name }}"
+    env_files:
+      - "{{ rodano_path }}/.env"
+    service: backend
+    entrypoint: >-
+      java
+      -Dspring.profiles.active=database
+      -Drodano.init.with-data=true
+      -Drodano.init.with-users=true
+      -cp /app/rodano.jar
+      org.springframework.boot.loader.launch.PropertiesLauncher
+      cleanup: true
+  when: initialize_database | default(false) | bool
+
+- name: Start the rodano service
+  ansible.builtin.systemd:
+    name: rodano
+    state: started
+    scope: user
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/{{ uid.stdout }}"
+    DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ uid.stdout }}/bus"
