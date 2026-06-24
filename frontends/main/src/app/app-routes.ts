@@ -1,13 +1,14 @@
-import {Routes} from '@angular/router';
-import {AuthGuard} from './guards/authentication.guard';
-import {LoginGuard} from './guards/login.guard';
+import {Route} from '@angular/router';
+
 import {ChangePasswordContext} from './change-password/change-password-context';
 import {ErrorContext} from './error/error-context';
+import {AuthGuard} from './guards/authentication.guard';
+import {EproEnabledGuard} from './guards/epro-enabled.guard';
+import {LoginGuard} from './guards/login.guard';
 import {CMSLayoutResolver} from './resolvers/cms-layout-resolver';
 import {MeResolver} from './resolvers/me-resolver';
-import {EproEnabledGuard} from './guards/epro-enabled.guard';
 
-export const APP_ROUTES: Routes = [
+export default [
 	{
 		path: '',
 		redirectTo: '/dashboard', pathMatch: 'full'
@@ -141,4 +142,4 @@ export const APP_ROUTES: Routes = [
 		loadComponent: () => import('./error/error.component').then(m => m.ErrorComponent),
 		data: {context: ErrorContext.NOT_FOUND}
 	}
-];
+] satisfies Route[];

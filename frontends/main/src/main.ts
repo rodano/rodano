@@ -1,7 +1,6 @@
 import {ErrorHandler, importProvidersFrom, provideZonelessChangeDetection} from '@angular/core';
 import {AppComponent} from './app/app.component';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {APP_ROUTES} from './app/app-routes';
 import {bootstrapApplication} from '@angular/platform-browser';
 import {MAT_TABS_CONFIG} from '@angular/material/tabs';
 import {MatDialogModule} from '@angular/material/dialog';
@@ -15,6 +14,7 @@ import {provideRouter, withComponentInputBinding} from '@angular/router';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {MAT_ICON_DEFAULT_OPTIONS} from '@angular/material/icon';
+import appRoutes from './app/app-routes';
 
 bootstrapApplication(AppComponent, {
 	providers: [
@@ -34,7 +34,7 @@ bootstrapApplication(AppComponent, {
 		{provide: DateAdapter, useClass: CustomDateAdapter},
 		provideZonelessChangeDetection(),
 		provideHttpClient(withInterceptors([authInterceptor])),
-		provideRouter(APP_ROUTES, withComponentInputBinding()),
+		provideRouter(appRoutes, withComponentInputBinding()),
 		provideCharts(withDefaultRegisterables())
 	]
 }).catch(err => console.error(err));
