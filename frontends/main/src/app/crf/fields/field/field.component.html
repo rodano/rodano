@@ -132,7 +132,6 @@
 		<!-- Workflow creation actions menu -->
 		@if (hasActions()) {
 			<mat-menu #appMenu="matMenu">
-				<!-- Add creation actions used to create new workflow statuses -->
 				@for (action of creationActions(); track action.id) {
 					<button
 						mat-menu-item
@@ -141,18 +140,6 @@
 						<mat-icon>{{ action.icon }}</mat-icon>
 						<span>{{ action.shortname | localizeMap }}</span>
 					</button>
-				}
-				<!-- Add actions to manipulate non important statuses (important statuses have their dedicated block below the field) -->
-				@for (status of field().workflowStatuses | notImportantStatus; track status.pk || status.workflowId) {
-					@for (action of status.state.possibleActions; track $index) {
-						<button
-							mat-menu-item
-							type="button"
-							(click)="updateWorkflow(status, action)">
-							<mat-icon>{{ action.icon }}</mat-icon>
-							<span>{{ action.shortname | localizeMap }}</span>
-						</button>
-					}
 				}
 			</mat-menu>
 			<button
@@ -165,15 +152,15 @@
 	</div>
 
 	<!-- Workflow statuses actions -->
-	@if ((field().workflowStatuses | importantStatus).length > 0) {
+	@if (displayedWorkflowStatuses().length > 0) {
 		<p class="statuses">
 			<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
-			@for (status of field().workflowStatuses | importantStatus; track status.pk || status.workflowId) {
+			@for (status of displayedWorkflowStatuses(); track status.pk || status.workflowId) {
 				<app-workflow-status
 					[entity]="workflowableEntity.FIELD"
 					[workflowStatus]="status"
 					[workflowable]="field()"
-					rough="true"
+					[rough]="displayedWorkflowStatuses().some(s => s.state.important)"
 					(actionResponse)="onActionResponse($event)">
 				</app-workflow-status>
 			}

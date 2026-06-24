@@ -34,9 +34,7 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {Workflowable} from '@core/utilities/workflowable';
 import {AdministrationService} from '@core/services/administration.service';
 import {MatIconButton} from '@angular/material/button';
-import {WorkflowStatusImportantPipe} from '../../../pipes/workflow-status-important.pipe';
 import {WorkflowStatus} from '@core/model/workflow-status';
-import {WorkflowStatusNotImportantPipe} from '../../../pipes/workflow-status-not-important';
 import {FeatureStatic} from '@core/model/feature-static';
 import {Field} from '@core/model/field';
 import {WorkflowableUpdateService} from '../../services/workflowable-update.service';
@@ -63,8 +61,6 @@ import {WorkflowableUpdateService} from '../../services/workflowable-update.serv
 		FileUploadComponent,
 		LocalizeMapPipe,
 		WorkflowStatusComponent,
-		WorkflowStatusImportantPipe,
-		WorkflowStatusNotImportantPipe,
 		LocalizeFieldModelPipe
 	]
 })
@@ -148,20 +144,20 @@ export class FieldComponent implements OnInit {
 	readonly id = computed(() => `dataset-${this.field().datasetId}-field-${this.field().modelId}`);
 
 	readonly style = computed(() => {
-		const importantStatuses = this.field().workflowStatuses.filter(s => s.state.important);
-		if(importantStatuses.length === 0) {
+		const importantStatus = this.field().workflowStatuses.find(s => s.state.important);
+		if(!importantStatus) {
 			return {} as Record<string, string>;
 		}
-		const color = importantStatuses[0].state.color;
+		const color = importantStatus.state.color;
 		return {
 			backgroundColor: `${color + 15}`,
 			border: `1px solid ${color}`
 		};
 	});
 
-	readonly hasActions = computed(() =>
-		this.field().possibleWorkflows.length > 0 || this.field().workflowStatuses.filter(s => !s.state.important).some(s => s.state.possibleActions.length > 0)
-	);
+	readonly displayedWorkflowStatuses = computed(() => this.field().workflowStatuses.filter(s => s.state.important || s.state.possibleActions.length > 0));
+
+	readonly hasActions = computed(() => this.field().possibleWorkflows.length > 0);
 
 	readonly creationActions = computed<WorkflowAction[]>(() =>
 		this.field().possibleWorkflows.map(workflow => {
