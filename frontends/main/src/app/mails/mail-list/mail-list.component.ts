@@ -9,7 +9,7 @@ import {MailsService} from '@core/services/mails.service';
 import {MailSearch} from '@core/utilities/search/mail-search';
 import {MailDetailComponent} from '../mail-detail/mail-detail.component';
 import {YesNoPipe} from '../../pipes/yes-no.pipe';
-import {ShortenStringPipe} from '../../pipes/shorten-string.pipe';
+import {JoinStringsPipe} from '../../pipes/join-strings.pipe';
 import {CapitalizeFirstPipe} from '../../pipes/capitalize-first.pipe';
 import {DownloadDirective} from '../../directives/download.component';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
@@ -58,7 +58,7 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatPaginatorModule,
 		KeyValuePipe,
 		CapitalizeFirstPipe,
-		ShortenStringPipe,
+		JoinStringsPipe,
 		YesNoPipe,
 		DateTimeUTCPipe,
 		MatInputModule,

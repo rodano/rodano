@@ -197,7 +197,7 @@
 		<td
 			mat-cell
 			*matCellDef="let mail">
-			{{ mail.recipients | shortenString: 1 }}
+			{{ mail.recipients | joinStrings }}
 		</td>
 	</ng-container>
 
