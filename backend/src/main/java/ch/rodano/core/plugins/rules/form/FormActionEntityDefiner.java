@@ -69,7 +69,7 @@ public class FormActionEntityDefiner extends AbstractFormEntityDefiner {
 						final var scope = scopeService.get(form);
 						final var event = eventService.get(form);
 						final var family = new DataFamily(scope, event, form);
-						workflowStatusService.create(family, form, workflow, data, context, "Initialize from rule");
+						workflowStatusService.create(family, form, workflow, data, context, "Initialized from rule");
 					}
 				}
 

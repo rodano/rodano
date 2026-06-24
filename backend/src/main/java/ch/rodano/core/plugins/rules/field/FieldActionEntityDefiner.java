@@ -192,7 +192,7 @@ public class FieldActionEntityDefiner extends AbstractFieldEntityDefiner {
 						final var scope = scopeService.get(dataset);
 						final var event = eventService.get(dataset);
 						final var family = new DataFamily(scope, event, dataset, field);
-						workflowStatusService.create(family, field, workflow, data, context, "Initialize from rule");
+						workflowStatusService.create(family, field, workflow, data, context, "Initialized from rule");
 					}
 				}
 
