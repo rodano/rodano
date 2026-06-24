@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the project
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v4
@@ -90,7 +90,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the project
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v4
