@@ -32,6 +32,8 @@ public class WorkflowStatusDTO {
 	Integer orderBy;
 	@Schema(description = "The ID of the action used to create the workflow")
 	String creationActionId;
+	@Schema(description = "The ID of the validator used to create the workflow")
+	String creationValidatorId;
 
 	// Scope info
 	@Schema(description = "Scope reference of the WorkflowStatus")
@@ -128,6 +130,14 @@ public class WorkflowStatusDTO {
 
 	public void setCreationActionId(final String creationActionId) {
 		this.creationActionId = creationActionId;
+	}
+
+	public String getCreationValidatorId() {
+		return creationValidatorId;
+	}
+
+	public void setCreationValidatorId(final String creationValidatorId) {
+		this.creationValidatorId = creationValidatorId;
 	}
 
 	public Long getScopeFk() {

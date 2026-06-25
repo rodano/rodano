@@ -2,14 +2,21 @@
 	border-radius: var(--mat-sys-corner-extra-small);
 	display: flex;
 	align-items: center;
-	padding: 0.5rem;
+	padding: var(--gap);
 	gap: var(--gap);
+	box-sizing: border-box;
 }
-span {
-	flex: 1 1 0;
+.workflow-details {
+	flex: 3 1 0;
 	min-width: 0;
 	word-wrap: break-word;
 }
-.trigger-message {
+.workflow-details .mat-icon {
+	vertical-align: middle;
+}
+.expandable {
 	cursor: pointer;
+}
+button + button {
+	margin-left: var(--gap);
 }

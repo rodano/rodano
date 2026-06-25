@@ -31,6 +31,7 @@ public class WorkflowDTO {
 	@Schema(description = "Is the workflow mandatory?")
 	@NotNull
 	public boolean mandatory;
+	@Schema(description = "ID of the action than can be used to create the workflow")
 	public String actionId;
 
 	@Schema(description = "Message attached to the workflow")

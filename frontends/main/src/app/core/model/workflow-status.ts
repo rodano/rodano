@@ -37,6 +37,10 @@ export interface WorkflowStatus {
      */
     creationActionId?: string;
     /**
+     * The ID of the validator used to create the workflow
+     */
+    creationValidatorId?: string;
+    /**
      * Scope reference of the WorkflowStatus
      */
     scopeFk: number;

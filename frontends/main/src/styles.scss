@@ -281,7 +281,7 @@ button {
 	width: 25rem;
 }
 
-//workflow statuses list (used in the scope and event dashboards)
+//workflow statuses list
 .workflow-statuses {
 	display: flex;
 	flex-direction: column;
@@ -419,7 +419,4 @@ nav.side-navigation {
 // Gaps that work in flex and in grids
 .full-width {
 	width: 100%;
-}
-.gap-1 {
-	gap: 1rem;
 }

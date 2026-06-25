@@ -1,38 +1,42 @@
 <div
 	class="workflow-container"
 	[style]="style()">
-	<mat-icon aria-hidden="false">
-		{{ icon() }}
-	</mat-icon>
-	<span>
+	<span class="workflow-details">
+		<mat-icon
+			[style.color]="color()"
+			aria-hidden="false">
+			{{ icon() }}
+		</mat-icon>
 		{{ effectiveWorkflow()?.shortname | localizeMap }}
 		@if (workflowStatus()) {
 			- {{ workflowStatus()!.state.shortname | localizeMap }}
-			@if (displayTriggerMessage()) {
-				@let triggerMessage = workflowStatus()!.triggerMessage;
+		}
+		@if (displayTriggerMessage()) {
+			@let triggerMessage = workflowStatus()!.triggerMessage;
+			<span
+				[class.expandable]="triggerMessage.length > 40"
+				(click)="toggleTriggerMessage()"
+				[matTooltip]="triggerMessage.length > 40 ? (showFullTriggerMessage() ? 'Collapse' : 'Expand') : ''">
 				:
-				<span
-					class="trigger-message"
-					(click)="toggleTriggerMessage()"
-					[matTooltip]="showFullTriggerMessage() ? 'Collapse' : 'Expand'">
-					@if (showFullTriggerMessage()) {
-						{{ triggerMessage }}
-					} @else {
-						{{ triggerMessage | abbreviate }}
-					}
-				</span>
-			}
+				@if (showFullTriggerMessage()) {
+					{{ triggerMessage }}
+				} @else {
+					{{ triggerMessage | abbreviate: 40 }}
+				}
+			</span>
 		}
 	</span>
 	@if (displayActions()) {
-		@for (action of actions(); track action.id) {
-			<button
-				type="button"
-				mat-flat-button
-				(click)="executeWorkflowAction(action)">
-				{{ action.shortname | localizeMap }}
-			</button>
-		}
+		<span>
+			@for (action of actions(); track action.id) {
+				<button
+					type="button"
+					mat-flat-button
+					(click)="executeWorkflowAction(action)">
+					{{ action.shortname | localizeMap }}
+				</button>
+			}
+		</span>
 	}
 
 	@if (displayAuditTrail()) {

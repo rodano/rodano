@@ -50,7 +50,7 @@
 						@for (status of form.workflowStatuses; track status.pk || status.workflowId) {
 							<mat-icon
 								[style.color]="status.state.color"
-								[matTooltip]="status.state.shortname | localizeMap">
+								[matTooltip]="(status.workflow.shortname | localizeMap) + ' - ' + (status.state.shortname | localizeMap)">
 								{{ status.state.icon }}
 							</mat-icon>
 						}
@@ -98,7 +98,7 @@
 								@for (status of event.workflowStatuses; track status.pk || status.workflowId) {
 									<mat-icon
 										[style.color]="status.state.color"
-										[matTooltip]="status.state.shortname | localizeMap">
+										[matTooltip]="(status.workflow.shortname | localizeMap) + ' - ' + (status.state.shortname | localizeMap)">
 										{{ status.state.icon }}
 									</mat-icon>
 								}
@@ -130,7 +130,7 @@
 											@for (status of form.workflowStatuses; track status.pk || status.workflowId) {
 												<mat-icon
 													[style.color]="status.state.color"
-													[matTooltip]="status.state.shortname | localizeMap">
+													[matTooltip]="(status.workflow.shortname | localizeMap) + ' - ' + (status.state.shortname | localizeMap)">
 													{{ status.state.icon }}
 												</mat-icon>
 											}

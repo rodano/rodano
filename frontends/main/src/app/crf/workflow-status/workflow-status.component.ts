@@ -83,11 +83,13 @@ export class WorkflowStatusComponent {
 
 	readonly icon = computed(() => this.workflowStatus()?.state.icon ?? this.effectiveWorkflow()?.icon ?? 'manufacturing');
 
+	readonly color = computed(() => this.workflowStatus()?.state.color ?? '#000');
+
 	readonly style = computed(() => {
 		if(this.rough()) {
 			return {} as Record<string, string>;
 		}
-		const color = this.workflowStatus()?.state.color ?? '#000';
+		const color = this.color();
 		return {
 			backgroundColor: `${color + 15}`,
 			border: `1px solid ${color}`
@@ -96,6 +98,11 @@ export class WorkflowStatusComponent {
 
 	readonly displayTriggerMessage = computed(() => {
 		if(this.workflowStatus() && this.workflowStatus()!.triggerMessage) {
+			//display the trigger message for workflows triggered by a validator
+			if(this.workflowStatus()!.creationValidatorId) {
+				return true;
+			}
+			//display the trigger message for workflows triggered by an action that is documentable
 			const actionId = this.workflowStatus()!.creationActionId;
 			if(actionId) {
 				const action = this.workflowStatus()!.workflow.actions.find(a => a.id === actionId);

@@ -28,7 +28,5 @@ public interface WorkflowDTOService {
 
 	WorkflowStatusDTO createWorkflowStatusDTO(WorkflowStatus workflowStatus, ACL acl);
 
-	WorkflowStatusDTO createWorkflowStatusDTO(Workflow workflow, WorkflowState state, ACL acl);
-
 	WorkflowStatusDTO createWorkflowStatusDTO(DataFamily family, WorkflowStatus workflowStatus, ACL acl);
 }

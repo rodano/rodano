@@ -148,7 +148,8 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.orderBy = workflow.getOrderBy();
 		dto.date = workflowStatus.getLastUpdateTime();
 		dto.triggerMessage = workflowStatus.getTriggerMessage();
-		dto.creationActionId = workflow.getActionId();
+		dto.creationActionId = workflowStatus.getActionId();
+		dto.creationValidatorId = workflowStatus.getValidatorId();
 		dto.workflow = createWorkflowDTO(workflow, acl);
 		dto.state = createWorkflowStateDTO(workflowStatus, acl);
 
@@ -166,19 +167,6 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 			dto.fieldFk = field.getPk();
 			dto.fieldShortname = field.getFieldModel().getDefaultLocalizedShortname();
 		});
-
-		return dto;
-	}
-
-	@Override
-	public WorkflowStatusDTO createWorkflowStatusDTO(final Workflow workflow, final WorkflowState state, final ACL acl) {
-		final var dto = new WorkflowStatusDTO();
-		dto.workflowId = workflow.getId();
-		dto.statusId = state.getId();
-		dto.orderBy = workflow.getOrderBy();
-		dto.creationActionId = workflow.getActionId();
-		dto.workflow = createWorkflowDTO(workflow, acl);
-		dto.state = createWorkflowStateDTO(state, acl);
 
 		return dto;
 	}

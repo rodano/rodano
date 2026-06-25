@@ -34,6 +34,9 @@ export interface Workflow {
      * Is the workflow mandatory?
      */
     mandatory: boolean;
+    /**
+     * ID of the action than can be used to create the workflow
+     */
     actionId?: string;
     /**
      * Message attached to the workflow
