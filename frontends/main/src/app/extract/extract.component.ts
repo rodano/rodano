@@ -10,7 +10,6 @@ import {ReportService} from '@core/services/report.service';
 import {MatButton} from '@angular/material/button';
 import {MatFormField, MatLabel} from '@angular/material/input';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatListModule} from '@angular/material/list';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {DownloadDirective} from '../directives/download.component';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
@@ -21,6 +20,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 import {ScopePickerComponent} from '../scope-picker/scope-picker.component';
 import {MeService} from '@core/services/me.service';
 import {FeatureStatic} from '@core/model/feature-static';
+import {MatListOption, MatSelectionList} from '@angular/material/list';
 
 @Component({
 	templateUrl: './extract.component.html',
@@ -29,8 +29,9 @@ import {FeatureStatic} from '@core/model/feature-static';
 		RouterLink,
 		MatTabsModule,
 		MatButton,
+		MatSelectionList,
+		MatListOption,
 		MatLabel,
-		MatListModule,
 		ReactiveFormsModule,
 		MatFormField,
 		MatCheckbox,

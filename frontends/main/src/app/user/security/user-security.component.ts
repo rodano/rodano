@@ -9,7 +9,7 @@ import {switchMap, takeWhile} from 'rxjs/operators';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatCardModule} from '@angular/material/card';
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ChangePasswordComponent} from '../../change-password/change-password.component';
 import {ChangePasswordContext} from '../../change-password/change-password-context';
@@ -23,7 +23,12 @@ import {USER_TOKEN} from '../home/user.component';
 	styleUrls: ['./user-security.component.css'],
 	imports: [
 		ReactiveFormsModule,
-		MatCardModule,
+		MatCard,
+		MatCardHeader,
+		MatCardTitle,
+		MatCardSubtitle,
+		MatCardContent,
+		MatCardActions,
 		MatLabel,
 		MatFormField,
 		MatInput,

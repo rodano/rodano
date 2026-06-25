@@ -1,5 +1,5 @@
 import {Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
+import {MatPaginator} from '@angular/material/paginator';
 import {MatDialog} from '@angular/material/dialog';
 import {startWith, switchMap} from 'rxjs/operators';
 import {Subject, merge} from 'rxjs';
@@ -20,10 +20,10 @@ import {MatOption} from '@angular/material/core';
 import {KeyValuePipe} from '@angular/common';
 import {MatSort, MatSortHeader} from '@angular/material/sort';
 import {MatSelect} from '@angular/material/select';
-import {MatInputModule} from '@angular/material/input';
-import {MatFormField} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
 import {FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
-import {MatExpansionModule} from '@angular/material/expansion';
+import {MatExpansionPanel, MatExpansionPanelActionRow, MatExpansionPanelHeader, MatExpansionPanelTitle} from '@angular/material/expansion';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
@@ -40,12 +40,18 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 	templateUrl: './mail-list.component.html',
 	styleUrls: ['./mail-list.component.css'],
 	imports: [
-		MatExpansionModule,
 		ReactiveFormsModule,
 		MatFormField,
 		MatSelect,
+		MatExpansionPanel,
+		MatExpansionPanelHeader,
+		MatExpansionPanelTitle,
+		MatLabel,
+		MatExpansionPanelActionRow,
+		MatPaginator,
 		MatOption,
 		MatCheckbox,
+		MatInput,
 		MatButton,
 		MatProgressBar,
 		MatTableModule,
@@ -55,13 +61,11 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatSort,
 		MatSortHeader,
 		DownloadDirective,
-		MatPaginatorModule,
 		KeyValuePipe,
 		CapitalizeFirstPipe,
 		JoinStringsPipe,
 		YesNoPipe,
 		DateTimeUTCPipe,
-		MatInputModule,
 		MatDatepickerModule
 	]
 })

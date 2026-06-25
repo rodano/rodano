@@ -4,8 +4,6 @@ import {Menu} from '@core/model/menu';
 import {switchMap} from 'rxjs/operators';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatIcon} from '@angular/material/icon';
-import {MatButtonModule} from '@angular/material/button';
-import {MatToolbarModule} from '@angular/material/toolbar';
 import {User} from '@core/model/user';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
 import {MatBadge} from '@angular/material/badge';
@@ -19,15 +17,18 @@ import {Environment} from '@core/model/environment';
 import {Profile} from '@core/model/profile';
 import {MeService} from '@core/services/me.service';
 import {NotificationService} from '../services/notification.service';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatToolbar} from '@angular/material/toolbar';
 
 @Component({
 	selector: 'app-header',
 	templateUrl: './header.component.html',
 	styleUrls: ['./header.component.scss'],
 	imports: [
-		MatToolbarModule,
-		MatButtonModule,
+		MatToolbar,
 		MatTooltip,
+		MatButton,
+		MatIconButton,
 		RouterLinkActive,
 		RouterLink,
 		MatIcon,

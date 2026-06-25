@@ -5,7 +5,6 @@ import {MatDialog} from '@angular/material/dialog';
 import {EMPTY, combineLatest, forkJoin, map, of, switchMap} from 'rxjs';
 import {FormService} from '@core/services/form.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
-import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatIcon} from '@angular/material/icon';
 import {Scope} from '@core/model/scope';
 import {Form} from '@core/model/form';
@@ -20,6 +19,7 @@ import {NotificationService} from '../../services/notification.service';
 import {DateUTCPipe} from '../../pipes/date-utc.pipe';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {SettingsService} from '@core/services/settings.service';
+import {MatTooltip} from '@angular/material/tooltip';
 
 @Component({
 	selector: 'app-side-menu',
@@ -28,10 +28,10 @@ import {SettingsService} from '@core/services/settings.service';
 	imports: [
 		RouterLink,
 		MatIcon,
+		MatTooltip,
 		MatButton,
 		MatIconButton,
 		RouterLinkActive,
-		MatTooltipModule,
 		LocalizeMapPipe,
 		DateUTCPipe
 	]

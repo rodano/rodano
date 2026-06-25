@@ -3,7 +3,7 @@ import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {EventModel} from '@core/model/event-model';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatButton} from '@angular/material/button';
-import {MatListModule} from '@angular/material/list';
+import {MatList, MatListItem} from '@angular/material/list';
 
 export interface WorkflowRationaleData {
 	title: string;
@@ -15,8 +15,9 @@ export interface WorkflowRationaleData {
 	templateUrl: 'select-event.component.html',
 	imports: [
 		MatDialogModule,
-		MatListModule,
 		MatButton,
+		MatList,
+		MatListItem,
 		LocalizeMapPipe
 	]
 })

@@ -4,7 +4,6 @@ import {Scope} from '@core/model/scope';
 import {TimelineGraphData} from '@core/model/timeline-graph-data';
 import {Timeline} from '@rodano/timeline';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
-import {MatCardModule} from '@angular/material/card';
 import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 import {LoggingService} from '@core/services/logging.service';
 
@@ -13,7 +12,6 @@ import {LoggingService} from '@core/services/logging.service';
 	templateUrl: './timeline.component.html',
 	styleUrls: ['./timeline.component.css'],
 	imports: [
-		MatCardModule,
 		LocalizeMapPipe,
 		SafeHtmlPipe
 	]

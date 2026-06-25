@@ -14,7 +14,7 @@ import {MatIcon} from '@angular/material/icon';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatCardModule} from '@angular/material/card';
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardTitle} from '@angular/material/card';
 import {MatButton} from '@angular/material/button';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {MatTableModule} from '@angular/material/table';
@@ -36,11 +36,15 @@ import {USER_TOKEN} from '../home/user.component';
 		MatTableModule,
 		MatButton,
 		ReactiveFormsModule,
-		MatCardModule,
 		MatProgressBar,
 		MatLabel,
+		MatCard,
+		MatCardHeader,
 		MatFormField,
 		MatSelect,
+		MatCardTitle,
+		MatCardContent,
+		MatCardActions,
 		MatOption,
 		MatIcon,
 		LocalizeMapPipe,

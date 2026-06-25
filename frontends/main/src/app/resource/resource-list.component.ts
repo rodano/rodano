@@ -10,12 +10,12 @@ import {ResourceService} from '@core/services/resource.service';
 import {ResourceSearch} from '@core/utilities/search/resource-search';
 import {ResourceSubmission} from '@core/model/resource-submission';
 import {NotificationService} from '../services/notification.service';
-import {MatPaginator, MatPaginatorModule} from '@angular/material/paginator';
-import {MatToolbarModule} from '@angular/material/toolbar';
+import {MatPaginator} from '@angular/material/paginator';
+import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {MatDivider} from '@angular/material/divider';
 import {MatTableModule} from '@angular/material/table';
 import {MatIcon} from '@angular/material/icon';
-import {MatMenuModule} from '@angular/material/menu';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton} from '@angular/material/button';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
@@ -44,13 +44,17 @@ import {PaginatedSearch} from '@core/utilities/search/paginated-search';
 		MatOption,
 		MatButton,
 		MatProgressBar,
-		MatMenuModule,
 		MatIcon,
+		MatMenu,
+		MatMenuItem,
 		MatTableModule,
 		DownloadDirective,
 		MatDivider,
-		MatToolbarModule,
-		MatPaginatorModule,
+		MatMenu,
+		MatMenuTrigger,
+		MatToolbar,
+		MatToolbarRow,
+		MatPaginator,
 		LocalizeMapPipe,
 		MatSort,
 		MatSortHeader

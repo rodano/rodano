@@ -9,7 +9,7 @@ import {CustomValidators} from '../utils/custom-validators';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatCardModule} from '@angular/material/card';
+import {MatCard, MatCardActions, MatCardContent, MatCardHeader, MatCardSubtitle, MatCardTitle} from '@angular/material/card';
 import {getPasswordErrorMessage} from '@core/utilities/error-utils';
 import {ChangePasswordContext} from './change-password-context';
 import {ResetPassword} from '@core/model/reset-password';
@@ -21,8 +21,13 @@ import {User} from '@core/model/user';
 	templateUrl: './change-password.component.html',
 	styleUrls: ['./change-password.component.css'],
 	imports: [
-		MatCardModule,
 		ReactiveFormsModule,
+		MatCard,
+		MatCardHeader,
+		MatCardTitle,
+		MatCardSubtitle,
+		MatCardContent,
+		MatCardActions,
 		MatLabel,
 		MatFormField,
 		MatInput,
