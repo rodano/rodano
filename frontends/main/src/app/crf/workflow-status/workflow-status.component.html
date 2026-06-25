@@ -1,9 +1,10 @@
 <div
 	class="workflow-container"
-	[style]="style()">
+	[class.rough]="rough()"
+	[style.--workflow-color]="color()">
 	<span class="workflow-details">
 		<mat-icon
-			[style.color]="color()"
+			[style.color]="'var(--workflow-color)'"
 			aria-hidden="false">
 			{{ icon() }}
 		</mat-icon>
@@ -14,14 +15,16 @@
 		@if (displayTriggerMessage()) {
 			@let triggerMessage = workflowStatus()!.triggerMessage;
 			<span
-				[class.expandable]="triggerMessage.length > 40"
+				[class.expandable]="triggerMessage.length > MESSAGE_PREVIEW_LENGTH"
 				(click)="toggleTriggerMessage()"
-				[matTooltip]="triggerMessage.length > 40 ? (showFullTriggerMessage() ? 'Collapse' : 'Expand') : ''">
+				[matTooltip]="
+					triggerMessage.length > MESSAGE_PREVIEW_LENGTH ? (showFullTriggerMessage() ? 'Collapse' : 'Expand') : ''
+				">
 				:
 				@if (showFullTriggerMessage()) {
 					{{ triggerMessage }}
 				} @else {
-					{{ triggerMessage | abbreviate: 40 }}
+					{{ triggerMessage | abbreviate: MESSAGE_PREVIEW_LENGTH }}
 				}
 			</span>
 		}

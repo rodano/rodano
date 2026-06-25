@@ -1,10 +1,18 @@
 .workflow-container {
+	--workflow-color: #000;
 	border-radius: var(--mat-sys-corner-extra-small);
 	display: flex;
 	align-items: center;
 	padding: var(--gap);
 	gap: var(--gap);
 	box-sizing: border-box;
+	background-color: color-mix(in srgb, var(--workflow-color) 8%, transparent);
+	border: 1px solid var(--workflow-color);
+}
+.rough {
+	background-color: transparent;
+	border-color: transparent;
+	padding: 0;
 }
 .workflow-details {
 	flex: 3 1 0;

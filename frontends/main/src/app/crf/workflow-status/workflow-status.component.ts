@@ -48,6 +48,8 @@ export class WorkflowStatusComponent {
 
 	readonly showFullTriggerMessage = signal(false);
 
+	protected readonly MESSAGE_PREVIEW_LENGTH = 40;
+
 	readonly effectiveWorkflow = computed(() => this.workflowStatus()?.workflow ?? this.workflow());
 
 	constructor(
@@ -84,17 +86,6 @@ export class WorkflowStatusComponent {
 	readonly icon = computed(() => this.workflowStatus()?.state.icon ?? this.effectiveWorkflow()?.icon ?? 'manufacturing');
 
 	readonly color = computed(() => this.workflowStatus()?.state.color ?? '#000');
-
-	readonly style = computed(() => {
-		if(this.rough()) {
-			return {} as Record<string, string>;
-		}
-		const color = this.color();
-		return {
-			backgroundColor: `${color + 15}`,
-			border: `1px solid ${color}`
-		};
-	});
 
 	readonly displayTriggerMessage = computed(() => {
 		if(this.workflowStatus() && this.workflowStatus()!.triggerMessage) {
