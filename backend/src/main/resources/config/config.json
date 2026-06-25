@@ -724,7 +724,7 @@
 							},
 							{
 								"id": "MESSAGE",
-								"value": "Status changed because a value has been updated",
+								"value": "Status changed because a field has been updated",
 								"className": "RuleActionParameter"
 							}
 						],
