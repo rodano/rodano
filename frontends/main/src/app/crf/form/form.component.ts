@@ -181,7 +181,7 @@ export class FormComponent implements OnInit {
 			});
 	}
 
-	onActionResponse(newForm: Workflowable) {
+	onWorkflowExecution(newForm: Workflowable) {
 		this.form.set(newForm as Form);
 	}
 }

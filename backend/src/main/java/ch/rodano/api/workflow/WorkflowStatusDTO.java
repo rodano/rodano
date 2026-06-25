@@ -30,9 +30,8 @@ public class WorkflowStatusDTO {
 	@NotNull
 	ZonedDateTime date;
 	Integer orderBy;
-	@Schema(description = "Does this WorkflowStatus have a creation action?")
-	@NotNull
-	boolean hasCreationAction;
+	@Schema(description = "The ID of the action used to create the workflow")
+	String creationActionId;
 
 	// Scope info
 	@Schema(description = "Scope reference of the WorkflowStatus")
@@ -123,12 +122,12 @@ public class WorkflowStatusDTO {
 		this.orderBy = orderBy;
 	}
 
-	public boolean isHasCreationAction() {
-		return hasCreationAction;
+	public String getCreationActionId() {
+		return creationActionId;
 	}
 
-	public void setHasCreationAction(final boolean hasCreationAction) {
-		this.hasCreationAction = hasCreationAction;
+	public void setCreationActionId(final String creationActionId) {
+		this.creationActionId = creationActionId;
 	}
 
 	public Long getScopeFk() {

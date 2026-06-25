@@ -29,29 +29,42 @@
 	}
 
 	<div id="form-actions">
-		<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
-		@for (status of workflowStatuses(); track status.pk || status.workflowId) {
-			<app-workflow-status
-				[entity]="workflowableEntity.FORM"
-				[workflowStatus]="status"
-				[workflowable]="form()"
-				(actionResponse)="onActionResponse($event)">
-			</app-workflow-status>
-		}
+		<div id="form-save">
+			@if (dirty()) {
+				<span>You have unsaved values</span>
+			}
 
-		@if (dirty()) {
-			<span>You have unsaved values</span>
-		}
+			@if (form().canWrite) {
+				<span class="toolbar-spacer"></span>
+				<button
+					mat-flat-button
+					[class.loading]="saveLoading()"
+					[disabled]="formLoading() || saveLoading()"
+					type="submit">
+					Save
+				</button>
+			}
+		</div>
 
-		@if (form().canWrite) {
-			<span class="toolbar-spacer"></span>
-			<button
-				mat-flat-button
-				[class.loading]="saveLoading()"
-				[disabled]="formLoading() || saveLoading()"
-				type="submit">
-				Save
-			</button>
-		}
+		<div class="workflow-statuses">
+			<!-- Track statuses using their pk or their workflow id because aggregate workflow statuses don't have any pk -->
+			@for (status of workflowStatuses(); track status.pk || status.workflowId) {
+				<app-workflow-status
+					[entity]="workflowableEntity.FORM"
+					[workflowable]="form()"
+					[workflowStatus]="status"
+					(actionResponse)="onWorkflowExecution($event)">
+				</app-workflow-status>
+			}
+			<!-- Display workflows that can be created -->
+			@for (workflow of form().possibleWorkflows; track workflow.id) {
+				<app-workflow-status
+					[entity]="workflowableEntity.FORM"
+					[workflowable]="form()"
+					[workflow]="workflow"
+					(actionResponse)="onWorkflowExecution($event)">
+				</app-workflow-status>
+			}
+		</div>
 	</div>
 </form>

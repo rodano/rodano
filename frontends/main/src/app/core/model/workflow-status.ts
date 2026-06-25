@@ -33,9 +33,9 @@ export interface WorkflowStatus {
     date: Date;
     orderBy?: number;
     /**
-     * Does this WorkflowStatus have a creation action?
+     * The ID of the action used to create the workflow
      */
-    hasCreationAction: boolean;
+    creationActionId?: string;
     /**
      * Scope reference of the WorkflowStatus
      */

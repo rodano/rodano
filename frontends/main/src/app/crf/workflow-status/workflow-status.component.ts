@@ -1,8 +1,9 @@
-import {booleanAttribute, Component, computed, input, output} from '@angular/core';
+import {booleanAttribute, Component, computed, input, output, signal} from '@angular/core';
 import {WorkflowAction} from '@core/model/workflow-action';
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {WorkflowActionService} from '../services/workflow-action.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
+import {MatTooltip} from '@angular/material/tooltip';
 import {MatButton} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIcon} from '@angular/material/icon';
@@ -15,6 +16,7 @@ import {Form} from '@core/model/form';
 import {Field} from '@core/model/field';
 import {Workflow} from '@core/model/workflow';
 import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
+import {AbbreviatePipe} from '../../pipes/abbreviate.pipe';
 
 @Component({
 	selector: 'app-workflow-status',
@@ -25,7 +27,9 @@ import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-bu
 		MatFormFieldModule,
 		MatButton,
 		LocalizeMapPipe,
-		AuditTrailButtonComponent
+		AuditTrailButtonComponent,
+		AbbreviatePipe,
+		MatTooltip
 	]
 })
 export class WorkflowStatusComponent {
@@ -41,6 +45,8 @@ export class WorkflowStatusComponent {
 	readonly rough = input(false, {transform: booleanAttribute});
 
 	readonly actionResponse = output<Workflowable>();
+
+	readonly showFullTriggerMessage = signal(false);
 
 	readonly effectiveWorkflow = computed(() => this.workflowStatus()?.workflow ?? this.workflow());
 
@@ -88,6 +94,17 @@ export class WorkflowStatusComponent {
 		};
 	});
 
+	readonly displayTriggerMessage = computed(() => {
+		if(this.workflowStatus() && this.workflowStatus()!.triggerMessage) {
+			const actionId = this.workflowStatus()!.creationActionId;
+			if(actionId) {
+				const action = this.workflowStatus()!.workflow.actions.find(a => a.id === actionId);
+				return action?.documentable ?? false;
+			}
+		}
+		return false;
+	});
+
 	readonly actions = computed<WorkflowAction[]>(() => {
 		if(this.workflowStatus()) {
 			return this.workflowStatus()!.state.possibleActions;
@@ -116,4 +133,12 @@ export class WorkflowStatusComponent {
 			default: return false;
 		}
 	});
+
+	readonly displayAuditTrail = computed(() => {
+		return this.workflowStatus() && !this.workflowStatus()!.workflow.aggregatedWorkflowId;
+	});
+
+	toggleTriggerMessage() {
+		this.showFullTriggerMessage.update(v => !v);
+	}
 }

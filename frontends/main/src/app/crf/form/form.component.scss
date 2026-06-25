@@ -12,11 +12,13 @@ form {
 	overflow: auto;
 }
 #form-actions {
-	display: flex;
-	align-items: center;
-	gap: var(--gap);
-	min-height: 3.5rem;
-	padding: 0.8rem 1rem;
+	padding: var(--gap);
 	box-sizing: border-box;
 	background-color: var(--light-highlight-color);
+}
+#form-save {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-bottom: var(--gap);
 }

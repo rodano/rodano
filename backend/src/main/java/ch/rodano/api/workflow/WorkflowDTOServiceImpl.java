@@ -110,7 +110,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.orderBy = workflow.getOrderBy();
 		dto.date = workflowStatus.getLastUpdateTime();
 		dto.triggerMessage = workflowStatus.getTriggerMessage();
-		dto.hasCreationAction = workflow.getActionId() != null;
+		dto.creationActionId = workflow.getActionId();
 		dto.workflow = createWorkflowDTO(workflow, acl);
 		dto.state = createWorkflowStateDTO(workflowStatus, acl);
 
@@ -148,7 +148,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.orderBy = workflow.getOrderBy();
 		dto.date = workflowStatus.getLastUpdateTime();
 		dto.triggerMessage = workflowStatus.getTriggerMessage();
-		dto.hasCreationAction = workflow.getActionId() != null;
+		dto.creationActionId = workflow.getActionId();
 		dto.workflow = createWorkflowDTO(workflow, acl);
 		dto.state = createWorkflowStateDTO(workflowStatus, acl);
 
@@ -176,7 +176,7 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.workflowId = workflow.getId();
 		dto.statusId = state.getId();
 		dto.orderBy = workflow.getOrderBy();
-		dto.hasCreationAction = workflow.getActionId() != null;
+		dto.creationActionId = workflow.getActionId();
 		dto.workflow = createWorkflowDTO(workflow, acl);
 		dto.state = createWorkflowStateDTO(state, acl);
 

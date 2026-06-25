@@ -9,8 +9,8 @@
 		@for (status of scope().workflowStatuses; track status.pk || status.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.SCOPE"
-				[workflowStatus]="status"
 				[workflowable]="scope()"
+				[workflowStatus]="status"
 				(actionResponse)="onWorkflowExecution($event)">
 			</app-workflow-status>
 		}

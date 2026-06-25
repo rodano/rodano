@@ -10,3 +10,6 @@ span {
 	min-width: 0;
 	word-wrap: break-word;
 }
+.trigger-message {
+	cursor: pointer;
+}

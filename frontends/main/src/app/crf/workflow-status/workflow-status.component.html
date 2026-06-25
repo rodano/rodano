@@ -5,12 +5,22 @@
 		{{ icon() }}
 	</mat-icon>
 	<span>
-		@if (workflowStatus() && entity() === workflowableEntity.FIELD) {
-			{{ workflowStatus()!.state.shortname | localizeMap }}: {{ workflowStatus()!.triggerMessage }}
-		} @else {
-			{{ effectiveWorkflow()?.shortname | localizeMap }}
-			@if (workflowStatus()) {
-				: <strong>{{ workflowStatus()!.state.shortname | localizeMap }}</strong>
+		{{ effectiveWorkflow()?.shortname | localizeMap }}
+		@if (workflowStatus()) {
+			- {{ workflowStatus()!.state.shortname | localizeMap }}
+			@if (displayTriggerMessage()) {
+				@let triggerMessage = workflowStatus()!.triggerMessage;
+				:
+				<span
+					class="trigger-message"
+					(click)="toggleTriggerMessage()"
+					[matTooltip]="showFullTriggerMessage() ? 'Collapse' : 'Expand'">
+					@if (showFullTriggerMessage()) {
+						{{ triggerMessage }}
+					} @else {
+						{{ triggerMessage | abbreviate }}
+					}
+				</span>
 			}
 		}
 	</span>
@@ -25,7 +35,7 @@
 		}
 	}
 
-	@if (workflowStatus()) {
+	@if (displayAuditTrail()) {
 		<app-audit-trail-button [workflowStatus]="workflowStatus()!" />
 	}
 </div>

@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 124,
-	"configDate": 1782144563622,
+	"configDate": 1782373810179,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -13964,7 +13964,8 @@
 			"workflowIds": [
 				"FORM_REPORTING",
 				"QUERY_SUMMARY",
-				"PROTOCOL_DEVIATION_SUMMARY"
+				"PROTOCOL_DEVIATION_SUMMARY",
+				"QUERY"
 			],
 			"rules": [
 				{

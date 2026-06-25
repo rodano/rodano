@@ -23,8 +23,8 @@
 		@for (status of event().workflowStatuses; track status.pk || status.workflowId) {
 			<app-workflow-status
 				[entity]="workflowableEntity.EVENT"
-				[workflowStatus]="status"
 				[workflowable]="event()"
+				[workflowStatus]="status"
 				(actionResponse)="onWorkflowExecution($event)">
 			</app-workflow-status>
 		}
