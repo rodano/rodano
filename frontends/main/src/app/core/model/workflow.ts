@@ -39,9 +39,8 @@ export interface Workflow {
      */
     actionId?: string;
     /**
-     * Message attached to the workflow
+     * Icon of the workflow
      */
-    message: { [key: string]: string; };
     icon?: string;
     /**
      * Possible states of the workflow

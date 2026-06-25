@@ -30,7 +30,6 @@ export class Workflow extends DisplayableNode {
 			actionId: {type: 'string'},
 			unique: {type: 'boolean'},
 			aggregateWorkflowId: {type: 'string'},
-			message: {type: 'object'},
 			icon: {type: 'string'},
 		};
 	}
@@ -59,7 +58,6 @@ export class Workflow extends DisplayableNode {
 		this.actionId = undefined;
 		this.unique = true;
 		this.aggregateWorkflowId = undefined;
-		this.message = {};
 		this.icon = undefined;
 		EntitiesHooks?.CreateNode.call(this, values);
 	}

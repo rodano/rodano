@@ -34,9 +34,7 @@ public class WorkflowDTO {
 	@Schema(description = "ID of the action than can be used to create the workflow")
 	public String actionId;
 
-	@Schema(description = "Message attached to the workflow")
-	@NotNull
-	public SortedMap<String, String> message = new TreeMap<>();
+	@Schema(description = "Icon of the workflow")
 	public String icon;
 
 	@Schema(description = "Possible states of the workflow")

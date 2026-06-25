@@ -680,7 +680,6 @@ export default {
 				FormHelpers.FillLocalizedInput(document.getElementById('workflow_shortname'), workflow.study.languages);
 				FormHelpers.FillLocalizedInput(document.getElementById('workflow_longname'), workflow.study.languages);
 				FormHelpers.FillLocalizedInput(document.getElementById('workflow_description'), workflow.study.languages);
-				FormHelpers.FillLocalizedInput(document.getElementById('workflow_message'), workflow.study.languages);
 				FormHelpers.UpdateForm(document.getElementById('edit_workflow_form'), workflow);
 
 				manage_mandatory();

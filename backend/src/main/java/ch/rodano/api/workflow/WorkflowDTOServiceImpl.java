@@ -45,8 +45,6 @@ public class WorkflowDTOServiceImpl implements WorkflowDTOService {
 		dto.aggregatedWorkflowId = workflow.getAggregateWorkflowId();
 		dto.mandatory = workflow.isMandatory();
 		dto.actionId = workflow.getActionId();
-
-		dto.message = workflow.getMessage();
 		dto.icon = workflow.getIcon();
 
 		dto.states = createWorkflowStateDTOs(workflow.getStates(), acl);

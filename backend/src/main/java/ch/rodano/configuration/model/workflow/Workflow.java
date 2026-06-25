@@ -70,7 +70,6 @@ public class Workflow implements SuperDisplayable, Serializable, FamilyAssignabl
 
 	private String aggregateWorkflowId;
 
-	private SortedMap<String, String> message;
 	private String icon;
 
 	public Workflow() {
@@ -80,7 +79,6 @@ public class Workflow implements SuperDisplayable, Serializable, FamilyAssignabl
 		states = new ArrayList<>();
 		actions = new TreeSet<>();
 		mandatory = true;
-		message = new TreeMap<>();
 	}
 
 	@Override
@@ -216,14 +214,6 @@ public class Workflow implements SuperDisplayable, Serializable, FamilyAssignabl
 
 	public final void setAggregateWorkflowId(final String basedOnWorkflowId) {
 		this.aggregateWorkflowId = basedOnWorkflowId;
-	}
-
-	public final SortedMap<String, String> getMessage() {
-		return message;
-	}
-
-	public final void setMessage(final SortedMap<String, String> message) {
-		this.message = message;
 	}
 
 	public final String getIcon() {

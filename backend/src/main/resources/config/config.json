@@ -26,7 +26,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 124,
-	"configDate": 1782373810179,
+	"configDate": 1782401214829,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -17870,7 +17870,6 @@
 			"mandatory": true,
 			"initialStateId": "PENDING",
 			"unique": false,
-			"message": {},
 			"icon": "domain",
 			"className": "Workflow"
 		},
@@ -17937,7 +17936,6 @@
 			"mandatory": false,
 			"unique": true,
 			"aggregateWorkflowId": "FORM_REPORTING",
-			"message": {},
 			"icon": "event",
 			"className": "Workflow"
 		},
@@ -18247,7 +18245,6 @@
 			"mandatory": false,
 			"initialStateId": "NOT_VERIFIED",
 			"unique": true,
-			"message": {},
 			"icon": "fact_check",
 			"className": "Workflow"
 		},
@@ -18336,7 +18333,6 @@
 			"mandatory": true,
 			"initialStateId": "REGISTERED",
 			"unique": false,
-			"message": {},
 			"icon": "person",
 			"className": "Workflow"
 		},
@@ -18383,7 +18379,6 @@
 			"mandatory": true,
 			"initialStateId": "NOT_SAVED",
 			"unique": false,
-			"message": {},
 			"icon": "description",
 			"className": "Workflow"
 		},
@@ -18738,7 +18733,6 @@
 			"mandatory": false,
 			"unique": true,
 			"aggregateWorkflowId": "SOURCE_DATA_VERIFICATION",
-			"message": {},
 			"icon": "fact_check",
 			"className": "Workflow"
 		},
@@ -19169,9 +19163,6 @@
 			"initialStateId": "TO_REVIEW",
 			"actionId": "CREATE_PD",
 			"unique": false,
-			"message": {
-				"en": "Please review following protocol deviations:"
-			},
 			"icon": "flag",
 			"className": "Workflow"
 		},
@@ -19735,9 +19726,6 @@
 			"initialStateId": "OPEN",
 			"actionId": "CREATE_QUERY",
 			"unique": false,
-			"message": {
-				"en": "Please pay attention to the following queries:"
-			},
 			"icon": "comment",
 			"className": "Workflow"
 		},
@@ -19868,7 +19856,6 @@
 			"mandatory": true,
 			"initialStateId": "UNSIGNED",
 			"unique": false,
-			"message": {},
 			"icon": "verified_user",
 			"className": "Workflow"
 		},
@@ -20257,7 +20244,6 @@
 			"mandatory": false,
 			"unique": true,
 			"aggregateWorkflowId": "SOURCE_DATA_VERIFICATION",
-			"message": {},
 			"icon": "fact_check",
 			"className": "Workflow"
 		},
@@ -20475,7 +20461,6 @@
 			"mandatory": true,
 			"initialStateId": "READY_TO_REVIEW",
 			"unique": false,
-			"message": {},
 			"icon": "manufacturing",
 			"className": "Workflow"
 		},
@@ -21368,7 +21353,6 @@
 			"actionId": "INITIALIZE_VERIFICATION",
 			"unique": true,
 			"aggregateWorkflowId": "SOURCE_DATA_VERIFICATION",
-			"message": {},
 			"icon": "fact_check",
 			"className": "Workflow"
 		},
@@ -21404,7 +21388,6 @@
 			"mandatory": false,
 			"unique": true,
 			"aggregateWorkflowId": "QUERY",
-			"message": {},
 			"icon": "comment",
 			"className": "Workflow"
 		},
@@ -21474,7 +21457,6 @@
 			"mandatory": false,
 			"unique": true,
 			"aggregateWorkflowId": "PROTOCOL_DEVIATION",
-			"message": {},
 			"icon": "flag",
 			"className": "Workflow"
 		},
@@ -21820,9 +21802,6 @@
 			"mandatory": false,
 			"initialStateId": "OPEN",
 			"unique": false,
-			"message": {
-				"en": "Please pay attention to the following queries:"
-			},
 			"icon": "comment",
 			"className": "Workflow"
 		}
