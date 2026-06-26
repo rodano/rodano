@@ -5,6 +5,7 @@
 	display: flex;
 	justify-content: space-between;
 	gap: var(--gap);
+	position: relative;
 }
 h1 {
 	height: 100%;
@@ -50,4 +51,29 @@ h1 {
 .user {
 	display: flex;
 	gap: 0.25rem;
+}
+
+//mobile menu: hamburger shows on small screens, dropdown anchored to the toolbar
+.mobile-menu-button {
+	display: none;
+}
+
+@media (max-width: 768px) {
+	.mobile-menu-button {
+		display: inline-flex;
+	}
+	.menus {
+		display: none;
+		position: absolute;
+		top: 100%;
+		left: 0;
+		right: 0;
+		flex-direction: column;
+		background-color: var(--mat-sys-primary);
+		padding: 0.5rem;
+		z-index: 1000;
+	}
+	.menus.open {
+		display: flex;
+	}
 }

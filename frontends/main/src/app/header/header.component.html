@@ -11,7 +11,19 @@
 		</a>
 	</h1>
 
-	<div class="menus">
+	<button
+		mat-icon-button
+		type="button"
+		class="mobile-menu-button"
+		aria-label="Toggle menu"
+		(click)="mobileMenuOpen.update(v => !v)">
+		<mat-icon>menu</mat-icon>
+	</button>
+
+	<div
+		class="menus"
+		[class.open]="mobileMenuOpen()"
+		(click)="mobileMenuOpen.set(false)">
 		<!-- TODO the action.context should be simplified, this should be a single parameter instead of a nonsensical array-->
 		@for (menu of menus(); track menu.id) {
 			@if (menu.submenus.length === 0) {

@@ -48,6 +48,7 @@ export class HeaderComponent implements OnInit {
 	readonly menus = signal<Menu[]>([]);
 	readonly profiles = signal<Profile[]>([]);
 	readonly pendingRolesNumber = signal<number>(0);
+	readonly mobileMenuOpen = signal<boolean>(false);
 
 	constructor(
 		private authStateService: AuthStateService,
