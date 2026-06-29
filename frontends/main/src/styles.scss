@@ -196,13 +196,12 @@ button {
 //search block for pages with a search form and a table underneath
 .browse-entities {
 	display: flex;
-	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: var(--gap);
 	align-items: center;
 	margin-bottom: 1rem;
-	& form {
-		display: flex;
-		gap: var(--gap);
-		align-items: center;
+	& .new-entity {
+		margin-left: auto;
 	}
 }
 

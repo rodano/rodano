@@ -1,45 +1,46 @@
 <h1>Resources</h1>
 
-<div class="browse-entities">
-	<form
-		[formGroup]="searchForm"
-		(ngSubmit)="search()">
-		<mat-form-field>
-			<mat-label>Title</mat-label>
-			<input
-				matInput
-				formControlName="fullText"
-				name="fullText" />
-		</mat-form-field>
+<form
+	class="browse-entities"
+	[formGroup]="searchForm"
+	(ngSubmit)="search()">
+	<mat-form-field>
+		<mat-label>Title</mat-label>
+		<input
+			matInput
+			formControlName="fullText"
+			name="fullText" />
+	</mat-form-field>
 
-		<mat-form-field>
-			<mat-label>Category</mat-label>
-			<mat-select
-				formControlName="categoryId"
-				name="categoryId">
-				@for (category of categories(); track category.id) {
-					<mat-option [value]="category.id">
-						{{ category.shortname | localizeMap }}
-					</mat-option>
-				}
-			</mat-select>
-		</mat-form-field>
-
-		<button
-			mat-flat-button
-			type="submit">
-			Search
-		</button>
-		<button
-			mat-stroked-button
-			type="reset"
-			(click)="reset()">
-			Clear
-		</button>
-	</form>
+	<mat-form-field>
+		<mat-label>Category</mat-label>
+		<mat-select
+			formControlName="categoryId"
+			name="categoryId">
+			@for (category of categories(); track category.id) {
+				<mat-option [value]="category.id">
+					{{ category.shortname | localizeMap }}
+				</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
 
 	<button
 		mat-flat-button
+		type="submit">
+		Search
+	</button>
+	<button
+		mat-stroked-button
+		type="reset"
+		(click)="reset()">
+		Clear
+	</button>
+
+	<button
+		mat-flat-button
+		class="new-entity"
+		type="button"
 		[matMenuTriggerFor]="menu">
 		<mat-icon>add</mat-icon>
 		New...
@@ -53,7 +54,7 @@
 			</button>
 		}
 	</mat-menu>
-</div>
+</form>
 
 <mat-progress-bar
 	mode="indeterminate"

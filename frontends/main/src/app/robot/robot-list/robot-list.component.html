@@ -1,51 +1,52 @@
 <h1>Robots</h1>
 
-<div class="browse-entities">
-	<form
-		[formGroup]="searchForm"
-		(ngSubmit)="search()">
-		<mat-form-field>
-			<mat-label>Name</mat-label>
-			<input
-				matInput
-				formControlName="name"
-				name="name" />
-		</mat-form-field>
+<form
+	class="browse-entities"
+	[formGroup]="searchForm"
+	(ngSubmit)="search()">
+	<mat-form-field>
+		<mat-label>Name</mat-label>
+		<input
+			matInput
+			formControlName="name"
+			name="name" />
+	</mat-form-field>
 
-		<mat-form-field>
-			<mat-label>Profile</mat-label>
-			<mat-select
-				formControlName="profileId"
-				name="profileId">
-				<mat-option></mat-option>
-				@for (profile of profiles(); track profile.id) {
-					<mat-option [value]="profile.id">
-						{{ profile.shortname | localizeMap }}
-					</mat-option>
-				}
-			</mat-select>
-		</mat-form-field>
-
-		<button
-			mat-flat-button
-			type="submit">
-			Search
-		</button>
-		<button
-			mat-stroked-button
-			type="reset"
-			(click)="reset()">
-			Clear
-		</button>
-	</form>
+	<mat-form-field>
+		<mat-label>Profile</mat-label>
+		<mat-select
+			formControlName="profileId"
+			name="profileId">
+			<mat-option></mat-option>
+			@for (profile of profiles(); track profile.id) {
+				<mat-option [value]="profile.id">
+					{{ profile.shortname | localizeMap }}
+				</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
 
 	<button
 		mat-flat-button
+		type="submit">
+		Search
+	</button>
+	<button
+		mat-stroked-button
+		type="reset"
+		(click)="reset()">
+		Clear
+	</button>
+
+	<button
+		mat-flat-button
+		class="new-entity"
+		type="button"
 		[routerLink]="['/robots', 'new']">
 		<mat-icon>add</mat-icon>
 		New robot
 	</button>
-</div>
+</form>
 
 <mat-progress-bar
 	mode="indeterminate"

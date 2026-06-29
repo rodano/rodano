@@ -1,46 +1,45 @@
 <h1>ePro</h1>
 
-<div class="browse-entities">
-	<form
-		[formGroup]="searchForm"
-		(ngSubmit)="search()">
-		<mat-form-field>
-			<mat-label>Code or name</mat-label>
-			<input
-				matInput
-				formControlName="fullText"
-				name="fullText" />
+<form
+	class="browse-entities"
+	[formGroup]="searchForm"
+	(ngSubmit)="search()">
+	<mat-form-field>
+		<mat-label>Code or name</mat-label>
+		<input
+			matInput
+			formControlName="fullText"
+			name="fullText" />
+	</mat-form-field>
+
+	@if (parentScopes().length > 0) {
+		<mat-form-field class="scope-picker">
+			<mat-label>Parent</mat-label>
+			<mat-select
+				formControlName="parentPk"
+				name="parentPk">
+				<mat-option></mat-option>
+				@for (parentScope of parentScopes(); track parentScope.pk) {
+					<mat-option [value]="[parentScope.pk]">
+						{{ parentScope | scopeCodeShortname }}
+					</mat-option>
+				}
+			</mat-select>
 		</mat-form-field>
+	}
 
-		@if (parentScopes().length > 0) {
-			<mat-form-field class="scope-picker">
-				<mat-label>Parent</mat-label>
-				<mat-select
-					formControlName="parentPk"
-					name="parentPk">
-					<mat-option></mat-option>
-					@for (parentScope of parentScopes(); track parentScope.pk) {
-						<mat-option [value]="[parentScope.pk]">
-							{{ parentScope | scopeCodeShortname }}
-						</mat-option>
-					}
-				</mat-select>
-			</mat-form-field>
-		}
-
-		<button
-			mat-flat-button
-			type="submit">
-			Search
-		</button>
-		<button
-			mat-stroked-button
-			type="reset"
-			(click)="reset()">
-			Clear
-		</button>
-	</form>
-</div>
+	<button
+		mat-flat-button
+		type="submit">
+		Search
+	</button>
+	<button
+		mat-stroked-button
+		type="reset"
+		(click)="reset()">
+		Clear
+	</button>
+</form>
 
 <mat-progress-bar
 	mode="indeterminate"

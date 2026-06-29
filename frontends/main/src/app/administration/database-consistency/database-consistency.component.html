@@ -17,53 +17,52 @@
 	</button>
 </p>
 
-<div class="browse-entities">
-	<form
-		[formGroup]="filterForm"
-		(ngSubmit)="search()">
-		<mat-form-field>
-			<mat-label>Entity</mat-label>
-			<mat-select
-				multiple
-				formControlName="entity">
-				@for (entity of entityOptions; track entity) {
-					<mat-option [value]="entity">{{ entity }}</mat-option>
-				}
-			</mat-select>
-		</mat-form-field>
-		<mat-form-field>
-			<mat-label>Type</mat-label>
-			<mat-select
-				multiple
-				formControlName="type">
-				@for (type of typeOptions; track type) {
-					<mat-option [value]="type">{{ getInconsistencyTypeDisplay(type).label }}</mat-option>
-				}
-			</mat-select>
-		</mat-form-field>
-		<mat-form-field>
-			<mat-label>Status</mat-label>
-			<mat-select
-				multiple
-				formControlName="status">
-				@for (status of statusOptions; track status) {
-					<mat-option [value]="status">{{ getInconsistencyStatusDisplay(status).label }}</mat-option>
-				}
-			</mat-select>
-		</mat-form-field>
-		<button
-			mat-flat-button
-			type="submit">
-			Search
-		</button>
-		<button
-			mat-stroked-button
-			type="reset"
-			(click)="resetFilters()">
-			Clear
-		</button>
-	</form>
-</div>
+<form
+	class="browse-entities"
+	[formGroup]="filterForm"
+	(ngSubmit)="search()">
+	<mat-form-field>
+		<mat-label>Entity</mat-label>
+		<mat-select
+			multiple
+			formControlName="entity">
+			@for (entity of entityOptions; track entity) {
+				<mat-option [value]="entity">{{ entity }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	<mat-form-field>
+		<mat-label>Type</mat-label>
+		<mat-select
+			multiple
+			formControlName="type">
+			@for (type of typeOptions; track type) {
+				<mat-option [value]="type">{{ getInconsistencyTypeDisplay(type).label }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	<mat-form-field>
+		<mat-label>Status</mat-label>
+		<mat-select
+			multiple
+			formControlName="status">
+			@for (status of statusOptions; track status) {
+				<mat-option [value]="status">{{ getInconsistencyStatusDisplay(status).label }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+	<button
+		mat-flat-button
+		type="submit">
+		Search
+	</button>
+	<button
+		mat-stroked-button
+		type="reset"
+		(click)="resetFilters()">
+		Clear
+	</button>
+</form>
 
 <mat-progress-bar
 	mode="indeterminate"
