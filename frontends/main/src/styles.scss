@@ -293,17 +293,32 @@ button {
 	height: 100%;
 	width: 100%;
 	& aside {
-		flex-basis: 20%;
-		max-width: 20%;
+		flex: 0 0 16rem;
 		position: relative; /* this allows absolute elements below to be positioned relatively to this element */
 		background-color: var(--light-highlight-color);
 	}
 	& main {
-		flex-basis: 80%;
-		max-width: 80%;
+		flex: 1 1 auto;
+		min-width: 0; /* allow the main content to shrink below its intrinsic width */
 		height: 100%;
 		box-sizing: border-box;
 		overflow-y: auto;
+	}
+
+	/* on mobile, stack the side section on top of the main content */
+	@media (max-width: 768px) {
+		flex-direction: column;
+		height: auto;
+		& aside {
+			flex: 0 0 auto;
+			width: 100%;
+		}
+		& main {
+			flex: 1 1 auto;
+			width: 100%;
+			height: auto;
+			overflow-y: visible;
+		}
 	}
 }
 
@@ -376,6 +391,16 @@ nav.side-navigation {
 	footer {
 		text-align: right;
 		padding: 0.8rem 1rem;
+	}
+
+	/* on mobile, the side navigation flows naturally with the page (items stacked vertically) */
+	@media (max-width: 768px) {
+		height: auto;
+		border-right: none;
+		border-bottom: 1px solid var(--mat-sys-primary);
+		& > ol {
+			overflow: visible;
+		}
 	}
 }
 
