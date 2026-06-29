@@ -104,12 +104,14 @@
 		<th
 			mat-header-cell
 			*matHeaderCellDef
-			mat-sort-header>
+			mat-sort-header
+			class="optional">
 			Scope
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let resource">
+			*matCellDef="let resource"
+			class="optional">
 			{{ resource.scopeShortname }}
 		</td>
 	</ng-container>
@@ -118,12 +120,14 @@
 		<th
 			mat-header-cell
 			*matHeaderCellDef
-			mat-sort-header>
+			mat-sort-header
+			class="optional">
 			Public
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let resource">
+			*matCellDef="let resource"
+			class="optional">
 			{{ resource.publicResource ? 'Yes' : 'No' }}
 		</td>
 	</ng-container>

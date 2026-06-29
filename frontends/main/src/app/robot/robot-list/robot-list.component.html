@@ -85,12 +85,14 @@
 		<th
 			mat-header-cell
 			*matHeaderCellDef
-			mat-sort-header>
+			mat-sort-header
+			class="optional">
 			Profile
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let robot">
+			*matCellDef="let robot"
+			class="optional">
 			{{ robot.roles[0].profileId | lookupById: profiles() | getField: 'shortname' | localizeMap }}
 		</td>
 	</ng-container>
@@ -99,12 +101,14 @@
 		<th
 			mat-header-cell
 			*matHeaderCellDef
-			mat-sort-header>
+			mat-sort-header
+			class="optional">
 			Scope
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let robot">
+			*matCellDef="let robot"
+			class="optional">
 			{{ robot.roles[0].scope.shortname }}
 		</td>
 	</ng-container>

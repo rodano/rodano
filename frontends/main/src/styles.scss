@@ -205,6 +205,13 @@ button {
 	}
 }
 
+//columns flagged as optional in entity-listing tables are hidden on mobile devices to keep them readable
+@media (max-width: 768px) {
+	table .optional {
+		display: none;
+	}
+}
+
 //cards
 .mat-mdc-card {
 	min-width: 20rem;
