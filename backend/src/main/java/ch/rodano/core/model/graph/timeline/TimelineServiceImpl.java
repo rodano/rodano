@@ -2,6 +2,7 @@ package ch.rodano.core.model.graph.timeline;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -138,7 +139,7 @@ public class TimelineServiceImpl implements TimelineService {
 		for(final var section : config.getSections()) {
 			final var graphData = new TimelineGraphDataSection(section);
 			graphData.setId(section.getId());
-			instance.getDataSections().add(graphData);
+			instance.getSections().add(graphData);
 
 			//representation of scope path dates
 			if(section.isUseScopePaths()) {
@@ -183,9 +184,8 @@ public class TimelineServiceImpl implements TimelineService {
 						final var graphValue = new TimelineGraphDataValue();
 						graphValue.setLabel(eventService.getLabel(scope, event, languages));
 						graphValue.setDate(event.getDateOrExpectedDate());
-						if(!event.isExpected()) {
-							graphValue.setLink(String.format("/crf/%d/events/%d?expandedEventPks=%d", scope.getPk(), event.getPk(), event.getPk()));
-						}
+						final Map<String, Object> metadata = Map.of("scopePk", scope.getPk(), "eventPk", event.getPk());
+						graphValue.setMetadata(metadata);
 						graphData.getValues().add(graphValue);
 					}
 				}
@@ -296,8 +296,12 @@ public class TimelineServiceImpl implements TimelineService {
 							}
 						}
 
-						//add link
-						final var baseLink = String.format("/crf/%s", scope.getPk());
+						//add meta data
+						final Map<String, Object> metadata = new HashMap<String, Object>();
+						metadata.put("scopePk", scope.getPk());
+						if(eventPk != null) {
+							metadata.put("eventPk", eventPk);
+						}
 						if(referenceFieldModel != null) {
 							//find form model
 							final var formModel = referenceFieldModel.getFormModels().stream()
@@ -305,25 +309,16 @@ public class TimelineServiceImpl implements TimelineService {
 							if(formModel.isPresent()) {
 								final var formModelId = formModel.get().getId();
 								//find form
-								if(eventPk == null) {
-									final var formPk = formsByFormModelId.get(formModelId);
-									graphValue.setLink(String.format("%s/forms/%d", baseLink, formPk));
-								}
-								else {
-									final var formPk = formsByEventPkAndFormModelId.get(eventPk).get(formModelId);
-									graphValue.setLink(String.format("%s/events/%d/forms/%d?expandedEventPks=%d", baseLink, eventPk, formPk, eventPk));
-								}
+								final var formPk = eventPk == null ? formsByFormModelId.get(formModelId) : formsByEventPkAndFormModelId.get(eventPk).get(formModelId);
+								metadata.put("formPk", formPk);
 							}
 						}
-						if(graphValue.getLink() == null && eventPk != null) {
-							graphValue.setLink(String.format("/%s/events/%d?expandedEventPks=%d", baseLink, eventPk, eventPk));
-						}
 
-						//add meta data
 						section.getMetaFieldModelIds().forEach(fieldModelId -> {
 							final var value = recordByFieldModelId.get(fieldModelId).get(FIELD.VALUE);
-							graphValue.getMetadata().put(fieldModelId, value);
+							metadata.put(fieldModelId, value);
 						});
+						graphValue.setMetadata(metadata);
 
 						graphData.getValues().add(graphValue);
 					}

@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.configuration.model.rights.Rights;
+import ch.rodano.core.model.graph.timeline.TimelineGraphData;
 import ch.rodano.core.model.graph.timeline.TimelineService;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.actor.ActorService;
@@ -27,7 +28,7 @@ import ch.rodano.core.utils.UtilsService;
 
 @Tag(name = "Timeline")
 @RestController
-@RequestMapping("/scopes/{scopePk}/timeline")
+@RequestMapping("/scopes/{scopePk}/timelines")
 @Transactional(readOnly = true)
 public class TimelineController extends AbstractSecuredController {
 
@@ -51,10 +52,10 @@ public class TimelineController extends AbstractSecuredController {
 		this.scopeDAOService = scopeDAOService;
 	}
 
-	@Operation(summary = "Get scope timeline")
+	@Operation(summary = "Get scope timelines")
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
-	public List<TimelineGraphDataDTO> getTimeline(
+	public List<TimelineGraphData> getTimeline(
 		@PathVariable final Long scopePk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -66,8 +67,6 @@ public class TimelineController extends AbstractSecuredController {
 
 		rightsService.checkRight(currentActor, currentRoles, scope.getScopeModel(), Rights.READ);
 
-		return timelineService.getTimelineGraphs(currentActor, currentRoles, scope, studyService.getStudy()).stream()
-			.map(TimelineGraphDataDTO::new)
-			.toList();
+		return timelineService.getTimelineGraphs(currentActor, currentRoles, scope, studyService.getStudy());
 	}
 }

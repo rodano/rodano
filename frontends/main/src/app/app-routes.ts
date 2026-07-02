@@ -1,6 +1,7 @@
 import {Route} from '@angular/router';
 
 import {ChangePasswordContext} from './change-password/change-password-context';
+import {CRF_PATH} from './crf/crf-routes';
 import {ErrorContext} from './error/error-context';
 import {AuthGuard} from './guards/authentication.guard';
 import {EproEnabledGuard} from './guards/epro-enabled.guard';
@@ -40,7 +41,7 @@ export default [
 		loadChildren: () => import('./search/search.component').then(m => m.SearchComponent.ROUTES)
 	},
 	{
-		path: 'crf',
+		path: CRF_PATH,
 		canActivate: [AuthGuard],
 		loadChildren: () => import('./crf/crf-routes')
 	},

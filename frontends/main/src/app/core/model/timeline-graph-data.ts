@@ -8,6 +8,7 @@
  * Do not edit the class manually.
  */
 import { TimelineGraphDataPeriod } from './timeline-graph-data-period';
+import { TimelineGraphDataSection } from './timeline-graph-data-section';
 
 
 /**
@@ -15,13 +16,6 @@ import { TimelineGraphDataPeriod } from './timeline-graph-data-period';
  */
 export interface TimelineGraphData { 
     id: string;
-    shortname: { [key: string]: string; };
-    longname: { [key: string]: string; };
-    description?: { [key: string]: string; };
-    scopeModelId: string;
-    studyStartEventModelId?: string;
-    studyStopEventModelId?: string;
-    studyPeriodIsDefault?: boolean;
     width?: number;
     height?: number;
     legendWidth?: number;
@@ -29,5 +23,6 @@ export interface TimelineGraphData {
     showScroller: boolean;
     footNote?: { [key: string]: string; };
     periods: Array<TimelineGraphDataPeriod>;
+    sections: Array<TimelineGraphDataSection>;
 }
 

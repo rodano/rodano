@@ -10,6 +10,8 @@ import {FormResolver} from '../resolvers/form-resolver';
 import {TimelineComponent} from './timeline/timeline.component';
 import {UnsavedChangesGuard} from './guards/unsaved-changes/unsaved-changes.guard';
 
+export const CRF_PATH = 'crf';
+
 export default [
 	{
 		path: ':scopePk',

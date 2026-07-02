@@ -89,8 +89,8 @@ export class ScopeService {
 		return this.http.post<number>(`${this.serviceUrl}/${scopePk}/enrollment/count`, criteria);
 	}
 
-	getGraphs(scopePk: number): Observable<TimelineGraphData[]> {
-		return this.http.get<TimelineGraphData[]>(`${this.serviceUrl}/${scopePk}/timeline`);
+	getTimelines(scopePk: number): Observable<TimelineGraphData[]> {
+		return this.http.get<TimelineGraphData[]>(`${this.serviceUrl}/${scopePk}/timelines`);
 	}
 
 	getAvailableEventModels(scopePk: number): Observable<EventModel[]> {
