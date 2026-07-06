@@ -1,4 +1,4 @@
-import {Component, ViewChild, DestroyRef, OnInit, signal} from '@angular/core';
+import {Component, ViewChild, DestroyRef, OnInit, signal, HostListener} from '@angular/core';
 import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
 import {Observable, Subject, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
 import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
@@ -47,7 +47,6 @@ import {AutofocusDirective} from '../directives/autofocus.directive';
 import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
-	changeDetection: ChangeDetectionStrategy.OnPush,
 	selector: 'app-search',
 	templateUrl: './scopes-search.component.html',
 	styleUrls: ['./scopes-search.component.css'],
@@ -71,15 +70,12 @@ import {FeatureStatic} from '@core/model/feature-static';
 		MatSelect,
 		MatOption,
 		MatDatepickerModule,
-		DateUTCPipe,
 		LowerCasePipe,
 		MatCheckbox,
 		AutofocusDirective
 	]
 })
 export class SearchComponent implements OnInit {
-	private static readonly ROUTE_PATH = '/scopes-search';
-
 	readonly columnsToDisplay = signal<string[]>([]);
 
 	Object = Object;
@@ -269,11 +265,20 @@ export class SearchComponent implements OnInit {
 	search(): void {
 		const scopeSearch = this.generateScopeSearch();
 		//Remove scopeModelId from query params since it's in the path
-		delete (scopeSearch as any).scopeModelId;
-		const query = this.httpParamsService.toHttpParams(scopeSearch);
-		const queryString = query.toString();
-		const path = queryString ? `?${queryString}` : '';
-		this.location.replaceState(`${SearchComponent.ROUTE_PATH}/${this.scopeModelId}${path}`);
+		delete scopeSearch.scopeModelId;
+
+		if(scopeSearch.workflowStates && Object.keys(scopeSearch.workflowStates).length > 0) {
+			(scopeSearch as any).workflowStates = JSON.stringify(scopeSearch.workflowStates);
+		}
+		if(scopeSearch.fieldModelCriteria && Array.isArray(scopeSearch.fieldModelCriteria) && scopeSearch.fieldModelCriteria.length > 0) {
+			(scopeSearch as any).fieldModelCriteria = JSON.stringify(scopeSearch.fieldModelCriteria);
+		}
+
+		const urlTree = this.router.createUrlTree(
+			['scopes-search', this.scopeModelId],
+			{queryParams: scopeSearch}
+		);
+		this.location.replaceState(this.router.serializeUrl(urlTree));
 		this.searchTrigger$.next(scopeSearch);
 	}
 
@@ -371,20 +376,21 @@ export class SearchComponent implements OnInit {
 	private syncFormAndUrl(scopeSearch: ScopeSearch) {
 		//Sync the scope code
 		this.searchForm.controls.scopeCode.setValue(scopeSearch.fullText, {emitEvent: false});
-
 		//Sync the workflow controls
-		if(scopeSearch.workflowStates) {
-			Object.keys(scopeSearch.workflowStates).forEach(workflowId => {
+		const workflowStatesValue = scopeSearch.workflowStates as any;
+		if(workflowStatesValue) {
+			Object.keys(workflowStatesValue).forEach(workflowId => {
 				const workflow = this.getWorkflow(workflowId);
 				if(workflow) {
 					const control = this.searchForm.controls[this.getWSFormControlName(workflow)];
-					control.setValue(scopeSearch.workflowStates[workflowId], {emitEvent: false});
+					control.setValue(workflowStatesValue[workflowId], {emitEvent: false});
 				}
 			});
 		}
 		//Sync the fieldModelCriteria fields
-		if(scopeSearch.fieldModelCriteria) {
-			this.fieldModelCriteria = JSON.parse(scopeSearch.fieldModelCriteria);
+		const fieldModelCriteriaValue = scopeSearch.fieldModelCriteria as string;
+		if(fieldModelCriteriaValue) {
+			this.fieldModelCriteria = JSON.parse(fieldModelCriteriaValue);
 			this.fieldModelCriteria.forEach(criteria => {
 				const datasetModelId = criteria.datasetModelId;
 				const fieldModelId = criteria.fieldModelId;
@@ -477,8 +483,15 @@ export class SearchComponent implements OnInit {
 		});
 
 		this.fieldModelCriteria = newFieldModelCriteria;
-		if(this.fieldModelCriteria.length > 0) {
-			search.fieldModelCriteria = JSON.stringify(this.fieldModelCriteria);
+		if(this.fieldModelCriteria.length === 0) {
+			delete (search as any).fieldModelCriteria;
+		}
+		else {
+			(search as any).fieldModelCriteria = this.fieldModelCriteria;
+		}
+
+		if(Object.keys(search.workflowStates).length === 0) {
+			delete (search as any).workflowStates;
 		}
 
 		const parentScopeControl = this.parentScopeControl;
@@ -593,7 +606,21 @@ export class SearchComponent implements OnInit {
 		if(!result.fieldValues || !fieldModel) {
 			return undefined;
 		}
-		return result.fieldValues[fieldModel.datasetModelId]?.[fieldModel.id];
+		const rawValue = result.fieldValues[fieldModel.datasetModelId]?.[fieldModel.id];
+		if(!rawValue) {
+			return undefined;
+		}
+
+		if(this.getIsPossibleValue(fieldModel.datasetModelId, fieldModel.id)) {
+			const localizationMap = this.getValueShortname(fieldModel.datasetModelId, fieldModel.id, rawValue);
+			return localizationMap ? new LocalizeMapPipe().transform(localizationMap) : rawValue;
+		}
+		if(this.getIsCompleteDate(fieldModel.datasetModelId, fieldModel.id)) {
+			const dateObj = this.getDateObjectFromString(rawValue);
+			return dateObj ? new DateUTCPipe().transform(dateObj) : rawValue;
+		}
+
+		return rawValue;
 	}
 
 	resetSearchCriteria(): void {
@@ -609,5 +636,10 @@ export class SearchComponent implements OnInit {
 
 	navigateToScope(scopePk: number): void {
 		this.router.navigate(['crf', scopePk]);
+	}
+
+	@HostListener('keydown.escape')
+	onKeyDown(): void {
+		this.resetSearchCriteria();
 	}
 }

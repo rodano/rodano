@@ -47,6 +47,7 @@ import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.rule.RuleService;
+import ch.rodano.core.utils.RightsService;
 import ch.rodano.core.utils.UtilsService;
 
 @Service
@@ -62,6 +63,7 @@ public class ScopeServiceImpl implements ScopeService {
 	private final ScopeRelationService scopeRelationService;
 	private final WorkflowStatusService workflowStatusService;
 	private final UtilsService utilsService;
+	private final RightsService rightsService;
 
 	private final Pattern siblingsPattern;
 	private final Pattern sameScopeModelPattern;
@@ -75,7 +77,8 @@ public class ScopeServiceImpl implements ScopeService {
 		final WorkflowStatusService workflowStatusService,
 		final ScopeDAOService scopeDAOService,
 		final ScopeRelationService scopeRelationService,
-		final UtilsService utilsService
+		final UtilsService utilsService,
+		final RightsService rightsService
 	) {
 		this.studyService = studyService;
 		this.ruleService = ruleService;
@@ -86,6 +89,7 @@ public class ScopeServiceImpl implements ScopeService {
 		this.scopeDAOService = scopeDAOService;
 		this.scopeRelationService = scopeRelationService;
 		this.utilsService = utilsService;
+		this.rightsService = rightsService;
 
 		siblingsPattern = Pattern.compile("\\$\\{siblingsNumber:(\\d+)}");
 		sameScopeModelPattern = Pattern.compile("\\$\\{sameScopeModelNumber:(\\d+)}");

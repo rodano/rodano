@@ -111,17 +111,7 @@
 						mat-cell
 						*matCellDef="let result"
 						class="value-cell">
-						@let value = getFieldValueForDisplay(result, fieldModel);
-						@if (value !== undefined) {
-							@if (getIsPossibleValue(fieldModel.datasetModelId, fieldModel.id)) {
-								{{ getValueShortname(fieldModel.datasetModelId, fieldModel.id, value) | localizeMap }}
-							} @else if (getIsCompleteDate(fieldModel.datasetModelId, fieldModel.id)) {
-								@let date = getDateObjectFromString(value);
-								{{ date ? (date | dateUTC) : value }}
-							} @else {
-								{{ value }}
-							}
-						}
+						{{ getFieldValueForDisplay(result, fieldModel) }}
 					</td>
 				</ng-container>
 			}
