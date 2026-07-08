@@ -300,7 +300,7 @@ button {
 	height: 100%;
 	width: 100%;
 	& aside {
-		flex: 0 0 16rem;
+		flex: 0 0 18rem;
 		position: relative; /* this allows absolute elements below to be positioned relatively to this element */
 		background-color: var(--light-highlight-color);
 	}
