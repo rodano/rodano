@@ -477,7 +477,7 @@ public class EventServiceImpl implements EventService {
 		final var progression = new Progression();
 		final var fields = fieldDAOService.getFieldsByEventPk(event.getPk());
 		progression.setTotal(fields.size());
-		progression.setProgress(Math.toIntExact(fields.stream().filter(f -> !f.getFieldModel().isPlugin() && !f.isNull()).count()));
+		progression.setProgress(Math.toIntExact(fields.stream().filter(f -> !f.getFieldModel().isPlugin() && f.isNotNull()).count()));
 		return progression;
 	}
 

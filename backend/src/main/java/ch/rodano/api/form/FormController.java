@@ -36,6 +36,7 @@ import ch.rodano.core.model.rules.data.DataState;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.dataset.DatasetSubmissionService;
+import ch.rodano.core.services.bll.form.FormContentService;
 import ch.rodano.core.services.bll.form.FormService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.study.StudyService;
@@ -57,6 +58,7 @@ public class FormController extends AbstractSecuredController {
 	private final EventDAOService eventDAOService;
 	private final FormDAOService formDAOService;
 	private final FormService formService;
+	private final FormContentService formContentService;
 	private final FormDTOService formDTOService;
 	private final ConfigDTOService configDTOService;
 	private final UtilsService utilsService;
@@ -73,6 +75,7 @@ public class FormController extends AbstractSecuredController {
 		final ScopeDAOService scopeDAOService,
 		final EventDAOService eventDAOService,
 		final FormService formService,
+		final FormContentService formContentService,
 		final FormDTOService formDTOService,
 		final ConfigDTOService configDTOService,
 		final UtilsService utilsService,
@@ -86,6 +89,7 @@ public class FormController extends AbstractSecuredController {
 		this.eventDAOService = eventDAOService;
 		this.formDAOService = formDAOService;
 		this.formService = formService;
+		this.formContentService = formContentService;
 		this.formDTOService = formDTOService;
 		this.configDTOService = configDTOService;
 		this.utilsService = utilsService;
@@ -195,7 +199,7 @@ public class FormController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor(), scope);
 		acl.checkRight(form.getFormModel(), Rights.WRITE);
 
-		final var datasets = datasetSubmissionService.submit(acl, scope, event, datasetSubmissionDTO, currentContext(), Optional.empty());
+		datasetSubmissionService.submit(acl, scope, event, datasetSubmissionDTO, currentContext(), Optional.empty());
 
 		final var state = new DataState(scope, event, form);
 
@@ -211,6 +215,8 @@ public class FormController extends AbstractSecuredController {
 			ruleService.execute(state, rules, currentContext());
 		}
 
-		return datasetDTOService.createDTOs(scope, event, form, datasets, acl);
+		final var formContent = formContentService.generateFormContent(scope, event, form);
+
+		return datasetDTOService.createDTOs(scope, event, formContent.getDatasets(), formContent.getFields(), acl);
 	}
 }

@@ -1,14 +1,10 @@
 package ch.rodano.core.services.dao.field;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Operator;
 import org.jooq.Table;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
@@ -70,6 +66,15 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	}
 
 	@Override
+	public List<Field> getFieldsByDatasetPks(final Collection<Long> datasetPks) {
+		if(datasetPks.isEmpty()) {
+			return Collections.emptyList();
+		}
+		final var query = create.selectFrom(FIELD).where(FIELD.DATASET_FK.in(datasetPks));
+		return find(query);
+	}
+
+	@Override
 	public List<Field> getFieldsByDatasetPkHavingFieldModelIds(final Long datasetPk, final Collection<String> fieldModelIds) {
 		if(fieldModelIds.isEmpty()) {
 			return Collections.emptyList();
@@ -87,14 +92,14 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	@Override
 	public List<Field> getFieldsByScopePk(final Long scopePk) {
 		final var query = create.selectFrom(FIELD)
-			.where(FIELD.dataset().SCOPE_FK.eq(scopePk));
+			.where(FIELD.dataset().SCOPE_FK.eq(scopePk).and(FIELD.dataset().EVENT_FK.isNull()));
 		return find(query);
 	}
 
 	@Override
 	public List<Field> getFieldsFromScopeWithAValue(final Long scopePk) {
 		final var query = create.selectFrom(FIELD)
-			.where(FIELD.dataset().SCOPE_FK.eq(scopePk).and(FIELD.VALUE.isNotNull()));
+			.where(FIELD.dataset().SCOPE_FK.eq(scopePk).and(FIELD.dataset().EVENT_FK.isNull()).and(FIELD.VALUE.isNotNull()));
 		return find(query);
 	}
 
@@ -102,8 +107,7 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 	public boolean doesScopeHaveFieldsWithAValue(final Long scopePk) {
 		return create.select(DSL.countDistinct(FIELD.PK))
 			.from(FIELD)
-			.innerJoin(DATASET).on(DATASET.PK.eq(FIELD.DATASET_FK))
-			.where(DATASET.SCOPE_FK.eq(scopePk).and(FIELD.VALUE.isNotNull()))
+			.where(FIELD.dataset().SCOPE_FK.eq(scopePk).and(FIELD.dataset().EVENT_FK.isNull()).and(FIELD.VALUE.isNotNull()))
 			.fetchSingle()
 			.value1() > 0;
 	}
@@ -130,16 +134,6 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 			.where(DATASET.EVENT_FK.eq(eventPk).and(FIELD.VALUE.isNotNull()))
 			.fetchSingle()
 			.value1() > 0;
-	}
-
-	@Override
-	public List<Field> getFieldsRelatedToEvent(final Long scopePk, final Optional<Long> eventPk) {
-		final var conditions = new ArrayList<Condition>();
-		conditions.add(FIELD.dataset().SCOPE_FK.eq(scopePk));
-		eventPk.ifPresent(p -> conditions.add(FIELD.dataset().EVENT_FK.eq(p)));
-		final var query = create.selectFrom(FIELD)
-			.where(DSL.condition(Operator.OR, conditions));
-		return find(query);
 	}
 
 }

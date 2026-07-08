@@ -1,6 +1,5 @@
 package ch.rodano.api.dataset;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +12,6 @@ import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.field.Field;
-import ch.rodano.core.model.form.Form;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.event.EventService;
@@ -99,19 +97,10 @@ public class DatasetDTOServiceImpl implements DatasetDTOService {
 	}
 
 	@Override
-	public List<DatasetDTO> createDTOs(final Scope scope, final Optional<Event> event, final Form form, final Collection<Dataset> datasets, final ACL acl) {
-		//retrieve fields used in the provided form
-		final var fieldModels = form.getFormModel().getFieldModels();
-
-		final var dtos = new ArrayList<DatasetDTO>();
-		for(final Dataset dataset : datasets) {
-			final var fields = fieldService.getAll(dataset, fieldModels);
-			if(!fields.isEmpty()) {
-				dtos.add(createDTO(scope, event, dataset, fields, acl));
-			}
-		}
-
-		return dtos;
+	public List<DatasetDTO> createDTOs(final Scope scope, final Optional<Event> event, final Collection<Dataset> datasets, final Collection<Field> fields, final ACL acl) {
+		return datasets.stream()
+			.map(d -> createDTO(scope, event, d, fields.stream().filter(f -> f.getDatasetFk().equals(d.getPk())).toList(), acl))
+			.toList();
 	}
 
 }

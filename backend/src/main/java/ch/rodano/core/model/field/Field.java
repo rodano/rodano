@@ -166,6 +166,14 @@ public class Field extends FieldRecord implements TimestampableObject, Persisten
 		return value == null;
 	}
 
+	/**
+	 * @return true if value is not null
+	 */
+	@JsonIgnore
+	public boolean isNotNull() {
+		return !isNull();
+	}
+
 	@JsonAnySetter
 	public void setAnySetter(final String key, final Object value) {
 		final var message = new StringBuilder("Field - Unknown property : ");

@@ -2,9 +2,11 @@ package ch.rodano.core.services.bll.workflowStatus;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
@@ -340,8 +342,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final Form form
 	) {
 		final var formContent = formContentService.generateFormContent(scope, event, form);
-		final var fieldPks = formContent.getAllNonDeletedFields().stream()
-			.filter(f -> f.getValue() != null)
+		final var fieldPks = formContent.getFilledInFields().stream()
 			.map(Field::getPk)
 			.toList();
 		return workflowStatusDAOService.getWorkflowStatusesByFieldPks(fieldPks);
@@ -353,19 +354,33 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final Optional<Event> event,
 		final List<Form> forms
 	) {
-		final var scopeDatasets = datasetDAOService.getAllDatasetsByScopePk(scope.getPk());
-		final var eventDatasets = event.map(Event::getPk).map(datasetDAOService::getAllDatasetsByEventPk).orElse(Collections.emptyList());
-		final var fields = fieldDAOService.getFieldsRelatedToEvent(scope.getPk(), event.map(Event::getPk));
+		final var formContents = formContentService.generateFormContents(scope, event, forms);
 
-		final var wsByForm = new HashMap<Form, List<WorkflowStatus>>();
-		for(final var form : forms) {
-			final var formContent = formContentService.generateFormContent(scope, event, form, scopeDatasets, eventDatasets, fields);
-			final var fieldPks = formContent.getAllNonDeletedFields().stream()
-				.filter(f -> f.getValue() != null)
+		//collect the fields contained in each form
+		final var fieldPksByForm = new LinkedHashMap<Form, List<Long>>();
+		for(final var formContent : formContents) {
+			final var fieldPks = formContent.getFilledInFields().stream()
 				.map(Field::getPk)
 				.toList();
-			wsByForm.put(form, workflowStatusDAOService.getWorkflowStatusesByFieldPks(fieldPks));
+			fieldPksByForm.put(formContent.form(), fieldPks);
 		}
+
+		//fetch all workflows attached to all fields of these forms
+		final var allFieldPks = formContents.stream()
+			.flatMap(fc -> fc.getFilledInFields().stream())
+			.map(Field::getPk)
+			.toList();
+		final var statusesByFieldFk = workflowStatusDAOService.getWorkflowStatusesByFieldPks(allFieldPks).stream()
+			.collect(Collectors.groupingBy(WorkflowStatus::getFieldFk));
+
+		//reassemble the statuses per form
+		final var wsByForm = new HashMap<Form, List<WorkflowStatus>>(forms.size());
+		fieldPksByForm.forEach(
+			(form, fieldPks) -> wsByForm.put(
+				form,
+				fieldPks.stream().flatMap(pk -> statusesByFieldFk.getOrDefault(pk, List.of()).stream()).toList()
+			)
+		);
 		return wsByForm;
 	}
 

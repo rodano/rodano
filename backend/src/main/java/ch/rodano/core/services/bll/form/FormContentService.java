@@ -2,12 +2,15 @@ package ch.rodano.core.services.bll.form;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.configuration.model.layout.Cell;
@@ -66,10 +69,21 @@ public class FormContentService {
 		return datasets.stream().filter(d -> d.getDatasetModelId().equals(datasetModelId)).toList();
 	}
 
+	public List<FormContent> generateFormContents(final Scope scope, final Optional<Event> event, final List<Form> forms) {
+		final List<Dataset> scopeDatasets = datasetDAOService.getAllDatasetsByScopePk(scope.getPk());
+		final List<Dataset> eventDatasets = event.map(Event::getPk).map(datasetDAOService::getAllDatasetsByEventPk).orElse(Collections.emptyList());
+		final var datasetPks = Stream.concat(scopeDatasets.stream(), eventDatasets.stream()).map(Dataset::getPk).toList();
+		final var fields = fieldDAOService.getFieldsByDatasetPks(datasetPks);
+		return forms.stream()
+			.map(form -> generateFormContent(scope, event, form, scopeDatasets, eventDatasets, fields))
+			.toList();
+	}
+
 	public FormContent generateFormContent(final Scope scope, final Optional<Event> event, final Form form) {
 		final List<Dataset> scopeDatasets = datasetDAOService.getAllDatasetsByScopePk(scope.getPk());
 		final List<Dataset> eventDatasets = event.map(Event::getPk).map(datasetDAOService::getAllDatasetsByEventPk).orElse(Collections.emptyList());
-		final var fields = fieldDAOService.getFieldsRelatedToEvent(scope.getPk(), event.map(Event::getPk));
+		final var datasetPks = Stream.concat(scopeDatasets.stream(), eventDatasets.stream()).map(Dataset::getPk).toList();
+		final var fields = fieldDAOService.getFieldsByDatasetPks(datasetPks);
 		return generateFormContent(scope, event, form, scopeDatasets, eventDatasets, fields);
 	}
 
@@ -81,8 +95,9 @@ public class FormContentService {
 		final List<Dataset> eventDatasets,
 		final List<Field> fields
 	) {
-		final var fieldsByDataset = fields.stream()
-			.collect(Collectors.groupingBy(Field::getDatasetFk, Collectors.mapping(Function.identity(), Collectors.toSet())));
+		//index fields by their parent dataset for fast lookups while building layout contents
+		final var fieldsByDatasetPk = fields.stream()
+			.collect(Collectors.groupingBy(Field::getDatasetFk, Collectors.toSet()));
 
 		final List<LayoutContent> singleLayouts = new ArrayList<>();
 		final List<LayoutContent> repeatableLayouts = new ArrayList<>();
@@ -92,47 +107,40 @@ public class FormContentService {
 			.toList();
 
 		for(final Layout layout : layouts) {
-			final var cells = layout.getCells().stream()
+			final List<Cell> cells = layout.getCells().stream()
 				.filter(Cell::hasFieldModel)
 				.filter(c -> isCellValid(c, form, scope, event))
 				.toList();
 
-			//add entire datasets if the layout is a multiple layout
+			final Map<Dataset, Set<Field>> layoutFields = new LinkedHashMap<>();
+
+			//a repeatable layout produces one row per dataset
 			if(layout.getType().isRepeatable()) {
-				//retrieve all field models in this document (hence in this layout)
-				final List<String> fieldModelIds = cells.stream()
-					.filter(Cell::hasFieldModel)
-					.map(Cell::getFieldModelId)
-					.toList();
-				//retrieve all datasets for this layout
+				final List<String> fieldModelIds = cells.stream().map(Cell::getFieldModelId).toList();
 				final List<Dataset> datasets = getDatasets(event, scopeDatasets, eventDatasets, layout.getDatasetModelId());
-				//gather all fields in this layout
-				final var datasetsFields = new ArrayList<Pair<Dataset, Field>>();
+
 				for(final Dataset dataset : datasets) {
-					fieldsByDataset.get(dataset.getPk()).stream()
+					final var datasetFields = fieldsByDatasetPk.get(dataset.getPk()).stream()
 						.filter(f -> fieldModelIds.contains(f.getFieldModelId()))
-						.map(f -> Pair.of(dataset, f))
-						.forEach(datasetsFields::add);
+						.collect(Collectors.toSet());
+					layoutFields.put(dataset, datasetFields);
 				}
-				repeatableLayouts.add(new LayoutContent(layout, datasetsFields));
+				repeatableLayouts.add(new LayoutContent(layout, layoutFields));
 			}
-			//retrieve datasets and fields if it's a non multiple layout
+			//a single layout resolves each cell to exactly one (dataset, field) pair
 			else {
-				final var datasetsFields = new ArrayList<Pair<Dataset, Field>>();
 				for(final Cell cell : cells) {
-					final String datasetModelId = cell.getDatasetModelId();
-					//retrieve the datasets for this cell
-					final Dataset dataset = getDatasets(event, scopeDatasets, eventDatasets, datasetModelId).getFirst();
-					//gather the fields in this cell
-					final var field = fieldsByDataset.get(dataset.getPk()).stream()
+					final Dataset dataset = getDatasets(event, scopeDatasets, eventDatasets, cell.getDatasetModelId()).getFirst();
+					final Field field = fieldsByDatasetPk.get(dataset.getPk()).stream()
 						.filter(f -> f.getFieldModelId().equals(cell.getFieldModelId()))
-						.findAny().orElseThrow();
-					datasetsFields.add(Pair.of(dataset, field));
+						.findAny()
+						.orElseThrow();
+					layoutFields.computeIfAbsent(dataset, _ -> new HashSet<>()).add(field);
 				}
-				singleLayouts.add(new LayoutContent(layout, datasetsFields));
+				singleLayouts.add(new LayoutContent(layout, layoutFields));
 			}
 		}
 
-		return new FormContent(singleLayouts, repeatableLayouts);
+		return new FormContent(form, singleLayouts, repeatableLayouts);
 	}
 }

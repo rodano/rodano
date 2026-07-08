@@ -1,8 +1,8 @@
 package ch.rodano.core.services.bll.form;
 
-import java.util.List;
-
-import org.apache.commons.lang3.tuple.Pair;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import ch.rodano.configuration.model.layout.Layout;
 import ch.rodano.core.model.dataset.Dataset;
@@ -10,19 +10,22 @@ import ch.rodano.core.model.field.Field;
 
 public record LayoutContent(
 	Layout layout,
-	List<Pair<Dataset, Field>> datasetsFields
+	Map<Dataset, Set<Field>> fieldsByDataset
 ) {
 
-	public List<Dataset> getDatasets() {
-		return datasetsFields.stream().map(Pair::getLeft).toList();
+	public Set<Dataset> getDatasets() {
+		return fieldsByDataset.keySet();
 	}
 
-	public List<Field> getFields() {
-		return datasetsFields.stream().map(Pair::getRight).toList();
+	public Set<Field> getFields() {
+		return fieldsByDataset.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
 	}
 
-	public List<Field> getNonDeletedFields() {
-		return datasetsFields.stream().filter(p -> !p.getLeft().getDeleted()).map(Pair::getRight).toList();
+	public Set<Field> getNonDeletedFields() {
+		return fieldsByDataset.entrySet().stream()
+			.filter(e -> !e.getKey().getDeleted())
+			.flatMap(e -> e.getValue().stream())
+			.collect(Collectors.toSet());
 	}
 
 }

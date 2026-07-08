@@ -15,6 +15,8 @@ public interface FieldDAOService {
 
 	Field getFieldByPk(Long pk);
 
+	List<Field> getFieldsByDatasetPks(Collection<Long> datasetPks);
+
 	/**
 	 * Get the fields associated with a given dataset
 	 *
@@ -46,8 +48,6 @@ public interface FieldDAOService {
 	List<Field> getFieldsFromEventWithAValue(Long eventPk);
 
 	boolean doesEventHaveFieldsWithAValue(Long eventPk);
-
-	List<Field> getFieldsRelatedToEvent(Long scopePk, Optional<Long> eventPk);
 
 	NavigableSet<FieldAuditTrail> getAuditTrails(Field field, Optional<Timeframe> timeframe, Optional<Long> actorPk);
 

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
@@ -139,7 +140,7 @@ public class FormServiceImpl implements FormService {
 		//reset workflow status on the form its fields
 		final var family = new DataFamily(scope, event, form);
 		workflowStatusService.resetMandatoryAndDeleteTheRest(family, form, context, enhancedRationale);
-		for(final Entry<Dataset, List<Field>> entry : formContent.getFieldsNotInMultiple().entrySet()) {
+		for(final Entry<Dataset, Set<Field>> entry : formContent.getFieldsNotInMultiple().entrySet()) {
 			for(final Field field : entry.getValue()) {
 				final var fieldFamily = new DataFamily(scope, event, entry.getKey(), field);
 				workflowStatusService.resetMandatoryAndDeleteTheRest(fieldFamily, field, context, enhancedRationale);
@@ -159,11 +160,11 @@ public class FormServiceImpl implements FormService {
 
 		//reset fields that are not on scope
 		final var fieldRationale = String.format("Field reset: %s", baseRationale);
-		for(final Entry<Dataset, List<Field>> entry : formContent.getFieldsNotInMultiple().entrySet()) {
+		for(final Entry<Dataset, Set<Field>> entry : formContent.getFieldsNotInMultiple().entrySet()) {
 			//reset only non-blank values
 			if(event.isPresent() && eventDatasetModels.contains(entry.getKey().getDatasetModelId()) || event.isEmpty() && scopeModelDatasetModels.contains(entry.getKey().getDatasetModelId())) {
 				for(final Field field : entry.getValue()) {
-					if(!field.getFieldModel().isPlugin() && !field.isNull()) {
+					if(!field.getFieldModel().isPlugin() && field.isNotNull()) {
 						fieldService.reset(scope, event, entry.getKey(), field, context, fieldRationale);
 					}
 				}

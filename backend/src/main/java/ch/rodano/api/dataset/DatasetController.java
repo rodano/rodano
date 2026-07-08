@@ -1,6 +1,5 @@
 package ch.rodano.api.dataset;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -50,6 +49,7 @@ import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.dataset.DatasetSubmissionService;
+import ch.rodano.core.services.bll.form.FormContentService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.dataset.DatasetDAOService;
@@ -69,6 +69,7 @@ public class DatasetController extends AbstractSecuredController {
 	private final ScopeDAOService scopeDAOService;
 	private final EventDAOService eventDAOService;
 	private final FormDAOService formDAOService;
+	private final FormContentService formContentService;
 	private final DatasetService datasetService;
 	private final DatasetDAOService datasetDAOService;
 	private final DatasetDTOService datasetDTOService;
@@ -90,12 +91,14 @@ public class DatasetController extends AbstractSecuredController {
 		final DatasetDTOService datasetDTOService,
 		final DatasetSubmissionService datasetSubmissionService,
 		final UtilsService utilsService,
-		final PlatformTransactionManager transactionManager
+		final PlatformTransactionManager transactionManager,
+		final FormContentService formContentService
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.scopeDAOService = scopeDAOService;
 		this.eventDAOService = eventDAOService;
 		this.formDAOService = formDAOService;
+		this.formContentService = formContentService;
 		this.datasetService = datasetService;
 		this.datasetDAOService = datasetDAOService;
 		this.datasetDTOService = datasetDTOService;
@@ -159,16 +162,9 @@ public class DatasetController extends AbstractSecuredController {
 		event.ifPresent(e -> acl.checkRight(e.getEventModel(), Rights.READ));
 		acl.checkRight(form.getFormModel(), Rights.READ);
 
-		//retrieve form dataset models
-		final var datasetModels = form.getFormModel().getDatasetModels();
-		final var datasets = new ArrayList<Dataset>();
-		datasets.addAll(datasetService.search(scope, event, Optional.of(datasetModels), acl));
-		//if the form is attached on an event, it can display fields (hence datasets) attached directly to the scope
-		if(event.isPresent()) {
-			datasets.addAll(datasetService.search(scope, Optional.empty(), Optional.of(datasetModels), acl));
-		}
+		final var formContent = formContentService.generateFormContent(scope, event, form);
 
-		return datasetDTOService.createDTOs(scope, event, form, datasets, acl);
+		return datasetDTOService.createDTOs(scope, event, formContent.getDatasets(), formContent.getFields(), acl);
 	}
 
 	@Operation(summary = "Get dataset")

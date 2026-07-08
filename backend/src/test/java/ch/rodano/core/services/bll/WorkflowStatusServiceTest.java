@@ -17,9 +17,11 @@ import ch.rodano.api.workflow.WorkflowStatusSearch;
 import ch.rodano.configuration.model.event.EventModel;
 import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowableEntity;
+import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.workflow.WorkflowStatus;
+import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.event.EventService;
 import ch.rodano.core.services.bll.field.FieldService;
 import ch.rodano.core.services.bll.form.FormService;
@@ -54,6 +56,9 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 	@Autowired
 	private EventService eventService;
+
+	@Autowired
+	private DatasetService datasetService;
 
 	@Autowired
 	private FieldService fieldService;
@@ -132,20 +137,23 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//find every scope-related workflow statuses created by this operation
 		final List<WorkflowStatus> recordedWorkflowStatuses = new ArrayList<>();
+		final var datasets = new ArrayList<Dataset>();
 		for(final Scope scope : scopes) {
+			datasets.addAll(datasetService.getAll(scope));
 			recordedWorkflowStatuses.addAll(workflowStatusService.getAll(scope));
 			for(final var form : formService.getAll(scope)) {
 				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(form));
 			}
 			for(final var event : eventService.getAll(scope)) {
+				datasets.addAll(datasetService.getAll(event));
 				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(event));
 				for(final var form : formService.getAll(event)) {
 					recordedWorkflowStatuses.addAll(workflowStatusService.getAll(form));
 				}
-				final var fields = fieldService.getAll(scope, Optional.of(event));
-				for(final var field : fields) {
-					recordedWorkflowStatuses.addAll(workflowStatusService.getAll(field));
-				}
+			}
+			final var fields = fieldService.get(datasets);
+			for(final var field : fields) {
+				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(field));
 			}
 		}
 
@@ -188,17 +196,21 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 		//find every event-related workflow statuses created by this operation
 		final List<WorkflowStatus> recordedWorkflowStatuses = new ArrayList<>();
+		final var datasets = new ArrayList<Dataset>();
 		for(final Scope scope : scopes) {
 			for(final var event : eventService.getAll(scope)) {
 				eventPks.add(event.getPk());
+				datasets.addAll(datasetService.getAll(event));
+
+				//gather workflow statuses
 				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(event));
 				for(final var form : formService.getAll(event)) {
 					recordedWorkflowStatuses.addAll(workflowStatusService.getAll(form));
 				}
-				final var fields = fieldService.getAll(scope, Optional.of(event));
-				for(final var field : fields) {
-					recordedWorkflowStatuses.addAll(workflowStatusService.getAll(field));
-				}
+			}
+			final var fields = fieldService.get(datasets);
+			for(final var field : fields) {
+				recordedWorkflowStatuses.addAll(workflowStatusService.getAll(field));
 			}
 		}
 

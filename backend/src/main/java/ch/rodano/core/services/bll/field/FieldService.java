@@ -146,11 +146,7 @@ public interface FieldService {
 		String rationale
 	);
 
-	/**
-	 * Get fields on scope and event, if provided.
-	 * @return Fields contained in scope and event datasets.
-	 */
-	List<Field> getAll(Scope scope, Optional<Event> event);
+	List<Field> get(Collection<Dataset> datasets);
 
 	List<Field> getAll(Dataset dataset);
 

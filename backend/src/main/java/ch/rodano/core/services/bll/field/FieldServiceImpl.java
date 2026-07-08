@@ -353,9 +353,13 @@ public class FieldServiceImpl implements FieldService {
 	}
 
 	@Override
+	public List<Field> get(final Collection<Dataset> datasets) {
+		return fieldDAOService.getFieldsByDatasetPks(datasets.stream().map(Dataset::getPk).toList());
+	}
+
+	@Override
 	public List<Field> getAll(final Dataset dataset) {
-		final var fieldModelIds = dataset.getDatasetModel().getFieldModels().stream().map(FieldModel::getId).toList();
-		return fieldDAOService.getFieldsByDatasetPkHavingFieldModelIds(dataset.getPk(), fieldModelIds);
+		return get(Collections.singleton(dataset));
 	}
 
 	@Override
@@ -371,11 +375,6 @@ public class FieldServiceImpl implements FieldService {
 		return fieldDAOService.getFieldsByDatasetPkHavingFieldModelIds(dataset.getPk(), Collections.singleton(fieldModel.getId())).stream()
 			.findFirst()
 			.orElseThrow();
-	}
-
-	@Override
-	public List<Field> getAll(final Scope scope, final Optional<Event> event) {
-		return fieldDAOService.getFieldsRelatedToEvent(scope.getPk(), event.map(Event::getPk));
 	}
 
 	@Override

@@ -105,7 +105,7 @@ public class FormRelationEntityDefiner extends AbstractFormEntityDefiner {
 					final var event = eventService.get(form);
 					final var scope = scopeService.get(form);
 					final var formContent = formContentService.generateFormContent(scope, event, form);
-					return new HashSet<>(formContent.getAllFields());
+					return new HashSet<>(formContent.getFields());
 				}
 
 				@Override
