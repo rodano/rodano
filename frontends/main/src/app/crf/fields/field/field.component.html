@@ -132,7 +132,7 @@
 		<!-- Workflow creation actions menu -->
 		@if (hasActions()) {
 			<mat-menu #appMenu="matMenu">
-				@for (action of creationActions(); track action.id) {
+				@for (action of creationActions(); track $index) {
 					<button
 						mat-menu-item
 						type="button"
