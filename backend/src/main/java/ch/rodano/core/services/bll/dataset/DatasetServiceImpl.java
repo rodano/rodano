@@ -219,7 +219,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? baseRationale : String.format("%s: %s", baseRationale, rationale);
 		datasetDAOService.restoreDataset(dataset, context, enhancedRationale);
 
-		validateFieldsOnDataset(scope, event, dataset, context, enhancedRationale);
+		validateFields(scope, event, dataset, context, enhancedRationale);
 
 		final var state = new DataState(scope, event, dataset);
 
@@ -237,7 +237,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void validateFieldsOnDataset(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
+	public void validateFields(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
 		//re-validate all fields that have a value
 		final var fields = fieldDAOService.getFieldsFromDatasetWithAValue(dataset.getPk());
 		for(final var f : fields) {

@@ -65,13 +65,13 @@ public interface EventService {
 	);
 
 	/**
-	 * Validate all datasets attached to the event.
+	 * Validate fields attached to the event
 	 * @param scope Event's scope
 	 * @param event The event
 	 * @param context   Action context
 	 * @param rationale The rationale for the operation
 	 */
-	void validate(
+	void validateFields(
 		Scope scope,
 		Event event,
 		DatabaseActionContext context,

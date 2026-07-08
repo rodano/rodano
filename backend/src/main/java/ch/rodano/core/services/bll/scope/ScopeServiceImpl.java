@@ -41,12 +41,10 @@ import ch.rodano.core.model.scope.exceptions.ScopeCodeAlreadyUsedException;
 import ch.rodano.core.model.workflow.WorkflowStatus;
 import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.event.EventService;
-import ch.rodano.core.services.bll.field.ValidationService;
 import ch.rodano.core.services.bll.form.FormService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
-import ch.rodano.core.services.dao.field.FieldDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.rule.RuleService;
 import ch.rodano.core.utils.UtilsService;
@@ -62,8 +60,6 @@ public class ScopeServiceImpl implements ScopeService {
 	private final FormService formService;
 	private final ScopeDAOService scopeDAOService;
 	private final ScopeRelationService scopeRelationService;
-	private final ValidationService validationService;
-	private final FieldDAOService fieldDAOService;
 	private final WorkflowStatusService workflowStatusService;
 	private final UtilsService utilsService;
 
@@ -76,9 +72,7 @@ public class ScopeServiceImpl implements ScopeService {
 		final EventService eventService,
 		final DatasetService datasetService,
 		final FormService formService,
-		final FieldDAOService fieldDAOService,
 		final WorkflowStatusService workflowStatusService,
-		final ValidationService validationService,
 		final ScopeDAOService scopeDAOService,
 		final ScopeRelationService scopeRelationService,
 		final UtilsService utilsService
@@ -88,9 +82,7 @@ public class ScopeServiceImpl implements ScopeService {
 		this.eventService = eventService;
 		this.datasetService = datasetService;
 		this.formService = formService;
-		this.fieldDAOService = fieldDAOService;
 		this.workflowStatusService = workflowStatusService;
-		this.validationService = validationService;
 		this.scopeDAOService = scopeDAOService;
 		this.scopeRelationService = scopeRelationService;
 		this.utilsService = utilsService;
@@ -227,7 +219,7 @@ public class ScopeServiceImpl implements ScopeService {
 		final var enhancedRationale = StringUtils.isBlank(rationale) ? baseRationale : String.format("%s: %s", baseRationale, rationale);
 		scopeDAOService.restoreScope(scope, context, enhancedRationale);
 
-		validateFieldsOnScopeAndEvents(scope, context, enhancedRationale);
+		validateContainedFields(scope, context, enhancedRationale);
 
 		final var state = new DataState(scope);
 
@@ -337,31 +329,29 @@ public class ScopeServiceImpl implements ScopeService {
 	}
 
 	@Override
-	public void validateFieldsOnScope(
+	public void validateFields(
 		final Scope scope,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		//revalidate all fields that have a value
-		final var fields = fieldDAOService.getFieldsFromScopeWithAValue(scope.getPk());
-		for(final var f : fields) {
-			final var dataset = datasetService.get(f);
-			validationService.validateField(scope, Optional.empty(), dataset, f, context.toSystemAction(), rationale);
+		utilsService.checkNotLocked(scope);
+		for(final var dataset : datasetService.getAll(scope)) {
+			datasetService.validateFields(scope, Optional.empty(), dataset, context, rationale);
 		}
 	}
 
 	@Override
-	public void validateFieldsOnScopeAndEvents(
+	public void validateContainedFields(
 		final Scope scope,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
 		for(final var dataset : datasetService.getAll(scope)) {
-			datasetService.validateFieldsOnDataset(scope, Optional.empty(), dataset, context, rationale);
+			datasetService.validateFields(scope, Optional.empty(), dataset, context, rationale);
 		}
 		for(final var event : eventService.getAll(scope)) {
 			if(!event.getLocked()) {
-				eventService.validate(scope, event, context, rationale);
+				eventService.validateFields(scope, event, context, rationale);
 			}
 		}
 	}

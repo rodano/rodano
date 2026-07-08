@@ -208,7 +208,7 @@ public interface DatasetService {
 	 * @param context   Action context
 	 * @param rationale The rationale for the operation
 	 */
-	void validateFieldsOnDataset(
+	void validateFields(
 		Scope scope,
 		Optional<Event> event,
 		Dataset dataset,

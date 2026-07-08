@@ -313,7 +313,7 @@ public class EventServiceImpl implements EventService {
 
 		resetDates(scope, context, rationale);
 
-		validate(scope, event, context, enhancedRationale);
+		validateFields(scope, event, context, enhancedRationale);
 
 		final var state = new DataState(scope, event);
 
@@ -359,14 +359,15 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public void validate(
+	public void validateFields(
 		final Scope scope,
 		final Event event,
 		final DatabaseActionContext context,
 		final String rationale
 	) {
+		utilsService.checkNotLocked(scope, Optional.of(event));
 		for(final var dataset : datasetService.getAll(event)) {
-			datasetService.validateFieldsOnDataset(scope, Optional.of(event), dataset, context, rationale);
+			datasetService.validateFields(scope, Optional.of(event), dataset, context, rationale);
 		}
 	}
 

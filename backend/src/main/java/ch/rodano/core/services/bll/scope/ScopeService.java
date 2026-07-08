@@ -134,24 +134,24 @@ public interface ScopeService {
 	void unlock(Scope scope, DatabaseActionContext context);
 
 	/**
-	 * Validate all fields on scope
+	 * Validate fields attached to the scope
 	 * @param scope         The scope
 	 * @param context       The action context
 	 * @param rationale     The rationale for the operation
 	 */
-	void validateFieldsOnScope(
+	void validateFields(
 		Scope scope,
 		DatabaseActionContext context,
 		String rationale
 	);
 
 	/**
-	 * Validate datasets on scope and all its events
+	 * Validate fields contained in the scope (field attached directly on the scope or to one of its events)
 	 * @param scope         The scope
 	 * @param context       The action context
 	 * @param rationale     The rationale for the operation
 	 */
-	void validateFieldsOnScopeAndEvents(
+	void validateContainedFields(
 		Scope scope,
 		DatabaseActionContext context,
 		String rationale

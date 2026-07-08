@@ -459,7 +459,7 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 				) {
 					final var event = (Event) evaluable;
 					final var scope = scopeService.get(event);
-					eventService.validate(scope, event, context, "Validate event");
+					eventService.validateFields(scope, event, context, "Validate event");
 				}
 
 				@Override

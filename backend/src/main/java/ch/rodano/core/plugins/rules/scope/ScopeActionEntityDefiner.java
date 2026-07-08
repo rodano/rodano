@@ -365,7 +365,7 @@ public class ScopeActionEntityDefiner extends AbstractScopeEntityDefiner {
 					final Map<String, Object> data
 				) {
 					final var scope = (Scope) evaluable;
-					scopeService.validateFieldsOnScope(scope, context, "Validate scope");
+					scopeService.validateFields(scope, context, "Validate scope");
 				}
 
 				@Override
