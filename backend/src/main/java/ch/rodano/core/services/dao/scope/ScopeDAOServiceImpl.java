@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Table;
@@ -239,6 +238,9 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public Map<Long, Integer> getEnabledDescendantsByScopeModelIdCount(final String scopeModelId, final Collection<Long> scopePks) {
+		if(scopePks.isEmpty()) {
+			return Collections.emptyMap();
+		}
 		final var now = ZonedDateTime.now();
 		final var count = DSL.countDistinct(SCOPE.PK).as("count");
 		final var values = create.select(SCOPE_ANCESTOR.ANCESTOR_FK, count)
@@ -366,7 +368,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public List<Scope> getScopesByPks(final Collection<Long> pks) {
-		if(CollectionUtils.isEmpty(pks)) {
+		if(pks.isEmpty()) {
 			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(SCOPE).where(SCOPE.PK.in(pks));
@@ -381,7 +383,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public List<Scope> getScopesByCodes(final Collection<String> codes) {
-		if(CollectionUtils.isEmpty(codes)) {
+		if(codes.isEmpty()) {
 			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(SCOPE).where(SCOPE.CODE.in(codes));
@@ -396,7 +398,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public List<Scope> getScopesByIds(final Collection<String> ids) {
-		if(CollectionUtils.isEmpty(ids)) {
+		if(ids.isEmpty()) {
 			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(SCOPE).where(SCOPE.ID.in(ids));

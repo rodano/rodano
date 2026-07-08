@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.mail;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,7 +69,10 @@ public class MailDAOServiceImpl extends AbstractDAOService<Mail, MailRecord> imp
 	 * @return The mails
 	 */
 	@Override
-	public List<Mail> getMailsByPks(final List<Long> pks) {
+	public List<Mail> getMailsByPks(final Collection<Long> pks) {
+		if(pks.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(MAIL).where(MAIL.PK.in(pks));
 		return find(query);
 	}

@@ -1,5 +1,6 @@
 package ch.rodano.core.services.dao.mail;
 
+import java.util.Collection;
 import java.util.List;
 
 import ch.rodano.api.dto.paging.PagedResult;
@@ -13,7 +14,7 @@ public interface MailDAOService {
 
 	Mail getMailByPk(Long pk);
 
-	List<Mail> getMailsByPks(List<Long> pks);
+	List<Mail> getMailsByPks(Collection<Long> pks);
 
 	/**
 	 * Get mails by their status

@@ -25,7 +25,7 @@ public interface DatasetDAOService {
 	 * @param pks
 	 * @return The datasets associated with the given primary keys
 	 */
-	List<Dataset> getDatasetsByPks(List<Long> pks);
+	List<Dataset> getDatasetsByPks(Collection<Long> pks);
 
 	/**
 	 * Search for datasets matching the provided criteria

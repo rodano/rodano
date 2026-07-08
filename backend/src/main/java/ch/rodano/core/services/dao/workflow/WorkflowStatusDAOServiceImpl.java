@@ -88,7 +88,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 	private List<WorkflowStatus> getWorkflowStatusesByScopePks(final Collection<Long> scopePks, final Optional<String> workflowId) {
 		if(scopePks.isEmpty()) {
-			throw new IllegalArgumentException();
+			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(WORKFLOW_STATUS)
 			.where(
@@ -119,7 +119,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 	private List<WorkflowStatus> getWorkflowStatusesByEventPks(final Collection<Long> eventPks, final Optional<String> workflowId) {
 		if(eventPks.isEmpty()) {
-			throw new IllegalArgumentException();
+			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(WORKFLOW_STATUS)
 			.where(
@@ -149,7 +149,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 	private List<WorkflowStatus> getWorkflowStatusesByFormPks(final Collection<Long> formPks, final Optional<String> workflowId) {
 		if(formPks.isEmpty()) {
-			throw new IllegalArgumentException();
+			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(WORKFLOW_STATUS)
 			.where(
@@ -177,7 +177,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 
 	private List<WorkflowStatus> getWorkflowStatusesByFieldPks(final Collection<Long> fieldPks, final Optional<String> workflowId) {
 		if(fieldPks.isEmpty()) {
-			throw new IllegalArgumentException();
+			return Collections.emptyList();
 		}
 		final var query = create.selectFrom(WORKFLOW_STATUS)
 			.where(

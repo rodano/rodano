@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.form;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,6 +83,9 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 
 	@Override
 	public List<Form> getFormsByScopePkAndFormModelIds(final Long scopePk, final Collection<String> formModelIds) {
+		if(formModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.of(scopePk), Optional.empty(), false, Optional.of(formModelIds));
 	}
 
@@ -92,6 +96,9 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 
 	@Override
 	public List<Form> getAllFormsByScopePkAndFormModelIds(final Long scopePk, final Collection<String> formModelIds) {
+		if(formModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.of(scopePk), Optional.empty(), true, Optional.of(formModelIds));
 	}
 
@@ -103,6 +110,9 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 
 	@Override
 	public List<Form> getFormsByEventPkAndFormModelIds(final Long eventPk, final Collection<String> formModelIds) {
+		if(formModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.empty(), Optional.of(eventPk), false, Optional.of(formModelIds));
 	}
 
@@ -113,6 +123,9 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 
 	@Override
 	public List<Form> getAllFormsByEventPkAndFormModelIds(final Long eventPk, final Collection<String> formModelIds) {
+		if(formModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.empty(), Optional.of(eventPk), true, Optional.of(formModelIds));
 	}
 

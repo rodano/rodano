@@ -344,10 +344,6 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 			.filter(f -> f.getValue() != null)
 			.map(Field::getPk)
 			.toList();
-
-		if(fieldPks.isEmpty()) {
-			return Collections.emptyList();
-		}
 		return workflowStatusDAOService.getWorkflowStatusesByFieldPks(fieldPks);
 	}
 
@@ -368,8 +364,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 				.filter(f -> f.getValue() != null)
 				.map(Field::getPk)
 				.toList();
-			final List<WorkflowStatus> ws = fieldPks.isEmpty() ? Collections.emptyList() : workflowStatusDAOService.getWorkflowStatusesByFieldPks(fieldPks);
-			wsByForm.put(form, ws);
+			wsByForm.put(form, workflowStatusDAOService.getWorkflowStatusesByFieldPks(fieldPks));
 		}
 		return wsByForm;
 	}

@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.role;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.jooq.DSLContext;
@@ -67,6 +68,9 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 
 	@Override
 	public List<Role> getRolesByUserPks(final Collection<Long> userPks) {
+		if(userPks.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(ROLE).where(ROLE.USER_FK.in(userPks));
 		return find(query);
 	}
@@ -79,6 +83,9 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 
 	@Override
 	public List<Role> getRolesByRobotPks(final Collection<Long> robotPks) {
+		if(robotPks.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(ROLE).where(ROLE.ROBOT_FK.in(robotPks));
 		return find(query);
 	}
@@ -91,6 +98,9 @@ public class RoleDAOServiceImpl extends AuditableDAOService<Role, RoleAuditTrail
 
 	@Override
 	public List<Role> getRolesByScopePkAndProfiles(final Long scopePk, final Collection<String> profileIds) {
+		if(profileIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(ROLE).where(ROLE.SCOPE_FK.eq(scopePk).and(ROLE.PROFILE_ID.in(profileIds)));
 		return find(query);
 	}

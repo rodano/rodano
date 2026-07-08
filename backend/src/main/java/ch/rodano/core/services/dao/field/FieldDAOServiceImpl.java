@@ -2,6 +2,7 @@ package ch.rodano.core.services.dao.field;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,6 +71,9 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 
 	@Override
 	public List<Field> getFieldsByDatasetPkHavingFieldModelIds(final Long datasetPk, final Collection<String> fieldModelIds) {
+		if(fieldModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(FIELD).where(FIELD.DATASET_FK.eq(datasetPk).and(FIELD.FIELD_MODEL_ID.in(fieldModelIds)));
 		return find(query);
 	}

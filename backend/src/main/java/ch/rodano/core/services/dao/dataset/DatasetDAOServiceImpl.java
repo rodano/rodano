@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.dataset;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,13 +62,19 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 	}
 
 	@Override
-	public List<Dataset> getDatasetsByPks(final List<Long> pks) {
+	public List<Dataset> getDatasetsByPks(final Collection<Long> pks) {
+		if(pks.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(DATASET).where(DATASET.PK.in(pks));
 		return find(query);
 	}
 
 	@Override
 	public List<Dataset> getAllDatasetsByDatasetModelIds(final Collection<String> datasetModelIds) {
+		if(datasetModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(DATASET).where(DATASET.DATASET_MODEL_ID.in(datasetModelIds));
 		return find(query);
 	}
@@ -95,6 +102,9 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 
 	@Override
 	public List<Dataset> getDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
+		if(datasetModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.of(scopePk), Optional.empty(), false, Optional.of(datasetModelIds));
 	}
 
@@ -105,6 +115,9 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 
 	@Override
 	public List<Dataset> getAllDatasetsByScopePkAndDatasetModelIds(final Long scopePk, final Collection<String> datasetModelIds) {
+		if(datasetModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.of(scopePk), Optional.empty(), true, Optional.of(datasetModelIds));
 	}
 
@@ -116,6 +129,9 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 
 	@Override
 	public List<Dataset> getDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<String> datasetModelIds) {
+		if(datasetModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.empty(), Optional.of(eventPk), false, Optional.of(datasetModelIds));
 	}
 
@@ -126,6 +142,9 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 
 	@Override
 	public List<Dataset> getAllDatasetsByEventPkAndDatasetModelIds(final Long eventPk, final Collection<String> datasetModelIds) {
+		if(datasetModelIds.isEmpty()) {
+			return Collections.emptyList();
+		}
 		return search(Optional.empty(), Optional.of(eventPk), true, Optional.of(datasetModelIds));
 	}
 

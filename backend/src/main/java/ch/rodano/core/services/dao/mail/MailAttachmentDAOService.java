@@ -1,5 +1,6 @@
 package ch.rodano.core.services.dao.mail;
 
+import java.util.Collection;
 import java.util.List;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -29,7 +30,7 @@ public interface MailAttachmentDAOService {
 	 * @param mailPks The mail pks
 	 * @return Mail attachments
 	 */
-	List<MailAttachment> getMailAttachmentByMailPks(List<Long> mailPks);
+	List<MailAttachment> getMailAttachmentByMailPks(Collection<Long> mailPks);
 
 	/**
 	 * Create or update a mail attachment

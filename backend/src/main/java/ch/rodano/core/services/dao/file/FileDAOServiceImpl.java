@@ -1,6 +1,7 @@
 package ch.rodano.core.services.dao.file;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.jooq.DSLContext;
@@ -107,6 +108,9 @@ public class FileDAOServiceImpl extends AbstractDAOService<File, FileRecord> imp
 
 	@Override
 	public List<File> getFileByFieldPks(final Collection<Long> fieldPks) {
+		if(fieldPks.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(FILE)
 			.where(
 				FILE.FIELD_FK.in(fieldPks)

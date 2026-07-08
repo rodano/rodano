@@ -1,5 +1,7 @@
 package ch.rodano.core.services.dao.mail;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.jooq.DSLContext;
@@ -50,7 +52,10 @@ public class MailAttachmentDAOServiceImpl extends AbstractDAOService<MailAttachm
 	}
 
 	@Override
-	public List<MailAttachment> getMailAttachmentByMailPks(final List<Long> mailPks) {
+	public List<MailAttachment> getMailAttachmentByMailPks(final Collection<Long> mailPks) {
+		if(mailPks.isEmpty()) {
+			return Collections.emptyList();
+		}
 		final var query = create.selectFrom(MAIL_ATTACHMENT).where(MAIL_ATTACHMENT.MAIL_FK.in(mailPks));
 		return find(query);
 	}
