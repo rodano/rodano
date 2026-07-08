@@ -384,7 +384,7 @@ public class DatasetController extends AbstractSecuredController {
 	public Set<DatasetDTO> saveScopeDatasets(
 		@PathVariable final Long scopePk,
 		@PathVariable final Optional<Long> eventPk,
-		@Valid @RequestBody final Set<DatasetUpdateDTO> datasetDTOs,
+		@RequestBody final Set<@Valid DatasetUpdateDTO> datasetDTOs,
 		@RequestHeader("X-Rationale") final Optional<String> rationale
 	) throws DatasetSubmissionException {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);

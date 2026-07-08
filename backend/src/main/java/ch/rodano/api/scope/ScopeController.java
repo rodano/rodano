@@ -388,7 +388,7 @@ public class ScopeController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public Integer countEnrollableScopes(
 		@PathVariable final Long scopePk,
-		@Valid @RequestBody final List<FieldModelCriterion> criteria
+		@RequestBody final List<@Valid FieldModelCriterion> criteria
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 
