@@ -1,4 +1,4 @@
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Service, inject} from '@angular/core';
 import {identity, Observable} from 'rxjs';
 import {concatMap, map, first, shareReplay} from 'rxjs/operators';
@@ -130,7 +130,8 @@ export class ConfigurationService {
 	}
 
 	getAutocompleteOptions(datasetModelId: string, fieldModelId: string, value: string): Observable<string[]> {
-		return this.http.get<string[]>(`${this.serviceUrl}/dataset-models/${datasetModelId}/field-models/${fieldModelId}/autocomplete/${value}`);
+		const params = new HttpParams().set('text', value);
+		return this.http.get<string[]>(`${this.serviceUrl}/dataset-models/${datasetModelId}/field-models/${fieldModelId}/autocomplete`, {params});
 	}
 
 	private getScopeModelIsRoot(scopeModel: ScopeModel): boolean {

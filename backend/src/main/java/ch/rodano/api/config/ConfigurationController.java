@@ -1,6 +1,7 @@
 package ch.rodano.api.config;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -253,12 +254,12 @@ public class ConfigurationController extends AbstractSecuredController {
 	}
 
 	@Operation(summary = "Get field model autocomplete options")
-	@GetMapping("dataset-models/{datasetModelId}/field-models/{fieldModelId}/autocomplete/{text}")
+	@GetMapping("dataset-models/{datasetModelId}/field-models/{fieldModelId}/autocomplete")
 	@ResponseStatus(HttpStatus.OK)
 	public List<String> getFieldModelAutocomplete(
 		@PathVariable final String datasetModelId,
 		@PathVariable final String fieldModelId,
-		@PathVariable final String text
+		@RequestParam final String text
 	) throws IOException {
 		final var fieldModel = studyService.getStudy().getDatasetModel(datasetModelId).getFieldModel(fieldModelId);
 		final var dictionary = fieldModel.getDictionary();
@@ -266,7 +267,9 @@ public class ConfigurationController extends AbstractSecuredController {
 		if(StringUtils.isNotBlank(text) && text.length() > 1) {
 			final var search = text.toLowerCase();
 			var i = 0;
-			try(var scan = new Scanner(ConfigurationController.class.getResource(String.format("/dictionaries/%s", dictionary)).openStream())) {
+			//join with Path to avoid manual "/" concatenation and to normalize the resource location
+			final var resourcePath = Path.of("/dictionaries").resolve(dictionary).normalize().toString();
+			try(var scan = new Scanner(ConfigurationController.class.getResource(resourcePath).openStream())) {
 				while(scan.hasNext() && i < 100) {
 					final var line = scan.nextLine();
 					if(line.toLowerCase().contains(search)) {
