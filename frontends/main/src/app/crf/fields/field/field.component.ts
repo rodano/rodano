@@ -34,7 +34,6 @@ import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {Workflowable} from '@core/utilities/workflowable';
 import {AdministrationService} from '@core/services/administration.service';
 import {MatIconButton} from '@angular/material/button';
-import {WorkflowStatus} from '@core/model/workflow-status';
 import {FeatureStatic} from '@core/model/feature-static';
 import {Field} from '@core/model/field';
 import {WorkflowableUpdateService} from '../../services/workflowable-update.service';
@@ -177,12 +176,6 @@ export class FieldComponent implements OnInit {
 
 	initializeWorkflow(action: WorkflowAction) {
 		this.workflowActionService.createOnField(this.field(), action).subscribe(newField => {
-			this.field.update(f => ({...newField, shown: f.shown, error: f.error}));
-		});
-	}
-
-	updateWorkflow(status: WorkflowStatus, action: WorkflowAction) {
-		this.workflowActionService.executeActionOnField(this.field(), status, action).subscribe(newField => {
 			this.field.update(f => ({...newField, shown: f.shown, error: f.error}));
 			this.workflowableUpdateService.emitUpdatedWorkflowable(WorkflowableEntity.FIELD, newField);
 		});
