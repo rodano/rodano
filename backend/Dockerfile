@@ -12,10 +12,14 @@ COPY . .
 RUN mvn -B install -DskipTests
 
 # build an image containing everything required to compile study plugins
-FROM builder AS plugins-compiler
+FROM maven:3-eclipse-temurin-25 AS plugins-compiler
 
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano image containing the bits required to compile study plugins"
+
+COPY --from=builder /root/.m2 /root/.m2
+
+WORKDIR /app
 
 COPY compile-plugins.sh /usr/local/bin/compile-plugins.sh
 RUN chmod +x /usr/local/bin/compile-plugins.sh
