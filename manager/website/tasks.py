@@ -88,7 +88,13 @@ async def do_task(task, steps, *args):
 				message["details"] = error
 			messaging.broadcast_task_message(message)
 	else:
-		messaging.broadcast_task_message({"task" : task, "id" : tasks[task]["id"], "end" : True, "error" : f"Failed to execute {task}. Process exit code is {process.returncode}"})
+		message = {"task" : task, "id" : tasks[task]["id"], "end" : True, "error" : f"Failed to execute {task}. Process exit code is {process.returncode}."}
+		streams = await process.communicate()
+		error = streams[1].decode("utf-8")
+		logger.error(f"Failed to execute {task}. Process exit code is {process.returncode}. Error: {error}")
+		if error:
+			message["details"] = error
+		messaging.broadcast_task_message(message)
 
 	#free task process
 	tasks[task] = None
