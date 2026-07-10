@@ -12,20 +12,20 @@ all:
       ansible_ssh_user: debian
       study_git_url: https://github.com/my-organization/my-study.git
       study_git_reference: master
-      rodano_git_reference: dev
       server_name: my-study.com
       server_email: my.email@my-study.com
-	  manager_magic_token=mylongmagictoken
+      rodano_environment:
+        TAG: dev
+        MANAGER_MAGIC_TOKEN: mylongmagictoken
 ```
 
 The variables to configure are:
 - `ansible_ssh_user`: the user to use on the server
 - `study_git_url`: the URL of the Git repository containing the study
 - `study_git_reference`: the Git reference to fetch from the Git repository
-- `rodano_git_reference`: the Git reference used for Rodano
 - `server_name`: the FQDN of the server, use to generate the Let's Encrypt certificate
 - `server_email`: an email, use to generate the Let's Encrypt certificate
-- `manager_magic_token`: a magic token that will allow you to access the manager container
+- `rodano_environment`: variables from this dictionary will override the values defined in the root environment file
 
 Then, you need to install the dependencies:
 ```
