@@ -151,9 +151,9 @@ class ApplicationUsers(helpers.AuthenticatedRequestHandler):
 					self.write(json.dumps(users, cls=helpers.JSONCustomEncoder))
 			finally:
 				connection.close()
-		except pymysql.ProgrammingError:
+		except pymysql.ProgrammingError as e:
 			self.set_status(500)
-			self.write({"error" : f"No database with name {database}."})
+			self.write({"error" : f"Unable to retrieve connected users: {str(e)}."})
 
 #application reset
 class ApplicationReset(helpers.AuthenticatedRequestHandler):
