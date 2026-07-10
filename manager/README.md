@@ -6,7 +6,10 @@ A manager container for Rodano when it's run in a Docker Compose environment. It
 - restore a backup
 - display backend logs
 
-## Local use
+> In a Docker Compose environment, the project name must be `rodano` so the manager can detect the other application containers.
+
+## Local use
+
 The container comes with a website that will perform the management operations in the Docker Compose environment. This website is located in the `website` folder.
 
 To run it locally, install the dependencies:

@@ -28,20 +28,19 @@ To use the embedded test configuration, `STUDY_PATH` must be set to `/path/to/ro
 
 Once the env file is configured, run:
 ```
-docker compose --env-file .env --project-name rodano up
+docker compose up
 ```
-The project name must be set to `rodano` so the `manager` container can work properly.
 
 Finally, open your browser and browse [http://localhost:7586](http://localhost:7586).
 
 To force the refresh of the images, run:
 ```
-docker compose --env-file .env pull
+docker compose pull
 ```
 
 If you use the embedded test configuration, you can initialize the database with sample data using the following command:
 ```
-docker compose --env-file .env run --entrypoint="java -Dspring.profiles.active=database -Drodano.init.with-data=true -Drodano.init.with-users=true -cp /app/rodano.jar org.springframework.boot.loader.launch.PropertiesLauncher" backend
+docker compose run --entrypoint="java -Dspring.profiles.active=database -Drodano.init.with-data=true -Drodano.init.with-users=true -cp /app/rodano.jar org.springframework.boot.loader.launch.PropertiesLauncher" backend
 ```
 See the [backend documentation](backend/README.md) for advanced configuration of the database initialization.
 
