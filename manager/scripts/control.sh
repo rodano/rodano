@@ -14,6 +14,10 @@ fi
 #fail if a variable is referenced before being set or if a command fails
 set -u -e -x
 
+#retrieve environment variables
+BACKEND_HOST=${BACKEND_HOST:-"localhost"}
+BACKEND_PORT=${BACKEND_PORT:-8080}
+
 function start {
 	running=$(docker ps --filter "name=$CONTAINER_NAME" --filter "status=running" -q | wc -l)
 
@@ -26,7 +30,7 @@ function start {
 		time=0
 		success=0
 		while [[ $time -lt 61 ]] && [[ $success -eq 0 ]]; do
-			if curl --silent "http://backend:8080/administration/is-online" | jq -r ".message" | grep --ignore-case --quiet "up";
+			if curl --silent "http://$BACKEND_HOST:$BACKEND_PORT/administration/is-online" | jq -r ".message" | grep --ignore-case --quiet "up";
 			then
 				success=1
 			else

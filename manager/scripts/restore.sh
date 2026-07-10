@@ -20,7 +20,7 @@ DATABASE_USER=${DATABASE_USER:-"root"}
 DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 DATABASE_NAME=${DATABASE_NAME:-"rodano"}
 
-USER_CONTENT=${USER_CONTENT:-"/user_content"}
+USER_CONTENT=${USER_CONTENT:-"/tmp/user_content"}
 
 #prepare a dedicated directory to build the backup
 backup_build_dir="/tmp/restore"

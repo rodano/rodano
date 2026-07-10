@@ -121,6 +121,9 @@ services:
       context: manager
       dockerfile: Dockerfile
     depends_on:
+      #the manager must be started after the backend to be able to detect it
+      backend:
+        condition: service_started
       db:
         condition: service_healthy
     ports:
@@ -131,6 +134,7 @@ services:
       - backups:/backups
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
+      BACKEND_HOST: backend
       DATABASE_HOST: db
       DATABASE_PORT: 3306
       DATABASE_USER: root
@@ -139,7 +143,7 @@ services:
       BASE_URL_PATH: /manager/
       MAGIC_TOKEN: ${MANAGER_MAGIC_TOKEN}
       USER_CONTENT: /user_content
-      BACKUPS_PATH: /backups
+      BACKUPS_STORAGE_PATH: /backups
       BACKUP_CRON_EXPRESSION: "0 3 * * *"
     restart: on-failure
 

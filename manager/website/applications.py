@@ -36,7 +36,7 @@ class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 				http = tornado.httpclient.AsyncHTTPClient()
 				try:
 					response = await http.fetch(
-						f"http://{config.BACKEND_HOSTNAME}:8080/config/public-study",
+						f"http://{config.BACKEND_HOST}:{config.BACKEND_PORT}/config/public-study",
 						request_timeout=5
 					)
 				except tornado.httpclient.HTTPClientError:

@@ -21,8 +21,8 @@ DATABASE_USER=${DATABASE_USER:-"root"}
 DATABASE_PASSWORD=${DATABASE_PASSWORD:-"root"}
 DATABASE_NAME=${DATABASE_NAME:-"rodano"}
 
-USER_CONTENT=${USER_CONTENT:-"/user_content"}
-BACKUPS_PATH=${BACKUPS_PATH:-"/backups"}
+USER_CONTENT=${USER_CONTENT:-"/tmp/user_content"}
+BACKUPS_STORAGE_PATH=${BACKUPS_STORAGE_PATH:-"/tmp/backups"}
 
 #generate backup id
 date_file=$(date -u +"%Y-%m-%d-%H-%M-%S")
@@ -97,7 +97,7 @@ zip -j "$backup_package" "$backup_build_dir/description.ini" "$backup_build_dir/
 
 #store the backup to the backup storage
 echo "Moving backup package..."
-mv "$backup_package" "$BACKUPS_PATH"
+mv "$backup_package" "$BACKUPS_STORAGE_PATH"
 
 #remove temporary files
 rm -r "$backup_build_dir"

@@ -63,11 +63,11 @@ async def cleanup():
 	rollover_age = int(config.config.get("backups", "rollover_age"))
 	rollover_day = config.config.get("backups", "rollover_day")
 
-	backup_path = config.BACKUPS_PATH
-	backups = [f for f in os.listdir(backup_path) if os.path.isfile(os.path.join(backup_path, f))]
+	backup_storage_path = config.BACKUPS_STORAGE_PATH
+	backups = [f for f in os.listdir(backup_storage_path) if os.path.isfile(os.path.join(backup_storage_path, f))]
 
 	for backup in backups:
-		path = os.path.join(backup_path, backup)
+		path = os.path.join(backup_storage_path, backup)
 		_, extension = os.path.splitext(backup)
 		if extension == ".zip":
 			#open backup archive
