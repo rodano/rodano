@@ -31,7 +31,7 @@ mkdir -p "$backup_build_dir"
 unzip "$RESTORE_FILE" -d "$backup_build_dir"
 
 #restore database
-mariadb_connection_arguments=("-h$DATABASE_HOST" "-u$DATABASE_USER" "-p$DATABASE_PASSWORD")
+mariadb_connection_arguments=("-h$DATABASE_HOST" "-P$DATABASE_PORT" "-u$DATABASE_USER" "-p$DATABASE_PASSWORD")
 
 echo "Deleting current database..."
 mariadb_command_arguments=("${mariadb_connection_arguments[@]}")

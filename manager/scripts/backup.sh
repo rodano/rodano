@@ -48,7 +48,7 @@ echo "Creating database backup..."
 backup_db="$backup_build_dir/database.sql"
 
 #build database connection parameters
-mariadb_connection_arguments=("-h$DATABASE_HOST" "-u$DATABASE_USER" "-p$DATABASE_PASSWORD")
+mariadb_connection_arguments=("-h$DATABASE_HOST" "-P$DATABASE_PORT" "-u$DATABASE_USER" "-p$DATABASE_PASSWORD")
 
 #retrieve tables to dump
 #the goal is to exclude the views from the dump (they will re-created by kv anyway)
