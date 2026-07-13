@@ -21,50 +21,51 @@ regexp_backup_id = re.compile(r'^[A-Za-z0-9-_]+\.zip$')
 #global status
 class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 	async def get(self):
-		backend = await aiodocker.Docker().containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
-		container_info = await backend.show()
-		if container_info['State']['Status'] != "running":
-			self.set_status(503)
-			self.write({"error" : "Backend must be started to get application information."})
-			return
+		async with aiodocker.Docker() as docker_client:
+			backend = await docker_client.containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
+			container_info = await backend.show()
+			if container_info['State']['Status'] != "running":
+				self.set_status(503)
+				self.write({"error" : "Backend must be started to get application information."})
+				return
 
-		try:
-			application = {}
-
-			#retrieve study information from backend API
-			http = tornado.httpclient.AsyncHTTPClient()
 			try:
-				response = await http.fetch(
-					f"http://{config.BACKEND_HOSTNAME}:8080/config/public-study",
-					request_timeout=5
-				)
-			except tornado.httpclient.HTTPClientError:
+				application = {}
+
+				#retrieve study information from backend API
+				http = tornado.httpclient.AsyncHTTPClient()
+				try:
+					response = await http.fetch(
+						f"http://{config.BACKEND_HOSTNAME}:8080/config/public-study",
+						request_timeout=5
+					)
+				except tornado.httpclient.HTTPClientError:
+					self.set_status(503)
+					self.write({"error" : "Backend is not responding."})
+					return
+				if response.code != 200:
+					self.set_status(503)
+					self.write({"error" : "Backend is not responding."})
+					return
+				study = json.loads(response.body.decode("utf-8"))
+				application["name"] = study["id"]
+				#override environment to PROD in debug mode to be able to perform backups
+				application["environment"] = "PROD" if config.DEBUG else study["environment"]
+
+				#retrieve environment variables from container config
+				env_list = container_info.get('Config', {}).get('Env', [])
+				env = {}
+				for entry in env_list:
+					if "=" in entry:
+						key, value = entry.split("=", 1)
+						env[key] = value
+				application["env"] = env
+
+				self.write(json.dumps(application, cls=helpers.JSONCustomEncoder))
+			except Exception:
+				logger.exception("Error retrieving application info")
 				self.set_status(503)
 				self.write({"error" : "Backend is not responding."})
-				return
-			if response.code != 200:
-				self.set_status(503)
-				self.write({"error" : "Backend is not responding."})
-				return
-			study = json.loads(response.body.decode("utf-8"))
-			application["name"] = study["id"]
-			#override environment to PROD in debug mode to be able to perform backups
-			application["environment"] = "PROD" if config.DEBUG else study["environment"]
-
-			#retrieve environment variables from container config
-			env_list = container_info.get('Config', {}).get('Env', [])
-			env = {}
-			for entry in env_list:
-				if "=" in entry:
-					key, value = entry.split("=", 1)
-					env[key] = value
-			application["env"] = env
-
-			self.write(json.dumps(application, cls=helpers.JSONCustomEncoder))
-		except Exception:
-			logger.exception("Error retrieving application info")
-			self.set_status(503)
-			self.write({"error" : "Backend is not responding."})
 
 class ApplicationBackups(helpers.AuthenticatedRequestHandler):
 	def get(self):
@@ -289,23 +290,24 @@ class ApplicationBackup(helpers.AuthenticatedRequestHandler):
 #send log in web socket
 async def stream_logs():
 	while True:
-		try:
-			backend = await aiodocker.Docker().containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
-			container_info = await backend.show()
-			#wait until the backend container is running if necessary
-			if container_info['State']['Status'] != "running":
-				logger.info(f"Backend container {config.DOCKER_BACKEND_CONTAINER_NAME} is not running")
-				await asyncio.sleep(10)
-				continue
+		async with aiodocker.Docker() as docker_client:
+			try:
+				backend = await docker_client.containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
+				container_info = await backend.show()
+				#wait until the backend container is running if necessary
+				if container_info['State']['Status'] != "running":
+					logger.info(f"Backend container {config.DOCKER_BACKEND_CONTAINER_NAME} is not running")
+					await asyncio.sleep(10)
+					continue
 
-			#stream logs
-			async for line in backend.log(stdout=True, stderr=True, follow=True):
-				if line:
-					messaging.broadcast_message({"type": messaging.MessageType.LOG.value, "data": line})
+				#stream logs
+				async for line in backend.log(stdout=True, stderr=True, follow=True):
+					if line:
+						messaging.broadcast_message({"type": messaging.MessageType.LOG.value, "data": line})
 
-		except Exception as e:
-			logger.error(f"Error streaming logs: {e}")
-			await asyncio.sleep(5)
+			except Exception as e:
+				logger.error(f"Error streaming logs: {e}")
+				await asyncio.sleep(5)
 
 #start the log streaming task
 def start_log_streaming():
