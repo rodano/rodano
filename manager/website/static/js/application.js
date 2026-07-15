@@ -5,7 +5,8 @@ const UNKNOWN_APPLICATION = Object.freeze({
 	name: 'Unknown',
 	environment: '???',
 	running: false,
-	env: {}
+	env: {},
+	images: {}
 });
 
 const application = Object.assign({}, UNKNOWN_APPLICATION);
@@ -23,6 +24,14 @@ function update_application() {
 		const li = document.createElement('li');
 		li.textContent = `${key}=${application.env[key]}`;
 		variables.appendChild(li);
+	});
+
+	const digests = document.getElementById('application_image_digests');
+	digests.empty();
+	Object.keys(application.images).sort().forEach(service => {
+		const li = document.createElement('li');
+		li.textContent = `${service}: ${application.images[service]}`;
+		digests.appendChild(li);
 	});
 
 	//stop button

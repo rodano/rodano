@@ -18,6 +18,14 @@ logger = logging.getLogger(__name__)
 regexp_backup_rationale = re.compile(r'^[A-Za-z0-9-_ ]+$')
 regexp_backup_id = re.compile(r'^[A-Za-z0-9-_]+\.zip$')
 
+async def get_container_image_digest(docker_client, container_name):
+	try:
+		container = await docker_client.containers.get(container_name)
+		info = await container.show()
+		return info['Image']
+	except Exception:
+		return 'N/A'
+
 #global status
 class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 	async def get(self):
@@ -60,6 +68,13 @@ class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 						key, value = entry.split("=", 1)
 						env[key] = value
 				application["env"] = env
+
+				#retrieve image digests
+				application["images"] = {
+					"backend": container_info['Image'],
+					"frontend": await get_container_image_digest(docker_client, config.DOCKER_FRONTEND_CONTAINER_NAME),
+					"manager": await get_container_image_digest(docker_client, config.DOCKER_MANAGER_CONTAINER_NAME)
+				}
 
 				self.write(json.dumps(application, cls=helpers.JSONCustomEncoder))
 			except Exception:
