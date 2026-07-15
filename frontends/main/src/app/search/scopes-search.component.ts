@@ -77,6 +77,7 @@ import {FeatureStatic} from '@core/model/feature-static';
 })
 export class SearchComponent implements OnInit {
 	readonly columnsToDisplay = signal<string[]>([]);
+	SearchComponent = SearchComponent;
 
 	Object = Object;
 	FieldModelType = FieldModelType;
@@ -173,7 +174,9 @@ export class SearchComponent implements OnInit {
 			this.searchableWorkflows = results.searchableWorkflows;
 			this.parentScopes.set(results.parentScopes.filter(scope => scope.modelId === this.selectedScopeModel().defaultParentId));
 
-			this.searchableFields = results.searchableFields;
+			// Filter out date fields that are not fully collected and mandatory, as they cannot be searched
+			// TODO implement date range search to allow searching on partially collected dates
+			this.searchableFields = results.searchableFields.filter(field => !(field.type === FieldModelType.DATE || field.type === FieldModelType.DATE_SELECT) || SearchComponent.getIsCompleteDate(field));
 
 			this.buildColumnsArray();
 
@@ -194,7 +197,7 @@ export class SearchComponent implements OnInit {
 		const newColumns = ['parentScopeCode', 'scopeCode'];
 
 		this.searchableFields.forEach(fieldModel => {
-			newColumns.push(this.getSFFormControlName(fieldModel));
+			newColumns.push(SearchComponent.getSFFormControlName(fieldModel));
 		});
 
 		this.searchableWorkflows.forEach(workflow => {
@@ -233,16 +236,17 @@ export class SearchComponent implements OnInit {
 		//Create workflow controls
 		this.searchableWorkflows.forEach(workflow => {
 			const control = new FormControl();
-			this.searchForm.addControl(this.getWSFormControlName(workflow), control);
+			this.searchForm.addControl(SearchComponent.getWSFormControlName(workflow), control);
 			observables.push(control.valueChanges);
 		});
 
 		//Create searchable field controls
 		this.searchableFields.forEach(fieldModel => {
 			const control = new FormControl();
-			this.searchForm.addControl(this.getSFFormControlName(fieldModel), control);
+			this.searchForm.addControl(SearchComponent.getSFFormControlName(fieldModel), control);
 
-			if(SearchComponent.getIsSearchableDate(fieldModel)) {
+			// At this point all date field models are searchable (i.e. fully collected and mandatory), so we can just check the type
+			if(fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) {
 				hasDateFields = true;
 			}
 			else {
@@ -318,11 +322,11 @@ export class SearchComponent implements OnInit {
 		this.searchTrigger$.next(initialScopeSearch);
 	}
 
-	getWSFormControlName(workflow: Workflow): string {
+	static getWSFormControlName(workflow: Workflow): string {
 		return `ws_${workflow.id}`;
 	}
 
-	getSFFormControlName(fieldModel: FieldModel): string {
+	static getSFFormControlName(fieldModel: FieldModel): string {
 		const fieldName = `${fieldModel.datasetModelId}.${fieldModel.id}`.toLowerCase();
 		return fieldName;
 	}
@@ -382,7 +386,7 @@ export class SearchComponent implements OnInit {
 			Object.keys(workflowStatesValue).forEach(workflowId => {
 				const workflow = this.getWorkflow(workflowId);
 				if(workflow) {
-					const control = this.searchForm.controls[this.getWSFormControlName(workflow)];
+					const control = this.searchForm.controls[SearchComponent.getWSFormControlName(workflow)];
 					control.setValue(workflowStatesValue[workflowId], {emitEvent: false});
 				}
 			});
@@ -403,9 +407,10 @@ export class SearchComponent implements OnInit {
 					return;
 				}
 
-				const control = this.searchForm.controls[this.getSFFormControlName(fieldModel)];
+				const control = this.searchForm.controls[SearchComponent.getSFFormControlName(fieldModel)];
 				if(control) {
-					if(criteria.value && SearchComponent.getIsSearchableDate(fieldModel)) {
+					// We ensure that when the field model is date, it is a complete date (searchableDate) to parse it directly to a Date object
+					if(criteria.value && SearchComponent.getIsCompleteDate(fieldModel)) {
 						const date = parse(criteria.value, 'dd.MM.yyyy', 0);
 						control.setValue(date, {emitEvent: false});
 					}
@@ -446,7 +451,7 @@ export class SearchComponent implements OnInit {
 
 		//Process workflow states
 		this.searchableWorkflows.forEach(workflow => {
-			const control = this.searchForm.controls[this.getWSFormControlName(workflow)];
+			const control = this.searchForm.controls[SearchComponent.getWSFormControlName(workflow)];
 			const value = control?.value;
 
 			if(!value?.length) {
@@ -460,13 +465,13 @@ export class SearchComponent implements OnInit {
 		//Rebuild fieldModelCriteria from current control values
 		const newFieldModelCriteria: FieldModelCriterion[] = [];
 		this.searchableFields.forEach(fieldModel => {
-			const control = this.searchForm.controls[this.getSFFormControlName(fieldModel)];
+			const control = this.searchForm.controls[SearchComponent.getSFFormControlName(fieldModel)];
 			if(!control?.value) {
 				return;
 			}
 
 			const isString = fieldModel.type === FieldModelType.STRING;
-			const value = this.getFieldValueForCriteria(fieldModel, control.value);
+			const value = SearchComponent.getFieldValueForCriteria(fieldModel, control.value);
 
 			//Skip strings with less than 3 characters
 			if(isString && value.length < 3) {
@@ -533,16 +538,16 @@ export class SearchComponent implements OnInit {
 	getDateObject(datasetModelId: string, fieldId: string, field: any): Date | undefined {
 		const fieldModel = this.getFieldModel(datasetModelId, fieldId);
 		if(fieldModel?.type === FieldModelType.DATE) {
-			return this.parseDateString(field);
+			return SearchComponent.parseDateString(field);
 		}
 		return undefined;
 	}
 
-	getDateObjectFromString(field: any): Date | undefined {
-		return field ? this.parseDateString(field) : undefined;
+	static getDateObjectFromString(field: any): Date | undefined {
+		return field ? SearchComponent.parseDateString(field) : undefined;
 	}
 
-	private parseDateString(dateStr: string): Date | undefined {
+	static parseDateString(dateStr: string): Date | undefined {
 		try {
 			const parsedDate = parse(dateStr, 'dd.MM.yyyy', new Date());
 			return isValid(parsedDate) ? parsedDate : undefined;
@@ -552,19 +557,8 @@ export class SearchComponent implements OnInit {
 		}
 	}
 
-	getIsPossibleValue(datasetModelId: string, fieldId: string): boolean {
-		const fieldModel = this.getFieldModel(datasetModelId, fieldId);
+	static getIsPossibleValue(fieldModel: FieldModel): boolean {
 		return (fieldModel?.possibleValues?.length ?? 0) > 0;
-	}
-
-	getIsCompleteDate(datasetModelId: string, fieldId: string): boolean {
-		const fieldModel = this.getFieldModel(datasetModelId, fieldId);
-		if(!fieldModel) {
-			return false;
-		}
-
-		const isDateType = fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT;
-		return isDateType && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory;
 	}
 
 	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
@@ -580,19 +574,22 @@ export class SearchComponent implements OnInit {
 		return this.getFieldModel(datasetModelId, fieldId)?.type;
 	}
 
-	getFieldValueForCriteria(fieldModel: FieldModel, value: string): string {
-		if(SearchComponent.getIsSearchableDate(fieldModel)) {
+	static getFieldValueForCriteria(fieldModel: FieldModel, value: string): string {
+		// We ensure that when the field model is date, it is a complete date (searchableDate) to parse it directly to a Date object
+		if(SearchComponent.getIsCompleteDate(fieldModel)) {
 			const dateValue = new Date(value);
 			return format(dateValue, 'dd.MM.yyyy');
 		}
 		return value;
 	}
 
-	static getIsSearchableDate(fieldModel: FieldModel): boolean {
-		return fieldModel?.type === FieldModelType.DATE || (fieldModel?.type === FieldModelType.DATE_SELECT && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory);
+	static getIsCompleteDate(fieldModel: FieldModel): boolean {
+		const dMYCollected = (fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) && fieldModel.withDays && fieldModel.withMonths && fieldModel.withYears;
+		const dMYMandatory = fieldModel.type === FieldModelType.DATE || (fieldModel?.type === FieldModelType.DATE_SELECT && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory);
+		return dMYCollected && dMYMandatory;
 	}
 
-	getStartDate() {
+	static getStartDate() {
 		//Return a date that is 30 years in the past
 		//This is used to set the default date for the date picker
 		const date = new Date();
@@ -611,12 +608,12 @@ export class SearchComponent implements OnInit {
 			return undefined;
 		}
 
-		if(this.getIsPossibleValue(fieldModel.datasetModelId, fieldModel.id)) {
+		if(SearchComponent.getIsPossibleValue(fieldModel)) {
 			const localizationMap = this.getValueShortname(fieldModel.datasetModelId, fieldModel.id, rawValue);
 			return localizationMap ? new LocalizeMapPipe().transform(localizationMap) : rawValue;
 		}
-		if(this.getIsCompleteDate(fieldModel.datasetModelId, fieldModel.id)) {
-			const dateObj = this.getDateObjectFromString(rawValue);
+		if(SearchComponent.getIsCompleteDate(fieldModel)) {
+			const dateObj = SearchComponent.getDateObjectFromString(rawValue);
 			return dateObj ? new DateUTCPipe().transform(dateObj) : rawValue;
 		}
 

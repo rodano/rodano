@@ -67,7 +67,7 @@
 
 			<!-- Field model columns -->
 			@for (fieldModel of searchableFields; track fieldModel.id) {
-				@let columnId = getSFFormControlName(fieldModel);
+				@let columnId = SearchComponent.getSFFormControlName(fieldModel);
 				<ng-container [matColumnDef]="columnId">
 					<th
 						mat-header-cell
@@ -78,19 +78,19 @@
 								<mat-label>{{ fieldModel.shortname | localizeMap }}</mat-label>
 								<input
 									matInput
-									[formControlName]="getSFFormControlName(fieldModel)"
+									[formControlName]="SearchComponent.getSFFormControlName(fieldModel)"
 									[matDatepicker]="datePicker" />
 								<mat-datepicker-toggle
 									matSuffix
 									[for]="datePicker"></mat-datepicker-toggle>
 								<mat-datepicker
 									#datePicker
-									[startAt]="getStartDate()"></mat-datepicker>
+									[startAt]="SearchComponent.getStartDate()"></mat-datepicker>
 							</mat-form-field>
 						} @else if (fieldModel.type === FieldModelType.SELECT || fieldModel.type === FieldModelType.RADIO) {
 							<mat-form-field (click)="$event.stopPropagation()">
 								<mat-label>{{ fieldModel.shortname | localizeMap }}</mat-label>
-								<mat-select [formControlName]="getSFFormControlName(fieldModel)">
+								<mat-select [formControlName]="SearchComponent.getSFFormControlName(fieldModel)">
 									@for (value of fieldModel.possibleValues; track value.id) {
 										<mat-option [value]="value.id">
 											{{ value.shortname | localizeMap }}
@@ -103,7 +103,7 @@
 								<mat-label>{{ fieldModel.shortname | localizeMap }}</mat-label>
 								<input
 									matInput
-									[formControlName]="getSFFormControlName(fieldModel)" />
+									[formControlName]="SearchComponent.getSFFormControlName(fieldModel)" />
 							</mat-form-field>
 						}
 					</th>
@@ -126,7 +126,7 @@
 						<mat-form-field (click)="$event.stopPropagation()">
 							<mat-label>{{ workflow.shortname | localizeMap }}</mat-label>
 							<mat-select
-								[formControlName]="getWSFormControlName(workflow)"
+								[formControlName]="SearchComponent.getWSFormControlName(workflow)"
 								multiple>
 								@for (state of workflow.states; track state.id) {
 									<mat-option [value]="state.id">
