@@ -1,7 +1,7 @@
 import {Component, ViewChild, DestroyRef, OnInit, signal, HostListener} from '@angular/core';
 import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
-import {Observable, Subject, forkJoin, merge, of, iif, defer, fromEvent, EMPTY} from 'rxjs';
-import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
+import {Observable, Subject, forkJoin, merge, of, iif, defer, EMPTY} from 'rxjs';
+import {debounceTime, filter, map, switchMap, tap, distinctUntilChanged} from 'rxjs/operators';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Scope} from '@core/model/scope';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
@@ -174,8 +174,8 @@ export class SearchComponent implements OnInit {
 			this.searchableWorkflows = results.searchableWorkflows;
 			this.parentScopes.set(results.parentScopes.filter(scope => scope.modelId === this.selectedScopeModel().defaultParentId));
 
-			// Filter out date fields that are not fully collected and mandatory, as they cannot be searched
-			// TODO implement date range search to allow searching on partially collected dates
+			//Filter out date fields that are not fully collected and mandatory, as they cannot be searched
+			//TODO implement date range search to allow searching on partially collected dates
 			this.searchableFields = results.searchableFields.filter(field => !(field.type === FieldModelType.DATE || field.type === FieldModelType.DATE_SELECT) || SearchComponent.getIsCompleteDate(field));
 
 			this.buildColumnsArray();
@@ -227,11 +227,22 @@ export class SearchComponent implements OnInit {
 		this.paginator.page
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => this.search());
+
+		//Handle browser back/forward navigation or external URL changes
+		this.route.queryParams
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
+				filter(params => Object.keys(params).length > 0),
+				map(params => this.httpParamsService.toScopeSearch(params))
+			)
+			.subscribe(scopeSearch => {
+				this.syncFormAndUrl(scopeSearch);
+			});
 	}
 
 	private createFormControlsAndObservables(): Observable<any>[] {
 		const observables: Observable<any>[] = [];
-		let hasDateFields = false;
 
 		//Create workflow controls
 		this.searchableWorkflows.forEach(workflow => {
@@ -245,24 +256,8 @@ export class SearchComponent implements OnInit {
 			const control = new FormControl();
 			this.searchForm.addControl(SearchComponent.getSFFormControlName(fieldModel), control);
 
-			// At this point all date field models are searchable (i.e. fully collected and mandatory), so we can just check the type
-			if(fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) {
-				hasDateFields = true;
-			}
-			else {
-				observables.push(control.valueChanges);
-			}
+			observables.push(control.valueChanges);
 		});
-
-		//Add a single shared Enter key observable for all date fields
-		if(hasDateFields) {
-			const enterKeyPress$ = fromEvent<KeyboardEvent>(document, 'keydown').pipe(
-				filter(event => event.key === 'Enter'),
-				takeUntilDestroyed(this.destroyRef)
-			);
-			observables.push(enterKeyPress$);
-		}
-
 		return observables;
 	}
 
@@ -295,7 +290,6 @@ export class SearchComponent implements OnInit {
 			}),
 			switchMap(scopeSearchObj => {
 				scopeSearchObj.scopeModelId = this.selectedScopeModel().id;
-				this.syncFormAndUrl(scopeSearchObj);
 				return this.scopeService.extendedSearch(scopeSearchObj);
 			}),
 			tap(() => this.loading.set(false))
@@ -314,11 +308,15 @@ export class SearchComponent implements OnInit {
 			this.resultsLength.set(scopeResults.paging.total);
 		});
 
-		//Trigger initial load from URL params
+		//Trigger initial load from URL params and sync form only on initial load
 		const params = this.route.snapshot.queryParams;
 		const initialScopeSearch = Object.entries(params).length === 0
 			? new ScopeSearch()
 			: this.httpParamsService.toScopeSearch(params);
+
+		//Sync form state from URL only on initial page load
+		this.syncFormAndUrl(initialScopeSearch);
+
 		this.searchTrigger$.next(initialScopeSearch);
 	}
 
@@ -409,7 +407,7 @@ export class SearchComponent implements OnInit {
 
 				const control = this.searchForm.controls[SearchComponent.getSFFormControlName(fieldModel)];
 				if(control) {
-					// We ensure that when the field model is date, it is a complete date (searchableDate) to parse it directly to a Date object
+					//We ensure that when the field model is date, it is a complete date (searchableDate) to parse it directly to a Date object
 					if(criteria.value && SearchComponent.getIsCompleteDate(fieldModel)) {
 						const date = parse(criteria.value, 'dd.MM.yyyy', 0);
 						control.setValue(date, {emitEvent: false});
@@ -575,7 +573,7 @@ export class SearchComponent implements OnInit {
 	}
 
 	static getFieldValueForCriteria(fieldModel: FieldModel, value: string): string {
-		// We ensure that when the field model is date, it is a complete date (searchableDate) to parse it directly to a Date object
+		//We ensure that when the field model is date, it is a complete date (searchableDate) to parse it directly to a Date object
 		if(SearchComponent.getIsCompleteDate(fieldModel)) {
 			const dateValue = new Date(value);
 			return format(dateValue, 'dd.MM.yyyy');
