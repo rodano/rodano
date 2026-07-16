@@ -1,4 +1,4 @@
-import {Component, DestroyRef, effect, input} from '@angular/core';
+import {Component, DestroyRef, effect, input, signal} from '@angular/core';
 import {ReactiveFormsModule, FormGroup, FormControl} from '@angular/forms';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
 import {MatInput} from '@angular/material/input';
@@ -27,7 +27,7 @@ export class CheckboxGroupComponent {
 	//this cannot be static as it is used in the template
 	readonly otherControlName = 'OTHER_SPECIFY_VALUE';
 
-	specifyValueId: string | undefined;
+	specifyValueId = signal<string | undefined>(undefined);
 	formGroup: FormGroup;
 
 	constructor(
@@ -38,7 +38,8 @@ export class CheckboxGroupComponent {
 			const field = this.field();
 
 			//retrieve the possible value that asks for a specify value if any
-			this.specifyValueId = field.model.possibleValues.find(v => v.specify)?.id;
+			const specifyValueId = field.model.possibleValues.find(v => v.specify)?.id;
+			this.specifyValueId.set(specifyValueId);
 
 			//get the values of the field, and the "other" value if any
 			const fieldValues = field.value?.split(',') ?? [];
@@ -62,8 +63,8 @@ export class CheckboxGroupComponent {
 				const field = this.field();
 
 				//retrieve all selected values except the one that asks for an other value
-				const fieldValues = field.model.possibleValues.map(v => v.id).filter(v => this.specifyValueId !== v && values[v]);
-				if(this.specifyValueId && values[this.specifyValueId]) {
+				const fieldValues = field.model.possibleValues.map(v => v.id).filter(v => this.specifyValueId() !== v && values[v]);
+				if(specifyValueId && values[specifyValueId]) {
 					fieldValues.push(this.formGroup.get(this.otherControlName)?.value as string);
 				}
 				const fieldValue = fieldValues.join(',');

@@ -7,11 +7,13 @@
 		</li>
 	}
 
-	<li [class.hidden]="!specifyValueId || !formGroup.get(specifyValueId)?.value">
-		<mat-form-field>
-			<input
-				matInput
-				[formControlName]="otherControlName" />
-		</mat-form-field>
-	</li>
+	@if (specifyValueId(); as specifyId) {
+		<li [class.hidden]="!formGroup.get(specifyId)?.value">
+			<mat-form-field>
+				<input
+					matInput
+					[formControlName]="otherControlName" />
+			</mat-form-field>
+		</li>
+	}
 </ul>
