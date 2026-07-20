@@ -5,7 +5,11 @@ permissions:
   packages: write
   id-token: write
 
-on: [push]
+on:
+  push:
+    branches:
+      - dev
+      - main
 
 env:
   REGISTRY: ghcr.io
