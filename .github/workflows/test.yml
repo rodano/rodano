@@ -45,7 +45,7 @@ jobs:
         working-directory: ./backend
     services:
       mariadb:
-        image: mariadb:12.0
+        image: mariadb:12.2
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: rodano
