@@ -120,12 +120,6 @@ services:
     build:
       context: manager
       dockerfile: Dockerfile
-    depends_on:
-      #the manager must be started after the backend to be able to detect it
-      backend:
-        condition: service_started
-      db:
-        condition: service_healthy
     ports:
       - "127.0.0.1:8081:8081"
     volumes:

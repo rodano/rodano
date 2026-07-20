@@ -86,49 +86,35 @@ BACKUP_STEPS = [
 ]
 
 DOCKER_COMPOSE_PREFIX = "rodano"
-DOCKER_BACKEND_CONTAINER_NAME = DOCKER_COMPOSE_PREFIX + "-backend-1"
-DOCKER_FRONTEND_CONTAINER_NAME = DOCKER_COMPOSE_PREFIX + "-frontend-1"
-DOCKER_MANAGER_CONTAINER_NAME = DOCKER_COMPOSE_PREFIX + "-manager-1"
+
+def update_docker_containers_names():
+	global DOCKER_BACKEND_CONTAINER_NAME, DOCKER_FRONTEND_CONTAINER_NAME, DOCKER_MANAGER_CONTAINER_NAME
+	DOCKER_BACKEND_CONTAINER_NAME = DOCKER_COMPOSE_PREFIX + "-backend-1"
+	DOCKER_FRONTEND_CONTAINER_NAME = DOCKER_COMPOSE_PREFIX + "-frontend-1"
+	DOCKER_MANAGER_CONTAINER_NAME = DOCKER_COMPOSE_PREFIX + "-manager-1"
+
+update_docker_containers_names()
 
 async def discover_compose_environment():
 	global DOCKER_COMPOSE_PREFIX
-	global DOCKER_BACKEND_CONTAINER_NAME
 
-	docker_client = aiodocker.Docker()
-	current_hostname = socket.gethostname()
+	async with aiodocker.Docker() as docker_client:
+		current_hostname = socket.gethostname()
 
-	#discover if the app is run from inside the Docker Compose environment
-	#this is the standard mode of this application
-	#in that case, it's possible to deduce the Docker Compose project name
-	try:
-		current_container = await docker_client.containers.get(current_hostname)
-		info = await current_container.show()
-		labels = info.get("Config", {}).get("Labels", {})
+		#discover if the app is run from inside the Docker Compose environment
+		#this is the standard mode of this application
+		#in that case, it's possible to deduce the Docker Compose project name
+		try:
+			current_container = await docker_client.containers.get(current_hostname)
+			info = await current_container.show()
+			labels = info.get("Config", {}).get("Labels", {})
 
-		DOCKER_COMPOSE_PREFIX = labels.get("com.docker.compose.project")
-		logger.info(f"Discovered Docker Compose project: {DOCKER_COMPOSE_PREFIX}")
-	except aiodocker.exceptions.DockerError:
-		#if not running inside a Docker container, the current hostname will not match any container name
-		#this will trigger the error
-		logger.warning(f"Not running inside a Docker container")
+			DOCKER_COMPOSE_PREFIX = labels.get("com.docker.compose.project")
+			logger.info(f"Discovered Docker Compose project: {DOCKER_COMPOSE_PREFIX}")
+			update_docker_containers_names()
+		except aiodocker.exceptions.DockerError:
+			#if not running inside a Docker container, the current hostname will not match any container name
+			#this will trigger the error
+			logger.warning(f"Not running inside a Docker container")
 
-	#find the backend container
-	#this must be done even if the app is not running inside the Docker Compose environment
-	#having access to the backend container allows to start/stop the container and to fetch the logs
-	containers = await docker_client.containers.list()
-
-	container_name = None
-	for container in containers:
-		info = await container.show()
-		labels = info.get("Config", {}).get("Labels", {})
-		if labels.get("com.docker.compose.project") == DOCKER_COMPOSE_PREFIX and labels.get("com.docker.compose.service") == BACKEND_HOST:
-			container_name = info.get("Name", "").lstrip("/")
-			break
-
-	if container_name:
-		DOCKER_BACKEND_CONTAINER_NAME = container_name
-		logger.info(f"Found backend container: {DOCKER_BACKEND_CONTAINER_NAME}")
-	else:
-		logger.warning(f"Unable to find backend container, using default name: {DOCKER_BACKEND_CONTAINER_NAME}")
-
-	await docker_client.close()
+		logger.info(f"Assuming Docker containers names: backend={DOCKER_BACKEND_CONTAINER_NAME}, frontend={DOCKER_FRONTEND_CONTAINER_NAME}, manager={DOCKER_MANAGER_CONTAINER_NAME}")
