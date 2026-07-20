@@ -22,9 +22,9 @@ async def get_container_image_digest(docker_client, container_name):
 	try:
 		container = await docker_client.containers.get(container_name)
 		info = await container.show()
-		return info['Image']
+		return info["Image"]
 	except Exception:
-		return 'N/A'
+		return "N/A"
 
 #global status
 class ApplicationInfo(helpers.AuthenticatedRequestHandler):
@@ -32,7 +32,7 @@ class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 		async with aiodocker.Docker() as docker_client:
 			backend = await docker_client.containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
 			container_info = await backend.show()
-			if container_info['State']['Status'] != "running":
+			if container_info["State"]["Status"] != "running":
 				self.set_status(503)
 				self.write({"error" : "Backend must be started to get application information."})
 				return
@@ -61,7 +61,7 @@ class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 				application["environment"] = "PROD" if config.DEBUG else study["environment"]
 
 				#retrieve environment variables from container config
-				env_list = container_info.get('Config', {}).get('Env', [])
+				env_list = container_info.get("Config", {}).get("Env", [])
 				env = {}
 				for entry in env_list:
 					if "=" in entry:
@@ -71,7 +71,7 @@ class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 
 				#retrieve image digests
 				application["images"] = {
-					"backend": container_info['Image'],
+					"backend": container_info["Image"],
 					"frontend": await get_container_image_digest(docker_client, config.DOCKER_FRONTEND_CONTAINER_NAME),
 					"manager": await get_container_image_digest(docker_client, config.DOCKER_MANAGER_CONTAINER_NAME)
 				}
@@ -310,7 +310,7 @@ async def stream_logs():
 				backend = await docker_client.containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
 				container_info = await backend.show()
 				#wait until the backend container is running if necessary
-				if container_info['State']['Status'] != "running":
+				if container_info["State"]["Status"] != "running":
 					logger.info(f"Backend container {config.DOCKER_BACKEND_CONTAINER_NAME} is not running")
 					await asyncio.sleep(10)
 					continue

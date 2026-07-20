@@ -28,8 +28,8 @@ def broadcast_message(data):
 
 class Messaging(tornado.websocket.WebSocketHandler):
 	def select_subprotocol(self, subprotocols):
-		if 'access_token' in subprotocols:
-			return 'access_token'
+		if "access_token" in subprotocols:
+			return "access_token"
 		return None
 
 	def open(self):
