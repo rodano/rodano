@@ -24,63 +24,59 @@ async def get_container_image_digest(docker_client, container_name):
 		info = await container.show()
 		return info["Image"]
 	except Exception:
+		logger.exception(f"Error retrieving image digest from container {container_name}")
 		return "N/A"
 
 #global status
 class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 	async def get(self):
+		application = {}
+
+		#retrieve study information from backend API
+		http = tornado.httpclient.AsyncHTTPClient()
+		try:
+			response = await http.fetch(
+				f"http://{config.BACKEND_HOST}:{config.BACKEND_PORT}/config/public-study",
+				request_timeout=5
+			)
+		except tornado.httpclient.HTTPClientError:
+			self.set_status(503)
+			self.write({"error" : "Backend is not responding."})
+			return
+		if response.code != 200:
+			self.set_status(503)
+			self.write({"error" : "Backend is not responding."})
+			return
+		study = json.loads(response.body.decode("utf-8"))
+		application["name"] = study["id"]
+		#override environment to PROD in debug mode to be able to perform backups
+		application["environment"] = "PROD" if config.DEBUG else study["environment"]
+
+		#retrieve information from Docker Compose environment
 		async with aiodocker.Docker() as docker_client:
+			#retrieve environment variables from container config
 			backend = await docker_client.containers.get(config.DOCKER_BACKEND_CONTAINER_NAME)
-			container_info = await backend.show()
-			if container_info["State"]["Status"] != "running":
-				self.set_status(503)
-				self.write({"error" : "Backend must be started to get application information."})
-				return
-
 			try:
-				application = {}
-
-				#retrieve study information from backend API
-				http = tornado.httpclient.AsyncHTTPClient()
-				try:
-					response = await http.fetch(
-						f"http://{config.BACKEND_HOST}:{config.BACKEND_PORT}/config/public-study",
-						request_timeout=5
-					)
-				except tornado.httpclient.HTTPClientError:
-					self.set_status(503)
-					self.write({"error" : "Backend is not responding."})
-					return
-				if response.code != 200:
-					self.set_status(503)
-					self.write({"error" : "Backend is not responding."})
-					return
-				study = json.loads(response.body.decode("utf-8"))
-				application["name"] = study["id"]
-				#override environment to PROD in debug mode to be able to perform backups
-				application["environment"] = "PROD" if config.DEBUG else study["environment"]
-
-				#retrieve environment variables from container config
-				env_list = container_info.get("Config", {}).get("Env", [])
-				env = {}
-				for entry in env_list:
-					if "=" in entry:
-						key, value = entry.split("=", 1)
-						env[key] = value
-				application["env"] = env
-
-				#retrieve image digests
-				application["images"] = {
-					"backend": container_info["Image"],
-					"frontend": await get_container_image_digest(docker_client, config.DOCKER_FRONTEND_CONTAINER_NAME),
-					"manager": await get_container_image_digest(docker_client, config.DOCKER_MANAGER_CONTAINER_NAME)
-				}
-
-				self.write(json.dumps(application, cls=helpers.JSONCustomEncoder))
+				backend_info = await backend.show()
+				if backend_info["State"]["Status"] == "running":
+					env_list = backend_info.get("Config", {}).get("Env", [])
+					env = {}
+					for entry in env_list:
+						if "=" in entry:
+							key, value = entry.split("=", 1)
+							env[key] = value
+					application["env"] = env
 			except Exception:
-				logger.exception("Error retrieving application info")
-				self.set_status(503)
-				self.write({"error" : "Backend is not responding."})
+				logger.warning(f"Error retrieving environment variables from container {config.DOCKER_BACKEND_CONTAINER_NAME}")
+
+			#retrieve image digests
+			application["images"] = {
+				"backend": await get_container_image_digest(docker_client, config.DOCKER_BACKEND_CONTAINER_NAME),
+				"frontend": await get_container_image_digest(docker_client, config.DOCKER_FRONTEND_CONTAINER_NAME),
+				"manager": await get_container_image_digest(docker_client, config.DOCKER_MANAGER_CONTAINER_NAME)
+			}
+
+		self.write(json.dumps(application, cls=helpers.JSONCustomEncoder))
 
 class ApplicationBackups(helpers.AuthenticatedRequestHandler):
 	def get(self):
