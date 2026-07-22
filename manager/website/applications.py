@@ -18,14 +18,33 @@ logger = logging.getLogger(__name__)
 regexp_backup_rationale = re.compile(r'^[A-Za-z0-9-_ ]+$')
 regexp_backup_id = re.compile(r'^[A-Za-z0-9-_]+\.zip$')
 
-async def get_container_image_digest(docker_client, container_name):
+async def get_container_image_info(docker_client, container_name):
+	#return a dict with the image "digest" (as published on the registry, without the "sha256:" prefix)
+	#and optionally the "tag" (e.g. "myrepo/backend:1.2.3") when the image was pulled from a registry
 	try:
 		container = await docker_client.containers.get(container_name)
-		info = await container.show()
-		return info["Image"]
+		container_info = await container.show()
+		image = await docker_client.images.inspect(container_info["Image"])
+
+		digest = None
+		repo_digests = image.get("RepoDigests") or []
+		if repo_digests:
+			#repository digests entries look like "myrepo/backend@sha256:abcdef..."
+			_, _, digest = repo_digests[0].partition("@sha256:")
+		if not digest:
+			#fallback for locally-built images that were never pushed or pulled
+			local_id = image.get("Id", "")
+			digest = local_id.removeprefix("sha256:") or "N/A"
+
+		tag = None
+		repo_tags = image.get("RepoTags") or []
+		if repo_tags:
+			tag = repo_tags[0]
+
+		return {"digest": digest, "tag": tag}
 	except Exception:
-		logger.exception(f"Error retrieving image digest from container {container_name}")
-		return "N/A"
+		logger.exception(f"Error retrieving image info from container {container_name}")
+		return {"digest": "N/A", "tag": None}
 
 #global status
 class ApplicationInfo(helpers.AuthenticatedRequestHandler):
@@ -69,11 +88,11 @@ class ApplicationInfo(helpers.AuthenticatedRequestHandler):
 			except Exception:
 				logger.warning(f"Error retrieving environment variables from container {config.DOCKER_BACKEND_CONTAINER_NAME}")
 
-			#retrieve image digests
+			#retrieve containers images information
 			application["images"] = {
-				"backend": await get_container_image_digest(docker_client, config.DOCKER_BACKEND_CONTAINER_NAME),
-				"frontend": await get_container_image_digest(docker_client, config.DOCKER_FRONTEND_CONTAINER_NAME),
-				"manager": await get_container_image_digest(docker_client, config.DOCKER_MANAGER_CONTAINER_NAME)
+				"backend": await get_container_image_info(docker_client, config.DOCKER_BACKEND_CONTAINER_NAME),
+				"frontend": await get_container_image_info(docker_client, config.DOCKER_FRONTEND_CONTAINER_NAME),
+				"manager": await get_container_image_info(docker_client, config.DOCKER_MANAGER_CONTAINER_NAME)
 			}
 
 		self.write(json.dumps(application, cls=helpers.JSONCustomEncoder))

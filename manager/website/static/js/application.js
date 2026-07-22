@@ -29,8 +29,13 @@ function update_application() {
 	const digests = document.getElementById('application_image_digests');
 	digests.empty();
 	Object.keys(application.images).sort().forEach(service => {
+		const image = application.images[service];
 		const li = document.createElement('li');
-		li.textContent = `${service}: ${application.images[service]}`;
+		let text = `${service}: ${image.digest}`;
+		if(image.tag) {
+			text += ` (${image.tag})`;
+		}
+		li.textContent = text;
 		digests.appendChild(li);
 	});
 
