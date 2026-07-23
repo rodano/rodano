@@ -31,13 +31,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -66,7 +67,7 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>field_audit.pk</code>.
 	 */
-	public final TableField<FieldAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<FieldAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>field_audit.audit_action_fk</code>.
@@ -297,7 +298,7 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	 */
 	@Override
 	public FieldAudit where(Condition condition) {
-		return new FieldAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new FieldAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -364,7 +365,7 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public FieldAudit whereExists(Select<?> select) {
+	public FieldAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -372,7 +373,7 @@ public class FieldAudit extends TableImpl<FieldAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public FieldAudit whereNotExists(Select<?> select) {
+	public FieldAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

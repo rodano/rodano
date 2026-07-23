@@ -31,13 +31,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -66,7 +67,7 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>event_audit.pk</code>.
 	 */
-	public final TableField<EventAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<EventAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>event_audit.audit_action_fk</code>.
@@ -106,7 +107,7 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>event_audit.id</code>.
 	 */
-	public final TableField<EventAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).nullable(false), this, "");
+	public final TableField<EventAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>event_audit.deleted</code>.
@@ -337,7 +338,7 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	 */
 	@Override
 	public EventAudit where(Condition condition) {
-		return new EventAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new EventAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -404,7 +405,7 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public EventAudit whereExists(Select<?> select) {
+	public EventAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -412,7 +413,7 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public EventAudit whereNotExists(Select<?> select) {
+	public EventAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

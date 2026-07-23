@@ -274,6 +274,6 @@ public class MailRecord extends UpdatableRecordImpl<MailRecord> {
 		setSubject(subject);
 		setTextBody(textBody);
 		setHtmlBody(htmlBody);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

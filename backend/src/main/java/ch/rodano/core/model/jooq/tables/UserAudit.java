@@ -30,13 +30,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -65,7 +66,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>user_audit.pk</code>.
 	 */
-	public final TableField<UserAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<UserAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>user_audit.audit_action_fk</code>.
@@ -115,7 +116,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>user_audit.email</code>.
 	 */
-	public final TableField<UserAuditRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200).nullable(false), this, "");
+	public final TableField<UserAuditRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>user_audit.externally_managed</code>.
@@ -301,20 +302,20 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 
 	@Override
 	public List<ForeignKey<UserAuditRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_USER_AUDIT_AUDIT_OBJECT_FK, Keys.FK_USER_AUDIT_ROBOT_FK, Keys.FK_USER_AUDIT_USER_FK, Keys.FK_USER_TRAIL_AUDIT_ACTION_FK);
+		return Arrays.asList(Keys.FK_USER_AUDIT_OBJECT_FK, Keys.FK_USER_AUDIT_ROBOT_FK, Keys.FK_USER_AUDIT_USER_FK, Keys.FK_USER_TRAIL_AUDIT_ACTION_FK);
 	}
 
-	private transient UserPath _fkUserAuditAuditObjectFk;
+	private transient UserPath _fkUserAuditObjectFk;
 
 	/**
 	 * Get the implicit join path to the <code>user</code> table, via the
-	 * <code>fk_user_audit_audit_object_fk</code> key.
+	 * <code>fk_user_audit_object_fk</code> key.
 	 */
-	public UserPath fkUserAuditAuditObjectFk() {
-		if (_fkUserAuditAuditObjectFk == null)
-			_fkUserAuditAuditObjectFk = new UserPath(this, Keys.FK_USER_AUDIT_AUDIT_OBJECT_FK, null);
+	public UserPath fkUserAuditObjectFk() {
+		if (_fkUserAuditObjectFk == null)
+			_fkUserAuditObjectFk = new UserPath(this, Keys.FK_USER_AUDIT_OBJECT_FK, null);
 
-		return _fkUserAuditAuditObjectFk;
+		return _fkUserAuditObjectFk;
 	}
 
 	private transient RobotPath _robot;
@@ -398,7 +399,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	 */
 	@Override
 	public UserAudit where(Condition condition) {
-		return new UserAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new UserAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -465,7 +466,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public UserAudit whereExists(Select<?> select) {
+	public UserAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -473,7 +474,7 @@ public class UserAudit extends TableImpl<UserAuditRecord> implements AuditTable 
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public UserAudit whereNotExists(Select<?> select) {
+	public UserAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

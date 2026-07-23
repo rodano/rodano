@@ -227,6 +227,6 @@ public class FormAuditRecord extends UpdatableRecordImpl<FormAuditRecord> implem
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setFormModelId(formModelId);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

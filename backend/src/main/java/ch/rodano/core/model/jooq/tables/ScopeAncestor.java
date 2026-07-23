@@ -18,12 +18,13 @@ import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -99,7 +100,7 @@ public class ScopeAncestor extends TableImpl<ScopeAncestorRecord> {
 	}
 
 	private ScopeAncestor(Name alias, Table<ScopeAncestorRecord> aliased, Field<?>[] parameters, Condition where) {
-		super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.view("create view `scope_ancestor` as with recursive recursive_scope_ancestor(`scope_fk`,`ancestor_fk`,`start_date`,`end_date`,`direct`,`depth`,`virtual`,`default_relation`,`ancestor_deleted`) as (select `sr`.`scope_fk` AS `scope_fk`,`sr`.`parent_fk` AS `ancestor_fk`,`sr`.`start_date` AS `start_date`,`sr`.`end_date` AS `end_date`,1 AS `direct`,1 AS `depth`,`s`.`virtual` AS `virtual`,`sr`.`default` AS `default_relation`,`s`.`deleted` AS `ancestor_deleted` from (`rodano`.`scope_relation` `sr` join `rodano`.`scope` `s` on(`sr`.`parent_fk` = `s`.`pk`)) union all select `rsa`.`scope_fk` AS `scope_fk`,`sr`.`parent_fk` AS `parent_fk`,case when `sr`.`start_date` is null then `rsa`.`start_date` when `rsa`.`start_date` is null then `sr`.`start_date` else greatest(`sr`.`start_date`,`rsa`.`start_date`) end AS `start_date`,case when `sr`.`end_date` is null then `rsa`.`end_date` when `rsa`.`end_date` is null then `sr`.`end_date` else least(`sr`.`end_date`,`rsa`.`end_date`) end AS `end_date`,0 AS `direct`,`rsa`.`depth` + 1 AS `depth`,`s`.`virtual` <> 0 or `rsa`.`virtual` <> 0 AS `s.virtual or rsa.virtual`,`sr`.`default` <> 0 and `rsa`.`default_relation` <> 0 AS `sr.``default`` && rsa.``default_relation```,`s`.`deleted` <> 0 or `rsa`.`ancestor_deleted` <> 0 AS `ancestor_deleted` from ((`recursive_scope_ancestor` `rsa` join `rodano`.`scope_relation` `sr` on(`sr`.`scope_fk` = `rsa`.`ancestor_fk`)) join `rodano`.`scope` `s` on(`sr`.`parent_fk` = `s`.`pk`)))select `recursive_scope_ancestor`.`scope_fk` AS `scope_fk`,`recursive_scope_ancestor`.`ancestor_fk` AS `ancestor_fk`,min(`recursive_scope_ancestor`.`start_date`) AS `start_date`,case when max(case when `recursive_scope_ancestor`.`end_date` is null then 1 else 0 end) = 0 then max(`recursive_scope_ancestor`.`end_date`) end AS `end_date`,bit_or(`recursive_scope_ancestor`.`direct`) AS `direct`,`recursive_scope_ancestor`.`depth` AS `depth`,bit_and(`recursive_scope_ancestor`.`virtual`) AS `virtual`,bit_or(`recursive_scope_ancestor`.`default_relation`) AS `default`,bit_and(`recursive_scope_ancestor`.`ancestor_deleted`) AS `ancestor_deleted` from `recursive_scope_ancestor` group by `recursive_scope_ancestor`.`scope_fk`,`recursive_scope_ancestor`.`ancestor_fk` order by `recursive_scope_ancestor`.`scope_fk`"), where);
+		super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.view("CREATE VIEW `scope_ancestor` AS with recursive recursive_scope_ancestor(`scope_fk`,`ancestor_fk`,`start_date`,`end_date`,`direct`,`depth`,`virtual`,`default_relation`,`ancestor_deleted`) as (select `sr`.`scope_fk` AS `scope_fk`,`sr`.`parent_fk` AS `ancestor_fk`,`sr`.`start_date` AS `start_date`,`sr`.`end_date` AS `end_date`,1 AS `direct`,1 AS `depth`,`s`.`virtual` AS `virtual`,`sr`.`default` AS `default_relation`,`s`.`deleted` AS `ancestor_deleted` from (`rodano`.`scope_relation` `sr` join `rodano`.`scope` `s` on(`sr`.`parent_fk` = `s`.`pk`)) union all select `rsa`.`scope_fk` AS `scope_fk`,`sr`.`parent_fk` AS `parent_fk`,case when `sr`.`start_date` is null then `rsa`.`start_date` when `rsa`.`start_date` is null then `sr`.`start_date` else greatest(`sr`.`start_date`,`rsa`.`start_date`) end AS `start_date`,case when `sr`.`end_date` is null then `rsa`.`end_date` when `rsa`.`end_date` is null then `sr`.`end_date` else least(`sr`.`end_date`,`rsa`.`end_date`) end AS `end_date`,0 AS `direct`,`rsa`.`depth` + 1 AS `depth`,`s`.`virtual` <> 0 or `rsa`.`virtual` <> 0 AS `s.virtual or rsa.virtual`,`sr`.`default` <> 0 and `rsa`.`default_relation` <> 0 AS `sr.``default`` && rsa.``default_relation```,`s`.`deleted` <> 0 or `rsa`.`ancestor_deleted` <> 0 AS `ancestor_deleted` from ((`recursive_scope_ancestor` `rsa` join `rodano`.`scope_relation` `sr` on(`sr`.`scope_fk` = `rsa`.`ancestor_fk`)) join `rodano`.`scope` `s` on(`sr`.`parent_fk` = `s`.`pk`)))select `recursive_scope_ancestor`.`scope_fk` AS `scope_fk`,`recursive_scope_ancestor`.`ancestor_fk` AS `ancestor_fk`,min(`recursive_scope_ancestor`.`start_date`) AS `start_date`,case when max(case when `recursive_scope_ancestor`.`end_date` is null then 1 else 0 end) = 0 then max(`recursive_scope_ancestor`.`end_date`) end AS `end_date`,bit_or(`recursive_scope_ancestor`.`direct`) AS `direct`,`recursive_scope_ancestor`.`depth` AS `depth`,bit_and(`recursive_scope_ancestor`.`virtual`) AS `virtual`,bit_or(`recursive_scope_ancestor`.`default_relation`) AS `default`,bit_and(`recursive_scope_ancestor`.`ancestor_deleted`) AS `ancestor_deleted` from `recursive_scope_ancestor` group by `recursive_scope_ancestor`.`scope_fk`,`recursive_scope_ancestor`.`ancestor_fk` order by `recursive_scope_ancestor`.`scope_fk`"), where);
 	}
 
 	/**
@@ -172,7 +173,7 @@ public class ScopeAncestor extends TableImpl<ScopeAncestorRecord> {
 	 */
 	@Override
 	public ScopeAncestor where(Condition condition) {
-		return new ScopeAncestor(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new ScopeAncestor(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -239,7 +240,7 @@ public class ScopeAncestor extends TableImpl<ScopeAncestorRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public ScopeAncestor whereExists(Select<?> select) {
+	public ScopeAncestor whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -247,7 +248,7 @@ public class ScopeAncestor extends TableImpl<ScopeAncestorRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public ScopeAncestor whereNotExists(Select<?> select) {
+	public ScopeAncestor whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

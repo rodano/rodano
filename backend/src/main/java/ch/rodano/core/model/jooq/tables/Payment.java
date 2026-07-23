@@ -31,13 +31,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -66,7 +67,7 @@ public class Payment extends TableImpl<PaymentRecord> {
 	/**
 	 * The column <code>payment.pk</code>.
 	 */
-	public final TableField<PaymentRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<PaymentRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>payment.creation_time</code>.
@@ -96,7 +97,7 @@ public class Payment extends TableImpl<PaymentRecord> {
 	/**
 	 * The column <code>payment.plan_id</code>.
 	 */
-	public final TableField<PaymentRecord, String> PLAN_ID = createField(DSL.name("plan_id"), SQLDataType.VARCHAR(50).nullable(false), this, "");
+	public final TableField<PaymentRecord, String> PLAN_ID = createField(DSL.name("plan_id"), SQLDataType.VARCHAR(50).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>payment.step_id</code>.
@@ -182,7 +183,7 @@ public class Payment extends TableImpl<PaymentRecord> {
 
 	@Override
 	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.PAYMENT_IDX_PAYMENT_DELETED);
+		return Arrays.asList(Indexes.PAYMENT_IDX_PAYMENT_DELETED, Indexes.PAYMENT_PAYMENT_BATCH_FK, Indexes.PAYMENT_WORKFLOW_STATUS_FK);
 	}
 
 	@Override
@@ -280,7 +281,7 @@ public class Payment extends TableImpl<PaymentRecord> {
 	 */
 	@Override
 	public Payment where(Condition condition) {
-		return new Payment(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Payment(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -347,7 +348,7 @@ public class Payment extends TableImpl<PaymentRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Payment whereExists(Select<?> select) {
+	public Payment whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -355,7 +356,7 @@ public class Payment extends TableImpl<PaymentRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Payment whereNotExists(Select<?> select) {
+	public Payment whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

@@ -241,6 +241,6 @@ public class FileRecord extends UpdatableRecordImpl<FileRecord> {
 		setName(name);
 		setChecksum(checksum);
 		setSubmitted(submitted);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

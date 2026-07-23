@@ -196,6 +196,6 @@ public class PaymentRecord extends UpdatableRecordImpl<PaymentRecord> {
 		setStepId(stepId);
 		setStatus(status);
 		setValue(value);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

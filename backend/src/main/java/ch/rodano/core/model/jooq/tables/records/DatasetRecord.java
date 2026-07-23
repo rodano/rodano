@@ -166,6 +166,6 @@ public class DatasetRecord extends UpdatableRecordImpl<DatasetRecord> {
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setDatasetModelId(datasetModelId);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

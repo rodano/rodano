@@ -347,6 +347,6 @@ public class EventAuditRecord extends UpdatableRecordImpl<EventAuditRecord> impl
 		setNotDone(notDone);
 		setBlocking(blocking);
 		setLocked(locked);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

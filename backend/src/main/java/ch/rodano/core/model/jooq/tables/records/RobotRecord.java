@@ -151,6 +151,6 @@ public class RobotRecord extends UpdatableRecordImpl<RobotRecord> {
 		setName(name);
 		setKey(key);
 		setActivated(activated);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

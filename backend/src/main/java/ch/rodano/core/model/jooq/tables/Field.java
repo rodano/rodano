@@ -29,13 +29,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -64,7 +65,7 @@ public class Field extends TableImpl<FieldRecord> {
 	/**
 	 * The column <code>field.pk</code>.
 	 */
-	public final TableField<FieldRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<FieldRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>field.creation_time</code>.
@@ -270,7 +271,7 @@ public class Field extends TableImpl<FieldRecord> {
 	 */
 	@Override
 	public Field where(Condition condition) {
-		return new Field(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Field(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -337,7 +338,7 @@ public class Field extends TableImpl<FieldRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Field whereExists(Select<?> select) {
+	public Field whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -345,7 +346,7 @@ public class Field extends TableImpl<FieldRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Field whereNotExists(Select<?> select) {
+	public Field whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

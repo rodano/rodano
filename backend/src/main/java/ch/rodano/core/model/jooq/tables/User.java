@@ -20,7 +20,6 @@ import ch.rodano.core.model.jooq.tables.Role.RolePath;
 import ch.rodano.core.model.jooq.tables.RoleAudit.RoleAuditPath;
 import ch.rodano.core.model.jooq.tables.ScopeAudit.ScopeAuditPath;
 import ch.rodano.core.model.jooq.tables.UserAudit.UserAuditPath;
-import ch.rodano.core.model.jooq.tables.UserSession.UserSessionPath;
 import ch.rodano.core.model.jooq.tables.WorkflowStatus.WorkflowStatusPath;
 import ch.rodano.core.model.jooq.tables.WorkflowStatusAudit.WorkflowStatusAuditPath;
 import ch.rodano.core.model.jooq.tables.records.UserRecord;
@@ -43,13 +42,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -78,7 +78,7 @@ public class User extends TableImpl<UserRecord> {
 	/**
 	 * The column <code>user.pk</code>.
 	 */
-	public final TableField<UserRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<UserRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>user.creation_time</code>.
@@ -98,12 +98,12 @@ public class User extends TableImpl<UserRecord> {
 	/**
 	 * The column <code>user.name</code>.
 	 */
-	public final TableField<UserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(400).nullable(false), this, "");
+	public final TableField<UserRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(400).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>user.email</code>.
 	 */
-	public final TableField<UserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200).nullable(false), this, "");
+	public final TableField<UserRecord, String> EMAIL = createField(DSL.name("email"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>user.externally_managed</code>.
@@ -279,7 +279,7 @@ public class User extends TableImpl<UserRecord> {
 
 	@Override
 	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.USER_IDX_USER_DELETED, Indexes.USER_IDX_USER_EMAIL, Indexes.USER_IDX_USER_NAME);
+		return Arrays.asList(Indexes.USER_IDX_USER_DELETED, Indexes.USER_IDX_USER_EMAIL);
 	}
 
 	@Override
@@ -429,17 +429,17 @@ public class User extends TableImpl<UserRecord> {
 		return _scopeAudit;
 	}
 
-	private transient UserAuditPath _fkUserAuditAuditObjectFk;
+	private transient UserAuditPath _fkUserAuditObjectFk;
 
 	/**
 	 * Get the implicit to-many join path to the <code>user_audit</code> table, via
-	 * the <code>fk_user_audit_audit_object_fk</code> key
+	 * the <code>fk_user_audit_object_fk</code> key
 	 */
-	public UserAuditPath fkUserAuditAuditObjectFk() {
-		if (_fkUserAuditAuditObjectFk == null)
-			_fkUserAuditAuditObjectFk = new UserAuditPath(this, null, Keys.FK_USER_AUDIT_AUDIT_OBJECT_FK.getInverseKey());
+	public UserAuditPath fkUserAuditObjectFk() {
+		if (_fkUserAuditObjectFk == null)
+			_fkUserAuditObjectFk = new UserAuditPath(this, null, Keys.FK_USER_AUDIT_OBJECT_FK.getInverseKey());
 
-		return _fkUserAuditAuditObjectFk;
+		return _fkUserAuditObjectFk;
 	}
 
 	private transient UserAuditPath _fkUserAuditUserFk;
@@ -453,18 +453,6 @@ public class User extends TableImpl<UserRecord> {
 			_fkUserAuditUserFk = new UserAuditPath(this, null, Keys.FK_USER_AUDIT_USER_FK.getInverseKey());
 
 		return _fkUserAuditUserFk;
-	}
-
-	private transient UserSessionPath _userSession;
-
-	/**
-	 * Get the implicit to-many join path to the <code>user_session</code> table
-	 */
-	public UserSessionPath userSession() {
-		if (_userSession == null)
-			_userSession = new UserSessionPath(this, null, Keys.FK_USER_SESSION_USER_FK.getInverseKey());
-
-		return _userSession;
 	}
 
 	private transient WorkflowStatusAuditPath _workflowStatusAudit;
@@ -536,7 +524,7 @@ public class User extends TableImpl<UserRecord> {
 	 */
 	@Override
 	public User where(Condition condition) {
-		return new User(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new User(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -603,7 +591,7 @@ public class User extends TableImpl<UserRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public User whereExists(Select<?> select) {
+	public User whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -611,7 +599,7 @@ public class User extends TableImpl<UserRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public User whereNotExists(Select<?> select) {
+	public User whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

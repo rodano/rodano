@@ -302,6 +302,6 @@ public class ScopeRecord extends UpdatableRecordImpl<ScopeRecord> {
 		setMaxNumber(maxNumber);
 		setLocked(locked);
 		setData(data);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

@@ -30,13 +30,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -65,7 +66,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	/**
 	 * The column <code>resource.pk</code>.
 	 */
-	public final TableField<ResourceRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<ResourceRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>resource.creation_time</code>.
@@ -80,7 +81,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	/**
 	 * The column <code>resource.deleted</code>.
 	 */
-	public final TableField<ResourceRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<ResourceRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false), this, "");
 
 	/**
 	 * The column <code>resource.user_fk</code>.
@@ -95,7 +96,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	/**
 	 * The column <code>resource.uuid</code>.
 	 */
-	public final TableField<ResourceRecord, String> UUID = createField(DSL.name("uuid"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.field(DSL.raw("uuid()"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<ResourceRecord, String> UUID = createField(DSL.name("uuid"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>resource.title</code>.
@@ -191,7 +192,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 
 	@Override
 	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.RESOURCE_IDX_RESOURCE_DELETED);
+		return Arrays.asList(Indexes.RESOURCE_IDX_RESOURCE_DELETED, Indexes.RESOURCE_PUBLIC_RESOURCE);
 	}
 
 	@Override
@@ -282,7 +283,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	 */
 	@Override
 	public Resource where(Condition condition) {
-		return new Resource(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Resource(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -349,7 +350,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Resource whereExists(Select<?> select) {
+	public Resource whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -357,7 +358,7 @@ public class Resource extends TableImpl<ResourceRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Resource whereNotExists(Select<?> select) {
+	public Resource whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

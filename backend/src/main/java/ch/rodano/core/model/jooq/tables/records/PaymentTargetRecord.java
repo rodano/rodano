@@ -151,6 +151,6 @@ public class PaymentTargetRecord extends UpdatableRecordImpl<PaymentTargetRecord
 		setPaymentFk(paymentFk);
 		setPayableId(payableId);
 		setValue(value);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

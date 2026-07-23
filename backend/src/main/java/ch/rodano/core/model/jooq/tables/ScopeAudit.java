@@ -33,13 +33,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -68,7 +69,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>scope_audit.pk</code>.
 	 */
-	public final TableField<ScopeAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<ScopeAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>scope_audit.audit_action_fk</code>.
@@ -108,7 +109,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>scope_audit.id</code>.
 	 */
-	public final TableField<ScopeAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).nullable(false), this, "");
+	public final TableField<ScopeAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>scope_audit.deleted</code>.
@@ -118,7 +119,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>scope_audit.scope_model_id</code>.
 	 */
-	public final TableField<ScopeAuditRecord, String> SCOPE_MODEL_ID = createField(DSL.name("scope_model_id"), SQLDataType.VARCHAR(64).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+	public final TableField<ScopeAuditRecord, String> SCOPE_MODEL_ID = createField(DSL.name("scope_model_id"), SQLDataType.VARCHAR(64).nullable(false), this, "");
 
 	/**
 	 * The column <code>scope_audit.code</code>.
@@ -349,7 +350,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	 */
 	@Override
 	public ScopeAudit where(Condition condition) {
-		return new ScopeAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new ScopeAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -416,7 +417,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public ScopeAudit whereExists(Select<?> select) {
+	public ScopeAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -424,7 +425,7 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public ScopeAudit whereNotExists(Select<?> select) {
+	public ScopeAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

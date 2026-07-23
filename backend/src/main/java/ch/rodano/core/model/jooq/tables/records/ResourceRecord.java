@@ -226,6 +226,6 @@ public class ResourceRecord extends UpdatableRecordImpl<ResourceRecord> {
 		setCategoryId(categoryId);
 		setPublicResource(publicResource);
 		setFilename(filename);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

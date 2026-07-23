@@ -527,6 +527,6 @@ public class UserAuditRecord extends UpdatableRecordImpl<UserAuditRecord> implem
 		setPhone(phone);
 		setLanguageId(languageId);
 		setUserAgent(userAgent);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

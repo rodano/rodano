@@ -33,14 +33,15 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
 import org.jooq.impl.EnumConverter;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -69,7 +70,7 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.pk</code>.
 	 */
-	public final TableField<MailRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<MailRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>mail.creation_time</code>.
@@ -89,7 +90,7 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.status</code>.
 	 */
-	public final TableField<MailRecord, MailStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(32).nullable(false), this, "", new EnumConverter<String, MailStatus>(String.class, MailStatus.class));
+	public final TableField<MailRecord, MailStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR(32).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "", new EnumConverter<String, MailStatus>(String.class, MailStatus.class));
 
 	/**
 	 * The column <code>mail.error</code>.
@@ -99,7 +100,7 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.sent_time</code>.
 	 */
-	public final TableField<MailRecord, ZonedDateTime> SENT_TIME = createField(DSL.name("sent_time"), SQLDataType.LOCALDATETIME(3).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
+	public final TableField<MailRecord, ZonedDateTime> SENT_TIME = createField(DSL.name("sent_time"), SQLDataType.LOCALDATETIME(0).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
 
 	/**
 	 * The column <code>mail.origin</code>.
@@ -114,12 +115,12 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.sender</code>.
 	 */
-	public final TableField<MailRecord, String> SENDER = createField(DSL.name("sender"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+	public final TableField<MailRecord, String> SENDER = createField(DSL.name("sender"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>mail.recipients</code>.
 	 */
-	public final TableField<MailRecord, Set> RECIPIENTS = createField(DSL.name("recipients"), SQLDataType.CLOB(65535).nullable(false), this, "", new StringSetConverter());
+	public final TableField<MailRecord, Set> RECIPIENTS = createField(DSL.name("recipients"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "", new StringSetConverter());
 
 	/**
 	 * The column <code>mail.reply_to</code>.
@@ -129,12 +130,12 @@ public class Mail extends TableImpl<MailRecord> {
 	/**
 	 * The column <code>mail.subject</code>.
 	 */
-	public final TableField<MailRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+	public final TableField<MailRecord, String> SUBJECT = createField(DSL.name("subject"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>mail.text_body</code>.
 	 */
-	public final TableField<MailRecord, String> TEXT_BODY = createField(DSL.name("text_body"), SQLDataType.CLOB(65535).nullable(false), this, "");
+	public final TableField<MailRecord, String> TEXT_BODY = createField(DSL.name("text_body"), SQLDataType.CLOB(65535).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.CLOB)), this, "");
 
 	/**
 	 * The column <code>mail.html_body</code>.
@@ -279,7 +280,7 @@ public class Mail extends TableImpl<MailRecord> {
 	 */
 	@Override
 	public Mail where(Condition condition) {
-		return new Mail(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Mail(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -346,7 +347,7 @@ public class Mail extends TableImpl<MailRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Mail whereExists(Select<?> select) {
+	public Mail whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -354,7 +355,7 @@ public class Mail extends TableImpl<MailRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Mail whereNotExists(Select<?> select) {
+	public Mail whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

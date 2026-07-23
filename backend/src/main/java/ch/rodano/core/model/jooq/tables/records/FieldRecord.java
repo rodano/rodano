@@ -151,6 +151,6 @@ public class FieldRecord extends UpdatableRecordImpl<FieldRecord> {
 		setDatasetModelId(datasetModelId);
 		setFieldModelId(fieldModelId);
 		setValue(value);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

@@ -227,6 +227,6 @@ public class RobotAuditRecord extends UpdatableRecordImpl<RobotAuditRecord> impl
 		setName(name);
 		setKey(key);
 		setActivated(activated);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

@@ -27,13 +27,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -62,7 +63,7 @@ public class ScopeRelation extends TableImpl<ScopeRelationRecord> {
 	/**
 	 * The column <code>scope_relation.pk</code>.
 	 */
-	public final TableField<ScopeRelationRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<ScopeRelationRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>scope_relation.creation_time</code>.
@@ -251,7 +252,7 @@ public class ScopeRelation extends TableImpl<ScopeRelationRecord> {
 	 */
 	@Override
 	public ScopeRelation where(Condition condition) {
-		return new ScopeRelation(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new ScopeRelation(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -318,7 +319,7 @@ public class ScopeRelation extends TableImpl<ScopeRelationRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public ScopeRelation whereExists(Select<?> select) {
+	public ScopeRelation whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -326,7 +327,7 @@ public class ScopeRelation extends TableImpl<ScopeRelationRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public ScopeRelation whereNotExists(Select<?> select) {
+	public ScopeRelation whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

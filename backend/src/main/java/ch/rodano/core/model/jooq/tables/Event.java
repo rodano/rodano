@@ -34,13 +34,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -69,7 +70,7 @@ public class Event extends TableImpl<EventRecord> {
 	/**
 	 * The column <code>event.pk</code>.
 	 */
-	public final TableField<EventRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<EventRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>event.id</code>.
@@ -109,7 +110,7 @@ public class Event extends TableImpl<EventRecord> {
 	/**
 	 * The column <code>event.event_model_id</code>.
 	 */
-	public final TableField<EventRecord, String> EVENT_MODEL_ID = createField(DSL.name("event_model_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<EventRecord, String> EVENT_MODEL_ID = createField(DSL.name("event_model_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>event.expected_date</code>.
@@ -349,7 +350,7 @@ public class Event extends TableImpl<EventRecord> {
 	 */
 	@Override
 	public Event where(Condition condition) {
-		return new Event(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Event(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -416,7 +417,7 @@ public class Event extends TableImpl<EventRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Event whereExists(Select<?> select) {
+	public Event whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -424,7 +425,7 @@ public class Event extends TableImpl<EventRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Event whereNotExists(Select<?> select) {
+	public Event whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

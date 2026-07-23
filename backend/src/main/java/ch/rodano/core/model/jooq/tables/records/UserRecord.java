@@ -451,6 +451,6 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> {
 		setPhone(phone);
 		setLanguageId(languageId);
 		setUserAgent(userAgent);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

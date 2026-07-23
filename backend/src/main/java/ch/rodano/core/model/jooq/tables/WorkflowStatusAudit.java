@@ -31,13 +31,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -66,7 +67,7 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	/**
 	 * The column <code>workflow_status_audit.pk</code>.
 	 */
-	public final TableField<WorkflowStatusAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<WorkflowStatusAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>workflow_status_audit.audit_action_fk</code>.
@@ -337,7 +338,7 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	 */
 	@Override
 	public WorkflowStatusAudit where(Condition condition) {
-		return new WorkflowStatusAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new WorkflowStatusAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -404,7 +405,7 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public WorkflowStatusAudit whereExists(Select<?> select) {
+	public WorkflowStatusAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -412,7 +413,7 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public WorkflowStatusAudit whereNotExists(Select<?> select) {
+	public WorkflowStatusAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

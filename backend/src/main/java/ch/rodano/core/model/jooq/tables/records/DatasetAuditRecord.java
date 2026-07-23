@@ -242,6 +242,6 @@ public class DatasetAuditRecord extends UpdatableRecordImpl<DatasetAuditRecord> 
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setDatasetModelId(datasetModelId);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

@@ -121,6 +121,6 @@ public class AuditActionRecord extends UpdatableRecordImpl<AuditActionRecord> {
 		setUserFk(userFk);
 		setRobotFk(robotFk);
 		setContext(context);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

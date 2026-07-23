@@ -29,13 +29,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -64,7 +65,7 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 	/**
 	 * The column <code>payment_target.pk</code>.
 	 */
-	public final TableField<PaymentTargetRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<PaymentTargetRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>payment_target.creation_time</code>.
@@ -165,7 +166,7 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 
 	@Override
 	public List<Index> getIndexes() {
-		return Arrays.asList(Indexes.PAYMENT_TARGET_IDX_PAYMENT_TARGET_DELETED);
+		return Arrays.asList(Indexes.PAYMENT_TARGET_IDX_PAYMENT_TARGET_DELETED, Indexes.PAYMENT_TARGET_PAYMENT_FK);
 	}
 
 	@Override
@@ -239,7 +240,7 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 	 */
 	@Override
 	public PaymentTarget where(Condition condition) {
-		return new PaymentTarget(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new PaymentTarget(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -306,7 +307,7 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public PaymentTarget whereExists(Select<?> select) {
+	public PaymentTarget whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -314,7 +315,7 @@ public class PaymentTarget extends TableImpl<PaymentTargetRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public PaymentTarget whereNotExists(Select<?> select) {
+	public PaymentTarget whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

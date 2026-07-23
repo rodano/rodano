@@ -121,6 +121,6 @@ public class UserSessionRecord extends UpdatableRecordImpl<UserSessionRecord> {
 		setToken(token);
 		setUserFk(userFk);
 		setLastAccessTime(lastAccessTime);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

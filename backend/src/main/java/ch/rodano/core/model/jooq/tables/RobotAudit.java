@@ -30,13 +30,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -65,7 +66,7 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	/**
 	 * The column <code>robot_audit.pk</code>.
 	 */
-	public final TableField<RobotAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<RobotAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>robot_audit.audit_action_fk</code>.
@@ -201,20 +202,20 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 
 	@Override
 	public List<ForeignKey<RobotAuditRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_ROBOT_AUDIT_AUDIT_OBJECT_FK, Keys.FK_ROBOT_AUDIT_ROBOT_FK, Keys.FK_ROBOT_AUDIT_USER_FK, Keys.FK_ROBOT_TRAIL_AUDIT_ACTION_FK);
+		return Arrays.asList(Keys.FK_ROBOT_AUDIT_OBJECT_FK, Keys.FK_ROBOT_AUDIT_ROBOT_FK, Keys.FK_ROBOT_AUDIT_USER_FK, Keys.FK_ROBOT_TRAIL_AUDIT_ACTION_FK);
 	}
 
-	private transient RobotPath _fkRobotAuditAuditObjectFk;
+	private transient RobotPath _fkRobotAuditObjectFk;
 
 	/**
 	 * Get the implicit join path to the <code>robot</code> table, via the
-	 * <code>fk_robot_audit_audit_object_fk</code> key.
+	 * <code>fk_robot_audit_object_fk</code> key.
 	 */
-	public RobotPath fkRobotAuditAuditObjectFk() {
-		if (_fkRobotAuditAuditObjectFk == null)
-			_fkRobotAuditAuditObjectFk = new RobotPath(this, Keys.FK_ROBOT_AUDIT_AUDIT_OBJECT_FK, null);
+	public RobotPath fkRobotAuditObjectFk() {
+		if (_fkRobotAuditObjectFk == null)
+			_fkRobotAuditObjectFk = new RobotPath(this, Keys.FK_ROBOT_AUDIT_OBJECT_FK, null);
 
-		return _fkRobotAuditAuditObjectFk;
+		return _fkRobotAuditObjectFk;
 	}
 
 	private transient RobotPath _fkRobotAuditRobotFk;
@@ -298,7 +299,7 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	 */
 	@Override
 	public RobotAudit where(Condition condition) {
-		return new RobotAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new RobotAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -365,7 +366,7 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public RobotAudit whereExists(Select<?> select) {
+	public RobotAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -373,7 +374,7 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public RobotAudit whereNotExists(Select<?> select) {
+	public RobotAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

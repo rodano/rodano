@@ -151,6 +151,6 @@ public class FormRecord extends UpdatableRecordImpl<FormRecord> {
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setFormModelId(formModelId);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

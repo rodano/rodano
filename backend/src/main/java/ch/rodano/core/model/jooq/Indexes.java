@@ -16,6 +16,7 @@ import ch.rodano.core.model.jooq.tables.Robot;
 import ch.rodano.core.model.jooq.tables.Role;
 import ch.rodano.core.model.jooq.tables.Scope;
 import ch.rodano.core.model.jooq.tables.User;
+import ch.rodano.core.model.jooq.tables.UserSession;
 import ch.rodano.core.model.jooq.tables.WorkflowStatus;
 
 import org.jooq.Index;
@@ -36,6 +37,7 @@ public class Indexes {
 
 	public static final Index WORKFLOW_STATUS_AGGREGATE_EVENT = Internal.createIndex(DSL.name("aggregate_event"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.WORKFLOW_ID, WorkflowStatus.WORKFLOW_STATUS.DELETED, WorkflowStatus.WORKFLOW_STATUS.EVENT_FK, WorkflowStatus.WORKFLOW_STATUS.FORM_FK, WorkflowStatus.WORKFLOW_STATUS.FIELD_FK }, false);
 	public static final Index WORKFLOW_STATUS_AGGREGATE_SCOPE = Internal.createIndex(DSL.name("aggregate_scope"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.WORKFLOW_ID, WorkflowStatus.WORKFLOW_STATUS.DELETED, WorkflowStatus.WORKFLOW_STATUS.SCOPE_FK }, false);
+	public static final Index USER_SESSION_FK_USER_SESSION_USER_FK = Internal.createIndex(DSL.name("fk_user_session_user_fk"), UserSession.USER_SESSION, new OrderField[] { UserSession.USER_SESSION.USER_FK }, false);
 	public static final Index DATASET_IDX_DATASET_DELETED = Internal.createIndex(DSL.name("idx_dataset_deleted"), Dataset.DATASET, new OrderField[] { Dataset.DATASET.DELETED }, false);
 	public static final Index EVENT_IDX_EVENT_BLOCKING = Internal.createIndex(DSL.name("idx_event_blocking"), Event.EVENT, new OrderField[] { Event.EVENT.BLOCKING }, false);
 	public static final Index EVENT_IDX_EVENT_DATE = Internal.createIndex(DSL.name("idx_event_date"), Event.EVENT, new OrderField[] { Event.EVENT.DATE }, false);
@@ -55,8 +57,11 @@ public class Indexes {
 	public static final Index SCOPE_IDX_SCOPE_DELETED = Internal.createIndex(DSL.name("idx_scope_deleted"), Scope.SCOPE, new OrderField[] { Scope.SCOPE.DELETED }, false);
 	public static final Index USER_IDX_USER_DELETED = Internal.createIndex(DSL.name("idx_user_deleted"), User.USER, new OrderField[] { User.USER.DELETED }, false);
 	public static final Index USER_IDX_USER_EMAIL = Internal.createIndex(DSL.name("idx_user_email"), User.USER, new OrderField[] { User.USER.EMAIL }, false);
-	public static final Index USER_IDX_USER_NAME = Internal.createIndex(DSL.name("idx_user_name"), User.USER, new OrderField[] { User.USER.NAME }, false);
 	public static final Index WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_DELETED = Internal.createIndex(DSL.name("idx_workflow_status_deleted"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.DELETED }, false);
 	public static final Index WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_STATE_ID = Internal.createIndex(DSL.name("idx_workflow_status_state_id"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.STATE_ID }, false);
 	public static final Index WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_WORKFLOW_ID = Internal.createIndex(DSL.name("idx_workflow_status_workflow_id"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.WORKFLOW_ID }, false);
+	public static final Index PAYMENT_PAYMENT_BATCH_FK = Internal.createIndex(DSL.name("PAYMENT_BATCH_FK"), Payment.PAYMENT, new OrderField[] { Payment.PAYMENT.PAYMENT_BATCH_FK }, false);
+	public static final Index PAYMENT_TARGET_PAYMENT_FK = Internal.createIndex(DSL.name("PAYMENT_FK"), PaymentTarget.PAYMENT_TARGET, new OrderField[] { PaymentTarget.PAYMENT_TARGET.PAYMENT_FK }, false);
+	public static final Index RESOURCE_PUBLIC_RESOURCE = Internal.createIndex(DSL.name("public_resource"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.PUBLIC_RESOURCE }, false);
+	public static final Index PAYMENT_WORKFLOW_STATUS_FK = Internal.createIndex(DSL.name("WORKFLOW_STATUS_FK"), Payment.PAYMENT, new OrderField[] { Payment.PAYMENT.WORKFLOW_STATUS_FK }, false);
 }

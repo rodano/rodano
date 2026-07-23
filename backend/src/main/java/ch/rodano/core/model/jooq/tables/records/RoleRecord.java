@@ -167,6 +167,6 @@ public class RoleRecord extends UpdatableRecordImpl<RoleRecord> {
 		setScopeFk(scopeFk);
 		setProfileId(profileId);
 		setStatus(status);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

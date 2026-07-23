@@ -227,6 +227,6 @@ public class FieldAuditRecord extends UpdatableRecordImpl<FieldAuditRecord> impl
 		setDatasetModelId(datasetModelId);
 		setFieldModelId(fieldModelId);
 		setValue(value);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

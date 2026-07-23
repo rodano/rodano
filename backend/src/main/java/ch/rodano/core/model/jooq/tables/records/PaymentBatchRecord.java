@@ -211,6 +211,6 @@ public class PaymentBatchRecord extends UpdatableRecordImpl<PaymentBatchRecord> 
 		setClosedDate(closedDate);
 		setPrintedDate(printedDate);
 		setComment(comment);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

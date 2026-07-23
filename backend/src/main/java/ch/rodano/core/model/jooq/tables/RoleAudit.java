@@ -31,13 +31,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -66,7 +67,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 	/**
 	 * The column <code>role_audit.pk</code>.
 	 */
-	public final TableField<RoleAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<RoleAuditRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>role_audit.audit_action_fk</code>.
@@ -207,7 +208,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 
 	@Override
 	public List<ForeignKey<RoleAuditRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_ROLE_AUDIT_AUDIT_OBJECT_FK, Keys.FK_ROLE_AUDIT_ROBOT_FK, Keys.FK_ROLE_AUDIT_USER_FK, Keys.FK_ROLE_TRAIL_AUDIT_ACTION_FK);
+		return Arrays.asList(Keys.FK_ROLE_AUDIT_OBJECT_FK, Keys.FK_ROLE_AUDIT_ROBOT_FK, Keys.FK_ROLE_AUDIT_USER_FK, Keys.FK_ROLE_TRAIL_AUDIT_ACTION_FK);
 	}
 
 	private transient RolePath _role;
@@ -217,7 +218,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 	 */
 	public RolePath role() {
 		if (_role == null)
-			_role = new RolePath(this, Keys.FK_ROLE_AUDIT_AUDIT_OBJECT_FK, null);
+			_role = new RolePath(this, Keys.FK_ROLE_AUDIT_OBJECT_FK, null);
 
 		return _role;
 	}
@@ -302,7 +303,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 	 */
 	@Override
 	public RoleAudit where(Condition condition) {
-		return new RoleAudit(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new RoleAudit(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -369,7 +370,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public RoleAudit whereExists(Select<?> select) {
+	public RoleAudit whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -377,7 +378,7 @@ public class RoleAudit extends TableImpl<RoleAuditRecord> implements AuditTable 
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public RoleAudit whereNotExists(Select<?> select) {
+	public RoleAudit whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

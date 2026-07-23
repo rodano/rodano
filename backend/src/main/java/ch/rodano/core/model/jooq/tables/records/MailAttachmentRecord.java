@@ -136,6 +136,6 @@ public class MailAttachmentRecord extends UpdatableRecordImpl<MailAttachmentReco
 		setMailFk(mailFk);
 		setFilename(filename);
 		setContent(content);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

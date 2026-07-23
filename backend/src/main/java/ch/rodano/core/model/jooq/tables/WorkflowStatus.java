@@ -36,13 +36,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -71,7 +72,7 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	/**
 	 * The column <code>workflow_status.pk</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<WorkflowStatusRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>workflow_status.creation_time</code>.
@@ -121,12 +122,12 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	/**
 	 * The column <code>workflow_status.state_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> STATE_ID = createField(DSL.name("state_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<WorkflowStatusRecord, String> STATE_ID = createField(DSL.name("state_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>workflow_status.workflow_id</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, String> WORKFLOW_ID = createField(DSL.name("workflow_id"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<WorkflowStatusRecord, String> WORKFLOW_ID = createField(DSL.name("workflow_id"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>workflow_status.action_id</code>.
@@ -371,7 +372,7 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	 */
 	@Override
 	public WorkflowStatus where(Condition condition) {
-		return new WorkflowStatus(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new WorkflowStatus(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -438,7 +439,7 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public WorkflowStatus whereExists(Select<?> select) {
+	public WorkflowStatus whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -446,7 +447,7 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public WorkflowStatus whereNotExists(Select<?> select) {
+	public WorkflowStatus whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

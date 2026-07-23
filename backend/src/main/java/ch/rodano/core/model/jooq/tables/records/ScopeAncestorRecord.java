@@ -171,6 +171,6 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 		setVirtual(virtual);
 		setDefault(default_);
 		setAncestorDeleted(ancestorDeleted);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

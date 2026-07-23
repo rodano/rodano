@@ -166,6 +166,6 @@ public class ScopeRelationRecord extends UpdatableRecordImpl<ScopeRelationRecord
 		setStartDate(startDate);
 		setEndDate(endDate);
 		setDefault(default_);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

@@ -40,13 +40,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -75,7 +76,7 @@ public class Robot extends TableImpl<RobotRecord> {
 	/**
 	 * The column <code>robot.pk</code>.
 	 */
-	public final TableField<RobotRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<RobotRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>robot.creation_time</code>.
@@ -95,7 +96,7 @@ public class Robot extends TableImpl<RobotRecord> {
 	/**
 	 * The column <code>robot.name</code>.
 	 */
-	public final TableField<RobotRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).nullable(false), this, "");
+	public final TableField<RobotRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(100).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>robot.key</code>.
@@ -254,17 +255,17 @@ public class Robot extends TableImpl<RobotRecord> {
 		return _formAudit;
 	}
 
-	private transient RobotAuditPath _fkRobotAuditAuditObjectFk;
+	private transient RobotAuditPath _fkRobotAuditObjectFk;
 
 	/**
 	 * Get the implicit to-many join path to the <code>robot_audit</code> table,
-	 * via the <code>fk_robot_audit_audit_object_fk</code> key
+	 * via the <code>fk_robot_audit_object_fk</code> key
 	 */
-	public RobotAuditPath fkRobotAuditAuditObjectFk() {
-		if (_fkRobotAuditAuditObjectFk == null)
-			_fkRobotAuditAuditObjectFk = new RobotAuditPath(this, null, Keys.FK_ROBOT_AUDIT_AUDIT_OBJECT_FK.getInverseKey());
+	public RobotAuditPath fkRobotAuditObjectFk() {
+		if (_fkRobotAuditObjectFk == null)
+			_fkRobotAuditObjectFk = new RobotAuditPath(this, null, Keys.FK_ROBOT_AUDIT_OBJECT_FK.getInverseKey());
 
-		return _fkRobotAuditAuditObjectFk;
+		return _fkRobotAuditObjectFk;
 	}
 
 	private transient RobotAuditPath _fkRobotAuditRobotFk;
@@ -397,7 +398,7 @@ public class Robot extends TableImpl<RobotRecord> {
 	 */
 	@Override
 	public Robot where(Condition condition) {
-		return new Robot(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Robot(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -464,7 +465,7 @@ public class Robot extends TableImpl<RobotRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Robot whereExists(Select<?> select) {
+	public Robot whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -472,7 +473,7 @@ public class Robot extends TableImpl<RobotRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Robot whereNotExists(Select<?> select) {
+	public Robot whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

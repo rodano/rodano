@@ -378,6 +378,6 @@ public class ScopeAuditRecord extends UpdatableRecordImpl<ScopeAuditRecord> impl
 		setMaxNumber(maxNumber);
 		setLocked(locked);
 		setData(data);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

@@ -347,6 +347,6 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 		setActionId(actionId);
 		setValidatorId(validatorId);
 		setTriggerMessage(triggerMessage);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

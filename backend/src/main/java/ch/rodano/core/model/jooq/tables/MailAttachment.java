@@ -27,13 +27,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -62,7 +63,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	/**
 	 * The column <code>mail_attachment.pk</code>.
 	 */
-	public final TableField<MailAttachmentRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<MailAttachmentRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>mail_attachment.creation_time</code>.
@@ -82,7 +83,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	/**
 	 * The column <code>mail_attachment.filename</code>.
 	 */
-	public final TableField<MailAttachmentRecord, String> FILENAME = createField(DSL.name("filename"), SQLDataType.VARCHAR(255).nullable(false), this, "");
+	public final TableField<MailAttachmentRecord, String> FILENAME = createField(DSL.name("filename"), SQLDataType.VARCHAR(255).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
 	 * The column <code>mail_attachment.content</code>.
@@ -227,7 +228,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	 */
 	@Override
 	public MailAttachment where(Condition condition) {
-		return new MailAttachment(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new MailAttachment(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -294,7 +295,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public MailAttachment whereExists(Select<?> select) {
+	public MailAttachment whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -302,7 +303,7 @@ public class MailAttachment extends TableImpl<MailAttachmentRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public MailAttachment whereNotExists(Select<?> select) {
+	public MailAttachment whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

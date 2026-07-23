@@ -6,8 +6,8 @@ package ch.rodano.core.model.jooq.tables;
 
 import ch.rodano.core.helpers.configuration.DateConverter;
 import ch.rodano.core.model.jooq.DefaultSchema;
+import ch.rodano.core.model.jooq.Indexes;
 import ch.rodano.core.model.jooq.Keys;
-import ch.rodano.core.model.jooq.tables.User.UserPath;
 import ch.rodano.core.model.jooq.tables.records.UserSessionRecord;
 
 import java.time.ZonedDateTime;
@@ -17,23 +17,21 @@ import java.util.List;
 
 import org.jooq.Condition;
 import org.jooq.Field;
-import org.jooq.ForeignKey;
 import org.jooq.Identity;
-import org.jooq.InverseForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
-import org.jooq.Path;
 import org.jooq.PlainSQL;
 import org.jooq.QueryPart;
-import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -62,7 +60,7 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	/**
 	 * The column <code>user_session.pk</code>.
 	 */
-	public final TableField<UserSessionRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<UserSessionRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>user_session.creation_time</code>.
@@ -113,42 +111,14 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 		this(DSL.name("user_session"), null);
 	}
 
-	public <O extends Record> UserSession(Table<O> path, ForeignKey<O, UserSessionRecord> childPath, InverseForeignKey<O, UserSessionRecord> parentPath) {
-		super(path, childPath, parentPath, USER_SESSION);
-	}
-
-	/**
-	 * A subtype implementing {@link Path} for simplified path-based joins.
-	 */
-	public static class UserSessionPath extends UserSession implements Path<UserSessionRecord> {
-
-		private static final long serialVersionUID = 1L;
-		public <O extends Record> UserSessionPath(Table<O> path, ForeignKey<O, UserSessionRecord> childPath, InverseForeignKey<O, UserSessionRecord> parentPath) {
-			super(path, childPath, parentPath);
-		}
-		private UserSessionPath(Name alias, Table<UserSessionRecord> aliased) {
-			super(alias, aliased);
-		}
-
-		@Override
-		public UserSessionPath as(String alias) {
-			return new UserSessionPath(DSL.name(alias), this);
-		}
-
-		@Override
-		public UserSessionPath as(Name alias) {
-			return new UserSessionPath(alias, this);
-		}
-
-		@Override
-		public UserSessionPath as(Table<?> alias) {
-			return new UserSessionPath(alias.getQualifiedName(), this);
-		}
-	}
-
 	@Override
 	public Schema getSchema() {
 		return aliased() ? null : DefaultSchema.DEFAULT_SCHEMA;
+	}
+
+	@Override
+	public List<Index> getIndexes() {
+		return Arrays.asList(Indexes.USER_SESSION_FK_USER_SESSION_USER_FK);
 	}
 
 	@Override
@@ -159,28 +129,6 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	@Override
 	public UniqueKey<UserSessionRecord> getPrimaryKey() {
 		return Keys.KEY_USER_SESSION_PRIMARY;
-	}
-
-	@Override
-	public List<UniqueKey<UserSessionRecord>> getUniqueKeys() {
-		return Arrays.asList(Keys.KEY_USER_SESSION_IDX_USER_SESSION_TOKEN);
-	}
-
-	@Override
-	public List<ForeignKey<UserSessionRecord, ?>> getReferences() {
-		return Arrays.asList(Keys.FK_USER_SESSION_USER_FK);
-	}
-
-	private transient UserPath _user;
-
-	/**
-	 * Get the implicit join path to the <code>user</code> table.
-	 */
-	public UserPath user() {
-		if (_user == null)
-			_user = new UserPath(this, Keys.FK_USER_SESSION_USER_FK, null);
-
-		return _user;
 	}
 
 	@Override
@@ -227,7 +175,7 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	 */
 	@Override
 	public UserSession where(Condition condition) {
-		return new UserSession(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new UserSession(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -294,7 +242,7 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public UserSession whereExists(Select<?> select) {
+	public UserSession whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -302,7 +250,7 @@ public class UserSession extends TableImpl<UserSessionRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public UserSession whereNotExists(Select<?> select) {
+	public UserSession whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

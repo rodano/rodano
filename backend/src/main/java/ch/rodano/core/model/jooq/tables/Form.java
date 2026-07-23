@@ -32,13 +32,14 @@ import org.jooq.QueryPart;
 import org.jooq.Record;
 import org.jooq.SQL;
 import org.jooq.Schema;
-import org.jooq.Select;
 import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
+import org.jooq.TableLike;
 import org.jooq.TableOptions;
 import org.jooq.UniqueKey;
 import org.jooq.impl.DSL;
+import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 
@@ -67,7 +68,7 @@ public class Form extends TableImpl<FormRecord> {
 	/**
 	 * The column <code>form.pk</code>.
 	 */
-	public final TableField<FormRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).identity(true), this, "");
+	public final TableField<FormRecord, Long> PK = createField(DSL.name("pk"), SQLDataType.BIGINT.nullable(false).generatedByDefaultAsIdentity(), this, "");
 
 	/**
 	 * The column <code>form.creation_time</code>.
@@ -87,7 +88,7 @@ public class Form extends TableImpl<FormRecord> {
 	/**
 	 * The column <code>form.scope_fk</code>.
 	 */
-	public final TableField<FormRecord, Long> SCOPE_FK = createField(DSL.name("scope_fk"), SQLDataType.BIGINT.defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.BIGINT)), this, "");
+	public final TableField<FormRecord, Long> SCOPE_FK = createField(DSL.name("scope_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
 	 * The column <code>form.event_fk</code>.
@@ -278,7 +279,7 @@ public class Form extends TableImpl<FormRecord> {
 	 */
 	@Override
 	public Form where(Condition condition) {
-		return new Form(getQualifiedName(), aliased() ? this : null, null, condition);
+		return new Form(getQualifiedName(), aliased() ? this : null, null, Internal.condition(this, condition));
 	}
 
 	/**
@@ -345,7 +346,7 @@ public class Form extends TableImpl<FormRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Form whereExists(Select<?> select) {
+	public Form whereExists(TableLike<?> select) {
 		return where(DSL.exists(select));
 	}
 
@@ -353,7 +354,7 @@ public class Form extends TableImpl<FormRecord> {
 	 * Create an inline derived table from this table
 	 */
 	@Override
-	public Form whereNotExists(Select<?> select) {
+	public Form whereNotExists(TableLike<?> select) {
 		return where(DSL.notExists(select));
 	}
 }

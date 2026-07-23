@@ -271,6 +271,6 @@ public class EventRecord extends UpdatableRecordImpl<EventRecord> {
 		setNotDone(notDone);
 		setBlocking(blocking);
 		setLocked(locked);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }

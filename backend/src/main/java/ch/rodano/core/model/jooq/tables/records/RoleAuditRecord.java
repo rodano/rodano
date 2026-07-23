@@ -242,6 +242,6 @@ public class RoleAuditRecord extends UpdatableRecordImpl<RoleAuditRecord> implem
 		setScopeFk(scopeFk);
 		setProfileId(profileId);
 		setStatus(status);
-		resetChangedOnNotNull();
+		resetTouchedOnNotNull();
 	}
 }
