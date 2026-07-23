@@ -33,6 +33,25 @@
 				"panel": "shared"
 			},
 			"problemMatcher": []
+		},
+		{
+			"label": "Generate jOOQ classes",
+			"type": "shell",
+			"command": "mvn",
+			"args": [
+				"compile",
+				"exec:java",
+				"-Dexec.mainClass=org.jooq.codegen.GenerationTool",
+				"-Dexec.classpathScope=runtime",
+				"-Dexec.args=src/main/resources/jooq/jooq-database.xml"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": true,
+				"panel": "shared"
+			},
+			"problemMatcher": []
 		}
 	]
 }

@@ -105,6 +105,20 @@
 				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
 				"problemMatcher": []
 			},
+			{
+				"label": "Backend: Generate jOOQ classes",
+				"type": "shell",
+				"command": "mvn",
+				"args": [
+					"compile",
+					"exec:java",
+					"-Dexec.mainClass=org.jooq.codegen.GenerationTool",
+					"-Dexec.classpathScope=runtime",
+					"-Dexec.args=src/main/resources/jooq/jooq-database.xml"
+				],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"problemMatcher": []
+			},
 			//frontend: main
 			{
 				"label": "Frontend Main: Start",
