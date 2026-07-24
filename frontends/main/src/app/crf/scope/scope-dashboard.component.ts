@@ -13,6 +13,8 @@ import {MatDialog} from '@angular/material/dialog';
 import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.component';
 import {of, switchMap} from 'rxjs';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
+import {LowerCasePipe} from '@angular/common';
 
 @Component({
 	selector: 'app-scope-dashboard',
@@ -22,6 +24,8 @@ import {WorkflowableUpdateService} from '../services/workflowable-update.service
 		WorkflowStatusComponent,
 		AuditTrailButtonComponent,
 		IssueViewerComponent,
+		LocalizeMapPipe,
+		LowerCasePipe,
 		MatButton
 	]
 })
@@ -44,8 +48,9 @@ export class ScopeDashboardComponent {
 	) { }
 
 	remove() {
+		const entityName = this.scope().shortname;
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: true})
+			.open(DeleteRestoreComponent, {data: {deletion: true, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {
@@ -71,8 +76,9 @@ export class ScopeDashboardComponent {
 	}
 
 	restore() {
+		const entityName = this.scope().shortname;
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: false})
+			.open(DeleteRestoreComponent, {data: {deletion: false, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {

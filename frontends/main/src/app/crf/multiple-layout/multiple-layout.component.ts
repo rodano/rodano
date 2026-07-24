@@ -157,8 +157,9 @@ export class MultipleLayoutComponent implements OnInit {
 	}
 
 	private openRationaleDialog(deletion: boolean): Observable<string | undefined> {
+		const entityName = new LocalizeMapPipe().transform(this.layout().datasetModel.shortname);
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: deletion})
+			.open(DeleteRestoreComponent, {data: {deletion, entityName}})
 			.afterClosed();
 	}
 

@@ -69,8 +69,9 @@ export class ScopeSettingsComponent {
 	}
 
 	remove() {
+		const entityName = this.scope().shortname;
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: true})
+			.open(DeleteRestoreComponent, {data: {deletion: true, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {
@@ -94,8 +95,9 @@ export class ScopeSettingsComponent {
 	}
 
 	restore() {
+		const entityName = this.scope().shortname;
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: false})
+			.open(DeleteRestoreComponent, {data: {deletion: false, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {

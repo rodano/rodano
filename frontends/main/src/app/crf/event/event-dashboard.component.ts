@@ -16,6 +16,7 @@ import {DeleteRestoreComponent} from '../dialogs/delete-restore/delete-restore.c
 import {MatDialog} from '@angular/material/dialog';
 import {of, switchMap} from 'rxjs';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
+import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 
 @Component({
 	selector: 'app-event-dashboard',
@@ -55,8 +56,9 @@ export class EventDashboardComponent {
 	) {}
 
 	remove() {
+		const entityName = new LocalizeMapPipe().transform(this.event().model.shortname);
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: true})
+			.open(DeleteRestoreComponent, {data: {deletion: true, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {
@@ -82,8 +84,9 @@ export class EventDashboardComponent {
 	}
 
 	restore() {
+		const entityName = new LocalizeMapPipe().transform(this.event().model.shortname);
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: false})
+			.open(DeleteRestoreComponent, {data: {deletion: false, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {

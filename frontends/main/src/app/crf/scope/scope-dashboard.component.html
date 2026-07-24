@@ -31,7 +31,7 @@
 				mat-flat-button
 				(click)="restore()"
 				type="button">
-				Restore
+				Restore {{ scope().model.shortname | localizeMap | lowercase }}
 			</button>
 		} @else {
 			@if (scope().locked) {
@@ -39,20 +39,20 @@
 					mat-flat-button
 					(click)="unlock()"
 					type="button">
-					Unlock
+					Unlock {{ scope().model.shortname | localizeMap | lowercase }}
 				</button>
 			} @else {
 				<button
 					mat-flat-button
 					(click)="remove()"
 					type="button">
-					Remove
+					Remove {{ scope().model.shortname | localizeMap | lowercase }}
 				</button>
 				<button
 					mat-flat-button
 					(click)="lock()"
 					type="button">
-					Lock
+					Lock {{ scope().model.shortname | localizeMap | lowercase }}
 				</button>
 			}
 		}

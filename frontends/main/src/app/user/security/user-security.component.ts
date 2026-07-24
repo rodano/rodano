@@ -117,8 +117,9 @@ export class UserSecurityComponent {
 	}
 
 	remove() {
+		const entityName = this.user().name;
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: true})
+			.open(DeleteRestoreComponent, {data: {deletion: true, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {
@@ -142,8 +143,9 @@ export class UserSecurityComponent {
 	}
 
 	restore() {
+		const entityName = this.user().name;
 		return this.dialog
-			.open(DeleteRestoreComponent, {data: false})
+			.open(DeleteRestoreComponent, {data: {deletion: false, entityName}})
 			.afterClosed()
 			.pipe(
 				switchMap((rationale?: string) => {

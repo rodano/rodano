@@ -45,7 +45,7 @@
 				mat-flat-button
 				(click)="restore()"
 				type="button">
-				Restore
+				Restore event
 			</button>
 		} @else {
 			@if (event().locked) {
@@ -53,20 +53,20 @@
 					mat-flat-button
 					(click)="unlock()"
 					type="button">
-					Unlock
+					Unlock event
 				</button>
 			} @else {
 				<button
 					mat-flat-button
 					(click)="remove()"
 					type="button">
-					Remove
+					Remove event
 				</button>
 				<button
 					mat-flat-button
 					(click)="lock()"
 					type="button">
-					Lock
+					Lock event
 				</button>
 			}
 		}
