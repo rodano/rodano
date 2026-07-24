@@ -79,7 +79,6 @@ export class SearchComponent implements OnInit {
 	readonly columnsToDisplay = signal<string[]>([]);
 	SearchComponent = SearchComponent;
 
-	Object = Object;
 	FieldModelType = FieldModelType;
 
 	scopeModelId: string;
@@ -109,10 +108,6 @@ export class SearchComponent implements OnInit {
 	loading = signal(false);
 
 	private readonly searchTrigger$ = new Subject<ScopeSearch>();
-
-	//Caches
-	private readonly fieldModelCache = new Map<string, FieldModel>();
-	private readonly workflowCache = new Map<string, Workflow>();
 
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
@@ -160,7 +155,7 @@ export class SearchComponent implements OnInit {
 				const resolvedScopeModel = this.route.snapshot.data['scopeModel'];
 				this.selectedScopeModel.set(resolvedScopeModel);
 				this.selectedScopeModelParentModel.set(scopeModels.find(scopeModel => scopeModel.id === this.selectedScopeModel().defaultParentId) ?? ({} as ScopeModel));
-				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.includes(FeatureStatic.MANAGE_DELETED_DATA)) ?? false);
+				this.hasManageDeletedDataFeature.set(results.me.roles?.some(r => r.profile.features.includes(FeatureStatic.MANAGE_REMOVED_DATA)) ?? false);
 
 				//Load dependent data after we have the scope model
 				return forkJoin({
@@ -178,16 +173,15 @@ export class SearchComponent implements OnInit {
 			//TODO implement date range search to allow searching on partially collected dates
 			this.searchableFields = results.searchableFields.filter(field => !(field.type === FieldModelType.DATE || field.type === FieldModelType.DATE_SELECT) || SearchComponent.getIsCompleteDate(field));
 
-			this.buildColumnsArray();
+			//Warn if any searchable fields were filtered out
+			if(results.searchableFields.length > this.searchableFields.length) {
+				const filteredOutFields: FieldModel[] = results.searchableFields.filter(field => !this.searchableFields.some(f => f.type === field.type));
+				console.warn(`Searchable fields filtered out: ${filteredOutFields.map(f => f.id).join(', ')}`);
+			}
 
-			//Cache workflows and fields
-			this.searchableWorkflows.forEach(workflow => this.workflowCache.set(workflow.id, workflow));
-			this.searchableFields.forEach(field => {
-				const key = `${field.datasetModelId.toUpperCase()}.${field.id.toUpperCase()}`;
-				this.fieldModelCache.set(key, field);
-			});
+			this.buildColumnsArray();
 			this.setupFormListeners();
-			this.loadData();
+			this.setupSearch();
 
 			this.writeAccessOnParent.set(results.parentsWithWriteAccess.length > 0);
 		});
@@ -281,7 +275,7 @@ export class SearchComponent implements OnInit {
 		this.searchTrigger$.next(scopeSearch);
 	}
 
-	private loadData(): void {
+	private setupSearch(): void {
 		this.searchTrigger$.pipe(takeUntilDestroyed(this.destroyRef),
 			tap(() => {
 				this.loading.set(true);
@@ -379,20 +373,18 @@ export class SearchComponent implements OnInit {
 		//Sync the scope code
 		this.searchForm.controls.scopeCode.setValue(scopeSearch.fullText, {emitEvent: false});
 		//Sync the workflow controls
-		const workflowStatesValue = scopeSearch.workflowStates as any;
-		if(workflowStatesValue) {
-			Object.keys(workflowStatesValue).forEach(workflowId => {
+		if(scopeSearch.workflowStates) {
+			Object.keys(scopeSearch.workflowStates).forEach(workflowId => {
 				const workflow = this.getWorkflow(workflowId);
 				if(workflow) {
 					const control = this.searchForm.controls[SearchComponent.getWSFormControlName(workflow)];
-					control.setValue(workflowStatesValue[workflowId], {emitEvent: false});
+					control.setValue(scopeSearch.workflowStates[workflowId], {emitEvent: false});
 				}
 			});
 		}
 		//Sync the fieldModelCriteria fields
-		const fieldModelCriteriaValue = scopeSearch.fieldModelCriteria as string;
-		if(fieldModelCriteriaValue) {
-			this.fieldModelCriteria = JSON.parse(fieldModelCriteriaValue);
+		if(scopeSearch.fieldModelCriteria) {
+			this.fieldModelCriteria = JSON.parse(scopeSearch.fieldModelCriteria as string);
 			this.fieldModelCriteria.forEach(criteria => {
 				const datasetModelId = criteria.datasetModelId;
 				const fieldModelId = criteria.fieldModelId;
@@ -421,8 +413,7 @@ export class SearchComponent implements OnInit {
 
 		//Sync the ancestor scopes
 		if(scopeSearch.parentPks) {
-			const control = this.parentScopeControl;
-			control.setValue(scopeSearch.parentPks, {emitEvent: false});
+			this.parentScopeControl.setValue(scopeSearch.parentPks, {emitEvent: false});
 		}
 
 		//Sync the show removed scopes checkbox - always sync, default to false
@@ -487,7 +478,7 @@ export class SearchComponent implements OnInit {
 
 		this.fieldModelCriteria = newFieldModelCriteria;
 		if(this.fieldModelCriteria.length === 0) {
-			delete (search as any).fieldModelCriteria;
+			delete (search).fieldModelCriteria;
 		}
 		else {
 			(search as any).fieldModelCriteria = this.fieldModelCriteria;
@@ -523,7 +514,7 @@ export class SearchComponent implements OnInit {
 	}
 
 	getStatusModel(workflowId: string, stateId: string): Record<string, string> | undefined {
-		const workflow = this.workflowCache.get(workflowId);
+		const workflow = this.getWorkflow(workflowId);
 		const state = workflow?.states.find(s => s.id === stateId);
 		return state?.shortname;
 	}
@@ -560,12 +551,13 @@ export class SearchComponent implements OnInit {
 	}
 
 	getFieldModel(datasetModelId: string, fieldId: string): FieldModel | undefined {
-		const key = `${datasetModelId.toUpperCase()}.${fieldId.toUpperCase()}`;
-		return this.fieldModelCache.get(key);
+		return this.searchableFields.find(field =>
+			field.datasetModelId === datasetModelId && field.id === fieldId
+		);
 	}
 
 	getWorkflow(workflowId: string): Workflow | undefined {
-		return this.workflowCache.get(workflowId);
+		return this.searchableWorkflows.find(workflow => workflow.id === workflowId);
 	}
 
 	getFieldModelType(datasetModelId: string, fieldId: string): FieldModelType | undefined {
@@ -583,7 +575,7 @@ export class SearchComponent implements OnInit {
 
 	static getIsCompleteDate(fieldModel: FieldModel): boolean {
 		const dMYCollected = (fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) && fieldModel.withDays && fieldModel.withMonths && fieldModel.withYears;
-		const dMYMandatory = fieldModel.type === FieldModelType.DATE || (fieldModel?.type === FieldModelType.DATE_SELECT && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory);
+		const dMYMandatory = fieldModel.type === FieldModelType.DATE || (fieldModel.type === FieldModelType.DATE_SELECT && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory);
 		return dMYCollected && dMYMandatory;
 	}
 
