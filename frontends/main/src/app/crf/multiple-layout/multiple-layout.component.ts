@@ -1,7 +1,7 @@
-import {Component, DestroyRef, OnInit, ViewChild, effect, input, signal} from '@angular/core';
+import {Component, DestroyRef, OnInit, computed, input, model, signal} from '@angular/core';
 import {Layout} from '@core/model/layout';
 import {MatSortModule, Sort} from '@angular/material/sort';
-import {MatTable, MatTableDataSource, MatTableModule} from '@angular/material/table';
+import {MatTableModule} from '@angular/material/table';
 import {MatIcon} from '@angular/material/icon';
 import {MatTooltip} from '@angular/material/tooltip';
 import {MatButton, MatIconButton} from '@angular/material/button';
@@ -27,6 +27,11 @@ import {FieldService} from '@core/services/field.service';
 import {EmptyObjectCheck} from '../../utils/empty-object-check';
 import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 
+interface DatasetSort {
+	field?: FieldModel;
+	ascending: boolean;
+}
+
 @Component({
 	selector: 'app-multiple-layout',
 	templateUrl: './multiple-layout.component.html',
@@ -46,20 +51,35 @@ import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 })
 export class MultipleLayoutComponent implements OnInit {
 	readonly layout = input.required<Layout>();
-	//this component must have a reference to the reference list of datasets to be able to push new datasets in it
-	//if a filtered list is provided, new datasets will not be visible by the parent component
-	readonly datasets = input.required<CRFDataset[]>();
+	//this component must have access to the whole list of datasets and be able to push new datasets in it
+	//if only a filtered list is provided, new datasets will not be visible by the parent component
+	readonly datasets = model.required<CRFDataset[]>();
 	readonly disabled = input<boolean>(false);
 
-	multipleDatasets: CRFDataset[] = [];
-
-	@ViewChild(MatTable) table: MatTable<any>;
-	readonly fieldModelsToDisplay = signal<FieldModel[]>([]);
-	readonly columnsToDisplay = signal<string[]>([]);
-	//handle datasource manually to be able to refresh it properly
-	readonly dataSource = signal(new MatTableDataSource<CRFDataset>([]));
-
 	readonly shown = signal(true);
+	private readonly sort = signal<DatasetSort>({ascending: true});
+
+	readonly fieldModelsToDisplay = computed(() => {
+		const layout = this.layout();
+		return (layout.datasetModel?.meaningfulFieldModelIds ?? [])
+			.map(fieldModelId => layout.datasetModel.fieldModels.find(f => f.id === fieldModelId) as FieldModel);
+	});
+
+	readonly columnsToDisplay = computed(() => [...this.fieldModelsToDisplay().map(f => f.id), 'actions']);
+
+	//datasets relevant to this layout, filtered and sorted
+	//fully derived from the datasets model and the sort state, so any addition is reflected
+	readonly multipleDatasets = computed(() => {
+		const layout = this.layout();
+		const {field, ascending} = this.sort();
+		const sortField = field ?? this.fieldModelsToDisplay()[0];
+		return this.datasets()
+			.filter(d => d.modelId === layout.datasetModel.id)
+			.sort((d1, d2) => {
+				const comparison = this.compareDatasets(sortField, d1, d2);
+				return ascending ? comparison : -comparison;
+			});
+	});
 
 	constructor(
 		private crfService: CRFService,
@@ -70,24 +90,7 @@ export class MultipleLayoutComponent implements OnInit {
 		private loggingService: LoggingService,
 		private dialog: MatDialog,
 		private destroyRef: DestroyRef
-	) {
-		effect(() => {
-			const layout = this.layout();
-			const datasets = this.datasets();
-			const fieldModelsToDisplay: FieldModel[] = [];
-			layout.datasetModel?.meaningfulFieldModelIds?.forEach(fieldModelId => {
-				const fieldModel = layout.datasetModel.fieldModels.find(a => a.id === fieldModelId) as FieldModel;
-				fieldModelsToDisplay.push(fieldModel);
-			});
-			this.fieldModelsToDisplay.set(fieldModelsToDisplay);
-			this.columnsToDisplay.set([...fieldModelsToDisplay.map(f => f.id), 'actions']);
-			this.multipleDatasets = datasets.filter(d => d.modelId === layout.datasetModel.id);
-			if(fieldModelsToDisplay.length > 0) {
-				this.sortDatasets(fieldModelsToDisplay[0], true);
-			}
-			this.dataSource.set(new MatTableDataSource<CRFDataset>(this.multipleDatasets));
-		});
-	}
+	) {}
 
 	ngOnInit() {
 		this.visibilityService.layoutVisibilityEvents$(this.layout().id).pipe(
@@ -95,8 +98,9 @@ export class MultipleLayoutComponent implements OnInit {
 		).subscribe(shown => {
 			this.loggingService.info(`Multiple layout ${this.layout().id} receiving visibility event containing ${shown}`);
 			this.shown.set(shown);
-			//mark the datasets
-			this.multipleDatasets.forEach(d => d.show = shown);
+			//mark the datasets belonging to this layout, replacing them instead of mutating them in place
+			const modelId = this.layout().datasetModel.id;
+			this.datasets.update(datasets => datasets.map(d => d.modelId === modelId ? {...d, show: shown} : d));
 		});
 	}
 
@@ -119,11 +123,7 @@ export class MultipleLayoutComponent implements OnInit {
 		//in that case, the candidate datasets should be "asked" for the scope, not for the event, even if the eventPk is available
 		const eventPk = layout.datasetModel.scopeDocumentation ? undefined : layout.eventPk;
 		this.crfService.getCandidateCRFDataset(layout.scopePk, eventPk, layout.datasetModel.id).subscribe(newDataset => {
-			newDataset.expanded = true;
-			this.datasets().push(newDataset);
-			this.multipleDatasets.push(newDataset);
-			this.dataSource()._updateChangeSubscription();
-			//this.crfService.addDataset(newDataset);
+			this.datasets.update(datasets => [...datasets, {...newDataset, expanded: true}]);
 			this.cellLoadingService.registerLayoutCells(layout);
 		});
 	}
@@ -132,14 +132,12 @@ export class MultipleLayoutComponent implements OnInit {
 		//if the dataset does not have a pk yet, that means that it has not been uploaded yet
 		//we can thus delete it permanently
 		if(!dataset.pk) {
-			const datasets = this.datasets();
-			datasets.splice(datasets.indexOf(dataset), 1);
+			this.datasets.update(datasets => datasets.filter(d => d !== dataset));
 		}
 		else {
 			this.openRationaleDialog(true).subscribe((rationale?: string) => {
 				if(rationale) {
-					dataset.rationale = rationale;
-					dataset.removed = true;
+					this.updateDataset(dataset, {rationale, removed: true});
 					this.notificationService.showSuccess('Dataset marked for deletion');
 				}
 			});
@@ -149,11 +147,15 @@ export class MultipleLayoutComponent implements OnInit {
 	restoreDataset(dataset: CRFDataset) {
 		this.openRationaleDialog(false).subscribe((rationale?: string) => {
 			if(rationale) {
-				dataset.rationale = rationale;
-				dataset.removed = false;
+				this.updateDataset(dataset, {rationale, removed: false});
 				this.notificationService.showSuccess('Dataset marked for restoration');
 			}
 		});
+	}
+
+	//replace a dataset with an updated copy instead of mutating it in place, so the change flows through the datasets signal
+	private updateDataset(dataset: CRFDataset, changes: Partial<CRFDataset>) {
+		this.datasets.update(datasets => datasets.map(d => d === dataset ? {...d, ...changes} : d));
 	}
 
 	private openRationaleDialog(deletion: boolean): Observable<string | undefined> {
@@ -163,31 +165,21 @@ export class MultipleLayoutComponent implements OnInit {
 			.afterClosed();
 	}
 
-	sortDatasets(sortField: FieldModel, direction: boolean) {
-		let comparator: (d1: CRFDataset, d2: CRFDataset) => number;
-		if(sortField) {
-			comparator = (d1, d2) => {
-				const v1 = d1.fields.find(f => f.modelId === sortField.id)?.value;
-				const v2 = d2.fields.find(f => f.modelId === sortField.id)?.value;
-				const comparison = this.compareFieldValues(sortField, v1, v2);
-				return direction ? comparison : -comparison;
-			};
+	private compareDatasets(field: FieldModel | undefined, d1: CRFDataset, d2: CRFDataset): number {
+		if(!field) {
+			return d1.id.localeCompare(d2.id);
 		}
-		else {
-			comparator = (d1, d2) => d1.id.localeCompare(d2.id);
-		}
-		this.multipleDatasets.sort(comparator);
+		const v1 = d1.fields.find(f => f.modelId === field.id)?.value;
+		const v2 = d2.fields.find(f => f.modelId === field.id)?.value;
+		return this.compareFieldValues(field, v1, v2);
 	}
 
 	sortChange(sort: Sort) {
 		if(!sort.active && sort.direction === '') {
 			return;
 		}
-		const sortField = this.layout().datasetModel.fieldModels.find(f => f.id === sort.active) as FieldModel;
-		this.sortDatasets(sortField, sort.direction === 'asc');
-
-		//re-render the rows after the sorting is done
-		this.table.renderRows();
+		const field = this.layout().datasetModel.fieldModels.find(f => f.id === sort.active);
+		this.sort.set({field, ascending: sort.direction === 'asc'});
 	}
 
 	compareFieldValues(field: FieldModel, v1: string | undefined, v2: string | undefined) {

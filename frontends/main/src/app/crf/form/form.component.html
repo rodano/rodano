@@ -17,7 +17,7 @@
 			} @else {
 				<app-multiple-layout
 					[layout]="layout"
-					[datasets]="datasets()"
+					[(datasets)]="datasets"
 					[disabled]="!form().canWrite">
 				</app-multiple-layout>
 			}

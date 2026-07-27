@@ -7,12 +7,12 @@
 
 	<table
 		mat-table
-		[dataSource]="dataSource()"
+		[dataSource]="multipleDatasets()"
 		[trackBy]="trackBy"
 		multiTemplateDataRows
 		matSort
 		(matSortChange)="sortChange($event)">
-		@if (dataSource().data.length === 0) {
+		@if (multipleDatasets().length === 0) {
 			<tr
 				*matNoDataRow
 				class="no-data-row">
