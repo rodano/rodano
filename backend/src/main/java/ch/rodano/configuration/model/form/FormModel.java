@@ -42,7 +42,6 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 	private SortedMap<String, String> description;
 
 	private boolean optional;
-	private boolean contribution;
 	//save rules
 	private List<Rule> rules;
 
@@ -73,7 +72,6 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 		layouts = formModel.getLayouts();
 		workflowIds = formModel.getWorkflowIds();
 		constraint = formModel.getConstraint();
-		contribution = formModel.isContribution();
 		xslTemplate = formModel.getXslTemplate();
 		xslFilename = formModel.getXslFilename();
 		printButtonLabel = formModel.getPrintButtonLabel();
@@ -141,16 +139,6 @@ public class FormModel implements Serializable, SuperDisplayable, RightAssignabl
 
 	public void setOptional(final boolean optional) {
 		this.optional = optional;
-	}
-
-	@JsonIgnore
-	public final boolean isContribution() {
-		return contribution;
-	}
-
-	@JsonIgnore
-	public final void setContribution(final boolean contribution) {
-		this.contribution = contribution;
 	}
 
 	public List<Rule> getRules() {

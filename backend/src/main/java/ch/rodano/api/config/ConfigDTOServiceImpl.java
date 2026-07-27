@@ -112,7 +112,6 @@ public class ConfigDTOServiceImpl implements ConfigDTOService {
 			dto.defaultSortFieldModelId = layout.getDefaultSortFieldModelId();
 		}
 
-		dto.contribution = layout.isContribution();
 		dto.columns = layout.getColumns().stream().map(c -> new ColumnHeaderDTO(c.getCssCode())).toList();
 		dto.textBefore = layout.getTextBefore();
 		dto.textAfter = layout.getTextAfter();

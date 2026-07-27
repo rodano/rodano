@@ -185,41 +185,6 @@ public class StudyServiceImpl implements StudyService, InfoContributor {
 		}
 	}
 
-	/**
-	 * Remove scopes's contributions
-	 */
-	@SuppressWarnings("unused")
-	private void removeScopesContributions() {
-		// Remove from study
-		new ArrayList<>(study.getDatasetModels()).stream().filter(DatasetModel::isContribution).forEach(datasetModel -> {
-			// Remove dataset models
-			study.getDatasetModels().remove(datasetModel);
-
-			// Remove from event models
-			study.getEventModels().forEach(event -> event.getDatasetModelIds().remove(datasetModel.getId()));
-
-			// Remove from profiles
-			study.getProfiles().forEach(profile -> profile.getGrantedDatasetModelIdRights().remove(datasetModel.getId()));
-		});
-
-		// Remove form models and layouts
-		for(final var formModel : new ArrayList<>(study.getFormModels())) {
-			if(!formModel.isContribution()) {
-				new ArrayList<>(formModel.getLayouts()).stream().filter(Layout::isContribution).forEach(layout -> formModel.getLayouts().remove(layout));
-				continue;
-			}
-
-			// Remove from study
-			study.getFormModels().remove(formModel);
-
-			// Remove from event models
-			study.getEventModels().forEach(event -> event.getFormModelIds().remove(formModel.getId()));
-
-			// Remove from profiles
-			study.getProfiles().forEach(profile -> profile.getGrantedFormModelIdRights().remove(formModel.getId()));
-		}
-	}
-
 	@Override
 	public Study getStudy() {
 		return study;

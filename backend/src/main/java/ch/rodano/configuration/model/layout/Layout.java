@@ -30,8 +30,6 @@ public class Layout implements Node {
 	private SortedMap<String, String> shortname;
 	private SortedMap<String, String> description;
 
-	private boolean contribution;
-
 	private LayoutType type;
 	private String datasetModelId;
 	private String defaultSortFieldModelId;
@@ -49,7 +47,6 @@ public class Layout implements Node {
 	public Layout() {
 		shortname = new TreeMap<>();
 		description = new TreeMap<>();
-		contribution = false;
 		columns = new ArrayList<>();
 		lines = new ArrayList<>();
 		textBefore = new TreeMap<>();
@@ -61,7 +58,6 @@ public class Layout implements Node {
 		id = layout.getId();
 		shortname = layout.getShortname();
 		description = layout.getDescription();
-		contribution = layout.isContribution();
 		type = layout.getType();
 		datasetModelId = layout.getDatasetModelId();
 		columns = layout.getColumns();
@@ -114,16 +110,6 @@ public class Layout implements Node {
 
 	public final void setDescription(final SortedMap<String, String> description) {
 		this.description = description;
-	}
-
-	@JsonIgnore
-	public final boolean isContribution() {
-		return contribution;
-	}
-
-	@JsonIgnore
-	public final void setContribution(final boolean contribution) {
-		this.contribution = contribution;
 	}
 
 	public final LayoutType getType() {

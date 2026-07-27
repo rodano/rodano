@@ -56,8 +56,6 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 	private String family;
 	private boolean master;
 
-	private boolean contribution;
-
 	private boolean exportable;
 	private int exportOrder;
 
@@ -70,7 +68,6 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 		shortname = new TreeMap<>();
 		longname = new TreeMap<>();
 		description = new TreeMap<>();
-		contribution = false;
 	}
 
 	public DatasetModel(final DatasetModel datasetModel) {
@@ -83,7 +80,6 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 		description = datasetModel.getDescription();
 		family = datasetModel.getFamily();
 		master = datasetModel.getMaster();
-		contribution = datasetModel.isContribution();
 		exportable = datasetModel.isExportable();
 		exportOrder = datasetModel.getExportOrder();
 		deleteRules = datasetModel.getDeleteRules();
@@ -157,16 +153,6 @@ public class DatasetModel implements Serializable, SuperDisplayable, Node, Right
 
 	public final void setExportable(final boolean exportable) {
 		this.exportable = exportable;
-	}
-
-	@JsonIgnore
-	public final boolean isContribution() {
-		return contribution;
-	}
-
-	@JsonIgnore
-	public final void setContribution(final boolean contribution) {
-		this.contribution = contribution;
 	}
 
 	public final int getExportOrder() {

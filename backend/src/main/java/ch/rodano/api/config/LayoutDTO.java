@@ -28,9 +28,6 @@ public class LayoutDTO {
 	String defaultSortFieldModelId;
 
 	@NotNull
-	Boolean contribution;
-
-	@NotNull
 	List<ColumnHeaderDTO> columns;
 	@NotNull
 	List<LayoutLineDTO> lines;
@@ -102,14 +99,6 @@ public class LayoutDTO {
 
 	public void setDefaultSortFieldModelId(final String defaultSortFieldModelId) {
 		this.defaultSortFieldModelId = defaultSortFieldModelId;
-	}
-
-	public Boolean getContribution() {
-		return contribution;
-	}
-
-	public void setContribution(final Boolean contribution) {
-		this.contribution = contribution;
 	}
 
 	public List<ColumnHeaderDTO> getColumns() {

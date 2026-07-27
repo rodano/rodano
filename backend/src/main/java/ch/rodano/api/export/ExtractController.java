@@ -121,13 +121,10 @@ public class ExtractController extends AbstractSecuredController {
 			.toList();
 
 		for(final var datasetModel : datasetModels) {
-			// TODO check rights even for contributions
-			if(!datasetModel.isContribution()) {
-				rightsService.checkRight(currentActor, currentRoles, datasetModel, Rights.READ);
+			rightsService.checkRight(currentActor, currentRoles, datasetModel, Rights.READ);
 
-				if(!datasetModel.isExportable()) {
-					throw new UnauthorizedException(String.format("Dataset model %s is not exportable", datasetModel.getId()));
-				}
+			if(!datasetModel.isExportable()) {
+				throw new UnauthorizedException(String.format("Dataset model %s is not exportable", datasetModel.getId()));
 			}
 		}
 
@@ -174,13 +171,10 @@ public class ExtractController extends AbstractSecuredController {
 			.toList();
 
 		for(final var document : datasetModels) {
-			// TODO check rights even for contributions
-			if(!document.isContribution()) {
-				rightsService.checkRight(currentActor, currentRoles, document, Rights.READ);
+			rightsService.checkRight(currentActor, currentRoles, document, Rights.READ);
 
-				if(!document.isExportable()) {
-					throw new UnauthorizedException(String.format("Dataset model %s is not exportable", document.getId()));
-				}
+			if(!document.isExportable()) {
+				throw new UnauthorizedException(String.format("Dataset model %s is not exportable", document.getId()));
 			}
 		}
 
