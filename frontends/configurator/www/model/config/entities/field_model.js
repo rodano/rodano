@@ -352,6 +352,17 @@ export class FieldModel extends DisplayableNode {
 		if(this.exportable && this.exportOrder === undefined) {
 			report.addWarning(`Field model ${this.id} is exportable but does not have an export order`);
 		}
+		//non boolean checkbox
+		if(this.type === 'CHECKBOX' && this.dataType !== 'BOOLEAN') {
+			report.addError(
+				`Field model ${this.id} is a checkbox but its data type is not boolean`,
+				this,
+				function() {
+					this.dataType = 'BOOLEAN';
+				},
+				'Set data type to boolean'
+			);
+		}
 		//possible values
 		if(FieldModelType[this.type].is_multiple_choice) {
 			this.possibleValues.forEach(function(possible_value) {
