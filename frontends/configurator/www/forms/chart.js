@@ -36,6 +36,22 @@ function manage_dataset_model(event) {
 	}
 }
 
+function manage_field_model(event) {
+	const dataset_model_id = event ? document.getElementById('chart_dataset_model_id').value : selected_chart.datasetModelId;
+	const field_model_id = event ? this.value : selected_chart.fieldModelId;
+	if(dataset_model_id && field_model_id) {
+		const dataset_model = selected_chart.study.getDatasetModel(dataset_model_id);
+		const field_model = dataset_model.getFieldModel(field_model_id);
+		if(field_model.dataType === Config.Enums.DataType.NUMBER.name) {
+			document.getElementById('chart_with_statistics').parentElement.style.display = 'block';
+		}
+		else {
+			selected_chart.withStatistics = false;
+			document.getElementById('chart_with_statistics').parentElement.style.display = 'none';
+		}
+	}
+}
+
 function manage_workflow(event) {
 	const workflow_id = event ? this.value : selected_chart.workflowId;
 	if(workflow_id) {
@@ -170,6 +186,7 @@ export default {
 
 		document.getElementById('chart_type').addEventListener('change', manage_type);
 		document.getElementById('chart_dataset_model_id').addEventListener('change', manage_dataset_model);
+		document.getElementById('chart_field_model_id').addEventListener('change', manage_field_model);
 		document.getElementById('chart_workflow_id').addEventListener('change', manage_workflow);
 		document.getElementById('chart_enrollment_workflow_id').addEventListener('change', manage_enrollment_workflow);
 	},
@@ -194,6 +211,7 @@ export default {
 		manage_type();
 		manage_leaf_scope_model();
 		manage_dataset_model();
+		manage_field_model();
 		manage_workflow();
 		manage_enrollment_workflow();
 
