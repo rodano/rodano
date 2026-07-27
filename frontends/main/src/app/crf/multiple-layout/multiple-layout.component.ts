@@ -26,6 +26,9 @@ import {FieldModelType} from '@core/model/field-model-type';
 import {FieldService} from '@core/services/field.service';
 import {EmptyObjectCheck} from '../../utils/empty-object-check';
 import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
+import {WorkflowableUpdateService} from '../services/workflowable-update.service';
+import {WorkflowableEntity} from '@core/model/workflowable-entity';
+import {Field} from '@core/model/field';
 
 interface DatasetSort {
 	field?: FieldModel;
@@ -83,6 +86,7 @@ export class MultipleLayoutComponent implements OnInit {
 
 	constructor(
 		private crfService: CRFService,
+		private workflowableUpdateService: WorkflowableUpdateService,
 		private visibilityService: VisibilityService,
 		private cellLoadingService: CellLoadingService,
 		private notificationService: NotificationService,
@@ -102,6 +106,30 @@ export class MultipleLayoutComponent implements OnInit {
 			const modelId = this.layout().datasetModel.id;
 			this.datasets.update(datasets => datasets.map(d => d.modelId === modelId ? {...d, show: shown} : d));
 		});
+
+		//when a field of a dataset has been updated, refresh its workflow statuses and error
+		//replacing the field (and its dataset) instead of mutating them in place, so the change flows through the datasets signal
+		this.workflowableUpdateService.updatedWorkflowable$.pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(typedWorkflowable => {
+			if(typedWorkflowable.entity !== WorkflowableEntity.FIELD) {
+				return;
+			}
+			const updatedField = typedWorkflowable.workflowable as Field;
+			this.datasets.update(datasets => datasets.map(dataset => {
+				if(dataset.pk !== updatedField.datasetPk) {
+					return dataset;
+				}
+				const fields = dataset.fields.map(field => {
+					if(field.pk !== updatedField.pk) {
+						return field;
+					}
+					//preserve the CRF-only properties that are not part of the server response
+					return {...field, ...updatedField, shown: field.shown, error: field.error};
+				});
+				return {...dataset, fields};
+			}));
+		});
 	}
 
 	trackBy(_: number, dataset: CRFDataset) {
@@ -109,6 +137,10 @@ export class MultipleLayoutComponent implements OnInit {
 	}
 
 	hasError(dataset: CRFDataset): boolean {
+		//do not highlight removed dataset
+		if(dataset.removed) {
+			return false;
+		}
 		return dataset.fields.some(f => f.error() || f.workflowStatuses.some(s => s.state.important));
 	}
 
