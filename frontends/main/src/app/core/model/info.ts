@@ -10,14 +10,7 @@ export interface Info {
 		group: string;
 	};
 	config: {
-		kv: string;
 		sha1: string;
 		date: Date;
-	};
-	deployment: {
-		user: string;
-		date: string;
-		commit_sha1: string;
-		info: string;
 	};
 }

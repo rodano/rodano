@@ -7,29 +7,10 @@
 		Version: <strong>{{ info()?.build?.version }}</strong>
 	</li>
 	<li>
-		Rodano version: <strong>{{ info()?.config?.kv }}</strong>
-	</li>
-	<li>
 		Configuration sha1: <strong>{{ info()?.config?.sha1 }}</strong>
 	</li>
 	<li>
 		Configuration latest edition date: <strong>{{ info()?.config?.date | dateTimeUTC }}</strong>
-	</li>
-</ul>
-
-<h2>Deployment</h2>
-<ul>
-	<li>
-		User: <strong>{{ info()?.deployment?.user }}</strong>
-	</li>
-	<li>
-		Date: <strong>{{ info()?.deployment?.date }}</strong>
-	</li>
-	<li>
-		Commit sha1: <strong>{{ info()?.deployment?.commit_sha1 }}</strong>
-	</li>
-	<li>
-		Information: <strong>{{ info()?.deployment?.info }}</strong>
 	</li>
 </ul>
 
