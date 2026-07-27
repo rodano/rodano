@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +28,6 @@ import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.configuration.exceptions.NoNodeException;
 import ch.rodano.configuration.model.common.Displayable;
-import ch.rodano.configuration.model.dataset.DatasetModel;
-import ch.rodano.configuration.model.layout.Layout;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.study.Study;
