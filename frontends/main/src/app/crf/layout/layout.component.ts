@@ -47,7 +47,7 @@ export class LayoutComponent implements OnInit {
 			//deal only with single layout here
 			//if the layout is multiple, its visibility state will be managed by the parent component
 			if(this.layout().type === LayoutType.SINGLE) {
-				this.loggingService.info(`Layout ${this.layout().id} receiving visibility event containing ${shown}`);
+				this.loggingService.info(`Setting visibility on single layout ${this.layout().id} to ${shown}`);
 				this.shown.set(shown);
 				const cells = this.crfService.getLayoutCells(this.layout());
 				//reset state of the cells inside the layout

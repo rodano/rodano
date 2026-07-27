@@ -42,34 +42,10 @@ export class CellComponent implements OnInit, AfterViewInit {
 	) {}
 
 	ngOnInit() {
-		/*this.visibilityService.cellCriterionEvents$(this.cell.id, this.layoutUid).pipe(
-			takeUntilDestroyed(this.destroyRef)
-		).subscribe(criterion => {
-			this.loggingService.info(`Cell ${this.cell.id} receiving criterion`, criterion);
-			const show = criterion.action.toLocaleLowerCase() === VisibilityCriteria.ActionEnum.SHOW.toLocaleLowerCase();
-			this.shown = criterion.reverse ? !show : show;
-
-			//mark the field
-			if(this.field) {
-				this.field.shown = this.shown;
-			}
-
-			//trigger nested visibility criterion to the cells inside the layout
-
-			/*if(!this.shown) {
-				//this.triggerHide();
-			}
-			else {
-				if(this.field?.value) {
-					this.triggerCriteria();
-				}
-			}*/
-		//});
-
 		this.visibilityService.cellVisibilityEvents$(this.cell().id, this.layoutUid()).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
-			this.loggingService.info(`Cell ${this.cell().id} receiving visibility event containing ${shown}`);
+			this.loggingService.info(`Setting visibility on cell ${this.cell().id} to ${shown}`);
 			this.shown.set(shown);
 			//mark the field
 			if(this.field()) {

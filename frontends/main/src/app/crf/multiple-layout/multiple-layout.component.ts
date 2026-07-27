@@ -96,7 +96,7 @@ export class MultipleLayoutComponent implements OnInit {
 		this.visibilityService.layoutVisibilityEvents$(this.layout().id).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(shown => {
-			this.loggingService.info(`Multiple layout ${this.layout().id} receiving visibility event containing ${shown}`);
+			this.loggingService.info(`Setting visibility on multiple layout ${this.layout().id} to ${shown}`);
 			this.shown.set(shown);
 			//mark the datasets belonging to this layout, replacing them instead of mutating them in place
 			const modelId = this.layout().datasetModel.id;
