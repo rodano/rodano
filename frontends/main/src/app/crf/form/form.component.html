@@ -12,13 +12,13 @@
 					[layout]="layout"
 					[datasets]="datasets()"
 					[layoutUid]="layout.id"
-					[disabled]="!form().canWrite">
+					[disabled]="!form().canWrite || form().removed">
 				</app-layout>
 			} @else {
 				<app-multiple-layout
 					[layout]="layout"
 					[(datasets)]="datasets"
-					[disabled]="!form().canWrite">
+					[disabled]="!form().canWrite || form().removed">
 				</app-multiple-layout>
 			}
 		}
@@ -34,7 +34,7 @@
 				<span>You have unsaved values</span>
 			}
 
-			@if (form().canWrite) {
+			@if (form().canWrite && !form().removed) {
 				<span class="toolbar-spacer"></span>
 				<button
 					mat-flat-button
