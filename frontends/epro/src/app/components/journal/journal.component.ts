@@ -1,37 +1,47 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { EventDTO } from '../../api/model/event-dto';
-import { EventService } from '../../api/services/event.service';
-import { filter, first, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { forkJoin, Observable, of, Subject } from 'rxjs';
-import { AlertController, RefresherCustomEvent, ToastController, IonicModule } from '@ionic/angular';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
-import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { DatasetDTO } from 'src/app/api/model/dataset-dto';
-import { NavigationEnd, Router } from '@angular/router';
-import { ScopeService } from 'src/app/api/services/scope.service';
-import { ConfigurationService } from 'src/app/api/services/configuration.service';
-import { EventModelDTO } from 'src/app/api/model/event-model-dto';
-import { LocalizerPipe } from '../../pipes/localizer.pipe';
-import { EventCardComponent } from '../event-card/event-card.component';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Event} from '@core/model/event';
+import {EventService} from '@core/services/event.service';
+import {filter, first, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {forkJoin, Observable, of, Subject} from 'rxjs';
+import {AlertController, IonContent, IonFab, IonFabButton, IonFabList, IonHeader, IonIcon, IonProgressBar, IonRefresher, IonRefresherContent, IonText, IonTitle, IonToolbar, RefresherCustomEvent, ToastController} from '@ionic/angular/standalone';
+import {Scope} from '@core/model/scope';
+import {DatasetStateService} from '../../services/dataset-state.service';
+import {Dataset} from '@core/model/dataset';
+import {NavigationEnd, Router} from '@angular/router';
+import {ScopeService} from '@core/services/scope.service';
+import {MeService} from '@core/services/me.service';
+import {EventModel} from '@core/model/event-model';
+import {LocalizerPipe} from '../../pipes/localizer.pipe';
+import {EventCardComponent} from '../event-card/event-card.component';
 
 @Component({
 	templateUrl: './journal.component.html',
 	styleUrls: ['./journal.component.css'],
 	standalone: true,
 	imports: [
-		IonicModule,
+		IonContent,
+		IonFab,
+		IonFabButton,
+		IonFabList,
+		IonHeader,
+		IonIcon,
+		IonProgressBar,
+		IonRefresher,
+		IonRefresherContent,
+		IonText,
+		IonTitle,
+		IonToolbar,
 		EventCardComponent,
 		LocalizerPipe
 	]
 })
 export class JournalComponent implements OnInit, OnDestroy {
-
 	selectedLanguageId: string;
-	scope: ScopeDTO;
-	events: EventDTO[];
-	availableEventModels: EventModelDTO[];
+	scope: Scope;
+	events: Event[];
+	availableEventModels: EventModel[];
 
-	refresh$: Observable<{ events: EventDTO[]; datasets: DatasetDTO[]; }>;
+	refresh$: Observable<{events: Event[]; datasets: Dataset[]}>;
 
 	loading = false;
 
@@ -39,7 +49,7 @@ export class JournalComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private router: Router,
-		private configService: ConfigurationService,
+		private meService: MeService,
 		private scopeService: ScopeService,
 		private eventService: EventService,
 		private datasetStateService: DatasetStateService,
@@ -69,7 +79,8 @@ export class JournalComponent implements OnInit, OnDestroy {
 			this.availableEventModels = results.eventModels.sort((a, b) => {
 				if(a.number && b.number) {
 					return a.number - b.number;
-				} else {
+				}
+				else {
 					return 1;
 				}
 			});
@@ -89,7 +100,7 @@ export class JournalComponent implements OnInit, OnDestroy {
 				first()
 			);
 
-			// TODO Same proble as in the surveys component, they should be merged
+			//TODO Same problem as in the surveys component, they should be merged
 			this.router.events.pipe(
 				tap(() => this.loading = true),
 				filter(e => e instanceof NavigationEnd && e.url === '/main/journal'),
@@ -103,7 +114,7 @@ export class JournalComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	createEvent(eventModel: EventModelDTO) {
+	createEvent(eventModel: EventModel) {
 		this.eventService.create(this.scope.pk, eventModel.id).pipe(
 			switchMap(newEvent => {
 				return forkJoin({
@@ -113,7 +124,7 @@ export class JournalComponent implements OnInit, OnDestroy {
 			}),
 			takeUntil(this.unsubscribe$)
 		).subscribe({
-			next: (results) => {
+			next: results => {
 				this.events = results.refresh.events;
 
 				const newEvent = results.newEvent;
@@ -126,7 +137,7 @@ export class JournalComponent implements OnInit, OnDestroy {
 					newDatasets[0].pk
 				]);
 			},
-			error: async (error) => {
+			error: async error => {
 				console.log(error.error.message);
 
 				const errToast = await this.toastCtrl.create({
@@ -142,12 +153,12 @@ export class JournalComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	private getUpdatedScopeAndEvents(): Observable<{ scope: ScopeDTO, events: EventDTO[]}> {
-		return this.configService.getRootScope().pipe(
+	private getUpdatedScopeAndEvents(): Observable<{scope: Scope; events: Event[]}> {
+		return this.meService.getRootScope().pipe(
 			switchMap(scope => {
 				return forkJoin({
 					scope: of(scope),
-					events: this.eventService.getForScope(scope.pk)
+					events: this.eventService.search(scope.pk)
 				});
 			}),
 			switchMap(updatedResults => {
@@ -168,7 +179,7 @@ export class JournalComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	public async onDelete(event: EventDTO) {
+	public async onDelete(event: Event) {
 		const alert = await this.alertCtrl.create({
 			header: 'Delete event?',
 			message: 'Are you sure you want to delete this event?',
@@ -198,7 +209,6 @@ export class JournalComponent implements OnInit, OnDestroy {
 		});
 		await alert.present();
 	}
-
 
 	ngOnDestroy() {
 		this.unsubscribe$.next();

@@ -1,27 +1,66 @@
-import { TestBed } from '@angular/core/testing';
-import { of, throwError } from 'rxjs';
-import { AuthService } from '../api/services/auth.service';
-import { RobotCredentials } from '../models/robotCredentials';
-import { AppService } from './app.service';
-import { AuthStateService } from './auth-state.service';
+import {beforeEach, afterEach, describe, it, expect, vi, type MockedObject} from 'vitest';
+import {TestBed} from '@angular/core/testing';
+import {of, throwError} from 'rxjs';
+import {EproRobot} from '@core/model/epro-robot';
+import {EproService} from '@core/services/epro.service';
+import {AppService} from './app.service';
+import {AuthStateService} from './auth-state.service';
+
+//jsdom doesn't expose a working localStorage for the default "about:blank" origin, so it's stubbed here
+class InMemoryStorage implements Storage {
+	private readonly store = new Map<string, string>();
+
+	get length(): number {
+		return this.store.size;
+	}
+
+	clear(): void {
+		this.store.clear();
+	}
+
+	getItem(key: string): string | null {
+		return this.store.get(key) ?? null;
+	}
+
+	key(index: number): string | null {
+		return Array.from(this.store.keys())[index] ?? null;
+	}
+
+	removeItem(key: string): void {
+		this.store.delete(key);
+	}
+
+	setItem(key: string, value: string): void {
+		this.store.set(key, value);
+	}
+}
 
 describe('AuthStateService', () => {
 	let authStateService: AuthStateService;
-	let authServiceSpy: jasmine.SpyObj<AuthService>;
+	let eproServiceSpy: MockedObject<EproService>;
 
 	beforeEach(() => {
-		const spy = jasmine.createSpyObj('AuthService', ['getRobot']);
+		vi.stubGlobal('localStorage', new InMemoryStorage());
+		vi.stubGlobal('sessionStorage', new InMemoryStorage());
+
+		const eproServiceMock = {
+			getRobot: vi.fn().mockName('EproService.getRobot')
+		};
 
 		TestBed.configureTestingModule({
 			providers: [
 				AuthStateService,
 				AppService,
-				{ provide: AuthService, useValue: spy }
+				{provide: EproService, useValue: eproServiceMock}
 			]
 		});
 
 		authStateService = TestBed.inject(AuthStateService);
-		authServiceSpy = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
+		eproServiceSpy = TestBed.inject(EproService) as MockedObject<EproService>;
+	});
+
+	afterEach(() => {
+		vi.unstubAllGlobals();
 	});
 
 	it('#robotLogin works', () => {
@@ -29,38 +68,33 @@ describe('AuthStateService', () => {
 		const stubRobotCreds = {
 			name: 'TastyRobot',
 			key
-		} as RobotCredentials;
+		} as EproRobot;
 
-		authServiceSpy.getRobot.and.returnValue(of(stubRobotCreds));
+		eproServiceSpy.getRobot.mockReturnValue(of(stubRobotCreds));
 
-		authStateService.robotLogin(key).subscribe(
-			robotCred => {
-				expect(robotCred).toEqual(stubRobotCreds);
+		authStateService.robotLogin(key).subscribe(robotCred => {
+			expect(robotCred).toEqual(stubRobotCreds);
 
-				expect(authStateService.getRobotCredentials()).toEqual(stubRobotCreds);
+			expect(authStateService.getRobotCredentials()).toEqual(stubRobotCreds);
 
-				expect(authStateService.hasRobotCredentials()).toBeTrue();
+			expect(authStateService.hasRobotCredentials()).toBe(true);
 
-				authStateService.deleteRobotCredentials();
+			authStateService.deleteRobotCredentials();
 
-				expect(authStateService.hasRobotCredentials()).toBeFalse();
-			},
-			fail
-		);
+			expect(authStateService.hasRobotCredentials()).toBe(false);
+		});
 	});
 
 	it('#robotLogin fails correctly', () => {
 		const key = 'failKey';
 
-		authServiceSpy.getRobot.and.returnValue(throwError('Incorrect key'));
+		eproServiceSpy.getRobot.mockReturnValue(throwError(() => new Error('Incorrect key')));
 
-		authStateService.robotLogin(key).subscribe(
-			fail,
-			() => {
+		authStateService.robotLogin(key).subscribe({
+			error: () => {
 				expect(authStateService.getRobotCredentials()).toBeUndefined();
-				expect(authStateService.hasRobotCredentials()).toBeFalse();
+				expect(authStateService.hasRobotCredentials()).toBe(false);
 			}
-		);
+		});
 	});
-
 });

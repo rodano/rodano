@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { format, parse } from 'date-fns';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
-import { EventDTO } from 'src/app/api/model/event-dto';
-import { FieldDTO } from '../../api/model/field-dto';
-import { LocalizerPipe } from '../../pipes/localizer.pipe';
-import { FormsModule } from '@angular/forms';
-import { IonicModule } from '@ionic/angular';
+import {Component, EventEmitter, Input, Output, inject} from '@angular/core';
+import {format, parse} from 'date-fns';
+import {Scope} from '@core/model/scope';
+import {Event} from '@core/model/event';
+import {Field} from '@core/model/field';
+import {LocalizerPipe} from '../../pipes/localizer.pipe';
+import {FormsModule} from '@angular/forms';
+import {IonButton, IonDatetime, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPopover, IonRadioGroup, IonRange, IonRow, IonText, IonTextarea} from '@ionic/angular/standalone';
+import {FieldService} from '@core/services/field.service';
 
 @Component({
 	selector: 'app-question',
@@ -13,45 +14,60 @@ import { IonicModule } from '@ionic/angular';
 	styleUrls: ['./question.component.css'],
 	standalone: true,
 	imports: [
-		IonicModule,
+		IonButton,
+		IonDatetime,
+		IonIcon,
+		IonInput,
+		IonItem,
+		IonLabel,
+		IonList,
+		IonPopover,
+		IonRadioGroup,
+		IonRange,
+		IonRow,
+		IonText,
+		IonTextarea,
 		FormsModule,
 		LocalizerPipe
 	]
 })
 export class QuestionComponent {
+	@Input() rootScope: Scope;
+	@Input() event: Event;
+	@Input() field: Field;
 
-	@Input() rootScope: ScopeDTO;
-	@Input() event: EventDTO;
-	@Input() field: FieldDTO;
-
-	// This is for the custom EQ5D questions
+	//This is for the custom EQ5D questions
 	@Input() isEQ5D: boolean;
 
 	@Output() noAnswer = new EventEmitter<void>();
 
 	selectedLanguage = 'en';
+	private fieldService = inject(FieldService);
 
 	selectPossibleValue(value: string | undefined) {
-		// TODO remove this as soon as the disabled feature is implemented in all ionic components
+		//TODO remove this as soon as the disabled feature is implemented in all ionic components
 		if(!this.rootScope.locked && !this.event.locked) {
 			this.field.value = value;
 		}
 	}
 
 	get readableDateTimeValue(): string | null {
-		if(this.field.value && this.field.value !== '' && this.field.model.format) {
-			const parsedDate = parse(this.field.value, this.field.model.format, new Date());
-			return format(parsedDate, this.field.model.format);
+		if(this.field.value && this.field.value !== '') {
+			const fmt = this.fieldService.generateFormat(this.field.model);
+			const parsedDate = parse(this.field.value, fmt, new Date());
+			return format(parsedDate, fmt);
 		}
 		return null;
 	}
 
 	setDatetimeValue(newDateTime: string | string[] | null | undefined) {
-		if(newDateTime && !Array.isArray(newDateTime) && this.field.model.format) {
+		if(newDateTime && !Array.isArray(newDateTime)) {
 			const dateTime = new Date(newDateTime);
-			const formattedDatetime = format(dateTime, this.field.model.format);
+			const fmt = this.fieldService.generateFormat(this.field.model);
+			const formattedDatetime = format(dateTime, fmt);
 			this.field.value = formattedDatetime;
-		} else {
+		}
+		else {
 			throw new Error('Can not accept multiple dates as input');
 		}
 	}
@@ -66,21 +82,19 @@ export class QuestionComponent {
 		this.noAnswer.emit();
 	}
 
-	onTouchMove(event: Event) {
+	onTouchMove(event: TouchEvent) {
 		event.stopPropagation();
 	}
 
 	dateTimePickerPresentation(): string {
-		if(this.field.model.format) {
-			if(this.field.model.format.includes('YYYY') && this.field.model.format.includes('HH')) {
-				return 'date-time';
-			} else if(this.field.model.format.includes('YYYY')) {
-				return 'date';
-			} else if(this.field.model.format.includes('HH')) {
-				return 'time';
-			} else {
-				return 'date-time';
-			}
+		if(this.fieldService.isDate(this.field.model) && this.fieldService.isTime(this.field.model)) {
+			return 'date-time';
+		}
+		if(this.fieldService.isDate(this.field.model)) {
+			return 'date';
+		}
+		if(this.fieldService.isTime(this.field.model)) {
+			return 'time';
 		}
 		throw new Error(`${this.field.model.id} does not have the date format`);
 	}

@@ -1,19 +1,22 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { LoadingController, AlertController, IonicModule } from '@ionic/angular';
-import { Subject } from 'rxjs';
-import { PublicStudyDTO } from 'src/app/api/model/public-study-dto';
-import { ConfigurationService } from 'src/app/api/services/configuration.service';
-import { AuthStateService } from 'src/app/services/auth-state.service';
-import { LocalizerPipe } from '../../../pipes/localizer.pipe';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {UntypedFormBuilder, UntypedFormGroup, Validators, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {AlertController, IonButton, IonIcon, IonInput, IonText, LoadingController} from '@ionic/angular/standalone';
+import {Subject} from 'rxjs';
+import {PublicStudy} from '@core/model/public-study';
+import {ConfigurationService} from '@core/services/configuration.service';
+import {AuthStateService} from '../../../services/auth-state.service';
+import {LocalizerPipe} from '../../../pipes/localizer.pipe';
 
 @Component({
 	templateUrl: './login.component.html',
 	styleUrls: ['./login.component.css'],
 	standalone: true,
 	imports: [
-		IonicModule,
+		IonButton,
+		IonIcon,
+		IonInput,
+		IonText,
 		RouterLink,
 		FormsModule,
 		ReactiveFormsModule,
@@ -23,7 +26,7 @@ import { LocalizerPipe } from '../../../pipes/localizer.pipe';
 export class LoginComponent implements OnInit, OnDestroy {
 	CODE_REGEX = /[a-z0-9]{8}/;
 
-	study: PublicStudyDTO;
+	study: PublicStudy;
 
 	loginForm: UntypedFormGroup;
 
@@ -38,7 +41,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 		private alertCtrl: AlertController
 	) {
 		this.loginForm = this.formBuilder.group({
-			accessCode: ['', Validators.pattern(this.CODE_REGEX)],
+			accessCode: ['', Validators.pattern(this.CODE_REGEX)]
 		});
 	}
 
@@ -59,7 +62,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 				loader.dismiss();
 				let header;
 				let message;
-				if (response.status === 400) {
+				if(response.status === 400) {
 					header = 'Invalid code';
 					message = 'Check the code or contact support to ask for a new code';
 				}
@@ -67,7 +70,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 					header = 'Error';
 					message = 'Please, try again in a few minutes';
 				}
-				const alert = await this.alertCtrl.create({ header, message, buttons: ['OK'] });
+				const alert = await this.alertCtrl.create({header, message, buttons: ['OK']});
 				alert.present();
 			}
 		);
