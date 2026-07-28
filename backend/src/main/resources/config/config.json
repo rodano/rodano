@@ -15060,11 +15060,11 @@
 					"textAfter": {},
 					"columns": [
 						{
-							"cssCode": "width: 565px;",
+							"cssCode": "width: 500px;",
 							"className": "Column"
 						},
 						{
-							"cssCode": "width: 595px;",
+							"cssCode": "width: 500px;",
 							"className": "Column"
 						}
 					],
