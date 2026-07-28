@@ -1,29 +1,38 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { EventDTO } from '../../api/model/event-dto';
-import { EventService } from '../../api/services/event.service';
-import { filter, first, switchMap, takeUntil, tap } from 'rxjs/operators';
-import { forkJoin, Observable, of, Subject } from 'rxjs';
-import { AlertController, RefresherCustomEvent, ToastController, IonicModule } from '@ionic/angular';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
-import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { DatasetDTO } from 'src/app/api/model/dataset-dto';
-import { NavigationEnd, Router } from '@angular/router';
-import { ConfigurationService } from 'src/app/api/services/configuration.service';
-import { EventCardComponent } from '../event-card/event-card.component';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Event} from '@core/model/event';
+import {EventService} from '@core/services/event.service';
+import {filter, first, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {forkJoin, Observable, of, Subject} from 'rxjs';
+import {AlertController, IonContent, IonHeader, IonProgressBar, IonRefresher, IonRefresherContent, IonText, IonTitle, IonToolbar, RefresherCustomEvent, ToastController} from '@ionic/angular/standalone';
+import {Scope} from '@core/model/scope';
+import {DatasetStateService} from '../../services/dataset-state.service';
+import {Dataset} from '@core/model/dataset';
+import {NavigationEnd, Router} from '@angular/router';
+import {MeService} from '@core/services/me.service';
+import {EventCardComponent} from '../event-card/event-card.component';
 
 @Component({
 	templateUrl: './surveys.component.html',
 	styleUrls: ['./surveys.component.css'],
 	standalone: true,
-	imports: [IonicModule, EventCardComponent]
+	imports: [
+		IonContent,
+		IonHeader,
+		IonProgressBar,
+		IonRefresher,
+		IonRefresherContent,
+		IonText,
+		IonTitle,
+		IonToolbar,
+		EventCardComponent
+	]
 })
 export class SurveysComponent implements OnInit, OnDestroy {
-
 	selectedLanguageId: string;
-	scope: ScopeDTO;
-	events: EventDTO[];
+	scope: Scope;
+	events: Event[];
 
-	refresh$: Observable<{ events: EventDTO[]; datasets: DatasetDTO[]; }>;
+	refresh$: Observable<{events: Event[]; datasets: Dataset[]}>;
 
 	loading = false;
 
@@ -31,7 +40,7 @@ export class SurveysComponent implements OnInit, OnDestroy {
 
 	constructor(
 		private router: Router,
-		private configService: ConfigurationService,
+		private meService: MeService,
 		private eventService: EventService,
 		private datasetStateService: DatasetStateService,
 		private alertCtrl: AlertController,
@@ -59,9 +68,9 @@ export class SurveysComponent implements OnInit, OnDestroy {
 
 			this.loading = false;
 
-			// This is used to reload the events when we redirect back to this component since their properties
-			// can be changed by the dataset fields (the event dates most notably)
-			// TODO There must be a better way to do this
+			//This is used to reload the events when we redirect back to this component since their properties
+			//can be changed by the dataset fields (the event dates most notably)
+			//TODO There must be a better way to do this
 			this.router.events.pipe(
 				tap(() => this.loading = true),
 				filter(e => e instanceof NavigationEnd && e.url === '/main/surveys'),
@@ -88,12 +97,12 @@ export class SurveysComponent implements OnInit, OnDestroy {
 		);
 	}
 
-	private getUpdatedScopeAndEvents(): Observable<{ scope: ScopeDTO, events: EventDTO[]}> {
-		return this.configService.getRootScope().pipe(
+	private getUpdatedScopeAndEvents(): Observable<{scope: Scope; events: Event[]}> {
+		return this.meService.getRootScope().pipe(
 			switchMap(scope => {
 				return forkJoin({
 					scope: of(scope),
-					events: this.eventService.getForScope(scope.pk)
+					events: this.eventService.search(scope.pk)
 				});
 			}),
 			switchMap(results => {
@@ -104,7 +113,7 @@ export class SurveysComponent implements OnInit, OnDestroy {
 					events: of(filteredEvents)
 				});
 			}),
-			takeUntil(this.unsubscribe$),
+			takeUntil(this.unsubscribe$)
 		);
 	}
 
@@ -115,7 +124,7 @@ export class SurveysComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	public async onDelete(event: EventDTO) {
+	public async onDelete(event: Event) {
 		const alert = await this.alertCtrl.create({
 			header: 'Delete event?',
 			message: 'Are you sure you want to delete this event?',
@@ -145,7 +154,6 @@ export class SurveysComponent implements OnInit, OnDestroy {
 		});
 		await alert.present();
 	}
-
 
 	ngOnDestroy() {
 		this.unsubscribe$.next();

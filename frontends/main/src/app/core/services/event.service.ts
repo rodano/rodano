@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {Event} from '../model/event';
 import {APIService} from './api.service';
 import {reviveDates} from '../decorators/revive-dates.decorator';
+import {isPast, sub} from 'date-fns';
 
 @Service()
 export class EventService {
@@ -53,5 +54,37 @@ export class EventService {
 	@reviveDates
 	unlock(scopePk: number, eventPk: number): Observable<Event> {
 		return this.http.put<Event>(`${this.apiService.getApiUrl()}/scopes/${scopePk}/events/${eventPk}/unlock`, {});
+	}
+
+	/**
+	 * Checks if an event is planned according to the ePRO logic of event planning.
+	 * @param event The event
+	 * @returns True if the event is planned, false otherwise.
+	 */
+	isPlanned(event: Event): boolean {
+		return !!event.model.deadline && !!event.model.deadlineUnit && !!event.model.deadlineReferenceEventModelIds && event.model.deadlineReferenceEventModelIds.length > 0;
+	}
+
+	/**
+	 * Checks that the event is planned and is due. If the event has an interval associated with it
+	 * the lower bound of the event's expected date will be taken as reference point in time,
+	 * otherwise the event's expected date acts as the reference point in time.
+	 * Note that the event's true date is used in case the expected date is not present.
+	 * @param event The event
+	 * @returns True if the event is planned and is due, false otherwise.
+	 */
+	isEventPlannedAndDue(event: Event): boolean {
+		const eventDate = event.expectedDate ? event.expectedDate : event.date;
+
+		if(event.model.interval && event.model.intervalUnit) {
+			const intervalObject: Record<string, number> = {};
+			intervalObject[event.model.intervalUnit.toLowerCase()] = event.model.interval;
+
+			const lowerBoundDate = sub(eventDate, intervalObject);
+			return this.isPlanned(event) && isPast(lowerBoundDate);
+		}
+		else {
+			return this.isPlanned(event) && isPast(eventDate);
+		}
 	}
 }

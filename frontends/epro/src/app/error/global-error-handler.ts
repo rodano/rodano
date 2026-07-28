@@ -1,6 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorHandler, Injectable } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import {HttpErrorResponse} from '@angular/common/http';
+import {ErrorHandler, Injectable} from '@angular/core';
+import {ToastController} from '@ionic/angular/standalone';
 
 @Injectable()
 export class GlobalErrorHandler implements ErrorHandler {

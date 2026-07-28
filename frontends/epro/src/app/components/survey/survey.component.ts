@@ -1,36 +1,43 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ToastController, IonicModule } from '@ionic/angular';
-import { DatasetDTO } from '../../api/model/dataset-dto';
-import { FieldDTO } from '../../api/model/field-dto';
-import { switchMap, takeUntil } from 'rxjs/operators';
-import { combineLatest, Subject } from 'rxjs';
-import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { EventDTO } from 'src/app/api/model/event-dto';
-import { EventService } from 'src/app/api/services/event.service';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
-import { compareAsc } from 'date-fns';
-import { ConfigurationService } from 'src/app/api/services/configuration.service';
-import { LocalizerPipe } from '../../pipes/localizer.pipe';
-import { QuestionComponent } from '../question/question.component';
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
+import {IonBackButton, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonProgressBar, IonTitle, IonToolbar, ToastController} from '@ionic/angular/standalone';
+import {Dataset} from '@core/model/dataset';
+import {Field} from '@core/model/field';
+import {switchMap, takeUntil} from 'rxjs/operators';
+import {combineLatest, Subject} from 'rxjs';
+import {DatasetStateService} from '../../services/dataset-state.service';
+import {Event} from '@core/model/event';
+import {EventService} from '@core/services/event.service';
+import {Scope} from '@core/model/scope';
+import {compareAsc} from 'date-fns';
+import {MeService} from '@core/services/me.service';
+import {LocalizerPipe} from '../../pipes/localizer.pipe';
+import {QuestionComponent} from '../question/question.component';
 
 @Component({
 	templateUrl: './survey.component.html',
 	styleUrls: ['./survey.component.css'],
 	standalone: true,
 	imports: [
-		IonicModule,
+		IonBackButton,
+		IonButton,
+		IonButtons,
+		IonContent,
+		IonFooter,
+		IonHeader,
+		IonProgressBar,
+		IonTitle,
+		IonToolbar,
 		QuestionComponent,
 		LocalizerPipe
 	]
 })
 export class SurveyComponent implements OnInit, OnDestroy {
-
-	rootScope: ScopeDTO;
-	event: EventDTO;
-	dataset: DatasetDTO;
-	datasetFields: FieldDTO[];
-	field: FieldDTO;
+	rootScope: Scope;
+	event: Event;
+	dataset: Dataset;
+	datasetFields: Field[];
+	field: Field;
 
 	loaded = false;
 
@@ -44,18 +51,18 @@ export class SurveyComponent implements OnInit, OnDestroy {
 		private toastCtrl: ToastController,
 		private eventService: EventService,
 		private datasetStateService: DatasetStateService,
-		private configService: ConfigurationService
-	) {	}
+		private meService: MeService
+	) { }
 
 	ngOnInit() {
 		this.activatedRoute.params.pipe(
 			switchMap(params => {
-				const scopePk = parseInt(params.scopePk, 10);
-				const eventPk = parseInt(params.eventPk, 10);
-				const datasetPk = parseInt(params.datasetPk, 10);
+				const scopePk = parseInt(params['scopePk'], 10);
+				const eventPk = parseInt(params['eventPk'], 10);
+				const datasetPk = parseInt(params['datasetPk'], 10);
 
 				return combineLatest([
-					this.configService.getRootScope(),
+					this.meService.getRootScope(),
 					this.eventService.get(scopePk, eventPk),
 					this.datasetStateService.pullDatasets(scopePk, [eventPk]).pipe(
 						switchMap(() => this.datasetStateService.getDatasetForEvent$(eventPk, datasetPk))
@@ -68,13 +75,14 @@ export class SurveyComponent implements OnInit, OnDestroy {
 			this.event = results[1];
 			this.dataset = results[2];
 
-			// Get all the fields from the dataset and filter out the readonly fields
+			//Get all the fields from the dataset and filter out the readonly fields
 			this.datasetFields = this.dataset.fields
 				.filter(f => !f.model.readOnly)
 				.sort((field1, field2) => {
 					if(field1.model.order && field2.model.order) {
 						return field1.model.order - field2.model.order;
-					} else {
+					}
+					else {
 						return 0;
 					}
 				});
@@ -107,7 +115,7 @@ export class SurveyComponent implements OnInit, OnDestroy {
 	}
 
 	nextFieldModel() {
-		// save the dataset if the rootscope and the event are not locked
+		//save the dataset if the rootscope and the event are not locked
 		if(!this.rootScope.locked && !this.event.locked) {
 			this.datasetStateService.saveField(this.dataset, this.field).pipe(
 				takeUntil(this.unsubscribe$)
@@ -118,20 +126,22 @@ export class SurveyComponent implements OnInit, OnDestroy {
 
 				this.advanceToField(true);
 			});
-		} else {
+		}
+		else {
 			this.advanceToField(true);
 		}
 	}
 
 	previousFieldModel() {
-		// save the dataset if the rootscope and the event are not locked
+		//save the dataset if the root scope and the event are not locked
 		if(!this.rootScope.locked && !this.event.locked && this.field.value !== null) {
 			this.datasetStateService.saveField(this.dataset, this.field).pipe(
 				takeUntil(this.unsubscribe$)
 			).subscribe(() => {
 				this.advanceToField(false);
 			});
-		} else {
+		}
+		else {
 			this.advanceToField(false);
 		}
 	}
@@ -149,7 +159,8 @@ export class SurveyComponent implements OnInit, OnDestroy {
 
 		if(compareAsc(startDate, endDate) === 0) {
 			return 'HH:mm';
-		} else {
+		}
+		else {
 			return 'MMM d yyyy - HH:mm';
 		}
 	}
@@ -164,19 +175,21 @@ export class SurveyComponent implements OnInit, OnDestroy {
 			let nextIndex;
 			if(forward) {
 				nextIndex = index + 1;
-			} else {
+			}
+			else {
 				nextIndex = index - 1;
 			}
 
 			const nextField = this.datasetFields[nextIndex];
-			this.field = this.datasetFields.find(f => f.modelId === nextField.modelId) as FieldDTO;
+			this.field = this.datasetFields.find(f => f.modelId === nextField.modelId) as Field;
 		}
 	}
 
 	private navigateBack() {
 		if(this.eventService.isPlanned(this.event)) {
 			this.router.navigate(['/main/surveys']);
-		} else {
+		}
+		else {
 			this.router.navigate(['/main/journal']);
 		}
 	}
@@ -185,7 +198,7 @@ export class SurveyComponent implements OnInit, OnDestroy {
 		const toast = await this.toastCtrl.create({
 			position: 'top',
 			message: 'Thank you for answering the questions of this survey',
-			duration: 3000,
+			duration: 3000
 		});
 		toast.present();
 	}
@@ -193,7 +206,6 @@ export class SurveyComponent implements OnInit, OnDestroy {
 	onNoAnswer() {
 		this.nextFieldModel();
 	}
-
 
 	ngOnDestroy() {
 		this.unsubscribe$.next();
