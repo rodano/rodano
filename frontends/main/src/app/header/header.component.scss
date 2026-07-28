@@ -1,29 +1,27 @@
 .mat-toolbar {
-	height: 100%;
 	color: white;
 	background-color: var(--mat-sys-primary);
 	display: flex;
+	align-items: center;
 	justify-content: space-between;
 	gap: var(--gap);
 	position: relative;
+	container-type: size;
 }
 h1 {
 	height: 100%;
 	flex-shrink: 1;
 	min-width: 0;
 	& > a {
-		display: block;
-		height: 100%;
 		line-height: 100%;
 		text-decoration: none;
 		color: inherit;
-		font-size: 3.5rem;
-		white-space: nowrap;
-		text-overflow: ellipsis;
+		font-size: 85cqh;
 		& > img {
-			height: 2.5rem;
+			height: 80%;
 			width: auto;
 			object-fit: contain;
+			vertical-align: middle;
 		}
 	}
 }

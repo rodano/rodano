@@ -18,9 +18,6 @@
 	user-select: none;
 	pointer-events: none;
 }
-header {
-	height: 4rem;
-}
 #content {
 	flex: 1;
 	box-sizing: border-box;
