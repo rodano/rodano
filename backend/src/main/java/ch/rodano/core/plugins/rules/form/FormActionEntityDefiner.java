@@ -88,34 +88,6 @@ public class FormActionEntityDefiner extends AbstractFormEntityDefiner {
 					final Map<String, Object> data
 				) {
 					final var form = (Form) evaluable;
-					final var workflow = studyService.getStudy().getWorkflow((String) parameters.get("WORKFLOW"));
-
-					final var workflowStatuses = workflowStatusService.getAll(form, workflow);
-					if(!workflowStatuses.isEmpty()) {
-						final var scope = scopeService.get(form);
-						final var event = eventService.get(form);
-						final var family = new DataFamily(scope, event, form);
-						for(final var workflowStatus : workflowStatuses) {
-							workflowStatusService.delete(family, workflowStatus, context, "Delete workflow");
-						}
-					}
-				}
-
-				@Override
-				public String getId() {
-					return "DELETE_WORKFLOW";
-				}
-			},
-			new EntityAction() {
-				@Override
-				public void action(
-					final Evaluable evaluable,
-					final Map<String, Object> parameters,
-					final DatabaseActionContext context,
-					final String message,
-					final Map<String, Object> data
-				) {
-					final var form = (Form) evaluable;
 					final var event = eventService.get(form);
 					final var scope = scopeService.get(form);
 					final var rationale = (String) parameters.get("RATIONALE");

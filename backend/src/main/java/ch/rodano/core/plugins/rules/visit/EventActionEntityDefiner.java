@@ -431,33 +431,6 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 					final Map<String, Object> data
 				) {
 					final var event = (Event) evaluable;
-					final var workflow = studyService.getStudy().getWorkflow((String) parameters.get("WORKFLOW"));
-
-					final var workflowStatuses = workflowStatusService.getAll(event, workflow);
-					if(!workflowStatuses.isEmpty()) {
-						final var scope = scopeService.get(event);
-						final var family = new DataFamily(scope, event);
-						for(final var workflowStatus : workflowStatuses) {
-							workflowStatusService.delete(family, workflowStatus, context, "Delete workflow");
-						}
-					}
-				}
-
-				@Override
-				public String getId() {
-					return "DELETE_WORKFLOW";
-				}
-			},
-			new EntityAction() {
-				@Override
-				public void action(
-					final Evaluable evaluable,
-					final Map<String, Object> parameters,
-					final DatabaseActionContext context,
-					final String message,
-					final Map<String, Object> data
-				) {
-					final var event = (Event) evaluable;
 					final var scope = scopeService.get(event);
 					eventService.validateFields(scope, event, context, "Validate event");
 				}

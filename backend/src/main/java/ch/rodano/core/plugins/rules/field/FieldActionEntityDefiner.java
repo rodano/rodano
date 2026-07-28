@@ -200,35 +200,6 @@ public class FieldActionEntityDefiner extends AbstractFieldEntityDefiner {
 				public String getId() {
 					return "INITIALIZE_WORKFLOW";
 				}
-			},
-			new EntityAction() {
-				@Override
-				public void action(
-					final Evaluable evaluable,
-					final Map<String, Object> parameters,
-					final DatabaseActionContext context,
-					final String message,
-					final Map<String, Object> data
-				) {
-					final var field = (Field) evaluable;
-					final var workflow = studyService.getStudy().getWorkflow((String) parameters.get("WORKFLOW"));
-
-					final var workflowStatuses = workflowStatusService.getAll(field, workflow);
-					if(!workflowStatuses.isEmpty()) {
-						final var dataset = datasetService.get(field);
-						final var scope = scopeService.get(dataset);
-						final var event = eventService.get(dataset);
-						final var family = new DataFamily(scope, event, dataset, field);
-						for(final var workflowStatus : workflowStatuses) {
-							workflowStatusService.delete(family, workflowStatus, context, "Delete workflow");
-						}
-					}
-				}
-
-				@Override
-				public String getId() {
-					return "DELETE_WORKFLOW";
-				}
 			}
 		);
 	}

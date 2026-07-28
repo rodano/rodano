@@ -55,6 +55,25 @@ public class WorkflowActionEntityDefiner extends AbstractWorkflowEntityDefiner {
 				public String getId() {
 					return "CHANGE_STATUS";
 				}
+			},
+			new EntityAction() {
+				@Override
+				public void action(
+					final Evaluable evaluable,
+					final Map<String, Object> parameters,
+					final DatabaseActionContext context,
+					final String message,
+					final Map<String, Object> data
+				) {
+					final var workflowStatus = (WorkflowStatus) evaluable;
+					final var family = workflowStatusService.createDataFamily(workflowStatus);
+					workflowStatusService.delete(family, workflowStatus, context, "Delete workflow");
+				}
+
+				@Override
+				public String getId() {
+					return "REMOVE";
+				}
 			}
 		);
 	}

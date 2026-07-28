@@ -622,18 +622,6 @@ const RuleEntities = Object.freeze({
 						configurationEntity: Entities.Workflow.name
 					}
 				]
-			},
-			{
-				id: 'DELETE_WORKFLOW',
-				label: 'Delete workflow',
-				parameters: [
-					{
-						id: 'WORKFLOW',
-						label: 'Workflow',
-						type: 'STRING',
-						configurationEntity: Entities.Workflow.name
-					}
-				]
 			}
 		]
 	},
@@ -813,18 +801,6 @@ const RuleEntities = Object.freeze({
 				]
 			},
 			{
-				id: 'DELETE_WORKFLOW',
-				label: 'Delete workflow',
-				parameters: [
-					{
-						id: 'WORKFLOW',
-						label: 'Workflow',
-						type: 'STRING',
-						configurationEntity: Entities.Workflow.name
-					}
-				]
-			},
-			{
 				id: 'RESET',
 				label: 'Reset'
 			},
@@ -873,18 +849,6 @@ const RuleEntities = Object.freeze({
 			{
 				id: 'INITIALIZE_WORKFLOW',
 				label: 'Initialize workflow',
-				parameters: [
-					{
-						id: 'WORKFLOW',
-						label: 'Workflow',
-						type: 'STRING',
-						configurationEntity: Entities.Workflow.name
-					}
-				]
-			},
-			{
-				id: 'DELETE_WORKFLOW',
-				label: 'Delete workflow',
 				parameters: [
 					{
 						id: 'WORKFLOW',
@@ -1000,6 +964,10 @@ const RuleEntities = Object.freeze({
 						optional: true
 					}
 				]
+			},
+			{
+				id: 'REMOVE',
+				label: 'Remove workflow',
 			}
 		]
 	}
