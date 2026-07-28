@@ -136,21 +136,10 @@ public class FormServiceImpl implements FormService {
 		formDAOService.deleteForm(form, context, enhancedRationale);
 
 		final var formContent = formContentService.generateFormContent(scope, event, form);
-
-		//reset workflow status on the form its fields
-		final var family = new DataFamily(scope, event, form);
-		workflowStatusService.resetMandatoryAndDeleteTheRest(family, form, context, enhancedRationale);
-		for(final Entry<Dataset, Set<Field>> entry : formContent.getFieldsNotInMultiple().entrySet()) {
-			for(final Field field : entry.getValue()) {
-				final var fieldFamily = new DataFamily(scope, event, entry.getKey(), field);
-				workflowStatusService.resetMandatoryAndDeleteTheRest(fieldFamily, field, context, enhancedRationale);
-			}
-		}
-
 		final var scopeModelDatasetModels = scope.getScopeModel().getDatasetModelIds();
 		final var eventDatasetModels = event.isPresent() ? event.get().getEventModel().getDatasetModelIds() : new ArrayList<>();
 
-		//delete multiple datasets that are not directly attached to the scope or event
+		//delete multiple datasets that are directly attached to the scope or event containing the form
 		final var datasetRationale = String.format("Record deleted: %s", baseRationale);
 		for(final var dataset : formContent.getMultipleDatasets()) {
 			if(event.isPresent() && eventDatasetModels.contains(dataset.getDatasetModelId()) || event.isEmpty() && scopeModelDatasetModels.contains(dataset.getDatasetModelId())) {
@@ -158,13 +147,14 @@ public class FormServiceImpl implements FormService {
 			}
 		}
 
-		//reset fields that are not on scope
+		//reset fields that are directly attached to the scope or event containing the form
 		final var fieldRationale = String.format("Field reset: %s", baseRationale);
 		for(final Entry<Dataset, Set<Field>> entry : formContent.getFieldsNotInMultiple().entrySet()) {
-			//reset only non-blank values
 			if(event.isPresent() && eventDatasetModels.contains(entry.getKey().getDatasetModelId()) || event.isEmpty() && scopeModelDatasetModels.contains(entry.getKey().getDatasetModelId())) {
 				for(final Field field : entry.getValue()) {
-					if(!field.getFieldModel().isPlugin() && field.isNotNull()) {
+					//reset only non-plugin fields
+					//reset blank fields because their workflow statuses need to be reset as well
+					if(!field.getFieldModel().isPlugin()) {
 						fieldService.reset(scope, event, entry.getKey(), field, context, fieldRationale);
 					}
 				}
