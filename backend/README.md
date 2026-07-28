@@ -23,11 +23,11 @@ where xxx is the name of the profile to trigger and can be set to:
 
 Only one of these profiles can be used at the same time.
 
-Most of the time, you will need to specify a configuration file and the database that will be used by the application. Read the following sections to know in details how to configure the application.
+Most of the time, you will need to specify a configuration file and the database that will be used by the application. Read the following sections to know in detail how to configure the application.
 
 ### API
 
-This profile is the main profile and starts the API. Being the default, it can be started with the following command:
+This is the main profile and starts the API. Being the default, it can be started with the following command:
 
 ```
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/config.json -Drodano.database.name=database_name"
@@ -35,12 +35,12 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/con
 
 ### Database
 
-This profile will initialize a blank database with the data required to start the application:
+This profile initializes a blank database with everything required to start the application:
 * creation of all the tables
 * creation of a root scope
 * creation of default users
 
-You can add following parameters:
+You can add the following parameters:
 * `rodano.init.with-data` (default `false`): add predefined test data in the database (only works with the `test` study)
 * `rodano.init.with-users` (default `false`): generate one user for each profile of the configuration
 * `rodano.init.users-password` (default `Password1!`): used with `rodano.init.with-users`, define the password for the generated users
@@ -72,26 +72,26 @@ Most of these properties should not be touched. However, some of them, used by a
 * `rodano.environment`: the study environment (choose among PROD, VAL, or DEV)
 * `rodano.path.data`: the path to the directory that stores the files uploaded by the users
 
-The logging level can be set using the parameter `logging.level.com.example.app=xxx`. The log level can be ERROR, WARN, INFO, DEBUG or TRACE. For example, `logging.level.ch.rodano.core=DEBUG`.
+The logging level can be set using the parameter `logging.level.<package>=xxx`. The log level can be ERROR, WARN, INFO, DEBUG or TRACE. For example, `logging.level.ch.rodano.core=DEBUG`.
 
 ### Overriding configuration properties
 
-It is possible to override the value of these properties with the different approaches:
+It is possible to override the value of these properties using one of the following approaches:
 * directly in the command line using `-Dproperty=value`
 * by adding another profile which has a property file associated with it
 * using environment variables, that are read by Spring on top of Java properties
 
-Both techniques can be used at the same time, but note that the properties passed through the command line will always take precedence.
+These approaches can be combined, but note that properties passed through the command line will always take precedence.
 
 #### Using properties file
 
-You can create a profile named `local`, associated with a file name `application-local.properties`. Then, you can launch the application with the following command:
+You can create a profile named `local`, associated with a file named `application-local.properties`. Then, you can launch the application with the following command:
 
 ```
 mvn spring-boot:run -Dspring-boot.run.profiles=xxx,local -Dspring-boot.run.jvmArguments="-Drodano.database.name=database_name"
 ```
 
-The order of the active profiles is important. The profile `local` must appear after the profile `xxx` so the properties from the file `application-local.properties` will override the properties from the profile `xxx` (stored in `application-xxx.properties`).
+The order of the active profiles is important. The profile `local` must appear after the profile `xxx` so that the properties from the file `application-local.properties` override the properties from the profile `xxx` (stored in `application-xxx.properties`).
 
 
 If you have a custom property file for a study, named `application-study.properties`, and want to launch the API, you can use the following command:
@@ -102,7 +102,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=api,study -Dspring-boot.run.jvmAr
 
 #### Using command line parameters
 
-When launched via the spring-boot-maven-plugin (i.e `mvn spring-boot:run`), the application is started in a forked JVM instance. Consequently, the arguments passed to the JVM will not be available in Rodano (parameters will only be passed to the Spring parent process that starts Rodano in a second step, and won't be inherited by Rodano).
+When launched via the spring-boot-maven-plugin (i.e. `mvn spring-boot:run`), the application is started in a forked JVM instance. Consequently, the arguments passed to the JVM will not be available in Rodano (parameters will only be passed to the Spring parent process that starts Rodano in a second step, and won't be inherited by Rodano).
 
 If you use the spring-boot-maven-plugin, and you want to pass JVM properties to the Rodano process, you will need to wrap them within the `spring-boot.run.jvmArguments` argument, like this:
 
@@ -112,9 +112,9 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="[all your properties separat
 
 ## Plugins
 
-Spring has a mechanism to load additional compiled code, also known as plugins. These plugins allow adding content in the application of to customize its behavior. This code must be compiled to be used by Spring.
+Spring has a mechanism to load additional compiled code, also known as plugins. These plugins allow adding content in the application or to customize its behavior. This code must be compiled to be used by Spring.
 
-When using the spring-boot-maven-plugin (i.e `mvn spring-boot:run`), the parameter `spring-boot.run.additional-classpath` allows loading additional compiled code:
+When using the spring-boot-maven-plugin (i.e. `mvn spring-boot:run`), the parameter `spring-boot.run.additional-classpath-elements` allows loading additional compiled code:
 
 ```
 mvn spring-boot:run -Dspring-boot.run.profiles=xxx -Dspring-boot.run.additional-classpath-elements=/path/to/study/plugins/target/classes
@@ -165,10 +165,10 @@ mvn deploy -DskipTests
 
 ### Generating Database classes using jOOQ
 
-In order to generate the database classes, configure a Java Application within the `rodano-backend` project (ie. same classpath) using the main class `org.jooq.codegen.GenerationTool` and add `src/main/resources/jooq/jooq-database.xml`as an argument.
-It is important that some jOOQ classes and auxiliary classes (`jooq-x.x.x.jar`,`jooq-meta-x.x.x.jar`,`jooq-codegen-x.x.x.jar`,`reactive-streams-x.x.x.jar`,`[JDBC-driver].jar`) be present on the classpath for the code generation to work ; as they are already imported via Maven, nothing needs to be done.
+In order to generate the database classes, configure a Java Application within the `rodano-backend` project (i.e. same classpath) using the main class `org.jooq.codegen.GenerationTool` and add `src/main/resources/jooq/jooq-database.xml` as an argument.
+It is important that some jOOQ classes and auxiliary classes (`jooq-x.x.x.jar`,`jooq-meta-x.x.x.jar`,`jooq-codegen-x.x.x.jar`,`reactive-streams-x.x.x.jar`,`[JDBC-driver].jar`) be present on the classpath for the code generation to work; as they are already imported via Maven, nothing needs to be done.
 
-Note that one can also run a command line (this time specifying the dependencies):
+Alternatively, you can run the generation tool directly from the command line, specifying the dependencies explicitly:
 
 ```
 java -cp jooq-x.x.x.jar;jooq-meta-x.x.x.jar;jooq-codegen-x.x.x.jar;reactive-streams-x.x.x.jar;[JDBC-driver].jar org.jooq.codegen.GenerationTool jooq-database.xml
@@ -176,7 +176,7 @@ java -cp jooq-x.x.x.jar;jooq-meta-x.x.x.jar;jooq-codegen-x.x.x.jar;reactive-stre
 
 ## Docker
 
-This folder contains a Docker file to build a Docker image containing the backend. An additional image is provided in the same Docker file, to compile study plugins.
+This folder contains a Dockerfile to build a Docker image containing the backend. The same Dockerfile also provides an additional image used to compile study plugins.
 
 ### Build the Docker images
 
@@ -194,7 +194,7 @@ docker build -t ghcr.io/rodano/plugins-compiler --target plugins-compiler .
 
 ### Use Docker image
 
-To use the Docker image, remember that a database is required. You can either use the Docker compose configuration file that is provided at the root of hte repository or install a local database.
+To use the Docker image, remember that a database is required. You can either use the Docker Compose configuration file that is provided at the root of the repository or install a local database.
 
 If you have a local database installed, you can run:
 
