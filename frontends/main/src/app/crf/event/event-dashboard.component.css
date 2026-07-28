@@ -1,3 +1,6 @@
 .actions button + button {
 	margin-left: var(--gap);
 }
+.workflow-statuses {
+	margin-bottom: var(--gap);
+}

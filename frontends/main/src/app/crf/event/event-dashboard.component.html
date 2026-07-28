@@ -39,38 +39,40 @@
 		}
 	</div>
 
-	<p class="actions">
-		@if (event().removed) {
-			<button
-				mat-flat-button
-				(click)="restore()"
-				type="button">
-				Restore event
-			</button>
-		} @else {
-			@if (event().locked) {
+	@if (!event().inRemoved) {
+		<p class="actions">
+			@if (event().removed) {
 				<button
 					mat-flat-button
-					(click)="unlock()"
+					(click)="restore()"
 					type="button">
-					Unlock event
+					Restore event
 				</button>
 			} @else {
-				<button
-					mat-flat-button
-					(click)="remove()"
-					type="button">
-					Remove event
-				</button>
-				<button
-					mat-flat-button
-					(click)="lock()"
-					type="button">
-					Lock event
-				</button>
+				@if (event().locked) {
+					<button
+						mat-flat-button
+						(click)="unlock()"
+						type="button">
+						Unlock event
+					</button>
+				} @else {
+					<button
+						mat-flat-button
+						(click)="remove()"
+						type="button">
+						Remove event
+					</button>
+					<button
+						mat-flat-button
+						(click)="lock()"
+						type="button">
+						Lock event
+					</button>
+				}
 			}
-		}
-	</p>
+		</p>
+	}
 
 	<app-issue-viewer
 		[scopePks]="[scope().pk]"

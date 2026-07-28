@@ -34,7 +34,7 @@
 				<span>You have unsaved values</span>
 			}
 
-			@if (form().canWrite && !form().removed) {
+			@if (form().canWrite && !form().removed && !form().inRemoved) {
 				<span class="toolbar-spacer"></span>
 				<button
 					mat-flat-button
