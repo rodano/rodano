@@ -115,7 +115,9 @@
 
 					<!-- Event forms -->
 					@if (expandedEventPks().includes(event.pk)) {
-						<ol class="submenu">
+						<ol
+							[id]="'event-' + event.pk + '-forms'"
+							class="submenu">
 							@for (form of eventsForms()[event.pk]; track form.pk) {
 								<li>
 									<a

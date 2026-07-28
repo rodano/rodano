@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit, model, signal} from '@angular/core';
+import {Component, DestroyRef, ElementRef, Injector, OnInit, afterNextRender, effect, model, signal} from '@angular/core';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {EventService} from '@core/services/event.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -77,8 +77,27 @@ export class SideMenuComponent implements OnInit {
 		private notificationService: NotificationService,
 		private router: Router,
 		private dialog: MatDialog,
-		private settingsService: SettingsService
-	) { }
+		private settingsService: SettingsService,
+		private elementRef: ElementRef<HTMLElement>,
+		private injector: Injector
+	) {
+		//scroll the currently expanded event into view, whether it was just created or opened through a direct link
+		effect(() => {
+			const eventPk = this.eventPk();
+			if(!eventPk) {
+				return;
+			}
+			//also depend on the event's forms: the submenu is empty until they are loaded
+			const forms = this.eventsForms()[eventPk];
+			if(!forms) {
+				return;
+			}
+			//wait for the forms to be rendered in the menu before scrolling to them
+			afterNextRender(() => {
+				this.elementRef.nativeElement.querySelector(`#event-${eventPk}-forms`)?.scrollIntoView({block: 'end'});
+			}, {injector: this.injector});
+		});
+	}
 
 	ngOnInit() {
 		//do no try to be smart
