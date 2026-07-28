@@ -1,9 +1,9 @@
 <div class="content">
 
-	@if (field.model.helpText && field.model.helpText[selectedLanguage]) {
+	@if (field.model.advancedHelp && field.model.advancedHelp[selectedLanguage]) {
 		<ion-item lines="none">
 			<ion-text color="secondary">
-				<p [innerHTML]="field.model.helpText[selectedLanguage]"></p>
+				<p [innerHTML]="field.model.advancedHelp[selectedLanguage]"></p>
 			</ion-text>
 		</ion-item>
 	}
@@ -56,7 +56,7 @@
 			<ion-input
 				[(ngModel)]="field.value"
 				[disabled]="rootScope.locked || event.locked"
-				placeholder="{{ field.model.forDisplay }}">
+				[placeholder]="field.model.inlineHelp">
 			</ion-input>
 		</ion-item>
 	}
@@ -110,7 +110,7 @@
 			<ion-textarea
 				[(ngModel)]="field.value"
 				[disabled]="rootScope.locked || event.locked"
-				placeholder="{{ field.model.forDisplay }}"
+				[placeholder]="field.model.inlineHelp"
 				autoGrow="true">
 			</ion-textarea>
 		</ion-item>
@@ -206,7 +206,7 @@
 @if (isEQ5D) {
 	<ion-item class="footer">
 		<ion-text class="even-smaller-text" color="secondary">
-			© EuroQol Research Foundation. EQ-5D™ is a trade mark of the EuroQol Research Foundation 
+			© EuroQol Research Foundation. EQ-5D™ is a trade mark of the EuroQol Research Foundation
 		</ion-text>
 	</ion-item>
 }

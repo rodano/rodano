@@ -1,6 +1,7 @@
 package ch.rodano.api.epro;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.jooq.DSLContext;
@@ -11,8 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -88,17 +89,18 @@ public class EproController extends AbstractSecuredController {
 	}
 
 	//allows to retrieve the robot name from the key
-	// TODO Currently the ePRO root needs robot name and key to use the API
-	// TODO The robot name should not be required to perform API requests
-	// TODO Basic auth should not rely on robot name, just the robot key
+	//TODO currently the ePRO root needs robot name and key to use the API
+	//the robot name should not be required to perform API requests
+	//basic auth should not rely on robot name, just the robot key
 	@Deprecated
 	@SecurityRequirements
 	@Operation(summary = "Get robot")
-	// Warning : if you change this API endpoint, do not forget to change it in the security configuration !
+	// Warning : if you change this API endpoint, do not forget to change it in the security configuration!
 	@PostMapping("/robot")
 	public EproRobotDTO getRobot(
-		@RequestParam final String key
+		@RequestBody final Map<String, String> payload
 	) throws InvalidKeyException {
+		final var key = payload.getOrDefault("key", "");
 		//retrieve robot
 		final var robot = robotDAOService.getRobotByKey(key);
 		if(robot == null) {

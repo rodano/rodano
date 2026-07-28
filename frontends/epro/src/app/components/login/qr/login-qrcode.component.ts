@@ -1,17 +1,16 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
-import { AlertController, LoadingController, IonicModule } from '@ionic/angular';
-import { AuthStateService } from 'src/app/services/auth-state.service';
+import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Router} from '@angular/router';
+import {AlertController, IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, LoadingController} from '@ionic/angular/standalone';
+import {AuthStateService} from '../../../services/auth-state.service';
 import QrScanner from 'qr-scanner';
 
 @Component({
 	templateUrl: './login-qrcode.component.html',
 	styleUrls: ['./login-qrcode.component.css'],
 	standalone: true,
-	imports: [IonicModule]
+	imports: [IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar]
 })
 export class LoginQrcodeComponent implements OnInit, OnDestroy {
-
 	qrScanner: QrScanner;
 
 	loading: boolean;
@@ -20,27 +19,27 @@ export class LoginQrcodeComponent implements OnInit, OnDestroy {
 		private alertCtrl: AlertController,
 		private router: Router,
 		private authStateService: AuthStateService,
-		private loadingCtrl: LoadingController,
+		private loadingCtrl: LoadingController
 	) { }
 
 	async ngOnInit() {
 		this.loading = false;
 
-		// Get the video element
+		//Get the video element
 		const videoElem = document.getElementById('qr-scanner') as HTMLVideoElement;
 
-		// Create the QR scanner
-		this.qrScanner = new QrScanner(videoElem, async (result) => {
-			await this.onScanSuccess(result);
-		});
+		//Create the QR scanner
+		this.qrScanner = new QrScanner(videoElem, async result => {
+			await this.onScanSuccess(result.data);
+		}, {});
 
-		// Start the scanner
+		//Start the scanner
 		this.qrScanner.start();
 	}
 
 	async onScanSuccess(authURL: string) {
 		if(!this.loading) {
-			// Stop the scanner
+			//Stop the scanner
 			this.qrScanner.stop();
 
 			this.loading = true;
@@ -57,7 +56,7 @@ export class LoginQrcodeComponent implements OnInit, OnDestroy {
 
 			this.authStateService.robotLogin(code).subscribe(
 				() => {
-					// Destroy the scanner
+					//Destroy the scanner
 					this.qrScanner.destroy();
 
 					this.loading = false;
@@ -69,7 +68,7 @@ export class LoginQrcodeComponent implements OnInit, OnDestroy {
 					loader.dismiss();
 					let header;
 					let message;
-					if (response.status === 400) {
+					if(response.status === 400) {
 						header = 'Invalid code';
 						message = 'Ask for a new invitation';
 					}
@@ -77,10 +76,10 @@ export class LoginQrcodeComponent implements OnInit, OnDestroy {
 						header = 'Error';
 						message = 'Please, try again in a few minutes';
 					}
-					const alert = await this.alertCtrl.create({ header, message, buttons: ['OK'] });
+					const alert = await this.alertCtrl.create({header, message, buttons: ['OK']});
 					await alert.present();
 
-					// Start the scanner again
+					//Start the scanner again
 					this.qrScanner.start();
 				}
 			);
@@ -95,7 +94,6 @@ export class LoginQrcodeComponent implements OnInit, OnDestroy {
 		});
 		alert.present();
 	}
-
 
 	ngOnDestroy(): void {
 		if(this.qrScanner) {

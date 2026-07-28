@@ -1,32 +1,31 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
-import { compareAsc, format } from 'date-fns';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { DatasetDTO } from 'src/app/api/model/dataset-dto';
-import { ScopeDTO } from 'src/app/api/model/scope-dto';
-import { EventDTO } from 'src/app/api/model/event-dto';
-import { EventService } from 'src/app/api/services/event.service';
-import { DatasetStateService } from 'src/app/services/dataset-state.service';
-import { LocalizerPipe } from '../../pipes/localizer.pipe';
-import { IonicModule } from '@ionic/angular';
+import {Component, EventEmitter, Input, OnDestroy, OnInit, Output} from '@angular/core';
+import {Router} from '@angular/router';
+import {compareAsc, format} from 'date-fns';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
+import {Dataset} from '@core/model/dataset';
+import {Scope} from '@core/model/scope';
+import {Event} from '@core/model/event';
+import {EventService} from '@core/services/event.service';
+import {DatasetStateService} from '../../services/dataset-state.service';
+import {LocalizerPipe} from '../../pipes/localizer.pipe';
+import {IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonFooter, IonIcon, IonItem, IonLabel, IonList, IonText} from '@ionic/angular/standalone';
 
 @Component({
 	selector: 'app-event-card',
 	templateUrl: './event-card.component.html',
 	styleUrls: ['./event-card.component.css'],
 	standalone: true,
-	imports: [IonicModule, LocalizerPipe],
+	imports: [IonButton, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonFooter, IonIcon, IonItem, IonLabel, IonList, IonText, LocalizerPipe]
 })
 export class EventCardComponent implements OnInit, OnDestroy {
-
 	@Input() languageId: string;
-	@Input() scope: ScopeDTO;
-	@Input() event: EventDTO;
+	@Input() scope: Scope;
+	@Input() event: Event;
 
-	@Output() deleted = new EventEmitter<EventDTO>();
+	@Output() deleted = new EventEmitter<Event>();
 
-	datasets: DatasetDTO[];
+	datasets: Dataset[] = [];
 
 	unsubscribe$ = new Subject<void>();
 
@@ -46,7 +45,7 @@ export class EventCardComponent implements OnInit, OnDestroy {
 		});
 	}
 
-	public getHumanReadableProgression(dataset: DatasetDTO): string {
+	public getHumanReadableProgression(dataset: Dataset): string {
 		const progression = this.datasetStateService.getProgression(dataset);
 		return `${Math.floor(progression * 100)}%`;
 	}
@@ -76,17 +75,12 @@ export class EventCardComponent implements OnInit, OnDestroy {
 		const endDate = new Date(this.event.endDate);
 		endDate.setHours(0, 0, 0, 0);
 
-		let endDateFormat = '';
-		if(compareAsc(startDate, endDate) === 0) {
-			endDateFormat = 'HH:mm';
-		} else {
-			endDateFormat = 'MMM d yyyy - HH:mm';
-		}
+		const endDateFormat = compareAsc(startDate, endDate) === 0 ? 'HH:mm' : 'MMM d yyyy - HH:mm';
 
 		return format(this.event.endDate, endDateFormat);
 	}
 
-	public onSelect(dataset: DatasetDTO) {
+	public onSelect(dataset: Dataset) {
 		this.router.navigate([
 			'/survey',
 			dataset.scopePk,
@@ -95,10 +89,9 @@ export class EventCardComponent implements OnInit, OnDestroy {
 		]);
 	}
 
-	public onDelete(event: EventDTO) {
+	public onDelete(event: Event) {
 		this.deleted.emit(event);
 	}
-
 
 	ngOnDestroy() {
 		this.unsubscribe$.next();

@@ -4,6 +4,7 @@ import {APIService} from './api.service';
 import {Observable} from 'rxjs';
 import {Dataset} from '../model/dataset';
 import {HttpParamsService} from './http-params.service';
+import {DatasetUpdate} from '@core/model/dataset-update';
 
 @Service()
 export class DatasetService {
@@ -51,13 +52,13 @@ export class DatasetService {
 		return this.http.get<Dataset>(`${url}/candidate-dataset`, {params});
 	}
 
-	saveForScope(scopePk: number, datasets: Dataset[]): Observable<Dataset[]> {
-		const url = `${this.serviceUrl}/${scopePk}/datasets`;
-		return this.http.post<Dataset[]>(url, datasets);
+	saveForScope(scopePk: number, dataset: DatasetUpdate): Observable<Dataset> {
+		const url = `${this.serviceUrl}/${scopePk}/datasets/${dataset.pk}`;
+		return this.http.post<Dataset>(url, dataset);
 	}
 
-	saveForEvent(scopePk: number, eventPk: number, datasets: Dataset[]): Observable<Dataset[]> {
-		const url = `${this.serviceUrl}/${scopePk}/events/${eventPk}/datasets`;
-		return this.http.post<Dataset[]>(url, datasets);
+	saveForEvent(scopePk: number, eventPk: number, dataset: DatasetUpdate): Observable<Dataset> {
+		const url = `${this.serviceUrl}/${scopePk}/events/${eventPk}/datasets/${dataset.pk}`;
+		return this.http.post<Dataset>(url, dataset);
 	}
 }

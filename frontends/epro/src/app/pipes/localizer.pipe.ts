@@ -1,5 +1,5 @@
-import { Pipe, PipeTransform } from '@angular/core';
-import { AppService } from '../services/app.service';
+import {Pipe, PipeTransform} from '@angular/core';
+import {AppService} from '../services/app.service';
 
 @Pipe({
 	name: 'localizer',
@@ -14,7 +14,8 @@ export class LocalizerPipe implements PipeTransform {
 		const languageId = localizeLanguageId || this.appService.getSelectedLanguageId();
 		if(object) {
 			return object[languageId];
-		} else {
+		}
+		else {
 			return '';
 		}
 	}

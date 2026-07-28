@@ -1,15 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { AlertController, LoadingController } from '@ionic/angular';
-import { AuthStateService } from 'src/app/services/auth-state.service';
+import {Component, OnInit} from '@angular/core';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router} from '@angular/router';
+import {AlertController, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonMenuButton, IonTitle, IonToolbar, LoadingController} from '@ionic/angular/standalone';
+import {AuthStateService} from '../../../services/auth-state.service';
 
 @Component({
 	templateUrl: './user-login.component.html',
-	styleUrls: ['./user-login.component.css']
+	styleUrls: ['./user-login.component.css'],
+	imports: [IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonMenuButton, IonTitle, IonToolbar, ReactiveFormsModule]
 })
 export class UserLoginComponent implements OnInit {
-
 	public loginForm: FormGroup;
 
 	constructor(
@@ -21,18 +21,18 @@ export class UserLoginComponent implements OnInit {
 	) {
 		this.loginForm = this.formBuilder.group({
 			email: ['', Validators.compose([Validators.required, Validators.email])],
-			password: ['', Validators.required],
+			password: ['', Validators.required]
 		});
 	}
 
 	ngOnInit() {
-		// Ensure no patient authKey is present
+		//Ensure no patient authKey is present
 		this.authStateService.deleteUserToken();
 	}
 
 	public async login() {
-		// Disable user interaction
-		const loader = await this.loadingCtrl.create({ message: 'Please wait...' });
+		//Disable user interaction
+		const loader = await this.loadingCtrl.create({message: 'Please wait...'});
 		loader.present();
 
 		const credentials = {
@@ -40,7 +40,7 @@ export class UserLoginComponent implements OnInit {
 			password: this.loginForm.controls.password.value
 		};
 
-		// Login to KV
+		//Login to KV
 		this.authStateService.userLogin(credentials.email, credentials.password).subscribe(
 			() => {
 				loader.dismiss();
@@ -48,10 +48,10 @@ export class UserLoginComponent implements OnInit {
 			},
 			async () => {
 				loader.dismiss();
-				// Use message for time being as done in KV
+				//Use message for time being as done in KV
 				const header = 'Unable to sign in';
 				const message = 'Please, try again in a few minutes';
-				const alert = await this.alertController.create({ header, message, buttons: ['OK'] });
+				const alert = await this.alertController.create({header, message, buttons: ['OK']});
 				alert.present();
 			}
 		);
@@ -60,5 +60,4 @@ export class UserLoginComponent implements OnInit {
 	public lostPassword() {
 		console.log('Lost Password');
 	}
-
 }
