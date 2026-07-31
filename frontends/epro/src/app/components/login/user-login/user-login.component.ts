@@ -1,63 +1,59 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, OnInit, inject, signal} from '@angular/core';
+import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {AlertController, IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonMenuButton, IonTitle, IonToolbar, LoadingController} from '@ionic/angular/standalone';
+import {finalize} from 'rxjs/operators';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatButton} from '@angular/material/button';
+import {MatIcon} from '@angular/material/icon';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatInput} from '@angular/material/input';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatDialog} from '@angular/material/dialog';
 import {AuthStateService} from '../../../services/auth-state.service';
+import {ConfirmDialogComponent} from '../../../dialogs/confirm/confirm.dialog';
 
 @Component({
 	templateUrl: './user-login.component.html',
 	styleUrls: ['./user-login.component.css'],
-	imports: [IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonInput, IonItem, IonList, IonMenuButton, IonTitle, IonToolbar, ReactiveFormsModule]
+	imports: [
+		MatToolbar,
+		MatButton,
+		MatIcon,
+		MatFormField,
+		MatLabel,
+		MatInput,
+		MatProgressBar,
+		ReactiveFormsModule
+	]
 })
 export class UserLoginComponent implements OnInit {
-	public loginForm: FormGroup;
+	private router = inject(Router);
+	private authStateService = inject(AuthStateService);
+	private dialog = inject(MatDialog);
 
-	constructor(
-		private formBuilder: FormBuilder,
-		private alertController: AlertController,
-		private router: Router,
-		private authStateService: AuthStateService,
-		private loadingCtrl: LoadingController
-	) {
-		this.loginForm = this.formBuilder.group({
-			email: ['', Validators.compose([Validators.required, Validators.email])],
-			password: ['', Validators.required]
-		});
-	}
+	readonly loading = signal(false);
+
+	readonly loginForm = new FormGroup({
+		email: new FormControl('', {nonNullable: true, validators: [Validators.required, Validators.email]}),
+		password: new FormControl('', {nonNullable: true, validators: [Validators.required]})
+	});
 
 	ngOnInit() {
-		//Ensure no patient authKey is present
+		//ensure no patient authKey is present
 		this.authStateService.deleteUserToken();
 	}
 
-	public async login() {
-		//Disable user interaction
-		const loader = await this.loadingCtrl.create({message: 'Please wait...'});
-		loader.present();
+	login() {
+		this.loading.set(true);
+		const {email, password} = this.loginForm.getRawValue();
 
-		const credentials = {
-			email: this.loginForm.controls.email.value,
-			password: this.loginForm.controls.password.value
-		};
-
-		//Login to KV
-		this.authStateService.userLogin(credentials.email, credentials.password).subscribe(
-			() => {
-				loader.dismiss();
-				this.router.navigate(['/main/surveys']);
-			},
-			async () => {
-				loader.dismiss();
-				//Use message for time being as done in KV
-				const header = 'Unable to sign in';
-				const message = 'Please, try again in a few minutes';
-				const alert = await this.alertController.create({header, message, buttons: ['OK']});
-				alert.present();
-			}
-		);
-	}
-
-	public lostPassword() {
-		console.log('Lost Password');
+		this.authStateService.userLogin(email, password).pipe(
+			finalize(() => this.loading.set(false))
+		).subscribe({
+			next: () => this.router.navigate(['/main/surveys']),
+			error: () => this.dialog.open(ConfirmDialogComponent, {
+				data: {title: 'Unable to sign in', message: 'Please, try again in a few minutes'}
+			})
+		});
 	}
 }

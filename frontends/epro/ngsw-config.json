@@ -9,7 +9,8 @@
 					"/favicon.png",
 					"/index.html",
 					"/*.css",
-					"/*.js"
+					"/*.js",
+					"/fonts/**"
 				]
 			}
 		}, {

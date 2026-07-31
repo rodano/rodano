@@ -1,76 +1,58 @@
-<ion-card>
-	<ion-card-header>
-		<ion-card-title>
-			{{ event.shortname }}
-			@if (scope.locked || event.locked) {
-			<ion-icon name="lock-closed"></ion-icon>
+<mat-card appearance="outlined">
+	<mat-card-header>
+		<mat-card-title>
+			{{ event().shortname }}
+			@if (locked()) {
+				<mat-icon>lock</mat-icon>
 			}
-		</ion-card-title>
-		<ion-card-subtitle>
+		</mat-card-title>
+		<mat-card-subtitle>
 			{{ getReadableDate() }}
-		</ion-card-subtitle>
-	</ion-card-header>
-	<ion-card-content>
-		<ion-list lines="none">
-			@for (dataset of datasets; track dataset.id) {
-			<ion-item
-				(click)="onSelect(dataset)"
-				button
-				type="button">
-				@if (scope.locked || event.locked) {
-				<ion-icon
-					slot="start"
-					size="large"
-					name="lock-closed">
-				</ion-icon>
-				}
-				@if (!scope.locked && !event.locked && !datasetStateService.isStarted(dataset) && !datasetStateService.isCompleted(dataset)) {
-				<ion-icon
-					slot="start"
-					size="large"
-					name="ellipse-outline">
-				</ion-icon>
-				}
-				@if (!scope.locked && !event.locked && datasetStateService.isStarted(dataset) && !datasetStateService.isCompleted(dataset)) {
-				<ion-icon
-					slot="start"
-					size="large"
-					name="warning"
-					color="warning">
-				</ion-icon>
-				}
-				@if (!scope.locked && !event.locked && datasetStateService.isStarted(dataset) && datasetStateService.isCompleted(dataset)) {
-				<ion-icon
-					slot="start"
-					size="large"
-					name="checkmark-circle"
-					color="primary">
-				</ion-icon>
-				}
+		</mat-card-subtitle>
+	</mat-card-header>
 
-				<ion-label class="ion-text-wrap">
-					<ion-text>
-						{{ dataset.model.shortname | localizer }}
-					</ion-text>
-					<p>{{ dataset.model.fieldModels.length }} questions</p>
-				</ion-label>
+	<mat-card-content>
+		<mat-action-list>
+			@for (dataset of datasets(); track dataset.pk) {
+				<button
+					mat-list-item
+					type="button"
+					[disabled]="locked()"
+					(click)="onSelect(dataset)">
+					@if (locked()) {
+						<mat-icon matListItemIcon>lock</mat-icon>
+					} @else if (!datasetStateService.isStarted(dataset)) {
+						<mat-icon matListItemIcon>radio_button_unchecked</mat-icon>
+					} @else if (!datasetStateService.isCompleted(dataset)) {
+						<mat-icon
+							matListItemIcon
+							class="started">
+							warning
+						</mat-icon>
+					} @else {
+						<mat-icon
+							matListItemIcon
+							class="completed">
+							check_circle
+						</mat-icon>
+					}
 
-			</ion-item>
+					<span matListItemTitle>{{ dataset.model.shortname | localizer }}</span>
+					<span matListItemLine>{{ dataset.model.fieldModels.length }} questions</span>
+				</button>
 			}
-		</ion-list>
-	</ion-card-content>
+		</mat-action-list>
+	</mat-card-content>
 
-	@if (!eventService.isPlanned(event)) {
-	<ion-footer>
-		<ion-item>
-			<ion-button
-				(click)="onDelete(event)"
-				slot="end"
-				size="small"
-				color="danger">
+	@if (removable()) {
+		<mat-card-actions align="end">
+			<button
+				mat-stroked-button
+				type="button"
+				class="remove"
+				(click)="onDelete()">
 				Remove
-			</ion-button>
-		</ion-item>
-	</ion-footer>
+			</button>
+		</mat-card-actions>
 	}
-</ion-card>
+</mat-card>

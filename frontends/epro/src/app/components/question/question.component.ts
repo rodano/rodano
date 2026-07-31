@@ -1,101 +1,71 @@
-import {Component, EventEmitter, Input, Output, inject} from '@angular/core';
-import {format, parse} from 'date-fns';
+import {Component, computed, inject, input, model, output} from '@angular/core';
 import {Scope} from '@core/model/scope';
 import {Event} from '@core/model/event';
 import {Field} from '@core/model/field';
 import {LocalizerPipe} from '../../pipes/localizer.pipe';
 import {FormsModule} from '@angular/forms';
-import {IonButton, IonDatetime, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPopover, IonRadioGroup, IonRange, IonRow, IonText, IonTextarea} from '@ionic/angular/standalone';
-import {FieldService} from '@core/services/field.service';
+import {CdkTextareaAutosize} from '@angular/cdk/text-field';
+import {MatButton} from '@angular/material/button';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
+import {MatInputModule} from '@angular/material/input';
+import {MatRadioModule} from '@angular/material/radio';
+import {MatSliderModule} from '@angular/material/slider';
+import {DateComponent} from '../date/date.component';
+import {AppService} from '../../services/app.service';
 
 @Component({
 	selector: 'app-question',
 	templateUrl: './question.component.html',
 	styleUrls: ['./question.component.css'],
-	standalone: true,
 	imports: [
-		IonButton,
-		IonDatetime,
-		IonIcon,
-		IonInput,
-		IonItem,
-		IonLabel,
-		IonList,
-		IonPopover,
-		IonRadioGroup,
-		IonRange,
-		IonRow,
-		IonText,
-		IonTextarea,
+		MatButton,
+		MatFormField,
+		MatLabel,
+		MatIcon,
+		MatInputModule,
+		MatRadioModule,
+		MatSliderModule,
+		CdkTextareaAutosize,
+		DateComponent,
 		FormsModule,
 		LocalizerPipe
 	]
 })
 export class QuestionComponent {
-	@Input() rootScope: Scope;
-	@Input() event: Event;
-	@Input() field: Field;
+	private appService = inject(AppService);
+
+	readonly rootScope = input.required<Scope>();
+	readonly event = input.required<Event>();
+	readonly field = input.required<Field>();
 
 	//This is for the custom EQ5D questions
-	@Input() isEQ5D: boolean;
+	readonly isEQ5D = input<boolean>(false);
 
-	@Output() noAnswer = new EventEmitter<void>();
+	readonly value = model<string | undefined>();
 
-	selectedLanguage = 'en';
-	private fieldService = inject(FieldService);
+	readonly noAnswer = output<void>();
 
-	selectPossibleValue(value: string | undefined) {
-		//TODO remove this as soon as the disabled feature is implemented in all ionic components
-		if(!this.rootScope.locked && !this.event.locked) {
-			this.field.value = value;
-		}
-	}
+	readonly selectedLanguage = this.appService.getSelectedLanguageId();
 
-	get readableDateTimeValue(): string | null {
-		if(this.field.value && this.field.value !== '') {
-			const fmt = this.fieldService.generateFormat(this.field.model);
-			const parsedDate = parse(this.field.value, fmt, new Date());
-			return format(parsedDate, fmt);
-		}
-		return null;
-	}
+	readonly disabled = computed(() => this.rootScope().locked || this.event().locked);
 
-	setDatetimeValue(newDateTime: string | string[] | null | undefined) {
-		if(newDateTime && !Array.isArray(newDateTime)) {
-			const dateTime = new Date(newDateTime);
-			const fmt = this.fieldService.generateFormat(this.field.model);
-			const formattedDatetime = format(dateTime, fmt);
-			this.field.value = formattedDatetime;
-		}
-		else {
-			throw new Error('Can not accept multiple dates as input');
-		}
-	}
+	readonly numberValue = computed(() => {
+		const value = this.value();
+		return value === undefined || value === '' ? undefined : Number(value);
+	});
 
 	isFieldValueValid() {
-		const numberValue = Number(this.field.value);
-		return this.field.value !== null && this.field.value !== undefined && !isNaN(numberValue);
+		const value = this.numberValue();
+		return value !== undefined && !isNaN(value);
+	}
+
+	setNumberValue(newValue: number) {
+		this.value.set(String(newValue));
 	}
 
 	emitNoAnswer() {
-		this.field.value = '';
+		this.value.set('');
 		this.noAnswer.emit();
-	}
-
-	onTouchMove(event: TouchEvent) {
-		event.stopPropagation();
-	}
-
-	dateTimePickerPresentation(): string {
-		if(this.fieldService.isDate(this.field.model) && this.fieldService.isTime(this.field.model)) {
-			return 'date-time';
-		}
-		if(this.fieldService.isDate(this.field.model)) {
-			return 'date';
-		}
-		if(this.fieldService.isTime(this.field.model)) {
-			return 'time';
-		}
-		throw new Error(`${this.field.model.id} does not have the date format`);
 	}
 }

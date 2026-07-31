@@ -1,53 +1,40 @@
-<ion-header>
-	<ion-toolbar>
-		<ion-buttons slot="start">
-			<ion-menu-button></ion-menu-button>
-		</ion-buttons>
-		<ion-title>Sign-in</ion-title>
-	</ion-toolbar>
-</ion-header>
+<mat-toolbar class="page-toolbar">
+	<span class="toolbar-title">Sign in</span>
+</mat-toolbar>
+@if (loading()) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 
-<ion-content>
-	<form [formGroup]="loginForm" (ngSubmit)="login()">
-		<ion-list>
-			<ion-item>
-				<ion-input
-					type="email"
-					autocorrect="off"
-					autocapitalize="none"
-					placeholder="E-mail"
-					formControlName="email"
-					name="email">
-				</ion-input>
-			</ion-item>
+<div class="content">
+	<form
+		[formGroup]="loginForm"
+		(ngSubmit)="login()">
+		<mat-form-field>
+			<mat-label>E-mail</mat-label>
+			<input
+				matInput
+				type="email"
+				autocapitalize="none"
+				autocorrect="off"
+				formControlName="email" />
+		</mat-form-field>
 
-			<ion-item>
-				<ion-input
-					type="password"
-					autocorrect="off"
-					autocapitalize="none"
-					placeholder="Password"
-					formControlName="password"
-					name="password">
-				</ion-input>
-			</ion-item>
-		</ion-list>
+		<mat-form-field>
+			<mat-label>Password</mat-label>
+			<input
+				matInput
+				type="password"
+				autocapitalize="none"
+				autocorrect="off"
+				formControlName="password" />
+		</mat-form-field>
 
-		<ion-toolbar>
-			<ion-buttons>
-				<ion-button
-					color="primary"
-					expand="block"
-					fill="solid"
-					type="submit"
-					[disabled]="!loginForm.valid">
-					<ion-icon name="log-in"></ion-icon>
-					Sign In
-				</ion-button>
-			</ion-buttons>
-		</ion-toolbar>
+		<button
+			mat-flat-button
+			type="submit"
+			[disabled]="!loginForm.valid || loading()">
+			<mat-icon>login</mat-icon>
+			Sign in
+		</button>
 	</form>
-	<!--<p class="ion-text-center">
-		<a href="#" (click)="lostPassword()" class="trouble-helper">Forgot Password ?</a>
-	</p>-->
-</ion-content>
+</div>

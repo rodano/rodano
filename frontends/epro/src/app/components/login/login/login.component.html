@@ -1,46 +1,43 @@
-<div class="welcome-container">
+@if (loading()) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 
-	@if (study) {
-		<div class="welcome-block">
-			<ion-text color="primary">
-				<h1>Welcome to the {{ study.shortname | localizer }} study </h1>
-			</ion-text>
-		</div>
+<div class="welcome-container">
+	@if (study(); as study) {
+		<h1>Welcome to the {{ study.shortname | localizer }} study</h1>
 	}
 
 	<div class="login-block">
-
-		<ion-button
-			expand="block"
+		<button
+			mat-flat-button
+			type="button"
+			[disabled]="loading()"
 			[routerLink]="['/login-qrcode']">
-			<ion-icon slot="start" name="qr-code"></ion-icon>
+			<mat-icon>qr_code</mat-icon>
 			Sign in with the QR code
-		</ion-button>
+		</button>
 
-		<ion-text color="secondary">
-			<h3>OR</h3>
-		</ion-text>
+		<h3>OR</h3>
 
-		<form [formGroup]="loginForm" (ngSubmit)="login()">
-			<ion-input
-				label="Access code"
-				label-placement="floating"
-				fill="outline"
-				name="accessCode"
-				type="text"
-				required
-				formControlName="accessCode">
-			</ion-input>
-			<ion-button
-				color="primary"
-				expand="block"
+		<form
+			[formGroup]="loginForm"
+			(ngSubmit)="login()">
+			<mat-form-field>
+				<mat-label>Access code</mat-label>
+				<input
+					matInput
+					type="text"
+					autocapitalize="none"
+					autocorrect="off"
+					formControlName="accessCode" />
+			</mat-form-field>
+			<button
+				mat-flat-button
 				type="submit"
-				[disabled]="!loginForm.valid">
-				<ion-icon slot="start" name="log-in"></ion-icon>
-				Sign In
-			</ion-button>
+				[disabled]="!loginForm.valid || loading()">
+				<mat-icon>login</mat-icon>
+				Sign in
+			</button>
 		</form>
-
 	</div>
-
 </div>

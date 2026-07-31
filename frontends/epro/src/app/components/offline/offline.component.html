@@ -1,15 +1,11 @@
-<ion-content style="text-align: center;">
-	<h2>
-		Unable to connect to server.
-	</h2>
-	<p>
-		Please check you internet connection and try again later.
-	</p>
-	<ion-button
-		(click)="checkConnectionAndProceed()"
-		[disabled]="loading"
-		color="primary"
-		fill="solid">
+<div class="content">
+	<h2>Unable to connect to server</h2>
+	<p>Please check your internet connection and try again later.</p>
+	<button
+		mat-flat-button
+		type="button"
+		[disabled]="loading()"
+		(click)="checkConnectionAndProceed()">
 		Try to connect
-	</ion-button>
-</ion-content>
+	</button>
+</div>

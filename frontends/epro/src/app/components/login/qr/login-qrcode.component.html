@@ -1,12 +1,17 @@
-<ion-header>
-	<ion-toolbar>
-		<ion-buttons slot="start">
-			<ion-back-button></ion-back-button>
-		</ion-buttons>
-		<ion-title>Scan QR Code</ion-title>
-	</ion-toolbar>
-</ion-header>
+<mat-toolbar class="page-toolbar">
+	<button
+		mat-icon-button
+		type="button"
+		aria-label="Back"
+		(click)="back()">
+		<mat-icon>arrow_back</mat-icon>
+	</button>
+	<span class="toolbar-title">Scan QR code</span>
+</mat-toolbar>
+@if (loading()) {
+	<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 
-<ion-content>
-	<video id="qr-scanner"></video>
-</ion-content>
+<div class="content">
+	<video #video></video>
+</div>

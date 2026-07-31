@@ -1,101 +1,75 @@
-import {Component, OnInit, OnDestroy} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, inject, signal, viewChild} from '@angular/core';
+import {Location} from '@angular/common';
 import {Router} from '@angular/router';
-import {AlertController, IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar, LoadingController} from '@ionic/angular/standalone';
-import {AuthStateService} from '../../../services/auth-state.service';
+import {finalize} from 'rxjs/operators';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatIcon} from '@angular/material/icon';
+import {MatIconButton} from '@angular/material/button';
+import {MatProgressBar} from '@angular/material/progress-bar';
+import {MatDialog} from '@angular/material/dialog';
 import QrScanner from 'qr-scanner';
+import {AuthStateService} from '../../../services/auth-state.service';
+import {ConfirmDialogComponent, ConfirmDialogData} from '../../../dialogs/confirm/confirm.dialog';
 
 @Component({
 	templateUrl: './login-qrcode.component.html',
 	styleUrls: ['./login-qrcode.component.css'],
-	standalone: true,
-	imports: [IonBackButton, IonButtons, IonContent, IonHeader, IonTitle, IonToolbar]
+	imports: [MatToolbar, MatIcon, MatIconButton, MatProgressBar]
 })
 export class LoginQrcodeComponent implements OnInit, OnDestroy {
-	qrScanner: QrScanner;
+	private router = inject(Router);
+	private location = inject(Location);
+	private authStateService = inject(AuthStateService);
+	private dialog = inject(MatDialog);
 
-	loading: boolean;
+	readonly video = viewChild.required<ElementRef<HTMLVideoElement>>('video');
 
-	constructor(
-		private alertCtrl: AlertController,
-		private router: Router,
-		private authStateService: AuthStateService,
-		private loadingCtrl: LoadingController
-	) { }
+	readonly loading = signal(false);
 
-	async ngOnInit() {
-		this.loading = false;
+	private qrScanner: QrScanner;
 
-		//Get the video element
-		const videoElem = document.getElementById('qr-scanner') as HTMLVideoElement;
-
-		//Create the QR scanner
-		this.qrScanner = new QrScanner(videoElem, async result => {
-			await this.onScanSuccess(result.data);
-		}, {});
-
-		//Start the scanner
+	ngOnInit() {
+		this.qrScanner = new QrScanner(this.video().nativeElement, result => this.onScanSuccess(result.data), {});
 		this.qrScanner.start();
 	}
 
-	async onScanSuccess(authURL: string) {
-		if(!this.loading) {
-			//Stop the scanner
-			this.qrScanner.stop();
+	back() {
+		this.location.back();
+	}
 
-			this.loading = true;
-
-			if(window.navigator.vibrate) {
-				window.navigator.vibrate(200);
-			}
-
-			const url = new URL(authURL);
-			const code = url.searchParams.get('code') as string;
-
-			const loader = await this.loadingCtrl.create({message: 'Please wait...'});
-			loader.present();
-
-			this.authStateService.robotLogin(code).subscribe(
-				() => {
-					//Destroy the scanner
-					this.qrScanner.destroy();
-
-					this.loading = false;
-					loader.dismiss();
-					this.router.navigate(['/main/surveys']);
-				},
-				async response => {
-					this.loading = false;
-					loader.dismiss();
-					let header;
-					let message;
-					if(response.status === 400) {
-						header = 'Invalid code';
-						message = 'Ask for a new invitation';
-					}
-					else {
-						header = 'Error';
-						message = 'Please, try again in a few minutes';
-					}
-					const alert = await this.alertCtrl.create({header, message, buttons: ['OK']});
-					await alert.present();
-
-					//Start the scanner again
-					this.qrScanner.start();
-				}
-			);
+	private onScanSuccess(authURL: string) {
+		if(this.loading()) {
+			return;
 		}
-	}
 
-	async onScanError() {
-		const alert = await this.alertCtrl.create({
-			header: 'Could not scan the QR code',
-			message: 'Please try again',
-			buttons: ['OK']
+		this.qrScanner.stop();
+		this.loading.set(true);
+
+		if(window.navigator.vibrate) {
+			window.navigator.vibrate(200);
+		}
+
+		const code = new URL(authURL).searchParams.get('code') as string;
+
+		this.authStateService.robotLogin(code).pipe(
+			finalize(() => this.loading.set(false))
+		).subscribe({
+			next: () => {
+				this.qrScanner.destroy();
+				this.router.navigate(['/main/surveys']);
+			},
+			error: response => {
+				const data: ConfirmDialogData = response.status === 400
+					? {title: 'Invalid code', message: 'Ask for a new invitation'}
+					: {title: 'Error', message: 'Please, try again in a few minutes'};
+				this.dialog.open(ConfirmDialogComponent, {data})
+					.afterClosed()
+					.subscribe(() => this.qrScanner.start());
+			}
 		});
-		alert.present();
 	}
 
-	ngOnDestroy(): void {
+	ngOnDestroy() {
 		if(this.qrScanner) {
 			this.qrScanner.stop();
 			this.qrScanner.destroy();

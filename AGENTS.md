@@ -68,7 +68,7 @@ mvn test
 
 ### ePRO (`frontends/epro/`)
 - Purpose: Mobile web application for study subjects
-- Technology: TypeScript, Angular 17, Ionic
+- Technology: TypeScript, Angular 22, Angular Material
 
 ### Commands
 Commands must be run from the specific frontend directory (e.g. `frontends/main/`). After modifications, check what you've done with:

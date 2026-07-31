@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Observable, of} from 'rxjs';
 import {switchMap, tap} from 'rxjs/operators';
 import {AuthService} from '@core/services/auth.service';
@@ -8,16 +8,14 @@ import {AppService} from './app.service';
 import {Authentication} from '@core/model/authentication';
 import {Credentials} from '@core/model/credentials';
 
-@Injectable()
+@Service()
 export class AuthStateService {
 	private static TOKEN_STORAGE_KEY = 'userToken';
 	private static API_KEY_STORAGE_KEY = 'robotCredentials';
 
-	constructor(
-		private authService: AuthService,
-		private eproService: EproService,
-		private appService: AppService
-	) { }
+	private authService = inject(AuthService);
+	private eproService = inject(EproService);
+	private appService = inject(AppService);
 
 	public robotLogin(code: string): Observable<EproRobot> {
 		return this.eproService.getRobot(code).pipe(

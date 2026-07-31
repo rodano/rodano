@@ -1,17 +1,23 @@
 import {Component} from '@angular/core';
-import {IonIcon, IonLabel, IonTabBar, IonTabButton, IonTabs} from '@ionic/angular/standalone';
+import {RouterLink, RouterLinkActive, RouterOutlet} from '@angular/router';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatIcon} from '@angular/material/icon';
 
 @Component({
 	templateUrl: './main.component.html',
 	styleUrls: ['./main.component.css'],
-	standalone: true,
 	imports: [
-		IonIcon,
-		IonLabel,
-		IonTabBar,
-		IonTabButton,
-		IonTabs
+		MatToolbar,
+		MatIcon,
+		RouterLink,
+		RouterLinkActive,
+		RouterOutlet
 	]
 })
 export class MainComponent {
+	readonly tabs = [
+		{path: 'surveys', label: 'Surveys', icon: 'calendar_month'},
+		{path: 'journal', label: 'Journal', icon: 'description'},
+		{path: 'help', label: 'Help', icon: 'help'}
+	];
 }

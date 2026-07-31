@@ -1,58 +1,62 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, DestroyRef, OnInit, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {IonBackButton, IonButton, IonButtons, IonContent, IonFooter, IonHeader, IonProgressBar, IonTitle, IonToolbar, ToastController} from '@ionic/angular/standalone';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {combineLatest} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
+import {MatToolbar} from '@angular/material/toolbar';
+import {MatIcon} from '@angular/material/icon';
+import {MatButton, MatIconButton} from '@angular/material/button';
+import {MatProgressBar} from '@angular/material/progress-bar';
 import {Dataset} from '@core/model/dataset';
 import {Field} from '@core/model/field';
-import {switchMap, takeUntil} from 'rxjs/operators';
-import {combineLatest, Subject} from 'rxjs';
-import {DatasetStateService} from '../../services/dataset-state.service';
 import {Event} from '@core/model/event';
-import {EventService} from '@core/services/event.service';
 import {Scope} from '@core/model/scope';
-import {compareAsc} from 'date-fns';
+import {EventService} from '@core/services/event.service';
 import {MeService} from '@core/services/me.service';
+import {DatasetStateService} from '../../services/dataset-state.service';
+import {NotificationService} from '../../services/notification.service';
 import {LocalizerPipe} from '../../pipes/localizer.pipe';
 import {QuestionComponent} from '../question/question.component';
 
 @Component({
 	templateUrl: './survey.component.html',
 	styleUrls: ['./survey.component.css'],
-	standalone: true,
 	imports: [
-		IonBackButton,
-		IonButton,
-		IonButtons,
-		IonContent,
-		IonFooter,
-		IonHeader,
-		IonProgressBar,
-		IonTitle,
-		IonToolbar,
+		MatToolbar,
+		MatIcon,
+		MatButton,
+		MatIconButton,
+		MatProgressBar,
 		QuestionComponent,
 		LocalizerPipe
 	]
 })
-export class SurveyComponent implements OnInit, OnDestroy {
-	rootScope: Scope;
-	event: Event;
-	dataset: Dataset;
-	datasetFields: Field[];
-	field: Field;
+export class SurveyComponent implements OnInit {
+	private router = inject(Router);
+	private activatedRoute = inject(ActivatedRoute);
+	private eventService = inject(EventService);
+	private datasetStateService = inject(DatasetStateService);
+	private meService = inject(MeService);
+	private notificationService = inject(NotificationService);
+	private destroyRef = inject(DestroyRef);
 
-	loaded = false;
+	readonly rootScope = signal<Scope | undefined>(undefined);
+	readonly event = signal<Event | undefined>(undefined);
+	readonly dataset = signal<Dataset | undefined>(undefined);
+	readonly datasetFields = signal<Field[]>([]);
+	readonly fieldIndex = signal(0);
 
-	selectedLanguage = 'en';
+	//the value being edited is kept apart from the field so that changes made by the question component are tracked
+	readonly value = signal<string | undefined>(undefined);
 
-	unsubscribe$ = new Subject<void>();
+	readonly field = computed<Field | undefined>(() => this.datasetFields()[this.fieldIndex()]);
+	readonly progress = computed(() => 100 * (this.fieldIndex() + 1) / this.datasetFields().length);
+	readonly isFirstField = computed(() => this.fieldIndex() === 0);
+	readonly isLastField = computed(() => this.fieldIndex() === this.datasetFields().length - 1);
+	readonly previousLabel = computed(() => this.isFirstField() ? 'Back to surveys' : 'Previous question');
+	readonly nextLabel = computed(() => this.isLastField() ? 'Finish' : 'Next question');
 
-	constructor(
-		private router: Router,
-		private activatedRoute: ActivatedRoute,
-		private toastCtrl: ToastController,
-		private eventService: EventService,
-		private datasetStateService: DatasetStateService,
-		private meService: MeService
-	) { }
+	private loaded = false;
 
 	ngOnInit() {
 		this.activatedRoute.params.pipe(
@@ -69,100 +73,62 @@ export class SurveyComponent implements OnInit, OnDestroy {
 					)
 				]);
 			}),
-			takeUntil(this.unsubscribe$)
-		).subscribe(results => {
-			this.rootScope = results[0];
-			this.event = results[1];
-			this.dataset = results[2];
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(([rootScope, event, dataset]) => {
+			this.rootScope.set(rootScope);
+			this.event.set(event);
+			this.dataset.set(dataset);
 
-			//Get all the fields from the dataset and filter out the readonly fields
-			this.datasetFields = this.dataset.fields
-				.filter(f => !f.model.readOnly)
-				.sort((field1, field2) => {
-					if(field1.model.order && field2.model.order) {
-						return field1.model.order - field2.model.order;
-					}
-					else {
-						return 0;
-					}
-				});
+			//keep only the editable fields, in the order defined in the configuration
+			this.datasetFields.set(
+				dataset.fields
+					.filter(f => !f.model.readOnly)
+					.sort((field1, field2) => (field1.model.order ?? 0) - (field2.model.order ?? 0))
+			);
 
 			if(!this.loaded) {
-				this.field = this.datasetFields[0];
+				this.selectField(0);
 				this.loaded = true;
 			}
 		});
 	}
 
-	getFieldIndex(): number {
-		return this.datasetFields.findIndex(field => field.modelId === this.field.modelId);
-	}
-
-	isFirstField(): boolean {
-		return this.getFieldIndex() === 0;
-	}
-
-	isLastField(): boolean {
-		return this.getFieldIndex() === this.datasetFields.length - 1;
-	}
-
-	getPreviousLabel(): string {
-		return this.isFirstField() ? 'Back to surveys' : 'Previous question';
-	}
-
-	getNextLabel(): string {
-		return this.isLastField() ? 'Finish' : 'Next question';
-	}
-
-	nextFieldModel() {
-		//save the dataset if the rootscope and the event are not locked
-		if(!this.rootScope.locked && !this.event.locked) {
-			this.datasetStateService.saveField(this.dataset, this.field).pipe(
-				takeUntil(this.unsubscribe$)
-			).subscribe(() => {
-				if(this.isLastField()) {
-					this.toastSuccess();
-				}
-
-				this.advanceToField(true);
-			});
-		}
-		else {
+	next() {
+		this.saveThen(() => {
+			if(this.isLastField()) {
+				this.notificationService.showSuccess('Thank you for answering the questions of this survey');
+			}
 			this.advanceToField(true);
-		}
+		});
 	}
 
-	previousFieldModel() {
-		//save the dataset if the root scope and the event are not locked
-		if(!this.rootScope.locked && !this.event.locked && this.field.value !== null) {
-			this.datasetStateService.saveField(this.dataset, this.field).pipe(
-				takeUntil(this.unsubscribe$)
-			).subscribe(() => {
-				this.advanceToField(false);
-			});
-		}
-		else {
-			this.advanceToField(false);
-		}
+	previous() {
+		this.saveThen(() => this.advanceToField(false));
 	}
 
-	getEndDateFormat(): string {
-		if(this.event.endDate === undefined) {
-			throw new Error(`The end date has not been defined for the event ${this.event.pk}`);
+	onNoAnswer() {
+		this.next();
+	}
+
+	back() {
+		this.navigateBack();
+	}
+
+	private saveThen(callback: () => void) {
+		const rootScope = this.rootScope();
+		const event = this.event();
+		const dataset = this.dataset();
+		const field = this.field();
+
+		if(!rootScope || !event || !dataset || !field || rootScope.locked || event.locked) {
+			callback();
+			return;
 		}
 
-		const startDate = new Date(this.event.date);
-		startDate.setHours(0, 0, 0, 0);
-
-		const endDate = new Date(this.event.endDate);
-		endDate.setHours(0, 0, 0, 0);
-
-		if(compareAsc(startDate, endDate) === 0) {
-			return 'HH:mm';
-		}
-		else {
-			return 'MMM d yyyy - HH:mm';
-		}
+		field.value = this.value();
+		this.datasetStateService.saveField(dataset, field).pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(() => callback());
 	}
 
 	private advanceToField(forward: boolean) {
@@ -170,45 +136,22 @@ export class SurveyComponent implements OnInit, OnDestroy {
 			this.navigateBack();
 		}
 		else {
-			const index = this.getFieldIndex();
-
-			let nextIndex;
-			if(forward) {
-				nextIndex = index + 1;
-			}
-			else {
-				nextIndex = index - 1;
-			}
-
-			const nextField = this.datasetFields[nextIndex];
-			this.field = this.datasetFields.find(f => f.modelId === nextField.modelId) as Field;
+			this.selectField(this.fieldIndex() + (forward ? 1 : -1));
 		}
 	}
 
+	private selectField(index: number) {
+		this.fieldIndex.set(index);
+		this.value.set(this.datasetFields()[index]?.value);
+	}
+
 	private navigateBack() {
-		if(this.eventService.isPlanned(this.event)) {
+		const event = this.event();
+		if(event && this.eventService.isPlanned(event)) {
 			this.router.navigate(['/main/surveys']);
 		}
 		else {
 			this.router.navigate(['/main/journal']);
 		}
-	}
-
-	async toastSuccess() {
-		const toast = await this.toastCtrl.create({
-			position: 'top',
-			message: 'Thank you for answering the questions of this survey',
-			duration: 3000
-		});
-		toast.present();
-	}
-
-	onNoAnswer() {
-		this.nextFieldModel();
-	}
-
-	ngOnDestroy() {
-		this.unsubscribe$.next();
-		this.unsubscribe$.complete();
 	}
 }

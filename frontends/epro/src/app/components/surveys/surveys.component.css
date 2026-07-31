@@ -1,0 +1,9 @@
+.empty {
+	margin-top: 2rem;
+	text-align: center;
+	color: var(--mat-sys-on-surface-variant);
+}
+
+app-event-card + app-event-card {
+	margin-top: var(--gap);
+}
