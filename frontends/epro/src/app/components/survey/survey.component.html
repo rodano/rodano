@@ -1,53 +1,53 @@
-<ion-header>
-	<ion-toolbar>
-		<ion-buttons slot="start">
-			<ion-back-button></ion-back-button>
-		</ion-buttons>
-		@if (dataset) {
-			<ion-title>
-				<div class="ion-text-wrap">
-					{{ dataset.model.shortname | localizer }}
-				</div>
-			</ion-title>
-		}
-	</ion-toolbar>
-	@if (datasetFields) {
-		<ion-progress-bar value="{{ (getFieldIndex() + 1) / datasetFields.length }}" />
+<mat-toolbar class="page-toolbar">
+	<button
+		mat-icon-button
+		type="button"
+		aria-label="Back"
+		(click)="back()">
+		<mat-icon>arrow_back</mat-icon>
+	</button>
+	@if (dataset(); as dataset) {
+		<span class="toolbar-title">{{ dataset.model.shortname | localizer }}</span>
 	}
-</ion-header>
+</mat-toolbar>
+<mat-progress-bar
+	mode="determinate"
+	[value]="progress()"></mat-progress-bar>
 
-@if (event && dataset && field) {
-<ion-content>
-	<app-question
-		[rootScope]="rootScope"
-		[event]="event"
-		[field]="field"
-		[isEQ5D]="dataset.modelId === 'EQ5D'"
-		(noAnswer)="onNoAnswer()">
-	</app-question>
-</ion-content>
-}
+<div class="content">
+	@if (rootScope(); as rootScope) {
+		@if (event(); as event) {
+			@if (dataset(); as dataset) {
+				@if (field(); as field) {
+					<app-question
+						[rootScope]="rootScope"
+						[event]="event"
+						[field]="field"
+						[isEQ5D]="dataset.modelId === 'EQ5D'"
+						[(value)]="value"
+						(noAnswer)="onNoAnswer()">
+					</app-question>
+				}
+			}
+		}
+	}
+</div>
 
-@if (dataset && field) {
-<ion-footer>
-	<ion-toolbar>
-		<ion-buttons slot="start">
-			<ion-button
-				(click)="previousFieldModel()"
-				fill="solid"
-				color="primary">
-				{{ getPreviousLabel() }}
-			</ion-button>
-		</ion-buttons>
-		<ion-buttons slot="end">
-			<ion-button
-				[disabled]="field.value === null"
-				(click)="nextFieldModel()"
-				fill="solid"
-				color="primary">
-				{{ getNextLabel() }}
-			</ion-button>
-		</ion-buttons>
-	</ion-toolbar>
-</ion-footer>
+@if (field()) {
+	<mat-toolbar class="actions">
+		<button
+			mat-flat-button
+			type="button"
+			(click)="previous()">
+			{{ previousLabel() }}
+		</button>
+		<span class="toolbar-spacer"></span>
+		<button
+			mat-flat-button
+			type="button"
+			[disabled]="value() === undefined"
+			(click)="next()">
+			{{ nextLabel() }}
+		</button>
+	</mat-toolbar>
 }

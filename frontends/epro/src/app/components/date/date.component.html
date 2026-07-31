@@ -1,0 +1,61 @@
+@if (field().model.withYears && field().model.withMonths && field().model.withDays) {
+	<mat-form-field>
+		<input
+			matInput
+			placeholder="YYYY-MM-DD"
+			[matDatepicker]="picker"
+			[formControl]="dateControl" />
+		<mat-datepicker-toggle
+			matSuffix
+			[for]="picker"></mat-datepicker-toggle>
+		<mat-datepicker
+			#picker
+			startView="multi-year"
+			(yearSelected)="yearHandler($event, picker)"
+			(monthSelected)="monthHandler($event, picker)">
+		</mat-datepicker>
+	</mat-form-field>
+} @else if (field().model.withYears && field().model.withMonths) {
+	<mat-form-field appDateFormatMonthYear>
+		<input
+			matInput
+			placeholder="YYYY-MM"
+			[matDatepicker]="picker"
+			[formControl]="dateControl" />
+		<mat-datepicker-toggle
+			matSuffix
+			[for]="picker"></mat-datepicker-toggle>
+		<mat-datepicker
+			#picker
+			startView="multi-year"
+			(yearSelected)="yearHandler($event, picker)"
+			(monthSelected)="monthHandler($event, picker)">
+		</mat-datepicker>
+	</mat-form-field>
+} @else if (field().model.withYears) {
+	<mat-form-field appDateFormatYear>
+		<input
+			matInput
+			placeholder="YYYY"
+			[matDatepicker]="picker"
+			[formControl]="dateControl" />
+		<mat-datepicker-toggle
+			matSuffix
+			[for]="picker"></mat-datepicker-toggle>
+		<mat-datepicker
+			#picker
+			startView="multi-year"
+			(yearSelected)="yearHandler($event, picker)"
+			(monthSelected)="monthHandler($event, picker)">
+		</mat-datepicker>
+	</mat-form-field>
+}
+@if (isTime()) {
+	<mat-form-field class="time">
+		<input
+			matInput
+			type="text"
+			[placeholder]="getPlaceholder()"
+			[formControl]="timeControl" />
+	</mat-form-field>
+}

@@ -1,26 +1,15 @@
 import {HttpErrorResponse, HttpInterceptorFn} from '@angular/common/http';
 import {inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {ToastController} from '@ionic/angular/standalone';
 import {throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 import {AuthStateService} from './services/auth-state.service';
+import {NotificationService} from './services/notification.service';
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	const router = inject(Router);
 	const authStateService = inject(AuthStateService);
-	const toastCtrl = inject(ToastController);
-
-	async function presentOfflineToast() {
-		const errToast = await toastCtrl.create({
-			position: 'bottom',
-			header: 'Error',
-			message: 'Can not connect to server',
-			color: 'danger',
-			duration: 3000
-		});
-		await errToast.present();
-	}
+	const notificationService = inject(NotificationService);
 
 	let enhancedRequest;
 	const robotCredentials = authStateService.getRobotCredentials();
@@ -47,7 +36,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 			switch(response.status) {
 				case 0:
 				case 504:
-					presentOfflineToast();
+					notificationService.showError('Can not connect to server');
 					router.navigate(['/offline']);
 					break;
 				case 401:

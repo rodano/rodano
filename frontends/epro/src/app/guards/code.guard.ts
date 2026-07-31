@@ -1,19 +1,16 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {ActivatedRouteSnapshot, UrlTree, Router} from '@angular/router';
-import {AlertController} from '@ionic/angular/standalone';
+import {MatDialog} from '@angular/material/dialog';
 import {Observable, of} from 'rxjs';
 import {catchError, switchMap, tap} from 'rxjs/operators';
 import {AuthStateService} from '../services/auth-state.service';
+import {ConfirmDialogComponent} from '../dialogs/confirm/confirm.dialog';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class CodeGuard {
-	constructor(
-		private router: Router,
-		private authStateService: AuthStateService,
-		private alertCtrl: AlertController
-	) { }
+	private router = inject(Router);
+	private authStateService = inject(AuthStateService);
+	private dialog = inject(MatDialog);
 
 	canActivate(route: ActivatedRouteSnapshot): Observable<boolean | UrlTree> | boolean | UrlTree {
 		//User is already logged in
@@ -29,13 +26,13 @@ export class CodeGuard {
 				switchMap(() => of(this.router.parseUrl('/main/surveys'))),
 				catchError(() => {
 					return of(true).pipe(
-						tap(async () => {
-							const alert = await this.alertCtrl.create({
-								header: 'Invalid code',
-								message: 'Ask for a new invitation',
-								buttons: ['OK']
+						tap(() => {
+							this.dialog.open(ConfirmDialogComponent, {
+								data: {
+									title: 'Invalid code',
+									message: 'Ask for a new invitation'
+								}
 							});
-							await alert.present();
 						})
 					);
 				})

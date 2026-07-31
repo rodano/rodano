@@ -1,3 +1,27 @@
-ion-card-content {
-  padding: 0;
+:host {
+	display: block;
+}
+
+mat-card-title {
+	display: flex;
+	align-items: center;
+	gap: var(--gap);
+}
+
+mat-card-content {
+	padding: 0;
+}
+
+mat-action-list {
+	padding: 0;
+}
+
+.started {
+	color: #b78103;
+}
+.completed {
+	color: var(--mat-sys-primary);
+}
+.remove {
+	color: var(--mat-sys-error);
 }

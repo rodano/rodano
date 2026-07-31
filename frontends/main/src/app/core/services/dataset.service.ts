@@ -54,11 +54,11 @@ export class DatasetService {
 
 	saveForScope(scopePk: number, dataset: DatasetUpdate): Observable<Dataset> {
 		const url = `${this.serviceUrl}/${scopePk}/datasets/${dataset.pk}`;
-		return this.http.post<Dataset>(url, dataset);
+		return this.http.put<Dataset>(url, dataset);
 	}
 
 	saveForEvent(scopePk: number, eventPk: number, dataset: DatasetUpdate): Observable<Dataset> {
 		const url = `${this.serviceUrl}/${scopePk}/events/${eventPk}/datasets/${dataset.pk}`;
-		return this.http.post<Dataset>(url, dataset);
+		return this.http.put<Dataset>(url, dataset);
 	}
 }

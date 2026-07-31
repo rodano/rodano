@@ -1,30 +1,17 @@
 import {HttpErrorResponse} from '@angular/common/http';
-import {ErrorHandler, Injectable} from '@angular/core';
-import {ToastController} from '@ionic/angular/standalone';
+import {ErrorHandler, Injector, Service, inject} from '@angular/core';
+import {NotificationService} from '../services/notification.service';
 
-@Injectable()
+@Service()
 export class GlobalErrorHandler implements ErrorHandler {
-	constructor(
-		private toastCtrl: ToastController
-	) {}
+	//the notification service is retrieved lazily to avoid a circular dependency with the injector during bootstrap
+	private injector = inject(Injector);
 
 	handleError(error: HttpErrorResponse) {
 		if(error.status === 400 || error.status === 500) {
-			this.presentErrorToast();
+			this.injector.get(NotificationService).showError('Something went wrong, could not perform the operation');
 		}
 
 		console.error(error.message);
-	}
-
-	private async presentErrorToast() {
-		const toast = await this.toastCtrl.create({
-			position: 'top',
-			header: 'Something went wrong',
-			message: 'Could not perform the operation',
-			color: 'danger',
-			duration: 3000
-		});
-
-		toast.present();
 	}
 }
