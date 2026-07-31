@@ -1,13 +1,11 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {AuthStateService} from '../services/auth-state.service';
 
-@Injectable()
+@Service()
 export class AuthGuard {
-	constructor(
-		private router: Router,
-		private authStateService: AuthStateService
-	) { }
+	private router = inject(Router);
+	private authStateService = inject(AuthStateService);
 
 	canActivate() {
 		if(this.authStateService.hasUserToken() || this.authStateService.hasRobotCredentials()) {

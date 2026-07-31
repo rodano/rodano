@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Service, inject} from '@angular/core';
 import {BehaviorSubject, forkJoin, identity, Observable, of} from 'rxjs';
 import {filter, mergeMap, switchMap, tap} from 'rxjs/operators';
 import {Dataset} from '@core/model/dataset';
@@ -7,9 +7,7 @@ import {DatasetService} from '@core/services/dataset.service';
 import {DatasetUpdate} from '@core/model/dataset-update';
 import {FieldUpdate} from '@core/model/field-update';
 
-@Injectable({
-	providedIn: 'root'
-})
+@Service()
 export class DatasetStateService {
 	private readonly _currentDatasets = new BehaviorSubject<Dataset[]>([]);
 
@@ -19,9 +17,7 @@ export class DatasetStateService {
 		return this._currentDatasets.getValue();
 	}
 
-	constructor(
-		private datasetService: DatasetService
-	) { }
+	private datasetService = inject(DatasetService);
 
 	private setCurrentDatasets(newDatasets: Dataset[]): void {
 		newDatasets.sort((a, b) => a.pk - b.pk);

@@ -1,6 +1,6 @@
-import {Injectable, isDevMode} from '@angular/core';
+import {Service, isDevMode} from '@angular/core';
 
-@Injectable()
+@Service()
 export class AppService {
 	private static readonly LANGUAGE_KEY = 'selectedLanguageId';
 

@@ -1,0 +1,33 @@
+:host {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+}
+
+/* Material Design has no bottom navigation bar component, so it is built from a toolbar */
+.tab-bar {
+	flex: 0 0 auto;
+	height: auto;
+	padding: 0;
+	border-top: 1px solid var(--light-border-color);
+	background: var(--mat-sys-surface-container);
+	/* keep the bar above the home indicator on iOS */
+	padding-bottom: env(safe-area-inset-bottom);
+
+	& a {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.125rem;
+		padding: 0.5rem 0;
+		text-decoration: none;
+		color: var(--mat-sys-on-surface-variant);
+		font-size: 0.75rem;
+
+		&.active {
+			color: var(--mat-sys-primary);
+		}
+	}
+}

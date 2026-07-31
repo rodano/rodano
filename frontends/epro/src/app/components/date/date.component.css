@@ -1,0 +1,13 @@
+:host {
+	display: flex;
+	flex-direction: row;
+	gap: var(--gap);
+}
+
+mat-form-field {
+	flex: 1;
+}
+
+mat-form-field.time {
+	flex: 0 0 8rem;
+}
