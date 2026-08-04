@@ -1,16 +1,27 @@
-<h1 mat-dialog-title>
-	{{ data.action.shortname | localizeMap }}
-</h1>
+<h1 mat-dialog-title>{{ data.workflowableName }} - {{ data.action.shortname | localizeMap }}</h1>
 
 <form
 	name="form"
 	novalidate>
 	<mat-dialog-content>
 		@if (data.workflow) {
-			<p>
-				<span class="label">Status:</span><strong>{{ data.workflow.statusId | capitalizeFirst }}</strong>
-			</p>
-			<p><span class="label">Message:</span>{{ data.workflow.triggerMessage }}</p>
+			<div
+				class="workflow-container"
+				[style.--workflow-color]="color()">
+				<p class="state">
+					<mat-icon
+						[style.color]="'var(--workflow-color)'"
+						aria-hidden="true">
+						{{ icon() }}
+					</mat-icon>
+					<span
+						>{{ data.workflow.workflow.shortname | localizeMap }} - {{ data.workflow.state.shortname | localizeMap }}</span
+					>
+				</p>
+				@if (data.workflow.triggerMessage) {
+					<p class="trigger-message">{{ data.workflow.triggerMessage }}</p>
+				}
+			</div>
 		}
 
 		@if (data.action.documentableOptions.length > 0) {

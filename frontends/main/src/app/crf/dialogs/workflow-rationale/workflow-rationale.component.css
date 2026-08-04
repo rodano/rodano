@@ -1,6 +1,22 @@
-.label {
-	display: inline-block;
-	width: 8rem;
+.workflow-container {
+	--workflow-color: #000;
+	margin-bottom: 1rem;
+	padding: var(--gap);
+	border-radius: var(--mat-sys-corner-extra-small);
+	background-color: color-mix(in srgb, var(--workflow-color) 8%, transparent);
+	border: 1px solid var(--workflow-color);
+
+	& p {
+		padding: 0.2rem;
+		margin: 0.2rem 0;
+	}
+}
+.state .mat-icon {
+	vertical-align: middle;
+	margin-right: var(--gap);
+}
+.trigger-message {
+	font-weight: bold;
 }
 .mat-mdc-radio-group {
 	margin: 1rem 0;

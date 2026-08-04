@@ -33,10 +33,13 @@ export class WorkflowActionService {
 	}
 
 	private openWorkflowRationaleDialog(
+		entity: WorkflowableEntity,
+		workflowable: Workflowable,
 		action: WorkflowAction,
 		workflowStatus?: WorkflowStatus
 	): Observable<WorkflowUpdate | undefined> {
 		const data = {
+			workflowableName: this.getWorkflowableName(entity, workflowable),
 			workflow: workflowStatus,
 			action
 		};
@@ -46,10 +49,13 @@ export class WorkflowActionService {
 	}
 
 	private openWorkflowSignatureDialog(
+		entity: WorkflowableEntity,
+		workflowable: Workflowable,
 		action: WorkflowAction,
 		workflowStatus: WorkflowStatus
 	): Observable<WorkflowUpdate | undefined> {
 		const data = {
+			workflowableName: this.getWorkflowableName(entity, workflowable),
 			workflow: workflowStatus,
 			action
 		};
@@ -58,21 +64,48 @@ export class WorkflowActionService {
 			.afterClosed();
 	}
 
-	private openWorkflowActionDialog(action: WorkflowAction, workflowStatus?: WorkflowStatus): Observable<WorkflowUpdate | undefined> {
+	private openWorkflowActionDialog(
+		entity: WorkflowableEntity,
+		workflowable: Workflowable,
+		action: WorkflowAction,
+		workflowStatus?: WorkflowStatus
+	): Observable<WorkflowUpdate | undefined> {
 		if(action.documentable) {
-			return this.openWorkflowRationaleDialog(action, workflowStatus);
+			return this.openWorkflowRationaleDialog(entity, workflowable, action, workflowStatus);
 		}
 		else if(action.requireSignature && workflowStatus) {
-			return this.openWorkflowSignatureDialog(action, workflowStatus);
+			return this.openWorkflowSignatureDialog(entity, workflowable, action, workflowStatus);
 		}
 		throw new Error(`The action ${action.id} is neither documentable, nor requires a signature`);
 	}
 
-	private buildWorkflowUpdate(action: WorkflowAction, workflowStatus?: WorkflowStatus): Observable<WorkflowUpdate | undefined> {
+	private buildWorkflowUpdate(entity: WorkflowableEntity, workflowable: Workflowable, action: WorkflowAction, workflowStatus?: WorkflowStatus): Observable<WorkflowUpdate | undefined> {
 		if(!action.documentable && !action.requireSignature) {
 			return of({workflowId: action.workflowId, actionId: action.id});
 		}
-		return this.openWorkflowActionDialog(action, workflowStatus);
+		return this.openWorkflowActionDialog(entity, workflowable, action, workflowStatus);
+	}
+
+	getWorkflowableName(entity: WorkflowableEntity, workflowable: Workflowable): string {
+		switch(entity) {
+			case WorkflowableEntity.SCOPE: {
+				const scope = workflowable as Scope;
+				return scope.shortname;
+			}
+			case WorkflowableEntity.EVENT: {
+				const event = workflowable as Event;
+				return this.localizeMapPipe.transform(event.model.shortname);
+			}
+			case WorkflowableEntity.FORM: {
+				const form = workflowable as Form;
+				return this.localizeMapPipe.transform(form.model.shortname);
+			}
+			case WorkflowableEntity.FIELD: {
+				const field = workflowable as Field;
+				return this.localizeMapPipe.transform(field.model.shortname);
+			}
+			default: return '';
+		}
 	}
 
 	canPerformAction(entity: WorkflowableEntity, workflowable: Workflowable): boolean {
@@ -131,7 +164,7 @@ export class WorkflowActionService {
 		action: WorkflowAction
 	): Observable<Workflowable> {
 		const workflowLabel = this.capitalizeFirstPipe.transform(action.workflowId);
-		return this.buildWorkflowUpdate(action).pipe(
+		return this.buildWorkflowUpdate(entity, workflowable, action).pipe(
 			mergeMap(workflowUpdate => {
 				if(workflowUpdate) {
 					switch(entity) {
@@ -198,7 +231,7 @@ export class WorkflowActionService {
 		action: WorkflowAction
 	): Observable<Workflowable> {
 		const actionLabel = this.capitalizeFirstPipe.transform(this.localizeMapPipe.transform(action.shortname));
-		return this.buildWorkflowUpdate(action, workflowStatus).pipe(
+		return this.buildWorkflowUpdate(entity, workflowable, action, workflowStatus).pipe(
 			switchMap(workflowUpdate => {
 				if(workflowUpdate) {
 					switch(entity) {

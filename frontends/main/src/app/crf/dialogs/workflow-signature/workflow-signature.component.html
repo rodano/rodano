@@ -1,6 +1,4 @@
-<h1 mat-dialog-title>
-	{{ data.action.shortname | localizeMap }}
-</h1>
+<h1 mat-dialog-title>{{ data.workflowableName }} - {{ data.action.shortname | localizeMap }}</h1>
 
 <form [formGroup]="passwordForm">
 	<mat-dialog-content>

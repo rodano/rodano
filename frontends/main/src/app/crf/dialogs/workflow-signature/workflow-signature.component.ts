@@ -1,9 +1,7 @@
-import {Component, Inject} from '@angular/core';
+import {Component, inject} from '@angular/core';
 import {Validators, ReactiveFormsModule, FormGroup, FormControl} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule} from '@angular/material/dialog';
 import {WorkflowAction} from '@core/model/workflow-action';
-import {Scope} from '@core/model/scope';
-import {Event} from '@core/model/event';
 import {WorkflowUpdate} from '@core/model/workflow-update';
 import {WorkflowStatus} from '@core/model/workflow-status';
 import {LocalizeMapPipe} from '../../../pipes/localize-map.pipe';
@@ -26,6 +24,8 @@ import {MatFormField, MatLabel} from '@angular/material/form-field';
 	]
 })
 export class WorkflowSignatureComponent {
+	data = inject<{workflowableName?: string; action: WorkflowAction; workflow?: WorkflowStatus}>(MAT_DIALOG_DATA);
+
 	passwordForm = new FormGroup({
 		email: new FormControl('', {
 			nonNullable: true,
@@ -36,10 +36,6 @@ export class WorkflowSignatureComponent {
 			validators: [Validators.required]
 		})
 	});
-
-	constructor(
-		@Inject(MAT_DIALOG_DATA) public data: {action: WorkflowAction; workflow: WorkflowStatus; object: Scope | Event}
-	) { }
 
 	getResponse(): WorkflowUpdate {
 		return {
