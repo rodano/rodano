@@ -10,10 +10,6 @@ import {MatIcon} from '@angular/material/icon';
 import {Workflowable} from '@core/utilities/workflowable';
 import {WorkflowableEntity} from '@core/model/workflowable-entity';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
-import {Scope} from '@core/model/scope';
-import {Event} from '@core/model/event';
-import {Form} from '@core/model/form';
-import {Field} from '@core/model/field';
 import {Workflow} from '@core/model/workflow';
 import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-button.component';
 import {AbbreviatePipe} from '../../pipes/abbreviate.pipe';
@@ -111,25 +107,7 @@ export class WorkflowStatusComponent {
 	});
 
 	readonly displayActions = computed<boolean>(() => {
-		switch(this.entity()) {
-			case WorkflowableEntity.SCOPE: {
-				const scope = this.workflowable() as Scope;
-				return !scope.removed && !scope.locked;
-			}
-			case WorkflowableEntity.EVENT: {
-				const event = this.workflowable() as Event;
-				return !event.removed && !event.inRemoved && !event.locked && !event.inLocked;
-			}
-			case WorkflowableEntity.FORM: {
-				const form = this.workflowable() as Form;
-				return !form.removed && !form.inLocked;
-			}
-			case WorkflowableEntity.FIELD: {
-				const field = this.workflowable() as Field;
-				return !field.inRemoved && !field.inLocked;
-			}
-			default: return false;
-		}
+		return this.workflowActionService.canPerformAction(this.entity(), this.workflowable());
 	});
 
 	readonly displayAuditTrail = computed(() => {

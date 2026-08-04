@@ -229,9 +229,6 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 		dto.leaves = leaves;
 
 		//workflows
-		dto.workflowStatuses = new ArrayList<>();
-		dto.possibleWorkflows = new ArrayList<>();
-
 		final var family = new DataFamily(scope);
 		final var workflowComparator = Workflow.getWorkflowableComparator(model);
 		dto.workflowStatuses = workflowStatuses
@@ -241,15 +238,20 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 			.map(ws -> workflowDTOService.createWorkflowStatusDTO(family, ws, acl))
 			.toList();
 
-		//workflow that can be created
-		dto.possibleWorkflows = model.getWorkflows()
-			.stream()
-			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
-			.filter(w -> acl.hasRight(w.getAction()))
-			.sorted(workflowComparator)
-			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
-			.toList();
+		//workflows that can be created
+		if(!scope.getLocked() && !scope.getDeleted()) {
+			dto.possibleWorkflows = model.getWorkflows()
+				.stream()
+				.filter(w -> !w.isMandatory() && w.getActionId() != null)
+				.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+				.filter(w -> acl.hasRight(w.getAction()))
+				.sorted(workflowComparator)
+				.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
+				.toList();
+		}
+		else {
+			dto.possibleWorkflows = Collections.emptyList();
+		}
 
 		//retrieve user linked to this scope
 		//used in scope list to display the user in charge of the scope

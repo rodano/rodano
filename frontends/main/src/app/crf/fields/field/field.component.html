@@ -130,7 +130,7 @@
 		}
 
 		<!-- Workflow creation actions menu -->
-		@if (!field().inRemoved && hasActions()) {
+		@if (hasActions()) {
 			<mat-menu #appMenu="matMenu">
 				@for (action of creationActions(); track $index) {
 					<button

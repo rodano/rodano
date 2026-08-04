@@ -140,28 +140,30 @@ public class FormDTOServiceImpl implements FormDTOService {
 			dto.printButtonLabel = model.getPrintButtonLabel();
 		}
 
-		//workflow statuses
-		dto.workflowStatuses = new ArrayList<>();
-		dto.possibleWorkflows = new ArrayList<>();
-
+		//workflows
 		final var family = new DataFamily(scope, event, form);
 		final var workflowComparator = Workflow.getWorkflowableComparator(model);
-		workflowStatuses
+		dto.workflowStatuses = workflowStatuses
 			.stream()
 			.filter(w -> acl.hasRight(w.getWorkflow()))
 			.sorted(WorkflowStatus.proxyComparator(workflowComparator))
 			.map(ws -> workflowDTOService.createWorkflowStatusDTO(family, ws, acl))
-			.forEach(dto.workflowStatuses::add);
-
-		//available workflow creation actions
-		dto.possibleWorkflows = model.getWorkflows()
-			.stream()
-			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
-			.filter(w -> acl.hasRight(w.getAction()))
-			.sorted(workflowComparator)
-			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
 			.toList();
+
+		//workflows that can be created
+		if(!form.getDeleted() && !dto.inRemoved && !dto.inLocked) {
+			dto.possibleWorkflows = model.getWorkflows()
+				.stream()
+				.filter(w -> !w.isMandatory() && w.getActionId() != null)
+				.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+				.filter(w -> acl.hasRight(w.getAction()))
+				.sorted(workflowComparator)
+				.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
+				.toList();
+		}
+		else {
+			dto.possibleWorkflows = Collections.emptyList();
+		}
 
 		return dto;
 	}

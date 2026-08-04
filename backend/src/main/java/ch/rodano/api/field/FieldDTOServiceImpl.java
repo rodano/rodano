@@ -1,6 +1,5 @@
 package ch.rodano.api.field;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -164,28 +163,35 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		dto.value = value;
 		dto.valueLabel = field.getFieldModel().valueToLabel(possibleValues, value, languages);
 
-		//workflow statuses
-		dto.workflowStatuses = new ArrayList<>();
-		dto.possibleWorkflows = new ArrayList<>();
+		dto.inRemoved = scope.getDeleted() || dataset.getDeleted();
+		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.getDeleted());
 
+		dto.inLocked = scope.getLocked() || event.isPresent() && event.get().getLocked();
+
+		//workflows
 		final var family = new DataFamily(scope, event, dataset, field);
 		final var workflowComparator = Workflow.getWorkflowableComparator(model);
-		workflowStatuses
+		dto.workflowStatuses = workflowStatuses
 			.stream()
 			.filter(w -> acl.hasRight(w.getWorkflow()))
 			.sorted(WorkflowStatus.proxyComparator(workflowComparator))
 			.map(ws -> workflowDTOService.createWorkflowStatusDTO(family, ws, acl))
-			.forEach(dto.workflowStatuses::add);
-
-		//workflow that can be created
-		dto.possibleWorkflows = model.getWorkflows()
-			.stream()
-			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
-			.filter(w -> acl.hasRight(w.getAction()))
-			.sorted(workflowComparator)
-			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
 			.toList();
+
+		//workflows that can be created
+		if(!dto.isInRemoved() && !dto.isInLocked()) {
+			dto.possibleWorkflows = model.getWorkflows()
+				.stream()
+				.filter(w -> !w.isMandatory() && w.getActionId() != null)
+				.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+				.filter(w -> acl.hasRight(w.getAction()))
+				.sorted(workflowComparator)
+				.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
+				.toList();
+		}
+		else {
+			dto.possibleWorkflows = Collections.emptyList();
+		}
 
 		final var entries = fieldDAOService.getAuditTrailsForProperty(field, timeframe, FieldRecord::getValue);
 		if(entries.size() > 1) {
@@ -193,11 +199,6 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 				.filter(e -> e.getValue() != null && !Objects.equals(e.getValue(), ""))
 				.count() > 1;
 		}
-
-		dto.inRemoved = scope.getDeleted() || dataset.getDeleted();
-		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.getDeleted());
-
-		dto.inLocked = scope.getLocked() || event.isPresent() && event.get().getLocked();
 
 		return dto;
 	}

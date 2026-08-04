@@ -125,10 +125,7 @@ public class EventDTOServiceImpl implements EventDTOService {
 		dto.notDone = event.getNotDone();
 		dto.blocking = event.getBlocking();
 
-		//workflow statuses
-		dto.workflowStatuses = new ArrayList<>();
-		dto.possibleWorkflows = new ArrayList<>();
-
+		//workflows
 		final var family = new DataFamily(scope, event);
 		final var workflowComparator = Workflow.getWorkflowableComparator(model);
 		dto.workflowStatuses = workflowStatuses
@@ -138,15 +135,20 @@ public class EventDTOServiceImpl implements EventDTOService {
 			.map(ws -> workflowDTOService.createWorkflowStatusDTO(family, ws, acl))
 			.toList();
 
-		//available workflow creation actions
-		dto.possibleWorkflows = model.getWorkflows()
-			.stream()
-			.filter(w -> !w.isMandatory() && w.getActionId() != null)
-			.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
-			.filter(w -> acl.hasRight(w.getAction()))
-			.sorted(workflowComparator)
-			.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
-			.toList();
+		//workflows that can be created
+		if(!event.getDeleted() && !dto.inRemoved && !event.getLocked() && !dto.inLocked) {
+			dto.possibleWorkflows = model.getWorkflows()
+				.stream()
+				.filter(w -> !w.isMandatory() && w.getActionId() != null)
+				.filter(w -> !w.isUnique() || dto.workflowStatuses.stream().noneMatch(ws -> ws.getWorkflowId().equals(w.getId())))
+				.filter(w -> acl.hasRight(w.getAction()))
+				.sorted(workflowComparator)
+				.map(w -> workflowDTOService.createWorkflowDTO(w, acl))
+				.toList();
+		}
+		else {
+			dto.possibleWorkflows = Collections.emptyList();
+		}
 
 		return dto;
 	}

@@ -75,6 +75,28 @@ export class WorkflowActionService {
 		return this.openWorkflowActionDialog(action, workflowStatus);
 	}
 
+	canPerformAction(entity: WorkflowableEntity, workflowable: Workflowable): boolean {
+		switch(entity) {
+			case WorkflowableEntity.SCOPE: {
+				const scope = workflowable as Scope;
+				return !scope.removed && !scope.locked;
+			}
+			case WorkflowableEntity.EVENT: {
+				const event = workflowable as Event;
+				return !event.removed && !event.inRemoved && !event.locked && !event.inLocked;
+			}
+			case WorkflowableEntity.FORM: {
+				const form = workflowable as Form;
+				return !form.removed && !form.inLocked;
+			}
+			case WorkflowableEntity.FIELD: {
+				const field = workflowable as Field;
+				return !field.inRemoved && !field.inLocked;
+			}
+			default: return false;
+		}
+	}
+
 	createOnScope(
 		scope: Scope,
 		action: WorkflowAction
