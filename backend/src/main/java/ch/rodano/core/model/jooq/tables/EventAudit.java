@@ -110,9 +110,9 @@ public class EventAudit extends TableImpl<EventAuditRecord> implements AuditTabl
 	public final TableField<EventAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
-	 * The column <code>event_audit.deleted</code>.
+	 * The column <code>event_audit.removed</code>.
 	 */
-	public final TableField<EventAuditRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<EventAuditRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>event_audit.scope_fk</code>.

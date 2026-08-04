@@ -63,16 +63,16 @@ public class ResourceRecord extends UpdatableRecordImpl<ResourceRecord> {
 	}
 
 	/**
-	 * Setter for <code>resource.deleted</code>.
+	 * Setter for <code>resource.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>resource.deleted</code>.
+	 * Getter for <code>resource.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -211,13 +211,13 @@ public class ResourceRecord extends UpdatableRecordImpl<ResourceRecord> {
 	/**
 	 * Create a detached, initialised ResourceRecord
 	 */
-	public ResourceRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long userFk, Long scopeFk, String uuid, String title, String description, String categoryId, Boolean publicResource, String filename) {
+	public ResourceRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long userFk, Long scopeFk, String uuid, String title, String description, String categoryId, Boolean publicResource, String filename) {
 		super(Resource.RESOURCE);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setUserFk(userFk);
 		setScopeFk(scopeFk);
 		setUuid(uuid);

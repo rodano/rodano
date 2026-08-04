@@ -5,11 +5,11 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import ch.rodano.api.exception.http.NotFoundException;
-import ch.rodano.core.model.common.DeletableObject;
 import ch.rodano.core.model.common.LockableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.event.Event;
-import ch.rodano.core.model.exception.DeletedObjectException;
 import ch.rodano.core.model.exception.LockedObjectException;
+import ch.rodano.core.model.exception.RemovedObjectException;
 import ch.rodano.core.model.scope.Scope;
 
 @Service
@@ -37,19 +37,19 @@ public class UtilsServiceImpl implements UtilsService {
 	}
 
 	@Override
-	public void checkNotDeleted(final DeletableObject o) {
-		if(o.getDeleted()) {
-			throw new DeletedObjectException(o);
+	public void checkNotRemoved(final RemovableObject o) {
+		if(o.isRemoved()) {
+			throw new RemovedObjectException(o);
 		}
 	}
 
 	@Override
-	public void checkNotDeleted(final Scope scope, final Optional<Event> event) {
-		if(scope.getDeleted()) {
-			throw new DeletedObjectException(scope);
+	public void checkNotRemoved(final Scope scope, final Optional<Event> event) {
+		if(scope.isRemoved()) {
+			throw new RemovedObjectException(scope);
 		}
-		if(event.isPresent() && event.get().getDeleted()) {
-			throw new DeletedObjectException(event.get());
+		if(event.isPresent() && event.get().isRemoved()) {
+			throw new RemovedObjectException(event.get());
 		}
 	}
 

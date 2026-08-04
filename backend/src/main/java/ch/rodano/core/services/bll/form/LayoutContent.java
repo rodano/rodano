@@ -23,7 +23,7 @@ public record LayoutContent(
 
 	public Set<Field> getNonDeletedFields() {
 		return fieldsByDataset.entrySet().stream()
-			.filter(e -> !e.getKey().getDeleted())
+			.filter(e -> !e.getKey().isRemoved())
 			.flatMap(e -> e.getValue().stream())
 			.collect(Collectors.toSet());
 	}

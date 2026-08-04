@@ -63,16 +63,16 @@ public class PaymentTargetRecord extends UpdatableRecordImpl<PaymentTargetRecord
 	}
 
 	/**
-	 * Setter for <code>payment_target.deleted</code>.
+	 * Setter for <code>payment_target.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>payment_target.deleted</code>.
+	 * Getter for <code>payment_target.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -141,13 +141,13 @@ public class PaymentTargetRecord extends UpdatableRecordImpl<PaymentTargetRecord
 	/**
 	 * Create a detached, initialised PaymentTargetRecord
 	 */
-	public PaymentTargetRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long paymentFk, String payableId, Double value) {
+	public PaymentTargetRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long paymentFk, String payableId, Double value) {
 		super(PaymentTarget.PAYMENT_TARGET);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setPaymentFk(paymentFk);
 		setPayableId(payableId);
 		setValue(value);

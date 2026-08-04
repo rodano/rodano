@@ -6,10 +6,10 @@ import java.util.Objects;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.actor.ActorType;
 import ch.rodano.core.model.common.AuditableObject;
-import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 
-public class Robot extends RobotRecord implements DeletableObject, TimestampableObject, AuditableObject, Actor {
+public class Robot extends RobotRecord implements RemovableObject, TimestampableObject, AuditableObject, Actor {
 
 	private Long pk;
 	protected ZonedDateTime creationTime;

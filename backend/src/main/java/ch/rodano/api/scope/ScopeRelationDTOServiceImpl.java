@@ -29,7 +29,7 @@ public class ScopeRelationDTOServiceImpl implements ScopeRelationDTOService {
 
 	@Override
 	public List<ScopeRelationDTO> createDTOs(final Scope scope, final Actor actor, final List<Role> roles) {
-		final var relations = scopeRelationService.getNonDeletedParentRelations(scope);
+		final var relations = scopeRelationService.getNonRemovedParentRelations(scope);
 		final var relationDTOs = new ArrayList<ScopeRelationDTO>();
 		for(final ScopeRelation relation : relations) {
 			final var parent = scopeRelationService.getParent(relation);

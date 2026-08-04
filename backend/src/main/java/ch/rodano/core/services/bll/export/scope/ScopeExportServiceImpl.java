@@ -101,7 +101,7 @@ public class ScopeExportServiceImpl implements ScopeExportService {
 					line.add(Integer.toString(scopeService.getLeafCount(scope)));
 				}
 
-				line.add(Boolean.toString(scope.getDeleted()));
+				line.add(Boolean.toString(scope.isRemoved()));
 
 				writer.writeNext(line.toArray(new String[0]));
 			}

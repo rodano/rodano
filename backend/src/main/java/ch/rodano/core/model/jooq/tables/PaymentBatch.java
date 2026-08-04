@@ -78,9 +78,9 @@ public class PaymentBatch extends TableImpl<PaymentBatchRecord> {
 	public final TableField<PaymentBatchRecord, ZonedDateTime> LAST_UPDATE_TIME = createField(DSL.name("last_update_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
 
 	/**
-	 * The column <code>payment_batch.deleted</code>.
+	 * The column <code>payment_batch.removed</code>.
 	 */
-	public final TableField<PaymentBatchRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<PaymentBatchRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>payment_batch.scope_id</code>.

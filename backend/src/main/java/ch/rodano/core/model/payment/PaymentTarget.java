@@ -2,23 +2,23 @@ package ch.rodano.core.model.payment;
 
 import java.time.ZonedDateTime;
 
-import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 
-public class PaymentTarget implements DeletableObject, TimestampableObject {
+public class PaymentTarget implements RemovableObject, TimestampableObject {
 
 	protected Long pk;
 	protected ZonedDateTime creationTime;
 	protected ZonedDateTime lastUpdateTime;
 
-	protected boolean deleted;
+	protected boolean removed;
 
 	private Long paymentFk;
 	private String payableId;
 	private Double value;
 
 	public PaymentTarget() {
-		deleted = false;
+		removed = false;
 	}
 
 	@Override
@@ -52,13 +52,13 @@ public class PaymentTarget implements DeletableObject, TimestampableObject {
 	}
 
 	@Override
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
 	@Override
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public Long getPaymentFk() {

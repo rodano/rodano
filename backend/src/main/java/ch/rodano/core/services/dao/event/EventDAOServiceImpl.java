@@ -83,7 +83,7 @@ public class EventDAOServiceImpl extends AuditableDAOService<Event, EventAuditTr
 
 	@Override
 	public List<Event> getEventsByScopePk(final Long scopePk) {
-		final var query = create.selectFrom(EVENT).where(EVENT.SCOPE_FK.eq(scopePk).and(EVENT.DELETED.isFalse()));
+		final var query = create.selectFrom(EVENT).where(EVENT.SCOPE_FK.eq(scopePk).and(EVENT.REMOVED.isFalse()));
 		return find(query);
 	}
 
@@ -95,7 +95,7 @@ public class EventDAOServiceImpl extends AuditableDAOService<Event, EventAuditTr
 
 	@Override
 	public List<Event> getEventsByScopePkAndEventModelId(final Long scopePk, final String eventModelId) {
-		final var query = create.selectFrom(EVENT).where(EVENT.SCOPE_FK.eq(scopePk).and(EVENT.EVENT_MODEL_ID.eq(eventModelId))).and(EVENT.DELETED.isFalse());
+		final var query = create.selectFrom(EVENT).where(EVENT.SCOPE_FK.eq(scopePk).and(EVENT.EVENT_MODEL_ID.eq(eventModelId))).and(EVENT.REMOVED.isFalse());
 		return find(query);
 	}
 
@@ -118,7 +118,7 @@ public class EventDAOServiceImpl extends AuditableDAOService<Event, EventAuditTr
 				EVENT.SCOPE_FK.eq(scopePk)
 					.and(EVENT.EVENT_MODEL_ID.eq(eventModelId))
 					.and(EVENT.EVENT_GROUP_NUMBER.eq(eventNumber))
-					.and(EVENT.DELETED.isFalse())
+					.and(EVENT.REMOVED.isFalse())
 			);
 		return findUnique(query);
 	}

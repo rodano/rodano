@@ -289,7 +289,7 @@ public class ScopeServiceImpl implements ScopeService {
 	@Override
 	//refrain from optimizing this using an SQL query because the audit trail is required
 	public void lock(final Scope scope, final DatabaseActionContext context) {
-		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotRemoved(scope);
 
 		lockScope(scope, context, "Lock scope");
 		eventService.getAll(scope).forEach(e -> eventService.lock(scope, e, context, "Lock scope"));
@@ -310,7 +310,7 @@ public class ScopeServiceImpl implements ScopeService {
 	@Override
 	//refrain from optimizing this using an SQL query because the audit trail is required
 	public void unlock(final Scope scope, final DatabaseActionContext context) {
-		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotRemoved(scope);
 
 		unlockScope(scope, context, "Unlock scope");
 		eventService.getAll(scope).forEach(e -> eventService.unlock(scope, e, context, "Unlock scope"));
@@ -430,8 +430,8 @@ public class ScopeServiceImpl implements ScopeService {
 	}
 
 	@Override
-	public boolean isDeletedOrInDeletedScope(final Scope scope) {
-		return scope.getDeleted() || scopeDAOService.hasDeletedDefaultAncestor(scope.getPk());
+	public boolean isRemovedOrInRemovedScope(final Scope scope) {
+		return scope.isRemoved() || scopeDAOService.hasRemovedDefaultAncestor(scope.getPk());
 	}
 
 	@Override

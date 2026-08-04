@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
-import ch.rodano.core.model.exception.DeletedObjectException;
 import ch.rodano.core.model.exception.LockedObjectException;
+import ch.rodano.core.model.exception.RemovedObjectException;
 import ch.rodano.core.model.field.Field;
 import ch.rodano.core.model.form.Form;
 import ch.rodano.core.model.scope.Scope;
@@ -80,32 +80,32 @@ public record DataFamily(
 		}
 	}
 
-	public void checkNotDeleted() {
-		if(scope.getDeleted()) {
-			throw new DeletedObjectException(scope);
+	public void checkNotRemoved() {
+		if(scope.isRemoved()) {
+			throw new RemovedObjectException(scope);
 		}
-		if(event.isPresent() && event.get().getDeleted()) {
-			throw new DeletedObjectException(event.get());
+		if(event.isPresent() && event.get().isRemoved()) {
+			throw new RemovedObjectException(event.get());
 		}
-		if(form.isPresent() && form.get().getDeleted()) {
-			throw new DeletedObjectException(form.get());
+		if(form.isPresent() && form.get().isRemoved()) {
+			throw new RemovedObjectException(form.get());
 		}
-		if(dataset.isPresent() && dataset.get().getDeleted()) {
-			throw new DeletedObjectException(dataset.get());
+		if(dataset.isPresent() && dataset.get().isRemoved()) {
+			throw new RemovedObjectException(dataset.get());
 		}
 	}
 
-	public boolean isDeleted() {
-		if(scope.getDeleted()) {
+	public boolean isRemoved() {
+		if(scope.isRemoved()) {
 			return true;
 		}
-		if(event.isPresent() && event.get().getDeleted()) {
+		if(event.isPresent() && event.get().isRemoved()) {
 			return true;
 		}
-		if(form.isPresent() && form.get().getDeleted()) {
+		if(form.isPresent() && form.get().isRemoved()) {
 			return true;
 		}
-		if(dataset.isPresent() && dataset.get().getDeleted()) {
+		if(dataset.isPresent() && dataset.get().isRemoved()) {
 			return true;
 		}
 		return false;

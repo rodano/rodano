@@ -74,9 +74,9 @@ public class DatasetDTOServiceImpl implements DatasetDTOService {
 		dto.model = configDTOService.createDatasetModelDTO(model, acl);
 		dto.modelId = model.getId();
 
-		dto.removed = dataset.getDeleted();
-		dto.inRemoved = scope.getDeleted();
-		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.getDeleted());
+		dto.removed = dataset.isRemoved();
+		dto.inRemoved = scope.isRemoved();
+		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.isRemoved());
 
 		dto.inLocked = scope.getLocked() || event.isPresent() && event.get().getLocked();
 

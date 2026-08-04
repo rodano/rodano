@@ -10,7 +10,7 @@
 
 
 export interface RobotAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     name?: string;
     key?: string;
     pk?: number;

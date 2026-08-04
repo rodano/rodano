@@ -2,7 +2,7 @@ package ch.rodano.core.model.resource;
 
 public class ResourceRecord {
 
-	protected boolean deleted;
+	protected boolean removed;
 
 	protected Long userFk;
 	protected Long scopeFk;
@@ -17,15 +17,15 @@ public class ResourceRecord {
 	protected String filename;
 
 	protected ResourceRecord() {
-		setDeleted(false);
+		setRemoved(false);
 	}
 
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public Long getUserFk() {

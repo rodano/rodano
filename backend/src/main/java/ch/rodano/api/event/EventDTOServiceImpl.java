@@ -104,8 +104,8 @@ public class EventDTOServiceImpl implements EventDTOService {
 		dto.model = new EventModelDTO(model);
 		dto.modelId = event.getEventModelId();
 
-		dto.removed = event.getDeleted();
-		dto.inRemoved = scope.getDeleted();
+		dto.removed = event.isRemoved();
+		dto.inRemoved = scope.isRemoved();
 
 		dto.locked = event.getLocked();
 		dto.inLocked = scope.getLocked();
@@ -136,7 +136,7 @@ public class EventDTOServiceImpl implements EventDTOService {
 			.toList();
 
 		//workflows that can be created
-		if(!event.getDeleted() && !dto.inRemoved && !event.getLocked() && !dto.inLocked) {
+		if(!event.isRemoved() && !dto.inRemoved && !event.getLocked() && !dto.inLocked) {
 			dto.possibleWorkflows = model.getWorkflows()
 				.stream()
 				.filter(w -> !w.isMandatory() && w.getActionId() != null)

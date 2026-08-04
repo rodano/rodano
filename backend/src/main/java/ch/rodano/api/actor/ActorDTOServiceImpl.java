@@ -108,7 +108,7 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 		dto.pk = robot.getPk();
 		dto.creationTime = robot.getCreationTime();
 		dto.lastUpdateTime = robot.getLastUpdateTime();
-		dto.removed = robot.getDeleted();
+		dto.removed = robot.isRemoved();
 		dto.name = robot.getName();
 
 		dto.key = robot.getKey();
@@ -166,7 +166,7 @@ public class ActorDTOServiceImpl implements ActorDTOService {
 		dto.pk = user.getPk();
 		dto.creationTime = user.getCreationTime();
 		dto.lastUpdateTime = user.getLastUpdateTime();
-		dto.removed = user.getDeleted();
+		dto.removed = user.isRemoved();
 		dto.name = user.getName();
 
 		dto.email = user.getEmail();

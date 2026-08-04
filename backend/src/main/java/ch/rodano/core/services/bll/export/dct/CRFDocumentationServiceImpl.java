@@ -267,10 +267,10 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 		final var timeframe = new Timeframe(Optional.empty(), date);
 
 		//build the lists of interesting audit trail properties for each entity
-		final List<Function<ScopeAuditTrail, Object>> scopeProperties = Arrays.asList(ScopeAuditTrail::getDeleted, ScopeAuditTrail::getLocked);
-		final List<Function<EventAuditTrail, Object>> visitProperties = Arrays.asList(EventAuditTrail::getDeleted, EventAuditTrail::getLocked);
-		final List<Function<FormAuditTrail, Object>> formProperties = Arrays.asList(FormAuditTrail::getDeleted);
-		final List<Function<DatasetAuditTrail, Object>> datasetProperties = Arrays.asList(DatasetAuditTrail::getDeleted);
+		final List<Function<ScopeAuditTrail, Object>> scopeProperties = Arrays.asList(ScopeAuditTrail::isRemoved, ScopeAuditTrail::getLocked);
+		final List<Function<EventAuditTrail, Object>> visitProperties = Arrays.asList(EventAuditTrail::isRemoved, EventAuditTrail::getLocked);
+		final List<Function<FormAuditTrail, Object>> formProperties = Arrays.asList(FormAuditTrail::isRemoved);
+		final List<Function<DatasetAuditTrail, Object>> datasetProperties = Arrays.asList(DatasetAuditTrail::isRemoved);
 		final List<Function<WorkflowStatusAuditTrail, Object>> workflowStatusProperties = Arrays.asList(WorkflowStatusAuditTrail::getStateId);
 
 		final var studyE = ExportableUtils.getExportForXml(doc, study, languages);
@@ -289,7 +289,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 		scopeE.setAttribute("scopeModelLabel", scope.getScopeModel().getDefaultLocalizedShortname());
 		scopeE.setAttribute("id", scope.getId());
 		scopeE.setAttribute("code", scope.getCode());
-		scopeE.setAttribute("deleted", Boolean.toString(scope.getDeleted()));
+		scopeE.setAttribute("deleted", Boolean.toString(scope.isRemoved()));
 		scopeE.setAttribute("shortname", scope.getShortname());
 		scopeE.setAttribute("longname", scope.getLongname());
 		scopeE.setAttribute("codeandshortname", scope.getCodeAndShortname());
@@ -318,7 +318,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 			final var eventE = doc.createElement("event");
 			eventE.setAttribute("id", event.getId());
 			eventE.setAttribute("eventModelId", event.getEventModelId());
-			eventE.setAttribute("deleted", Boolean.toString(event.getDeleted()));
+			eventE.setAttribute("deleted", Boolean.toString(event.isRemoved()));
 			eventE.setAttribute("shortname", event.getEventModel().getLocalizedShortname(languages));
 			eventE.setAttribute("label", eventService.getLabel(scope, event, languages));
 			eventE.setAttribute("expected", Boolean.toString(event.isExpected()));
@@ -344,7 +344,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 				final var formE = doc.createElement("form");
 				formE.setAttribute("id", form.getId());
 				formE.setAttribute("formModelId", form.getFormModelId());
-				formE.setAttribute("deleted", Boolean.toString(form.getDeleted()));
+				formE.setAttribute("deleted", Boolean.toString(form.isRemoved()));
 				formE.setAttribute("shortname", form.getFormModel().getLocalizedShortname(languages));
 				formE.appendChild(generateTrailsElement(doc, formDAOService.getAuditTrailsForProperties(form, Optional.of(timeframe), formProperties)));
 				eventE.appendChild(formE);
@@ -386,7 +386,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 							final var dataset = layoutState.getReferenceDataset();
 							layoutE.setAttribute("documentId", dataset.getDatasetModelId());
 							layoutE.setAttribute("index", Integer.toString(++index));
-							layoutE.setAttribute("deleted", Boolean.toString(dataset.getDeleted()));
+							layoutE.setAttribute("deleted", Boolean.toString(dataset.isRemoved()));
 							layoutE.appendChild(generateTrailsElement(doc, datasetDAOService.getAuditTrailsForProperties(dataset, Optional.of(timeframe), datasetProperties)));
 						}
 						layoutGroupLayoutsE.appendChild(layoutE);

@@ -105,9 +105,9 @@ public class WorkflowStatusAudit extends TableImpl<WorkflowStatusAuditRecord> im
 	public final TableField<WorkflowStatusAuditRecord, Long> AUDIT_OBJECT_FK = createField(DSL.name("audit_object_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>workflow_status_audit.deleted</code>.
+	 * The column <code>workflow_status_audit.removed</code>.
 	 */
-	public final TableField<WorkflowStatusAuditRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<WorkflowStatusAuditRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>workflow_status_audit.scope_fk</code>.

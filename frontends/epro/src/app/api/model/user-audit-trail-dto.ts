@@ -12,7 +12,7 @@
 
 
 export interface UserAuditTrailDTO { 
-    deleted?: boolean;
+    removed?: boolean;
     authkey?: string;
     name?: string;
     externallyManaged?: boolean;

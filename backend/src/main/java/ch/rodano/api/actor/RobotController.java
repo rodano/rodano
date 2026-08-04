@@ -96,7 +96,7 @@ public class RobotController extends AbstractSecuredController {
 		final var search = new RobotSearch()
 			.setName(name.filter(StringUtils::isNotBlank))
 			.setProfileId(profileId.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_DELETED_DATA))
+			.setIncludeRemoved(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_REMOVED_DATA))
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
 			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
 		//set sort if provided

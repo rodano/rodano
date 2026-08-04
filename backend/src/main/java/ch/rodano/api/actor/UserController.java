@@ -123,7 +123,7 @@ public class UserController extends AbstractSecuredController {
 			.setStates(states)
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
 			.setEmail(email.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_DELETED_DATA))
+			.setIncludeRemoved(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_REMOVED_DATA))
 			.setEnabled(enabled)
 			.setExternallyManaged(externallyManaged)
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
@@ -156,7 +156,7 @@ public class UserController extends AbstractSecuredController {
 			.setStates(states)
 			.setEmail(email.filter(StringUtils::isNotBlank))
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_DELETED_DATA))
+			.setIncludeRemoved(rightsService.hasRight(currentRoles, FeatureStatic.MANAGE_REMOVED_DATA))
 			.setEnabled(enabled)
 			.setExternallyManaged(externallyManaged)
 			.setSortBy(UserSearch.DEFAULT_SORT_BY)
@@ -286,7 +286,7 @@ public class UserController extends AbstractSecuredController {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
 		rightsService.checkRight(currentActor, currentRoles, user, Rights.WRITE);
-		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.MANAGE_DELETED_DATA);
+		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.MANAGE_REMOVED_DATA);
 
 		//restore user
 		userService.restoreUser(user, currentContext(), "Restore user");

@@ -110,9 +110,9 @@ public class DatasetAudit extends TableImpl<DatasetAuditRecord> implements Audit
 	public final TableField<DatasetAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
 	/**
-	 * The column <code>dataset_audit.deleted</code>.
+	 * The column <code>dataset_audit.removed</code>.
 	 */
-	public final TableField<DatasetAuditRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<DatasetAuditRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>dataset_audit.scope_fk</code>.

@@ -2,7 +2,7 @@ package ch.rodano.core.model.workflow;
 
 public class WorkflowStatusRecord {
 
-	protected boolean deleted;
+	protected boolean removed;
 
 	protected Long scopeFk;
 	protected Long fieldFk;
@@ -17,15 +17,15 @@ public class WorkflowStatusRecord {
 	protected String triggerMessage;
 
 	protected WorkflowStatusRecord() {
-		deleted = false;
+		removed = false;
 	}
 
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public Long getScopeFk() {

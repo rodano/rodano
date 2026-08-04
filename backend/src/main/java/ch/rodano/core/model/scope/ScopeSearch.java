@@ -48,7 +48,7 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 	public Optional<Boolean> leaf = Optional.empty();
 
 	@Schema(description = "Include the removed scopes?")
-	public boolean includeDeleted;
+	public boolean includeRemoved;
 
 	@Schema(description = "Sort by")
 	public ScopeSortBy sortBy = DEFAULT_SORT_BY;
@@ -172,12 +172,12 @@ public class ScopeSearch extends PaginatedSearch<ScopeSearch> {
 		return this;
 	}
 
-	public boolean getIncludeDeleted() {
-		return includeDeleted;
+	public boolean getIncludeRemoved() {
+		return includeRemoved;
 	}
 
-	public ScopeSearch setIncludeDeleted(final boolean includeDeleted) {
-		this.includeDeleted = includeDeleted;
+	public ScopeSearch setIncludeRemoved(final boolean includeRemoved) {
+		this.includeRemoved = includeRemoved;
 		return this;
 	}
 

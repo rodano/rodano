@@ -77,16 +77,16 @@ public class EventRecord extends UpdatableRecordImpl<EventRecord> {
 	}
 
 	/**
-	 * Setter for <code>event.deleted</code>.
+	 * Setter for <code>event.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(4, value);
 	}
 
 	/**
-	 * Getter for <code>event.deleted</code>.
+	 * Getter for <code>event.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(4);
 	}
 
@@ -253,14 +253,14 @@ public class EventRecord extends UpdatableRecordImpl<EventRecord> {
 	/**
 	 * Create a detached, initialised EventRecord
 	 */
-	public EventRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, String scopeModelId, Integer eventGroupNumber, String eventModelId, ZonedDateTime expectedDate, ZonedDateTime date, ZonedDateTime endDate, Boolean notDone, Boolean blocking, Boolean locked) {
+	public EventRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long scopeFk, String scopeModelId, Integer eventGroupNumber, String eventModelId, ZonedDateTime expectedDate, ZonedDateTime date, ZonedDateTime endDate, Boolean notDone, Boolean blocking, Boolean locked) {
 		super(Event.EVENT);
 
 		setPk(pk);
 		setId(id);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setScopeModelId(scopeModelId);
 		setEventGroupNumber(eventGroupNumber);

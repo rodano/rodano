@@ -213,7 +213,7 @@ public class EventAttributeEntityDefiner extends AbstractEventEntityDefiner {
 			new EntityAttribute() {
 				@Override
 				public Boolean getValue(final Evaluable evaluable) {
-					return ((Event) evaluable).getDeleted();
+					return ((Event) evaluable).isRemoved();
 				}
 
 				@Override

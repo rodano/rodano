@@ -1,5 +1,5 @@
 create or replace view scope_ancestor
-as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, end_date, direct, depth, `virtual`, default_relation, ancestor_deleted) as (
+as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, end_date, direct, depth, `virtual`, default_relation, ancestor_removed) as (
 	select
 		scope_fk,
 		parent_fk,
@@ -9,7 +9,7 @@ as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, e
 		1 as depth,
 		s.`virtual`,
 		sr.`default`,
-		deleted as ancestor_deleted
+		removed as ancestor_removed
 	from scope_relation sr inner join scope s on sr.parent_fk = s.pk
 	union all
 	select
@@ -29,7 +29,7 @@ as with recursive recursive_scope_ancestor (scope_fk, ancestor_fk, start_date, e
 		rsa.depth + 1 as depth,
 		s.virtual or rsa.virtual,
 		sr.`default` && rsa.`default_relation`,
-		s.deleted or rsa.ancestor_deleted AS ancestor_deleted
+		s.removed or rsa.ancestor_removed AS ancestor_removed
 	from recursive_scope_ancestor rsa
 	inner join scope_relation sr on sr.scope_fk = rsa.ancestor_fk
 	inner join scope s on sr.parent_fk = s.pk
@@ -47,7 +47,7 @@ select
 	depth as depth,
 	bit_and(`virtual`) as `virtual`,
 	bit_or(default_relation) as `default`,
-	bit_and(ancestor_deleted) as ancestor_deleted
+	bit_and(ancestor_removed) as ancestor_removed
 from recursive_scope_ancestor
 group by scope_fk, ancestor_fk
 order by scope_fk;

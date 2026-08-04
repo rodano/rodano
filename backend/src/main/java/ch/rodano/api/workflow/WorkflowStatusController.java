@@ -651,7 +651,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		final String password
 	) {
 		family.checkNotLocked();
-		family.checkNotDeleted();
+		family.checkNotRemoved();
 
 		// Retrieve current status
 		final var workflowStatus = workflowStatusDAOService.getWorkflowStatusByPk(workflowStatusPk);
@@ -685,7 +685,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 		final String password
 	) {
 		family.checkNotLocked();
-		family.checkNotDeleted();
+		family.checkNotRemoved();
 
 		// Retrieve workflow and check rights
 		final var workflow = studyService.getStudy().getWorkflow(workflowId);

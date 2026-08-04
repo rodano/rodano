@@ -217,7 +217,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 		dto.root = scopeService.isRootScope(scope);
 
 		dto.locked = scope.getLocked();
-		dto.removed = scope.getDeleted();
+		dto.removed = scope.isRemoved();
 		dto.expectedNumber = scope.getExpectedNumber();
 		dto.maxNumber = scope.getMaxNumber();
 
@@ -239,7 +239,7 @@ public class ScopeDTOServiceImpl implements ScopeDTOService {
 			.toList();
 
 		//workflows that can be created
-		if(!scope.getLocked() && !scope.getDeleted()) {
+		if(!scope.getLocked() && !scope.isRemoved()) {
 			dto.possibleWorkflows = model.getWorkflows()
 				.stream()
 				.filter(w -> !w.isMandatory() && w.getActionId() != null)

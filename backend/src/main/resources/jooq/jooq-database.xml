@@ -75,7 +75,7 @@
 
 				<forcedType>
 					<name>BOOLEAN</name>
-					<includeExpression>scope_ancestor.virtual | scope_ancestor.default | scope_ancestor.direct | scope_ancestor.ancestor_deleted</includeExpression>
+					<includeExpression>scope_ancestor.virtual | scope_ancestor.default | scope_ancestor.direct | scope_ancestor.ancestor_removed</includeExpression>
 					<includeTypes>.*</includeTypes>
 				</forcedType>
 			</forcedTypes>

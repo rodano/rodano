@@ -122,7 +122,7 @@ public interface ScopeRelationService {
 	List<Scope> getParents(Scope scope);
 
 	/**
-	 * Get ALL the parents of a scope, even the deleted ones.
+	 * Get ALL the parents of a scope, even the removed ones.
 	 * @param scope Child scope
 	 * @return      Scope's parents
 	 */
@@ -134,7 +134,7 @@ public interface ScopeRelationService {
 
 	List<ScopeRelation> getAllParentRelations(Scope scope);
 
-	List<ScopeRelation> getNonDeletedParentRelations(Scope scope);
+	List<ScopeRelation> getNonRemovedParentRelations(Scope scope);
 
 	List<ScopeRelation> getActiveParentRelations(Scope scope, ZonedDateTime date);
 
@@ -150,7 +150,7 @@ public interface ScopeRelationService {
 	List<Scope> getChildren(Scope scope);
 
 	/**
-	 * Get ALL the children of a scope, even the deleted ones.
+	 * Get ALL the children of a scope, even the removed ones.
 	 * @param scope Parent scope
 	 * @return      Scope's children
 	 */
@@ -166,7 +166,7 @@ public interface ScopeRelationService {
 
 	List<ScopeRelation> getChildRelations(Scope scope);
 
-	List<ScopeRelation> getNonDeletedChildRelations(Scope scope);
+	List<ScopeRelation> getNonRemovedChildRelations(Scope scope);
 
 	List<ScopeRelation> getActiveChildRelations(Scope scope, ZonedDateTime date);
 
@@ -179,7 +179,7 @@ public interface ScopeRelationService {
 	List<Scope> getEnabledDescendants(Scope scope, ScopeModel scopeModel);
 
 	/**
-	 * Get all the enabled descendants (even the deleted ones)
+	 * Get all the enabled descendants (even the removed ones)
 	 * @param scope The parent scope
 	 * @return descendants
 	 */

@@ -17,14 +17,14 @@ import ch.rodano.core.model.scope.ScopeSearch;
 public interface ScopeDAOService {
 
 	/**
-	 * Get all (including deleted) scopes
+	 * Get all (including removed) scopes
 	 *
 	 * @return All scopes
 	 */
 	List<Scope> getAllScopes();
 
 	/**
-	 * Get all (including deleted) scopes matching the provided scope model id
+	 * Get all (including removed) scopes matching the provided scope model id
 	 *
 	 * @param scopeModelId The scope model id
 	 * @return The scopes matching the scope model id
@@ -86,7 +86,7 @@ public interface ScopeDAOService {
 
 	List<Scope> getDefaultAncestors(Long scopePk);
 
-	boolean hasDeletedDefaultAncestor(Long scopePk);
+	boolean hasRemovedDefaultAncestor(Long scopePk);
 
 	boolean isDescendantOf(Long scopePk, Long potentialAncestorPk);
 

@@ -86,14 +86,14 @@ public class RobotDAOServiceImpl extends AuditableDAOService<Robot, RobotAuditTr
 	@Override
 	public Robot getRobotByKey(final String key) {
 		//do not include deleted robots, this method is used for the authentication and deleted robots must not have the right to use the API
-		final var query = create.selectFrom(ROBOT).where(ROBOT.KEY.eq(key).and(ROBOT.DELETED.isFalse()));
+		final var query = create.selectFrom(ROBOT).where(ROBOT.KEY.eq(key).and(ROBOT.REMOVED.isFalse()));
 		return findUnique(query);
 	}
 
 	@Override
 	public Robot getRobotByNameAndKey(final String name, final String key) {
 		//do not include deleted robots, this method is used for the authentication and deleted robots must not have the right to use the API
-		final var query = create.selectFrom(ROBOT).where(ROBOT.NAME.eq(name).and(ROBOT.KEY.eq(key)).and(ROBOT.DELETED.isFalse()));
+		final var query = create.selectFrom(ROBOT).where(ROBOT.NAME.eq(name).and(ROBOT.KEY.eq(key)).and(ROBOT.REMOVED.isFalse()));
 		return findUnique(query);
 	}
 
@@ -109,8 +109,8 @@ public class RobotDAOServiceImpl extends AuditableDAOService<Robot, RobotAuditTr
 			conditions.add(ROLE.PROFILE_ID.eq(profileId));
 		});
 
-		if(!search.getIncludeDeleted()) {
-			conditions.add(ROBOT.DELETED.isFalse());
+		if(!search.getIncludeRemoved()) {
+			conditions.add(ROBOT.REMOVED.isFalse());
 		}
 
 		final var query = create.select(ROBOT.asterisk(), DSL.count().over().as("total"))

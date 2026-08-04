@@ -16,8 +16,8 @@ public class RobotSearch extends PaginatedSearch<RobotSearch> {
 	@Schema(description = "Profile id")
 	private Optional<String> profileId = Optional.empty();
 
-	@Schema(description = "Include the deleted resources?")
-	private boolean includeDeleted;
+	@Schema(description = "Include the removed resources?")
+	private boolean includeRemoved;
 
 	@Schema(description = "Sort by")
 	private RobotSortBy sortBy = DEFAULT_SORT_BY;
@@ -45,12 +45,12 @@ public class RobotSearch extends PaginatedSearch<RobotSearch> {
 		return this;
 	}
 
-	public boolean getIncludeDeleted() {
-		return includeDeleted;
+	public boolean getIncludeRemoved() {
+		return includeRemoved;
 	}
 
-	public RobotSearch setIncludeDeleted(final boolean includeDeleted) {
-		this.includeDeleted = includeDeleted;
+	public RobotSearch setIncludeRemoved(final boolean includeRemoved) {
+		this.includeRemoved = includeRemoved;
 		return this;
 	}
 

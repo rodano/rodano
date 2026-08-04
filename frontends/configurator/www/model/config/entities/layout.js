@@ -254,7 +254,7 @@ export class Layout extends Node {
 				function(event) {
 					event.stop();
 					const line = this.parentNode.parentNode;
-					line.data.deleted = true;
+					line.data.removed = true;
 					line.parentNode.removeChild(layout_expanded);
 					line.parentNode.removeChild(layout_body_line);
 				}

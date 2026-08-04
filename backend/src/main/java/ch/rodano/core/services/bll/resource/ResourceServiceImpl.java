@@ -133,7 +133,7 @@ public class ResourceServiceImpl implements ResourceService {
 		final Resource resource
 	) throws IOException {
 		// check if the resource has not been deleted
-		if(resource.getDeleted()) {
+		if(resource.isRemoved()) {
 			throw new ResourceException("The resource has been removed");
 		}
 

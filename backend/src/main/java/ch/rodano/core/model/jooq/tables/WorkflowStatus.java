@@ -85,9 +85,9 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	public final TableField<WorkflowStatusRecord, ZonedDateTime> LAST_UPDATE_TIME = createField(DSL.name("last_update_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
 
 	/**
-	 * The column <code>workflow_status.deleted</code>.
+	 * The column <code>workflow_status.removed</code>.
 	 */
-	public final TableField<WorkflowStatusRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<WorkflowStatusRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>workflow_status.scope_fk</code>.

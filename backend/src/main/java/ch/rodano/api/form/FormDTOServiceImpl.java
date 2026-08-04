@@ -126,9 +126,9 @@ public class FormDTOServiceImpl implements FormDTOService {
 		dto.model = new FormModelDTO(model);
 		dto.modelId = model.getId();
 
-		dto.removed = form.getDeleted();
-		dto.inRemoved = scope.getDeleted();
-		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.getDeleted());
+		dto.removed = form.isRemoved();
+		dto.inRemoved = scope.isRemoved();
+		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.isRemoved());
 
 		dto.inLocked = scope.getLocked() || event.isPresent() && event.get().getLocked();
 
@@ -151,7 +151,7 @@ public class FormDTOServiceImpl implements FormDTOService {
 			.toList();
 
 		//workflows that can be created
-		if(!form.getDeleted() && !dto.inRemoved && !dto.inLocked) {
+		if(!form.isRemoved() && !dto.inRemoved && !dto.inLocked) {
 			dto.possibleWorkflows = model.getWorkflows()
 				.stream()
 				.filter(w -> !w.isMandatory() && w.getActionId() != null)

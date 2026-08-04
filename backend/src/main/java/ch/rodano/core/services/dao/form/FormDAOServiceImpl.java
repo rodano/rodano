@@ -64,7 +64,7 @@ public class FormDAOServiceImpl extends AuditableDAOService<Form, FormAuditTrail
 		final var query = create.selectFrom(FORM).where(
 			scopePk.map(FORM.SCOPE_FK::eq).orElse(DSL.noCondition())
 				.and(eventPk.map(FORM.EVENT_FK::eq).orElse(FORM.EVENT_FK.isNull()))
-				.and(includeDeleted ? DSL.noCondition() : FORM.DELETED.isFalse())
+				.and(includeDeleted ? DSL.noCondition() : FORM.REMOVED.isFalse())
 				.and(formModelIds.map(FORM.FORM_MODEL_ID::in).orElse(DSL.noCondition()))
 		);
 		return find(query);

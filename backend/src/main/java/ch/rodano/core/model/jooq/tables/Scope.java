@@ -93,9 +93,9 @@ public class Scope extends TableImpl<ScopeRecord> {
 	public final TableField<ScopeRecord, ZonedDateTime> LAST_UPDATE_TIME = createField(DSL.name("last_update_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
 
 	/**
-	 * The column <code>scope.deleted</code>.
+	 * The column <code>scope.removed</code>.
 	 */
-	public final TableField<ScopeRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<ScopeRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>scope.scope_model_id</code>.

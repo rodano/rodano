@@ -117,12 +117,12 @@ public class ResourceController extends AbstractSecuredController {
 			currentRoles = currentActor.map(roleService::getActiveRoles);
 		}
 
-		final var hasRightToSeeDeleted = currentRoles.isPresent() && rightsService.hasRight(currentRoles.get(), FeatureStatic.MANAGE_DELETED_DATA);
+		final var hasRightToSeeDeleted = currentRoles.isPresent() && rightsService.hasRight(currentRoles.get(), FeatureStatic.MANAGE_REMOVED_DATA);
 
 		final var search = new ResourceSearch()
 			.setCategoryId(categoryId.filter(StringUtils::isNotBlank))
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(hasRightToSeeDeleted && removed.orElse(false))
+			.setIncludeRemoved(hasRightToSeeDeleted && removed.orElse(false))
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
 			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
 		//set sort if provided

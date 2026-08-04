@@ -7,10 +7,10 @@ import java.util.Objects;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.actor.ActorType;
 import ch.rodano.core.model.common.AuditableObject;
-import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 
-public final class User extends UserRecord implements DeletableObject, TimestampableObject, AuditableObject, Actor, Comparable<User> {
+public final class User extends UserRecord implements RemovableObject, TimestampableObject, AuditableObject, Actor, Comparable<User> {
 
 	public static final Comparator<User> DEFAULT_COMPARATOR = Comparator
 		.comparing(User::getEmail)
@@ -112,7 +112,7 @@ public final class User extends UserRecord implements DeletableObject, Timestamp
 			setUserData(new UserData());
 		}
 	}
-	
+
 	@Override
 	public void onPreUpdate() {
 		/*
@@ -124,7 +124,7 @@ public final class User extends UserRecord implements DeletableObject, Timestamp
 			setData(null);
 		}
 	}
-	
+
 	@Override
 	public void onPostUpdate(final DatabaseAction action) {
 		onPostLoad();

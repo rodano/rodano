@@ -10,7 +10,7 @@
 
 
 export interface UserAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     name?: string;
     externallyManaged?: boolean;
     activated?: boolean;

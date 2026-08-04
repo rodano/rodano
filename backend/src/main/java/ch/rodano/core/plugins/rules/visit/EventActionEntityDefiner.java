@@ -326,7 +326,7 @@ public class EventActionEntityDefiner extends AbstractEventEntityDefiner {
 							formService.create(scope, event, formModel, context, StringUtils.defaultIfBlank(rationale, "Create form"));
 						}
 						//restore form otherwise
-						else if(form.get().getDeleted()) {
+						else if(form.get().isRemoved()) {
 							formService.restore(scope, Optional.of(event), form.get(), context, StringUtils.defaultIfBlank(rationale, "Restore form"));
 						}
 						//otherwise, nothing to do

@@ -4,10 +4,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 import ch.rodano.api.exception.http.NotFoundException;
-import ch.rodano.core.model.common.DeletableObject;
 import ch.rodano.core.model.common.LockableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.event.Event;
-import ch.rodano.core.model.exception.DeletedObjectException;
+import ch.rodano.core.model.exception.RemovedObjectException;
 import ch.rodano.core.model.scope.Scope;
 
 public interface UtilsService {
@@ -43,19 +43,19 @@ public interface UtilsService {
 	void checkNotNull(Class<?> clazz, Object o, String id);
 
 	/**
-	 * Checks if the object is not deleted, throws an exception otherwise.
+	 * Checks if the object is not removed, throws an exception otherwise.
 	 * @param o         The object itself
-	 * @throws DeletedObjectException    Thrown if the object is deleted
+	 * @throws RemovedObjectException    Thrown if the object is removed
 	 */
-	void checkNotDeleted(DeletableObject o);
+	void checkNotRemoved(RemovableObject o);
 
 	/**
-	 * Checks if the scope is not deleted and, if the event is present, that it is not deleted either, throws an exception otherwise.
+	 * Checks if the scope is not removed and, if the event is present, that it is not removed either, throws an exception otherwise.
 	 * @param scope     The scope
 	 * @param event     The optional event belonging to the scope
-	 * @throws DeletedObjectException    Thrown if the scope or the event is deleted
+	 * @throws RemovedObjectException    Thrown if the scope or the event is removed
 	 */
-	void checkNotDeleted(Scope scope, Optional<Event> event);
+	void checkNotRemoved(Scope scope, Optional<Event> event);
 
 	/**
 	 * Checks if the object is not locked, throws an exception otherwise.

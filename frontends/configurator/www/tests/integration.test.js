@@ -473,7 +473,7 @@ export default async function test(bundle, assert, driver) {
 			//widget detail right
 			assert.equal(await driver.getValue('#cms_widget_required_feature'), '', 'Required feature is empty');
 			assert.selectContains('#cms_widget_required_feature', 'ADMIN', 'Required feature select contains "ADMIN"');
-			assert.selectContains('#cms_widget_required_feature', 'MANAGE_DELETED_DATA', 'Required feature select contains "MANAGE_DELETED_DATA"');
+			assert.selectContains('#cms_widget_required_feature', 'MANAGE_REMOVED_DATA', 'Required feature select contains "MANAGE_REMOVED_DATA"');
 			await driver.type('#cms_widget_required_feature', 'EXPORT');
 			assert.equal(await driver.getValue('#cms_widget_required_right_entity'), '', 'Required right entity is empty');
 			assert.selectContains('#cms_widget_required_right_entity', 'SCOPE_MODEL', 'Required right entity contains "SCOPE_MODEL"');

@@ -77,16 +77,16 @@ public class DatasetRecord extends UpdatableRecordImpl<DatasetRecord> {
 	}
 
 	/**
-	 * Setter for <code>dataset.deleted</code>.
+	 * Setter for <code>dataset.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(4, value);
 	}
 
 	/**
-	 * Getter for <code>dataset.deleted</code>.
+	 * Getter for <code>dataset.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(4);
 	}
 
@@ -155,14 +155,14 @@ public class DatasetRecord extends UpdatableRecordImpl<DatasetRecord> {
 	/**
 	 * Create a detached, initialised DatasetRecord
 	 */
-	public DatasetRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, String datasetModelId) {
+	public DatasetRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long scopeFk, Long eventFk, String datasetModelId) {
 		super(Dataset.DATASET);
 
 		setPk(pk);
 		setId(id);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setDatasetModelId(datasetModelId);

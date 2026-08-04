@@ -149,16 +149,16 @@ public class ScopeAuditRecord extends UpdatableRecordImpl<ScopeAuditRecord> impl
 	}
 
 	/**
-	 * Setter for <code>scope_audit.deleted</code>.
+	 * Setter for <code>scope_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(9, value);
 	}
 
 	/**
-	 * Getter for <code>scope_audit.deleted</code>.
+	 * Getter for <code>scope_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(9);
 	}
 
@@ -353,7 +353,7 @@ public class ScopeAuditRecord extends UpdatableRecordImpl<ScopeAuditRecord> impl
 	/**
 	 * Create a detached, initialised ScopeAuditRecord
 	 */
-	public ScopeAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean deleted, String scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
+	public ScopeAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean removed, String scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
 		super(ScopeAudit.SCOPE_AUDIT);
 
 		setPk(pk);
@@ -365,7 +365,7 @@ public class ScopeAuditRecord extends UpdatableRecordImpl<ScopeAuditRecord> impl
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
 		setId(id);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeModelId(scopeModelId);
 		setCode(code);
 		setShortname(shortname);

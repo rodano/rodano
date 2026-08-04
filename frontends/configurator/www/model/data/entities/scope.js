@@ -12,7 +12,7 @@ export function add_scope(study, Data, entity_constructor) {
 				path: {type: 'array'},
 				status: {type: 'string'},
 				virtual: {type: 'boolean'},
-				deleted: {type: 'boolean'},
+				removed: {type: 'boolean'},
 				expectedNumber: {type: 'number'},
 				maxNumber: {type: 'number'},
 				workflowStatus: {type: 'array'},
@@ -32,7 +32,7 @@ export function add_scope(study, Data, entity_constructor) {
 			this.paths = [];
 			this.status = undefined;
 			this.virtual = false;
-			this.deleted = false;
+			this.removed = false;
 			this.expectedNumber = undefined;
 			this.maxNumber = undefined;
 			this.workflowStatus = [];

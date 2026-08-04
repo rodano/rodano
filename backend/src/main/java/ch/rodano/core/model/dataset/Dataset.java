@@ -8,12 +8,12 @@ import ch.rodano.configuration.model.dataset.DatasetModel;
 import ch.rodano.configuration.model.rules.RulableEntity;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.model.common.AuditableObject;
-import ch.rodano.core.model.common.DeletableObject;
 import ch.rodano.core.model.common.PersistentObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.model.rules.Evaluable;
 
-public class Dataset extends DatasetRecord implements DeletableObject, TimestampableObject, PersistentObject, AuditableObject, Evaluable, Comparable<Dataset> {
+public class Dataset extends DatasetRecord implements RemovableObject, TimestampableObject, PersistentObject, AuditableObject, Evaluable, Comparable<Dataset> {
 
 	public static final Comparator<Dataset> DEFAULT_COMPARATOR = Comparator
 		.comparing(Dataset::getDatasetModel)

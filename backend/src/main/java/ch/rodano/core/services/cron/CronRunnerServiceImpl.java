@@ -78,7 +78,7 @@ public class CronRunnerServiceImpl implements CronRunnerService, DisposableBean 
 
 					// Cron Service
 					for(final var scope : scopeService.getAllIncludingRemoved()) {
-						if(!scope.getDeleted()) {
+						if(!scope.isRemoved()) {
 
 							transactionTemplate.execute(_ -> {
 								ruleService.execute(new DataState(scope), cron.getRules(), null);

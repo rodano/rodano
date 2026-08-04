@@ -88,7 +88,7 @@ public class FormServiceImpl implements FormService {
 	}
 
 	private Form create(final Scope scope, final Optional<Event> event, final FormModel formModel, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		if(event.isEmpty()) {
@@ -128,7 +128,7 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public void delete(final Scope scope, final Optional<Event> event, final Form form, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		final var baseRationale = "Form removed";
@@ -164,7 +164,7 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public void restore(final Scope scope, final Optional<Event> event, final Form form, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		final var baseRationale = "Form restored";
@@ -179,7 +179,7 @@ public class FormServiceImpl implements FormService {
 		if(formModelIds.isEmpty()) {
 			return Collections.emptyList();
 		}
-		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
+		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_REMOVED_DATA);
 		final var forms = new ArrayList<>(
 			formDAOService.search(
 				scope.getPk(),
@@ -235,7 +235,7 @@ public class FormServiceImpl implements FormService {
 
 	@Override
 	public void save(final Scope scope, final Optional<Event> event, final Form form, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		formDAOService.saveForm(form, context, rationale);

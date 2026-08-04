@@ -2,21 +2,21 @@ package ch.rodano.core.model.robot;
 
 public class RobotRecord {
 
-	protected boolean deleted;
+	protected boolean removed;
 
 	protected String name;
 	protected String key;
 
 	protected RobotRecord() {
-		deleted = false;
+		removed = false;
 	}
 
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public String getName() {

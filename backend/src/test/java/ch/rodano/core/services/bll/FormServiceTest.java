@@ -59,7 +59,7 @@ public class FormServiceTest extends DatabaseTest {
 
 		final var retrievedForm = formService.get(patient, childrenFormModel);
 		assertNotNull(retrievedForm);
-		assertFalse(retrievedForm.getDeleted());
+		assertFalse(retrievedForm.isRemoved());
 		assertEquals(patient.getPk(), retrievedForm.getScopeFk());
 
 		assertEquals(1, formDAOService.getAuditTrails(retrievedForm, Optional.empty(), Optional.empty()).size());
@@ -74,7 +74,7 @@ public class FormServiceTest extends DatabaseTest {
 		//delete form
 		final var deletionRationale = "Deletion";
 		formService.delete(patient, Optional.empty(), childrenForm, context, deletionRationale);
-		assertTrue(childrenForm.getDeleted());
+		assertTrue(childrenForm.isRemoved());
 
 		assertThrows(MissingDataException.class, () -> formService.get(patient, childrenFormModel));
 
@@ -84,7 +84,7 @@ public class FormServiceTest extends DatabaseTest {
 		final var trail = trails.last();
 		assertEquals(Actor.SYSTEM_USERNAME, trail.getAuditActor());
 		assertEquals(String.format("Form removed: %s", deletionRationale), trail.getAuditContext());
-		assertTrue(trail.getDeleted());
+		assertTrue(trail.isRemoved());
 	}
 
 	@Test
@@ -99,11 +99,11 @@ public class FormServiceTest extends DatabaseTest {
 		//restore form
 		final var restorationRationale = "Restoration";
 		formService.restore(patient, Optional.empty(), childrenForm, context, restorationRationale);
-		assertFalse(childrenForm.getDeleted());
+		assertFalse(childrenForm.isRemoved());
 
 		final var retrievedForm = formService.get(patient, childrenFormModel);
 		assertNotNull(retrievedForm);
-		assertFalse(retrievedForm.getDeleted());
+		assertFalse(retrievedForm.isRemoved());
 
 		//check the deleted flag and audit trail
 		final var trails = formDAOService.getAuditTrails(childrenForm, Optional.empty(), Optional.empty());
@@ -111,7 +111,7 @@ public class FormServiceTest extends DatabaseTest {
 		final var trail = trails.last();
 		assertEquals(Actor.SYSTEM_USERNAME, trail.getAuditActor());
 		assertEquals(String.format("Form restored: %s", restorationRationale), trail.getAuditContext());
-		assertFalse(trail.getDeleted());
+		assertFalse(trail.isRemoved());
 	}
 
 	@Test

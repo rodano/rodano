@@ -208,7 +208,7 @@ public class TimelineServiceImpl implements TimelineService {
 						.where(
 							DATASET.DATASET_MODEL_ID.eq(section.getDatasetModelId())
 								.and(DATASET.SCOPE_FK.eq(scope.getPk()).or(DATASET.EVENT_FK.in(eventPks)))
-								.and(DATASET.DELETED.isFalse())
+								.and(DATASET.REMOVED.isFalse())
 								.and(FIELD.FIELD_MODEL_ID.isNull().or(FIELD.FIELD_MODEL_ID.in(sectionFieldModelIds)))
 						)
 						.orderBy(DATASET.PK);

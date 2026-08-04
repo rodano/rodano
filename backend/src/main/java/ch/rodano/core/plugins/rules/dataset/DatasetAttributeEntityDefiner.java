@@ -87,7 +87,7 @@ public class DatasetAttributeEntityDefiner extends AbstractDatasetEntityDefiner 
 			new EntityAttribute() {
 				@Override
 				public Boolean getValue(final Evaluable evaluable) {
-					return ((Dataset) evaluable).getDeleted();
+					return ((Dataset) evaluable).isRemoved();
 				}
 
 				@Override

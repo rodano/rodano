@@ -10,7 +10,7 @@
 
 
 export interface FormAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     scopeFk?: number;
     eventFk?: number;
     formModelId?: string;

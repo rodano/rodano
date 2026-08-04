@@ -360,7 +360,7 @@ public class DatasetController extends AbstractSecuredController {
 		acl.checkRight(dataset.getDatasetModel(), Rights.WRITE);
 
 		//check rights
-		acl.checkRight(FeatureStatic.MANAGE_DELETED_DATA);
+		acl.checkRight(FeatureStatic.MANAGE_REMOVED_DATA);
 		acl.checkRight(dataset.getDatasetModel(), Rights.WRITE);
 
 		datasetService.restore(scope, event, dataset, currentContext(), rationale);

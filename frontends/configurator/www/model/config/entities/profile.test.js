@@ -15,7 +15,7 @@ export default async function test(bundle, assert) {
 			}
 		});
 		const feature = new Feature({
-			id: 'MANAGE_DELETED_DATA'
+			id: 'MANAGE_REMOVED_DATA'
 		});
 
 		//assignation
@@ -23,11 +23,11 @@ export default async function test(bundle, assert) {
 			assert.equal(profile.grantedFeatureIds.length, 0, 'No feature has been assigned to profile');
 			profile.assign(Entities.Feature, feature.id);
 			assert.equal(profile.grantedFeatureIds.length, 1, 'One feature has been assigned to profile');
-			assert.equal(profile.grantedFeatureIds[0], 'MANAGE_DELETED_DATA', '"MANAGE_DELETED_DATA" is the id of the first feature assigned to profile"');
-			assert.ok(profile.isAssigned(Entities.Feature, 'MANAGE_DELETED_DATA'), 'Feature "MANAGE_DELETED_DATA" has been assigned to profile');
+			assert.equal(profile.grantedFeatureIds[0], 'MANAGE_REMOVED_DATA', '"MANAGE_REMOVED_DATA" is the id of the first feature assigned to profile"');
+			assert.ok(profile.isAssigned(Entities.Feature, 'MANAGE_REMOVED_DATA'), 'Feature "MANAGE_REMOVED_DATA" has been assigned to profile');
 			profile.unassign(Entities.Feature, feature.id);
 			assert.equal(profile.grantedFeatureIds.length, 0, 'There is no more feature assigned to profile');
-			assert.notOk(profile.isAssigned(Entities.Feature, 'MANAGE_DELETED_DATA'), 'Feature "MANAGE_DELETED_DATA" is no more assigned to profile');
+			assert.notOk(profile.isAssigned(Entities.Feature, 'MANAGE_REMOVED_DATA'), 'Feature "MANAGE_REMOVED_DATA" is no more assigned to profile');
 		});
 	});
 

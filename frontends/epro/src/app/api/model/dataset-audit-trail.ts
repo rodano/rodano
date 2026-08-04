@@ -12,7 +12,7 @@
 
 
 export interface DatasetAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     id?: string;
     scopeFk?: number;
     eventFk?: number;

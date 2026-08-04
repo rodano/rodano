@@ -63,16 +63,16 @@ public class RobotRecord extends UpdatableRecordImpl<RobotRecord> {
 	}
 
 	/**
-	 * Setter for <code>robot.deleted</code>.
+	 * Setter for <code>robot.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>robot.deleted</code>.
+	 * Getter for <code>robot.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -141,13 +141,13 @@ public class RobotRecord extends UpdatableRecordImpl<RobotRecord> {
 	/**
 	 * Create a detached, initialised RobotRecord
 	 */
-	public RobotRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String name, String key, Boolean activated) {
+	public RobotRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, String name, String key, Boolean activated) {
 		super(Robot.ROBOT);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setName(name);
 		setKey(key);
 		setActivated(activated);

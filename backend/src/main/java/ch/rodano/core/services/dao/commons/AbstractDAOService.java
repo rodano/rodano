@@ -11,10 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.common.AuditableObject;
-import ch.rodano.core.model.common.DeletableObject;
 import ch.rodano.core.model.common.HardDeletableObject;
 import ch.rodano.core.model.common.IdentifiableObject;
 import ch.rodano.core.model.common.PersistentObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.exception.NotUniqueResultException;
@@ -144,7 +144,7 @@ public abstract class AbstractDAOService<U extends IdentifiableObject, V extends
 	 */
 	protected void delete(final U o, final DatabaseActionContext context, final String rationale) {
 		//TODO find a solution to enforce this check at compile time
-		if(o instanceof final DeletableObject dao) {
+		if(o instanceof final RemovableObject dao) {
 			if(dao instanceof final PersistentObject po) {
 				po.onPreUpdate();
 			}
@@ -155,7 +155,7 @@ public abstract class AbstractDAOService<U extends IdentifiableObject, V extends
 			}
 
 			// Set the deleted flag
-			dao.delete();
+			dao.remove();
 
 			strategy.save(getTable(), dao);
 
@@ -184,7 +184,7 @@ public abstract class AbstractDAOService<U extends IdentifiableObject, V extends
 	 */
 	protected void restore(final U o, final DatabaseActionContext context, final String rationale) {
 		//TODO find a solution to enforce this check at compile time
-		if(o instanceof final DeletableObject dao) {
+		if(o instanceof final RemovableObject dao) {
 			if(dao instanceof final PersistentObject po) {
 				po.onPreUpdate();
 			}

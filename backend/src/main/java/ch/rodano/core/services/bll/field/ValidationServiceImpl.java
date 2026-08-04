@@ -124,13 +124,15 @@ public class ValidationServiceImpl implements ValidationService {
 			return;
 		}
 
-		//do not validate fields that are in a deleted element
-		if(dataset.getDeleted() || event.isPresent() && event.get().getDeleted() || scope.getDeleted()) {
-			logger.info("Skipping validation for field [{}] that is inside a deleted element (dataset, event or scope)", field.getId());
+		final var family = new DataFamily(scope, event, dataset, field);
+
+		family.checkNotLocked();
+
+		//do not validate fields that are in a removed element
+		if(family.isRemoved()) {
+			logger.info("Skipping validation for field [{}] that is inside a removed element (dataset, event or scope)", field.getId());
 			return;
 		}
-
-		final var family = new DataFamily(scope, event, dataset, field);
 
 		logger.info("Validating field [{}] with value [{}]", field.getId(), field.getValue());
 

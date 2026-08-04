@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 124;
+const CURRENT_VERSION = 125;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -225,7 +225,25 @@ const Migrations = {
 				profile.grantedWorkflowIds = rights;
 			});
 		}
-	}
+	},
+	migrate_124: {
+		description: 'Rename feature',
+		migration: function(config) {
+			config.features.forEach(feature => {
+				if(feature.id === 'MANAGE_DELETED_DATA') {
+					feature.id = 'MANAGE_REMOVED_DATA';
+					feature.shortname.en = 'Manage removed data';
+					feature.description.en = 'Allows to view and manage removed data';
+				}
+			});
+			config.profiles.forEach(profile => {
+				if(profile.grantedFeatureIds.includes('MANAGE_DELETED_DATA')) {
+					profile.grantedFeatureIds = profile.grantedFeatureIds.filter(f => f !== 'MANAGE_DELETED_DATA');
+					profile.grantedFeatureIds.push('MANAGE_REMOVED_DATA');
+				}
+			});
+		}
+	},
 };
 
 /*function migrate_layouts(config, section_migrator, widget_migrator) {

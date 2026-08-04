@@ -70,8 +70,8 @@ public class ResourceDAOServiceImpl extends AbstractDAOService<Resource, Resourc
 			conditions.add(RESOURCE.TITLE.containsIgnoreCase(fullText).or(RESOURCE.DESCRIPTION.containsIgnoreCase(fullText)));
 		});
 
-		if(!search.getIncludeDeleted()) {
-			conditions.add(RESOURCE.DELETED.isFalse());
+		if(!search.getIncludeRemoved()) {
+			conditions.add(RESOURCE.REMOVED.isFalse());
 		}
 
 		final var query = create.selectDistinct(RESOURCE.asterisk(), DSL.count().over().as("total")).from(RESOURCE)

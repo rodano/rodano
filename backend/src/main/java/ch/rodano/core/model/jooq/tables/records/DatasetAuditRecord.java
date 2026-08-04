@@ -148,16 +148,16 @@ public class DatasetAuditRecord extends UpdatableRecordImpl<DatasetAuditRecord> 
 	}
 
 	/**
-	 * Setter for <code>dataset_audit.deleted</code>.
+	 * Setter for <code>dataset_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(9, value);
 	}
 
 	/**
-	 * Getter for <code>dataset_audit.deleted</code>.
+	 * Getter for <code>dataset_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(9);
 	}
 
@@ -226,7 +226,7 @@ public class DatasetAuditRecord extends UpdatableRecordImpl<DatasetAuditRecord> 
 	/**
 	 * Create a detached, initialised DatasetAuditRecord
 	 */
-	public DatasetAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean deleted, Long scopeFk, Long eventFk, String datasetModelId) {
+	public DatasetAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean removed, Long scopeFk, Long eventFk, String datasetModelId) {
 		super(DatasetAudit.DATASET_AUDIT);
 
 		setPk(pk);
@@ -238,7 +238,7 @@ public class DatasetAuditRecord extends UpdatableRecordImpl<DatasetAuditRecord> 
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
 		setId(id);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setDatasetModelId(datasetModelId);

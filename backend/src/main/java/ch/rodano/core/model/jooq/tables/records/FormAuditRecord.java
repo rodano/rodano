@@ -134,16 +134,16 @@ public class FormAuditRecord extends UpdatableRecordImpl<FormAuditRecord> implem
 	}
 
 	/**
-	 * Setter for <code>form_audit.deleted</code>.
+	 * Setter for <code>form_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(8, value);
 	}
 
 	/**
-	 * Getter for <code>form_audit.deleted</code>.
+	 * Getter for <code>form_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(8);
 	}
 
@@ -212,7 +212,7 @@ public class FormAuditRecord extends UpdatableRecordImpl<FormAuditRecord> implem
 	/**
 	 * Create a detached, initialised FormAuditRecord
 	 */
-	public FormAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, Long scopeFk, Long eventFk, String formModelId) {
+	public FormAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean removed, Long scopeFk, Long eventFk, String formModelId) {
 		super(FormAudit.FORM_AUDIT);
 
 		setPk(pk);
@@ -223,7 +223,7 @@ public class FormAuditRecord extends UpdatableRecordImpl<FormAuditRecord> implem
 		setAuditRobotFk(auditRobotFk);
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setFormModelId(formModelId);

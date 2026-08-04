@@ -97,9 +97,9 @@ public class LockSummaryService {
 			.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
 			.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
 			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()))
-			.and(SCOPE.DELETED.isFalse())
+			.and(SCOPE.REMOVED.isFalse())
 			//remember that the scope may not have any event
-			.and(EVENT.DELETED.isNull().or(EVENT.DELETED.isFalse()))
+			.and(EVENT.REMOVED.isNull().or(EVENT.REMOVED.isFalse()))
 			.groupBy(SCOPE_ANCESTOR.ANCESTOR_FK, SCOPE.PK).asTable("x");
 
 		final var query = create.select(
@@ -177,7 +177,7 @@ public class LockSummaryService {
 			.and(ancestorTable.VIRTUAL.isFalse())
 			.and(ancestorTable.SCOPE_MODEL_ID.in(scopeModelIds))
 			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()))
-			.and(SCOPE.DELETED.isFalse())
+			.and(SCOPE.REMOVED.isFalse())
 			.groupBy(SCOPE.PK);
 
 		try(var writer = new CSVWriter(new OutputStreamWriter(out))) {
@@ -248,8 +248,8 @@ public class LockSummaryService {
 			.and(ancestorTable.VIRTUAL.isFalse())
 			.and(ancestorTable.SCOPE_MODEL_ID.in(scopeModelIds))
 			.and(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()))
-			.and(SCOPE.DELETED.isFalse())
-			.and(EVENT.DELETED.isFalse())
+			.and(SCOPE.REMOVED.isFalse())
+			.and(EVENT.REMOVED.isFalse())
 			.groupBy(EVENT.PK);
 
 		try(var writer = new CSVWriter(new OutputStreamWriter(out))) {

@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 
 public class UserRecord {
 
-	private boolean deleted;
+	private boolean removed;
 
 	protected String name;
 
@@ -40,16 +40,16 @@ public class UserRecord {
 	//protected Byte[] data;
 
 	protected UserRecord() {
-		deleted = false;
+		removed = false;
 		setPasswordAttempts(0);
 	}
 
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public String getName() {

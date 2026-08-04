@@ -2,10 +2,10 @@ package ch.rodano.core.model.resource;
 
 import java.time.ZonedDateTime;
 
-import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 
-public class Resource extends ResourceRecord implements DeletableObject, TimestampableObject {
+public class Resource extends ResourceRecord implements RemovableObject, TimestampableObject {
 
 	private Long pk;
 	protected ZonedDateTime creationTime;

@@ -168,7 +168,7 @@ public class ScopeController extends AbstractSecuredController {
 			.setFieldModelCriteria(fieldModelCriterionList) // here too
 			.setLeaf(leaf)
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA))
+			.setIncludeRemoved(acl.hasRight(FeatureStatic.MANAGE_REMOVED_DATA))
 			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
 			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
 		//set sort if provided
@@ -216,7 +216,7 @@ public class ScopeController extends AbstractSecuredController {
 			.setFieldModelCriteria(fieldModelCriterionList) // here too
 			.setLeaf(leaf)
 			.setFullText(fullText.filter(StringUtils::isNotBlank))
-			.setIncludeDeleted(acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA))
+			.setIncludeRemoved(acl.hasRight(FeatureStatic.MANAGE_REMOVED_DATA))
 			.setSortBy(ScopeSearch.DEFAULT_SORT_BY)
 			.setSortAscending(ScopeSearch.DEFAULT_SORT_ASCENDING);
 
@@ -314,8 +314,8 @@ public class ScopeController extends AbstractSecuredController {
 
 		//check rights
 		final var acl = rightsService.getACL(currentActor(), scope);
-		acl.checkRight(FeatureStatic.MANAGE_DELETED_DATA);
-		//no need to check if actor has the right to write the scope (MANAGE_DELETED_DATA is sufficient and surpass WRITE scope model right)
+		acl.checkRight(FeatureStatic.MANAGE_REMOVED_DATA);
+		//no need to check if actor has the right to write the scope (MANAGE_REMOVED_DATA is sufficient and surpass WRITE scope model right)
 
 		scopeService.restore(scope, currentContext(), rationale.message());
 

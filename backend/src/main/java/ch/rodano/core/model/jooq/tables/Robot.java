@@ -89,9 +89,9 @@ public class Robot extends TableImpl<RobotRecord> {
 	public final TableField<RobotRecord, ZonedDateTime> LAST_UPDATE_TIME = createField(DSL.name("last_update_time"), SQLDataType.LOCALDATETIME(3).nullable(false).defaultValue(DSL.field(DSL.raw("current_timestamp(3)"), SQLDataType.LOCALDATETIME)), this, "", new DateConverter());
 
 	/**
-	 * The column <code>robot.deleted</code>.
+	 * The column <code>robot.removed</code>.
 	 */
-	public final TableField<RobotRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<RobotRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>robot.name</code>.

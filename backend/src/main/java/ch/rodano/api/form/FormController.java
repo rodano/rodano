@@ -193,7 +193,7 @@ public class FormController extends AbstractSecuredController {
 		utilsService.checkNotNull(Form.class, form, formPk);
 		URLConsistencyUtils.checkConsistency(scope, event, form);
 
-		utilsService.checkNotDeleted(form);
+		utilsService.checkNotRemoved(form);
 
 		//check rights
 		final var acl = rightsService.getACL(currentActor(), scope);

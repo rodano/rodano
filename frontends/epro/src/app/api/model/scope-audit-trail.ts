@@ -13,7 +13,7 @@ import { ScopeData } from './scope-data';
 
 
 export interface ScopeAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     id?: string;
     code?: string;
     shortname?: string;

@@ -63,16 +63,16 @@ public class PaymentRecord extends UpdatableRecordImpl<PaymentRecord> {
 	}
 
 	/**
-	 * Setter for <code>payment.deleted</code>.
+	 * Setter for <code>payment.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>payment.deleted</code>.
+	 * Getter for <code>payment.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -183,13 +183,13 @@ public class PaymentRecord extends UpdatableRecordImpl<PaymentRecord> {
 	/**
 	 * Create a detached, initialised PaymentRecord
 	 */
-	public PaymentRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long paymentBatchFk, Long workflowStatusFk, String planId, String stepId, String status, Integer value) {
+	public PaymentRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long paymentBatchFk, Long workflowStatusFk, String planId, String stepId, String status, Integer value) {
 		super(Payment.PAYMENT);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setPaymentBatchFk(paymentBatchFk);
 		setWorkflowStatusFk(workflowStatusFk);
 		setPlanId(planId);

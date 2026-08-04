@@ -6,7 +6,7 @@ public final class UserAuditTrailDTO extends UserAuditTrail {
 
 	public UserAuditTrailDTO(final UserAuditTrail userAuditTrail) {
 		// copy all the user record properties
-		this.setDeleted(userAuditTrail.getDeleted());
+		this.setRemoved(userAuditTrail.isRemoved());
 		this.name = userAuditTrail.getName();
 		this.externallyManaged = userAuditTrail.isExternallyManaged();
 		this.previousLoginDate = userAuditTrail.getPreviousLoginDate();

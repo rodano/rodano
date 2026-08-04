@@ -49,14 +49,14 @@ const static_config = {
 			optional: false
 		},
 		{
-			id: 'MANAGE_DELETED_DATA',
+			id: 'MANAGE_REMOVED_DATA',
 			className: 'Feature',
 			shortname: {
-				en: 'Manage deleted data',
+				en: 'Manage removed data',
 				fr: 'Gestion des données supprimées'
 			},
 			description: {
-				en: 'Allows to view and manage deleted data',
+				en: 'Allows to view and manage removed data',
 				fr: 'Permet de voir et gérer les données supprimées'
 			},
 			optional: false

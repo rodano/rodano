@@ -90,7 +90,7 @@ public class StatisticsChartFactoryService {
 
 		//conditions
 		final List<Condition> conditions = new ArrayList<>();
-		conditions.add(SCOPE.DELETED.isFalse());
+		conditions.add(SCOPE.REMOVED.isFalse());
 		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId()));
 		conditions.add(DATASET.DATASET_MODEL_ID.eq(chart.getDatasetModelId()));
 		conditions.add(FIELD.FIELD_MODEL_ID.eq(chart.getFieldModelId()));

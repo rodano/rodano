@@ -63,16 +63,16 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	}
 
 	/**
-	 * Setter for <code>workflow_status.deleted</code>.
+	 * Setter for <code>workflow_status.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>workflow_status.deleted</code>.
+	 * Getter for <code>workflow_status.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -253,13 +253,13 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	/**
 	 * Create a detached, initialised WorkflowStatusRecord
 	 */
-	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
 		super(WorkflowStatus.WORKFLOW_STATUS);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setFormFk(formFk);

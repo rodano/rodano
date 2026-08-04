@@ -105,9 +105,9 @@ public class FormAudit extends TableImpl<FormAuditRecord> implements AuditTable 
 	public final TableField<FormAuditRecord, Long> AUDIT_OBJECT_FK = createField(DSL.name("audit_object_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>form_audit.deleted</code>.
+	 * The column <code>form_audit.removed</code>.
 	 */
-	public final TableField<FormAuditRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<FormAuditRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>form_audit.scope_fk</code>.

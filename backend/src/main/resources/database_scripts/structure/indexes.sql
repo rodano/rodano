@@ -20,22 +20,22 @@ alter table mail add index idx_mail_origin (origin);
 alter table mail add index idx_mail_sender (sender);
 alter table mail add index idx_mail_subject (subject);
 
-/* deleted indices */
-alter table dataset add index idx_dataset_deleted (deleted);
-alter table form add index idx_form_deleted (deleted);
-alter table payment add index idx_payment_deleted (deleted);
-alter table payment_batch add index idx_payment_batch_deleted (deleted);
-alter table payment_target add index idx_payment_target_deleted (deleted);
-alter table resource add index idx_resource_deleted (deleted);
-alter table robot add index idx_robot_deleted (deleted);
-alter table scope add index idx_scope_deleted (deleted);
-alter table user add index idx_user_deleted (deleted);
-alter table event add index idx_event_deleted (deleted);
-alter table workflow_status add index idx_workflow_status_deleted (deleted);
+/* removed indices */
+alter table dataset add index idx_dataset_removed (removed);
+alter table form add index idx_form_removed (removed);
+alter table payment add index idx_payment_removed (removed);
+alter table payment_batch add index idx_payment_batch_removed (removed);
+alter table payment_target add index idx_payment_target_removed (removed);
+alter table resource add index idx_resource_removed (removed);
+alter table robot add index idx_robot_removed (removed);
+alter table scope add index idx_scope_removed (removed);
+alter table user add index idx_user_removed (removed);
+alter table event add index idx_event_removed (removed);
+alter table workflow_status add index idx_workflow_status_removed (removed);
 
 /* aggregate workflow states indices */
-alter table workflow_status add index aggregate_scope (workflow_id, deleted, scope_fk);
-alter table workflow_status add index aggregate_event (workflow_id, deleted, event_fk, form_fk, field_fk);
+alter table workflow_status add index aggregate_scope (workflow_id, removed, scope_fk);
+alter table workflow_status add index aggregate_event (workflow_id, removed, event_fk, form_fk, field_fk);
 
 /* user session */
 alter table user_session add unique index idx_user_session_token (token);

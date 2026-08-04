@@ -104,9 +104,9 @@ public class RobotAudit extends TableImpl<RobotAuditRecord> implements AuditTabl
 	public final TableField<RobotAuditRecord, Long> AUDIT_OBJECT_FK = createField(DSL.name("audit_object_fk"), SQLDataType.BIGINT.nullable(false), this, "");
 
 	/**
-	 * The column <code>robot_audit.deleted</code>.
+	 * The column <code>robot_audit.removed</code>.
 	 */
-	public final TableField<RobotAuditRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<RobotAuditRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>robot_audit.name</code>.

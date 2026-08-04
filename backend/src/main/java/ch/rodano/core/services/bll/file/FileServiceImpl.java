@@ -104,7 +104,7 @@ public class FileServiceImpl implements FileService {
 		final DatabaseActionContext context,
 		final String rationale
 	) throws IOException {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		final var file = new File();
@@ -134,7 +134,7 @@ public class FileServiceImpl implements FileService {
 		final DatabaseActionContext context,
 		final String rationale
 	) throws IOException {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		final var file = new File();
@@ -222,7 +222,7 @@ public class FileServiceImpl implements FileService {
 		final var conditions = new ArrayList<Condition>();
 		conditions.add(FILE.SUBMITTED.isTrue());
 		conditions.add(FILE.TRAIL_FK.isNull());
-		conditions.add(SCOPE.DELETED.isFalse());
+		conditions.add(SCOPE.REMOVED.isFalse());
 		conditions.add(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()));
 		if(scopeModel.isPresent()) {
 			conditions.add(SCOPE.SCOPE_MODEL_ID.eq(scopeModel.get().getId()));

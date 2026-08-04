@@ -23,8 +23,8 @@ public class ResourceSearch extends PaginatedSearch<ResourceSearch> {
 	@Schema(description = "Text search on title and description")
 	private Optional<String> fullText = Optional.empty();
 
-	@Schema(description = "Include the deleted resources?")
-	private boolean includeDeleted;
+	@Schema(description = "Include the removed resources?")
+	private boolean includeRemoved;
 
 	@Schema(description = "Sort by")
 	private ResourceSortBy sortBy = DEFAULT_SORT_BY;
@@ -70,12 +70,12 @@ public class ResourceSearch extends PaginatedSearch<ResourceSearch> {
 		return this;
 	}
 
-	public boolean getIncludeDeleted() {
-		return includeDeleted;
+	public boolean getIncludeRemoved() {
+		return includeRemoved;
 	}
 
-	public ResourceSearch setIncludeDeleted(final boolean includeDeleted) {
-		this.includeDeleted = includeDeleted;
+	public ResourceSearch setIncludeRemoved(final boolean includeRemoved) {
+		this.includeRemoved = includeRemoved;
 		return this;
 	}
 

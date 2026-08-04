@@ -97,12 +97,12 @@ public class ExtractServiceImpl implements ExtractService {
 
 		final List<Condition> conditions = new ArrayList<>();
 		conditions.add(DATASET.DATASET_MODEL_ID.eq(datasetModel.getId()));
-		conditions.add(DATASET.DELETED.isFalse());
-		conditions.add(SCOPE.DELETED.isFalse());
+		conditions.add(DATASET.REMOVED.isFalse());
+		conditions.add(SCOPE.REMOVED.isFalse());
 
 		//add event conditions
 		if(!datasetModel.isScopeDocumentation()) {
-			conditions.add(EVENT.DELETED.isFalse());
+			conditions.add(EVENT.REMOVED.isFalse());
 			conditions.add(EVENT.DATE.isNotNull());
 		}
 

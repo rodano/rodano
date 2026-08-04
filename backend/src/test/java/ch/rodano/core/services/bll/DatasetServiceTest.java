@@ -70,7 +70,7 @@ public class DatasetServiceTest extends DatabaseTest {
 		final var retrievedDatasets = datasetService.getAll(patient, Collections.singleton(dmtGridModel));
 		assertEquals(1, retrievedDatasets.size());
 		final var retrievedDataset = retrievedDatasets.getFirst();
-		assertFalse(retrievedDataset.getDeleted());
+		assertFalse(retrievedDataset.isRemoved());
 		assertEquals(patient.getPk(), retrievedDataset.getScopeFk());
 
 		assertEquals(1, datasetDAOService.getAuditTrails(dmtDataset, Optional.empty(), Optional.empty()).size());
@@ -85,12 +85,12 @@ public class DatasetServiceTest extends DatabaseTest {
 		//delete dataset
 		final var deletionRationale = "Deletion";
 		datasetService.delete(patient, Optional.empty(), dmtDataset, context, deletionRationale);
-		assertTrue(dmtDataset.getDeleted());
+		assertTrue(dmtDataset.isRemoved());
 
 		final var retrievedDatasets = datasetService.getAllIncludingRemoved(patient, Collections.singleton(dmtGridModel));
 		assertEquals(1, retrievedDatasets.size());
 		final var retrievedDataset = retrievedDatasets.getFirst();
-		assertTrue(retrievedDataset.getDeleted());
+		assertTrue(retrievedDataset.isRemoved());
 
 		//check the deleted flag and audit trail
 		final var trails = datasetDAOService.getAuditTrails(dmtDataset, Optional.empty(), Optional.empty());
@@ -98,7 +98,7 @@ public class DatasetServiceTest extends DatabaseTest {
 		final var trail = trails.last();
 		assertEquals(Actor.SYSTEM_USERNAME, trail.getAuditActor());
 		assertEquals(String.format("Dataset removed: %s", deletionRationale), trail.getAuditContext());
-		assertTrue(trail.getDeleted());
+		assertTrue(trail.isRemoved());
 	}
 
 	@Test
@@ -113,12 +113,12 @@ public class DatasetServiceTest extends DatabaseTest {
 		//restore dataset
 		final var restorationRationale = "Restoration";
 		datasetService.restore(patient, Optional.empty(), dmtDataset, context, restorationRationale);
-		assertFalse(dmtDataset.getDeleted());
+		assertFalse(dmtDataset.isRemoved());
 
 		final var retrievedDatasets = datasetService.getAll(patient, Collections.singleton(dmtGridModel));
 		assertEquals(1, retrievedDatasets.size());
 		final var retrievedDataset = retrievedDatasets.getFirst();
-		assertFalse(retrievedDataset.getDeleted());
+		assertFalse(retrievedDataset.isRemoved());
 
 		//check the deleted flag and audit trail
 		final var trails = datasetDAOService.getAuditTrails(dmtDataset, Optional.empty(), Optional.empty());
@@ -126,7 +126,7 @@ public class DatasetServiceTest extends DatabaseTest {
 		final var trail = trails.last();
 		assertEquals(Actor.SYSTEM_USERNAME, trail.getAuditActor());
 		assertEquals(String.format("Dataset restored: %s", restorationRationale), trail.getAuditContext());
-		assertFalse(trail.getDeleted());
+		assertFalse(trail.isRemoved());
 	}
 
 	@Test

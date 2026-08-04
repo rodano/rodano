@@ -153,8 +153,8 @@ public class UserDAOServiceImpl extends AuditableDAOService<User, UserAuditTrail
 			conditions.add(ROLE.PROFILE_ID.in(profileIds));
 		});
 
-		if(!search.getIncludeDeleted()) {
-			conditions.add(USER.DELETED.isFalse());
+		if(!search.getIncludeRemoved()) {
+			conditions.add(USER.REMOVED.isFalse());
 		}
 
 		if(search.getEnabled().isPresent()) {

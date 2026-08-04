@@ -58,7 +58,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		final String rationale
 	) {
 		// Perform the necessary checks
-		checkLockedOrDeleted(scope, parent);
+		checkLockedOrRemoved(scope, parent);
 
 		// If the two scopes already have an active relation, no relation can be created
 		if(isChildOf(scope, parent)) {
@@ -91,7 +91,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		relation.setParentFk(parent.getPk());
 		relation.setStartDate(startDate);
 		endDate.ifPresent(relation::setEndDate);
-		relation.setDefault(getNonDeletedParentRelations(scope).isEmpty());
+		relation.setDefault(getNonRemovedParentRelations(scope).isEmpty());
 
 		// save to database
 		scopeRelationDAOService.saveScopeRelation(relation, context, rationale);
@@ -110,7 +110,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		final var parent = scopeDAOService.getScopeByPk(relation.getParentFk());
 
 		// Perform the necessary checks
-		checkLockedOrDeleted(scope, parent);
+		checkLockedOrRemoved(scope, parent);
 
 		// If the relation is the default relation, it can not be ended
 		if(relation.getDefault()) {
@@ -150,7 +150,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		final var parent = getParent(relation);
 
 		// Perform the necessary checks
-		checkLockedOrDeleted(scope, parent);
+		checkLockedOrRemoved(scope, parent);
 
 		if(isVirtual(relation)) {
 			throw new ScopeRelationException("A virtual relation cannot be made default");
@@ -161,7 +161,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		}
 
 		// Make all the current default relations not default
-		getNonDeletedParentRelations(scope).stream()
+		getNonRemovedParentRelations(scope).stream()
 			.filter(ScopeRelation::getDefault)
 			.forEach(rel -> {
 				rel.setDefault(false);
@@ -183,7 +183,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		final DatabaseActionContext context
 	) {
 		// Perform the necessary checks
-		checkLockedOrDeleted(scope, newParent);
+		checkLockedOrRemoved(scope, newParent);
 
 		//invalidate current default relation
 		final var oldParentRelation = getDefaultParentRelation(scope);
@@ -228,7 +228,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	@Override
 	public List<Scope> getParents(final Scope scope) {
-		return this.getNonDeletedParentRelations(scope).stream()
+		return this.getNonRemovedParentRelations(scope).stream()
 			.map(this::getParent)
 			.toList();
 	}
@@ -262,20 +262,20 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 	}
 
 	@Override
-	public List<ScopeRelation> getNonDeletedParentRelations(final Scope scope) {
-		return getNonDeletedParentRelationsStream(scope).toList();
+	public List<ScopeRelation> getNonRemovedParentRelations(final Scope scope) {
+		return getNonRemovedParentRelationsStream(scope).toList();
 	}
 
 	@Override
 	public List<ScopeRelation> getActiveParentRelations(final Scope scope, final ZonedDateTime date) {
-		return getNonDeletedParentRelationsStream(scope)
+		return getNonRemovedParentRelationsStream(scope)
 			.filter(rel -> isEnabled(rel, date))
 			.toList();
 	}
 
 	@Override
 	public ScopeRelation getDefaultParentRelation(final Scope scope) {
-		return getNonDeletedParentRelations(scope).stream()
+		return getNonRemovedParentRelations(scope).stream()
 			.filter(ScopeRelation::getDefault)
 			.findFirst()
 			.orElseThrow(() -> new ScopeRelationException("No default parent relation found for " + scope.getLocalizedShortname()));
@@ -288,7 +288,7 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 
 	@Override
 	public List<Scope> getChildren(final Scope scope) {
-		return this.getNonDeletedChildRelations(scope).stream()
+		return this.getNonRemovedChildRelations(scope).stream()
 			.map(this::getChild)
 			.toList();
 	}
@@ -313,14 +313,14 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 	}
 
 	@Override
-	public List<ScopeRelation> getNonDeletedChildRelations(final Scope scope) {
-		return getNonDeletedChildRelationsStream(scope)
+	public List<ScopeRelation> getNonRemovedChildRelations(final Scope scope) {
+		return getNonRemovedChildRelationsStream(scope)
 			.toList();
 	}
 
 	@Override
 	public List<ScopeRelation> getActiveChildRelations(final Scope scope, final ZonedDateTime date) {
-		return getNonDeletedChildRelationsStream(scope)
+		return getNonRemovedChildRelationsStream(scope)
 			.filter(rel -> isEnabled(rel, date))
 			.toList();
 	}
@@ -428,10 +428,10 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		return parent.getVirtual();
 	}
 
-	private void checkLockedOrDeleted(final Scope scope, final Scope parent) {
-		// If one of the scopes is deleted, no relation can be created
-		utilsService.checkNotDeleted(scope);
-		utilsService.checkNotDeleted(parent);
+	private void checkLockedOrRemoved(final Scope scope, final Scope parent) {
+		// If one of the scopes is removed, no relation can be created
+		utilsService.checkNotRemoved(scope);
+		utilsService.checkNotRemoved(parent);
 
 		// If either of the scopes is locked, no relation can be created
 		utilsService.checkNotLocked(scope);
@@ -491,19 +491,19 @@ public class ScopeRelationServiceImpl implements ScopeRelationService {
 		return isVirtual(relation) || (relation.getStartDate().equals(date) || relation.getStartDate().isBefore(date)) && (relation.getEndDate() == null || relation.getEndDate().isAfter(date));
 	}
 
-	private Stream<ScopeRelation> getNonDeletedParentRelationsStream(final Scope scope) {
+	private Stream<ScopeRelation> getNonRemovedParentRelationsStream(final Scope scope) {
 		return scopeRelationDAOService.getParentRelations(scope.getPk()).stream()
 			.filter(relation -> {
 				final var parentScope = scopeDAOService.getScopeByPk(relation.getParentFk());
-				return !parentScope.getDeleted();
+				return !parentScope.isRemoved();
 			});
 	}
 
-	private Stream<ScopeRelation> getNonDeletedChildRelationsStream(final Scope scope) {
+	private Stream<ScopeRelation> getNonRemovedChildRelationsStream(final Scope scope) {
 		return scopeRelationDAOService.getChildrenRelations(scope.getPk()).stream()
 			.filter(relation -> {
 				final var childScope = scopeDAOService.getScopeByPk(relation.getScopeFk());
-				return !childScope.getDeleted();
+				return !childScope.isRemoved();
 			});
 	}
 

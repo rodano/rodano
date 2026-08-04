@@ -134,16 +134,16 @@ public class RobotAuditRecord extends UpdatableRecordImpl<RobotAuditRecord> impl
 	}
 
 	/**
-	 * Setter for <code>robot_audit.deleted</code>.
+	 * Setter for <code>robot_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(8, value);
 	}
 
 	/**
-	 * Getter for <code>robot_audit.deleted</code>.
+	 * Getter for <code>robot_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(8);
 	}
 
@@ -212,7 +212,7 @@ public class RobotAuditRecord extends UpdatableRecordImpl<RobotAuditRecord> impl
 	/**
 	 * Create a detached, initialised RobotAuditRecord
 	 */
-	public RobotAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, String name, String key, Boolean activated) {
+	public RobotAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean removed, String name, String key, Boolean activated) {
 		super(RobotAudit.ROBOT_AUDIT);
 
 		setPk(pk);
@@ -223,7 +223,7 @@ public class RobotAuditRecord extends UpdatableRecordImpl<RobotAuditRecord> impl
 		setAuditRobotFk(auditRobotFk);
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setName(name);
 		setKey(key);
 		setActivated(activated);

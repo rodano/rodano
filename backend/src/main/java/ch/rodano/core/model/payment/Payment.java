@@ -4,17 +4,17 @@ import java.time.ZonedDateTime;
 
 import ch.rodano.configuration.model.payment.PaymentPlan;
 import ch.rodano.configuration.model.payment.PaymentStep;
-import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 
-public final class Payment implements DeletableObject, TimestampableObject, Comparable<Payment> {
+public final class Payment implements RemovableObject, TimestampableObject, Comparable<Payment> {
 	private static final String EXCLUDED = "Excluded";
 
 	private Long pk;
 	private ZonedDateTime creationTime;
 	private ZonedDateTime lastUpdateTime;
 
-	private boolean deleted;
+	private boolean removed;
 
 	private Long paymentBatchFk;
 	private Long workflowStatusFk;
@@ -26,7 +26,7 @@ public final class Payment implements DeletableObject, TimestampableObject, Comp
 	private PaymentPlan plan;
 
 	public Payment() {
-		deleted = false;
+		removed = false;
 	}
 
 	public PaymentStep getPaymentStep() {
@@ -68,13 +68,13 @@ public final class Payment implements DeletableObject, TimestampableObject, Comp
 	}
 
 	@Override
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
 	@Override
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public Long getPaymentBatchFk() {

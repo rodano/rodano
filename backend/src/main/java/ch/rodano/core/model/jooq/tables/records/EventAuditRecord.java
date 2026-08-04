@@ -148,16 +148,16 @@ public class EventAuditRecord extends UpdatableRecordImpl<EventAuditRecord> impl
 	}
 
 	/**
-	 * Setter for <code>event_audit.deleted</code>.
+	 * Setter for <code>event_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(9, value);
 	}
 
 	/**
-	 * Getter for <code>event_audit.deleted</code>.
+	 * Getter for <code>event_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(9);
 	}
 
@@ -324,7 +324,7 @@ public class EventAuditRecord extends UpdatableRecordImpl<EventAuditRecord> impl
 	/**
 	 * Create a detached, initialised EventAuditRecord
 	 */
-	public EventAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean deleted, Long scopeFk, String scopeModelId, Integer eventGroupNumber, String eventModelId, ZonedDateTime expectedDate, ZonedDateTime date, ZonedDateTime endDate, Boolean notDone, Boolean blocking, Boolean locked) {
+	public EventAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, String id, Boolean removed, Long scopeFk, String scopeModelId, Integer eventGroupNumber, String eventModelId, ZonedDateTime expectedDate, ZonedDateTime date, ZonedDateTime endDate, Boolean notDone, Boolean blocking, Boolean locked) {
 		super(EventAudit.EVENT_AUDIT);
 
 		setPk(pk);
@@ -336,7 +336,7 @@ public class EventAuditRecord extends UpdatableRecordImpl<EventAuditRecord> impl
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
 		setId(id);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setScopeModelId(scopeModelId);
 		setEventGroupNumber(eventGroupNumber);

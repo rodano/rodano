@@ -84,7 +84,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final String rationale
 	) {
 		family.checkNotLocked();
-		family.checkNotDeleted();
+		family.checkNotRemoved();
 
 		workflowStatusDAOService.saveWorkflowStatus(workflowStatus, context, rationale);
 	}
@@ -101,7 +101,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		//update modification date, add trail and execute rules only if workflow status changes
 		if(!state.getId().equals(workflowStatus.getStateId())) {
 			family.checkNotLocked();
-			family.checkNotDeleted();
+			family.checkNotRemoved();
 
 			workflowStatus.setState(state);
 			workflowStatusDAOService.saveWorkflowStatus(workflowStatus, context, rationale);
@@ -120,7 +120,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final String rationale
 	) {
 		family.checkNotLocked();
-		family.checkNotDeleted();
+		family.checkNotRemoved();
 
 		workflowStatusDAOService.deleteWorkflowStatus(workflowStatus, context, rationale);
 	}
@@ -143,7 +143,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 		final String rationale
 	) {
 		family.checkNotLocked();
-		family.checkNotDeleted();
+		family.checkNotRemoved();
 
 		if(!workflowable.getWorkflowableModel().getWorkflowIds().contains(workflow.getId())) {
 			throw new NoRespectForConfigurationException(String.format("Workflow %s is not allowed for %s", workflow.getId(), workflowable.getWorkflowableModel().getId()));

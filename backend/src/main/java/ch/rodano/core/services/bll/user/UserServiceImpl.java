@@ -308,7 +308,7 @@ public class UserServiceImpl implements UserService {
 					row[i++] = role.getProfile().getLocalizedShortname(languages);
 					row[i++] = scopeService.get(role).getCodeAndShortname();
 					row[i++] = role.getStatus().getLabel();
-					row[i++] = Boolean.toString(user.getDeleted());
+					row[i++] = Boolean.toString(user.isRemoved());
 					writer.writeNext(row);
 				}
 			}

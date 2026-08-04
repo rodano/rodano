@@ -232,7 +232,7 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotRemoved(scope);
 		utilsService.checkNotLocked(scope);
 		utilsService.checkNotLocked(event);
 
@@ -246,7 +246,7 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotRemoved(scope);
 		utilsService.checkNotLocked(scope);
 		utilsService.checkNotLocked(event);
 
@@ -281,7 +281,7 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotRemoved(scope);
 		utilsService.checkNotLocked(scope);
 		utilsService.checkNotLocked(event);
 
@@ -337,8 +337,8 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		utilsService.checkNotDeleted(scope);
-		utilsService.checkNotDeleted(event);
+		utilsService.checkNotRemoved(scope);
+		utilsService.checkNotRemoved(event);
 
 		event.lock();
 		eventDAOService.saveEvent(event, context, rationale);
@@ -351,8 +351,8 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		utilsService.checkNotDeleted(scope);
-		utilsService.checkNotDeleted(event);
+		utilsService.checkNotRemoved(scope);
+		utilsService.checkNotRemoved(event);
 
 		event.unlock();
 		eventDAOService.saveEvent(event, context, rationale);
@@ -399,7 +399,7 @@ public class EventServiceImpl implements EventService {
 		final DatabaseActionContext context,
 		final String rationale
 	) {
-		utilsService.checkNotDeleted(scope);
+		utilsService.checkNotRemoved(scope);
 		utilsService.checkNotLocked(scope);
 
 		resetEventsDate(getAll(scope), context, rationale);
@@ -444,7 +444,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<Event> search(final Scope scope, final ACL acl) {
-		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
+		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_REMOVED_DATA);
 		final var events = includeDeleted ? getAllIncludingRemoved(scope) : getAll(scope);
 		return events.stream()
 			.filter(e -> acl.hasRight(e.getDateOrExpectedDate(), e.getEventModel(), Rights.READ))
@@ -495,7 +495,7 @@ public class EventServiceImpl implements EventService {
 
 	@Override
 	public List<EventModel> getEventModels(final Scope scope) {
-		if(scope.getDeleted() || scope.getLocked()) {
+		if(scope.isRemoved() || scope.getLocked()) {
 			return Collections.emptyList();
 		}
 		//retrieve all existing events for the scope

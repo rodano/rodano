@@ -137,7 +137,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	private Dataset create(final Scope scope, final Optional<Event> event, final DatasetModel datasetModel, final DatabaseActionContext context, final String rationale, final Optional<String> id) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		if(event.isEmpty()) {
@@ -184,7 +184,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void delete(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		final var datasetModel = dataset.getDatasetModel();
@@ -210,7 +210,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void restore(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		final var datasetModel = dataset.getDatasetModel();
@@ -247,7 +247,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void save(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		datasetDAOService.saveDataset(dataset, context, rationale);
@@ -255,7 +255,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void reset(final Scope scope, final Optional<Event> event, final Dataset dataset, final DatabaseActionContext context, final String rationale) {
-		utilsService.checkNotDeleted(scope, event);
+		utilsService.checkNotRemoved(scope, event);
 		utilsService.checkNotLocked(scope, event);
 
 		for(final var f : fieldService.getAll(dataset)) {
@@ -310,7 +310,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<Dataset> search(final Scope scope, final Optional<Event> event, final Optional<Collection<DatasetModel>> datasetModels, final ACL acl) {
-		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
+		final var includeDeleted = acl.hasRight(FeatureStatic.MANAGE_REMOVED_DATA);
 		final var datasets = datasetDAOService.search(
 			scope.getPk(),
 			event.map(Event::getPk),

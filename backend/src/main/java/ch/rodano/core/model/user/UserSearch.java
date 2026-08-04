@@ -42,8 +42,8 @@ public class UserSearch extends PaginatedSearch<UserSearch> {
 	@Schema(description = "Is the user externally managed?")
 	private Optional<Boolean> externallyManaged = Optional.empty();
 
-	@Schema(description = "Include the deleted users?")
-	private boolean includeDeleted;
+	@Schema(description = "Include the removed users?")
+	private boolean includeRemoved;
 
 	@Schema(description = "Sort by")
 	private UserSortBy sortBy = DEFAULT_SORT_BY;
@@ -159,12 +159,12 @@ public class UserSearch extends PaginatedSearch<UserSearch> {
 		return this;
 	}
 
-	public boolean getIncludeDeleted() {
-		return includeDeleted;
+	public boolean getIncludeRemoved() {
+		return includeRemoved;
 	}
 
-	public UserSearch setIncludeDeleted(final boolean includeDeleted) {
-		this.includeDeleted = includeDeleted;
+	public UserSearch setIncludeRemoved(final boolean includeRemoved) {
+		this.includeRemoved = includeRemoved;
 		return this;
 	}
 

@@ -89,7 +89,7 @@ public class SubstudyServiceImpl implements SubstudyService {
 
 	public List<Scope> getOpenSubstudies() {
 		return scopeDAOService.getVirtualScopes().stream()
-			.filter(s -> !s.getDeleted() && !s.isClosed() && s.getData().getEnrollmentModel() != null)
+			.filter(s -> !s.isRemoved() && !s.isClosed() && s.getData().getEnrollmentModel() != null)
 			.toList();
 
 	}

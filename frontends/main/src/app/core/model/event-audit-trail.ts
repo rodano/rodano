@@ -10,7 +10,7 @@
 
 
 export interface EventAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     id?: string;
     scopeFk?: number;
     scopeModelId?: string;

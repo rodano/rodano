@@ -355,7 +355,7 @@ export default async function test(bundle, assert) {
 
 	//feature
 	const feature = new Feature({
-		id: 'MANAGE_DELETED_DATA'
+		id: 'MANAGE_REMOVED_DATA'
 	});
 	feature.study = study;
 	study.features.push(feature);

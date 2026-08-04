@@ -78,16 +78,16 @@ public class ScopeRecord extends UpdatableRecordImpl<ScopeRecord> {
 	}
 
 	/**
-	 * Setter for <code>scope.deleted</code>.
+	 * Setter for <code>scope.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(4, value);
 	}
 
 	/**
-	 * Getter for <code>scope.deleted</code>.
+	 * Getter for <code>scope.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(4);
 	}
 
@@ -282,14 +282,14 @@ public class ScopeRecord extends UpdatableRecordImpl<ScopeRecord> {
 	/**
 	 * Create a detached, initialised ScopeRecord
 	 */
-	public ScopeRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
+	public ScopeRecord(Long pk, String id, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, String scopeModelId, String code, String shortname, String longname, ZonedDateTime startDate, ZonedDateTime stopDate, Boolean virtual, String color, Integer expectedNumber, Integer maxNumber, Boolean locked, ScopeData data) {
 		super(Scope.SCOPE);
 
 		setPk(pk);
 		setId(id);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeModelId(scopeModelId);
 		setCode(code);
 		setShortname(shortname);

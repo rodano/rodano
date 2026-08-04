@@ -100,7 +100,7 @@ public class ScopeAttributeEntityDefiner extends AbstractScopeEntityDefiner {
 			new EntityAttribute() {
 				@Override
 				public Boolean getValue(final Evaluable evaluable) {
-					return ((Scope) evaluable).getDeleted();
+					return ((Scope) evaluable).isRemoved();
 				}
 
 				@Override
@@ -119,7 +119,7 @@ public class ScopeAttributeEntityDefiner extends AbstractScopeEntityDefiner {
 					final var scope = (Scope) evaluable;
 					final var defaultParent = scopeRelationService.getDefaultParent(scope);
 					final var siblings = scopeRelationService.getAllChildren(defaultParent);
-					return siblings.stream().filter(s -> !s.getDeleted()).sorted(Comparator.comparing(Scope::getCreationTime)).toList().indexOf(scope);
+					return siblings.stream().filter(s -> !s.isRemoved()).sorted(Comparator.comparing(Scope::getCreationTime)).toList().indexOf(scope);
 				}
 
 				@Override

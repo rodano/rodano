@@ -10,7 +10,7 @@
 
 
 export interface WorkflowStatusAuditTrail { 
-    deleted?: boolean;
+    removed?: boolean;
     scopeFk?: number;
     fieldFk?: number;
     eventFk?: number;

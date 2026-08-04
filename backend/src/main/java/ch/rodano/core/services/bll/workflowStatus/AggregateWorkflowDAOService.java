@@ -122,7 +122,7 @@ public class AggregateWorkflowDAOService {
 
 		//query conditions
 		final var conditions = new ArrayList<Condition>();
-		conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
+		conditions.add(WORKFLOW_STATUS.REMOVED.isFalse());
 		//select only workflow that could be aggregated
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflows.stream().map(Workflow::getAggregateWorkflowId).toList()));
 
@@ -133,11 +133,11 @@ public class AggregateWorkflowDAOService {
 		//exclude workflow states that are attached directly on a scope (we want only workflow states on fields, forms or events included in a scope)
 		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNotNull().or(WORKFLOW_STATUS.FIELD_FK.isNotNull()).or(WORKFLOW_STATUS.FORM_FK.isNotNull()));
 		//exclude deleted events
-		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNull().or(EVENT.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNull().or(EVENT.REMOVED.isFalse()));
 		//exclude deleted forms
-		conditions.add(WORKFLOW_STATUS.FORM_FK.isNull().or(FORM.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.FORM_FK.isNull().or(FORM.REMOVED.isFalse()));
 		//exclude deleted datasets
-		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(DATASET.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(DATASET.REMOVED.isFalse()));
 		//exclude fields that have null value
 		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(FIELD.VALUE.isNotNull()));
 
@@ -156,7 +156,7 @@ public class AggregateWorkflowDAOService {
 			DSL.min(WORKFLOW_STATUS.PK).as(WORKFLOW_STATUS.PK),
 			DSL.min(WORKFLOW_STATUS.CREATION_TIME).as(WORKFLOW_STATUS.CREATION_TIME),
 			DSL.max(WORKFLOW_STATUS.LAST_UPDATE_TIME).as(WORKFLOW_STATUS.LAST_UPDATE_TIME),
-			DSL.inline(false, WORKFLOW_STATUS.DELETED).as(WORKFLOW_STATUS.DELETED),
+			DSL.inline(false, WORKFLOW_STATUS.REMOVED).as(WORKFLOW_STATUS.REMOVED),
 			WORKFLOW_STATUS.SCOPE_FK,
 			DSL.inline(null, WORKFLOW_STATUS.EVENT_FK).as(WORKFLOW_STATUS.EVENT_FK),
 			DSL.inline(null, WORKFLOW_STATUS.FORM_FK).as(WORKFLOW_STATUS.FORM_FK),
@@ -189,7 +189,7 @@ public class AggregateWorkflowDAOService {
 
 		//query conditions
 		final var conditions = new ArrayList<Condition>();
-		conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
+		conditions.add(WORKFLOW_STATUS.REMOVED.isFalse());
 		//select only workflow that could be aggregated
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(workflows.stream().map(Workflow::getAggregateWorkflowId).toList()));
 
@@ -200,9 +200,9 @@ public class AggregateWorkflowDAOService {
 		//exclude workflow states that are attached directly on an event (we want only workflow states on fields or forms included in a event)
 		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNotNull().or(WORKFLOW_STATUS.FORM_FK.isNotNull()));
 		//exclude deleted forms
-		conditions.add(WORKFLOW_STATUS.FORM_FK.isNull().or(FORM.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.FORM_FK.isNull().or(FORM.REMOVED.isFalse()));
 		//exclude deleted datasets
-		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(DATASET.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(DATASET.REMOVED.isFalse()));
 		//exclude fields that have null value
 		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(FIELD.VALUE.isNotNull()));
 
@@ -221,7 +221,7 @@ public class AggregateWorkflowDAOService {
 			DSL.min(WORKFLOW_STATUS.PK).as(WORKFLOW_STATUS.PK),
 			DSL.min(WORKFLOW_STATUS.CREATION_TIME).as(WORKFLOW_STATUS.CREATION_TIME),
 			DSL.max(WORKFLOW_STATUS.LAST_UPDATE_TIME).as(WORKFLOW_STATUS.LAST_UPDATE_TIME),
-			DSL.inline(false, WORKFLOW_STATUS.DELETED).as(WORKFLOW_STATUS.DELETED),
+			DSL.inline(false, WORKFLOW_STATUS.REMOVED).as(WORKFLOW_STATUS.REMOVED),
 			WORKFLOW_STATUS.SCOPE_FK,
 			WORKFLOW_STATUS.EVENT_FK,
 			DSL.inline(null, WORKFLOW_STATUS.FORM_FK).as(WORKFLOW_STATUS.FORM_FK),

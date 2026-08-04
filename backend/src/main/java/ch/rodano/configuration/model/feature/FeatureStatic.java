@@ -43,11 +43,11 @@ public enum FeatureStatic implements SuperDisplayable {
 			return description;
 		}
 	},
-	MANAGE_DELETED_DATA {
+	MANAGE_REMOVED_DATA {
 		@Override
 		public SortedMap<String, String> getShortname() {
 			final SortedMap<String, String> shortname = new TreeMap<>();
-			shortname.put(LanguageStatic.en.getId(), "Manage deleted data");
+			shortname.put(LanguageStatic.en.getId(), "Manage removed data");
 			shortname.put(LanguageStatic.fr.getId(), "Gestion des données supprimées");
 			return shortname;
 		}
@@ -55,7 +55,7 @@ public enum FeatureStatic implements SuperDisplayable {
 		@Override
 		public SortedMap<String, String> getDescription() {
 			final SortedMap<String, String> description = new TreeMap<>();
-			description.put(LanguageStatic.en.getId(), "Allows to view and manage deleted data");
+			description.put(LanguageStatic.en.getId(), "Allows to view and manage removed data");
 			description.put(LanguageStatic.fr.getId(), "Permet de voir et gérer les données supprimées");
 			return description;
 		}

@@ -83,7 +83,7 @@ public class DatasetDAOServiceImpl extends AuditableDAOService<Dataset, DatasetA
 		final var query = create.selectFrom(DATASET).where(
 			scopePk.map(DATASET.SCOPE_FK::eq).orElse(DSL.noCondition())
 				.and(eventPk.map(DATASET.EVENT_FK::eq).orElse(DATASET.EVENT_FK.isNull()))
-				.and(includeDeleted ? DSL.noCondition() : DATASET.DELETED.isFalse())
+				.and(includeDeleted ? DSL.noCondition() : DATASET.REMOVED.isFalse())
 				.and(datasetModelIds.map(DATASET.DATASET_MODEL_ID::in).orElse(DSL.noCondition()))
 		);
 		return find(query);

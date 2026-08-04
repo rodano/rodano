@@ -63,16 +63,16 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> {
 	}
 
 	/**
-	 * Setter for <code>user.deleted</code>.
+	 * Setter for <code>user.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>user.deleted</code>.
+	 * Getter for <code>user.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -421,13 +421,13 @@ public class UserRecord extends UpdatableRecordImpl<UserRecord> {
 	/**
 	 * Create a detached, initialised UserRecord
 	 */
-	public UserRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
+	public UserRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
 		super(User.USER);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setName(name);
 		setEmail(email);
 		setExternallyManaged(externallyManaged);

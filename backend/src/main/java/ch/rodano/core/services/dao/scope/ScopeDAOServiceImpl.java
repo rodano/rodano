@@ -83,7 +83,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public List<Scope> getVirtualScopes() {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.VIRTUAL.isTrue().and(SCOPE.DELETED.isFalse()));
+		final var query = create.selectFrom(SCOPE).where(SCOPE.VIRTUAL.isTrue().and(SCOPE.REMOVED.isFalse()));
 		return find(query);
 	}
 
@@ -96,7 +96,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 
 	@Override
 	public List<Scope> getScopesByScopeModelId(final String scopeModelId) {
-		final var query = create.selectFrom(SCOPE).where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId).and(SCOPE.DELETED.isFalse()));
+		final var query = create.selectFrom(SCOPE).where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId).and(SCOPE.REMOVED.isFalse()));
 		return find(query);
 	}
 
@@ -104,7 +104,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 	public Integer getScopesByScopeModelIdCount(final String scopeModelId) {
 		return create.select(DSL.count(SCOPE.PK))
 			.from(SCOPE)
-			.where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId).and(SCOPE.DELETED.isFalse()))
+			.where(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId).and(SCOPE.REMOVED.isFalse()))
 			.fetchSingle()
 			.value1();
 	}
@@ -121,11 +121,11 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.where(
 				SCOPE.PK.in(ancestorPks).or(
 					SCOPE_ANCESTOR.ANCESTOR_FK.in(ancestorPks)
-						.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+						.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 						.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 				)
 					.and(SCOPE.SCOPE_MODEL_ID.in(scopeModelIds))
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -138,8 +138,8 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.ANCESTOR_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -152,9 +152,9 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.ANCESTOR_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -172,7 +172,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
 					//TODO the prefix "All" in the method name is usually used to say that we consider all objects, even the deleted ones
 					//this condition should be removed
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -191,7 +191,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
 					//TODO the prefix "All" in the method name is usually used to say that we consider all objects, even the deleted ones
 					//this condition should be removed
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -205,9 +205,9 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.ANCESTOR_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -221,11 +221,11 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.ANCESTOR_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 					.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -248,11 +248,11 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.SCOPE_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.ANCESTOR_FK.in(scopePks)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 					.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
 					.and(SCOPE.SCOPE_MODEL_ID.eq(scopeModelId))
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.groupBy(SCOPE_ANCESTOR.ANCESTOR_FK)
 			.fetchMap(SCOPE_ANCESTOR.ANCESTOR_FK, count);
@@ -269,8 +269,8 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.ANCESTOR_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -284,9 +284,9 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.innerJoin(SCOPE_ANCESTOR).on(SCOPE_ANCESTOR.ANCESTOR_FK.eq(SCOPE.PK))
 			.where(
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -300,19 +300,19 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.where(
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.DEFAULT.isTrue())
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
 	}
 
 	@Override
-	public boolean hasDeletedDefaultAncestor(final Long scopePk) {
+	public boolean hasRemovedDefaultAncestor(final Long scopePk) {
 		return create.select(DSL.count(SCOPE.PK))
 			.from(SCOPE_ANCESTOR)
 			.where(
 				SCOPE_ANCESTOR.ANCESTOR_FK.eq(scopePk)
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isTrue())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isTrue())
 					.and(SCOPE_ANCESTOR.DEFAULT.isTrue())
 			)
 			.fetchSingle()
@@ -327,7 +327,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			.where(
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue())
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 			)
 			.coerce(SCOPE);
 		return find(query);
@@ -342,7 +342,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 				SCOPE_ANCESTOR.SCOPE_FK.eq(scopePk)
 					.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(potentialAncestorPk))
 					.and(SCOPE_ANCESTOR.VIRTUAL.isTrue().or(SCOPE_ANCESTOR.START_DATE.lessThan(now).and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))))
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 			)
 			.fetchSingle()
 			.value1() > 0;
@@ -448,8 +448,8 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 		search.getAncestorPks().ifPresent(ancestorPks -> {
 			final var aliasedTable = SCOPE_ANCESTOR.as("SA");
 			query.innerJoin(aliasedTable).on(SCOPE.PK.eq(aliasedTable.SCOPE_FK).and(aliasedTable.ANCESTOR_FK.in(ancestorPks)));
-			if(!search.getIncludeDeleted()) {
-				conditions.add(aliasedTable.ANCESTOR_DELETED.isFalse());
+			if(!search.getIncludeRemoved()) {
+				conditions.add(aliasedTable.ANCESTOR_REMOVED.isFalse());
 			}
 		});
 
@@ -461,7 +461,7 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 				query.innerJoin(workflowJoin).on(
 					SCOPE.PK.eq(workflowJoin.SCOPE_FK)
 						.and(workflowJoin.WORKFLOW_ID.eq(entry.getKey()))
-						.and(workflowJoin.DELETED.isFalse())
+						.and(workflowJoin.REMOVED.isFalse())
 						.and(workflowJoin.STATE_ID.in(entry.getValue()))
 				);
 			}
@@ -518,12 +518,12 @@ public class ScopeDAOServiceImpl extends AuditableDAOService<Scope, ScopeAuditTr
 			}
 		});
 
-		if(!search.getIncludeDeleted()) {
+		if(!search.getIncludeRemoved()) {
 			// if we exclude the deleted scopes, then we also exclude the scopes that descend from a deleted scope
 			conditions.add(
-				SCOPE.DELETED.isFalse()
+				SCOPE.REMOVED.isFalse()
 					//scope ancestor table is null for the root scope
-					.and(SCOPE_ANCESTOR.ANCESTOR_FK.isNull().or(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse()))
+					.and(SCOPE_ANCESTOR.ANCESTOR_FK.isNull().or(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse()))
 			);
 		}
 

@@ -132,16 +132,16 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 	}
 
 	/**
-	 * Setter for <code>scope_ancestor.ancestor_deleted</code>.
+	 * Setter for <code>scope_ancestor.ancestor_removed</code>.
 	 */
-	public void setAncestorDeleted(Boolean value) {
+	public void setAncestorRemoved(Boolean value) {
 		set(8, value);
 	}
 
 	/**
-	 * Getter for <code>scope_ancestor.ancestor_deleted</code>.
+	 * Getter for <code>scope_ancestor.ancestor_removed</code>.
 	 */
-	public Boolean getAncestorDeleted() {
+	public Boolean getAncestorRemoved() {
 		return (Boolean) get(8);
 	}
 
@@ -159,7 +159,7 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 	/**
 	 * Create a detached, initialised ScopeAncestorRecord
 	 */
-	public ScopeAncestorRecord(Long scopeFk, Long ancestorFk, ZonedDateTime startDate, ZonedDateTime endDate, Boolean direct, Integer depth, Boolean virtual, Boolean default_, Boolean ancestorDeleted) {
+	public ScopeAncestorRecord(Long scopeFk, Long ancestorFk, ZonedDateTime startDate, ZonedDateTime endDate, Boolean direct, Integer depth, Boolean virtual, Boolean default_, Boolean ancestorRemoved) {
 		super(ScopeAncestor.SCOPE_ANCESTOR);
 
 		setScopeFk(scopeFk);
@@ -170,7 +170,7 @@ public class ScopeAncestorRecord extends TableRecordImpl<ScopeAncestorRecord> {
 		setDepth(depth);
 		setVirtual(virtual);
 		setDefault(default_);
-		setAncestorDeleted(ancestorDeleted);
+		setAncestorRemoved(ancestorRemoved);
 		resetTouchedOnNotNull();
 	}
 }

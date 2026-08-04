@@ -58,9 +58,9 @@ public class ScopeControllerTest extends ControllerTest {
 
 	@Test
 	@Disabled
-	@DisplayName("User who does not have the MANAGE_DELETED_DATA feature can not see scopes that have a deleted ancestor")
-	public void canNotGetScopesWithDeletedAncestor() {
-		// login as an investigator (who does not have the MANAGE_DELETED_DATA feature
+	@DisplayName("User who does not have the MANAGE_REMOVED_DATA feature can not see scopes that have a removed ancestor")
+	public void canNotGetScopesWithRemovedAncestor() {
+		// login as an investigator (who does not have the MANAGE_REMOVED_DATA feature
 		authenticate(investigatorOnStudyEmail);
 
 		// verify that all the patients are there first

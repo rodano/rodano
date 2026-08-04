@@ -2,7 +2,7 @@ package ch.rodano.core.model.dataset;
 
 public class DatasetRecord {
 
-	protected boolean deleted;
+	protected boolean removed;
 
 	protected String id;
 	protected Long scopeFk;
@@ -10,15 +10,15 @@ public class DatasetRecord {
 	protected String datasetModelId;
 
 	protected DatasetRecord() {
-		deleted = false;
+		removed = false;
 	}
 
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public String getId() {

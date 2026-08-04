@@ -137,7 +137,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			SCOPE_ANCESTOR.DEFAULT.isTrue()
 				.and(SCOPE_ANCESTOR.START_DATE.le(now))
 				.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.ge(now)))
-				.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+				.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 		);
 		conditions.add(
 			SCOPE_RELATION.DEFAULT.isTrue()
@@ -146,14 +146,14 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				.and(SCOPE_RELATION.PARENT_FK.eq(scope.getPk()))
 		);
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
-		conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
+		conditions.add(WORKFLOW_STATUS.REMOVED.isFalse());
 		conditions.add(SCOPE.SCOPE_MODEL_ID.eq(summary.getLeafScopeModelId()));
-		conditions.add(SCOPE.DELETED.isFalse());
-		conditions.add(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse());
+		conditions.add(SCOPE.REMOVED.isFalse());
+		conditions.add(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse());
 		//keep in mind that the workflow may be attached directly to scopes (and not be linked to a event nor to a dataset)
-		conditions.add(WORKFLOW_STATUS.FORM_FK.isNull().or(FORM.DELETED.isFalse()));
-		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNull().or(EVENT.DELETED.isFalse()));
-		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(DATASET.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.FORM_FK.isNull().or(FORM.REMOVED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.EVENT_FK.isNull().or(EVENT.REMOVED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.FIELD_FK.isNull().or(DATASET.REMOVED.isFalse()));
 		//do not consider workflows on field that are empty
 		if(WorkflowableEntity.FIELD.equals(entity)) {
 			conditions.add(FIELD.VALUE.isNotNull());
@@ -282,12 +282,12 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 		).as("ancestors").convertFrom(r -> r.map(ra -> new ScopeTinyDTO(ra.value1(), ra.value2(), ra.value3(), ra.value4(), ra.value5())));
 
 		final var removedField = DSL.greatest(
-			WORKFLOW_STATUS.DELETED,
-			SCOPE.DELETED,
-			SCOPE_ANCESTOR.ANCESTOR_DELETED,
-			DSL.ifnull(EVENT.DELETED, 0),
-			DSL.ifnull(FORM.DELETED, 0),
-			DSL.ifnull(DATASET.DELETED, 0)
+			WORKFLOW_STATUS.REMOVED,
+			SCOPE.REMOVED,
+			SCOPE_ANCESTOR.ANCESTOR_REMOVED,
+			DSL.ifnull(EVENT.REMOVED, 0),
+			DSL.ifnull(FORM.REMOVED, 0),
+			DSL.ifnull(DATASET.REMOVED, 0)
 		);
 		//query columns
 		final var columns = new ArrayList<SelectField<?>>(
@@ -317,7 +317,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 					.and(SCOPE_ANCESTOR.START_DATE.le(now))
 					.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.ge(now)))
 					.and(SCOPE_ANCESTOR.VIRTUAL.isFalse())
-					.and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 			)
 		);
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
@@ -340,13 +340,13 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			conditions.add(EVENT.PK.isNull().or(EVENT.DATE.isNotNull()));
 		}
 		if(!includeDeleted) {
-			conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
-			conditions.add(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse());
-			conditions.add(SCOPE.DELETED.isFalse());
+			conditions.add(WORKFLOW_STATUS.REMOVED.isFalse());
+			conditions.add(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse());
+			conditions.add(SCOPE.REMOVED.isFalse());
 			//keep in mind that the workflow may be attached directly to scopes (and not be linked to a event nor to a dataset)
-			conditions.add(FORM.PK.isNull().or(FORM.DELETED.isFalse()));
-			conditions.add(EVENT.PK.isNull().or(EVENT.DELETED.isFalse()));
-			conditions.add(DATASET.PK.isNull().or(DATASET.DELETED.isFalse()));
+			conditions.add(FORM.PK.isNull().or(FORM.REMOVED.isFalse()));
+			conditions.add(EVENT.PK.isNull().or(EVENT.REMOVED.isFalse()));
+			conditions.add(DATASET.PK.isNull().or(DATASET.REMOVED.isFalse()));
 		}
 
 		final var query = create.select(columns).from(table)
@@ -512,12 +512,12 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 		).as("ancestors").convertFrom(r -> r.map(ra -> new ScopeTinyDTO(ra.value1(), ra.value2(), ra.value3(), ra.value4(), ra.value5())));
 
 		final var removedField = DSL.greatest(
-			WORKFLOW_STATUS.DELETED,
-			SCOPE.DELETED,
-			SCOPE_ANCESTOR.ANCESTOR_DELETED,
-			DSL.ifnull(EVENT.DELETED, 0),
-			DSL.ifnull(FORM.DELETED, 0),
-			DSL.ifnull(DATASET.DELETED, 0)
+			WORKFLOW_STATUS.REMOVED,
+			SCOPE.REMOVED,
+			SCOPE_ANCESTOR.ANCESTOR_REMOVED,
+			DSL.ifnull(EVENT.REMOVED, 0),
+			DSL.ifnull(FORM.REMOVED, 0),
+			DSL.ifnull(DATASET.REMOVED, 0)
 		);
 		//query columns
 		final var columns = new ArrayList<SelectField<?>>();
@@ -546,7 +546,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				SCOPE_ANCESTOR.ANCESTOR_FK.in(scopePks)
 					.and(SCOPE_ANCESTOR.START_DATE.le(now))
 					.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.ge(now)))
-					.and(SCOPE_ANCESTOR.VIRTUAL.isFalse()).and(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse())
+					.and(SCOPE_ANCESTOR.VIRTUAL.isFalse()).and(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse())
 			)
 		);
 		conditions.add(WORKFLOW_STATUS.WORKFLOW_ID.in(summary.getWorkflowIds()));
@@ -569,13 +569,13 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			conditions.add(EVENT.PK.isNull().or(EVENT.DATE.isNotNull()));
 		}
 		if(!includeDeleted) {
-			conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
-			conditions.add(SCOPE_ANCESTOR.ANCESTOR_DELETED.isFalse());
-			conditions.add(SCOPE.DELETED.isFalse());
+			conditions.add(WORKFLOW_STATUS.REMOVED.isFalse());
+			conditions.add(SCOPE_ANCESTOR.ANCESTOR_REMOVED.isFalse());
+			conditions.add(SCOPE.REMOVED.isFalse());
 			//keep in mind that the workflow may be attached directly to scopes (and not be linked to a event nor to a dataset)
-			conditions.add(FORM.PK.isNull().or(FORM.DELETED.isFalse()));
-			conditions.add(EVENT.PK.isNull().or(EVENT.DELETED.isFalse()));
-			conditions.add(DATASET.PK.isNull().or(DATASET.DELETED.isFalse()));
+			conditions.add(FORM.PK.isNull().or(FORM.REMOVED.isFalse()));
+			conditions.add(EVENT.PK.isNull().or(EVENT.REMOVED.isFalse()));
+			conditions.add(DATASET.PK.isNull().or(DATASET.REMOVED.isFalse()));
 		}
 
 		final var query = create.select(columns).from(WORKFLOW_STATUS)

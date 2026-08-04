@@ -113,7 +113,7 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 			roles = currentActiveRoles(scopes.getFirst());
 		}
 
-		final var includeDeleted = rightsService.hasRight(roles, FeatureStatic.MANAGE_DELETED_DATA);
+		final var includeDeleted = rightsService.hasRight(roles, FeatureStatic.MANAGE_REMOVED_DATA);
 
 		//send response
 		final StreamingResponseBody stream = os -> workflowSummaryService.getExport(os, summary, scopes, includeDeleted, languages);
@@ -153,7 +153,7 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 			roles = currentActiveRoles(scopes.getFirst());
 		}
 
-		final var includeDeleted = rightsService.hasRight(roles, FeatureStatic.MANAGE_DELETED_DATA);
+		final var includeDeleted = rightsService.hasRight(roles, FeatureStatic.MANAGE_REMOVED_DATA);
 
 		//send response
 		final StreamingResponseBody stream = os -> workflowSummaryService.getHistoricalExport(os, summary, scopes, includeDeleted, languages);

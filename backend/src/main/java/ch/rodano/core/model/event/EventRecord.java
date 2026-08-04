@@ -4,7 +4,7 @@ import java.time.ZonedDateTime;
 
 public class EventRecord {
 
-	protected boolean deleted;
+	protected boolean removed;
 
 	protected String id;
 	protected Long scopeFk;
@@ -19,15 +19,15 @@ public class EventRecord {
 	protected Boolean locked;
 
 	protected EventRecord() {
-		deleted = false;
+		removed = false;
 	}
 
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public String getId() {

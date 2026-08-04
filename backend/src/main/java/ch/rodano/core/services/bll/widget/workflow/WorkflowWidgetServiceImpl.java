@@ -228,13 +228,13 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		query.and(ancestorRelationsTable.DEFAULT.eq(true));
 
 		//do not consider workflows that are deleted
-		query.and(WORKFLOW_STATUS.DELETED.isFalse());
+		query.and(WORKFLOW_STATUS.REMOVED.isFalse());
 		//aggregated workflow on scopes already filter the contained deleted events, forms and fields in the view, but not the scope that carries the aggregate workflow
-		query.and(SCOPE.DELETED.isFalse());
+		query.and(SCOPE.REMOVED.isFalse());
 		if(WorkflowableEntity.SCOPE != widget.getWorkflowEntity()) {
 			//aggregated workflow on events already filter the contained deleted forms and fields in the view, but not the event that carries the aggregate workflow
 			//deleted column may be null if workflow is not related to a event
-			query.and(EVENT.DELETED.isNull().or(EVENT.DELETED.isFalse()));
+			query.and(EVENT.REMOVED.isNull().or(EVENT.REMOVED.isFalse()));
 			if(widget.isFilterExpectedEvents()) {
 				//date column may be null if workflow is not related to a event
 				query.and(EVENT.PK.isNull().or(EVENT.DATE.isNotNull()));
@@ -243,7 +243,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 				//aggregated workflow already filter the deleted datasets in the view, there is no need to filter them again
 				if(!isAggregator) {
 					//deleted column may be null if workflow is not related to a field
-					query.and(DATASET.DELETED.isNull().or(DATASET.DELETED.isFalse()));
+					query.and(DATASET.REMOVED.isNull().or(DATASET.REMOVED.isFalse()));
 				}
 			}
 		}

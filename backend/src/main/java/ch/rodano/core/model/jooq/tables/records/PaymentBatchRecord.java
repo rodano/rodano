@@ -63,16 +63,16 @@ public class PaymentBatchRecord extends UpdatableRecordImpl<PaymentBatchRecord> 
 	}
 
 	/**
-	 * Setter for <code>payment_batch.deleted</code>.
+	 * Setter for <code>payment_batch.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>payment_batch.deleted</code>.
+	 * Getter for <code>payment_batch.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -197,13 +197,13 @@ public class PaymentBatchRecord extends UpdatableRecordImpl<PaymentBatchRecord> 
 	/**
 	 * Create a detached, initialised PaymentBatchRecord
 	 */
-	public PaymentBatchRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, String scopeId, String planId, String status, ZonedDateTime paymentDate, ZonedDateTime closedDate, ZonedDateTime printedDate, String comment) {
+	public PaymentBatchRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, String scopeId, String planId, String status, ZonedDateTime paymentDate, ZonedDateTime closedDate, ZonedDateTime printedDate, String comment) {
 		super(PaymentBatch.PAYMENT_BATCH);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeId(scopeId);
 		setPlanId(planId);
 		setStatus(status);

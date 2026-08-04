@@ -50,12 +50,12 @@ public class EnrollmentChartFactoryService {
 					SCOPE.PK.eq(WORKFLOW_STATUS.SCOPE_FK)
 						.and(WORKFLOW_STATUS.WORKFLOW_ID.eq(chart.getEnrollmentWorkflowId()))
 						.and(WORKFLOW_STATUS.STATE_ID.in(chart.getEnrollmentStateIds()))
-						.and(WORKFLOW_STATUS.DELETED.isFalse())
+						.and(WORKFLOW_STATUS.REMOVED.isFalse())
 				);
 		}
 		query.where(
 				SCOPE.SCOPE_MODEL_ID.eq(chart.getLeafScopeModelId())
-					.and(SCOPE.DELETED.isFalse())
+					.and(SCOPE.REMOVED.isFalse())
 					.and(SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk()))
 			)
 			.groupBy(scopeDate)

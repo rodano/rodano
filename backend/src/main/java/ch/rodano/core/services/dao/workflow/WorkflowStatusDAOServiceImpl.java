@@ -96,7 +96,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 					.and(WORKFLOW_STATUS.EVENT_FK.isNull())
 					.and(WORKFLOW_STATUS.FORM_FK.isNull())
 					.and(WORKFLOW_STATUS.FIELD_FK.isNull())
-					.and(WORKFLOW_STATUS.DELETED.isFalse())
+					.and(WORKFLOW_STATUS.REMOVED.isFalse())
 					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
@@ -126,7 +126,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 				WORKFLOW_STATUS.EVENT_FK.in(eventPks)
 					.and(WORKFLOW_STATUS.FORM_FK.isNull())
 					.and(WORKFLOW_STATUS.FIELD_FK.isNull())
-					.and(WORKFLOW_STATUS.DELETED.isFalse())
+					.and(WORKFLOW_STATUS.REMOVED.isFalse())
 					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
@@ -154,7 +154,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		final var query = create.selectFrom(WORKFLOW_STATUS)
 			.where(
 				WORKFLOW_STATUS.FORM_FK.in(formPks)
-					.and(WORKFLOW_STATUS.DELETED.isFalse())
+					.and(WORKFLOW_STATUS.REMOVED.isFalse())
 					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
@@ -182,7 +182,7 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		final var query = create.selectFrom(WORKFLOW_STATUS)
 			.where(
 				WORKFLOW_STATUS.FIELD_FK.in(fieldPks)
-					.and(WORKFLOW_STATUS.DELETED.isFalse())
+					.and(WORKFLOW_STATUS.REMOVED.isFalse())
 					.and(workflowId.map(WORKFLOW_STATUS.WORKFLOW_ID::eq).orElse(DSL.noCondition()))
 			);
 		return find(query);
@@ -221,11 +221,11 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		final List<Condition> conditions = new ArrayList<>();
 
 		//do not consider workflow statuses that are deleted or attached to deleted entities
-		conditions.add(WORKFLOW_STATUS.DELETED.isFalse());
-		conditions.add(SCOPE.DELETED.isNull().or(SCOPE.DELETED.isFalse()));
-		conditions.add(EVENT.DELETED.isNull().or(EVENT.DELETED.isFalse()));
-		conditions.add(FORM.DELETED.isNull().or(FORM.DELETED.isFalse()));
-		conditions.add(DATASET.DELETED.isNull().or(DATASET.DELETED.isFalse()));
+		conditions.add(WORKFLOW_STATUS.REMOVED.isFalse());
+		conditions.add(SCOPE.REMOVED.isNull().or(SCOPE.REMOVED.isFalse()));
+		conditions.add(EVENT.REMOVED.isNull().or(EVENT.REMOVED.isFalse()));
+		conditions.add(FORM.REMOVED.isNull().or(FORM.REMOVED.isFalse()));
+		conditions.add(DATASET.REMOVED.isNull().or(DATASET.REMOVED.isFalse()));
 
 		//mandatory conditions
 		conditions.add(SCOPE_ANCESTOR.ANCESTOR_FK.in(search.getAncestorScopePks()).or(WORKFLOW_STATUS.SCOPE_FK.in(search.getAncestorScopePks())));

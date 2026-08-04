@@ -157,8 +157,8 @@ public class EventController extends AbstractSecuredController {
 
 		final var acl = rightsService.getACL(currentActor(), scope);
 
-		acl.checkRight(FeatureStatic.MANAGE_DELETED_DATA);
-		//no need to check if actor has the right to write the scope and the event group (MANAGE_DELETED_DATA is sufficient and surpass WRITE scope model right and WRITE event group)
+		acl.checkRight(FeatureStatic.MANAGE_REMOVED_DATA);
+		//no need to check if actor has the right to write the scope and the event group (MANAGE_REMOVED_DATA is sufficient and surpass WRITE scope model right and WRITE event group)
 
 		eventService.restore(scope, event, currentContext(), rationale.message());
 

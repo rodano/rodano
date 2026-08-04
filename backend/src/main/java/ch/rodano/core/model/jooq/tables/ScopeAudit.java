@@ -112,9 +112,9 @@ public class ScopeAudit extends TableImpl<ScopeAuditRecord> implements AuditTabl
 	public final TableField<ScopeAuditRecord, String> ID = createField(DSL.name("id"), SQLDataType.VARCHAR(200).nullable(false).defaultValue(DSL.field(DSL.raw("''"), SQLDataType.VARCHAR)), this, "");
 
 	/**
-	 * The column <code>scope_audit.deleted</code>.
+	 * The column <code>scope_audit.removed</code>.
 	 */
-	public final TableField<ScopeAuditRecord, Boolean> DELETED = createField(DSL.name("deleted"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
+	public final TableField<ScopeAuditRecord, Boolean> REMOVED = createField(DSL.name("removed"), SQLDataType.BOOLEAN.nullable(false).defaultValue(DSL.field(DSL.raw("0"), SQLDataType.BOOLEAN)), this, "");
 
 	/**
 	 * The column <code>scope_audit.scope_model_id</code>.

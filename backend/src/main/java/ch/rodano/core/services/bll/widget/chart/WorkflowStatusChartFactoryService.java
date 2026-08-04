@@ -40,7 +40,7 @@ public class WorkflowStatusChartFactoryService {
 		//the first step is to select the most recent audit date for each workflow
 		final var conditions = new ArrayList<Condition>();
 		conditions.add(WORKFLOW_STATUS_AUDIT.WORKFLOW_ID.eq(chart.getWorkflowId()));
-		conditions.add(SCOPE.DELETED.isFalse());
+		conditions.add(SCOPE.REMOVED.isFalse());
 		if(CollectionUtils.isNotEmpty(chart.getIncludedStateIds())) {
 			conditions.add(WORKFLOW_STATUS_AUDIT.STATE_ID.in(chart.getIncludedStateIds()));
 		}

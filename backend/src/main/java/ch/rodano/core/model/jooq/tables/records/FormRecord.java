@@ -63,16 +63,16 @@ public class FormRecord extends UpdatableRecordImpl<FormRecord> {
 	}
 
 	/**
-	 * Setter for <code>form.deleted</code>.
+	 * Setter for <code>form.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(3, value);
 	}
 
 	/**
-	 * Getter for <code>form.deleted</code>.
+	 * Getter for <code>form.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(3);
 	}
 
@@ -141,13 +141,13 @@ public class FormRecord extends UpdatableRecordImpl<FormRecord> {
 	/**
 	 * Create a detached, initialised FormRecord
 	 */
-	public FormRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean deleted, Long scopeFk, Long eventFk, String formModelId) {
+	public FormRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long scopeFk, Long eventFk, String formModelId) {
 		super(Form.FORM);
 
 		setPk(pk);
 		setCreationTime(creationTime);
 		setLastUpdateTime(lastUpdateTime);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setFormModelId(formModelId);

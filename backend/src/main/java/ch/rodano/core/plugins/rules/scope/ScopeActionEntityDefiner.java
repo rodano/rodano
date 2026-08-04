@@ -286,7 +286,7 @@ public class ScopeActionEntityDefiner extends AbstractScopeEntityDefiner {
 							formService.create(scope, formModel, context, rationale);
 						}
 						//restore form otherwise
-						else if(form.get().getDeleted()) {
+						else if(form.get().isRemoved()) {
 							formService.restore(scope, Optional.empty(), form.get(), context, StringUtils.defaultIfBlank(rationale, "Create form"));
 						}
 						//otherwise, nothing to do

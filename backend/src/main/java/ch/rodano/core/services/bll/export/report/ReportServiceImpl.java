@@ -130,7 +130,7 @@ public class ReportServiceImpl implements ReportService {
 			final var PARENT_SCOPE = SCOPE.as("parent");
 
 			// Body
-			final var query = create.select(PARENT_SCOPE.PK, PARENT_SCOPE.CODE, SCOPE.PK, SCOPE.CODE, EVENT.PK, EVENT.EVENT_MODEL_ID, EVENT.EXPECTED_DATE, EVENT.DATE, EVENT.END_DATE, EVENT.DELETED)
+			final var query = create.select(PARENT_SCOPE.PK, PARENT_SCOPE.CODE, SCOPE.PK, SCOPE.CODE, EVENT.PK, EVENT.EVENT_MODEL_ID, EVENT.EXPECTED_DATE, EVENT.DATE, EVENT.END_DATE, EVENT.REMOVED)
 				.from(EVENT)
 				.innerJoin(SCOPE).on(EVENT.SCOPE_FK.eq(SCOPE.PK))
 				.innerJoin(SCOPE_RELATION).on(SCOPE.PK.eq(SCOPE_RELATION.SCOPE_FK))
@@ -162,7 +162,7 @@ public class ReportServiceImpl implements ReportService {
 				line[i++] = date != null ? date.format(UtilsService.HUMAN_READABLE_DATE_TIME) : "";
 				final var endDate = record.get(EVENT.END_DATE);
 				line[i++] = endDate != null ? endDate.format(UtilsService.HUMAN_READABLE_DATE_TIME) : "";
-				line[i++] = record.get(EVENT.DELETED).toString();
+				line[i++] = record.get(EVENT.REMOVED).toString();
 				writer.writeNext(line);
 			}
 		}

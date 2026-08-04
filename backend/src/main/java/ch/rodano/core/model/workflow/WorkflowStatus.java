@@ -16,12 +16,12 @@ import ch.rodano.configuration.model.workflow.Workflow;
 import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 import ch.rodano.core.model.common.AuditableObject;
-import ch.rodano.core.model.common.DeletableObject;
 import ch.rodano.core.model.common.PersistentObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.model.rules.Evaluable;
 
-public class WorkflowStatus extends WorkflowStatusRecord implements DeletableObject, TimestampableObject, AuditableObject, PersistentObject, Evaluable, Comparable<WorkflowStatus> {
+public class WorkflowStatus extends WorkflowStatusRecord implements RemovableObject, TimestampableObject, AuditableObject, PersistentObject, Evaluable, Comparable<WorkflowStatus> {
 
 	public static final Comparator<WorkflowStatus> DEFAULT_COMPARATOR = Comparator
 		.comparing(WorkflowStatus::getState, WorkflowState.COMPARATOR_IMPORTANCE)

@@ -80,7 +80,7 @@ public interface ScopeService {
 	);
 
 	/**
-	 * Restore a scope from its deleted state
+	 * Restore a scope from its removed state
 	 *
 	 * @param scope     The scope
 	 * @param context   Context of the action
@@ -224,12 +224,12 @@ public interface ScopeService {
 	PagedResult<Scope> search(ScopeSearch search);
 
 	/**
-	 * Checks if at least one of the default ancestors of a scope is deleted
+	 * Checks if at least one of the default ancestors of a scope is removed
 	 *
 	 * @param scope The scope
-	 * @return True if at least one of the default ancestors of a scope is deleted
+	 * @return True if at least one of the default ancestors of a scope is removed
 	 */
-	boolean isDeletedOrInDeletedScope(Scope scope);
+	boolean isRemovedOrInRemovedScope(Scope scope);
 
 	/**
 	 * Get number of enabled leaves

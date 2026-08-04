@@ -103,7 +103,7 @@ export default async function test(bundle, assert) {
 	language_2.shortname.de = 'Französisch';
 
 	//feature
-	const feature = new Feature({id: 'MANAGE_DELETED_DATA'});
+	const feature = new Feature({id: 'MANAGE_REMOVED_DATA'});
 	feature.study = study;
 	study.features.push(feature);
 
@@ -401,11 +401,11 @@ export default async function test(bundle, assert) {
 	await bundle.describe('Feature', async bundle_feature => {
 		//change feature id
 		await bundle_feature.it('updates profiles when a feature is updated (FS_FEATURE_003)', () => {
-			assert.ok(profile.isAssigned(Entities.Feature, 'MANAGE_DELETED_DATA'), 'Profile "ADMIN" contains a feature with id "MANAGE_DELETED_DATA"');
-			assert.ok(profile.isAssignedNode(feature), 'Profile "ADMIN" contains feature "MANAGE_DELETED_DATA"');
+			assert.ok(profile.isAssigned(Entities.Feature, 'MANAGE_REMOVED_DATA'), 'Profile "ADMIN" contains a feature with id "MANAGE_REMOVED_DATA"');
+			assert.ok(profile.isAssignedNode(feature), 'Profile "ADMIN" contains feature "MANAGE_REMOVED_DATA"');
 			feature.id = 'TESTING';
-			assert.ok(profile.isAssignedNode(feature), 'Profile "ADMIN" still contains feature "MANAGE_DELETED_DATA" after id of this feature has been changed');
-			assert.notOk(profile.isAssigned(Entities.Feature, 'MANAGE_DELETED_DATA'), 'Profile "ADMIN" no more contains a feature with id "MANAGE_DELETED_DATA" after its id of this feature has been changed');
+			assert.ok(profile.isAssignedNode(feature), 'Profile "ADMIN" still contains feature "MANAGE_REMOVED_DATA" after id of this feature has been changed');
+			assert.notOk(profile.isAssigned(Entities.Feature, 'MANAGE_REMOVED_DATA'), 'Profile "ADMIN" no more contains a feature with id "MANAGE_REMOVED_DATA" after its id of this feature has been changed');
 			assert.ok(profile.isAssigned(Entities.Feature, 'TESTING'), 'Profile "ADMIN" contains feature with id "TESTING"');
 		});
 
@@ -415,7 +415,7 @@ export default async function test(bundle, assert) {
 			feature['delete']();
 			assert.ok(study.features.isEmpty(), 'There is no feature in study after the only feature has been deleted');
 
-			assert.notOk(profile.isAssignedNode(feature), 'There is no more feature "MANAGE_DELETED_DATA" for profile "ADMIN" after this feature has been deleted');
+			assert.notOk(profile.isAssignedNode(feature), 'There is no more feature "MANAGE_REMOVED_DATA" for profile "ADMIN" after this feature has been deleted');
 			assert.notOk(profile.isAssigned(Entities.Feature, 'TESTING'), 'There is no more feature with id "TESTING" for profile "ADMIN" after this feature has been deleted');
 		});
 	});

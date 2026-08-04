@@ -185,7 +185,7 @@ public class UserSecurityService {
 		}
 
 		// Check if the user has been deleted
-		if(delegateUser.getDeleted()) {
+		if(delegateUser.isRemoved()) {
 			throw new WrongCredentialsException();
 		}
 
@@ -282,7 +282,7 @@ public class UserSecurityService {
 		final DatabaseActionContext context
 	) {
 		// Check if the user has been deleted
-		if(user.getDeleted()) {
+		if(user.isRemoved()) {
 			throw new WrongCredentialsException();
 		}
 
@@ -753,7 +753,7 @@ public class UserSecurityService {
 		user.setPassword(encodedPassword);
 
 		/*if(getUserData().twoStep) {
-		
+
 		//reencrypt stuff if old password is available
 		//make this work with helperPassword
 		if(oldPassword != null || helperPassword != null) {
@@ -866,14 +866,14 @@ public class UserSecurityService {
 		}
 		return codes;
 	}
-	
+
 	private static byte[] generateTSKey() {
 		//create two step key
 		final var tsKey = new byte[10];
 		new Random().nextBytes(tsKey);
 		return tsKey;
 	}
-	
+
 	private SecretKeySpec generateSecretKeySpec(final String password) {
 		try {
 			//generate AES key from password
@@ -888,8 +888,8 @@ public class UserSecurityService {
 			return null;
 		}
 	}
-	
-	
+
+
 	private boolean isValidAuthKey(final User user, final String authkey) {
 		return !StringUtils.isBlank(authkey) && Objects.equals(generateMD5FromString(authkey), user.getAuthkey());
 	}

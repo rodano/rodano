@@ -163,8 +163,8 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		dto.value = value;
 		dto.valueLabel = field.getFieldModel().valueToLabel(possibleValues, value, languages);
 
-		dto.inRemoved = scope.getDeleted() || dataset.getDeleted();
-		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.getDeleted());
+		dto.inRemoved = scope.isRemoved() || dataset.isRemoved();
+		event.ifPresent(e -> dto.inRemoved = dto.inRemoved || e.isRemoved());
 
 		dto.inLocked = scope.getLocked() || event.isPresent() && event.get().getLocked();
 

@@ -4,17 +4,17 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import ch.rodano.configuration.model.payment.PaymentPlan;
-import ch.rodano.core.model.common.DeletableObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 
-public final class PaymentBatch implements DeletableObject, TimestampableObject {
+public final class PaymentBatch implements RemovableObject, TimestampableObject {
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private Long pk;
 	private ZonedDateTime creationTime;
 	private ZonedDateTime lastUpdateTime;
 
-	private boolean deleted;
+	private boolean removed;
 
 	private String scopeId;
 	private String planId;
@@ -27,7 +27,7 @@ public final class PaymentBatch implements DeletableObject, TimestampableObject 
 	private PaymentPlan plan;
 
 	public PaymentBatch() {
-		deleted = false;
+		removed = false;
 	}
 
 	public String getBatchId() {
@@ -69,13 +69,13 @@ public final class PaymentBatch implements DeletableObject, TimestampableObject 
 	}
 
 	@Override
-	public boolean getDeleted() {
-		return deleted;
+	public boolean isRemoved() {
+		return removed;
 	}
 
 	@Override
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
+	public void setRemoved(final boolean removed) {
+		this.removed = removed;
 	}
 
 	public String getScopeId() {

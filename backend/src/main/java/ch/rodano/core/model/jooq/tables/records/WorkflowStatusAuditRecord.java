@@ -134,16 +134,16 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 	}
 
 	/**
-	 * Setter for <code>workflow_status_audit.deleted</code>.
+	 * Setter for <code>workflow_status_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(8, value);
 	}
 
 	/**
-	 * Getter for <code>workflow_status_audit.deleted</code>.
+	 * Getter for <code>workflow_status_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(8);
 	}
 
@@ -324,7 +324,7 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 	/**
 	 * Create a detached, initialised WorkflowStatusAuditRecord
 	 */
-	public WorkflowStatusAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean removed, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
 		super(WorkflowStatusAudit.WORKFLOW_STATUS_AUDIT);
 
 		setPk(pk);
@@ -335,7 +335,7 @@ public class WorkflowStatusAuditRecord extends UpdatableRecordImpl<WorkflowStatu
 		setAuditRobotFk(auditRobotFk);
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setScopeFk(scopeFk);
 		setEventFk(eventFk);
 		setFormFk(formFk);

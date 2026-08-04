@@ -13,13 +13,13 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.WorkflowableEntity;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 import ch.rodano.core.model.common.AuditableObject;
-import ch.rodano.core.model.common.DeletableObject;
 import ch.rodano.core.model.common.PersistentObject;
+import ch.rodano.core.model.common.RemovableObject;
 import ch.rodano.core.model.common.TimestampableObject;
 import ch.rodano.core.model.rules.Evaluable;
 import ch.rodano.core.model.workflow.Workflowable;
 
-public class Form extends FormRecord implements DeletableObject, TimestampableObject, PersistentObject, AuditableObject, Workflowable, Comparable<Form>, Evaluable {
+public class Form extends FormRecord implements RemovableObject, TimestampableObject, PersistentObject, AuditableObject, Workflowable, Comparable<Form>, Evaluable {
 
 	private Long pk;
 	protected ZonedDateTime creationTime;

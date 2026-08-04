@@ -10,7 +10,7 @@ export function add_event(study, Data, entity_constructor) {
 				date: {type: 'date'},
 				endDate: {type: 'date'},
 				blocking: {type: 'boolean'},
-				deleted: {type: 'boolean'},
+				removed: {type: 'boolean'},
 				datasets: {type: 'array'},
 				forms: {type: 'array'}
 			};
@@ -25,7 +25,7 @@ export function add_event(study, Data, entity_constructor) {
 			this.expectedDate = undefined;
 			this.endDate = undefined;
 			this.blocking = false;
-			this.deleted = false;
+			this.removed = false;
 			this.datasets = [];
 			this.forms = [];
 			entity_constructor.call(this, values);
@@ -72,7 +72,7 @@ export function add_event(study, Data, entity_constructor) {
 		}
 
 		getDataset(dataset_model_id, number) {
-			return this.datasets.find(d => d.datasetModelId === dataset_model_id && d.number === number && !d.deleted);
+			return this.datasets.find(d => d.datasetModelId === dataset_model_id && d.number === number && !d.removed);
 		}
 	};
 }

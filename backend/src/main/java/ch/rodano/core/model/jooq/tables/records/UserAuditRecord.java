@@ -134,16 +134,16 @@ public class UserAuditRecord extends UpdatableRecordImpl<UserAuditRecord> implem
 	}
 
 	/**
-	 * Setter for <code>user_audit.deleted</code>.
+	 * Setter for <code>user_audit.removed</code>.
 	 */
-	public void setDeleted(Boolean value) {
+	public void setRemoved(Boolean value) {
 		set(8, value);
 	}
 
 	/**
-	 * Getter for <code>user_audit.deleted</code>.
+	 * Getter for <code>user_audit.removed</code>.
 	 */
-	public Boolean getDeleted() {
+	public Boolean getRemoved() {
 		return (Boolean) get(8);
 	}
 
@@ -492,7 +492,7 @@ public class UserAuditRecord extends UpdatableRecordImpl<UserAuditRecord> implem
 	/**
 	 * Create a detached, initialised UserAuditRecord
 	 */
-	public UserAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean deleted, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
+	public UserAuditRecord(Long pk, Long auditActionFk, ZonedDateTime auditDatetime, String auditActor, Long auditUserFk, Long auditRobotFk, String auditContext, Long auditObjectFk, Boolean removed, String name, String email, Boolean externallyManaged, Boolean activated, String activationCode, String recoveryCode, String pendingEmail, ZonedDateTime emailModificationDate, String emailVerificationCode, String password, ZonedDateTime passwordChangedDate, String previousPasswords, Integer passwordAttempts, String passwordResetCode, ZonedDateTime passwordResetDate, ZonedDateTime loginDate, ZonedDateTime previousLoginDate, ZonedDateTime logoutDate, ZonedDateTime loginBlockingDate, Boolean shouldChangePassword, String phone, String languageId, String userAgent) {
 		super(UserAudit.USER_AUDIT);
 
 		setPk(pk);
@@ -503,7 +503,7 @@ public class UserAuditRecord extends UpdatableRecordImpl<UserAuditRecord> implem
 		setAuditRobotFk(auditRobotFk);
 		setAuditContext(auditContext);
 		setAuditObjectFk(auditObjectFk);
-		setDeleted(deleted);
+		setRemoved(removed);
 		setName(name);
 		setEmail(email);
 		setExternallyManaged(externallyManaged);

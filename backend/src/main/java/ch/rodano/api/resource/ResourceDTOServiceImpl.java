@@ -49,7 +49,7 @@ public class ResourceDTOServiceImpl implements ResourceDTOService {
 		final var resourceCategory = studyService.getStudy().getResourceCategory(resource.getCategoryId());
 		dto.category = new ResourceCategoryDTO(resourceCategory);
 
-		dto.removed = resource.getDeleted();
+		dto.removed = resource.isRemoved();
 
 		dto.publicResource = resource.getPublicResource();
 

@@ -7,7 +7,7 @@ export function add_dataset(study, Data, entity_constructor) {
 				event: {type: 'Event', back_reference: true},
 				datasetModelId: {type: 'string'},
 				number: {type: 'number'},
-				deleted: {type: 'boolean'},
+				removed: {type: 'boolean'},
 				fields: {type: 'array'},
 			};
 		}
@@ -17,7 +17,7 @@ export function add_dataset(study, Data, entity_constructor) {
 			this.event = undefined;
 			this.datasetModelId = undefined;
 			this.number = 0;
-			this.deleted = false;
+			this.removed = false;
 			this.fields = [];
 			entity_constructor.call(this, values);
 			//create fields
