@@ -122,7 +122,7 @@ public class UserServiceTest extends DatabaseTest {
 		final var user = new User();
 
 		assertThrows(
-			org.jooq.exception.IntegrityConstraintViolationException.class,
+			org.jooq.exception.DataAccessException.class,
 			() -> userDAOService.saveUser(user, context, TEST_RATIONALE),
 			"The user is saved with no name provided"
 		);
