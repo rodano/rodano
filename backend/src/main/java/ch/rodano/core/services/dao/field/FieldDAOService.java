@@ -2,6 +2,7 @@ package ch.rodano.core.services.dao.field;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.function.Function;
@@ -52,5 +53,7 @@ public interface FieldDAOService {
 	NavigableSet<FieldAuditTrail> getAuditTrails(Field field, Optional<Timeframe> timeframe, Optional<Long> actorPk);
 
 	NavigableSet<FieldAuditTrail> getAuditTrailsForProperty(Field field, Optional<Timeframe> timeframe, Function<FieldAuditTrail, Object> property);
+
+	Map<Long, NavigableSet<FieldAuditTrail>> getAuditTrailsForProperty(Collection<Field> fields, Optional<Timeframe> timeframe, Function<FieldAuditTrail, Object> property);
 
 }

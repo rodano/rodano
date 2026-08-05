@@ -1,12 +1,16 @@
 package ch.rodano.core.services.dao.commons;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -67,13 +71,71 @@ public abstract class AuditableDAOService<U extends AuditableObject, V extends A
 		return new TreeSet<V>(auditTrails);
 	}
 
+	/**
+	 * Batched version of getAuditTrails: fetches audit trails for several objects in a single query
+	 *
+	 * @param os        The objects to fetch audit trails for
+	 * @param timeframe The timeframe to restrict the audit trails to
+	 * @return A map of audit trails, grouped by object pk
+	 */
+	public Map<Long, NavigableSet<V>> getAuditTrails(final Collection<U> os, final Optional<Timeframe> timeframe) {
+		if(os.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		final var pks = os.stream().map(AuditableObject::getPk).toList();
+		final var table = getAuditTable();
+
+		final List<Condition> conditions = new ArrayList<>();
+		conditions.add(table.AUDIT_OBJECT_FK().in(pks));
+		timeframe.ifPresent(tf -> {
+			tf.startDate().ifPresent(startDate -> {
+				conditions.add(table.AUDIT_DATETIME().greaterThan(startDate));
+			});
+			tf.stopDate().ifPresent(stopDate -> {
+				conditions.add(table.AUDIT_DATETIME().lessThan(stopDate));
+			});
+		});
+
+		final ResultQuery<S> query = create.selectFrom(table).where(conditions).orderBy(table.AUDIT_OBJECT_FK(), table.AUDIT_DATETIME(), table.PK());
+		final var auditTrails = strategy.find(table, query, getEntityAuditClass());
+
+		//group by object pk, sorting each group the same way getAuditTrails(U, ...) does
+		return auditTrails.stream().collect(Collectors.groupingBy(AuditTrail::getAuditObjectFk, Collectors.toCollection(TreeSet::new)));
+	}
+
 	public NavigableSet<V> getAuditTrailsForProperties(
 		final U o,
 		final Optional<Timeframe> timeframe,
 		final List<Function<V, Object>> properties
 	) {
 		final var auditTrails = getAuditTrails(o, timeframe, Optional.empty());
+		return filterAuditTrailsForProperties(auditTrails, properties);
+	}
 
+	/**
+	 * Batched version of getAuditTrailsForProperty: fetches audit trails for several objects in a single query
+	 *
+	 * @param os        The objects to fetch audit trails for
+	 * @param timeframe The timeframe to restrict the audit trails to
+	 * @param property  The property to detect changes on
+	 * @return A map of audit trails, grouped by object pk
+	 */
+	public Map<Long, NavigableSet<V>> getAuditTrailsForProperty(
+		final Collection<U> os,
+		final Optional<Timeframe> timeframe,
+		final Function<V, Object> property
+	) {
+		final var auditTrailsByObjectFk = getAuditTrails(os, timeframe);
+
+		final Map<Long, NavigableSet<V>> filteredAuditTrailsByObjectFk = new HashMap<>();
+		for(final var entry : auditTrailsByObjectFk.entrySet()) {
+			filteredAuditTrailsByObjectFk.put(entry.getKey(), filterAuditTrailsForProperties(entry.getValue(), Collections.singletonList(property)));
+		}
+		return filteredAuditTrailsByObjectFk;
+	}
+
+	private NavigableSet<V> filterAuditTrailsForProperties(final NavigableSet<V> auditTrails, final List<Function<V, Object>> properties) {
 		List<Object> propertyValues = new ArrayList<>();
 		final var filterAuditTrails = new TreeSet<V>();
 		for(final V auditTrail : auditTrails) {

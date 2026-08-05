@@ -3,6 +3,7 @@ package ch.rodano.api.field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.NavigableSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
@@ -15,6 +16,7 @@ import ch.rodano.api.config.PossibleValueDTO;
 import ch.rodano.api.workflow.WorkflowDTOService;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.configuration.model.workflow.Workflow;
+import ch.rodano.core.model.audit.models.FieldAuditTrail;
 import ch.rodano.core.model.dataset.Dataset;
 import ch.rodano.core.model.event.Event;
 import ch.rodano.core.model.event.Timeframe;
@@ -85,6 +87,10 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		final var filesByFieldPk = fileDAOService.getFileByFieldPks(fieldPks)
 			.stream()
 			.collect(Collectors.toMap(File::getFieldFk, Function.identity()));
+		//timeframe is the same for every field of the batch, since it only depends on the dataset model and the ACL
+		final var timeframe = acl.getTimeframe(dataset.getDatasetModel(), Rights.READ);
+		//retrieve all audit trails for the selected fields
+		final var auditTrailsByFieldPk = fieldDAOService.getAuditTrailsForProperty(fields, timeframe, FieldRecord::getValue);
 		return fields.stream()
 			.map(
 				f -> createDTO(
@@ -94,7 +100,9 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 					f,
 					acl,
 					Optional.ofNullable(filesByFieldPk.get(f.getPk())),
-					workflowStatusesByFieldPk.getOrDefault(f.getPk(), Collections.emptyList())
+					workflowStatusesByFieldPk.getOrDefault(f.getPk(), Collections.emptyList()),
+					timeframe,
+					auditTrailsByFieldPk.getOrDefault(f.getPk(), Collections.emptyNavigableSet())
 				)
 			)
 			.toList();
@@ -110,7 +118,9 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 	) {
 		final var file = Optional.ofNullable(fileService.getFile(field));
 		final var workflowStatuses = workflowStatusDAOService.getWorkflowStatusesByFieldPk(field.getPk());
-		return createDTO(scope, event, dataset, field, acl, file, workflowStatuses);
+		final var timeframe = acl.getTimeframe(dataset.getDatasetModel(), Rights.READ);
+		final var auditTrails = fieldDAOService.getAuditTrailsForProperty(field, timeframe, FieldRecord::getValue);
+		return createDTO(scope, event, dataset, field, acl, file, workflowStatuses, timeframe, auditTrails);
 	}
 
 	private FieldDTO createDTO(
@@ -120,7 +130,9 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		final Field field,
 		final ACL acl,
 		final Optional<File> file,
-		final List<WorkflowStatus> workflowStatuses
+		final List<WorkflowStatus> workflowStatuses,
+		final Optional<Timeframe> timeframe,
+		final NavigableSet<FieldAuditTrail> auditTrails
 	) {
 		final var languages = actorService.getLanguages(acl.actor());
 		final var model = field.getFieldModel();
@@ -156,7 +168,6 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 		dto.model = new FieldModelDTO(model, languages);
 		dto.modelId = model.getId();
 
-		final var timeframe = acl.getTimeframe(dataset.getDatasetModel(), Rights.READ);
 		final var possibleValues = fieldService.getPossibleValues(scope, event, dataset, field);
 		final var value = fieldService.getInterpretedValue(scope, event, dataset, field, timeframe.flatMap(Timeframe::stopDate));
 		dto.possibleValues = possibleValues.stream().map(PossibleValueDTO::new).toList();
@@ -193,9 +204,8 @@ public class FieldDTOServiceImpl implements FieldDTOService {
 			dto.possibleWorkflows = Collections.emptyList();
 		}
 
-		final var entries = fieldDAOService.getAuditTrailsForProperty(field, timeframe, FieldRecord::getValue);
-		if(entries.size() > 1) {
-			dto.newContent = entries.stream()
+		if(auditTrails.size() > 1) {
+			dto.newContent = auditTrails.stream()
 				.filter(e -> e.getValue() != null && !Objects.equals(e.getValue(), ""))
 				.count() > 1;
 		}
