@@ -9,14 +9,10 @@
 				class="workflow-container"
 				[style.--workflow-color]="color()">
 				<p class="state">
-					<mat-icon
-						[style.color]="'var(--workflow-color)'"
-						aria-hidden="true">
-						{{ icon() }}
-					</mat-icon>
-					<span
-						>{{ data.workflow.workflow.shortname | localizeMap }} - {{ data.workflow.state.shortname | localizeMap }}</span
-					>
+					<mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
+					<span>
+						{{ data.workflow.workflow.shortname | localizeMap }} - {{ data.workflow.state.shortname | localizeMap }}
+					</span>
 				</p>
 				@if (data.workflow.triggerMessage) {
 					<p class="trigger-message">{{ data.workflow.triggerMessage }}</p>

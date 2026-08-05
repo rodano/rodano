@@ -3,11 +3,7 @@
 	[class.rough]="rough()"
 	[style.--workflow-color]="color()">
 	<span class="workflow-details">
-		<mat-icon
-			[style.color]="'var(--workflow-color)'"
-			aria-hidden="true">
-			{{ icon() }}
-		</mat-icon>
+		<mat-icon aria-hidden="true">{{ icon() }}</mat-icon>
 		{{ effectiveWorkflow()?.shortname | localizeMap }}
 		@if (workflowStatus()) {
 			- {{ workflowStatus()!.state.shortname | localizeMap }}

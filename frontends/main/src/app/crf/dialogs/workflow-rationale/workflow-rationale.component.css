@@ -6,6 +6,9 @@
 	background-color: color-mix(in srgb, var(--workflow-color) 8%, transparent);
 	border: 1px solid var(--workflow-color);
 
+	& .mat-icon {
+		color: var(--workflow-color);
+	}
 	& p {
 		padding: 0.2rem;
 		margin: 0.2rem 0;

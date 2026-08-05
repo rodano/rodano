@@ -8,6 +8,10 @@
 	box-sizing: border-box;
 	background-color: color-mix(in srgb, var(--workflow-color) 8%, transparent);
 	border: 1px solid var(--workflow-color);
+
+	& .mat-icon {
+		color: var(--workflow-color);
+	}
 }
 .rough {
 	background-color: transparent;
