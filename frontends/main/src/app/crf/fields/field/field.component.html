@@ -125,7 +125,7 @@
 				mat-icon-button
 				type="button"
 				(click)="openAuditTrail()">
-				<mat-icon>difference</mat-icon>
+				<mat-icon [class.new-content]="field().newContent">difference</mat-icon>
 			</button>
 		}
 

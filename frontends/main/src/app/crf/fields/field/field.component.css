@@ -21,6 +21,9 @@
 *:not(.mat-mdc-icon-button) + .mat-mdc-icon-button {
 	margin-left: 0.5rem;
 }
+.new-content {
+	color: #ffa700;
+}
 
 /* custom styles for the different field types */
 input[type='number'] {
