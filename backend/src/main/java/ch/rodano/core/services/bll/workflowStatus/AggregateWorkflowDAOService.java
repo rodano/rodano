@@ -307,7 +307,7 @@ public class AggregateWorkflowDAOService {
 		return getAggregateWorkflowStatusByForms(scope, event, Collections.singletonList(form));
 	}
 
-	private Optional<WorkflowState> retriveState(final List<WorkflowStatus> statuses, final Workflow workflow) {
+	private Optional<WorkflowState> retrieveState(final List<WorkflowStatus> statuses, final Workflow workflow) {
 		if(!statuses.isEmpty()) {
 			for(final var state : workflow.getStatesHavingMatcher(StateMatcher.ALL)) {
 				if(statuses.stream().allMatch(s -> s.getStateId().equals(state.getAggregateStateId()))) {
@@ -332,7 +332,7 @@ public class AggregateWorkflowDAOService {
 		for(final Workflow workflow : form.getFormModel().getWorkflows()) {
 			if(workflow.isAggregator()) {
 				final List<WorkflowStatus> statuses = containedStatuses.stream().filter(ws -> ws.getWorkflowId().equals(workflow.getAggregateWorkflowId())).toList();
-				final Optional<WorkflowState> state = retriveState(statuses, workflow);
+				final Optional<WorkflowState> state = retrieveState(statuses, workflow);
 				if(state.isPresent()) {
 					final var status = new AggregateWorkflowStatus();
 					status.setWorkflow(workflow);
