@@ -86,4 +86,56 @@ const UI = {};
 	};
 })();
 
+UI.Confirm = function(message, yes_text, no_text) {
+	const confirm_window = /**@type {HTMLDialogElement}*/ (document.getElementById('confirm'));
+	//message can either be a string, or a HTML element
+	const confirm_message = document.getElementById('confirm_message');
+	confirm_message.empty();
+	if(String.isString(message)) {
+		confirm_message.textContent = message;
+	}
+	else {
+		confirm_message.appendChild(message);
+	}
+	//manage buttons
+	const confirm_buttons = document.getElementById('confirm_buttons');
+	confirm_buttons.empty();
+
+	return new Promise(resolve => {
+		const no_button_container = document.createElement('li');
+		const no_button = document.createFullElement(
+			'button',
+			{type: 'button', autofocus: true},
+			no_text || 'No',
+			{
+				click: function(event) {
+					event.stop();
+					confirm_window.close();
+					resolve(false);
+				}
+			}
+		);
+		const yes_button_container = document.createElement('li');
+		const yes_button = document.createFullElement(
+			'button',
+			{type: 'button', style: 'margin-left: 0.5rem;'},
+			yes_text || 'Yes',
+			{
+				click: function(event) {
+					event.stop();
+					confirm_window.close();
+					resolve(true);
+				}
+			}
+		);
+		no_button_container.appendChild(no_button);
+		yes_button_container.appendChild(yes_button);
+		confirm_buttons.appendChild(no_button_container);
+		confirm_buttons.appendChild(yes_button_container);
+
+		confirm_window.showModal();
+		no_button.focus();
+	});
+};
+
 export {UI};

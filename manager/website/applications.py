@@ -126,35 +126,6 @@ class ApplicationBackups(helpers.AuthenticatedRequestHandler):
 			self.set_status(500)
 			self.write({"error" : f"Unable to retrieve backups: {str(e)}."})
 
-class ApplicationBackupDownload(helpers.AuthenticatedRequestHandler):
-	def get(self, backup_id):
-		try:
-			#ensure the backup path exists
-			if not os.path.exists(config.BACKUPS_STORAGE_PATH):
-				self.set_status(500)
-				self.write({"error" : f"Backup path {config.BACKUPS_STORAGE_PATH} does not exist."})
-				return
-
-			backup_file_path = os.path.join(config.BACKUPS_STORAGE_PATH, backup_id)
-			if not os.path.isfile(backup_file_path):
-				self.set_status(404)
-				self.write({"error" : f"Backup file {backup_id} does not exist."})
-				return
-
-			#send the backup file
-			self.set_header("Content-Type", "application/zip")
-			self.set_header("Content-Disposition", f'attachment; filename="{backup_id}"')
-			with open(backup_file_path, "rb") as backup_file:
-				while True:
-					data = backup_file.read(4096)
-					if not data:
-						break
-					self.write(data)
-			self.finish()
-		except Exception as e:
-			self.set_status(500)
-			self.write({"error" : f"Unable to retrieve backups: {str(e)}."})
-
 class ApplicationUsers(helpers.AuthenticatedRequestHandler):
 	def get(self):
 		try:
@@ -289,6 +260,34 @@ class ApplicationControl(helpers.AuthenticatedRequestHandler):
 
 #application backup
 class ApplicationBackup(helpers.AuthenticatedRequestHandler):
+	def get(self, backup_id):
+		try:
+			#ensure the backup path exists
+			if not os.path.exists(config.BACKUPS_STORAGE_PATH):
+				self.set_status(500)
+				self.write({"error" : f"Backup path {config.BACKUPS_STORAGE_PATH} does not exist."})
+				return
+
+			backup_file_path = os.path.join(config.BACKUPS_STORAGE_PATH, backup_id)
+			if not os.path.isfile(backup_file_path):
+				self.set_status(404)
+				self.write({"error" : f"Backup file {backup_id} does not exist."})
+				return
+
+			#send the backup file
+			self.set_header("Content-Type", "application/zip")
+			self.set_header("Content-Disposition", f'attachment; filename="{backup_id}"')
+			with open(backup_file_path, "rb") as backup_file:
+				while True:
+					data = backup_file.read(4096)
+					if not data:
+						break
+					self.write(data)
+			self.finish()
+		except Exception as e:
+			self.set_status(500)
+			self.write({"error" : f"Unable to retrieve backups: {str(e)}."})
+
 	def post(self):
 		#retrieve and check parameters
 		id = self.get_argument("id", str(uuid.uuid1()))
@@ -316,6 +315,25 @@ class ApplicationBackup(helpers.AuthenticatedRequestHandler):
 			self.write({"error" : "There is already one backup launched on one application right now. Please retry in a moment."})
 			self.finish()
 
+	def delete(self, backup_id):
+		try:
+			#ensure the backup path exists
+			if not os.path.exists(config.BACKUPS_STORAGE_PATH):
+				self.set_status(500)
+				self.write({"error" : f"Backup path {config.BACKUPS_STORAGE_PATH} does not exist."})
+				return
+
+			backup_file_path = os.path.join(config.BACKUPS_STORAGE_PATH, backup_id)
+			if not os.path.isfile(backup_file_path):
+				self.set_status(404)
+				self.write({"error" : f"Backup file {backup_id} does not exist."})
+				return
+
+			os.remove(backup_file_path)
+			self.write({"message" : f"Backup file {backup_id} deleted successfully."})
+		except Exception as e:
+			self.set_status(500)
+			self.write({"error" : f"Unable to delete backup: {str(e)}."})
 
 #send log in web socket
 async def stream_logs():
@@ -347,10 +365,10 @@ def start_log_streaming():
 url_pattern = [
 	("/api/info", ApplicationInfo),
 	("/api/backups", ApplicationBackups),
-	(f"/api/backups/([A-Za-z0-9-_.]+)", ApplicationBackupDownload),
 	("/api/users", ApplicationUsers),
 	("/api/control", ApplicationControl),
 	("/api/backup", ApplicationBackup),
+	(f"/api/backups/([A-Za-z0-9-_.]+)", ApplicationBackup),
 	("/api/reset", ApplicationReset),
 	("/api/restore", ApplicationRestore)
 ]

@@ -76,6 +76,17 @@ input {
 	}
 }
 
+/* menus */
+menu {
+	display: flex;
+	justify-content: flex-end;
+	gap: 0.5rem;
+	list-style-type: none;
+	margin: 0;
+	padding: 0.5rem 1rem;
+	box-sizing: border-box;
+}
+
 /* buttons */
 button, a.button {
 	display: inline-block;
@@ -149,6 +160,12 @@ dialog {
 	color: #721c24;
 	height: 10rem;
 	width: 50rem;
+}
+
+/* confirm */
+#confirm {
+	width: 50rem;
+	max-height: 15rem;
 }
 
 /* notifications */
@@ -283,4 +300,7 @@ dialog {
 #application_backups {
 	max-height: 20rem;
 	overflow: auto;
+	& button {
+		margin: 0.2rem 0 0.2rem 0.5rem;
+	}
 }

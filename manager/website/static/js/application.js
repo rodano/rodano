@@ -1,5 +1,6 @@
 import {bus} from './event_bus.js';
 import {api_base_url, Fetch, FetchFile} from './fetch.js';
+import {UI} from './ui.js';
 
 const UNKNOWN_APPLICATION = Object.freeze({
 	name: 'Unknown',
@@ -83,21 +84,45 @@ function download_backup(event) {
 		});
 }
 
+function delete_backup(event) {
+	event.stop();
+	const backup = this.dataset.backup;
+	UI.Confirm(`Delete backup "${backup}"? This action cannot be undone.`, 'Delete', 'Cancel')
+		.then(confirmed => {
+			if(confirmed) {
+				Fetch(`${api_base_url}/backups/${encodeURIComponent(backup)}`, {method: 'DELETE'})
+					.then(() => {
+						document.getElementById('application_backups').removeChild(this.parentElement);
+					});
+			}
+		});
+}
+
 function update_backups(backups) {
 	const application_backups = document.getElementById('application_backups');
 	application_backups.empty();
 	backups.forEach(backup => {
 		const li = document.createElement('li');
-		const link = document.createElement('a');
-		link.textContent = backup;
-		link.href = `${api_base_url}/backups/${encodeURIComponent(backup)}`;
-		link.addEventListener('click', download_backup);
-		li.appendChild(link);
+		const download_link = document.createFullElement('a', {href: `${api_base_url}/backups/${encodeURIComponent(backup)}`}, backup);
+		download_link.addEventListener('click', download_backup);
+		li.appendChild(download_link);
+		const delete_button = document.createFullElement('button', {'data-backup': backup}, 'Delete');
+		delete_button.addEventListener('click', delete_backup);
+		li.appendChild(delete_button);
 		application_backups.appendChild(li);
 	});
 }
 
 const ApplicationManager = {
+	UpdateBackups: function() {
+		Fetch(`${api_base_url}/backups`)
+			.then(response => {
+				update_backups(response);
+			})
+			.catch(() => {
+				update_backups([]);
+			});
+	},
 	Update: function() {
 		Fetch(`${api_base_url}/info`, {'managed-error': [500, 503]})
 			.then(app => {
@@ -112,13 +137,7 @@ const ApplicationManager = {
 			.finally(() => {
 				update_application();
 			});
-		Fetch(`${api_base_url}/backups`)
-			.then(response => {
-				update_backups(response);
-			})
-			.catch(() => {
-				update_backups([]);
-			});
+		ApplicationManager.UpdateBackups();
 	},
 	Init: function() {
 		//register listener to catch log messages

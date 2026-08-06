@@ -2,7 +2,7 @@ import {UUID} from './basic-tools/uuid.js';
 import {bus} from './event_bus.js';
 import {UI} from './ui.js';
 import {api_base_url, Fetch} from './fetch.js';
-import {application} from './application.js';
+import {application, ApplicationManager} from './application.js';
 
 let selected_task_id;
 
@@ -59,6 +59,7 @@ export const Backup = {
 						//refresh ui
 						window.history.back();
 						UI.Notify('Application backed up successfully', {tag: 'backup', icon: 'images/notifications/cog.png', body: 'Application backed up successfully'});
+						ApplicationManager.UpdateBackups();
 					}
 				}
 			}
