@@ -102,7 +102,7 @@ async def cleanup():
 							if not valid:
 								#remove backup file
 								logger.info(f"Removing old backup file {backup}")
-								#os.unlink(os.path.join(backup_path, backup))
+								os.unlink(path)
 
 #start the backup cleanup scheduler
 def start_backups_cleanup():
