@@ -194,35 +194,37 @@ public class DatasetController extends AbstractSecuredController {
 	}
 
 	/**
-	 * This function programmatically creates its own isolated transaction and sets it to "rollback only"
-	 * in order to roll back the transaction.
+	 * This function creates the candidate dataset in a savepoint and rolls back to it, so the skeleton is built by the
+	 * regular creation code without ever being persisted. A savepoint is used rather than an independent transaction so
+	 * the request keeps a single transaction, and therefore a single audit action.
 	 */
 	@Operation(summary = "Create a candidate dataset", description = "Provides a dataset skeleton from which an actual dataset can be created")
 	@GetMapping({ "candidate-dataset", "events/{eventPk}/candidate-dataset" })
 	@ResponseStatus(HttpStatus.OK)
+	@Transactional
 	public DatasetDTO createCandidateDataset(
 		@PathVariable final Long scopePk,
 		@PathVariable final Optional<Long> eventPk,
 		@RequestParam final String datasetModelId
 	) {
+		final var scope = scopeDAOService.getScopeByPk(scopePk);
+		final var event = eventPk.map(eventDAOService::getEventByPk);
+
+		utilsService.checkNotNull(Scope.class, scope, scopePk);
+		utilsService.checkNotNull(Event.class, event, eventPk);
+		URLConsistencyUtils.checkConsistency(scope, event);
+
+		final var datasetModel = studyService.getStudy().getDatasetModel(datasetModelId);
+
+		//check rights
+		final var acl = rightsService.getACL(currentActor(), scope);
+		acl.checkRight(datasetModel, Rights.WRITE);
+
 		final var transactionTemplate = new TransactionTemplate(transactionManager);
-		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_NESTED);
 
 		return transactionTemplate.execute(status -> {
 			status.setRollbackOnly();
-
-			final var scope = scopeDAOService.getScopeByPk(scopePk);
-			final var event = eventPk.map(eventDAOService::getEventByPk);
-
-			utilsService.checkNotNull(Scope.class, scope, scopePk);
-			utilsService.checkNotNull(Event.class, event, eventPk);
-			URLConsistencyUtils.checkConsistency(scope, event);
-
-			final var datasetModel = studyService.getStudy().getDatasetModel(datasetModelId);
-
-			//check rights
-			final var acl = rightsService.getACL(currentActor(), scope);
-			acl.checkRight(datasetModel, Rights.WRITE);
 
 			final var candidateDataset = datasetService.createCandidate(scope, event, datasetModel, acl.actor());
 			final var datasetDTO = datasetDTOService.createDTO(scope, event, candidateDataset, acl);

@@ -11,10 +11,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.core.model.rules.data.DataState;
+import ch.rodano.core.scheduler.task.ScheduledTask;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.rule.RuleService;
@@ -22,25 +22,22 @@ import ch.rodano.core.services.rule.RuleService;
 @Profile("!test & !migration & !database")
 @Service
 @ConditionalOnProperty(value = "rodano.schedule.cron-runner", havingValue = "true")
-public class CronRunnerServiceImpl implements CronRunnerService, DisposableBean {
+public class CronRunnerServiceImpl implements CronRunnerService, ScheduledTask, DisposableBean {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final Map<String, ZonedDateTime> cronLastRun;
 
-	private final PlatformTransactionManager transactionManager;
 	private final RuleService ruleService;
 	private final StudyService studyService;
 	private final ScopeService scopeService;
 
 	public CronRunnerServiceImpl(
-		final PlatformTransactionManager transactionManager,
 		final RuleService ruleService,
 		final StudyService studyService,
 		final ScopeService scopeService
 	) {
 		this.cronLastRun = new TreeMap<>();
 
-		this.transactionManager = transactionManager;
 		this.ruleService = ruleService;
 		this.studyService = studyService;
 		this.scopeService = scopeService;
@@ -60,11 +57,10 @@ public class CronRunnerServiceImpl implements CronRunnerService, DisposableBean 
 	 * Execute the cron runner
 	 */
 	@Scheduled(zone = "UTC", cron = "${rodano.schedule.cron-runner.cron}")
+	@Transactional
 	@Override
 	public void run() {
 		final var now = ZonedDateTime.now();
-
-		final var transactionTemplate = new TransactionTemplate(transactionManager);
 
 		// Manage periodic cron
 		for(final var cron : studyService.getStudy().getCrons()) {
@@ -79,12 +75,7 @@ public class CronRunnerServiceImpl implements CronRunnerService, DisposableBean 
 					// Cron Service
 					for(final var scope : scopeService.getAllIncludingRemoved()) {
 						if(!scope.isRemoved()) {
-
-							transactionTemplate.execute(_ -> {
-								ruleService.execute(new DataState(scope), cron.getRules(), null);
-								return true;
-							});
-
+							ruleService.execute(new DataState(scope), cron.getRules(), null);
 						}
 					}
 				}

@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.task.SimpleAsyncTaskExecutorCustomizer;
+import org.springframework.boot.task.ThreadPoolTaskExecutorCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -25,9 +27,11 @@ import freemarker.template.TemplateException;
 
 import tools.jackson.databind.json.JsonMapper;
 
+import ch.rodano.api.configuration.async.ReadOnlyUnitOfWorkTaskDecorator;
+import ch.rodano.api.configuration.async.WritableUnitOfWorkTaskDecorator;
 import ch.rodano.api.configuration.interceptor.MustChangePasswordInterceptor;
 import ch.rodano.api.configuration.interceptor.RequestContextInterceptor;
-import ch.rodano.api.configuration.interceptor.TransactionCacheHandlerInterceptor;
+import ch.rodano.core.services.unitofwork.UnitOfWorkService;
 
 @Profile({ "api", "test" })
 @Configuration
@@ -35,8 +39,8 @@ import ch.rodano.api.configuration.interceptor.TransactionCacheHandlerIntercepto
 public class WebConfigurer implements WebMvcConfigurer {
 	private final JsonMapper mapper;
 	private final MustChangePasswordInterceptor mustChangePasswordInterceptor;
-	private final TransactionCacheHandlerInterceptor transactionCacheHandlerInterceptor;
 	private final RequestContextInterceptor requestContextInterceptor;
+	private final UnitOfWorkService unitOfWorkService;
 
 	private final Integer corePoolSize;
 	private final Integer maxPoolSize;
@@ -48,8 +52,8 @@ public class WebConfigurer implements WebMvcConfigurer {
 	public WebConfigurer(
 		final JsonMapper mapper,
 		final MustChangePasswordInterceptor mustChangePasswordInterceptor,
-		final TransactionCacheHandlerInterceptor transactionCacheHandlerInterceptor,
 		final RequestContextInterceptor requestContextInterceptor,
+		final UnitOfWorkService unitOfWorkService,
 		@Value("${rodano.controller.pool.core-size:-1}") final Integer corePoolSize,
 		@Value("${rodano.controller.pool.max-size:40}") final Integer maxPoolSize,
 		@Value("${rodano.controller.pool.queue-capacity:15}") final Integer poolQueueCapacity,
@@ -59,8 +63,8 @@ public class WebConfigurer implements WebMvcConfigurer {
 	) {
 		this.mapper = mapper;
 		this.mustChangePasswordInterceptor = mustChangePasswordInterceptor;
-		this.transactionCacheHandlerInterceptor = transactionCacheHandlerInterceptor;
 		this.requestContextInterceptor = requestContextInterceptor;
+		this.unitOfWorkService = unitOfWorkService;
 		this.corePoolSize = corePoolSize;
 		this.maxPoolSize = maxPoolSize;
 		this.poolQueueCapacity = poolQueueCapacity;
@@ -85,7 +89,6 @@ public class WebConfigurer implements WebMvcConfigurer {
 	@Override
 	public void addInterceptors(final InterceptorRegistry registry) {
 		registry.addInterceptor(mustChangePasswordInterceptor).excludePathPatterns("/auth/password/change", "/me", "/config/study", "/config/public-study");
-		registry.addInterceptor(transactionCacheHandlerInterceptor);
 		registry.addInterceptor(requestContextInterceptor);
 	}
 
@@ -107,9 +110,35 @@ public class WebConfigurer implements WebMvcConfigurer {
 		executor.setThreadNamePrefix(poolName);
 		executor.setAllowCoreThreadTimeOut(poolTimeoutActive);
 		executor.setKeepAliveSeconds(poolTimeoutDuration);
+		executor.setTaskDecorator(new ReadOnlyUnitOfWorkTaskDecorator(unitOfWorkService));
 		executor.initialize();
 
 		configurer.setTaskExecutor(executor);
+	}
+
+	/**
+	 * Wrap every job submitted to the auto-configured {@code applicationTaskExecutor} in a writable unit of work.
+	 * Background jobs such as random-data generation and CRF archive creation run on a pooled thread after the request
+	 * has returned, so they need their own unit of work, and unlike streamed responses they must be allowed to write.
+	 *
+	 * @return The customizer that installs the writable decorator on the application task executor
+	 */
+	@Bean
+	public ThreadPoolTaskExecutorCustomizer applicationTaskExecutorCustomizer() {
+		final var decorator = new WritableUnitOfWorkTaskDecorator(unitOfWorkService);
+		return executor -> executor.setTaskDecorator(decorator);
+	}
+
+	/**
+	 * Same writable unit of work as {@link #applicationTaskExecutorCustomizer()}, for when the application task executor
+	 * is a {@code SimpleAsyncTaskExecutor} (for instance once virtual threads are enabled) rather than a thread pool.
+	 *
+	 * @return The customizer that installs the writable decorator on a simple application task executor
+	 */
+	@Bean
+	public SimpleAsyncTaskExecutorCustomizer simpleApplicationTaskExecutorCustomizer() {
+		final var decorator = new WritableUnitOfWorkTaskDecorator(unitOfWorkService);
+		return executor -> executor.setTaskDecorator(decorator);
 	}
 
 	/**

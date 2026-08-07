@@ -28,7 +28,7 @@ public class PersistentContext {
 
 	@Bean
 	public DataSourceTransactionManager transactionManager() {
-		return new AuditActionTransactionManager(dataSource);
+		return new DataSourceTransactionManager(dataSource);
 	}
 
 	@Bean

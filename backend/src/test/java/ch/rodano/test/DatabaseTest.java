@@ -18,7 +18,7 @@ import ch.rodano.core.services.bll.export.views.AggregateWorkflowViewService;
 import ch.rodano.core.services.bll.export.views.ExportViewService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
-import ch.rodano.core.services.dao.commons.cache.transaction.TransactionCacheDAOService;
+import ch.rodano.core.services.unitofwork.UnitOfWorkService;
 
 /**
  * Class used to execute tests that require a database and care about its state
@@ -35,7 +35,7 @@ public class DatabaseTest {
 	protected StudyService studyService;
 
 	@Autowired
-	protected TransactionCacheDAOService transactionCacheDAOService;
+	protected UnitOfWorkService unitOfWorkService;
 
 	@Autowired
 	protected AuditActionService auditActionService;
@@ -54,8 +54,8 @@ public class DatabaseTest {
 	@BeforeAll
 	protected void initializeTests() throws Exception {
 		if(!init) {
-			// Clear the transaction cache before initializing the database
-			transactionCacheDAOService.emptyCache();
+			// Clear the objects held by the current unit of work before initializing the database
+			unitOfWorkService.clear();
 
 			final var watch = new StopWatch();
 			watch.start();
@@ -95,7 +95,7 @@ public class DatabaseTest {
 
 	@AfterEach
 	protected void emptyCacheAndReloadConfig() throws IOException {
-		transactionCacheDAOService.emptyCache();
+		unitOfWorkService.clear();
 		studyService.reload();
 	}
 

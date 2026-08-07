@@ -35,7 +35,6 @@ import ch.rodano.core.services.bll.field.FieldService;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
-import ch.rodano.core.services.dao.commons.cache.transaction.TransactionCacheDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
 import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
@@ -54,7 +53,6 @@ public class RandomDataInitializer {
 	private final EventService eventService;
 	private final DatasetService datasetService;
 	private final FieldService fieldService;
-	private final TransactionCacheDAOService transactionCacheDAOService;
 	private final ScopeCreatorService scopeCreatorService;
 	private final AuditActionService auditActionService;
 
@@ -64,7 +62,7 @@ public class RandomDataInitializer {
 		final EventService eventService,
 		final DatasetService datasetService,
 		final FieldService fieldService,
-		final TransactionCacheDAOService transactionCacheDAOService,
+
 		final ScopeCreatorService scopeCreatorService,
 		final ScopeDAOService scopeDAOService,
 		final AuditActionService auditActionService
@@ -75,7 +73,6 @@ public class RandomDataInitializer {
 		this.eventService = eventService;
 		this.datasetService = datasetService;
 		this.fieldService = fieldService;
-		this.transactionCacheDAOService = transactionCacheDAOService;
 		this.scopeCreatorService = scopeCreatorService;
 		this.auditActionService = auditActionService;
 		randomUtils = RandomUtils.insecure();
@@ -247,7 +244,6 @@ public class RandomDataInitializer {
 				logger.info(String.format("%s already exists", scope.getCode()));
 			}
 			scopePks.add(scope.getPk());
-			transactionCacheDAOService.emptyCache();
 		}
 		return scopePks;
 	}

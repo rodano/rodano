@@ -15,7 +15,6 @@ import org.springframework.security.oauth2.server.resource.introspection.OAuth2I
 import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionException;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.session.PendingSessionUpdates;
@@ -47,8 +46,8 @@ public class SessionOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 		this.pendingSessionUpdates = pendingSessionUpdates;
 	}
 
+	//not transactional on purpose: this runs in the security filter chain, before the controller's own transaction begins
 	@Override
-	@Transactional
 	public OAuth2AuthenticatedPrincipal introspect(final String token) {
 		//validate token format before hitting the database
 		if(!StringUtils.isAsciiPrintable(token) || token.length() != SessionService.SESSION_TOKEN_STRING_LENGTH) {

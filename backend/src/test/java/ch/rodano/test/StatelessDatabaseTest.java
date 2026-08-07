@@ -14,7 +14,7 @@ import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
-import ch.rodano.core.services.dao.commons.cache.transaction.TransactionCacheDAOService;
+import ch.rodano.core.services.unitofwork.UnitOfWorkService;
 
 /**
  * Class used to execute tests that require a database but don't care about its state
@@ -29,7 +29,7 @@ public class StatelessDatabaseTest {
 	protected StudyService studyService;
 
 	@Autowired
-	protected TransactionCacheDAOService transactionCacheDAOService;
+	protected UnitOfWorkService unitOfWorkService;
 
 	@Autowired
 	protected AuditActionService auditActionService;
@@ -41,8 +41,8 @@ public class StatelessDatabaseTest {
 
 	@BeforeAll
 	protected void initializeTests() {
-		// Clear the transaction cache before initializing the database
-		transactionCacheDAOService.emptyCache();
+		// Clear the objects held by the current unit of work before initializing the database
+		unitOfWorkService.clear();
 
 		logger.info("Ensuring that a database exists");
 
@@ -63,7 +63,7 @@ public class StatelessDatabaseTest {
 
 	@AfterEach
 	protected void emptyCacheAndReloadConfig() throws IOException {
-		transactionCacheDAOService.emptyCache();
+		unitOfWorkService.clear();
 		studyService.reload();
 	}
 }

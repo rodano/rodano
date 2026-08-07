@@ -6,19 +6,13 @@ import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 
 public interface RequestContextService {
-	boolean isAuditedRequest();
+	/**
+	 * Record the actor and rationale of an audited request. Non-audited requests never call this.
+	 */
+	void setAuditContext(Optional<Actor> actor, String rationale);
 
-	void setAuditedRequest(boolean auditedRequest);
-
-	Optional<Actor> getActor();
-
-	void setActor(Optional<Actor> actor);
-
-	String getRationale();
-
-	void setRationale(String rationale);
-
-	void setDatabaseActionContext(final DatabaseActionContext context);
-
+	/**
+	 * The audit context for the current request, or {@code null} if the request is not audited.
+	 */
 	DatabaseActionContext getDatabaseActionContext();
 }

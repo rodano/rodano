@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Profile;
 
 import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.core.services.bll.scope.ScopeAncestorServiceImpl;
+import ch.rodano.core.services.unitofwork.UnitOfWorkService;
 
 //TODO delete this and the associated "database" Spring profile. Initialization must be made by the main application
 @Profile("database")
@@ -26,29 +27,36 @@ public class DatabaseInitConfiguration implements CommandLineRunner {
 
 	private final ScopeAncestorServiceImpl scopeAncestorService;
 
+	private final UnitOfWorkService unitOfWorkService;
+
 	public DatabaseInitConfiguration(
 		@Value("${rodano.init.with-users:false}") final Boolean withUsers,
 		@Value("${rodano.init.with-data:false}") final Boolean withData,
 		final DatabaseInitializer databaseInitializer,
-		final ScopeAncestorServiceImpl scopeAncestorService
+		final ScopeAncestorServiceImpl scopeAncestorService,
+		final UnitOfWorkService unitOfWorkService
 	) {
 		logger.info("Starting database profile");
 		this.withUsers = withUsers;
 		this.withData = withData;
 		this.databaseInitializer = databaseInitializer;
 		this.scopeAncestorService = scopeAncestorService;
+		this.unitOfWorkService = unitOfWorkService;
 	}
 
 	@Override
 	public void run(final String... args) throws Exception {
-		if(databaseInitializer.isDatabaseBlank()) {
-			databaseInitializer.initializeStructure();
-		}
-		else {
-			databaseInitializer.truncateTables();
-		}
-		scopeAncestorService.updateView();
-		databaseInitializer.initializeDatabaseContent(withUsers, withData);
+		unitOfWorkService.run(false, () -> {
+			if(databaseInitializer.isDatabaseBlank()) {
+				databaseInitializer.initializeStructure();
+			}
+			else {
+				databaseInitializer.truncateTables();
+			}
+			scopeAncestorService.updateView();
+			databaseInitializer.initializeDatabaseContent(withUsers, withData);
+			return null;
+		});
 	}
 
 }

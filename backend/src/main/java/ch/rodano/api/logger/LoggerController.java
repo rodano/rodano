@@ -1,6 +1,7 @@
 package ch.rodano.api.logger;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,6 +45,7 @@ public class LoggerController extends AbstractSecuredController {
 	@Operation(summary = "Create log", hidden = true)
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
+	@Transactional
 	public void log(
 		@RequestBody final LoggerDTO loggerDTO
 	) {
