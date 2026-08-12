@@ -30,7 +30,7 @@ public class FileCleanerTask implements ScheduledTask, DisposableBean {
 	@Override
 	public void run() {
 		fileService.deleteUnsubmittedFiles();
-		logger.debug("Unsubmitted files cleaned up done.");
+		logger.debug("Unsubmitted files deleted");
 	}
 
 	@Override
