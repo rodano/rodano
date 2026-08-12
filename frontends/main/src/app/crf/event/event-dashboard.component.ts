@@ -1,4 +1,4 @@
-import {Component, computed, input, model} from '@angular/core';
+import {Component, computed, DestroyRef, input, model, signal, OnInit} from '@angular/core';
 import {Event} from '@core/model/event';
 import {Scope} from '@core/model/scope';
 import {EventService} from '@core/services/event.service';
@@ -17,6 +17,9 @@ import {MatDialog} from '@angular/material/dialog';
 import {of, switchMap} from 'rxjs';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {AuthStateService} from '../../services/auth-state.service';
+import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
 	selector: 'app-event-dashboard',
@@ -32,7 +35,7 @@ import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 		AuditTrailButtonComponent
 	]
 })
-export class EventDashboardComponent {
+export class EventDashboardComponent implements OnInit {
 	workflowableEntity = WorkflowableEntity;
 
 	readonly scope = input.required<Scope>();
@@ -43,6 +46,8 @@ export class EventDashboardComponent {
 	//maybe at some point we will have "withComponentModelBinding" instead of "withComponentInputBinding"
 	readonly event = model.required<Event>();
 
+	readonly canToggleLock = signal(false);
+
 	readonly dateDifferenceInDays = computed(() => {
 		const date = this.event().date ?? this.event().expectedDate;
 		return differenceInDays(date, new Date());
@@ -50,10 +55,20 @@ export class EventDashboardComponent {
 
 	constructor(
 		private eventService: EventService,
+		private authStateService: AuthStateService,
 		private notificationService: NotificationService,
 		private workflowableUpdateService: WorkflowableUpdateService,
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private destroyRef: DestroyRef
 	) {}
+
+	ngOnInit() {
+		this.authStateService.listenConnectedUser().pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(user => {
+			this.canToggleLock.set(user?.roles.some(r => r.profile.features.includes(FeatureStatic.LOCK)) ?? false);
+		});
+	}
 
 	remove() {
 		const entityName = new LocalizeMapPipe().transform(this.event().model.shortname);

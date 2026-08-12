@@ -57,18 +57,22 @@
 						Unlock event
 					</button>
 				} @else {
-					<button
-						mat-flat-button
-						(click)="remove()"
-						type="button">
-						Remove event
-					</button>
-					<button
-						mat-flat-button
-						(click)="lock()"
-						type="button">
-						Lock event
-					</button>
+					@if (event().canBeRemoved) {
+						<button
+							mat-flat-button
+							(click)="remove()"
+							type="button">
+							Remove event
+						</button>
+					}
+					@if (canToggleLock()) {
+						<button
+							mat-flat-button
+							(click)="lock()"
+							type="button">
+							Lock event
+						</button>
+					}
 				}
 			}
 		</p>

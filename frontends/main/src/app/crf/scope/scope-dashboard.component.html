@@ -42,18 +42,22 @@
 					Unlock {{ scope().model.shortname | localizeMap | lowercase }}
 				</button>
 			} @else {
-				<button
-					mat-flat-button
-					(click)="remove()"
-					type="button">
-					Remove {{ scope().model.shortname | localizeMap | lowercase }}
-				</button>
-				<button
-					mat-flat-button
-					(click)="lock()"
-					type="button">
-					Lock {{ scope().model.shortname | localizeMap | lowercase }}
-				</button>
+				@if (scope().canBeRemoved) {
+					<button
+						mat-flat-button
+						(click)="remove()"
+						type="button">
+						Remove {{ scope().model.shortname | localizeMap | lowercase }}
+					</button>
+				}
+				@if (canToggleLock()) {
+					<button
+						mat-flat-button
+						(click)="lock()"
+						type="button">
+						Lock {{ scope().model.shortname | localizeMap | lowercase }}
+					</button>
+				}
 			}
 		}
 	</p>

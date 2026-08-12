@@ -1,4 +1,4 @@
-import {Component, model} from '@angular/core';
+import {Component, DestroyRef, model, OnInit, signal} from '@angular/core';
 import {ScopeService} from '@core/services/scope.service';
 import {Scope} from '@core/model/scope';
 import {NotificationService} from '../../services/notification.service';
@@ -15,6 +15,9 @@ import {of, switchMap} from 'rxjs';
 import {WorkflowableUpdateService} from '../services/workflowable-update.service';
 import {LocalizeMapPipe} from '../../pipes/localize-map.pipe';
 import {LowerCasePipe} from '@angular/common';
+import {AuthStateService} from '../../services/auth-state.service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {FeatureStatic} from '@core/model/feature-static';
 
 @Component({
 	selector: 'app-scope-dashboard',
@@ -29,7 +32,7 @@ import {LowerCasePipe} from '@angular/common';
 		MatButton
 	]
 })
-export class ScopeDashboardComponent {
+export class ScopeDashboardComponent implements OnInit {
 	workflowableEntity = WorkflowableEntity;
 
 	//using a writable signal so it can be updated when the scope is updated (e.g. after lock/unlock/remove/restore)
@@ -38,14 +41,27 @@ export class ScopeDashboardComponent {
 	//this means other components in the same router-outlet will not see the updated scope until a new resolve is triggered, which can be confusing
 	//maybe at some point we will have "withComponentModelBinding" instead of "withComponentInputBinding"
 	readonly scope = model.required<Scope>();
+
+	readonly canToggleLock = signal(false);
+
 	graphs: TimelineGraphData[] = [];
 
 	constructor(
 		private scopeService: ScopeService,
 		private workflowableUpdateService: WorkflowableUpdateService,
+		private authStateService: AuthStateService,
 		private notificationService: NotificationService,
-		private dialog: MatDialog
+		private dialog: MatDialog,
+		private destroyRef: DestroyRef
 	) { }
+
+	ngOnInit() {
+		this.authStateService.listenConnectedUser().pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(user => {
+			this.canToggleLock.set(user?.roles.some(r => r.profile.features.includes(FeatureStatic.LOCK)) ?? false);
+		});
+	}
 
 	remove() {
 		const entityName = this.scope().shortname;
