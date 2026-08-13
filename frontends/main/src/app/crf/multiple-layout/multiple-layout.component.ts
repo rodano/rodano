@@ -102,9 +102,13 @@ export class MultipleLayoutComponent implements OnInit {
 		).subscribe(shown => {
 			this.loggingService.info(`Setting visibility on multiple layout ${this.layout().id} to ${shown}`);
 			this.shown.set(shown);
-			//mark the datasets belonging to this layout, replacing them instead of mutating them in place
 			const modelId = this.layout().datasetModel.id;
-			this.datasets.update(datasets => datasets.map(d => d.modelId === modelId ? {...d, show: shown} : d));
+			//when the layout is hidden, drop the datasets that have not been committed yet (no pk),
+			//as they have been added locally and would otherwise be uploaded despite the layout being hidden
+			//mark the remaining datasets belonging to this layout, replacing them instead of mutating them in place
+			this.datasets.update(datasets => datasets
+				.filter(d => shown || d.modelId !== modelId || d.pk)
+				.map(d => d.modelId === modelId ? {...d, show: shown} : d));
 		});
 
 		//when a field of a dataset has been updated, refresh its workflow statuses and error
