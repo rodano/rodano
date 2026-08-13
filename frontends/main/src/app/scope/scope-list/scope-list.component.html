@@ -1,4 +1,15 @@
-<h1>{{ scopeModel().pluralShortname | localizeMap }}</h1>
+<h1>
+	{{ scopeModel().pluralShortname | localizeMap }}
+	<button
+		mat-flat-button
+		class="new-entity"
+		type="button"
+		[routerLink]="['/scopes', scopeModel().id, 'new']"
+		[disabled]="!writeAccessOnParent()">
+		<mat-icon>add</mat-icon>
+		New {{ scopeModel().shortname | localizeMap | lowercase }}
+	</button>
+</h1>
 
 <form
 	class="browse-entities"
@@ -36,16 +47,6 @@
 		type="reset"
 		(click)="reset()">
 		Clear
-	</button>
-
-	<button
-		mat-flat-button
-		class="new-entity"
-		type="button"
-		[routerLink]="['/scopes', scopeModel().id, 'new']"
-		[disabled]="!writeAccessOnParent()">
-		<mat-icon>add</mat-icon>
-		New {{ scopeModel().shortname | localizeMap | lowercase }}
 	</button>
 </form>
 

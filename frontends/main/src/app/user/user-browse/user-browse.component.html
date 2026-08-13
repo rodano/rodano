@@ -1,4 +1,15 @@
-<h1>Users</h1>
+<h1>
+	Users
+	<button
+		mat-flat-button
+		class="new-entity"
+		type="button"
+		[routerLink]="['/users', 'new']"
+		[disabled]="!me()?.rights?.canCreateUser">
+		<mat-icon>add</mat-icon>
+		New user
+	</button>
+</h1>
 
 <form
 	class="browse-entities"
@@ -68,16 +79,6 @@
 		type="reset"
 		(click)="reset()">
 		Clear
-	</button>
-
-	<button
-		mat-flat-button
-		class="new-entity"
-		type="button"
-		[routerLink]="['/users', 'new']"
-		[disabled]="!me()?.rights?.canCreateUser">
-		<mat-icon>add</mat-icon>
-		New user
 	</button>
 </form>
 

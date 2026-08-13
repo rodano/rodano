@@ -1,4 +1,23 @@
-<h1>Resources</h1>
+<h1>
+	Resources
+	<button
+		mat-flat-button
+		class="new-entity"
+		type="button"
+		[matMenuTriggerFor]="menu">
+		<mat-icon>add</mat-icon>
+		New...
+	</button>
+	<mat-menu #menu="matMenu">
+		@for (category of categories(); track category.id) {
+			<button
+				mat-menu-item
+				(click)="createResource(category.id)">
+				{{ category.shortname | localizeMap }}
+			</button>
+		}
+	</mat-menu>
+</h1>
 
 <form
 	class="browse-entities"
@@ -36,24 +55,6 @@
 		(click)="reset()">
 		Clear
 	</button>
-
-	<button
-		mat-flat-button
-		class="new-entity"
-		type="button"
-		[matMenuTriggerFor]="menu">
-		<mat-icon>add</mat-icon>
-		New...
-	</button>
-	<mat-menu #menu="matMenu">
-		@for (category of categories(); track category.id) {
-			<button
-				mat-menu-item
-				(click)="createResource(category.id)">
-				{{ category.shortname | localizeMap }}
-			</button>
-		}
-	</mat-menu>
 </form>
 
 <mat-progress-bar

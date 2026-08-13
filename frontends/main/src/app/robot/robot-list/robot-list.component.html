@@ -1,4 +1,14 @@
-<h1>Robots</h1>
+<h1>
+	Robots
+	<button
+		mat-flat-button
+		class="new-entity"
+		type="button"
+		[routerLink]="['/robots', 'new']">
+		<mat-icon>add</mat-icon>
+		New robot
+	</button>
+</h1>
 
 <form
 	class="browse-entities"
@@ -36,15 +46,6 @@
 		type="reset"
 		(click)="reset()">
 		Clear
-	</button>
-
-	<button
-		mat-flat-button
-		class="new-entity"
-		type="button"
-		[routerLink]="['/robots', 'new']">
-		<mat-icon>add</mat-icon>
-		New robot
 	</button>
 </form>
 

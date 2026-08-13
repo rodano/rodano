@@ -193,16 +193,19 @@ button {
 	}
 }
 
-//search block for pages with a search form and a table underneath
+//entities browsing pages all using the same design:
+//1. title containing the "new entity" button
+//2. forms to filter entities
+//3. table listing found entities
+.new-entity {
+	float: right;
+}
 .browse-entities {
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--gap);
 	align-items: center;
 	margin-bottom: 1rem;
-	& .new-entity {
-		margin-left: auto;
-	}
 }
 
 //columns flagged as optional in entity-listing tables are hidden on mobile devices to keep them readable
