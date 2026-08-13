@@ -76,6 +76,12 @@
 	}
 </div>
 
+@if (scope()) {
+	@if (scope().removed) {
+		<p class="warning">This {{ scopeModel().shortname | localizeMap | lowercase }} has been removed.</p>
+	}
+}
+
 <mat-tab-nav-panel #tabPanel>
 	<main>
 		<router-outlet></router-outlet>

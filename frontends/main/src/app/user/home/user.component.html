@@ -65,25 +65,29 @@
 </div>
 
 @if (user()) {
-	@if (user().externallyManaged) {
-		<p class="warning">
-			@if (me().pk === user().pk) {
-				Your account is managed externally by an organization directory.
-			} @else {
-				This user is managed externally by an organization directory and some details cannot be edited here.
-			}
-		</p>
-	}
+	@if (user().removed) {
+		<p class="warning">This user has been removed.</p>
+	} @else {
+		@if (user().externallyManaged) {
+			<p class="warning">
+				@if (me().pk === user().pk) {
+					Your account is managed externally by an organization directory.
+				} @else {
+					This user is managed externally by an organization directory and some details cannot be edited here.
+				}
+			</p>
+		}
 
-	@if (!user().activated) {
-		<p class="warning">This user has not activated their account yet.</p>
-	}
+		@if (!user().activated) {
+			<p class="warning">This user has not activated their account yet.</p>
+		}
 
-	@if (user().canWrite && user().blocked) {
-		<p class="warning">
-			This user account is locked due to suspicious activity. The user must unlock their account using the email sent to
-			their registered address.
-		</p>
+		@if (user().blocked) {
+			<p class="warning">
+				This user account is locked due to suspicious activity. The user must unlock their account using the email sent to
+				their registered address.
+			</p>
+		}
 	}
 }
 
