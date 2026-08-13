@@ -80,6 +80,27 @@
 				"problemMatcher": [],
 			},
 			{
+				"label": "Backend: Start study (debug)",
+				"type": "shell",
+				"command": "mvn",
+				"args": [
+					"spring-boot:run",
+					"-Dspring-boot.run.profiles=api,local",
+					"-Dspring-boot.run.additional-classpath-elements=${input:study-path}/backend/target/classes",
+					"-Dspring-boot.run.jvmArguments='-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=localhost:5005 -Drodano.database.name=smsc -Drodano.environment=DEV -Drodano.config=${input:study-path}/config.json'"
+				],
+				"options": { "cwd": "${workspaceFolder:☕ Backend}" },
+				"isBackground": true,
+				"problemMatcher": {
+					"pattern": { "regexp": "^$" },
+					"background": {
+						"activeOnStart": true,
+						"beginsPattern": ".*",
+						"endsPattern": ".*Started RodanoApplication.*"
+					}
+				}
+			},
+			{
 				"label": "Backend: Build",
 				"type": "shell",
 				"command": "mvn",
@@ -238,6 +259,13 @@
 				"options": { "cwd": "${workspaceFolder:⚙️ Configurator}" },
 				"problemMatcher": "$eslint-stylish"
 			}
+		],
+		"inputs": [
+			{
+				"id": "study-path",
+				"type": "promptString",
+				"description": "Path to the study directory"
+			}
 		]
 	},
 	"launch": {
@@ -251,7 +279,19 @@
 				"mainClass": "ch.rodano.application.RodanoApplication",
 				"projectName": "rodano-backend",
 				"cwd": "${workspaceFolder:☕ Backend}",
-				"vmArgs": "-Drodano.environment=DEV -Dspring.profiles.active=api,local"
+				"vmArgs": "-Dspring.profiles.active=api,local -Drodano.environment=DEV "
+			},
+			//starting a study with a Java command is not possible because of the study plugins
+			//these plugins are added to the classpath at runtime by the Maven command
+			//so the study must be started with Maven and then the debugger can be attached
+			{
+				"type": "java",
+				"name": "Backend: Launch study",
+				"request": "attach",
+				"hostName": "localhost",
+				"port": 5005,
+				"projectName": "rodano-backend",
+				"preLaunchTask": "Backend: Start study (debug)"
 			},
 			//frontend: main
 			{
