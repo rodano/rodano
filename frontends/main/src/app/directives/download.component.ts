@@ -81,7 +81,7 @@ export class DownloadDirective {
 				}
 			},
 			error: error => {
-				this.notificationService.showError(`Error getting file: ${error}`);
+				this.notificationService.showError(`Unable to download the file: ${error}`);
 			}
 		});
 	}
