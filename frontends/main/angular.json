@@ -19,7 +19,10 @@
 						"index": "src/index.html",
 						"tsConfig": "tsconfig.app.json",
 						"assets": [
-							"src/assets"
+							{
+								"glob": "**/*",
+								"input": "src/public"
+							}
 						],
 						"styles": [
 							"src/styles.scss"
