@@ -6,7 +6,7 @@ import {SideMenuComponent} from '../side-menu/side-menu.component';
 @Component({
 	selector: 'app-crf',
 	templateUrl: './crf.component.html',
-	styleUrls: ['./crf.component.scss'],
+	styleUrls: ['./crf.component.css'],
 	imports: [
 		SideMenuComponent,
 		RouterOutlet

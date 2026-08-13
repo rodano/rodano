@@ -31,7 +31,7 @@ import {Workflowable} from '@core/utilities/workflowable';
 @Component({
 	selector: 'app-form',
 	templateUrl: './form.component.html',
-	styleUrls: ['./form.component.scss'],
+	styleUrls: ['./form.component.css'],
 	imports: [
 		FormsModule,
 		MatButton,

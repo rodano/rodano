@@ -51,7 +51,7 @@ h1 {
 	gap: 0.25rem;
 }
 
-//mobile menu: hamburger shows on small screens, dropdown anchored to the toolbar
+/* mobile menu: hamburger shows on small screens, dropdown anchored to the toolbar */
 .mobile-menu-button {
 	display: none;
 }

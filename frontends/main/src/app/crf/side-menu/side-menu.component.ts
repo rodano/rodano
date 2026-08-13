@@ -24,7 +24,7 @@ import {MatTooltip} from '@angular/material/tooltip';
 @Component({
 	selector: 'app-side-menu',
 	templateUrl: './side-menu.component.html',
-	styleUrl: './side-menu.component.scss',
+	styleUrl: './side-menu.component.css',
 	imports: [
 		RouterLink,
 		MatIcon,

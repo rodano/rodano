@@ -2,7 +2,7 @@ ol.submenu {
 	list-style-type: none;
 	padding: 0;
 	background-color: var(--themed-highlight-color);
-	//width of the border is the width of the toggle icon plus the padding of the form items
+	/* width of the border is the width of the toggle icon plus the padding of the form items */
 	border-left: calc(24px - 0.4rem) solid var(--mat-sys-primary);
 
 	& li {

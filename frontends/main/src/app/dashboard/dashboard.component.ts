@@ -8,7 +8,7 @@ import {ActivatedRoute, RouterLink} from '@angular/router';
 
 @Component({
 	templateUrl: './dashboard.component.html',
-	styleUrls: ['./dashboard.component.scss'],
+	styleUrls: ['./dashboard.component.css'],
 	imports: [
 		RouterLink,
 		GenericWidgetComponent,

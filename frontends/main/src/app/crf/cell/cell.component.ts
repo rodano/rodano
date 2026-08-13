@@ -15,7 +15,7 @@ import {SafeHtmlPipe} from '../../pipes/safe-html.pipe';
 @Component({
 	selector: 'app-cell',
 	templateUrl: './cell.component.html',
-	styleUrls: ['./cell.component.scss'],
+	styleUrls: ['./cell.component.css'],
 	imports: [
 		LocalizeMapPipe,
 		SafeHtmlPipe,
