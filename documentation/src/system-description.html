@@ -1,0 +1,48 @@
+<nav id="table-of-contents"></nav>
+<section id="introduction">
+	<h2>Introduction</h2>
+	<p>This document describes how the Rodano platform works. Its purpose is to introduce readers to the main principles of the system without requiring them to work through all the technical details covered in the <a href="technical-specifications.html">Technical specifications</a> document.</p>
+</section>
+<section id="system-overview">
+	<h2>System overview</h2>
+	<p>Rodano is an electronic data capture (EDC) system for clinical trials. It is a highly configurable, web-based application that meets the regulatory requirements of <a href="https://www.ecfr.gov/current/title-21">Title 21 of the Code of Federal Regulations (CFR)</a>.</p>
+	<p>The platform is made up of a backend that exposes an HTTP API, several frontends that consume it, and supporting tooling:</p>
+	<ul>
+		<li><strong>Backend</strong> — a Java application, built on Spring Boot, that holds the data model, business logic, and HTTP API.</li>
+		<li><strong>Main frontend</strong> — an Angular web application used by medical staff to capture and review study data.</li>
+		<li><strong>Configurator</strong> — a JavaScript tool used by data managers to produce a study's configuration file.</li>
+		<li><strong>ePRO</strong> — an Ionic and Angular mobile web application used by study subjects to report outcomes themselves.</li>
+		<li><strong>Manager</strong> — a web application used to operate and maintain a Dockerized Rodano instance.</li>
+	</ul>
+</section>
+<section id="backend">
+	<h2>Backend</h2>
+	<p>The backend is the server component that all frontends communicate with over its HTTP API. It manages access to the MariaDB database and enforces the study's business rules. Its main responsibilities are to:</p>
+	<ul>
+		<li>authenticate users so that only authorized people can interact with the system;</li>
+		<li>validate incoming data, rejecting invalid values and reporting the errors back to the user;</li>
+		<li>process and store valid data;</li>
+		<li>maintain an audit trail that records every change made to the data;</li>
+		<li>generate reports and send email notifications to users.</li>
+	</ul>
+</section>
+<section id="main-frontend">
+	<h2>Main frontend</h2>
+	<p>The main frontend is the primary user interface for medical staff. Through a web browser, authorized users enter data required by the study protocol and receive real-time feedback on whether that data complies with the protocol. The frontend is also where users and their roles are managed for a given study. It communicates with the backend exclusively through the HTTP API.</p>
+</section>
+<section id="configurator">
+	<h2>Configurator</h2>
+	<p>A Rodano instance needs a configuration file to start. This file defines every setting and entity required for a given study, and is prepared by data managers with the necessary domain knowledge. The Configurator is the tool used to author it. It can run in two modes: standalone, to create a new configuration from scratch, or hosted by a Rodano server, to edit the configuration of an existing study. The resulting file is then loaded by the backend to run the EDC system for that study.</p>
+</section>
+<section id="epro">
+	<h2>ePRO</h2>
+	<p>ePRO (electronic patient-reported outcomes) is a mobile web application that lets study subjects contribute data directly, without going through a member of staff. Like the other frontends, it communicates with the backend through the HTTP API.</p>
+</section>
+<section id="manager">
+	<h2>Manager</h2>
+	<p>The Manager is a web application that lets system administrators operate a Rodano instance running in a Dockerized environment. It reports the status of the platform's containers and can restart the application when needed. It also schedules automatic backups, cleans up old ones, and can restore a chosen backup.</p>
+</section>
+<section id="study-deployment">
+	<h2>Study deployment</h2>
+	<p>When a new study goes into production, its configuration file is first prepared and verified by the client. The study is then deployed with the current version of Rodano.</p>
+</section>
