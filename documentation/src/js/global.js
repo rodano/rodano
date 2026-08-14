@@ -1,6 +1,11 @@
 window.addEventListener('load', () => {
 	const toc = document.getElementById('table-of-contents');
 
+	//stop here if no table of contents is present
+	if(!toc) {
+		return;
+	}
+
 	//clear existing content
 	while(toc.firstChild) {
 		toc.removeChild(toc.firstChild);
