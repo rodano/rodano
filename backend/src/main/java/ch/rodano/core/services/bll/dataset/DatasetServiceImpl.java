@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
 import ch.rodano.configuration.model.dataset.DatasetModel;
@@ -50,7 +48,6 @@ public class DatasetServiceImpl implements DatasetService {
 	private final RuleService ruleService;
 	private final ValidationService validationService;
 	private final AuditActionService auditActionService;
-	private final PlatformTransactionManager transactionManager;
 	private final UtilsServiceImpl utilsService;
 
 	public DatasetServiceImpl(
@@ -61,7 +58,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final RuleService ruleService,
 		final ValidationService validationService,
 		final AuditActionService auditActionService,
-		final PlatformTransactionManager transactionManager,
 		final UtilsServiceImpl utilsService
 	) {
 		this.studyService = studyService;
@@ -71,13 +67,12 @@ public class DatasetServiceImpl implements DatasetService {
 		this.ruleService = ruleService;
 		this.validationService = validationService;
 		this.auditActionService = auditActionService;
-		this.transactionManager = transactionManager;
 		this.utilsService = utilsService;
 	}
 
 	/**
-	 * This function programmatically crates its own transaction and sets it to "rollback only"
-	 * in order to roll back the transaction.
+	 * Build a candidate using the regular persistence code. The caller is responsible for rolling back the candidate
+	 * after materializing all data that needs to be returned.
 	 */
 	@Override
 	public Dataset createCandidate(
@@ -86,18 +81,12 @@ public class DatasetServiceImpl implements DatasetService {
 		final DatasetModel datasetModel,
 		final Actor actor
 	) {
-		final var transactionTemplate = new TransactionTemplate(transactionManager);
+		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, "Create candidate dataset");
 
-		return transactionTemplate.execute(status -> {
-			status.setRollbackOnly();
-
-			final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, "Create candidate dataset");
-
-			if(event.isPresent()) {
-				return create(scope, event.get(), datasetModel, context, "Create candidate dataset");
-			}
-			return create(scope, datasetModel, context, "Create candidate dataset");
-		});
+		if(event.isPresent()) {
+			return create(scope, event.get(), datasetModel, context, "Create candidate dataset");
+		}
+		return create(scope, datasetModel, context, "Create candidate dataset");
 	}
 
 	@Override

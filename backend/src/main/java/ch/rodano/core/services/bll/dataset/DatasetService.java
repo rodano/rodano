@@ -16,7 +16,8 @@ import ch.rodano.core.utils.ACL;
 public interface DatasetService {
 
 	/**
-	 * Create a candidate dataset, which serves as a pre-filled shell for a new dataset.
+	 * Create and persist a candidate dataset, which serves as a pre-filled shell for a new dataset. The caller must run
+	 * this inside a transaction that is rolled back after all candidate data has been materialized.
 	 * @param scope         Dataset scope
 	 * @param event         Dataset event
 	 * @param datasetModel  Dataset model

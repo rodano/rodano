@@ -35,7 +35,6 @@ import ch.rodano.core.model.mail.MailOrigin;
 import ch.rodano.core.services.bll.mail.MailService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
-import ch.rodano.core.services.dao.commons.cache.transaction.TransactionCacheDAOService;
 
 @ControllerAdvice
 public class APIExceptionHandler extends ResponseEntityExceptionHandler {
@@ -44,7 +43,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
 	private final StudyService studyService;
 	private final MailService mailService;
-	private final TransactionCacheDAOService transactionCacheDAOService;
 	private final Configurator configurator;
 	private final boolean sendExceptionEmail;
 	private final String exceptionEmailRecipient;
@@ -53,7 +51,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 	public APIExceptionHandler(
 		final StudyService studyService,
 		final MailService mailService,
-		final TransactionCacheDAOService transactionCacheDAOService,
 		final AuditActionService auditActionService,
 		@Value("${rodano.api.exception-emails.enabled:false}") final boolean sendExceptionEmail,
 		@Value("${rodano.api.exception-emails.recipient:bug@rodano.ch}") final String exceptionEmailRecipient,
@@ -61,7 +58,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 	) {
 		this.studyService = studyService;
 		this.mailService = mailService;
-		this.transactionCacheDAOService = transactionCacheDAOService;
 		this.configurator = configurator;
 		this.sendExceptionEmail = sendExceptionEmail;
 		this.exceptionEmailRecipient = exceptionEmailRecipient;
@@ -79,9 +75,6 @@ public class APIExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@ExceptionHandler(value = { Exception.class })
 	protected ResponseEntity<Object> handleAnyException(final Exception e, final WebRequest request) {
-		// IMPORTANT ! Empty the cache in case of an exception, otherwise the cache will be left in memory, polluting the thread execution.
-		transactionCacheDAOService.emptyCache();
-
 		final String path = request.getDescription(false);
 
 		// Handle exceptions thrown from controllers via the ResponseStatusException API

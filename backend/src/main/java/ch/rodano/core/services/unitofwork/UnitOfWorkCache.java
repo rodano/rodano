@@ -1,4 +1,4 @@
-package ch.rodano.core.services.dao.commons.cache.transaction;
+package ch.rodano.core.services.unitofwork;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,11 +11,11 @@ import org.slf4j.LoggerFactory;
 
 import ch.rodano.core.model.common.IdentifiableObject;
 
-public class TransactionCacheDAO {
+public class UnitOfWorkCache {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	/**
-	 * The java object cache stores java objects for when they need to be recovered several times over the course of a single request.
+	 * The java object cache stores java objects for when they need to be recovered several times over the course of a single unit of work.
 	 */
 	private final Map<Class<?>, Map<Long, IdentifiableObject>> javaObjectCaches;
 	/**
@@ -24,8 +24,8 @@ public class TransactionCacheDAO {
 	 */
 	private final Map<String, Map<Long, Record>> recordCaches;
 
-	public TransactionCacheDAO() {
-		// No need to create an thread safe map cause one session cache is attached to only one thread
+	public UnitOfWorkCache() {
+		// No need to create a thread safe map cause one cache is attached to only one thread
 		javaObjectCaches = new HashMap<>();
 		recordCaches = new HashMap<>();
 	}
@@ -64,7 +64,7 @@ public class TransactionCacheDAO {
 		if(record != null) {
 			return record;
 		}
-		throw new IllegalArgumentException(String.format("No record in table %s with pk %s was found in the transaction cache", table.getName(), recordPk));
+		throw new IllegalArgumentException(String.format("No record in table %s with pk %s was found in the unit of work cache", table.getName(), recordPk));
 	}
 
 	/**

@@ -52,9 +52,7 @@ public class RequestContextInterceptor implements HandlerInterceptor {
 			}
 
 			// Store the contextual info in a request-scope service
-			requestContextService.setAuditedRequest(true);
-			requestContextService.setActor(actor);
-			requestContextService.setRationale(rationale);
+			requestContextService.setAuditContext(actor, rationale);
 		}
 
 		return true;
