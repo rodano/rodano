@@ -4,10 +4,10 @@
 		<meta charset="utf-8"/>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 		<meta name="description" content="Documentation of Rodano, the EDC platform for all types of clinical trials"/>
-		<link rel="icon" href="images/favicon.ico"/>
-		<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
-		<link href="css/global.css" rel="stylesheet" type="text/css" title="default"/>
-		<script type="module" src="js/global.js"></script>
+		<link rel="icon" href="/images/favicon.ico"/>
+		<link rel="icon" href="/images/favicon.svg" type="image/svg+xml">
+		<link href="/css/global.css" rel="stylesheet" type="text/css" title="default"/>
+		<script type="module" src="/js/global.js"></script>
 		<title>{{ rodano }} documentation</title>
 	</head>
 	<body>
@@ -34,6 +34,12 @@
 						</li>
 						<li>
 							<a {% if page.url == "/technical-specifications.html" %} aria-current="page" {% endif %} href="/technical-specifications.html">Technical specifications</a>
+						</li>
+						<li>
+							<span>Configurator</span>
+							<ol>
+								<li><a {% if page.url == "/configurator/technical-specifications.html" %} aria-current="page" {% endif %} href="/configurator/technical-specifications.html">Technical specifications</a></li>
+							</ol>
 						</li>
 					</ol>
 				</nav>

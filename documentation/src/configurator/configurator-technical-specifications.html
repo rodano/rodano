@@ -1,0 +1,734 @@
+<nav id="table-of-contents"></nav>
+<section id="introduction">
+	<h2>Introduction</h2>
+	<p>The configurator is a Javascript application that allows to configure with ease all aspects of a clinical study built with Rodano. The configurator can run in two different modes:</p>
+	<ul>
+		<li>Stand-alone, used to create a new study.</li>
+		<li>Hosted by a Rodano server, used to edit an existing configuration.</li>
+	</ul>
+</section>
+<section id="functional-requirements">
+	<h2>Functional requirements</h2>
+	<section id="study">
+		<h3>Study</h3>
+		<p>In stand-alone mode, the configurator offers to create a study from scratch.</p>
+	</section>
+	<section id="language">
+		<h3>Language</h3>
+		<section id="add-a-language">
+			<h4>Add a language</h4>
+			<p>It should be possible to add a language.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Language" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates language settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new language must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new language is added in the configuration (<code>FS_LANGUAGE_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-language">
+			<h4>Edit a language</h4>
+			<p>It should be possible to edit a language.</p>
+			<h5>Process</h5>
+			<p>The user selects a language in the nodes tree. The application shows an edition panel and the user updates language settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new language id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Language settings have been updated (<code>FS_LANGUAGE_002</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-language">
+			<h4>Delete a language</h4>
+			<p>It should be possible to delete a language.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the language on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The language has been deleted (<code>FS_LANGUAGE_003</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="country">
+		<h3>Country</h3>
+		<section id="add-a-country">
+			<h4>Add a country</h4>
+			<p>It should be possible to add a country.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Country" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates country settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new country must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new country is added in the configuration (<code>FS_COUNTRY_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-country">
+			<h4>Edit a country</h4>
+			<p>It should be possible to edit a country.</p>
+			<h5>Process</h5>
+			<p>The user selects a country in the nodes tree. The application shows an edition panel and the user updates country settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new country id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Country settings have been updated (<code>FS_COUNTRY_002</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-country">
+			<h4>Delete a country</h4>
+			<p>It should be possible to delete a country.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the country on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The country has been deleted (<code>FS_COUNTRY_003</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="profile">
+		<h3>Profile</h3>
+		<section id="add-a-profile">
+			<h4>Add a profile</h4>
+			<p>It should be possible to add a profile.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Profile" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates profile settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new profile must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new profile is added in the configuration (<code>FS_PROFILE_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-profile">
+			<h4>Edit a profile</h4>
+			<p>It should be possible to edit a profile.</p>
+			<h5>Process</h5>
+			<p>The user selects a profile in the nodes tree. The application shows an edition panel and the user updates profile settings.</p>
+			<h5>Pre-conditions</h5>
+			<p>The new profile id must not already exist in the configuration.</p>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Profile settings have been updated (<code>FS_PROFILE_002</code>).</li>
+				<li>Profile id has been updated in "Profile/Profiles" matrix (<code>FS_PROFILE_003</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-profile">
+			<h4>Delete a profile</h4>
+			<p>It should be possible to delete a profile.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the profile on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The profile has been deleted (<code>FS_PROFILE_004</code>).</li>
+				<li>Profile id has been removed in "Profile/Profiles" matrix (<code>FS_PROFILE_005</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="feature">
+		<h3>Feature</h3>
+		<section id="add-a-feature">
+			<h4>Add a feature</h4>
+			<p>It should be possible to add a feature.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Feature" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates feature settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new feature must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new feature is added in the configuration (<code>FS_FEATURE_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-feature">
+			<h4>Edit a feature</h4>
+			<p>It should be possible to edit a feature.</p>
+			<h5>Process</h5>
+			<p>The user selects a feature in the nodes tree. The application shows an edition panel and the user updates feature settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new feature id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Feature settings have been updated (<code>FS_FEATURE_002</code>).</li>
+				<li>Feature id has been updated in "Profile/Features" matrix (<code>FS_FEATURE_003</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-feature">
+			<h4>Delete a feature</h4>
+			<p>It should be possible to delete a feature.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the feature on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The feature has been deleted (<code>FS_FEATURE_004</code>).</li>
+				<li>Feature id has been removed in "Profile/Features" matrix (<code>FS_FEATURE_005</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="menu">
+		<h3>Menu</h3>
+		<section id="add-a-menu">
+			<h4>Add a menu</h4>
+			<p>It should be possible to add a menu.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Menu" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates menu settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new menu must not already exist in the configuration (among level 1 and 2).</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new menu is added in the configuration (<code>FS_MENU_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-menu">
+			<h4>Edit a menu</h4>
+			<p>It should be possible to edit a menu.</p>
+			<h5>Process</h5>
+			<p>The user selects a menu in the nodes tree. The application shows an edition panel and the user updates menu settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new menu id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Menu settings have been updated (<code>FS_MENU_002</code>).</li>
+				<li>Menu id has been updated in "Profile/Menus" matrix (<code>FS_MENU_003</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-menu">
+			<h4>Delete a menu</h4>
+			<p>It should be possible to delete a menu.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the menu on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The menu has been deleted (<code>FS_MENU_004</code>).</li>
+				<li>Menu id has been removed in "Profile/Menus" matrix (<code>FS_MENU_005</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="scope-model">
+		<h3>Scope model</h3>
+		<section id="add-a-scope-model">
+			<h4>Add a scope model</h4>
+			<p>It should be possible to add a scope model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Scope model" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates scope model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new scope model must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new scope model is added in the configuration (<code>FS_SCOPE_MODEL_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-scope-model">
+			<h4>Edit a scope model</h4>
+			<p>It should be possible to edit a scope model.</p>
+			<h5>Process</h5>
+			<p>The user selects a scope model in the nodes tree. The application shows an edition panel and the user updates scope model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new scope model id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Scope model settings have been updated (<code>FS_SCOPE_MODEL_002</code>).</li>
+				<li>Scope model id has been updated in "Profile/Scope models" matrix (<code>FS_SCOPE_MODEL_003</code>).</li>
+				<li>Scope model id has been updated in every other scope model which has a reference to the scope model (<code>FS_SCOPE_MODEL_004</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-scope-model">
+			<h4>Delete a scope model</h4>
+			<p>It should be possible to delete a scope model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the scope model on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The scope model has been deleted (<code>FS_SCOPE_MODEL_006</code>).</li>
+				<li>Scope model id has been removed in "Profile/Scope models" matrix (<code>FS_SCOPE_MODEL_007</code>).</li>
+				<li>Scope model id has been removed from every other scope model which has a reference to the scope model (<code>FS_SCOPE_MODEL_008</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="event-model">
+		<h3>Event model</h3>
+		<section id="add-an-event-model">
+			<h4>Add an event model</h4>
+			<p>It should be possible to add an event model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Event model" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates event model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new event model must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new event model is added in the configuration (<code>FS_EVENT_MODEL_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-an-event-model">
+			<h4>Edit an event model</h4>
+			<p>It should be possible to edit an event model.</p>
+			<h5>Process</h5>
+			<p>The user selects an event model in the nodes tree. The application shows an edition panel and the user updates event model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new event model id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Event model settings have been updated (<code>FS_EVENT_MODEL_002</code>).</li>
+				<li>Event model id has been updated in "Profile/Event models" matrix (<code>FS_EVENT_MODEL_003</code>).</li>
+				<li>Event model id has been updated in every other event model which has a reference to the event model (<code>FS_EVENT_MODEL_004</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-an-event-model">
+			<h4>Delete an event model</h4>
+			<p>It should be possible to delete an event model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the event model on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The event model has been deleted (<code>FS_EVENT_MODEL_005</code>).</li>
+				<li>Event model id has been removed in "Profile/Event models" matrix (<code>FS_EVENT_MODEL_006</code>).</li>
+				<li>Event model id has been removed from every other event model which has a reference to the event model (<code>FS_EVENT_MODEL_007</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="dataset-model">
+		<h3>Dataset model</h3>
+		<section id="add-a-dataset-model">
+			<h4>Add a dataset model</h4>
+			<p>It should be possible to add a dataset model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Dataset model" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates dataset model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new dataset model must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new dataset model is added in the configuration (<code>FS_DATASET_MODEL_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-dataset-model">
+			<h4>Edit a dataset model</h4>
+			<p>It should be possible to edit a dataset model.</p>
+			<h5>Process</h5>
+			<p>The user selects a dataset model in the nodes tree. The application shows an edition panel and the user updates dataset model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new dataset model id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Dataset model settings have been updated (<code>FS_DATASET_MODEL_002</code>).</li>
+				<li>Dataset model id has been updated in "Profile/Dataset models" matrix (<code>FS_DATASET_MODEL_003</code>).</li>
+				<li>Dataset model id has been updated in every scope model which has a reference to the dataset model (<code>FS_DATASET_MODEL_004</code>).</li>
+				<li>Dataset model id has been updated in every event model which has a reference to the dataset model (<code>FS_DATASET_MODEL_005</code>).</li>
+				<li>Dataset model id has been updated in every form model which has a reference to the dataset model (<code>FS_DATASET_MODEL_006</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-dataset-model">
+			<h4>Delete a dataset model</h4>
+			<p>It should be possible to delete a dataset model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the dataset model on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The dataset model has been deleted (<code>FS_DATASET_MODEL_007</code>).</li>
+				<li>Dataset model id has been removed in "Profile/Dataset models" matrix (<code>FS_DATASET_MODEL_008</code>).</li>
+				<li>Dataset model id has been removed from every scope model which has a reference to the dataset model (<code>FS_DATASET_MODEL_009</code>).</li>
+				<li>Dataset model id has been removed from every event model which has a reference to the dataset model (<code>FS_DATASET_MODEL_010</code>).</li>
+				<li>Dataset model id has been removed from every form model which has a reference to the dataset model (<code>FS_DATASET_MODEL_011</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="field-model">
+		<h3>Field model</h3>
+		<section id="add-an-field-model">
+			<h4>Add an field model</h4>
+			<p>It should be possible to add an field model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Field model" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates field model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new field model must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new field model is added in the configuration (<code>FS_FIELD_MODEL_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-an-field-model">
+			<h4>Edit an field model</h4>
+			<p>It should be possible to edit an field model.</p>
+			<h5>Process</h5>
+			<p>The user selects an field model in the nodes tree. The application shows an edition panel and the user updates field model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new field model id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Field model settings have been updated (<code>FS_FIELD_MODEL_002</code>).</li>
+				<li>Field model id has been updated in every form model which has a reference to the field model (<code>FS_FIELD_MODEL_003</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-an-field-model">
+			<h4>Delete an field model</h4>
+			<p>It should be possible to delete an field model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the field model on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The field model has been deleted (<code>FS_FIELD_MODEL_004</code>).</li>
+				<li>Field model id has been removed from every form model which has a reference to the field model (<code>FS_FIELD_MODEL_005</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="validator">
+		<h3>Validator</h3>
+		<section id="add-a-validator">
+			<h4>Add a validator</h4>
+			<p>It should be possible to add a validator.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Validator" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates validator settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new validator must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new validator is added in the configuration (<code>FS_VALIDATOR_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-validator">
+			<h4>Edit a validator</h4>
+			<p>It should be possible to edit a validator.</p>
+			<h5>Process</h5>
+			<p>The user selects a validator in the nodes tree. The application shows an edition panel and the user updates validator settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new validator id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Validator settings have been updated (<code>FS_VALIDATOR_002</code>).</li>
+				<li>Validator id has been updated in every field model which has a reference to the validator (<code>FS_VALIDATOR_003</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-validator">
+			<h4>Delete a validator</h4>
+			<p>It should be possible to delete a validator.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the validator on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The validator has been deleted (<code>FS_VALIDATOR_004</code>).</li>
+				<li>Validator id has been removed from every field model which has a reference to the validator (<code>FS_VALIDATOR_005</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="workflow">
+		<h3>Workflow</h3>
+		<section id="add-a-workflow">
+			<h4>Add a workflow</h4>
+			<p>It should be possible to add a workflow.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Workflow" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates workflow settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new workflow must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new workflow is added in the configuration (<code>FS_WORKFLOW_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-workflow">
+			<h4>Edit a workflow</h4>
+			<p>It should be possible to edit a workflow.</p>
+			<h5>Process</h5>
+			<p>The user selects a workflow in the nodes tree. The application shows an edition panel and the user updates workflow settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new workflow id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Workflow settings have been updated (<code>FS_WORKFLOW_002</code>).</li>
+				<li>Workflow id has been updated in every profile which has a reference to the workflow (<code>FS_WORKFLOW_003</code>).</li>
+				<li>Workflow id has been updated in every scope model which has a reference to the workflow (<code>FS_WORKFLOW_004</code>).</li>
+				<li>Workflow id has been updated in every event model which has a reference to the workflow (<code>FS_WORKFLOW_005</code>).</li>
+				<li>Workflow id has been updated in every form model which has a reference to the workflow (<code>FS_WORKFLOW_006</code>).</li>
+				<li>Workflow id has been updated in every field model which has a reference to the workflow (<code>FS_WORKFLOW_007</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-workflow">
+			<h4>Delete a workflow</h4>
+			<p>It should be possible to delete a workflow.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the workflow on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The workflow has been deleted (<code>FS_WORKFLOW_008</code>).</li>
+				<li>Workflow id has been removed from every profile which has a reference to the workflow (<code>FS_WORKFLOW_009</code>).</li>
+				<li>Workflow id has been removed from every scope model which has a reference to the workflow (<code>FS_WORKFLOW_010</code>).</li>
+				<li>Workflow id has been removed from every event model which has a reference to the workflow (<code>FS_WORKFLOW_011</code>).</li>
+				<li>Workflow id has been removed from every form model which has a reference to the workflow (<code>FS_WORKFLOW_012</code>).</li>
+				<li>Workflow id has been removed from every field model which has a reference to the workflow (<code>FS_WORKFLOW_013</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="action">
+		<h3>Action</h3>
+		<section id="add-an-action">
+			<h4>Add an action</h4>
+			<p>It should be possible to add an action.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Action" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates action settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new action must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new action is added in the configuration (<code>FS_ACTION_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-an-action">
+			<h4>Edit an action</h4>
+			<p>It should be possible to edit an action.</p>
+			<h5>Process</h5>
+			<p>The user selects an action in the nodes tree. The application shows an edition panel and the user updates action settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new action id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Action settings have been updated (<code>FS_ACTION_002</code>).</li>
+				<li>Action id has been updated in every profile which has a reference to the action (<code>FS_ACTION_003</code>).</li>
+				<li>Action id has been updated in every workflow which has a reference to the action (<code>FS_ACTION_004</code>).</li>
+				<li>Action id has been updated in every workflow state which has a reference to the action (<code>FS_ACTION_005</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-an-action">
+			<h4>Delete an action</h4>
+			<p>It should be possible to delete an action.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the action on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The action has been deleted (<code>FS_ACTION_006</code>).</li>
+				<li>Action id has been removed from every profile which has a reference to the action (<code>FS_ACTION_007</code>).</li>
+				<li>Action id has been removed from every workflow which has a reference to the action (<code>FS_ACTION_008</code>).</li>
+				<li>Action id has been removed from every workflow state which has a reference to the action (<code>FS_ACTION_009</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="workflow-state">
+		<h3>Workflow state</h3>
+		<section id="add-a-workflow-state">
+			<h4>Add a workflow state</h4>
+			<p>It should be possible to add a workflow state.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Workflow state" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates workflow state settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new workflow state must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new workflow state is added in the configuration (<code>FS_WORKFLOW_STATE_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-workflow-state">
+			<h4>Edit a workflow state</h4>
+			<p>It should be possible to edit a workflow state.</p>
+			<h5>Process</h5>
+			<p>The user selects a workflow state in the nodes tree. The application shows an edition panel and the user updates workflow state settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new workflow state id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Workflow state settings have been updated (<code>FS_WORKFLOW_STATE_002</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-workflow-state">
+			<h4>Delete a workflow state</h4>
+			<p>It should be possible to delete a workflow state.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the workflow state on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The workflow state has been deleted (<code>FS_WORKFLOW_STATE_003</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="form-model">
+		<h3>Form model</h3>
+		<section id="add-a-form-model">
+			<h4>Add a form model</h4>
+			<p>It should be possible to add a form model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Form model" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates form model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new form model must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new form model is added in the configuration (<code>FS_FORM_MODEL_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-form-model">
+			<h4>Edit a form model</h4>
+			<p>It should be possible to edit a form model.</p>
+			<h5>Process</h5>
+			<p>The user selects a form model in the nodes tree. The application shows an edition panel and the user updates form model settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new form model id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Form model settings have been updated (<code>FS_FORM_MODEL_002</code>).</li>
+				<li>Form model id has been updated in "Profile/Form models" matrix (<code>FS_FORM_MODEL_003</code>).</li>
+				<li>Form model id has been updated in every scope model which has a reference to the form model (<code>FS_FORM_MODEL_004</code>).</li>
+				<li>Form model id has been updated in every event which has a reference to the form model (<code>FS_FORM_MODEL_005</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-form-model">
+			<h4>Delete a form model</h4>
+			<p>It should be possible to delete a form model.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the form model on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The form model has been deleted (<code>FS_FORM_MODEL_006</code>).</li>
+				<li>Form model id has been removed in "Profile/Form models" matrix (<code>FS_FORM_MODEL_007</code>).</li>
+				<li>Form model id has been removed from every scope model which has a reference to the form model (<code>FS_FORM_MODEL_008</code>).</li>
+				<li>Form model id has been removed from every event model which has a reference to the form model (<code>FS_FORM_MODEL_009</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="workflow-widget">
+		<h3>Workflow widget</h3>
+		<section id="add-an-workflow-widget">
+			<h4>Add an workflow widget</h4>
+			<p>It should be possible to add an workflow widget.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Workflow widget" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates workflow widget settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new workflow widget must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new workflow widget is added in the configuration (<code>FS_WORKFLOW_WIDGET_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-an-workflow-widget">
+			<h4>Edit an workflow widget</h4>
+			<p>It should be possible to edit an workflow widget.</p>
+			<h5>Process</h5>
+			<p>The user selects an workflow widget in the nodes tree. The application shows an edition panel and the user updates workflow widget settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new workflow widget id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Workflow widget settings have been updated (<code>FS_WORKFLOW_WIDGET_002</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-an-workflow-widget">
+			<h4>Delete an workflow widget</h4>
+			<p>It should be possible to delete an workflow widget.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the workflow widget on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The workflow widget has been deleted (<code>FS_WORKFLOW_WIDGET_003</code>).</li>
+			</ul>
+		</section>
+	</section>
+	<section id="privacy-policy">
+		<h3>Privacy policy</h3>
+		<section id="add-a-privacy-policy">
+			<h4>Add a privacy policy</h4>
+			<p>It should be possible to add a privacy policy.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the "Privacy policy" entity in the nodes tree and click on the addition icon (green plus). The application then shows an edition panel and the user updates privacy policy settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>Id of the new privacy policy must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>A new privacy policy is added in the configuration (<code>FS_PRIVACY_POLICY_001</code>).</li>
+			</ul>
+		</section>
+		<section id="edit-a-privacy-policy">
+			<h4>Edit a privacy policy</h4>
+			<p>It should be possible to edit a privacy policy.</p>
+			<h5>Process</h5>
+			<p>The user selects a privacy policy in the nodes tree. The application shows an edition panel and the user updates privacy policy settings.</p>
+			<h5>Pre-conditions</h5>
+			<ul>
+				<li>The new privacy policy id must not already exist in the configuration.</li>
+			</ul>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>Privacy policy settings have been updated (<code>FS_PRIVACY_POLICY_002</code>).</li>
+			</ul>
+		</section>
+		<section id="delete-a-privacy-policy">
+			<h4>Delete a privacy policy</h4>
+			<p>It should be possible to delete a privacy policy.</p>
+			<h5>Process</h5>
+			<p>The user moves his mouse over the privacy policy on the node tree and click on the deletion icon (red cross).</p>
+			<h5>Pre-conditions</h5>
+			<h5>Post-conditions</h5>
+			<ul>
+				<li>The privacy policy has been deleted (<code>FS_PRIVACY_POLICY_003</code>).</li>
+			</ul>
+		</section>
+	</section>
+</section>
