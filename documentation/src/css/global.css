@@ -48,6 +48,12 @@ header {
 	& > a {
 		color: var(--highlight-surface-text-color);
 	}
+	& > .version {
+		color: var(--highlight-surface-text-color);
+		font-size: 1rem;
+		opacity: 0.8;
+		margin-left: 0.5rem;
+	}
 }
 a {
 	color: var(--highlight-color);
