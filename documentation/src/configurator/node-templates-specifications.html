@@ -1,0 +1,136 @@
+<nav id="table-of-contents"></nav>
+<section id="introduction">
+	<h2>Introduction</h2>
+	<p>Node templates are configuration elements (for example field models, workflows or entire studies) that are saved in a repository on a server so that they can be reused.</p>
+</section>
+<section id="node-templates-types">
+	<h2>Node templates types</h2>
+	<p>The following entities can be saved as templates:</p>
+	<ul>
+		<li>Study</li>
+		<li>Sheet (a combination of a dataset model and a page)</li>
+		<li>Dataset model</li>
+		<li>Field model</li>
+		<li>Workflow</li>
+	</ul>
+</section>
+<section id="node-templates-server">
+	<h2>Node templates server</h2>
+	<p>All templates are stored as files on a server. The server provides an API to add or delete templates. This API is written in JavaScript and run with Node.js.</p>
+	<section id="source-code">
+		<h3>Source code</h3>
+		<p>The source code of the server is hosted in the same repository as the Configurator application. It consists of a single JavaScript file.</p>
+	</section>
+	<section id="server-setup">
+		<h3>Server setup</h3>
+		<p>The template server requires a working Unix OS with Node.js and a Node.js script called "forever".</p>
+		<p>The command to start the server is:</p>
+		<pre><code>forever start template.server.node.js</code></pre>
+	</section>
+</section>
+<section id="node-templates-management-in-the-configurator">
+	<h2>Node templates management in the Configurator</h2>
+	<p>The Configurator is used to manage node templates. It can create templates from configuration nodes and save them in a repository.</p>
+	<p>The Configurator can be set up to work with multiple template repositories.</p>
+	<section id="repositories-configuration">
+		<h3>Repositories configuration</h3>
+		<section id="local-repository">
+			<h4>Local repository</h4>
+			<p>By default, the Configurator comes with a pre-configured local template repository. It stores templates locally, directly inside the browser, and behaves exactly like the official Rodano template server.</p>
+			<p>However, by design, this repository cannot be used to share templates across the company because it is not shared between Configurator users.</p>
+		</section>
+		<section id="configure-official-rodano-repository">
+			<h4>Configure the official Rodano repository</h4>
+			<p>The first thing to do is to configure the official Rodano template repository.</p>
+			<ul>
+				<li>Use the menu Tools&gt;Templates.</li>
+				<li>Click "Manage repositories" in the upper right corner of the templates window.</li>
+				<li>Click "Add repository".</li>
+				<li>Set "rodano" for the id, "http://templates.rodanotech.ch" for the URL, "rodano" for the login and the usual password for the password.</li>
+				<li>Click "Test" to check that everything is correct.</li>
+				<li>Click "Submit" to save the configuration.</li>
+				<li>Close the window.</li>
+			</ul>
+			<p>In the title of the templates window, it is now possible to switch to the newly created "rodano" repository. Existing templates should appear, sorted into different sections.</p>
+		</section>
+	</section>
+	<section id="node-template-creation">
+		<h3>Node template creation</h3>
+		<p>Go to the node you would like to save as a template. If it is a supported entity, a disk icon is shown in the title of the node form.</p>
+		<figure>
+			<img src="/images/configurator/node_templates_save_template_1.png" alt="Save a template from an existing node"/>
+			<figcaption>Save a template from an existing node</figcaption>
+		</figure>
+		<p>After clicking this icon, you must set a name and a description for the template. You should also check that the selected repository is "rodano".</p>
+		<figure>
+			<img src="/images/configurator/node_templates_save_template_2.png" alt="Add a name and a description for a template"/>
+			<figcaption>Add a name and a description for a template</figcaption>
+		</figure>
+		<section id="limitations">
+			<h4>Limitations</h4>
+			<p>Not all node information is saved in the template. The limitations are described below.</p>
+			<h5>Field model</h5>
+			<p>All references to validators are removed. All initialization rules and modification rules are removed.</p>
+			<h5>Dataset model</h5>
+			<p>All field models are cleaned as described above.</p>
+			<h5>Workflow</h5>
+			<p>All workflow rules and rules on workflow actions are removed.</p>
+			<h5>Sheet</h5>
+			<p>Sheet templates are specific in that they are a combination of a form model, the dataset model and the field models used in the form model. It is not possible to create a sheet template from a page that is linked to more than one document.</p>
+		</section>
+		<section id="restrictions-for-the-configurator">
+			<h4>Restrictions for the Configurator</h4>
+			<p>When creating a template for the Configurator, there are also specific restrictions.</p>
+			<h5>Study</h5>
+			<ul>
+				<li>the study must contain scope models with the ids "STUDY", "COUNTRY", "CENTER" and "PATIENT";</li>
+				<li>the study must have a single scheduled event group whose id is "SCHEDULING";</li>
+				<li>if there is a baseline event model, its id must be "BASELINE" and it must be inside the scheduled event group;</li>
+				<li>if there is a screening event model, its id must be "SCREENING" and it must be inside the scheduled event group;</li>
+				<li>the validators "REQUIRED" and "REQUIRED_WITH_QUERY" must exist;</li>
+				<li>the profiles "INVESTIGATOR", "DATAMANAGER", "CRA", "CRO" and "SPONSOR" must exist;</li>
+				<li>the workflows "QUERY" and "PROTOCOL_DEVIATION" must exist;</li>
+				<li>the workflows "EVENT_SDV" and "PAGE_SDV" must exist;</li>
+				<li>the workflows "PAGE_ENTRY", "DATA_MANAGEMENT" and "EVENTS_REPORTING" must exist.</li>
+			</ul>
+		</section>
+	</section>
+	<section id="node-template-usage">
+		<h3>Node template usage</h3>
+		<p>Node templates that are not studies can be added to any existing configuration.</p>
+		<p>While editing an existing configuration, use the menu Tools&gt;Templates to open the template management modal window. After selecting the right kind of template in the section on the left, click the plus icon to add the selected template to the current configuration.</p>
+		<figure>
+			<img src="/images/configurator/node_templates_use_template.png" alt="Use a template"/>
+			<figcaption>Use a template</figcaption>
+		</figure>
+	</section>
+	<section id="node-template-deletion">
+		<h3>Node template deletion</h3>
+		<p>While editing an existing configuration, use the menu Tools&gt;Templates to open the template management modal window. After selecting the right kind of template in the section on the left, click the red cross to delete the selected template.</p>
+		<figure>
+			<img src="/images/configurator/node_templates_delete_template.png" alt="Delete a template"/>
+			<figcaption>Delete a template</figcaption>
+		</figure>
+	</section>
+	<section id="node-template-modifications">
+		<h3>Node template modifications</h3>
+		<p>The process to edit a node template depends on the kind of template.</p>
+		<section id="templates-which-are-not-study">
+			<h4>Templates that are not studies</h4>
+			<p>There is no way to edit these kinds of templates. They must be deleted and re-created.</p>
+		</section>
+		<section id="study-templates">
+			<h4>Study templates</h4>
+			<p>Study templates can be edited in the Configurator. In stand-alone mode, use the welcome modal window to load a study from a configured template repository.</p>
+			<figure>
+				<img src="/images/configurator/node_templates_load_study.png" alt="Load a study from a repository"/>
+				<figcaption>Load a study from a repository</figcaption>
+			</figure>
+			<p>It is then possible to push a template to the template server using the menu Configuration&gt;Push template to server.</p>
+		</section>
+	</section>
+</section>
+<section id="templates-usage-in-the-configurator">
+	<h2>Templates usage in the Configurator</h2>
+	<p>The Configurator is pre-configured to show study, page and attribute templates from the official Rodano repository. Every user of the Configurator has access to the templates stored on this server.</p>
+</section>
