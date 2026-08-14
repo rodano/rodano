@@ -251,3 +251,26 @@ jobs:
         with:
           name: frontend-epro-test-report
           path: frontends/epro/test-report.html
+
+  documentation:
+    name: Test documentation
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./documentation
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: 'npm'
+          cache-dependency-path: documentation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      - name: Lint
+        run: npm run lint

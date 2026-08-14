@@ -1,0 +1,1161 @@
+<nav id="table-of-contents"></nav>
+<section id="introduction">
+	<h2>Introduction</h2>
+	<p>This document describes the general architecture of the Rodano system.</p>
+</section>
+<section id="good-coding-practices">
+	<h2>Good coding practices</h2>
+	<p>The design conventions and general guidelines are the following:</p>
+	<ol>
+		<li>Always use the style guide provided by your IDE of choice. Keeps the code style consistent.</li>
+		<li>Try to keep the code simple. Comment and document the complicated parts.</li>
+		<li>Code should be as readable as possible: try to stay concise, limit the line character length, always think of the most readable and consistent naming for variables and functions.</li>
+		<li>Think about the separation of concerns. If a function or a class does too many things, break them up.</li>
+	</ol>
+</section>
+<section id="dependencies">
+	<h2>Dependencies</h2>
+	<p>The application requires the following dependencies/environment to work:</p>
+	<ul>
+		<li><strong>A relational database</strong> used to store the study data (MariaDB)</li>
+		<li><strong>A configuration file</strong> to specify the study configuration (in JSON format)</li>
+		<li><strong>A directory on a persistent drive</strong> to store the files uploaded by the users</li>
+		<li><strong>An SMTP server</strong> to send emails</li>
+	</ul>
+</section>
+<section id="technologies">
+	<h2>Technologies</h2>
+	<p>Several technologies are used in the Rodano system, the most prominent ones are:</p>
+	<ul>
+		<li><strong>Spring boot</strong>: used for general application framework</li>
+		<li><strong>MariaDB</strong>: acts as the database for all the persistent data</li>
+		<li><strong>jOOQ</strong>: used to write SQL queries in a type-safe way</li>
+		<li><strong>OpenCSV</strong>: used to generate CSV files</li>
+		<li><strong>JUnit</strong>: used for tests</li>
+	</ul>
+</section>
+<section id="technical-configuration">
+	<h2>Technical configuration</h2>
+	<p>Some technical aspects of Rodano can be configured using parameters that can be set in a dedicated file or added directly to the command line. These parameters are documented in the README file.</p>
+</section>
+<section id="business-configuration">
+	<h2>Business configuration</h2>
+	<p>Rodano is a highly configurable product and Rodano configurator can be used to configure it with ease. Rodano configurator generates a JSON configuration file for Rodano.</p>
+	<p>Each entity found in Rodano has an equivalent entity in the configuration. Here is the matching table between configuration entities and their associated Rodano entities:</p>
+	<table>
+		<thead>
+			<tr class="header">
+				<th style="text-align: left"><strong>Configuration entity</strong></th>
+				<th style="text-align: left"><strong>Database entity</strong></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td style="text-align: left">Study</td>
+				<td style="text-align: left">Study</td>
+			</tr>
+			<tr>
+				<td style="text-align: left">Scope model</td>
+				<td style="text-align: left">Scope</td>
+			</tr>
+			<tr>
+				<td style="text-align: left">Event model</td>
+				<td style="text-align: left">Event</td>
+			</tr>
+			<tr>
+				<td style="text-align: left">Dataset model</td>
+				<td style="text-align: left">Dataset</td>
+			</tr>
+			<tr>
+				<td style="text-align: left">Field model</td>
+				<td style="text-align: left">Field</td>
+			</tr>
+			<tr>
+				<td style="text-align: left">Workflow</td>
+				<td style="text-align: left">Workflow status</td>
+			</tr>
+		</tbody>
+	</table>
+	<section id="usage">
+		<h3>Usage</h3>
+		<p>When Rodano is started it deserializes the JSON configuration file into a graph of objects. The configuration object graph is static and global.</p>
+	</section>
+	<section id="configuration-entities">
+		<h3>Configuration entities</h3>
+		<section id="study">
+			<h4>Study</h4>
+			<p>Study is the root element of the configuration. It contains global settings like information about the protocol, study email settings or available languages.</p>
+		</section>
+		<section id="languages">
+			<h4>Languages</h4>
+			<p>Rodano is a multilingual product. Every element of the configuration can be translated. Connected users can choose their language among activated languages on the product.</p>
+		</section>
+		<section id="menu">
+			<h4>Menu</h4>
+			<p>Menus are used to navigate through the Rodano application. Configured menus will appear in the menu bar, on top of every page. There are two levels of menus. A top level menu can contain one or several sub-menus.</p>
+		</section>
+		<section id="feature">
+			<h4>Feature</h4>
+			<p>A feature defines a right to access an information or to perform an action. There is a list of pre-configured features in the product. It is possible to define new features dynamically and to use these new features in other parts of the configuration.</p>
+			<p>Here is the list of pre-configured features:</p>
+			<table>
+				<thead>
+					<tr class="header">
+						<th style="text-align: left"><strong>Name</strong></th>
+						<th style="text-align: left"><strong>Description</strong></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style="text-align: left">ADMIN</td>
+						<td style="text-align: left">Gives global administration rights</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">LOGIN</td>
+						<td style="text-align: left"> Allows to connect on the web interface</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">MANAGE_CONFIGURATION</td>
+						<td style="text-align: left">Allows to edit the configuration</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">MANAGE_DELETED_DATA</td>
+						<td style="text-align: left"> Allows to view and manage deleted data</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">MANAGE_MAILS</td>
+						<td style="text-align: left"> Allows to manage emails sent by system</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">MANAGE_RESOURCE</td>
+						<td style="text-align: left">Allows to manage resources</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">LOCK</td>
+						<td style="text-align: left"> Allows locking of scopes and events</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">DOCUMENTATION</td>
+						<td style="text-align: left"> Allows to export documentation files</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">EXPORT</td>
+						<td style="text-align: left">Allows to export data</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">NOTIFY_RESOURCE_PUBLISHED</td>
+						<td style="text-align: left"> Get notified when a resource is published</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">VIEW_AUDIT_TRAIL</td>
+						<td style="text-align: left">View audit trails</td>
+					</tr>
+				</tbody>
+			</table>
+		</section>
+		<section id="profile">
+			<h4>Profile</h4>
+			<p>A profile is a set of features that can be assigned to a user.</p>
+		</section>
+		<section id="scope-model">
+			<h4>Scope model</h4>
+			<p>A scope model describes the behavior of a scope. Scopes are main elements of a study. A scope can be a
+				patient, a center or a country and will be used as a data container. A scope can be it-self contained in
+				one or more other scopes following the scheme described by scope models. For example, the scope model
+				<em>PATIENT</em> can be configured as a child of scope models <em>CENTER</em> and <em>SUBSTUDY</em>. In
+				this case, all “patients” (scopes having <em>PATIENT</em> as scope model) of a study would be able to be
+				stored in “centers” or “substudies”. The leaf scope model does not have any children.</p>
+			<p>Here are notable settings of a scope model:</p>
+			<ul>
+				<li>"maxNumber" is the maximum number of scopes that can be created with this scope model.</li>
+				<li>"virtual" means that the scope model is a logical group than a physical one.</li>
+				<li>"format" is the pattern that be used to generate the id/code of a scope created from this scope model.</li>
+			</ul>
+			<p>A profile can have the following rights on a scope model: <em>READ</em> and <em>WRITE</em>.</p>
+		</section>
+		<section id="event-model">
+			<h4>Event model</h4>
+			<p>An event model is a generic configuration for an event in time.</p>
+		</section>
+		<section id="dataset-model">
+			<h4>Dataset model</h4>
+			<p>A dataset model is a group of field models. A dataset model can be associated to a minimum of 2 other dataset models to create a family. Every family of models must contain one and only one master model. Other models are called slaves. When a value of a slave model is updated, it is compared to the same value on the other slave models. If all values are equals, the value is saved in the master model. If it is not the case, a “disparity” is created and a manual action is required to choose the correct value.
+			</p>
+			<p>Here are notable settings of a dataset model:</p>
+			<ul>
+				<li>"exportable" means that the model will be available on the export page of Rodano.</li>
+			</ul>
+			A profile can have the following rights on a dataset model: <em>READ</em> and <em>WRITE</em>.
+		</section>
+		<section id="field-model">
+			<h4>Field model</h4>
+			<p>A field model is a configuration entity of a field in the eCRF. There are different types of field
+				models:</p>
+			<table>
+				<thead>
+					<tr class="header">
+						<th style="text-align: left"><strong>Name</strong></th>
+						<th style="text-align: left"><strong>Description</strong></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td style="text-align: left">STRING</td>
+						<td style="text-align: left">Alphanumeric value with a maximum of 200 characters.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">NUMBER</td>
+						<td style="text-align: left">Number with specified format.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">TEXTAREA</td>
+						<td style="text-align: left">Alphanumeric value displayed as a text.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">SELECT</td>
+						<td style="text-align: left">Value among a list of options, only one value possible.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">RADIO</td>
+						<td style="text-align: left">Value among a list of options, only one value possible.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">CHECKBOX</td>
+						<td style="text-align: left">Value empty, true or false. Displayed as a checkbox.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">CHECKBOX_GROUP</td>
+						<td style="text-align: left">Values among a list of options, more the one value possible.
+							Option "other" allows to have the user fill his own value.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">DATE</td>
+						<td style="text-align: left">Date, time or both, following a specified format. Displayed as
+							simple input.</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">DATE_SELECT</td>
+						<td style="text-align: left">Date using 3 dropdowns. Allows choosing "Unknown" for some fields
+							(e.g. "Unknown.05.1974").</td>
+					</tr>
+					<tr>
+						<td style="text-align: left">AUTO_COMPLETION</td>
+						<td style="text-align: left">Alphanumeric value with suggestions.</td>
+					</tr>
+				</tbody>
+			</table>
+			<p>Here are notable settings of a field model:</p>
+			<ul>
+				<li>"exportable" means that the field model will be available on the export page of Rodano.</li>
+			</ul>
+		</section>
+		<section id="validator">
+			<h4>Validator</h4>
+			<p>A validator is used to validate a value of a field. It relies on rules written by the eCRF designer which
+				are used to decide if a value is valid or not. If value is not valid, a workflow can be triggered.</p>
+		</section>
+		<section id="workflow">
+			<h4>Workflow</h4>
+			<p>A workflow is the description of a process that can be attached to scope, event, form or a field. A
+				workflow contains one or more states which have one or more actions.</p>
+		</section>
+		<section id="privacy-policy">
+			<h4>Privacy policy</h4>
+			<p>A privacy policy is a text that will be displayed to the user when he activates every new role. It is
+				linked to a <a href="#profile">profile</a>. The user must accept the policy to activate his role.
+			</p>
+		</section>
+	</section>
+</section>
+<section id="scope">
+	<h2>Scope</h2>
+	<section id="scope-description">
+		<h3>Description</h3>
+		<p>Scope is the main data container object of the application. A scope’s configuration is defined by its <a href="#scope-model">scope model</a>. Through the use of a scope model, a scope can represent any study entity: patient, centre, country, study, sub-study, etc. Data that is directly related to the scope entity can be represented using the one or more <a href="#dataset">datasets</a> attached directly to the scope (e.g. patient record, medical history, family history, etc.). <a href="#event">Events</a> can also be attached to scope to represent specific events through time (e.g.medical visit, termination event, etc.).</p>
+		<p>Scopes are arranged in a tree-like hierarchy with the scope representing the study usually acting as the root node of the tree, this scope is referred to as the <em>root scope</em>. All the scopes must have at least one parent relation except for the <em>root scope</em>.</p>
+		<section id="root-scope">
+			<h4>Root scope</h4>
+			<p><em>Root scope</em> serves as the root node of the scope tree hierarchy. Thus one and only one <em>root scope</em> can be present in the system at any given moment. The <em>root scope</em> can not be created by a user and is usually created at the database initialization of a new deployment.</p>
+		</section>
+		<section id="scope-code">
+			<h4>Scope code</h4>
+			<p>When a scope is created, a unique and non-modifiable scope code is created for it. The format of the scope code is based on the code format specified in the relevant scope model.</p>
+		</section>
+	</section>
+	<section id="virtual-scope">
+		<h3>Virtual scope</h3>
+		<p>A virtual scope is used to represent non-physical assembly of other scopes. For example, it can be used to
+			assemble a group of scopes that adhere to certain criteria. Note that virtual scopes can only be created by
+			providing a scope model that is marked as virtual.</p>
+		<section id="enrollment-model">
+			<h4>Enrollment model</h4>
+			<p>It is possible to define an enrollment model for a virtual scope. An enrollment model describes characteristics required for other scopes to be associated with the virtual scope. Here are the available options when creating an enrollment model:</p>
+			<ul>
+				<li><strong>Scope model ID</strong>: scope model to match</li>
+				<li><strong>Scope container IDs</strong>: candidates must be contained in one of the specified scope container. This is used to build a white list of ancestors to which candidates must be related</li>
+				<li><strong>Field model criterion</strong>: candidate’s data must match specified criterion. A criterion is a combination of a reference to particular models (i.e. dataset and field models), an operator (equals, greater, lower or equals, etc.) and a value</li>
+			</ul>
+			<p>An enrollment model can be automatic or manual. In automatic mode, if a scope matches enrollment model
+				constraints, it is automatically added as a child of the virtual scope. In manual mode, a user must
+				validate each candidate manually. An enrolled scope will never be removed automatically from a virtual
+				scope even if, after being updated, it no longer matches required constraints.</p>
+		</section>
+	</section>
+	<section id="scope-relation">
+		<h3>Scope relations</h3>
+		<p>Scope relations are the entities that define the edges between the scopes in the scope hierarchy tree. They define the relations between individual scopes. All scope relations are created with a start date and can feature an optional end date. The relation end date thus defines the end of the relation between the two referenced scopes. A scope’s model can define the maximum number of allowed child scopes.</p>
+		<section id="default-relation">
+			<h4>Default relation</h4>
+			<p>A scope relation can be defined as the default relation between two scopes. Every scope must have exactly one parent relation marked as default at any time. Note that virtual and non-active relations (past or future relations) can not be defined as default.</p>
+		</section>
+		<section id="virtual-relation">
+			<h4>Virtual relation</h4>
+			<p>A relation is defined as virtual if the parent scope of the relation is a <a href="#virtual-scope">virtual scope</a>.</p>
+		</section>
+		<section id="scope-relation-creation">
+			<h4>Creation</h4>
+			<p>A scope relation needs the following parameters upon creation:</p>
+			<ol>
+				<li>Reference to the parent scope.</li>
+				<li>Reference to the child scope.</li>
+				<li>The start date of the relation.</li>
+				<li>An optional end date of the relation.</li>
+			</ol>
+			A relation can not be created if at least one of the following statements is true:
+			<ul>
+				<li>At least one of the scopes is either deleted or locked</li>
+				<li>The two scopes already have an active relation at the time of creation</li>
+				<li>There is no date overlap in the relations between the parent and child scopes</li>
+				<li>The total number of children scopes does not exceed the maximum allowed in the parent’s scope model, if such a maximum is defined</li>
+				<li>The relation must respect the scope’s model constraints. i.e. The scope model of the child scope must be a child scope model of the scope model of the parent scope</li>
+			</ul>
+		</section>
+		<section id="end-of-relation">
+			<h4>End of relation</h4>
+			<p>A scope relation can be ended at the provided end date under the following conditions:</p>
+			<ul>
+				<li>Neither of the scopes is locked or deleted</li>
+				<li>The relation is not the default relation</li>
+				<li>The provided relation end date is after the relation start date</li>
+			</ul>
+			<p>Important to note that the virtual relations will be immediately and permanently removed from the database, while the non-virtual relations will just have an end date set to them.</p>
+		</section>
+	</section>
+	<section id="user-rights-on-scopes">
+		<h3>User rights on scopes</h3>
+		<p>When a user is granted the rights to manage a scope, he can see all current descendant scopes of this scope.
+			This means that he has rights to see descendant scopes that have been added in the scope before he has been
+			given the right on the scope. The user will also have right to see any future descendant scopes that could
+			be added afterwards.</p>
+		<p>However, if a descendant scope is transferred to another scope, the user will be able to see only data of
+			events that happened before the transfer. All future collected data will be hidden from the user. This means
+			that they won’t be able to view next events nor the eventual data modifications. Analogously, if a
+			descendant scope is transferred to his scope he will see all pre-existing data in read only mode and won’t
+			be able to add events before the transfer date.</p>
+		<p>Note that in the case of a virtual scope, the user that has rights on the virtual scope can see all the past
+			data of the descendant scopes. To illustrate this concept, suppose that a user has rights on centre
+			<em>x</em> which has a patient that just got transferred from centre <em>y</em> to centre <em>x</em>. At
+			this point the user can only see the data that happened after the transfer. But if the user is also granted
+			rights on a virtual scope of which the patient scope is a descendant of, then the user will be able to see
+			all the patient’s data before the transfer. In this way the virtual scope "overrides" the usual rights on
+			scopes.</p>
+	</section>
+	<section id="scope-creation">
+		<h3>Creation</h3>
+		<p>A scope can be created at any time providing the following parameters:</p>
+		<ol>
+			<li>Scope model.</li>
+			<li>Parent scope.</li>
+		</ol>
+	</section>
+	<section id="scope-deletion">
+		<h3>Deletion</h3>
+		<p>When a scope is deleted by a user, its <em>deleted</em> flag is set to <em>true</em> and all the scope
+			deletion <a href="#rules">rules</a> are executed on the scope. The deleted scope can be restored by a
+			user with the appropriate rights. Note that if a parent scope is deleted, it and its descendants will only
+			be visible to authorized users, even though the descendant scopes are not deleted.</p>
+	</section>
+	<section id="scope-restoration">
+		<h3>Restoration</h3>
+		<p>Any deleted scope can be restored by an authorized user. When a scope is restored by a user:</p>
+		<ol>
+			<li>The scope’s <em>deleted</em> flag is set to <em>false</em>.</li>
+			<li>All the fields found in the scope’s datasets, the datasets of its events and recursively in all its
+				descendant scopes are <a href="#field-model-validation">validated</a>.</li>
+			<li>All the scope restoration <a href="#rules">rules</a> are executed.</li>
+		</ol>
+	</section>
+</section>
+<section id="event">
+	<h2>Event</h2>
+	<section id="event-description">
+		<h3>Description</h3>
+		<p>An event is a representation of something (i.e. a patient visit, an intervention, a sample collection, etc.) that has already happened or will happen in the future. An event is always attached to a <a href="#scope">scope</a> and can contain one or more <a href="#dataset">datasets</a>. Event’s model is defined by an <a href="#event-model">event model</a> in the configuration. An event has an expected date, a start date and an optional end date.</p>
+		<section id="expected-event">
+			<h4>Expected event</h4>
+			<p>An event is considered expected when it has an expected date set, but not the start date. When an event has both an expected date and a start date set, it is no longer considered expected.</p>
+		</section>
+		<section id="planned-event">
+			<h4>Planned event</h4>
+			An event is considered planned if its <a href="#event-model">event model</a> is planned.
+		</section>
+	</section>
+	<section id="event-creation">
+		<h3>Creation</h3>
+		<p>If the event’s <a href="#event-model">event model</a> is mandatory, it is created automatically when it’s
+			associated scope is created. Otherwise, the event can be created manually by a user, if the configuration
+			allows it. An event can be created if all the following statements are true:</p>
+		<ol>
+			<li>The associated scope is not locked.</li>
+			<li>The event’s model is linked to the scope’s model in the configuration.</li>
+			<li>No blocking event is present on the scope.</li>
+			<li>The maximum number of allowed events has not been reached, if a maximum is defined in the configuration.
+			</li>
+			<li>There is no rule that forbids the addition of the event.</li>
+		</ol>
+		<section id="event-deletion">
+			<h3>Deletion</h3>
+			<p>A mandatory or locked event can not be deleted or reset. A non-mandatory event can be deleted manually by
+				an authorized user. When an event is deleted, the following sequence occurs:</p>
+			<ol>
+				<li>The event’s <em>deleted</em> flag is set to <em>true</em>.</li>
+				<li>The dates of all the <a href="#planned_event">planned</a> events’ expected dates are
+					recalculated.</li>
+				<li>All the event deletion <a href="#rules">rules</a> are executed.</li>
+			</ol>
+		</section>
+		<section id="event-restoration">
+			<h3>Restoration</h3>
+			Any deleted event can be restored by an authorized user. When an event is restored by a user:
+			<ol>
+				<li>The event’s <em>deleted</em> flag is set to <em>false</em>.</li>
+				<li>If the event is a <a href="#planned_event">planned event</a>, it’s expected date is recalculated.</li>
+				<li>The dates of all the <a href="#planned_event">planned</a> events’ expected dates are recalculated.</li>
+				<li>All the fields found in the event’s datasets are <a href="#field-model-validation">validated</a>.</li>
+				<li>All the event restoration <a href="#rules">rules</a> are executed.</li>
+			</ol>
+		</section>
+	</section>
+</section>
+<section id="dataset">
+	<h2>Dataset</h2>
+	<section id="dataset-description">
+		<h3>Description</h3>
+		<p>Dataset is a container for one or more <a href="#field">fields</a>. A dataset represents a collection of
+			one or more fields and can thus serve to regroup fields with the same theme (e.g. all the fields relating to
+			the patient information could be regrouped in a single "patient information" dataset). A dataset can be
+			attached directly to a <a href="#scope">scope</a> or to a <a href="#event">event</a>. A dataset can
+			be either of <em>single</em> or <em>multiple</em> type. Dataset’s model is defined by a <a href="#dataset-model">dataset model</a> in the configuration.</p>
+		<section id="single-and-multiple-datasets">
+			<h4>Single and multiple datasets</h4>
+			<p><em>Single</em> datasets are datasets that can be instanced only once on a single object.
+				<em>Multiple</em> datasets are datasets that can be instanced more than once on the same object. This
+				type of dataset is useful for multiple entries of generic information (i.e. drug treatments for a single
+				patient) or for tracking history in a single scope/event (i.e. single patient’s medical history).</p>
+		</section>
+	</section>
+	<section id="dataset-creation">
+		<h3>Creation</h3>
+		<p>Datasets of type <em>single</em> are created whenever a scope or an event is created and has dataset models attached to it in the configuration. Dataset of type <em>multiple</em> can be created manually by an authorized user. In order to create a dataset, its dataset model has to be present in the scope’s or event’s model. When a dataset is created, all the <a href="#field">fields</a> associated with it are created.
+		</p>
+	</section>
+	<section id="dataset-deletion">
+		<h3>Deletion</h3>
+		<p>Only a dataset of type <em>multiple</em> can be manually deleted by an authorized user. When a dataset is deleted, all the dataset removal <a href="#rules">rules</a> are executed.</p>
+	</section>
+	<section id="dataset-restoration">
+		<h3>Restoration</h3>
+		<p>A deleted dataset can be restored by an authorized user. When a dataset is restored, all the dataset’s <a href="#field">fields</a> are <a href="#field-model-validation">validated</a> and the dataset restoration <a href="#rules">rules</a> are executed.</p>
+	</section>
+</section>
+<section id="form">
+	<h2>Form</h2>
+	<section id="form-description">
+		<h3>Description</h3>
+		<p>A form object serves as a metaphor for a paper medical form in a clinical study. A form can contain zero or
+			more <a href="#field">fields</a> from one or more <a href="#dataset">datasets</a>. Note that a form
+			does not need to contain all the fields of a particular dataset, it is a visual grouping of fields. For
+			example, we can have a form that contains the address of the patient and a form that regroups fields that
+			define other information pertinent to the patient while all these fields belong to one single dataset that
+			regroups patient information. The form’s model, including its visual layout, is defined by the <a
+				href="#form-model">form model</a> in the configuration. A form can have zero or more <a
+				href="#workflow-status">workflow statuses</a> attached to it. A form can be attached to an event or
+			directly to a scope.</p>
+	</section>
+	<section id="form-creation">
+		<h3>Creation</h3>
+		<p>All forms associated with a scope or an event in the configuration are automatically created upon their
+			creation. All the workflows attached to the form in the configuration are initialized upon form creation.
+		</p>
+	</section>
+	<section id="form-deletion">
+		<h3>Deletion</h3>
+		A form can be deleted through a form removal <a href="#rules">action</a>. Upon deletion:
+		<ol>
+			<li>The form’s <em>deleted</em> value is set to <em>true</em>.</li>
+			<li>The mandatory workflows of the form and its fields are reset.</li>
+			<li>The non-mandatory workflows of the form and its fields are deleted.</li>
+			<li>Datasets of type <em>multiple</em> that are not directly attached to a scope or an event are deleted.</li>
+			<li>Fields that are not on scope are reset.</li>
+		</ol>
+	</section>
+	<section id="form-restoration">
+		<h3>Restoration</h3>
+		<p>A form can be restored through a form restore <a href="#rules">action</a>. Note that this action only
+			restores the form itself and it does not affect any fields or datasets associated with the form.</p>
+	</section>
+</section>
+<section id="field">
+	<h2>Field</h2>
+	<section id="field-description">
+		<h3>Description</h3>
+		<p>A field represents a singular value in a dataset. They are used for value transmission (for example, when a user sends new data to the system), field validation and value storage. A field contains a unique identifier, a reference to its dataset, the ID of the <a href="#field-model">field model</a> and a value. A field can not be deleted nor restored. Field’s model is defined by a <a href="#field-model">field model</a> in the configuration.</p>
+	</section>
+	<section id="field-value">
+		<h3>Field value</h3>
+		<p>A field’s value represents the value that is actually stored in the database for a given field. A field can
+			have three possible values associated with it:</p>
+		<ol>
+			<li>A <em>null</em> value.</li>
+			<li>A <em>blank</em> value, which is either an empty string or whitespace.</li>
+			<li>A <em>string</em> value, which is stored as a string of characters in the database.</li>
+		</ol>
+	</section>
+	<section id="interpreted-value">
+		<h3>Interpreted value</h3>
+		<p>The value that is actually returned to the user through the API is the <em>interpreted</em> value of the
+			field. The <em>interpreted</em> value calculation abides by the following pattern:</p>
+		<ol>
+			<li>If the user that requests the field’s value no longer has rights to the scope to which the field belongs, the value returned is the last value to which the user had rights before rights removal.</li>
+			<li>If the field value is <em>null</em>, the field model is not a <em>plugin</em> and the model has a formula defined on it, then the value is calculated using the provided <a href="#formula">formula</a>.</li>
+			<li>Otherwise, the actual field value is returned.</li>
+		</ol>
+		<p>It should be noted that the <em>interpreted</em> value is calculated on the fly and does not necessarily reflect the field value actually stored in the database.</p>
+	</section>
+	<section id="file-field">
+		<h3>File field</h3>
+		<p>Fields with the model of type <em>FILE</em> are a special case among the fields. In order to identify
+			possible file changes and to integrate it with the <em>string only</em> value of the field, the field value
+			in this case consists of the file name concatenated with the checksum of the actual file that has been
+			uploaded. More information on the file field processing can be found in section <a href="#file-upload"
+				data-reference-type="ref" data-reference="file-upload">16.3.1</a>.</p>
+	</section>
+	<section id="field-creation">
+		<h3>Creation</h3>
+		<p>Whenever a new dataset is created, a field is automatically created for every <a href="#field-model">field model</a> that is associated with the dataset’s <a href="#dataset-model">model</a> in the configuration.</p>
+	</section>
+	<section id="field-reset">
+		<h3>Reset</h3>
+		<p>A field can be reset. This means that its value is set to <em>null</em> and the value update <a href="#rules">rules</a> are executed. When a field is reset, all the mandatory <a href="#workflow-status">workflow statuses</a> associated with it are reset to their initial state and all the non-mandatory workflow statuses are deleted.</p>
+	</section>
+</section>
+<section id="workflow-status">
+	<h2>Workflow status</h2>
+	<section id="workflow-status-description">
+		<h3>Description</h3>
+		<p>A workflow status defines the status of a workflow on an object. The model of the workflow status is defined by the <a href="#workflow">workflow</a> in the configuration. A workflow status can be attached to any <em>workflowable</em> object:</p>
+		<ul>
+			<li><a href="#scope">Scope</a></li>
+			<li><a href="#event">Event</a></li>
+			<li><a href="#form">Form</a></li>
+			<li><a href="#field">Field</a></li>
+		</ul>
+	</section>
+	<section id="workflow-status-creation">
+		<h3>Creation</h3>
+		<p>When a workflow status is created, it is initialized with a reference to an object, an ID of a <a href="#workflow">workflow</a> in the configuration and an initial status as defined in the workflow configuration. Workflow status can be created in several ways:</p>
+		<ol>
+			<li>When a <em>workflowable</em> object is created, and it has workflows associated with its creation in the configuration.</li>
+			<li>Through a manual user operation.</li>
+			<li>Through the <a href="#field-validation">field validation</a> mechanism.</li>
+		</ol>
+		Whenever a workflow status is initialized, the workflow creation <a href="#rules">rules</a> are executed.
+	</section>
+	<section id="workflow-status-modification">
+		<h3>Status modification</h3>
+		<p>Whenever the status of an existing workflow status is modified, the status ID is changed and the change is <a href="#audit-trails">audit trailed</a>. Whenever a status is modified, the status modification <a href="#rules">rules</a> are executed. Workflow status can be modified through:</p>
+		<ol>
+			<li>A manual user call using a <a href="#workflow_action">workflow action</a>.</li>
+			<li>The <a href="#field-validation">field validation</a> mechanism.</li>
+		</ol>
+		<p>Note that the status can not be modified if the associated <em>workflowable</em> object is <a href="#lock">locked</a>.</p>
+	</section>
+	<section id="workflow-status-deletion">
+		<h3>Deletion</h3>
+		A workflow status is deleted whenever an object to which it is attached to is reset or deleted.
+	</section>
+</section>
+<section id="audit-trails">
+	<h2>Audit trails</h2>
+	<p>All the modifications performed on the objects in the system are audit trailed. Audit trails are used to track all object modifications and can be used to reconstruct the object history.</p>
+	<p>The principle behind audit trailing in Rodano is similar to a version control system. Every time an object is saved the system fetches the same object already present in the database and checks if any of the properties of the object have been changed. If that is the case, the new version of the object is timestamped and saved in the audit trail table. If the object has not been modified, nothing is saved. The whole process is described in the diagram below.</p>
+	<figure>
+		<img src="images/technical-specifications/AuditTrailDiagram.png" alt="Audit trail flow"/></p>
+		<figcaption>Audit trail flow</figcaption>
+	</figure>
+	<p>Note that if two users perform the same modification to one object at the same time, two identical audit trail
+		rows may be added to the database (reflecting the same last state of the entity). That is because the
+		modifications will be made in different SQL transactions.</p>
+	<section id="audit-action">
+		<h3>Audit action</h3>
+		<p>An audit action is a construct that allows grouping of multiple audit trails under a single action triggered by a user or a robot. For example, suppose some user updates a <a href="#field">field</a> in a <a href="#dataset">dataset</a> which in turn triggers a <a href="#rule">rule</a> that updates the value of another field. All the audit trails resulting from the user action (even changes that are executed by the system) will be associated with a single audit action. We can thus see which user interaction triggered specific changes in the database.</p>
+		<p>Note that the audit actions are created and recorded in the database even when no modification is made by the user on the database entities. This is a current limitation that will be addressed in a future version.</p>
+		<h3 id="content-and-creation">Content and creation</h3>
+		<p>An audit action is created whenever a data-modifying API action (identified by HTTP methods <em>PUT</em>, <em>POST</em> and <em>DELETE</em>) is performed by a user or whenever the system starts a pre-programmed action (i.e. a CRON task). An audit action contains the following properties:</p>
+		<ul>
+			<li>Date of the action.</li>
+			<li>PK of the user or the robot performing the action. Empty if it is the system that starts the action.</li>
+			<li>Context for the action, which is the endpoint of the API method activated by the user.</li>
+		</ul>
+	</section>
+</section>
+<section id="users">
+	<h2>Users</h2>
+	<p>A user is identified by a unique email and a password. A single user can have multiple <a href="#roles">roles</a>. A user can only read and write data in the system in accordance to the <a href="#role_rights">rights</a> given to their roles. A single role can also have multiple <a href="#role_features">features</a> that enables them to perform certain specific actions as defined in the study configuration (i.e. see deleted resources, etc.).</p>
+	<section id="user-creation">
+		<h3>Creation</h3>
+		A user can be created by other users who have the rights to do so. To create a user the following is necessary:
+		<ul>
+			<li>Name of the user.</li>
+			<li>Unique email.</li>
+			<li>Whether the user is externally manged or not.</li>
+			<li>At least one user <a href="#roles">role</a>.</li>
+		</ul>
+		<p>When a user is created, an email with a unique link is sent to the user’s email inviting them to enable the
+			role to which they were invited. When the user lands on the activation page, they need to accept the
+			displayed privacy policies, if any are attached to the role, and select a password for their account. As
+			soon as a valid password is chosen, the user’s account is activated and the user’s roles <a href="#role-status">status</a> change from <em>PENDING</em> to <em>ENABLED</em>. And thus the user
+			account creation is finalized.</p>
+	</section>
+	<section id="identification">
+		<h3>Identification</h3>
+		<p>A user is identified by a unique email which serves as the user’s ID and a secret password (as described in 11.10 (d) of 21 CFR Part 11 and tested in <em>USER_ID</em>).</p>
+	</section>
+	<section id="authentication">
+		<h3>Authentication</h3>
+		<p>A user can log into the system by using their verified email and their secret password. All successful and
+			unsuccessful login attempts are <a href="#audit-trails">audit trailed</a> (as described in 11.10 (d) of
+			21 CFR Part 11 and tested in <em>USER_LOGIN_TRAIL</em>).</p>
+	</section>
+	<section id="email-verification">
+		<h3>Email verification</h3>
+		<p>Anytime a user changes their email it needs to be verified in order for the user to be able to access the system with the new email. Whenever a user changes his email, the following happens:</p>
+		<ol>
+			<li>An email with a verification link is sent to the newly entered email address.</li>
+			<li>The user has 7 days to activate his new email by using the verification link.</li>
+			<li>If the user uses the link, the new email becomes the user’s current email.</li>
+			<li>If the user does not use the link in the allotted time, the link expires and the user’s email does not change.</li>
+		</ol>
+		<p>When a user is created, the email is implicitly verified upon the first <a href="#role_activation">role activation</a>. The following diagrams describes all the flows of the email verification.</p>
+		<figure>
+			<img src="images/technical-specifications/UserCreationDiagram.png" alt="User creation flow"/>
+			<figcaption>When a user is created</figcaption>
+		</figure>
+		<figure>
+			<img src="images/technical-specifications/EmailVerificationDiagram.png" alt="Email verification flow"/>
+			<figcaption>When a user e-mail is changed</figcaption>
+		</figure>
+	</section>
+	<section id="password-management">
+		<h3>Password management</h3>
+		<section id="modification">
+			<h4>Modification</h4>
+			<p>Any logged-in user can modify their password anytime (as described in 11.10 (d) of 21 CFR Part 11 and
+				tested in <em>USER_CAN_CHANGE_PASSWORD</em>). A user’s password can be modified in several ways:</p>
+			<ol>
+				<li>When a user activates his first role, the user needs to choose his password.</li>
+				<li>A logged-in user can modify his password anytime using his current password as confirmation.</li>
+			</ol>
+		</section>
+		<section id="length-and-required-characters">
+			<h4>Length and required characters</h4>
+			<p>Any user password is subject to password requirements (as described in 11.10 (d) of 21 CFR Part 11 and
+				tested in <em>CHECK_PASSWORD_LENGTH</em>). A user’s password must have a length of at least six
+				characters and must contain at least:</p>
+			<ol>
+				<li>One uppercase character.</li>
+				<li>One number.</li>
+				<li>One of the following special characters: <strong>! \" # $ % &amp; ’ ( ) * + , - . /: ; &lt; = &gt; ? @ [ ] ^_ ‘</strong></li>
+			</ol>
+		</section>
+		<section id="limited-duration">
+			<h4>Limited duration</h4>
+			<p>If a password time limit is defined in the study configuration, a user’s password can have a limited
+				duration. If a user’s password is expired, they will be asked to enter a new password on their next
+				login attempt (as described in 11.300 (b) of 21 CFR Part 11 and tested in <em>PASSWORD_DURATION</em> and
+				<em>MUST_CHANGE_PASSWORD</em>).</p>
+		</section>
+		<section id="limited-attempts">
+			<h4>Limited attempts</h4>
+			<p>If a limit for consecutive unsuccessful login attempts is defined in the study configuration, user will
+				be locked out of the system upon reaching that limit. The user will then be forced to contact a system
+				administrator in order to get a new password (as described in 11.10 (d) of 21 CFR Part 11 and tested in
+				<em>LIMITED_PASSWORD_ATTEMPTS</em>).</p>
+		</section>
+		<section id="previous-passwords">
+			<h4>Previous passwords</h4>
+			<p>Every time a user’s password is changed, the hash of the new password is checked against all the hashes
+				of the user’s previous passwords in order to verify if the new password has already been used. If a
+				positive match is found, the new password is rejected. If the password has never been used, the new
+				password becomes current and the hash of the previous password is added to the array of used passwords
+				(as described in 11.300 (b) of 21 CFR Part 11 and tested in <em>COMPARE_TO_PREVIOUS_PASSWORDS</em>).
+			</p>
+		</section>
+		<section id="storage">
+			<h4>Storage</h4>
+			<p>All passwords are stored in the database in the form of a bcrypt hash (as described in 11.10 (d) of 21
+				CFR Part 11 and tested in <em>PASSWORD_HASHING</em>). When a user tries to log in, the password is
+				hashed using the bcrypt algorithm and compared to the hash stored in the database. The plaintext
+				password is then discarded. Only the hashes of the passwords are stored in the database to protect all
+				the user passwords in an unfortunate event of a database leak and to keep the users’ passwords protected
+				from the system administrators.</p>
+		</section>
+	</section>
+</section>
+<section id="roles">
+	<h2>Roles</h2>
+	<p>All users must have at least one active role. A role is necessarily associated with a scope. A role grants the user all rights defined by the role’s <a href="#profile">profile</a> and its scope. The following diagram shows the lifecycle of a role.</p>
+	<figure>
+		<img src="images/technical-specifications/RoleStatusDiagram.png" alt="Role lifecycle"/>
+		<figcaption>Role lifecycle</figcaption>
+	</figure>
+	<section id="role-status">
+		<h3>Possible states</h3>
+		These are the possible states for any role:
+		<ol>
+			<li><strong>PENDING</strong>: the role has been created, but has not yet been accepted by the user.</li>
+			<li><strong>ENABLED</strong>: the role is enabled after the user has accepted the role and its privacy policies.</li>
+			<li><strong>DISABLED</strong>: the role has been disabled by an authorized user.</li>
+		</ol>
+	</section>
+	<section id="creating-a-role">
+		<h3>Creating a role</h3>
+		<p>A role can be created on any existing user. When a role is created, the role creation rules are triggered and
+			the role’s status is set to <em>PENDING</em>. Only two things are needed for role creation:</p>
+		<ol>
+			<li>A scope reference, to which the role will be attached.</li>
+			<li>A <a href="#profile">profile</a>, which defines the role’s features.</li>
+		</ol>
+	</section>
+	<section id="enabling-a-role">
+		<h3>Enabling a role</h3>
+		<p>If a user has pending roles associated with them, they can enable the role themselves directly, if no privacy
+			policies are attached to the role’s <a href="#profile">profile</a>. If privacy policies are present, the
+			user first needs to accept them in order to enabled the role. If the user rejects the privacy policies, the
+			role will become <em>DISABLED</em>. Furthermore any authorized user can enbale a pending role on another
+			user, as long as no privacy policies are attached to the role’s <a href="#profile">profile</a>.</p>
+	</section>
+	<section id="disabling-a-role">
+		<h3>Disabling a role</h3>
+		<p>Any enabled role can be disabled by a user with sufficient rights. Note that if a user has only one role
+			enabled, it can not be disabled. If a user possessing a single enabled role must be removed from the system,
+			it is preferable to delete the user.</p>
+	</section>
+	<section id="re-enabling-a-role">
+		<h3>Re-enabling a role</h3>
+		Note that any disabled role can be re-enabled by an authorized user.
+	</section>
+</section>
+<section id="field-processing-and-validation">
+	<h2>Field processing and validation</h2>
+	<p>After the user submits new data to eCRF in form of datasets that contain newly modified fields, those fields are
+		filtered, validated and updated in the database.</p>
+	<section id="field-processing">
+		<h3>Field processing</h3>
+		<p>When the system receives the newly submitted fields, it needs to identify which fields need to be processed
+			and which can be reset or discarded. To do this, the following criteria are used:</p>
+		<ul>
+			<li>Is the field <strong>visible</strong> on the page? Some fields are displayed only if some other field holds a particular value or certain conditions are met. If the field is not visible, it is reset.</li>
+			<li>Is the field is <strong>dynamic</strong>? If the field is dynamic then its value will be set by the system and not by the user, however, its value might need to be processed for validation, or to trigger a rule.</li>
+			<li>Is the field <strong>read-only</strong>? Some fields are not editable by users and might be computed by other fields. However, such fields need to be processed, so the validation can occur and rules can be triggered.</li>
+			<li>Does the field have an <strong>edit check</strong>? If an edit check is attached to a field, the system must validate the field if some conditions are met.</li>
+		</ul>
+		<p>The field filtering flow is described in the following diagram.</p>
+		<figure>
+			<img src="images/technical-specifications/field_filtering.png" alt="Field filtering flowchart"/>
+			<figcaption>Field filtering flowchart</figcaption>
+		</figure>
+	</section>
+	<section id="field-validation">
+		<h3>Validation</h3>
+		<p>After the fields are submitted and filtered, the field validation phase starts. The field validation applies
+			to all fields whose models have validators attached to them. The field validation can be broken down into
+			three phases:</p>
+		<ol>
+			<li><strong>Phase I</strong>: Blocking validators are applied.</li>
+			<li><strong>Phase II</strong>: Required field validators are applied.</li>
+			<li><strong>Phase III</strong>: All other validators are applied.</li>
+		</ol>
+		<p>The whole field validation procedure is described in detail in the following diagram.</p>
+		<figure>
+			<img src="images/technical-specifications/field_validation.jpg" alt="Field validation flowchart"/>
+			<figcaption>Field validation flowchart</figcaption>
+		</figure>
+		<section id="blocking-validators">
+			<h4>Blocking validators</h4>
+			<p>Some fields have blocking validators attached to them. <strong>If at least one</strong> the blocking validator’s criteria are not met, the system aborts the <strong>whole</strong> field update process and sends the failed blocking validators’ descriptions to the user. The following diagram describes the process.</p>
+			<figure>
+				<img src="images/technical-specifications/blocking_validators.png" alt="Blocking validator flow"/>
+				<figcaption>Blocking validator flow</figcaption>
+			</figure>
+		</section>
+		<section id="required-field-validation">
+			<h4><em>Required field</em> validation</h4>
+			<p>Some field models can be marked as “required“ in the study configuration. The fields that are associated with those models are validated in the required field phase of the field validation. For each field that has a required validator, the following occurs:</p>
+			<ol>
+				<li>
+					If the field is <strong>valid</strong> (i.e. not empty), the validation proceeds on to the next
+					field and:
+					<ol>
+						<li>If the field has workflow attached to it, then the workflow is set to an <strong>invalid</strong> state.</li>
+					</ol>
+				</li>
+				<li>
+					If the is <strong>not valid</strong> (i.e. empty), the validation proceeds on to the next field and:
+					<ol>
+						<li>If the field has no workflow attached to it, then <strong>initialize the workflow</strong> specified in the configuration and set it to the <strong>invalid</strong> state.</li>
+						<li>If the field already has a workflow attached to it, then leave the workflow <strong>as-is</strong>.</li>
+					</ol>
+				</li>
+			</ol>
+			<p>This validation phase is described in the following diagram.</p>
+			<figure>
+				<img src="images/technical-specifications/required_validators.png" alt="Required validator flow"/>
+				<figcaption>Required validator flow</figcaption>
+			</figure>
+		</section>
+		<section id="field-model-validation">
+			<h4>Field validation</h4>
+			<p>Any field model can have one or more validators attached to it in the study configuration. The fields associated with those models are validated in this phase of the field validation.</p>
+			<p>For each validator attached to the field:</p>
+			<ol>
+				<li>
+					If the value of the field is <strong>valid</strong>:
+					<ol>
+						<li>If it is in a valid state, then leave the workflow as-is.</li>
+						<li>If it is in an invalid state, then set the workflow to the valid state.</li>
+					</ol>
+				</li>
+				<li>
+					If the value of the field is not <strong>valid</strong>:
+					<ol>
+						<li>If the field value or its dependencies have changed, set the workflow to valid state and initialize a new required workflow in an invalid state.</li>
+						<li>Otherwise, if the required workflow that is already present should be set to an invalid state.</li>
+					</ol>
+				</li>
+			</ol>
+			<p>The whole process is described in the following diagram.</p>
+			<figure>
+				<img src="images/technical-specifications/custom_validators.png" alt="Field model validator flow"/>
+				<figcaption>Field model validator flow</figcaption>
+			</figure>
+		</section>
+	</section>
+	<section id="updating-values">
+		<h3>Updating values</h3>
+		<p>The value update process works as follows:</p>
+		<ol>
+			<li>
+				The submitted field value is compared to the same field value present in the database
+				<ol>
+					<li>If the value is the same, the field value is not updated.</li>
+					<li>If the value is different, then the field value is updated to the newly submitted value.</li>
+				</ol>
+			</li>
+			<li>All updated fields are saved and audit trailed in a single transaction in the database.</li>
+		</ol>
+		<section id="file-upload">
+			<h4>Updating file fields</h4>
+			<p>Fields of type <em>FILE</em> are a special case during the value update process. The actual file content is uploaded in a separate transaction before the field is uploaded. When the field is uploaded and after it is processed and linked with the file, the resulting value of the field is a concatenation of the file name and the checksum of the file content. The whole procedure is:</p>
+			<ol>
+				<li>The file is uploaded by a user. A SHA-1 checksum is generated from its contents and a new field name is generated by concatenating the file name and the checksum.</li>
+				<li>The new field name is sent to the user.</li>
+				<li>The file field is uploaded with the newly updated value of the field.</li>
+				<li>The uploaded field value is compared to the field value present in the database. If the value is the same, the field value is not updated and the uploaded file is discarded. If the value is different, proceed.</li>
+				<li>The value of the field is updated, the new file is saved and the old file associated with field is audit trailed.</li>
+			</ol>
+			<p>Because the field value contains both file name and file checksum, the system can detect the file name
+				change and file content change in the field value comparison. This way if a user uploads a different
+				file with the same name several times, the system will detect this fact.</p>
+			<p>Note that if the field value has been updated, but no file has been uploaded, the field update operation
+				will throw an error. Also, the files that have been uploaded, but never associated with a field will be
+				deleted from the database after a certain time.</p>
+		</section>
+	</section>
+</section>
+<section id="lock">
+	<h2>Lock</h2>
+	<p>A lock placed on an object prevents all further modifications to that object. All attempt at modification of a
+		locked object results in error. Lock is employed on two levels: event and scope. Lock on an event prevents all
+		modifications to the event itself, to its datasets and fields. Locking a scope locks the scope itself, its
+		events and all its descendant scopes and their events. A locked scope or event can be unlocked at any time by an
+		authorized user. When a scope is unlocked, all of its events and descendant scopes are unlocked.</p>
+	<p>Note that when a scope is locked, all its descendant scopes are locked, but this doesn’t prevent the descendant
+		scopes from being unlocked individually at any time.</p>
+</section>
+<section id="emails">
+	<h2>Emails</h2>
+	<p>The system can send notifications in form of emails. Notifications can be sent automatically by the system to
+		notify users of important events (such as a new role invitation) or through the rules defined in the study
+		configuration.</p>
+	<section id="dispatch-queue">
+		<h3>Dispatch queue</h3>
+		<p>The system implements a dispatch queue for emails. When an email is created, it is added to the dispatch
+			queue. The dispatch queue sends batches of emails periodically (batch size and the dispatch period is
+			adjustable in the configuration) and sends the emails in FIFO order. If an email is cancelled before it
+			could be sent, it is removed from the dispatch queue.</p>
+	</section>
+	<section id="lifecycle">
+		<h3>Lifecycle</h3>
+		<p>These are the possible states of an email:</p>
+		<ol>
+			<li><strong>Pending</strong>: The email has been created and added to the email queue.</li>
+			<li><strong>Sent</strong>: The email has been sent.</li>
+			<li><strong>Simulated</strong>: This status is used for email testing and does not actually send out the email.</li>
+			<li><strong>Cancelled</strong>: email dispatch has been manually cancelled.</li>
+			<li><strong>Failed</strong>: email dispatch has failed.</li>
+		</ol>
+		<p>When an email is created, it is added to the email dispatch queue. The following diagram shows the lifecycle of an email.</p>
+		<figure>
+			<img src="images/technical-specifications/EmailStatusDiagram.png" alt="Email lifecycle"/>
+			<figcaption>Email lifecycle</figcaption>
+		</figure>
+	</section>
+</section>
+<section id="reports">
+	<h2>Reports</h2>
+	<section id="workflow-summaries">
+		<h3>Workflow summaries</h3>
+		<p>A workflow summary is a tabular report that aggregates the data of one workflow by scope and state. It shows the number (absolute and percentage of the total) of workflows that are in each state of the workflow, for all scopes of the study.</p>
+		<h3 id="export">Export</h3>
+		<p>It is possible to export the workflows statuses that have been used to build the report. The export is a CSV file that lists all workflow statuses. It contains the following columns:</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Content</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Ancestor scope model ID</td>
+					<td>scope.pk</td>
+					<td>Scope unique identifier (repeatable for each ancestor)</td>
+				</tr>
+				<tr>
+					<td>Ancestor scope code</td>
+					<td>scope.code</td>
+					<td>Scope code (repeatable for each ancestor)</td>
+				</tr>
+				<tr>
+					<td>Event ID</td>
+					<td>event.pk</td>
+					<td>Event unique identifier (only if the workflow is linked to an event, or the workflow is linked to an entity linked to an event)</td>
+				</tr>
+				<tr>
+					<td>Event</td>
+					<td>eventModel.shortname</td>
+					<td>Event shortname (only if the workflow is linked to an event, or the workflow is linked to an entity linked to an event)</td>
+				</tr>
+				<tr>
+					<td>Event date</td>
+					<td>event.date</td>
+					<td>Event date (only if the workflow is linked to an event, or the workflow is linked to an entity linked to an event)</td>
+				</tr>
+				<tr>
+					<td>Form ID</td>
+					<td>form.pk</td>
+					<td>Field unique identifier (only if the workflow is linked to a field)</td>
+				</tr>
+				<tr>
+					<td>Form</td>
+					<td>formModel.shortname</td>
+					<td>Form shortname (only if the workflow is linked to a form)</td>
+				</tr>
+				<tr>
+					<td>Dataset ID</td>
+					<td>dataset.pk</td>
+					<td>Dataset unique identifier (only if the workflow is linked to a field)</td>
+				</tr>
+				<tr>
+					<td>Dataset</td>
+					<td>dataset.dataset_model_id</td>
+					<td>Dataset model ID in the configuration (only if the workflow is linked to a field)</td>
+				</tr>
+				<tr>
+					<td>Field ID</td>
+					<td>field.pk</td>
+					<td>Field unique identifier (only if the workflow is linked to a field)</td>
+				</tr>
+				<tr>
+					<td>Field</td>
+					<td>field.field_model_id</td>
+					<td>Field model ID in the configuration (only if the workflow is linked to a field)</td>
+				</tr>
+				<tr>
+					<td>Field value</td>
+					<td>field.value</td>
+					<td>Value of the field at the time the workflow status changed (only if the workflow is linked to a field)</td>
+				</tr>
+				<tr>
+					<td>Workflow ID</td>
+					<td>workflow.pk</td>
+					<td>Workflow unique identifier</td>
+				</tr>
+				<tr>
+					<td>Workflow</td>
+					<td>workflow.workflow_id</td>
+					<td>Workflow ID in the configuration</td>
+				</tr>
+				<tr>
+					<td>Workflow initialisation date</td>
+					<td>workflow.creation_time</td>
+					<td>Date and time when the workflow was created</td>
+				</tr>
+				<tr>
+					<td>Workflow initialisation message</td>
+					<td>workflow_status.trigger_message</td>
+					<td>Workflow status initial message</td>
+				</tr>
+				<tr>
+					<td>Workflow validator</td>
+					<td>workflow_status.validator_id</td>
+					<td>The validator that triggered the workflow (relevant only if the workflow has been triggered by a validator)</td>
+				</tr>
+				<tr>
+					<td>Current workflow status</td>
+					<td>workflow_status.state_id</td>
+					<td>Current status of the workflow</td>
+				</tr>
+				<tr>
+					<td>Current workflow status date</td>
+					<td>workflow_status.last_update_time</td>
+					<td>Date of the latest modification</td>
+				</tr>
+				<tr>
+					<td>Removed</td>
+					<td>workflow_status.deleted || entity.deleted</td>
+					<td>Specify if the workflow or the linked entity or one of the parent entity containing the workflow is deleted</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>The first 2 columns are repeated as many times as the depth of the scope tree. For example, in studies where
+			the scope model tree consists of Study, Country, Center and Patient, the columns will be: Study ID, Study,
+			Country ID, Country, Center ID, Center, Patient ID, Patient.</p>
+		<p>Deleted workflow statuses and workflow statuses attached to deleted entities are included only for users
+			having the feature <strong>MANAGE_DELETED_DATA</strong>.</p>
+	</section>
+	<section id="audit-trail-export">
+		<h3>Audit trail export</h3>
+		<p>For workflow summaries that display non aggregating workflows, it is also possible to download the history of
+			the workflow statuses that have been used to build the report. The export is a CSV file that contains the
+			same workflow statuses as the regular export, and, for each of the workflow status, alls states it went
+			through. It contains the same columns as the regular export (except columns "Current workflow status" and
+			"Current workflow status date") and contain the following additional columns:</p>
+		<table>
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Content</th>
+					<th>Description</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Actor</td>
+					<td>workflow_status_audit.audit_actor</td>
+					<td>Actor who changed the workflow status</td>
+				</tr>
+				<tr>
+					<td>Workflow audit ID</td>
+					<td>workflow_status_audit.pk</td>
+					<td>Workflow audit unique identifier</td>
+				</tr>
+				<tr>
+					<td>Workflow audit date</td>
+					<td>workflow_status_audit.audit_datetime</td>
+					<td>Date and time when the workflow state changed</td>
+				</tr>
+				<tr>
+					<td>Workflow audit status</td>
+					<td>workflow_status_audit.state_id</td>
+					<td>State of the workflow on status change</td>
+				</tr>
+				<tr>
+					<td>Workflow audit message</td>
+					<td>workflow_status_audit.audit_context</td>
+					<td>Context of the status change</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+</section>
+<section id="resource">
+	<h2>Resource</h2>
+	<section id="resource-description">
+		<h3>Description</h3>
+		<p>A resource is an object containing information that can be displayed to the users. A resource can contain text (useful for spreading news to users) and it can contain attachments (useful for sharing documents to other users). A resource must be attached to a <a href="#scope">scope</a> in order to define who can access it.</p>
+		<section id="resource-scope">
+			<h4>Resource scope</h4>
+			<p>A resource must be attached to an existing scope. Only the users who have the right to read the resource’s scope can see the resource. The resource’s scope can be modified anytime.</p>
+		</section>
+		<section id="public-resource">
+			<h4>Public resource</h4>
+			<p>A resource that is marked as public can be accessed by anyone possessing the link to the resource, even by users who are not logged-in to the platform. The attachments of the public resources can also be downloaded by absolutely anyone possessing the link to the resource attachment. A resource can be marked as public during its creation or it can be made public during its lifetime. Note that the resource that is marked as public is automatically attached to the <a href="#root-scope"><em>root scope</em></a> of the study.</p>
+		</section>
+		<section id="resource-category">
+			<h4>Resource category</h4>
+			<p>A resource must be associated with a category. A category can be defined in the study configuration and is used to categorize resource into groups (e.g. news, study documents, etc.).</p>
+		</section>
+	</section>
+	<section id="resource-creation">
+		<h3>Creation</h3>
+		<p>A resource can be created by an authorized user and requires the following parameters:</p>
+		<ol>
+			<li>Title</li>
+			<li>Category ID</li>
+			<li>Scope ID</li>
+			<li>Is the resource public or not</li>
+		</ol>
+	</section>
+	<section id="resource-deletion">
+		<h3>Deletion</h3>
+		<p>Any resource can be deleted anytime by an authorized user.</p>
+	</section>
+	<section id="resource-restoration">
+		<h3>Restoration</h3>
+		<p>Any deleted resource can be restored by an authorized user.</p>
+	</section>
+	<section id="file-attachment">
+		<h3>File attachment</h3>
+		<section id="upload">
+			<h4>Upload</h4>
+			When a file attachment is uploaded:
+			<ul>
+				<li>Uploaded file’s filename is stored in the database.</li>
+				<li>File itself is written to the filesystem with the resource’s UUID as its filename.</li>
+				<li>If the resource’s category is not <em>news</em>, a resource publication email notification is sent to subscribed users.</li>
+			</ul>
+			<p>Since the resource’s UUID is used as the filename when it is stored in the filesystem, a resource can have only one attachment file.</p>
+		</section>
+		<section id="download">
+			<h4>Download</h4>
+			<p>A file associated with a resource can be downloaded by any user who has the <em>read</em> right on the resource’s scope, unless the resource is public, in which case absolutely anyone can download the said file.</p>
+		</section>
+	</section>
+</section>
+<section id="widget">
+	<h2>Widget</h2>
+	<section id="widget-description">
+		<h3>Description</h3>
+		<p>A widget is a pre-configured component that displays information relevant to the study. They provide overviews of information relevant to the ongoing study. The available widgets are:</p>
+		<ul>
+			<li><strong>Welcome text</strong> - displays the welcome text defined in the configuration.</li>
+			<li><strong>General information</strong> - displays general information relevant to the study. This widget uses custom study code in order to extract the relevant data.</li>
+			<li><strong>Resources</strong> - displays the resources available to the user. Uses the configured resource category to filter the displayed resources.</li>
+			<li><strong>Chart</strong> - displays the pre-configured chart based on the study data.</li>
+			<li><strong>Workflow</strong> - displays the workflow-related information.</li>
+		</ul>
+	</section>
+</section>

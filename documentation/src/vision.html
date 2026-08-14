@@ -1,0 +1,215 @@
+<nav id="table-of-contents"></nav>
+
+<section id="introduction">
+	<h2>Introduction</h2>
+	<p>Rodano is a software platform to handle clinical studies, patient medical data and more generally, activities related to patients and health-care institutions.</p>
+	<p>In a first section, this document describes the concepts used for handling users, profiles, authorizations and scopes.</p>
+	<p>In a second section, we will cover patients, events, documents, workflows and some additional concepts specific to clinical studies.</p>
+</section>
+
+<section id="clinical-studies">
+	<h2>Clinical studies</h2>
+	<p>In order to understand the concepts which will be presented in the following pages, we are going to make a quick overview of what is a clinical study and define a few basic terms.</p>
+	<p>A clinical study is the process of collecting specific data from a group of patients during a certain period of time in order to discover or confirm the efficiency, toxicity or best dose for a drug. There are different kinds of trials depending on whether the drug is already approved to be sold or not. Some studies aim at comparing two drugs or a drug versus a placebo, etc...</p>
+	<p>Rodano is focused on phase 4 studies, which come after the drug has been approved by health authorities to be sold (and often reimbursed by health systems). Phase 4 studies can be usually divided into two categories. The marketing studies and the safety studies.</p>
+	<p>Marketing studies are studies where the pharmaceutical company wants to follow the usage of their drug within a country or several countries, sometimes aiming at a specific patient type.</p>
+	<p>Safety studies are often required by health authorities to follow the long term impact of the use of a drug on a given population. It is for example required if the drug has a proven efficiency but has known important and sometimes fatal side effects.</p>
+	<p>When setting up a study several steps are taken:</p>
+	<ul>
+		<li>A target patient population is decided as well as the expected number of patients and how data will be collected.</li>
+		<li>The data to be collected from the patients is defined. The number of times and at what interval is also decided. It is called the study protocol.</li>
+		<li>The study documentation and legal work is done.</li>
+		<li>The clinical study project is submitted to the ethics committee.</li>
+	</ul>
+	<p>Once accepted, the study can start. There is always an enrollment period during which new centers will join the study. During that enrollment period, new patients are enrolled. Once the number of targeted centers and patients is reached, the enrollment period is finished, and the study continues for the duration which has been defined in the study protocol.</p>
+	<p>The data a study collects and the way it is collected is usually very well-defined. For example, a study could collect 10 very precise questions (weight, visual acuity, tension, etc...) every three months for 3 years. Because the study protocols are precise, it is necessary to check the validity of the data entry performed by the investigator. Some checks might be done automatically by a program (when the data is entered electronically), however some must be done manually because validity rules are either too complex or imply taking a decision based on criteria outside the scope of the data available in the software.</p>
+</section>
+
+<section id="definitions">
+	<h2>Definitions</h2>
+	<p>We shall now define some terms used in this document before going into the details of profiles, authorizations, patients, etc...</p>
+
+	<dl>
+		<dt>Study protocol</dt>
+		<dd>Document defining the study purpose, patient types, data to be collected, etc...</dd>
+
+		<dt>eCRF</dt>
+		<dd>Electronic Case Report Form. Traditionally on paper, the data collected is now done on computer.</dd>
+
+		<dt>Ethics committee</dt>
+		<dd>To be allowed to perform a clinical study and therefore collecting patients data for statistical or other reasons, even if it is done anonymously, an official body must first give its approval. There is usually an ethics committee dependent on the health authorities which give an authorization for a study. Then, locally within a hospital, there are also ethics committees which give authorizations to perform studies.</dd>
+
+		<dt>Consent form</dt>
+		<dd>Even with the ethics committees giving their approval for a study, in most countries, the law requires asking the patient for his approval before including him in a study, even when data is collected anonymously. For that reason a consent form must be signed by the patient.</dd>
+
+		<dt>CRO</dt>
+		<dd>Clinical Research Organization. Company taking care of part or all of the organization of a study.</dd>
+
+		<dt>CRA</dt>
+		<dd>Clinical Research Associate. Company or consultant handling local issues for the study and in particular, most direct relations with the centers and investigators. Most of the time, there is one CRO for a study and several CRAs, often one or more per country.</dd>
+
+		<dt>Center</dt>
+		<dd>A service or department in a clinic or hospital or a medical practice. Patients are recruited from centers. Depending on the study protocol there can be just one center participating in a study up to several hundred.</dd>
+
+
+		<dt>Investigator</dt>
+		<dd>Usually a physician identified at a center who will recruit patients to be included in a study. Some centers might identify more than one investigator. A principal investigator will be the main contact and person in charge of the study at a center. An investigator will often be paid for his time spent providing patients data.</dd>
+
+		<dt>Data manager</dt>
+		<dd>Person who checks the validity of the patient data provided by the investigators.</dd>
+
+		<dt>Sponsor</dt>
+		<dd>Company, usually pharmaceutical, who owns and pays for the study. Data collected will be the propriety of the sponsor.</dd>
+
+		<dt>Affiliate</dt>
+		<dd>Local branch office or representative for the sponsor in countries or regions where the study is taking place.</dd>
+
+		<dt>Centers enrollment</dt>
+		<dd>Process of identifying interested centers suitable for the study. Handling legal and financial issues, defining targets, training investigator and bringing center to the point it is ready to enroll patients.</dd>
+
+		<dt>Patients enrollment</dt>
+		<dd>Process of adding new patients to the study.</dd>
+
+		<dt>Event</dt>
+		<dd>A study protocol usually defines the set of data to be collected and the frequency at which the data is collected. If a study defines a frequency of every 6 months, it implies the patient will visit the center, have an exam, a blood test or other procedure every 6 months. A pre-defined set of data will be collected at those occasions. To simplify it is usually called an event (even if most of the time it is a visit and exam at the medical center). Often there are enrollment events which is the first event for a patient and usually includes medical history data. Regular events are often called follow-up visits. The last event of a study is called the termination visit.</dd>
+	</dl>
+</section>
+
+<section id="problem">
+	<h2>Problem</h2>
+	<p>Commons problems around setup of clinical studies are:</p>
+	<ul>
+		<li>Data collected differs between studies.</li>
+		<li>The scheduling of events is different between studies.</li>
+		<li>Design of the eCRF is too complex.</li>
+		<li>Design of the eCRF takes too much time.</li>
+		<li>Validation of the application to be repeated for each new study.</li>
+		<li>Studies may involve only one center, be multi-centers or even multi-countries.</li>
+		<li>Data collected may be related to patients, centers or countries or other arbitrary groups.</li>
+	</ul>
+	<p>The goal of Rodano is to use the same product for all studies and configure it according to studies needs. To achieve this, Rodano is very versatile and has a lot of configuration options. In order to support a large panel of studies, all aspects of a study are managed using a very generic approach. Here is the list of the main concepts that have been used in Rodano to achieve this goal:</p>
+	<ul>
+		<li>The concept of "Field" and "FieldModel" has been created to allow the storage and configuration of the data points collected in a study, and how they will be displayed in the eCRF.</li>
+		<li>The concept of "EventModel" has been created to establish a planning of events.</li>
+		<li>As the system should be able to manage countries or centers when required or omit them when they are not necessary, the concept of "ScopeModel" has been created to allow the configuration of these entities.</li>
+		<li>As it should be possible to store data at every level (patient, countries or centers), the concept of "Scope" has been created to address this feature.</li>
+	</ul>
+
+	<section id="architecture">
+		<h3>Architecture</h3>
+		<p>More generally, most of the entities required in a study have been designed to be generic and reusable. They all have configuration counterparts that define their behavior. Facing this huge number of settings, a dedicated application named "configurator" has been developed to make the configuration easy.</p>
+		<p>The "configurator", is used to create and edit the configuration of a study. The main application then relies on a configuration generated by the configurator and offers all CDMS features (rights management, patients management, data entry, monitoring and reports) for a large panel of studies.</p>
+	</section>
+</section>
+
+<section id="scope">
+	<h2>Scope</h2>
+	<p>As we have seen in the previous section, data must be collected at different levels. To be generic, the concept of scope has been introduced. In Rodano, every container of data is a scope. This means a patient, a center, a country, a cohort or even the study itself are scopes. More generally, scopes are nodes of a graph (that generally mainly looks like a tree due to the physical organization of patients) and can be arranged as defined in the configuration using the concept of scope models.</p>
+	<p>These scopes allow consulting data hierarchically in respect of the geographical breakdown or using arbitrary groups. A scope can be part of multiple other scopes to make it possible for a patient to be part of a center and different cohorts. The state of the graph is stored in a database with time stamps that allow to keep track of the changes. Using this approach, it is possible to move a patient from one center to another or from one cohort to another.</p>
+	<p>These scopes are the main entities in the system. They are also for management of user rights.</p>
+</section>
+
+<section id="fields">
+	<h2>Fields</h2>
+	<p>As every study has its own set of fields to be collected, it is not possible to rely on a classical data model, using columns of a database to store each data point. Instead, a key-value storage is used. This means that all fields are stored in one huge database table, containing the identification of the field, its value, and meta information. The behavior of the field is defined in the configuration using field models. Field models describe what kind of data will be collected as well as how it should be displayed in the eCRF, and how it will be validated.</p>
+</section>
+
+<section id="events-and-datasets">
+	<h2>Events and datasets</h2>
+	<p>Fields with the same semantic are grouped in datasets. For example, a dataset model could be named "Vital signs" or "Biochemistry".</p>
+	<p>These datasets can then be attached directly to scopes, or attached to events which are then attached to scopes. In the configuration, the dataset models and the event models allow defining the behavior of the datasets and events.</p>
+</section>
+
+<section id="rights-management">
+	<h2>Rights management</h2>
+	<section id="features">
+		<h3>Features</h3>
+		<p>Features are the basic unit of authorizations and allow performing certain actions in the system. They are hard-coded in the system and are not configurable.</p>
+	</section>
+
+	<section id="profiles">
+		<h3>Profiles</h3>
+		<p>A profile is a job or professional activity of a person. In a clinic the obvious profiles are nurse and physician. For a clinical study the profiles could be investigator, data manager and sponsor.</p>
+		<p>If we consider only the authorization aspects of a system, profiles are a way of grouping features or to give rights over configuration entities. Which features are associated with a profile is defined in the configuration, using the profiles/features matrix. Each feature can be associated with one or more profiles. For example, in a clinic, a simple matrix could look like this:</p>
+		<table>
+			<thead>
+				<tr>
+					<th></th>
+					<th><strong>Investigator</strong></th>
+					<th><strong>Data manager</strong></th>
+					<th><strong>CRA</strong></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>MANAGE_CONFIGURATION</td>
+					<td>No</td>
+					<td>Yes</td>
+					<td>No</td>
+				</tr>
+				<tr>
+					<td>VIEW_AUDIT_TRAIL</td>
+					<td>No</td>
+					<td>Yes</td>
+					<td>No</td>
+				</tr>
+				<tr>
+					<td>EXPORT</td>
+					<td>No</td>
+					<td>Yes</td>
+					<td>No</td>
+				</tr>
+				<tr>
+					<td>MANAGE_RESOURCES</td>
+					<td>No</td>
+					<td>No</td>
+					<td>Yes</td>
+				</tr>
+			</tbody>
+		</table>
+		<p>In addition to features, profiles are used to configure the rights over most of the configuration entities. This is done through different matrices. Some matrices, such as the profiles/features matrix allows giving or not a right, but advanced matrices allow configuring if the profile has the right to "Read" or "Write" an entity. For example, there is a profiles/event models matrix which determine which profile has the right to read or write each event model.</p>
+		<p>There is even a profiles/profiles matrix that defines which profiles can be managed by a user having a specific profile. For example, if a user has an investigator role on a center, and the investigator profile allows “assistant investigator” in the managed profiles, then that user can give assistant investigator roles on his center.</p>
+		<p>The advantages of handling authorizations in such a way are obvious. Any changes in the authorizations can be done globally for a professional activity and not individually for each user. On top of that, profiles carry some semantics (the profession of the user) and they can be used to easily group or identify users, for example:</p>
+		<ul>
+			<li>All investigators in Germany</li>
+			<li>All nurses in center CH-001</li>
+			<li>All users users who can read document "Biochemistry" in center "DE-005"</li>
+		</ul>
+	</section>
+
+	<section id="roles">
+		<h3>Roles</h3>
+		<p>Now, to give authorizations to users, we create roles. A role is the association of a user, a scope, and a profile. Users may cumulate multiple roles. For example a user can be an investigator on the center CH-001 and a manager for the country CH. From the profile of the role, the system can infer the associated features given to the user on a specific scope and answer the question "Can Dr. Joe view audit trails for a patient in the center FR-010?" or "Can Ms. Smith enter visit data for a patient of center DE-001?".</p>
+	</section>
+</section>
+
+<section id="menus">
+	<h2>Menus</h2>
+	<p>Menu, as its name hints, will allow to automatically handle menus and sub-menus of an application. For simplicity reasons, menus will only define 2 levels: main menus and sub-menus.</p>
+	<p>For example, the complete menu hierarchy of an application might be:</p>
+	<ul>
+		<li>Dashboard</li>
+		<li>Centers</li>
+		<li>Patients</li>
+		<li>Reports</li>
+		<li>Statistics</li>
+		<li>Export</li>
+		<li>Contact</li>
+		<li>Help</li>
+	</ul>
+	<p>As described in the rights management section, rights can be given over menus, so an investigator might be allowed only:</p>
+	<ul>
+		<li>Dashboard</li>
+		<li>Patients</li>
+		<li>Reports</li>
+		<li>Contact</li>
+		<li>Help</li>
+	</ul>
+</section>
+
+<section id="workflows">
+	<h2>Workflows</h2>
+	<p>Workflows are an integral part of any activity related to clinical studies or patient care. It is therefore important to define how workflows will be integrated to the various parts of the applications.</p>
+	<p>In the application, workflows can be attached to scopes, events, forms or fields. Each of these entities can have one or more different workflows or even have multiple instance of the same workflow. For example, a validation workflow can be attached to an event (event is first submitted by an investigator, then review and locked by a data manager) and the same event may also support a verification workflow (a CRA reviews a submitted event to ensure data are correct).</p>
+	<p>A workflow is defined by its possible states and the actions that manage transitions between states. Each action can have one or more rules which defines what happens when the action is triggered.</p>
+</section>

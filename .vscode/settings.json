@@ -23,6 +23,10 @@
 		"frontends/configurator/package-lock.json": true,
 		"frontends/configurator/node_modules": true,
 		"frontends/configurator/test-output": true,
-		"frontends/configurator/.vscode/chrome": true
+		"frontends/configurator/.vscode/chrome": true,
+
+		"documentation/node_modules": true,
+		"documentation/package-lock.json": true,
+		"documentation/_site": true
 	}
 }

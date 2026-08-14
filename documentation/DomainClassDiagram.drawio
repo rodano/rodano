@@ -1,0 +1,280 @@
+<mxfile host="65bd71144e">
+    <diagram id="0" name="Page-1">
+        <mxGraphModel dx="1492" dy="1431" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="0" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-57" value="0..n" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamondThin;startFill=1;endArrow=none;endFill=0;endSize=12;startSize=12;entryX=0;entryY=0.25;entryDx=0;entryDy=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" target="7gQAAdqvfVkWTgLr4iEC-56" edge="1">
+                    <mxGeometry x="-0.4713" y="14" relative="1" as="geometry">
+                        <mxPoint x="600" y="74" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                        <mxPoint x="522" y="53" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="h2sbrf845wG81F9tgiG4-53" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;startArrow=diamondThin;startFill=1;endSize=12;endArrow=open;endFill=0;startSize=12;" parent="1" source="21" target="28" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Scope&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String scopeModelId&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String code&lt;/span&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String shortname&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String longname&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date startDate&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date stopDate&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean virtual&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String color&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Number exepectedNumber&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Number maxNumber&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean locked&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String data&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="30" width="200" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;WorkflowStatus&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String workflowId&lt;/span&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String stateId&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String actionId&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String validatorId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String profileId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String triggerMessage&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="640" width="200" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;b style=&quot;font-size: 12px;&quot;&gt;Event&lt;/b&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String id&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String scopeModelId&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String eventModelId&lt;/span&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String eventGroupNumber&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date expectedDate&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date date&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date endDate&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean expected&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean notDone&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean blocking&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean locked&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="320" width="200" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Dataset&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String id&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String datasetModelId&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="860" y="270" width="150" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Form&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String formModelId&lt;/span&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="630" y="270" width="150" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Role&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String profileId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String status&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="880" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="29" target="23" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="777" y="783" as="sourcePoint"/>
+                        <mxPoint x="570" y="680" as="targetPoint"/>
+                        <mxPoint x="108" y="-139" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="43c601d6ebd2fef4-124" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endFill=0;exitDx=0;exitDy=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;entryDx=0;entryDy=0;" parent="1" source="24" target="23" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="319" y="1098" as="sourcePoint"/>
+                        <mxPoint x="579" y="783" as="targetPoint"/>
+                        <mxPoint x="20" y="-30" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="5eb29fa8f3aa5192-110" value="&lt;div&gt;&lt;b style=&quot;text-wrap-mode: wrap;&quot;&gt;Domain class d&lt;/b&gt;&lt;b style=&quot;text-wrap-mode: wrap; line-height: 1.26;&quot;&gt;iagram&lt;/b&gt;&lt;/div&gt;Last update:&amp;nbsp;2025-04-01" style="text;html=1;strokeColor=#000000;fillColor=#ffffff;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="40" y="20" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="7712952a9811be18-115" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;exitX=0;exitY=0.75;entryX=0;entryY=0.5;exitDx=0;exitDy=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;entryDx=0;entryDy=0;" parent="1" source="21" target="23" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="209" y="678" as="sourcePoint"/>
+                        <mxPoint x="405" y="613" as="targetPoint"/>
+                        <mxPoint x="-20" y="-275" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="280" y="195"/>
+                            <mxPoint x="280" y="715"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7712952a9811be18-116" value="0..n" style="endArrow=open;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.25;entryX=0.25;entryY=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;entryDx=0;entryDy=0;exitDx=0;exitDy=0;" parent="1" source="24" target="29" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="137" y="1084" as="sourcePoint"/>
+                        <mxPoint x="747" y="771" as="targetPoint"/>
+                        <mxPoint x="-52" y="38" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="580" y="375"/>
+                            <mxPoint x="580" y="240"/>
+                            <mxPoint x="668" y="240"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7712952a9811be18-121" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;User&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String name&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;String email&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean externallyManaged&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;Boolean activated&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;String activationCode&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;String recoveryCode&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String pendingEmail&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;Date emailModificationDate&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String emailVerificationCode&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;String password&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;Date passwordChangedDate&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;String previousPasswords&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;Integer passwordAttemps&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;String passwordResetCode&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;Date passwordResetDate&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;Date loginDate&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;Date previousLoginDate&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;Date logoutDate&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;Date loginBlockingDate&lt;/span&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px;&quot;&gt;Boolean shouldChangePassword&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;String phone&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String languageId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String countryId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;color: rgb(63, 63, 63);&quot;&gt;String userAgent&lt;/span&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="994.5" width="200" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="7712952a9811be18-122" value="1..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=0;exitY=0.25;entryX=1;entryY=0.75;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;entryDx=0;entryDy=0;fontSize=12;fontColor=#000000;exitDx=0;exitDy=0;" parent="1" source="7712952a9811be18-121" target="34" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="932" y="289" as="sourcePoint"/>
+                        <mxPoint x="932" y="221" as="targetPoint"/>
+                        <mxPoint x="55" y="106" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="54bdf078edc20680-103" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=14;startFill=1;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;entryX=0.5;entryY=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" source="21" target="24" edge="1">
+                    <mxGeometry x="42" as="geometry">
+                        <mxPoint x="69" y="409" as="sourcePoint"/>
+                        <mxPoint x="245" y="739" as="targetPoint"/>
+                        <mxPoint x="13" y="2" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="54bdf078edc20680-108" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;b style=&quot;font-size: 12px;&quot;&gt;Field&lt;/b&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String datasetModelId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String fieldModelId&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String value&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="860" y="480" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="54bdf078edc20680-109" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;exitX=0.5;exitY=1;endFill=0;exitDx=0;exitDy=0;entryDx=0;entryDy=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" source="28" target="54bdf078edc20680-108" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="125" y="640" as="sourcePoint"/>
+                        <mxPoint x="125" y="680" as="targetPoint"/>
+                        <mxPoint x="19" y="-40" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="54bdf078edc20680-110" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;exitX=0.5;exitY=1;endFill=0;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" source="54bdf078edc20680-108" target="23" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="352" y="740" as="sourcePoint"/>
+                        <mxPoint x="750" y="580" as="targetPoint"/>
+                        <mxPoint x="223" y="-37" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-51" value="&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;&lt;span style=&quot;line-height: 1.26; font-size: 12px;&quot;&gt;All entities have the following properties:&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;&lt;span style=&quot;line-height: 1.26; font-size: 12px;&quot;&gt;- pk&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;- creationTime&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;- lastUpdateTime&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;- deleted&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/div&gt;&lt;div style=&quot;text-align: left; font-size: 12px;&quot;&gt;All entities have a dedicated table to store their audit trails.&lt;/div&gt;" style="whiteSpace=wrap;html=1;spacing=10;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="1220" y="30" width="190" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-52" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;b style=&quot;font-size: 12px;&quot;&gt;File&lt;/b&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String uuid&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String name&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Binary content&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String checksum&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean submitted&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="1070" y="470" width="160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-53" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Robot&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String name&lt;/span&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String key&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean activated&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="470" y="855" width="200" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-54" value="1..n" style="endArrow=diamondThin;endSize=12;startArrow=none;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=1;exitY=0.25;entryX=0;entryY=0.5;exitDx=0;exitDy=0;entryDx=0;entryDy=0;endFill=1;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" source="34" target="7gQAAdqvfVkWTgLr4iEC-53" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="1132" y="236" as="sourcePoint"/>
+                        <mxPoint x="1132" y="315" as="targetPoint"/>
+                        <mxPoint x="55" y="30" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-55" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="21" target="34" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="280" y="70" as="sourcePoint"/>
+                        <mxPoint x="1111" y="306" as="targetPoint"/>
+                        <mxPoint x="30" y="-390" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-56" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;ScopeRelation&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;Date startDate&lt;/span&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date stopDate&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Boolean default&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="31" width="160" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-61" value="0..n" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;startArrow=diamondThin;startFill=1;endArrow=none;endFill=0;endSize=12;startSize=12;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;entryX=0;entryY=0.75;entryDx=0;entryDy=0;fontSize=12;fontColor=#000000;" parent="1" target="7gQAAdqvfVkWTgLr4iEC-56" edge="1">
+                    <mxGeometry x="-0.4483" y="11" relative="1" as="geometry">
+                        <mxPoint x="522" y="98" as="sourcePoint"/>
+                        <mxPoint x="605" y="111" as="targetPoint"/>
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7gQAAdqvfVkWTgLr4iEC-62" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryDx=0;entryDy=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" source="54bdf078edc20680-108" target="7gQAAdqvfVkWTgLr4iEC-52" edge="1">
+                    <mxGeometry x="-144" as="geometry">
+                        <mxPoint x="64" y="721" as="sourcePoint"/>
+                        <mxPoint x="64" y="791" as="targetPoint"/>
+                        <mxPoint x="-10" y="15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="h2sbrf845wG81F9tgiG4-55" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;startArrow=diamondThin;startFill=1;endSize=12;endArrow=open;endFill=0;startSize=12;exitX=1;exitY=0.75;exitDx=0;exitDy=0;" parent="1" source="21" target="29" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="540" y="200" as="sourcePoint"/>
+                        <mxPoint x="1115" y="280" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="h2sbrf845wG81F9tgiG4-58" value="0..n" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontSize=12;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="h2sbrf845wG81F9tgiG4-55" connectable="0" vertex="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint y="12" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="h2sbrf845wG81F9tgiG4-56" value="" style="endArrow=open;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;exitX=1;exitY=0.25;entryX=0.25;entryY=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;entryDx=0;entryDy=0;exitDx=0;exitDy=0;" parent="1" source="24" target="28" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="620" y="414" as="sourcePoint"/>
+                        <mxPoint x="908" y="284" as="targetPoint"/>
+                        <mxPoint x="-144" y="91" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="580" y="375"/>
+                            <mxPoint x="580" y="240"/>
+                            <mxPoint x="898" y="240"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="52" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=1;exitY=0.5;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="7712952a9811be18-121" target="7gQAAdqvfVkWTgLr4iEC-52" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="970" y="1088" as="sourcePoint"/>
+                        <mxPoint x="990" y="1250" as="targetPoint"/>
+                        <mxPoint x="-230" y="288" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="53" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.75;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startArrow=diamondThin;startFill=0;endSize=12;endArrow=open;endFill=0;startSize=12;" parent="1" source="21" target="7gQAAdqvfVkWTgLr4iEC-52" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="630" y="170" as="sourcePoint"/>
+                        <mxPoint x="1041" y="245" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="54" value="0..n" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=default;labelBackgroundColor=default;fillColor=none;gradientColor=none;" parent="53" vertex="1" connectable="0">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-3" y="15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="55" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.25;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startArrow=diamondThin;startFill=0;endSize=12;endArrow=open;endFill=0;startSize=12;" parent="1" source="24" target="7gQAAdqvfVkWTgLr4iEC-52" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="640" y="171" as="sourcePoint"/>
+                        <mxPoint x="1306" y="501" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="1110" y="430"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="56" value="0..n" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=default;labelBackgroundColor=default;fillColor=none;gradientColor=none;" parent="55" vertex="1" connectable="0">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-295" y="15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="57" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.75;exitDx=0;exitDy=0;startArrow=diamondThin;startFill=0;endSize=12;endArrow=open;endFill=0;startSize=12;" parent="1" source="28" target="7gQAAdqvfVkWTgLr4iEC-52" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1066" y="350" as="sourcePoint"/>
+                        <mxPoint x="1652" y="390" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="58" value="0..n" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=default;labelBackgroundColor=default;fillColor=none;gradientColor=none;" parent="57" vertex="1" connectable="0">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="18" y="15" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="59" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Mail&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Integer attemps&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String status&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String error&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;Date sentTime&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String origin&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String intent&lt;span style=&quot;font-size: 12px;&quot;&gt;&lt;br style=&quot;font-size: 12px;&quot;&gt;&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String sender&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String recipients&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String replyTo&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String subject&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String textBody&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String htmlBody&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="770" y="1241" width="200" height="240" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;MailAttachment&lt;/strong&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String filename&lt;br&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Binary content&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="1040" y="1316" width="200" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="0..n" style="endArrow=diamondThin;endSize=12;startArrow=none;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=0;exitY=0.5;entryX=1;entryY=0.5;exitDx=0;exitDy=0;entryDx=0;entryDy=0;endFill=1;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;" parent="1" source="60" target="59" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="350" y="981" as="sourcePoint"/>
+                        <mxPoint x="430" y="981" as="targetPoint"/>
+                        <mxPoint x="-25" y="30" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="63" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;Resource&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String uuid&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String title&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String description&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;String categoryId&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;Boolean public&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String filename&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="1122" width="160" height="145" as="geometry"/>
+                </mxCell>
+                <mxCell id="64" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;entryX=0;entryY=0.5;entryDx=0;entryDy=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitX=0;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="21" target="63" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="190" y="121" as="sourcePoint"/>
+                        <mxPoint x="70" y="831" as="targetPoint"/>
+                        <mxPoint x="55" y="-572" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="110" y="85"/>
+                            <mxPoint x="110" y="1195"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="65" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=0;exitY=0.5;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="7712952a9811be18-121" target="63" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="720" y="1098" as="sourcePoint"/>
+                        <mxPoint x="1196" y="610" as="targetPoint"/>
+                        <mxPoint x="50" y="25" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="66" value="&lt;p style=&quot;margin: 4px 0px 0px; text-align: center; text-decoration: underline; font-size: 12px;&quot;&gt;&lt;strong style=&quot;font-size: 12px;&quot;&gt;UserSession&lt;/strong&gt;&lt;/p&gt;&lt;hr style=&quot;font-size: 12px;&quot;&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;String token&lt;/p&gt;&lt;p style=&quot;margin: 0px 0px 0px 8px; font-size: 12px;&quot;&gt;Date lastAccessTime&lt;/p&gt;" style="verticalAlign=top;align=left;overflow=fill;fontSize=12;fontFamily=Open Sans;html=1;strokeColor=#003366;shadow=1;fillColor=#D4E1F5;fontColor=#000000;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="1350" width="160" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="67" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=1;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=0;exitY=0.75;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="7712952a9811be18-121" target="66" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="490" y="1330" as="sourcePoint"/>
+                        <mxPoint x="330" y="1330" as="targetPoint"/>
+                        <mxPoint x="50" y="-16" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="68" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;exitX=0.5;exitY=0;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;exitDx=0;exitDy=0;entryX=0.75;entryY=1;entryDx=0;entryDy=0;" parent="1" source="7gQAAdqvfVkWTgLr4iEC-53" target="23" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="710" y="879.5" as="sourcePoint"/>
+                        <mxPoint x="1188" y="428.5" as="targetPoint"/>
+                        <mxPoint x="10" y="28" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="69" value="0..n" style="endArrow=none;endSize=12;startArrow=diamondThin;startSize=12;startFill=0;edgeStyle=orthogonalEdgeStyle;align=left;verticalAlign=bottom;endFill=0;fontFamily=Open Sans;fontSource=https%3A%2F%2Ffonts.googleapis.com%2Fcss%3Ffamily%3DOpen%2BSans;fontSize=12;fontColor=#000000;entryX=1;entryY=0.75;entryDx=0;entryDy=0;exitX=1;exitY=0.25;exitDx=0;exitDy=0;" parent="1" source="7712952a9811be18-121" target="23" edge="1">
+                    <mxGeometry as="geometry">
+                        <mxPoint x="870" y="940" as="sourcePoint"/>
+                        <mxPoint x="480" y="800" as="targetPoint"/>
+                        <mxPoint x="85" y="157" as="offset"/>
+                        <Array as="points">
+                            <mxPoint x="770" y="1095"/>
+                            <mxPoint x="770" y="753"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

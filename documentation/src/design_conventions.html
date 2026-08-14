@@ -1,0 +1,106 @@
+<nav id="table-of-contents"></nav>
+
+<section id="introduction">
+	<h2>Introduction</h2>
+	<p>This document defines the Design Conventions for the Rodano platform. As the EDC platform evolves, common solutions and patterns will solve similar problems. Shared design practices and naming conventions need to be established to improve the quality of the software.</p>
+	<p>This document establishes several naming conventions around Rodano that shall be followed by developers at different phases of the life-cycle.</p>
+	<p>It is the responsibility of the maintainers to ensure that these conventions are followed in practice.</p>
+</section>
+
+<section id="naming-conventions">
+	<h2>Naming conventions</h2>
+	<p>Naming conventions must be established for the following objects:</p>
+	<ul>
+		<li>registries and storage structures for documentation artefacts</li>
+		<li>development projects</li>
+		<li>applications at the system, subsystem and support levels</li>
+		<li>other executables such as jobs, tasks and scheduled events</li>
+		<li>libraries, modules and packages</li>
+		<li>reports</li>
+		<li>files</li>
+		<li>database objects (tables, views, columns, indexes, constraints)</li>
+		<li>database migration scripts</li>
+	</ul>
+	<p>Naming convention for each system should be unique and appropriate to its characteristics. Naming conventions for characteristics that are common across several systems should be consistent. Naming conventions should be consistent across documentation, module implementation, test cases, test summaries and reports.</p>
+</section>
+
+<section id="text-editing-conventions">
+	<h2>Text editing conventions</h2>
+	<p>Text editing conventions promote a unified way of editing the code and text files in general. This leads to improved readability and consistency across the team and projects. It also leads to less complex diff procedures.</p>
+	<ul>
+		<li>Use tabs over spaces.</li>
+		<li>Establish code formatting conventions across the team. Once a common convention is established, the text editor configuration files should be committed to the project repository. This way the code style stays consistent, no matter the editor.</li>
+		<li>Force all the editors to import the dependencies in the same order. This leads to less file diff clutter.</li>
+	</ul>
+</section>
+
+<section id="design-specifications">
+	<h2>Design specifications</h2>
+	<p>Design specifications provide a concise definition of each software module. These definitions must be traceable back to business functions expressed in the Requirement Specifications. It should be clear which function implements the designed solution.</p>
+	<p>Usage of common design patterns (standard across the IT industry) is highly encouraged. Design discussions between developers will consciously establish trade-offs with relation to these known models for solving common business problems.</p>
+</section>
+
+<section id="design-conventions-detail">
+	<h2>Design conventions</h2>
+	<p>Design standards are vital to ensure consistency and supportability of any computer system. It is the responsibility of the maintainers to ensure that design decisions are achievable during the implementation phase.</p>
+	<p>Evidence must be present that source code reviews have been conducted as part of the development process. This practice is ensured by developers while integrating their work into a common release branch, before deployment it to a validation environment.</p>
+	<p>The maintainers group is responsible for verifying the code is implemented according to the defined design and that the review practices are consistently and continuously followed.</p>
+</section>
+
+<section id="java-best-practices">
+	<h2>Java best practices</h2>
+	<p>To improve the general quality of the Java code developers should follow these best practices, unless there is a good reason to not use them:</p>
+	<ul>
+		<li>Design modular components instead of monolithic application blocks.</li>
+		<li>Use interfaces instead of classes wherever possible in order to separate public testable APIs from their possible implementation (i.e. design by contract).</li>
+		<li>Favour composition over inheritance.</li>
+		<li>Avoid deep inheritance chains of 3 or more object levels.</li>
+		<li>Inheritance must be used only for classes in the same domain or module.</li>
+		<li>Each core entity of the application should be comparable, and all comparators must be declared statically at the beginning of the class.</li>
+		<li>Apply the <a href="https://en.wikipedia.org/wiki/KISS_principle">KISS-Principle</a> principle as much as possible.</li>
+		<li>When possible, avoid code duplication by applying the <a href="https://en.wikipedia.org/wiki/Don%27t_repeat_yourself">DRY-Principle</a> principle.</li>
+		<li>Avoid assigning too many parameters in a single function.</li>
+		<li>Favour small focused functions (typically a few lines of code) over long and complex functions with many possible outcomes.</li>
+		<li>Favour dependency injection over implicit dependencies.</li>
+		<li>Follow the separation of concerns principles wherever possible.</li>
+		<li>Favour constructor injection over setter injection.</li>
+	</ul>
+</section>
+
+<section id="spring-boot-best-practices">
+	<h2>Spring Boot best practices</h2>
+	<p>Rodano uses Spring Boot framework as its main dependency. Spring boot is a framework with many features and has its own best practices that should be followed:</p>
+	<ul>
+		<li>Favour autoconfiguration wherever possible. Only manually configure components that absolutely need to be customized.</li>
+		<li>Favour the logger provided by Spring for all system logs.</li>
+		<li>Keep the DAO layer focused on database queries and keep it as simple as possible.</li>
+		<li>Keep all the business logic in the service layer.</li>
+		<li>Controllers should contain as little business logic as possible. Ideally they should just deal with the HTTP layer of the application and nothing else.</li>
+		<li>Use the HTTP API documentation generation libraries in order to keep the API documentation up to date automatically.</li>
+		<li>Try to keep the Spring Boot parent dependency up to date with each product release.</li>
+	</ul>
+</section>
+
+<section id="javascript-best-practices">
+	<h2>JavaScript best practices</h2>
+	<p>In order to maintain the general quality of the JavaScript code, developers should follow these best practices, unless there is a good reason to not follow them:</p>
+	<ul>
+		<li>Use tools like <a href="https://eslint.org">ESLint</a> to follow the established code style conventions in order to simplify the code readability.</li>
+		<li>Use the latest JavaScript features (i.e. "let" and "const" instead of "var", arrow functions, etc.).</li>
+		<li>Always use the "===" operator instead of "==".</li>
+	</ul>
+</section>
+
+<section id="angular-best-practices">
+	<h2>Angular best practices</h2>
+	<p>The frontend of the Rodano application is built in JavaScript using the Angular framework. Following practices shall be applied in this context:</p>
+	<ul>
+		<li>Split the application into multiple modules with each module contained in its own folder (logic, template, style and tests).</li>
+		<li>Use proper naming conventions (e.g. suffix every controller name by <em>Ctrl</em>).</li>
+		<li>Create a separate Angular service for each individual REST resource.</li>
+		<li>The business logic shall reside inside Angular services.</li>
+		<li>Use standalone components</li>
+		<li>Favour import of components instead of modules</li>
+		<li>Use Reactive Forms for all forms</li>
+	</ul>
+</section>

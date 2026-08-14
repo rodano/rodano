@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta name="description" content="Documentation of Rodano, the EDC platform for all types of clinical trials"/>
+		<link rel="icon" href="images/favicon.ico"/>
+		<link rel="icon" href="images/favicon.svg" type="image/svg+xml">
+		<link href="css/global.css" rel="stylesheet" type="text/css" title="default"/>
+		<script type="module" src="js/global.js"></script>
+		<title>{{ rodano }} documentation</title>
+	</head>
+	<body>
+		<header>
+			<a href="/">{{ rodano }} documentation</a>
+		</header>
+		<div class="content">
+			<aside>
+				<nav>
+					<ol>
+						<!-- do no use a loop here to have full control over the order -->
+						<li>
+							<a {% if page.url == "/vision.html" %} aria-current="page" {% endif %} href="/vision.html">Vision</a>
+						</li>
+						<li>
+							<a {% if page.url == "/design-conventions.html" %} aria-current="page" {% endif %} href="/design-conventions.html">Design conventions</a>
+						</li>
+						<li>
+							<span>Diagrams</span>
+							<ol>
+								<li><a{% if page.url == "/configuration-class-diagram.html" %} aria-current="page"{% endif %} href="/configuration-class-diagram.html">Configuration diagram</a></li>
+								<li><a{% if page.url == "/domain-class-diagram.html" %} aria-current="page"{% endif %} href="/domain-class-diagram.html">Domain diagram</a></li>
+							</ol>
+						</li>
+						<li>
+							<a {% if page.url == "/technical-specifications.html" %} aria-current="page" {% endif %} href="/technical-specifications.html">Technical specifications</a>
+						</li>
+					</ol>
+				</nav>
+			</aside>
+			<main>
+				<article>
+					<h1>{{ title }}</h1>
+					{{ content | safe }}
+				</article>
+			</main>
+		</div>
+		<footer>
+			Last updated: {{ page.date | isoDate }}.
+		</footer>
+	</body>
+</html>
