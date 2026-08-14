@@ -2,6 +2,7 @@ package ch.rodano.core.services.dao.field;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.function.Function;

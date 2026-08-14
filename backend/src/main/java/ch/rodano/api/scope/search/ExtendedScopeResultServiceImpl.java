@@ -169,8 +169,8 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			pkQuery.innerJoin(saFilter)
 				.on(SCOPE.PK.eq(saFilter.SCOPE_FK).and(saFilter.ANCESTOR_FK.in(ancestorPks)));
 
-			if(!search.getIncludeDeleted()) {
-				conditions.add(saFilter.ANCESTOR_DELETED.isFalse());
+			if(!search.getIncludeRemoved()) {
+				conditions.add(saFilter.ANCESTOR_REMOVED.isFalse());
 			}
 		});
 
@@ -189,10 +189,10 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			}
 		});
 
-		if(!search.getIncludeDeleted()) {
+		if(!search.getIncludeRemoved()) {
 			conditions.add(
-				SCOPE.DELETED.isFalse()
-					.and(sa.ANCESTOR_FK.isNull().or(sa.ANCESTOR_DELETED.isFalse())));
+				SCOPE.REMOVED.isFalse()
+					.and(sa.ANCESTOR_FK.isNull().or(sa.ANCESTOR_REMOVED.isFalse())));
 		}
 
 		final var workflowStatesByWorkflow = search.getWorkflowStates().orElse(Collections.emptyMap());
@@ -206,7 +206,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 					DSL.select(workflowFilter.SCOPE_FK)
 						.from(workflowFilter)
 						.where(workflowFilter.WORKFLOW_ID.eq(workflowId))
-						.and(workflowFilter.DELETED.isFalse())
+						.and(workflowFilter.REMOVED.isFalse())
 						.and(workflowFilter.STATE_ID.in(filteredStates))
 				));
 			}
@@ -278,7 +278,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 					pkQuery.leftJoin(workflowSortJoin).on(
 						SCOPE.PK.eq(workflowSortJoin.SCOPE_FK)
 							.and(workflowSortJoin.WORKFLOW_ID.eq(sort.workflowId()))
-							.and(workflowSortJoin.DELETED.isFalse()));
+							.and(workflowSortJoin.REMOVED.isFalse()));
 					sortField = DSL.field(DSL.name(sqlWorkflowsStateColumnAlias(sort.workflowId()) + "_sort", "state_id"), String.class);
 					break;
 				case FIELD_VALUE:
@@ -379,7 +379,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			detailQuery.leftJoin(workflowJoin).on(
 				SCOPE.PK.eq(workflowJoin.SCOPE_FK)
 					.and(workflowJoin.WORKFLOW_ID.eq(workflowId))
-					.and(workflowJoin.DELETED.isFalse()));
+					.and(workflowJoin.REMOVED.isFalse()));
 		});
 
 		final Map<String, org.jooq.Table<?>> datasetTables = new HashMap<>();
@@ -418,7 +418,7 @@ public class ExtendedScopeResultServiceImpl implements ExtendedScopeResultServic
 			dto.setLongname(record.get("longname") != null ? record.get("longname").toString() : null);
 			dto.setModelId(record.get("scope_model_id").toString());
 			dto.setVirtual((Boolean) record.get("virtual"));
-			dto.setRemoved(record.get("deleted") != null ? (Boolean) record.get("deleted") : false);
+			dto.setRemoved(record.get("removed") != null ? (Boolean) record.get("removed") : false);
 			final ScopeTinyDTO parentDTO = new ScopeTinyDTO(
 				record.get("default_parent_sc_pk", Long.class),
 				record.get("default_parent_sc_model_id", String.class),

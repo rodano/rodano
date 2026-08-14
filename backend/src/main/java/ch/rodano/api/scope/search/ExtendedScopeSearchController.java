@@ -100,9 +100,9 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		final var acl = rightsService.getACL(currentActor());
 		final var currentRoles = currentActiveRoles();
 
-		// when the actor actually has the MANAGE_DELETED_DATA right. By default, do not include
+		// when the actor actually has the MANAGE_REMOVED_DATA right. By default, do not include
 		// removed scopes unless explicitly requested via the includeDeleted parameter.
-		final var canManageDeleted = acl.hasRight(FeatureStatic.MANAGE_DELETED_DATA);
+		final var canManageDeleted = acl.hasRight(FeatureStatic.MANAGE_REMOVED_DATA);
 		final boolean includeDeletedFinal = includeDeleted.map(val -> canManageDeleted && val).orElse(false);
 
 		final var stateType = TypeFactory.defaultInstance().constructMapType(Map.class, String.class, List.class);
@@ -122,7 +122,7 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 		.setFieldModelCriteria(fieldModelCriterionList)
 		.setLeaf(leaf)
 		.setFullText(fullText.filter(StringUtils::isNotBlank))
-		.setIncludeDeleted(includeDeletedFinal)
+		.setIncludeRemoved(includeDeletedFinal)
 		.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
 		.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
 		
