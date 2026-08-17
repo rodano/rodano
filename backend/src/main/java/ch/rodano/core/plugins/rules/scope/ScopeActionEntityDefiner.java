@@ -329,40 +329,6 @@ public class ScopeActionEntityDefiner extends AbstractScopeEntityDefiner {
 					final DatabaseActionContext context,
 					final String message,
 					final Map<String, Object> data
-				) throws IOException {
-					final var scope = (Scope) evaluable;
-
-					// Handle text message with velocity
-					final var loader = new StringTemplateLoader();
-					loader.putTemplate("log", (String) parameters.get("TEXT"));
-					freemarkerConfiguration.setTemplateLoader(loader);
-
-					final String text;
-					try {
-						text = FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfiguration.getTemplate("log"), Map.of("scope", scope));
-					}
-					catch(final TemplateException e) {
-						throw new MailPreparationException(e);
-					}
-
-					freemarkerConfiguration.unsetTemplateLoader();
-
-					logger.info(text);
-				}
-
-				@Override
-				public String getId() {
-					return "WRITE_TO_LOG";
-				}
-			},
-			new EntityAction() {
-				@Override
-				public void action(
-					final Evaluable evaluable,
-					final Map<String, Object> parameters,
-					final DatabaseActionContext context,
-					final String message,
-					final Map<String, Object> data
 				) {
 					final var scope = (Scope) evaluable;
 					scopeService.validateFields(scope, context, "Validate scope");

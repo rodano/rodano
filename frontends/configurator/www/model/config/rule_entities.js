@@ -207,17 +207,6 @@ const RuleEntities = Object.freeze({
 				label: 'Export'
 			},
 			{
-				id: 'WRITE_TO_LOG',
-				label: 'Write to log',
-				parameters: [
-					{
-						id: 'TEXT',
-						label: 'Text',
-						type: 'TEXT'
-					}
-				]
-			},
-			{
 				id: 'CREATE_EVENT',
 				label: 'Create event',
 				parameters: [

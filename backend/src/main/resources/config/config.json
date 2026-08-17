@@ -83,42 +83,7 @@
 		}
 	],
 	"eventActions": {
-		"CREATE_SCOPE": [
-			{
-				"description": "Add activity log",
-				"constraint": {
-					"conditions": {
-						"SCOPE": {
-							"mode": "OR",
-							"conditions": [],
-							"className": "RuleConditionList"
-						}
-					},
-					"evaluations": [],
-					"className": "RuleConstraint"
-				},
-				"actions": [
-					{
-						"id": "",
-						"label": {},
-						"optional": false,
-						"rulableEntity": "SCOPE",
-						"actionId": "WRITE_TO_LOG",
-						"parameters": [
-							{
-								"id": "TEXT",
-								"value": "${scope.code} created successfully.",
-								"className": "RuleActionParameter"
-							}
-						],
-						"className": "RuleAction"
-					}
-				],
-				"message": {},
-				"tags": [],
-				"className": "Rule"
-			}
-		],
+		"CREATE_SCOPE": [],
 		"CREATE_EVENT": [
 			{
 				"description": "Log visit created and send an email",
