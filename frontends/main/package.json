@@ -18,17 +18,17 @@
 		"generate-model": "npx @openapitools/openapi-generator-cli generate"
 	},
 	"dependencies": {
-		"@angular/cdk": "^22.0.2",
-		"@angular/common": "^22.0.2",
-		"@angular/compiler": "^22.0.1",
-		"@angular/core": "^22.0.2",
-		"@angular/forms": "^22.0.2",
-		"@angular/material": "^22.0.2",
-		"@angular/platform-browser": "^22.0.2",
-		"@angular/platform-browser-dynamic": "^22.0.2",
-		"@angular/router": "^22.0.2",
+		"@angular/cdk": "^22.1.2",
+		"@angular/common": "^22.1.2",
+		"@angular/compiler": "^22.1.2",
+		"@angular/core": "^22.1.2",
+		"@angular/forms": "^22.1.2",
+		"@angular/material": "^22.1.2",
+		"@angular/platform-browser": "^22.1.2",
+		"@angular/platform-browser-dynamic": "^22.1.2",
+		"@angular/router": "^22.1.2",
 		"@rodano/timeline": "github:rodano/timeline#v2.10.0",
-		"angularx-qrcode": "^21.0.5",
+		"angularx-qrcode": "^22.0.1",
 		"chart.js": "^4.5.0",
 		"chartjs-adapter-date-fns": "^3.0.0",
 		"chartjs-plugin-datalabels": "^2.2.0",
@@ -38,29 +38,23 @@
 		"tslib": "^2.6.2"
 	},
 	"devDependencies": {
-		"@angular/build": "^22.0.4",
-		"@angular/cli": "^22.0.4",
-		"@angular/compiler-cli": "^22.0.2",
-		"@angular/language-service": "^22.0.2",
+		"@angular/build": "^22.1.4",
+		"@angular/cli": "^22.1.4",
+		"@angular/compiler-cli": "^22.1.2",
+		"@angular/language-service": "^22.1.2",
 		"@eslint/js": "^10.0.1",
 		"@openapitools/openapi-generator-cli": "^2.39.0",
 		"@stylistic/eslint-plugin": "^5.2.2",
-		"@types/node": "^26.0.0",
+		"@types/node": "^26.2.0",
 		"@vitest/ui": "^4.0.18",
-		"angular-eslint": "22.0.0",
-		"eslint": "^10.0.3",
-		"globals": "^17.7.0",
-		"jsdom": "^29.0.1",
-		"prettier": "3.8.4",
+		"angular-eslint": "22.1.0",
+		"eslint": "^10.8.1",
+		"globals": "^17.11.0",
+		"jsdom": "^30.0.1",
+		"prettier": "3.9.6",
 		"ts-node": "~10.9.1",
 		"typescript": "~6.0.3",
 		"typescript-eslint": "^8.62.0",
-		"vitest": "^4.0.18"
-	},
-	"overrides": {
-		"angularx-qrcode": {
-			"@angular/common": "^22.0.0",
-			"@angular/core": "^22.0.0"
-		}
+		"vitest": "^4.1.10"
 	}
 }
