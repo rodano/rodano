@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import ch.rodano.api.controller.AbstractSecuredController;
+import ch.rodano.api.exception.http.ForbiddenOperationException;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.api.scope.ScopeDTOService;
 import ch.rodano.configuration.model.rights.Rights;
@@ -72,6 +73,8 @@ public class EproController extends AbstractSecuredController {
 	@GetMapping("robots")
 	@ResponseStatus(HttpStatus.OK)
 	public List<EproRobotDTO> invitedRobots() {
+		checkEproEnabled();
+
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
 		final var leafScopeModel = studyService.getStudy().getLeafScopeModel();
@@ -99,6 +102,8 @@ public class EproController extends AbstractSecuredController {
 	public EproRobotDTO getRobot(
 		@RequestParam final String key
 	) throws InvalidKeyException {
+		checkEproEnabled();
+
 		//retrieve robot
 		final var robot = robotDAOService.getRobotByKey(key);
 		if(robot == null) {
@@ -115,6 +120,8 @@ public class EproController extends AbstractSecuredController {
 	public EPROInvitationDTO invite(
 		@PathVariable final Long scopePk
 	) {
+		checkEproEnabled();
+
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 
 		//check rights
@@ -161,6 +168,8 @@ public class EproController extends AbstractSecuredController {
 	public void revoke(
 		@PathVariable final Long scopePk
 	) {
+		checkEproEnabled();
+
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
 
@@ -173,5 +182,11 @@ public class EproController extends AbstractSecuredController {
 
 	private String generateKey() {
 		return UUID.randomUUID().toString().substring(0, 8);
+	}
+
+	private void checkEproEnabled() {
+		if(!studyService.getStudy().isEproEnabled()) {
+			throw new ForbiddenOperationException("ePRO is not enabled for this study");
+		}
 	}
 }
