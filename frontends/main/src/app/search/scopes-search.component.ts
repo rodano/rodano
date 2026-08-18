@@ -230,11 +230,9 @@ export class SearchComponent implements OnInit {
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe(() => this.search());
 
-		//Handle browser back/forward navigation or external URL changes
 		this.route.queryParams
 			.pipe(
 				takeUntilDestroyed(this.destroyRef),
-				distinctUntilChanged((prev, curr) => JSON.stringify(prev) === JSON.stringify(curr)),
 				filter(params => Object.keys(params).length > 0),
 				map(params => this.httpParamsService.toScopeSearch(params))
 			)
