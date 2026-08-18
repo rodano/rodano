@@ -1,4 +1,4 @@
-insert into internal_patch (script, date, context, name) values (183, now(3), 'Add index for search optimization', 'db_update_182.sql');
+insert into internal_patch (script, date, context, name) values (183, now(3), 'Add index for search optimization', 'db_update_183.sql');
 
 CREATE INDEX idx_field_value ON field(value(255));
 CREATE INDEX idx_dataset_dataset_model_id ON dataset(dataset_model_id);

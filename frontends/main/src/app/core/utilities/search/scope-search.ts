@@ -1,4 +1,5 @@
 import {PaginatedSearch} from './paginated-search';
+import {FieldModelCriterion} from '../../model/field-model-criterion';
 
 export class ScopeSearch extends PaginatedSearch {
 	static readonly DEFAULT_SORT_BY = 'code';
@@ -11,8 +12,8 @@ export class ScopeSearch extends PaginatedSearch {
 	pks: number[] = [];
 	parentPks: number[] = [];
 	ancestorPks: number[] = [];
-	workflowStates?: Record<string, string[]> = {};
-	fieldModelCriteria?: string;
+	workflowStates?: Record<string, string[]> | string = {};
+	fieldModelCriteria?: FieldModelCriterion[] | string;
 	leaf?: boolean;
 	includeDeleted?: boolean = false;
 

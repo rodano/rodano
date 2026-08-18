@@ -1,7 +1,7 @@
 import {Component, ViewChild, DestroyRef, OnInit, signal, HostListener} from '@angular/core';
 import {ReactiveFormsModule, FormControl, FormGroup} from '@angular/forms';
 import {Observable, Subject, forkJoin, merge, of, iif, defer, EMPTY} from 'rxjs';
-import {debounceTime, filter, map, switchMap, tap, distinctUntilChanged} from 'rxjs/operators';
+import {debounceTime, filter, map, switchMap, tap} from 'rxjs/operators';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Scope} from '@core/model/scope';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
@@ -266,11 +266,18 @@ export class SearchComponent implements OnInit {
 		//Remove scopeModelId from query params since it's in the path
 		delete scopeSearch.scopeModelId;
 
-		if(scopeSearch.workflowStates && Object.keys(scopeSearch.workflowStates).length > 0) {
-			(scopeSearch as any).workflowStates = JSON.stringify(scopeSearch.workflowStates);
+		if(scopeSearch.workflowStates && typeof scopeSearch.workflowStates === 'object' && Object.keys(scopeSearch.workflowStates).length > 0) {
+			scopeSearch.workflowStates = JSON.stringify(scopeSearch.workflowStates);
 		}
+		else {
+			delete scopeSearch.workflowStates;
+		}
+
 		if(scopeSearch.fieldModelCriteria && Array.isArray(scopeSearch.fieldModelCriteria) && scopeSearch.fieldModelCriteria.length > 0) {
-			(scopeSearch as any).fieldModelCriteria = JSON.stringify(scopeSearch.fieldModelCriteria);
+			scopeSearch.fieldModelCriteria = JSON.stringify(scopeSearch.fieldModelCriteria);
+		}
+		else {
+			delete scopeSearch.fieldModelCriteria;
 		}
 
 		const urlTree = this.router.createUrlTree(
@@ -379,12 +386,13 @@ export class SearchComponent implements OnInit {
 		//Sync the scope code
 		this.searchForm.controls.scopeCode.setValue(scopeSearch.fullText, {emitEvent: false});
 		//Sync the workflow controls
-		if(scopeSearch.workflowStates) {
+		if(scopeSearch.workflowStates && typeof scopeSearch.workflowStates === 'object') {
 			Object.keys(scopeSearch.workflowStates).forEach(workflowId => {
 				const workflow = this.getWorkflow(workflowId);
 				if(workflow) {
 					const control = this.searchForm.controls[SearchComponent.getWSFormControlName(workflow)];
-					control.setValue(scopeSearch.workflowStates![workflowId], {emitEvent: false});
+					const workflowStates = scopeSearch.workflowStates as Record<string, string[]>;
+					control.setValue(workflowStates[workflowId], {emitEvent: false});
 				}
 			});
 		}
@@ -440,8 +448,8 @@ export class SearchComponent implements OnInit {
 		search.fullText = this.searchForm.controls.scopeCode.value;
 
 		search.scopeModelId = this.selectedScopeModel().id;
-		search.workflowStates = {};
-		search.fieldModelCriteria = '';
+		const workflowStates: Record<string, string[]> = {};
+		search.fieldModelCriteria = [];
 		search.includeDeleted = this.showRemovedScopesControl.value === true ? true : undefined;
 
 		//Process workflow states
@@ -454,7 +462,7 @@ export class SearchComponent implements OnInit {
 			}
 
 			const workflowId = workflow.aggregatedWorkflowId ?? workflow.id;
-			search.workflowStates![workflowId] = value;
+			workflowStates[workflowId] = value;
 		});
 
 		//Rebuild fieldModelCriteria from current control values
@@ -468,8 +476,8 @@ export class SearchComponent implements OnInit {
 			const isString = fieldModel.type === FieldModelType.STRING;
 			const value = SearchComponent.getFieldValueForCriteria(fieldModel, control.value);
 
-			//Skip strings with less than 3 characters
-			if(isString && value.length < 3) {
+			//Skip strings with empty value
+			if(isString && value.length === 0) {
 				return;
 			}
 
@@ -484,14 +492,14 @@ export class SearchComponent implements OnInit {
 
 		this.fieldModelCriteria = newFieldModelCriteria;
 		if(this.fieldModelCriteria.length === 0) {
-			delete (search).fieldModelCriteria;
+			delete search.fieldModelCriteria;
 		}
 		else {
-			(search as any).fieldModelCriteria = this.fieldModelCriteria;
+			search.fieldModelCriteria = this.fieldModelCriteria;
 		}
 
-		if(Object.keys(search.workflowStates).length === 0) {
-			delete (search as any).workflowStates;
+		if(Object.keys(workflowStates).length > 0) {
+			search.workflowStates = workflowStates;
 		}
 
 		const parentScopeControl = this.parentScopeControl;
@@ -525,12 +533,12 @@ export class SearchComponent implements OnInit {
 		return state?.shortname;
 	}
 
-	getValueShortname(datasetModelId: string, fieldId: string, field: any): Record<string, string> | undefined {
+	getValueShortname(datasetModelId: string, fieldId: string, field: string | number): Record<string, string> | undefined {
 		const fieldModel = this.getFieldModel(datasetModelId, fieldId);
-		return fieldModel?.possibleValues?.find(v => v.id === field)?.shortname ?? field;
+		return fieldModel?.possibleValues?.find(v => v.id === field)?.shortname;
 	}
 
-	getDateObject(datasetModelId: string, fieldId: string, field: any): Date | undefined {
+	getDateObject(datasetModelId: string, fieldId: string, field: string): Date | undefined {
 		const fieldModel = this.getFieldModel(datasetModelId, fieldId);
 		if(fieldModel?.type === FieldModelType.DATE) {
 			return SearchComponent.parseDateString(field);
@@ -538,7 +546,7 @@ export class SearchComponent implements OnInit {
 		return undefined;
 	}
 
-	static getDateObjectFromString(field: any): Date | undefined {
+	static getDateObjectFromString(field: string): Date | undefined {
 		return field ? SearchComponent.parseDateString(field) : undefined;
 	}
 
@@ -584,7 +592,6 @@ export class SearchComponent implements OnInit {
 		const dMYMandatory = fieldModel.type === FieldModelType.DATE || (fieldModel.type === FieldModelType.DATE_SELECT && fieldModel.daysMandatory && fieldModel.monthsMandatory && fieldModel.yearsMandatory);
 		return dMYCollected && dMYMandatory;
 	}
-
 
 	getFieldValueForDisplay(result: ExtendedScopeSearchResult, fieldModel: FieldModel | undefined): string | undefined {
 		if(!result.fieldValues || !fieldModel) {
