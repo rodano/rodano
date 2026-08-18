@@ -11,7 +11,7 @@ export class ScopeSearch extends PaginatedSearch {
 	pks: number[] = [];
 	parentPks: number[] = [];
 	ancestorPks: number[] = [];
-	workflowStates: Record<string, string[]> = {};
+	workflowStates?: Record<string, string[]> = {};
 	fieldModelCriteria?: string;
 	leaf?: boolean;
 	includeDeleted?: boolean = false;

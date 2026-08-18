@@ -112,6 +112,14 @@ export class SearchComponent implements OnInit {
 	@ViewChild(MatSort, {static: true}) sort: MatSort;
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
+	static readonly DEFAULT_START_DATE: Date = (() => {
+		const date = new Date();
+		date.setFullYear(date.getFullYear() - 30);
+		date.setMonth(0);
+		date.setDate(1);
+		return date;
+	})();
+
 	constructor(
 		private readonly configurationService: ConfigurationService,
 		private readonly scopeService: ScopeService,
@@ -378,7 +386,7 @@ export class SearchComponent implements OnInit {
 				const workflow = this.getWorkflow(workflowId);
 				if(workflow) {
 					const control = this.searchForm.controls[SearchComponent.getWSFormControlName(workflow)];
-					control.setValue(scopeSearch.workflowStates[workflowId], {emitEvent: false});
+					control.setValue(scopeSearch.workflowStates![workflowId], {emitEvent: false});
 				}
 			});
 		}
@@ -448,7 +456,7 @@ export class SearchComponent implements OnInit {
 			}
 
 			const workflowId = workflow.aggregatedWorkflowId ?? workflow.id;
-			search.workflowStates[workflowId] = value;
+			search.workflowStates![workflowId] = value;
 		});
 
 		//Rebuild fieldModelCriteria from current control values
@@ -579,15 +587,6 @@ export class SearchComponent implements OnInit {
 		return dMYCollected && dMYMandatory;
 	}
 
-	static getStartDate() {
-		//Return a date that is 30 years in the past
-		//This is used to set the default date for the date picker
-		const date = new Date();
-		date.setFullYear(date.getFullYear() - 30);
-		date.setMonth(0);
-		date.setDate(1);
-		return date;
-	}
 
 	getFieldValueForDisplay(result: ExtendedScopeSearchResult, fieldModel: FieldModel | undefined): string | undefined {
 		if(!result.fieldValues || !fieldModel) {
