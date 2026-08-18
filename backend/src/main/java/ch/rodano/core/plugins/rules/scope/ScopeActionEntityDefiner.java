@@ -1,6 +1,5 @@
 package ch.rodano.core.plugins.rules.scope;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -14,13 +13,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.mail.MailPreparationException;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 
-import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
-import freemarker.template.TemplateException;
 
 import ch.rodano.configuration.model.field.PartialDate;
 import ch.rodano.core.model.audit.DatabaseActionContext;
