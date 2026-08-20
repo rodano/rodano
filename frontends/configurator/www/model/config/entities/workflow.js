@@ -29,6 +29,7 @@ export class Workflow extends DisplayableNode {
 			initialStateId: {type: 'string'},
 			actionId: {type: 'string'},
 			unique: {type: 'boolean'},
+			searchable: {type: 'boolean'},
 			aggregateWorkflowId: {type: 'string'},
 			icon: {type: 'string'},
 		};
@@ -59,6 +60,7 @@ export class Workflow extends DisplayableNode {
 		this.unique = true;
 		this.aggregateWorkflowId = undefined;
 		this.icon = undefined;
+		this.searchable = false;
 		EntitiesHooks?.CreateNode.call(this, values);
 	}
 
@@ -235,6 +237,7 @@ export class Workflow extends DisplayableNode {
 		if(!this.isUsed()) {
 			report.addInfo(`Workflow ${this.id} is unused`, this, this['delete'], 'Delete workflow');
 		}
+		
 		return report;
 	}
 

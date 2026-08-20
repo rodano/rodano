@@ -1,9 +1,7 @@
 package ch.rodano.api.scope;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,8 +42,6 @@ import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.configuration.model.export.ExportFormat;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.rights.Rights;
-import ch.rodano.configuration.model.scope.ScopeModel;
-import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.scope.ScopeSearch;
@@ -163,7 +159,7 @@ public class ScopeController extends AbstractSecuredController {
 			.setAncestorPks(ancestorPks)
 			.setScopeModelId(scopeModelId)
 			//hard-code filter in predicate according to actor rights
-			.setScopeModelAncestorPks(buildActorRightPredicate(currentRoles, scopeModelId))
+			.setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, scopeModelId))
 			.setWorkflowStates(workflowStatesMap) //this makes the Optional<> method useless
 			.setFieldModelCriteria(fieldModelCriterionList) // here too
 			.setLeaf(leaf)
@@ -211,7 +207,7 @@ public class ScopeController extends AbstractSecuredController {
 			.setAncestorPks(ancestorPks)
 			.setScopeModelId(scopeModelId)
 			//hard-code filter in predicate according to actor rights
-			.setScopeModelAncestorPks(buildActorRightPredicate(currentRoles, scopeModelId))
+			.setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, scopeModelId))
 			.setWorkflowStates(workflowStatesMap) //this makes the Optional<> method useless
 			.setFieldModelCriteria(fieldModelCriterionList) // here too
 			.setLeaf(leaf)
@@ -480,28 +476,5 @@ public class ScopeController extends AbstractSecuredController {
 		final var string = UriUtils.decode(input, "UTF-8");
 		return mapper.readValue(string, type);
 	}
-
-	//TODO move this in the scope service
-	private Optional<Map<String, List<Long>>> buildActorRightPredicate(final List<Role> roles, final Optional<String> scopeModelId) {
-		//if a scope model is provided, hard-code ancestors pks
-		if(scopeModelId.isPresent()) {
-			//retrieve all ancestors on which current actor has the right to read scope having specified scope model
-			final List<Long> ancestorFks = rightsService.filterRoles(roles, studyService.getStudy().getScopeModel(scopeModelId.get()), Rights.READ).stream()
-				.map(Role::getScopeFk)
-				.distinct()
-				.toList();
-			return Optional.of(Collections.singletonMap(scopeModelId.get(), ancestorFks));
-		}
-		//otherwise, return all couples scope model / list of ancestors that the provided actor has the right to READ
-		final Map<String, List<Long>> scopeModelAncestorPks = new HashMap<>();
-		for(final var role : roles) {
-			final var roleScopeModelIds = role.getProfile().getScopeModels(Rights.READ).stream().map(ScopeModel::getId).toList();
-			for(final String roleScopeModelId : roleScopeModelIds) {
-				scopeModelAncestorPks.putIfAbsent(roleScopeModelId, new ArrayList<>());
-				scopeModelAncestorPks.get(roleScopeModelId).add(role.getScopeFk());
-			}
-		}
-		return Optional.of(scopeModelAncestorPks);
-	}
-
 }
+

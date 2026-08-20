@@ -36,9 +36,9 @@ export default [
 		loadChildren: () => import('./benchmark/benchmark-routes')
 	},
 	{
-		path: 'search',
+		path: 'scopes-search',
 		canActivate: [AuthGuard],
-		loadChildren: () => import('./search/search.component').then(m => m.SearchComponent.ROUTES)
+		loadChildren: () => import('./search/scopes-search')
 	},
 	{
 		path: CRF_PATH,

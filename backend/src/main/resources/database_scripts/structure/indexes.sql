@@ -39,3 +39,12 @@ alter table workflow_status add index aggregate_event (workflow_id, removed, eve
 
 /* user session */
 alter table user_session add unique index idx_user_session_token (token);
+
+/* indices for search optimization*/
+
+alter table field add index idx_field_value (value);
+alter table field add index idx_field_field_model_id (field_model_id);
+
+alter table dataset add index idx_dataset_dataset_model_id (dataset_model_id);
+
+

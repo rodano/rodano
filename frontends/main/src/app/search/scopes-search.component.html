@@ -1,0 +1,196 @@
+<mat-progress-bar
+	mode="indeterminate"
+	[style.visibility]="loading() ? 'visible' : 'hidden'">
+</mat-progress-bar>
+
+<div class="table-container">
+	<table
+		mat-table
+		[dataSource]="extendedScopeSearchResult()"
+		matSort>
+		<tr
+			*matNoDataRow
+			class="no-data-row">
+			<td [attr.colspan]="columnsToDisplay().length">No data</td>
+		</tr>
+		<form [formGroup]="searchForm">
+			<ng-container
+				matColumnDef="parentScopeCode"
+				[sticky]="true">
+				<th
+					mat-header-cell
+					*matHeaderCellDef>
+					<mat-form-field>
+						<mat-label>{{ selectedScopeModelParentModel().shortname | localizeMap }}</mat-label>
+						<mat-select
+							[formControl]="parentScopeControl"
+							multiple>
+							@for (parentScope of parentScopes(); track parentScope.pk) {
+								<mat-option [value]="parentScope.pk">
+									{{ parentScope.shortname }}
+								</mat-option>
+							}
+						</mat-select>
+					</mat-form-field>
+				</th>
+				<td
+					mat-cell
+					*matCellDef="let result"
+					class="value-cell">
+					{{ result.parentScope.code }}
+				</td>
+			</ng-container>
+
+			<ng-container
+				matColumnDef="scopeCode"
+				[sticky]="true">
+				<th
+					mat-header-cell
+					*matHeaderCellDef
+					mat-sort-header>
+					<mat-form-field (click)="$event.stopPropagation()">
+						<input
+							matInput
+							type="text"
+							formControlName="scopeCode"
+							appAutofocus
+							[placeholder]="selectedScopeModel().shortname | localizeMap" />
+					</mat-form-field>
+				</th>
+				<td
+					mat-cell
+					*matCellDef="let result"
+					class="value-cell">
+					{{ result.shortname }}
+				</td>
+			</ng-container>
+
+			<!-- Field model columns -->
+			@for (fieldModel of searchableFields; track fieldModel.id) {
+				@let columnId = SearchComponent.getSFFormControlName(fieldModel);
+				<ng-container [matColumnDef]="columnId">
+					<th
+						mat-header-cell
+						*matHeaderCellDef
+						mat-sort-header>
+						@if (fieldModel.type === FieldModelType.DATE || fieldModel.type === FieldModelType.DATE_SELECT) {
+							<mat-form-field (click)="$event.stopPropagation()">
+								<mat-label>{{ fieldModel.shortname | localizeMap }}</mat-label>
+								<input
+									matInput
+									[formControlName]="SearchComponent.getSFFormControlName(fieldModel)"
+									[matDatepicker]="datePicker" />
+								<mat-datepicker-toggle
+									matSuffix
+									[for]="datePicker"></mat-datepicker-toggle>
+								<mat-datepicker
+									#datePicker
+									[startAt]="SearchComponent.DEFAULT_START_DATE"></mat-datepicker>
+							</mat-form-field>
+						} @else if (fieldModel.type === FieldModelType.SELECT || fieldModel.type === FieldModelType.RADIO) {
+							<mat-form-field (click)="$event.stopPropagation()">
+								<mat-label>{{ fieldModel.shortname | localizeMap }}</mat-label>
+								<mat-select [formControlName]="SearchComponent.getSFFormControlName(fieldModel)">
+									@for (value of fieldModel.possibleValues; track value.id) {
+										<mat-option [value]="value.id">
+											{{ value.shortname | localizeMap }}
+										</mat-option>
+									}
+								</mat-select>
+							</mat-form-field>
+						} @else {
+							<mat-form-field (click)="$event.stopPropagation()">
+								<mat-label>{{ fieldModel.shortname | localizeMap }}</mat-label>
+								<input
+									matInput
+									[formControlName]="SearchComponent.getSFFormControlName(fieldModel)" />
+							</mat-form-field>
+						}
+					</th>
+					<td
+						mat-cell
+						*matCellDef="let result"
+						class="value-cell">
+						{{ getFieldValueForDisplay(result, fieldModel) }}
+					</td>
+				</ng-container>
+			}
+
+			<!-- Workflow status columns -->
+			@for (workflow of searchableWorkflows; track workflow.id) {
+				<ng-container [matColumnDef]="workflow.id">
+					<th
+						mat-header-cell
+						*matHeaderCellDef
+						mat-sort-header>
+						<mat-form-field (click)="$event.stopPropagation()">
+							<mat-label>{{ workflow.shortname | localizeMap }}</mat-label>
+							<mat-select
+								[formControlName]="SearchComponent.getWSFormControlName(workflow)"
+								multiple>
+								@for (state of workflow.states; track state.id) {
+									<mat-option [value]="state.id">
+										{{ state.shortname | localizeMap }}
+									</mat-option>
+								}
+							</mat-select>
+						</mat-form-field>
+					</th>
+					<td
+						mat-cell
+						*matCellDef="let result"
+						class="value-cell">
+						@for (workflowStatus of result.workflowStatuses; track $index) {
+							@let statusId = workflowStatus.statusId;
+							@if (statusId) {
+								{{ getStatusModel(workflow.id, statusId) | localizeMap }}
+							}
+						}
+					</td>
+				</ng-container>
+			}
+			<tr
+				mat-header-row
+				*matHeaderRowDef="columnsToDisplay(); sticky: true"></tr>
+			<tr
+				mat-row
+				[class.clickable]="true"
+				[class.removed]="result.removed"
+				(click)="navigateToScope(result.pk)"
+				*matRowDef="let result; columns: columnsToDisplay()"></tr>
+		</form>
+	</table>
+</div>
+
+<mat-divider></mat-divider>
+
+<mat-toolbar>
+	<mat-toolbar-row>
+		<button
+			mat-flat-button
+			(click)="createScope()"
+			[disabled]="!writeAccessOnParent()"
+			type="button">
+			<mat-icon>add</mat-icon>
+			New {{ selectedScopeModel().shortname | localizeMap | lowercase }}
+		</button>
+
+		<span class="toolbar-spacer"></span>
+
+		@if (hasManageDeletedDataFeature()) {
+			<mat-checkbox
+				class="filter-options"
+				[formControl]="showRemovedScopesControl">
+				Show removed {{ selectedScopeModel().pluralShortname | localizeMap | lowercase }}
+			</mat-checkbox>
+		}
+		<button
+			mat-flat-button
+			(click)="resetSearchCriteria()"
+			type="button">
+			<mat-icon>refresh</mat-icon>
+			Clear filters
+		</button>
+		<mat-paginator [length]="resultsLength()"></mat-paginator>
+	</mat-toolbar-row>
+</mat-toolbar>

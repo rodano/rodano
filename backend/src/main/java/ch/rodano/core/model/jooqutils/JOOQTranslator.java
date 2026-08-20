@@ -11,6 +11,7 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 
 public class JOOQTranslator {
+
 	public static Condition translate(final Study study, final FieldModelCriterion criterion, final Field<String> sqlField) {
 		final var fieldModel = criterion.getFieldModel(study);
 		return translate(criterion.operator(), fieldModel, sqlField, criterion.value());
@@ -36,6 +37,10 @@ public class JOOQTranslator {
 				throw new UnsupportedOperationException(errorMessage);
 			}
 		};
+	}
+
+	public static Field<?> translateSortableField(final FieldModel fieldModel, final Field<String> sqlField) {
+		return castSQLField(fieldModel, sqlField);
 	}
 
 	public static String getSQLDateFormat(final FieldModel fieldModel) {

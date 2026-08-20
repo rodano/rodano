@@ -90,6 +90,16 @@ export class ConfigurationService {
 		return this.getStudy().pipe(map(study => study.workflows));
 	}
 
+	getScopeModelWorkflows(scopeModel: ScopeModel, searchable = false): Observable<Workflow[]> {
+		return this.http.get<Workflow[]>(`${this.serviceUrl}/scope-model/${scopeModel.id}/workflows?searchable=${searchable}`);
+	}
+
+	getScopeModelSearchableWorkflows(scopeModel: ScopeModel): Observable<Workflow[]> {
+		return this.getScopeModelWorkflows(scopeModel, true).pipe(
+			map(workflows => workflows.filter(w => w.searchable))
+		);
+	}
+
 	getProfiles(): Observable<Profile[]> {
 		return this.getStudy().pipe(map(study => study.profiles));
 	}
@@ -125,8 +135,8 @@ export class ConfigurationService {
 		return this.http.get<DatasetModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/dataset-models`);
 	}
 
-	getScopeModelFieldModels(scopeModelId: string): Observable<FieldModel[]> {
-		return this.http.get<FieldModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/field-models`);
+	getScopeModelFieldModels(scopeModelId: string, searchable = false): Observable<FieldModel[]> {
+		return this.http.get<FieldModel[]>(`${this.serviceUrl}/scope-model/${scopeModelId}/field-models?searchable=${searchable}`);
 	}
 
 	getAutocompleteOptions(datasetModelId: string, fieldModelId: string, value: string): Observable<string[]> {

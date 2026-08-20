@@ -1,5 +1,6 @@
 package ch.rodano.core.services.dao.field;
 
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -135,5 +136,4 @@ public class FieldDAOServiceImpl extends AuditableDAOService<Field, FieldAuditTr
 			.fetchSingle()
 			.value1() > 0;
 	}
-
 }

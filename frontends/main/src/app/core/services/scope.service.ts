@@ -11,6 +11,7 @@ import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {FieldModelCriterion} from '@core/model/field-model-criterion';
+import {PagedResultExtendedScopeSearchResult} from '@core/model/paged-result-extended-scope-search-result';
 
 @Service()
 export class ScopeService {
@@ -28,6 +29,18 @@ export class ScopeService {
 	search(search: ScopeSearch): Observable<PagedResultScope> {
 		const params = this.httpParamsService.toHttpParams(search);
 		return this.http.get<PagedResultScope>(this.serviceUrl, {params});
+	}
+
+	extendedSearch(search: ScopeSearch): Observable<PagedResultExtendedScopeSearchResult> {
+		const scopeModelId = search.scopeModelId;
+		if(!scopeModelId) {
+			throw new Error('scopeModelId is required for extended search');
+		}
+		//Create a copy without scopeModelId for query params
+		const searchCopy = {...search};
+		delete searchCopy.scopeModelId;
+		const params = this.httpParamsService.toHttpParams(searchCopy);
+		return this.http.get<PagedResultExtendedScopeSearchResult>(`${this.apiService.getApiUrl()}/scopes/extended-search/${scopeModelId}`, {params});
 	}
 
 	getExportUrl(search: ScopeSearch): string {

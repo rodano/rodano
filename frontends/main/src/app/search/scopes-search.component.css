@@ -1,7 +1,3 @@
-table {
-	padding-top: 0.5em;
-}
-
 table th {
 	min-width: 15em;
 }
@@ -15,4 +11,12 @@ table th {
 .value-cell {
 	text-align: left;
 	padding-left: 2.5em;
+}
+
+.clickable:hover {
+	cursor: pointer !important;
+}
+
+.filter-options {
+	padding-right: 1rem;
 }
