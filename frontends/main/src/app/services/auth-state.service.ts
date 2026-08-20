@@ -44,19 +44,19 @@ export class AuthStateService {
 	}
 
 	private setToken(token: string) {
-		//store token in local storage to keep user logged in between page refreshes
-		sessionStorage.setItem(AuthStateService.TOKEN_STORAGE_KEY, token);
+		//store token in local storage so it is shared across tabs (e.g. opening a link in a new tab) and kept between page refreshes
+		localStorage.setItem(AuthStateService.TOKEN_STORAGE_KEY, token);
 	}
 
 	public hasToken(): boolean {
-		return !!sessionStorage.getItem(AuthStateService.TOKEN_STORAGE_KEY);
+		return !!localStorage.getItem(AuthStateService.TOKEN_STORAGE_KEY);
 	}
 
 	public getToken(): string | undefined {
 		if(!this.hasToken()) {
 			return undefined;
 		}
-		return sessionStorage.getItem(AuthStateService.TOKEN_STORAGE_KEY) as string;
+		return localStorage.getItem(AuthStateService.TOKEN_STORAGE_KEY) as string;
 	}
 
 	public login(credentials: Credentials): Observable<User> {
@@ -70,14 +70,14 @@ export class AuthStateService {
 	public logout(): Observable<void> {
 		return this.authService.logout().pipe(
 			tap(() => {
-				sessionStorage.removeItem(AuthStateService.TOKEN_STORAGE_KEY);
+				localStorage.removeItem(AuthStateService.TOKEN_STORAGE_KEY);
 				this.emitUser(undefined);
 			})
 		);
 	}
 
 	public removeToken(): void {
-		sessionStorage.removeItem(AuthStateService.TOKEN_STORAGE_KEY);
+		localStorage.removeItem(AuthStateService.TOKEN_STORAGE_KEY);
 		this.emitUser(undefined);
 	}
 
