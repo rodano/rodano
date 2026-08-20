@@ -43,7 +43,7 @@
 
 - name: Remove database container
   community.docker.docker_container:
-    name: "{{ docker_project_name }}-database-1"
+    name: "{{ docker_project_name }}-db-1"
     state: absent
   when: reset_database | default(false) | bool
 
