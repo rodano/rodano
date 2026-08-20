@@ -10,7 +10,8 @@ import {DateAdapter, MatNativeDateModule} from '@angular/material/core';
 import {authInterceptor} from './app/interceptors/auth.interceptor';
 import {withInterceptors, provideHttpClient} from '@angular/common/http';
 import {GlobalErrorHandler} from './app/services/error/global-error-handler.service';
-import {provideRouter, withComponentInputBinding} from '@angular/router';
+import {provideRouter, TitleStrategy, withComponentInputBinding} from '@angular/router';
+import {StudyTitleStrategy} from './app/core/services/study-title-strategy';
 import {MatDatepickerModule} from '@angular/material/datepicker';
 import {provideCharts, withDefaultRegisterables} from 'ng2-charts';
 import {MAT_ICON_DEFAULT_OPTIONS} from '@angular/material/icon';
@@ -35,6 +36,7 @@ bootstrapApplication(AppComponent, {
 		provideZonelessChangeDetection(),
 		provideHttpClient(withInterceptors([authInterceptor])),
 		provideRouter(appRoutes, withComponentInputBinding()),
+		{provide: TitleStrategy, useClass: StudyTitleStrategy},
 		provideCharts(withDefaultRegisterables())
 	]
 }).catch(err => console.error(err));
