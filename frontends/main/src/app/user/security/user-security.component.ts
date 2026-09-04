@@ -5,7 +5,7 @@ import {UserService} from '@core/services/user.service';
 import {MatDialog} from '@angular/material/dialog';
 import {UserPasswordDialogComponent} from '../dialogs/user-password.dialog';
 import {NotificationService} from '../../services/notification.service';
-import {switchMap, takeWhile} from 'rxjs/operators';
+import {switchMap, takeWhile, tap} from 'rxjs/operators';
 import {MatButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
 import {MatFormField, MatLabel} from '@angular/material/form-field';
@@ -83,6 +83,12 @@ export class UserSecurityComponent {
 			.open<UserPasswordDialogComponent, any, UserPasswordDialogResult>(UserPasswordDialogComponent, {data: {user: this.me(), actionLabel: 'Change email'}})
 			.afterClosed()
 			.pipe(
+				//if the user canceled the dialog, restore the email field to its initial value
+				tap(userPassword => {
+					if(!userPassword) {
+						this.emailForm.controls.email.setValue(this.user().pendingEmail || this.user().email);
+					}
+				}),
 				//if the user canceled the dialog, we don't want to continue
 				takeWhile(userPassword => !!userPassword),
 				switchMap(userPassword => {
@@ -95,7 +101,10 @@ export class UserSecurityComponent {
 					this.user.set(user);
 					this.notificationService.showSuccess('Email change requested');
 				},
-				error: response => this.notificationService.showError(response.error.message)
+				error: response => {
+					this.emailForm.controls.email.setValue(this.user().pendingEmail || this.user().email);
+					this.notificationService.showError(response.error.message);
+				}
 			});
 	}
 
