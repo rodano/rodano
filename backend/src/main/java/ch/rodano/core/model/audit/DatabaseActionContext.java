@@ -26,4 +26,8 @@ public record DatabaseActionContext(
 	public DatabaseActionContext toSystemAction() {
 		return new DatabaseActionContext(auditAction);
 	}
+
+	public DatabaseActionContext toActorAction(final Actor actor) {
+		return new DatabaseActionContext(auditAction, Optional.of(actor));
+	}
 }

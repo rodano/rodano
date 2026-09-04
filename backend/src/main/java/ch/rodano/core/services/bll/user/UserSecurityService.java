@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -146,10 +145,11 @@ public class UserSecurityService {
 			throw new WrongCredentialsException();
 		}
 
+		//set the user as the actor of the changes so the login is attributed to him in the audit trail instead of the system
 		updateUserLoginInfo(
 			user,
 			agent,
-			context
+			context.toActorAction(user)
 		);
 
 		// Create and save the session object
@@ -494,12 +494,14 @@ public class UserSecurityService {
 		if(resetCodeAge > PASSWORD_RESET_CODE_EXPIRY_IN_MINUTES) {
 			throw new InvalidOneUseCodeException();
 		}
+		//set the user as the actor of the changes so the reset is attributed to him in the audit trail instead of the system
+		final var userContext = context.toActorAction(user);
 		validateAndSetPassword(user, newPassword);
 		//destroy password reset code
 		user.setPasswordResetCode(null);
 		user.setPasswordResetDate(null);
-		unblockUser(user, context);
-		userDAOService.saveUser(user, context, "Reset password using reset code");
+		unblockUser(user, userContext);
+		userDAOService.saveUser(user, userContext, "Reset password using reset code");
 	}
 
 	public void recoverUserAccount(final String recoveryCode, final DatabaseActionContext context) {
@@ -509,8 +511,10 @@ public class UserSecurityService {
 			throw new InvalidOneUseCodeException();
 		}
 
-		unblockUser(user, context);
-		userDAOService.saveUser(user, context, "User account recovered using recovery code");
+		//set the user as the actor of the changes so the recovery is attributed to him in the audit trail instead of the system
+		final var userContext = context.toActorAction(user);
+		unblockUser(user, userContext);
+		userDAOService.saveUser(user, userContext, "User account recovered using recovery code");
 	}
 
 	/**
@@ -593,13 +597,8 @@ public class UserSecurityService {
 			throw new InvalidOneUseCodeException();
 		}
 
-		// TODO maybe this should be in the controller ?
-		// We create a new context with the user set as the actor of the changes
-		// This way we can have a user that activates himself in the audit trails instead of the system.
-		final var newContext = new DatabaseActionContext(
-			context.auditAction(),
-			Optional.of(user)
-		);
+		//set the user as the actor of the changes so the activation is attributed to him in the audit trail instead of the system
+		final var userContext = context.toActorAction(user);
 
 		final var userHasPrivacyPolicies = roleService.getRoles(user).stream()
 			.map(Role::getProfile)
@@ -613,7 +612,7 @@ public class UserSecurityService {
 			// Try to set the new password
 			try {
 				// Set the new password.
-				forceSetNewPassword(user, password, newContext);
+				forceSetNewPassword(user, password, userContext);
 			}
 			catch(@SuppressWarnings("unused") final WeakPasswordException e) {
 				final var message = studyService.getStudy().getLocalizedPasswordMessage(user.getLanguageId());
@@ -625,15 +624,15 @@ public class UserSecurityService {
 		user.setActivated(true);
 		// Remove user's activation code
 		user.setActivationCode(null);
-		userDAOService.saveUser(user, newContext, "User activated");
+		userDAOService.saveUser(user, userContext, "User activated");
 
 		// Enable the roles
 		for(final var role : roleService.getRoles(user)) {
-			roleService.enableRoleWithoutNotification(user, role, newContext);
+			roleService.enableRoleWithoutNotification(user, role, userContext);
 		}
 
 		// Send the user activation confirmation e-mail
-		mailService.sendUserAccountActivationConfirmation(user, newContext);
+		mailService.sendUserAccountActivationConfirmation(user, userContext);
 	}
 
 	/**

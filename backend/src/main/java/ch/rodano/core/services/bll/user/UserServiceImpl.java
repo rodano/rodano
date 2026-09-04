@@ -233,7 +233,8 @@ public class UserServiceImpl implements UserService {
 		user.setPendingEmail(null);
 		user.setEmailModificationDate(null);
 		user.setEmailVerificationCode(null);
-		saveUser(user, context, "User email verified");
+		//set the user as the actor of the changes so the verification is attributed to him in the audit trail instead of the system
+		saveUser(user, context.toActorAction(user), "User email verified");
 	}
 
 	// TODO 2FA
