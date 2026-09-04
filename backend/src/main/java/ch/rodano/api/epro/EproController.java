@@ -100,7 +100,7 @@ public class EproController extends AbstractSecuredController {
 	// Warning : if you change this API endpoint, do not forget to change it in the security configuration !
 	@PostMapping("/robot")
 	public EproRobotDTO getRobot(
-		@RequestParam final String key
+		@RequestParam("key") final String key
 	) throws InvalidKeyException {
 		checkEproEnabled();
 
@@ -118,7 +118,7 @@ public class EproController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EPROInvitationDTO invite(
-		@PathVariable final Long scopePk
+		@PathVariable("scopePk") final Long scopePk
 	) {
 		checkEproEnabled();
 
@@ -166,7 +166,7 @@ public class EproController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void revoke(
-		@PathVariable final Long scopePk
+		@PathVariable("scopePk") final Long scopePk
 	) {
 		checkEproEnabled();
 

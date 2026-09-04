@@ -58,8 +58,8 @@ public class ReportController extends AbstractSecuredController {
 	@GetMapping("transfers")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getTransferReport(
-		@RequestParam final String scopeModelId,
-		@RequestParam final Optional<Long> scopePk
+		@RequestParam("scopeModelId") final String scopeModelId,
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		var currentRoles = currentActiveRoles();
@@ -90,8 +90,8 @@ public class ReportController extends AbstractSecuredController {
 	@GetMapping("events")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getEventsReport(
-		@RequestParam final String scopeModelId,
-		@RequestParam final Optional<Long> scopePk
+		@RequestParam("scopeModelId") final String scopeModelId,
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		var currentRoles = currentActiveRoles();

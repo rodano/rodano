@@ -164,7 +164,7 @@ public class AdministrationController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public void executeScheduledTask(
-		@RequestParam final String scheduledTaskName
+		@RequestParam("scheduledTaskName") final String scheduledTaskName
 	) {
 		rightsService.checkRightAdmin(currentActor(), currentRoles());
 

@@ -74,7 +74,7 @@ public class EventController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<EventDTO> getScopeEvents(
-		@PathVariable final Long scopePk
+		@PathVariable("scopePk") final Long scopePk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 
@@ -92,8 +92,8 @@ public class EventController extends AbstractSecuredController {
 	@GetMapping("{eventPk}")
 	@ResponseStatus(HttpStatus.OK)
 	public EventDTO getEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventDAOService.getEventByPk(eventPk);
@@ -115,8 +115,8 @@ public class EventController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO removeEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
 		@Valid @RequestBody final RationaleDTO rationale
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -144,8 +144,8 @@ public class EventController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO restoreEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
 		@Valid @RequestBody final RationaleDTO rationale
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -170,8 +170,8 @@ public class EventController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public EventDTO createEvent(
-		@PathVariable final Long scopePk,
-		@RequestParam final String eventModelId
+		@PathVariable("scopePk") final Long scopePk,
+		@RequestParam("eventModelId") final String eventModelId
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 
@@ -194,8 +194,8 @@ public class EventController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO lockEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventDAOService.getEventByPk(eventPk);
@@ -218,8 +218,8 @@ public class EventController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO unlockEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventDAOService.getEventByPk(eventPk);

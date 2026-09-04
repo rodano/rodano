@@ -108,8 +108,8 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping("scopes/{scopePk}/versions")
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<ScopeAuditTrail> getForScope(
-		@PathVariable final Long scopePk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("scopePk") final Long scopePk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 
@@ -128,8 +128,8 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping("workflows/{workflowPk}/versions")
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<WorkflowStatusAuditTrail> getForWorkflowStatus(
-		@PathVariable final Long workflowPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("workflowPk") final Long workflowPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var workflowStatus = workflowStatusDAOService.getWorkflowStatusByPk(workflowPk);
 		utilsService.checkNotNull(WorkflowStatus.class, workflowStatus, workflowPk);
@@ -149,9 +149,9 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping("scopes/{scopePk}/events/{eventPk}/versions")
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<EventAuditTrail> getForEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventDAOService.getEventByPk(eventPk);
@@ -175,10 +175,10 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping({ "scopes/{scopePk}/datasets/{datasetPk}/versions", "scopes/{scopePk}/events/{eventPk}/datasets/{datasetPk}/versions" })
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<DatasetAuditTrail> getForDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -205,11 +205,11 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping({ "scopes/{scopePk}/datasets/{datasetPk}/fields/{fieldPk}/versions", "scopes/{scopePk}/events/{eventPk}/datasets/{datasetPk}/fields/{fieldPk}/versions" })
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<FieldAuditTrail> getForField(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -238,10 +238,10 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping({ "scopes/{scopePk}/forms/{formPk}/versions", "scopes/{scopePk}/events/{eventPk}/forms/{formPk}/versions" })
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<FormAuditTrail> getForForm(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -268,8 +268,8 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping("users/{userPk}/versions")
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<UserAuditTrailDTO> getForUser(
-		@PathVariable final Long userPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("userPk") final Long userPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var user = userDAOService.getUserByPk(userPk);
 
@@ -292,8 +292,8 @@ public class VersionsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	public NavigableSet<RobotAuditTrail> getForRobot(
-		@PathVariable final Long robotPk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("robotPk") final Long robotPk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 		final var robot = robotDAOService.getRobotByPk(robotPk);
 
@@ -309,9 +309,9 @@ public class VersionsController extends AbstractSecuredController {
 	@GetMapping("users/{userPk}/roles/{rolePk}/versions")
 	@ResponseStatus(HttpStatus.OK)
 	public NavigableSet<RoleAuditTrail> getForUserRole(
-		@PathVariable final Long userPk,
-		@PathVariable final Long rolePk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("userPk") final Long userPk,
+		@PathVariable("rolePk") final Long rolePk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 
 		final var user = userDAOService.getUserByPk(userPk);
@@ -337,9 +337,9 @@ public class VersionsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	public NavigableSet<RoleAuditTrail> getForRobotRole(
-		@PathVariable final Long robotPk,
-		@PathVariable final Long rolePk,
-		@RequestParam final Optional<Long> auditActorPk
+		@PathVariable("robotPk") final Long robotPk,
+		@PathVariable("rolePk") final Long rolePk,
+		@RequestParam("auditActorPk") final Optional<Long> auditActorPk
 	) {
 
 		final var robot = robotDAOService.getRobotByPk(robotPk);

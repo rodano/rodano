@@ -66,8 +66,8 @@ public class ChartWidgetController extends AbstractSecuredController {
 	@GetMapping("{chartId}")
 	@ResponseStatus(HttpStatus.OK)
 	public ChartDTO<?, ?> getChart(
-		@PathVariable final String chartId,
-		@RequestParam final Optional<List<Long>> scopePks,
+		@PathVariable("chartId") final String chartId,
+		@RequestParam("scopePks") final Optional<List<Long>> scopePks,
 		@RequestParam(name = "criteria") final Optional<String> encodedCriteria
 	) {
 		final var currentActor = currentActor();

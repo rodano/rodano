@@ -74,7 +74,7 @@ public class ExtractController extends AbstractSecuredController {
 	@GetMapping("dataset-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<DatasetModelDTO> getDatasetModelsPerScopeModel(
-		@Parameter(description = "Scope model ID") @RequestParam final String scopeModelId
+		@Parameter(description = "Scope model ID") @RequestParam("scopeModelId") final String scopeModelId
 	) {
 		final var scopeModel = studyService.getStudy().getScopeModel(scopeModelId);
 
@@ -106,8 +106,8 @@ public class ExtractController extends AbstractSecuredController {
 			Dataset model IDs.
 			If only one is provided, a CSV file is returned.
 			If more than one ID is provided, a ZIP file containing individual specifications is returned.
-			""") @RequestParam final List<String> datasetModelIds,
-		@Parameter(description = "Should the modification dates be included ?") @RequestParam final Optional<Boolean> withModificationDates
+			""") @RequestParam("datasetModelIds") final List<String> datasetModelIds,
+		@Parameter(description = "Should the modification dates be included ?") @RequestParam("withModificationDates") final Optional<Boolean> withModificationDates
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -157,9 +157,9 @@ public class ExtractController extends AbstractSecuredController {
 			Dataset model IDs.
 			If only one is provided, a CSV file is returned.
 			If more than one ID is provided, a ZIP file containing individual specifications is returned.
-			""") @RequestParam final List<String> datasetModelIds,
-		@Parameter(description = "Scope reference on which the export will be performed") @RequestParam final Optional<Long> scopePk,
-		@Parameter(description = "Should the modification dates be included ?") @RequestParam final Optional<Boolean> withModificationDates
+			""") @RequestParam("datasetModelIds") final List<String> datasetModelIds,
+		@Parameter(description = "Scope reference on which the export will be performed") @RequestParam("scopePk") final Optional<Long> scopePk,
+		@Parameter(description = "Should the modification dates be included ?") @RequestParam("withModificationDates") final Optional<Boolean> withModificationDates
 	) {
 		final var currentActor = currentActor();
 		var currentRoles = currentActiveRoles();

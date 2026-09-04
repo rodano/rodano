@@ -56,7 +56,7 @@ public class TimelineController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<TimelineGraphData> getTimeline(
-		@PathVariable final Long scopePk
+		@PathVariable("scopePk") final Long scopePk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 

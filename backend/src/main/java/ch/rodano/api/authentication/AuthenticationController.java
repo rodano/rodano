@@ -55,7 +55,7 @@ public class AuthenticationController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public void recover(
-		@RequestParam final String email,
+		@RequestParam("email") final String email,
 		final HttpServletRequest servletRequest
 	) {
 		final var user = userService.getUserByEmail(email);

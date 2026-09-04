@@ -73,7 +73,7 @@ public class RoleController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public List<RoleDTO> getUserRoles(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -89,8 +89,8 @@ public class RoleController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public RoleDTO enableRole(
-		@PathVariable final Long userPk,
-		@PathVariable final Long rolePk
+		@PathVariable("userPk") final Long userPk,
+		@PathVariable("rolePk") final Long rolePk
 	) {
 		final var user = userDAOService.getUserByPk(userPk);
 		final var role = roleDAOService.getRoleByPk(rolePk);
@@ -124,8 +124,8 @@ public class RoleController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public RoleDTO disableRole(
-		@PathVariable final Long userPk,
-		@PathVariable final Long rolePk
+		@PathVariable("userPk") final Long userPk,
+		@PathVariable("rolePk") final Long rolePk
 	) {
 		final var user = userDAOService.getUserByPk(userPk);
 		final var role = roleDAOService.getRoleByPk(rolePk);
@@ -151,8 +151,8 @@ public class RoleController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public RoleDTO rejectRole(
-		@PathVariable final Long userPk,
-		@PathVariable final Long rolePk
+		@PathVariable("userPk") final Long userPk,
+		@PathVariable("rolePk") final Long rolePk
 	) {
 		final var user = userDAOService.getUserByPk(userPk);
 		final var role = roleDAOService.getRoleByPk(rolePk);
@@ -179,7 +179,7 @@ public class RoleController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public RoleDTO createRole(
-		@PathVariable final Long userPk,
+		@PathVariable("userPk") final Long userPk,
 		@Valid @RequestBody final RoleCreationDTO roleCreationDTO
 	) {
 		final var user = userDAOService.getUserByPk(userPk);

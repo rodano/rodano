@@ -74,8 +74,8 @@ public class DocumentationController extends AbstractSecuredController {
 	@GetMapping("/crf-blank/{scopeModelId}")
 	@Transactional
 	public ResponseEntity<StreamingResponseBody> crfBlank(
-		@PathVariable final String scopeModelId,
-		@Parameter(description = "Annotated?") @RequestParam final boolean annotated
+		@PathVariable("scopeModelId") final String scopeModelId,
+		@Parameter(description = "Annotated?") @RequestParam("annotated") final boolean annotated
 	) {
 		final var scopeModel = studyService.getStudy().getScopeModel(scopeModelId);
 
@@ -93,8 +93,8 @@ public class DocumentationController extends AbstractSecuredController {
 	@Operation(summary = "Export archive CRF in PDF format for one scope")
 	@GetMapping("/crf-archive/{scopePk}")
 	public ResponseEntity<StreamingResponseBody> crfOneScopeArchive(
-		@PathVariable final Long scopePk,
-		@Parameter(description = "With audit trails?") @RequestParam final boolean auditTrails
+		@PathVariable("scopePk") final Long scopePk,
+		@Parameter(description = "With audit trails?") @RequestParam("auditTrails") final boolean auditTrails
 	) {
 		final var currentActor = currentActor();
 		final var scope = scopeDAOService.getScopeByPk(scopePk);

@@ -146,17 +146,17 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@Operation(summary = "Search workflows")
 	@GetMapping("workflows")
 	public PagedResult<WorkflowStatusDTO> search(
-		@Parameter(description = "Workflow IDs") @RequestParam final Optional<List<String>> workflowIds,
-		@Parameter(description = "State IDs") @RequestParam final Optional<List<String>> stateIds,
-		@Parameter(description = "Ancestor scope PKs") @RequestParam final Optional<List<Long>> ancestorScopePks,
-		@Parameter(description = "Scope PKs") @RequestParam final Optional<List<Long>> scopePks,
-		@Parameter(description = "Event PKs") @RequestParam final Optional<List<Long>> eventPks,
-		@Parameter(description = "Full-text search on workflows") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Include workflows on expected events ?") @RequestParam final Optional<Boolean> filterExpectedEvents,
-		@Parameter(description = "Order the results by which property ?") @RequestParam final Optional<WorkflowStatusSortBy> sortBy,
-		@Parameter(description = "Use the ascending order ?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@Parameter(description = "Workflow IDs") @RequestParam("workflowIds") final Optional<List<String>> workflowIds,
+		@Parameter(description = "State IDs") @RequestParam("stateIds") final Optional<List<String>> stateIds,
+		@Parameter(description = "Ancestor scope PKs") @RequestParam("ancestorScopePks") final Optional<List<Long>> ancestorScopePks,
+		@Parameter(description = "Scope PKs") @RequestParam("scopePks") final Optional<List<Long>> scopePks,
+		@Parameter(description = "Event PKs") @RequestParam("eventPks") final Optional<List<Long>> eventPks,
+		@Parameter(description = "Full-text search on workflows") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Include workflows on expected events ?") @RequestParam("filterExpectedEvents") final Optional<Boolean> filterExpectedEvents,
+		@Parameter(description = "Order the results by which property ?") @RequestParam("sortBy") final Optional<WorkflowStatusSortBy> sortBy,
+		@Parameter(description = "Use the ascending order ?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 		final var currentActor = currentActor();
 		final var acl = rightsService.getACL(currentActor);
@@ -210,10 +210,10 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public FieldDTO initWorkflowOnField(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -248,11 +248,11 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public FieldDTO doActionOnFieldWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
-		@PathVariable final Long workflowPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
+		@PathVariable("workflowPk") final Long workflowPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -287,8 +287,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO initWorkflowOnEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -320,9 +320,9 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO doActionOnEventWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@PathVariable final Long workflowPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
+		@PathVariable("workflowPk") final Long workflowPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -354,10 +354,10 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public EventDTO doActionOnEventAggregateWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@PathVariable final String workflowId,
-		@PathVariable final String actionId,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
+		@PathVariable("workflowId") final String workflowId,
+		@PathVariable("actionId") final String actionId,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -389,9 +389,9 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public FormDTO initWorkflowOnForm(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -425,10 +425,10 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public FormDTO doActionOnFormWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk,
-		@PathVariable final Long workflowPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk,
+		@PathVariable("workflowPk") final Long workflowPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -462,11 +462,11 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public FormDTO doActionOnFormAggregateWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk,
-		@PathVariable final String workflowId,
-		@PathVariable final String actionId,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk,
+		@PathVariable("workflowId") final String workflowId,
+		@PathVariable("actionId") final String actionId,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -501,7 +501,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public ScopeDTO initWorkflowOnScope(
-		@PathVariable final Long scopePk,
+		@PathVariable("scopePk") final Long scopePk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -530,8 +530,8 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public ScopeDTO doActionOnScopeWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long workflowPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("workflowPk") final Long workflowPk,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -560,9 +560,9 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public ScopeDTO doActionOnScopeAggregateWorkflow(
-		@PathVariable final Long scopePk,
-		@PathVariable final String workflowId,
-		@PathVariable final String actionId,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("workflowId") final String workflowId,
+		@PathVariable("actionId") final String actionId,
 		@Valid @RequestBody final WorkflowUpdateDTO workflowAction
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -591,7 +591,7 @@ public class WorkflowStatusController extends AbstractSecuredController {
 	@GetMapping("workflows/{workflowPk}/form")
 	@ResponseStatus(HttpStatus.OK)
 	public FormInfoDTO getFormFromWorkflowStatus(
-		@PathVariable final Long workflowPk
+		@PathVariable("workflowPk") final Long workflowPk
 	) {
 		final var ws = workflowStatusDAOService.getWorkflowStatusByPk(workflowPk);
 		final var scope = scopeDAOService.getScopeByPk(ws.getScopeFk());

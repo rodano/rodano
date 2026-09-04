@@ -95,13 +95,13 @@ public class ResourceController extends AbstractSecuredController {
 	@GetMapping(value = { "", "public" })
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<ResourceDTO> search(
-		@Parameter(description = "Category ID of the resource") @RequestParam final Optional<String> categoryId,
-		@Parameter(description = "Full text search on title and description") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Has the resource been removed ?") @RequestParam final Optional<Boolean> removed,
-		@Parameter(description = "Sort the results by which property?") @RequestParam final Optional<ResourceSortBy> sortBy,
-		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@Parameter(description = "Category ID of the resource") @RequestParam("categoryId") final Optional<String> categoryId,
+		@Parameter(description = "Full text search on title and description") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Has the resource been removed ?") @RequestParam("removed") final Optional<Boolean> removed,
+		@Parameter(description = "Sort the results by which property?") @RequestParam("sortBy") final Optional<ResourceSortBy> sortBy,
+		@Parameter(description = "Use the ascending order?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 
 		final Optional<Actor> currentActor;
@@ -169,7 +169,7 @@ public class ResourceController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public ResourceDTO updateResource(
-		@PathVariable final Long resourcePk,
+		@PathVariable("resourcePk") final Long resourcePk,
 		@Valid @RequestBody final ResourceDTO resourceDTO
 	) {
 		// TODO remove these checks when the spring validation is integrated
@@ -210,7 +210,7 @@ public class ResourceController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public ResourceDTO restoreResource(
-		@PathVariable final Long resourcePk
+		@PathVariable("resourcePk") final Long resourcePk
 	) {
 		final var currentActor = currentActor();
 
@@ -230,7 +230,7 @@ public class ResourceController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public ResourceDTO removeResource(
-		@PathVariable final Long resourcePk
+		@PathVariable("resourcePk") final Long resourcePk
 	) {
 		final var currentActor = currentActor();
 
@@ -250,8 +250,8 @@ public class ResourceController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public ResourceDTO uploadResourceFile(
-		@PathVariable final Long resourcePk,
-		@RequestParam final MultipartFile file
+		@PathVariable("resourcePk") final Long resourcePk,
+		@RequestParam("file") final MultipartFile file
 	) throws IOException {
 		final var currentActor = currentActor();
 		final var resource = resourceService.getResourceByPk(resourcePk);
@@ -284,7 +284,7 @@ public class ResourceController extends AbstractSecuredController {
 	@GetMapping(value = { "{resourcePk}/file", "/public/{resourcePk}/file" })
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> downloadResourceFile(
-		@PathVariable final Long resourcePk
+		@PathVariable("resourcePk") final Long resourcePk
 	) {
 		final var resource = resourceService.getResourceByPk(resourcePk);
 

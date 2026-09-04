@@ -63,8 +63,8 @@ public class OverdueController extends AbstractSecuredController {
 	@Operation(summary = "Get widget data")
 	@GetMapping("{widgetId}")
 	public PagedResult<OverdueDTO> getData(
-		@PathVariable final String widgetId,
-		@RequestParam final Optional<List<Long>> scopePks,
+		@PathVariable("widgetId") final String widgetId,
+		@RequestParam("scopePks") final Optional<List<Long>> scopePks,
 		@Parameter(description = "Full text search on scope code and workflowable model") @RequestParam(name = "fullText") final Optional<String> fullText,
 		@Parameter(description = "Order the results by which property?") @RequestParam(name = "sortBy") final Optional<String> sortBy,
 		@Parameter(description = "Use the ascending order?") @RequestParam(name = "orderAscending") final Optional<Boolean> orderAscending,
@@ -101,8 +101,8 @@ public class OverdueController extends AbstractSecuredController {
 	@Operation(summary = "Export widget data")
 	@GetMapping("{widgetId}/export")
 	public ResponseEntity<StreamingResponseBody> getExport(
-		@PathVariable final String widgetId,
-		@RequestParam final Optional<List<Long>> scopePks
+		@PathVariable("widgetId") final String widgetId,
+		@RequestParam("scopePks") final Optional<List<Long>> scopePks
 	) {
 		final var currentActor = currentActor();
 

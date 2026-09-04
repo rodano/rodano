@@ -102,8 +102,8 @@ public class FormController extends AbstractSecuredController {
 	@GetMapping({ "forms", "events/{eventPk}/forms" })
 	@ResponseStatus(HttpStatus.OK)
 	public List<FormDTO> getForms(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -125,9 +125,9 @@ public class FormController extends AbstractSecuredController {
 	@GetMapping({ "forms/{formPk}", "events/{eventPk}/forms/{formPk}" })
 	@ResponseStatus(HttpStatus.OK)
 	public FormDTO getForm(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -151,9 +151,9 @@ public class FormController extends AbstractSecuredController {
 	@GetMapping({ "forms/{formPk}/layouts", "events/{eventPk}/forms/{formPk}/layouts" })
 	@ResponseStatus(HttpStatus.OK)
 	public List<LayoutDTO> getFormLayouts(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -179,9 +179,9 @@ public class FormController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional(rollbackFor = DatasetSubmissionException.class)
 	public List<DatasetDTO> saveForm(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk,
 		@RequestBody final DatasetSubmissionDTO datasetSubmissionDTO
 	) throws DatasetSubmissionException {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);

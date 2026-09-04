@@ -71,9 +71,9 @@ public class FieldController extends AbstractSecuredController {
 	@GetMapping("datasets/{datasetPk}/fields/{fieldPk}")
 	@ResponseStatus(HttpStatus.OK)
 	public FieldDTO getField(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk
 	) {
 		return getField(scopePk, Optional.empty(), datasetPk, fieldPk);
 	}
@@ -82,10 +82,10 @@ public class FieldController extends AbstractSecuredController {
 	@GetMapping("events/{eventPk}/datasets/{datasetPk}/fields/{fieldPk}")
 	@ResponseStatus(HttpStatus.OK)
 	public FieldDTO getFieldOnEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk
 	) {
 		return getField(scopePk, Optional.of(eventPk), datasetPk, fieldPk);
 	}

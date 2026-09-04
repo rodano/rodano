@@ -109,7 +109,7 @@ public class MailController extends AbstractSecuredController {
 	@GetMapping("{mailPk}")
 	@ResponseStatus(HttpStatus.OK)
 	public MailDTO getMailByPk(
-		@PathVariable final Long mailPk
+		@PathVariable("mailPk") final Long mailPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -125,7 +125,7 @@ public class MailController extends AbstractSecuredController {
 	@GetMapping("{mailPk}/attachments")
 	@ResponseStatus(HttpStatus.OK)
 	public List<MailAttachmentDTO> getAttachmentsByMailByPk(
-		@PathVariable final Long mailPk
+		@PathVariable("mailPk") final Long mailPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -138,8 +138,8 @@ public class MailController extends AbstractSecuredController {
 	@GetMapping("{mailPk}/attachments/{attachmentPk}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getMailAttachment(
-		@PathVariable final Long mailPk,
-		@PathVariable final Long attachmentPk
+		@PathVariable("mailPk") final Long mailPk,
+		@PathVariable("attachmentPk") final Long attachmentPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -162,7 +162,7 @@ public class MailController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@Transactional
 	public void cancelMail(
-		@PathVariable final Long mailPk
+		@PathVariable("mailPk") final Long mailPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -186,7 +186,7 @@ public class MailController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.ACCEPTED)
 	@Transactional
 	public void resendMails(
-		@RequestParam final List<Long> mailPks
+		@RequestParam("mailPks") final List<Long> mailPks
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -203,18 +203,18 @@ public class MailController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<MailDTO> search(
-		@Parameter(description = "Mail origin") @RequestParam final Optional<MailOrigin> origin,
-		@Parameter(description = "Mail status") @RequestParam final Optional<MailStatus> status,
-		@Parameter(description = "Mail intent") @RequestParam final Optional<String> intent,
-		@Parameter(description = "Mail sender") @RequestParam final Optional<String> sender,
-		@Parameter(description = "Mail recipient") @RequestParam final Optional<String> recipient,
-		@Parameter(description = "Full text search on mail body and subject") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Lower boundary for the mail creation time") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> beforeDate,
-		@Parameter(description = "Upper boundary for the mail creation time") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> afterDate,
-		@Parameter(description = "Sort the results by which property?") @RequestParam final Optional<MailSortBy> sortBy,
-		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@Parameter(description = "Mail origin") @RequestParam("origin") final Optional<MailOrigin> origin,
+		@Parameter(description = "Mail status") @RequestParam("status") final Optional<MailStatus> status,
+		@Parameter(description = "Mail intent") @RequestParam("intent") final Optional<String> intent,
+		@Parameter(description = "Mail sender") @RequestParam("sender") final Optional<String> sender,
+		@Parameter(description = "Mail recipient") @RequestParam("recipient") final Optional<String> recipient,
+		@Parameter(description = "Full text search on mail body and subject") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Lower boundary for the mail creation time") @RequestParam("beforeDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> beforeDate,
+		@Parameter(description = "Upper boundary for the mail creation time") @RequestParam("afterDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> afterDate,
+		@Parameter(description = "Sort the results by which property?") @RequestParam("sortBy") final Optional<MailSortBy> sortBy,
+		@Parameter(description = "Use the ascending order?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -243,14 +243,14 @@ public class MailController extends AbstractSecuredController {
 	@GetMapping("export")
 	@ResponseStatus(HttpStatus.CREATED)
 	public ResponseEntity<StreamingResponseBody> export(
-		@Parameter(description = "Mail origin") @RequestParam final Optional<MailOrigin> origin,
-		@Parameter(description = "Mail status") @RequestParam final Optional<MailStatus> status,
-		@Parameter(description = "Mail intent") @RequestParam final Optional<String> intent,
-		@Parameter(description = "Mail sender") @RequestParam final Optional<String> sender,
-		@Parameter(description = "Mail recipient") @RequestParam final Optional<String> recipient,
-		@Parameter(description = "Full text search on mail body and subject") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Lower boundary for the mail creation time") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> beforeDate,
-		@Parameter(description = "Upper boundary for the mail creation time") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> afterDate
+		@Parameter(description = "Mail origin") @RequestParam("origin") final Optional<MailOrigin> origin,
+		@Parameter(description = "Mail status") @RequestParam("status") final Optional<MailStatus> status,
+		@Parameter(description = "Mail intent") @RequestParam("intent") final Optional<String> intent,
+		@Parameter(description = "Mail sender") @RequestParam("sender") final Optional<String> sender,
+		@Parameter(description = "Mail recipient") @RequestParam("recipient") final Optional<String> recipient,
+		@Parameter(description = "Full text search on mail body and subject") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Lower boundary for the mail creation time") @RequestParam("beforeDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> beforeDate,
+		@Parameter(description = "Upper boundary for the mail creation time") @RequestParam("afterDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final Optional<ZonedDateTime> afterDate
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();

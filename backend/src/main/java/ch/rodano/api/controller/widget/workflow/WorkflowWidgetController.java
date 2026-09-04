@@ -67,7 +67,7 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	@GetMapping("{widgetId}")
 	@ResponseStatus(HttpStatus.OK)
 	public WorkflowWidgetDTO getWidget(
-		@PathVariable final String widgetId
+		@PathVariable("widgetId") final String widgetId
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -86,13 +86,13 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Get the workflows widget data")
 	@GetMapping("{widgetId}/data")
 	public PagedResult<WorkflowStatusInfo> getData(
-		@PathVariable final String widgetId,
-		@RequestParam final Optional<List<Long>> scopePks,
-		@Parameter(description = "Full text search on scope code and workflowable model") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Order the results by which property?") @RequestParam final Optional<String> sortBy,
-		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@PathVariable("widgetId") final String widgetId,
+		@RequestParam("scopePks") final Optional<List<Long>> scopePks,
+		@Parameter(description = "Full text search on scope code and workflowable model") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Order the results by which property?") @RequestParam("sortBy") final Optional<String> sortBy,
+		@Parameter(description = "Use the ascending order?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 		final var currentActor = currentActor();
 		final var study = studyService.getStudy();
@@ -128,8 +128,8 @@ public class WorkflowWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the workflow widget")
 	@GetMapping("{widgetId}/export")
 	public ResponseEntity<StreamingResponseBody> getExport(
-		@PathVariable final String widgetId,
-		@RequestParam final Optional<List<Long>> scopePks
+		@PathVariable("widgetId") final String widgetId,
+		@RequestParam("scopePks") final Optional<List<Long>> scopePks
 	) {
 		final var currentActor = currentActor();
 		final var languages = currentLanguages();

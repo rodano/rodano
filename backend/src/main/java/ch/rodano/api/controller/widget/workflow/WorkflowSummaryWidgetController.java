@@ -60,8 +60,8 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 	@GetMapping("{workflowSummaryId}")
 	@ResponseStatus(HttpStatus.OK)
 	public SummaryDTO getSummary(
-		@PathVariable final String workflowSummaryId,
-		@RequestParam final Optional<Long> scopePk
+		@PathVariable("workflowSummaryId") final String workflowSummaryId,
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		final var workflowSummary = studyService.getStudy().getWorkflowSummary(workflowSummaryId);
@@ -85,8 +85,8 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the workflow summary")
 	@GetMapping("{workflowSummaryId}/export")
 	public ResponseEntity<StreamingResponseBody> getExport(
-		@PathVariable final String workflowSummaryId,
-		@RequestParam final Optional<Long> scopePk
+		@PathVariable("workflowSummaryId") final String workflowSummaryId,
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		final var languages = currentLanguages();
@@ -125,8 +125,8 @@ public class WorkflowSummaryWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the historical workflow summary")
 	@GetMapping("{workflowSummaryId}/export/history")
 	public ResponseEntity<StreamingResponseBody> getHistoricalExport(
-		@PathVariable final String workflowSummaryId,
-		@RequestParam final Optional<Long> scopePk
+		@PathVariable("workflowSummaryId") final String workflowSummaryId,
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		final var languages = currentLanguages();

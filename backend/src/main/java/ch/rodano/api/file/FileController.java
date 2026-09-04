@@ -84,7 +84,7 @@ public class FileController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public FileDTO createScopeFieldFile(
-		@PathVariable final Long scopePk,
+		@PathVariable("scopePk") final Long scopePk,
 		@RequestParam("file") final MultipartFile multipartFile
 	) throws IOException {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -109,8 +109,8 @@ public class FileController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public FileDTO createEventFieldFile(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
 		@RequestParam("file") final MultipartFile multipartFile
 	) throws IOException {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -141,9 +141,9 @@ public class FileController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public FileDTO createScopeFieldFile(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
 		@RequestParam("file") final MultipartFile multipartFile
 	) throws IOException {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -177,10 +177,10 @@ public class FileController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public FileDTO createEventFieldFile(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
 		@RequestParam("file") final MultipartFile multipartFile
 	) throws IOException {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -213,7 +213,7 @@ public class FileController extends AbstractSecuredController {
 	@GetMapping("/files/{filePk}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getFile(
-		@PathVariable final Long filePk
+		@PathVariable("filePk") final Long filePk
 	) {
 		final var file = fileService.getFileByPk(filePk);
 		final var scope = scopeDAOService.getScopeByPk(file.getScopeFk());
@@ -241,10 +241,10 @@ public class FileController extends AbstractSecuredController {
 	@GetMapping("/scopes/{scopePk}/datasets/{datasetPk}/fields/{fieldPk}/files/{filePk}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getFileOnScope(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
-		@PathVariable final Long filePk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
+		@PathVariable("filePk") final Long filePk
 	) {
 		return downloadFile(scopePk, Optional.empty(), datasetPk, fieldPk, filePk);
 	}
@@ -254,11 +254,11 @@ public class FileController extends AbstractSecuredController {
 	@GetMapping("/scopes/{scopePk}/events/{eventPk}/datasets/{datasetPk}/fields/{fieldPk}/files/{filePk}")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> getFileOnEvent(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long eventPk,
-		@PathVariable final Long datasetPk,
-		@PathVariable final Long fieldPk,
-		@PathVariable final Long filePk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Long eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@PathVariable("fieldPk") final Long fieldPk,
+		@PathVariable("filePk") final Long filePk
 	) {
 		return downloadFile(scopePk, Optional.of(eventPk), datasetPk, fieldPk, filePk);
 	}
@@ -297,8 +297,8 @@ public class FileController extends AbstractSecuredController {
 	@GetMapping("/scopes/{scopePk}/files")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<StreamingResponseBody> downloadAllFiles(
-		@PathVariable final Long scopePk,
-		@RequestParam final Optional<String> scopeModelId
+		@PathVariable("scopePk") final Long scopePk,
+		@RequestParam("scopeModelId") final Optional<String> scopeModelId
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);

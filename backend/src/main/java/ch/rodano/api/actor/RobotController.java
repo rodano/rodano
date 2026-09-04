@@ -83,12 +83,12 @@ public class RobotController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	public PagedResult<RobotDTO> search(
-		@Parameter(description = "Robot name") @RequestParam final Optional<String> name,
-		@Parameter(description = "Profile ID") @RequestParam final Optional<String> profileId,
-		@Parameter(description = "Sort the results by which property?") @RequestParam final Optional<RobotSortBy> sortBy,
-		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@Parameter(description = "Robot name") @RequestParam("name") final Optional<String> name,
+		@Parameter(description = "Profile ID") @RequestParam("profileId") final Optional<String> profileId,
+		@Parameter(description = "Sort the results by which property?") @RequestParam("sortBy") final Optional<RobotSortBy> sortBy,
+		@Parameter(description = "Use the ascending order?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -112,7 +112,7 @@ public class RobotController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	public RobotDTO getRobot(
-		@PathVariable final Long robotPk
+		@PathVariable("robotPk") final Long robotPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -163,7 +163,7 @@ public class RobotController extends AbstractSecuredController {
 	@Transactional
 	@IsAdmin
 	public RobotDTO updateRobot(
-		@PathVariable final Long robotPk,
+		@PathVariable("robotPk") final Long robotPk,
 		@Valid @RequestBody final RobotUpdateDTO robotDTO
 	) {
 		//retrieve robot
@@ -187,7 +187,7 @@ public class RobotController extends AbstractSecuredController {
 	@Transactional
 	@IsAdmin
 	public RobotDTO removeRobot(
-		@PathVariable final Long robotPk
+		@PathVariable("robotPk") final Long robotPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -207,7 +207,7 @@ public class RobotController extends AbstractSecuredController {
 	@Transactional
 	@IsAdmin
 	public RobotDTO restoreRobot(
-		@PathVariable final Long robotPk
+		@PathVariable("robotPk") final Long robotPk
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();

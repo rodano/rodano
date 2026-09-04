@@ -111,9 +111,9 @@ public class DatasetController extends AbstractSecuredController {
 	@GetMapping({ "datasets", "events/{eventPk}/datasets" })
 	@ResponseStatus(HttpStatus.OK)
 	public List<DatasetDTO> getDatasets(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@RequestParam final Optional<Collection<String>> datasetModelIds
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@RequestParam("datasetModelIds") final Optional<Collection<String>> datasetModelIds
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -143,9 +143,9 @@ public class DatasetController extends AbstractSecuredController {
 	@GetMapping({ "forms/{formPk}/datasets", "events/{eventPk}/forms/{formPk}/datasets" })
 	@ResponseStatus(HttpStatus.OK)
 	public List<DatasetDTO> getDatasets(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long formPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("formPk") final Long formPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -171,9 +171,9 @@ public class DatasetController extends AbstractSecuredController {
 	@GetMapping({ "events/{eventPk}/datasets/{datasetPk}", "datasets/{datasetPk}" })
 	@ResponseStatus(HttpStatus.OK)
 	public DatasetDTO getDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -203,9 +203,9 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public DatasetDTO createCandidateDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@RequestParam final String datasetModelId
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@RequestParam("datasetModelId") final String datasetModelId
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -250,8 +250,8 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional(rollbackFor = DatasetSubmissionException.class)
 	public DatasetDTO createDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
 		@Valid @RequestBody final DatasetCreationDTO datasetDTO,
 		@RequestHeader("X-Rationale") final Optional<String> rationale
 	) throws DatasetSubmissionException {
@@ -282,9 +282,9 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional(rollbackFor = DatasetSubmissionException.class)
 	public DatasetDTO saveDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
 		@Valid @RequestBody final DatasetUpdateDTO datasetUpdateDTO,
 		@RequestHeader("X-Rationale") final Optional<String> rationale
 	) throws DatasetSubmissionException {
@@ -314,10 +314,10 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public DatasetDTO removeDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
-		@RequestParam final String rationale
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@RequestParam("rationale") final String rationale
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -343,10 +343,10 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public DatasetDTO restoreDataset(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
-		@PathVariable final Long datasetPk,
-		@RequestParam final String rationale
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
+		@PathVariable("datasetPk") final Long datasetPk,
+		@RequestParam("rationale") final String rationale
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		final var event = eventPk.map(eventDAOService::getEventByPk);
@@ -380,8 +380,8 @@ public class DatasetController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional(rollbackFor = DatasetSubmissionException.class)
 	public Set<DatasetDTO> saveScopeDatasets(
-		@PathVariable final Long scopePk,
-		@PathVariable final Optional<Long> eventPk,
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("eventPk") final Optional<Long> eventPk,
 		@RequestBody final Set<@Valid DatasetUpdateDTO> datasetDTOs,
 		@RequestHeader("X-Rationale") final Optional<String> rationale
 	) throws DatasetSubmissionException {

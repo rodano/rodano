@@ -104,8 +104,8 @@ public class ConfigurationController extends AbstractSecuredController {
 	@PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void push(
-		@RequestParam final MultipartFile config,
-		@RequestParam final boolean compressed
+		@RequestParam("config") final MultipartFile config,
+		@RequestParam("compressed") final boolean compressed
 	) throws IOException {
 		if(Environment.PROD.equals(configurator.getEnvironment())) {
 			throw new ForbiddenOperationException("No right to push the configuration on a production instance");
@@ -202,7 +202,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@Operation(summary = "Get the study workflow models on the scope model")
 	@GetMapping("/scope-model/{scopeModelId}/workflows")
 	public List<WorkflowDTO> getWorkflowsOnScopeModel(
-		@PathVariable final String scopeModelId,
+		@PathVariable("scopeModelId") final String scopeModelId,
 		@RequestParam(name = "isAggregator") final Optional<Boolean> isAggregator
 	) {
 		final var acl = rightsService.getACL(currentActor());
@@ -221,7 +221,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/form-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<FormModelDTO> getFormModels(
-		@PathVariable final String scopeModelId
+		@PathVariable("scopeModelId") final String scopeModelId
 	) {
 		final var acl = rightsService.getACL(currentActor());
 
@@ -235,7 +235,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/dataset-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<DatasetModelDTO> getDatasetModels(
-		@PathVariable final String scopeModelId
+		@PathVariable("scopeModelId") final String scopeModelId
 	) {
 		final var acl = rightsService.getACL(currentActor());
 
@@ -249,7 +249,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("/scope-model/{scopeModelId}/field-models")
 	@ResponseStatus(HttpStatus.OK)
 	public List<FieldModelDTO> getFieldModels(
-		@PathVariable final String scopeModelId,
+		@PathVariable("scopeModelId") final String scopeModelId,
 		@RequestParam(name = "searchable") final Optional<Boolean> searchable
 	) {
 		final var acl = rightsService.getACL(currentActor());
@@ -269,7 +269,7 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("menu/{menuId}/layout")
 	@ResponseStatus(HttpStatus.OK)
 	public CMSLayoutDTO getMenuLayout(
-		@PathVariable final String menuId
+		@PathVariable("menuId") final String menuId
 	) {
 		final var roles = currentActiveRoles();
 		final var menu = studyService.getStudy().getAllMenu(menuId);
@@ -280,9 +280,9 @@ public class ConfigurationController extends AbstractSecuredController {
 	@GetMapping("dataset-models/{datasetModelId}/field-models/{fieldModelId}/autocomplete")
 	@ResponseStatus(HttpStatus.OK)
 	public List<String> getFieldModelAutocomplete(
-		@PathVariable final String datasetModelId,
-		@PathVariable final String fieldModelId,
-		@RequestParam final String text
+		@PathVariable("datasetModelId") final String datasetModelId,
+		@PathVariable("fieldModelId") final String fieldModelId,
+		@RequestParam("text") final String text
 	) throws IOException {
 		final var fieldModel = studyService.getStudy().getDatasetModel(datasetModelId).getFieldModel(fieldModelId);
 		final var dictionary = fieldModel.getDictionary();

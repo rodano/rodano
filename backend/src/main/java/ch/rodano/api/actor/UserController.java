@@ -102,17 +102,17 @@ public class UserController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public PagedResult<UserDTO> search(
-		@Parameter(description = "Scope PKs") @RequestParam final Optional<Set<Long>> scopePks,
-		@Parameter(description = "Profile IDs") @RequestParam final Optional<Set<String>> profileIds,
-		@Parameter(description = "Role statuses") @RequestParam final Optional<Set<RoleStatus>> states,
-		@Parameter(description = "User e-mail") @RequestParam final Optional<String> email,
-		@Parameter(description = "Full text search on name and e-mail") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Is the user enabled?") @RequestParam final Optional<Boolean> enabled,
-		@Parameter(description = "Is the user externally managed?") @RequestParam final Optional<Boolean> externallyManaged,
-		@Parameter(description = "Order the results by which property?") @RequestParam final Optional<UserSortBy> sortBy,
-		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@Parameter(description = "Scope PKs") @RequestParam("scopePks") final Optional<Set<Long>> scopePks,
+		@Parameter(description = "Profile IDs") @RequestParam("profileIds") final Optional<Set<String>> profileIds,
+		@Parameter(description = "Role statuses") @RequestParam("states") final Optional<Set<RoleStatus>> states,
+		@Parameter(description = "User e-mail") @RequestParam("email") final Optional<String> email,
+		@Parameter(description = "Full text search on name and e-mail") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Is the user enabled?") @RequestParam("enabled") final Optional<Boolean> enabled,
+		@Parameter(description = "Is the user externally managed?") @RequestParam("externallyManaged") final Optional<Boolean> externallyManaged,
+		@Parameter(description = "Order the results by which property?") @RequestParam("sortBy") final Optional<UserSortBy> sortBy,
+		@Parameter(description = "Use the ascending order?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -139,13 +139,13 @@ public class UserController extends AbstractSecuredController {
 	@Operation(summary = "Export users in excel format")
 	@GetMapping("export")
 	public ResponseEntity<StreamingResponseBody> exportUsers(
-		@Parameter(description = "Scope PKs") @RequestParam final Optional<Set<Long>> scopePks,
-		@Parameter(description = "Profile IDs") @RequestParam final Optional<Set<String>> profileIds,
-		@Parameter(description = "Role statuses") @RequestParam final Optional<Set<RoleStatus>> states,
-		@Parameter(description = "User e-mail") @RequestParam final Optional<String> email,
-		@Parameter(description = "Full text search on name and e-mail") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Is the user enabled?") @RequestParam final Optional<Boolean> enabled,
-		@Parameter(description = "Is the user externally managed?") @RequestParam final Optional<Boolean> externallyManaged
+		@Parameter(description = "Scope PKs") @RequestParam("scopePks") final Optional<Set<Long>> scopePks,
+		@Parameter(description = "Profile IDs") @RequestParam("profileIds") final Optional<Set<String>> profileIds,
+		@Parameter(description = "Role statuses") @RequestParam("states") final Optional<Set<RoleStatus>> states,
+		@Parameter(description = "User e-mail") @RequestParam("email") final Optional<String> email,
+		@Parameter(description = "Full text search on name and e-mail") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Is the user enabled?") @RequestParam("enabled") final Optional<Boolean> enabled,
+		@Parameter(description = "Is the user externally managed?") @RequestParam("externallyManaged") final Optional<Boolean> externallyManaged
 	) {
 		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
@@ -174,7 +174,7 @@ public class UserController extends AbstractSecuredController {
 	@GetMapping("{userPk}")
 	@ResponseStatus(HttpStatus.OK)
 	public UserDTO getUser(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -230,7 +230,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public UserDTO updateUser(
-		@PathVariable final Long userPk,
+		@PathVariable("userPk") final Long userPk,
 		@Valid @RequestBody final UserUpdateDTO userUpdateDTO
 	) {
 		//retrieve user
@@ -254,7 +254,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public UserDTO removeUser(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -276,7 +276,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public UserDTO restoreUser(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -299,7 +299,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public UserDTO changeEmail(
-		@PathVariable final Long userPk,
+		@PathVariable("userPk") final Long userPk,
 		@Valid @RequestBody final ChangeEmailDTO emailDTO,
 		final HttpServletRequest servletRequest
 	) {
@@ -332,7 +332,7 @@ public class UserController extends AbstractSecuredController {
 	@Transactional
 	@IsAdmin
 	public UserDTO convertToLocalUser(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -354,7 +354,7 @@ public class UserController extends AbstractSecuredController {
 	@Transactional
 	@IsAdmin
 	public UserDTO convertToExternalUser(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -375,7 +375,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public UserDTO unblockUser(
-		@PathVariable final Long userPk
+		@PathVariable("userPk") final Long userPk
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -400,7 +400,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void verifyUserEmail(
-		@PathVariable final String verificationCode
+		@PathVariable("verificationCode") final String verificationCode
 	) {
 		userService.verifyUserEmail(verificationCode, currentContext());
 	}
@@ -412,7 +412,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void recoverUserAccount(
-		@PathVariable final String recoveryCode
+		@PathVariable("recoveryCode") final String recoveryCode
 	) {
 		userSecurityService.recoverUserAccount(recoveryCode, currentContext());
 	}
@@ -422,7 +422,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void resendEmailVerificationEmail(
-		@PathVariable final Long userPk,
+		@PathVariable("userPk") final Long userPk,
 		final HttpServletRequest servletRequest
 	) {
 		final var user = userService.getUserByPk(userPk);
@@ -445,7 +445,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void resendAccountActivationEmail(
-		@PathVariable final Long userPk,
+		@PathVariable("userPk") final Long userPk,
 		final HttpServletRequest servletRequest
 	) {
 		final var user = userService.getUserByPk(userPk);

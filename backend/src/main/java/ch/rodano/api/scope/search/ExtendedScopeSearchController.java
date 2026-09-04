@@ -78,20 +78,20 @@ public class ExtendedScopeSearchController extends AbstractSecuredController {
 	@GetMapping
 	public PagedResult<ExtendedScopeSearchResultDTO> search(
 		@Parameter(description = "Scope model ID") @PathVariable("scopeModelId") final String scopeModelId,
-		@Parameter(description = "Full text search on code, shortname and longname") @RequestParam final Optional<String> fullText,
-		@Parameter(description = "Scope code") @RequestParam final Optional<String> code,
-		@Parameter(description = "Scope IDs") @RequestParam final Optional<List<String>> ids,
-		@Parameter(description = "Scope PKs") @RequestParam final Optional<List<Long>> pks,
-		@Parameter(description = "Scope parent PKs") @RequestParam final Optional<List<Long>> parentPks,
-		@Parameter(description = "Scope ancestor PKs") @RequestParam final Optional<List<Long>> ancestorPks,
-		@Parameter(description = "Scope workflow states") @RequestParam final Optional<String> workflowStates,
-		@Parameter(description = "Field model criteria in a serialized form") @RequestParam final Optional<String> fieldModelCriteria,
-		@Parameter(description = "Only include the leaf scopes?") @RequestParam final Optional<Boolean> leaf,
-		@Parameter(description = "Include removed (deleted) scopes? Requires MANAGE_DELETED_DATA feature") @RequestParam final Optional<Boolean> includeDeleted,
-		@Parameter(description = "Order the results by which property?") @RequestParam final Optional<String> sortBy,
-		@Parameter(description = "Use the ascending order?") @RequestParam final Optional<Boolean> orderAscending,
-		@Parameter(description = "Page size") @RequestParam final Optional<Integer> pageSize,
-		@Parameter(description = "Page index") @RequestParam final Optional<Integer> pageIndex
+		@Parameter(description = "Full text search on code, shortname and longname") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Scope code") @RequestParam("code") final Optional<String> code,
+		@Parameter(description = "Scope IDs") @RequestParam("ids") final Optional<List<String>> ids,
+		@Parameter(description = "Scope PKs") @RequestParam("pks") final Optional<List<Long>> pks,
+		@Parameter(description = "Scope parent PKs") @RequestParam("parentPks") final Optional<List<Long>> parentPks,
+		@Parameter(description = "Scope ancestor PKs") @RequestParam("ancestorPks") final Optional<List<Long>> ancestorPks,
+		@Parameter(description = "Scope workflow states") @RequestParam("workflowStates") final Optional<String> workflowStates,
+		@Parameter(description = "Field model criteria in a serialized form") @RequestParam("fieldModelCriteria") final Optional<String> fieldModelCriteria,
+		@Parameter(description = "Only include the leaf scopes?") @RequestParam("leaf") final Optional<Boolean> leaf,
+		@Parameter(description = "Include removed (deleted) scopes? Requires MANAGE_DELETED_DATA feature") @RequestParam("includeDeleted") final Optional<Boolean> includeDeleted,
+		@Parameter(description = "Order the results by which property?") @RequestParam("sortBy") final Optional<String> sortBy,
+		@Parameter(description = "Use the ascending order?") @RequestParam("orderAscending") final Optional<Boolean> orderAscending,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
 	) {
 
 		//Validate that the scopeModelId exists (will throw NoNodeException if not found)

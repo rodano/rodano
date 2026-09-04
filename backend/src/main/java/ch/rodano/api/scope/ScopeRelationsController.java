@@ -82,7 +82,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@GetMapping("{scopePk}/relations")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeRelationDTO> getParentRelations(
-		@PathVariable final Long scopePk
+		@PathVariable("scopePk") final Long scopePk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);
@@ -94,7 +94,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public List<ScopeRelationDTO> createScopeRelation(
-		@PathVariable final Long scopePk,
+		@PathVariable("scopePk") final Long scopePk,
 		@Valid @RequestBody final ScopeRelationCreationDTO newRelation
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -121,8 +121,8 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public List<ScopeRelationDTO> makeRelationDefault(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long relationPk
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("relationPk") final Long relationPk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);
@@ -145,9 +145,9 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public List<ScopeRelationDTO> endRelation(
-		@PathVariable final Long scopePk,
-		@PathVariable final Long relationPk,
-		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final ZonedDateTime date
+		@PathVariable("scopePk") final Long scopePk,
+		@PathVariable("relationPk") final Long relationPk,
+		@RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final ZonedDateTime date
 	) {
 		// Convert the requestParam date to UTC
 		final var endDate = date.withZoneSameInstant(ZoneId.systemDefault());
@@ -171,7 +171,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
 	public List<ScopeRelationDTO> transfer(
-		@PathVariable final Long scopePk,
+		@PathVariable("scopePk") final Long scopePk,
 		@Valid @RequestBody final ScopeRelationCreationDTO newRelation
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -198,9 +198,9 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@GetMapping("relations/available-parents")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeDTO> getParents(
-		@RequestParam final String scopeModelId,
-		@RequestParam final Rights right,
-		@RequestParam final boolean onlyDefault
+		@RequestParam("scopeModelId") final String scopeModelId,
+		@RequestParam("right") final Rights right,
+		@RequestParam("onlyDefault") final boolean onlyDefault
 	) {
 		final var currentRoles = currentActiveRoles();
 
@@ -228,7 +228,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@GetMapping("{scopePk}/parents/default")
 	@ResponseStatus(HttpStatus.OK)
 	public ScopeDTO getDefaultParentScope(
-		@PathVariable final Long scopePk
+		@PathVariable("scopePk") final Long scopePk
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);
@@ -247,7 +247,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@GetMapping("{scopePk}/ancestors")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeDTO> getScopeAncestors(
-		@PathVariable final Long scopePk,
+		@PathVariable("scopePk") final Long scopePk,
 		@RequestParam(value = "onlyDefault", defaultValue = "false") final Boolean onlyDefault
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
@@ -272,9 +272,9 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@GetMapping("{scopePk}/children")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeDTO> getChildrenScopes(
-		@PathVariable final Long scopePk,
-		@RequestParam final Optional<String> scopeModelId,
-		@RequestParam(defaultValue = "false") final Boolean enabled
+		@PathVariable("scopePk") final Long scopePk,
+		@RequestParam("scopeModelId") final Optional<String> scopeModelId,
+		@RequestParam(name = "enabled", defaultValue = "false") final Boolean enabled
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);
@@ -305,7 +305,7 @@ public class ScopeRelationsController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeDTO> getScopeDescendants(
 		@PathVariable("scopePk") final Long scopePk,
-		@RequestParam final Boolean includeRemoved
+		@RequestParam("includeRemoved") final Boolean includeRemoved
 	) {
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
 		utilsService.checkNotNull(Scope.class, scope, scopePk);

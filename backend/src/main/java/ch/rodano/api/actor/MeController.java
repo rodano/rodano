@@ -113,9 +113,9 @@ public class MeController extends AbstractSecuredController {
 	@GetMapping("scopes")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeMiniDTO> getScopes(
-		@Parameter(description = "Filter scope to a specific feature") @RequestParam final Optional<FeatureStatic> feature,
-		@Parameter(description = "Exclude leaf") @RequestParam final boolean excludeLeaf,
-		@Parameter(description = "Exclude virtual") @RequestParam final boolean excludeVirtual
+		@Parameter(description = "Filter scope to a specific feature") @RequestParam("feature") final Optional<FeatureStatic> feature,
+		@Parameter(description = "Exclude leaf") @RequestParam("excludeLeaf") final boolean excludeLeaf,
+		@Parameter(description = "Exclude virtual") @RequestParam("excludeVirtual") final boolean excludeVirtual
 	) {
 		final var currentActor = currentActor();
 

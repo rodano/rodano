@@ -197,7 +197,7 @@ public class SessionController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void deleteSession(
-		@PathVariable final Long pk
+		@PathVariable("pk") final Long pk
 	) {
 		final var session = sessionService.getSessionByPk(pk);
 		sessionService.deleteSession(session);

@@ -57,7 +57,7 @@ public class UserActivationController extends AbstractSecuredController {
 	@GetMapping("{activationCode}")
 	@ResponseStatus(HttpStatus.OK)
 	public UserPrivacyPoliciesDTO getPrivacyPolicies(
-		@PathVariable final String activationCode
+		@PathVariable("activationCode") final String activationCode
 	) {
 		final var user = userDAOService.getUserByActivationCode(activationCode);
 
@@ -81,7 +81,7 @@ public class UserActivationController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
 	public void activateUserAccount(
-		@PathVariable final String activationCode,
+		@PathVariable("activationCode") final String activationCode,
 		@Valid @RequestBody final UserActivationDTO userActivationDTO
 	) {
 		userSecurityService.activateUser(

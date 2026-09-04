@@ -122,7 +122,7 @@ public class DatabaseController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.OK)
 	@IsAdmin
 	public void generateRandomData(
-		@RequestParam final Integer scale
+		@RequestParam("scale") final Integer scale
 	) {
 		if(Environment.PROD.equals(configurator.getEnvironment())) {
 			throw new UnauthorizedException("Database can be updated only in non production mode");

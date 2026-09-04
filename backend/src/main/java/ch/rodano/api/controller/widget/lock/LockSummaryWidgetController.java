@@ -54,7 +54,7 @@ public class LockSummaryWidgetController extends AbstractSecuredController {
 	@GetMapping
 	@ResponseStatus(HttpStatus.OK)
 	public SummaryDTO getSummary(
-		@RequestParam final Optional<Long> scopePk
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		final var leafScopeModel = studyService.getStudy().getLeafScopeModel();
@@ -76,7 +76,7 @@ public class LockSummaryWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the scope lock summary for a root scope")
 	@GetMapping("export/scopes")
 	public ResponseEntity<StreamingResponseBody> getScopeExport(
-		@RequestParam final Optional<Long> scopePk
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		final var languages = currentLanguages();
@@ -102,7 +102,7 @@ public class LockSummaryWidgetController extends AbstractSecuredController {
 	@Operation(summary = "Export the event lock summary for a root scope")
 	@GetMapping("export/events")
 	public ResponseEntity<StreamingResponseBody> getEventExport(
-		@RequestParam final Optional<Long> scopePk
+		@RequestParam("scopePk") final Optional<Long> scopePk
 	) {
 		final var currentActor = currentActor();
 		final var languages = currentLanguages();
