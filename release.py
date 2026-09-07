@@ -15,8 +15,8 @@ Procedures:
     cleanup X.Y.Z   Delete the release branch and the RC tags for X.Y.Z.
 
 dev never carries a semantic version: pom.xml always reads DEV-SNAPSHOT and the
-frontends' package.json/package-lock.json always read 0.0.0-dev; the actual
-next version is only decided when "branch" is run.
+frontends' package.json/package-lock.json always read 0.0.0-dev.
+The actual next version is only decided when "branch" is run.
 
 Global flags:
     --dry-run   Run every check and print the commands without mutating anything.
