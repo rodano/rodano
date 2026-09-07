@@ -48,11 +48,10 @@ public class DemoUsersInitializer {
 			final var profileId = profile.getId().toLowerCase();
 			final var email = String.format("%s+%s-%s@%s", emailParts[0], study.getId().toLowerCase(), profileId, emailParts[1]);
 			if(userService.getUserByEmail(email) == null) {
-				final var userAndRoles = UserBuilder.createUser(profile.getDefaultLocalizedShortname() + " Demo", email)
+				final var userBuilder = UserBuilder.createUser(profile.getDefaultLocalizedShortname() + " Demo", email)
 					.setHashedPassword(encodedPassword)
-					.addRole(root, profile)
-					.getUserAndRoles();
-				userCreatorService.createAndEnable(userAndRoles, context);
+					.addRole(root, profile);
+				userCreatorService.createAndEnable(userBuilder, context);
 			}
 			else {
 				logger.info("User {} already exists", email);

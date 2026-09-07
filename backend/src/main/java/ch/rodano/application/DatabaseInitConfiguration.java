@@ -12,7 +12,10 @@ import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.core.services.bll.scope.ScopeAncestorServiceImpl;
 import ch.rodano.core.services.unitofwork.UnitOfWorkService;
 
-//TODO delete this and the associated "database" Spring profile. Initialization must be made by the main application
+/*
+ * Allow to programmatically initialize the database during application startup.
+ * In standard processes, the database must be initialized during the main application's bootstrap phase through the web interface.
+ */
 @Profile("database")
 @Configuration
 @ComponentScan(basePackages = "ch.rodano.core")
@@ -20,8 +23,11 @@ public class DatabaseInitConfiguration implements CommandLineRunner {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final Boolean withUsers;
-
 	private final Boolean withData;
+
+	private final String creatorUserEmail;
+	private final String creatorUserName;
+	private final String usersPassword;
 
 	private final DatabaseInitializer databaseInitializer;
 
@@ -32,6 +38,9 @@ public class DatabaseInitConfiguration implements CommandLineRunner {
 	public DatabaseInitConfiguration(
 		@Value("${rodano.init.with-users:false}") final Boolean withUsers,
 		@Value("${rodano.init.with-data:false}") final Boolean withData,
+		@Value("${rodano.init.creator-user-email}") final String creatorUserEmail,
+		@Value("${rodano.init.creator-user-name}") final String creatorUserName,
+		@Value("${rodano.init.users-password}") final String usersPassword,
 		final DatabaseInitializer databaseInitializer,
 		final ScopeAncestorServiceImpl scopeAncestorService,
 		final UnitOfWorkService unitOfWorkService
@@ -39,6 +48,9 @@ public class DatabaseInitConfiguration implements CommandLineRunner {
 		logger.info("Starting database profile");
 		this.withUsers = withUsers;
 		this.withData = withData;
+		this.creatorUserEmail = creatorUserEmail;
+		this.usersPassword = usersPassword;
+		this.creatorUserName = creatorUserName;
 		this.databaseInitializer = databaseInitializer;
 		this.scopeAncestorService = scopeAncestorService;
 		this.unitOfWorkService = unitOfWorkService;
@@ -54,7 +66,7 @@ public class DatabaseInitConfiguration implements CommandLineRunner {
 				databaseInitializer.truncateTables();
 			}
 			scopeAncestorService.updateView();
-			databaseInitializer.initializeDatabaseContent(withUsers, withData);
+			databaseInitializer.initializeDatabaseContent(withUsers, withData, creatorUserEmail, creatorUserName, usersPassword);
 			return null;
 		});
 	}

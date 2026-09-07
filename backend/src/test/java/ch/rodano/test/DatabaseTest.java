@@ -27,6 +27,11 @@ public class DatabaseTest {
 
 	private static boolean init = false;
 
+	//test user credentials and rationale for database actions
+	protected static final String TEST_USER_EMAIL = "test@rodano.ch";
+	protected static final String TEST_USER_NAME = "Test User";
+	//for convenience, the default password is the same as the default used for database initialization
+	protected static final String TEST_USER_PASSWORD = "Password1!";
 	protected static final String TEST_RATIONALE = "Unit tests";
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -69,7 +74,7 @@ public class DatabaseTest {
 			else {
 				databaseInitializer.truncateTables();
 			}
-			databaseInitializer.initializeDatabaseContent(true, true);
+			databaseInitializer.initializeDatabaseContent(true, true, TEST_USER_EMAIL, TEST_USER_NAME, TEST_USER_PASSWORD);
 			exportViewService.updateViews();
 			aggregateWorkflowViewService.updateView();
 

@@ -21,7 +21,6 @@ import tools.jackson.databind.json.JsonMapper;
 
 import ch.rodano.api.authentication.AuthenticationDTO;
 import ch.rodano.api.authentication.CredentialsDTO;
-import ch.rodano.core.database.initializer.DatabaseInitializer;
 
 public class ControllerTest extends DatabaseTest {
 
@@ -76,7 +75,7 @@ public class ControllerTest extends DatabaseTest {
 	protected void authenticate(final String email) {
 		final var credentials = new CredentialsDTO();
 		credentials.setEmail(email);
-		credentials.setPassword(DatabaseInitializer.DEFAULT_PASSWORD);
+		credentials.setPassword(TEST_USER_PASSWORD);
 
 		final var authenticationDTO = client.post()
 			.uri("/sessions")

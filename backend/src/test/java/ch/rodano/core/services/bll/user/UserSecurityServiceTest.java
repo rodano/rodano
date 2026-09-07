@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.api.controller.user.exception.UserNotActivatedException;
-import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
 
@@ -31,7 +30,7 @@ public class UserSecurityServiceTest extends DatabaseTest {
 		// See if the login works
 		final var sessionToken = userSecurityService.login(
 			adminUser.getEmail(),
-			DatabaseInitializer.DEFAULT_PASSWORD,
+			TEST_USER_PASSWORD,
 			0,
 			null,
 			null,
@@ -48,7 +47,7 @@ public class UserSecurityServiceTest extends DatabaseTest {
 			UserNotActivatedException.class,
 			() -> userSecurityService.login(
 				adminUser.getEmail(),
-				DatabaseInitializer.DEFAULT_PASSWORD,
+				TEST_USER_PASSWORD,
 				null,
 				"",
 				"",

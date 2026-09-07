@@ -3,13 +3,11 @@ package ch.rodano.core.database.initializer;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -50,8 +48,6 @@ public class DatabaseInitializer {
 
 	private final static String DATABASE_SCRIPTS_PATH = "/database_scripts/structure/";
 	public static final String RATIONALE = "Database initialization";
-	public static final String TEST_USER_EMAIL = "test@rodano.ch";
-	public static final String DEFAULT_PASSWORD = "Password1!";
 
 	private final DataSource dataSource;
 	private final DSLContext create;
@@ -69,9 +65,6 @@ public class DatabaseInitializer {
 
 	private final String databaseName;
 
-	private final String usersPassword;
-	private final Boolean cleanPatchTable;
-	private final String internalPatchTable;
 
 	public DatabaseInitializer(
 		final DataSource dataSource,
@@ -87,9 +80,6 @@ public class DatabaseInitializer {
 		final TestDataInitializer testDataInitializer,
 		final DemoUsersInitializer demoUsersInitializer,
 		@Value("${rodano.database.name}") final String databaseName,
-		@Value("${rodano.init.users-password:Password1!}") final String usersPassword,
-		@Value("${rodano.init.clean-patch-table:true}") final Boolean cleanPatchTable,
-		@Value("${rodano.migration.internal-patch-table}") final String internalPatchTable,
 		final UserSecurityService userSecurityService
 	) {
 		this.dataSource = dataSource;
@@ -106,9 +96,6 @@ public class DatabaseInitializer {
 		this.demoUsersInitializer = demoUsersInitializer;
 		this.userSecurityService = userSecurityService;
 		this.databaseName = databaseName;
-		this.usersPassword = StringUtils.defaultIfBlank(usersPassword, DEFAULT_PASSWORD);
-		this.cleanPatchTable = cleanPatchTable;
-		this.internalPatchTable = internalPatchTable;
 	}
 
 	private List<String> getTables() {
@@ -179,21 +166,17 @@ public class DatabaseInitializer {
 		// Create first user
 		final var adminProfile = study.getProfile("ADMIN");
 		final var password = userSecurityService.encodePassword(userPassword);
-		final var users = new ArrayList<UserCreatorService.UserCreation>();
-		users.add(
-			UserBuilder.createUser(userName, userEmail)
+		final var userBuilder = UserBuilder.createUser(userName, userEmail)
 				.setHashedPassword(password)
 				.setLanguage(LanguageStatic.en)
-				.addRole(root, adminProfile)
-				.getUserAndRoles()
-		);
+				.addRole(root, adminProfile);
 
 		// Save the first user
-		userCreatorService.batchCreateAndEnable(users, context);
+		userCreatorService.createAndEnable(userBuilder, context);
 	}
 
 	@Transactional
-	public void initializeDatabaseContent(final boolean withUsers, final boolean withData) throws InvalidValueException, BadlyFormattedValue, IOException {
+	public void initializeDatabaseContent(final boolean withUsers, final boolean withData, final String creatorUserEmail, final String creatorUserName, final String usersPassword) throws InvalidValueException, BadlyFormattedValue, IOException {
 		logger.info("Initializing database content");
 		// Set the reference date
 		final ZonedDateTime origin;
@@ -208,47 +191,31 @@ public class DatabaseInitializer {
 
 		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE);
 
-		addRequiredData(context, origin);
-
-		// Add demo users
-		if(withUsers) {
-			logger.info("Add demo users");
-			demoUsersInitializer.initialize(TEST_USER_EMAIL, usersPassword, context);
-		}
-
-		// Add demo data
-		if(withData) {
-			logger.info("Add demo data");
-			testDataInitializer.initialize(origin);
-		}
-	}
-
-	/**
-	 * Add required data to the database
-	 * This method requires the application to be started
-	 *
-	 * @param origin The origin date time
-	 */
-	private void addRequiredData(final DatabaseActionContext context, final ZonedDateTime origin) {
 		logger.info("Add required data");
 
 		final Study study = studyService.getStudy();
 
 		final var root = createRootScope(context, origin, study.getDefaultLocalizedShortname());
 
-		// Create the users
+		// Create the creator user
 		final var adminProfile = study.getProfile("ADMIN");
-		final var users = new ArrayList<UserCreatorService.UserCreation>();
-		users.add(
-			UserBuilder.createUser("Test user", TEST_USER_EMAIL)
-				.setHashedPassword(userSecurityService.encodePassword(DEFAULT_PASSWORD))
+		final var userBuilder = UserBuilder.createUser(creatorUserName, creatorUserEmail)
+				.setHashedPassword(userSecurityService.encodePassword(usersPassword))
 				.setLanguage(LanguageStatic.en)
-				.addRole(root, adminProfile)
-				.getUserAndRoles()
-		);
+				.addRole(root, adminProfile);
+		final var creator = userCreatorService.createAndEnable(userBuilder, context);
 
-		// Save the users
-		userCreatorService.batchCreateAndEnable(users, context);
+		// Add demo users
+		if(withUsers) {
+			logger.info("Add demo users");
+			demoUsersInitializer.initialize(creatorUserEmail, usersPassword, context);
+		}
+
+		// Add demo data
+		if(withData) {
+			logger.info("Add demo data");
+			testDataInitializer.initialize(origin, creator, usersPassword);
+		}
 	}
 
 	/**
@@ -258,9 +225,6 @@ public class DatabaseInitializer {
 		logger.info("Emptying database");
 		//retrieve list of all tables to truncate
 		final List<String> tables = getTables();
-		if(!cleanPatchTable) {
-			tables.remove(internalPatchTable);
-		}
 
 		// Disable foreign key checks
 		create.execute("set FOREIGN_KEY_CHECKS=0;");

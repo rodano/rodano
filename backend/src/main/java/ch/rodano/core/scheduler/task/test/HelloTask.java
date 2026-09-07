@@ -8,7 +8,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.scheduler.task.ScheduledTask;
 import ch.rodano.core.services.bll.user.UserService;
@@ -38,7 +37,7 @@ public class HelloTask implements ScheduledTask {
 		final var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, rationale);
 
 		//update something in the database to check that the environment works properly
-		final var user = userService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL);
+		final var user = userService.getUserByPk(1l);
 		user.setUserAgent(RandomStringUtils.insecure().nextAlphanumeric(8));
 		userService.saveUser(user, context, "Updating user from a task");
 		logger.info("Hello from hello task :)");

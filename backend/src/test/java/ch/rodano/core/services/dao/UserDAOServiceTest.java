@@ -3,13 +3,11 @@ package ch.rodano.core.services.dao;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import ch.rodano.core.database.initializer.DatabaseInitializer;
 import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.scope.ScopeExtension;
 import ch.rodano.core.model.user.User;
@@ -44,7 +42,7 @@ public class UserDAOServiceTest extends DatabaseTest {
 	@DisplayName("Retrieve user")
 	public void testRetrieveUser() {
 		//retrieve user from email
-		assertEquals(DatabaseInitializer.TEST_USER_EMAIL, userDAOService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL).getEmail());
+		assertEquals(TEST_USER_EMAIL, userDAOService.getUserByEmail(TEST_USER_EMAIL).getEmail());
 	}
 
 	@Test
@@ -131,7 +129,7 @@ public class UserDAOServiceTest extends DatabaseTest {
 
 		assertAll(
 			"Find all the administrators on study and descendants",
-			() -> assertTrue(userEmails.contains(DatabaseInitializer.TEST_USER_EMAIL)),
+			() -> assertTrue(userEmails.contains(TEST_USER_EMAIL)),
 			() -> assertFalse(userEmails.contains("test+iinves@rodano.ch"))
 		);
 	}

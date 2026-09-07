@@ -46,7 +46,7 @@ public class ScopeTimeframeTest extends DatabaseTest {
 	@Test
 	@DisplayName("Timeframe start and end date are calculated correctly")
 	public void testDate() {
-		final var user = userDAOService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL);
+		final var user = userDAOService.getUserByEmail(TEST_USER_EMAIL);
 		final var scope = scopeDAOService.getScopeByCode("FR-01");
 
 		//if user has had right on the scope once, he always has the right since the beginning of time on this scope --weird but wished

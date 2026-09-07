@@ -31,6 +31,7 @@ import ch.rodano.core.model.rules.data.DataState;
 import ch.rodano.core.model.scope.EnrollmentType;
 import ch.rodano.core.model.scope.FieldModelCriterion;
 import ch.rodano.core.model.scope.Scope;
+import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.dataset.DatasetService;
 import ch.rodano.core.services.bll.event.EventService;
 import ch.rodano.core.services.bll.field.FieldService;
@@ -47,7 +48,6 @@ import ch.rodano.core.services.dao.audit.AuditActionService;
 import ch.rodano.core.services.dao.dataset.DatasetDAOService;
 import ch.rodano.core.services.dao.form.FormDAOService;
 import ch.rodano.core.services.dao.robot.RobotDAOService;
-import ch.rodano.core.services.dao.user.UserDAOService;
 import ch.rodano.core.services.plugin.validator.exception.BadlyFormattedValue;
 import ch.rodano.core.services.plugin.validator.exception.InvalidValueException;
 import ch.rodano.core.services.rule.RuleService;
@@ -61,7 +61,6 @@ public class TestDataInitializer {
 	private final AuditActionService auditActionService;
 	private final StudyService studyService;
 	private final RuleService ruleService;
-	private final UserDAOService userDAOService;
 	private final FormDAOService formDAOService;
 	private final ScopeService scopeService;
 	private final ScopeRelationService scopeRelationService;
@@ -82,7 +81,6 @@ public class TestDataInitializer {
 		final AuditActionService auditActionService,
 		final StudyService studyService,
 		final RuleService ruleService,
-		final UserDAOService userDAOService,
 		final FormDAOService formDAOService,
 		final ScopeService scopeService,
 		final ScopeRelationService scopeRelationService,
@@ -103,7 +101,6 @@ public class TestDataInitializer {
 		this.auditActionService = auditActionService;
 		this.studyService = studyService;
 		this.ruleService = ruleService;
-		this.userDAOService = userDAOService;
 		this.formDAOService = formDAOService;
 		this.scopeService = scopeService;
 		this.scopeRelationService = scopeRelationService;
@@ -138,10 +135,9 @@ public class TestDataInitializer {
 		return robot;
 	}
 
-	public void initialize(final ZonedDateTime origin) throws IOException,
+	public void initialize(final ZonedDateTime origin, final User creator, final String usersPassword) throws IOException,
 		InvalidValueException, BadlyFormattedValue {
 
-		final var creator = userDAOService.getUserByEmail(DatabaseInitializer.TEST_USER_EMAIL);
 		final var actionDate = origin.plusMonths(3);
 		final var root = scopeService.getRootScope();
 		final var study = studyService.getStudy();
@@ -532,55 +528,48 @@ public class TestDataInitializer {
 		ruleService.execute(state, study.getEventActions().get(WorkflowAction.SAVE_FORM), context);
 		ruleService.execute(state, relapse.getFormModel().getRules(), context);
 
-		final var encodedDefaultPassword = new BCryptPasswordEncoder(UserSecurityService.BCRYPT_STRENGTH).encode(DatabaseInitializer.DEFAULT_PASSWORD);
+		final var encodedDefaultPassword = new BCryptPasswordEncoder(UserSecurityService.BCRYPT_STRENGTH).encode(usersPassword);
 
 		final var dataEntryMasterUser = UserBuilder.createUser("DataEntry Master", "test+dmaster@rodano.ch")
 			.setHashedPassword(encodedDefaultPassword)
 			.addRole(root, study.getProfile("DATAENTRY_MASTER"))
 			.addRole(root, study.getProfile("DATAENTRY_A"))
-			.addRole(root, study.getProfile("DATAENTRY_B"))
-			.getUserAndRoles();
+			.addRole(root, study.getProfile("DATAENTRY_B"));
 		final var dataEntryMaster = userCreatorService.createAndEnable(dataEntryMasterUser, context);
 
 		final var dataManagerUser = UserBuilder.createUser("Data Manager", "test+dm@rodano.ch")
 			.setHashedPassword(encodedDefaultPassword)
-			.addRole(root, study.getProfile("DATAMANAGER"))
-			.getUserAndRoles();
+			.addRole(root, study.getProfile("DATAMANAGER"));
 		final var dataManager = userCreatorService.createAndEnable(dataManagerUser, context);
 
 		//create default users
-		final var defaultUsers = new ArrayList<UserCreatorService.UserCreation>();
+		final var defaultUsers = new ArrayList<UserBuilder>();
 		defaultUsers.add(
 			UserBuilder.createUser("Investigator", "test+iinves@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(fr01, study.getProfile("INVESTIGATOR"))
 				.addRole(fr01, study.getProfile("ESIGNATURE"))
-				.getUserAndRoles()
 		);
 		defaultUsers.add(
 			UserBuilder.createUser("Principal Investigator", "test+pinves@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(fr02, study.getProfile("PRINCIPAL_INVESTIGATOR"))
 				.addRole(fr01, study.getProfile("ESIGNATURE"))
-				.getUserAndRoles()
 		);
 		defaultUsers.add(
 			UserBuilder.createUser("Sponsor", "test+sponsor@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(root, study.getProfile("SPONSOR"))
-				.getUserAndRoles()
 		);
 		defaultUsers.add(
 			UserBuilder.createUser("DataEntry A", "test+dentrya@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(root, study.getProfile("DATAENTRY_A"))
-				.getUserAndRoles()
 		);
 		defaultUsers.add(
 			UserBuilder.createUser("DataEntry B", "test+dentryb@rodano.ch")
 				.setHashedPassword(encodedDefaultPassword)
 				.addRole(root, study.getProfile("DATAENTRY_B"))
-				.getUserAndRoles()
 		);
 
 		//save the default users
