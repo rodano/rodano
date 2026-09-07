@@ -52,7 +52,7 @@ See the [dedicated documentation](ansible/README.md).
 
 Releases follow a Git-flow process driven by the `release.py` script at the root of the repository. Pushing a version tag (`vX.Y.Z` or `vX.Y.Z-rcN`) triggers the CI workflows that create the GitHub release, deploy the documentation website, and publish the versioned Docker images.
 
-The version strings inside `backend/pom.xml` and the frontends' `package.json`/`package-lock.json` files are kept in sync with the release, as they are authoritative for the published Maven and npm artifacts.
+The version strings inside `backend/pom.xml` and the frontends' `package.json` files are kept in sync with the release, as they are authoritative for the published Maven and npm artifacts (the `package-lock.json` files are updated only to keep the root package version consistent).
 
 The script runs from a clean working tree and expects the standard `dev` and `main` branches to be up to date with `origin`. Each procedure prints a summary and asks for confirmation before making any change.
 
