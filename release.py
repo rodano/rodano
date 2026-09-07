@@ -201,22 +201,24 @@ def bump_pom(version):
 	POM.write_text(updated)
 
 
-def bump_json_version(path, version):
-	"""Rewrite every top-level `"version": "..."` occurrence in a JSON file.
+def bump_json_version(path, version, occurrences=1):
+	"""Rewrite the leading `"version": "..."` field(s) of a JSON file.
 
-	This targets the leading-whitespace-anchored version keys used by both
-	package.json (one occurrence) and package-lock.json (root and the empty
-	package entry), leaving nested dependency versions untouched.
+	npm always writes the package's own version first (package.json's single
+	field, or package-lock.json's root version followed by its `packages[""]`
+	entry), before any dependency; capping the substitution count to the
+	expected number of occurrences leaves nested dependency versions untouched.
 	"""
 	content = path.read_text()
 	updated, count = re.subn(
 		r'^(\s*"version":\s*")[^"]*(")',
 		rf'\g<1>{version}\g<2>',
 		content,
+		count=occurrences,
 		flags=re.MULTILINE,
 	)
-	if count == 0:
-		raise ReleaseError(f'Could not find a "version" field in {path}.')
+	if count != occurrences:
+		raise ReleaseError(f'Expected {occurrences} "version" field(s) in {path}, found {count}.')
 	if DRY_RUN:
 		logger.info(f'[dry-run] set version in {path.relative_to(ROOT)} to {version} ({count} occurrence(s))')
 		return
@@ -228,7 +230,7 @@ def bump_all_versions(version):
 	for frontend in FRONTENDS:
 		directory = ROOT / 'frontends' / frontend
 		bump_json_version(directory / 'package.json', version)
-		bump_json_version(directory / 'package-lock.json', version)
+		bump_json_version(directory / 'package-lock.json', version, occurrences=2)
 
 
 def bump_dev_placeholder_versions():
@@ -237,7 +239,7 @@ def bump_dev_placeholder_versions():
 	for frontend in FRONTENDS:
 		directory = ROOT / 'frontends' / frontend
 		bump_json_version(directory / 'package.json', DEV_FRONTEND_VERSION)
-		bump_json_version(directory / 'package-lock.json', DEV_FRONTEND_VERSION)
+		bump_json_version(directory / 'package-lock.json', DEV_FRONTEND_VERSION, occurrences=2)
 
 
 def changed_version_files():
