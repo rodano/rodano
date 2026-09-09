@@ -99,13 +99,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	private String welcomeText;
 	private String loginText;
 
-	//smtp configuration
-	private String smtpServer;
-	private Integer smtpPort;
-	private boolean smtpTLS;
-	private String smtpLogin;
-	private String smtpPassword;
-
 	//password configuration
 	private boolean passwordStrong;
 	private int passwordLength;
@@ -251,46 +244,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	public final void setProtocolNo(final String protocolNo) {
 		this.protocolNo = protocolNo;
-	}
-
-	public final String getSmtpServer() {
-		return smtpServer;
-	}
-
-	public final void setSmtpServer(final String smtpServer) {
-		this.smtpServer = smtpServer;
-	}
-
-	public final Integer getSmtpPort() {
-		return smtpPort;
-	}
-
-	public final void setSmtpPort(final Integer smtpPort) {
-		this.smtpPort = smtpPort;
-	}
-
-	public final boolean getSmtpTLS() {
-		return smtpTLS;
-	}
-
-	public void setSmtpTLS(final boolean smtpTLS) {
-		this.smtpTLS = smtpTLS;
-	}
-
-	public final String getSmtpLogin() {
-		return smtpLogin;
-	}
-
-	public final void setSmtpLogin(final String smtpLogin) {
-		this.smtpLogin = smtpLogin;
-	}
-
-	public final String getSmtpPassword() {
-		return smtpPassword;
-	}
-
-	public final void setSmtpPassword(final String smtpPassword) {
-		this.smtpPassword = smtpPassword;
 	}
 
 	public final String getEmail() {

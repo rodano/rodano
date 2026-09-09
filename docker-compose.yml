@@ -79,11 +79,13 @@ services:
       rodano.path.data: /app/user_content
       spring.datasource.username: root
       spring.datasource.password: root
-      #provide the following spring.mail.xxx properties if you use an external SMTP server
+      #the SMTP server defaults to the bundled "smtp" service, which is managed by this Docker Compose
+      #override the following spring.mail.xxx properties via the env file to use an external SMTP server
       spring.mail.host: ${SMTP_HOST:-smtp}
       spring.mail.port: ${SMTP_PORT:-25}
       spring.mail.username: ${SMTP_USERNAME:-anonymous}
       spring.mail.password: ${SMTP_PASSWORD:-unused-but-required}
+      spring.mail.properties.mail.smtp.starttls.enable: ${SMTP_STARTTLS:-true}
       logging.level.ch.rodano.core: INFO
     healthcheck:
       test:

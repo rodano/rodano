@@ -1107,11 +1107,9 @@ export default async function test(bundle, assert, driver) {
 			await driver.type('#study_id', 'TEST_BIS');
 			await driver.type(await driver.getShadow('#study_shortname', 'input'), 'Test bis');
 			await driver.type(await driver.getShadow('#study_longname', 'input'), 'Test bis');
-			await driver.type('#study_smtp_login', 'login');
-			await driver.type('#study_smtp_password', 'password');
 			await driver.submit('#edit_study_form');
-			assert.equal(await driver.getValue('#study_smtp_login'), 'login', 'SMTP login is "login"');
-			assert.equal(await driver.getValue('#study_smtp_password'), 'password', 'SMTP password is "password"');
+			assert.equal(await driver.getValue('#study_id'), 'TEST_BIS', 'Study id is "TEST_BIS"');
+			assert.equal(await driver.getValue('#study_email'), 'info@rodano.ch', 'Study email is "info@rodano.ch"');
 			assert.equal(study.id, 'TEST_BIS', 'Study id is "TEST_BIS"');
 			assert.equal(await driver.get('#tree a.selected'), await driver.get('#tree ul.study > li a[href="#node=Study:TEST_BIS"]'), 'Study is the selected element');
 			assert.equal(await driver.eval('#tree a.selected', e => e.textContent), 'Test bis', 'Tree has been updated with new study longname');

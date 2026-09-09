@@ -13,7 +13,6 @@
 	"email": "info@rodano.ch",
 	"color": "#5bd4d4",
 	"introductionText": "<h1>Rodano Test Study</h1><p>This study is not a real study, all data are dummy records. The purpose of this website is to illustrate the features of a typical study built with Rodano.</p>",
-	"smtpTLS": false,
 	"passwordStrong": true,
 	"passwordLength": 8,
 	"passwordValidityDuration": 30,

@@ -24,6 +24,10 @@ Then, edit the file `.env` at the root of this repository to configure the follo
 
 To use the embedded test configuration, `STUDY_PATH` must be set to `/path/to/rodano/repository/backend/src/main/resources/config`.
 
+### SMTP server
+
+The SMTP server is configured through environment variables. By default, Docker Compose starts a bundled `smtp` service used for testing. To use an external SMTP server, set the following variables in the `.env` file: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD` and `SMTP_STARTTLS`.
+
 ### Use
 
 Once the env file is configured, run:

@@ -30,11 +30,6 @@ export class Study extends DisplayableNode {
 			introductionText: {type: 'string'},
 			welcomeText: {type: 'string'},
 			loginText: {type: 'string'},
-			smtpServer: {type: 'string'},
-			smtpPort: {type: 'number'},
-			smtpTLS: {type: 'boolean'},
-			smtpLogin: {type: 'string'},
-			smtpPassword: {type: 'string'},
 			passwordStrong: {type: 'boolean'},
 			passwordLength: {type: 'number'},
 			passwordValidityDuration: {type: 'number'},
@@ -91,11 +86,6 @@ export class Study extends DisplayableNode {
 		this.introductionText = undefined;
 		this.welcomeText = undefined;
 		this.loginText = undefined;
-		this.smtpServer = undefined;
-		this.smtpPort = undefined;
-		this.smtpTLS = undefined;
-		this.smtpLogin = undefined;
-		this.smtpPassword = undefined;
 		this.passwordStrong = undefined;
 		this.passwordLength = 4;
 		this.passwordValidityDuration = undefined;
