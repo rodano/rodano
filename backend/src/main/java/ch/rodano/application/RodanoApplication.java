@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * Main class for the Spring application
  * This class must be kept in a dedicated package that has not descendant
  * The annotation @SpringBootApplication includes @ComponentScan so Spring will scan all the subpackages by default
- * For the application profiles "database" and "migration", we don't want to scan the API stuff
+ * For the application profile "database", we don't want to scan the API stuff
  *
  */
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class, ManagementWebSecurityAutoConfiguration.class })

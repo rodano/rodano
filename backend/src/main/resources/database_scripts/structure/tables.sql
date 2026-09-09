@@ -11,12 +11,7 @@ create table internal_patch (
 	constraint pk_internal_patch primary key (script)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
-insert into internal_patch (script, date, context, name) values (179, now(3), 'Remove country from user', 'db_update_179.sql');
-insert into internal_patch (script, date, context, name) values (180, now(3), 'Denormalize scope fk property on datasets and forms', 'db_update_180.sql');
-insert into internal_patch (script, date, context, name) values (181, now(3), 'Delete profile id column on workflow statuses', 'db_update_181.sql');
-insert into internal_patch (script, date, context, name) values (182, now(3), 'Rename deleted column to removed', 'db_update_182.sql');
-insert into internal_patch (script, date, context, name) values (183, now(3), 'Add index for search optimization', 'db_update_183.sql');
-insert into internal_patch (script, date, context, name) values (184, now(3), 'Remove payment feature', 'db_update_184.sql');
+/* internal patch baseline rows are seeded from internal_patch.sql */
 
 /***********************************
 *                                  *

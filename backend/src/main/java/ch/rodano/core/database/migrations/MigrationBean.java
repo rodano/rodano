@@ -11,6 +11,6 @@ import org.springframework.stereotype.Component;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Component
-@Profile("migration")
+@Profile("api")
 public @interface MigrationBean {
 }

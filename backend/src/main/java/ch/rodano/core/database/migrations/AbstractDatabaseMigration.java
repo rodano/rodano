@@ -68,7 +68,7 @@ public abstract class AbstractDatabaseMigration {
 	 *
 	 * @return The database update number
 	 */
-	protected abstract Double migrationTaskNumber();
+	public abstract Double migrationTaskNumber();
 
 	/**
 	 * Get the execution context of the database update
@@ -136,10 +136,5 @@ public abstract class AbstractDatabaseMigration {
 			.values(migrationTaskNumber(), ZonedDateTime.now(), context(), javaFileName());
 
 		query.execute();
-	}
-
-	@Transactional
-	public boolean runConsistencyCheck() {
-		return runMigrationTasks();
 	}
 }

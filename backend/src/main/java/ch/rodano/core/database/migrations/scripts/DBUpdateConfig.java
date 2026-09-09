@@ -26,7 +26,58 @@ import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.audit.AuditActionService;
 
 /**
- * This migration script must be extended to create new events / datasets or fields
+ * This migration script must be extended to create new events / datasets or fields following an update of the study protocol.
+ * A concrete migration declares a unique {@link #migrationTaskNumber()} and returns, for each map, the models to create.
+ * The subclass must be annotated with {@link MigrationBean} so it is picked up and run automatically at startup.
+ * <p>
+ * Example of a concrete migration:
+ * <pre>{@code
+ * @MigrationBean
+ * public class DBUpdate2000 extends DBUpdateConfig {
+ *
+ *     public DBUpdate2000(
+ *         final AuditActionService auditActionService,
+ *         final ScopeService scopeService,
+ *         final EventService eventService,
+ *         final StudyService studyService,
+ *         final DatasetService datasetService,
+ *         final FieldService fieldService
+ *     ) {
+ *         super(auditActionService, scopeService, eventService, studyService, datasetService, fieldService);
+ *     }
+ *
+ *     @Override
+ *     public Double migrationTaskNumber() {
+ *         return 2000D;
+ *     }
+ *
+ *     @Override
+ *     protected String description() {
+ *         return "Create events, datasets and fields";
+ *     }
+ *
+ *     @Override
+ *     protected String context() {
+ *         return "Add new events, datasets and fields following the update of the protocol";
+ *     }
+ *
+ *     @Override
+ *     protected Map<ScopeModel, List<String>> eventsToAddByScope() {
+ *         return Map.of(study.getScopeModel("PATIENT"), List.of("TELEPHONE_VISIT"));
+ *     }
+ *
+ *     @Override
+ *     protected Map<EventModel, List<String>> datasetsToAddByEvent() {
+ *         return Map.of(study.getScopeModel("PATIENT").getEventModel("BASELINE"), List.of("EQ5D"));
+ *     }
+ *
+ *     @Override
+ *     protected Map<DatasetModel, List<String>> fieldsToAddByDataset() {
+ *         return Map.of(study.getDatasetModel("VISIT_DOCUMENTATION"), List.of("EDSS_SCORE", "EDSS_STATUS"));
+ *     }
+ * }
+ * }</pre>
+ *
  * TODO It may be improved into an automatic script that update a database according to the current configuration
  * TODO In this case, it would be more efficient to proceed scope by scope
  */
@@ -56,9 +107,6 @@ public abstract class DBUpdateConfig extends AbstractDatabaseMigration {
 		this.fieldService = fieldService;
 		study = studyService.getStudy();
 	}
-
-	@Override
-	protected abstract Double migrationTaskNumber();
 
 	protected abstract String description();
 

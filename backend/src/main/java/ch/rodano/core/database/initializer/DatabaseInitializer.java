@@ -124,6 +124,17 @@ public class DatabaseInitializer {
 		databasePopulator.addScript(new ClassPathResource(DATABASE_SCRIPTS_PATH + "indexes.sql"));
 		databasePopulator.addScript(new ClassPathResource(DATABASE_SCRIPTS_PATH + "foreign_keys.sql"));
 		databasePopulator.execute(this.dataSource);
+		seedInternalPatch();
+	}
+
+	/**
+	 * Seed the internal patch table with the baseline version of the structure scripts.
+	 * This ensures the automatic migration starts from a deterministic version rather than replaying every historical script.
+	 */
+	private void seedInternalPatch() {
+		final var databasePopulator = new ResourceDatabasePopulator();
+		databasePopulator.addScript(new ClassPathResource(DATABASE_SCRIPTS_PATH + "internal_patch.sql"));
+		databasePopulator.execute(this.dataSource);
 	}
 
 	private Scope createRootScope(final DatabaseActionContext context, final ZonedDateTime origin, final String scopeName) {
@@ -233,6 +244,9 @@ public class DatabaseInitializer {
 		}
 		// Re-enable foreign key checks
 		create.execute("set FOREIGN_KEY_CHECKS=1;");
+
+		//re-apply the internal patch baseline so the database ends up in a deterministic version
+		seedInternalPatch();
 
 		logger.info("Tables {} have been truncated successfully", tables);
 	}

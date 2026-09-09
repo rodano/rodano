@@ -10,7 +10,7 @@ The backend of Rodano. In addition to the API, it is able to initialize and migr
 
 ## Profiles
 
-The application uses Spring Boot. It contains 3 different profiles that perform different operations. Each profile can be launched using the following command:
+The application uses Spring Boot. It contains 2 different profiles that perform different operations. Each profile can be launched using the following command:
 
 ```
 mvn spring-boot:run -Dspring-boot.run.profiles=xxx
@@ -19,7 +19,6 @@ mvn spring-boot:run -Dspring-boot.run.profiles=xxx
 where xxx is the name of the profile to trigger and can be set to:
 * `api`: launch the API (default)
 * `database`: initialize a database
-* `migration`: migrate a database
 
 Only one of these profiles can be used at the same time.
 
@@ -32,6 +31,8 @@ This is the main profile and starts the API. Being the default, it can be starte
 ```
 mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/config.json -Drodano.database.name=database_name"
 ```
+
+On startup, the API automatically migrates the database to the latest version (see [Database migrations](#database-migrations)). If a migration fails, the startup is aborted to avoid running on a partially migrated database.
 
 ### Database
 
@@ -51,13 +52,16 @@ For example:
 mvn spring-boot:run -Dspring-boot.run.profiles=database -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/config.json -Drodano.database.name=database_name -Drodano.init.with-data=true -Drodano.init.with-users=true -Drodano.init.users-password=MySuperPassword"
 ```
 
-### Migration
+## Database migrations
 
-This profile will migrate a database. Here is an example of how to launch a database migration:
+Migrations bring an existing database up to date with the current code. They are run automatically at API startup: the application reads the highest version recorded in the `internal_patch` table and applies every migration whose number is greater, in ascending order, until the database reaches the latest version. A failing migration aborts the startup.
 
-```
-mvn spring-boot:run -Dspring-boot.run.profiles=migration -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/config.json -Drodano.database.name=database_name"
-```
+There are two kinds of migrations, both identified by a unique number and merged into a single ordered sequence:
+
+* **SQL migrations**: files named `src/main/resources/database_scripts/migrations/db_update_<number>.sql`. Each script is responsible for inserting its own row into the `internal_patch` table (e.g. `insert into internal_patch (script, date, context, name) values (<number>, now(3), '<description>', 'db_update_<number>.sql');`).
+* **Java migrations**: classes that extend `AbstractDatabaseMigration` (or the `DBUpdateConfig` helper to add events/datasets/fields) and are annotated with `@MigrationBean`. Each declares its number through `migrationTaskNumber()`; the base class records the version in `internal_patch` automatically.
+
+To add a migration, create the appropriate file/class with a number higher than the latest existing one. It will be picked up and applied on the next startup.
 
 ## Configuration properties
 

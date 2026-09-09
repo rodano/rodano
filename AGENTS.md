@@ -21,9 +21,13 @@ Whenever you are instructed to adjust your output, update this file accordingly 
 
 ### Spring Boot profiles
 Run with: `mvn spring-boot:run -Dspring-boot.run.profiles=<profile>`
-- `api` (default) — starts the HTTP API
+- `api` (default) — starts the HTTP API; automatically migrates the database to the latest version on startup
 - `database` — initialises a blank database; supports flags `rodano.init.with-data`, `rodano.init.with-users`, `rodano.init.users-password`
-- `migration` — migrates an existing database
+
+### Database migrations
+Applied automatically at API startup, ordered by number (`internal_patch` table tracks the current version). Two kinds:
+- SQL: `backend/src/main/resources/database_scripts/migrations/db_update_<n>.sql` (each self-inserts its `internal_patch` row)
+- Java: `@MigrationBean` classes extending `AbstractDatabaseMigration` (or `DBUpdateConfig`), numbered via `migrationTaskNumber()`
 
 Key JVM properties (pass with `-Dspring-boot.run.jvmArguments="-D..."`):
 - `rodano.config` — path to `config.json` study file
