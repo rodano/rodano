@@ -27,7 +27,6 @@ import ch.rodano.configuration.exceptions.NoRespectForConfigurationException;
 import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.common.Node;
 import ch.rodano.configuration.model.common.SuperDisplayable;
-import ch.rodano.configuration.model.payment.PaymentPlan;
 import ch.rodano.configuration.model.rights.FamilyAssignableParent;
 import ch.rodano.configuration.model.rules.Rule;
 import ch.rodano.configuration.model.study.Study;
@@ -306,11 +305,6 @@ public class Workflow implements SuperDisplayable, Serializable, FamilyAssignabl
 	@JsonIgnore
 	public List<Entity> getWorkflowableEntities() {
 		return getWorkflowableModelsByEntity().entrySet().stream().filter(e -> !e.getValue().isEmpty()).map(Entry::getKey).toList();
-	}
-
-	@JsonIgnore
-	public List<PaymentPlan> getPaymentPlans() {
-		return study.getPaymentPlans().stream().filter(plan -> plan.getWorkflow().equals(id)).toList();
 	}
 
 	@Override

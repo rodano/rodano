@@ -23,9 +23,6 @@ alter table mail add index idx_mail_subject (subject);
 /* removed indices */
 alter table dataset add index idx_dataset_removed (removed);
 alter table form add index idx_form_removed (removed);
-alter table payment add index idx_payment_removed (removed);
-alter table payment_batch add index idx_payment_batch_removed (removed);
-alter table payment_target add index idx_payment_target_removed (removed);
 alter table resource add index idx_resource_removed (removed);
 alter table robot add index idx_robot_removed (removed);
 alter table scope add index idx_scope_removed (removed);

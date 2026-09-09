@@ -20,7 +20,6 @@ export const StudyTree = {
 			Entities.RuleDefinitionActionParameter,
 			Entities.TimelineGraphSectionReferenceEntry,
 			Entities.CMSLayout,
-			Entities.PaymentDistribution,
 			Entities.SelectionNode
 		];
 		const HIDDEN_ENTITIES_SEARCH = [

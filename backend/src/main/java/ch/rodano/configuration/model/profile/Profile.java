@@ -25,8 +25,6 @@ import ch.rodano.configuration.model.event.EventModel;
 import ch.rodano.configuration.model.feature.Feature;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.form.FormModel;
-import ch.rodano.configuration.model.payment.Payable;
-import ch.rodano.configuration.model.payment.PayableModel;
 import ch.rodano.configuration.model.policy.PrivacyPolicy;
 import ch.rodano.configuration.model.reports.Report;
 import ch.rodano.configuration.model.resource.ResourceCategory;
@@ -40,7 +38,7 @@ import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.timelinegraph.TimelineGraph;
 import ch.rodano.configuration.model.workflow.Workflow;
 
-public class Profile implements SuperDisplayable, Payable, PayableModel, Node, RightAssignable<Profile> {
+public class Profile implements SuperDisplayable, Node, RightAssignable<Profile> {
 	@Serial
 	private static final long serialVersionUID = -213015124204792366L;
 
@@ -88,7 +86,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	//right assignables
 	private Map<String, Set<Rights>> grantedProfileIdRights;
 	private Map<String, Set<Rights>> grantedScopeModelIdRights;
-	private Map<String, Set<Rights>> grantedPaymentIdRights;
 	private Map<String, Set<Rights>> grantedDatasetModelIdRights;
 	private Map<String, Set<Rights>> grantedEventModelIdRights;
 	private Map<String, Set<Rights>> grantedFormModelIdRights;
@@ -108,7 +105,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 		grantedTimelineGraphIds = new TreeSet<>();
 		grantedProfileIdRights = new TreeMap<>();
 		grantedScopeModelIdRights = new TreeMap<>();
-		grantedPaymentIdRights = new TreeMap<>();
 		grantedDatasetModelIdRights = new TreeMap<>();
 		grantedEventModelIdRights = new TreeMap<>();
 		grantedWorkflowIds = new TreeMap<>();
@@ -216,14 +212,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 		return grantedReportIds;
 	}
 
-	public Map<String, Set<Rights>> getGrantedPaymentIdRights() {
-		return grantedPaymentIdRights;
-	}
-
-	public void setGrantedPaymentIdRights(final Map<String, Set<Rights>> grantedPaymentIdRights) {
-		this.grantedPaymentIdRights = grantedPaymentIdRights;
-	}
-
 	public final Map<String, Set<Rights>> getGrantedProfileIdRights() {
 		return grantedProfileIdRights;
 	}
@@ -326,11 +314,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	}
 
 	@JsonIgnore
-	public final List<Workflow> getPayments(final Rights right) {
-		return getNodes(Entity.PAYMENT_PLAN, grantedPaymentIdRights, right);
-	}
-
-	@JsonIgnore
 	public final List<Workflow> getWorkflows() {
 		return study.getNodesFromIds(Entity.WORKFLOW, grantedWorkflowIds.keySet());
 	}
@@ -387,7 +370,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 			case FORM_MODEL -> grantedFormModelIdRights;
 			case PROFILE -> grantedProfileIdRights;
 			case SCOPE_MODEL -> grantedScopeModelIdRights;
-			case PAYMENT_PLAN -> grantedPaymentIdRights;
 			case EVENT_MODEL -> grantedEventModelIdRights;
 			default -> throw new UnsupportedOperationException(String.format("%s is not a right assignable entity", entity.getId()));
 		};
@@ -475,18 +457,6 @@ public class Profile implements SuperDisplayable, Payable, PayableModel, Node, R
 	public boolean hasRight(final FamilyAssignableParent<?> familyAssignable) {
 		final var assignables = getFamilyAssignables(familyAssignable.getEntity());
 		return assignables.containsKey(familyAssignable.getId());
-	}
-
-	@Override
-	@JsonIgnore
-	public final PayableModel getPayableModel() {
-		return this;
-	}
-
-	@Override
-	@JsonIgnore
-	public final String getPayableModelId() {
-		return getId();
 	}
 
 	@Override

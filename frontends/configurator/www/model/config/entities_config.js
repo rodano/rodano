@@ -23,9 +23,6 @@ import {WorkflowState} from './entities/workflow_state.js';
 import {Action} from './entities/action.js';
 import {Profile} from './entities/profile.js';
 import {Feature} from './entities/feature.js';
-import {PaymentPlan} from './entities/payment_plan.js';
-import {PaymentStep} from './entities/payment_step.js';
-import {PaymentDistribution} from './entities/payment_distribution.js';
 import {Menu} from './entities/menu.js';
 import {ResourceCategory} from './entities/resource_category.js';
 import {PrivacyPolicy} from './entities/privacy_policy.js';
@@ -125,11 +122,6 @@ export function create_config() {
 		//rights
 		Profile: Profile,
 		Feature: Feature,
-
-		//payment
-		PaymentPlan: PaymentPlan,
-		PaymentStep: PaymentStep,
-		PaymentDistribution: PaymentDistribution,
 
 		//ui
 		Menu: Menu,

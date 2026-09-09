@@ -8,8 +8,7 @@ import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
-import ch.rodano.configuration.model.payment.Payable;
-import ch.rodano.configuration.model.payment.PayableModel;
+import ch.rodano.configuration.model.common.Displayable;
 import ch.rodano.configuration.model.rules.RulableEntity;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
@@ -25,7 +24,7 @@ import ch.rodano.core.model.enrollment.EnrollmentTarget;
 import ch.rodano.core.model.rules.Evaluable;
 import ch.rodano.core.model.workflow.Workflowable;
 
-public class Scope extends ScopeRecord implements RemovableObject, LockableObject, TimestampableObject, AuditableObject, PersistentObject, Comparable<Scope>, Workflowable, Payable, Evaluable {
+public class Scope extends ScopeRecord implements RemovableObject, LockableObject, TimestampableObject, AuditableObject, PersistentObject, Comparable<Scope>, Workflowable, Displayable, Evaluable {
 	public static final Comparator<Scope> DEFAULT_COMPARATOR = Comparator
 		.comparing(Scope::getScopeModel)
 		.thenComparing(Scope::getCode)
@@ -180,16 +179,6 @@ public class Scope extends ScopeRecord implements RemovableObject, LockableObjec
 	@Override
 	public final WorkflowableModel getWorkflowableModel() {
 		return getScopeModel();
-	}
-
-	@Override
-	public final PayableModel getPayableModel() {
-		return getScopeModel();
-	}
-
-	@Override
-	public final String getPayableModelId() {
-		return getScopeModelId();
 	}
 
 	@Override

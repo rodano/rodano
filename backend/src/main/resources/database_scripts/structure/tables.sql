@@ -16,6 +16,7 @@ insert into internal_patch (script, date, context, name) values (180, now(3), 'D
 insert into internal_patch (script, date, context, name) values (181, now(3), 'Delete profile id column on workflow statuses', 'db_update_181.sql');
 insert into internal_patch (script, date, context, name) values (182, now(3), 'Rename deleted column to removed', 'db_update_182.sql');
 insert into internal_patch (script, date, context, name) values (183, now(3), 'Add index for search optimization', 'db_update_183.sql');
+insert into internal_patch (script, date, context, name) values (184, now(3), 'Remove payment feature', 'db_update_184.sql');
 
 /***********************************
 *                                  *
@@ -273,50 +274,6 @@ create table workflow_status_audit (
 	validator_id varchar(100) default null,
 	trigger_message varchar(1000) default null,
 	constraint pk_workflow_status_audit primary key (pk)
-) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
-
-/* payment */
-drop table if exists payment;
-create table payment (
-	pk bigint(20) not null auto_increment,
-	creation_time datetime(3) not null default now(3),
-	last_update_time datetime(3) not null default now(3),
-	removed boolean not null default false,
-	payment_batch_fk bigint(20) not null,
-	workflow_status_fk bigint(20) not null,
-	plan_id varchar(50) not null,
-	step_id varchar(100) default null,
-	status varchar(50) default null,
-	value int(11) default null,
-	constraint pk_payment primary key (pk)
-) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
-
-drop table if exists payment_batch;
-create table payment_batch (
-	pk bigint(20) not null auto_increment,
-	creation_time datetime(3) not null default now(3),
-	last_update_time datetime(3) not null default now(3),
-	removed boolean not null default false,
-	scope_id varchar(200) default null,
-	plan_id varchar(50) default null,
-	status varchar(50) default null,
-	payment_date datetime(3) default null,
-	closed_date datetime(3) default null,
-	printed_date datetime(3) default null,
-	comment varchar(500) default null,
-	constraint pk_payment_batch primary key (pk)
-) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
-
-drop table if exists payment_target;
-create table payment_target (
-	pk bigint(20) not null auto_increment,
-	creation_time datetime(3) not null default now(3),
-	last_update_time datetime(3) not null default now(3),
-	removed boolean not null default false,
-	payment_fk bigint(20) not null,
-	payable_id varchar(100) default null,
-	value float(11, 2) not null,
-	constraint pk_payment_target primary key (pk)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 
 /* role */

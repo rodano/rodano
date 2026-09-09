@@ -65,7 +65,6 @@ export class Study extends DisplayableNode {
 			workflows: {type: 'array', subtype: Entities.Workflow.name},
 			profiles: {type: 'array', subtype: Entities.Profile.name},
 			features: {type: 'array', subtype: Entities.Feature.name},
-			paymentPlans: {type: 'array', subtype: Entities.PaymentPlan.name},
 			menus: {type: 'array', subtype: Entities.Menu.name},
 			privacyPolicies: {type: 'array', subtype: Entities.PrivacyPolicy.name},
 			resourceCategories: {type: 'array', subtype: Entities.ResourceCategory.name},
@@ -127,7 +126,6 @@ export class Study extends DisplayableNode {
 		this.workflows = [];
 		this.profiles = [];
 		this.features = [];
-		this.paymentPlans = [];
 		this.menus = [];
 		this.privacyPolicies = [];
 		this.resourceCategories = [];
@@ -295,8 +293,6 @@ export class Study extends DisplayableNode {
 				return this.formModels.slice();
 			case Entities.Profile:
 				return this.profiles.slice();
-			case Entities.PaymentPlan:
-				return this.paymentPlans.slice();
 		}
 		throw new Error(`Entity ${entity.name} is not a right assignable`);
 	}
@@ -327,8 +323,6 @@ export class Study extends DisplayableNode {
 				return this.languages.slice();
 			case Entities.Menu:
 				return this.menus.slice();
-			case Entities.PaymentPlan:
-				return this.paymentPlans.slice();
 			case Entities.Chart:
 				return this.charts.slice();
 			case Entities.TimelineGraph:
@@ -395,10 +389,6 @@ export class Study extends DisplayableNode {
 				break;
 			case Entities.Menu:
 				this.menus.push(child);
-				child.study = this;
-				break;
-			case Entities.PaymentPlan:
-				this.paymentPlans.push(child);
 				child.study = this;
 				break;
 			case Entities.Chart:
@@ -502,9 +492,6 @@ export class Study extends DisplayableNode {
 	}
 	onDeleteMenu(event) {
 		this.menus.removeElement(event.node);
-	}
-	onDeletePaymentPlan(event) {
-		this.paymentPlans.removeElement(event.node);
 	}
 	onDeleteChart(event) {
 		this.charts.removeElement(event.node);

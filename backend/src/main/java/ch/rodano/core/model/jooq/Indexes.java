@@ -8,9 +8,6 @@ import ch.rodano.core.model.jooq.tables.Dataset;
 import ch.rodano.core.model.jooq.tables.Event;
 import ch.rodano.core.model.jooq.tables.Form;
 import ch.rodano.core.model.jooq.tables.Mail;
-import ch.rodano.core.model.jooq.tables.Payment;
-import ch.rodano.core.model.jooq.tables.PaymentBatch;
-import ch.rodano.core.model.jooq.tables.PaymentTarget;
 import ch.rodano.core.model.jooq.tables.Resource;
 import ch.rodano.core.model.jooq.tables.Robot;
 import ch.rodano.core.model.jooq.tables.Role;
@@ -48,9 +45,6 @@ public class Indexes {
 	public static final Index MAIL_IDX_MAIL_SENDER = Internal.createIndex(DSL.name("idx_mail_sender"), Mail.MAIL, new OrderField[] { Mail.MAIL.SENDER }, false);
 	public static final Index MAIL_IDX_MAIL_STATUS = Internal.createIndex(DSL.name("idx_mail_status"), Mail.MAIL, new OrderField[] { Mail.MAIL.STATUS }, false);
 	public static final Index MAIL_IDX_MAIL_SUBJECT = Internal.createIndex(DSL.name("idx_mail_subject"), Mail.MAIL, new OrderField[] { Mail.MAIL.SUBJECT }, false);
-	public static final Index PAYMENT_BATCH_IDX_PAYMENT_BATCH_DELETED = Internal.createIndex(DSL.name("idx_payment_batch_deleted"), PaymentBatch.PAYMENT_BATCH, new OrderField[] { PaymentBatch.PAYMENT_BATCH.REMOVED }, false);
-	public static final Index PAYMENT_IDX_PAYMENT_DELETED = Internal.createIndex(DSL.name("idx_payment_deleted"), Payment.PAYMENT, new OrderField[] { Payment.PAYMENT.REMOVED }, false);
-	public static final Index PAYMENT_TARGET_IDX_PAYMENT_TARGET_DELETED = Internal.createIndex(DSL.name("idx_payment_target_deleted"), PaymentTarget.PAYMENT_TARGET, new OrderField[] { PaymentTarget.PAYMENT_TARGET.REMOVED }, false);
 	public static final Index RESOURCE_IDX_RESOURCE_DELETED = Internal.createIndex(DSL.name("idx_resource_deleted"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.REMOVED }, false);
 	public static final Index ROBOT_IDX_ROBOT_DELETED = Internal.createIndex(DSL.name("idx_robot_deleted"), Robot.ROBOT, new OrderField[] { Robot.ROBOT.REMOVED }, false);
 	public static final Index ROLE_IDX_ROLE_PROFILE_ID = Internal.createIndex(DSL.name("idx_role_profile_id"), Role.ROLE, new OrderField[] { Role.ROLE.PROFILE_ID }, false);
@@ -60,8 +54,5 @@ public class Indexes {
 	public static final Index WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_DELETED = Internal.createIndex(DSL.name("idx_workflow_status_deleted"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.REMOVED }, false);
 	public static final Index WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_STATE_ID = Internal.createIndex(DSL.name("idx_workflow_status_state_id"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.STATE_ID }, false);
 	public static final Index WORKFLOW_STATUS_IDX_WORKFLOW_STATUS_WORKFLOW_ID = Internal.createIndex(DSL.name("idx_workflow_status_workflow_id"), WorkflowStatus.WORKFLOW_STATUS, new OrderField[] { WorkflowStatus.WORKFLOW_STATUS.WORKFLOW_ID }, false);
-	public static final Index PAYMENT_PAYMENT_BATCH_FK = Internal.createIndex(DSL.name("PAYMENT_BATCH_FK"), Payment.PAYMENT, new OrderField[] { Payment.PAYMENT.PAYMENT_BATCH_FK }, false);
-	public static final Index PAYMENT_TARGET_PAYMENT_FK = Internal.createIndex(DSL.name("PAYMENT_FK"), PaymentTarget.PAYMENT_TARGET, new OrderField[] { PaymentTarget.PAYMENT_TARGET.PAYMENT_FK }, false);
 	public static final Index RESOURCE_PUBLIC_RESOURCE = Internal.createIndex(DSL.name("public_resource"), Resource.RESOURCE, new OrderField[] { Resource.RESOURCE.PUBLIC_RESOURCE }, false);
-	public static final Index PAYMENT_WORKFLOW_STATUS_FK = Internal.createIndex(DSL.name("WORKFLOW_STATUS_FK"), Payment.PAYMENT, new OrderField[] { Payment.PAYMENT.WORKFLOW_STATUS_FK }, false);
 }

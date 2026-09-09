@@ -48,7 +48,6 @@ import ch.rodano.configuration.model.form.FormModel;
 import ch.rodano.configuration.model.language.Language;
 import ch.rodano.configuration.model.language.LanguageStatic;
 import ch.rodano.configuration.model.menu.Menu;
-import ch.rodano.configuration.model.payment.PaymentPlan;
 import ch.rodano.configuration.model.policy.PrivacyPolicy;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.reports.Report;
@@ -148,7 +147,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	private SortedSet<ResourceCategory> resourceCategories;
 	private SortedSet<PrivacyPolicy> privacyPolicies;
-	private SortedSet<PaymentPlan> paymentPlans;
 
 	private SortedSet<Report> reports;
 	private SortedSet<WorkflowWidget> workflowWidgets;
@@ -185,7 +183,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 		menus = new TreeSet<>();
 		resourceCategories = new TreeSet<>();
 		privacyPolicies = new TreeSet<>();
-		paymentPlans = new TreeSet<>();
 		reports = new TreeSet<>();
 		workflowWidgets = new TreeSet<>();
 		workflowSummaries = new TreeSet<>();
@@ -738,24 +735,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 			.orElseThrow(() -> new NoNodeException(this, Entity.PRIVACY_POLICY, privacyPolicyId));
 	}
 
-	@JsonManagedReference
-	public final void setPaymentPlans(final SortedSet<PaymentPlan> paymentPlans) {
-		this.paymentPlans = paymentPlans;
-	}
-
-	@JsonManagedReference
-	public final SortedSet<PaymentPlan> getPaymentPlans() {
-		return paymentPlans;
-	}
-
-	@JsonIgnore
-	public PaymentPlan getPaymentPlan(final String paymentPlanId) {
-		return paymentPlans.stream()
-			.filter(p -> p.getId().equalsIgnoreCase(paymentPlanId))
-			.findAny()
-			.orElseThrow(() -> new NoNodeException(this, Entity.PAYMENT_PLAN, paymentPlanId));
-	}
-
 	public final List<Cron> getCrons() {
 		return crons;
 	}
@@ -1052,7 +1031,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 			case WORKFLOW -> getWorkflow(nodeId);
 			case PROFILE -> getProfile(nodeId);
 			case FEATURE -> getFeature(nodeId);
-			case PAYMENT_PLAN -> getPaymentPlan(nodeId);
 			case REPORT -> getReport(nodeId);
 			case PRIVACY_POLICY -> getPrivacyPolicy(nodeId);
 			case WORKFLOW_WIDGET -> getWorkflowWidget(nodeId);
@@ -1076,7 +1054,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 			case WORKFLOW -> Collections.unmodifiableSet(workflows);
 			case PROFILE -> Collections.unmodifiableSet(profiles);
 			case FEATURE -> Collections.unmodifiableSet(features);
-			case PAYMENT_PLAN -> Collections.unmodifiableSet(paymentPlans);
 			case REPORT -> Collections.unmodifiableSet(reports);
 			case PRIVACY_POLICY -> Collections.unmodifiableSet(privacyPolicies);
 			case WORKFLOW_WIDGET -> Collections.unmodifiableSet(workflowWidgets);

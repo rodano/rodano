@@ -17,7 +17,6 @@ const right_assignables = {
 	[Entities.EventModel.name]: 'grantedEventModelIdRights',
 	[Entities.DatasetModel.name]: 'grantedDatasetModelIdRights',
 	[Entities.FormModel.name]: 'grantedFormModelIdRights',
-	[Entities.PaymentPlan.name]: 'grantedPaymentIdRights',
 };
 
 export class Profile extends DisplayableNode {
@@ -33,7 +32,6 @@ export class Profile extends DisplayableNode {
 			grantedProfileIdRights: {type: 'object'},
 			grantedDatasetModelIdRights: {type: 'object'},
 			grantedScopeModelIdRights: {type: 'object'},
-			grantedPaymentIdRights: {type: 'object'},
 			grantedEventModelIdRights: {type: 'object'},
 			grantedFormModelIdRights: {type: 'object'},
 			grantedWorkflowIds: {type: 'object'},
@@ -60,7 +58,6 @@ export class Profile extends DisplayableNode {
 		this.grantedProfileIdRights = {};
 		this.grantedDatasetModelIdRights = {};
 		this.grantedScopeModelIdRights = {};
-		this.grantedPaymentIdRights = {};
 		this.grantedEventModelIdRights = {};
 		this.grantedFormModelIdRights = {};
 		this.grantedWorkflowIds = {};
@@ -143,16 +140,6 @@ export class Profile extends DisplayableNode {
 	}
 	onDeleteScopeModel(event) {
 		delete this.grantedScopeModelIdRights[event.node.id];
-	}
-
-	onChangePaymentPlanId(event) {
-		if(event.oldValue) {
-			this.grantedPaymentIdRights[event.newValue] = this.grantedPaymentIdRights[event.oldValue];
-			delete this.grantedPaymentIdRights[event.oldValue];
-		}
-	}
-	onDeletePaymentPlan(event) {
-		delete this.grantedPaymentIdRights[event.node.id];
 	}
 
 	onChangeDatasetModelId(event) {

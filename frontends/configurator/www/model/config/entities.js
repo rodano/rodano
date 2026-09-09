@@ -358,43 +358,6 @@ const Entities = Object.freeze({
 		comparison_structural: true
 	},
 
-	//payment
-	/**@type {Entity}*/
-	PaymentPlan: {
-		name: 'PaymentPlan',
-		children: {},
-		relations: {},
-		id: 'payment_plan',
-		label: 'Payment plan',
-		plural_label: 'Payment plans',
-		icon: 'money.png',
-		configuration_name: 'PAYMENT_PLAN',
-		comparison_structural: true
-	},
-	/**@type {Entity}*/
-	PaymentStep: {
-		name: 'PaymentStep',
-		children: {},
-		relations: {},
-		id: 'payment_step',
-		label: 'Step',
-		plural_label: 'Steps',
-		icon: 'money.png',
-		configuration_name: 'PAYMENT_STEP',
-		comparison_structural: true
-	},
-	/**@type {Entity}*/
-	PaymentDistribution: {
-		name: 'PaymentDistribution',
-		children: {},
-		relations: {},
-		id: 'payment_distribution',
-		label: 'Payment distribution',
-		plural_label: 'Payment distributions',
-		configuration_name: 'PAYMENT_DISTRIBUTION',
-		comparison_structural: true
-	},
-
 	//ui
 	/**@type {Entity}*/
 	Menu: {
@@ -901,10 +864,6 @@ Entities.FormModel.relations[Entities.Workflow.name] = {structuring: false};
 Entities.FormModel.relations[Entities.DatasetModel.name] = {structuring: false};
 Entities.FormModel.relations[Entities.FieldModel.name] = {structuring: false};
 
-Entities.PaymentPlan.children[Entities.PaymentStep.name] = {size: 1};
-
-Entities.PaymentStep.children[Entities.PaymentDistribution.name] = {size: 1};
-
 Entities.Menu.children[Entities.Menu.name] = {size: 1};
 Entities.Menu.children[Entities.CMSLayout.name] = {size: 1};
 
@@ -942,7 +901,6 @@ Entities.Study.children[Entities.Profile.name] = {size: 1};
 Entities.Study.children[Entities.Feature.name] = {size: 1};
 Entities.Study.children[Entities.Language.name] = {size: 1};
 Entities.Study.children[Entities.Menu.name] = {size: 1};
-Entities.Study.children[Entities.PaymentPlan.name] = {size: 1};
 Entities.Study.children[Entities.Chart.name] = {size: 1};
 Entities.Study.children[Entities.TimelineGraph.name] = {size: 1};
 Entities.Study.children[Entities.ResourceCategory.name] = {size: 1};

@@ -15,8 +15,6 @@ import {Layout} from './entities/layout.js';
 import {Line} from './entities/line.js';
 import {Menu} from './entities/menu.js';
 import {FormModel} from './entities/form_model.js';
-import {PaymentPlan} from './entities/payment_plan.js';
-import {PaymentStep} from './entities/payment_step.js';
 import {PrivacyPolicy} from './entities/privacy_policy.js';
 import {Profile} from './entities/profile.js';
 import {ResourceCategory} from './entities/resource_category.js';
@@ -325,16 +323,6 @@ export default async function test(bundle, assert) {
 	layout_3.type = 'MULTIPLE';
 	layout_3.datasetModelId = dataset_model_3.id;
 	form_model.layouts.push(layout_3);
-
-	//payment plan
-	const payment_plan = new PaymentPlan({id: 'VISIT_PLAN'});
-	payment_plan.study = study;
-	study.paymentPlans.push(payment_plan);
-
-	//payment step
-	const payment_step = new PaymentStep({id: 'VISIT_PLAN_FIRST_STEP'});
-	payment_step.paymentPlan = payment_plan;
-	payment_plan.steps.push(payment_step);
 
 	//menu
 	const menu = new Menu({id: 'HOME'});
@@ -678,24 +666,6 @@ export default async function test(bundle, assert) {
 		await feature.it('deletes layout properly and updates cells', () => {
 			layout_2['delete']();
 			assert.ok(cell_2.visibilityCriteria.isEmpty(), 'Cell visibility criteria is empty');
-		});
-	});
-
-	await bundle.describe('PaymentStep', async feature => {
-		//delete payment step
-		await feature.it('deletes payment step properly', () => {
-			assert.equal(payment_plan.steps.length, 1, 'Payment plan contains 1 step');
-			payment_step['delete']();
-			assert.notOk(payment_plan.steps.includes(payment_step), 'Payment plan no more contains payment step');
-			assert.equal(payment_plan.steps.length, 0, 'Payment plan contains 0 step');
-		});
-	});
-
-	await bundle.describe('PaymentPlan', async feature => {
-		//delete payment plan
-		await feature.it('deletes payment plan properly', () => {
-			payment_plan['delete']();
-			assert.notOk(study.paymentPlans.includes(payment_plan), 'Study no more contains payment plan');
 		});
 	});
 

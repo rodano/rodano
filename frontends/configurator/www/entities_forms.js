@@ -21,8 +21,6 @@ const available_entities = {
 	[Entities.Layout.name]: {html: true, js: true, css: false, overlay: false},
 	[Entities.Menu.name]: {html: true, js: true, css: false, overlay: false},
 	[Entities.FormModel.name]: {html: true, js: true, css: true, overlay: false},
-	[Entities.PaymentPlan.name]: {html: true, js: true, css: false, overlay: false},
-	[Entities.PaymentStep.name]: {html: true, js: true, css: false, overlay: false},
 	[Entities.PrivacyPolicy.name]: {html: true, js: true, css: false, overlay: false},
 	[Entities.Profile.name]: {html: true, js: true, css: false, overlay: false},
 	[Entities.Report.name]: {html: true, js: true, css: false, overlay: false},

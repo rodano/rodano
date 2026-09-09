@@ -28,7 +28,6 @@ import ch.rodano.core.services.bll.form.FormService;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.workflowStatus.DataFamily;
 import ch.rodano.core.services.bll.workflowStatus.WorkflowStatusService;
-import ch.rodano.core.services.dao.payment.PaymentDAOService;
 import ch.rodano.test.DatabaseTest;
 import ch.rodano.test.SpringTestConfiguration;
 import ch.rodano.test.TestHelperService;
@@ -65,9 +64,6 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 
 	@Autowired
 	private FormService formService;
-
-	@Autowired
-	private PaymentDAOService paymentDAOService;
 
 	@Autowired
 	private TestHelperService testHelperService;
@@ -517,25 +513,6 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 			() -> assertEquals(form, formWorkflowable),
 			() -> assertEquals(WorkflowableEntity.FORM, formReportingWS.get().getWorkflowableType()),
 			() -> assertEquals(baselineEvent, eventService.get(dataManagementWS.get()).get())
-		);
-	}
-
-	@Test
-	@DisplayName("Payments are correctly associated with workflows")
-	public void workflowPaymentTest() {
-		//retrieve workflows
-		final var dataManagementStatus = studyService.getStudy().getWorkflow("DATA_MANAGEMENT_STATUS");
-
-		final var center = testHelperService.createCenter(context);
-		final var patient = testHelperService.createPatient(center, context);
-
-		//event
-		final var event = eventService.get(patient, getBaselineEvent(), 0);
-		final var eventStatus = workflowStatusService.getMostRecent(event, dataManagementStatus);
-
-		assertAll(
-			() -> assertTrue(eventStatus.isPresent()),
-			() -> assertEquals(paymentDAOService.getPaymentsByWorkflowStatusFk(eventStatus.get().getPk()).size(), 0)
 		);
 	}
 

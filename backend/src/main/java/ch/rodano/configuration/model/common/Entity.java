@@ -18,7 +18,7 @@ public enum Entity implements SuperDisplayable {
 
 		@Override
 		public List<Entity> getChildrenEmbedded() {
-			return Arrays.asList(SCOPE_MODEL, EVENT_MODEL, FORM_MODEL, DATASET_MODEL, VALIDATOR, PROFILE, FEATURE, PAYMENT_PLAN, WORKFLOW, ACTION, WORKFLOW_WIDGET,
+			return Arrays.asList(SCOPE_MODEL, EVENT_MODEL, FORM_MODEL, DATASET_MODEL, VALIDATOR, PROFILE, FEATURE, WORKFLOW, ACTION, WORKFLOW_WIDGET,
 				RESOURCE_CATEGORY, PRIVACY_POLICY, REPORT, MENU, LANGUAGE);
 		}
 
@@ -622,38 +622,6 @@ public enum Entity implements SuperDisplayable {
 			final Map<String, String> shortname = new HashMap<>();
 			shortname.put(LanguageStatic.en.getId(), "Chart SQL request");
 			shortname.put(LanguageStatic.fr.getId(), "Requête SQL de graphique");
-			return shortname;
-		}
-	},
-	PAYMENT_PLAN {
-		@Override
-		public List<Entity> getChildrenEmbedded() {
-			return Collections.singletonList(PAYMENT_STEP);
-		}
-
-		@Override
-		public Map<String, String> getShortname() {
-			final Map<String, String> shortname = new HashMap<>();
-			shortname.put(LanguageStatic.en.getId(), "Payment plan");
-			shortname.put(LanguageStatic.fr.getId(), "Plan de paiement");
-			return shortname;
-		}
-	},
-	PAYMENT_STEP {
-		@Override
-		public Map<String, String> getShortname() {
-			final Map<String, String> shortname = new HashMap<>();
-			shortname.put(LanguageStatic.en.getId(), "Payment step");
-			shortname.put(LanguageStatic.fr.getId(), "Etape de paiement");
-			return shortname;
-		}
-	},
-	PAYMENT_DISTRIBUTION {
-		@Override
-		public Map<String, String> getShortname() {
-			final Map<String, String> shortname = new HashMap<>();
-			shortname.put(LanguageStatic.en.getId(), "Payment distribution");
-			shortname.put(LanguageStatic.fr.getId(), "Distribution d'un paiement");
 			return shortname;
 		}
 	},

@@ -15,7 +15,6 @@ const RightAssignables = [
 	Entities.DatasetModel,
 	Entities.FormModel,
 	Entities.Profile,
-	Entities.PaymentPlan
 ];
 
 const FamilyAssignableParents = [

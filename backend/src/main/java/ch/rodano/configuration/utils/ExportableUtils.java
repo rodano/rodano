@@ -26,9 +26,6 @@ import ch.rodano.configuration.model.form.FormModel;
 import ch.rodano.configuration.model.layout.Cell;
 import ch.rodano.configuration.model.layout.ColumnHeader;
 import ch.rodano.configuration.model.layout.Layout;
-import ch.rodano.configuration.model.payment.PaymentDistribution;
-import ch.rodano.configuration.model.payment.PaymentPlan;
-import ch.rodano.configuration.model.payment.PaymentStep;
 import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.validator.Validator;
@@ -326,45 +323,6 @@ public final class ExportableUtils {
 
 		final var children = new HashMap<String, String>();
 		children.put("description", validator.getLocalizedDescription(languages));
-		DocumentHelper.appendSimpleChildren(element, children);
-
-		return element;
-	}
-
-	public static Element getExportForXml(final org.w3c.dom.Document doc, final PaymentPlan plan, final String... languages) {
-		final var element = DocumentHelper.createElement(doc, "plan", Map.of(
-			"id", plan.getId(),
-			"shortname", plan.getLocalizedShortname(languages),
-			"longname", plan.getLocalizedLongname(languages)));
-
-		final var children = new HashMap<String, String>();
-		children.put("description", plan.getLocalizedDescription(languages));
-		children.put("currency", plan.getCurrency());
-		children.put("entity", plan.getEntity().getLocalizedShortname(languages));
-		children.put("workflow", plan.getWorkflow());
-		children.put("state", plan.getState());
-		DocumentHelper.appendSimpleChildren(element, children);
-
-		//steps
-		final var stepsElement = doc.createElement("steps");
-		element.appendChild(stepsElement);
-		for(final var step : plan.getSteps()) {
-			stepsElement.appendChild(getExportForXml(doc, step, languages));
-		}
-
-		return element;
-	}
-
-	public static Element getExportForXml(final org.w3c.dom.Document doc, final PaymentStep step, final String... languages) {
-		final var element = DocumentHelper.createElement(doc, "step", Map.of(
-			"id", step.getId(),
-			"shortname", step.getLocalizedShortname(languages),
-			"longname", step.getLocalizedLongname(languages)));
-
-		final var children = new HashMap<String, String>();
-		children.put("description", step.getLocalizedDescription(languages));
-		children.put("entity", step.getEntity().getLocalizedShortname(languages));
-		children.put("amount", NUMBER_FORMATTER.format(step.getDistributions().stream().mapToDouble(PaymentDistribution::getValue).sum()));
 		DocumentHelper.appendSimpleChildren(element, children);
 
 		return element;

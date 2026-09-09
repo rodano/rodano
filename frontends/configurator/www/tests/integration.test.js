@@ -239,7 +239,7 @@ export default async function test(bundle, assert, driver) {
 
 	await bundle.describe('validator wizard', async feature => {
 		await feature.it('creates a validator with all dependencies in the same visit', async () => {
-			await driver.click('#menubar > li:nth-child(8) > ul > li:nth-child(2) > button');
+			await driver.click('#menubar > li:nth-child(8) > ul > li:nth-child(1) > button');
 			await driver.wait();
 			assert.visible('#wizard', 'Wizard is displayed');
 			await driver.click('#wizard_start');
@@ -279,7 +279,7 @@ export default async function test(bundle, assert, driver) {
 		});
 
 		await feature.it('creates a validator with dependencies in the scope and the event', async () => {
-			await driver.click('#menubar > li:nth-child(8) > ul > li:nth-child(2) > button');
+			await driver.click('#menubar > li:nth-child(8) > ul > li:nth-child(1) > button');
 			await driver.wait();
 			assert.visible('#wizard', 'Wizard is displayed');
 			await driver.click('#wizard_start');
@@ -345,6 +345,19 @@ export default async function test(bundle, assert, driver) {
 
 	await bundle.describe('consistency check', async feature => {
 		await feature.it('shows errors properly', async () => {
+			//create a field wrongly configured to trigger a consistency error
+			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST&entity=DatasetModel"]', e => e.previousElementSibling));
+			await driver.click(await driver.eval('#tree ul.dataset_model > li a[href="#node=Study:TEST|DatasetModel:CENTER_INFORMATION"]', e => e.nextElementSibling));
+			await driver.wait();
+			await driver.type('#field_model_id', 'CENTER_MANAGER');
+			await driver.type('#field_model_type', 'STRING');
+			await driver.type(await driver.getShadow('#field_model_shortname', 'input'), 'Center manager');
+			await driver.submit('#edit_field_model_form');
+			await driver.click('a[href="#node=Study:TEST|DatasetModel:CENTER_INFORMATION|FieldModel:CENTER_MANAGER&tab=edit_field_model_validators_workflows"]');
+			await driver.wait();
+			await driver.doubleClick(await driver.getShadow('#field_model_validator_ids', 'div > ul > li:nth-child(7)'));
+			await driver.submit('#edit_field_model_form');
+
 			await driver.click('#menubar > li:nth-child(6) > ul > li > a');
 			//this takes some time
 			await driver.wait();
@@ -357,8 +370,8 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.eval('#consistency_check_section_errors', e => e.children.length), 3, 'There are still 3 errors');
 			assert.equal(await driver.getStyle('#consistency_check_section_errors > li', 'text-decoration'), 'line-through', 'Error is still displayed and has been fixed');
 			//check infos
-			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_infos"]');
-			assert.equal(await driver.eval('#consistency_check_section_infos', e => e.children.length), 1, 'There is 1 information');
+			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_warnings"]');
+			assert.equal(await driver.eval('#consistency_check_section_warnings', e => e.children.length), 5, 'There are 5 warnings');
 			//close report
 			await driver.click('#consistency_check menu > li > a.button');
 			//this takes some time
@@ -370,8 +383,8 @@ export default async function test(bundle, assert, driver) {
 			await driver.wait();
 			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_errors"]');
 			assert.equal(await driver.eval('#consistency_check_section_errors', e => e.children.length), 2, '2 errors are displayed after 1 error has been fixed');
-			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_infos"]');
-			assert.equal(await driver.eval('#consistency_check_section_infos', e => e.children.length), 1, 'There is still 1 information');
+			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_warnings"]');
+			assert.equal(await driver.eval('#consistency_check_section_warnings', e => e.children.length), 5, 'There are 5 warnings');
 			await driver.click('#consistency_check menu > li > a.button');
 			//this takes some time
 			await driver.wait();
@@ -800,7 +813,7 @@ export default async function test(bundle, assert, driver) {
 	await bundle.describe('constraints', async feature => {
 		await feature.it('manages constraint properly', async () => {
 			//layout
-			await driver.click('#tree ul.entities > li > ul.form_model > li:nth-child(11) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
+			await driver.click('#tree ul.entities > li > ul.form_model > li:nth-child(10) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
 			await driver.wait();
 			await driver.click('#form_model_layouts > div > h3 > a[title="Edit layout"]');
 			await driver.wait();
@@ -908,9 +921,9 @@ export default async function test(bundle, assert, driver) {
 			await driver.contextMenu('#tree ul.dataset_model > li:nth-child(4) a[href="#node=Study:TEST|DatasetModel:CHILD"]');
 			await driver.wait();
 			assert.visible(await driver.get('#node_menu', {hidden: true}), 'Node menu is displayed after a right click on a node');
-			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 20, 'There are 20 dataset models');
+			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 19, 'There are 19 dataset models');
 			await driver.click('#node_menu_clone');
-			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 21, 'There are 21 dataset models after one has been cloned');
+			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 20, 'There are 20 dataset models after one has been cloned');
 			assert.hidden(await driver.get('#node_menu', {hidden: true}), 'Node menu is hidden');
 			//check cloned node in model
 			const cloned_node = study.getDatasetModel('COPY_CHILD');
@@ -950,10 +963,10 @@ export default async function test(bundle, assert, driver) {
 			//delete cloned node
 			await driver.contextMenu('#tree ul.dataset_model > li:nth-child(3) a[href="#node=Study:TEST|DatasetModel:ADOPTED_CHILD"]');
 			await driver.wait();
-			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 21, 'There are 21 dataset models');
+			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 20, 'There are 20 dataset models');
 			await driver.click('#node_menu_delete');
 			await driver.click('#validate_buttons > li:last-child > button');
-			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 20, 'There are 20 dataset models');
+			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.children.length), 19, 'There are 19 dataset models');
 		});
 	});
 
@@ -969,7 +982,7 @@ export default async function test(bundle, assert, driver) {
 			//check initial model state
 			assert.equal(study.id, 'TEST', 'Study id is "TEST"');
 			assert.equal(study.getEventModels().length, 8, 'There are 8 event models in the configuration');
-			assert.equal(study.formModels.length, 21, 'There are 21 form models in the configuration');
+			assert.equal(study.formModels.length, 20, 'There are 20 form models in the configuration');
 
 			//select study
 			await driver.click('#tree ul.study > li a[href="#node=Study:TEST"]');
@@ -1004,14 +1017,14 @@ export default async function test(bundle, assert, driver) {
 
 			//delete form model
 			//await driver.click(await driver.eval('#tree a[href="#node=Study:TEST_BIS&entity=FormModel"]', e => e.previousElementSibling));
-			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 21, 'There are 21 form models in the tree');
-			await driver.contextMenu('#tree ul.form_model > li:nth-child(12) a[href="#node=Study:TEST_BIS|FormModel:RELAPSES"]');
+			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 20, 'There are 20 form models in the tree');
+			await driver.contextMenu('#tree ul.form_model > li:nth-child(11) a[href="#node=Study:TEST_BIS|FormModel:RELAPSES"]');
 			await driver.wait();
 			await driver.click('#node_menu_delete');
 			await driver.click('#validate_buttons > li:last-child > button');
 			//check modifications in ui and model
-			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 20, 'There are 20 form models in the tree after 1 form model has been deleted');
-			assert.equal(study.formModels.length, 20, 'There are 20 form models in configuration');
+			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 19, 'There are 19 form models in the tree after 1 form model has been deleted');
+			assert.equal(study.formModels.length, 19, 'There are 19 form models in configuration');
 
 			//create event model
 			//await driver.click(await driver.eval('#tree a[href="#node=Study:TEST_BIS|ScopeModel:PATIENT&entity=EventModel"]', e => e.previousElementSibling));
@@ -1043,7 +1056,7 @@ export default async function test(bundle, assert, driver) {
 			//check model has been restored
 			assert.equal(study.id, 'TEST', 'Study id has been restored to "TEST"');
 			assert.equal(study.getEventModels().length, 8, 'There are 8 event models in configuration');
-			assert.equal(study.formModels.length, 21, 'There are 21 form models in configuration');
+			assert.equal(study.formModels.length, 20, 'There are 20 form models in configuration');
 
 			//check selection has been kept
 			//assert.equal(await driver.get('#tree a.selected'), await driver.get('#tree ul.validator > li a[href="#node=Study:TEST|Validator:REQUIRED"]'), 'Selection has been restored a reset based on url and is study');
@@ -1056,11 +1069,11 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.getValue('#study_email'), 'info@rodano.ch', 'Study email is "info@rodano.ch"');
 
 			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST&entity=FormModel"]', e => e.previousElementSibling));
-			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 21, 'There are now 21 form models');
-			await driver.click('#tree ul.form_model > li:nth-child(12) a[href="#node=Study:TEST|FormModel:RELAPSES"]');
+			assert.equal(await driver.eval('#tree ul.form_model', e => e.childNodes.length), 20, 'There are now 20 form models');
+			await driver.click('#tree ul.form_model > li:nth-child(11) a[href="#node=Study:TEST|FormModel:RELAPSES"]');
 			await driver.wait();
-			assert.equal(await driver.getValue('#form_model_id'), 'RELAPSES', 'Ninth form model id is "RELAPSES"');
-			assert.equal(await driver.getValueShadow('#form_model_shortname', 'input'), 'Relapses', 'Ninth form model shortname is "Relapses"');
+			assert.equal(await driver.getValue('#form_model_id'), 'RELAPSES', 'Form model id is "RELAPSES"');
+			assert.equal(await driver.getValueShadow('#form_model_shortname', 'input'), 'Relapses', 'Form model shortname is "Relapses"');
 
 			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST|ScopeModel:PATIENT&entity=EventModel"]', e => e.previousElementSibling));
 			assert.equal(await driver.eval('#tree ul.scope_model > li:has(a[href="#node=Study:TEST|ScopeModel:PATIENT"]) ul.event_model', e => e.childNodes.length), 8, 'There are still 8 event models');
@@ -1401,10 +1414,10 @@ export default async function test(bundle, assert, driver) {
 		await feature.it('edits form models', async () => {
 			//form model
 			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST&entity=FormModel"]', e => e.previousElementSibling));
-			await driver.click('#tree ul.form_model > li:nth-child(11) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
+			await driver.click('#tree ul.form_model > li:nth-child(10) a[href="#node=Study:TEST|FormModel:MS_HISTORY"]');
 			//let time for form to load
 			await driver.wait();
-			assert.equal(await driver.getValue('#form_model_id'), 'MS_HISTORY', 'Fifth form model has id "MS_HISTORY"');
+			assert.equal(await driver.getValue('#form_model_id'), 'MS_HISTORY', 'Tenth form model has id "MS_HISTORY"');
 			assert.selectContains(await driver.getShadow('#form_model_shortname', 'select'), 'en');
 			assert.selectContains(await driver.getShadow('#form_model_shortname', 'select'), 'fr');
 			assert.selectNotContains(await driver.getShadow('#form_model_shortname', 'select'), 'de');
@@ -1628,74 +1641,6 @@ export default async function test(bundle, assert, driver) {
 		});
 	});
 
-	await bundle.describe('payment plan form', async feature => {
-		await feature.it('edits payment plans', async () => {
-			const study = StudyHandler.GetStudy();
-			//check existing
-			await driver.click(await driver.eval('#tree a[href="#node=Study:TEST&entity=PaymentPlan"]', e => e.previousElementSibling));
-			await driver.click('#tree ul.payment_plan > li a[href="#node=Study:TEST|PaymentPlan:DATA_MANAGEMENT_PAYMENT"]');
-			//let time for form to load
-			await driver.wait();
-			assert.equal(await driver.getValue('#payment_plan_id'), 'DATA_MANAGEMENT_PAYMENT', 'First payment plan is payment plan with id "DATA_MANAGEMENT_PAYMENT"');
-			assert.equal(await driver.getValue('#payment_plan_currency'), 'CHF', 'First payment plan currency is "CHF"');
-			assert.selectContains(await driver.get('#payment_plan_workflow_id'), 'VISIT_REPORTING');
-			assert.selectContains(await driver.get('#payment_plan_workflow_id'), 'CENTER_STATUS');
-			assert.selectContains(await driver.get('#payment_plan_workflow_id'), 'FORM_REPORTING');
-			assert.selectContains(await driver.get('#payment_plan_workflow_state_id'), 'READY_TO_REVIEW');
-			assert.selectContains(await driver.get('#payment_plan_workflow_state_id'), 'REVIEWED');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'INCOMPLETE');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'COMPLETE');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'LOCKED');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'UNLOCKED');
-			await driver.type('#payment_plan_workflow_id', 'VISIT_REPORTING');
-			assert.selectContains(await driver.get('#payment_plan_workflow_state_id'), 'EMPTY');
-			assert.selectContains(await driver.get('#payment_plan_workflow_state_id'), 'INCOMPLETE');
-			assert.selectContains(await driver.get('#payment_plan_workflow_state_id'), 'COMPLETE');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'READY_TO_REVIEW');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'REVIEWED');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'LOCKED');
-			assert.selectNotContains(await driver.get('#payment_plan_workflow_state_id'), 'UNLOCKED');
-
-			//create
-			await driver.click('#tree img[title="Add payment plan"]');
-			await driver.type('#payment_plan_id', 'SIGNATURE_PAYMENT');
-			await driver.type(await driver.getShadow('#payment_plan_shortname', 'input'), 'Signature payment');
-			await driver.type('#payment_plan_currency', 'EUR');
-			await driver.type('#payment_plan_invoiced_scope_model_id', 'PATIENT');
-			await driver.type('#payment_plan_workflow_id', 'SIGNATURE');
-			await driver.type('#payment_plan_workflow_state_id', 'SIGNED');
-			await driver.submit('#edit_payment_plan_form');
-			assert.equal(await driver.eval('#tree ul.payment_plan', e => e.childNodes.length), 2, 'There are 2 payment plans in the tree');
-			assert.equal(study.paymentPlans.length, 2, 'There are 2 payment plans in study');
-
-			//hook payment dataset model
-			assert.selectContains(await driver.get('#payment_plan_event_id'), 'BASELINE');
-			assert.selectContains(await driver.get('#payment_plan_event_id'), 'VISIT_12');
-			assert.selectContains(await driver.get('#payment_plan_event_id'), 'TERMINATION_VISIT');
-
-			await driver.type('#payment_plan_event_id', 'BASELINE');
-			await driver.click('#payment_plan_hook');
-			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.childNodes.length), 21, 'There are 21 dataset models in the tree');
-			assert.equal(study.datasetModels.length, 21, 'There are 21 dataset models in study');
-
-			//delete generated dataset model
-			await driver.contextMenu('#tree ul.dataset_model > li:nth-child(16) a[href="#node=Study:TEST|DatasetModel:SIGNATURE_PAYMENT"]');
-			await driver.wait();
-			await driver.click('#node_menu_delete');
-			await driver.click('#validate_buttons > li:last-child > button');
-			assert.equal(await driver.eval('#tree ul.dataset_model', e => e.childNodes.length), 20, 'There are 20 dataset models in the tree');
-			assert.equal(study.datasetModels.length, 20, 'There are 20 dataset models in study');
-
-			//delete
-			await driver.contextMenu('#tree ul.payment_plan > li:nth-child(2) a[href="#node=Study:TEST|PaymentPlan:SIGNATURE_PAYMENT"]');
-			await driver.wait();
-			await driver.click('#node_menu_delete');
-			await driver.click('#validate_buttons > li:last-child > button');
-			assert.equal(await driver.eval('#tree ul.payment_plan', e => e.childNodes.length), 1, 'There is 1 payment plan in the tree');
-			assert.equal(study.paymentPlans.length, 1, 'There are 1 payment plan in study');
-		});
-	});
-
 	await bundle.describe('menu form', async feature => {
 		await feature.it('edits menus', async () => {
 			//edit
@@ -1842,7 +1787,7 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.getStyle('#matrix', 'display'), 'block', 'Matrix section is visible');
 			assert.equal(await driver.eval('#matrix', e => e.childNodes.length), 1, 'There is 1 matrix shown');
 			assert.equal(await driver.eval('#matrix > table > caption', e => e.textContent), 'Dataset models', 'First matrix is dataset models matrix');
-			assert.equal(await driver.eval('#matrix > table > tbody', e => e.childNodes.length), 20, 'First matrix contains 20 lines because there are 19 dataset models in configuration');
+			assert.equal(await driver.eval('#matrix > table > tbody', e => e.childNodes.length), 19, 'First matrix contains 19 lines because there are 18 dataset models in configuration');
 
 			await driver.click('span[title="Give right READ on ADDRESS for profile PRINCIPAL_INVESTIGATOR"]');
 			assert.ok(study.getProfile('PRINCIPAL_INVESTIGATOR').isAssignedRight(Entities.DatasetModel, 'ADDRESS', 'READ'), 'Right "READ" on "ADDRESS" has been added for profile "PRINCIPAL_INVESTIGATOR"');

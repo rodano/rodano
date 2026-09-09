@@ -11,7 +11,6 @@ import ch.rodano.core.model.jooq.Keys;
 import ch.rodano.core.model.jooq.tables.Event.EventPath;
 import ch.rodano.core.model.jooq.tables.Field.FieldPath;
 import ch.rodano.core.model.jooq.tables.Form.FormPath;
-import ch.rodano.core.model.jooq.tables.Payment.PaymentPath;
 import ch.rodano.core.model.jooq.tables.Robot.RobotPath;
 import ch.rodano.core.model.jooq.tables.Scope.ScopePath;
 import ch.rodano.core.model.jooq.tables.User.UserPath;
@@ -301,18 +300,6 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 			_user = new UserPath(this, Keys.FK_WORKFLOW_STATUS_USER_FK, null);
 
 		return _user;
-	}
-
-	private transient PaymentPath _payment;
-
-	/**
-	 * Get the implicit to-many join path to the <code>payment</code> table
-	 */
-	public PaymentPath payment() {
-		if (_payment == null)
-			_payment = new PaymentPath(this, null, Keys.FK_PAYMENT_WORKFLOW_STATUS_FK.getInverseKey());
-
-		return _payment;
 	}
 
 	private transient WorkflowStatusAuditPath _workflowStatusAudit;

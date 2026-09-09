@@ -28,7 +28,6 @@ import ch.rodano.configuration.model.event.EventGroup;
 import ch.rodano.configuration.model.event.EventModel;
 import ch.rodano.configuration.model.field.FieldModel;
 import ch.rodano.configuration.model.form.FormModel;
-import ch.rodano.configuration.model.payment.PayableModel;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.reports.WorkflowStatesSelector;
 import ch.rodano.configuration.model.rights.RightAssignable;
@@ -40,7 +39,7 @@ import ch.rodano.configuration.model.workflow.WorkflowState;
 import ch.rodano.configuration.model.workflow.WorkflowableModel;
 import ch.rodano.configuration.utils.DisplayableUtils;
 
-public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableModel, PayableModel, Node, RightAssignable<ScopeModel> {
+public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableModel, Node, RightAssignable<ScopeModel> {
 	@Serial
 	private static final long serialVersionUID = -3652751984945692998L;
 

@@ -71,17 +71,4 @@ export class ScopeCriterionRight extends Node {
 			this.id = undefined;
 		}
 	}
-
-	onChangePaymentPlan(event) {
-		if(this.rightEntity === Entities.PaymentPlan.configuration_name && this.id && this.id === event.oldValue) {
-			this.id = event.newValue;
-		}
-	}
-	onDeletePaymentPlan(event) {
-		if(this.rightEntity === Entities.PaymentPlan.configuration_name && this.id === event.node.id) {
-			this.rightEntity = undefined;
-			this.right = undefined;
-			this.id = undefined;
-		}
-	}
 }

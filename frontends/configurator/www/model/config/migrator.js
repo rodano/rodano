@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 125;
+const CURRENT_VERSION = 126;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -241,6 +241,15 @@ const Migrations = {
 					profile.grantedFeatureIds = profile.grantedFeatureIds.filter(f => f !== 'MANAGE_DELETED_DATA');
 					profile.grantedFeatureIds.push('MANAGE_REMOVED_DATA');
 				}
+			});
+		}
+	},
+	migrate_125: {
+		description: 'Remove payment feature',
+		migration: function(config) {
+			delete config.paymentPlans;
+			config.profiles.forEach(profile => {
+				delete profile.grantedPaymentIdRights;
 			});
 		}
 	},

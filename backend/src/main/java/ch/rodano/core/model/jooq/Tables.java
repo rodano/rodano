@@ -16,9 +16,6 @@ import ch.rodano.core.model.jooq.tables.Form;
 import ch.rodano.core.model.jooq.tables.FormAudit;
 import ch.rodano.core.model.jooq.tables.Mail;
 import ch.rodano.core.model.jooq.tables.MailAttachment;
-import ch.rodano.core.model.jooq.tables.Payment;
-import ch.rodano.core.model.jooq.tables.PaymentBatch;
-import ch.rodano.core.model.jooq.tables.PaymentTarget;
 import ch.rodano.core.model.jooq.tables.Resource;
 import ch.rodano.core.model.jooq.tables.Robot;
 import ch.rodano.core.model.jooq.tables.RobotAudit;
@@ -100,21 +97,6 @@ public class Tables {
 	 * The table <code>mail_attachment</code>.
 	 */
 	public static final MailAttachment MAIL_ATTACHMENT = MailAttachment.MAIL_ATTACHMENT;
-
-	/**
-	 * The table <code>payment</code>.
-	 */
-	public static final Payment PAYMENT = Payment.PAYMENT;
-
-	/**
-	 * The table <code>payment_batch</code>.
-	 */
-	public static final PaymentBatch PAYMENT_BATCH = PaymentBatch.PAYMENT_BATCH;
-
-	/**
-	 * The table <code>payment_target</code>.
-	 */
-	public static final PaymentTarget PAYMENT_TARGET = PaymentTarget.PAYMENT_TARGET;
 
 	/**
 	 * The table <code>resource</code>.

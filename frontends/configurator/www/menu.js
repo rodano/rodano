@@ -273,7 +273,6 @@ export const Menu = {
 		document.getElementById('menu_advanced_download').addEventListener('click', () => Configuration.Download());
 		document.getElementById('menu_advanced_logs').addEventListener('click', () => Logs.OpenDialog());
 
-		document.getElementById('menu_wizards_payment').addEventListener('click', () => Wizards.Open('payment'));
 		document.getElementById('menu_wizards_validator').addEventListener('click', () => Wizards.Open('validator'));
 		document.getElementById('menu_wizards_form_model').addEventListener('click', () => Wizards.Open('form_model'));
 

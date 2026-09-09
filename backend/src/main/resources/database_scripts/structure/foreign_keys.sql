@@ -64,13 +64,6 @@ alter table workflow_status_audit
 	add constraint fk_workflow_status_audit_user_fk foreign key (audit_user_fk) references user (pk),
 	add constraint fk_workflow_status_audit_robot_fk foreign key (audit_robot_fk) references robot (pk);
 
-/* payment */
-alter table payment
-	add constraint fk_payment_payment_batch_fk foreign key (payment_batch_fk) references payment_batch (pk),
-	add constraint fk_payment_workflow_status_fk foreign key (workflow_status_fk) references workflow_status (pk);
-
-alter table payment_target add constraint fk_payment_target_payment_fk foreign key (payment_fk) references payment (pk);
-
 /* role */
 alter table role
 	add constraint fk_role_user_fk foreign key (user_fk) references user (pk),

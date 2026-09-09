@@ -20,9 +20,6 @@ import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.feature.Feature;
 import ch.rodano.configuration.model.language.Language;
 import ch.rodano.configuration.model.language.LanguageStatic;
-import ch.rodano.configuration.model.payment.PaymentDistribution;
-import ch.rodano.configuration.model.payment.PaymentPlan;
-import ch.rodano.configuration.model.payment.PaymentStep;
 import ch.rodano.configuration.model.profile.Profile;
 import ch.rodano.configuration.model.validator.Validator;
 import ch.rodano.configuration.utils.DisplayableUtils;
@@ -268,55 +265,5 @@ public class StudyTest {
 		assertEquals("", validator.getLocalizedShortname("TOTO"));
 	}
 
-	@Test
-	@DisplayName("Check payment plan")
-	public void checkPaymentPlan() {
-		//Create study
-		final var study = StudyBuilder.buildStudy().getStudy();
-
-		//create plan
-		final var plan = new PaymentPlan();
-		plan.setId("PLAN1");
-		assertEquals(0, plan.getSteps().size());
-
-		//add plan in study
-		plan.setStudy(study);
-		study.getPaymentPlans().add(plan);
-		assertEquals(1, study.getPaymentPlans().size());
-
-		assertNotNull(study.getPaymentPlan("PLAN1"));
-		try {
-			study.getPaymentPlan("DUMMY_PLAN");
-			fail("Found non existent plan DUMMY_PLAN");
-		}
-		catch(final Exception e) {
-			//success
-		}
-
-		final var step1 = new PaymentStep();
-		step1.setId("STEP1");
-		step1.setPaymentPlan(plan);
-
-		plan.getSteps().add(step1);
-
-		assertEquals("STEP1", plan.getStepFromId("STEP1").getId());
-		try {
-			assertEquals("STEP2", plan.getStepFromId("STEP2").getId());
-			fail("Step does not exist");
-		}
-		catch(final Exception e) {
-			//success
-		}
-
-		plan.setWorkflow("DE_VISIT");
-		plan.getStepFromId("STEP1").setWorkflowable("BASELINE");
-		plan.setCurrency("EUR");
-
-		final var distribution = new PaymentDistribution();
-		distribution.setScopeModelId("Center");
-		distribution.setStep(step1);
-
-		plan.getStepFromId("STEP1").getDistributions().add(distribution);
-	}
 }
 

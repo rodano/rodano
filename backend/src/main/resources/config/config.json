@@ -25,8 +25,9 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 125,
-	"configDate": 1785853373960,
+	"configVersion": 126,
+	"configDate": 1788939798808,
+	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
 		"en",
@@ -2809,754 +2810,6 @@
 		}
 	],
 	"datasetModels": [
-		{
-			"id": "DATA_MANAGEMENT_PAYMENT",
-			"shortname": {
-				"en": "Data management payment"
-			},
-			"longname": {},
-			"description": {},
-			"multiple": false,
-			"meaningfulFieldModelIds": [],
-			"master": false,
-			"exportable": true,
-			"exportOrder": 80,
-			"deleteRules": [],
-			"restoreRules": [],
-			"fieldModels": [
-				{
-					"id": "IBAN_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "IBAN Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 0,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "SWIFT_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "SWIFT Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 5,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "ACCOUNT_NO_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "Account No. Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 10,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "SPEC_INSTR_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "Special Instruction Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "TEXTAREA",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 15,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "BIC_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "BIC Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 20,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "IBAN_DATAMANAGER",
-					"shortname": {
-						"en": "IBAN Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 25,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "SWIFT_DATAMANAGER",
-					"shortname": {
-						"en": "SWIFT Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 30,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "ACCOUNT_NO_DATAMANAGER",
-					"shortname": {
-						"en": "Account No. Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 35,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "SPEC_INSTR_DATAMANAGER",
-					"shortname": {
-						"en": "Special Instruction Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "TEXTAREA",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 40,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "BIC_DATAMANAGER",
-					"shortname": {
-						"en": "BIC Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "STRING",
-					"dataType": "STRING",
-					"plugin": false,
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 45,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "CURRENCY",
-					"shortname": {
-						"en": "Currency",
-						"fr": "Monnaie"
-					},
-					"longname": {},
-					"description": {},
-					"type": "SELECT",
-					"dataType": "STRING",
-					"plugin": false,
-					"valueFormula": "CHF",
-					"possibleValues": [
-						{
-							"id": "EUR",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "USD",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "AUD",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "CAD",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "CHF",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "GBP",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "JPY",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "NOK",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "NZD",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						},
-						{
-							"id": "ZAR",
-							"shortname": {},
-							"specify": false,
-							"className": "PossibleValue"
-						}
-					],
-					"validatorIds": [
-						"REQUIRED_WITH_QUERY"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 50,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "VAT",
-					"shortname": {
-						"en": "VAT",
-						"fr": "TVA"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "STRING",
-					"plugin": false,
-					"valueFormula": "0.00",
-					"possibleValues": [],
-					"validatorIds": [],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 55,
-					"maxLength": 3,
-					"maxIntegerDigits": 1,
-					"maxDecimalDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "PAYMENT_VISIT_6_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "Payment visit 6 Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
-					"plugin": false,
-					"valueFormula": "20",
-					"possibleValues": [],
-					"validatorIds": [
-						"REQUIRED"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 60,
-					"maxLength": 10,
-					"maxIntegerDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "PAYMENT_VISIT_6_DATAMANAGER",
-					"shortname": {
-						"en": "Payment visit 6 Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
-					"plugin": false,
-					"valueFormula": "5",
-					"possibleValues": [],
-					"validatorIds": [
-						"REQUIRED"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 65,
-					"maxLength": 10,
-					"maxIntegerDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "PAYMENT_VISIT_12_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "Payment visit 12 Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
-					"plugin": false,
-					"valueFormula": "20",
-					"possibleValues": [],
-					"validatorIds": [
-						"REQUIRED"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 70,
-					"maxLength": 10,
-					"maxIntegerDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "PAYMENT_VISIT_18_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "Payment visit 18 Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
-					"plugin": false,
-					"valueFormula": "20",
-					"possibleValues": [],
-					"validatorIds": [
-						"REQUIRED"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 75,
-					"maxLength": 10,
-					"maxIntegerDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "PAYMENT_TERMINATION_VISIT_PRINCIPAL_INVESTIGATOR",
-					"shortname": {
-						"en": "Payment termination visit Principal Investigator"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
-					"plugin": false,
-					"valueFormula": "20",
-					"possibleValues": [],
-					"validatorIds": [
-						"REQUIRED"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 80,
-					"maxLength": 10,
-					"maxIntegerDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				},
-				{
-					"id": "PAYMENT_TERMINATION_VISIT_DATAMANAGER",
-					"shortname": {
-						"en": "Payment termination visit Data Manager"
-					},
-					"longname": {},
-					"description": {},
-					"type": "NUMBER",
-					"dataType": "NUMBER",
-					"plugin": false,
-					"valueFormula": "5",
-					"possibleValues": [],
-					"validatorIds": [
-						"REQUIRED"
-					],
-					"workflowIds": [],
-					"rules": [],
-					"searchable": false,
-					"readOnly": false,
-					"exportable": true,
-					"allowDateInFuture": false,
-					"exportOrder": 85,
-					"maxLength": 10,
-					"maxIntegerDigits": 2,
-					"matcherMessage": {},
-					"withYears": false,
-					"withMonths": false,
-					"withDays": false,
-					"withHours": false,
-					"withMinutes": false,
-					"withSeconds": false,
-					"yearsMandatory": false,
-					"monthsMandatory": false,
-					"daysMandatory": false,
-					"hoursMandatory": true,
-					"minutesMandatory": true,
-					"secondsMandatory": true,
-					"advancedHelp": {},
-					"className": "FieldModel"
-				}
-			],
-			"className": "DatasetModel"
-		},
 		{
 			"id": "ADDRESS",
 			"shortname": {
@@ -14227,365 +13480,6 @@
 			"className": "FormModel"
 		},
 		{
-			"id": "DATA_MANAGEMENT_PAYMENT_PAGE",
-			"shortname": {
-				"en": "Data management payment"
-			},
-			"longname": {},
-			"description": {},
-			"layouts": [
-				{
-					"id": "DATA_MANAGEMENT_PAYMENT_MAIN_LAYOUT",
-					"description": {
-						"en": "Data management payment main layout"
-					},
-					"type": "SINGLE",
-					"textBefore": {},
-					"textAfter": {},
-					"columns": [
-						{
-							"cssCode": "width: 690px;",
-							"className": "Column"
-						}
-					],
-					"lines": [
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_IBAN_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "IBAN_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_SWIFT_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "SWIFT_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_ACCOUNT_NO_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "ACCOUNT_NO_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_SPEC_INSTR_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "SPEC_INSTR_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_BIC_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "BIC_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_IBAN_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "IBAN_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_SWIFT_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "SWIFT_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_ACCOUNT_NO_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "ACCOUNT_NO_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_SPEC_INSTR_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "SPEC_INSTR_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_BIC_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "BIC_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_CURRENCY",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "CURRENCY",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_VAT",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "VAT",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_PAYMENT_VISIT_6_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "PAYMENT_VISIT_6_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_PAYMENT_VISIT_6_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "PAYMENT_VISIT_6_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DM_PAYMENT_PAYMENT_VISIT_12_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "PAYMENT_VISIT_12_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DM_PAYMENT_PAYMENT_VISIT_18_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "PAYMENT_VISIT_18_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DM_PAYMENT_PAYMENT_TERMINATION_VISIT_PRINCIPAL_INVESTIGATOR",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "PAYMENT_TERMINATION_VISIT_PRINCIPAL_INVESTIGATOR",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						},
-						{
-							"cells": [
-								{
-									"id": "DATA_MANAGEMENT_PAYMENT_PAYMENT_TERMINATION_VISIT_DATAMANAGER",
-									"datasetModelId": "DATA_MANAGEMENT_PAYMENT",
-									"fieldModelId": "PAYMENT_TERMINATION_VISIT_DATAMANAGER",
-									"textBefore": {},
-									"textAfter": {},
-									"visibilityCriteria": [],
-									"cssCodeForLabel": "width: 305px;",
-									"displayLabel": true,
-									"displayPossibleValueLabels": true,
-									"colspan": 1,
-									"className": "Cell"
-								}
-							],
-							"className": "Line"
-						}
-					],
-					"className": "Layout"
-				}
-			],
-			"workflowIds": [
-				"FORM_REPORTING"
-			],
-			"rules": [],
-			"optional": false,
-			"printButtonLabel": {},
-			"className": "FormModel"
-		},
-		{
 			"id": "RELAPSES",
 			"shortname": {
 				"en": "Relapses"
@@ -21861,10 +20755,6 @@
 					"READ",
 					"WRITE"
 				],
-				"DATA_MANAGEMENT_PAYMENT": [
-					"WRITE",
-					"READ"
-				],
 				"RELAPSES_GRID": [
 					"READ",
 					"WRITE"
@@ -21956,12 +20846,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {
-				"DATA_MANAGEMENT_PAYMENT": [
-					"WRITE",
-					"READ"
-				]
-			},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ",
@@ -22022,10 +20906,6 @@
 					"WRITE"
 				],
 				"RELAPSES": [
-					"READ",
-					"WRITE"
-				],
-				"DATA_MANAGEMENT_PAYMENT_PAGE": [
 					"READ",
 					"WRITE"
 				],
@@ -22274,7 +21154,6 @@
 				"STUDY_ENTRY": [
 					"READ"
 				],
-				"DATA_MANAGEMENT_PAYMENT": [],
 				"STUDY_INFORMATION": [
 					"READ"
 				],
@@ -22304,7 +21183,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ"
@@ -22516,10 +21394,6 @@
 					"READ",
 					"WRITE"
 				],
-				"DATA_MANAGEMENT_PAYMENT": [
-					"WRITE",
-					"READ"
-				],
 				"EQ5D": [
 					"READ"
 				],
@@ -22555,12 +21429,6 @@
 					"READ"
 				],
 				"COHORT": [
-					"READ"
-				]
-			},
-			"grantedPaymentIdRights": {
-				"DATA_MANAGEMENT_PAYMENT": [
-					"WRITE",
 					"READ"
 				]
 			},
@@ -22730,7 +21598,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ",
@@ -22818,7 +21685,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ",
@@ -22917,7 +21783,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ",
@@ -23061,9 +21926,6 @@
 				"VEHICLE": [
 					"READ"
 				],
-				"DATA_MANAGEMENT_PAYMENT": [
-					"READ"
-				],
 				"EQ5D": [
 					"READ"
 				],
@@ -23101,9 +21963,6 @@
 				"COHORT": [
 					"READ"
 				]
-			},
-			"grantedPaymentIdRights": {
-				"DATA_MANAGEMENT_PAYMENT": []
 			},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
@@ -23151,9 +22010,6 @@
 					"READ"
 				],
 				"RELAPSES": [
-					"READ"
-				],
-				"DATA_MANAGEMENT_PAYMENT_PAGE": [
 					"READ"
 				],
 				"SF_36_B": [
@@ -23373,7 +22229,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ",
@@ -23613,7 +22468,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ",
@@ -23828,10 +22682,6 @@
 				"EARLY_TERMINATION": [
 					"READ"
 				],
-				"DATA_MANAGEMENT_PAYMENT": [
-					"WRITE",
-					"READ"
-				],
 				"STUDY_ENTRY": [
 					"READ"
 				],
@@ -23866,7 +22716,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ"
@@ -23938,9 +22787,6 @@
 					"WRITE"
 				],
 				"SF_36_FULL_PAGE": [
-					"READ"
-				],
-				"DATA_MANAGEMENT_PAYMENT_PAGE": [
 					"READ"
 				],
 				"DMT_REMINDER": [
@@ -24030,7 +22876,6 @@
 					"WRITE"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"WRITE",
@@ -24187,7 +23032,6 @@
 					"READ"
 				]
 			},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {
 				"BASELINE": [
 					"READ"
@@ -24304,7 +23148,6 @@
 			"grantedProfileIdRights": {},
 			"grantedDatasetModelIdRights": {},
 			"grantedScopeModelIdRights": {},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {},
 			"grantedFormModelIdRights": {},
 			"grantedWorkflowIds": {
@@ -24330,7 +23173,6 @@
 			"grantedProfileIdRights": {},
 			"grantedDatasetModelIdRights": {},
 			"grantedScopeModelIdRights": {},
-			"grantedPaymentIdRights": {},
 			"grantedEventModelIdRights": {},
 			"grantedFormModelIdRights": {},
 			"grantedWorkflowIds": {
@@ -24356,112 +23198,6 @@
 			"description": {},
 			"optional": false,
 			"className": "Feature"
-		}
-	],
-	"paymentPlans": [
-		{
-			"id": "DATA_MANAGEMENT_PAYMENT",
-			"shortname": {
-				"en": "Data management payment"
-			},
-			"longname": {},
-			"description": {},
-			"currency": "CHF",
-			"invoicedScopeModel": "CENTER",
-			"workflow": "DATA_MANAGEMENT_STATUS",
-			"allowBatchMerger": false,
-			"steps": [
-				{
-					"id": "PAYMENT_VISIT_6",
-					"shortname": {
-						"en": "Payment visit 6"
-					},
-					"longname": {},
-					"description": {},
-					"repeatable": false,
-					"workflowable": "VISIT_6",
-					"distributions": [
-						{
-							"scopeModelId": "CENTER",
-							"profileId": "PRINCIPAL_INVESTIGATOR",
-							"value": 20,
-							"className": "PaymentDistribution"
-						},
-						{
-							"scopeModelId": "STUDY",
-							"profileId": "DATAMANAGER",
-							"value": 5,
-							"className": "PaymentDistribution"
-						}
-					],
-					"className": "PaymentStep"
-				},
-				{
-					"id": "PAYMENT_VISIT_12",
-					"shortname": {
-						"en": "Payment visit 12"
-					},
-					"longname": {},
-					"description": {},
-					"repeatable": false,
-					"workflowable": "VISIT_12",
-					"distributions": [
-						{
-							"scopeModelId": "CENTER",
-							"profileId": "PRINCIPAL_INVESTIGATOR",
-							"value": 20,
-							"className": "PaymentDistribution"
-						}
-					],
-					"className": "PaymentStep"
-				},
-				{
-					"id": "PAYMENT_VISIT_18",
-					"shortname": {
-						"en": "Payment visit 18"
-					},
-					"longname": {},
-					"description": {},
-					"repeatable": false,
-					"workflowable": "VISIT_18",
-					"distributions": [
-						{
-							"scopeModelId": "CENTER",
-							"profileId": "PRINCIPAL_INVESTIGATOR",
-							"value": 20,
-							"className": "PaymentDistribution"
-						}
-					],
-					"className": "PaymentStep"
-				},
-				{
-					"id": "PAYMENT_TERMINATION_VISIT",
-					"shortname": {
-						"en": "Payment termination visit"
-					},
-					"longname": {},
-					"description": {},
-					"repeatable": false,
-					"workflowable": "TERMINATION_VISIT",
-					"distributions": [
-						{
-							"scopeModelId": "CENTER",
-							"profileId": "PRINCIPAL_INVESTIGATOR",
-							"value": 20,
-							"className": "PaymentDistribution"
-						},
-						{
-							"scopeModelId": "STUDY",
-							"profileId": "DATAMANAGER",
-							"value": 5,
-							"className": "PaymentDistribution"
-						}
-					],
-					"className": "PaymentStep"
-				}
-			],
-			"extendedSteps": false,
-			"className": "PaymentPlan"
 		}
 	],
 	"menus": [
@@ -24498,7 +23234,9 @@
 			"action": {
 				"labels": {},
 				"page": "scopes-search",
-				"context": ["PATIENT"],
+				"context": [
+					"PATIENT"
+				],
 				"parameters": {},
 				"className": "CMSAction"
 			},
