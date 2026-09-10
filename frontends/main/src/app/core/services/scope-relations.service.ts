@@ -1,12 +1,12 @@
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
-import {Scope} from '../model/scope';
 import {ScopeRelationCreation} from '../model/scope-relation-creation';
 import {ScopeRelation} from '../model/scope-relation';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {APIService} from './api.service';
-import {Rights} from '../model/rights';
+import {Rights} from '@core/model/rights';
+import {Scope} from '@core/model/scope';
 
 @Service()
 export class ScopeRelationsService {
@@ -64,17 +64,5 @@ export class ScopeRelationsService {
 			.set('right', right)
 			.set('onlyDefault', onlyDefault);
 		return this.http.get<Scope[]>(`${this.serviceUrl}/relations/available-parents`, {params});
-	}
-
-	@reviveDates
-	getDefaultParentScope(scopePk: number): Observable<Scope> {
-		return this.http.get<Scope>(`${this.serviceUrl}/${scopePk}/parents/default`);
-	}
-
-	@reviveDates
-	getAncestors(scopePk: number, onlyDefault = true): Observable<Scope[]> {
-		const params = new HttpParams()
-			.set('onlyDefault', onlyDefault);
-		return this.http.get<Scope[]>(`${this.serviceUrl}/${scopePk}/ancestors`, {params});
 	}
 }

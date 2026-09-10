@@ -37,7 +37,6 @@ import ch.rodano.api.config.EventModelDTO;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.dto.RationaleDTO;
 import ch.rodano.api.dto.paging.PagedResult;
-import ch.rodano.api.exception.http.BadArgumentException;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.configuration.model.export.ExportFormat;
 import ch.rodano.configuration.model.feature.FeatureStatic;
@@ -53,7 +52,6 @@ import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.scope.ScopeRelationService;
 import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
-import ch.rodano.core.services.bll.study.SubstudyService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.utils.RightsService;
 import ch.rodano.core.utils.UtilsService;
@@ -64,7 +62,6 @@ import ch.rodano.core.utils.UtilsService;
 @Validated
 @Transactional(readOnly = true)
 public class ScopeController extends AbstractSecuredController {
-	private final SubstudyService substudyService;
 	private final ScopeService scopeService;
 	private final ScopeExportService scopeExportService;
 	private final ScopeDTOService scopeDTOService;
@@ -82,7 +79,6 @@ public class ScopeController extends AbstractSecuredController {
 		final ActorService actorService,
 		final RoleService roleService,
 		final RightsService rightsService,
-		final SubstudyService substudyService,
 		final ScopeService scopeService,
 		final ScopeExportService scopeExportService,
 		final ScopeDTOService scopeDTOService,
@@ -94,7 +90,6 @@ public class ScopeController extends AbstractSecuredController {
 		@Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
-		this.substudyService = substudyService;
 		this.scopeService = scopeService;
 		this.scopeExportService = scopeExportService;
 		this.scopeDTOService = scopeDTOService;
@@ -341,74 +336,6 @@ public class ScopeController extends AbstractSecuredController {
 		return scopeDTOService.createDTO(scope, acl);
 	}
 
-	@Operation(summary = "Enroll all scopes", description = "Enroll all scopes in a substudy")
-	@PostMapping("{scopePk}/enrollment/enroll")
-	@ResponseStatus(HttpStatus.CREATED)
-	@Transactional
-	public void autoEnroll(
-		@PathVariable("scopePk") final Long scopePk
-	) {
-		final var scope = scopeDAOService.getScopeByPk(scopePk);
-
-		utilsService.checkNotNull(Scope.class, scope, scopePk);
-
-		//check rights
-		final var acl = rightsService.getACL(currentActor(), scope);
-		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
-
-		substudyService.enrollScopesInSubstudy(scope, currentContext(), "Perform automatic enrollment");
-	}
-
-	@Operation(summary = "Unenroll all scopes", description = "Unenroll all scopes from a substudy")
-	@PostMapping("{scopePk}/enrollment/unenroll")
-	@ResponseStatus(HttpStatus.CREATED)
-	@Transactional
-	public void cleanEnroll(
-		@PathVariable("scopePk") final Long scopePk
-	) {
-		final var scope = scopeDAOService.getScopeByPk(scopePk);
-
-		utilsService.checkNotNull(Scope.class, scope, scopePk);
-
-		//check rights
-		final var acl = rightsService.getACL(currentActor(), scope);
-		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
-
-		for(final var relation : scopeRelationService.getChildRelations(scope)) {
-			scopeRelationService.endRelation(relation, ZonedDateTime.now(), currentContext(), "Clean enrollment");
-		}
-	}
-
-	@Operation(summary = "Count enroll-able scopes")
-	@PostMapping("{scopePk}/enrollment/count")
-	@ResponseStatus(HttpStatus.OK)
-	public Integer countEnrollableScopes(
-		@PathVariable("scopePk") final Long scopePk,
-		@RequestBody final List<@Valid FieldModelCriterion> criteria
-	) {
-		final var scope = scopeDAOService.getScopeByPk(scopePk);
-
-		utilsService.checkNotNull(Scope.class, scope, scopePk);
-
-		//only virtual scope can have an enrollment
-		if(!scope.getScopeModel().isVirtual()) {
-			throw new BadArgumentException("Cannot count enrollment for non virtual scope");
-		}
-
-		for(final var criterion : criteria) {
-			if(!criterion.isValid() || !criterion.hasValidValue(studyService.getStudy())) {
-				throw new BadArgumentException(String.format("The following enrollment criterion is invalid: %s", criterion));
-			}
-		}
-
-		//check rights
-		final var acl = rightsService.getACL(currentActor(), scope);
-		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
-
-		final var targetScopeModel = scope.getScopeModel().getDescendantsScopeModel().getFirst();
-		return substudyService.findPotentialScopes(Collections.singleton(scopeService.getRootScope()), targetScopeModel, criteria).size();
-	}
-
 	@Operation(summary = "Lock scope")
 	@PutMapping("{scopePk}/lock")
 	@ResponseStatus(HttpStatus.OK)
@@ -472,9 +399,50 @@ public class ScopeController extends AbstractSecuredController {
 			.toList();
 	}
 
+	@Operation(summary = "Get default parent scope")
+	@GetMapping("{scopePk}/default-parent")
+	@ResponseStatus(HttpStatus.OK)
+	public ScopeDTO getDefaultParentScope(
+		@PathVariable("scopePk") final Long scopePk
+	) {
+		final var scope = scopeDAOService.getScopeByPk(scopePk);
+		utilsService.checkNotNull(Scope.class, scope, scopePk);
+
+		if(scopeService.isRootScope(scope)) {
+			return null;
+		}
+
+		final var parentScope = scopeRelationService.getDefaultParent(scope);
+		final var acl = rightsService.getACL(currentActor(), parentScope);
+
+		return scopeDTOService.createDTO(parentScope, acl);
+	}
+
+	@Operation(summary = "Get ancestor scopes", description = "Get all the scopes that are above in the scopes hierarchy")
+	@GetMapping("{scopePk}/ancestors")
+	@ResponseStatus(HttpStatus.OK)
+	public List<ScopeDTO> getScopeAncestors(
+		@PathVariable("scopePk") final Long scopePk,
+		@RequestParam(value = "onlyDefault", defaultValue = "false") final Boolean onlyDefault
+	) {
+		final var scope = scopeDAOService.getScopeByPk(scopePk);
+		utilsService.checkNotNull(Scope.class, scope, scopePk);
+
+		final var acl = rightsService.getACL(currentActor(), scope);
+		acl.checkRight(scope.getScopeModel(), Rights.READ);
+
+		final List<Scope> ancestors;
+		if(onlyDefault) {
+			ancestors = scopeRelationService.getDefaultAncestors(scope);
+		}
+		else {
+			ancestors = scopeRelationService.getAncestors(scope);
+		}
+		return scopeDTOService.createDTOs(ancestors, acl);
+	}
+
 	private <T> T readFromURI(final String input, final JavaType type) {
 		final var string = UriUtils.decode(input, "UTF-8");
 		return mapper.readValue(string, type);
 	}
 }
-

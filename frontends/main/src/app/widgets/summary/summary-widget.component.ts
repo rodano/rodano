@@ -15,7 +15,6 @@ import {ConfigurationService} from '@core/services/configuration.service';
 import {ScopeModel} from '@core/model/scope-model';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
-import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {MatProgressBar} from '@angular/material/progress-bar';
 import {ScopeBreadcrumbComponent} from '../../scope/breadcrumb/scope-breadcrumb.component';
@@ -27,6 +26,7 @@ import {Summary} from '@core/model/summary';
 import {MatDivider} from '@angular/material/divider';
 import {MatTooltip} from '@angular/material/tooltip';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ScopeService} from '@core/services/scope.service';
 
 @Component({
 	templateUrl: './summary-widget.component.html',
@@ -77,7 +77,7 @@ export abstract class SummaryWidgetComponent implements OnInit {
 
 	constructor(
 		private configurationService: ConfigurationService,
-		private scopeRelationService: ScopeRelationsService,
+		private scopeService: ScopeService,
 		protected widgetService: WidgetService,
 		private destroyRef: DestroyRef
 	) {}
@@ -108,7 +108,7 @@ export abstract class SummaryWidgetComponent implements OnInit {
 					this.buttons.set(this.getButtons(rootScopePk));
 					return forkJoin({
 						data: of(data),
-						ancestors: this.scopeRelationService.getAncestors(rootScopePk)
+						ancestors: this.scopeService.getAncestors(rootScopePk)
 					});
 				})
 			).subscribe(({data, ancestors}) => {

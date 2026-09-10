@@ -33,6 +33,7 @@ import {LowerCasePipe} from '@angular/common';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
 import {DateTimeUTCPipe} from '../../pipes/date-time-utc.pipe';
 import {SCOPE_TOKEN} from '../home/scope.component';
+import {ScopeEnrollmentService} from '@core/services/scope-enrollment.service';
 
 @Component({
 	selector: 'app-scope-enrollment',
@@ -85,6 +86,7 @@ export class ScopeEnrollmentComponent {
 	constructor(
 		private configurationService: ConfigurationService,
 		private scopeService: ScopeService,
+		private scopeEnrollmentService: ScopeEnrollmentService,
 		private meService: MeService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
@@ -122,7 +124,7 @@ export class ScopeEnrollmentComponent {
 				}
 
 				const criteria = this.generateCriteria();
-				return this.scopeService.countEnrollable(this.scope().pk, criteria).pipe(
+				return this.scopeEnrollmentService.countEnrollable(this.scope().pk, criteria).pipe(
 					catchError(() => of(undefined))
 				);
 			})
@@ -239,7 +241,7 @@ export class ScopeEnrollmentComponent {
 	}
 
 	enroll() {
-		this.scopeService.enroll(this.scope().pk).subscribe(
+		this.scopeEnrollmentService.enroll(this.scope().pk).subscribe(
 			{
 				next: () => {
 					this.notificationService.showSuccess('All scopes enrolled successfully');
@@ -254,7 +256,7 @@ export class ScopeEnrollmentComponent {
 	}
 
 	unenroll() {
-		this.scopeService.unenroll(this.scope().pk).subscribe({
+		this.scopeEnrollmentService.unenroll(this.scope().pk).subscribe({
 			next: () => {
 				this.notificationService.showSuccess('All scopes unenrolled successfully');
 				this.loadChildScopes();

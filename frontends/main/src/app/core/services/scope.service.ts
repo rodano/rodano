@@ -10,7 +10,6 @@ import {TimelineGraphData} from '../model/timeline-graph-data';
 import {EventModel} from '../model/event-model';
 import {ScopeCandidate} from '../model/scope-candidate';
 import {reviveDates} from '../decorators/revive-dates.decorator';
-import {FieldModelCriterion} from '@core/model/field-model-criterion';
 import {PagedResultExtendedScopeSearchResult} from '@core/model/paged-result-extended-scope-search-result';
 
 @Service()
@@ -90,23 +89,23 @@ export class ScopeService {
 		return this.http.put<Scope>(`${this.serviceUrl}/${scopePk}/unlock`, {});
 	}
 
-	enroll(scopePk: number): Observable<void> {
-		return this.http.post<void>(`${this.serviceUrl}/${scopePk}/enrollment/enroll`, {});
-	}
-
-	unenroll(scopePk: number): Observable<void> {
-		return this.http.post<void>(`${this.serviceUrl}/${scopePk}/enrollment/unenroll`, {});
-	}
-
-	countEnrollable(scopePk: number, criteria: FieldModelCriterion[]): Observable<number> {
-		return this.http.post<number>(`${this.serviceUrl}/${scopePk}/enrollment/count`, criteria);
-	}
-
 	getTimelines(scopePk: number): Observable<TimelineGraphData[]> {
 		return this.http.get<TimelineGraphData[]>(`${this.serviceUrl}/${scopePk}/timelines`);
 	}
 
 	getAvailableEventModels(scopePk: number): Observable<EventModel[]> {
 		return this.http.get<EventModel[]>(`${this.serviceUrl}/${scopePk}/available-event-models`);
+	}
+
+	@reviveDates
+	getDefaultParent(scopePk: number): Observable<Scope> {
+		return this.http.get<Scope>(`${this.serviceUrl}/${scopePk}/default-parent`);
+	}
+
+	@reviveDates
+	getAncestors(scopePk: number, onlyDefault = true): Observable<Scope[]> {
+		const params = new HttpParams()
+			.set('onlyDefault', onlyDefault);
+		return this.http.get<Scope[]>(`${this.serviceUrl}/${scopePk}/ancestors`, {params});
 	}
 }
