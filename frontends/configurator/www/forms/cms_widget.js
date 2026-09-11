@@ -3,7 +3,7 @@ import '../basic-tools/extension.js';
 import {Config} from '../model_config.js';
 import {FormHelpers} from '../form_helpers.js';
 import {Router} from '../router.js';
-import {ScopeCriterionRight} from '../model/config/entities/scope_criterion_right.js';
+import {RequiredRight} from '../model/config/entities/required_right.js';
 import {RightAssignables} from '../model/config/entities_categories.js';
 
 function manage_right_entity() {
@@ -49,7 +49,7 @@ export default {
 
 		//add required right to widget
 		if(!widget.requiredRight) {
-			widget.requiredRight = new ScopeCriterionRight();
+			widget.requiredRight = new RequiredRight();
 		}
 
 		FormHelpers.FillSelect(document.getElementById('cms_widget_required_feature'), widget.section.layout.layoutable.getStudy().features, true);

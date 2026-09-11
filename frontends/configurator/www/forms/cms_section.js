@@ -1,7 +1,7 @@
 import {Config} from '../model_config.js';
 import {FormHelpers} from '../form_helpers.js';
 import {Router} from '../router.js';
-import {ScopeCriterionRight} from '../model/config/entities/scope_criterion_right.js';
+import {RequiredRight} from '../model/config/entities/required_right.js';
 import {RightAssignables} from '../model/config/entities_categories.js';
 
 function manage_right_entity(event) {
@@ -47,7 +47,7 @@ export default {
 
 		//add required right to section
 		if(!section.requiredRight) {
-			section.requiredRight = new ScopeCriterionRight();
+			section.requiredRight = new RequiredRight();
 		}
 
 		FormHelpers.FillSelect(document.getElementById('cms_section_required_feature'), section.layout.layoutable.getStudy().features, true);

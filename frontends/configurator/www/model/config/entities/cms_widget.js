@@ -12,7 +12,7 @@ export class CMSWidget extends Node {
 			parameters: {type: 'object'},
 			width: {type: 'string'},
 			requiredFeature: {type: 'string'},
-			requiredRight: {type: Entities.ScopeCriterionRight.name}
+			requiredRight: {type: Entities.RequiredRight.name}
 		};
 	}
 

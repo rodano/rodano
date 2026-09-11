@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 126;
+const CURRENT_VERSION = 127;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -253,6 +253,31 @@ const Migrations = {
 			});
 		}
 	},
+	migrate_126: {
+		description: 'Rename ScopeCriterionRight to RequiredRight',
+		migration: function(config) {
+			function migrate_menu(menu) {
+				if(menu.layout && menu.layout.sections) {
+					menu.layout.sections.forEach(section => {
+						if(section.requiredRight) {
+							section.requiredRight.className = 'RequiredRight';
+						}
+						section.widgets.forEach(widget => {
+							if(widget.requiredRight) {
+								widget.requiredRight.className = 'RequiredRight';
+							}
+						});
+					});
+				}
+			}
+			config.menus.forEach(menu => {
+				migrate_menu(menu);
+				menu.submenus.forEach(submenu => {
+					migrate_menu(submenu);
+				});
+			});
+		}
+	}
 };
 
 /*function migrate_layouts(config, section_migrator, widget_migrator) {

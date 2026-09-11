@@ -640,14 +640,14 @@ const Entities = Object.freeze({
 		comparison_structural: true
 	},
 	/**@type {Entity}*/
-	ScopeCriterionRight: {
-		name: 'ScopeCriterionRight',
+	RequiredRight: {
+		name: 'RequiredRight',
 		children: {},
 		relations: {},
-		id: 'scope_criterion_right',
-		label: 'Scope criterion right',
-		plural_label: 'Scope criterion rights',
-		configuration_name: 'SCOPE_CRITERION_RIGHT',
+		id: 'required_right',
+		label: 'Required right',
+		plural_label: 'Required rights',
+		configuration_name: 'REQUIRED_RIGHT',
 		comparison_structural: true
 	},
 

@@ -10,7 +10,7 @@ export class CMSSection extends Node {
 			id: {type: 'string'},
 			labels: {type: 'object'},
 			requiredFeature: {type: 'string'},
-			requiredRight: {type: Entities.ScopeCriterionRight.name},
+			requiredRight: {type: Entities.RequiredRight.name},
 			widgets: {type: 'array', subtype: Entities.CMSWidget.name}
 		};
 	}

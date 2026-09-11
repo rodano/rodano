@@ -24,8 +24,8 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 126,
-	"configDate": 1788939798808,
+	"configVersion": 127,
+	"configDate": 1789058391485,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -23265,7 +23265,7 @@
 								"parameters": {},
 								"width": "FULL",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							},
@@ -23277,7 +23277,7 @@
 								},
 								"width": "FULL",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							},
@@ -23295,7 +23295,7 @@
 								},
 								"width": "HALF",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							},
@@ -23307,7 +23307,7 @@
 								},
 								"width": "HALF",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							},
@@ -23318,7 +23318,7 @@
 								},
 								"width": "FULL",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							}
@@ -23334,7 +23334,7 @@
 							"rightEntity": "SCOPE_MODEL",
 							"right": "WRITE",
 							"id": "PATIENT",
-							"className": "ScopeCriterionRight"
+							"className": "RequiredRight"
 						},
 						"widgets": [
 							{
@@ -23357,7 +23357,7 @@
 							"rightEntity": "SCOPE_MODEL",
 							"right": "WRITE",
 							"id": "PATIENT",
-							"className": "ScopeCriterionRight"
+							"className": "RequiredRight"
 						},
 						"widgets": [
 							{
@@ -23370,7 +23370,7 @@
 									"rightEntity": "SCOPE_MODEL",
 									"right": "WRITE",
 									"id": "PATIENT",
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							}
@@ -23386,7 +23386,7 @@
 							"rightEntity": "SCOPE_MODEL",
 							"right": "WRITE",
 							"id": "PATIENT",
-							"className": "ScopeCriterionRight"
+							"className": "RequiredRight"
 						},
 						"widgets": [
 							{
@@ -23396,7 +23396,7 @@
 								},
 								"width": "FULL",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							}
@@ -23412,7 +23412,7 @@
 							"rightEntity": "SCOPE_MODEL",
 							"right": "READ",
 							"id": "PATIENT",
-							"className": "ScopeCriterionRight"
+							"className": "RequiredRight"
 						},
 						"widgets": [
 							{
@@ -23426,7 +23426,7 @@
 									"rightEntity": "SCOPE_MODEL",
 									"right": "READ",
 									"id": "PATIENT",
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							}
@@ -23440,7 +23440,7 @@
 						},
 						"requiredFeature": "REVIEW_VISIT",
 						"requiredRight": {
-							"className": "ScopeCriterionRight"
+							"className": "RequiredRight"
 						},
 						"widgets": [
 							{
@@ -23764,7 +23764,7 @@
 									"en": "Signature status"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -23809,7 +23809,7 @@
 									"en": "Query status"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -23822,7 +23822,7 @@
 											"rightEntity": "SCOPE_MODEL",
 											"right": "READ",
 											"id": "PATIENT",
-											"className": "ScopeCriterionRight"
+											"className": "RequiredRight"
 										},
 										"className": "CMSWidget"
 									}
@@ -23860,7 +23860,7 @@
 									"en": "Protocol deviation status"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -23873,7 +23873,7 @@
 											"rightEntity": "SCOPE_MODEL",
 											"right": "READ",
 											"id": "PATIENT",
-											"className": "ScopeCriterionRight"
+											"className": "RequiredRight"
 										},
 										"className": "CMSWidget"
 									}
@@ -23911,7 +23911,7 @@
 									"en": "Enrollment status"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -23924,7 +23924,7 @@
 											"rightEntity": "SCOPE_MODEL",
 											"right": "READ",
 											"id": "PATIENT",
-											"className": "ScopeCriterionRight"
+											"className": "RequiredRight"
 										},
 										"className": "CMSWidget"
 									},
@@ -23971,7 +23971,7 @@
 									"en": "Visit status"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -23981,7 +23981,7 @@
 										},
 										"width": "FULL",
 										"requiredRight": {
-											"className": "ScopeCriterionRight"
+											"className": "RequiredRight"
 										},
 										"className": "CMSWidget"
 									}
@@ -24019,7 +24019,7 @@
 									"en": "Statistics"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -24029,7 +24029,7 @@
 										},
 										"width": "FULL",
 										"requiredRight": {
-											"className": "ScopeCriterionRight"
+											"className": "RequiredRight"
 										},
 										"className": "CMSWidget"
 									},
@@ -24040,7 +24040,7 @@
 										},
 										"width": "FULL",
 										"requiredRight": {
-											"className": "ScopeCriterionRight"
+											"className": "RequiredRight"
 										},
 										"className": "CMSWidget"
 									}
@@ -24078,7 +24078,7 @@
 									"en": "Benchmarking"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -24139,7 +24139,7 @@
 									"en": "Lock summary"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -24184,7 +24184,7 @@
 									"en": "Data management status"
 								},
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"widgets": [
 									{
@@ -24230,7 +24230,7 @@
 						"id": "DOCUMENTS",
 						"labels": {},
 						"requiredRight": {
-							"className": "ScopeCriterionRight"
+							"className": "RequiredRight"
 						},
 						"widgets": [
 							{
@@ -24241,7 +24241,7 @@
 								},
 								"width": "FULL",
 								"requiredRight": {
-									"className": "ScopeCriterionRight"
+									"className": "RequiredRight"
 								},
 								"className": "CMSWidget"
 							},

@@ -44,7 +44,7 @@ import {CMSLayout} from './entities/cms_layout.js';
 import {CMSSection} from './entities/cms_section.js';
 import {CMSWidget} from './entities/cms_widget.js';
 import {CMSAction} from './entities/cms_action.js';
-import {ScopeCriterionRight} from './entities/scope_criterion_right.js';
+import {RequiredRight} from './entities/required_right.js';
 import {RuleDefinitionProperty} from './entities/rule_definition_property.js';
 import {RuleDefinitionAction} from './entities/rule_definition_action.js';
 import {RuleDefinitionActionParameter} from './entities/rule_definition_action_parameter.js';
@@ -157,7 +157,7 @@ export function create_config() {
 		CMSSection: CMSSection,
 		CMSWidget: CMSWidget,
 		CMSAction: CMSAction,
-		ScopeCriterionRight: ScopeCriterionRight,
+		RequiredRight: RequiredRight,
 
 		//rule
 		RuleDefinitionProperty: RuleDefinitionProperty,

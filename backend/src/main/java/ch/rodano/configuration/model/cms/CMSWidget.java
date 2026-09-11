@@ -27,7 +27,7 @@ public class CMSWidget implements Node, Comparable<CMSWidget> {
 
 	protected Map<String, Object> parameters;
 
-	protected ScopeCriterionRight requiredRight;
+	protected RequiredRight requiredRight;
 	protected String requiredFeature;
 
 	public CMSWidget() {
@@ -100,11 +100,11 @@ public class CMSWidget implements Node, Comparable<CMSWidget> {
 		this.requiredFeature = requiredFeature;
 	}
 
-	public final ScopeCriterionRight getRequiredRight() {
+	public final RequiredRight getRequiredRight() {
 		return requiredRight != null && requiredRight.isValid() ? requiredRight : null;
 	}
 
-	public final void setRequiredRight(final ScopeCriterionRight requiredRight) {
+	public final void setRequiredRight(final RequiredRight requiredRight) {
 		this.requiredRight = requiredRight;
 	}
 

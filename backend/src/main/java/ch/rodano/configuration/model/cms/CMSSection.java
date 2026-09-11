@@ -27,7 +27,7 @@ public class CMSSection implements Node, Comparable<CMSSection>, Cloneable {
 	protected Map<String, String> labels;
 
 	protected String requiredFeature;
-	protected ScopeCriterionRight requiredRight;
+	protected RequiredRight requiredRight;
 	protected List<String> requiredScopeIds;
 
 	protected List<CMSWidget> widgets;
@@ -80,11 +80,11 @@ public class CMSSection implements Node, Comparable<CMSSection>, Cloneable {
 		this.requiredFeature = requiredFeature;
 	}
 
-	public final ScopeCriterionRight getRequiredRight() {
+	public final RequiredRight getRequiredRight() {
 		return requiredRight;
 	}
 
-	public final void setRequiredRight(final ScopeCriterionRight requiredRight) {
+	public final void setRequiredRight(final RequiredRight requiredRight) {
 		this.requiredRight = requiredRight;
 	}
 

@@ -643,12 +643,12 @@ public enum Entity implements SuperDisplayable {
 			return shortname;
 		}
 	},
-	SCOPE_CRITERION_RIGHT {
+	REQUIRED_RIGHT {
 		@Override
 		public Map<String, String> getShortname() {
 			final Map<String, String> shortname = new HashMap<>();
-			shortname.put(LanguageStatic.en.getId(), "Scope criterion right");
-			shortname.put(LanguageStatic.fr.getId(), "Droit sur un critère de scope");
+			shortname.put(LanguageStatic.en.getId(), "Required right");
+			shortname.put(LanguageStatic.fr.getId(), "Droit requis");
 			return shortname;
 		}
 	},

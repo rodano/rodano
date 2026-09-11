@@ -2,7 +2,7 @@ import {Entities} from '../entities.js';
 import {EntitiesHooks} from '../entities_hooks.js';
 import {Node} from '../node.js';
 
-export class ScopeCriterionRight extends Node {
+export class RequiredRight extends Node {
 	static getProperties() {
 		return {
 			rightEntity: {type: 'string'},
