@@ -51,3 +51,32 @@ See the [backend documentation](backend/README.md) for advanced configuration of
 ## Deploy Rodano instances
 
 See the [dedicated documentation](ansible/README.md).
+
+## Releasing
+
+Releases follow a Git-flow process driven by the `release.py` script at the root of the repository. Pushing a version tag (`vX.Y.Z` or `vX.Y.Z-rcN`) triggers the CI workflows that create the GitHub release, deploy the documentation website, and publish the versioned Docker images.
+
+The version strings inside `backend/pom.xml` and the frontends' `package.json` files are kept in sync with the release, as they are authoritative for the published Maven and npm artifacts (the `package-lock.json` files are updated only to keep the root package version consistent).
+
+The script runs from a clean working tree and expects the standard `dev` and `main` branches to be up to date with `origin`. Each procedure prints a summary and asks for confirmation before making any change.
+
+```
+# 1. Cut the release branch (releases/vX.Y.Z) from dev and set the files to X.Y.Z-SNAPSHOT
+./release.py branch X.Y.Z
+
+# 2. (optional, repeatable) Publish a release candidate: bumps files to
+#    X.Y.Z-rc.N and pushes the tag vX.Y.Z-rcN (a CI prerelease)
+./release.py rc X.Y.Z
+
+# 3. Publish the final release: bumps files to X.Y.Z, merges the release
+#    branch into main, pushes the tag vX.Y.Z, back-merges main into dev and
+#    deletes the release branch
+./release.py release X.Y.Z
+
+# 4. (optional) Remove the release branch and RC tags for a version
+./release.py cleanup X.Y.Z
+```
+
+Useful flags:
+- `--dry-run`: run every check and print the commands without changing anything.
+- `--yes`: skip the interactive confirmation prompt.
