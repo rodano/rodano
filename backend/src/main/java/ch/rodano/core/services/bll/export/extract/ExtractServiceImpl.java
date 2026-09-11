@@ -9,7 +9,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -59,6 +62,18 @@ public class ExtractServiceImpl implements ExtractService {
 	}
 
 	@Override
+	public DataExtract getDataRows(final DatasetModel datasetModel, final Collection<Scope> scopes, final int maxRows) {
+		Assert.isTrue(maxRows > 0 && maxRows < Integer.MAX_VALUE, "A positive row limit must be provided");
+		final var records = getData(datasetModel, scopes, maxRows + 1);
+		final var truncated = records.size() > maxRows;
+		final var rows = records.stream()
+			.limit(maxRows)
+			.map(row -> toDataExtractRow(datasetModel, row))
+			.toList();
+		return new DataExtract(rows, truncated);
+	}
+
+	@Override
 	public void getDataExtract(
 		final OutputStream out,
 		final DatasetModel datasetModel,
@@ -66,8 +81,8 @@ public class ExtractServiceImpl implements ExtractService {
 		final Collection<Scope> scopes,
 		final boolean withModificationDates
 	) throws IOException {
-		Assert.notEmpty(scopes, "A non empty list of scopes must be provided");
 		final List<FieldModel> fieldModels = datasetModel.getFieldModelsExportables();
+		final var rows = getData(datasetModel, scopes, null);
 
 		//retrieve document scope model
 		final var scopeModels = datasetModel.getScopeModels();
@@ -75,77 +90,6 @@ public class ExtractServiceImpl implements ExtractService {
 		final Optional<ScopeModel> parentScopeModel = scopeModel.isRoot() ? Optional.empty() : Optional.of(scopeModel.getDefaultParent());
 
 		final var parentTable = SCOPE.as("parent");
-
-		final List<SelectFieldOrAsterisk> fields = new ArrayList<>();
-		fields.addAll(
-			List.of(
-				SCOPE.PK,
-				SCOPE.CODE,
-				parentTable.PK,
-				parentTable.CODE,
-				EVENT.PK,
-				EVENT.SCOPE_MODEL_ID,
-				EVENT.EVENT_MODEL_ID,
-				DATASET.PK
-			)
-		);
-
-		for(final var fieldModel : datasetModel.getFieldModelsExportables()) {
-			fields.add(DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(fieldModel.getId()));
-			fields.add(DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(String.format("%s_MD", fieldModel.getId())));
-		}
-
-		final List<Condition> conditions = new ArrayList<>();
-		conditions.add(DATASET.DATASET_MODEL_ID.eq(datasetModel.getId()));
-		conditions.add(DATASET.REMOVED.isFalse());
-		conditions.add(SCOPE.REMOVED.isFalse());
-
-		//add event conditions
-		if(!datasetModel.isScopeDocumentation()) {
-			conditions.add(EVENT.REMOVED.isFalse());
-			conditions.add(EVENT.DATE.isNotNull());
-		}
-
-		//add scope conditions
-		final var now = ZonedDateTime.now();
-		final List<Condition> scopeConditions = new ArrayList<>();
-		for(final var scope : scopes) {
-			scopeConditions.add(
-				SCOPE.PK.eq(scope.getPk()).or(
-					SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk())
-						.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
-						.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
-				)
-			);
-		}
-		conditions.add(DSL.or(scopeConditions));
-
-		final SelectOnConditionStep<Record> query;
-		if(datasetModel.isScopeDocumentation()) {
-			query = create.select(fields)
-				.from(FIELD)
-				.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
-				//this join allows to select columns of the event table even if they are all null
-				.leftJoin(EVENT).on(DATASET.EVENT_FK.eq(EVENT.PK))
-				.join(SCOPE).on(DATASET.SCOPE_FK.eq(SCOPE.PK));
-		}
-		else {
-			query = create.select(fields)
-				.from(FIELD)
-				.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
-				.join(EVENT).on(DATASET.EVENT_FK.eq(EVENT.PK))
-				.join(SCOPE).on(EVENT.SCOPE_FK.eq(SCOPE.PK));
-		}
-
-		//build query
-		query.leftJoin(SCOPE_ANCESTOR).on(SCOPE.PK.eq(SCOPE_ANCESTOR.SCOPE_FK))
-			.leftJoin(SCOPE_RELATION).on(SCOPE.PK.eq(SCOPE_RELATION.SCOPE_FK).and(SCOPE_RELATION.DEFAULT.isTrue()))
-			.leftJoin(parentTable).on(SCOPE_RELATION.PARENT_FK.eq(parentTable.PK))
-			.where(DSL.and(conditions))
-			.groupBy(DATASET.PK)
-			.orderBy(SCOPE.CODE, EVENT.DATE, DATASET.PK);
-
-		logger.debug(query.toString());
 
 		final var study = studyService.getStudy();
 
@@ -198,7 +142,7 @@ public class ExtractServiceImpl implements ExtractService {
 		}
 		writer.writeNext(csvHeader);
 
-		for(final org.jooq.Record row : query.fetch()) {
+		for(final org.jooq.Record row : rows) {
 			i = 0;
 			final var csvLine = new String[columnNumber];
 
@@ -236,6 +180,92 @@ public class ExtractServiceImpl implements ExtractService {
 
 		// Flush the writer to the OutputStream
 		writer.flush();
+	}
+
+	private List<Record> getData(final DatasetModel datasetModel, final Collection<Scope> scopes, final Integer maxRows) {
+		Assert.notEmpty(scopes, "A non empty list of scopes must be provided");
+		final var parentTable = SCOPE.as("parent");
+		final List<SelectFieldOrAsterisk> fields = new ArrayList<>();
+		fields.addAll(
+			List.of(
+				SCOPE.PK,
+				SCOPE.CODE,
+				parentTable.PK,
+				parentTable.CODE,
+				EVENT.PK,
+				EVENT.SCOPE_MODEL_ID,
+				EVENT.EVENT_MODEL_ID,
+				DATASET.PK
+			)
+		);
+
+		for(final var fieldModel : datasetModel.getFieldModelsExportables()) {
+			fields.add(DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(fieldModel.getId()));
+			fields.add(DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(String.format("%s_MD", fieldModel.getId())));
+		}
+
+		final List<Condition> conditions = new ArrayList<>();
+		conditions.add(DATASET.DATASET_MODEL_ID.eq(datasetModel.getId()));
+		conditions.add(DATASET.REMOVED.isFalse());
+		conditions.add(SCOPE.REMOVED.isFalse());
+		if(!datasetModel.isScopeDocumentation()) {
+			conditions.add(EVENT.REMOVED.isFalse());
+			conditions.add(EVENT.DATE.isNotNull());
+		}
+
+		final var now = ZonedDateTime.now();
+		final List<Condition> scopeConditions = new ArrayList<>();
+		for(final var scope : scopes) {
+			scopeConditions.add(
+				SCOPE.PK.eq(scope.getPk()).or(
+					SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk())
+						.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
+						.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
+				)
+			);
+		}
+		conditions.add(DSL.or(scopeConditions));
+
+		final SelectOnConditionStep<Record> query;
+		if(datasetModel.isScopeDocumentation()) {
+			query = create.select(fields)
+				.from(FIELD)
+				.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
+				.leftJoin(EVENT).on(DATASET.EVENT_FK.eq(EVENT.PK))
+				.join(SCOPE).on(DATASET.SCOPE_FK.eq(SCOPE.PK));
+		}
+		else {
+			query = create.select(fields)
+				.from(FIELD)
+				.join(DATASET).on(FIELD.DATASET_FK.eq(DATASET.PK))
+				.join(EVENT).on(DATASET.EVENT_FK.eq(EVENT.PK))
+				.join(SCOPE).on(EVENT.SCOPE_FK.eq(SCOPE.PK));
+		}
+
+		final var orderedQuery = query.leftJoin(SCOPE_ANCESTOR).on(SCOPE.PK.eq(SCOPE_ANCESTOR.SCOPE_FK))
+			.leftJoin(SCOPE_RELATION).on(SCOPE.PK.eq(SCOPE_RELATION.SCOPE_FK).and(SCOPE_RELATION.DEFAULT.isTrue()))
+			.leftJoin(parentTable).on(SCOPE_RELATION.PARENT_FK.eq(parentTable.PK))
+			.where(DSL.and(conditions))
+			.groupBy(DATASET.PK)
+			.orderBy(SCOPE.CODE, EVENT.DATE, DATASET.PK);
+
+		logger.debug(orderedQuery.toString());
+		return maxRows == null ? orderedQuery.fetch() : orderedQuery.limit(maxRows).fetch();
+	}
+
+	private DataExtractRow toDataExtractRow(final DatasetModel datasetModel, final Record row) {
+		final Map<String, String> values = new LinkedHashMap<>();
+		for(final var fieldModel : datasetModel.getFieldModelsExportables()) {
+			values.put(fieldModel.getId(), formatField(fieldModel, row));
+		}
+		return new DataExtractRow(
+			row.get(DATASET.PK),
+			row.get(SCOPE.PK),
+			row.get(SCOPE.CODE),
+			row.get(EVENT.PK),
+			row.get(EVENT.EVENT_MODEL_ID),
+			Collections.unmodifiableMap(values)
+		);
 	}
 
 	@Override

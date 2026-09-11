@@ -10,6 +10,15 @@ import ch.rodano.core.model.scope.Scope;
 
 public interface ExtractService {
 	/**
+	 * Retrieve a bounded structured extract for one dataset model.
+	 */
+	DataExtract getDataRows(
+		DatasetModel datasetModel,
+		Collection<Scope> scopes,
+		int maxRows
+	);
+
+	/**
 	 * Get the export info and write the export file to the given output stream in CSV format.
 	 *
 	 * @param out                   Output stream to which the file is written.

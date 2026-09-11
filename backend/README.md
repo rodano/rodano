@@ -34,6 +34,8 @@ mvn spring-boot:run -Dspring-boot.run.jvmArguments="-Drodano.config=/path/to/con
 
 On startup, the API automatically migrates the database to the latest version (see [Database migrations](#database-migrations)). If a migration fails, the startup is aborted to avoid running on a partially migrated database.
 
+The API also exposes a prototype MCP Streamable HTTP endpoint at `/mcp`. MCP requests use HTTP Basic authentication with the name and key of an active Rodano robot. The robot's roles determine which study models and data the MCP tools can read.
+
 ### Database
 
 This profile initializes a blank database with everything required to start the application:
