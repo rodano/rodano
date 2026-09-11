@@ -76,7 +76,7 @@ public class SecurityConfiguration {
 	}
 
 	@Bean
-	@Order(2)
+	@Order(3)
 	public SecurityFilterChain privateFilterChain(final HttpSecurity http) {
 		http
 			//disable cross site request forging protection

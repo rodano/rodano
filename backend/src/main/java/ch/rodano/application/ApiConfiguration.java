@@ -16,7 +16,7 @@ import ch.rodano.core.services.unitofwork.UnitOfWorkService;
 
 @Profile({ "api" })
 @Configuration
-@ComponentScan(basePackages = { "ch.rodano.core", "ch.rodano.api", "ch.rodano.studies" })
+@ComponentScan(basePackages = { "ch.rodano.core", "ch.rodano.api", "ch.rodano.mcp", "ch.rodano.studies" })
 public class ApiConfiguration implements InitializingBean {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
