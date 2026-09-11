@@ -1,11 +1,10 @@
 package ch.rodano.api.actor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
@@ -29,7 +28,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.api.scope.ScopeMiniDTO;
+import ch.rodano.configuration.model.cms.RequiredRight;
+import ch.rodano.configuration.model.common.Entity;
 import ch.rodano.configuration.model.feature.FeatureStatic;
+import ch.rodano.configuration.model.rights.RightAssignable;
+import ch.rodano.configuration.model.rights.Rights;
+import ch.rodano.configuration.model.scope.ScopeModel;
 import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.configuration.core.Environment;
 import ch.rodano.core.model.exception.UnauthorizedException;
@@ -109,32 +113,66 @@ public class MeController extends AbstractSecuredController {
 			.toList();
 	}
 
-	@Operation(summary = "Get all scopes on which the currently connected actor (yourself) has a right")
+	@Operation(summary = "Get scopes on which the currently connected actor (yourself) has a feature or a required right")
 	@GetMapping("scopes")
 	@ResponseStatus(HttpStatus.OK)
 	public List<ScopeMiniDTO> getScopes(
-		@Parameter(description = "Filter scope to a specific feature") @RequestParam("feature") final Optional<FeatureStatic> feature,
-		@Parameter(description = "Exclude leaf") @RequestParam("excludeLeaf") final boolean excludeLeaf,
-		@Parameter(description = "Exclude virtual") @RequestParam("excludeVirtual") final boolean excludeVirtual
+		@Parameter(description = "Feature ID the actor must have a right on") @RequestParam("feature") final Optional<FeatureStatic> feature,
+		@Parameter(description = "Entity on which the required right applies") @RequestParam("rightEntity") final Optional<Entity> rightEntity,
+		@Parameter(description = "Id of the entity of the actor must have a right on") @RequestParam("rightId") final Optional<String> rightId,
+		@Parameter(description = "Right the actor must have on the entity") @RequestParam("right") final Optional<Rights> right,
+		@Parameter(description = "Restrict the returned scopes to these scope models; if absent, all non-leaf scope models are considered") @RequestParam("scopeModelIds") final Optional<Collection<String>> scopeModelIds
 	) {
 		final var currentActor = currentActor();
+		final var currentRoles = currentActiveRoles();
 
-		final List<Scope> rootScopes = feature.map(f -> actorService.getRootScopes(currentActor, f)).orElseGet(() -> actorService.getRootScopes(currentActor));
+		final var study = studyService.getStudy();
 
-		// Retrieve interesting scope models
-		final var scopeModels = studyService.getStudy().getScopeModels()
-			.stream()
-			.filter(s -> !excludeLeaf || !s.isLeaf())
-			.filter(s -> !excludeVirtual || !s.isVirtual())
-			.collect(Collectors.toSet());
+		//find root scopes based on the required right or feature
+		List<Scope> rootScopes = new ArrayList<>();
+		if(rightEntity.isPresent() || rightId.isPresent() || right.isPresent()) {
+			final var requiredRight = new RequiredRight(
+				rightId.orElse(null),
+				right.orElse(null),
+				rightEntity.orElse(null)
+			);
+			if(!requiredRight.isValid()) {
+				throw new IllegalArgumentException("Invalid required right");
+			}
+			if(feature.isPresent()) {
+				throw new IllegalArgumentException("Cannot specify both a feature and a required right");
+			}
+			final var assignable = study.getChild(requiredRight.getRightEntity(), requiredRight.getId());
+			if(!(assignable instanceof RightAssignable)) {
+				throw new IllegalArgumentException("Assignable is not a RightAssignable");
+			}
 
-		final Set<Scope> scopes = new TreeSet<>(Scope.DEPTH_COMPARATOR);
-		for(final var rootScope : rootScopes) {
-			scopes.add(rootScope);
-			scopes.addAll(scopeService.getAll(scopeModels, Collections.singleton(rootScope)));
+			rootScopes = actorService.getRootScopes(currentActor, (RightAssignable<?>) assignable, requiredRight.getRight());
+		}
+		else if(feature.isPresent()) {
+			rootScopes = actorService.getRootScopes(currentActor, feature.get());
+		}
+		else {
+			rootScopes = actorService.getRootScopes(currentActor);
 		}
 
-		return scopes.stream()
+		//target scope models
+		Collection<ScopeModel> targetScopeModels = new ArrayList<>();
+
+		if(scopeModelIds.isPresent()) {
+			targetScopeModels = scopeModelIds.get().stream().map(study::getScopeModel).collect(Collectors.toSet());
+			targetScopeModels.forEach(s -> rightsService.checkRight(currentActor, currentRoles, s, Rights.READ));
+		}
+		else {
+			targetScopeModels = study.getScopeModels().stream()
+				.filter(s -> !s.isLeaf())
+				.filter(s -> rightsService.hasRight(currentRoles, s, Rights.READ))
+				.collect(Collectors.toSet());
+		}
+
+		//scope service returns root scopes as well as their descendants matching the configured target scope models
+		return scopeService.getAll(targetScopeModels, rootScopes).stream()
+			.sorted(Scope.DEPTH_COMPARATOR)
 			.map(ScopeMiniDTO::new)
 			.collect(Collectors.toList());
 	}

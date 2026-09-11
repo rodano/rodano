@@ -1,5 +1,5 @@
 import {Component, computed, DestroyRef, OnInit, input, signal} from '@angular/core';
-import {forkJoin} from 'rxjs';
+import {forkJoin, switchMap} from 'rxjs';
 import {PossibleValue} from '@core/model/possible-value';
 import {operatorByType} from '@core/enums/operator-by-type';
 import {ConfigurationService} from '@core/services/configuration.service';
@@ -21,6 +21,8 @@ import {ChartWidgetComponent} from '../widgets/chart/chart-widget.component';
 import {CMSLayout} from '@core/model/cms-layout';
 import {ScopeModel} from '@core/model/scope-model';
 import {LocalizeMapPipe} from '../pipes/localize-map.pipe';
+import {RightEntity} from '@core/enums/right-entity';
+import {Rights} from '@core/model/rights';
 
 @Component({
 	selector: 'app-benchmark',
@@ -53,7 +55,7 @@ export class BenchmarkComponent implements OnInit {
 	}) as FormGroup;
 
 	readonly scopeModels = signal<ScopeModel[]>([]);
-	readonly rootScopes = signal<ScopeMini[]>([]);
+	readonly parentScopes = signal<ScopeMini[]>([]);
 	readonly fieldModels = signal<FieldModel[]>([]);
 
 	//parameters sent to widgets
@@ -67,22 +69,26 @@ export class BenchmarkComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
-		forkJoin({
-			scopeModels: this.configurationService.getScopeModelsSorted(),
-			fieldModels: this.configurationService.getSearchableFieldModels(),
-			rootScopes: this.meService.getScopes(undefined, true, false)
-		}).pipe(
+		this.configurationService.getStudy().pipe(
+			switchMap(study => {
+				const leafScopeModel = study.leafScopeModel;
+				return forkJoin({
+					scopeModels: this.configurationService.getScopeModelsSorted(),
+					fieldModels: this.configurationService.getSearchableFieldModels(),
+					parentScopes: this.meService.getScopesForRequiredRight(RightEntity.SCOPE_MODEL, leafScopeModel.id, Rights.READ, [leafScopeModel.defaultParentId])
+				});
+			}),
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({scopeModels, fieldModels, rootScopes}) => {
+		).subscribe(({scopeModels, fieldModels, parentScopes}) => {
 			this.scopeModels.set(scopeModels);
 			this.fieldModels.set(fieldModels);
-			this.rootScopes.set(rootScopes);
+			this.parentScopes.set(parentScopes);
 			this.reset();
 		});
 	}
 
 	getScopes(modelId: string): ScopeMini[] {
-		return this.rootScopes().filter(s => s.modelId === modelId) ?? [];
+		return this.parentScopes().filter(s => s.modelId === modelId) ?? [];
 	}
 
 	getControl(i: number, j: number): FormControl {
@@ -127,7 +133,7 @@ export class BenchmarkComponent implements OnInit {
 
 	update() {
 		const scopes = (this.customizeForm.get('rootScopePks')?.value ?? []) as number[];
-		this.chartScopes.set(scopes.map(p => this.rootScopes().find(s => s.pk === p) as ScopeMini));
+		this.chartScopes.set(scopes.map(p => this.parentScopes().find(s => s.pk === p) as ScopeMini));
 
 		this.chartCriteria.set(this.criteria.controls.map((criterion: FormArray, index: number) => {
 			const fieldModel = this.getFieldModel(index);
@@ -142,7 +148,7 @@ export class BenchmarkComponent implements OnInit {
 
 	reset() {
 		this.customizeForm.reset();
-		this.customizeForm.get('rootScopePks')?.setValue([this.rootScopes()[0].pk]);
+		this.customizeForm.get('rootScopePks')?.setValue([this.parentScopes()[0].pk]);
 		this.criteria.clear();
 		this.update();
 	}

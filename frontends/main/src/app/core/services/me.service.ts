@@ -7,6 +7,8 @@ import {SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {Scope} from '../model/scope';
 import {ScopeMini} from '../model/scope-mini';
+import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 
 @Service()
 export class MeService {
@@ -47,13 +49,43 @@ export class MeService {
 	}
 
 	@reviveDates
-	getScopes(feature: string | undefined, excludeLeaf = true, excludeVirtual = false): Observable<ScopeMini[]> {
+	getScopes(
+		scopeModelIds?: string[]
+	): Observable<ScopeMini[]> {
 		let params = new HttpParams();
-		if(feature) {
-			params = params.set('feature', feature);
+		if(scopeModelIds) {
+			params = params.set('scopeModelIds', scopeModelIds.join(','));
 		}
-		params = params.set('excludeLeaf', excludeLeaf);
-		params = params.set('excludeVirtual', excludeVirtual);
+		return this.http.get<ScopeMini[]>(`${this.serviceUrl}/scopes`, {params});
+	}
+
+	@reviveDates
+	getScopesForFeature(
+		feature: string,
+		scopeModelIds?: string[]
+	): Observable<ScopeMini[]> {
+		let params = new HttpParams();
+		params = params.set('feature', feature);
+		if(scopeModelIds) {
+			params = params.set('scopeModelIds', scopeModelIds.join(','));
+		}
+		return this.http.get<ScopeMini[]>(`${this.serviceUrl}/scopes`, {params});
+	}
+
+	@reviveDates
+	getScopesForRequiredRight(
+		rightEntity: RightEntity,
+		rightId: string,
+		right: Rights,
+		scopeModelIds?: string[]
+	): Observable<ScopeMini[]> {
+		let params = new HttpParams();
+		params = params.set('rightEntity', rightEntity);
+		params = params.set('rightId', rightId);
+		params = params.set('right', right);
+		if(scopeModelIds) {
+			params = params.set('scopeModelIds', scopeModelIds.join(','));
+		}
 		return this.http.get<ScopeMini[]>(`${this.serviceUrl}/scopes`, {params});
 	}
 

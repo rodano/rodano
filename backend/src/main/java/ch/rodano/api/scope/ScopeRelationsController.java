@@ -2,12 +2,8 @@ package ch.rodano.api.scope;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
@@ -31,13 +27,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.configuration.model.rights.Rights;
-import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.scope.ScopeRelation;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.scope.ScopeRelationService;
-import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.utils.RightsService;
@@ -49,9 +43,7 @@ import ch.rodano.core.utils.UtilsService;
 @Validated
 @Transactional(readOnly = true)
 public class ScopeRelationsController extends AbstractSecuredController {
-	private final ScopeService scopeService;
 	private final ScopeDAOService scopeDAOService;
-	private final ScopeDTOService scopeDTOService;
 	private final ScopeRelationService scopeRelationService;
 	private final ScopeRelationDTOService scopeRelationDTOService;
 	private final UtilsService utilsService;
@@ -63,16 +55,12 @@ public class ScopeRelationsController extends AbstractSecuredController {
 		final RoleService roleService,
 		final RightsService rightsService,
 		final ScopeDAOService scopeDAOService,
-		final ScopeDTOService scopeDTOService,
 		final ScopeRelationService scopeRelationService,
 		final ScopeRelationDTOService scopeRelationDTOService,
-		final UtilsService utilsService,
-		final ScopeService scopeService
+		final UtilsService utilsService
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
-		this.scopeService = scopeService;
 		this.scopeDAOService = scopeDAOService;
-		this.scopeDTOService = scopeDTOService;
 		this.scopeRelationService = scopeRelationService;
 		this.scopeRelationDTOService = scopeRelationDTOService;
 		this.utilsService = utilsService;
@@ -192,35 +180,5 @@ public class ScopeRelationsController extends AbstractSecuredController {
 		scopeRelationService.transfer(scope, newParent, newRelation.startDate(), currentContext());
 
 		return scopeRelationDTOService.createDTOs(scope, currentActor, currentRoles);
-	}
-
-	@Operation(summary = "Get parent scopes for a given scope model")
-	@GetMapping("relations/available-parents")
-	@ResponseStatus(HttpStatus.OK)
-	public List<ScopeDTO> getParents(
-		@RequestParam("scopeModelId") final String scopeModelId,
-		@RequestParam("right") final Rights right,
-		@RequestParam("onlyDefault") final boolean onlyDefault
-	) {
-		final var currentRoles = currentActiveRoles();
-
-		final var scopeModel = studyService.getStudy().getScopeModel(scopeModelId);
-
-		if(scopeModel.isRoot()) {
-			return Collections.emptyList();
-		}
-
-		//retrieve parent scope models
-		final var scopeModelIds = onlyDefault ? Collections.singleton(scopeModel.getDefaultParentId()) : scopeModel.getParentIds();
-
-		final var rootScopesPks = rightsService.filterRoles(currentRoles, scopeModel, right).stream().map(Role::getScopeFk).collect(Collectors.toSet());
-		final List<Scope> scopes = scopeDAOService.getScopesByScopeModelIdHavingAncestor(scopeModelIds, rootScopesPks).stream()
-			//when asking for parent to create a scope, do a special filter
-			.filter(s -> Rights.WRITE != right || s.canEnroll())
-			.sorted(Comparator.comparing(Scope::getCode))
-			.toList();
-
-		final var acl = rightsService.getACL(currentActor());
-		return scopeDTOService.createDTOs(scopes, acl);
 	}
 }

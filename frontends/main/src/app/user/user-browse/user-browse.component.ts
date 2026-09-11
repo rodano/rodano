@@ -42,7 +42,7 @@ import {FeatureStatic} from '@core/model/feature-static';
 export class UserBrowseComponent implements OnInit {
 	readonly predicate = signal<UserSearch>(new UserSearch());
 	readonly profiles = signal<Profile[]>([]);
-	readonly scopes = signal<ScopeMini[]>([]);
+	readonly parentScopes = signal<ScopeMini[]>([]);
 	readonly me = signal<User | undefined>(undefined);
 	roleStatus = RoleStatus;
 	showDeleted = false;
@@ -68,11 +68,11 @@ export class UserBrowseComponent implements OnInit {
 	ngOnInit() {
 		forkJoin({
 			profiles: this.configurationService.getProfiles(),
-			scopes: this.meService.getScopes(undefined, true, false),
+			parentScopes: this.meService.getScopes(),
 			me: this.meService.get()
-		}).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({profiles, scopes, me}) => {
+		}).pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({profiles, parentScopes, me}) => {
 			this.profiles.set(profiles);
-			this.scopes.set(scopes);
+			this.parentScopes.set(parentScopes);
 			this.me.set(me);
 		});
 	}

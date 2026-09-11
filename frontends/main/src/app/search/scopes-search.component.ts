@@ -39,8 +39,8 @@ import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
 import {Location, LowerCasePipe} from '@angular/common';
 import {FormService} from '@core/services/form.service';
-import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 import {ExtendedScopeSearchResult} from '@core/model/extended-scope-search-result';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {AutofocusDirective} from '../directives/autofocus.directive';
@@ -131,8 +131,7 @@ export class SearchComponent implements OnInit {
 		private readonly location: Location,
 		private readonly dialog: MatDialog,
 		private readonly destroyRef: DestroyRef,
-		private readonly formService: FormService,
-		private readonly scopeRelationService: ScopeRelationsService
+		private readonly formService: FormService
 	) { }
 
 	ngOnInit(): void {
@@ -168,9 +167,9 @@ export class SearchComponent implements OnInit {
 				//Load dependent data after we have the scope model
 				return forkJoin({
 					searchableWorkflows: this.configurationService.getScopeModelSearchableWorkflows(this.selectedScopeModel()),
-					parentScopes: this.meService.getScopes(undefined, true, false),
+					parentScopes: this.meService.getScopesForRequiredRight(RightEntity.SCOPE_MODEL, this.selectedScopeModel().id, Rights.READ, [this.selectedScopeModel().defaultParentId]),
 					searchableFields: this.configurationService.getScopeModelFieldModels(this.selectedScopeModel().id, true),
-					parentsWithWriteAccess: this.scopeRelationService.getParents(this.selectedScopeModel().id, Rights.WRITE)
+					parentsWithWriteAccess: this.meService.getScopesForRequiredRight(RightEntity.SCOPE_MODEL, this.selectedScopeModel().id, Rights.WRITE, [this.selectedScopeModel().defaultParentId])
 				});
 			})
 		).subscribe(results => {

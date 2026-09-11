@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {UserService} from '@core/services/user.service';
 import {ConfigurationService} from '@core/services/configuration.service';
 import {Profile} from '@core/model/profile';
-import {forkJoin} from 'rxjs';
+import {filter, forkJoin, switchMap} from 'rxjs';
 import {NotificationService} from '../../services/notification.service';
 import {UserCreation} from '@core/model/user-creation';
 import {Language} from '@core/model/language';
@@ -19,6 +19,8 @@ import {User} from '@core/model/user';
 import {ArraySortPipe} from '../../pipes/sort-array.pipe';
 import {MeService} from '@core/services/me.service';
 import {ScopeMini} from '@core/model/scope-mini';
+import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 
 @Component({
@@ -64,16 +66,20 @@ export class UserCreateComponent implements OnInit {
 	) {}
 
 	ngOnInit() {
+		this.userCreationForm.controls.role.controls.profileId.valueChanges.pipe(
+			filter((profileId): profileId is string => !!profileId),
+			switchMap(profileId => this.meService.getScopesForRequiredRight(RightEntity.PROFILE, profileId, Rights.WRITE)),
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(scopes => this.scopes.set(scopes));
+
 		return forkJoin({
 			languages: this.configurationService.getLanguages(),
-			profiles: this.configurationService.getProfiles(),
-			scopes: this.meService.getScopes(undefined, true, false)
+			profiles: this.configurationService.getProfiles()
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({languages, profiles, scopes}) => {
+		).subscribe(({languages, profiles}) => {
 			this.languages.set(languages);
 			this.profiles.set(profiles);
-			this.scopes.set(scopes);
 			this.userCreationForm.reset();
 		});
 	}

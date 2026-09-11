@@ -11,7 +11,6 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {DocumentationService} from '@core/services/documentation.service';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
-import {Scope} from '@core/model/scope';
 import {forkJoin, interval, skipWhile, switchMap} from 'rxjs';
 import {ScopePickerComponent} from '../scope-picker/scope-picker.component';
 import {MeService} from '@core/services/me.service';
@@ -42,8 +41,7 @@ export class DocumentationComponent implements OnInit {
 	crfDocumentationGenerationStatus: CRFDocumentationGenerationStatus;
 
 	readonly scopeModels = signal<ScopeModel[]>([]);
-	readonly rootScopes = signal<ScopeMini[]>([]);
-	scopes: Scope[] = [];
+	readonly parentScopes = signal<ScopeMini[]>([]);
 
 	readonly generationStatus = signal<CRFDocumentationGenerationStatus | undefined>(undefined);
 
@@ -72,13 +70,13 @@ export class DocumentationComponent implements OnInit {
 
 	ngOnInit() {
 		forkJoin({
-			rootScopes: this.meService.getScopes(FeatureStatic.DOCUMENTATION, true, false),
+			parentScopes: this.meService.getScopesForFeature(FeatureStatic.DOCUMENTATION),
 			scopeModels: this.configurationService.getScopeModelsSorted()
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({rootScopes, scopeModels}) => {
-			this.rootScopes.set(rootScopes);
-			this.archiveMultipleCrfForm.get('rootScopePk')?.setValue(this.rootScopes()[0].pk);
+		).subscribe(({parentScopes, scopeModels}) => {
+			this.parentScopes.set(parentScopes);
+			this.archiveMultipleCrfForm.get('rootScopePk')?.setValue(this.parentScopes()[0].pk);
 			this.scopeModels.set(scopeModels);
 			const leafScopeModel = this.scopeModels()[this.scopeModels().length - 1];
 			this.blankCrfForm.get('scopeModelId')?.setValue(leafScopeModel.id);
@@ -94,10 +92,6 @@ export class DocumentationComponent implements OnInit {
 			skipWhile(() => this.generationStatus() !== CRFDocumentationGenerationStatus.IN_PROGRESS),
 			switchMap(() => this.documentationService.getArchiveCrfStatus())
 		).subscribe(s => this.generationStatus.set(s));
-	}
-
-	getScopes(modelId: string): Scope[] {
-		return this.scopes?.filter(s => s.modelId === modelId) ?? [];
 	}
 
 	get dataStructureUrl(): string {

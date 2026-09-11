@@ -75,7 +75,7 @@ export class ScopeEnrollmentComponent {
 	}) as FormGroup;
 
 	readonly scopeModels = signal<ScopeModel[]>([]);
-	readonly rootScopes = signal<ScopeMini[]>([]);
+	readonly parentScopes = signal<ScopeMini[]>([]);
 	readonly fieldModels = signal<FieldModel[]>([]);
 	enrollmentTypes: EnrollmentType[] = [EnrollmentType.AUTOMATIC, EnrollmentType.MANUAL];
 	readonly enrollableCount = signal<number | undefined>(undefined);
@@ -98,14 +98,14 @@ export class ScopeEnrollmentComponent {
 				scopeModels: this.configurationService.getScopeModelsSorted(),
 				fieldModels: this.configurationService.getScopeModelFieldModels(childScopeModelId),
 				childScopeModel: this.configurationService.getScopeModel(childScopeModelId),
-				rootScopes: this.meService.getScopes(undefined, true, false)
+				parentScopes: this.meService.getScopes()
 			}).pipe(
 				takeUntilDestroyed(this.destroyRef)
-			).subscribe(({scopeModels, fieldModels, childScopeModel, rootScopes}) => {
+			).subscribe(({scopeModels, fieldModels, childScopeModel, parentScopes}) => {
 				this.scopeModels.set(scopeModels);
 				this.fieldModels.set(fieldModels);
 				this.childScopeModel.set(childScopeModel);
-				this.rootScopes.set(rootScopes);
+				this.parentScopes.set(parentScopes);
 				this.reset();
 			});
 		});
@@ -134,7 +134,7 @@ export class ScopeEnrollmentComponent {
 	}
 
 	getScopes(modelId: string): ScopeMini[] {
-		return this.rootScopes().filter(s => s.modelId === modelId) ?? [];
+		return this.parentScopes().filter(s => s.modelId === modelId) ?? [];
 	}
 
 	getControl(i: number, j: number): FormControl {

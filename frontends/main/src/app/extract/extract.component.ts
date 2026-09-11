@@ -46,7 +46,7 @@ import {MatListOption, MatSelectionList} from '@angular/material/list';
 export class ExtractComponent implements OnInit {
 	readonly selectedScopeModel = signal<ScopeModel | undefined>(undefined);
 
-	readonly rootScopes = signal<ScopeMini[]>([]);
+	readonly parentScopes = signal<ScopeMini[]>([]);
 	readonly scopeModels = signal<ScopeModel[]>([]);
 	readonly datasetModels = signal<DatasetModel[]>([]);
 
@@ -78,15 +78,15 @@ export class ExtractComponent implements OnInit {
 		});
 
 		forkJoin({
-			rootScopes: this.meService.getScopes(FeatureStatic.EXPORT, true, false),
+			parentScopes: this.meService.getScopesForFeature(FeatureStatic.EXPORT),
 			scopeModels: this.configurationService.getScopeModelsSorted()
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(({rootScopes, scopeModels}) => {
+		).subscribe(({parentScopes, scopeModels}) => {
 			scopeModels.reverse();
-			this.rootScopes.set(rootScopes);
+			this.parentScopes.set(parentScopes);
 			this.scopeModels.set(scopeModels);
-			this.extractForm.get('rootScopePk')?.setValue(this.rootScopes()[0].pk);
+			this.extractForm.get('rootScopePk')?.setValue(this.parentScopes()[0].pk);
 			this.selectScopeModel(this.activatedRoute.snapshot.params['scopeModelId']);
 		});
 	}

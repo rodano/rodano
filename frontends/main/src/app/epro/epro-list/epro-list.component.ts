@@ -13,7 +13,6 @@ import {EPROInvitation} from '@core/model/epro-invitation';
 import {EproInvitationComponent} from '../epro-invitation/epro-invitation.component';
 import {NotificationService} from '../../services/notification.service';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatToolbar, MatToolbarRow} from '@angular/material/toolbar';
 import {MatDivider} from '@angular/material/divider';
 import {MatTableModule} from '@angular/material/table';
@@ -27,8 +26,11 @@ import {MatProgressBar} from '@angular/material/progress-bar';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {EMPTY_PAGED_RESULT} from '@core/utilities/empty-paged-result';
 import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {Profile} from '@core/model/profile';
+import {MeService} from '@core/services/me.service';
+import {ScopeMini} from '@core/model/scope-mini';
 
 @Component({
 	templateUrl: './epro-list.component.html',
@@ -51,7 +53,7 @@ import {Profile} from '@core/model/profile';
 	]
 })
 export class EproListComponent implements OnInit {
-	readonly parentScopes = signal<Scope[]>([]);
+	readonly parentScopes = signal<ScopeMini[]>([]);
 	searchForm = new FormGroup({
 		fullText: new FormControl('', {nonNullable: true}),
 		parentPk: new FormControl(0)
@@ -78,7 +80,7 @@ export class EproListComponent implements OnInit {
 	constructor(
 		private configurationService: ConfigurationService,
 		private scopeService: ScopeService,
-		private scopeRelationsService: ScopeRelationsService,
+		private meService: MeService,
 		private eproService: EproService,
 		private notificationService: NotificationService,
 		private dialog: MatDialog,
@@ -88,16 +90,16 @@ export class EproListComponent implements OnInit {
 	ngOnInit(): void {
 		this.configurationService.getStudy().pipe(
 			switchMap(study => {
+				const leafScopeModel = study.leafScopeModel;
 				return forkJoin({
-					parentScopes: this.scopeRelationsService.getParents(study.leafScopeModel.id, Rights.READ),
-					eproProfile: of(study.eproProfile),
-					eproEnabled: of(study.eproEnabled)
+					parentScopes: this.meService.getScopesForRequiredRight(RightEntity.SCOPE_MODEL, leafScopeModel.id, Rights.READ, [leafScopeModel.defaultParentId]),
+					eproProfile: of(study.eproProfile)
 				});
 			}),
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(result => {
-			this.parentScopes.set(result.parentScopes);
-			this.eproProfile = result.eproProfile;
+		).subscribe(({parentScopes, eproProfile}) => {
+			this.parentScopes.set(parentScopes);
+			this.eproProfile = eproProfile;
 		});
 
 		merge(

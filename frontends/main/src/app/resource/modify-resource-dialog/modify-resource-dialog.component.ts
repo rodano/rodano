@@ -68,7 +68,7 @@ export class ModifyResourceDialogComponent implements OnInit {
 		this.resourceForm.reset(this.resource);
 		forkJoin({
 			categories: this.configurationService.getResourceCategories(),
-			scopes: this.meService.getScopes(FeatureStatic.MANAGE_RESOURCE, true, true)
+			scopes: this.meService.getScopesForFeature(FeatureStatic.MANAGE_RESOURCE)
 		}).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(({scopes, categories}) => {

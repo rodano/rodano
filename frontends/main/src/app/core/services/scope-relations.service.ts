@@ -5,8 +5,6 @@ import {ScopeRelationCreation} from '../model/scope-relation-creation';
 import {ScopeRelation} from '../model/scope-relation';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {APIService} from './api.service';
-import {Rights} from '@core/model/rights';
-import {Scope} from '@core/model/scope';
 
 @Service()
 export class ScopeRelationsService {
@@ -55,14 +53,5 @@ export class ScopeRelationsService {
 			`${this.serviceUrl}/${scopePk}/relations/transfer`,
 			newRelation
 		);
-	}
-
-	@reviveDates
-	getParents(scopeModelId: string, right: Rights, onlyDefault = true): Observable<Scope[]> {
-		const params = new HttpParams()
-			.set('scopeModelId', scopeModelId)
-			.set('right', right)
-			.set('onlyDefault', onlyDefault);
-		return this.http.get<Scope[]>(`${this.serviceUrl}/relations/available-parents`, {params});
 	}
 }

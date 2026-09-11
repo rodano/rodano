@@ -1,11 +1,11 @@
 import {Component, DestroyRef, OnInit, input, signal} from '@angular/core';
 import {FormBuilder, Validators, ReactiveFormsModule} from '@angular/forms';
+import {MeService} from '@core/services/me.service';
 import {Router} from '@angular/router';
 import {ScopeModel} from '@core/model/scope-model';
-import {Scope} from '@core/model/scope';
+import {ScopeMini} from '@core/model/scope-mini';
 import {ScopeService} from '@core/services/scope.service';
 import {NotificationService} from '../../services/notification.service';
-import {ScopeRelationsService} from '@core/services/scope-relations.service';
 import {MatButton} from '@angular/material/button';
 import {MatOption} from '@angular/material/core';
 import {MatSelect} from '@angular/material/select';
@@ -15,6 +15,7 @@ import {ScopeCandidate} from '@core/model/scope-candidate';
 import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 
 @Component({
 	templateUrl: './scope-create.component.html',
@@ -39,19 +40,19 @@ export class ScopeCreateComponent implements OnInit {
 		parentScopePk: this.formBuilder.control<number | undefined>(undefined, [Validators.required])
 	});
 
-	readonly parentScopes = signal<Scope[]>([]);
+	readonly parentScopes = signal<ScopeMini[]>([]);
 
 	constructor(
 		private router: Router,
 		private formBuilder: FormBuilder,
+		private meService: MeService,
 		private scopeService: ScopeService,
-		private scopeRelationsService: ScopeRelationsService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
 	) { }
 
 	ngOnInit() {
-		this.scopeRelationsService.getParents(this.scopeModel().id, Rights.READ).subscribe(s => this.parentScopes.set(s));
+		this.meService.getScopesForRequiredRight(RightEntity.SCOPE_MODEL, this.scopeModel().id, Rights.READ, this.scopeModel().parentIds).subscribe(s => this.parentScopes.set(s));
 	}
 
 	save() {

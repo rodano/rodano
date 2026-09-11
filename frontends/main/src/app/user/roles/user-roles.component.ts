@@ -2,7 +2,7 @@ import {Component, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {Profile} from '@core/model/profile';
 import {ConfigurationService} from '@core/services/configuration.service';
-import {switchMap} from 'rxjs/operators';
+import {filter, switchMap} from 'rxjs/operators';
 import {forkJoin, Observable} from 'rxjs';
 import {RoleService} from '@core/services/role.service';
 import {Role} from '@core/model/role';
@@ -23,6 +23,8 @@ import {AuditTrailButtonComponent} from '../../audit-trail-button/audit-trail-bu
 import {AuthStateService} from '../../services/auth-state.service';
 import {MeService} from '@core/services/me.service';
 import {ArraySortPipe} from '../../pipes/sort-array.pipe';
+import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 import {ScopeMini} from '@core/model/scope-mini';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {getRoleStatusDisplay} from '../role-status-display';
@@ -94,13 +96,17 @@ export class UserRolesComponent implements OnInit {
 		private meService: MeService) {}
 
 	ngOnInit() {
+		this.roleForm.controls.profile.valueChanges.pipe(
+			filter(profileId => !!profileId),
+			switchMap(profileId => this.meService.getScopesForRequiredRight(RightEntity.PROFILE, profileId, Rights.WRITE)),
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(scopes => this.scopes.set(scopes));
+
 		this.loading.set(true);
 		forkJoin({
-			profiles: this.configurationService.getProfiles(),
-			scopes: this.meService.getScopes(undefined, true, false)
-		}).subscribe(({profiles, scopes}) => {
+			profiles: this.configurationService.getProfiles()
+		}).subscribe(({profiles}) => {
 			this.profiles.set(profiles);
-			this.scopes.set(scopes);
 			this.loading.set(false);
 		});
 	}

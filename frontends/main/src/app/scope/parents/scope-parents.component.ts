@@ -2,7 +2,6 @@ import {Component, DestroyRef, computed, effect, inject, input, signal} from '@a
 import {Validators, FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 import {forkJoin} from 'rxjs';
 import {ScopeModel} from '@core/model/scope-model';
-import {Scope} from '@core/model/scope';
 import {ScopeRelation} from '@core/model/scope-relation';
 import {NotificationService} from '../../services/notification.service';
 import {ScopeRelationsService} from '@core/services/scope-relations.service';
@@ -19,10 +18,13 @@ import {MatIcon} from '@angular/material/icon';
 import {MatTableModule} from '@angular/material/table';
 import {ScopeCodeShortnamePipe} from '../../pipes/scope-code-shortname.pipe';
 import {Rights} from '@core/model/rights';
+import {RightEntity} from '@core/enums/right-entity';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ArraySortPipe} from '../../pipes/sort-array.pipe';
 import {ScopePickerComponent} from '../../scope-picker/scope-picker.component';
 import {SCOPE_TOKEN} from '../home/scope.component';
+import {MeService} from '@core/services/me.service';
+import {ScopeMini} from '@core/model/scope-mini';
 
 @Component({
 	selector: 'app-scope-parents',
@@ -79,7 +81,7 @@ export class ScopeParentsComponent {
 		})
 	});
 
-	private readonly allParentScopes = signal<Scope[]>([]);
+	private readonly allParentScopes = signal<ScopeMini[]>([]);
 	readonly parentScopes = computed(() => {
 		const currentParentScopePks = this.scopeRelations()
 			.filter(rel => this.isCurrent(rel))
@@ -92,13 +94,14 @@ export class ScopeParentsComponent {
 	);
 
 	constructor(
+		private meService: MeService,
 		private scopeRelationsService: ScopeRelationsService,
 		private notificationService: NotificationService,
 		private destroyRef: DestroyRef
 	) {
 		effect(() => {
 			forkJoin({
-				allParentScopes: this.scopeRelationsService.getParents(this.scopeModel().id, Rights.WRITE, false),
+				allParentScopes: this.meService.getScopesForRequiredRight(RightEntity.SCOPE_MODEL, this.scopeModel().id, Rights.WRITE, this.scopeModel().parentIds),
 				scopeRelations: this.scopeRelationsService.getParentRelations(this.scope().pk)
 			}).pipe(
 				takeUntilDestroyed(this.destroyRef)
