@@ -13,7 +13,6 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.dao.robot.RobotDAOService;
@@ -50,8 +49,8 @@ public class RobotBasicAuthenticationProvider implements AuthenticationProvider 
 	 * <code>Authentication</code> class will be tried.
 	 * @throws AuthenticationException if authentication fails.
 	 */
+	//not transactional on purpose: this runs in the security filter chain, before the controller's own transaction begins
 	@Override
-	@Transactional
 	public Authentication authenticate(final Authentication authentication) {
 		final var name = authentication.getName();
 		final var key = authentication.getCredentials().toString();

@@ -119,10 +119,10 @@ public class TestDataInitializer {
 		randomUtils = RandomUtils.insecure();
 	}
 
-	private Robot createAndSaveRobot(final String name, final Scope scope, final Profile profile, final DatabaseActionContext context) {
+	private Robot createAndSaveRobot(final String name, final Optional<String> key, final Scope scope, final Profile profile, final DatabaseActionContext context) {
 		final var robot = new Robot();
 		robot.setName(name);
-		robot.setKey(RandomStringUtils.insecure().nextAlphanumeric(32));
+		robot.setKey(key.orElseGet(() -> RandomStringUtils.insecure().nextAlphanumeric(32)));
 
 		robotService.createRobot(
 			robot,
@@ -146,15 +146,10 @@ public class TestDataInitializer {
 		var context = auditActionService.createAuditActionAndGenerateContext(Actor.SYSTEM, DatabaseInitializer.RATIONALE, actionDate);
 
 		//add the robots
-		createAndSaveRobot("Bender", root, adminProfile, context);
-		createAndSaveRobot("R2-D2", root, adminProfile, context);
-		createAndSaveRobot("C-3PO", root, adminProfile, context);
-		createAndSaveRobot("T-1000", root, adminProfile, context);
-		createAndSaveRobot("Wall-E", root, adminProfile, context);
-
-		final var robot = createAndSaveRobot("rodano-ssoproxy", root, adminProfile, context);
-		robot.setKey("TG53KhK4nSEJSWoaeubvMmXlEPYBaFGJ");
-		robotDAOService.saveRobot(robot, context, DatabaseInitializer.RATIONALE);
+		createAndSaveRobot("R2-D2", Optional.empty(), root, adminProfile, context);
+		createAndSaveRobot("C-3PO", Optional.empty(), root, adminProfile, context);
+		createAndSaveRobot("rodano-ssoproxy", Optional.of("Key:SSOProxy!"), root, adminProfile, context);
+		createAndSaveRobot("rodano-mcp", Optional.of("Key:MCP!"), root, adminProfile, context);
 
 		//add countries
 		final var country = study.getScopeModel("COUNTRY");
