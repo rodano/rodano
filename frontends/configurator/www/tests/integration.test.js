@@ -371,7 +371,7 @@ export default async function test(bundle, assert, driver) {
 			assert.equal(await driver.getStyle('#consistency_check_section_errors > li', 'text-decoration'), 'line-through', 'Error is still displayed and has been fixed');
 			//check infos
 			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_warnings"]');
-			assert.equal(await driver.eval('#consistency_check_section_warnings', e => e.children.length), 5, 'There are 5 warnings');
+			assert.equal(await driver.eval('#consistency_check_section_warnings', e => e.children.length), 4, 'There are 4 warnings');
 			//close report
 			await driver.click('#consistency_check menu > li > a.button');
 			//this takes some time
@@ -384,7 +384,7 @@ export default async function test(bundle, assert, driver) {
 			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_errors"]');
 			assert.equal(await driver.eval('#consistency_check_section_errors', e => e.children.length), 2, '2 errors are displayed after 1 error has been fixed');
 			await driver.click('#consistency_check ul.tabs > li[data-tab="consistency_check_section_warnings"]');
-			assert.equal(await driver.eval('#consistency_check_section_warnings', e => e.children.length), 5, 'There are 5 warnings');
+			assert.equal(await driver.eval('#consistency_check_section_warnings', e => e.children.length), 4, 'There are 4 warnings');
 			await driver.click('#consistency_check menu > li > a.button');
 			//this takes some time
 			await driver.wait();

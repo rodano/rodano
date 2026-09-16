@@ -25,7 +25,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 127,
-	"configDate": 1789058391485,
+	"configDate": 1789566113706,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -8930,7 +8930,9 @@
 					"validatorIds": [
 						"REQUIRED"
 					],
-					"workflowIds": [],
+					"workflowIds": [
+						"QUERY"
+					],
 					"rules": [],
 					"searchable": false,
 					"readOnly": false,
@@ -8967,7 +8969,9 @@
 					"validatorIds": [
 						"REQUIRED"
 					],
-					"workflowIds": [],
+					"workflowIds": [
+						"QUERY"
+					],
 					"rules": [],
 					"searchable": false,
 					"readOnly": false,
@@ -11069,6 +11073,7 @@
 					"readOnly": false,
 					"exportable": true,
 					"allowDateInFuture": false,
+					"exportOrder": 0,
 					"maxLength": 8,
 					"matcherMessage": {},
 					"withYears": false,
@@ -11084,6 +11089,45 @@
 					"minutesMandatory": true,
 					"secondsMandatory": true,
 					"inlineHelp": "8 characters identifying the patient",
+					"advancedHelp": {},
+					"className": "FieldModel"
+				},
+				{
+					"id": "USUAL_MATERNITY_NAME",
+					"shortname": {
+						"en": "Usual maternity name"
+					},
+					"longname": {},
+					"description": {},
+					"type": "STRING",
+					"dataType": "STRING",
+					"plugin": false,
+					"possibleValues": [],
+					"validatorIds": [
+						"REQUIRED_WITH_QUERY"
+					],
+					"workflowIds": [
+						"QUERY"
+					],
+					"rules": [],
+					"searchable": false,
+					"readOnly": false,
+					"exportable": true,
+					"allowDateInFuture": false,
+					"exportOrder": 5,
+					"matcherMessage": {},
+					"withYears": false,
+					"withMonths": false,
+					"withDays": false,
+					"withHours": false,
+					"withMinutes": false,
+					"withSeconds": false,
+					"yearsMandatory": true,
+					"monthsMandatory": true,
+					"daysMandatory": true,
+					"hoursMandatory": true,
+					"minutesMandatory": true,
+					"secondsMandatory": true,
 					"advancedHelp": {},
 					"className": "FieldModel"
 				}
@@ -14963,6 +15007,40 @@
 			},
 			"description": {},
 			"layouts": [
+				{
+					"id": "CHILDREN_ADMINISTRATIVE",
+					"description": {},
+					"type": "SINGLE",
+					"textBefore": {},
+					"textAfter": {},
+					"columns": [
+						{
+							"cssCode": "width: 750px;",
+							"className": "Column"
+						}
+					],
+					"lines": [
+						{
+							"cells": [
+								{
+									"id": "ADMINISTRATIVE_USUAL_MATERNITY_NAME",
+									"datasetModelId": "ADMINISTRATIVE",
+									"fieldModelId": "USUAL_MATERNITY_NAME",
+									"textBefore": {},
+									"textAfter": {},
+									"visibilityCriteria": [],
+									"cssCodeForLabel": "width: 245px;",
+									"displayLabel": true,
+									"displayPossibleValueLabels": true,
+									"colspan": 1,
+									"className": "Cell"
+								}
+							],
+							"className": "Line"
+						}
+					],
+					"className": "Layout"
+				},
 				{
 					"id": "CHILDREN_MULTIPLE_LAYOUT",
 					"description": {
@@ -26483,7 +26561,7 @@
 							"selections": [
 								{
 									"nodeEntity": "LAYOUT",
-									"nodeId": "LAYOUT_1",
+									"nodeId": "CHILDREN_ADMINISTRATIVE",
 									"selections": [],
 									"className": "SelectionNode"
 								}
