@@ -43,24 +43,28 @@ public interface CRFDocumentationService {
 	void generateCRFArchive(Actor actor, Scope scope, boolean withAuditTrails, OutputStream outputStream);
 
 	/**
-	 * Get the status of the archive generation process
+	 * Get the status of the archive generation process for a given actor
 	 *
+	 * @param actor The actor who requested the generation
 	 * @return Status of the archive generation process
 	 */
-	CRFDocumentationGenerationStatus getCRFArchiveGenerationStatus();
+	CRFDocumentationGenerationStatus getCRFArchiveGenerationStatus(Actor actor);
 
 	/**
-	 * Stream the last generated tree into a zip
+	 * Stream the last generated archive of a given actor into a zip
 	 *
-	 * @param os An output stream
+	 * @param actor The actor who requested the generation
+	 * @param os    An output stream
 	 * @throws IOException Thrown if an error occurred while creating the zip file
 	 */
-	void streamCRFArchive(OutputStream os) throws IOException;
+	void streamCRFArchive(Actor actor, OutputStream os) throws IOException;
 
 	/**
-	 * Get the filename of the archive
+	 * Get the filename of the archive of a given actor
+	 *
+	 * @param actor The actor who requested the generation
 	 */
-	String getCRFArchiveFilename();
+	String getCRFArchiveFilename(Actor actor);
 
 	/**
 	 * Generate the CRF archive filename

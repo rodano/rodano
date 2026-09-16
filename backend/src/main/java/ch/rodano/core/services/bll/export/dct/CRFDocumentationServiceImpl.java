@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -107,9 +108,9 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 	private final PageStateService pageStateService;
 	private final TaskExecutor taskExecutor;
 
-	private final AtomicBoolean generationInProgress;
-	private final File crfArchiveFolder;
-	private String generationId;
+	private final File crfArchiveBaseFolder;
+	//each actor gets its own generation state and folder, so generating an archive for one actor never blocks or leaks to another
+	private final Map<Long, CRFArchiveGeneration> generationsByActor = new ConcurrentHashMap<>();
 
 	public CRFDocumentationServiceImpl(
 		final StudyService studyService,
@@ -147,8 +148,17 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 		this.pageStateService = pageStateService;
 		this.taskExecutor = taskExecutor;
 
-		this.crfArchiveFolder = new File(configurator.getTempFolder(), CRF_TEMPORARY_ARCHIVE_FOLDER);
-		this.generationInProgress = new AtomicBoolean(false);
+		this.crfArchiveBaseFolder = new File(configurator.getTempFolder(), CRF_TEMPORARY_ARCHIVE_FOLDER);
+	}
+
+	private static final class CRFArchiveGeneration {
+		private final File folder;
+		private final AtomicBoolean inProgress = new AtomicBoolean(false);
+		private volatile String id;
+
+		private CRFArchiveGeneration(final File folder) {
+			this.folder = folder;
+		}
 	}
 
 	public <T extends AuditTrail> Element generateTrailsElement(final Document doc, final NavigableSet<T> auditTrails) {
@@ -567,47 +577,52 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 	@Override
 	public String generateCRFArchive(final Actor actor, final ScopeModel scopeModel, final List<Scope> scopes, final boolean withAuditTrails) {
-		// Queue and return an uid if no report is currently being generated and set generation in progress
-		if(generationInProgress.getAndSet(true)) {
-			logger.info("A CRF archive task is already running");
-			return generationId;
+		final var generation = generationsByActor.computeIfAbsent(
+			actor.getPk(),
+			pk -> new CRFArchiveGeneration(new File(crfArchiveBaseFolder, pk.toString()))
+		);
+
+		// Queue and return an uid if no report is currently being generated for this actor and set generation in progress
+		if(generation.inProgress.getAndSet(true)) {
+			logger.info("A CRF archive task is already running for actor {}", actor.getPk());
+			return generation.id;
 		}
 
 		try {
-			cleanOldCRFArchives();
+			cleanOldCRFArchive(generation.folder);
 		}
 		catch(final IOException e) {
-			generationInProgress.set(false);
+			generation.inProgress.set(false);
 			throw new RuntimeException("Unable to clean old CRF archives", e);
 		}
 
 		// Set the id of the generation
-		generationId = UUID.randomUUID().toString();
+		generation.id = UUID.randomUUID().toString();
 
 		taskExecutor.execute(() -> {
 			logger.info(
 				"Creating CRF archive for root scope [{}] with id {} into {} ",
 				scopes.stream().map(Scope::getCode).collect(Collectors.joining(", ")),
-				generationId,
-				crfArchiveFolder
+				generation.id,
+				generation.folder
 			);
 
 			try {
 				for(final var scope : scopes) {
-					generateCRFArchives(actor, scopeModel, scope, Optional.empty(), Optional.empty(), withAuditTrails, crfArchiveFolder);
+					generateCRFArchives(actor, scopeModel, scope, Optional.empty(), Optional.empty(), withAuditTrails, generation.folder);
 				}
-				logger.info("CRF archive with id {} created successfully", generationId);
+				logger.info("CRF archive with id {} created successfully", generation.id);
 			}
 			catch(final Exception e) {
 				logger.error("Unable to create CRF archive", e);
 			}
 			finally {
-				generationId = null;
-				generationInProgress.set(false);
+				generation.id = null;
+				generation.inProgress.set(false);
 			}
 		});
 
-		return generationId;
+		return generation.id;
 	}
 
 	@Override
@@ -616,26 +631,32 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 	}
 
 	@Override
-	public CRFDocumentationGenerationStatus getCRFArchiveGenerationStatus() {
-		if(generationInProgress.get()) {
+	public CRFDocumentationGenerationStatus getCRFArchiveGenerationStatus(final Actor actor) {
+		final var generation = generationsByActor.get(actor.getPk());
+		if(generation == null) {
+			return CRFDocumentationGenerationStatus.NOT_STARTED;
+		}
+		if(generation.inProgress.get()) {
 			return CRFDocumentationGenerationStatus.IN_PROGRESS;
 		}
-		if(crfArchiveFolder.exists()) {
+		if(generation.folder.exists()) {
 			return CRFDocumentationGenerationStatus.COMPLETED;
 		}
 		return CRFDocumentationGenerationStatus.NOT_STARTED;
 	}
 
 	@Override
-	public void streamCRFArchive(final OutputStream os) throws IOException {
-		// Generation in progress return
-		if(generationInProgress.get()) {
-			logger.info("A CRF archive task is running");
+	public void streamCRFArchive(final Actor actor, final OutputStream os) throws IOException {
+		final var generation = generationsByActor.get(actor.getPk());
+
+		// Generation in progress or never started, nothing to stream
+		if(generation == null || generation.inProgress.get()) {
+			logger.info("A CRF archive task is running or has not been started for this actor");
 			return;
 		}
 
 		// Check that something has been generated
-		if(!crfArchiveFolder.exists()) {
+		if(!generation.folder.exists()) {
 			logger.info("No CRF archive is available");
 			return;
 		}
@@ -646,7 +667,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 		final var zip = new ZipOutputStream(os);
 
 		// If more than one we do zip-ception :D
-		final var files = crfArchiveFolder.listFiles();
+		final var files = generation.folder.listFiles();
 		if(files.length > 1) {
 			for(final var file : files) {
 				if(!file.isDirectory()) {
@@ -671,7 +692,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 			}
 		}
 		else {
-			addToZipFile(zip, crfArchiveFolder, Optional.empty());
+			addToZipFile(zip, generation.folder, Optional.empty());
 		}
 
 		// Write the zip without closing the sub-output stream
@@ -707,31 +728,34 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 	}
 
 	/**
-	 * Clean old CRF archives
+	 * Clean an actor's old CRF archive
 	 *
+	 * @param folder The actor's CRF archive folder
 	 * @throws IOException Thrown if the directory cannot be recursively deleted
 	 */
-	private void cleanOldCRFArchives() throws IOException {
+	private void cleanOldCRFArchive(final File folder) throws IOException {
 		// Delete the folder and its subtree if it exists
-		if(crfArchiveFolder.exists()) {
-			FileUtils.deleteDirectory(crfArchiveFolder);
+		if(folder.exists()) {
+			FileUtils.deleteDirectory(folder);
 		}
-		crfArchiveFolder.mkdirs();
+		folder.mkdirs();
 	}
 
 	@Override
-	public String getCRFArchiveFilename() {
-		// Generation in progress return
-		if(generationInProgress.get()) {
+	public String getCRFArchiveFilename(final Actor actor) {
+		final var generation = generationsByActor.get(actor.getPk());
+
+		// Generation in progress or never started, nothing to download
+		if(generation == null || generation.inProgress.get()) {
 			throw new UnsupportedOperationException("A CRF archive task is running");
 		}
 
 		// Check that something has been generated
-		if(!crfArchiveFolder.exists()) {
+		if(!generation.folder.exists()) {
 			throw new UnsupportedOperationException("No CRF archive is available");
 		}
 
-		final var files = crfArchiveFolder.listFiles();
+		final var files = generation.folder.listFiles();
 		if(files.length > 1) {
 			return CRF_TEMPORARY_ARCHIVE_FOLDER;
 		}

@@ -127,8 +127,8 @@ public class DocumentationController extends AbstractSecuredController {
 			rightsService.checkRight(currentActor, roles, scopeModel, Rights.READ);
 		}
 
-		//do not allow multiple generation at the same time
-		if(CRFDocumentationGenerationStatus.IN_PROGRESS.equals(crfDocumentationService.getCRFArchiveGenerationStatus())) {
+		//do not allow an actor to start multiple generations at the same time
+		if(CRFDocumentationGenerationStatus.IN_PROGRESS.equals(crfDocumentationService.getCRFArchiveGenerationStatus(currentActor))) {
 			throw new ResponseStatusException(HttpStatus.TOO_MANY_REQUESTS, "There is already one running archive request");
 		}
 
@@ -144,7 +144,7 @@ public class DocumentationController extends AbstractSecuredController {
 		final var currentRoles = currentActiveRoles(scopeService.getRootScope());
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.DOCUMENTATION);
 
-		return Collections.singletonMap("status", crfDocumentationService.getCRFArchiveGenerationStatus());
+		return Collections.singletonMap("status", crfDocumentationService.getCRFArchiveGenerationStatus(currentActor));
 	}
 
 	@Operation(summary = "Get the latest CRF archive in zip form")
@@ -155,8 +155,8 @@ public class DocumentationController extends AbstractSecuredController {
 
 		rightsService.checkRight(currentActor, currentRoles, FeatureStatic.DOCUMENTATION);
 
-		final StreamingResponseBody stream = crfDocumentationService::streamCRFArchive;
-		return fileResponse(stream, MediaType.valueOf("application/zip"), crfDocumentationService.getCRFArchiveFilename());
+		final StreamingResponseBody stream = os -> crfDocumentationService.streamCRFArchive(currentActor, os);
+		return fileResponse(stream, MediaType.valueOf("application/zip"), crfDocumentationService.getCRFArchiveFilename(currentActor));
 	}
 
 	@Operation(summary = "Generate the data structure")
