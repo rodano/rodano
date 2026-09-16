@@ -172,7 +172,7 @@ export class FormComponent implements OnInit {
 					});
 
 					if(result.message) {
-						this.notificationService.showError(result.message);
+						this.notificationService.showError(`Form could not be saved: ${result.message}`);
 					}
 					else {
 						this.notificationService.showError('Something went wrong, please try again later');
