@@ -3,6 +3,7 @@ import {RouterOutlet} from '@angular/router';
 import {HeaderComponent} from './header/header.component';
 import {Environment} from '@core/model/environment';
 import {PublicStudy} from '@core/model/public-study';
+import {AdministrationService} from '@core/services/administration.service';
 import {ConfigurationService} from '@core/services/configuration.service';
 
 @Component({
@@ -12,14 +13,32 @@ import {ConfigurationService} from '@core/services/configuration.service';
 	imports: [HeaderComponent, RouterOutlet]
 })
 export class AppComponent implements OnInit {
-	constructor(private configurationService: ConfigurationService) {}
+	constructor(
+		private administrationService: AdministrationService,
+		private configurationService: ConfigurationService
+	) {}
 
 	environment = Environment;
 
 	readonly study = signal<PublicStudy | undefined>(undefined);
+	readonly inMaintenance = signal(false);
 	readonly displayContent = signal(false);
 
 	ngOnInit() {
+		this.administrationService.isInMaintenance().subscribe(inMaintenance => {
+			this.inMaintenance.set(inMaintenance);
+			if(!inMaintenance) {
+				this.loadStudy();
+			}
+		});
+	}
+
+	bypassMaintenance() {
+		this.inMaintenance.set(false);
+		this.loadStudy();
+	}
+
+	private loadStudy() {
 		//set the CSS color variables to the body
 		this.configurationService.getPublicStudy()
 			.subscribe({

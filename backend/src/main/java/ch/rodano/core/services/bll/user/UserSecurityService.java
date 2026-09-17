@@ -22,8 +22,10 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.api.controller.user.exception.EmailAlreadyUsedException;
 import ch.rodano.api.controller.user.exception.UserNotActivatedException;
+import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
+import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.model.actor.Actor;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.exception.InvalidOneUseCodeException;
@@ -31,6 +33,7 @@ import ch.rodano.core.model.exception.NoEnabledRoleException;
 import ch.rodano.core.model.exception.UnauthorizedException;
 import ch.rodano.core.model.exception.UserNotFoundException;
 import ch.rodano.core.model.exception.security.AlreadyUsedPassword;
+import ch.rodano.core.model.exception.security.MaintenanceModeException;
 import ch.rodano.core.model.exception.security.TooManyAttemptsException;
 import ch.rodano.core.model.exception.security.WeakPasswordException;
 import ch.rodano.core.model.exception.security.WrongCredentialsException;
@@ -72,6 +75,7 @@ public class UserSecurityService {
 	private final RoleService roleService;
 	private final MailService mailService;
 	private final RuleService ruleService;
+	private final Configurator configurator;
 
 	public UserSecurityService(
 		final StudyService studyService,
@@ -81,7 +85,8 @@ public class UserSecurityService {
 		final MailService mailService,
 		final RuleService ruleService,
 		final ActorService actorService,
-		final UserService userService
+		final UserService userService,
+		final Configurator configurator
 	) {
 		this.studyService = studyService;
 		this.sessionService = sessionService;
@@ -91,6 +96,7 @@ public class UserSecurityService {
 		this.roleService = roleService;
 		this.mailService = mailService;
 		this.ruleService = ruleService;
+		this.configurator = configurator;
 	}
 
 	/**
@@ -143,6 +149,10 @@ public class UserSecurityService {
 			logger.info("User {} failed to log in with the following error: {}", email, e.getLocalizedMessage());
 			//consider any known exception as wrong credentials to prevent hackers from testing valid e-mails
 			throw new WrongCredentialsException();
+		}
+
+		if(configurator.getMaintenanceMode() && !roleService.getRoles(user).stream().anyMatch(role -> role.getProfile().hasFeature(FeatureStatic.ADMIN.name()))) {
+			throw new MaintenanceModeException();
 		}
 
 		//set the user as the actor of the changes so the login is attributed to him in the audit trail instead of the system

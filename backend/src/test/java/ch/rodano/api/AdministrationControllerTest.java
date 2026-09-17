@@ -4,11 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.core.ParameterizedTypeReference;
 
+import ch.rodano.api.authentication.CredentialsDTO;
 import ch.rodano.test.ControllerTest;
 import ch.rodano.test.SpringTestConfiguration;
 
@@ -31,6 +34,27 @@ public class AdministrationControllerTest extends ControllerTest {
 		client.post().uri("/administration/maintenance").body(Map.of("state", false)).exchange().expectStatus().isAccepted();
 		inMaintenance = get("/administration/maintenance", dictionaryType);
 		assertFalse(inMaintenance.get("state"));
+	}
+
+	@Test
+	@DisplayName("Only administrators can log in during maintenance mode")
+	void loginDuringMaintenance() {
+		authenticate(adminOnStudyEmail);
+		client.post().uri("/administration/maintenance").body(Map.of("state", true)).exchange().expectStatus().isAccepted();
+		token = Optional.empty();
+
+		final var invalidAdminCredentials = new CredentialsDTO();
+		invalidAdminCredentials.setEmail(adminOnStudyEmail);
+		invalidAdminCredentials.setPassword("invalid-password");
+		client.post().uri("/sessions").body(invalidAdminCredentials).exchange().expectStatus().isUnauthorized();
+
+		final var investigatorCredentials = new CredentialsDTO();
+		investigatorCredentials.setEmail(investigatorOnStudyEmail);
+		investigatorCredentials.setPassword(TEST_USER_PASSWORD);
+		client.post().uri("/sessions").body(investigatorCredentials).exchange().expectStatus().isEqualTo(HttpStatus.SERVICE_UNAVAILABLE);
+
+		authenticate(adminOnStudyEmail);
+		client.post().uri("/administration/maintenance").body(Map.of("state", false)).exchange().expectStatus().isAccepted();
 	}
 
 	@Test
