@@ -12,6 +12,7 @@ import {ConfigurationService} from './configuration.service';
  */
 @Service()
 export class StudyTitleStrategy extends TitleStrategy {
+	private readonly defaultTitle = 'Rodano';
 	private readonly title = inject(Title);
 	private readonly configurationService = inject(ConfigurationService);
 
@@ -19,8 +20,13 @@ export class StudyTitleStrategy extends TitleStrategy {
 
 	constructor() {
 		super();
-		this.configurationService.getPublicStudy().subscribe(study => {
-			this.mainTitle = study.shortname[study.defaultLanguage.id] ?? 'Rodano';
+		this.configurationService.getPublicStudy().subscribe({
+			next: study => {
+				this.mainTitle = study.shortname[study.defaultLanguage.id] ?? this.defaultTitle;
+			},
+			error: () => {
+				this.mainTitle = this.defaultTitle;
+			}
 		});
 	}
 

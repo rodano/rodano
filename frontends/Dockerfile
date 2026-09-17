@@ -27,8 +27,5 @@ COPY configurator/www /app/configurator
 COPY --from=builder /app/main/www/browser /app/main
 COPY --from=builder /app/epro/www /app/epro
 
-# copy maintenance file
-COPY maintenance.html /app/maintenance/
-
 # copy Nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf

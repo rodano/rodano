@@ -1,8 +1,8 @@
 import {HttpErrorResponse, HttpInterceptorFn, HttpStatusCode} from '@angular/common/http';
 import {inject} from '@angular/core';
 import {Router} from '@angular/router';
-import {throwError} from 'rxjs';
-import {catchError} from 'rxjs/operators';
+import {throwError, TimeoutError} from 'rxjs';
+import {catchError, timeout} from 'rxjs/operators';
 import {AuthStateService} from '../services/auth-state.service';
 import {ErrorContext} from '../error/error-context';
 import {LoggingService} from '@core/services/logging.service';
@@ -17,6 +17,8 @@ export const SKIP_AUTH_TOKEN_HEADER = 'X-Skip-Auth-Token';
  * If the header contains values (as a comma separated list of HTTP response code), handling of the specified response code will be skipped
  */
 export const SKIP_ERROR_HANDLING_HEADER = 'X-Skip-Error-Handling';
+
+const REQUEST_TIMEOUT_MS = 10_000;
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	const router = inject(Router);
@@ -43,15 +45,20 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	}
 
 	const enhancedRequest = request.clone({headers});
+	const timedRequest = next(enhancedRequest).pipe(timeout({each: REQUEST_TIMEOUT_MS}));
 
 	//if the skip error handling token is present in the request, skip the error handling of the request
 	if(skipErrorHandling) {
-		return next(enhancedRequest);
+		return timedRequest;
 	}
 
 	//else handle the authorization errors
-	return next(enhancedRequest).pipe(
+	return timedRequest.pipe(
 		catchError((response: HttpErrorResponse) => {
+			if(response instanceof TimeoutError) {
+				router.navigate(['/error', {context: ErrorContext.NETWORK}]);
+			}
+
 			//if the response code is in the skip error handling list, simply return the response
 			if(skipErrors.includes(response.status)) {
 				return throwError(() => response);
@@ -87,9 +94,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 						router.navigate(['/error', {context: ErrorContext.FORBIDDEN}]);
 					}
 					break;
-				//404, 500 and 504 and no network
+				//404, 500, 502, 504 and no network
 				case HttpStatusCode.NotFound:
 				case HttpStatusCode.InternalServerError:
+				case HttpStatusCode.BadGateway:
 				case HttpStatusCode.GatewayTimeout:
 				case 0:
 					router.navigate(['/error', {context: ErrorContext.NETWORK}]);

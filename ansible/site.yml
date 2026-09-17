@@ -208,8 +208,8 @@
       become: true
 
     - name: Deploy maintenance page
-      ansible.builtin.copy:
-        src: "{{ playbook_dir }}/../frontends/maintenance.html"
+      ansible.builtin.template:
+        src: "templates/maintenance.html"
         dest: /var/www/rodano/maintenance.html
         mode: "0644"
       become: true
