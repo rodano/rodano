@@ -104,6 +104,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 			family.checkNotRemoved();
 
 			workflowStatus.setState(state);
+			workflowStatus.setLastMessage(rationale);
 			workflowStatusDAOService.saveWorkflowStatus(workflowStatus, context, rationale);
 
 			//execute modifications rules

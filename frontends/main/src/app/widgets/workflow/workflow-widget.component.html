@@ -177,6 +177,20 @@
 		</td>
 	</ng-container>
 
+	<ng-container matColumnDef="WORKFLOW_LAST_MESSAGE">
+		<th
+			mat-header-cell
+			*matHeaderCellDef
+			mat-sort-header>
+			{{ getColumnHeader('WORKFLOW_LAST_MESSAGE') | localizeMap }}
+		</th>
+		<td
+			mat-cell
+			*matCellDef="let status">
+			{{ status.lastMessage }}
+		</td>
+	</ng-container>
+
 	<ng-container matColumnDef="FORM_LABEL">
 		<th
 			mat-header-cell

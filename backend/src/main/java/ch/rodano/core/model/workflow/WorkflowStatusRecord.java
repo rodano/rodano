@@ -15,6 +15,7 @@ public class WorkflowStatusRecord {
 	protected String actionId;
 	protected String validatorId;
 	protected String triggerMessage;
+	protected String lastMessage;
 
 	protected WorkflowStatusRecord() {
 		removed = false;
@@ -116,6 +117,14 @@ public class WorkflowStatusRecord {
 
 	public void setTriggerMessage(final String triggerMessage) {
 		this.triggerMessage = triggerMessage;
+	}
+
+	public String getLastMessage() {
+		return lastMessage;
+	}
+
+	public void setLastMessage(final String lastMessage) {
+		this.lastMessage = lastMessage;
 	}
 
 }

@@ -12,11 +12,12 @@
 /**
  * Type of column
  */
-export type WorkflowWidgetColumnType = 'WORKFLOW_LABEL' | 'WORKFLOW_TRIGGER_MESSAGE' | 'STATUS_LABEL' | 'STATUS_DATE' | 'PARENT_SCOPE_CODE' | 'SCOPE_CODE' | 'EVENT_LABEL' | 'EVENT_DATE' | 'FORM_LABEL' | 'FORM_DATE' | 'FIELD_LABEL' | 'FIELD_DATE';
+export type WorkflowWidgetColumnType = 'WORKFLOW_LABEL' | 'WORKFLOW_TRIGGER_MESSAGE' | 'WORKFLOW_LAST_MESSAGE' | 'STATUS_LABEL' | 'STATUS_DATE' | 'PARENT_SCOPE_CODE' | 'SCOPE_CODE' | 'EVENT_LABEL' | 'EVENT_DATE' | 'FORM_LABEL' | 'FORM_DATE' | 'FIELD_LABEL' | 'FIELD_DATE';
 
 export const WorkflowWidgetColumnType = {
     WORKFLOW_LABEL: 'WORKFLOW_LABEL' as WorkflowWidgetColumnType,
     WORKFLOW_TRIGGER_MESSAGE: 'WORKFLOW_TRIGGER_MESSAGE' as WorkflowWidgetColumnType,
+    WORKFLOW_LAST_MESSAGE: 'WORKFLOW_LAST_MESSAGE' as WorkflowWidgetColumnType,
     STATUS_LABEL: 'STATUS_LABEL' as WorkflowWidgetColumnType,
     STATUS_DATE: 'STATUS_DATE' as WorkflowWidgetColumnType,
     PARENT_SCOPE_CODE: 'PARENT_SCOPE_CODE' as WorkflowWidgetColumnType,

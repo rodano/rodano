@@ -78,6 +78,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		workflow.setInitialStateId("OPEN");
 		final var openWorkflowStatus = workflowStatusService.create(family, center, workflow, Collections.emptyMap(), context, TEST_RATIONALE);
 		assertEquals(openWorkflowStatus.getStateId(), "OPEN");
+		assertEquals(TEST_RATIONALE, openWorkflowStatus.getLastMessage());
 
 		workflow.setInitialStateId("PENDING");
 		final var pendingWorkflowStatus = workflowStatusService.create(family, center, workflow, Collections.emptyMap(), context, TEST_RATIONALE);
@@ -457,6 +458,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 			"Change state",
 			() -> assertTrue(reviewedWorkflowStatus.isPresent()),
 			() -> assertEquals("REVIEWED", reviewedWorkflowStatus.get().getStateId()),
+			() -> assertEquals("Change to reviewed", reviewedWorkflowStatus.get().getLastMessage()),
 			() -> assertEquals(1, reviewedWorkflowStatus.get().getState().getPossibleActions().size())
 		);
 
@@ -467,6 +469,7 @@ public class WorkflowStatusServiceTest extends DatabaseTest {
 		assertAll(
 			() -> assertTrue(readyToReviewWorkflowStatus.isPresent()),
 			() -> assertEquals("READY_TO_REVIEW", readyToReviewWorkflowStatus.get().getStateId()),
+			() -> assertEquals("Change to unreviewed", readyToReviewWorkflowStatus.get().getLastMessage()),
 			() -> assertEquals(1, readyToReviewWorkflowStatus.get().getState().getPossibleActions().size())
 		);
 

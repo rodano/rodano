@@ -243,6 +243,7 @@ create table workflow_status (
 	action_id varchar(100) default null,
 	validator_id varchar(100) default null,
 	trigger_message varchar(1000) default null,
+	last_message varchar(1000) default null,
 	constraint pk_workflow_status primary key (pk)
 ) engine = InnoDB default charset = utf8mb4 collate = utf8mb4_unicode_ci;
 

@@ -25,6 +25,17 @@ public enum WorkflowWidgetColumnType {
 			return 80;
 		}
 	},
+	WORKFLOW_LAST_MESSAGE {
+		@Override
+		public OperandType getType() {
+			return OperandType.STRING;
+		}
+
+		@Override
+		public int getDefaultWidth() {
+			return 80;
+		}
+	},
 	STATUS_LABEL {
 		@Override
 		public OperandType getType() {

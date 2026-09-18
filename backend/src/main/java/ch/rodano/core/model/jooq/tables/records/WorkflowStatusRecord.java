@@ -230,6 +230,20 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 		return (String) get(14);
 	}
 
+	/**
+	 * Setter for <code>workflow_status.last_message</code>.
+	 */
+	public void setLastMessage(String value) {
+		set(15, value);
+	}
+
+	/**
+	 * Getter for <code>workflow_status.last_message</code>.
+	 */
+	public String getLastMessage() {
+		return (String) get(15);
+	}
+
 	// -------------------------------------------------------------------------
 	// Primary key information
 	// -------------------------------------------------------------------------
@@ -253,7 +267,7 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 	/**
 	 * Create a detached, initialised WorkflowStatusRecord
 	 */
-	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage) {
+	public WorkflowStatusRecord(Long pk, ZonedDateTime creationTime, ZonedDateTime lastUpdateTime, Boolean removed, Long scopeFk, Long eventFk, Long formFk, Long fieldFk, Long userFk, Long robotFk, String stateId, String workflowId, String actionId, String validatorId, String triggerMessage, String lastMessage) {
 		super(WorkflowStatus.WORKFLOW_STATUS);
 
 		setPk(pk);
@@ -271,6 +285,7 @@ public class WorkflowStatusRecord extends UpdatableRecordImpl<WorkflowStatusReco
 		setActionId(actionId);
 		setValidatorId(validatorId);
 		setTriggerMessage(triggerMessage);
+		setLastMessage(lastMessage);
 		resetTouchedOnNotNull();
 	}
 }

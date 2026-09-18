@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record15;
+import org.jooq.Record16;
 import org.jooq.Select;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -256,7 +256,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 
 		final Table<?> table;
 		if(isAggregator) {
-			Select<Record15<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String>> tableQuery = null;
+			Select<Record16<Long,ZonedDateTime,ZonedDateTime,Boolean,Long,Long,Long,Long,Long,Long,String,String,String,String,String,String>> tableQuery = null;
 			//a widget displaying an aggregation workflow is either on scopes or events
 			if(WorkflowableEntity.SCOPE.equals(entity)) {
 				tableQuery = aggregateWorkflowDAOService.generateScopeQuery(Optional.of(workflows.getFirst()), Optional.empty());
@@ -297,6 +297,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				WORKFLOW_STATUS.LAST_UPDATE_TIME,
 				WORKFLOW_STATUS.WORKFLOW_ID,
 				WORKFLOW_STATUS.TRIGGER_MESSAGE,
+				WORKFLOW_STATUS.LAST_MESSAGE,
 				WORKFLOW_STATUS.VALIDATOR_ID,
 				WORKFLOW_STATUS.STATE_ID
 			)
@@ -402,6 +403,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			header.add("Workflow");
 			header.add("Workflow initialisation date");
 			header.add("Workflow initialisation message");
+			header.add("Workflow last message");
 			header.add("Workflow validator");
 			header.add("Current workflow status");
 			header.add("Current workflow status date");
@@ -483,6 +485,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID));
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS.CREATION_TIME)));
 				line.add(record.getValue(WORKFLOW_STATUS.TRIGGER_MESSAGE));
+				line.add(record.getValue(WORKFLOW_STATUS.LAST_MESSAGE));
 				line.add(record.getValue(WORKFLOW_STATUS.VALIDATOR_ID));
 				line.add(record.getValue(WORKFLOW_STATUS.STATE_ID));
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS.LAST_UPDATE_TIME)));
@@ -527,6 +530,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				WORKFLOW_STATUS.CREATION_TIME,
 				WORKFLOW_STATUS.WORKFLOW_ID,
 				WORKFLOW_STATUS.TRIGGER_MESSAGE,
+				WORKFLOW_STATUS.LAST_MESSAGE,
 				WORKFLOW_STATUS.VALIDATOR_ID
 			)
 		);
@@ -631,6 +635,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 			header.add("Workflow");
 			header.add("Workflow initialisation date");
 			header.add("Workflow initialisation message");
+			header.add("Workflow last message");
 			header.add("Workflow validator");
 			header.add("Removed");
 			header.add("Actor");
@@ -715,6 +720,7 @@ public class WorkflowSummaryServiceImpl implements WorkflowSummaryService {
 				line.add(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID));
 				line.add(UtilsService.HUMAN_READABLE_DATE_TIME.format(record.getValue(WORKFLOW_STATUS.CREATION_TIME)));
 				line.add(record.getValue(WORKFLOW_STATUS.TRIGGER_MESSAGE));
+				line.add(record.getValue(WORKFLOW_STATUS.LAST_MESSAGE));
 				line.add(record.getValue(WORKFLOW_STATUS.VALIDATOR_ID));
 				line.add(Boolean.toString(record.getValue(removedField)));
 				line.add(record.getValue(WORKFLOW_STATUS_AUDIT.AUDIT_ACTOR()));

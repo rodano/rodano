@@ -17,9 +17,11 @@ public class WorkflowStatusDTO {
 	@Schema(description = "The workflow status ID")
 	@NotBlank
 	String statusId;
-	@Schema(description = "User message that was attached to the latest status change")
+	@Schema(description = "User message that triggered the workflow")
 	@NotBlank
 	String triggerMessage;
+	@Schema(description = "User message attached to the latest status change")
+	String lastMessage;
 	@Schema(description = "The workflow model of the WorkflowStatus")
 	@NotNull
 	WorkflowDTO workflow;
@@ -90,6 +92,14 @@ public class WorkflowStatusDTO {
 
 	public void setTriggerMessage(final String triggerMessage) {
 		this.triggerMessage = triggerMessage;
+	}
+
+	public String getLastMessage() {
+		return lastMessage;
+	}
+
+	public void setLastMessage(final String lastMessage) {
+		this.lastMessage = lastMessage;
 	}
 
 	public WorkflowDTO getWorkflow() {

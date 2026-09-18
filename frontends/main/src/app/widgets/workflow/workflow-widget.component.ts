@@ -68,6 +68,7 @@ export class WorkflowWidgetComponent implements OnInit {
 	columnToApiPropertyMap: Record<string, string> = {
 		WORKFLOW_LABEL: 'workflow',
 		WORKFLOW_TRIGGER_MESSAGE: 'triggerMessage',
+		WORKFLOW_LAST_MESSAGE: 'lastMessage',
 		STATUS_LABEL: 'status',
 		STATUS_DATE: 'statusDate',
 		PARENT_SCOPE_CODE: 'parentScopeCode',
