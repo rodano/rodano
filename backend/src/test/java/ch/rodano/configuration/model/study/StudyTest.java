@@ -203,16 +203,16 @@ public class StudyTest {
 			);
 
 		assertAll("Ancestors",
-			() -> assertEquals(0, studyModel.getScopeModelAncestors().size()),
-			() -> assertEquals(3, patient.getScopeModelAncestors().size()),
-			() -> assertEquals(1, patient.getScopeModelParents().size()),
-			() -> assertEquals(center, patient.getScopeModelParents().get(0))
+			() -> assertEquals(0, studyModel.getAncestors().size()),
+			() -> assertEquals(3, patient.getAncestors().size()),
+			() -> assertEquals(1, patient.getParents().size()),
+			() -> assertEquals(center, patient.getParents().get(0))
 			);
 
 		assertAll("Children",
-			() -> assertEquals(1, studyModel.getChildrenScopeModel().size()),
-			() -> assertEquals(3, studyModel.getDescendantsScopeModel().size()),
-			() -> assertEquals(0, patient.getChildrenScopeModel().size())
+			() -> assertEquals(1, studyModel.getChildren().size()),
+			() -> assertEquals(3, studyModel.getDescendants().size()),
+			() -> assertEquals(0, patient.getChildren().size())
 			);
 
 		assertAll("Is ... of",
@@ -266,4 +266,3 @@ public class StudyTest {
 	}
 
 }
-

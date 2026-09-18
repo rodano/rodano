@@ -331,16 +331,16 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
-	public List<ScopeModel> getScopeModelParents() {
+	public List<ScopeModel> getParents() {
 		return getParentIds().stream().map(study::getScopeModel).toList();
 	}
 
 	@JsonIgnore
-	public List<ScopeModel> getScopeModelAncestors() {
+	public List<ScopeModel> getAncestors() {
 		final List<ScopeModel> ancestors = new ArrayList<>();
-		getScopeModelParents().forEach(parent -> {
+		getParents().forEach(parent -> {
 			ancestors.add(parent);
-			ancestors.addAll(parent.getScopeModelAncestors());
+			ancestors.addAll(parent.getAncestors());
 		});
 		return ancestors;
 	}
@@ -361,18 +361,18 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	}
 
 	@JsonIgnore
-	public List<ScopeModel> getChildrenScopeModel() {
+	public List<ScopeModel> getChildren() {
 		return getStudy().getScopeModels().stream()
 			.filter(s -> s.getParentIds().contains(getId()))
 			.toList();
 	}
 
 	@JsonIgnore
-	public final List<ScopeModel> getDescendantsScopeModel() {
+	public final List<ScopeModel> getDescendants() {
 		final List<ScopeModel> descendants = new ArrayList<>();
-		for(final var child : getChildrenScopeModel()) {
+		for(final var child : getChildren()) {
 			descendants.add(child);
-			descendants.addAll(child.getDescendantsScopeModel());
+			descendants.addAll(child.getDescendants());
 		}
 		return descendants;
 	}
@@ -390,7 +390,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 			models.add(model);
 		}
 		else {
-			for(final var parent : getScopeModelParents()) {
+			for(final var parent : getParents()) {
 				for(final var branch : parent.getBranch(model)) {
 					if(!models.contains(branch)) {
 						models.add(branch);
@@ -435,7 +435,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 		if(isChildOf(potentialAncestor)) {
 			return true;
 		}
-		for(final var s : getScopeModelParents()) {
+		for(final var s : getParents()) {
 			if(s.isDescendantOf(potentialAncestor)) {
 				return true;
 			}
@@ -493,7 +493,7 @@ public class ScopeModel implements Serializable, SuperDisplayable, WorkflowableM
 	@JsonIgnore
 	public final Collection<Node> getChildrenWithEntity(final Entity entity) {
 		return switch(entity) {
-			case SCOPE_MODEL -> Collections.unmodifiableList(getChildrenScopeModel());
+			case SCOPE_MODEL -> Collections.unmodifiableList(getChildren());
 			case EVENT_GROUP -> Collections.unmodifiableList(getEventGroups());
 			case EVENT_MODEL -> Collections.unmodifiableList(getEventModels());
 			default -> Collections.emptyList();
