@@ -63,6 +63,8 @@ public class WorkflowStatusInfo {
 	private String workflow;
 	@NotBlank
 	private String triggerMessage;
+	@NotBlank
+	private String lastMessage;
 
 	@NotBlank
 	private String status;
@@ -78,6 +80,7 @@ public class WorkflowStatusInfo {
 		return switch(type) {
 			case WORKFLOW_LABEL -> workflow;
 			case WORKFLOW_TRIGGER_MESSAGE -> triggerMessage;
+			case WORKFLOW_LAST_MESSAGE -> lastMessage;
 			case STATUS_LABEL -> status;
 			case STATUS_DATE -> statusDate;
 			case EVENT_LABEL -> eventLabel;
@@ -256,6 +259,14 @@ public class WorkflowStatusInfo {
 
 	public void setTriggerMessage(final String triggerMessage) {
 		this.triggerMessage = triggerMessage;
+	}
+
+	public String getLastMessage() {
+		return lastMessage;
+	}
+
+	public void setLastMessage(final String lastMessage) {
+		this.lastMessage = lastMessage;
 	}
 
 	public String getWorkflow() {

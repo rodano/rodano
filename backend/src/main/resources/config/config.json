@@ -25,7 +25,7 @@
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
 	"configVersion": 127,
-	"configDate": 1789566113706,
+	"configDate": 1789748629060,
 	"configUser": "NA",
 	"configChangelogs": [],
 	"languageIds": [
@@ -25643,6 +25643,13 @@
 						"fr": "Date"
 					},
 					"type": "STATUS_DATE",
+					"className": "WorkflowWidgetColumn"
+				},
+				{
+					"label": {
+						"en": "Message"
+					},
+					"type": "WORKFLOW_LAST_MESSAGE",
 					"className": "WorkflowWidgetColumn"
 				}
 			],

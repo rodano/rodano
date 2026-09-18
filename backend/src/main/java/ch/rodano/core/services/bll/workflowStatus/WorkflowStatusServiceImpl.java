@@ -104,6 +104,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 			family.checkNotRemoved();
 
 			workflowStatus.setState(state);
+			workflowStatus.setLastMessage(rationale);
 			workflowStatusDAOService.saveWorkflowStatus(workflowStatus, context, rationale);
 
 			//execute modifications rules
@@ -184,6 +185,7 @@ public class WorkflowStatusServiceImpl implements WorkflowStatusService {
 
 		ws.setWorkflow(workflow);
 		ws.setTriggerMessage(rationale);
+		ws.setLastMessage(rationale);
 		//use orElseGet to retrieve the workflow initial state only if the state is not provided
 		//retrieving the initial state will fail if the workflow has none
 		ws.setState(state.orElseGet(() -> workflow.getInitialState()));

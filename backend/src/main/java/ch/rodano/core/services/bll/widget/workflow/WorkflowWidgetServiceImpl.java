@@ -152,7 +152,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 				ancestorsField,
 				totalField,
 				WORKFLOW_STATUS.PK, WORKFLOW_STATUS.SCOPE_FK, WORKFLOW_STATUS.EVENT_FK, WORKFLOW_STATUS.FORM_FK, WORKFLOW_STATUS.FIELD_FK,
-				WORKFLOW_STATUS.TRIGGER_MESSAGE, WORKFLOW_STATUS.LAST_UPDATE_TIME, WORKFLOW_STATUS.WORKFLOW_ID, WORKFLOW_STATUS.STATE_ID,
+				WORKFLOW_STATUS.TRIGGER_MESSAGE, WORKFLOW_STATUS.LAST_MESSAGE, WORKFLOW_STATUS.LAST_UPDATE_TIME, WORKFLOW_STATUS.WORKFLOW_ID, WORKFLOW_STATUS.STATE_ID,
 				SCOPE.PK, SCOPE.SCOPE_MODEL_ID, SCOPE.CODE, SCOPE.SHORTNAME, SCOPE.LONGNAME,
 				PARENT_SCOPE_TABLE.CODE
 			)
@@ -257,6 +257,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 		fullText.ifPresent(search -> {
 			final var searchValue = StringUtils.join("%", search.toLowerCase(), "%");
 			var searchCondition = WORKFLOW_STATUS.TRIGGER_MESSAGE.likeIgnoreCase(searchValue)
+				.or(WORKFLOW_STATUS.LAST_MESSAGE.likeIgnoreCase(searchValue))
 				.or(PARENT_SCOPE_TABLE.CODE.like(searchValue))
 				.or(SCOPE.CODE.like(searchValue));
 			//add search on workflowable models
@@ -359,6 +360,7 @@ public class WorkflowWidgetServiceImpl implements WorkflowWidgetService {
 			}
 
 			wsi.setTriggerMessage(record.getValue(WORKFLOW_STATUS.TRIGGER_MESSAGE));
+			wsi.setLastMessage(record.getValue(WORKFLOW_STATUS.LAST_MESSAGE));
 			wsi.setStatusDate(record.getValue(WORKFLOW_STATUS.LAST_UPDATE_TIME));
 
 			final var workflow = study.getWorkflow(record.getValue(WORKFLOW_STATUS.WORKFLOW_ID));

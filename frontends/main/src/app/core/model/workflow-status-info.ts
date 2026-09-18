@@ -36,6 +36,7 @@ export interface WorkflowStatusInfo {
     pk: number;
     workflow: string;
     triggerMessage: string;
+    lastMessage: string;
     status: string;
     statusDate: Date;
     statusIcon: string;

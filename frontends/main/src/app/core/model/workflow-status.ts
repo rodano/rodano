@@ -22,9 +22,13 @@ export interface WorkflowStatus {
      */
     statusId: string;
     /**
-     * User message that was attached to the latest status change
+     * User message that triggered the workflow
      */
     triggerMessage: string;
+    /**
+     * User message attached to the latest status change
+     */
+    lastMessage: string;
     workflow: Workflow;
     state: WorkflowState;
     /**

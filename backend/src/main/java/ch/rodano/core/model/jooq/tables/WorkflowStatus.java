@@ -143,6 +143,11 @@ public class WorkflowStatus extends TableImpl<WorkflowStatusRecord> {
 	 */
 	public final TableField<WorkflowStatusRecord, String> TRIGGER_MESSAGE = createField(DSL.name("trigger_message"), SQLDataType.VARCHAR(1000).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
 
+	/**
+	 * The column <code>workflow_status.last_message</code>.
+	 */
+	public final TableField<WorkflowStatusRecord, String> LAST_MESSAGE = createField(DSL.name("last_message"), SQLDataType.VARCHAR(1000).defaultValue(DSL.field(DSL.raw("NULL"), SQLDataType.VARCHAR)), this, "");
+
 	private WorkflowStatus(Name alias, Table<WorkflowStatusRecord> aliased) {
 		this(alias, aliased, (Field<?>[]) null, null);
 	}

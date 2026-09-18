@@ -9,3 +9,4 @@ insert into internal_patch (script, date, context, name) values (181, now(3), 'D
 insert into internal_patch (script, date, context, name) values (182, now(3), 'Rename deleted column to removed', 'db_update_182.sql');
 insert into internal_patch (script, date, context, name) values (183, now(3), 'Add index for search optimization', 'db_update_183.sql');
 insert into internal_patch (script, date, context, name) values (184, now(3), 'Remove payment feature', 'db_update_184.sql');
+insert into internal_patch (script, date, context, name) values (185, now(3), 'Add latest message to workflow statuses', 'db_update_185.sql');

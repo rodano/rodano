@@ -15,7 +15,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.GroupConcatOrderByStep;
 import org.jooq.GroupField;
-import org.jooq.Record15;
+import org.jooq.Record16;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
@@ -112,7 +112,7 @@ public class AggregateWorkflowDAOService {
 		return DSL.case_(WORKFLOW_STATUS.WORKFLOW_ID).mapFields(values);
 	}
 
-	public Select<Record15<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String>> generateScopeQuery(
+	public Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> generateScopeQuery(
 		final Optional<Workflow> workflow,
 		final Optional<Collection<Long>> scopePks
 	) {
@@ -167,7 +167,8 @@ public class AggregateWorkflowDAOService {
 			workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
 			DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
 			DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
-			DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
+			DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE),
+			DSL.inline(null, WORKFLOW_STATUS.LAST_MESSAGE).as(WORKFLOW_STATUS.LAST_MESSAGE)
 		)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(EVENT).on(WORKFLOW_STATUS.EVENT_FK.eq(EVENT.PK))
@@ -179,7 +180,7 @@ public class AggregateWorkflowDAOService {
 			.having(DSL.field("state_id").isNotNull());
 	}
 
-	public Select<Record15<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String>> generateEventQuery(
+	public Select<Record16<Long, ZonedDateTime, ZonedDateTime, Boolean, Long, Long, Long, Long, Long, Long, String, String, String, String, String, String>> generateEventQuery(
 		final Optional<Workflow> workflow,
 		final Optional<Collection<Long>> eventPks
 	) {
@@ -232,7 +233,8 @@ public class AggregateWorkflowDAOService {
 			workflowCase.as(WORKFLOW_STATUS.WORKFLOW_ID),
 			DSL.inline(null, WORKFLOW_STATUS.ACTION_ID).as(WORKFLOW_STATUS.ACTION_ID),
 			DSL.inline(null, WORKFLOW_STATUS.VALIDATOR_ID).as(WORKFLOW_STATUS.VALIDATOR_ID),
-			DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE)
+			DSL.inline(null, WORKFLOW_STATUS.TRIGGER_MESSAGE).as(WORKFLOW_STATUS.TRIGGER_MESSAGE),
+			DSL.inline(null, WORKFLOW_STATUS.LAST_MESSAGE).as(WORKFLOW_STATUS.LAST_MESSAGE)
 		)
 			.from(WORKFLOW_STATUS)
 			.leftJoin(FIELD).on(WORKFLOW_STATUS.FIELD_FK.eq(FIELD.PK))

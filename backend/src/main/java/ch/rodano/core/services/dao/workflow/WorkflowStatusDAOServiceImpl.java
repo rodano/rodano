@@ -248,7 +248,9 @@ public class WorkflowStatusDAOServiceImpl extends AuditableDAOService<WorkflowSt
 		});
 
 		search.getFullText().ifPresent(_ -> {
-			conditions.add(WORKFLOW_STATUS.TRIGGER_MESSAGE.containsIgnoreCase(search.getFullText().get()));
+			conditions.add(
+				WORKFLOW_STATUS.TRIGGER_MESSAGE.containsIgnoreCase(search.getFullText().get())
+				.or(WORKFLOW_STATUS.LAST_MESSAGE.containsIgnoreCase(search.getFullText().get())));
 		});
 
 		query

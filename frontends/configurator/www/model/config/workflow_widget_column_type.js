@@ -9,7 +9,12 @@ export const WorkflowWidgetColumnType = Object.freeze({
 	},
 	WORKFLOW_TRIGGER_MESSAGE: {
 		label: 'Workflow trigger message',
-		type: DataType.DATE,
+		type: DataType.STRING,
+		default_width: 80
+	},
+	WORKFLOW_LAST_MESSAGE: {
+		label: 'Workflow last message',
+		type: DataType.STRING,
 		default_width: 80
 	},
 	STATUS_LABEL: {
