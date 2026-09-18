@@ -148,7 +148,7 @@ function import_line(line, index, study, language, dry_run) {
 				field_model.withSeconds = !!line['Collect seconds'];
 				field_model.size = numberify(line['Size'], undefined);
 				field_model.maxLength = numberify(line['Max length'], undefined);
-				field_model.forDisplay = line['Help'] || undefined;
+				field_model.inlineHelp = line['Help'] || undefined;
 			}
 			//set possible values
 			let possible_value_ids = undefined;
