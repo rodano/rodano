@@ -82,7 +82,7 @@ function select_cell(cell) {
 		const wizard_form_model_field_model_unit = /**@type {HTMLInputElement}*/ (document.getElementById('wizard_form_model_field_model_unit'));
 		if(field_model.type === 'NUMBER') {
 			wizard_form_model_field_model_format.value = field_model.format || '';
-			wizard_form_model_field_model_unit.value = field_model.forDisplay || '';
+			wizard_form_model_field_model_unit.value = field_model.inlineHelp || '';
 			wizard_form_model_field_model_unit.parentElement.style.display = 'block';
 		}
 		else {
@@ -303,14 +303,14 @@ Wizards.Register('form_model', {
 					}
 					if(field_model.type === 'NUMBER') {
 						field_model.format = this.number_format.value;
-						field_model.forDisplay = this.unit.value;
+						field_model.inlineHelp = this.unit.value;
 						field_model.size = 4 + field_model.format.length;
 						field_model.maxLength = field_model.size;
 					}
 					if(field_model.type === 'DATE') {
 						const format = this.date_format.value;
 						field_model.format = format;
-						field_model.forDisplay = `(${format.toLowerCase()})`;
+						field_model.inlineHelp = `(${format.toLowerCase()})`;
 						field_model.size = format.length;
 						field_model.maxLength = field_model.size;
 					}
