@@ -1,3 +1,8 @@
+<!--
+display header only if a study is available
+that's because the header comes with Rodano default color, which might not match the study's theme
+and we want to avoid the header to flicker
+-->
 @if (study()) {
 	@if (study()!.environment !== environment.PROD) {
 		<div id="stamp">{{ study()!.environment }}</div>
@@ -20,14 +25,13 @@
 		<p>
 			<button (click)="bypassMaintenance()">Continue using the application</button>
 		</p>
-	}
-	<!--content must be displayed even if the study cannot be fetched, to display the error page-->
-	@else if (displayContent()) {
+	} @else {
 		<router-outlet></router-outlet>
 	}
 </div>
 
-@if (displayContent()) {
+<!-- same as for the header, display the footer only if a study is available -->
+@if (study()) {
 	<footer>
 		Powered by <a href="https://www.rodano.ch">Rodano</a>. Distributed under AGPLv3. Access source code
 		<a href="https://github.com/rodano/rodano">here</a>.
