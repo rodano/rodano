@@ -88,7 +88,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 	 */
 	@Override
 	public void addInterceptors(final InterceptorRegistry registry) {
-		registry.addInterceptor(mustChangePasswordInterceptor).excludePathPatterns("/auth/password/change", "/me", "/config/study", "/config/public-study");
+		registry.addInterceptor(mustChangePasswordInterceptor).excludePathPatterns("/auth/password/change", "/me", "/config/study", "/config/public-study", "/sessions");
 		registry.addInterceptor(requestContextInterceptor);
 	}
 
