@@ -1,7 +1,7 @@
 {
 	"name": "@rodano/rodano-configurator",
 	"description": "Rodano configuration tool",
-	"version": "7.0.0-dev",
+	"version": "0.0.0-dev",
 	"repository": "git://github.com/rodano/rodano.git",
 	"license": "AGPL-3.0-only",
 	"type": "module",

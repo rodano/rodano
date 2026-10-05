@@ -1,6 +1,8 @@
 {
 	//VSCode settings for the whole repository. In VSCode, it's usually better to open the folder of a specific module instead of the whole repository
 	"files.exclude": {
+		"__pycache__*": true,
+
 		".ansible": true,
 		"ansible/.venv": true,
 

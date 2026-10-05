@@ -1,7 +1,7 @@
 {
 	"name": "@rodano/rodano-epro",
 	"description": "Patient reported outcome frontend for Rodano",
-	"version": "7.0.0-dev",
+	"version": "0.0.0-dev",
 	"repository": "git://github.com/rodano/rodano.git",
 	"license": "AGPL-3.0-only",
 	"scripts": {
