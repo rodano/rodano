@@ -32,6 +32,10 @@ FROM eclipse-temurin:25
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano backend"
 
+RUN apt-get update \
+	&& apt-get install --yes --no-install-recommends curl \
+	&& rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY --from=builder /app/target/rodano-backend-exec.jar rodano.jar

@@ -91,7 +91,7 @@ services:
       test:
         [
             "CMD-SHELL",
-            "curl -s http://localhost:8080/administration/is-online | grep -q 'study is up'"
+            "curl --fail --silent http://localhost:8080/administration/is-online | grep --quiet 'study is up'"
         ]
       start_period: 30s
       retries: 5
