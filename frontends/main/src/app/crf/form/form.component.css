@@ -22,3 +22,33 @@ form {
 	align-items: center;
 	margin-bottom: var(--gap);
 }
+
+/* These classes are used by dynamically injected content from external configuration (child nodes).
+   These are intended to be used in textBefore and textAfter content of a cell component.
+   Using ::ng-deep allows them to pierce Angular's view encapsulation so they can be applied to
+   nodes that are not part of this component's template. 
+   */
+:host ::ng-deep .instructions {
+	color: #1a5fad;
+	background-color: #e4f1ff;
+	padding: 0.8rem;
+}
+:host ::ng-deep .important {
+	color: red;
+	font-weight: bold;
+	padding: 0.8rem;
+}
+
+:host ::ng-deep .ecrf_section {
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+:host ::ng-deep .ecrf_section::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background-color: #ddd;
+}
