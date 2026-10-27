@@ -334,7 +334,7 @@ public class MailServiceImpl implements MailService {
 			MailTemplate.USER_ACTIVATION_INVITATION,
 			vars,
 			Collections.singleton(recipient.getEmail()),
-			"Send user activation e-mail"
+			ACCOUNT_ACTIVATION_INTENT
 		);
 
 		createMail(mail, context, "Send user activation invitation e-mail");
@@ -370,7 +370,7 @@ public class MailServiceImpl implements MailService {
 			MailTemplate.EMAIL_VERIFICATION,
 			templateVars,
 			Collections.singleton(recipient.getPendingEmail()),
-			"Verify user e-mail"
+			EMAIL_VERIFICATION_INTENT
 		);
 
 		createMail(mail, context, "Verify user e-mail");

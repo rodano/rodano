@@ -128,8 +128,13 @@ export class UserSecurityComponent {
 	resendEmailVerificationEmail() {
 		this.userService.resendEmailVerificationEmail(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(() => {
-			this.notificationService.showSuccess('Email verification email resent');
+		).subscribe({
+			next: () => {
+				this.notificationService.showSuccess('Email verification email resent');
+			},
+			error: response => {
+				this.notificationService.showError(response.error?.message ?? 'Unable to send the email');
+			}
 		});
 	}
 
@@ -188,8 +193,13 @@ export class UserSecurityComponent {
 	resendAccountActivationEmail() {
 		this.userService.resendAccountActivationEmail(this.user().pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
-		).subscribe(() => {
-			this.notificationService.showSuccess('Activation email resent');
+		).subscribe({
+			next: () => {
+				this.notificationService.showSuccess('Activation email resent');
+			},
+			error: response => {
+				this.notificationService.showError(response.error?.message ?? 'Unable to send the email');
+			}
 		});
 	}
 

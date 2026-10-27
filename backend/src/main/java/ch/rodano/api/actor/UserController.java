@@ -1,5 +1,7 @@
 package ch.rodano.api.actor;
 
+import java.time.Duration;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,8 +38,10 @@ import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.configuration.model.export.ExportFormat;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.rights.Rights;
+import ch.rodano.core.model.exception.TooManyRequestsException;
 import ch.rodano.core.model.exception.WrongDataConditionException;
 import ch.rodano.core.model.exception.security.WrongCredentialsException;
+import ch.rodano.core.model.mail.MailSearch;
 import ch.rodano.core.model.role.RoleStatus;
 import ch.rodano.core.model.scope.Scope;
 import ch.rodano.core.model.user.User;
@@ -59,6 +63,8 @@ import ch.rodano.core.utils.UtilsService;
 @Validated
 @Transactional(readOnly = true)
 public class UserController extends AbstractSecuredController {
+
+	private static final Duration RESEND_COOLDOWN = Duration.ofMinutes(1);
 
 	private final MailService mailService;
 	private final UserService userService;
@@ -431,10 +437,14 @@ public class UserController extends AbstractSecuredController {
 		userSecurityService.recoverUserAccount(recoveryCode, currentContext());
 	}
 
-	@Operation(summary = "Resend email verification email")
+	@Operation(
+		summary = "Resend email verification email",
+		description = "Users can resend their own verification email. Other users need the write right on the target user. At most one email can be sent per minute."
+	)
 	@PostMapping("{userPk}/resend-email-verification")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
+	@IsUser
 	public void resendEmailVerificationEmail(
 		@PathVariable("userPk") final Long userPk,
 		final HttpServletRequest servletRequest
@@ -442,9 +452,16 @@ public class UserController extends AbstractSecuredController {
 		final var user = userService.getUserByPk(userPk);
 		utilsService.checkNotNull(User.class, user, userPk);
 
+		final var currentUser = (User) currentActor();
+		if(!currentUser.getPk().equals(userPk)) {
+			rightsService.checkRight(currentUser, currentActiveRoles(), user, Rights.WRITE);
+		}
+
 		if(StringUtils.isBlank(user.getPendingEmail())) {
 			throw new WrongDataConditionException("User has no pending email");
 		}
+
+		checkResendCooldown(user.getPendingEmail(), MailService.EMAIL_VERIFICATION_INTENT);
 
 		mailService.sendUserEmailVerificationEmail(
 			user,
@@ -454,10 +471,14 @@ public class UserController extends AbstractSecuredController {
 		);
 	}
 
-	@Operation(summary = "Resend account activation email")
+	@Operation(
+		summary = "Resend account activation email",
+		description = "Requires the write right on the target user. At most one email can be sent per minute."
+	)
 	@PostMapping("{userPk}/resend-account-activation")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@Transactional
+	@IsUser
 	public void resendAccountActivationEmail(
 		@PathVariable("userPk") final Long userPk,
 		final HttpServletRequest servletRequest
@@ -465,9 +486,13 @@ public class UserController extends AbstractSecuredController {
 		final var user = userService.getUserByPk(userPk);
 		utilsService.checkNotNull(User.class, user, userPk);
 
+		rightsService.checkRight(currentActor(), currentActiveRoles(), user, Rights.WRITE);
+
 		if(user.isActivated()) {
 			throw new WrongDataConditionException("User is already activated");
 		}
+
+		checkResendCooldown(user.getEmail(), MailService.ACCOUNT_ACTIVATION_INTENT);
 
 		mailService.sendUserAccountActivationInvitation(
 			user,
@@ -475,5 +500,19 @@ public class UserController extends AbstractSecuredController {
 			getServerURL(servletRequest),
 			currentContext()
 		);
+	}
+
+	private void checkResendCooldown(final String recipient, final String intent) {
+		// the search matches recipients and intents by substring, so the results are filtered on the exact values
+		final var search = new MailSearch()
+			.setRecipient(Optional.of(recipient))
+			.setIntent(Optional.of(intent))
+			.setAfterDate(Optional.of(ZonedDateTime.now().minus(RESEND_COOLDOWN)));
+		final var alreadySent = mailService.search(search).getObjects().stream()
+			.filter(mail -> intent.equals(mail.getIntent()))
+			.anyMatch(mail -> mail.getRecipients().stream().anyMatch(recipient::equalsIgnoreCase));
+		if(alreadySent) {
+			throw new TooManyRequestsException("An email has already been sent recently, please try again later");
+		}
 	}
 }

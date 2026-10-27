@@ -21,6 +21,10 @@ import ch.rodano.core.model.user.User;
 
 public interface MailService {
 
+	// intents of the e-mails, shared so that callers can find previously sent e-mails
+	String ACCOUNT_ACTIVATION_INTENT = "Send user activation e-mail";
+	String EMAIL_VERIFICATION_INTENT = "Verify user e-mail";
+
 	/**
 	 * Check if a mail address appear to be valid
 	 * This only checks the syntax of the address, and is by no means a guarantee that e-mails sent to this address will be received
