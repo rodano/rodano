@@ -38,6 +38,14 @@ public interface SessionDAOService {
 	void deleteSessionsByUserPk(Long userPk);
 
 	/**
+	 * Delete all sessions of a user except one
+	 *
+	 * @param userPk            The pk of the user
+	 * @param retainedSessionPk The pk of the session to keep
+	 */
+	void deleteOtherSessionsByUserPk(Long userPk, Long retainedSessionPk);
+
+	/**
 	 * Get a session by its token
 	 *
 	 * @param token The token

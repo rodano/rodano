@@ -50,6 +50,11 @@ public class SessionServiceImpl implements SessionService {
 	}
 
 	@Override
+	public void deleteOtherSessions(final User user, final Session retainedSession) {
+		sessionDAOService.deleteOtherSessionsByUserPk(user.getPk(), retainedSession.getPk());
+	}
+
+	@Override
 	public Session getSessionByToken(final String token) {
 		return sessionDAOService.getSessionByToken(token);
 	}

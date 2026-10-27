@@ -43,6 +43,7 @@ import ch.rodano.core.model.mail.MailOrigin;
 import ch.rodano.core.model.mail.MailTemplate;
 import ch.rodano.core.model.role.Role;
 import ch.rodano.core.model.rules.data.DataState;
+import ch.rodano.core.model.session.Session;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.mail.MailService;
@@ -512,6 +513,8 @@ public class UserSecurityService {
 		user.setPasswordResetDate(null);
 		unblockUser(user, userContext);
 		userDAOService.saveUser(user, userContext, "Reset password using reset code");
+		//the password may have been reset because the account was compromised, so every existing token is revoked
+		sessionService.deleteSessions(user);
 	}
 
 	public void recoverUserAccount(final String recoveryCode, final DatabaseActionContext context) {
@@ -580,12 +583,14 @@ public class UserSecurityService {
 	 * @param user              User to modify
 	 * @param currentPassword   User's current password
 	 * @param newPassword       New password
+	 * @param currentSession    Session used to change the password, the only one kept
 	 * @param context           Database action context
 	 */
 	public void changePassword(
 		final User user,
 		final String currentPassword,
 		final String newPassword,
+		final Session currentSession,
 		final DatabaseActionContext context
 	) {
 		if(user.isExternallyManaged()) {
@@ -605,6 +610,8 @@ public class UserSecurityService {
 		//try to set password
 		validateAndSetPassword(user, newPassword);
 		userDAOService.saveUser(user, context, "Change Password");
+		//revoke the other tokens, but keep the session of the user who just proved they know the password
+		sessionService.deleteOtherSessions(user, currentSession);
 	}
 
 	/**

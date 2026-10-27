@@ -1,5 +1,6 @@
 package ch.rodano.api;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import ch.rodano.api.authentication.ChangePasswordDTO;
+import ch.rodano.api.authentication.ResetPasswordDTO;
 import ch.rodano.core.helpers.UserCreatorService;
 import ch.rodano.core.helpers.builder.UserBuilder;
 import ch.rodano.core.model.user.User;
@@ -26,12 +29,14 @@ import ch.rodano.test.SpringTestConfiguration;
 import static ch.rodano.core.model.jooq.tables.User.USER;
 import static ch.rodano.core.model.jooq.tables.UserSession.USER_SESSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
  * Check that tokens already issued to a user stop working when the account or its credentials change
  */
 @SpringTestConfiguration
 public class SessionRevocationTest extends ControllerTest {
+	private static final String NEW_PASSWORD = "AnotherPassword2!";
 
 	@Autowired
 	private UserCreatorService userCreatorService;
@@ -102,6 +107,52 @@ public class SessionRevocationTest extends ControllerTest {
 
 		assertTokenRejected(removedUserToken);
 		assertTokenRejected(deactivatedUserToken);
+	}
+
+	@Test
+	@DisplayName("Resetting a password revokes all the tokens issued to the user")
+	public void resettingPasswordRevokesSessions() {
+		final var user = createUser();
+		authenticate(user.getEmail());
+		final var firstToken = token.get();
+		authenticate(user.getEmail());
+		final var secondToken = token.get();
+		assertEquals(2, countSessions(user));
+
+		final var resetCode = UUID.randomUUID().toString();
+		new TransactionTemplate(transactionManager).executeWithoutResult(_ -> create.update(USER)
+			.set(USER.PASSWORD_RESET_CODE, resetCode)
+			.set(USER.PASSWORD_RESET_DATE, ZonedDateTime.now())
+			.where(USER.PK.eq(user.getPk()))
+			.execute()
+		);
+		token = Optional.empty();
+		client.post().uri("/auth/password/reset")
+			.body(new ResetPasswordDTO(resetCode, NEW_PASSWORD))
+			.exchange().expectStatus().isNoContent();
+
+		assertTokenRejected(firstToken);
+		assertTokenRejected(secondToken);
+		assertEquals(0, countSessions(user));
+	}
+
+	@Test
+	@DisplayName("Changing a password revokes the other tokens and keeps the one used for the change")
+	public void changingPasswordRevokesOtherSessions() {
+		final var user = createUser();
+		authenticate(user.getEmail());
+		final var otherToken = token.get();
+		authenticate(user.getEmail());
+		final var currentToken = token.get();
+		assertNotEquals(otherToken, currentToken);
+
+		client.post().uri("/auth/password/change")
+			.body(new ChangePasswordDTO(TEST_USER_PASSWORD, NEW_PASSWORD))
+			.exchange().expectStatus().isCreated();
+
+		assertTokenAccepted(currentToken);
+		assertTokenRejected(otherToken);
+		assertEquals(1, countSessions(user));
 	}
 
 	private User createUser() {

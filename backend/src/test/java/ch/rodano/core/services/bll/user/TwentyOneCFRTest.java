@@ -57,6 +57,9 @@ public class TwentyOneCFRTest extends DatabaseTest {
 	@Autowired
 	private ScopeService scopeService;
 
+	@Autowired
+	private SessionService sessionService;
+
 	private User createVerifiedUser() {
 		final var user = new User();
 		user.setName("John Doe");
@@ -118,7 +121,7 @@ public class TwentyOneCFRTest extends DatabaseTest {
 		userSecurityService.forceSetNewPassword(user, userPassword, context);
 
 		final var newPassword = "ANOTHERSuperStronkPassword!!!111111";
-		userSecurityService.changePassword(user, userPassword, newPassword, context);
+		userSecurityService.changePassword(user, userPassword, newPassword, sessionService.createSession(user), context);
 
 		assertTrue(new BCryptPasswordEncoder(BCRYPT_STRENGTH).matches(newPassword, user.getPassword()));
 	}

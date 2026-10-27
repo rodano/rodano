@@ -40,6 +40,14 @@ public interface SessionService {
 	void deleteSessions(User user);
 
 	/**
+	 * Delete all sessions of a user except one, revoking every other token issued to them
+	 *
+	 * @param user            The user
+	 * @param retainedSession The session to keep
+	 */
+	void deleteOtherSessions(User user, Session retainedSession);
+
+	/**
 	 * Get a session by its token
 	 *
 	 * @param token The token

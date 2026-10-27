@@ -46,6 +46,11 @@ public class SessionDAOServiceImpl implements SessionDAOService {
 	}
 
 	@Override
+	public void deleteOtherSessionsByUserPk(final Long userPk, final Long retainedSessionPk) {
+		create.deleteFrom(USER_SESSION).where(USER_SESSION.USER_FK.eq(userPk).and(USER_SESSION.PK.ne(retainedSessionPk))).execute();
+	}
+
+	@Override
 	public Session getSessionByToken(final String token) {
 		return create.selectFrom(USER_SESSION).where(USER_SESSION.TOKEN.eq(token)).fetchOneInto(Session.class);
 	}

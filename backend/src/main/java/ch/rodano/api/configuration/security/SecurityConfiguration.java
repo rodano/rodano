@@ -118,7 +118,10 @@ public class SecurityConfiguration {
 						.authenticationConverter((_, principal) -> {
 							final var user = (User) principal.getAttribute("user");
 							final var session = (Session) principal.getAttribute("session");
-							return new UsernamePasswordAuthenticationToken(user, session, principal.getAuthorities());
+							final var authentication = new UsernamePasswordAuthenticationToken(user, session, principal.getAuthorities());
+							//credentials are erased once the authentication succeeds, so the session is also exposed as the details of the authentication
+							authentication.setDetails(session);
+							return authentication;
 						})
 				)
 			);

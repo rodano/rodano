@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.request.context.RequestContextService;
+import ch.rodano.core.model.session.Session;
 import ch.rodano.core.model.user.User;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.role.RoleService;
@@ -78,10 +80,12 @@ public class AuthenticationController extends AbstractSecuredController {
 		@Valid @RequestBody final ChangePasswordDTO changePassword
 	) {
 		final var user = (User) currentActor();
+		final var session = (Session) SecurityContextHolder.getContext().getAuthentication().getDetails();
 		userSecurityService.changePassword(
 			user,
 			changePassword.currentPassword(),
 			changePassword.newPassword(),
+			session,
 			currentContext()
 		);
 	}
