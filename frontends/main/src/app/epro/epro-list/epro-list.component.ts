@@ -1,13 +1,11 @@
 import {Component, DestroyRef, OnInit, ViewChild, signal} from '@angular/core';
 import {EproService} from '@core/services/epro.service';
-import {ScopeService} from '@core/services/scope.service';
 import {MatPaginator} from '@angular/material/paginator';
 import {startWith, switchMap} from 'rxjs/operators';
 import {MatDialog} from '@angular/material/dialog';
 import {ScopeSearch} from '@core/utilities/search/scope-search';
-import {EproRobot} from '@core/model/epro-robot';
-import {Scope} from '@core/model/scope';
-import {PagedResultScope} from '@core/model/paged-result-scope';
+import {EproScope} from '@core/model/epro-scope';
+import {PagedResultEproScope} from '@core/model/paged-result-epro-scope';
 import {Subject, forkJoin, merge, of} from 'rxjs';
 import {EPROInvitation} from '@core/model/epro-invitation';
 import {EproInvitationComponent} from '../epro-invitation/epro-invitation.component';
@@ -60,10 +58,9 @@ export class EproListComponent implements OnInit {
 	});
 
 	refreshSearch$ = new Subject<void>();
-	readonly scopes = signal<PagedResultScope>(EMPTY_PAGED_RESULT);
+	readonly scopes = signal<PagedResultEproScope>(EMPTY_PAGED_RESULT);
 	readonly loading = signal(false);
 
-	readonly robots = signal<EproRobot[]>([]);
 	columnsToDisplay: string[] = [
 		'code',
 		'name',
@@ -73,13 +70,10 @@ export class EproListComponent implements OnInit {
 
 	eproProfile?: Profile;
 
-	scopeRobotMap: Record<number, EproRobot>;
-
 	@ViewChild(MatPaginator, {static: true}) paginator: MatPaginator;
 
 	constructor(
 		private configurationService: ConfigurationService,
-		private scopeService: ScopeService,
 		private meService: MeService,
 		private eproService: EproService,
 		private notificationService: NotificationService,
@@ -111,20 +105,15 @@ export class EproListComponent implements OnInit {
 			switchMap(() => {
 				this.loading.set(true);
 				const search = new ScopeSearch();
-				search.leaf = true;
 				search.fullText = this.searchForm.get('fullText')?.value;
 				const parentPk = this.searchForm.get('parentPk')?.value;
 				if(parentPk) {
 					search.parentPks = [parentPk];
 				}
 				search.pageIndex = this.paginator.pageIndex;
-				return forkJoin({
-					robots: this.eproService.getInvitedRobots(),
-					scopes: this.scopeService.search(search)
-				});
+				return this.eproService.searchScopes(search);
 			})
-		).subscribe(({robots, scopes}) => {
-			this.robots.set(robots);
+		).subscribe(scopes => {
 			this.scopes.set(scopes);
 			this.loading.set(false);
 		});
@@ -143,12 +132,8 @@ export class EproListComponent implements OnInit {
 		this.refreshSearch$.next();
 	}
 
-	hasBeenInvited(scope: Scope): boolean {
-		return this.robots().some(robot => robot.scopePk === scope.pk);
-	}
-
-	invite(scope: Scope) {
-		this.eproService.invite(scope.pk).pipe(
+	invite(scope: EproScope) {
+		this.eproService.invite(scope.scope.pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(invitation => {
 			this.openInvitationDialog(invitation);
@@ -156,8 +141,8 @@ export class EproListComponent implements OnInit {
 		});
 	}
 
-	revoke(scope: Scope) {
-		this.eproService.revoke(scope.pk).pipe(
+	revoke(scope: EproScope) {
+		this.eproService.revoke(scope.scope.pk).pipe(
 			takeUntilDestroyed(this.destroyRef)
 		).subscribe(() => {
 			this.search();

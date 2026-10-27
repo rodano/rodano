@@ -1,7 +1,9 @@
 package ch.rodano.core.services.dao.robot;
 
+import java.util.Collection;
 import java.util.NavigableSet;
 import java.util.Optional;
+import java.util.Set;
 
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.core.model.audit.DatabaseActionContext;
@@ -71,6 +73,14 @@ public interface RobotDAOService {
 	 * @return The wanted robot or null if doesn't exist
 	 */
 	Robot getRobotByNameAndKey(String name, String key);
+
+	/**
+	 * Get the names of the active (not removed) robots among the given names
+	 *
+	 * @param names The names of the robots
+	 * @return The names of the active robots
+	 */
+	Set<String> getActiveRobotNames(Collection<String> names);
 
 	/**
 	 * Search robots based on the given predicate

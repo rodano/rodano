@@ -4,6 +4,10 @@ import {Observable} from 'rxjs';
 import {APIService} from './api.service';
 import {EPROInvitation} from '../model/epro-invitation';
 import {EproRobot} from '../model/epro-robot';
+import {PagedResultEproScope} from '../model/paged-result-epro-scope';
+import {ScopeSearch} from '../utilities/search/scope-search';
+import {HttpParamsService} from './http-params.service';
+import {reviveDates} from '../decorators/revive-dates.decorator';
 
 @Service()
 export class EproService {
@@ -11,13 +15,16 @@ export class EproService {
 
 	private readonly http = inject(HttpClient);
 	private readonly apiService = inject(APIService);
+	private readonly httpParamsService = inject(HttpParamsService);
 
 	constructor() {
 		this.serviceUrl = `${this.apiService.getApiUrl()}/epro`;
 	}
 
-	getInvitedRobots(): Observable<EproRobot[]> {
-		return this.http.get<EproRobot[]>(`${this.serviceUrl}/robots`);
+	@reviveDates
+	searchScopes(search: ScopeSearch): Observable<PagedResultEproScope> {
+		const params = this.httpParamsService.toHttpParams(search);
+		return this.http.get<PagedResultEproScope>(`${this.serviceUrl}/scopes`, {params});
 	}
 
 	getRobot(key: string): Observable<EproRobot> {

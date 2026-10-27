@@ -64,8 +64,8 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let scope">
-			{{ scope.code }}
+			*matCellDef="let eproScope">
+			{{ eproScope.scope.code }}
 		</td>
 	</ng-container>
 
@@ -77,8 +77,8 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let scope">
-			{{ scope.shortname }}
+			*matCellDef="let eproScope">
+			{{ eproScope.scope.shortname }}
 		</td>
 	</ng-container>
 
@@ -91,9 +91,9 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let scope"
+			*matCellDef="let eproScope"
 			class="optional">
-			{{ hasBeenInvited(scope) ? 'Invited' : 'Awaiting invitation' }}
+			{{ eproScope.invited ? 'Invited' : 'Awaiting invitation' }}
 		</td>
 	</ng-container>
 
@@ -105,21 +105,21 @@
 		</th>
 		<td
 			mat-cell
-			*matCellDef="let scope">
-			@if (hasBeenInvited(scope)) {
+			*matCellDef="let eproScope">
+			@if (eproScope.invited) {
 				<button
-					(click)="invite(scope)"
+					(click)="invite(eproScope)"
 					mat-stroked-button>
 					Show invitation
 				</button>
 				<button
-					(click)="revoke(scope)"
+					(click)="revoke(eproScope)"
 					mat-stroked-button>
 					Revoke
 				</button>
 			} @else {
 				<button
-					(click)="invite(scope)"
+					(click)="invite(eproScope)"
 					mat-stroked-button>
 					Invite
 				</button>

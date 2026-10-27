@@ -1,9 +1,11 @@
 package ch.rodano.api.epro;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import org.jooq.DSLContext;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -17,25 +19,30 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import ch.rodano.api.controller.AbstractSecuredController;
+import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.exception.http.ForbiddenOperationException;
+import ch.rodano.api.exception.http.NotFoundException;
 import ch.rodano.api.request.context.RequestContextService;
 import ch.rodano.api.scope.ScopeDTOService;
+import ch.rodano.api.scope.ScopeMiniDTO;
 import ch.rodano.configuration.model.rights.Rights;
 import ch.rodano.core.model.robot.Robot;
+import ch.rodano.core.model.scope.Scope;
+import ch.rodano.core.model.scope.ScopeSearch;
 import ch.rodano.core.services.bll.actor.ActorService;
 import ch.rodano.core.services.bll.robot.RobotService;
 import ch.rodano.core.services.bll.role.RoleService;
+import ch.rodano.core.services.bll.scope.ScopeService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.robot.RobotDAOService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.utils.RightsService;
-
-import static ch.rodano.core.model.jooq.tables.Robot.ROBOT;
-import static ch.rodano.core.model.jooq.tables.Scope.SCOPE;
+import ch.rodano.core.utils.UtilsService;
 
 @Tag(name = "ePRO")
 @RestController
@@ -47,7 +54,9 @@ public class EproController extends AbstractSecuredController {
 	private final RobotDAOService robotDAOService;
 	private final ScopeDAOService scopeDAOService;
 	private final ScopeDTOService scopeDTOService;
-	private final DSLContext create;
+	private final ScopeService scopeService;
+	private final UtilsService utilsService;
+	private final Integer defaultPageSize;
 
 	public EproController(
 		final RequestContextService requestContextService,
@@ -58,36 +67,50 @@ public class EproController extends AbstractSecuredController {
 		final RobotService robotService,
 		final RobotDAOService robotDAOService,
 		final ScopeDAOService scopeDAOService,
-		final DSLContext create,
-		final ScopeDTOService scopeDTOService
+		final ScopeService scopeService,
+		final ScopeDTOService scopeDTOService,
+		final UtilsService utilsService,
+		@Value("${rodano.pagination.maximum-page-size}") final Integer defaultPageSize
 	) {
 		super(requestContextService, studyService, actorService, roleService, rightsService);
 		this.robotService = robotService;
 		this.robotDAOService = robotDAOService;
 		this.scopeDAOService = scopeDAOService;
 		this.scopeDTOService = scopeDTOService;
-		this.create = create;
+		this.scopeService = scopeService;
+		this.utilsService = utilsService;
+		this.defaultPageSize = defaultPageSize;
 	}
 
-	@Operation(summary = "Get the invited robots")
-	@GetMapping("robots")
+	@Operation(summary = "Search for the leaf scopes that can be invited to ePRO", description = "The robot keys are never returned")
+	@GetMapping("scopes")
 	@ResponseStatus(HttpStatus.OK)
-	public List<EproRobotDTO> invitedRobots() {
+	public PagedResult<EproScopeDTO> searchScopes(
+		@Parameter(description = "Full text search on code, shortname and longname") @RequestParam("fullText") final Optional<String> fullText,
+		@Parameter(description = "Scope parent PKs") @RequestParam("parentPks") final Optional<List<Long>> parentPks,
+		@Parameter(description = "Page size") @RequestParam("pageSize") final Optional<Integer> pageSize,
+		@Parameter(description = "Page index") @RequestParam("pageIndex") final Optional<Integer> pageIndex
+	) {
 		checkEproEnabled();
 
-		final var currentActor = currentActor();
 		final var currentRoles = currentActiveRoles();
 		final var leafScopeModel = studyService.getStudy().getLeafScopeModel();
 
-		rightsService.checkRight(currentActor, currentRoles, leafScopeModel, Rights.READ);
+		//only the leaf scopes located under the scopes on which the actor has a role granting the read right are returned
+		final var search = new ScopeSearch()
+			.setScopeModelId(Optional.of(leafScopeModel.getId()))
+			.setScopeModelAncestorPks(scopeService.buildActorRightPredicate(currentRoles, Optional.of(leafScopeModel.getId())))
+			.setLeaf(Optional.of(true))
+			.setParentPks(parentPks)
+			.setFullText(fullText.filter(StringUtils::isNotBlank))
+			.setIncludeRemoved(false)
+			.setPageSize(pageSize.isEmpty() ? Optional.of(defaultPageSize) : pageSize)
+			.setPageIndex(pageIndex.isEmpty() ? Optional.of(0) : pageIndex);
 
-		// Retrieve all roles that are linked to a leaf scope
-		final var query = create.select(SCOPE.PK.as("scope_pk"), ROBOT.NAME.as("robot_name"), ROBOT.KEY.as("robot_key"))
-			.from(ROBOT)
-			.innerJoin(SCOPE).on(SCOPE.ID.eq(ROBOT.NAME))
-			.where(SCOPE.SCOPE_MODEL_ID.eq(leafScopeModel.getId()).and(ROBOT.REMOVED.isFalse()));
+		final var result = scopeService.search(search);
+		final var invitedScopeIds = robotDAOService.getActiveRobotNames(result.getObjects().stream().map(Scope::getId).toList());
 
-		return query.fetchInto(EproRobotDTO.class);
+		return result.withObjectTransformation(scope -> new EproScopeDTO(new ScopeMiniDTO(scope), invitedScopeIds.contains(scope.getId())));
 	}
 
 	//allows to retrieve the robot name from the key
@@ -170,13 +193,16 @@ public class EproController extends AbstractSecuredController {
 	) {
 		checkEproEnabled();
 
-		final var currentActor = currentActor();
-		final var currentRoles = currentActiveRoles();
-
 		final var scope = scopeDAOService.getScopeByPk(scopePk);
-		rightsService.checkRight(currentActor, currentRoles, scope.getScopeModel(), Rights.WRITE);
+		utilsService.checkNotNull(Scope.class, scope, scopePk);
+
+		final var acl = rightsService.getACL(currentActor(), scope);
+		acl.checkRight(scope.getScopeModel(), Rights.WRITE);
 
 		final var robot = robotDAOService.getRobotByName(scope.getId());
+		if(robot == null || robot.isRemoved()) {
+			throw new NotFoundException(Robot.class, scope.getId());
+		}
 		robotService.deleteRobot(robot, currentContext(), "Revoke user access to ePro");
 	}
 

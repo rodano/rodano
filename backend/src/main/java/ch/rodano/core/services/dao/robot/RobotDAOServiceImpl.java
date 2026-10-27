@@ -1,7 +1,10 @@
 package ch.rodano.core.services.dao.robot;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -88,6 +91,14 @@ public class RobotDAOServiceImpl extends AuditableDAOService<Robot, RobotAuditTr
 		//do not include deleted robots, this method is used for the authentication and deleted robots must not have the right to use the API
 		final var query = create.selectFrom(ROBOT).where(ROBOT.KEY.eq(key).and(ROBOT.REMOVED.isFalse()));
 		return findUnique(query);
+	}
+
+	@Override
+	public Set<String> getActiveRobotNames(final Collection<String> names) {
+		if(names.isEmpty()) {
+			return Set.of();
+		}
+		return new HashSet<>(create.select(ROBOT.NAME).from(ROBOT).where(ROBOT.NAME.in(names).and(ROBOT.REMOVED.isFalse())).fetch(ROBOT.NAME));
 	}
 
 	@Override
