@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import ch.rodano.api.controller.user.exception.EmailAlreadyUsedException;
 import ch.rodano.api.controller.user.exception.UserNotActivatedException;
+import ch.rodano.api.controller.user.exception.UserRemovedException;
 import ch.rodano.configuration.model.feature.FeatureStatic;
 import ch.rodano.configuration.model.study.Study;
 import ch.rodano.configuration.model.workflow.WorkflowAction;
@@ -130,7 +131,13 @@ public class UserSecurityService {
 			throw new WrongCredentialsException();
 		}
 
-		// If the user has not yet activated their account, reject them
+		//login answers must not reveal whether an e-mail belongs to an account, except for removed and not activated accounts
+		//these users can not log in whatever the password, and would be lost with a generic answer, so the feedback is explicit
+		//this is an accepted disclosure: someone testing an e-mail can learn that it belongs to a removed or a not activated account
+		//removed users are also deactivated, so removal must be checked first to report the right reason
+		if(user.isRemoved()) {
+			throw new UserRemovedException();
+		}
 		if(!user.isActivated()) {
 			throw new UserNotActivatedException();
 		}
@@ -297,9 +304,10 @@ public class UserSecurityService {
 			throw new WrongCredentialsException();
 		}
 
-		// No login when password is not set
+		// No login when password is not set, with the generic answer as the account is activated and this must not reveal it exists
 		if(StringUtils.isBlank(user.getPassword())) {
-			throw new RuntimeException("No user password has been set");
+			logger.warn("User {} tried to log in but has no password", user.getEmail());
+			throw new WrongPasswordException();
 		}
 
 		//reset attempts because of time
@@ -702,7 +710,7 @@ public class UserSecurityService {
 		final User user,
 		final String rawPassword
 	) {
-		if(StringUtils.isBlank(rawPassword)) {
+		if(StringUtils.isBlank(rawPassword) || StringUtils.isBlank(user.getPassword())) {
 			return false;
 		}
 
