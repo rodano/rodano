@@ -1,4 +1,5 @@
-import {Component, InjectionToken, OnInit, WritableSignal, inject, model, signal} from '@angular/core';
+import {Component, DestroyRef, InjectionToken, OnInit, WritableSignal, inject, model, signal} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ActivatedRoute, RouterOutlet, RouterLink, RouterLinkActive} from '@angular/router';
 import {User} from '@core/model/user';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -36,12 +37,17 @@ export class UserComponent implements OnInit {
 
 	constructor(
 		private authStateService: AuthStateService,
-		private route: ActivatedRoute) {}
+		private route: ActivatedRoute,
+		private destroyRef: DestroyRef) {}
 
 	ngOnInit() {
-		const user = this.route.snapshot.data['user'];
-		this.user.set(user);
-		this.authStateService.listenConnectedUser().subscribe(user => {
+		//the component is reused when navigating from a user to another one, so the resolved user must be followed
+		this.route.data.pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(data => this.user.set(data['user']));
+		this.authStateService.listenConnectedUser().pipe(
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe(user => {
 			this.pendingRolesNumber.set(AuthStateService.getUserPendingRolesNumber(user));
 		});
 	}
