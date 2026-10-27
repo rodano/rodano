@@ -63,6 +63,10 @@ public class SessionOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 		pendingSessionUpdates.add(session.getPk(), ZonedDateTime.now());
 
 		final var user = userDAOService.getUserByPk(session.getUserFk());
+		//a session must not outlive the account: removed or deactivated users are rejected even with a valid token
+		if(user == null || user.isRemoved() || !user.isActivated()) {
+			throw new OAuth2IntrospectionException("Inactive user");
+		}
 		final var roles = roleService.getActiveRoles(user);
 
 		final List<GrantedAuthority> authorities = new ArrayList<>();

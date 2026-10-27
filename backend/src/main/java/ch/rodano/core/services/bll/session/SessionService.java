@@ -33,6 +33,13 @@ public interface SessionService {
 	void deleteSession(Session session);
 
 	/**
+	 * Delete all sessions of a user, revoking every token issued to them
+	 *
+	 * @param user The user
+	 */
+	void deleteSessions(User user);
+
+	/**
 	 * Get a session by its token
 	 *
 	 * @param token The token

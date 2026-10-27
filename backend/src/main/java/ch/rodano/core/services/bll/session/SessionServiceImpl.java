@@ -45,6 +45,11 @@ public class SessionServiceImpl implements SessionService {
 	}
 
 	@Override
+	public void deleteSessions(final User user) {
+		sessionDAOService.deleteSessionsByUserPk(user.getPk());
+	}
+
+	@Override
 	public Session getSessionByToken(final String token) {
 		return sessionDAOService.getSessionByToken(token);
 	}

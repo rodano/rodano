@@ -31,6 +31,13 @@ public interface SessionDAOService {
 	void deleteSession(Session session);
 
 	/**
+	 * Delete all sessions of a user
+	 *
+	 * @param userPk The pk of the user
+	 */
+	void deleteSessionsByUserPk(Long userPk);
+
+	/**
 	 * Get a session by its token
 	 *
 	 * @param token The token

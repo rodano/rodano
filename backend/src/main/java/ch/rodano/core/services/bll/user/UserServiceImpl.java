@@ -31,6 +31,7 @@ import ch.rodano.core.model.user.UserSearch;
 import ch.rodano.core.services.bll.mail.MailService;
 import ch.rodano.core.services.bll.role.RoleService;
 import ch.rodano.core.services.bll.scope.ScopeService;
+import ch.rodano.core.services.bll.session.SessionService;
 import ch.rodano.core.services.bll.study.StudyService;
 import ch.rodano.core.services.dao.scope.ScopeDAOService;
 import ch.rodano.core.services.dao.user.UserDAOService;
@@ -47,6 +48,7 @@ public class UserServiceImpl implements UserService {
 	private final RoleService roleService;
 	private final RightsService rightsService;
 	private final MailService mailService;
+	private final SessionService sessionService;
 
 	public UserServiceImpl(
 		final UserDAOService userDAOService,
@@ -55,7 +57,8 @@ public class UserServiceImpl implements UserService {
 		final ScopeService scopeService,
 		final RoleService roleService,
 		final RightsService rightsService,
-		final MailService mailService
+		final MailService mailService,
+		final SessionService sessionService
 	) {
 		this.userDAOService = userDAOService;
 		this.studyService = studyService;
@@ -64,6 +67,7 @@ public class UserServiceImpl implements UserService {
 		this.roleService = roleService;
 		this.rightsService = rightsService;
 		this.mailService = mailService;
+		this.sessionService = sessionService;
 	}
 
 	@Override
@@ -174,6 +178,8 @@ public class UserServiceImpl implements UserService {
 	) {
 		user.setActivated(false);
 		userDAOService.deleteUser(user, context, rationale);
+		//revoke the tokens already issued to the user, otherwise they would remain valid until they expire
+		sessionService.deleteSessions(user);
 	}
 
 	@Override
