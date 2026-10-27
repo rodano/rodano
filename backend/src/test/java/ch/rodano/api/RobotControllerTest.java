@@ -134,6 +134,23 @@ public class RobotControllerTest extends ControllerTest {
 		client.put().uri("/robots/{robotPk}", Map.of("robotPk", createdRobot2.getPk())).body(robotDTO3).exchange().expectStatus().isBadRequest();
 	}
 
+	@Test
+	@DisplayName("A robot can call a transactional endpoint using Basic authentication")
+	public void robotCanCallTransactionalEndpointWithBasicAuthentication() {
+		authenticate(adminOnStudyEmail);
+		final var roleCreationDTO = new RoleCreationDTO();
+		roleCreationDTO.setScopePk(1L);
+		roleCreationDTO.setProfileId("ADMIN");
+		final var robotDTO = new RobotCreationDTO(RandomStringUtils.secure().nextAlphanumeric(10), roleCreationDTO, null);
+		final var robot = post("/robots", robotDTO, RobotDTO.class);
+
+		final var fetchedRobot = client.get().uri("/robots/{robotPk}", Map.of("robotPk", robot.getPk()))
+			.headers(headers -> headers.setBasicAuth(robot.getName(), robot.getKey()))
+			.exchange().expectStatus().isOk().expectBody(RobotDTO.class).returnResult().getResponseBody();
+
+		assertEquals(robot.getPk(), fetchedRobot.getPk());
+	}
+
 	private RobotCreationDTO createRobotDTO(
 		final Optional<String> name,
 		final Optional<String> key
