@@ -170,6 +170,14 @@ public interface MailService {
 	 */
 	void sendEmailChangeNotification(User user, User actor, String newEmail, int pendingEmailExpiryLimit, DatabaseActionContext context);
 
+	/**
+	 * Send an e-mail to the previous e-mail of a user, notifying them that an administrator changed their e-mail
+	 * @param user          The user whose e-mail has been changed
+	 * @param previousEmail The previous e-mail of the user, used as recipient
+	 * @param context       The context
+	 */
+	void sendEmailChangedByAdministratorNotification(User user, String previousEmail, DatabaseActionContext context);
+
 	void sendRoleCreationConfirmation(
 		User recipient,
 		Role role,

@@ -555,6 +555,26 @@ public class UserSecurityService {
 	}
 
 	/**
+	 * Set new e-mail for user without verification, and notify the user at their previous e-mail
+	 * @param user      User to modify
+	 * @param newEmail  The new e-mail
+	 * @param context   Database action context
+	 */
+	public void forceChangeEmail(final User user, final String newEmail, final DatabaseActionContext context) {
+		userService.checkEmailCanBeUsed(newEmail);
+
+		final var previousEmail = user.getEmail();
+		user.setEmail(newEmail);
+		user.setPendingEmail(null);
+		user.setEmailModificationDate(null);
+		user.setEmailVerificationCode(null);
+		userDAOService.saveUser(user, context, "Change e-mail directly");
+
+		//notify the previous address so the owner of the account is alerted
+		mailService.sendEmailChangedByAdministratorNotification(user, previousEmail, context);
+	}
+
+	/**
 	 * Check the user's current password and set a new password.
 	 *
 	 * @param user              User to modify

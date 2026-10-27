@@ -79,7 +79,7 @@ export class UserService {
 	}
 
 	@reviveDates
-	changeEmail(userPk: number, password: string, email: string): Observable<User> {
+	changeEmail(userPk: number, email: string, password: string): Observable<User> {
 		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '');
 		return this.http.post<User>(`${this.serviceUrl}/${userPk}/email`, {password, email}, {headers});
 	}

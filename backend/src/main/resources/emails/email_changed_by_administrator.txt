@@ -1,0 +1,11 @@
+Dear ${user.name},
+
+The e-mail associated with your ${study.defaultLocalizedLongname} account was changed by an administrator to ${new_email}.
+From now on, all notifications will be sent to this new e-mail.
+
+If you did not expect this change, please send an e-mail to ${study.email}.
+
+With our best regards,
+The ${study.defaultLocalizedLongname} support team.
+
+*** This is an automatic notification, please do not reply ***

@@ -457,6 +457,23 @@ public class MailServiceImpl implements MailService {
 	}
 
 	@Override
+	public void sendEmailChangedByAdministratorNotification(
+		final User user,
+		final String previousEmail,
+		final DatabaseActionContext context
+	) {
+		final var mail = prepareMail(
+			user,
+			MailTemplate.EMAIL_CHANGED_BY_ADMINISTRATOR,
+			Map.of("new_email", user.getEmail()),
+			Collections.singleton(previousEmail),
+			"Your e-mail has been changed by an administrator"
+		);
+
+		createMail(mail, context, "User e-mail has been changed by an administrator");
+	}
+
+	@Override
 	public void sendRoleCreationConfirmation(
 		final User recipient,
 		final Role role,

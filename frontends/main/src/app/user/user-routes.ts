@@ -2,6 +2,7 @@ import {AuthGuard} from '../guards/authentication.guard';
 import {UserProfileComponent} from './profile/user-profile.component';
 import {UserComponent, USER_TOKEN} from './home/user.component';
 import {UserSecurityComponent} from './security/user-security.component';
+import {userSecurityGuard} from './security/user-security.guard';
 import {UserRolesComponent} from './roles/user-roles.component';
 import {UserResolver} from './resolvers/user-resolver';
 import {UserBrowseComponent} from './user-browse/user-browse.component';
@@ -49,7 +50,9 @@ export default [
 			},
 			{
 				path: 'security',
-				component: UserSecurityComponent
+				component: UserSecurityComponent,
+				canActivate: [userSecurityGuard],
+				runGuardsAndResolvers: 'always'
 			},
 			{
 				path: 'roles',

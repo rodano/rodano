@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import ch.rodano.api.configuration.security.IsAdmin;
+import ch.rodano.api.configuration.security.IsUser;
 import ch.rodano.api.controller.AbstractSecuredController;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.api.request.context.RequestContextService;
@@ -294,10 +295,14 @@ public class UserController extends AbstractSecuredController {
 		return actorDTOService.createUserDTO(user, currentActor, currentRoles);
 	}
 
-	@Operation(summary = "Change the user's email")
+	@Operation(
+		summary = "Change the user's email",
+		description = "Users can change their own email, which must then be verified. Administrators can change any user's email directly; the user is notified at their previous email. The caller must confirm their own password. Robots are not allowed."
+	)
 	@PostMapping("{userPk}/email")
 	@ResponseStatus(HttpStatus.OK)
 	@Transactional
+	@IsUser
 	public UserDTO changeEmail(
 		@PathVariable("userPk") final Long userPk,
 		@Valid @RequestBody final ChangeEmailDTO emailDTO,
@@ -307,21 +312,30 @@ public class UserController extends AbstractSecuredController {
 		final var user = userService.getUserByPk(userPk);
 		utilsService.checkNotNull(User.class, user, userPk);
 
+		//check rights
 		final var currentUser = (User) currentActor();
 		final var currentRoles = currentActiveRoles();
+		if(!currentUser.getPk().equals(userPk)) {
+			rightsService.checkRightAdmin(currentUser, currentRoles);
+		}
 
 		// Check the user's password
 		if(!userSecurityService.isPasswordValid(currentUser, emailDTO.password())) {
 			throw new WrongCredentialsException();
 		}
 
-		userSecurityService.changeEmail(
-			user,
-			emailDTO.email(),
-			currentUser,
-			getServerURL(servletRequest),
-			currentContext()
-		);
+		if(rightsService.hasRightAdmin(currentRoles)) {
+			userSecurityService.forceChangeEmail(user, emailDTO.email(), currentContext());
+		}
+		else {
+			userSecurityService.changeEmail(
+				user,
+				emailDTO.email(),
+				currentUser,
+				getServerURL(servletRequest),
+				currentContext()
+			);
+		}
 
 		return actorDTOService.createUserDTO(user, currentUser, currentRoles);
 	}

@@ -21,6 +21,11 @@ public enum MailTemplate {
 		"email_change.txt",
 		"email_change.html"
 	),
+	EMAIL_CHANGED_BY_ADMINISTRATOR(
+		"Your e-mail address was changed by an administrator",
+		"email_changed_by_administrator.txt",
+		"email_changed_by_administrator.html"
+	),
 	EMAIL_VERIFICATION(
 		"Please verify your email",
 		"email_verification.txt",

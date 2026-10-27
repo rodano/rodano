@@ -1,4 +1,4 @@
-import {Component, DestroyRef, effect, inject, input} from '@angular/core';
+import {Component, computed, DestroyRef, effect, inject, input} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {User} from '@core/model/user';
 import {UserService} from '@core/services/user.service';
@@ -39,6 +39,9 @@ import {USER_TOKEN} from '../home/user.component';
 export class UserSecurityComponent {
 	readonly user = inject(USER_TOKEN);
 	readonly me = input.required<User>();
+	private readonly canChangeEmail = computed(() => !!this.me().admin || this.me().pk === this.user().pk);
+	//administrators change emails directly, so there is no pending email to display to them
+	private readonly email = computed(() => this.me().admin ? this.user().email : this.user().pendingEmail || this.user().email);
 
 	emailForm = new FormGroup({
 		email: new FormControl('', {
@@ -56,7 +59,8 @@ export class UserSecurityComponent {
 		private destroyRef: DestroyRef
 	) {
 		effect(() => {
-			this.emailForm.controls.email.setValue(this.user().pendingEmail || this.user().email);
+			this.emailForm.controls.email.setValue(this.email());
+			this.emailForm.markAsPristine();
 		});
 	}
 
@@ -79,6 +83,10 @@ export class UserSecurityComponent {
 	}
 
 	changeEmail() {
+		if(!this.canChangeEmail() || this.emailForm.invalid) {
+			return undefined;
+		}
+		const admin = this.me().admin;
 		return this.dialog
 			.open<UserPasswordDialogComponent, any, UserPasswordDialogResult>(UserPasswordDialogComponent, {data: {user: this.me(), actionLabel: 'Change email'}})
 			.afterClosed()
@@ -86,23 +94,23 @@ export class UserSecurityComponent {
 				//if the user canceled the dialog, restore the email field to its initial value
 				tap(userPassword => {
 					if(!userPassword) {
-						this.emailForm.controls.email.setValue(this.user().pendingEmail || this.user().email);
+						this.emailForm.controls.email.setValue(this.email());
 					}
 				}),
 				//if the user canceled the dialog, we don't want to continue
 				takeWhile(userPassword => !!userPassword),
 				switchMap(userPassword => {
 					const email = this.emailForm.controls.email.value;
-					return this.userService.changeEmail(this.user().pk, userPassword.password, email);
+					return this.userService.changeEmail(this.user().pk, email, userPassword.password);
 				}),
 				takeUntilDestroyed(this.destroyRef)
 			).subscribe({
 				next: user => {
 					this.user.set(user);
-					this.notificationService.showSuccess('Email change requested');
+					this.notificationService.showSuccess(admin ? 'Email changed' : 'Email change requested');
 				},
 				error: response => {
-					this.emailForm.controls.email.setValue(this.user().pendingEmail || this.user().email);
+					this.emailForm.controls.email.setValue(this.email());
 					this.notificationService.showError(response.error.message);
 				}
 			});
