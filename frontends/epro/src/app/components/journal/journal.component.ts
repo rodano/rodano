@@ -83,7 +83,7 @@ export class JournalComponent implements OnInit {
 	private getScopeAndEvents(): Observable<{scope: Scope; events: Event[]}> {
 		return this.meService.getRootScope().pipe(
 			switchMap(scope => this.eventService.search(scope.pk).pipe(
-				map(events => ({scope, events: events.filter(e => !this.eventService.isPlanned(e))}))
+				map(events => ({scope, events: events.filter(e => !e.mandatory && !this.eventService.isPlanned(e))}))
 			))
 		);
 	}
