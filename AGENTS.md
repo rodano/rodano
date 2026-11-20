@@ -10,7 +10,7 @@ Whenever you are instructed to adjust your output, update this file accordingly 
 ## Backend (`backend/`)
 - Purpose: HTTP REST API, business logic, data model
 - Technology: Java 25, Spring Boot 4.0.1, Maven
-- Database: MariaDB 12.0 with jOOQ for type-safe SQL
+- Database: MariaDB 13.0 with jOOQ for type-safe SQL
 - Entry point: Spring Boot application with multiple profiles
 
 ### Package structure

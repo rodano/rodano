@@ -6,7 +6,7 @@ The backend of Rodano. In addition to the API, it is able to initialize and migr
 
 * JDK 25
 * Maven 3.9.0
-* MariaDB 12.0
+* MariaDB 13.0
 
 ## Profiles
 
