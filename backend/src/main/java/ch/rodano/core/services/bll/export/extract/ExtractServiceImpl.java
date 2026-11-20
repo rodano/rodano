@@ -8,9 +8,13 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -44,6 +48,8 @@ import static ch.rodano.core.model.jooq.Tables.SCOPE_RELATION;
 @Service
 public class ExtractServiceImpl implements ExtractService {
 	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX").withZone(ZoneOffset.UTC);
+	private static final Pattern NEW_LINES = Pattern.compile("[\r\n]+");
+	private static final int FETCH_SIZE = 1000;
 
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -76,24 +82,20 @@ public class ExtractServiceImpl implements ExtractService {
 
 		final var parentTable = SCOPE.as("parent");
 
-		final List<SelectFieldOrAsterisk> fields = new ArrayList<>();
-		fields.addAll(
-			List.of(
-				SCOPE.PK,
-				SCOPE.CODE,
-				parentTable.PK,
-				parentTable.CODE,
-				EVENT.PK,
-				EVENT.SCOPE_MODEL_ID,
-				EVENT.EVENT_MODEL_ID,
-				DATASET.PK
-			)
+		//the fields of a dataset are aggregated in a JSON array that jOOQ converts back into typed records
+		//this is much faster than pivoting each field into its own column with a filtered aggregate
+		final var datasetFields = DSL.multisetAgg(FIELD.FIELD_MODEL_ID, FIELD.VALUE, FIELD.LAST_UPDATE_TIME).as("fields");
+		final List<SelectFieldOrAsterisk> fields = List.of(
+			SCOPE.PK,
+			SCOPE.CODE,
+			parentTable.PK,
+			parentTable.CODE,
+			EVENT.PK,
+			EVENT.SCOPE_MODEL_ID,
+			EVENT.EVENT_MODEL_ID,
+			DATASET.PK,
+			datasetFields
 		);
-
-		for(final var fieldModel : datasetModel.getFieldModelsExportables()) {
-			fields.add(DSL.anyValue(FIELD.VALUE).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(fieldModel.getId()));
-			fields.add(DSL.anyValue(FIELD.LAST_UPDATE_TIME).filterWhere(FIELD.FIELD_MODEL_ID.eq(fieldModel.getId())).as(String.format("%s_MD", fieldModel.getId())));
-		}
 
 		final List<Condition> conditions = new ArrayList<>();
 		conditions.add(DATASET.DATASET_MODEL_ID.eq(datasetModel.getId()));
@@ -107,18 +109,17 @@ public class ExtractServiceImpl implements ExtractService {
 		}
 
 		//add scope conditions
+		//a subquery is used instead of a join, because a join would duplicate the field rows for each ancestor
 		final var now = ZonedDateTime.now();
-		final List<Condition> scopeConditions = new ArrayList<>();
-		for(final var scope : scopes) {
-			scopeConditions.add(
-				SCOPE.PK.eq(scope.getPk()).or(
-					SCOPE_ANCESTOR.ANCESTOR_FK.eq(scope.getPk())
-						.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
-						.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
-				)
+		final var scopePks = scopes.stream().map(Scope::getPk).toList();
+		final var descendantPks = DSL.select(SCOPE_ANCESTOR.SCOPE_FK)
+			.from(SCOPE_ANCESTOR)
+			.where(
+				SCOPE_ANCESTOR.ANCESTOR_FK.in(scopePks)
+					.and(SCOPE_ANCESTOR.START_DATE.lessThan(now))
+					.and(SCOPE_ANCESTOR.END_DATE.isNull().or(SCOPE_ANCESTOR.END_DATE.greaterThan(now)))
 			);
-		}
-		conditions.add(DSL.or(scopeConditions));
+		conditions.add(SCOPE.PK.in(scopePks).or(SCOPE.PK.in(descendantPks)));
 
 		final SelectOnConditionStep<Record> query;
 		if(datasetModel.isScopeDocumentation()) {
@@ -138,8 +139,7 @@ public class ExtractServiceImpl implements ExtractService {
 		}
 
 		//build query
-		query.leftJoin(SCOPE_ANCESTOR).on(SCOPE.PK.eq(SCOPE_ANCESTOR.SCOPE_FK))
-			.leftJoin(SCOPE_RELATION).on(SCOPE.PK.eq(SCOPE_RELATION.SCOPE_FK).and(SCOPE_RELATION.DEFAULT.isTrue()))
+		query.leftJoin(SCOPE_RELATION).on(SCOPE.PK.eq(SCOPE_RELATION.SCOPE_FK).and(SCOPE_RELATION.DEFAULT.isTrue()))
 			.leftJoin(parentTable).on(SCOPE_RELATION.PARENT_FK.eq(parentTable.PK))
 			.where(DSL.and(conditions))
 			.groupBy(DATASET.PK)
@@ -189,49 +189,58 @@ public class ExtractServiceImpl implements ExtractService {
 		csvHeader[i++] = "DATASET_ID";
 
 		//dynamic columns
+		//remember the position of the value column of each exported field model in a CSV line
+		final Map<String, Integer> fieldColumnIndexes = new HashMap<>();
 		for(final var fieldModel : fieldModels) {
 			final var fieldModelLabel = fieldModel.getExportColumnLabel().toUpperCase();
+			fieldColumnIndexes.put(fieldModel.getId(), (int) i);
 			csvHeader[i++] = fieldModelLabel;
 			if(withModificationDates) {
 				csvHeader[i++] = String.format("%s_MODIFICATION_DATE", fieldModelLabel);
 			}
 		}
 		writer.writeNext(csvHeader);
+		//send the header right away, so the client receives something while the query runs
+		writer.flush();
 
-		for(final org.jooq.Record row : query.fetch()) {
-			i = 0;
-			final var csvLine = new String[columnNumber];
+		//stream the rows instead of loading the whole result in memory
+		try(final var cursor = query.fetchSize(FETCH_SIZE).fetchLazy()) {
+			for(final var row : cursor) {
+				final var csvLine = new String[columnNumber];
+				//fields without any value in the database must be exported as empty columns
+				Arrays.fill(csvLine, "");
 
-			//static columns
-			if(parentScopeModel.isPresent()) {
-				csvLine[i++] = row.get(parentTable.PK).toString();
-				csvLine[i++] = row.get(parentTable.CODE);
-			}
-
-			csvLine[i++] = row.get(SCOPE.PK).toString();
-			csvLine[i++] = row.get(SCOPE.CODE);
-
-			if(!datasetModel.isScopeDocumentation()) {
-				csvLine[i++] = row.get(EVENT.PK).toString();
-				final var eventModel = study.getScopeModel(row.get(EVENT.SCOPE_MODEL_ID)).getEventModel(row.get(EVENT.EVENT_MODEL_ID));
-				csvLine[i++] = eventModel.getDefaultLocalizedShortname();
-				/*final var date = TimeHelper.asZonedDateTime(results.getTimestamp("event_date"));
-				csvLine[i++] = date != null ? date.format(DATE_FORMATTER) : "";
-				final var endDate = TimeHelper.asZonedDateTime(results.getTimestamp("event_end_date"));
-				csvLine[i++] = endDate != null ? endDate.format(DATE_FORMATTER) : "";*/
-			}
-
-			csvLine[i++] = row.get(DATASET.PK).toString();
-
-			//dynamic columns
-			for(final var fieldModel : fieldModels) {
-				csvLine[i++] = formatField(fieldModel, row);
-				if(withModificationDates) {
-					csvLine[i++] = row.get(String.format("%s_MD", fieldModel.getId()), ZonedDateTime.class).format(DATE_FORMATTER);
+				i = 0;
+				//static columns
+				if(parentScopeModel.isPresent()) {
+					csvLine[i++] = row.get(parentTable.PK).toString();
+					csvLine[i++] = row.get(parentTable.CODE);
 				}
-			}
 
-			writer.writeNext(csvLine);
+				csvLine[i++] = row.get(SCOPE.PK).toString();
+				csvLine[i++] = row.get(SCOPE.CODE);
+
+				if(!datasetModel.isScopeDocumentation()) {
+					csvLine[i++] = row.get(EVENT.PK).toString();
+					final var eventModel = study.getScopeModel(row.get(EVENT.SCOPE_MODEL_ID)).getEventModel(row.get(EVENT.EVENT_MODEL_ID));
+					csvLine[i++] = eventModel.getDefaultLocalizedShortname();
+				}
+
+				csvLine[i] = row.get(DATASET.PK).toString();
+
+				//dynamic columns
+				for(final var field : row.get(datasetFields)) {
+					final var columnIndex = fieldColumnIndexes.get(field.value1());
+					if(columnIndex != null) {
+						csvLine[columnIndex] = formatValue(field.value2());
+						if(withModificationDates && field.value3() != null) {
+							csvLine[columnIndex + 1] = field.value3().format(DATE_FORMATTER);
+						}
+					}
+				}
+
+				writer.writeNext(csvLine);
+			}
 		}
 
 		// Flush the writer to the OutputStream
@@ -272,11 +281,9 @@ public class ExtractServiceImpl implements ExtractService {
 		return String.format("%s.csv", datasetModel.getId());
 	}
 
-	private String formatField(final FieldModel fieldModel, final org.jooq.Record row) {
-		final String value = row.get(fieldModel.getId(), String.class);
-
+	private String formatValue(final String value) {
 		if(StringUtils.isNotBlank(value)) {
-			return value.replaceAll("[\r\n]+", " ");
+			return NEW_LINES.matcher(value).replaceAll(" ");
 		}
 
 		return "";
