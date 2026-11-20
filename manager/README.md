@@ -38,3 +38,9 @@ Then start the server:
 ```
 python server.py
 ```
+
+## Backups
+
+Backups are zip files stored in `BACKUPS_STORAGE_PATH`. Automatic backups are made according to `BACKUP_CRON_EXPRESSION` and are removed by a daily cleanup task once expired, according to the `[backups]` section of `website/config.ini`: by default, they are kept for 7 days, except the ones made on Wednesday, which are kept for 90 days. Manual backups are never removed automatically.
+
+The backups table of the web interface uses [basic-table](https://github.com/matco/basic-table), whose sources are copied in `website/static/js/basic-table`.

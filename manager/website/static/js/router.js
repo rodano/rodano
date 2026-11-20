@@ -26,7 +26,7 @@ export const Router = {
 							Reset.Launch();
 							break;
 						case 'restore':
-							Restore.Launch();
+							Restore.Launch(data.id && decodeURIComponent(data.id));
 							break;
 						default:
 							UI.Notify('Action unknown', {tag: 'error', icon: 'images/notifications/error.png', body: `There is no defined action ${data.action}`});

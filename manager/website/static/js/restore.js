@@ -120,13 +120,15 @@ export const Restore = {
 			}
 		});
 	},
-	Launch: function() {
+	Launch: function(backup) {
 		selected_task_id = undefined;
 		//update application ui
 		document.getElementById('restore_prod_warning').style.display = application.environment === 'PROD' ? 'block' : 'none';
 		Fetch(`${api_base_url}/backups`, {'managed-error': [500]})
 			.then(response => {
-				document.getElementById('restore_storage')['file'].fill(response, true);
+				const select = document.getElementById('restore_storage')['file'];
+				select.fill(response.map(backup => backup.id), true);
+				select.value = backup ?? '';
 			})
 			.catch(response => {
 				restore_error.textContent = response.body.error;

@@ -11,6 +11,7 @@ import messaging
 import tasks
 import tornado
 import config
+import backups
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
@@ -106,22 +107,7 @@ class ApplicationBackups(helpers.AuthenticatedRequestHandler):
 				self.write({"error" : f"Backup path {config.BACKUPS_STORAGE_PATH} does not exist."})
 				return
 
-			#retrieve all backup files from the backup path
-			entries = []
-			with os.scandir(config.BACKUPS_STORAGE_PATH) as it:
-				for entry in it:
-					if entry.is_file():
-						try:
-							modification_time = entry.stat().st_mtime
-						except Exception:
-							modification_time = 0
-						entries.append((entry.name, modification_time))
-
-			#sort by modification time (newest first)
-			entries.sort(key=lambda t: t[1], reverse=True)
-			backups = [name for name, _ in entries]
-
-			self.write(json.dumps(backups, cls=helpers.JSONCustomEncoder))
+			self.write(json.dumps(backups.list_backups(), cls=helpers.JSONCustomEncoder))
 		except Exception as e:
 			self.set_status(500)
 			self.write({"error" : f"Unable to retrieve backups: {str(e)}."})

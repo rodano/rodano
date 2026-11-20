@@ -298,9 +298,6 @@ dialog {
 }
 
 #application_backups {
-	max-height: 20rem;
-	overflow: auto;
-	& button {
-		margin: 0.2rem 0 0.2rem 0.5rem;
-	}
+	display: block;
+	margin-bottom: 1rem;
 }

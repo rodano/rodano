@@ -1,4 +1,5 @@
 import config
+import datetime
 import logging
 import json
 import sys
@@ -29,6 +30,9 @@ def validate_websocket_header(header):
 class JSONCustomEncoder(json.JSONEncoder):
 	def default(self, object):
 		if object.__class__.__name__ == "datetime":
+			#naive dates are considered to be in UTC
+			if object.tzinfo is not None:
+				object = object.astimezone(datetime.timezone.utc).replace(tzinfo=None)
 			return object.isoformat() + "Z"
 		if object.__class__.__name__ == "Row":
 			json_object = {}

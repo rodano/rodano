@@ -4,7 +4,6 @@ import asyncio
 import tasks
 import config
 import os
-import time
 import datetime
 import configparser
 import zipfile
@@ -56,53 +55,83 @@ def start_periodic_backups():
 		scheduler.start()
 		logger.info(f"Periodic backup scheduler started with cron expression {cron}")
 
-#cleanup old backups
-async def cleanup():
-	now = time.time()
+#read the description file embedded in a backup archive
+#return None if the archive does not contain a valid description
+def read_description(path):
+	with zipfile.ZipFile(path, "r") as zip_file:
+		if "description.ini" not in zip_file.namelist():
+			return None
+		with zip_file.open("description.ini") as description_file:
+			description_content = description_file.read().decode("utf-8")
+
+	#parse ini content, adding a fake DEFAULT section header
+	description = configparser.ConfigParser(interpolation=None)
+	description.read_string("[DEFAULT]\n" + description_content)
+	values = description["DEFAULT"]
+
+	backup_date = values.get("backup.date")
+	return {
+		"type": values.get("backup.type"),
+		"date": datetime.datetime.fromisoformat(backup_date) if backup_date else None,
+		"rationale": values.get("backup.rationale", "").strip('"') or None
+	}
+
+#return the date after which a backup will be deleted by the cleanup task, or None if it is kept forever
+#only automatic backups expire, manual backups are kept forever
+def get_expiration_date(backup_type, backup_date):
+	if backup_type != "automatic" or backup_date is None:
+		return None
 	max_age = int(config.config.get("backups", "max_age"))
 	rollover_age = int(config.config.get("backups", "rollover_age"))
 	rollover_day = config.config.get("backups", "rollover_day")
+	#backups made on the rollover day are kept until they reach the maximum age, others until they reach the rollover age
+	#the day is computed on the date recorded in the backup (in UTC) so the result does not depend on the server timezone
+	age = max_age if backup_date.strftime("%a") == rollover_day else min(rollover_age, max_age)
+	return backup_date + datetime.timedelta(seconds=age)
 
-	backup_storage_path = config.BACKUPS_STORAGE_PATH
-	backups = [f for f in os.listdir(backup_storage_path) if os.path.isfile(os.path.join(backup_storage_path, f))]
+#list all backups with their information
+def list_backups():
+	backups = []
+	with os.scandir(config.BACKUPS_STORAGE_PATH) as it:
+		for entry in it:
+			if not entry.is_file():
+				continue
+			stat = entry.stat()
+			backup = {
+				"id": entry.name,
+				"size": stat.st_size,
+				"date": datetime.datetime.fromtimestamp(stat.st_mtime, datetime.timezone.utc),
+				"type": None,
+				"rationale": None,
+				"expiration_date": None
+			}
+			if entry.name.endswith(".zip"):
+				try:
+					description = read_description(entry.path)
+				except Exception as e:
+					logger.warning(f"Unable to read description of backup {entry.name}: {e}")
+					description = None
+				if description:
+					backup["type"] = description["type"]
+					backup["rationale"] = description["rationale"]
+					if description["date"]:
+						backup["date"] = description["date"]
+					backup["expiration_date"] = get_expiration_date(description["type"], description["date"])
+			backups.append(backup)
+	backups.sort(key=lambda b: b["date"], reverse=True)
+	return backups
 
-	for backup in backups:
-		path = os.path.join(backup_storage_path, backup)
-		_, extension = os.path.splitext(backup)
-		if extension == ".zip":
-			#open backup archive
-			with zipfile.ZipFile(path, "r") as zip_file:
-				#look for the description file in the archive
-				if "description.ini" in zip_file.namelist():
-					#read the description file from zip
-					with zip_file.open("description.ini") as description_file:
-						description_content = description_file.read().decode("utf-8")
-
-						#parse ini content
-						description = configparser.ConfigParser()
-						#add a fake DEFAULT section header
-						description.read_string("[DEFAULT]\n" + description_content)
-
-						#handle only automatic backups
-						backup_type = description.get("DEFAULT", "backup.type")
-						backup_date = description.get("DEFAULT", "backup.date")
-
-						if backup_type == "automatic" and backup_date:
-							date = datetime.datetime.fromisoformat(backup_date)
-							timestamp = date.timestamp()
-							age = now - timestamp
-							valid = True
-							#remove backups too old
-							if age >= max_age:
-								valid = False
-							#remove backups that have been rolled over
-							day = datetime.datetime.fromtimestamp(timestamp).strftime("%a")
-							if age >= rollover_age and day != rollover_day:
-								valid = False
-							if not valid:
-								#remove backup file
-								logger.info(f"Removing old backup file {backup}")
-								os.unlink(path)
+#cleanup expired backups
+async def cleanup():
+	now = datetime.datetime.now(datetime.timezone.utc)
+	for backup in list_backups():
+		expiration_date = backup["expiration_date"]
+		if expiration_date is not None and expiration_date <= now:
+			logger.info(f"Removing expired backup file {backup['id']}")
+			try:
+				os.unlink(os.path.join(config.BACKUPS_STORAGE_PATH, backup["id"]))
+			except Exception:
+				logger.exception(f"Unable to remove expired backup file {backup['id']}")
 
 #start the backup cleanup scheduler
 def start_backups_cleanup():

@@ -1,6 +1,8 @@
 import {bus} from './event_bus.js';
 import {api_base_url, Fetch, FetchFile} from './fetch.js';
 import {UI} from './ui.js';
+import {Hash} from './basic-tools/hash.js';
+import {Table, Datasource} from './basic-table/index.js';
 
 const UNKNOWN_APPLICATION = Object.freeze({
 	name: 'Unknown',
@@ -11,6 +13,8 @@ const UNKNOWN_APPLICATION = Object.freeze({
 });
 
 const application = Object.assign({}, UNKNOWN_APPLICATION);
+
+let backups_table;
 
 function update_application() {
 	document.querySelector('main').style.display = 'block';
@@ -65,6 +69,10 @@ function update_application() {
 		application_reset.removeAttribute('disabled');
 		application_restore.removeAttribute('disabled');
 	}
+	//restore buttons of the backups table depend on the application status
+	if(backups_table?.datasource) {
+		backups_table.draw();
+	}
 }
 
 function download_backup(event) {
@@ -84,44 +92,96 @@ function download_backup(event) {
 		});
 }
 
-function delete_backup(event) {
-	event.stop();
-	const backup = this.dataset.backup;
-	UI.Confirm(`Delete backup "${backup}"? This action cannot be undone.`, 'Delete', 'Cancel')
-		.then(confirmed => {
-			if(confirmed) {
-				Fetch(`${api_base_url}/backups/${encodeURIComponent(backup)}`, {method: 'DELETE'})
-					.then(() => {
-						document.getElementById('application_backups').removeChild(this.parentElement);
-					});
-			}
-		});
+function format_size(size) {
+	const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+	let value = size;
+	let unit = 0;
+	while(value >= 1024 && unit < units.length - 1) {
+		value /= 1024;
+		unit++;
+	}
+	return `${unit === 0 ? value : value.toFixed(1)} ${units[unit]}`;
 }
 
-function update_backups(backups) {
-	const application_backups = document.getElementById('application_backups');
-	application_backups.empty();
-	backups.forEach(backup => {
-		const li = document.createElement('li');
-		const download_link = document.createFullElement('a', {href: `${api_base_url}/backups/${encodeURIComponent(backup)}`}, backup);
-		download_link.addEventListener('click', download_backup);
-		li.appendChild(download_link);
-		const delete_button = document.createFullElement('button', {'data-backup': backup}, 'Delete');
-		delete_button.addEventListener('click', delete_backup);
-		li.appendChild(delete_button);
-		application_backups.appendChild(li);
-	});
+//the table does not support null values, and its filter only works on string values
+function backup_to_row(backup) {
+	return {
+		id: backup.id,
+		date: backup.date,
+		type: backup.type ?? '',
+		rationale: backup.rationale ?? '',
+		size: backup.size,
+		expiration_date: backup.expiration_date ?? ''
+	};
+}
+
+function update_backups(rows) {
+	if(!backups_table) {
+		backups_table = new Table({
+			container: document.getElementById('application_backups'),
+			columns: [
+				{
+					label: 'Backup',
+					data: 'id',
+					type: Table.DataType.STRING,
+					render: value => {
+						const link = document.createFullElement('a', {href: `${api_base_url}/backups/${encodeURIComponent(value)}`}, value);
+						link.addEventListener('click', download_backup);
+						return link;
+					}
+				},
+				{label: 'Date', data: 'date', type: Table.DataType.DATE, render: value => value.toFullDisplay(), width: 170},
+				{label: 'Type', data: 'type', type: Table.DataType.STRING, width: 110},
+				{label: 'Rationale', data: 'rationale', type: Table.DataType.STRING},
+				{label: 'Size', data: 'size', type: Table.DataType.NUMBER, render: format_size, width: 90},
+				{label: 'Expiration', data: 'expiration_date', type: Table.DataType.DATE, render: value => value ? value.toFullDisplay() : 'Never', width: 170},
+				{
+					label: 'Actions',
+					unsortable: true,
+					render: (_, record) => {
+						const container = document.createElement('span');
+						const restore_button = document.createFullElement('button', {title: 'The application must be stopped to restore a backup'}, 'Restore');
+						if(application.running) {
+							restore_button.setAttribute('disabled', 'disabled');
+						}
+						else {
+							restore_button.removeAttribute('title');
+						}
+						restore_button.addEventListener('click', event => {
+							event.stop();
+							location.hash = Hash.Encode({action: 'restore', id: encodeURIComponent(record.id)});
+						});
+						container.appendChild(restore_button);
+						const button = document.createFullElement('button', {style: 'margin-left: 0.3rem;'}, 'Delete');
+						button.addEventListener('click', event => {
+							event.stop();
+							UI.Confirm(`Delete backup "${record.id}"? This action cannot be undone.`, 'Delete', 'Cancel')
+								.then(confirmed => {
+									if(confirmed) {
+										Fetch(`${api_base_url}/backups/${encodeURIComponent(record.id)}`, {method: 'DELETE'})
+											.then(() => update_backups(backups_table.datasource.data.filter(r => r.id !== record.id)));
+									}
+								});
+						});
+						container.appendChild(button);
+						return container;
+					},
+					width: 150
+				}
+			]
+		});
+	}
+	const datasource = new Datasource({data: rows});
+	//newest backups first by default (overridden by the ordering saved by the table, if any)
+	datasource.sortingOrders = [{field: 'date', descendant: true}];
+	backups_table.render(datasource);
 }
 
 const ApplicationManager = {
 	UpdateBackups: function() {
 		Fetch(`${api_base_url}/backups`)
-			.then(response => {
-				update_backups(response);
-			})
-			.catch(() => {
-				update_backups([]);
-			});
+			.then(backups => update_backups(backups.map(backup_to_row)))
+			.catch(() => update_backups([]));
 	},
 	Update: function() {
 		Fetch(`${api_base_url}/info`, {'managed-error': [500, 503]})
