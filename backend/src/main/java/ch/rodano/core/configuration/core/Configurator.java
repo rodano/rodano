@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -18,6 +19,7 @@ public class Configurator implements InitializingBean {
 	private final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final Environment environment;
+	private final String url;
 	private boolean maintenanceMode;
 
 	private final File tempFolder;
@@ -26,12 +28,14 @@ public class Configurator implements InitializingBean {
 
 	public Configurator(
 		@Value("${rodano.environment:DEV}") final Environment environment,
+		@Value("${rodano.url}") final String url,
 		@Value("${rodano.maintenance.enable:false}") final boolean maintenanceMode,
 		@Value("${rodano.path.data}") final String rootFolder,
 		@Value("${rodano.instance.uid}") final String instanceUuid
 	) {
 		this.maintenanceMode = maintenanceMode;
 		this.environment = environment;
+		this.url = StringUtils.removeEnd(url, "/");
 
 		Locale.setDefault(Locale.US);
 		TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -40,7 +44,7 @@ public class Configurator implements InitializingBean {
 		fileFolder = Path.of(rootFolder, "files").toFile();
 		resourceFolder = Path.of(rootFolder, "uploads").toFile();
 
-		logger.info("Configurator initialized with UUID {}, environment {}, root folder {}, temporary folder {}", instanceUuid, environment, rootFolder, tempFolder);
+		logger.info("Configurator initialized with UUID {}, environment {}, URL {}, root folder {}, temporary folder {}", instanceUuid, environment, this.url, rootFolder, tempFolder);
 	}
 
 	@Override
@@ -83,6 +87,13 @@ public class Configurator implements InitializingBean {
 
 	public Environment getEnvironment() {
 		return environment;
+	}
+
+	/**
+	 * @return the public URL of the application, used to build links sent to users
+	 */
+	public String getUrl() {
+		return url;
 	}
 
 	public boolean getMaintenanceMode() {

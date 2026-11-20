@@ -181,7 +181,7 @@ public class EproController extends AbstractSecuredController {
 		}
 
 		final var scopeDTO = scopeDTOService.createDTO(scope, acl);
-		return new EPROInvitationDTO(scopeDTO, studyService.getStudy().getUrl(), robot.getKey());
+		return new EPROInvitationDTO(scopeDTO, getServerURL(), robot.getKey());
 	}
 
 	@Operation(summary = "Revoke user access")

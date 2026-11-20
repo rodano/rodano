@@ -6,6 +6,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,6 +43,7 @@ import freemarker.template.TemplateExceptionHandler;
 import ch.rodano.api.controller.user.exception.InvalidEmailException;
 import ch.rodano.api.dto.paging.PagedResult;
 import ch.rodano.configuration.model.feature.FeatureStatic;
+import ch.rodano.core.configuration.core.Configurator;
 import ch.rodano.core.model.audit.DatabaseActionContext;
 import ch.rodano.core.model.mail.CustomizedTemplatedMail;
 import ch.rodano.core.model.mail.DefinedTemplatedMail;
@@ -74,6 +76,7 @@ public class MailServiceImpl implements MailService {
 	private final MailAttachmentDAOService mailAttachmentDAOService;
 	private final ScopeDAOService scopeDAOService;
 	private final UserDAOService userDAOService;
+	private final Configurator configurator;
 
 	public MailServiceImpl(
 		final JavaMailSender sender,
@@ -83,7 +86,8 @@ public class MailServiceImpl implements MailService {
 		final MailDAOService mailDAOService,
 		final MailAttachmentDAOService mailAttachmentDAOService,
 		final ScopeDAOService scopeDAOService,
-		final UserDAOService userDAOService
+		final UserDAOService userDAOService,
+		final Configurator configurator
 	) {
 		this.sender = sender;
 		this.resourceLoader = resourceLoader;
@@ -93,6 +97,7 @@ public class MailServiceImpl implements MailService {
 		this.mailAttachmentDAOService = mailAttachmentDAOService;
 		this.scopeDAOService = scopeDAOService;
 		this.userDAOService = userDAOService;
+		this.configurator = configurator;
 
 		freemarkerConfiguration.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
 	}
@@ -284,7 +289,10 @@ public class MailServiceImpl implements MailService {
 		freemarkerConfiguration.setTemplateLoader(loader);
 
 		try {
-			return FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfiguration.getTemplate(name), parameters);
+			//the application URL is available in all templates
+			final var allParameters = new HashMap<String, Object>(parameters);
+			allParameters.putIfAbsent("url", configurator.getUrl());
+			return FreeMarkerTemplateUtils.processTemplateIntoString(freemarkerConfiguration.getTemplate(name), allParameters);
 		}
 		catch(IOException | TemplateException e) {
 			throw new MailPreparationException(e);

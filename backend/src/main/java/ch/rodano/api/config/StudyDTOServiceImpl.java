@@ -48,7 +48,7 @@ public class StudyDTOServiceImpl implements StudyDTOService {
 		dto.color = study.getColor();
 		dto.logo = study.getLogo();
 
-		dto.url = study.getUrl();
+		dto.url = configurator.getUrl();
 
 		final var homePage = study.getPrivateHomePage();
 		dto.homePage = menuDTOService.createDTO(homePage, acl);

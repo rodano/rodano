@@ -1,6 +1,5 @@
 package ch.rodano.api.authentication;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.springframework.http.HttpStatus;
@@ -57,8 +56,7 @@ public class AuthenticationController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public void recover(
-		@RequestParam("email") final String email,
-		final HttpServletRequest servletRequest
+		@RequestParam("email") final String email
 	) {
 		final var user = userService.getUserByEmail(email);
 
@@ -68,7 +66,7 @@ public class AuthenticationController extends AbstractSecuredController {
 			return;
 		}
 
-		userSecurityService.triggerPasswordReset(user, getServerURL(servletRequest), currentContext());
+		userSecurityService.triggerPasswordReset(user, getServerURL(), currentContext());
 	}
 
 	@Operation(summary = "Change user password")

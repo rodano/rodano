@@ -2,10 +2,10 @@ package ch.rodano.api.controller;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +28,8 @@ public abstract class AbstractSecuredController {
 	protected final Logger logger = LoggerFactory.getLogger(getClass());
 
 	private final RequestContextService requestContextService;
+	@Value("${rodano.url}")
+	private String url;
 	protected final StudyService studyService;
 	protected final ActorService actorService;
 	protected final RoleService roleService;
@@ -115,7 +117,10 @@ public abstract class AbstractSecuredController {
 		return actorService.getLanguages(currentActor());
 	}
 
-	protected String getServerURL(final HttpServletRequest servletRequest) {
-		return servletRequest.getRequestURL().toString().replace(servletRequest.getRequestURI(), "");
+	/**
+	 * The URL is configured rather than read from the request, because the Host header is controlled by the client
+	 */
+	protected String getServerURL() {
+		return StringUtils.removeEnd(url, "/");
 	}
 }

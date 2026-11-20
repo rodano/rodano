@@ -2,7 +2,6 @@ package ch.rodano.api.authentication;
 
 import java.util.List;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -88,8 +87,7 @@ public class SessionController extends AbstractSecuredController {
 	@Transactional(noRollbackFor = WrongCredentialsException.class)
 	public AuthenticationDTO login(
 		@Valid @RequestBody final CredentialsDTO credentials,
-		@RequestHeader("User-Agent") final String agent,
-		final HttpServletRequest servletRequest
+		@RequestHeader("User-Agent") final String agent
 	) {
 
 		final var token = userSecurityService.login(
@@ -98,7 +96,7 @@ public class SessionController extends AbstractSecuredController {
 			credentials.getTsToken(),
 			credentials.getTsCode(),
 			credentials.getTsKey(),
-			getServerURL(servletRequest),
+			getServerURL(),
 			agent,
 			currentContext()
 		);

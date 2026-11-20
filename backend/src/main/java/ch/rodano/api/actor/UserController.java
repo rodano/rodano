@@ -5,7 +5,6 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.Set;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import org.apache.commons.lang3.StringUtils;
@@ -204,8 +203,7 @@ public class UserController extends AbstractSecuredController {
 	@ResponseStatus(HttpStatus.CREATED)
 	@Transactional
 	public UserDTO createUser(
-		@Valid @RequestBody final UserCreationDTO userCreationDTO,
-		final HttpServletRequest servletRequest
+		@Valid @RequestBody final UserCreationDTO userCreationDTO
 	) {
 		// retrieve the future role scope
 		final var selectedScope = scopeDAOService.getScopeByPk(userCreationDTO.role().getScopePk());
@@ -225,7 +223,7 @@ public class UserController extends AbstractSecuredController {
 			newUser,
 			profile,
 			roleScope,
-			getServerURL(servletRequest),
+			getServerURL(),
 			currentContext()
 		);
 
@@ -311,8 +309,7 @@ public class UserController extends AbstractSecuredController {
 	@IsUser
 	public UserDTO changeEmail(
 		@PathVariable("userPk") final Long userPk,
-		@Valid @RequestBody final ChangeEmailDTO emailDTO,
-		final HttpServletRequest servletRequest
+		@Valid @RequestBody final ChangeEmailDTO emailDTO
 	) {
 		//retrieve user
 		final var user = userService.getUserByPk(userPk);
@@ -338,7 +335,7 @@ public class UserController extends AbstractSecuredController {
 				user,
 				emailDTO.email(),
 				currentUser,
-				getServerURL(servletRequest),
+				getServerURL(),
 				currentContext()
 			);
 		}
@@ -446,8 +443,7 @@ public class UserController extends AbstractSecuredController {
 	@Transactional
 	@IsUser
 	public void resendEmailVerificationEmail(
-		@PathVariable("userPk") final Long userPk,
-		final HttpServletRequest servletRequest
+		@PathVariable("userPk") final Long userPk
 	) {
 		final var user = userService.getUserByPk(userPk);
 		utilsService.checkNotNull(User.class, user, userPk);
@@ -466,7 +462,7 @@ public class UserController extends AbstractSecuredController {
 		mailService.sendUserEmailVerificationEmail(
 			user,
 			UserService.PENDING_EMAIL_EXPIRY_LIMIT_IN_DAYS,
-			getServerURL(servletRequest),
+			getServerURL(),
 			currentContext()
 		);
 	}
@@ -480,8 +476,7 @@ public class UserController extends AbstractSecuredController {
 	@Transactional
 	@IsUser
 	public void resendAccountActivationEmail(
-		@PathVariable("userPk") final Long userPk,
-		final HttpServletRequest servletRequest
+		@PathVariable("userPk") final Long userPk
 	) {
 		final var user = userService.getUserByPk(userPk);
 		utilsService.checkNotNull(User.class, user, userPk);
@@ -497,7 +492,7 @@ public class UserController extends AbstractSecuredController {
 		mailService.sendUserAccountActivationInvitation(
 			user,
 			roleService.getRoles(user).getFirst(),
-			getServerURL(servletRequest),
+			getServerURL(),
 			currentContext()
 		);
 	}

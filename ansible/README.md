@@ -25,7 +25,7 @@ The variables to configure are:
 - `study_git_reference`: the Git reference to fetch from the Git repository
 - `server_name`: the FQDN of the server, use to generate the Let's Encrypt certificate
 - `server_email`: an email, use to generate the Let's Encrypt certificate
-- `rodano_environment`: variables from this dictionary will override the values defined in the root environment file
+- `rodano_environment`: variables from this dictionary will override the values defined in the root environment file; `RODANO_URL`, the public URL of the application, defaults to `https://<server_name>`
 
 Then, you need to install the dependencies:
 ```

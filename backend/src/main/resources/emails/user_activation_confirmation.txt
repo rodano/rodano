@@ -2,7 +2,7 @@ Dear ${user.name},
 
 Congratulations! You have successfully activated your account on ${study.defaultLocalizedLongname}.
 
-You can now access the ${study.defaultLocalizedLongname} website at ${study.url}.
+You can now access the ${study.defaultLocalizedLongname} website at ${url}.
 Your e-mail: ${user.email}
 Your password: the password that you entered when activating your account.
 

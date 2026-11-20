@@ -90,8 +90,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 	private SortedMap<String, String> longname;
 	private SortedMap<String, String> description;
 
-	private String url;
-
 	private String email;
 	private String color;
 	private String logo;
@@ -345,14 +343,6 @@ public final class Study implements Serializable, SuperDisplayable, Node, Compar
 
 	public final void setLoginText(final String loginText) {
 		this.loginText = loginText;
-	}
-
-	public final String getUrl() {
-		return url;
-	}
-
-	public final void setUrl(final String url) {
-		this.url = url;
 	}
 
 	public String getClientEmail() {

@@ -107,6 +107,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 	private final ActorService actorService;
 	private final PageStateService pageStateService;
 	private final TaskExecutor taskExecutor;
+	private final String url;
 
 	private final File crfArchiveBaseFolder;
 	//each actor gets its own generation state and folder, so generating an archive for one actor never blocks or leaks to another
@@ -148,6 +149,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 		this.pageStateService = pageStateService;
 		this.taskExecutor = taskExecutor;
 
+		this.url = configurator.getUrl();
 		this.crfArchiveBaseFolder = new File(configurator.getTempFolder(), CRF_TEMPORARY_ARCHIVE_FOLDER);
 	}
 
@@ -285,6 +287,7 @@ public class CRFDocumentationServiceImpl implements CRFDocumentationService {
 
 		final var studyE = ExportableUtils.getExportForXml(doc, study, languages);
 		doc.appendChild(studyE);
+		DocumentHelper.appendSimpleChildren(studyE, Map.of("url", url));
 
 		//check if scope has been selected
 		final var studySelections = study.getSelections();

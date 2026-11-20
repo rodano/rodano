@@ -73,6 +73,8 @@ services:
       spring.profiles.active: api,study
       rodano.config: /app/study/config.json
       rodano.environment: VAL
+      #public URL used to build the links sent to users
+      rodano.url: ${RODANO_URL}
       rodano.database.host: db
       rodano.database.port: 3306
       rodano.database.name: rodano

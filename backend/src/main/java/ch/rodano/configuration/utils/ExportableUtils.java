@@ -67,7 +67,6 @@ public final class ExportableUtils {
 
 		final var children = new HashMap<String, String>();
 		children.put("description", study.getLocalizedDescription(languages));
-		children.put("url", study.getUrl());
 		children.put("client", study.getClient());
 		children.put("clientEmail", study.getClientEmail());
 		children.put("versionNumber", study.getVersionNumber());

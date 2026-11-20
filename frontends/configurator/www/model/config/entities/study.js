@@ -23,7 +23,6 @@ export class Study extends DisplayableNode {
 			shortname: {type: 'object'},
 			longname: {type: 'object'},
 			description: {type: 'object'},
-			url: {type: 'string'},
 			email: {type: 'string'},
 			color: {type: 'string'},
 			logo: {type: 'string'},
@@ -79,7 +78,6 @@ export class Study extends DisplayableNode {
 		this.shortname = {};
 		this.longname = {};
 		this.description = {};
-		this.url = undefined;
 		this.email = undefined;
 		this.color = undefined;
 		this.logo = undefined;

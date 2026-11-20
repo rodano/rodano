@@ -8,10 +8,12 @@ import org.jooq.impl.DSL;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import ch.rodano.api.actor.ChangeEmailDTO;
 import ch.rodano.api.actor.RobotCreationDTO;
 import ch.rodano.api.actor.RobotDTO;
+import ch.rodano.api.actor.UserCreationDTO;
 import ch.rodano.api.actor.UserDTO;
 import ch.rodano.api.role.RoleCreationDTO;
 import ch.rodano.core.model.mail.MailTemplate;
@@ -22,6 +24,7 @@ import ch.rodano.test.SpringTestConfiguration;
 
 import static ch.rodano.core.model.jooq.tables.Mail.MAIL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -34,19 +37,69 @@ public class UserControllerTest extends ControllerTest {
 	@Autowired
 	private DSLContext create;
 
+	@Value("${rodano.url}")
+	private String url;
+
 	@Test
 	@DisplayName("A user can change their own email through verification")
 	public void userCanChangeOwnEmail() {
 		authenticate(investigatorOnStudyEmail);
 		final var user = userService.getUserByEmail(investigatorOnStudyEmail);
 		final var newEmail = "investigator-new@rodano.ch";
+		final var lastMailPk = getLastMailPk();
 
 		final var updatedUser = client.post().uri("/users/{userPk}/email", user.getPk())
+			.headers(headers -> headers.set("Host", "attacker.example"))
 			.body(new ChangeEmailDTO(newEmail, TEST_USER_PASSWORD))
 			.exchange().expectStatus().isOk().expectBody(UserDTO.class).returnResult().getResponseBody();
 
 		assertEquals(newEmail, updatedUser.getPendingEmail());
 		assertEquals(investigatorOnStudyEmail, updatedUser.getEmail());
+		assertMailLinksUseConfiguredUrl(lastMailPk, "/email-verification/");
+	}
+
+	@Test
+	@DisplayName("Password recovery emails use the configured URL, whatever the Host header of the request")
+	public void passwordRecoveryUsesConfiguredUrl() {
+		final var lastMailPk = getLastMailPk();
+
+		client.post().uri("/auth/password/recover?email={email}", investigatorOnStudyEmail)
+			.headers(headers -> headers.set("Host", "attacker.example"))
+			.exchange().expectStatus().isCreated();
+
+		assertMailLinksUseConfiguredUrl(lastMailPk, "/change-password/");
+	}
+
+	@Test
+	@DisplayName("Account activation emails use the configured URL, whatever the Host header of the request")
+	public void accountActivationUsesConfiguredUrl() {
+		authenticate(adminOnStudyEmail);
+		final var email = "security-link-" + UUID.randomUUID() + "@rodano.ch";
+		final var role = new RoleCreationDTO();
+		role.setScopePk(1L);
+		role.setProfileId("INVESTIGATOR");
+		final var lastMailPk = getLastMailPk();
+
+		final var createdUser = client.post().uri("/users")
+			.headers(headers -> headers.set("Host", "attacker.example"))
+			.body(new UserCreationDTO("Security Link User", email, null, "en", role))
+			.exchange().expectStatus().isCreated()
+			.expectBody(UserDTO.class).returnResult().getResponseBody();
+
+		try {
+			assertMailLinksUseConfiguredUrl(lastMailPk, "/register/");
+
+			//a user who has not activated their account is invited to do so when they try to recover their password
+			final var recoveryMailPk = getLastMailPk();
+			client.post().uri("/auth/password/recover?email={email}", email)
+				.headers(headers -> headers.set("Host", "attacker.example"))
+				.exchange().expectStatus().isCreated();
+			assertMailLinksUseConfiguredUrl(recoveryMailPk, "");
+		}
+		finally {
+			client.put().uri("/users/{userPk}/remove", createdUser.getPk())
+				.exchange().expectStatus().isOk();
+		}
 	}
 
 	@Test
@@ -161,6 +214,13 @@ public class UserControllerTest extends ControllerTest {
 
 	private long getLastMailPk() {
 		return create.select(DSL.coalesce(DSL.max(MAIL.PK), 0L)).from(MAIL).fetchOne(0, Long.class);
+	}
+
+	private void assertMailLinksUseConfiguredUrl(final long lastMailPk, final String linkPath) {
+		unitOfWorkService.clear();
+		final var mails = create.selectFrom(MAIL).where(MAIL.PK.gt(lastMailPk)).fetch();
+		assertTrue(mails.stream().anyMatch(mail -> mail.getTextBody().contains(url + linkPath)));
+		assertFalse(mails.stream().anyMatch(mail -> mail.getTextBody().contains("attacker.example")));
 	}
 
 	/**

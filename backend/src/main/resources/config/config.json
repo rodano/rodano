@@ -9,7 +9,6 @@
 	"description": {
 		"en": "Test study used to show the features of Rodano"
 	},
-	"url": "https://test.rodano.ch",
 	"email": "info@rodano.ch",
 	"color": "#5bd4d4",
 	"introductionText": "<h1>Rodano Test Study</h1><p>This study is not a real study, all data are dummy records. The purpose of this website is to illustrate the features of a typical study built with Rodano.</p>",
@@ -24,7 +23,7 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 127,
+	"configVersion": 128,
 	"configDate": 1789566113706,
 	"configUser": "NA",
 	"configChangelogs": [],

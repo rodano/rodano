@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 127;
+const CURRENT_VERSION = 128;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -277,7 +277,13 @@ const Migrations = {
 				});
 			});
 		}
-	}
+	},
+	migrate_127: {
+		description: 'Remove study URL, now configured for each deployment of the application',
+		migration: function(config) {
+			delete config.url;
+		}
+	},
 };
 
 /*function migrate_layouts(config, section_migrator, widget_migrator) {
