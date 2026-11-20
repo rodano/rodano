@@ -6,20 +6,35 @@ import {Router} from '@angular/router';
 import {authInterceptor, SKIP_AUTH_TOKEN, SKIP_ERROR_HANDLING} from './auth.interceptor';
 import {AuthStateService} from '../services/auth-state.service';
 import {LoggingService} from '@core/services/logging.service';
+import {NotificationService} from '../services/notification.service';
+import {EproAuthStateService} from '../epro/services/epro-auth-state.service';
 
 describe('authInterceptor', () => {
 	let http: HttpClient;
 	let controller: HttpTestingController;
-	const router = {navigate: vi.fn()};
+	const router = {navigate: vi.fn(), currentNavigation: () => null, navigated: true, url: '/home'};
+	const eproAuthStateService = {
+		getRobotCredentials: vi.fn(),
+		getUserToken: vi.fn(),
+		hasRobotCredentials: () => true,
+		hasUserToken: () => false,
+		deleteRobotCredentials: vi.fn(),
+		deleteUserToken: vi.fn()
+	};
 
 	beforeEach(() => {
 		router.navigate.mockClear();
+		router.url = '/home';
+		eproAuthStateService.getRobotCredentials.mockReturnValue({scopePk: 1, name: 'robot', key: 'key'});
+		eproAuthStateService.deleteRobotCredentials.mockClear();
 		TestBed.configureTestingModule({
 			providers: [
 				provideHttpClient(withInterceptors([authInterceptor])),
 				provideHttpClientTesting(),
 				{provide: Router, useValue: router},
 				{provide: AuthStateService, useValue: {getToken: () => 'token', hasToken: () => true}},
+				{provide: EproAuthStateService, useValue: eproAuthStateService},
+				{provide: NotificationService, useValue: {showError: vi.fn()}},
 				{provide: LoggingService, useValue: {error: vi.fn()}}
 			]
 		});
@@ -54,5 +69,30 @@ describe('authInterceptor', () => {
 
 		controller.expectOne('/a').flush(null, {status: HttpStatusCode.InternalServerError, statusText: 'Error'});
 		expect(router.navigate).not.toHaveBeenCalled();
+	});
+
+	describe('on ePRO pages', () => {
+		beforeEach(() => (router.url = '/epro/main/surveys'));
+
+		it('adds the ePRO robot credentials', () => {
+			http.get('/a').subscribe();
+
+			expect(controller.expectOne('/a').request.headers.get('Authorization')).toBe(`Basic ${btoa('robot:key')}`);
+		});
+
+		it('does not apply to the ePRO management pages', () => {
+			router.url = '/epro-management';
+			http.get('/a').subscribe();
+
+			expect(controller.expectOne('/a').request.headers.get('Authorization')).toBe('Bearer token');
+		});
+
+		it('removes the ePRO credentials and redirects to the ePRO login page if unauthorized', () => {
+			http.get('/a').subscribe({error: () => undefined});
+
+			controller.expectOne('/a').flush(null, {status: HttpStatusCode.Unauthorized, statusText: 'Unauthorized'});
+			expect(eproAuthStateService.deleteRobotCredentials).toHaveBeenCalledOnce();
+			expect(router.navigate).toHaveBeenCalledWith(['/', 'epro', 'login']);
+		});
 	});
 });

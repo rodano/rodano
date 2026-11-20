@@ -1,0 +1,65 @@
+@use '@angular/material' as mat;
+
+//ePRO is a mobile application: it uses the default density and a layout where only the content of the pages scrolls
+app-epro {
+	@include mat.theme(
+		(
+			density: 0,
+		)
+	);
+
+	//reset the compact inputs of the staff application to the Material defaults, more suitable for touch screens
+	--mat-form-field-container-height: 56px;
+	--mat-form-field-container-vertical-padding: 16px;
+
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+
+	//routed components are created dynamically and never carry the style encapsulation attribute of their parent, so they must be laid out from here
+	& router-outlet + * {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+	}
+
+	//page layout shared by all pages: a fixed toolbar, a scrollable content and an optional fixed footer
+	& .content {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		overscroll-behavior-y: contain;
+	}
+	& .toolbar-title {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	//top toolbar shared by all pages, themed with the study color
+	& mat-toolbar.page-toolbar {
+		flex: 0 0 auto;
+		gap: var(--gap);
+		color: white;
+		background-color: var(--mat-sys-primary);
+
+		& .mat-icon,
+		& .mdc-button {
+			color: white;
+		}
+	}
+}
+
+//on wide screens, the mobile application is displayed in a framed column
+@media (min-width: 820px) {
+	app-epro {
+		width: 100%;
+		max-width: 820px;
+		margin: 0 auto;
+		box-sizing: border-box;
+		border: 3px solid var(--mat-sys-primary);
+		border-radius: 8px;
+	}
+}

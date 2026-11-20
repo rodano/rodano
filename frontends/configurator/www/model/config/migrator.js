@@ -1,6 +1,6 @@
 import '../../basic-tools/extension.js';
 
-const CURRENT_VERSION = 128;
+const CURRENT_VERSION = 129;
 
 class ApplicationOutdatedError extends Error {
 	constructor(version) {
@@ -282,6 +282,21 @@ const Migrations = {
 		description: 'Remove study URL, now configured for each deployment of the application',
 		migration: function(config) {
 			delete config.url;
+		}
+	},
+	migrate_128: {
+		description: 'Rename the ePRO management page, now that the ePRO application is served under the ePRO page',
+		migration: function(config) {
+			const menus = [];
+			config.menus.forEach(menu => {
+				[menu, ...menu.submenus].forEach(m => {
+					if(m.action?.page === 'epro') {
+						m.action.page = 'epro-management';
+						menus.push(m);
+					}
+				});
+			});
+			return menus;
 		}
 	},
 };

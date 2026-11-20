@@ -1,10 +1,13 @@
-import {Component, OnInit, signal} from '@angular/core';
-import {RouterOutlet} from '@angular/router';
+import {Component, OnInit, inject, signal} from '@angular/core';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {filter, map} from 'rxjs/operators';
 import {HeaderComponent} from './header/header.component';
 import {Environment} from '@core/model/environment';
 import {PublicStudy} from '@core/model/public-study';
 import {AdministrationService} from '@core/services/administration.service';
 import {ConfigurationService} from '@core/services/configuration.service';
+import {isEproUrl} from './epro/epro-path';
 
 @Component({
 	selector: 'app-root',
@@ -19,6 +22,15 @@ export class AppComponent implements OnInit {
 	) {}
 
 	environment = Environment;
+
+	//the ePRO pages are used by study subjects and must not display the elements of the staff application
+	readonly inEpro = toSignal(
+		inject(Router).events.pipe(
+			filter(event => event instanceof NavigationEnd),
+			map(event => isEproUrl(event.urlAfterRedirects))
+		),
+		{initialValue: isEproUrl(window.location.pathname)}
+	);
 
 	readonly study = signal<PublicStudy | undefined>(undefined);
 	readonly inMaintenance = signal(false);

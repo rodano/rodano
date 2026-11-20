@@ -86,18 +86,18 @@
 }
 html {
 	color-scheme: light;
-	height: 100vh; /* we want an app that don't scroll and use the viewport of the browser */
+	height: 100dvh; /* we want an app that don't scroll and use the viewport of the browser */
 	margin: 0;
 	padding: 0;
 	font-family: 'Open Sans';
 }
 body {
-	height: 100vh; /* we want an app that don't scroll and use the viewport of the browser */
+	height: 100dvh; /* we want an app that don't scroll and use the viewport of the browser */
 	margin: 0;
 	padding: 0;
 }
 app-root {
-	height: 100vh;
+	height: 100dvh;
 	display: flex;
 	flex-direction: column;
 }

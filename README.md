@@ -4,7 +4,7 @@ This repository contains the Rodano platform and tools for managing it. Rodano i
 
 This repository contains the following:
 - `backend`: backend source code written in Java, including the model, business layers, and HTTP API
-- `frontends`: the various frontends (the main frontend used by medical staff, the configurator used by data managers, and the ePRO mobile web application for study subjects)
+- `frontends`: the various frontends (the main frontend used by medical staff, which also contains the ePRO mobile web application for study subjects, and the configurator used by data managers)
 - `manager`: a web application to manage Rodano when running inside a Dockerized environment
 - `ansible`: an Ansible script to deploy the application to a remote server over SSH
 - a Docker Compose file to run the application locally

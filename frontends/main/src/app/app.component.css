@@ -27,6 +27,14 @@
 	&:not(:has(aside)) {
 		padding: 1rem;
 	}
+
+	/* ePRO pages manage their own layout */
+	&.epro {
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+	}
 }
 footer {
 	height: 1.5rem;

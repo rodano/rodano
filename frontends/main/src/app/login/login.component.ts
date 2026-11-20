@@ -1,6 +1,6 @@
 import {Component, DestroyRef, OnInit, signal} from '@angular/core';
 import {FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
-import {Router, ActivatedRoute} from '@angular/router';
+import {Router, ActivatedRoute, RouterLink} from '@angular/router';
 import {finalize} from 'rxjs/operators';
 import {PublicStudy} from '@core/model/public-study';
 import {Credentials} from '@core/model/credentials';
@@ -26,6 +26,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 		MatError,
 		MatLabel,
 		MatButton,
+		RouterLink,
 		LocalizeMapPipe
 	]
 })

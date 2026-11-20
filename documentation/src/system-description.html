@@ -9,9 +9,8 @@
 	<p>The platform is made up of a backend that exposes an HTTP API, several frontends that consume it, and supporting tooling:</p>
 	<ul>
 		<li><strong>Backend</strong> — a Java application, built on Spring Boot, that holds the data model, business logic, and HTTP API.</li>
-		<li><strong>Main frontend</strong> — an Angular web application used by medical staff to capture and review study data.</li>
+		<li><strong>Main frontend</strong> — an Angular web application used by medical staff to capture and review study data. It also contains ePRO, used by study subjects to report outcomes themselves.</li>
 		<li><strong>Configurator</strong> — a JavaScript tool used by data managers to produce a study's configuration file.</li>
-		<li><strong>ePRO</strong> — an Ionic and Angular mobile web application used by study subjects to report outcomes themselves.</li>
 		<li><strong>Manager</strong> — a web application used to operate and maintain a Dockerized Rodano instance.</li>
 	</ul>
 </section>
@@ -36,7 +35,7 @@
 </section>
 <section id="epro">
 	<h2>ePRO</h2>
-	<p>ePRO (electronic patient-reported outcomes) is a mobile web application that lets study subjects contribute data directly, without going through a member of staff. Like the other frontends, it communicates with the backend through the HTTP API.</p>
+	<p>ePRO (electronic patient-reported outcomes) is a mobile web application that lets study subjects contribute data directly, without going through a member of staff. It is part of the main frontend and is served under <code>/epro</code>, with its own layout and authentication: study subjects log in with an invitation code, usually scanned as a QR code, or with their own credentials.</p>
 </section>
 <section id="manager">
 	<h2>Manager</h2>

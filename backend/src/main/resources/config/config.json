@@ -23,7 +23,7 @@
 	"protocolNo": "RD-TEST-01",
 	"versionNumber": "1.2.1",
 	"versionDate": "25-Dec-2014",
-	"configVersion": 128,
+	"configVersion": 129,
 	"configDate": 1789566113706,
 	"configUser": "NA",
 	"configChangelogs": [],
@@ -24379,7 +24379,7 @@
 			"homePage": false,
 			"action": {
 				"labels": {},
-				"page": "epro",
+				"page": "epro-management",
 				"context": [],
 				"parameters": {},
 				"className": "CMSAction"

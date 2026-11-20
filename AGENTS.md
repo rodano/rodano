@@ -62,17 +62,14 @@ mvn test
 
 ### Main frontend (`frontends/main/`)
 - Purpose: Primary interface for medical staff
-- Technology: TypeScript, Angular 21, Angular Material
+- Technology: TypeScript, Angular 22, Angular Material
+- Also contains the ePRO application, a mobile web application for study subjects, served under `/epro` (code in `src/app/epro/`). Its pages have their own layout, authentication (`EproAuthStateService`) and error handling (in `auth.interceptor.ts`). The staff screens managing ePRO are in `src/app/epro-management/`.
 - The TypeScript API model is auto-generated from the backend's OpenAPI spec. Regenerate it with `npm run generate-model` after changing backend DTOs.
 
 ### Configurator (`frontends/configurator/`)
 - Purpose: Configure the application, produces a JSON file that is provided to the backend
 - Technology: Vanilla JavaScript/TypeScript (no framework)
 - Tests use Puppeteer for browser-based integration tests
-
-### ePRO (`frontends/epro/`)
-- Purpose: Mobile web application for study subjects
-- Technology: TypeScript, Angular 22, Angular Material
 
 ### Commands
 Commands must be run from the specific frontend directory (e.g. `frontends/main/`). After modifications, check what you've done with:

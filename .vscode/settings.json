@@ -17,11 +17,6 @@
 		"frontends/main/.angular": true,
 		"frontends/main/www": true,
 
-		"frontends/epro/package-lock.json": true,
-		"frontends/epro/node_modules": true,
-		"frontends/epro/.angular": true,
-		"frontends/epro/www": true,
-
 		"frontends/configurator/package-lock.json": true,
 		"frontends/configurator/node_modules": true,
 		"frontends/configurator/test-output": true,

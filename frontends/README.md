@@ -1,8 +1,7 @@
 # Frontends
 
 This folder contains the different frontends for the Rodano platform:
-- main: the main website
-- epro: the ePro website, used by patients
+- main: the main website, which also contains the ePRO application used by patients (under `/epro`)
 - configurator: the configurator app, used to manage Rodano configuration files
 
 ## Docker

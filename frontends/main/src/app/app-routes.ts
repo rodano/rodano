@@ -2,6 +2,7 @@ import {Route} from '@angular/router';
 
 import {ChangePasswordContext} from './change-password/change-password-context';
 import {CRF_PATH} from './crf/crf-routes';
+import {EPRO_PATH} from './epro/epro-path';
 import {ErrorContext} from './error/error-context';
 import {AuthGuard} from './guards/authentication.guard';
 import {EproEnabledGuard} from './guards/epro-enabled.guard';
@@ -70,9 +71,14 @@ export default [
 		loadChildren: () => import('./robot/robot-routes')
 	},
 	{
-		path: 'epro',
+		path: 'epro-management',
 		title: 'ePRO',
 		canActivate: [AuthGuard, EproEnabledGuard],
+		loadChildren: () => import('./epro-management/epro-management-routes')
+	},
+	{
+		path: EPRO_PATH,
+		title: 'ePRO',
 		loadChildren: () => import('./epro/epro-routes')
 	},
 	{

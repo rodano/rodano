@@ -13,10 +13,6 @@
 			"path": "./frontends/main"
 		},
 		{
-			"name": "📱 Frontend (ePRO)",
-			"path": "./frontends/epro"
-		},
-		{
 			"name": "⚙️ Configurator",
 			"path": "./frontends/configurator"
 		},

@@ -3,7 +3,7 @@ display header only if a study is available
 that's because the header comes with Rodano default color, which might not match the study's theme
 and we want to avoid the header to flicker
 -->
-@if (study()) {
+@if (study() && !inEpro()) {
 	@if (study()!.environment !== environment.PROD) {
 		<div id="stamp">{{ study()!.environment }}</div>
 	}
@@ -13,7 +13,9 @@ and we want to avoid the header to flicker
 }
 
 <!--this div container is required as router-outlet cannot be a container, because the content is appended after the router-outlet, not inside-->
-<div id="content">
+<div
+	id="content"
+	[class.epro]="inEpro()">
 	@if (inMaintenance()) {
 		<h1>Maintenance</h1>
 		<p>The website is currently under maintenance. Please come back later.</p>
@@ -31,7 +33,7 @@ and we want to avoid the header to flicker
 </div>
 
 <!-- same as for the header, display the footer only if a study is available -->
-@if (study()) {
+@if (study() && !inEpro()) {
 	<footer>
 		Powered by <a href="https://www.rodano.ch">Rodano</a>. Distributed under AGPLv3. Access source code
 		<a href="https://github.com/rodano/rodano">here</a>.

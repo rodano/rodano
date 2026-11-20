@@ -219,39 +219,6 @@ jobs:
             frontends/configurator/test-output/results.xml
             frontends/configurator/test-output/results.pdf
 
-  frontend-epro:
-    name: Test ePro frontend
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontends/epro
-    steps:
-      - name: Checkout the project
-        uses: actions/checkout@v7
-
-      - name: Setup Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: 24
-          cache: 'npm'
-          cache-dependency-path: frontends/epro/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Execute unit tests
-        run: npm test -- --no-watch --no-progress --karma-config=src/karma-ci.conf.js
-
-      # store reports as artifacts
-      - name: Store test report
-        uses: actions/upload-artifact@v7
-        with:
-          name: frontend-epro-test-report
-          path: frontends/epro/test-report.html
-
   documentation:
     name: Test documentation
     runs-on: ubuntu-latest
