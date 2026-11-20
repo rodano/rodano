@@ -1,4 +1,4 @@
-FROM python:3.14.0
+FROM python:3.14.10
 
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano manager"

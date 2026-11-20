@@ -1,7 +1,7 @@
 #variables using uppercase will be handled by the "env" file provided at runtime to docker-compose (during the deployment of the application)
 services:
   db:
-    image: mariadb:12.2
+    image: mariadb:12.3
     ports:
       - "127.0.0.1:3307:3306"
     volumes:
@@ -38,7 +38,7 @@ services:
 
 #this service can be removed if an external SMTP server is used
   smtp:
-    image: registry.gitlab.com/egos-tech/smtp:1.2.6
+    image: registry.gitlab.com/egos-tech/smtp:2.0.14
     restart: on-failure
 
   backend:

@@ -1,4 +1,4 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,7 @@ COPY epro/ /app/epro/
 RUN npm run build:prod --prefix /app/epro
 RUN sed -i 's/<base href="\/">/<base href="\/eproapp\/">/g' /app/epro/www/index.html
 
-FROM nginx:1.27-alpine
+FROM nginx:1.30-alpine
 
 LABEL org.opencontainers.image.authors="info@rodano.ch"
 LABEL org.opencontainers.image.description="Rodano frontend, containing the main frontend, the configurator and ePro"
