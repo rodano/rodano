@@ -1,5 +1,6 @@
 package ch.rodano.api.configuration.security;
 
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
@@ -31,19 +33,25 @@ public class SessionOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 	private final RightsService rightsService;
 	private final RoleService roleService;
 	private final PendingSessionUpdates pendingSessionUpdates;
+	private final Duration idleSessionDuration;
+	private final Duration absoluteSessionDuration;
 
 	public SessionOpaqueTokenIntrospector(
 		final UserDAOService userDAOService,
 		final SessionService sessionService,
 		final RightsService rightsService,
 		final RoleService roleService,
-		final PendingSessionUpdates pendingSessionUpdates
+		final PendingSessionUpdates pendingSessionUpdates,
+		@Value("${rodano.schedule.session-cleaner.session.duration:15}") final int idleSessionDurationInMinutes,
+		@Value("${rodano.session.absolute-duration:12h}") final Duration absoluteSessionDuration
 	) {
 		this.userDAOService = userDAOService;
 		this.sessionService = sessionService;
 		this.rightsService = rightsService;
 		this.roleService = roleService;
 		this.pendingSessionUpdates = pendingSessionUpdates;
+		this.idleSessionDuration = Duration.ofMinutes(idleSessionDurationInMinutes);
+		this.absoluteSessionDuration = absoluteSessionDuration;
 	}
 
 	//not transactional on purpose: this runs in the security filter chain, before the controller's own transaction begins
@@ -59,8 +67,15 @@ public class SessionOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 			throw new OAuth2IntrospectionException("Unknown session");
 		}
 
+		//the persisted last access time can lag behind by one run of the session updater, which is an acceptable imprecision
+		final var now = ZonedDateTime.now();
+		if(!session.getCreationTime().isAfter(now.minus(absoluteSessionDuration))
+			|| !session.getLastAccessTime().isAfter(now.minus(idleSessionDuration))) {
+			throw new OAuth2IntrospectionException("Expired session");
+		}
+
 		//flag session for last-access-time update
-		pendingSessionUpdates.add(session.getPk(), ZonedDateTime.now());
+		pendingSessionUpdates.add(session.getPk(), now);
 
 		final var user = userDAOService.getUserByPk(session.getUserFk());
 		//a session must not outlive the account: removed or deactivated users are rejected even with a valid token

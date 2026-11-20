@@ -155,6 +155,40 @@ public class SessionRevocationTest extends ControllerTest {
 		assertEquals(1, countSessions(user));
 	}
 
+	@Test
+	@DisplayName("Idle session expiry is enforced before the cleaner runs")
+	public void idleSessionExpiryIsEnforcedDuringAuthentication() {
+		final var user = createUser();
+		authenticate(user.getEmail());
+		final var userToken = token.get();
+
+		new TransactionTemplate(transactionManager).executeWithoutResult(_ -> create.update(USER_SESSION)
+			.set(USER_SESSION.LAST_ACCESS_TIME, ZonedDateTime.now().minusMinutes(20))
+			.where(USER_SESSION.TOKEN.eq(userToken))
+			.execute()
+		);
+		unitOfWorkService.clear();
+
+		assertTokenRejected(userToken);
+	}
+
+	@Test
+	@DisplayName("Absolute session expiry is enforced even when the session was recently accessed")
+	public void absoluteSessionExpiryIsEnforcedDuringAuthentication() {
+		final var user = createUser();
+		authenticate(user.getEmail());
+		final var userToken = token.get();
+
+		new TransactionTemplate(transactionManager).executeWithoutResult(_ -> create.update(USER_SESSION)
+			.set(USER_SESSION.CREATION_TIME, ZonedDateTime.now().minusHours(13))
+			.where(USER_SESSION.TOKEN.eq(userToken))
+			.execute()
+		);
+		unitOfWorkService.clear();
+
+		assertTokenRejected(userToken);
+	}
+
 	private User createUser() {
 		final var email = "test+session-" + UUID.randomUUID() + "@rodano.ch";
 		final var builder = UserBuilder.createUser("Session User", email)

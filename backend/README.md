@@ -75,6 +75,7 @@ Most of these properties should not be touched. However, some of them, used by a
 * `spring.datasource.url`: the JDBC URL used by the datasource
 * `rodano.environment`: the study environment (choose among PROD, VAL, or DEV)
 * `rodano.path.data`: the path to the directory that stores the files uploaded by the users
+* `rodano.session.absolute-duration`: maximum session age from creation (default: `12h`); idle sessions expire after 15 minutes by default
 
 The logging level can be set using the parameter `logging.level.<package>=xxx`. The log level can be ERROR, WARN, INFO, DEBUG or TRACE. For example, `logging.level.ch.rodano.core=DEBUG`.
 
