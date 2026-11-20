@@ -1,4 +1,4 @@
-import {HttpErrorResponse, HttpInterceptorFn, HttpStatusCode} from '@angular/common/http';
+import {HttpContextToken, HttpErrorResponse, HttpInterceptorFn, HttpStatusCode} from '@angular/common/http';
 import {inject} from '@angular/core';
 import {Router} from '@angular/router';
 import {throwError, TimeoutError} from 'rxjs';
@@ -18,7 +18,11 @@ export const SKIP_AUTH_TOKEN_HEADER = 'X-Skip-Auth-Token';
  */
 export const SKIP_ERROR_HANDLING_HEADER = 'X-Skip-Error-Handling';
 
-const REQUEST_TIMEOUT_MS = 10_000;
+/**
+ * Maximum delay, in milliseconds, between two events of a request
+ * Downloads, such as exports, must use a longer delay because they are received in one event only when they are complete
+ */
+export const REQUEST_TIMEOUT = new HttpContextToken<number>(() => 10_000);
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	const router = inject(Router);
@@ -45,7 +49,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	}
 
 	const enhancedRequest = request.clone({headers});
-	const timedRequest = next(enhancedRequest).pipe(timeout({each: REQUEST_TIMEOUT_MS}));
+	const timedRequest = next(enhancedRequest).pipe(timeout({each: request.context.get(REQUEST_TIMEOUT)}));
 
 	//if the skip error handling token is present in the request, skip the error handling of the request
 	if(skipErrorHandling) {

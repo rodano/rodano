@@ -1,8 +1,12 @@
-import {HttpClient, HttpResponse} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpResponse} from '@angular/common/http';
 import {Directive, HostListener, ElementRef, DestroyRef, effect, input} from '@angular/core';
 import {NotificationService} from '../services/notification.service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {finalize} from 'rxjs';
+import {REQUEST_TIMEOUT} from '../interceptors/auth.interceptor';
+
+//must match the timeout of streamed responses in the backend and in Nginx
+const DOWNLOAD_TIMEOUT_MS = 5 * 60 * 1000;
 
 @Directive({
 	selector: '[appDownload]'
@@ -46,7 +50,8 @@ export class DownloadDirective {
 		this.toggleDisabled(true);
 		button.classList.add('loading');
 
-		this.http.get(this.url()!, {observe: 'response', responseType: 'blob'}).pipe(
+		const context = new HttpContext().set(REQUEST_TIMEOUT, DOWNLOAD_TIMEOUT_MS);
+		this.http.get(this.url()!, {observe: 'response', responseType: 'blob', context}).pipe(
 			takeUntilDestroyed(this.destroyRef),
 			finalize(() => {
 				this.toggleDisabled(false);

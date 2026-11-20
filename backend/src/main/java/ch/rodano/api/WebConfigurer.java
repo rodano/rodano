@@ -2,6 +2,7 @@ package ch.rodano.api;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.task.SimpleAsyncTaskExecutorCustomizer;
@@ -48,6 +49,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 	private final String poolName;
 	private final Boolean poolTimeoutActive;
 	private final Integer poolTimeoutDuration; // In seconds
+	private final Duration asyncTimeout;
 
 	public WebConfigurer(
 		final JsonMapper mapper,
@@ -59,7 +61,8 @@ public class WebConfigurer implements WebMvcConfigurer {
 		@Value("${rodano.controller.pool.queue-capacity:15}") final Integer poolQueueCapacity,
 		@Value("${rodano.controller.pool.name:controller-pool}") final String poolName,
 		@Value("${rodano.controller.pool.timeout:true}") final Boolean poolTimeoutActive,
-		@Value("${rodano.controller.pool.timeout.duration:120}") final Integer poolTimeoutDuration
+		@Value("${rodano.controller.pool.timeout.duration:120}") final Integer poolTimeoutDuration,
+		@Value("${rodano.controller.async.timeout:5m}") final Duration asyncTimeout
 	) {
 		this.mapper = mapper;
 		this.mustChangePasswordInterceptor = mustChangePasswordInterceptor;
@@ -71,6 +74,7 @@ public class WebConfigurer implements WebMvcConfigurer {
 		this.poolName = poolName;
 		this.poolTimeoutActive = poolTimeoutActive;
 		this.poolTimeoutDuration = poolTimeoutDuration;
+		this.asyncTimeout = asyncTimeout;
 	}
 
 	/**
@@ -114,6 +118,8 @@ public class WebConfigurer implements WebMvcConfigurer {
 		executor.initialize();
 
 		configurer.setTaskExecutor(executor);
+		//streamed responses (exports, reports) may take longer than the default timeout of the servlet container (30 seconds)
+		configurer.setDefaultTimeout(asyncTimeout.toMillis());
 	}
 
 	/**
