@@ -1,4 +1,4 @@
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpStatusCode} from '@angular/common/http';
 import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {Field} from '../model/field';
@@ -12,7 +12,7 @@ import {FormInfo} from '../model/form-info';
 import {WorkflowStatusSearch} from '../utilities/search/workflow-status-search';
 import {HttpParamsService} from './http-params.service';
 import {reviveDates} from '../decorators/revive-dates.decorator';
-import {SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
+import {SKIP_ERROR_HANDLING} from '../../interceptors/auth.interceptor';
 
 @Service()
 export class WorkflowStatusService {
@@ -38,14 +38,14 @@ export class WorkflowStatusService {
 	@reviveDates
 	executeActionOnField(field: Field, workflowStatusPk: number, workflowUpdate: WorkflowUpdate): Observable<Field> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		let url = `${this.apiService.getApiUrl()}/scopes/${field.scopePk}`;
 		if(field.eventPk) {
 			url = `${url}/events/${field.eventPk}`;
 		}
 		url = `${url}/datasets/${field.datasetPk}/fields/${field.pk}/workflows/${workflowStatusPk}`;
 
-		return this.http.put<Field>(url, workflowUpdate, {headers});
+		return this.http.put<Field>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates
@@ -62,27 +62,27 @@ export class WorkflowStatusService {
 	@reviveDates
 	executeActionOnForm(form: Form, workflowStatusPk: number, workflowUpdate: WorkflowUpdate): Observable<Form> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		let url = `${this.apiService.getApiUrl()}/scopes/${form.scopePk}`;
 		if(form.eventPk) {
 			url = `${url}/events/${form.eventPk}`;
 		}
 		url = `${url}/forms/${form.pk}/workflows/${workflowStatusPk}`;
 
-		return this.http.put<Form>(url, workflowUpdate, {headers});
+		return this.http.put<Form>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates
 	executeAggregateActionOnForm(form: Form, workflowId: string, workflowUpdate: WorkflowUpdate): Observable<Form> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		let url = `${this.apiService.getApiUrl()}/scopes/${form.scopePk}`;
 		if(form.eventPk) {
 			url = `${url}/events/${form.eventPk}`;
 		}
 		url = `${url}/forms/${form.pk}/workflows/${workflowId}/${workflowUpdate.actionId}`;
 
-		return this.http.put<Form>(url, workflowUpdate, {headers});
+		return this.http.put<Form>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates
@@ -94,17 +94,17 @@ export class WorkflowStatusService {
 	@reviveDates
 	executeActionOnEvent(event: Event, workflowStatusPk: number, workflowUpdate: WorkflowUpdate): Observable<Event> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		const url = `${this.apiService.getApiUrl()}/scopes/${event.scopePk}/events/${event.pk}/workflows/${workflowStatusPk}`;
-		return this.http.put<Event>(url, workflowUpdate, {headers});
+		return this.http.put<Event>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates
 	executeAggregateActionOnEvent(event: Event, workflowId: string, workflowUpdate: WorkflowUpdate): Observable<Event> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		const url = `${this.apiService.getApiUrl()}/scopes/${event.scopePk}/events/${event.pk}/workflows/${workflowId}/${workflowUpdate.actionId}`;
-		return this.http.put<Event>(url, workflowUpdate, {headers});
+		return this.http.put<Event>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates
@@ -116,17 +116,17 @@ export class WorkflowStatusService {
 	@reviveDates
 	executeActionOnScope(scope: Scope, workflowStatusPk: number, workflowUpdate: WorkflowUpdate): Observable<Scope> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		const url = `${this.apiService.getApiUrl()}/scopes/${scope.pk}/workflows/${workflowStatusPk}`;
-		return this.http.put<Scope>(url, workflowUpdate, {headers});
+		return this.http.put<Scope>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates
 	executeAggregateActionOnScope(scope: Scope, workflowId: string, workflowUpdate: WorkflowUpdate): Observable<Scope> {
 		//for actions that require a signature, skip handling of "Unauthorized" errors
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
 		const url = `${this.apiService.getApiUrl()}/scopes/${scope.pk}/workflows/${workflowId}/${workflowUpdate.actionId}`;
-		return this.http.put<Scope>(url, workflowUpdate, {headers});
+		return this.http.put<Scope>(url, workflowUpdate, {context});
 	}
 
 	@reviveDates

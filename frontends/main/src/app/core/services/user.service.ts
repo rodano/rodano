@@ -1,4 +1,4 @@
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams, HttpStatusCode} from '@angular/common/http';
 import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
 import {User} from '../model/user';
@@ -7,7 +7,7 @@ import {UserSearch} from '../utilities/search/user-search';
 import {APIService} from './api.service';
 import {HttpParamsService} from './http-params.service';
 import {PagedResultUser} from '../model/paged-result-user';
-import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
+import {SKIP_AUTH_TOKEN, SKIP_ERROR_HANDLING} from '../../interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 
 @Service()
@@ -74,14 +74,14 @@ export class UserService {
 
 	@reviveDates
 	changePassword(userPk: number, oldPassword: string, newPassword: string): Observable<User> {
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '401');
-		return this.http.post<User>(`${this.serviceUrl}/${userPk}/password`, {oldPassword, newPassword}, {headers});
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.Unauthorized]);
+		return this.http.post<User>(`${this.serviceUrl}/${userPk}/password`, {oldPassword, newPassword}, {context});
 	}
 
 	@reviveDates
 	changeEmail(userPk: number, email: string, password: string): Observable<User> {
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '');
-		return this.http.post<User>(`${this.serviceUrl}/${userPk}/email`, {password, email}, {headers});
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, true);
+		return this.http.post<User>(`${this.serviceUrl}/${userPk}/email`, {password, email}, {context});
 	}
 
 	@reviveDates
@@ -90,8 +90,8 @@ export class UserService {
 	}
 
 	recoverAccount(recoveryCode: string): Observable<undefined> {
-		const headers = new HttpHeaders().set(SKIP_AUTH_TOKEN_HEADER, '').set(SKIP_ERROR_HANDLING_HEADER, '404');
-		return this.http.post<undefined>(`${this.serviceUrl}/account-recovery/${recoveryCode}`, undefined, {headers});
+		const context = new HttpContext().set(SKIP_AUTH_TOKEN, true).set(SKIP_ERROR_HANDLING, [HttpStatusCode.NotFound]);
+		return this.http.post<undefined>(`${this.serviceUrl}/account-recovery/${recoveryCode}`, undefined, {context});
 	}
 
 	resendEmailVerificationEmail(userPk: number): Observable<undefined> {
@@ -103,7 +103,7 @@ export class UserService {
 	}
 
 	verifyUserEmail(verificationCode: string): Observable<undefined> {
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '404');
-		return this.http.post<undefined>(`${this.serviceUrl}/email-verification/${verificationCode}`, undefined, {headers});
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, [HttpStatusCode.NotFound]);
+		return this.http.post<undefined>(`${this.serviceUrl}/email-verification/${verificationCode}`, undefined, {context});
 	}
 }

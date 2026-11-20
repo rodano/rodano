@@ -1,7 +1,7 @@
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import {Service, inject} from '@angular/core';
 import {Observable} from 'rxjs';
-import {SKIP_AUTH_TOKEN_HEADER, SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
+import {SKIP_AUTH_TOKEN, SKIP_ERROR_HANDLING} from '../../interceptors/auth.interceptor';
 import {Authentication} from '../model/authentication';
 import {Credentials} from '../model/credentials';
 import {APIService} from './api.service';
@@ -32,7 +32,7 @@ export class AuthService {
 			null,
 			{
 				params,
-				headers: new HttpHeaders().set(SKIP_AUTH_TOKEN_HEADER, '').set(SKIP_ERROR_HANDLING_HEADER, '')
+				context: new HttpContext().set(SKIP_AUTH_TOKEN, true).set(SKIP_ERROR_HANDLING, true)
 			}
 
 		);
@@ -43,7 +43,7 @@ export class AuthService {
 			`${this.apiService.getApiUrl()}/auth/password/change`,
 			changePassword,
 			{
-				headers: new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '')
+				context: new HttpContext().set(SKIP_ERROR_HANDLING, true)
 			}
 		);
 	}
@@ -53,7 +53,7 @@ export class AuthService {
 			`${this.apiService.getApiUrl()}/auth/password/reset`,
 			resetPassword,
 			{
-				headers: new HttpHeaders().set(SKIP_AUTH_TOKEN_HEADER, '').set(SKIP_ERROR_HANDLING_HEADER, '')
+				context: new HttpContext().set(SKIP_AUTH_TOKEN, true).set(SKIP_ERROR_HANDLING, true)
 			}
 		);
 	}

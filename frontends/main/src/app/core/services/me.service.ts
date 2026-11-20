@@ -1,9 +1,9 @@
-import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
+import {HttpClient, HttpContext, HttpParams} from '@angular/common/http';
 import {Service, inject} from '@angular/core';
 import {catchError, Observable, of} from 'rxjs';
 import {User} from '../model/user';
 import {APIService} from './api.service';
-import {SKIP_ERROR_HANDLING_HEADER} from '../../interceptors/auth.interceptor';
+import {SKIP_ERROR_HANDLING} from '../../interceptors/auth.interceptor';
 import {reviveDates} from '../decorators/revive-dates.decorator';
 import {Scope} from '../model/scope';
 import {ScopeMini} from '../model/scope-mini';
@@ -32,8 +32,8 @@ export class MeService {
 	 * @returns {Observable<User>} An observable of the user
 	 */
 	tryToGet(): Observable<User | undefined> {
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '');
-		return this.http.get<User>(this.serviceUrl, {headers}).pipe(
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, true);
+		return this.http.get<User>(this.serviceUrl, {context}).pipe(
 			catchError(() => of(undefined))
 		);
 	}
@@ -90,7 +90,7 @@ export class MeService {
 	}
 
 	impersonate(profileId: string): Observable<User> {
-		const headers = new HttpHeaders().set(SKIP_ERROR_HANDLING_HEADER, '');
-		return this.http.put<User>(`${this.serviceUrl}/impersonate`, {profileId}, {headers});
+		const context = new HttpContext().set(SKIP_ERROR_HANDLING, true);
+		return this.http.put<User>(`${this.serviceUrl}/impersonate`, {profileId}, {context});
 	}
 }

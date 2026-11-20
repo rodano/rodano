@@ -7,16 +7,18 @@ import {AuthStateService} from '../services/auth-state.service';
 import {ErrorContext} from '../error/error-context';
 import {LoggingService} from '@core/services/logging.service';
 
+//these settings are stored in the context of the request, which is never sent to the server
+
 /**
- * This is the HTTP request header that lets any request possessing it skip the automatic addition of the authentication token
+ * Skip the automatic addition of the authentication token
  */
-export const SKIP_AUTH_TOKEN_HEADER = 'X-Skip-Auth-Token';
+export const SKIP_AUTH_TOKEN = new HttpContextToken<boolean>(() => false);
 /**
- * This is the HTTP request header that lets any request possessing it skip error handling
- * If the header is empty, no error will be handled
- * If the header contains values (as a comma separated list of HTTP response code), handling of the specified response code will be skipped
+ * Skip error handling
+ * If true, no error will be handled
+ * If it is a list of HTTP status codes, only the handling of these codes will be skipped
  */
-export const SKIP_ERROR_HANDLING_HEADER = 'X-Skip-Error-Handling';
+export const SKIP_ERROR_HANDLING = new HttpContextToken<boolean | HttpStatusCode[]>(() => false);
 
 /**
  * Maximum delay, in milliseconds, between two events of a request
@@ -29,30 +31,22 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
 	const authStateService = inject(AuthStateService);
 	const loggingService = inject(LoggingService);
 
-	//retrieve interceptor configuration flags stored in headers
-	const skipAuthToken = request.headers.has(SKIP_AUTH_TOKEN_HEADER);
-	const skipErrorHandling = request.headers.has(SKIP_ERROR_HANDLING_HEADER);
-	const skipErrorHeader = request.headers.get(SKIP_ERROR_HANDLING_HEADER);
-	const skipErrors = skipErrorHeader ? skipErrorHeader.split(',').map(code => parseInt(code, 10)) : [];
-
-	//delete these flags, as they must not be sent to the server
-	//don't forget that the headers is an immutable object
-	let headers = request.headers.delete(SKIP_AUTH_TOKEN_HEADER);
-	headers = headers.delete(SKIP_ERROR_HANDLING_HEADER);
+	const skipErrorHandling = request.context.get(SKIP_ERROR_HANDLING);
+	const skipErrors = Array.isArray(skipErrorHandling) ? skipErrorHandling : [];
 
 	//if the skip auth token flag is not set, enhance the request with the authorization token
-	if(!skipAuthToken) {
+	let enhancedRequest = request;
+	if(!request.context.get(SKIP_AUTH_TOKEN)) {
 		const token = authStateService.getToken();
 		if(token) {
-			headers = headers.set('Authorization', `Bearer ${token.toString()}`);
+			enhancedRequest = request.clone({headers: request.headers.set('Authorization', `Bearer ${token.toString()}`)});
 		}
 	}
 
-	const enhancedRequest = request.clone({headers});
 	const timedRequest = next(enhancedRequest).pipe(timeout({each: request.context.get(REQUEST_TIMEOUT)}));
 
-	//if the skip error handling token is present in the request, skip the error handling of the request
-	if(skipErrorHandling) {
+	//if all errors must be skipped, skip the error handling of the request
+	if(skipErrorHandling === true) {
 		return timedRequest;
 	}
 
