@@ -12,6 +12,30 @@ import {Tasks} from './tasks.js';
 import {Users} from './users.js';
 import {TokenManager} from './token.js';
 
+let started = false;
+
+function start(token) {
+	TokenManager.SetToken(token);
+	//the token dialog is shown again when the token is rejected, the application must only be initialized once
+	if(started) {
+		ApplicationManager.Update();
+		return;
+	}
+	started = true;
+
+	//initialize everything that does not require application info
+	Messaging.Init();
+	Reset.Init();
+	Restore.Init();
+	Backup.Init();
+	Tasks.Init();
+	Users.Init();
+	ApplicationManager.Init();
+	Control.Init();
+	Router.Init();
+	Router.ForceRefresh();
+}
+
 window.addEventListener(
 	'load',
 	function() {
@@ -21,12 +45,11 @@ window.addEventListener(
 				event.preventDefault();
 				const token = this['token'].value;
 				if(token) {
-					TokenManager.SetToken(token);
 					if(this['save'].checked) {
 						localStorage.setItem('token', token);
 					}
 					this.parentElement.close();
-					ApplicationManager.Update();
+					start(token);
 				}
 			}
 		);
@@ -44,18 +67,6 @@ window.addEventListener(
 			return;
 		}
 
-		TokenManager.SetToken(token);
-
-		//initialize everything that does not require application info
-		Messaging.Init();
-		Reset.Init();
-		Restore.Init();
-		Backup.Init();
-		Tasks.Init();
-		Users.Init();
-		ApplicationManager.Init();
-		Control.Init();
-		Router.Init();
-		Router.ForceRefresh();
+		start(token);
 	}
 );
