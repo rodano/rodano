@@ -6,6 +6,8 @@ This repository contains the following:
 - `backend`: backend source code written in Java, including the model, business layers, and HTTP API
 - `frontends`: the various frontends (the main frontend used by medical staff, the configurator used by data managers, and the ePRO mobile web application for study subjects)
 - `manager`: a web application to manage Rodano when running inside a Dockerized environment
+- `modules`: optional add-on modules extending Rodano's functionality:
+  - `dm-reporter`: an R-based Shiny application for creating custom data reports
 - `ansible`: an Ansible script to deploy the application to a remote server over SSH
 - a Docker Compose file to run the application locally
 
@@ -61,6 +63,16 @@ The command creates the administrator `test@rodano.ch` with the password `Passwo
 ## Deploy Rodano instances
 
 See the [dedicated documentation](ansible/README.md).
+
+## Optional Modules
+
+The `modules/` directory contains optional add-on modules that extend Rodano's functionality:
+
+### dm-reporter
+
+**Purpose:** Create custom data reports with R-based Shiny application.
+
+**Documentation:** See [dm-reporter module documentation](modules/dm-reporter/readme.md) for setup and usage instructions.
 
 ## Releasing
 

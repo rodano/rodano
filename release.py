@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parent
 # Files carrying a version string that must be kept in sync with the release.
 POM = ROOT / 'backend' / 'pom.xml'
 FRONTENDS = ('configurator', 'epro', 'main')
+DM_REPORTER_DESCRIPTION = ROOT / 'modules' / 'dm-reporter' / 'DESCRIPTION'
 
 # A release version is a plain semantic version without pre-release identifier.
 VERSION_RE = re.compile(r'^\d+\.\d+\.\d+$')
@@ -51,9 +52,11 @@ def release_branch(version):
 
 # Placeholder versions kept on dev at all times; "branch" is what decides the
 # actual next semantic version. package.json requires a semver-shaped string,
-# unlike the POM, so the frontends get their own placeholder.
+# unlike the POM, so the frontends get their own placeholder. R packages don't
+# support hyphens, so dm-reporter uses .9000 for dev.
 DEV_POM_VERSION = 'DEV-SNAPSHOT'
 DEV_FRONTEND_VERSION = '0.0.0-dev'
+DEV_R_VERSION = '0.0.0.9000'
 
 
 class ReleaseError(Exception):
@@ -225,12 +228,47 @@ def bump_json_version(path, version, occurrences=1):
 	path.write_text(updated)
 
 
+def r_version(version):
+	"""Convert semantic version to R-compatible format.
+	
+	R packages don't support hyphens in versions:
+	- 1.0.0-SNAPSHOT → 1.0.0.9000
+	- 1.0.0-rc.N → 1.0.0.N
+	- 1.0.0 → 1.0.0
+	"""
+	if version.endswith('-SNAPSHOT'):
+		return version.replace('-SNAPSHOT', '.9000')
+	match = re.match(r'^(.+?)-rc\.(\d+)$', version)
+	if match:
+		return f'{match.group(1)}.{match.group(2)}'
+	return version
+
+
+def bump_description_version(path, version):
+	content = path.read_text()
+	r_ver = r_version(version)
+	updated, count = re.subn(
+		r'^(Version:\s*)[^\n]*',
+		rf'\g<1>{r_ver}',
+		content,
+		count=1,
+		flags=re.MULTILINE,
+	)
+	if count != 1:
+		raise ReleaseError(f'Could not find a Version field in {path}.')
+	if DRY_RUN:
+		logger.info(f'[dry-run] set version in {path.relative_to(ROOT)} to {r_ver}')
+		return
+	path.write_text(updated)
+
+
 def bump_all_versions(version):
 	bump_pom(version)
 	for frontend in FRONTENDS:
 		directory = ROOT / 'frontends' / frontend
 		bump_json_version(directory / 'package.json', version)
 		bump_json_version(directory / 'package-lock.json', version, occurrences=2)
+	bump_description_version(DM_REPORTER_DESCRIPTION, version)
 
 
 def bump_dev_placeholder_versions():
@@ -240,6 +278,7 @@ def bump_dev_placeholder_versions():
 		directory = ROOT / 'frontends' / frontend
 		bump_json_version(directory / 'package.json', DEV_FRONTEND_VERSION)
 		bump_json_version(directory / 'package-lock.json', DEV_FRONTEND_VERSION, occurrences=2)
+	bump_description_version(DM_REPORTER_DESCRIPTION, DEV_R_VERSION)
 
 
 def changed_version_files():
@@ -247,6 +286,7 @@ def changed_version_files():
 	for frontend in FRONTENDS:
 		files.append(f'frontends/{frontend}/package.json')
 		files.append(f'frontends/{frontend}/package-lock.json')
+	files.append(str(DM_REPORTER_DESCRIPTION.relative_to(ROOT)))
 	return files
 
 

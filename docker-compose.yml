@@ -119,6 +119,25 @@ services:
         read_only: true
     restart: on-failure
 
+  dm-reporter:
+    image: ghcr.io/rodano/dm-reporter:${TAG}
+    build:
+      context: modules/dm-reporter
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    volumes:
+      - type: bind
+        source: ${STUDY_PATH}/dm-reporter
+        target: /opt/custom-reports
+        read_only: true
+    environment:
+      API_URL: http://backend:8080
+      CUSTOM_REPORTS_PATH: /opt/custom-reports
+    ports:
+      - "127.0.0.1:3838:3838"
+    restart: on-failure
+
   manager:
     image: ghcr.io/rodano/manager:${TAG}
     build:
