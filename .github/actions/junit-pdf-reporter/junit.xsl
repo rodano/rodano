@@ -19,10 +19,10 @@
 						margin: 5px 0;
 						padding: 2px;
 						border: 1px solid #ddd;
-					}
-					h1 > span, h2 > span {
-						margin-left: 20px;
-						font-size: 0.9rem;
+						span {
+							margin-left: 20px;
+							font-size: 0.9rem;
+						}
 					}
 					ul {
 						list-style-type: none;

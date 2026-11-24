@@ -1,10 +1,9 @@
-import {defineConfig, globalIgnores} from 'eslint/config';
+import {defineConfig} from 'eslint/config';
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import globals from 'globals';
 
 export default defineConfig([
-	globalIgnores(['dist']),
 	{
 		plugins: {
 			'@stylistic': stylistic
@@ -59,13 +58,13 @@ export default defineConfig([
 			'@stylistic/key-spacing': 'error',
 			'@stylistic/keyword-spacing': ['error', {overrides: {if: {after: false}, for: {after: false}, switch: {after: false}, while: {after: false}}}],
 			'@stylistic/linebreak-style': 'error',
+			'@stylistic/list-style': ['error', {overrides: {'{}': {singleLine: {spacing: 'never'}}}}],
 			'@stylistic/member-delimiter-style': ['error', {multiline: {delimiter: 'semi'}}],
 			'@stylistic/no-extra-semi': 'error',
 			'@stylistic/no-multi-spaces': 'error',
 			'@stylistic/no-multiple-empty-lines': 'error',
 			'@stylistic/no-tabs': ['error', {allowIndentationTabs: true}],
 			'@stylistic/no-trailing-spaces': 'error',
-			'@stylistic/object-curly-spacing': ['error', 'never'],
 			'@stylistic/quotes': ['error', 'single'],
 			'@stylistic/semi': ['error', 'always', {omitLastInOneLineBlock: false}],
 			'@stylistic/space-before-function-paren': ['error', 'never'],

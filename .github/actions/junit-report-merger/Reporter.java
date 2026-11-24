@@ -1,18 +1,17 @@
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
-import javax.xml.parsers.DocumentBuilder;
+import javax.xml.XMLConstants;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventFactory;
@@ -22,197 +21,170 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.EndElement;
-import javax.xml.stream.events.StartDocument;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class Reporter {
-	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+	private static final Path POM_FILE = Path.of("pom.xml");
+	private static final Path SUREFIRE_REPORTS_DIR = Path.of("target", "surefire-reports");
+	private static final Path RESULT_FILE = Path.of("test-output", "results.xml");
 
-	private static final String POM_FILE_NAME = "pom.xml";
-
-	private static final String SUREFIRE_REPORTS_DIR = "target/surefire-reports/";
-	private static final String RESULT_FILE = "test-output/results.xml";
-
-	private static final String TESTCASE = "testcase";
 	private static final String TESTSUITE = "testsuite";
 	private static final String FAILURE = "failure";
+	private static final Set<String> COPIED_ELEMENTS = Set.of(TESTSUITE, "testcase", FAILURE);
 
-	private static final ArrayList<XMLEvent> xmlEvents = new ArrayList<>();
+	private static final XMLInputFactory INPUT_FACTORY = createInputFactory();
+	private static final XMLEventFactory EVENT_FACTORY = XMLEventFactory.newInstance();
 
-	private static double TotalTime = 0;
-	private static int TotalTests = 0;
-	private static int TotalFailures = 0;
+	private record Project(String name, String version) {}
 
-	public static void main(String[] args) throws IOException, XMLStreamException, ParserConfigurationException, SAXException {
-		//load all reports in memory
-		processAllReports(SUREFIRE_REPORTS_DIR);
-		//create result file
-		File result = new File(RESULT_FILE);
-		result.getParentFile().mkdirs();
-		result.createNewFile();
-		//write resulting report
-		writeReport(result);
+	private record Report(List<XMLEvent> events, BigDecimal time, int tests, int failures) {}
+
+	public static void main(final String[] args) throws IOException, XMLStreamException, ParserConfigurationException, SAXException {
+		final List<Report> reports = readReports(SUREFIRE_REPORTS_DIR);
+		Files.createDirectories(RESULT_FILE.getParent());
+		writeReport(RESULT_FILE, readProject(POM_FILE), reports);
 		System.out.println("The report is ready!");
 	}
 
-	private static void processAllReports(String folderName) {
-		File folder = new File(folderName);
-		File[] listFiles = folder.listFiles();
-
-		if(listFiles != null) {
-			Arrays.stream(listFiles)
-				.filter(file -> file.getName().endsWith(".xml"))
-				.sorted()
-				.forEach(file -> processReport(folderName + file.getName()));
-		}
+	private static XMLInputFactory createInputFactory() {
+		final XMLInputFactory factory = XMLInputFactory.newInstance();
+		factory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+		factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+		//keep failure stack traces in a single event even when they contain entities
+		factory.setProperty(XMLInputFactory.IS_COALESCING, true);
+		return factory;
 	}
 
-	private static void processReport(String reportName) {
-		try {
-			//Create a new XML Factory.
-			XMLInputFactory inputFactory = XMLInputFactory.newInstance();
-			//Setup a new EventReader.
-			InputStream in = new FileInputStream(reportName);
-			XMLEventReader eventReader = inputFactory.createXMLEventReader(in);
+	private static List<Report> readReports(final Path folder) throws IOException {
+		if(!Files.isDirectory(folder)) {
+			return List.of();
+		}
+		final List<Path> files;
+		try(Stream<Path> paths = Files.list(folder)) {
+			files = paths.filter(path -> path.getFileName().toString().endsWith(".xml")).sorted().toList();
+		}
+		final List<Report> reports = new ArrayList<>();
+		for(final Path file : files) {
+			try {
+				reports.add(readReport(file));
+			}
+			catch(final IOException | XMLStreamException e) {
+				System.err.printf("Unable to read report %s%n", file);
+				e.printStackTrace();
+			}
+		}
+		return reports;
+	}
 
-			//Now read the xml document.
-			while(eventReader.hasNext()) {
-				XMLEvent event = eventReader.nextEvent();
+	private static Report readReport(final Path file) throws IOException, XMLStreamException {
+		final List<XMLEvent> events = new ArrayList<>();
+		BigDecimal time = BigDecimal.ZERO;
+		int tests = 0;
+		int failures = 0;
+		boolean inFailure = false;
 
-				if(event.isStartElement()) {
-					StartElement startElem = event.asStartElement();
-
-					if(startElem.getName().getLocalPart().equals(TESTSUITE)) {
-						Iterator attributes = startElem.getAttributes();
-						while(attributes.hasNext()) {
-							Attribute attr = (Attribute) attributes.next();
-
-							if(attr.getName().getLocalPart().equals("time")) {
-								TotalTime += Double.parseDouble(attr.getValue());
-							}
-							if(attr.getName().getLocalPart().equals("tests")) {
-								TotalTests += Double.parseDouble(attr.getValue());
-							}
-							if(attr.getName().getLocalPart().equals("failures")) {
-								TotalFailures += Double.parseDouble(attr.getValue());
-							}
+		try(InputStream input = Files.newInputStream(file)) {
+			final XMLEventReader reader = INPUT_FACTORY.createXMLEventReader(input);
+			try {
+				while(reader.hasNext()) {
+					final XMLEvent event = reader.nextEvent();
+					if(event.isStartElement()) {
+						final StartElement element = event.asStartElement();
+						final String name = element.getName().getLocalPart();
+						if(TESTSUITE.equals(name)) {
+							time = time.add(new BigDecimal(getAttribute(element, "time", "0")));
+							tests += Integer.parseInt(getAttribute(element, "tests", "0"));
+							failures += Integer.parseInt(getAttribute(element, "failures", "0"));
 						}
-
-						xmlEvents.add(startElem);
+						if(COPIED_ELEMENTS.contains(name)) {
+							events.add(event);
+							inFailure = FAILURE.equals(name);
+						}
 					}
-
-					if(startElem.getName().getLocalPart().equals(TESTCASE)) {
-						xmlEvents.add(startElem);
+					else if(event.isEndElement()) {
+						final String name = event.asEndElement().getName().getLocalPart();
+						if(COPIED_ELEMENTS.contains(name)) {
+							events.add(event);
+							inFailure = false;
+						}
 					}
-
-					//Get the failure information if present.
-					if(startElem.getName().getLocalPart().equals(FAILURE)) {
-						xmlEvents.add(startElem);
-
-						//And get the error body.
-						event = eventReader.nextEvent();
-						xmlEvents.add(event);
-					}
-				}
-
-				if(event.isEndElement()) {
-					EndElement endElem = event.asEndElement();
-
-					if(endElem.getName().getLocalPart().equals(TESTSUITE)) {
-						xmlEvents.add(endElem);
-					}
-
-					if(endElem.getName().getLocalPart().equals(TESTCASE)) {
-						xmlEvents.add(endElem);
-					}
-
-					if(endElem.getName().getLocalPart().equals(FAILURE)) {
-						xmlEvents.add(endElem);
+					else if(inFailure && event.isCharacters()) {
+						events.add(event);
 					}
 				}
 			}
-		}
-		catch(FileNotFoundException | XMLStreamException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private static void writeReport(File result) throws IOException, XMLStreamException, SAXException, ParserConfigurationException {
-		//Create XML Output Factory.
-		XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
-		//Create XML Event Writer.
-		XMLEventWriter eventWriter = outputFactory.createXMLEventWriter(new FileOutputStream(result));
-
-		//Create an event factory.
-		XMLEventFactory eventFactory = XMLEventFactory.newInstance();
-		XMLEvent endLine = eventFactory.createDTD("\n");
-
-		//Add the start of the document.
-		StartDocument startDocument = eventFactory.createStartDocument("UTF-8");
-		eventWriter.add(startDocument);
-		eventWriter.add(endLine);
-
-		//Wrap everything in a single root tag.
-		StartElement testsuitesStartElement = eventFactory.createStartElement("", "", "testsuites");
-		eventWriter.add(testsuitesStartElement);
-
-		Map<String, String> projectInfo = getProjectInfo();
-		Attribute nameAttr = eventFactory.createAttribute("name", projectInfo.get("name"));
-		Attribute versionAttr = eventFactory.createAttribute("version", projectInfo.get("version"));
-		eventWriter.add(nameAttr);
-		eventWriter.add(versionAttr);
-
-		Attribute totalTimeAttr = eventFactory.createAttribute("time", String.valueOf(TotalTime));
-		Attribute totalTestsAttr = eventFactory.createAttribute("tests", String.valueOf(TotalTests));
-		Attribute totalFailuresAttr = eventFactory.createAttribute("failures", String.valueOf(TotalFailures));
-		Attribute dateAttr = eventFactory.createAttribute("date", DATE_FORMAT.format(ZonedDateTime.now()));
-		eventWriter.add(totalTimeAttr);
-		eventWriter.add(totalTestsAttr);
-		eventWriter.add(totalFailuresAttr);
-		eventWriter.add(dateAttr);
-
-		eventWriter.add(endLine);
-
-		//Add all the contents to the document.
-		for(XMLEvent event : xmlEvents) {
-			eventWriter.add(event);
-
-			if(event.isEndElement()) {
-				eventWriter.add(endLine);
+			finally {
+				reader.close();
 			}
 		}
-
-		//Close the single root tag.
-		eventWriter.add(eventFactory.createEndElement("", "", "testsuites"));
-		eventWriter.add(endLine);
-
-		//Add an end to the document and close the writer.
-		eventWriter.add(eventFactory.createEndDocument());
-		eventWriter.close();
+		return new Report(events, time, tests, failures);
 	}
 
-	private static Map<String, String> getProjectInfo() throws ParserConfigurationException, IOException, SAXException {
-		Map<String, String> infoMap = new HashMap<>();
+	private static String getAttribute(final StartElement element, final String name, final String defaultValue) {
+		final Attribute attribute = element.getAttributeByName(new QName(name));
+		return attribute != null ? attribute.getValue() : defaultValue;
+	}
 
-		File pomFile = new File(POM_FILE_NAME);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(pomFile);
+	private static void writeReport(final Path file, final Project project, final List<Report> reports) throws IOException, XMLStreamException {
+		final BigDecimal time = reports.stream().map(Report::time).reduce(BigDecimal.ZERO, BigDecimal::add);
+		final int tests = reports.stream().mapToInt(Report::tests).sum();
+		final int failures = reports.stream().mapToInt(Report::failures).sum();
+		final XMLEvent endLine = EVENT_FACTORY.createSpace("\n");
 
-		doc.getDocumentElement().normalize();
+		try(OutputStream output = Files.newOutputStream(file)) {
+			final XMLEventWriter writer = XMLOutputFactory.newInstance().createXMLEventWriter(output, "UTF-8");
+			try {
+				writer.add(EVENT_FACTORY.createStartDocument("UTF-8"));
+				writer.add(endLine);
 
-		Node projectNameNode = doc.getElementsByTagName("name").item(0);
-		infoMap.put("name", projectNameNode.getTextContent());
+				//wrap all test suites in a single root element
+				writer.add(EVENT_FACTORY.createStartElement("", "", "testsuites"));
+				writer.add(EVENT_FACTORY.createAttribute("name", project.name()));
+				writer.add(EVENT_FACTORY.createAttribute("version", project.version()));
+				writer.add(EVENT_FACTORY.createAttribute("time", time.stripTrailingZeros().toPlainString()));
+				writer.add(EVENT_FACTORY.createAttribute("tests", String.valueOf(tests)));
+				writer.add(EVENT_FACTORY.createAttribute("failures", String.valueOf(failures)));
+				writer.add(EVENT_FACTORY.createAttribute("date", LocalDate.now().toString()));
+				writer.add(endLine);
 
-		Node versionNode = doc.getElementsByTagName("version").item(0);
-		infoMap.put("version", versionNode.getTextContent());
+				for(final Report report : reports) {
+					for(final XMLEvent event : report.events()) {
+						writer.add(event);
+						if(event.isEndElement()) {
+							writer.add(endLine);
+						}
+					}
+				}
 
-		return infoMap;
+				writer.add(EVENT_FACTORY.createEndElement("", "", "testsuites"));
+				writer.add(endLine);
+				writer.add(EVENT_FACTORY.createEndDocument());
+			}
+			finally {
+				writer.close();
+			}
+		}
+	}
+
+	private static Project readProject(final Path pom) throws ParserConfigurationException, IOException, SAXException {
+		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+		final Element project = factory.newDocumentBuilder().parse(pom.toFile()).getDocumentElement();
+		return new Project(getChildText(project, "name"), getChildText(project, "version"));
+	}
+
+	private static String getChildText(final Element parent, final String name) {
+		for(Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
+			if(child instanceof final Element element && name.equals(element.getTagName())) {
+				return element.getTextContent();
+			}
+		}
+		throw new IllegalArgumentException("Missing element %s in %s".formatted(name, POM_FILE));
 	}
 }

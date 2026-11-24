@@ -1,64 +1,42 @@
-import fs from 'fs';
-import path from 'path';
-import http from 'http';
-import {fileURLToPath} from 'url';
+import {readFile} from 'node:fs/promises';
+import path from 'node:path';
 import puppeteer from 'puppeteer';
+import {Xslt, XmlParser} from 'xslt-processor';
 
-const PORT = 30000;
-const STYLESHEET = '<?xml-stylesheet type="text/xsl" href="/report.xsl"?>';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const HEADER = '<p style="font-size: 8px; color: black; margin: auto; text-align: center;"><span class="title"></span> - <span class="date"></span></p>';
+const FOOTER = '<footer style="font-size: 8px; color: black; margin: auto; text-align: center;"><span class="pageNumber"></span> of <span class="totalPages"></span></footer>';
 
 export default async function generate_pdf(report_path, pdf_path) {
 	console.log(`Generating PDF report from ${report_path}...`);
+	const [report, stylesheet] = await Promise.all([
+		readFile(report_path, 'utf8'),
+		readFile(path.join(import.meta.dirname, 'junit.xsl'), 'utf8')
+	]);
 
-	console.log('Loading XSL file in memory...');
-	const xsl = fs.readFileSync(path.join(__dirname, 'junit.xsl'));
-
-	console.log('Adding stylesheet to report in memory...');
-	const report_content = fs.readFileSync(report_path, 'utf8');
-	const report_content_lines = report_content.split('\n');
-	report_content_lines.splice(1, 0, STYLESHEET);
-	const updated_report_content = report_content_lines.join('\n');
-
-	console.log('Launching HTTP server...');
-	const server = http.createServer((request, response) => {
-		response.writeHead(200);
-		if(request.url === '/report.xsl') {
-			response.end(xsl);
-		}
-		else {
-			response.end(updated_report_content);
-		}
-	});
-	server.listen(PORT);
+	console.log('Transforming report to HTML...');
+	const parser = new XmlParser();
+	const html = await new Xslt().xsltProcess(parser.xmlParse(report), parser.xmlParse(stylesheet));
 
 	console.log('Launching browser...');
-	const browser = await puppeteer.launch({
-		headless: 'new',
-		defaultViewport: null,
-		args: [
-			'--no-sandbox'
-		]
-	});
+	//the sandbox cannot start on runners that restrict unprivileged user namespaces
+	const browser = await puppeteer.launch({args: ['--no-sandbox']});
+	try {
+		const page = await browser.newPage();
+		//wait for the network to be idle to let custom fonts load
+		await page.setContent(html, {waitUntil: 'networkidle0'});
 
-	const page = await browser.newPage();
-	//it's important to wait for network to let custom fonts the time to be loaded
-	await page.goto(`http://localhost:${PORT}`, {waitUntil: 'networkidle2'});
-
-	console.log(`Exporting PDF report ${pdf_path}...`);
-	const header = '<p style="font-size: 8px; color: black; margin: auto; text-align: center;"><span class="title"></span> - <span class="date"></span></p>';
-	const footer = '<footer style="font-size: 8px; color: black; margin: auto; text-align: center;"><span class="pageNumber" ></span> of <span class="totalPages"></span><footer>';
-	await page.pdf({
-		path: pdf_path,
-		displayHeaderFooter: true,
-		format: 'A4',
-		margin: {top: '1.5cm', bottom: '1.5cm', left: '0.5cm', right: '0.5cm'},
-		headerTemplate: header,
-		footerTemplate: footer
-	});
-
-	await browser.close();
-	server.close();
+		console.log(`Exporting PDF report ${pdf_path}...`);
+		await page.pdf({
+			path: pdf_path,
+			displayHeaderFooter: true,
+			format: 'A4',
+			margin: {top: '1.5cm', bottom: '1.5cm', left: '0.5cm', right: '0.5cm'},
+			headerTemplate: HEADER,
+			footerTemplate: FOOTER
+		});
+	}
+	finally {
+		await browser.close();
+	}
 	console.log('Done.');
 }

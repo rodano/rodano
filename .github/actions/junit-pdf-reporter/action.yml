@@ -10,7 +10,7 @@ runs:
     - name: Install reporter dependencies and browser
       shell: bash
       working-directory: ${{ github.action_path }}
-      run: npm ci
+      run: npm ci --omit=dev
     - name: Generate PDF
       shell: bash
       working-directory: ${{ github.workspace }}/${{ inputs.working-directory }}
