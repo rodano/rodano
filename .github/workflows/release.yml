@@ -1,9 +1,8 @@
 name: Release
 
 permissions:
-  # write access required to write the release asset
+  # write access required to create the release
   contents: write
-  packages: write
 
 on:
   push:
@@ -12,29 +11,14 @@ on:
     - 'v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+'
 
 jobs:
-  package:
-    name: Test and publish package
+  release:
+    name: Create GitHub release
     runs-on: ubuntu-latest
-    services:
-      mariadb:
-        image: mariadb:13.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: rodano
-        ports:
-            - 3307:3306
     steps:
-      # retrieve version
-      - name: Get the version from the Git reference
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF/refs\/tags\//}" >> $GITHUB_OUTPUT
-
       - name: Checkout the project
         uses: actions/checkout@v7
 
-      # create a GitHub release
       - name: Create a GitHub release
-        run: |
-          gh release create ${{ steps.get_version.outputs.VERSION }} ${{ contains(steps.get_version.outputs.VERSION, 'rc') && '--prerelease' || '' }}
+        run: gh release create ${{ github.ref_name }} ${{ contains(github.ref_name, 'rc') && '--prerelease' || '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
