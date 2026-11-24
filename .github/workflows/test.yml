@@ -157,12 +157,19 @@ jobs:
       - name: Execute unit tests
         run: npm run test:ci
 
+      - name: Generate custom test report
+        uses: $/.github/actions/junit-pdf-reporter
+        with:
+          working-directory: frontends/main
+
       # store reports as artifacts
       - name: Store test report
         uses: actions/upload-artifact@v7
         with:
           name: frontend-main-test-report
-          path: frontends/main/test-output/results.xml
+          path: |
+            frontends/main/test-output/results.xml
+            frontends/main/test-output/results.pdf
 
   frontend-configurator:
     name: Test configurator frontend
