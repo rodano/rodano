@@ -34,15 +34,16 @@ public class Reporter {
 	private static final Path RESULT_FILE = Path.of("test-output", "results.xml");
 
 	private static final String TESTSUITE = "testsuite";
-	private static final String FAILURE = "failure";
-	private static final Set<String> COPIED_ELEMENTS = Set.of(TESTSUITE, "testcase", FAILURE);
+	//unexpected exceptions are reported as errors, failed assertions as failures
+	private static final Set<String> FAILURE_ELEMENTS = Set.of("failure", "error");
+	private static final Set<String> COPIED_ELEMENTS = Set.of(TESTSUITE, "testcase", "failure", "error");
 
 	private static final XMLInputFactory INPUT_FACTORY = createInputFactory();
 	private static final XMLEventFactory EVENT_FACTORY = XMLEventFactory.newInstance();
 
 	private record Project(String name, String version) {}
 
-	private record Report(List<XMLEvent> events, BigDecimal time, int tests, int failures) {}
+	private record Report(List<XMLEvent> events, BigDecimal time, int tests, int failures, int errors) {}
 
 	public static void main(final String[] args) throws IOException, XMLStreamException, ParserConfigurationException, SAXException {
 		final List<Report> reports = readReports(SUREFIRE_REPORTS_DIR);
@@ -86,6 +87,7 @@ public class Reporter {
 		BigDecimal time = BigDecimal.ZERO;
 		int tests = 0;
 		int failures = 0;
+		int errors = 0;
 		boolean inFailure = false;
 
 		try(InputStream input = Files.newInputStream(file)) {
@@ -100,10 +102,11 @@ public class Reporter {
 							time = time.add(new BigDecimal(getAttribute(element, "time", "0")));
 							tests += Integer.parseInt(getAttribute(element, "tests", "0"));
 							failures += Integer.parseInt(getAttribute(element, "failures", "0"));
+							errors += Integer.parseInt(getAttribute(element, "errors", "0"));
 						}
 						if(COPIED_ELEMENTS.contains(name)) {
 							events.add(event);
-							inFailure = FAILURE.equals(name);
+							inFailure = FAILURE_ELEMENTS.contains(name);
 						}
 					}
 					else if(event.isEndElement()) {
@@ -122,7 +125,7 @@ public class Reporter {
 				reader.close();
 			}
 		}
-		return new Report(events, time, tests, failures);
+		return new Report(events, time, tests, failures, errors);
 	}
 
 	private static String getAttribute(final StartElement element, final String name, final String defaultValue) {
@@ -134,6 +137,7 @@ public class Reporter {
 		final BigDecimal time = reports.stream().map(Report::time).reduce(BigDecimal.ZERO, BigDecimal::add);
 		final int tests = reports.stream().mapToInt(Report::tests).sum();
 		final int failures = reports.stream().mapToInt(Report::failures).sum();
+		final int errors = reports.stream().mapToInt(Report::errors).sum();
 		final XMLEvent endLine = EVENT_FACTORY.createSpace("\n");
 
 		try(OutputStream output = Files.newOutputStream(file)) {
@@ -149,6 +153,7 @@ public class Reporter {
 				writer.add(EVENT_FACTORY.createAttribute("time", time.stripTrailingZeros().toPlainString()));
 				writer.add(EVENT_FACTORY.createAttribute("tests", String.valueOf(tests)));
 				writer.add(EVENT_FACTORY.createAttribute("failures", String.valueOf(failures)));
+				writer.add(EVENT_FACTORY.createAttribute("errors", String.valueOf(errors)));
 				writer.add(EVENT_FACTORY.createAttribute("date", LocalDate.now().toString()));
 				writer.add(endLine);
 

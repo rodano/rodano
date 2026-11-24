@@ -71,16 +71,17 @@
 				</style>
 			</head>
 			<body>
+				<xsl:variable name="failures" select="sum(@failures | @errors)" />
 				<h1>
-					<xsl:if test="@failures = 0">
+					<xsl:if test="$failures = 0">
 						<xsl:attribute name="class">success</xsl:attribute>
 					</xsl:if>
-					<xsl:if test="@failures != 0">
+					<xsl:if test="$failures != 0">
 						<xsl:attribute name="class">fail</xsl:attribute>
 					</xsl:if>
 					Report <xsl:value-of select="@name" />
 					<span>v<xsl:value-of select="@version" /></span>
-					<span><xsl:value-of select="@tests - @failures" />/<xsl:value-of select="@tests" /> tests</span>
+					<span><xsl:value-of select="@tests - $failures" />/<xsl:value-of select="@tests" /> tests</span>
 					<span><xsl:value-of select="@time" />s</span>
 				</h1>
 				<xsl:if test="count(./properties) != 0">
@@ -96,14 +97,14 @@
 	<xsl:template match="testsuite">
 		<div>
 			<h2>
-				<xsl:if test="count(./testcase/failure) = 0">
+				<xsl:if test="count(testcase/failure | testcase/error) = 0">
 					<xsl:attribute name="class">success</xsl:attribute>
 				</xsl:if>
-				<xsl:if test="count(./testcase/failure) != 0">
+				<xsl:if test="count(testcase/failure | testcase/error) != 0">
 					<xsl:attribute name="class">fail</xsl:attribute>
 				</xsl:if>
 				<xsl:value-of select="@name" />
-				<span><xsl:value-of select="@tests - @failures" />/<xsl:value-of select="@tests" /> tests</span>
+				<span><xsl:value-of select="@tests - sum(@failures | @errors)" />/<xsl:value-of select="@tests" /> tests</span>
 				<span><xsl:value-of select="@timestamp" /></span>
 				<span><xsl:value-of select="@time" />s</span>
 			</h2>
@@ -115,21 +116,21 @@
 
 	<xsl:template match="testcase">
 		<li>
-			<xsl:if test="count(./failure) = 0">
+			<xsl:if test="count(failure | error) = 0">
 				<xsl:attribute name="class">success</xsl:attribute>
 			</xsl:if>
-			<xsl:if test="count(./failure) != 0">
+			<xsl:if test="count(failure | error) != 0">
 				<xsl:attribute name="class">fail</xsl:attribute>
 			</xsl:if>
 			<xsl:value-of select="@name" />
 			<span class="description">
 				<xsl:value-of select="@description" />
 			</span>
-			<xsl:apply-templates select="failure" />
+			<xsl:apply-templates select="failure | error" />
 		</li>
 	</xsl:template>
 
-	<xsl:template match="failure">
+	<xsl:template match="failure | error">
 		<div class="failure">
 			<xsl:value-of select="@message" />
 			<xsl:if test="../system-err">
