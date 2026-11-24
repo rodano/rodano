@@ -2,12 +2,14 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 	<xsl:output method="html" version="1.1" omit-xml-declaration="yes" encoding="utf-8" indent="yes" />
 
+	<xsl:param name="version" />
+
 	<xsl:template match="testsuites">
 		<html>
 			<head>
 				<meta charset="UTF-8" />
 				<title>
-					<xsl:value-of select="@name" />-<xsl:value-of select="@version" />
+					<xsl:value-of select="normalize-space(concat(@name, ' ', $version))" />
 				</title>
 				<link href="https://fonts.googleapis.com/css?family=Inconsolata|Open+Sans:400,700" rel="stylesheet" />
 				<style type="text/css">
@@ -80,7 +82,9 @@
 						<xsl:attribute name="class">fail</xsl:attribute>
 					</xsl:if>
 					Report <xsl:value-of select="@name" />
-					<span>v<xsl:value-of select="@version" /></span>
+					<xsl:if test="$version">
+						<span><xsl:value-of select="$version" /></span>
+					</xsl:if>
 					<span><xsl:value-of select="@tests - $failures" />/<xsl:value-of select="@tests" /> tests</span>
 					<span><xsl:value-of select="@time" />s</span>
 				</h1>

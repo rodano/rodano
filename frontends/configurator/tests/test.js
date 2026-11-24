@@ -20,9 +20,6 @@ const TEST_OUTPUT = path.resolve('test-output');
 const RESULT_FILENAME = path.resolve(TEST_OUTPUT, 'results.xml');
 const SUITE_PATTERN = /(.*)\.suite\.json/i;
 
-//retrieve current version
-const VERSION = JSON.parse(fs.readFileSync(path.resolve('package.json'), {encoding: 'utf-8'})).version;
-
 //prepare report folder
 if(fs.existsSync(TEST_OUTPUT)) {
 	sync(TEST_OUTPUT);
@@ -99,8 +96,6 @@ else {
 //execute suites
 suites.reduce(run_and_reduce_suite, Promise.resolve()).then(function() {
 	const report = reporter('KVConfig tests', suites);
-	//add version
-	report.root().att({'version': VERSION});
 	fs.writeFileSync(RESULT_FILENAME, report.end({prettyPrint: true}));
 	//set error return code if test has failures
 	if(suites.some(s => s.getFailsNumber() > 0)) {

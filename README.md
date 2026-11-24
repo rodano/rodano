@@ -93,4 +93,4 @@ Useful flags:
 
 ## CI test reports
 
-The [Test workflow](.github/workflows/test.yml) uses embedded [JUnit report merger](.github/actions/junit-report-merger/action.yml) and [PDF reporter](.github/actions/junit-pdf-reporter/action.yml) actions. It references them with `$/`, so they run from the same commit as the workflow.
+The [Test workflow](.github/workflows/test.yml) uses embedded [JUnit report merger](.github/actions/junit-report-merger/action.yml) and [PDF reporter](.github/actions/junit-pdf-reporter/action.yml) actions. It references them with `$/`, so they run from the same commit as the workflow. The PDF reports show the tested commit, preceded by its tag when tests run on a release tag.

@@ -6,7 +6,7 @@ import {Xslt, XmlParser} from 'xslt-processor';
 const HEADER = '<p style="font-size: 8px; color: black; margin: auto; text-align: center;"><span class="title"></span> - <span class="date"></span></p>';
 const FOOTER = '<footer style="font-size: 8px; color: black; margin: auto; text-align: center;"><span class="pageNumber"></span> of <span class="totalPages"></span></footer>';
 
-export default async function generate_pdf(report_path, pdf_path) {
+export default async function generate_pdf(report_path, pdf_path, version = '') {
 	console.log(`Generating PDF report from ${report_path}...`);
 	const [report, stylesheet] = await Promise.all([
 		readFile(report_path, 'utf8'),
@@ -15,7 +15,7 @@ export default async function generate_pdf(report_path, pdf_path) {
 
 	console.log('Transforming report to HTML...');
 	const parser = new XmlParser();
-	const html = await new Xslt().xsltProcess(parser.xmlParse(report), parser.xmlParse(stylesheet));
+	const html = await new Xslt({parameters: [{name: 'version', value: version}]}).xsltProcess(parser.xmlParse(report), parser.xmlParse(stylesheet));
 
 	console.log('Launching browser...');
 	//the sandbox cannot start on runners that restrict unprivileged user namespaces

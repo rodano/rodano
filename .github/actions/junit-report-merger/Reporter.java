@@ -41,14 +41,12 @@ public class Reporter {
 	private static final XMLInputFactory INPUT_FACTORY = createInputFactory();
 	private static final XMLEventFactory EVENT_FACTORY = XMLEventFactory.newInstance();
 
-	private record Project(String name, String version) {}
-
 	private record Report(List<XMLEvent> events, BigDecimal time, int tests, int failures, int errors) {}
 
 	public static void main(final String[] args) throws IOException, XMLStreamException, ParserConfigurationException, SAXException {
 		final List<Report> reports = readReports(SUREFIRE_REPORTS_DIR);
 		Files.createDirectories(RESULT_FILE.getParent());
-		writeReport(RESULT_FILE, readProject(POM_FILE), reports);
+		writeReport(RESULT_FILE, readProjectName(POM_FILE), reports);
 		System.out.println("The report is ready!");
 	}
 
@@ -133,7 +131,7 @@ public class Reporter {
 		return attribute != null ? attribute.getValue() : defaultValue;
 	}
 
-	private static void writeReport(final Path file, final Project project, final List<Report> reports) throws IOException, XMLStreamException {
+	private static void writeReport(final Path file, final String name, final List<Report> reports) throws IOException, XMLStreamException {
 		final BigDecimal time = reports.stream().map(Report::time).reduce(BigDecimal.ZERO, BigDecimal::add);
 		final int tests = reports.stream().mapToInt(Report::tests).sum();
 		final int failures = reports.stream().mapToInt(Report::failures).sum();
@@ -148,8 +146,7 @@ public class Reporter {
 
 				//wrap all test suites in a single root element
 				writer.add(EVENT_FACTORY.createStartElement("", "", "testsuites"));
-				writer.add(EVENT_FACTORY.createAttribute("name", project.name()));
-				writer.add(EVENT_FACTORY.createAttribute("version", project.version()));
+				writer.add(EVENT_FACTORY.createAttribute("name", name));
 				writer.add(EVENT_FACTORY.createAttribute("time", time.stripTrailingZeros().toPlainString()));
 				writer.add(EVENT_FACTORY.createAttribute("tests", String.valueOf(tests)));
 				writer.add(EVENT_FACTORY.createAttribute("failures", String.valueOf(failures)));
@@ -176,12 +173,12 @@ public class Reporter {
 		}
 	}
 
-	private static Project readProject(final Path pom) throws ParserConfigurationException, IOException, SAXException {
+	private static String readProjectName(final Path pom) throws ParserConfigurationException, IOException, SAXException {
 		final DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
 		final Element project = factory.newDocumentBuilder().parse(pom.toFile()).getDocumentElement();
-		return new Project(getChildText(project, "name"), getChildText(project, "version"));
+		return getChildText(project, "name");
 	}
 
 	private static String getChildText(final Element parent, final String name) {

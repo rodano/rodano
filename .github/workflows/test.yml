@@ -5,11 +5,13 @@ permissions:
   packages: write
   id-token: write
 
-# this will be executed on every push on a branch (hence on every commit), but not when pushing a tag
+# this will be executed on every push on a branch (hence on every commit) and on every release tag, to include the tag in the test reports
 on:
   push:
     branches:
       - '*'
+    tags:
+      - 'v*'
 
 jobs:
   ansible:
