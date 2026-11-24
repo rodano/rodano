@@ -99,7 +99,7 @@ public class Reporter {
 							if(attr.getName().getLocalPart().equals("tests")) {
 								TotalTests += Double.parseDouble(attr.getValue());
 							}
-							if(attr.getName().getLocalPart().equals("falures")) {
+							if(attr.getName().getLocalPart().equals("failures")) {
 								TotalFailures += Double.parseDouble(attr.getValue());
 							}
 						}
