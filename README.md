@@ -90,3 +90,7 @@ The script runs from a clean working tree and expects the standard `dev` and `ma
 Useful flags:
 - `--dry-run`: print mutating commands instead of executing them. It still fetches remote refs and does not simulate changes that later checks may depend on.
 - `--yes`: skip the interactive confirmation prompt.
+
+## CI test reports
+
+The [Test workflow](.github/workflows/test.yml) uses embedded [JUnit report merger](.github/actions/junit-report-merger/action.yml) and [PDF reporter](.github/actions/junit-pdf-reporter/action.yml) actions. It references them with `$/`, so they run from the same commit as the workflow.

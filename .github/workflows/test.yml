@@ -83,29 +83,20 @@ jobs:
         run: mvn -B verify -Drodano.database.port=3307
 
       # generate and transform test report
-      - name: Retrieve JUnit report merger
-        uses: actions/checkout@v7
-        with:
-          repository: rodano/action-junit-report-merger
-          path: action-junit-report-merger
-          ref: main
-
       - name: Merge all test reports
-        shell: bash
-        run: |
-            javac ../action-junit-report-merger/Reporter.java
-            java -cp ../action-junit-report-merger/ Reporter
-      - name: Retrieve JUnit PDF reporter
-        uses: actions/checkout@v6
+        uses: $/.github/actions/junit-report-merger
         with:
-          repository: rodano/action-junit-pdf-reporter
-          path: action-junit-pdf-reporter
-          ref: main
+          working-directory: backend
+
+      - name: Setup Node for test reporting
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+
       - name: Generate custom test report
-        shell: bash
-        run: |
-            npm -C ../action-junit-pdf-reporter install
-            node ../action-junit-pdf-reporter/index.js
+        uses: $/.github/actions/junit-pdf-reporter
+        with:
+          working-directory: backend
 
 # does not work
 #      # generate and transform coverage report
@@ -199,16 +190,11 @@ jobs:
 
       - name: Run tests
         run: npm test -- --debug
-      - name: Retrieve JUnit PDF reporter
-        uses: actions/checkout@v7
-        with:
-          repository: rodano/action-junit-pdf-reporter
-          path: action-junit-pdf-reporter
-          ref: main
+
       - name: Generate custom test report
-        run: |
-            npm -C ../../action-junit-pdf-reporter install
-            node ../../action-junit-pdf-reporter/index.js
+        uses: $/.github/actions/junit-pdf-reporter
+        with:
+          working-directory: frontends/configurator
 
       # store reports as artifacts
       - name: Store test report

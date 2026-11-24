@@ -1,0 +1,15 @@
+name: JUnit report merger
+description: Merge Maven Surefire reports into test-output/results.xml
+inputs:
+  working-directory:
+    description: Component directory, relative to the repository workspace
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Merge reports
+      shell: bash
+      working-directory: ${{ github.workspace }}/${{ inputs.working-directory }}
+      env:
+        ACTION_PATH: ${{ github.action_path }}
+      run: java "$ACTION_PATH/Reporter.java"
