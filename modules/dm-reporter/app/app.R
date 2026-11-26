@@ -22,15 +22,15 @@ URLAPI <- Sys.getenv(
 ) # rodano api address and port
 print(sprintf("Found Rodano API location (%s) from %s", URLAPI, ifelse(Sys.getenv(x = "API_URL") == "", "default value", "environment variable")))
 URL_RODANO <- ifelse(URLAPI == "http://localhost:8080", "http://localhost:7586", "/")
-CUSTOM_REPORTS_PATH <<- Sys.getenv(
+assign("CUSTOM_REPORTS_PATH", Sys.getenv(
   x = "CUSTOM_REPORTS_PATH",
   unset = ifelse(
     file.exists("study_path.cfg"),
     read_file(file = "study_path.cfg"),
     "/opt/custom-reports"
   )
-)
-print(sprintf("Found Custom reports path (%s)", CUSTOM_REPORTS_PATH))
+))
+print(sprintf("Found Custom reports path (%s)", get("CUSTOM_REPORTS_PATH")))
 
 
 # OPTIONS: SHINY APP
@@ -46,16 +46,17 @@ MODULES <- list(
 login_reporter_feature <- "LOGIN_REPORTER"
 
 print("Loading study-specific reports:")
-toSource <- list.files(CUSTOM_REPORTS_PATH, pattern = "*\\.R") # Get all R code of custom reports
+toSource <- list.files(get("CUSTOM_REPORTS_PATH"), pattern = "*\\.R") # Get all R code of custom reports
 sapply(toSource, function(f_) {
   print(f_)
   if (f_ %in% names(MODULES)) MODULES[[f_]]$activated <<- TRUE # If it is one of the pre-defined modules, activate it
-  source(sprintf("%s/%s", CUSTOM_REPORTS_PATH, f_)) # Source R file to source
+  source(sprintf("%s/%s", get("CUSTOM_REPORTS_PATH"), f_)) # Source R file to source
 })
 print("Study-specific reports loaded.")
 
 # GLOBAL CODE
 PUBLIC_CONFIG <- NA
+
 # GLOBAL CODE: HELPER FUNCTIONS
 getExportableDatasetModels <- function(url, auth) {
   # Get config and derive useful data from it
@@ -109,7 +110,7 @@ getUserSessionActive <- function(urlapi, auth) {
       NULL
     }
   )
-  
+
   !is.null(connected_user)
 }
 
@@ -120,10 +121,9 @@ getUserSessionActive <- function(urlapi, auth) {
 renderedUi <- function(input, output, session) {
   if (is.na(PUBLIC_CONFIG)) {
     print("Getting public config...")
-    PUBLIC_CONFIG <- get_public_config(URLAPI)
-    STUDY <<- PUBLIC_CONFIG$id
-    STUDY_ABBR <- PUBLIC_CONFIG$shortname[[PUBLIC_CONFIG$defaultLanguage$id]]
-    COPYRIGHT <<- PUBLIC_CONFIG$copyright
+    assign("PUBLIC_CONFIG", get_public_config(URLAPI))
+    assign("STUDY_ABBR", PUBLIC_CONFIG$shortname[[PUBLIC_CONFIG$defaultLanguage$id]])
+    assign("COPYRIGHT", PUBLIC_CONFIG$copyright)
     if (!is.null(PUBLIC_CONFIG$color) && nzchar(PUBLIC_CONFIG$color)) {
       session$setCurrentTheme(
         bs_theme(
@@ -185,9 +185,8 @@ renderedUi <- function(input, output, session) {
             class = "app-footer"
           )
         )
-      }
-      # APPLICATION MAIN PAGE
-      else {
+      } else {
+        # APPLICATION MAIN PAGE
         list(
           page_navbar(
             title = tagList(
@@ -228,10 +227,9 @@ renderedUi <- function(input, output, session) {
                             selectInput(
                               inputId = "customReportSelector",
                               label = NULL,
-                              choices = names(CUSTOM_REPORTS)
+                              choices = names(get("CUSTOM_REPORTS"))
                             )
-                          )
-                          ,
+                          ),
                           div(
                             class = "selection-download",
                             # DOWNLOAD CUSTOM REPORT BUTTON
@@ -285,8 +283,7 @@ renderedUi <- function(input, output, session) {
                               label = NULL,
                               choices = getExportableDatasetModels(URLAPI, session$userData$auth)
                             )
-                          )
-                          ,
+                          ),
                           div(
                             class = "selection-download",
                             downloadButton(
@@ -353,10 +350,9 @@ renderedUi <- function(input, output, session) {
                             selectInput(
                               inputId = "tablesListingsSelector",
                               label = NULL,
-                              choices = names(TABLES_AND_LISTINGS)
+                              choices = names(get("TABLES_AND_LISTINGS"))
                             )
-                          )
-                          ,
+                          ),
                           div(
                             class = "selection-download",
                             # DOWNLOAD CUSTOM REPORT BUTTON
@@ -407,7 +403,7 @@ renderedUi <- function(input, output, session) {
                             selectInput(
                               inputId = "graphicalReportSelector",
                               label = NULL,
-                              choices = c("--", names(GRAPHICAL_REPORTS))
+                              choices = c("--", names(get("GRAPHICAL_REPORTS")))
                             )
                           )
                         ),
@@ -611,8 +607,8 @@ server <- shinyServer(function(input, output, session) {
   )
 
   output$tablesListingsDescription <- function() {
-    if (input$tablesListingsSelector %in% names(TABLES_AND_LISTINGS)) {
-      return(TABLES_AND_LISTINGS[[input$tablesListingsSelector]])
+    if (input$tablesListingsSelector %in% names(get("TABLES_AND_LISTINGS"))) {
+      return(get("TABLES_AND_LISTINGS")[[input$tablesListingsSelector]])
     } else {
       return("[UNAVAILABLE]")
     }
@@ -622,8 +618,8 @@ server <- shinyServer(function(input, output, session) {
 
   observeEvent(input$graphicalReportSelector, {
     output$graphicalReportDescription <- renderText({
-      if (input$graphicalReportSelector %in% names(GRAPHICAL_REPORTS)) {
-        return(GRAPHICAL_REPORTS[[input$graphicalReportSelector]])
+      if (input$graphicalReportSelector %in% names(get("GRAPHICAL_REPORTS"))) {
+        return(get("GRAPHICAL_REPORTS")[[input$graphicalReportSelector]])
       } else {
         return("")
       }
