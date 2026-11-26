@@ -35,6 +35,7 @@ ROOT = Path(__file__).resolve().parent
 # Files carrying a version string that must be kept in sync with the release.
 POM = ROOT / 'backend' / 'pom.xml'
 FRONTENDS = ('configurator', 'epro', 'main')
+DM_REPORTER_DESCRIPTION = ROOT / 'modules' / 'dm-reporter' / 'DESCRIPTION'
 
 # A release version is a plain semantic version without pre-release identifier.
 VERSION_RE = re.compile(r'^\d+\.\d+\.\d+$')
@@ -225,12 +226,30 @@ def bump_json_version(path, version, occurrences=1):
 	path.write_text(updated)
 
 
+def bump_description_version(path, version):
+	content = path.read_text()
+	updated, count = re.subn(
+		r'^(Version:\s*)[^\n]*',
+		rf'\g<1>{version}',
+		content,
+		count=1,
+		flags=re.MULTILINE,
+	)
+	if count != 1:
+		raise ReleaseError(f'Could not find a Version field in {path}.')
+	if DRY_RUN:
+		logger.info(f'[dry-run] set version in {path.relative_to(ROOT)} to {version}')
+		return
+	path.write_text(updated)
+
+
 def bump_all_versions(version):
 	bump_pom(version)
 	for frontend in FRONTENDS:
 		directory = ROOT / 'frontends' / frontend
 		bump_json_version(directory / 'package.json', version)
 		bump_json_version(directory / 'package-lock.json', version, occurrences=2)
+	bump_description_version(DM_REPORTER_DESCRIPTION, version)
 
 
 def bump_dev_placeholder_versions():
@@ -240,6 +259,7 @@ def bump_dev_placeholder_versions():
 		directory = ROOT / 'frontends' / frontend
 		bump_json_version(directory / 'package.json', DEV_FRONTEND_VERSION)
 		bump_json_version(directory / 'package-lock.json', DEV_FRONTEND_VERSION, occurrences=2)
+	bump_description_version(DM_REPORTER_DESCRIPTION, DEV_FRONTEND_VERSION)
 
 
 def changed_version_files():
@@ -247,6 +267,7 @@ def changed_version_files():
 	for frontend in FRONTENDS:
 		files.append(f'frontends/{frontend}/package.json')
 		files.append(f'frontends/{frontend}/package-lock.json')
+	files.append(str(DM_REPORTER_DESCRIPTION.relative_to(ROOT)))
 	return files
 
 
