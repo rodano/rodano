@@ -122,7 +122,7 @@ services:
   dm-reporter:
     image: ghcr.io/rodano/dm-reporter:${TAG}
     build:
-      context: frontends/dm-reporter
+      context: modules/dm-reporter
       dockerfile: Dockerfile
     depends_on:
       - backend
