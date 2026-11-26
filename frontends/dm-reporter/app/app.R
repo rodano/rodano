@@ -16,14 +16,6 @@ library(reshape2)
 library(ggplot2)
 library(rodano)
 
-# TODO
-# - All variable stuff (local vs deployed) into a .properties file with read.properties(tf, fields = c("key2", "key3"))
-# - More logs
-# - Handle case where there is no custom report
-# - Login exported from Rodano
-
-# OPTIONS
-# OPTIONS: DATA SOURCE
 URLAPI <- Sys.getenv(
   x = "API_URL",
   unset = "http://localhost:8080"
@@ -106,25 +98,20 @@ setUserFeatures <- function(features, session) {
 }
 
 # Check if user session is active
-getUserSessionActive <- function(auth) {
-  meAddress <- sprintf("%s/me", URLAPI)
-  getRes <- tryCatch(
-    {
-      GET(
-        url = meAddress,
-        config = auth,
-        encode = "json"
+getUserSessionActive <- function(urlapi, auth) {
+  connected_user <- tryCatch(
+    get_connected_user_dto(urlapi, auth),
+    error = function(e) {
+      warning(
+        sprintf("Get connected user DTO failed: %s", conditionMessage(e)),
+        call. = FALSE
       )
-    },
-    error = function(e) print(sprintf("Get me at: %s failed. %s", meAddress, e))
+      NULL
+    }
   )
-  if (getRes$status_code != 200) {
-    return(FALSE)
-  } else {
-    return(TRUE)
-  }
+  
+  !is.null(connected_user)
 }
-
 
 #############################################################################
 # UI
@@ -664,7 +651,7 @@ server <- shinyServer(function(input, output, session) {
   # Check presence of token on token in local storage change
   observeEvent(tokenFromLocalStorage(), {
     setUserConnectionData(tokenFromLocalStorage(), session)
-    if (getUserSessionActive(session$userData$auth)) {
+    if (getUserSessionActive(URLAPI, session$userData$auth)) {
       session$userData$dto <- get_connected_user_dto(URLAPI, session$userData$auth)
       features <- getUserFeaturesFromConfig(session$userData$dto)
       setUserFeatures(features, session)
