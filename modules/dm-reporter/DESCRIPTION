@@ -1,7 +1,9 @@
 Package: dm-reporter
 Title: Rodano Data Reporting Tool
-Version: 0.0.0-dev
-Description: An RShiny data reporting tool for custom reports in the Rodano medical data management system.
-Authors@R: c(person("Rodano", "Team", role = c("aut", "cre")))
-License: MIT
+Version: 0.0.0.9000
+Description: An RShiny data reporting tool for custom reports in the Rodano EDCsystem.
+Authors@R: c(
+    person("Jonathan", "Salfati", email = "jonathan.salfati@usb.ch", role = c("aut", "cre")),
+    person("Matthieu", "Corageoud", email = "matthieu.corageoud@usb.ch", role = "aut"))
 Encoding: UTF-8
+License: AGPL-3
