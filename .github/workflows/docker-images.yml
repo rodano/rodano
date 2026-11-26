@@ -122,3 +122,33 @@ jobs:
           context: frontends
           tags: ${{steps.frontend-meta.outputs.tags}}
           labels: ${{steps.frontend-meta.outputs.labels}}
+
+  publish-dm-reporter-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the project
+        uses: actions/checkout@v7
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker registry
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Retrieve the metadata for the dm reporter image
+        id: dm-reporter-meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.REGISTRY }}/rodano/dm-reporter
+
+      - name: Publish the dm reporter image
+        uses: docker/build-push-action@v7
+        with:
+          push: true
+          context: modules/dm-reporter
+          tags: ${{steps.dm-reporter-meta.outputs.tags}}
+          labels: ${{steps.dm-reporter-meta.outputs.labels}}
