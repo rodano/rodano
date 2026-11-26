@@ -35,7 +35,7 @@ print(sprintf("Found Custom reports path (%s)", CUSTOM_REPORTS_PATH))
 
 # OPTIONS: SHINY APP
 SIDE_PAN_SIZE_HALF <- 5
-SIDE_PANSIZE_FULL <- 12
+SIDE_PAN_SIZE_FULL <- 12
 
 MODULES <- list(
   "module_data_exports.R" = list(activated = TRUE, feature = "REPORTER_MODULE_DATA_EXPORTS"),
@@ -124,6 +124,15 @@ renderedUi <- function(input, output, session) {
     STUDY <<- PUBLIC_CONFIG$id
     STUDY_ABBR <- PUBLIC_CONFIG$shortname[[PUBLIC_CONFIG$defaultLanguage$id]]
     COPYRIGHT <<- PUBLIC_CONFIG$copyright
+    if (!is.null(PUBLIC_CONFIG$color) && nzchar(PUBLIC_CONFIG$color)) {
+      session$setCurrentTheme(
+        bs_theme(
+          version = 5,
+          bootswatch = "materia",
+          primary = PUBLIC_CONFIG$color
+        )
+      )
+    }
     print("Public config loaded.")
   }
 
@@ -141,33 +150,32 @@ renderedUi <- function(input, output, session) {
             fillable = FALSE
           ),
           fluidRow(
-            column(6,
-              offset = 3,
-              br(),
-              wellPanel(
-                h4(sprintf("%s reporting platform", STUDY_ABBR)),
-                helpText(sprintf("Please sign-in with your regular %s credentials.", STUDY_ABBR)),
-                hr(),
-                textInput(
-                  inputId = "emailInput",
-                  label = "",
-                  placeholder = "E-mail"
-                ),
-                passwordInput(
-                  inputId = "passwordInput",
-                  label = "",
-                  placeholder = "Password",
-                  value = ""
-                ),
-                hr(),
-                actionButton(
-                  inputId = "connectButton",
-                  label = "Login"
-                ),
-                br(),
-                br(),
-                p("To recover your password, please go back to the ", a("main platform", href = URL_RODANO), "and click on ", em("I forgot my password"),
-                  class = "help-text-small"
+            column(4,
+              offset = 8,
+              card(
+                card_body(
+                  h4(sprintf("%s reporting platform", STUDY_ABBR)),
+                  helpText(sprintf("Please sign-in with your regular %s credentials.", STUDY_ABBR)),
+                  textInput(
+                    inputId = "emailInput",
+                    label = "",
+                    placeholder = "E-mail"
+                  ),
+                  passwordInput(
+                    inputId = "passwordInput",
+                    label = "",
+                    placeholder = "Password",
+                    value = ""
+                  ),
+                  actionButton(
+                    inputId = "connectButton",
+                    label = "Login",
+                    class = "btn-primary"
+                  ),
+                  br(),
+                  p("To recover your password, please go back to the ", a("main platform", href = URL_RODANO), "and click on ", em("I forgot my password"),
+                    class = "help-text-small"
+                  )
                 )
               ),
             )
@@ -186,7 +194,10 @@ renderedUi <- function(input, output, session) {
               HTML(PUBLIC_CONFIG$logo),
               actionButton(
                 inputId = "logoutButton",
-                label = "Logout",
+                label = tags$span(
+                  class = "material-symbols-outlined",
+                  "logout"
+                ),
                 class = "logout-button"
               )
             ),
@@ -202,37 +213,41 @@ renderedUi <- function(input, output, session) {
               if (MODULES[["module_custom_reports.R"]]$activated & MODULES[["module_custom_reports.R"]]$feature %in% session$userData$features) {
                 fluidRow(
                   column(
-                    SIDE_PANSIZE_FULL,
+                    SIDE_PAN_SIZE_HALF,
                     br(),
-                    wellPanel(
-                      div(h5("Select desired Custom Report:"),
-                        class = "panel-title"
-                      ),
-                      fluidRow(
-                        class = "selection-row",
-                        div(
-                          class = "selection-field",
-                          # NAME SELECTOR
-                          selectInput(
-                            inputId = "customReportSelector",
-                            label = NULL,
-                            choices = names(CUSTOM_REPORTS)
-                          )
+                    card(
+                      card_body(
+                        div(h5("Select desired Custom Report:"),
+                          class = "panel-title"
                         ),
-                        div(
-                          class = "selection-download",
-                          # DOWNLOAD CUSTOM REPORT BUTTON
-                          downloadButton(
-                            outputId = "generateCustomReport",
-                            label = ""
+                        fluidRow(
+                          class = "selection-row",
+                          div(
+                            class = "selection-field",
+                            # NAME SELECTOR
+                            selectInput(
+                              inputId = "customReportSelector",
+                              label = NULL,
+                              choices = names(CUSTOM_REPORTS)
+                            )
                           )
+                          ,
+                          div(
+                            class = "selection-download",
+                            # DOWNLOAD CUSTOM REPORT BUTTON
+                            downloadButton(
+                              outputId = "generateCustomReport",
+                              label = "",
+                              class = "btn-primary"
+                            )
+                          ),
                         ),
-                      ),
-                      # DESCRIPTION DISPLAY
-                      div(h5(strong("Description")),
-                        class = "description-block",
-                        verbatimTextOutput(
-                          outputId = "customReportDescription"
+                        # DESCRIPTION DISPLAY
+                        div(h5(strong("Description")),
+                          class = "description-block",
+                          verbatimTextOutput(
+                            outputId = "customReportDescription"
+                          )
                         )
                       )
                     )
@@ -251,61 +266,58 @@ renderedUi <- function(input, output, session) {
               if (MODULES[["module_data_exports.R"]]$activated & MODULES[["module_data_exports.R"]]$feature %in% session$userData$features) {
                 fluidRow(
                   column(
-                    SIDE_PANSIZE_FULL,
+                    SIDE_PAN_SIZE_HALF,
                     br(),
                     # EXPORT SIDE PANEL
-                    wellPanel(
-                      div(h5("Select an extract to download:"),
-                        class = "panel-title"
-                      ),
-                      # EXPORT SELECTION
-                      fluidRow(
-                        class = "selection-row",
+                    card(
+                      card_body(
+                        div(h5("Select an extract to download:"),
+                          class = "panel-title"
+                        ),
+                        # EXPORT SELECTION
+                        fluidRow(
+                          class = "selection-row",
+                          div(
+                            class = "selection-field",
+                            # NAME SELECTOR
+                            selectInput(
+                              inputId = "exportSelector",
+                              label = NULL,
+                              choices = getExportableDatasetModels(URLAPI, session$userData$auth)
+                            )
+                          )
+                          ,
+                          div(
+                            class = "selection-download",
+                            downloadButton(
+                              outputId = "downloadSingleExport",
+                              label = "",
+                              class = "btn-primary"
+                            )
+                          ),
+                        ),
+                        div(HTML("<h6hr> OR </h6r>")),
+                        # DOWNLOAD ALL BUTTON
+                        downloadButton(
+                          outputId = "downloadAllExports",
+                          label = "Download All Exports",
+                          class = "full-width-button btn-primary"
+                        ),
+                        br(),
+                        # EXCEL FORMAT RADIO BUTTON
                         div(
-                          class = "selection-field",
-                          # NAME SELECTOR
-                          selectInput(
-                            inputId = "exportSelector",
+                          class = "format-label",
+                          h5("Format:")
+                        ),
+                        div(
+                          class = "format-radio",
+                          radioButtons(
+                            inputId = "exportFormat",
                             label = NULL,
-                            choices = getExportableDatasetModels(URLAPI, session$userData$auth)
+                            choices = c("Excel", "CSV"),
+                            selected = "Excel",
+                            inline = TRUE
                           )
-                        ),
-                        div(
-                          class = "selection-download",
-                          # PREVIEW BUTTON
-                          # actionButton(
-                          #    inputId = "previewExport",
-                          #    label = "",
-                          #    icon = icon("eye")
-                          # ),
-                          # DOWNLOAD BUTTON
-                          downloadButton(
-                            outputId = "downloadSingleExport",
-                            label = ""
-                          )
-                        ),
-                      ),
-                      div(HTML("<h6hr> OR </h6r>")),
-                      # DOWNLOAD ALL BUTTON
-                      downloadButton(
-                        outputId = "downloadAllExports",
-                        label = "Download All Exports",
-                        class = "full-width-button"
-                      ),
-                      br(),
-                      # EXCEL FORMAT RADIO BUTTON
-                      div(
-                        class = "format-label",
-                        h5("Format:")
-                      ),
-                      div(
-                        class = "format-radio",
-                        radioButtons(
-                          inputId = "exportFormat",
-                          label = NULL,
-                          choices = c("Excel", "CSV"),
-                          selected = "Excel",
-                          inline = TRUE
                         )
                       )
                     )
@@ -328,35 +340,39 @@ renderedUi <- function(input, output, session) {
                   column(
                     SIDE_PAN_SIZE_HALF,
                     br(),
-                    wellPanel(
-                      div(h5("Select desired Tables / Listings:"),
-                        class = "panel-title"
-                      ),
-                      fluidRow(
-                        class = "selection-row",
-                        div(
-                          class = "selection-field",
-                          # NAME SELECTOR
-                          selectInput(
-                            inputId = "tablesListingsSelector",
-                            label = NULL,
-                            choices = names(TABLES_AND_LISTINGS)
+                    card(
+                      card_body(
+                        div(h5("Select desired Tables / Listings:"),
+                          class = "panel-title"
+                        ),
+                        fluidRow(
+                          class = "selection-row",
+                          div(
+                            class = "selection-field",
+                            # NAME SELECTOR
+                            selectInput(
+                              inputId = "tablesListingsSelector",
+                              label = NULL,
+                              choices = names(TABLES_AND_LISTINGS)
+                            )
+                          )
+                          ,
+                          div(
+                            class = "selection-download",
+                            # DOWNLOAD CUSTOM REPORT BUTTON
+                            downloadButton(
+                              outputId = "generateTablesListings",
+                              label = "",
+                              class = "btn-primary"
+                            )
                           )
                         ),
-                        div(
-                          class = "selection-download",
-                          # DOWNLOAD CUSTOM REPORT BUTTON
-                          downloadButton(
-                            outputId = "generateTablesListings",
-                            label = ""
+                        # DESCRIPTION DISPLAY
+                        div(h5(strong("Description")),
+                          class = "description-block",
+                          verbatimTextOutput(
+                            outputId = "tablesListingsDescription"
                           )
-                        )
-                      ),
-                      # DESCRIPTION DISPLAY
-                      div(h5(strong("Description")),
-                        class = "description-block",
-                        verbatimTextOutput(
-                          outputId = "tablesListingsDescription"
                         )
                       )
                     )
@@ -378,27 +394,29 @@ renderedUi <- function(input, output, session) {
                   br(),
                   column(
                     SIDE_PAN_SIZE_HALF,
-                    wellPanel(
-                      div(h5("Select desired graphical report:"),
-                        class = "panel-title"
-                      ),
-                      fluidRow(
-                        class = "selection-row",
-                        div(
-                          class = "selection-field",
-                          # NAME SELECTOR
-                          selectInput(
-                            inputId = "graphicalReportSelector",
-                            label = NULL,
-                            choices = c("--", names(GRAPHICAL_REPORTS))
+                    card(
+                      card_body(
+                        div(h5("Select desired graphical report:"),
+                          class = "panel-title"
+                        ),
+                        fluidRow(
+                          class = "selection-row",
+                          div(
+                            class = "selection-field",
+                            # NAME SELECTOR
+                            selectInput(
+                              inputId = "graphicalReportSelector",
+                              label = NULL,
+                              choices = c("--", names(GRAPHICAL_REPORTS))
+                            )
                           )
                         ),
-                      ),
-                      # DESCRIPTION DISPLAY
-                      div(h5(strong("Description")),
-                        class = "description-block",
-                        verbatimTextOutput(
-                          outputId = "graphicalReportDescription"
+                        # DESCRIPTION DISPLAY
+                        div(h5(strong("Description")),
+                          class = "description-block",
+                          verbatimTextOutput(
+                            outputId = "graphicalReportDescription"
+                          )
                         )
                       )
                     ),
@@ -413,7 +431,7 @@ renderedUi <- function(input, output, session) {
                     ),
                     br(),
                     # DOWNLOAD PLOT BUTTON
-                    downloadButton(outputId = "downloadPlot", label = "Download plot"),
+                    downloadButton(outputId = "downloadPlot", label = "Download plot", class = "btn-primary"),
                     br(),
                     hr(),
                     br(),
@@ -422,7 +440,7 @@ renderedUi <- function(input, output, session) {
                     ),
                     br(),
                     # DOWNLOAD DATA BUTTON
-                    downloadButton(outputId = "downloadData", label = "Download data"),
+                    downloadButton(outputId = "downloadData", label = "Download data", class = "btn-primary"),
                     br(),
                     br()
                   )
@@ -446,9 +464,16 @@ ui <- fluidPage(
   includeCSS("www/custom.css"),
   theme = bs_theme(
     version = 5,
+    bootswatch = "materia",
     primary = "#0d6efd"
   ),
-  tags$head(tags$title("Rodanotech Reporting App")),
+  tags$head(
+    tags$title("Rodano Report App"),
+    tags$link(
+      rel = "stylesheet",
+      href = "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+    )
+  ),
   useShinyjs(),
   extendShinyjs(script = "script.js", functions = c("setTokenToLocalStorage")),
   uiOutput(outputId = "widget")
