@@ -122,6 +122,7 @@ renderedUi <- function(input, output, session) {
   if (is.na(PUBLIC_CONFIG)) {
     print("Getting public config...")
     assign("PUBLIC_CONFIG", get_public_config(URLAPI))
+    assign("STUDY", PUBLIC_CONFIG$id)
     assign("STUDY_ABBR", PUBLIC_CONFIG$shortname[[PUBLIC_CONFIG$defaultLanguage$id]])
     assign("COPYRIGHT", PUBLIC_CONFIG$copyright)
     if (!is.null(PUBLIC_CONFIG$color) && nzchar(PUBLIC_CONFIG$color)) {
@@ -551,7 +552,7 @@ server <- shinyServer(function(input, output, session) {
       })
     },
     filename = function() {
-      paste0("Exports_", STUDY, ".zip", collapse = "")
+      paste0("Exports_", get("STUDY"), ".zip", collapse = "")
     },
     contentType = "application/zip"
   )
